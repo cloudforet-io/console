@@ -118,10 +118,10 @@ import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
 import { TimeStamp } from '@/models';
-import { QueryStore } from '@/lib/query';
+import { store } from '@/store';
 
 enum JOB_TASK_STATUS {
     pending = 'PENDING',
@@ -197,8 +197,8 @@ export default {
                 status: makeEnumValueHandler(JOB_TASK_STATUS),
             },
         };
-        const queryStore = new QueryStore().setKeyItemSets(querySearchHandlers.keyItemSets);
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
             loading: false,
             job: {} as JobModel,
             collectorName: computed(() => state.job.collector_info?.name),
@@ -270,8 +270,8 @@ export default {
         };
         const durationFormatter = (createdAt, finishedAt) => {
             if (createdAt && finishedAt) {
-                const createdAtDatetime = dayjs(timestampFormatter(createdAt));
-                const finishedAtDatetime = dayjs(timestampFormatter(finishedAt));
+                const createdAtDatetime = dayjs(timestampFormatter(createdAt, state.timezone));
+                const finishedAtDatetime = dayjs(timestampFormatter(finishedAt, state.timezone));
                 const duration = finishedAtDatetime.diff(createdAtDatetime, 'minute');
                 return `${duration.toString()} min`;
             }
@@ -288,7 +288,7 @@ export default {
                     created_count: task.created_count,
                     updated_count: task.updated_count,
                     'errors.length': task.errors.length,
-                    created_at: timestampFormatter(task.created_at),
+                    created_at: timestampFormatter(task.created_at, state.timezone),
                     duration: durationFormatter(task.created_at, task.finished_at),
                 };
                 state.items.push(newTask);
@@ -296,7 +296,12 @@ export default {
         };
 
         /* api */
+        const apiQuery = new ApiQueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);
         const getQuery = () => {
+            apiQuery.setSort(state.sortBy, state.sortDesc)
+                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                .setFiltersAsQueryTag(state.searchTags);
+
             let statusValues: JOB_TASK_STATUS[] = [];
             if (state.activatedStatus === 'inProgress') {
                 statusValues = [JOB_TASK_STATUS.progress, JOB_TASK_STATUS.pending];
@@ -306,28 +311,17 @@ export default {
                 statusValues = [JOB_TASK_STATUS.failure];
             }
 
-            queryStore.setFiltersAsQueryTag(state.searchTags);
             statusValues.forEach((d) => {
-                queryStore.addFilter({ k: 'status', v: d, o: '=' });
+                apiQuery.addFilter({ k: 'status', v: d, o: '=' });
             });
 
-            const { filter, keyword } = queryStore.apiQuery;
-
-            const query = new QueryHelper()
-                .setSort(state.sortBy, state.sortDesc)
-                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setKeyword(keyword);
-
-
-            query.setFilter(...filter);
-            return query;
+            return apiQuery.data;
         };
         const getJobTasks = async () => {
             state.loading = true;
             try {
-                const query = getQuery();
                 const res = await SpaceConnector.client.inventory.jobTask.list({
-                    query: query.data,
+                    query: getQuery(),
                     job_id: props.jobId,
                 });
                 state.jobTasks = res.results;
@@ -469,8 +463,6 @@ export default {
                     &.active {
                         @apply text-gray-900;
                         font-weight: bold;
-                        &:before {
-                        }
                     }
                     &.failure:hover, &.failure:focus, &.failure.active {
                         @apply text-red-500;

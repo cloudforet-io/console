@@ -181,15 +181,15 @@ import {
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 
-import { replaceQuery } from '@/lib/router-query-string';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { getValue, showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import config from '@/lib/config';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
 
 const DEFAULT_PAGE_SIZE = 15;
@@ -244,9 +244,6 @@ interface SidebarItemType {
 
 export default {
     name: 'CloudServicePage',
-    filters: {
-        getValue,
-    },
     components: {
         ServerMain,
         PLazyImg,
@@ -284,7 +281,7 @@ export default {
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore();
+        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
 
         /** Breadcrumb */
         const routeState = reactive({
@@ -371,6 +368,8 @@ export default {
             typeOptionState.selectIndex = selectIndex;
         };
 
+
+        const schemaQueryHelper = new QueryHelper();
         const getTableSchema = async () => {
             try {
                 const schema = await SpaceConnector.client.addOns.pageSchema.get({
@@ -383,17 +382,17 @@ export default {
                     },
                 });
 
+                schemaQueryHelper.setFilters(tableState.fixedFilters);
+
                 // declare keyItemSets and valueHandlerMap with search schema
                 if (schema?.options?.search) {
-                    const searchProps = makeQuerySearchPropsWithSearchSchema(schema.options.search, 'inventory.CloudService', tableState.fixedFilters);
+                    const searchProps = makeQuerySearchPropsWithSearchSchema(schema.options.search, 'inventory.CloudService', schemaQueryHelper.apiQuery.filter);
                     typeOptionState.keyItemSets = searchProps.keyItemSets;
                     typeOptionState.valueHandlerMap = searchProps.valueHandlerMap;
                 }
 
                 // initiate queryTags with keyItemSets
-                fetchOptionState.queryTags = queryStore.setKeyItemSets(typeOptionState.keyItemSets)
-                    .setFiltersAsRawQueryString(vm.$route.query.filters)
-                    .queryTags;
+                fetchOptionState.queryTags = queryHelper.setKeyItemSets(typeOptionState.keyItemSets).queryTags;
 
                 // set schema to tableState -> create dynamic layout
                 tableState.schema = schema;
@@ -402,25 +401,21 @@ export default {
             }
         };
 
-        const query = new QueryHelper();
-        const fixedQueryStore = new QueryStore();
+        const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
-            const { filter, keyword } = queryStore.apiQuery;
-            fixedQueryStore.setFilters(tableState.fixedFilters);
-
-            query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
+            apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilter(...filter, ...fixedQueryStore.apiQuery.filter)
-                .setKeyword(keyword);
+                .setFilters(queryHelper.filters)
+                .addFilter(...tableState.fixedFilters);
 
             if (tableState.schema?.options?.fields) {
-                query.setOnly(...tableState.schema.options.fields.map((d) => {
+                apiQuery.setOnly(...tableState.schema.options.fields.map((d) => {
                     if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
                     return d.key;
                 }), 'reference', 'cloud_service_id');
             }
 
-            return query.data;
+            return apiQuery.data;
         };
 
         const cloudServiceListApi = SpaceConnector.client.inventory.cloudService.list;
@@ -455,9 +450,9 @@ export default {
                 if (changed.queryTags !== undefined) {
                     fetchOptionState.queryTags = changed.queryTags;
                     /* api query setting */
-                    queryStore.setFiltersAsQueryTag(changed.queryTags);
+                    queryHelper.setFiltersAsQueryTag(changed.queryTags);
                     /* sync updated query tags to url query string */
-                    replaceQuery('filters', queryStore.rawQueryStrings);
+                    replaceUrlQuery('filters', queryHelper.rawQueryStrings);
                 }
             } else {
                 // init
@@ -496,15 +491,12 @@ export default {
             return {};
         };
 
-        const cloudServiceTypeQuery = new QueryHelper();
-        const cloudServiceTypeQueryStore = new QueryStore();
+        const cloudServiceTypeQuery = new ApiQueryHelper();
         const getCloudServiceTypeQuery = () => {
-            cloudServiceTypeQueryStore.setFilters([
+            cloudServiceTypeQuery.setFilters([
                 { k: 'provider', v: props.provider, o: '=' },
                 { k: 'group', v: props.group, o: '=' },
-            ]);
-            cloudServiceTypeQuery.setFilter(...cloudServiceTypeQueryStore.apiQuery.filter)
-                .setOnly('cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'is_primary', 'resource_type')
+            ]).setOnly('cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'is_primary', 'resource_type')
                 .setSort('is_primary', true);
             return cloudServiceTypeQuery.data;
         };

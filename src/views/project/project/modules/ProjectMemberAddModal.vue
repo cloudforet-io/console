@@ -50,7 +50,7 @@ import {
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import { isEqual } from 'lodash';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { SearchTableListeners, Options } from '@/components/organisms/tables/search-table/type';
 
@@ -149,13 +149,12 @@ export default {
         const proxyVisible = makeProxy('visible', props, emit);
         const projectId = root.$route.params.id;
 
-        const getQuery = () => new QueryHelper()
-            .setSort(state.options.sortBy, state.options.sortDesc)
+        const apiQuery = new ApiQueryHelper();
+        const getQuery = () => apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
             .setPage(
                 getPageStart(state.options.thisPage, state.options.pageSize),
                 state.options.pageSize,
-            )
-            .setKeyword(state.options.searchText)
+            ).setFilters([{ v: state.options.searchText }])
             .data;
 
         // List api Handler for query search table

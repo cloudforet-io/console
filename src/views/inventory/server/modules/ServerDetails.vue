@@ -32,12 +32,11 @@ import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import PButtonTab from '@/components/organisms/tabs/button-tab/PButtonTab.vue';
 import {
     DynamicLayoutEventListeners, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
 } from '@/components/organisms/dynamic-layout/type';
-import { getTimezone } from '@/lib/util';
 import { DynamicLayout, DynamicLayoutType } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { getApiActionByLayoutType, makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { KeyItemSet, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
@@ -47,7 +46,6 @@ import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 import { find } from 'lodash';
-import { QueryStore } from '@/lib/query';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
     sortBy: '',
@@ -81,7 +79,7 @@ export default {
             data: undefined as any,
             loading: true,
             totalCount: 0,
-            timezone: computed(() => getTimezone()),
+            timezone: computed(() => store.state.user.timezone),
             selectIndex: [] as number[],
             keyItemSets: [] as KeyItemSet[],
             valueHandlerMap: {} as ValueHandlerMap,
@@ -145,21 +143,18 @@ export default {
             if (state.currentLayout.options?.search) setSearchOptions();
         };
 
-        const query = new QueryHelper();
-        const queryStore = new QueryStore();
+        const apiQuery = new ApiQueryHelper();
         const getQuery = (): any => {
             const options = fetchOptionsMap[state.fetchOptionKey] || defaultFetchOptions;
-            if (options.sortBy !== undefined) query.setSort(options.sortBy, options.sortDesc);
-            if (options.pageLimit !== undefined) query.setPageLimit(options.pageLimit);
-            if (options.pageStart !== undefined) query.setPageStart(options.pageStart);
-            if (options.searchText !== undefined) query.setKeyword(options.searchText);
+            if (options.sortBy !== undefined) apiQuery.setSort(options.sortBy, options.sortDesc);
+            if (options.pageLimit !== undefined) apiQuery.setPageLimit(options.pageLimit);
+            if (options.pageStart !== undefined) apiQuery.setPageStart(options.pageStart);
+            if (options.searchText !== undefined) apiQuery.setFilters([{ v: options.searchText }]);
             if (options.queryTags !== undefined) {
-                const { filter, keyword } = queryStore.setFiltersAsQueryTag(options.queryTags).apiQuery;
-                query.setFilter(...filter)
-                    .setKeyword(keyword);
+                apiQuery.setFiltersAsQueryTag(options.queryTags);
             }
 
-            return query.data;
+            return apiQuery.data;
         };
 
         const getParams = (type?: DynamicLayoutType) => {

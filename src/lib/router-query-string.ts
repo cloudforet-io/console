@@ -14,7 +14,7 @@ export type RouteQueryString = string | (string | null)[] | null | undefined;
 
 
 /** QueryString Converter Helpers */
-export const replaceQuery = async (key: string, value: RouteQueryString) => {
+export const replaceUrlQuery = async (key: string, value: RouteQueryString) => {
     try {
         await router.replace({ query: { ...router.currentRoute.query, [key]: value } });
     } catch (e) {

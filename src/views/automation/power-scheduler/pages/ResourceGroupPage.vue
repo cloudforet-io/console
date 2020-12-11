@@ -179,7 +179,7 @@ import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vu
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import {
     QuerySearchTableFetchOptions, QuerySearchTableListeners,
     QuerySearchTableTypeOptions,
@@ -194,7 +194,7 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import { showErrorMessage } from '@/lib/util';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 import { ResourceGroup, Resource, ResourceGroupItem } from '../type';
 
 
@@ -277,10 +277,9 @@ export default {
     },
     setup(props: Props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryHelper = new QueryHelper() as QueryHelper;
-        const queryStore = new QueryStore();
-        const hiddenQueryStore = new QueryStore();
-        const extraQueryStore = new QueryStore();
+        const apiQuery = new ApiQueryHelper();
+        const tableQueryHelper = new QueryHelper();
+        const extraQueryHelper = new QueryHelper();
 
         /* reactive variables */
         const formState = reactive({
@@ -380,10 +379,9 @@ export default {
                 });
             }
 
-            hiddenQueryStore.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
-            extraQueryStore.setFilters([]);
+            extraQueryHelper.setFilters([]);
             forEach(options, (d, k) => {
-                extraQueryStore.addFilter({ k, v: d, o: '=' });
+                extraQueryHelper.addFilter({ k, v: d, o: '=' });
             });
 
             return { ...options, include_id: true };
@@ -406,7 +404,7 @@ export default {
                 typeOptionState.valueHandlerMap = querySearchProps.valueHandlerMap;
 
                 if (state.schema.options?.fields) {
-                    queryHelper.setOnly(...state.schema.options.fields.map((d) => {
+                    apiQuery.setOnly(...state.schema.options.fields.map((d) => {
                         if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
                         if (d.options?.root_path) return `${d.options.root_path}.${d.key}`;
                         return d.key;
@@ -426,8 +424,12 @@ export default {
                     api = api[camelCase(d)];
                 });
 
+                apiQuery.setFilters(tableQueryHelper.filters)
+                    .addFilter(...extraQueryHelper.filters,
+                        { k: 'project_id', v: props.projectId, o: '=' });
+
                 const res = await api.list({
-                    query: queryHelper.data,
+                    query: apiQuery.data,
                 });
 
                 state.data = res.results;
@@ -449,28 +451,21 @@ export default {
             if (changed.sortBy !== undefined) {
                 fetchOptionState.sortBy = changed.sortBy;
                 fetchOptionState.sortDesc = !!changed.sortDesc;
-                queryHelper.setSort(changed.sortBy, changed.sortDesc);
+                apiQuery.setSort(changed.sortBy, changed.sortDesc);
             }
             if (changed.pageLimit !== undefined) {
                 fetchOptionState.pageLimit = changed.pageLimit;
-                queryHelper.setPageLimit(changed.pageLimit);
+                apiQuery.setPageLimit(changed.pageLimit);
             }
             if (changed.pageStart !== undefined) {
                 fetchOptionState.pageStart = changed.pageStart;
-                queryHelper.setPageStart(changed.pageStart);
+                apiQuery.setPageStart(changed.pageStart);
             }
             if (changed.queryTags !== undefined) {
                 fetchOptionState.queryTags = changed.queryTags;
-
-                const { filter, keyword } = queryStore
-                    .setFiltersAsQueryTag(changed.queryTags)
-                    .apiQuery;
-
-                queryHelper.setFilter(...hiddenQueryStore.apiQuery.filter,
-                    ...extraQueryStore.apiQuery.filter,
-                    ...filter)
-                    .setKeyword(keyword);
+                tableQueryHelper.setFiltersAsQueryTag(changed.queryTags);
             }
+
 
             await listResources();
         };
@@ -493,8 +488,8 @@ export default {
             fetchOptionState.sortDesc = true;
             fetchOptionState.sortBy = 'created_at';
 
-            queryStore.setFiltersAsRawQuery(formState.resourceGroup?.options.raw_filter || []);
-            fetchOptionState.queryTags = queryStore.queryTags;
+            tableQueryHelper.setFiltersAsRawQuery(formState.resourceGroup?.options.raw_filter || []);
+            fetchOptionState.queryTags = tableQueryHelper.queryTags;
 
             // set table schema
             if (state.selectedTypeIndex !== -1) await getPageSchema();
@@ -546,9 +541,9 @@ export default {
 
         /* list modal */
         const onListModalConfirm = () => {
-            const { filter, keyword } = queryStore.apiQuery;
+            const { filter, keyword } = tableQueryHelper.apiQuery;
 
-            state.resource.filter = [...filter, ...extraQueryStore.apiQuery.filter];
+            state.resource.filter = [...filter, ...extraQueryHelper.apiQuery.filter];
             state.resource.keyword = keyword;
 
             const params: ResourceGroupItem = {
@@ -558,7 +553,7 @@ export default {
                     name: state.name,
                     resources: [{ ...state.resource }],
                     options: {
-                        raw_filter: queryStore.rawQueries,
+                        raw_filter: tableQueryHelper.rawQueries,
                     },
                     // tags: state.dictRef.getDict(),
                 },

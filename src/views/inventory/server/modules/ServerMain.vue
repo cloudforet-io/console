@@ -158,9 +158,8 @@ import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 
-import { QueryStore } from '@/lib/query';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { replaceQuery } from '@/lib/router-query-string';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
@@ -169,6 +168,7 @@ import { Reference } from '@/lib/reference/type';
 import { ServerModel } from '@/models/inventory/server';
 import { store } from '@/store';
 import config from '@/lib/config';
+import { QueryHelper } from '@/lib/query';
 
 
 interface ProjectItemResp {
@@ -260,8 +260,8 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore();
-        const query = new QueryHelper();
+        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
+        const apiQuery = new ApiQueryHelper();
 
         const typeOptionState: Omit<QuerySearchTableTypeOptions, 'searchable'|'excelVisible'> = reactive({
             loading: true,
@@ -381,19 +381,13 @@ export default {
 
         /* api */
         const getQuery = () => {
-            if (props.isCloudService) {
-                queryStore.setFilters([
-                    { k: 'provider', o: '=', v: props.provider },
-                    { k: 'cloud_service_type', o: '=', v: props.cloudServiceType },
-                    { k: 'cloud_service_group', o: '=', v: props.cloudServiceGroup },
-                ]);
-            }
-            const { filter, keyword } = queryStore.apiQuery;
-            query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
+            apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilter(...filter)
-                .setKeyword(keyword);
-            return query.data;
+                .setFilters(queryHelper.filters)
+                .addFilter({ k: 'provider', o: '=', v: props.provider },
+                    { k: 'cloud_service_type', o: '=', v: props.cloudServiceType },
+                    { k: 'cloud_service_group', o: '=', v: props.cloudServiceGroup });
+            return apiQuery.data;
         };
         const listServerData = async () => {
             typeOptionState.loading = true;
@@ -445,7 +439,7 @@ export default {
 
                 // set api query to get only a few specified data
                 if (tableState.schema?.options?.fields) {
-                    query.setOnly(...tableState.schema.options.fields.map((d) => {
+                    apiQuery.setOnly(...tableState.schema.options.fields.map((d) => {
                         if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
                         return d.key;
                     }), 'server_id', 'reference', 'primary_ip_address', 'collection_info.collectors');
@@ -480,9 +474,7 @@ export default {
                 typeOptionState.valueHandlerMap.data = makeDistinctValueHandler('inventory.Server', 'data');
 
                 // initiate queryTags with keyItemSets
-                fetchOptionState.queryTags = queryStore.setKeyItemSets(typeOptionState.keyItemSets)
-                    .setFiltersAsRawQueryString(vm.$route.query.filters)
-                    .queryTags;
+                fetchOptionState.queryTags = queryHelper.setKeyItemSets(typeOptionState.keyItemSets).queryTags;
 
                 // set schema to tableState -> create dynamic layout
                 tableState.schema = res;
@@ -539,9 +531,9 @@ export default {
             if (changed.queryTags !== undefined) {
                 fetchOptionState.queryTags = changed.queryTags;
                 /* api query setting */
-                queryStore.setFiltersAsQueryTag(changed.queryTags);
+                queryHelper.setFiltersAsQueryTag(changed.queryTags);
                 /* sync updated query tags to url query string */
-                await replaceQuery('filters', queryStore.rawQueryStrings);
+                await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
             }
             await listServerData();
         };

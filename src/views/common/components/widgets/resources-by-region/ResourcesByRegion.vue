@@ -72,7 +72,7 @@ import { store } from '@/store';
 import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 import { ChartDataSets, ChartOptions } from 'chart.js';
 import { SpaceConnector } from '@/lib/space-connector';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 import { Location } from 'vue-router';
 
 interface Value {
@@ -128,7 +128,7 @@ export default {
     props: resourceByRegionProps,
     setup(props: ResourcesByRegionProps) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore();
+        const queryHelper = new QueryHelper();
 
         const state = reactive({
             chartRef: null,
@@ -320,7 +320,7 @@ export default {
                 res = {
                     name: 'server',
                     query: {
-                        filters: queryStore.setFilters([
+                        filters: queryHelper.setFilters([
                             { k: 'region_code', v: item.name, o: '=' },
                             { k: 'project_id', v: props.projectId, o: '=' },
                         ]).rawQueryStrings,
@@ -331,7 +331,7 @@ export default {
                     name: 'cloudServiceMain',
                     query: {
                         provider: item.provider || 'all',
-                        filters: queryStore.setFilters([
+                        filters: queryHelper.setFilters([
                             { k: 'region_code', v: item.name, o: '=' },
                             { k: 'project_id', v: props.projectId, o: '=' },
                         ]).rawQueryStrings,

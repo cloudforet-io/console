@@ -207,7 +207,7 @@ import {
 
 import { changeTimezoneToLocal, changeTimezoneToUTC } from '@/views/automation/power-scheduler/lib/util';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 
 dayjs.extend(isSameOrBefore);
@@ -425,23 +425,24 @@ export default {
             }
             return settings;
         };
+        const apiQuery = new ApiQueryHelper();
         const checkScheduleRuleExist = async (settings: RuleSettings, scheduleId): Promise<string> => {
-            const query = new QueryHelper().setFilter(
-                {
+            apiQuery.setFilters(
+                [{
                     k: 'rule_type',
                     v: settings.ruleType,
-                    o: 'eq',
+                    o: '=',
                 },
                 {
                     k: 'state',
                     v: settings.ruleState,
-                    o: 'eq',
-                },
+                    o: '=',
+                }],
             );
             try {
                 const res = await SpaceConnector.client.powerScheduler.scheduleRule.list({
                     schedule_id: scheduleId,
-                    query: query.data,
+                    query: apiQuery.data,
                 });
                 return res.results[0]?.schedule_rule_id || '';
             } catch (e) {

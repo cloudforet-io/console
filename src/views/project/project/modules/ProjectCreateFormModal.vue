@@ -35,7 +35,7 @@ import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModa
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { makeProxy } from '@/lib/compostion-util';
 import VueI18n from 'vue-i18n';
 
@@ -111,12 +111,14 @@ export default {
             showValidation: false,
         });
 
+
+        const apiQuery = new ApiQueryHelper()
         const getProjectNames = async () => {
-            const query = new QueryHelper().setOnly('name');
+            apiQuery.setOnly('name');
             const res = await SpaceConnector.client.identity.projectGroup.listProjects({
                 // eslint-disable-next-line camelcase
                 project_group_id: props.projectGroupId,
-                query: query.data,
+                query: apiQuery.data,
             });
             state.projectNames = res.results.map(d => d.name);
         };

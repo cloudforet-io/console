@@ -1,49 +1,66 @@
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { KeyItem, KeyItemSet, OperatorType } from '@/components/organisms/search/query-search/type';
-import { Filter, FilterOperator } from '@/lib/space-connector/type';
+import { Filter, FilterOperator, Query } from '@/lib/space-connector/type';
 import { find, flatten } from 'lodash';
 import {
-    ApiQuery, QueryStoreFilter, RawQuery, RawQueryOperator,
+    QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator,
 } from '@/lib/query/type';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
-import { store } from '@/store';
+import { computed, ComputedRef } from '@vue/composition-api';
+import {
+    datetimeRawQueryOperatorToQueryTagOperatorMap, rawQueryOperatorToApiQueryOperatorMap,
+    rawQueryOperatorToPluralApiQueryOperatorMap,
+} from '@/lib/query/config';
+// import { store as vuexStore } from '@/store';
 
 dayjs.extend(utc);
 dayjs.extend(tz);
 
-const rawQueryOperatorToApiQueryOperatorMap: Record<RawQueryOperator, FilterOperator> = {
-    '': 'contain',
-    '!': 'not_contain',
-    '=': 'eq',
-    '!=': 'not',
-    /* single only */
-    '>': 'gt',
-    '>=': 'gte',
-    '<': 'lt',
-    '<=': 'lte',
-    $: 'regex',
-    /* datetime only */
-    '>t': 'datetime_gt',
-    '>=t': 'datetime_gte',
-    '<t': 'datetime_lt',
-    '<=t': 'datetime_lte',
-    '=t': 'datetime_gt',
+
+const filterToQueryTag = (filter: { k?: string; v: QueryStoreFilterValue; o?: RawQueryOperator }, keyMap: Record<string, KeyItem>): QueryTag | null => {
+    if (filter.k === undefined || filter.k === null) {
+        /* no key case */
+        if (filter.v === null) return null;
+        return { value: { label: filter.v.toString(), name: filter.v } };
+    }
+    if (filter.v === null || filter.v === undefined) {
+        /* null case */
+        return {
+            key: keyMap[filter.k] || { label: filter.k, name: filter.k },
+            value: { label: 'Null', name: null },
+            operator: filter.o && filter.o.startsWith('!') ? '!' : '=',
+        };
+    }
+    if (datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string]) {
+        /* datetime case */
+        const key = keyMap[filter.k] || { label: filter.k, name: filter.k };
+        key.dataType = 'datetime';
+        return {
+            key,
+            value: { label: filter.v.toString(), name: filter.v },
+            operator: datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string],
+        };
+    }
+    /* general case */
+    return {
+        key: keyMap[filter.k] || { label: filter.k, name: filter.k },
+        value: { label: filter.v.toString(), name: filter.v },
+        operator: datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string] || filter.o || '' as OperatorType,
+    };
 };
 
-const datetimeRawQueryOperatorToQueryTagOperatorMap: Partial<Record<RawQueryOperator, OperatorType>> = {
-    '>t': '>',
-    '>=t': '>=',
-    '<t': '<',
-    '<=t': '<=',
-    '=t': '=',
-};
-
-export class QueryStore {
+export class QueryHelper {
     private _keyMap: Record<string, KeyItem> = {}
 
     private _filters: QueryStoreFilter[] = [];
+
+    private _timezone: ComputedRef<string>|undefined;
+
+    // constructor(store: typeof vuexStore = vuexStore) {
+    //     this._timezone = computed(() => store.state.user.timezone);
+    // }
 
 
     setKeyItemSets(keyItemSets: KeyItemSet[]): this {
@@ -112,32 +129,14 @@ export class QueryStore {
     get queryTags(): QueryTag[] {
         const res: QueryTag[] = [];
         this._filters.forEach((f) => {
-            if (f.k === undefined || f.k === null) {
-                /* no key case */
-                res.push({ value: { label: f.v, name: f.v } });
-            } else if (datetimeRawQueryOperatorToQueryTagOperatorMap[f.o as string]) {
-                /* datetime case */
-                const key = this._keyMap[f.k] || { label: f.k, name: f.k };
-                key.dataType = 'datetime';
-                res.push({
-                    key,
-                    value: { label: f.v, name: f.v },
-                    operator: datetimeRawQueryOperatorToQueryTagOperatorMap[f.o as string],
-                });
-            } else if (f.v === null || f.v === undefined) {
-                /* null case */
-                res.push({
-                    key: this._keyMap[f.k] || { label: f.k, name: f.k },
-                    value: { label: 'Null', name: null },
-                    operator: f.o && f.o.startsWith('!') ? '!' : '=',
+            if (Array.isArray(f.v)) {
+                f.v.forEach((v) => {
+                    const tag = filterToQueryTag({ k: f.k, v, o: f.o }, this._keyMap);
+                    if (tag) res.push(tag);
                 });
             } else {
-                /* general case */
-                res.push({
-                    key: this._keyMap[f.k] || { label: f.k, name: f.k },
-                    value: { label: f.v, name: f.v },
-                    operator: datetimeRawQueryOperatorToQueryTagOperatorMap[f.o as string] || f.o || '' as OperatorType,
-                });
+                const tag = filterToQueryTag(f as any, this._keyMap);
+                if (tag) res.push(tag);
             }
         });
         return res;
@@ -157,7 +156,7 @@ export class QueryStore {
         return this.rawQueries.map(q => JSON.stringify(q));
     }
 
-    get apiQuery(): ApiQuery {
+    get apiQuery(): Required<Pick<Query, 'filter'|'keyword'>> {
         const filter: Filter[] = [];
         const keyword: string[] = [];
 
@@ -165,7 +164,7 @@ export class QueryStore {
             if (f.k) {
                 if (typeof f.v === 'string' && datetimeRawQueryOperatorToQueryTagOperatorMap[f.o as string]) {
                     /* datetime case */
-                    const time = dayjs.tz(f.v, store.state.user.timezone).utc();
+                    const time = dayjs.tz(f.v, this._timezone?.value || 'UTC').utc();
 
                     if (f.o === '>t' || f.o === '>=t') {
                         filter.push({ k: f.k, v: time.toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['>=t'] });
@@ -175,11 +174,24 @@ export class QueryStore {
                         filter.push({ k: f.k, v: time.toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['>=t'] });
                         filter.push({ k: f.k, v: time.add(1, 'day').toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['<'] });
                     }
+                } else if (Array.isArray(f.v)) {
+                    /* plural case */
+                    if (rawQueryOperatorToPluralApiQueryOperatorMap[f.o || '']) {
+                        filter.push({ k: f.k, v: f.v, o: rawQueryOperatorToPluralApiQueryOperatorMap[f.o || ''] as FilterOperator });
+                    } else {
+                        f.v.forEach((v) => {
+                            filter.push({ k: f.k as string, v, o: rawQueryOperatorToApiQueryOperatorMap[f.o || ''] });
+                        });
+                    }
                 } else {
                     /* general case */
                     filter.push({ k: f.k, v: f.v, o: rawQueryOperatorToApiQueryOperatorMap[f.o || ''] });
                 }
-            } else if (f.v !== null) keyword.push(f.v);
+            } else if (f.v !== null && f.v !== undefined) {
+                /* keyword case */
+                if (Array.isArray(f.v)) keyword.push(...f.v.map(v => (v !== null ? v.toString() : '')));
+                else keyword.push(f.v.toString());
+            }
         });
         return {
             filter,

@@ -104,7 +104,7 @@ import { getAllPage } from '@/components/organisms/paginations/text-pagination/h
 import { SpaceConnector } from '@/lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { QueryStoreFilter } from '@/lib/query/type';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 import { green, red, yellow } from '@/styles/colors';
 
 am4core.useTheme(am4themes_animated);
@@ -158,7 +158,7 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore();
+        const queryHelper = new QueryHelper();
 
         const chartState = reactive({
             loading: true,
@@ -277,7 +277,7 @@ export default {
             return referenceRouter(
                 state.trustedAdvisorId,
                 { resource_type: 'inventory.CloudServiceType' },
-                { filters: queryStore.setFilters(filters).rawQueryStrings },
+                { filters: queryHelper.setFilters(filters).rawQueryStrings },
             );
         };
         const projectSummaryLinkFormatter = (rowNum, colNum) => {
@@ -293,7 +293,7 @@ export default {
             return referenceRouter(
                 state.trustedAdvisorId,
                 { resource_type: 'inventory.CloudServiceType' },
-                { filters: queryStore.setFilters(filters).rawQueryStrings },
+                { filters: queryHelper.setFilters(filters).rawQueryStrings },
             );
         };
 
@@ -407,6 +407,7 @@ export default {
             width: 50%;
             margin: auto;
         }
+
         @media screen and (width < 478px) {
             width: 90%;
             margin: auto;
@@ -483,9 +484,11 @@ export default {
 
             .left-part {
                 width: 20%;
+
                 @media screen and (576px < width < 1024px) {
                     width: 4%;
                 }
+
                 @media screen and (width < 576px) {
                     width: 8%;
                 }
@@ -503,9 +506,11 @@ export default {
             }
             .right-part {
                 width: 80%;
+
                 @media screen and (576px < width < 1024px) {
                     width: 96%;
                 }
+
                 @media screen and (width < 576px) {
                     width: 92%;
                 }

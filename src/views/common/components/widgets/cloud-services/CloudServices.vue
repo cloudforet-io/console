@@ -83,8 +83,8 @@ import PSelectableItem from '@/components/molecules/selectable-item/PSelectableI
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { QueryStore } from '@/lib/query';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { QueryHelper } from '@/lib/query';
 
 const DATA_LENGTH = 8;
 export default {
@@ -122,7 +122,7 @@ export default {
             count: number;
             href: [string, object];
         }
-        const queryStore = new QueryStore();
+
         const state = reactive({
             loading: true,
             skeletons: range(8),
@@ -136,13 +136,15 @@ export default {
             }>,
         });
 
+        const queryHelper = new QueryHelper();
+
         const getLink = (data, projectId?) => {
             let link;
             if (data.resource_type === 'inventory.Server' && !projectId) {
                 link = {
                     name: 'server',
                     query: {
-                        filters: queryStore.setFilters([
+                        filters: queryHelper.setFilters([
                             { k: 'provider', v: data.provider, o: '=' },
                             { k: 'cloud_service_type', v: data.cloud_service_type, o: '=' },
                         ]).rawQueryStrings,
@@ -153,7 +155,7 @@ export default {
                 link = {
                     name: 'server',
                     query: {
-                        filters: queryStore.setFilters([
+                        filters: queryHelper.setFilters([
                             { k: 'project_id', v: projectId, o: '=' },
                             { k: 'provider', v: data.provider, o: '=' },
                             { k: 'cloud_service_type', v: data.cloud_service_type, o: '=' },
@@ -180,7 +182,7 @@ export default {
                         name: data.cloud_service_type,
                     },
                     query: {
-                        filters: queryStore.setFilters([
+                        filters: queryHelper.setFilters([
                             { k: 'project_id', v: projectId, o: '=' },
                         ]).rawQueryStrings,
                     },
@@ -188,13 +190,12 @@ export default {
             }
             return link;
         };
-
+        const projectApiQuery = new ApiQueryHelper();
         const getDataInProject = async () => {
-            const query = new QueryHelper()
-                .setSort('count', true, 'name')
-                .setFilter({ k: 'project_id', v: props.projectId, o: 'eq' });
+            projectApiQuery.setSort('count', true, 'name')
+                .setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
             const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
-                query: query.data,
+                query: projectApiQuery.data,
                 is_primary: true,
             });
 
@@ -211,17 +212,17 @@ export default {
             ];
         };
 
+        const apiQuery = new ApiQueryHelper();
         const getData = async (): Promise<void> => {
             state.loading = true;
-            const query = new QueryHelper()
-                .setSort('count', true, 'name')
+            apiQuery.setSort('count', true, 'name')
                 .setPage(1, 9);
             try {
                 if (props.projectFilter) {
                     await getDataInProject();
                 } else {
                     const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
-                        query: query.data,
+                        query: apiQuery.data,
                         is_primary: true,
                     });
                     state.data = [

@@ -59,7 +59,7 @@ import {
     onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import PProgressBar from '@/components/molecules/progress-bar/PProgressBar.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { store } from '@/store';
@@ -67,7 +67,7 @@ import { coral, gray } from '@/components/styles/colors';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 import { Location } from 'vue-router';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 
 am4core.useTheme(am4themesAnimated);
 
@@ -97,17 +97,19 @@ export default {
             maxValue: 0,
         });
 
-        const queryStore = new QueryStore();
+        const queryHelper = new QueryHelper();
         /* Create map instance */
 
+        const apiQuery = new ApiQueryHelper();
         const getFilteredData = async (regionCode) => {
             // state.loading = true;
             state.selectedRegionCode = regionCode;
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
-                    query: new QueryHelper()
-                        .setFilter({ k: 'region_code', v: regionCode, o: 'eq' }, { k: 'provider', v: state.selectedProvider, o: 'eq' })
-                        .setPageLimit(10)
+                    query: apiQuery.setFilters([
+                        { k: 'region_code', v: regionCode, o: '=' },
+                        { k: 'provider', v: state.selectedProvider, o: '=' },
+                    ]).setPageLimit(10)
                         .setSort('count', true, 'name')
                         .data,
                     // eslint-disable-next-line camelcase
@@ -232,7 +234,7 @@ export default {
                 res = {
                     name: 'server',
                     query: {
-                        filters: queryStore.setFilters([
+                        filters: queryHelper.setFilters([
                             { k: 'region_code', v: state.selectedRegionCode, o: '=' },
                             { k: 'provider', v: item.provider, o: '=' },
                             { k: 'cloud_service_type', v: item.cloud_service_type, o: '=' },
@@ -248,7 +250,7 @@ export default {
                         name: item.cloud_service_type,
                     },
                     query: {
-                        filters: queryStore.setFilters([
+                        filters: queryHelper.setFilters([
                             { k: 'region_code', v: state.selectedRegionCode, o: '=' },
                         ]).rawQueryStrings,
                     },

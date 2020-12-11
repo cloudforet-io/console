@@ -157,8 +157,8 @@ import ServiceAccountCredentials from '@/views/identity/service-account/modules/
 import ServiceAccountMember from '@/views/identity/service-account/modules/ServiceAccountMember.vue';
 
 /* utils */
-import { replaceQuery } from '@/lib/router-query-string';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { replaceUrlQuery } from '@/lib/router-query-string';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import config from '@/lib/config';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
@@ -175,6 +175,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TranslateResult } from 'vue-i18n';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
+import { QueryHelper } from '@/lib/query';
 
 interface ProjectItemResp {
     id: string;
@@ -209,6 +210,7 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
 
         /** Provider(located at sidebar) & Page Title * */
         const selectedProvider: Ref<string> = ref('aws');
@@ -234,7 +236,7 @@ export default {
             pageLimit: 15,
             sortDesc: true,
             sortBy: 'created_at',
-            searchText: vm.$route.query.filters?.toString(),
+            searchText: queryHelper.apiQuery.keyword,
         });
 
         const typeOptionState: Omit<TableTypeOptions, 'searchable'|'excelVisible'> = reactive({
@@ -312,13 +314,13 @@ export default {
 
         /** Handling API with SpaceConnector * */
 
+        const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
-            const query = new QueryHelper();
-            query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
+            apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilter({ k: 'provider', v: [selectedProvider.value], o: 'in' })
-                .setKeyword(fetchOptionState.searchText);
-            return query.data;
+                .setFilters([{ k: 'provider', v: selectedProvider.value, o: '=' }])
+                .addFilter(...queryHelper.filters);
+            return apiQuery.data;
         };
 
         const serviceAccountListApi = SpaceConnector.client.identity.serviceAccount.list;
@@ -353,7 +355,8 @@ export default {
                 if (changed.searchText !== undefined) {
                     fetchOptionState.searchText = changed.searchText;
                     // sync updated query tags to url query string
-                    replaceQuery('filters', changed.searchText);
+                    queryHelper.setFilters([{ v: changed.searchText }]);
+                    replaceUrlQuery('filters', queryHelper.rawQueryStrings);
                 }
             }
             listServiceAccountData();
@@ -531,7 +534,7 @@ export default {
                 selectedProvider.value = providerFilter || providerState.items[0].provider;
                 watch(selectedProvider, async (after, before) => {
                     if (after !== before) {
-                        replaceQuery('provider', after);
+                        replaceUrlQuery('provider', after);
                         await getTableSchema();
                         await listServiceAccountData();
                     }

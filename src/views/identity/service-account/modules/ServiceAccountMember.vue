@@ -19,7 +19,7 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { reactive, toRefs, watch } from '@vue/composition-api';
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 
 export default {
@@ -48,13 +48,12 @@ export default {
             options: {} as Options,
         });
 
-        const getQuery = () => new QueryHelper()
-            .setSort(state.options.sortBy, state.options.sortDesc)
+        const apiQuery = new ApiQueryHelper();
+        const getQuery = () => apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
             .setPage(
                 getPageStart(state.options.thisPage, state.options.pageSize),
                 state.options.pageSize,
-            )
-            .setKeyword(state.options.searchText)
+            ).setFilters([{ v: state.options.searchText }])
             .data;
 
         const api = SpaceConnector.client.identity.serviceAccount.member.list;

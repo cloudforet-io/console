@@ -1,48 +1,26 @@
 /* eslint-disable camelcase */
-import { Query, Filter } from './type';
+import { QueryHelper } from '@/lib/query';
+import { Query } from './type';
 
-class QueryHelper {
+class ApiQueryHelper extends QueryHelper {
     private _data: Query = {};
 
     private _keywords: Array<string> = [];
+
 
     get data(): Query {
         if (this._keywords !== []) {
             this._data.keyword = this._keywords.join(' ');
         }
 
+        const { filter, keyword } = this.apiQuery;
+        this._data.keyword += keyword;
+        this._data.filter = filter;
+
         return this._data;
     }
 
-    addFilter(...filters: Array<Filter>): QueryHelper {
-        if (!this._data.filter) {
-            this._data.filter = [];
-        }
-
-        this._data.filter.concat(filters);
-        return this;
-    }
-
-    setFilter(...filters: Array<Filter>): QueryHelper {
-        this._data.filter = filters;
-        return this;
-    }
-
-    addFilterOr(...filters: Array<Filter>): QueryHelper {
-        if (!this._data.filter_or) {
-            this._data.filter_or = [];
-        }
-
-        this._data.filter_or.concat(filters);
-        return this;
-    }
-
-    setFilterOr(...filters: Array<Filter>): QueryHelper {
-        this._data.filter_or = filters;
-        return this;
-    }
-
-    setPage(start: number, limit: number): QueryHelper {
+    setPage(start: number, limit: number): ApiQueryHelper {
         this._data.page = {
             start,
             limit,
@@ -50,7 +28,7 @@ class QueryHelper {
         return this;
     }
 
-    setPageStart(start: number): QueryHelper {
+    setPageStart(start: number): ApiQueryHelper {
         if (!this._data.page) {
             this._data.page = {};
         }
@@ -60,7 +38,7 @@ class QueryHelper {
     }
 
 
-    setPageLimit(limit: number): QueryHelper {
+    setPageLimit(limit: number): ApiQueryHelper {
         if (!this._data.page) {
             this._data.page = {};
         }
@@ -69,7 +47,7 @@ class QueryHelper {
         return this;
     }
 
-    setSort(key: string, desc = false, field: 'key' | 'name' = 'key'): QueryHelper {
+    setSort(key: string, desc = false, field: 'key' | 'name' = 'key'): ApiQueryHelper {
         this._data.sort = {
             [field]: key,
             desc,
@@ -77,32 +55,32 @@ class QueryHelper {
         return this;
     }
 
-    setMinimal(): QueryHelper {
+    setMinimal(): ApiQueryHelper {
         this._data.minimal = true;
         return this;
     }
 
-    setCountOnly(): QueryHelper {
+    setCountOnly(): ApiQueryHelper {
         this._data.count_only = true;
         return this;
     }
 
-    setOnly(...keys: Array<string>): QueryHelper {
+    setOnly(...keys: Array<string>): ApiQueryHelper {
         this._data.only = keys;
         return this;
     }
 
-    addKeyword(key: string): QueryHelper {
+    addKeyword(key: string): ApiQueryHelper {
         this._keywords.push(key);
         return this;
     }
 
-    setKeyword(...keys: Array<string>): QueryHelper {
+    setKeyword(...keys: Array<string>): ApiQueryHelper {
         this._keywords = keys;
         return this;
     }
 }
 
 export {
-    QueryHelper,
+    ApiQueryHelper,
 };

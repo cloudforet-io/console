@@ -67,7 +67,7 @@ import {
     gray, violet, white,
 } from '@/styles/colors';
 import { SpaceConnector } from '@/lib/space-connector';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 
 am4core.useTheme(am4themes_animated);
 
@@ -98,7 +98,6 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore();
 
         const state = reactive({
             skeletons: range(4),

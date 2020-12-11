@@ -99,15 +99,13 @@ import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue'
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { queryTagsToQueryString } from '@/lib/router-query-string';
 import { SpaceConnector } from '@/lib/space-connector';
 import {
     gray, peacock, secondary,
 } from '@/styles/colors';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 
 am4core.useTheme(am4themes_animated);
 
@@ -148,7 +146,6 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore();
 
         const state = reactive({
             loading: true,
@@ -243,6 +240,8 @@ export default {
             chart.legend.markers.template.width = 8;
             chart.legend.markers.template.height = 8;
         };
+
+        const queryHelper = new QueryHelper();
         const getLocation = (type, projectId) => {
             let name: string;
             const query: Location['query'] = {};
@@ -260,7 +259,7 @@ export default {
             const location: Location = {
                 name,
                 query: {
-                    filters: queryStore.setFilters([
+                    filters: queryHelper.setFilters([
                         { k: 'project_id', v: projectId, o: '=' },
                     ]).rawQueryStrings,
                     ...query,

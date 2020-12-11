@@ -83,7 +83,7 @@ import { gray, secondary, secondary1 } from '@/styles/colors';
 import { store } from '@/store';
 import { SpaceConnector } from '@/lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 import { Location } from 'vue-router';
 import { QueryStoreFilter } from '@/lib/query/type';
 
@@ -96,7 +96,7 @@ export default {
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const projectId = computed<string>(() => context.root.$route.params.id as string);
-        const queryStore = new QueryStore();
+        const queryHelper = new QueryHelper();
 
             interface DataType {
                 provider: string;
@@ -145,7 +145,7 @@ export default {
                         name: 'cloudServiceMain',
                         query: {
                             provider: 'all',
-                            filters: queryStore.setFilters(filters).rawQueryStrings,
+                            filters: queryHelper.setFilters(filters).rawQueryStrings,
                         },
                     };
                 }
@@ -155,7 +155,7 @@ export default {
                     link = {
                         name: 'server',
                         query: {
-                            filters: queryStore.setFilters(filters).rawQueryStrings,
+                            filters: queryHelper.setFilters(filters).rawQueryStrings,
                         },
                     };
                 }

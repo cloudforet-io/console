@@ -153,18 +153,18 @@ import PageInformation from '@/views/automation/power-scheduler/modules/PageInfo
 import ScheduleHeatmap from '@/views/automation/power-scheduler/modules/ScheduleHeatmap.vue';
 
 /* Utils */
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import dayjs from 'dayjs';
-import { getTimezone } from '@/lib/util';
 
 /* Types */
 import { KeyItemSet } from '@/components/organisms/search/query-search/type';
-import { replaceQuery } from '@/lib/router-query-string';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { Location } from 'vue-router';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
+import { store } from '@/store';
 
 interface Scheduler {
     name: string;
@@ -188,7 +188,7 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore().setFiltersAsRawQueryString(vm.$route.query.filters);
+        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
 
         /**
          * Handlers for query search
@@ -216,13 +216,13 @@ export default {
             loading: false,
             keyItemSets: handlers.keyItemSets as KeyItemSet[],
             valueHandlerMap: handlers.valueHandlerMap,
-            tags: queryStore.setKeyItemSets(handlers.keyItemSets).queryTags,
+            tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
             thisPage: 1,
             pageSize: 12,
             totalCount: 0,
             scheduler: [] as unknown as Scheduler,
             weekday: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
-            currentDate: dayjs().tz(getTimezone()).format('YYYY-MM-DD'),
+            currentDate: dayjs().tz(store.state.user.timezone).format('YYYY-MM-DD'),
             tooltip: computed(() => ({
                 resource: `${vm.$t('AUTOMATION.POWER_SCHEDULER.LANDING.TOOLTIP_RESOURCE')} <br>
                                 [ALL] Server <br>
@@ -245,16 +245,14 @@ export default {
         /**
          * Search Query, Page parameter for API
          * */
-        const query = new QueryHelper();
+        const apiQuery = new ApiQueryHelper();
         const getParams = () => {
-            const { filter, keyword } = queryStore.apiQuery;
-            query.setPageStart(getPageStart(state.thisPage, state.pageSize))
+            apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
                 .setPageLimit(state.pageSize)
-                .setKeyword(keyword)
-                .setFilter(...filter);
+                .setFilters(queryHelper.filters);
 
             return {
-                query: query.data,
+                query: apiQuery.data,
             };
         };
 
@@ -322,8 +320,8 @@ export default {
          * Query String
          * */
         const changeQueryString = (options) => {
-            queryStore.setFiltersAsQueryTag(options.queryTags);
-            replaceQuery('filters', queryStore.rawQueryStrings);
+            queryHelper.setFiltersAsQueryTag(options.queryTags);
+            replaceUrlQuery('filters', queryHelper.rawQueryStrings);
         };
 
         /**

@@ -31,10 +31,10 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { getTimezone } from '@/lib/util';
 import config from '@/lib/config';
+import { store } from '@/store';
 
 export default {
     name: 'CloudServiceAdmin',
@@ -61,13 +61,13 @@ export default {
             options: {} as Options,
         });
 
-        const getQuery = () => new QueryHelper()
-            .setSort(state.options.sortBy, state.options.sortDesc)
+        const apiQuery = new ApiQueryHelper();
+        const getQuery = () => apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
             .setPage(
                 getPageStart(state.options.thisPage, state.options.pageSize),
                 state.options.pageSize,
             )
-            .setKeyword(state.options.searchText)
+            .setFilters([{ v: state.options.searchText }])
             .data;
 
         const api = SpaceConnector.client.inventory.cloudService.member.list;
@@ -108,7 +108,7 @@ export default {
                     template: {
                         options: {
                             fileType: 'xlsx',
-                            timezone: getTimezone(),
+                            timezone: store.state.user.timezone,
                         },
                         data_source: [
                             { name: 'User ID', key: 'user_info.user_id' },

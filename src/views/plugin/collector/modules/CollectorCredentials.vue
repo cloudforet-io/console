@@ -46,7 +46,7 @@
                 </router-link>
             </template>
             <template #col-created_at-format="{value}">
-                <span>{{ timestampFormatter(value) }}</span>
+                <span>{{ timestampFormatter(value, timezone) }}</span>
             </template>
             <template #col-collect-format="{item}">
                 <p-button
@@ -77,14 +77,13 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
 import { timestampFormatter } from '@/lib/util';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { DataTableField } from '@/components/organisms/tables/data-table/type';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
-import { QueryStore } from '@/lib/query';
 
 const CollectDataModal = () => import('@/views/plugin/collector/modules/CollectDataModal.vue');
 
@@ -143,9 +142,9 @@ export default {
                 project_id: makeReferenceValueHandler('identity.Project'),
             },
         };
-        const queryStore = new QueryStore().setKeyItemSets(querySearchHandlers.keyItemSets);
 
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
             items: [] as any,
             totalCount: 0,
             loading: true,
@@ -167,18 +166,14 @@ export default {
             queryTags: [],
         });
 
-        const query = new QueryHelper();
+        const apiQuery = new ApiQueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);
         const getQuery = () => {
-            const { filter, keyword } = queryStore.setFiltersAsQueryTag(state.queryTags)
-                .addFilter({ k: 'provider', v: props.provider, o: '=' })
-                .apiQuery;
-
-            query.setFilter(...filter)
-                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+            apiQuery.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
                 .setSort(state.sortBy, state.sortDesc)
-                .setKeyword(keyword);
+                .setFiltersAsQueryTag(state.queryTags)
+                .addFilter({ k: 'provider', v: props.provider, o: '=' });
 
-            return query.data;
+            return apiQuery.data;
         };
 
         const listCredentials = async (): Promise<void> => {

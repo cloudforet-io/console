@@ -80,7 +80,7 @@
                         <span :class="value.toLowerCase()" class="pl-2">{{ statusFormatter(value) }}</span>
                     </template>
                     <template #col-created_at-format="{value}">
-                        {{ timestampFormatter(value) }}
+                        {{ timestampFormatter(value, timezone) }}
                     </template>
                 </p-query-search-table>
                 <div v-if="!loading && items.length > 0" class="pagination">
@@ -156,9 +156,9 @@ import { QuerySearchTableFunctions } from '@/components/organisms/tables/query-s
 import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { timestampFormatter } from '@/lib/util';
-import { replaceQuery } from '@/lib/router-query-string';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
 } from '@/lib/component-utils/query-search';
@@ -166,7 +166,7 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
 import router from '@/routes';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -215,7 +215,7 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore().setFiltersAsRawQueryString(vm.$route.query.filters);
+        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const handlers = {
             keyItemSets: [{
                 title: 'Filters',
@@ -246,6 +246,7 @@ export default {
             },
         };
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
             loading: false,
             plugins: computed(() => store.state.resource.plugin.items),
             isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
@@ -285,7 +286,7 @@ export default {
             rowCursorPointer: true,
             //
             selectedJobId: '',
-            tags: queryStore.setKeyItemSets(handlers.keyItemSets).queryTags,
+            tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
             querySearchRef: null as null|QuerySearchTableFunctions,
             modalVisible: false,
         });
@@ -309,8 +310,8 @@ export default {
         };
         const durationFormatter = (createdAt, finishedAt) => {
             if (createdAt && finishedAt) {
-                const createdAtMoment = dayjs(timestampFormatter(createdAt));
-                const finishedAtMoment = dayjs(timestampFormatter(finishedAt));
+                const createdAtMoment = dayjs(timestampFormatter(createdAt, state.timezone));
+                const finishedAtMoment = dayjs(timestampFormatter(finishedAt, state.timezone));
                 const duration = finishedAtMoment.diff(createdAtMoment, 'minute');
                 return `${duration.toString()} min`;
             }
@@ -329,9 +330,12 @@ export default {
             });
         };
 
-        const query = new QueryHelper();
-        const apiQueryStore = new QueryStore();
+        const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
+            apiQuery.setSort(state.sortBy, state.sortDesc)
+                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                .setFilters(queryHelper.filters);
+
             let statusValues: JOB_STATUS[] = [];
             if (state.activatedStatus === 'inProgress') {
                 statusValues = [JOB_STATUS.progress];
@@ -341,18 +345,11 @@ export default {
                 statusValues = [JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout];
             }
 
-            const filters = queryStore.filters;
             statusValues.forEach((d) => {
-                filters.push({ k: 'status', v: d, o: '=' });
+                apiQuery.addFilter({ k: 'status', v: d, o: '=' });
             });
 
-            const { filter, keyword } = apiQueryStore.setFilters(filters).apiQuery;
-
-            query.setSort(state.sortBy, state.sortDesc)
-                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setKeyword(keyword)
-                .setFilter(...filter);
-            return query.data;
+            return apiQuery.data;
         };
 
         const getJobs = async () => {
@@ -376,8 +373,8 @@ export default {
         };
         const onChange = async (item) => {
             state.tags = item.queryTags;
-            queryStore.setFiltersAsQueryTag(item.queryTags);
-            replaceQuery('filters', queryStore.rawQueryStrings);
+            queryHelper.setFiltersAsQueryTag(item.queryTags);
+            replaceUrlQuery('filters', queryHelper.rawQueryStrings);
             try {
                 await getJobs();
             } catch (e) {

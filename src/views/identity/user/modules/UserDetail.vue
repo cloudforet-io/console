@@ -12,7 +12,10 @@
 import { ComponentRenderProxy, computed, getCurrentInstance } from '@vue/composition-api';
 import PInfoPanel from '@/components/organisms/panels/info-panel/PInfoPanel.vue';
 import PStatus from '@/components/molecules/status/PStatus.vue';
-import { timestampFormatter, arrayFormatter, userStateFormatter } from '@/lib/util';
+import { timestampFormatter } from '@/lib/util';
+import { userStateFormatter } from '@/views/identity/user/lib/helper';
+
+const arrayFormatter = value => ((value && Array.isArray(value) && value.length > 0) ? value.join(', ') : '');
 
 export default {
     name: 'PUserDetail',

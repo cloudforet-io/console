@@ -40,9 +40,8 @@ import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetL
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 
 import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
-import { colorset } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
-import { gray, blue } from '@/styles/colors';
+import styles, { gray, blue } from '@/styles/colors';
 
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -65,6 +64,19 @@ interface State {
     noChange: boolean;
     isDataReady: boolean;
 }
+
+const colorset = Object.freeze([
+    styles.primary,
+    styles.primary2,
+    styles.coral.default,
+    styles.secondary,
+    styles.secondary1,
+    styles.safe,
+    styles.green[600],
+    styles.green[400],
+    styles.yellow.default,
+    styles.primary1,
+]);
 
 export default {
     name: 'ServiceSummary',

@@ -60,7 +60,7 @@
                         </router-link>
                     </template>
                     <template #col-last_collected_at-format="{ value }">
-                        {{ value ? timestampFormatter(value) : '' }}
+                        {{ value ? timestampFormatter(value,timezone) : '' }}
                     </template>
                 </p-query-search-table>
             </template>
@@ -161,17 +161,16 @@ import { CollectorModel } from '@/views/plugin/collector/type';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import {
-    getTimezone, showErrorMessage, showSuccessMessage, timestampFormatter,
+    showErrorMessage, showSuccessMessage, timestampFormatter,
 } from '@/lib/util';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { replaceQuery } from '@/lib/router-query-string';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 import config from '@/lib/config';
 import { store } from '@/store';
-import { QueryStore } from '@/lib/query';
-import { QueryStoreFilter } from '@/lib/query/type';
+import { QueryHelper } from '@/lib/query';
 
 const GeneralPageLayout = (): Component => import('@/views/common/components/page-layout/GeneralPageLayout.vue') as Component;
 const TagsPanel = (): Component => import('@/views/common/components/tags/TagsPanel.vue') as Component;
@@ -207,9 +206,10 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore();
+        const queryHelper = new QueryHelper();
 
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
             plugins: computed(() => store.state.resource.plugin.items),
             fields: computed(() => [
                 { name: 'name', label: 'Name' },
@@ -336,38 +336,23 @@ export default {
 
         // Url query
         const setSearchTags = () => {
-            queryStore.setFiltersAsRawQueryString(vm.$route.query.filters)
+            queryHelper.setFiltersAsRawQueryString(vm.$route.query.filters)
                 .setKeyItemSets(state.querySearchHandlers.keyItemSets);
-            state.searchTags = queryStore.queryTags;
+            state.searchTags = queryHelper.queryTags;
         };
 
         // Table
-        const query = new QueryHelper().setOnly(
+        const apiQuery = new ApiQueryHelper().setOnly(
             'collector_id', 'name', 'priority', 'last_collected_at',
             'provider', 'tags', 'plugin_info', 'state',
         );
         const getQuery = () => {
-            const { filter, keyword } = queryStore.apiQuery;
-            query.setSort(state.sortBy, state.sortDesc)
+            apiQuery.setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setKeyword(keyword)
-                .setFilter(...filter);
-            return query.data;
+                .setFilters(queryHelper.filters);
+            return apiQuery.data;
         };
-
-        const detailQueryStore = new QueryStore();
-        const getDetailLink = (data) => {
-            const filters: QueryStoreFilter[] = [];
-            filters.push({ k: 'collector_id', v: data.collector_id, o: '=' });
-            const res: Location = {
-                name: 'collectorHistory',
-                query: {
-                    filters: detailQueryStore.setFilters(filters).rawQueryStrings,
-                },
-            };
-            return res;
-        };
-
+        const detailLinkQueryHelper = new QueryHelper();
         const getCollectors = async () => {
             state.loading = true;
             try {
@@ -375,7 +360,10 @@ export default {
                 state.items = res.results.map(d => ({
                     plugin_name: computed(() => store.state.resource.plugin.items[d.plugin_info.plugin_id]?.label).value,
                     plugin_icon: store.state.resource.plugin.items[d.plugin_info.plugin_id]?.icon,
-                    detailLink: getDetailLink(d),
+                    detailLink: {
+                        name: 'collectorHistory',
+                        query: { filters: detailLinkQueryHelper.setFilters([{ k: 'collector_id', v: d.collector_id, o: '=' }]).rawQueryStrings },
+                    },
                     ...d,
                 }));
                 state.totalCount = res.total_count || 0;
@@ -394,8 +382,8 @@ export default {
             state.selectedIndexes = [];
             state.searchTags = item.queryTags;
 
-            queryStore.setFiltersAsQueryTag(item.queryTags);
-            await replaceQuery('filters', queryStore.rawQueryStrings);
+            queryHelper.setFiltersAsQueryTag(item.queryTags);
+            await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
             try {
                 await getCollectors();
             } catch (e) {
@@ -469,7 +457,7 @@ export default {
                     template: {
                         options: {
                             fileType: 'xlsx',
-                            timezone: getTimezone(),
+                            timezone: store.state.user.timezone,
                         },
                         data_source: state.excelFields,
                     },

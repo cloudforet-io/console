@@ -146,7 +146,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { store } from '@/store';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectModel } from '@/views/project/project/type';
 import { TranslateResult } from 'vue-i18n';
@@ -227,7 +227,7 @@ export default {
         });
 
         // List api Handler for query search table
-        const memberTableQuery = new QueryHelper();
+        const memberTableQuery = new ApiQueryHelper();
         const memberTableState = reactive({
             selectIndex: [] as number[],
             fields: [
@@ -285,7 +285,7 @@ export default {
             }
             if (changed.searchText !== undefined) {
                 memberTableState.options.searchText = changed.searchText;
-                memberTableQuery.setKeyword(changed.searchText);
+                memberTableQuery.setFilters([{ v: changed.searchText }]);
             }
             await listMembers();
         };
@@ -399,19 +399,21 @@ export default {
         }, { immediate: true });
 
 
+        const apiQuery = new ApiQueryHelper();
         const getPageNavigation = async () => {
             const res = await SpaceConnector.client.identity.project.tree.search({
                 item_type: 'PROJECT',
                 // eslint-disable-next-line camelcase
                 item_id: projectId.value,
             });
-            const query = new QueryHelper().setFilter({
+
+            apiQuery.setFilters([{
                 k: 'project_group_id',
                 v: res.open_path,
-                o: 'in',
-            });
+                o: '=',
+            }]);
             const projectGroupName = await SpaceConnector.client.identity.projectGroup.list({
-                query: query.data,
+                query: apiQuery.data,
             });
             state.pageNavigation = [
                 { name: vm.$t('MENU.PROJECT.PROJECT'), path: '/project' },

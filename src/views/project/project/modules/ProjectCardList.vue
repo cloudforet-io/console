@@ -71,10 +71,7 @@
                             <span class="summary-item-text">{{ $t('PROJECT.LANDING.SERVER') }}</span>
                             <router-link v-if="cardSummary[item.project_id]"
                                          class="summary-item-num"
-                                         :to="{
-                                             name: 'server',
-                                             query: {filters: `project_id:=${item.project_id}`}
-                                         }"
+                                         :to="getLocation(item.project_id, 'server')"
                             >{{ cardSummary[item.project_id].serverCount }}
                             </router-link>
                             <span v-else class="summary-item-num none">N/A</span>
@@ -84,13 +81,7 @@
                             <span class="summary-item-text">{{ $t('PROJECT.LANDING.CLOUD_SERVICES') }}</span>
                             <router-link v-if="cardSummary[item.project_id]"
                                          class="summary-item-num"
-                                         :to="{
-                                             name: 'cloudService',
-                                             query: {
-                                                 provider: 'all',
-                                                 filters: `project_id:=${item.project_id}`
-                                             }
-                                         }"
+                                         :to="getLocation(item.project_id, 'cloudService')"
                             >{{ cardSummary[item.project_id].cloudServiceCount }}
                             </router-link>
                             <span v-else class="summary-item-num none">N/A</span>
@@ -142,7 +133,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { getAllPage } from '@/components/organisms/paginations/text-pagination/helper';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectGroup } from '@/views/project/project/type';
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
@@ -152,6 +143,7 @@ import { range, uniq } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
 import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import { QueryHelper } from '@/lib/query';
 
 interface Props {
     searchText: string;
@@ -216,13 +208,13 @@ export default {
 
         const listProjectApi = SpaceConnector.client.identity.projectGroup.listProjects;
         const listAllProjectApi = SpaceConnector.client.identity.project.list;
-        const listQuery = new QueryHelper();
+        const listQuery = new ApiQueryHelper();
 
         const getParams = (id?, text?) => {
             listQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
                 .setPageLimit(state.pageSize);
 
-            if (text) listQuery.setFilter({ k: 'name', v: props.searchText, o: 'contain' });
+            if (text) listQuery.setFilters([{ k: 'name', v: props.searchText, o: '' }]);
 
             const params: any = { include_provider: true, query: listQuery.data };
             if (id) params.project_group_id = id;
@@ -306,6 +298,12 @@ export default {
             await getData(groupId, searchText);
         };
 
+        const queryHelper = new QueryHelper();
+        const getLocation = (projectId, name) => ({
+            name,
+            query: { filters: queryHelper.setFilters([{ k: 'project_id', v: projectId, o: '=' }]).rawQueryStrings },
+        });
+
         watch(() => state.showAllProjects, async (after, before) => {
             if (after !== before) {
                 await listProjects(props.groupId, props.searchText, true);
@@ -321,6 +319,7 @@ export default {
             getData,
             skeletons: range(1),
             listProjects,
+            getLocation,
         };
     },
 };

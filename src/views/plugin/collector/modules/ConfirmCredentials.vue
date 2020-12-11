@@ -34,7 +34,7 @@ import {
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 
 export default {
     name: 'ConfirmCredentials',
@@ -76,15 +76,14 @@ export default {
             }
         };
 
+        const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
-            const query = new QueryHelper();
-            query
-                .setFilter({
-                    k: 'provider',
-                    v: props.provider,
-                    o: 'eq',
-                });
-            return query.data;
+            apiQuery.setFilters([{
+                k: 'provider',
+                v: props.provider,
+                o: '=',
+            }]);
+            return apiQuery.data;
         };
 
         const listSecretCount = async () => {

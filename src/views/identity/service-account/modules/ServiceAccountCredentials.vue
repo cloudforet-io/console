@@ -12,22 +12,25 @@
                         @change="onChange"
         >
             <template #col-created_at-format="{value}">
-                {{ timestampFormatter(value) }}
+                {{ timestampFormatter(value, timezone) }}
             </template>
         </p-search-table>
     </div>
 </template>
 
 <script lang="ts">
-import { reactive, toRefs, watch } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { timestampFormatter } from '@/lib/util';
+import { store } from '@/store';
 
 export default {
     name: 'ServiceAccountCredentials',
@@ -43,6 +46,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
             fields: [
                 { label: 'Secret', name: 'secret_id' },
                 { label: 'Name', name: 'name' },
@@ -63,19 +67,18 @@ export default {
             options: {} as Options,
         });
 
-        const getQuery = () => new QueryHelper()
-            .setFilter({
-                k: 'service_account_id',
-                v: props.serviceAccountId,
-                o: 'eq',
-            })
+        const apiQuery = new ApiQueryHelper();
+        const getQuery = () => apiQuery.setFilters([{
+            k: 'service_account_id',
+            v: props.serviceAccountId,
+            o: '=',
+        }, { v: state.options.searchText }])
             .setSort(state.options.sortBy, state.options.sortDesc)
             .setPage(
                 getPageStart(state.options.thisPage, state.options.pageSize),
                 state.options.pageSize,
             )
             .setOnly('secret_id', 'name', 'schema', 'created_at')
-            .setKeyword(state.options.searchText)
             .data;
 
         const api = SpaceConnector.client.secret.secret.list;

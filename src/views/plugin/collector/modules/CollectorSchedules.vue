@@ -49,10 +49,10 @@
                 </span>
             </template>
             <template #col-created_at-format="{value}">
-                {{ timestampFormatter(value) }}
+                {{ timestampFormatter(value, timezone) }}
             </template>
             <template #col-last_schedule_at-format="{value}">
-                {{ value ? timestampFormatter(value): '' }}
+                {{ value ? timestampFormatter(value, timezone): '' }}
             </template>
         </p-toolbox-table>
 
@@ -96,7 +96,7 @@ import { DataTableField } from '@/components/organisms/tables/data-table/type';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 
 import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { store } from '@/store';
 
@@ -119,6 +119,7 @@ export default {
     setup(props) {
         const vm: any = getCurrentInstance();
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
             loading: true,
             items: [],
             selectIndex: [],
@@ -182,18 +183,18 @@ export default {
             state.editVisible = true;
         };
 
+        const apiQuery = new ApiQueryHelper();
         const listSchedules = debounce(async (): Promise<void> => {
             state.loading = true;
             state.selectIndex = [];
             state.totalCount = 0;
             try {
-                const query = new QueryHelper()
-                    .setSort(state.sortBy, state.sortDesc)
+                apiQuery.setSort(state.sortBy, state.sortDesc)
                     .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
 
                 const res = await SpaceConnector.client.inventory.collector.schedule.list({
                     collector_id: props.collectorId,
-                    query: query.data,
+                    query: apiQuery.data,
                 });
                 state.items = res.results;
                 state.totalCount = res.total_count;

@@ -34,10 +34,10 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 import { SpaceChart } from '@/lib/chart/space-chart';
 import { SpaceConnector } from '@/lib/space-connector';
-import { getTimezone } from '@/lib/util';
 import {
     black, red, gray, primary,
 } from '@/styles/colors';
+import { store } from '@/store';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(utc);
@@ -82,11 +82,11 @@ export default {
             failureData: [] as number[],
             noData: false,
             //
-            currentDate: dayjs().tz(getTimezone()),
+            currentDate: dayjs().tz(store.state.user.timezone),
             currentMonthStart: computed(() => dayjs(state.currentDate).startOf('month')),
             currentMonthEnd: computed(() => dayjs(state.currentDate).endOf('month')),
             dayCount: computed(() => state.currentDate.daysInMonth()),
-            timezone: getTimezone(),
+            timezone: store.state.user.timezone,
         });
 
         const initChartData = (rawData) => {
@@ -94,12 +94,12 @@ export default {
 
             const orderedData = orderBy(rawData, ['date'], ['asc']);
             const dateFormattedData = orderedData.map(d => ({
-                date: dayjs(d.date).tz(getTimezone()),
+                date: dayjs(d.date).tz(store.state.user.timezone),
                 success: d.success,
                 failure: d.failure,
             }));
             const chartData = [] as ChartDataType[];
-            const today = dayjs().tz(getTimezone());
+            const today = dayjs().tz(store.state.user.timezone);
             let now = state.currentMonthStart.clone();
 
             while (now.isSameOrBefore(state.currentMonthEnd, 'day')) {
@@ -176,7 +176,7 @@ export default {
                 const item = event[0];
                 if (item) {
                     const clickedData = state.chartData[item._index];
-                    const selectedDate = dayjs.tz(clickedData.date, getTimezone()).format('YYYY-MM-DD');
+                    const selectedDate = dayjs.tz(clickedData.date, store.state.user.timezone).format('YYYY-MM-DD');
                     emit('click-date', selectedDate);
                 }
             };

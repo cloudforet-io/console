@@ -58,7 +58,7 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import { ProviderModel } from '@/views/identity/service-account/type';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { TimeStamp } from '@/models';
@@ -136,14 +136,14 @@ export default {
         };
 
         /* api */
+        const apiQuery = new ApiQueryHelper();
         const getData = async () => {
             state.loading = true;
             try {
-                const query = new QueryHelper()
-                    .setSort('created_at')
+                apiQuery.setSort('created_at')
                     .setPage(1, 5)
-                    .setFilter({ k: 'status', v: [JOB_STATE.created, JOB_STATE.progress], o: 'in' });
-                const res = await SpaceConnector.client.inventory.job.list({ query: query.data });
+                    .setFilters([{ k: 'status', v: [JOB_STATE.created, JOB_STATE.progress], o: '=' }]);
+                const res = await SpaceConnector.client.inventory.job.list({ query: apiQuery.data });
                 state.items = convertJobsToFieldItem(res.results);
             } catch (e) {
                 state.items = [];
@@ -152,11 +152,11 @@ export default {
                 state.loading = false;
             }
         };
+        const providerApiQuery = new ApiQueryHelper();
         const getProviders = async () => {
             try {
-                const query = new QueryHelper();
-                query.setOnly('provider', 'tags.icon');
-                const res = await SpaceConnector.client.identity.provider.list({ query: query.data });
+                providerApiQuery.setOnly('provider', 'tags.icon');
+                const res = await SpaceConnector.client.identity.provider.list({ query: providerApiQuery.data });
                 state.providers = res.results;
             } catch (e) {
                 console.error(e);

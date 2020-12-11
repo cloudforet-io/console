@@ -194,18 +194,17 @@ import PHr from '@/components/atoms/hr/PHr.vue';
 
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 import {
-    queryStringToStringArray, replaceQuery,
+    queryStringToStringArray, replaceUrlQuery,
     RouteQueryString,
 } from '@/lib/router-query-string';
-import { Filter } from '@/lib/space-connector/type';
 import { Tags, TimeStamp } from '@/models';
 import { store } from '@/store';
 import FavoriteList from '@/views/common/components/favorites/FavoriteList.vue';
 import { FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
 
 
@@ -240,7 +239,7 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore();
+        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
 
         const selectedProvider: Ref<string> = ref('all');
 
@@ -287,7 +286,7 @@ export default {
             loading: true,
             keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
-            tags: queryStore.setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(vm.$route.query.filters).queryTags,
+            tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
             thisPage: 1,
             pageSize: 24,
             totalCount: 0,
@@ -299,14 +298,14 @@ export default {
             vm.$store.dispatch('favorite/cloudServiceType/removeItem', item);
         };
 
+        const regionApiQuery = new ApiQueryHelper();
         const getRegionQuery = (value) => {
-            const regionQuery = new QueryHelper();
-            regionQuery.setFilter({
+            regionApiQuery.setFilters([{
                 k: 'provider',
                 v: value,
-                o: 'contain',
-            });
-            return regionQuery.data;
+                o: '',
+            }]);
+            return regionApiQuery.data;
         };
 
         const listRegionByProvider = async (selectedProviderValue) => {
@@ -334,22 +333,23 @@ export default {
         /**
          * Card click event
          * */
-        const cardQueryStore = new QueryStore();
+        const cardQueryHelper = new QueryHelper();
         const getToCloudService = (item) => {
             let res: Location;
-            const filters: QueryStoreFilter[] = [...queryStore.filters];
+            cardQueryHelper.setFilters(queryHelper.filters);
 
             forEach(filterState.regionFilter, (d) => {
-                filters.push({ k: 'region_code', o: '=', v: d });
+                cardQueryHelper.addFilter({ k: 'region_code', o: '=', v: d });
             });
 
             if (item.resource_type === 'inventory.Server') {
-                filters.push({ k: 'provider', o: '=', v: item.provider }, { k: 'cloud_service_type', o: '=', v: item.cloud_service_type });
+                cardQueryHelper.addFilter({ k: 'provider', o: '=', v: item.provider },
+                    { k: 'cloud_service_type', o: '=', v: item.cloud_service_type });
 
                 res = {
                     name: 'server',
                     query: {
-                        filters: cardQueryStore.setFilters(filters).rawQueryStrings,
+                        filters: cardQueryHelper.rawQueryStrings,
                     },
                 };
             } else {
@@ -361,28 +361,27 @@ export default {
                         name: item.cloud_service_type,
                     },
                     query: {
-                        filters: cardQueryStore.setFilters(filters).rawQueryStrings,
+                        filters: cardQueryHelper.rawQueryStrings,
                     },
                 };
             }
             return res;
         };
 
-        const sidebarQueryStore = new QueryStore();
-        const sidebarFilters = computed<{filters: Filter[]; labels: string[]}>(() => {
-            const filters: QueryStoreFilter[] = [];
+        const sidebarQueryHelper = new QueryHelper();
+        const sidebarFilters = computed<{filters: QueryStoreFilter[]; labels: string[]}>(() => {
+            sidebarQueryHelper.setFilters([]);
             if (selectedProvider.value !== 'all') {
-                filters.push({ k: 'provider', v: selectedProvider.value, o: '=' });
+                sidebarQueryHelper.addFilter({ k: 'provider', v: selectedProvider.value, o: '=' });
             }
             if (filterState.regionFilter.length > 0) {
                 filterState.regionFilter.forEach((d) => {
-                    filters.push({ k: 'region_code', v: d, o: '=' });
+                    sidebarQueryHelper.addFilter({ k: 'region_code', v: d, o: '=' });
                 });
             }
-            sidebarQueryStore.setFilters(filters);
 
             const res = {
-                filters: sidebarQueryStore.apiQuery.filter,
+                filters: sidebarQueryHelper.filters,
                 labels: [] as string[],
             };
             if (filterState.serviceFilter.length > 0) {
@@ -391,23 +390,22 @@ export default {
             return res;
         });
 
+        const apiQuery = new ApiQueryHelper();
         const getParams = (isTriggeredBySideFilter = false) => {
             const { filters, labels } = sidebarFilters.value;
 
-            const { filter, keyword } = queryStore.apiQuery;
-            const query = new QueryHelper();
-            query
-                .setPageLimit(state.pageSize)
-                .setKeyword(keyword)
-                .setFilter(...filter, ...filters)
+            apiQuery.setPageLimit(state.pageSize)
+                .setFilters(filters)
+                .addFilter(...queryHelper.filters)
                 .setSort('count', true, 'name');
+
             if (isTriggeredBySideFilter) state.thisPage = 1;
-            else query.setPageStart(getPageStart(state.thisPage, state.pageSize));
+            else apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize));
 
             return {
                 is_primary: filterState.isPrimary,
                 labels,
-                query: query.data,
+                query: apiQuery.data,
             };
         };
 
@@ -441,22 +439,22 @@ export default {
             if (after !== before) {
                 // await listCloudServiceType(after);
                 await listCloudServiceType(true);
-                await replaceQuery('provider', selectedProvider.value);
-                await replaceQuery('region', filterState.regionFilter);
-                await replaceQuery('service', filterState.serviceFilter);
+                await replaceUrlQuery('provider', selectedProvider.value);
+                await replaceUrlQuery('region', filterState.regionFilter);
+                await replaceUrlQuery('service', filterState.serviceFilter);
             }
         }, { immediate: false });
 
         watch<boolean, boolean>(() => filterState.isPrimary, async (after, before) => {
             if (after !== before) {
                 await listCloudServiceType();
-                await replaceQuery('primary', filterState.isPrimary.toString());
+                await replaceUrlQuery('primary', filterState.isPrimary.toString());
             }
         }, { immediate: false });
 
         const changeQueryString = async (options) => {
-            queryStore.setFiltersAsQueryTag(options.queryTags);
-            await replaceQuery('filters', queryStore.rawQueryStrings);
+            queryHelper.setFiltersAsQueryTag(options.queryTags);
+            await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
         };
 
         const onPaginationChange = async () => {

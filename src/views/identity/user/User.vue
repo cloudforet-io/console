@@ -125,15 +125,15 @@ import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 import { Timestamp } from '@/components/util/type';
 
-import { showErrorMessage, showSuccessMessage, userStateFormatter } from '@/lib/util';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
-import { replaceQuery } from '@/lib/router-query-string';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import { store } from '@/store';
 import { KeyItemSet } from '@/components/organisms/search/query-search/type';
-import { QueryStore } from '@/lib/query';
+import {userStateFormatter} from "@/views/identity/user/lib/helper";
 
 
 interface UserModel {
@@ -172,7 +172,7 @@ export default {
     },
     setup(props, { root, parent }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore();
+        const queryHelper = new ApiQueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const handlers = {
             keyItemSets: [{
                 title: 'Filters',
@@ -259,7 +259,7 @@ export default {
             ] as MenuItem[])),
             keyItemSets: handlers.keyItemSets as KeyItemSet[],
             valueHandlerMap: handlers.valueHandlerMap,
-            tags: queryStore.setKeyItemSets(handlers.keyItemSets).setFiltersAsRawQueryString(vm.$route.query.filters).queryTags,
+            tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
         });
         const modalState = reactive({
             visible: false,
@@ -295,14 +295,12 @@ export default {
             activeTab: 'data',
         });
 
-        const query = new QueryHelper();
+        const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
-            const { filter, keyword } = queryStore.apiQuery;
-            query.setSort(state.sortBy, state.sortDesc)
+            apiQuery.setSort(state.sortBy, state.sortDesc)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setFilter(...filter)
-                .setKeyword(keyword);
-            return query.data;
+                .setFilters(queryHelper.filters);
+            return apiQuery.data;
         };
 
         const getUsers = async () => {
@@ -334,8 +332,8 @@ export default {
                 if (changed.thisPage !== undefined) state.thisPage = changed.thisPage;
                 if (changed.queryTags !== undefined) {
                     state.tags = changed.queryTags;
-                    queryStore.setFiltersAsQueryTag(changed.queryTags);
-                    replaceQuery('filters', queryStore.rawQueryStrings);
+                    queryHelper.setFiltersAsQueryTag(changed.queryTags);
+                    replaceUrlQuery('filters', queryHelper.rawQueryStrings);
                 }
             }
             await getUsers();

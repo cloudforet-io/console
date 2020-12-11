@@ -77,7 +77,7 @@ import { CollectModalProps } from '@/views/common/components/collect-modal/type'
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { makeProxy } from '@/components/util/composition-helpers';
-import { QueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
 
 export default {
     name: 'CollectModal',
@@ -153,13 +153,13 @@ export default {
             return 'gray900';
         };
 
+        const apiQuery = new ApiQueryHelper();
         const listCollector = async (): Promise<void> => {
             state.loading = true;
 
             try {
-                const query = new QueryHelper()
-                    .setFilter({ k: 'collector_id', v: state.mergedCollectorIds, o: 'in' });
-                const res = await SpaceConnector.client.inventory.collector.list({ query: query.data });
+                apiQuery.setFilters([{ k: 'collector_id', v: state.mergedCollectorIds, o: '=' }]);
+                const res = await SpaceConnector.client.inventory.collector.list({ query: apiQuery.data });
                 state.collectors = res.results;
             } catch (e) {
                 console.error(e);

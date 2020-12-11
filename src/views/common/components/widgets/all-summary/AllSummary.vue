@@ -134,7 +134,7 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { gray, primary, primary1 } from '@/styles/colors';
 import { QueryStoreFilter } from '@/lib/query/type';
-import { QueryStore } from '@/lib/query';
+import { QueryHelper } from '@/lib/query';
 
 am4core.useTheme(am4themes_animated);
 am4core.options.autoSetClassName = true;
@@ -196,7 +196,6 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryStore = new QueryStore();
 
         const state = reactive({
             loading: false,
@@ -342,8 +341,9 @@ export default {
             if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             return num;
         };
+
+        const queryHelper = new QueryHelper();
         const getLocation = (type) => {
-            const filters: QueryStoreFilter[] = [...queryStore.filters];
             const query: Location['query'] = {};
             let name: string;
 
@@ -359,15 +359,13 @@ export default {
 
             // set filters
             if (props.projectId) {
-                filters.push({
-                    k: 'project_id', o: '=', v: props.projectId,
-                });
+                queryHelper.setFilters([{ k: 'project_id', o: '=', v: props.projectId }]);
             }
 
             const location: Location = {
                 name,
                 query: {
-                    filters: queryStore.setFilters(filters).rawQueryStrings,
+                    filters: queryHelper.rawQueryStrings,
                     ...query,
                 },
             };
@@ -504,7 +502,7 @@ export default {
                     },
                 ];
 
-                const summaryQueryStore = new QueryStore();
+                const summaryQueryHelper = new QueryHelper();
                 res.results.forEach((d) => {
                     let detailLocation: Location;
                     const filters: QueryStoreFilter[] = [];
@@ -520,7 +518,7 @@ export default {
                         detailLocation = {
                             name: 'server',
                             query: {
-                                filters: summaryQueryStore.setFilters(filters).rawQueryStrings,
+                                filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
                             },
                         };
                     } else {
@@ -532,7 +530,7 @@ export default {
                                 name: d.cloud_service_type,
                             },
                             query: {
-                                filters: summaryQueryStore.setFilters(filters).rawQueryStrings,
+                                filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
                             },
                         };
                     }
@@ -620,6 +618,7 @@ export default {
         border-radius: 0.375rem;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         padding-left: 1rem;
+
         @screen lg {
             padding-left: 1.25rem;
         }
@@ -644,7 +643,7 @@ export default {
                 @apply text-white;
                 font-weight: bold;
             }
-            &:after {
+            &::after {
                 position: absolute;
                 display: none;
                 content: '';
@@ -655,6 +654,7 @@ export default {
                 bottom: -0.45rem;
                 left: 50%;
                 margin-left: -0.5rem;
+
                 @screen sm {
                     display: block;
                 }
@@ -722,9 +722,11 @@ export default {
         height: 27.5rem;
         border-radius: 0.375rem;
         padding: 1.25rem 1.5rem;
+
         @screen md {
             height: 25rem;
         }
+
         @screen lg {
             height: 17.5rem;
         }
@@ -767,6 +769,7 @@ export default {
                 height: 5rem;
                 overflow-y: auto;
                 overflow-x: hidden;
+
                 @screen lg {
                     height: 12rem;
                 }
@@ -868,6 +871,7 @@ export default {
     &:last-child {
         display: block;
     }
+
     @screen sm {
         display: block;
     }
