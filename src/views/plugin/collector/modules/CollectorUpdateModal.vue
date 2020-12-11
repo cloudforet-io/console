@@ -88,7 +88,8 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 
 import { makeProxy } from '@/lib/compostion-util';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { CollectorPluginModel, CollectorUpdateParameter } from '@/views/plugin/collector/type';
 import { store } from '@/store';

@@ -30,7 +30,8 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';

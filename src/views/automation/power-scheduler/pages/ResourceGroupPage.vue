@@ -179,7 +179,8 @@ import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vu
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import {
     QuerySearchTableFetchOptions, QuerySearchTableListeners,
     QuerySearchTableTypeOptions,

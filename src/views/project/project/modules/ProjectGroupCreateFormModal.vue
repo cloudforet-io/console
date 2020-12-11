@@ -40,7 +40,8 @@ import { ProjectGroup } from '@/views/project/project/type';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { makeProxy } from '@/lib/compostion-util';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import VueI18n from 'vue-i18n';
 
 import TranslateResult = VueI18n.TranslateResult;

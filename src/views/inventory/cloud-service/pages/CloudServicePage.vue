@@ -183,7 +183,8 @@ import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { Reference } from '@/lib/reference/type';

@@ -59,7 +59,8 @@ import {
     onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import PProgressBar from '@/components/molecules/progress-bar/PProgressBar.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { store } from '@/store';

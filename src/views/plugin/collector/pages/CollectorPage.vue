@@ -161,7 +161,8 @@ import { CollectorModel } from '@/views/plugin/collector/type';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import {
     showErrorMessage, showSuccessMessage, timestampFormatter,
 } from '@/lib/util';

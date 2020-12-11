@@ -31,7 +31,8 @@ import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PBadge from '@/components/atoms/badges/PBadge.vue';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
 
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import config from '@/lib/config';
 import { store } from '@/store';

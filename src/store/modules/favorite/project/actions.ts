@@ -1,4 +1,4 @@
-import { SpaceConnector, ApiQueryHelper } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
 import { FavoriteState, FavoriteItem } from '@/store/modules/favorite/type';
 import { Action } from 'vuex';
 
@@ -38,14 +38,16 @@ export const removeItem: Action<FavoriteState, any> = async ({ commit, state, ro
     }
 };
 
-const apiQuery = new ApiQueryHelper();
 export const load = async ({ commit, state, rootState }): Promise<void|Error> => {
-    apiQuery.setFilters([{
-        k: 'name',
-        v: `console:${rootState.user.userType}:${rootState.user.userId}:favorite:${FAVORITE_TYPE}:`,
-        o: '',
-    }]).setOnly('data');
-
-    const response = await SpaceConnector.client.config.userConfig.list({ query: apiQuery.data });
+    const response = await SpaceConnector.client.config.userConfig.list({
+        query: {
+            filter: [{
+                k: 'name',
+                v: `console:${rootState.user.userType}:${rootState.user.userId}:favorite:${FAVORITE_TYPE}:`,
+                o: 'contain',
+            }],
+            only: ['data'],
+        },
+    });
     commit('loadItem', response.results.map(config => config.data));
 };

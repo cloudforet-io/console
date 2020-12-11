@@ -34,7 +34,8 @@ import {
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 
 export default {
     name: 'ConfirmCredentials',

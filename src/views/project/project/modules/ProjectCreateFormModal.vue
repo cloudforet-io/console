@@ -35,7 +35,8 @@ import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModa
 import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
 import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { makeProxy } from '@/lib/compostion-util';
 import VueI18n from 'vue-i18n';
 

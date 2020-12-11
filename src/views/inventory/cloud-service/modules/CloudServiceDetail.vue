@@ -39,7 +39,8 @@ import {
     DynamicLayoutEventListeners, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
 } from '@/components/organisms/dynamic-layout/type';
 import { getApiActionByLayoutType, makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import config from '@/lib/config';
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';

@@ -77,7 +77,8 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
 import { timestampFormatter } from '@/lib/util';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { referenceRouter } from '@/lib/reference/referenceRouter';

@@ -37,7 +37,8 @@ import PBadge from '@/components/atoms/badges/PBadge.vue';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
 
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { iso8601Formatter } from '@/lib/util';
 import config from '@/lib/config';
 import { store } from '@/store';

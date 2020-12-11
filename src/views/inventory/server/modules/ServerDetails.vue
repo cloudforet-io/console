@@ -32,7 +32,8 @@ import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import PButtonTab from '@/components/organisms/tabs/button-tab/PButtonTab.vue';
 import {
     DynamicLayoutEventListeners, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,

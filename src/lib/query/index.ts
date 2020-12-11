@@ -1,19 +1,18 @@
 import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
 import { KeyItem, KeyItemSet, OperatorType } from '@/components/organisms/search/query-search/type';
 import { Filter, FilterOperator, Query } from '@/lib/space-connector/type';
-import { find, flatten } from 'lodash';
+import { flatten } from 'lodash';
 import {
     QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator,
 } from '@/lib/query/type';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
-import { computed, ComputedRef } from '@vue/composition-api';
 import {
     datetimeRawQueryOperatorToQueryTagOperatorMap, rawQueryOperatorToApiQueryOperatorMap,
     rawQueryOperatorToPluralApiQueryOperatorMap,
 } from '@/lib/query/config';
-// import { store as vuexStore } from '@/store';
+import { store } from '@/store';
 
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -55,13 +54,6 @@ export class QueryHelper {
     private _keyMap: Record<string, KeyItem> = {}
 
     private _filters: QueryStoreFilter[] = [];
-
-    private _timezone: ComputedRef<string>|undefined;
-
-    // constructor(store: typeof vuexStore = vuexStore) {
-    //     this._timezone = computed(() => store.state.user.timezone);
-    // }
-
 
     setKeyItemSets(keyItemSets: KeyItemSet[]): this {
         this._keyMap = {};
@@ -164,7 +156,7 @@ export class QueryHelper {
             if (f.k) {
                 if (typeof f.v === 'string' && datetimeRawQueryOperatorToQueryTagOperatorMap[f.o as string]) {
                     /* datetime case */
-                    const time = dayjs.tz(f.v, this._timezone?.value || 'UTC').utc();
+                    const time = dayjs.tz(f.v, store.state.user.timezone).utc();
 
                     if (f.o === '>t' || f.o === '>=t') {
                         filter.push({ k: f.k, v: time.toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['>=t'] });

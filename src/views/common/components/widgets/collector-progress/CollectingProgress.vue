@@ -56,7 +56,8 @@ import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue'
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { TimeStamp } from '@/models';
 import { QueryHelper } from '@/lib/query';

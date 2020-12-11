@@ -194,7 +194,8 @@ import PHr from '@/components/atoms/hr/PHr.vue';
 
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import {
     queryStringToStringArray, replaceUrlQuery,
     RouteQueryString,

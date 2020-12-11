@@ -156,7 +156,8 @@ import { QuerySearchTableFunctions } from '@/components/organisms/tables/query-s
 import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { timestampFormatter } from '@/lib/util';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import {

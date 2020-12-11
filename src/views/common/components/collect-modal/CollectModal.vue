@@ -77,7 +77,8 @@ import { CollectModalProps } from '@/views/common/components/collect-modal/type'
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { makeProxy } from '@/components/util/composition-helpers';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 
 export default {
     name: 'CollectModal',

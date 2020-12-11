@@ -96,7 +96,8 @@ import { DataTableField } from '@/components/organisms/tables/data-table/type';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 
 import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { store } from '@/store';
 

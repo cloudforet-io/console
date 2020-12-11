@@ -158,7 +158,8 @@ import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout
 import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';

@@ -72,7 +72,8 @@ import { MenuItem as ContextMenuItem } from '@/components/organisms/context-menu
 import { debounce } from 'lodash';
 import PI from '@/components/atoms/icons/PI.vue';
 import { ItemType } from '@/views/project/project/type';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 
 const LIMIT = 5;
 

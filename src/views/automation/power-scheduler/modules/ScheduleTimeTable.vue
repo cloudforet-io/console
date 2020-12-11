@@ -207,7 +207,8 @@ import {
 
 import { changeTimezoneToLocal, changeTimezoneToUTC } from '@/views/automation/power-scheduler/lib/util';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { store } from '@/store';
 
 dayjs.extend(isSameOrBefore);

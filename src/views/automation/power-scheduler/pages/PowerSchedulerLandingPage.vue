@@ -153,7 +153,8 @@ import PageInformation from '@/views/automation/power-scheduler/modules/PageInfo
 import ScheduleHeatmap from '@/views/automation/power-scheduler/modules/ScheduleHeatmap.vue';
 
 /* Utils */
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import dayjs from 'dayjs';
 

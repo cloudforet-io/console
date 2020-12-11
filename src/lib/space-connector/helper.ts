@@ -1,21 +1,29 @@
 /* eslint-disable camelcase */
 import { QueryHelper } from '@/lib/query';
-import { Query } from './type';
+import { Filter, Query } from './type';
 
 class ApiQueryHelper extends QueryHelper {
     private _data: Query = {};
 
     private _keywords: Array<string> = [];
 
-
     get data(): Query {
-        if (this._keywords !== []) {
-            this._data.keyword = this._keywords.join(' ');
-        }
-
         const { filter, keyword } = this.apiQuery;
-        this._data.keyword += keyword;
-        this._data.filter = filter;
+
+        if (filter.length > 0) {
+            if (this._data.filter) {
+                this._data.filter.concat(filter);
+            } else {
+                this._data.filter = filter;
+            }
+        }
+        if (keyword) {
+            if (this._keywords.length > 0) {
+                this._data.keyword = `${this._keywords.join(' ')} ${keyword}`;
+            } else {
+                this._data.keyword = keyword;
+            }
+        }
 
         return this._data;
     }
@@ -36,7 +44,6 @@ class ApiQueryHelper extends QueryHelper {
         this._data.page.start = start;
         return this;
     }
-
 
     setPageLimit(limit: number): ApiQueryHelper {
         if (!this._data.page) {
@@ -77,6 +84,20 @@ class ApiQueryHelper extends QueryHelper {
 
     setKeyword(...keys: Array<string>): ApiQueryHelper {
         this._keywords = keys;
+        return this;
+    }
+
+    setApiFilter(...filter: Filter[]): ApiQueryHelper {
+        this.data.filter = filter;
+        return this;
+    }
+
+    addApiFilter(...filter: Filter[]): ApiQueryHelper {
+        if (!this.data.filter) {
+            this.data.filter = filter;
+        } else {
+            this.data.filter.push(...filter);
+        }
         return this;
     }
 }

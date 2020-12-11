@@ -50,7 +50,8 @@ import {
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import { isEqual } from 'lodash';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { SearchTableListeners, Options } from '@/components/organisms/tables/search-table/type';
 

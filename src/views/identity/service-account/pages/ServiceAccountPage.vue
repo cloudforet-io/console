@@ -158,7 +158,8 @@ import ServiceAccountMember from '@/views/identity/service-account/modules/Servi
 
 /* utils */
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import config from '@/lib/config';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 

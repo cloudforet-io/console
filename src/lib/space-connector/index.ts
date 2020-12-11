@@ -1,12 +1,11 @@
 import _ from 'lodash';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { AxiosRequestConfig } from 'axios';
 import API from './api';
 import { SessionTimeoutCallback, APIInfo } from './type';
 
 const API_REFLECTION_URL = '/api/reflection';
 
-class SpaceConnector {
+export class SpaceConnector {
     private static instance: SpaceConnector;
 
     private readonly api: API;
@@ -92,8 +91,3 @@ class SpaceConnector {
         };
     }
 }
-
-export {
-    SpaceConnector,
-    ApiQueryHelper,
-};

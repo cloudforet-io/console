@@ -133,7 +133,8 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { getAllPage } from '@/components/organisms/paginations/text-pagination/helper';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectGroup } from '@/views/project/project/type';
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';

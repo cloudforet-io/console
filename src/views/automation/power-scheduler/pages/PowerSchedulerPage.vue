@@ -91,7 +91,8 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
 import { DESIRED_STATES, Schedule } from '@/views/automation/power-scheduler/type';
 
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { showErrorMessage } from '@/lib/util';
 import { store } from '@/store';
 import router from '@/routes';

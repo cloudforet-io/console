@@ -101,7 +101,8 @@ import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIc
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import { TreeItem, TreeNode } from '@/components/molecules/tree-node/type';
 import PTree from '@/components/organisms/tree/PTree.vue';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { ProjectItemResp } from '@/views/project/project/type';
 
 

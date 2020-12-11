@@ -154,7 +154,8 @@ import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 
 /* types */
 import { QuerySearchTableTypeOptions, QuerySearchTableFetchOptions, QuerySearchTableListeners } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
-import { ApiQueryHelper, SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { MonitoringProps, MonitoringResourceType } from '@/views/common/components/monitoring/type';
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 import { ServerModel } from '@/models/inventory/server';
