@@ -249,6 +249,14 @@ export default {
             type: String,
             default: undefined,
         },
+        cloudServiceGroup: {
+            type: String,
+            default: undefined,
+        },
+        cloudServiceType: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -373,8 +381,12 @@ export default {
 
         /* api */
         const getQuery = () => {
-            if (props.provider) {
-                queryStore.setFilters([{ k: 'provider', v: props.provider, o: '=' }]);
+            if (props.isCloudService) {
+                queryStore.setFilters([
+                    { k: 'provider', o: '=', v: props.provider },
+                    { k: 'cloud_service_type', o: '=', v: props.cloudServiceType },
+                    { k: 'cloud_service_group', o: '=', v: props.cloudServiceGroup },
+                ]);
             }
             const { filter, keyword } = queryStore.apiQuery;
             query.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)

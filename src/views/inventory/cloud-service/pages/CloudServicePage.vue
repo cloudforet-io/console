@@ -24,7 +24,11 @@
                 <p-page-navigation :routes="routeState.route" />
             </div>
             <template v-if="sidebarState.selectedItem.type === 'inventory.Server'">
-                <server-main :is-cloud-service="true" :provider="provider" />
+                <server-main :is-cloud-service="true"
+                             :provider="provider"
+                             :cloud-service-type="name"
+                             :cloud-service-group="group"
+                />
             </template>
             <template v-else>
                 <p-page-title :title="name"
