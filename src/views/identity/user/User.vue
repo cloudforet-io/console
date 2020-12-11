@@ -2,14 +2,14 @@
     <vertical-page-layout :min-width="0" :init-width="260" :max-width="400">
         <template #sidebar>
             <div class="member-profile">
-                <img class="member-img" src="@/assets/images/brand/brand_logo.svg">
+                <p-i :name="userState.isAdmin ? 'admin' : 'user'" width="3rem" height="3rem" class="member-icon" />
                 <p class="member-id">
                     {{ userState.userId }}
                 </p>
                 <p v-if="userState.isAdmin" class="member-type">
                     SpaceONE Admin
                 </p>
-                <p v-else>
+                <p v-else class="member-type">
                     SpaceONE User
                 </p>
             </div>
@@ -189,6 +189,7 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { store } from '@/store';
 import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 import { userStateFormatter } from '@/views/identity/user/lib/helper';
+import PI from '@/components/atoms/icons/PI.vue';
 
 
 interface UserModel {
@@ -214,6 +215,7 @@ interface SidebarItemType {
 export default {
     name: 'User',
     components: {
+        PI,
         PHr,
         UserAccountPage,
         VerticalPageLayout,
@@ -581,11 +583,13 @@ export default {
     margin-bottom: 2.125rem;
     width: 14.75rem;
     height: 7.875rem;
-    .member-img {
+    .member-icon {
         @apply mx-auto;
         width: 3rem;
         height: 3rem;
+        border-radius: 100%;
         margin-bottom: 0.5rem;
+        overflow: hidden;
     }
     .member-id {
         @apply text-gray-900;

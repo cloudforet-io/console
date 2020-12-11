@@ -281,7 +281,7 @@ export default {
         width: 25rem;
     }
     .p-select-dropdown::v-deep {
-        width: 16rem;
+        width: 25rem;
         .dropdown-btn {
             margin-left: -9rem;
         }

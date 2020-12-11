@@ -36,70 +36,19 @@
                         </template>
                     </p-field-group>
                 </div>
-                <p-hr class="p-divider" />
                 <div class="bottom-part">
                     <div class="bottom-left-part">
-                        <p-field-group v-if="isInternalAuth"
-                                       :label="$t('IDENTITY.USER.FORM.PASSWORD')"
-                                       :invalid="!validationState.isPasswordValid"
-                                       :invalid-text="validationState.passwordInvalidText"
-                                       :required="true"
-                                       :help-text="$t('IDENTITY.USER.FORM.PASSWORD_HELP_TEXT')"
-                        >
-                            <template v-slot:default="{invalid}">
-                                <p-text-input v-model="formState.password"
-                                              type="password"
-                                              class="block"
-                                              :class="{'is-invalid':invalid}"
-                                />
-                            </template>
-                        </p-field-group>
-
                         <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')">
                             <p-text-input v-model="formState.name" class="block" />
                         </p-field-group>
-
-                        <p-field-group :label="$t('IDENTITY.USER.FORM.MOBILE')">
-                            <p-text-input v-model="formState.mobile" class="block" />
-                        </p-field-group>
-
-                        <p-field-group :label="$t('IDENTITY.USER.FORM.LANGUAGE')">
-                            <p-select-dropdown v-model="formState.language" :items="languages" />
-                        </p-field-group>
-
-                        <p-field-group :label="$t('IDENTITY.USER.FORM.TIMEZONE')">
-                            <p-select-dropdown v-model="formState.timezone" :items="timezones" />
-                        </p-field-group>
-                    </div>
-                    <div class="bottom-right-part">
-                        <p-field-group v-if="isInternalAuth"
-                                       :label="$t('IDENTITY.USER.FORM.PASSWORD_CHECK')"
-                                       :invalid="!validationState.isPasswordCheckValid"
-                                       :invalid-text="validationState.passwordCheckInvalidText"
-                                       :required="true"
-                        >
-                            <template v-slot:default="{invalid}">
-                                <p-text-input v-model="formState.passwordCheck"
-                                              type="password"
-                                              class="block"
-                                              :class="{'is-invalid':invalid}"
-                                />
-                            </template>
-                        </p-field-group>
-
                         <p-field-group :label="$t('IDENTITY.USER.FORM.EMAIL')">
                             <p-text-input v-model="formState.email" class="block" />
                         </p-field-group>
-
-                        <p-field-group :label="$t('IDENTITY.USER.FORM.GROUP')">
-                            <p-text-input v-model="formState.group" class="block" />
-                        </p-field-group>
-
-                        <p-field-group :label="$t('IDENTITY.USER.FORM.TAGS')">
-                            <tags-input-group class="tag-input"
-                                              :tags.sync="formState.tags"
-                                              :show-validation="true"
-                                              :is-valid.sync="validationState.isTagsValid"
+                        <p-field-group :label="'Domain Role'" class="input-form">
+                            <p-select-dropdown v-model="formState.domainRole"
+                                               :items="formState.domainRoleItem"
+                                               auto-height
+                                               class="dropdown"
                             />
                         </p-field-group>
                     </div>
@@ -135,8 +84,6 @@ export default {
         PButtonModal,
         PFieldGroup,
         PTextInput,
-        TagsInputGroup,
-        PHr,
         PSelectDropdown,
         PButton,
     },
@@ -170,39 +117,21 @@ export default {
 
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
-            isInternalAuth: computed(() => store.getters['domain/isInternalAuth']),
-            languages: [
-                { type: 'item', label: 'English', name: 'en' },
-                { type: 'item', label: '한국어', name: 'ko' },
-            ],
-            timezones: [
-                { type: 'item', label: 'UTC', name: 'UTC' },
-                { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
-            ],
         });
         const formState = reactive({
             user_id: '',
-            password: '',
-            passwordCheck: '',
             name: '',
             email: '',
-            mobile: '',
-            group: '',
-            language: 'en',
-            timezone: 'UTC',
-            tags: {},
+            domainRole: '',
+            domainRoleItem: [
+                { type: 'item', label: 'Not select role', name: '' },
+                { type: 'item', label: 'Domain Admin', name: '' },
+            ],
         });
         const validationState = reactive({
             isUserIdValid: undefined as undefined | boolean,
             userIdInvalidText: '' as TranslateResult | string,
             userIdValidText: computed(() => vm.$t('IDENTITY.USER.FORM.NAME_VALID')),
-            //
-            isPasswordValid: undefined as undefined | boolean,
-            passwordInvalidText: '' as TranslateResult | string,
-            isPasswordCheckValid: undefined as undefined | boolean,
-            passwordCheckInvalidText: '' as TranslateResult | string,
-            //
-            isTagsValid: true,
         });
 
         /* util */
@@ -216,15 +145,15 @@ export default {
                     validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
                     return;
                 }
-                if (!state.isInternalAuth) {
-                    await SpaceConnector.client.identity.user.find({
-                        search: { user_id: formState.user_id },
-                        domain_id: store.state.domain.domainId,
-                    }).catch(() => {
-                        validationState.isUserIdValid = false;
-                        validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.USER_ID_NOT_EXIST');
-                    });
-                }
+                // if (!state.isInternalAuth) {
+                //     await SpaceConnector.client.identity.user.find({
+                //         search: { user_id: formState.user_id },
+                //         domain_id: store.state.domain.domainId,
+                //     }).catch(() => {
+                //         validationState.isUserIdValid = false;
+                //         validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.USER_ID_NOT_EXIST');
+                //     });
+                // }
                 await SpaceConnector.client.identity.user.get({ user_id: formState.user_id })
                     .then(() => {
                         validationState.isUserIdValid = false;
@@ -237,37 +166,6 @@ export default {
                 validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
             }
         };
-        const checkPassword = () => {
-            // password1
-            if (!formState.password) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
-            } else if (formState.password.replace(/ /g, '').length !== formState.password.length) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
-            } else if (formState.password.length < 5) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 5 });
-            } else if (formState.password.length > 12) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MAX_LENGTH_INVALID', { max: 12 });
-            } else {
-                validationState.isPasswordValid = true;
-                validationState.passwordInvalidText = '';
-            }
-
-            // password2
-            if (!formState.passwordCheck) {
-                validationState.isPasswordCheckValid = false;
-                validationState.passwordCheckInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
-            } else if (formState.password !== formState.passwordCheck) {
-                validationState.isPasswordCheckValid = false;
-                validationState.passwordCheckInvalidText = vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID');
-            } else {
-                validationState.isPasswordCheckValid = true;
-                validationState.passwordCheckInvalidText = '';
-            }
-        };
 
         const confirm = async () => {
             if (!props.updateMode) {
@@ -277,28 +175,8 @@ export default {
                 }
             }
 
-            if (!validationState.isTagsValid) {
-                return;
-            }
-
-            if (state.isInternalAuth) {
-                await checkPassword();
-                if (!validationState.isPasswordValid || !validationState.isPasswordCheckValid) {
-                    return;
-                }
-            }
-
             const data = {} as any;
-            if (state.isInternalAuth) {
-                if (props.updateMode) {
-                    if (formState.password) {
-                        data.password = formState.password;
-                    }
-                } else {
-                    data.password = formState.password;
-                }
-            }
-            ['user_id', 'name', 'email', 'mobile', 'group', 'language', 'timezone', 'tags'].forEach((key) => {
+            ['user_id', 'name', 'email'].forEach((key) => {
                 if (formState[key]) {
                     data[key] = formState[key];
                 }
@@ -309,15 +187,8 @@ export default {
         const init = () => {
             if (props.updateMode) {
                 formState.user_id = props.item.user_id;
-                formState.password = props.item.password1;
-                formState.passwordCheck = props.item.password2;
                 formState.name = props.item.name;
                 formState.email = props.item.email;
-                formState.mobile = props.item.mobile;
-                formState.group = props.item.group;
-                formState.language = props.item.language;
-                formState.timezone = props.item.timezone;
-                formState.tags = props.item.tags;
             }
         };
         init();
