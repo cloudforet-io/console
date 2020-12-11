@@ -6,9 +6,15 @@
                 <p-query-search-table
                     :fields="fields"
                     :items="items"
-                    :key-item-sets="keyItemSets"
+                    :sort-by.sync="sortBy"
+                    :sort-desc.sync="sortDesc"
+                    :this-page.sync="thisPage"
+                    :page-size.sync="pageSize"
                     :total-count="totalCount"
+                    :key-item-sets="keyItemSets"
+                    :value-handler-map="valueHandlerMap"
                     :style="{height: `${height}px`}"
+                    :query-tags="tags"
                     @select="onSelect"
                     @change="onChange"
                 >
@@ -63,10 +69,23 @@ import PDefinitionTable from '@/components/organisms/tables/definition-table/PDe
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
+import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 
 import { SupervisorPluginModel } from '@/views/management/supervisor/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
+import {
+    makeDistinctValueHandler, makeEnumValueHandler,
+} from '@/lib/component-utils/query-search';
+import { replaceUrlQuery } from '@/lib/router-query-string';
+import { QueryHelper } from '@/lib/query';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { getPageStart } from '@/lib/component-utils/pagination';
+
+enum STATE {
+    active = 'ACTIVE',
+    inactive = 'INACTIVE',
+}
 
 export default {
     name: 'SupervisorPluginPage',
@@ -87,9 +106,27 @@ export default {
             default: '',
         },
     },
-    setup(props, context) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
+        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
+        const handlers = {
+            keyItemSets: [{
+                title: 'Filters',
+                items: [
+                    { name: 'plugin_id', label: 'Plugin ID' },
+                    // { name: 'name', label: 'Name' },
+                    { name: 'state', label: 'State' },
+                    { name: 'version', label: 'Version' },
+                ],
+            }],
+            valueHandlerMap: {
+                plugin_id: makeDistinctValueHandler('inventory.Collector', 'plugin_info.plugin_id'),
+                // name: makeDistinctValueHandler('repository.Plugin'),
+                state: makeEnumValueHandler(STATE),
+                version: makeDistinctValueHandler('inventory.Collector', 'plugin_info.version'),
+            },
+        };
         const state = reactive({
             fields: [
                 { label: 'Plugin ID', name: 'plugin_id' },
@@ -100,6 +137,10 @@ export default {
                 { label: 'Recovery', name: 'managed' },
             ],
             items: [] as SupervisorPluginModel[],
+            sortBy: '',
+            sortDesc: true,
+            pageSize: 15,
+            thisPage: 1,
             totalCount: 0,
             selectIndex: [],
             selectedItems: computed(() => {
@@ -109,15 +150,9 @@ export default {
                 });
                 return items;
             }),
-            keyItemSets: [{
-                title: 'Filters',
-                items: [
-                    { name: 'plugin_id', label: 'Collector ID' },
-                    { name: 'name', label: 'Name' },
-                    { name: 'state', label: 'State' },
-                    { name: 'version', label: 'Version' },
-                ],
-            }],
+            keyItemSets: handlers.keyItemSets as KeyItemSet[],
+            valueHandlerMap: handlers.valueHandlerMap,
+            tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
         });
         const pluginDetailState = reactive({
             name: computed(() => vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_TITLE')),
@@ -149,9 +184,18 @@ export default {
         });
 
         /* apis */
+        const getQuery = () => {
+            const apiQuery = new ApiQueryHelper();
+            apiQuery.setSort(state.sortBy, state.sortDesc)
+                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                .setFilters(queryHelper.filters);
+            return apiQuery.data;
+        };
         const listPlugins = async () => {
             try {
-                const res = await SpaceConnector.client.plugin.supervisor.plugin.list();
+                const res = await SpaceConnector.client.plugin.supervisor.plugin.list({
+                    query: getQuery(),
+                });
                 state.totalCount = res.total_count || 0;
                 state.items = res.results;
             } catch (e) {
@@ -168,8 +212,12 @@ export default {
             state.selectIndex = index;
             getPluginDetailData(index);
         };
-        const onChange = async () => {
+        const onChange = async (item) => {
             try {
+                state.tags = item.queryTags;
+                await queryHelper.setFiltersAsQueryTag(item.queryTags);
+                await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
+
                 await listPlugins();
                 state.selectIndex = [];
             } catch (e) {
