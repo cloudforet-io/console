@@ -187,7 +187,7 @@ export class QueryHelper {
                     /* general case */
                     filter.push({ k: f.k, v: f.v, o: rawQueryOperatorToApiQueryOperatorMap[f.o || ''] });
                 }
-            } else if (f.v !== null) {
+            } else if (f.v !== null && f.v !== undefined) {
                 /* keyword case */
                 if (Array.isArray(f.v)) keyword.push(...f.v.map(v => (v !== null ? v.toString() : '')));
                 else keyword.push(f.v.toString());

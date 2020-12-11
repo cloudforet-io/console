@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { QueryHelper } from '@/lib/query';
-import { Query, Filter } from './type';
+import { Query } from './type';
 
 class ApiQueryHelper extends QueryHelper {
     private _data: Query = {};
@@ -14,39 +14,10 @@ class ApiQueryHelper extends QueryHelper {
         }
 
         const { filter, keyword } = this.apiQuery;
-        if (keyword) this._data.keyword += keyword;
-        if (filter.length > 0) this._data.filter = filter;
+        this._data.keyword += keyword;
+        this._data.filter = filter;
 
         return this._data;
-    }
-
-    addApiFilter(...filters: Array<Filter>): ApiQueryHelper {
-        if (!this._data.filter) {
-            this._data.filter = [];
-        }
-
-        this._data.filter.concat(filters);
-        return this;
-    }
-
-    setApiFilter(...filters: Array<Filter>): ApiQueryHelper {
-        this._data.filter = filters;
-        return this;
-    }
-
-
-    addApiFilterOr(...filters: Array<Filter>): ApiQueryHelper {
-        if (!this._data.filter_or) {
-            this._data.filter_or = [];
-        }
-
-        this._data.filter_or.concat(filters);
-        return this;
-    }
-
-    setApiFilterOr(...filters: Array<Filter>): ApiQueryHelper {
-        this._data.filter_or = filters;
-        return this;
     }
 
     setPage(start: number, limit: number): ApiQueryHelper {

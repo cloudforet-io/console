@@ -359,7 +359,7 @@ export default {
 
             // set filters
             if (props.projectId) {
-                queryHelper.addFilter({ k: 'project_id', o: '=', v: props.projectId });
+                queryHelper.setFilters([{ k: 'project_id', o: '=', v: props.projectId }]);
             }
 
             const location: Location = {

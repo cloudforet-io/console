@@ -175,6 +175,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TranslateResult } from 'vue-i18n';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
+import { QueryHelper } from '@/lib/query';
 
 interface ProjectItemResp {
     id: string;
@@ -209,6 +210,7 @@ export default {
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
 
         /** Provider(located at sidebar) & Page Title * */
         const selectedProvider: Ref<string> = ref('aws');
@@ -234,7 +236,7 @@ export default {
             pageLimit: 15,
             sortDesc: true,
             sortBy: 'created_at',
-            searchText: vm.$route.query.filters?.toString(),
+            searchText: queryHelper.apiQuery.keyword,
         });
 
         const typeOptionState: Omit<TableTypeOptions, 'searchable'|'excelVisible'> = reactive({
@@ -316,10 +318,8 @@ export default {
         const getQuery = () => {
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .addFilter(
-                    { k: 'provider', v: [selectedProvider.value], o: '=' },
-                    { v: fetchOptionState.searchText },
-                );
+                .setFilters([{ k: 'provider', v: selectedProvider.value, o: '=' }])
+                .addFilter(...queryHelper.filters);
             return apiQuery.data;
         };
 
@@ -355,7 +355,8 @@ export default {
                 if (changed.searchText !== undefined) {
                     fetchOptionState.searchText = changed.searchText;
                     // sync updated query tags to url query string
-                    replaceUrlQuery('filters', changed.searchText);
+                    queryHelper.setFilters([{ v: changed.searchText }]);
+                    replaceUrlQuery('filters', queryHelper.rawQueryStrings);
                 }
             }
             listServiceAccountData();

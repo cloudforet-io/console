@@ -71,10 +71,7 @@
                             <span class="summary-item-text">{{ $t('PROJECT.LANDING.SERVER') }}</span>
                             <router-link v-if="cardSummary[item.project_id]"
                                          class="summary-item-num"
-                                         :to="{
-                                             name: 'server',
-                                             query: {filters: `project_id:=${item.project_id}`}
-                                         }"
+                                         :to="getLocation(item.project_id, 'server')"
                             >{{ cardSummary[item.project_id].serverCount }}
                             </router-link>
                             <span v-else class="summary-item-num none">N/A</span>
@@ -84,13 +81,7 @@
                             <span class="summary-item-text">{{ $t('PROJECT.LANDING.CLOUD_SERVICES') }}</span>
                             <router-link v-if="cardSummary[item.project_id]"
                                          class="summary-item-num"
-                                         :to="{
-                                             name: 'cloudService',
-                                             query: {
-                                                 provider: 'all',
-                                                 filters: `project_id:=${item.project_id}`
-                                             }
-                                         }"
+                                         :to="getLocation(item.project_id, 'cloudService')"
                             >{{ cardSummary[item.project_id].cloudServiceCount }}
                             </router-link>
                             <span v-else class="summary-item-num none">N/A</span>
@@ -152,6 +143,7 @@ import { range, uniq } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
 import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import { QueryHelper } from '@/lib/query';
 
 interface Props {
     searchText: string;
@@ -306,6 +298,12 @@ export default {
             await getData(groupId, searchText);
         };
 
+        const queryHelper = new QueryHelper();
+        const getLocation = (projectId, name) => ({
+            name,
+            query: { filters: queryHelper.setFilters([{ k: 'project_id', v: projectId, o: '=' }]).rawQueryStrings },
+        });
+
         watch(() => state.showAllProjects, async (after, before) => {
             if (after !== before) {
                 await listProjects(props.groupId, props.searchText, true);
@@ -321,6 +319,7 @@ export default {
             getData,
             skeletons: range(1),
             listProjects,
+            getLocation,
         };
     },
 };

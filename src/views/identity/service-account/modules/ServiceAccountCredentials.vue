@@ -72,14 +72,13 @@ export default {
             k: 'service_account_id',
             v: props.serviceAccountId,
             o: '=',
-        }])
+        }, { v: state.options.searchText }])
             .setSort(state.options.sortBy, state.options.sortDesc)
             .setPage(
                 getPageStart(state.options.thisPage, state.options.pageSize),
                 state.options.pageSize,
             )
             .setOnly('secret_id', 'name', 'schema', 'created_at')
-            .setFilters([{ v: state.options.searchText }])
             .data;
 
         const api = SpaceConnector.client.secret.secret.list;

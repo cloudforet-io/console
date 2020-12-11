@@ -335,7 +335,6 @@ export default {
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
                 .setFilters(queryHelper.filters);
-
             return apiQuery.data;
         };
 
