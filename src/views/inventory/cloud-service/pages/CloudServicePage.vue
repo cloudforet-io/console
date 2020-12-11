@@ -23,128 +23,136 @@
             <div class="page-navigation">
                 <p-page-navigation :routes="routeState.route" />
             </div>
-            <p-page-title :title="name"
-                          child
-                          use-total-count
-                          use-selected-count
-                          :total-count="typeOptionState.totalCount"
-                          :selected-count="tableState.selectedItems.length"
-                          @goBack="$router.go(-1)"
-            />
-            <p-horizontal-layout :height="tableState.tableHeight" @drag:end="onTableHeightChange">
-                <template #container="{ height }">
-                    <template v-if="tableState.schema">
-                        <p-dynamic-layout type="query-search-table"
-                                          :options="tableState.schema.options"
-                                          :data="tableState.items"
-                                          :fetch-options="fetchOptionState"
-                                          :type-options="typeOptionState"
-                                          :style="{height: `${height}px`}"
-                                          :field-handler="fieldHandler"
-                                          @init="fetchTableData"
-                                          @fetch="fetchTableData"
-                                          @select="onSelect"
-                                          @export="exportCloudServiceData"
-                        >
-                            <template #toolbox-left>
-                                <p-icon-text-button style-type="primary-dark"
-                                                    name="ic_plus_bold"
-                                                    :disabled="tableState.selectedItems.length === 0"
-                                                    @click="clickCollectData"
-                                >
-                                    {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.COLLECT_DATA') }}
-                                </p-icon-text-button>
+            <template v-if="sidebarState.selectedItem.type === 'inventory.Server'">
+                <server-main :is-cloud-service="true" :provider="provider" />
+            </template>
+            <template v-else>
+                <p-page-title :title="name"
+                              child
+                              use-total-count
+                              use-selected-count
+                              :total-count="typeOptionState.totalCount"
+                              :selected-count="tableState.selectedItems.length"
+                              @goBack="$router.go(-1)"
+                />
+                <p-horizontal-layout :height="tableState.tableHeight" @drag:end="onTableHeightChange">
+                    <template #container="{ height }">
+                        <template v-if="tableState.schema">
+                            <p-dynamic-layout type="query-search-table"
+                                              :options="tableState.schema.options"
+                                              :data="tableState.items"
+                                              :fetch-options="fetchOptionState"
+                                              :type-options="typeOptionState"
+                                              :style="{height: `${height}px`}"
+                                              :field-handler="fieldHandler"
+                                              @init="fetchTableData"
+                                              @fetch="fetchTableData"
+                                              @select="onSelect"
+                                              @export="exportCloudServiceData"
+                            >
+                                <template #toolbox-left>
+                                    <p-icon-text-button style-type="primary-dark"
+                                                        name="ic_plus_bold"
+                                                        :disabled="tableState.selectedItems.length === 0"
+                                                        @click="clickCollectData"
+                                    >
+                                        {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.COLLECT_DATA') }}
+                                    </p-icon-text-button>
 
-                                <p-dropdown-menu-btn class="left-toolbox-item mr-4"
-                                                     :menu="tableState.dropdown"
-                                                     @click-project="clickProject"
-                                >
-                                    {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.ACTION') }}
-                                </p-dropdown-menu-btn>
-                            </template>
-                        </p-dynamic-layout>
+                                    <p-dropdown-menu-btn class="left-toolbox-item mr-4"
+                                                         :menu="tableState.dropdown"
+                                                         @click-project="clickProject"
+                                    >
+                                        {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.ACTION') }}
+                                    </p-dropdown-menu-btn>
+                                </template>
+                            </p-dynamic-layout>
+                        </template>
                     </template>
-                </template>
-            </p-horizontal-layout>
-            <p-tab v-if="tableState.selectedItems.length === 1"
-                   :tabs="singleItemTabState.tabs"
-                   :active-tab.sync="singleItemTabState.activeTab"
-            >
-                <template #detail>
-                    <cloud-service-detail
-                        :cloud-service-id="tableState.selectedCloudServiceIds[0]"
-                        :provider="provider"
-                        :cloud-service-group="group"
-                        :cloud-service-type="name"
-                    />
-                </template>
+                </p-horizontal-layout>
+                <p-tab v-if="tableState.selectedItems.length === 1"
+                       :tabs="singleItemTabState.tabs"
+                       :active-tab.sync="singleItemTabState.activeTab"
+                >
+                    <template #detail>
+                        <cloud-service-detail
+                            :cloud-service-id="tableState.selectedCloudServiceIds[0]"
+                            :provider="provider"
+                            :cloud-service-group="group"
+                            :cloud-service-type="name"
+                        />
+                    </template>
 
-                <template #tag>
-                    <tags-panel :resource-id="tableState.selectedCloudServiceIds[0]"
-                                resource-type="inventory.CloudService"
-                                resource-key="cloud_service_id"
-                    />
-                </template>
-                <template #member>
-                    <cloud-service-admin :cloud-service-ids="tableState.selectedCloudServiceIds" />
-                </template>
-                <template #history>
-                    <cloud-service-history :cloud-service-id="tableState.selectedCloudServiceIds[0]" />
-                </template>
-                <template #monitoring>
-                    <monitoring :resource-type="monitoringState.resourceType"
-                                :resources="monitoringState.resources"
-                    />
-                </template>
-            </p-tab>
-            <p-tab v-else-if="typeOptionState.selectIndex.length > 1"
-                   :tabs="multiItemTabState.tabs"
-                   :active-tab.sync="multiItemTabState.activeTab"
-            >
-                <template #data>
-                    <p-dynamic-layout v-if="tableState.schema"
-                                      class="selected-data-tab"
-                                      type="simple-table"
-                                      :field-handler="fieldHandler"
-                                      :options="tableState.schema.options"
-                                      :type-options="{ colCopy: true, timezone: typeOptionState.timezone }"
-                                      :data="tableState.selectedItems"
-                    />
-                </template>
-                <template #member>
-                    <cloud-service-admin :cloud-service-ids="tableState.selectedCloudServiceIds" />
-                </template>
-                <template #monitoring>
-                    <monitoring :resource-type="monitoringState.resourceType"
-                                :resources="monitoringState.resources"
-                    />
-                </template>
-            </p-tab>
-            <p-empty v-else style="height: auto; margin-top: 4rem;">
-                {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.NO_SELECTED') }}
-            </p-empty>
-            <project-tree-modal :visible.sync="changeProjectState.visible"
-                                :project-id="changeProjectState.projectId"
-                                :loading="changeProjectState.loading"
-                                @confirm="changeProject"
-            />
-            <s-collect-modal :visible.sync="tableState.collectModalVisible"
-                             :resources="tableState.selectedItems"
-                             id-key="cloud_service_id"
-            />
+                    <template #tag>
+                        <tags-panel :resource-id="tableState.selectedCloudServiceIds[0]"
+                                    resource-type="inventory.CloudService"
+                                    resource-key="cloud_service_id"
+                        />
+                    </template>
+                    <template #member>
+                        <cloud-service-admin :cloud-service-ids="tableState.selectedCloudServiceIds" />
+                    </template>
+                    <template #history>
+                        <cloud-service-history :cloud-service-id="tableState.selectedCloudServiceIds[0]" />
+                    </template>
+                    <template #monitoring>
+                        <monitoring :resource-type="monitoringState.resourceType"
+                                    :resources="monitoringState.resources"
+                        />
+                    </template>
+                </p-tab>
+                <p-tab v-else-if="typeOptionState.selectIndex.length > 1"
+                       :tabs="multiItemTabState.tabs"
+                       :active-tab.sync="multiItemTabState.activeTab"
+                >
+                    <template #data>
+                        <p-dynamic-layout v-if="tableState.schema"
+                                          class="selected-data-tab"
+                                          type="simple-table"
+                                          :field-handler="fieldHandler"
+                                          :options="tableState.schema.options"
+                                          :type-options="{ colCopy: true, timezone: typeOptionState.timezone }"
+                                          :data="tableState.selectedItems"
+                        />
+                    </template>
+                    <template #member>
+                        <cloud-service-admin :cloud-service-ids="tableState.selectedCloudServiceIds" />
+                    </template>
+                    <template #monitoring>
+                        <monitoring :resource-type="monitoringState.resourceType"
+                                    :resources="monitoringState.resources"
+                        />
+                    </template>
+                </p-tab>
+                <p-empty v-else style="height: auto; margin-top: 4rem;">
+                    {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.NO_SELECTED') }}
+                </p-empty>
+                <project-tree-modal :visible.sync="changeProjectState.visible"
+                                    :project-id="changeProjectState.projectId"
+                                    :loading="changeProjectState.loading"
+                                    @confirm="changeProject"
+                />
+                <s-collect-modal :visible.sync="tableState.collectModalVisible"
+                                 :resources="tableState.selectedItems"
+                                 id-key="cloud_service_id"
+                />
+            </template>
         </template>
     </vertical-page-layout>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { get } from 'lodash';
+import { get, find } from 'lodash';
 
 import {
     reactive, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
+import ServerMain from '@/views/inventory/server/modules/ServerMain.vue';
+import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 import ProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
+import Monitoring from '@/views/common/components/monitoring/Monitoring.vue';
 import CloudServiceDetail from '@/views/inventory/cloud-service/modules/CloudServiceDetail.vue';
 import CloudServiceAdmin from '@/views/inventory/cloud-service/modules/CloudServiceAdmin.vue';
 import CloudServiceHistory from '@/views/inventory/cloud-service/modules/CloudServiceHistory.vue';
@@ -152,13 +160,14 @@ import SCollectModal from '@/views/common/components/collect-modal/CollectModal.
 import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import Monitoring from '@/views/common/components/monitoring/Monitoring.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
+import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
+import PHr from '@/components/atoms/hr/PHr.vue';
 import { MonitoringProps, MonitoringResourceType } from '@/views/common/components/monitoring/type';
 import { ProjectItemResp } from '@/views/project/project/type';
 import { MenuItem } from '@/components/organisms/context-menu/type';
@@ -176,12 +185,8 @@ import { getValue, showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import config from '@/lib/config';
-import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
-import PHr from '@/components/atoms/hr/PHr.vue';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import { QueryStore } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
-
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -230,6 +235,7 @@ const cloudServiceStore = {
 interface SidebarItemType {
     id?: string;
     name: string;
+    type?: string;
 }
 
 export default {
@@ -238,6 +244,7 @@ export default {
         getValue,
     },
     components: {
+        ServerMain,
         PLazyImg,
         PHr,
         VerticalPageLayout,
@@ -493,7 +500,7 @@ export default {
                 { k: 'group', v: props.group, o: '=' },
             ]);
             cloudServiceTypeQuery.setFilter(...cloudServiceTypeQueryStore.apiQuery.filter)
-                .setOnly('cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'is_primary')
+                .setOnly('cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'is_primary', 'resource_type')
                 .setSort('is_primary', true);
             return cloudServiceTypeQuery.data;
         };
@@ -506,6 +513,7 @@ export default {
                 sidebarState.items = res.results.map(d => ({
                     id: d.cloud_service_type_id,
                     name: d.name,
+                    type: d.resource_type,
                 }));
                 sidebarState.iconUrl = res.results[0].tags.find(tag => tag.key === 'spaceone:icon').value;
                 sidebarState.group = res.results[0].group;
@@ -616,7 +624,7 @@ export default {
         /** ******* Page Init ******* */
         const initSidebar = async () => {
             await listCloudServiceTypeData();
-            sidebarState.selectedItem = { name: props.name };
+            sidebarState.selectedItem = find(sidebarState.items, { name: props.name }) || { name: props.name };
         };
         const init = async () => {
             await store.dispatch('resource/loadAll');
