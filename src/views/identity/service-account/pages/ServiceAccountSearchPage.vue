@@ -32,7 +32,7 @@ export default {
                 if (result.url === DEFAULT_URL) {
                     vm.$router.push(ERROR_URL);
                 } else {
-                    link = `${result.url}&filters=${vm.$props.id}`;
+                    link = `${result.url}&filters=["${vm.$props.id}"]`;
                     vm.$router.push(link);
                 }
             } catch (e) {

@@ -2,22 +2,25 @@
 import { concat } from 'lodash';
 import { Location } from 'vue-router';
 import { Reference, ReferenceType } from '@/lib/reference/type';
+import { QueryHelper } from '@/lib/query';
 
 interface LinkFormatter {
     (baseUrl: string, data: string, reference: Reference, query: Location['query']): Location;
 }
 
+const queryHelper = new QueryHelper();
+
 const serverLinkFormatter: LinkFormatter = (name, data, reference, query) => {
     const location = { name, query };
+    let filters: any[] = [];
     if (data) {
-        if (location.query?.filters) {
-            location.query.filters = concat(location.query?.filters, `server_id:=${data}`);
-        } else {
-            location.query = {
-                filters: `server_id:=${data}`,
-            };
+        queryHelper.setFilters([{ k: 'server_id', v: data, o: '=' }]);
+        filters.push(...queryHelper.rawQueryStrings);
+        if (query?.filters) {
+            filters = concat(queryHelper.rawQueryStrings, query?.filters);
         }
     }
+    location.query = { filters };
     return location;
 };
 
@@ -43,15 +46,15 @@ const projectGroupLinkFormatter: LinkFormatter = (name, data, reference, query) 
 
 const collectorLinkFormatter: LinkFormatter = (name, data, reference, query) => {
     const location = { name, query };
+    let filters: any[] = [];
     if (data) {
-        if (location.query?.filters) {
-            location.query.filters = concat(location.query?.filters, `collector_id:=${data}`);
-        } else {
-            location.query = {
-                filters: `collector_id:=${data}`,
-            };
+        queryHelper.setFilters([{ k: 'collector_id', v: data, o: '=' }]);
+        filters.push(...queryHelper.rawQueryStrings);
+        if (query?.filters) {
+            filters = concat(queryHelper.rawQueryStrings, query?.filters);
         }
     }
+    location.query = { filters };
     return location;
 };
 

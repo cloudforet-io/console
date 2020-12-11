@@ -8,7 +8,7 @@
             >
                 <div class="content">
                     <div class="count">
-                        <router-link :to="getLocation(data.type)" class="anchor" :class="data.type">
+                        <router-link :to="data.type !== 'spendings' ? getLocation(data.type) : ''" class="anchor" :class="data.type">
                             <span class="number">
                                 <span v-if="data.type === 'spendings'" class="dollar-sign">$</span>
                                 <span>{{ numberCommaFormatter(data.count) }}</span>

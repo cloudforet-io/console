@@ -374,7 +374,7 @@ export default {
         const onChange = async (item) => {
             state.tags = item.queryTags;
             queryHelper.setFiltersAsQueryTag(item.queryTags);
-            replaceUrlQuery('filters', queryHelper.rawQueryStrings);
+            await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
             try {
                 await getJobs();
             } catch (e) {

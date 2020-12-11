@@ -383,10 +383,13 @@ export default {
         const getQuery = () => {
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
-                .setFilters(queryHelper.filters)
-                .addFilter({ k: 'provider', o: '=', v: props.provider },
+                .setFilters(queryHelper.filters);
+
+            if (props.isCloudService) {
+                apiQuery.addFilter({ k: 'provider', o: '=', v: props.provider },
                     { k: 'cloud_service_type', o: '=', v: props.cloudServiceType },
                     { k: 'cloud_service_group', o: '=', v: props.cloudServiceGroup });
+            }
             return apiQuery.data;
         };
         const listServerData = async () => {
