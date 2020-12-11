@@ -3,20 +3,11 @@ import { UserState } from './type';
 export const setUser = (state: UserState, userInfo: UserState): void => {
     state.userId = userInfo.userId;
     state.userType = userInfo.userType;
+    state.backend = userInfo.backend;
     state.name = userInfo.name;
     state.email = userInfo.email;
-    state.mobile = userInfo.mobile;
-    state.group = userInfo.group;
     state.language = userInfo.language;
     state.timezone = userInfo.timezone;
-};
-
-export const signIn = (state: UserState): void => {
-    state.isSignedIn = true;
-};
-
-export const signOut = (state: UserState): void => {
-    state.isSignedIn = false;
 };
 
 export const expireSession = (state: UserState): void => {

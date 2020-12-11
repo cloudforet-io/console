@@ -14,14 +14,12 @@ try {
 }
 
 const state: UserState = {
-    isSignedIn: storedUserState.isSignedIn || false,
     isSessionExpired: storedUserState.isSessionExpired || false,
     userId: storedUserState.userId,
     userType: storedUserState.userType,
+    backend: storedUserState.backend,
     name: storedUserState.name,
     email: storedUserState.email,
-    mobile: storedUserState.mobile,
-    group: storedUserState.group,
     language: storedUserState.language,
     timezone: storedUserState.timezone,
     reportState: storedUserState.reportState,
