@@ -1,113 +1,167 @@
 <template>
-    <general-page-layout>
-        <p-page-navigation :routes="routes" />
-        <p-page-title :title="$t('IDENTITY.USER.TITLE')" />
-        <p-horizontal-layout>
-            <template #container="{ height }">
-                <p-query-search-table
-                    :loading="loading"
-                    :items="users"
-                    :fields="fields"
-                    :setting-visible="false"
-                    :excel-visible="false"
-                    :responsive="true"
-                    :sort-by.sync="sortBy"
-                    :sort-desc.sync="sortDesc"
-                    :this-page.sync="thisPage"
-                    :page-size.sync="pageSize"
-                    :total-count="totalCount"
-                    :key-item-sets="keyItemSets"
-                    :value-handler-map="valueHandlerMap"
-                    :query-tags="tags"
-                    :style="{'height': height+'px'}"
-                    use-cursor-loading
-                    @select="onSelect"
-                    @change="onChange"
+    <vertical-page-layout :min-width="0" :init-width="260" :max-width="400">
+        <template #sidebar>
+            <div class="member-profile">
+                <img class="member-img" src="@/assets/images/brand/brand_logo.svg">
+                <p class="member-id">
+                    {{ userState.userId }}
+                </p>
+                <p v-if="userState.isAdmin" class="member-type">
+                    SpaceONE Admin
+                </p>
+                <p v-else>
+                    SpaceONE User
+                </p>
+            </div>
+            <div class="menu-title">
+                My Account
+            </div>
+            <p-hr class="menu-divider" />
+            <div v-for="(item) in sidebarState.userMenuList" :key="item.label"
+                 class="menu-item"
+                 :class="{'selected': item.label === sidebarState.selectedItem.label}"
+                 @click="showAccountPage(item)"
+            >
+                {{ item.label }}
+            </div>
+            <div v-if="userState.isAdmin" class="admin-menu-wrapper">
+                <div class="menu-title">
+                    Administrator
+                </div>
+                <p-hr class="menu-divider" />
+                <div v-for="(item) in sidebarState.adminMenuList"
+                     :key="item.label"
+                     class="menu-item"
+                     :class="{'selected': item.label === sidebarState.selectedItem.label}"
+                     @click="showManagementPage(item)"
                 >
-                    <template slot="toolbox-left">
-                        <p-icon-text-button style-type="primary-dark"
-                                            name="ic_plus_bold"
-                                            @click="clickAdd"
-                        >
-                            {{ $t('IDENTITY.USER.CREATE') }}
-                        </p-icon-text-button>
-                        <p-dropdown-menu-btn
-                            id="dropdown-btn"
-                            class="left-toolbox-item mr-4"
-                            :menu="dropdownMenu"
-                            @click-enable="clickEnable"
-                            @click-disable="clickDisable"
-                            @click-delete="clickDelete"
-                            @click-update="clickUpdate"
-                        >
-                            {{ $t('IDENTITY.USER.ACTION') }}
-                        </p-dropdown-menu-btn>
-                    </template>
-                    <template #col-state-format="{value}">
-                        <p-status v-bind="userStateFormatter(value)" />
-                    </template>
-                </p-query-search-table>
-            </template>
-        </p-horizontal-layout>
-        <p-tab v-if="selectedIndex.length === 1" :tabs="singleItemTabState.tabs"
-               :active-tab.sync="singleItemTabState.activeTab"
-        >
-            <template #detail>
-                <p-user-detail ref="userDetail"
-                               :item="selectedUsers[0]"
-                />
-            </template>
-        </p-tab>
-        <p-tab v-else-if="selectedIndex.length > 1" :tabs="multiItemTabState.tabs"
-               :active-tab.sync="multiItemTabState.activeTab"
-        >
-            <template #data>
-                <p-data-table
-                    :fields="multiSelectFields"
-                    :sortable="false"
-                    :selectable="false"
-                    :items="selectedUsers"
-                    :col-copy="true"
-                />
-            </template>
-        </p-tab>
+                    User Management
+                </div>
+            </div>
+        </template>
+        <template #default>
+            <div class="right-contents-container" :class="{'admin': sidebarState.selectedItem.label === 'User Management'}">
+                <p-page-navigation :routes="routes" />
+                <p-page-title :title="sidebarState.selectedItem.label" />
+                <div v-if="!sidebarState.showManagementPage">
+                    <user-account-page
+                        :user-type="userState.userType"
+                        :is-admin="userState.isAdmin"
+                        :user-id="userState.userId"
+                    />
+                </div>
+                <div v-if="sidebarState.showManagementPage">
+                    <p-horizontal-layout>
+                        <template #container="{ height }">
+                            <p-query-search-table
+                                :loading="loading"
+                                :items="users"
+                                :fields="fields"
+                                :setting-visible="false"
+                                :excel-visible="false"
+                                :responsive="true"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :this-page.sync="thisPage"
+                                :page-size.sync="pageSize"
+                                :total-count="totalCount"
+                                :key-item-sets="keyItemSets"
+                                :value-handler-map="valueHandlerMap"
+                                :query-tags="tags"
+                                :style="{'height': height+'px'}"
+                                use-cursor-loading
+                                @select="onSelect"
+                                @change="onChange"
+                            >
+                                <template slot="toolbox-left">
+                                    <p-icon-text-button style-type="primary-dark"
+                                                        name="ic_plus_bold"
+                                                        @click="clickAdd"
+                                    >
+                                        {{ $t('IDENTITY.USER.CREATE') }}
+                                    </p-icon-text-button>
+                                    <p-dropdown-menu-btn
+                                        id="dropdown-btn"
+                                        class="left-toolbox-item mr-4"
+                                        :menu="dropdownMenu"
+                                        @click-enable="clickEnable"
+                                        @click-disable="clickDisable"
+                                        @click-delete="clickDelete"
+                                        @click-update="clickUpdate"
+                                    >
+                                        {{ $t('IDENTITY.USER.ACTION') }}
+                                    </p-dropdown-menu-btn>
+                                </template>
+                                <template #col-state-format="{value}">
+                                    <p-status v-bind="userStateFormatter(value)" />
+                                </template>
+                            </p-query-search-table>
+                        </template>
+                    </p-horizontal-layout>
+                    <p-tab v-if="selectedIndex.length === 1" :tabs="singleItemTabState.tabs"
+                           :active-tab.sync="singleItemTabState.activeTab"
+                    >
+                        <template #detail>
+                            <p-user-detail ref="userDetail"
+                                           :item="selectedUsers[0]"
+                            />
+                        </template>
+                    </p-tab>
+                    <p-tab v-else-if="selectedIndex.length > 1" :tabs="multiItemTabState.tabs"
+                           :active-tab.sync="multiItemTabState.activeTab"
+                    >
+                        <template #data>
+                            <p-data-table
+                                :fields="multiSelectFields"
+                                :sortable="false"
+                                :selectable="false"
+                                :items="selectedUsers"
+                                :col-copy="true"
+                            />
+                        </template>
+                    </p-tab>
 
-        <div v-else id="empty-space">
-            <p-empty>{{ $t('IDENTITY.USER.NO_SELECTED') }}</p-empty>
-        </div>
-        <p-table-check-modal
-            v-if="!!modalState.mode"
-            :visible.sync="modalState.visible"
-            :header-title="modalState.title"
-            :sub-title="modalState.subTitle"
-            :theme-color="modalState.themeColor"
-            :fields="multiSelectFields"
-            size="lg"
-            :centered="true"
-            :selectable="false"
-            :items="selectedUsers"
-            @confirm="checkModalConfirm"
-        />
-        <p-user-form v-if="userFormState.visible"
-                     :header-title="userFormState.headerTitle"
-                     :update-mode="userFormState.updateMode"
-                     :item="userFormState.item"
-                     :visible.sync="userFormState.visible"
-                     @confirm="userFormConfirm"
-        />
-    </general-page-layout>
+                    <div v-else id="empty-space">
+                        <p-empty>{{ $t('IDENTITY.USER.NO_SELECTED') }}</p-empty>
+                    </div>
+                    <p-table-check-modal
+                        v-if="!!modalState.mode"
+                        :visible.sync="modalState.visible"
+                        :header-title="modalState.title"
+                        :sub-title="modalState.subTitle"
+                        :theme-color="modalState.themeColor"
+                        :fields="multiSelectFields"
+                        size="lg"
+                        :centered="true"
+                        :selectable="false"
+                        :items="selectedUsers"
+                        @confirm="checkModalConfirm"
+                    />
+                    <p-user-form v-if="userFormState.visible"
+                                 :header-title="userFormState.headerTitle"
+                                 :update-mode="userFormState.updateMode"
+                                 :item="userFormState.item"
+                                 :visible.sync="userFormState.visible"
+                                 @confirm="userFormConfirm"
+                    />
+                </div>
+            </div>
+        </template>
+    </vertical-page-layout>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { map } from 'lodash';
+import { find, map } from 'lodash';
 
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
+import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
+import UserAccountPage from '@/views/identity/user/modules/UserAccountPage.vue';
+import PHr from '@/components/atoms/hr/PHr.vue';
 import PUserForm from '@/views/identity/user/modules/UserForm.vue';
 import PUserDetail from '@/views/identity/user/modules/UserDetail.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
@@ -120,21 +174,21 @@ import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCh
 import PStatus from '@/components/molecules/status/PStatus.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
+
 import { Options } from '@/components/organisms/tables/query-search-table/type';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 import { Timestamp } from '@/components/util/type';
-
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import { store } from '@/store';
 import { KeyItemSet } from '@/components/organisms/search/query-search/type';
-import {userStateFormatter} from "@/views/identity/user/lib/helper";
+import { userStateFormatter } from '@/views/identity/user/lib/helper';
 
 
 interface UserModel {
@@ -153,14 +207,20 @@ interface UserModel {
     user_id: string;
 }
 
+interface SidebarItemType {
+    label: string;
+}
+
 export default {
     name: 'User',
     components: {
+        PHr,
+        UserAccountPage,
+        VerticalPageLayout,
         PEmpty,
         PQuerySearchTable,
         PPageNavigation,
         PIconTextButton,
-        GeneralPageLayout,
         PUserForm,
         PStatus,
         PHorizontalLayout,
@@ -262,6 +322,23 @@ export default {
             valueHandlerMap: handlers.valueHandlerMap,
             tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
         });
+        const sidebarState = reactive({
+            showManagementPage: false,
+            userMenuList: [
+                { label: 'Account & Profile' },
+            ],
+            adminMenuList: [
+                { label: 'User Management' },
+            ],
+            selectedItem: {} as SidebarItemType,
+        });
+        const userState = reactive({
+            isAdmin: computed(() => store.getters['user/isAdmin']),
+            userType: computed(() => store.state.user.backend) as unknown as string,
+            userName: computed(() => store.state.user.name),
+            email: computed(() => store.state.user.email),
+            userId: computed(() => store.state.user.userId),
+        });
         const modalState = reactive({
             visible: false,
             mode: '',
@@ -295,6 +372,15 @@ export default {
             ] as TabItem[])),
             activeTab: 'data',
         });
+
+        const showAccountPage = (item) => {
+            sidebarState.showManagementPage = false;
+            sidebarState.selectedItem = item;
+        };
+        const showManagementPage = (item) => {
+            sidebarState.showManagementPage = true;
+            sidebarState.selectedItem = item;
+        };
 
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
@@ -454,17 +540,22 @@ export default {
 
         const init = async () => {
             await getUsers();
+            sidebarState.selectedItem = sidebarState.userMenuList[0];
         };
         init();
 
         return {
             ...toRefs(state),
             ...toRefs(routeState),
+            userState,
             userFormState,
+            sidebarState,
             userStateFormatter,
             modalState,
             singleItemTabState,
             multiItemTabState,
+            showAccountPage,
+            showManagementPage,
             getUsers,
             clickAdd,
             clickUpdate,
@@ -481,6 +572,75 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+
+.member-profile {
+    text-align: center;
+    vertical-align: middle;
+    padding: 1rem 2.125rem;
+    margin-top: 1.5rem;
+    margin-bottom: 2.125rem;
+    width: 14.75rem;
+    height: 7.875rem;
+    .member-img {
+        @apply mx-auto;
+        width: 3rem;
+        height: 3rem;
+        margin-bottom: 0.5rem;
+    }
+    .member-id {
+        @apply text-gray-900;
+        font-size: 0.875rem;
+        margin-bottom: 0.25rem;
+        line-height: 140%;
+    }
+    .member-type {
+        @apply text-gray-500;
+        font-size: 0.75rem;
+        line-height: 120%;
+    }
+}
+.menu-title {
+    @apply font-bold text-gray-900;
+    font-size: 0.875rem;
+    line-height: 140%;
+    margin-left: 1rem;
+    margin-bottom: 0.5625rem;
+}
+.menu-divider {
+    @apply w-full;
+    margin-bottom: 0.75rem;
+}
+.menu-item {
+    @apply text-gray-900 truncate;
+    width: 14.75rem;
+    height: 2rem;
+    font-size: 0.875rem;
+    line-height: 140%;
+    padding: 6px 1rem;
+    margin-left: 0.75rem;
+    margin-right: 0.75rem;
+    &:hover {
+        @apply bg-blue-100 cursor-pointer;
+    }
+    &:active {
+        @apply bg-blue-200 text-blue-500 cursor-pointer;
+    }
+    &.selected {
+        @apply bg-blue-200 text-blue-500 cursor-pointer;
+    }
+}
+.admin-menu-wrapper {
+    margin-top: 2.625rem;
+}
+.right-contents-container {
+    @apply mx-auto;
+    max-width: 53rem;
+    &.admin {
+        @apply mx-0;
+        max-width: 100%;
+    }
+}
+
 .left-toolbox-item {
     margin-left: 1rem;
     &:last-child {
