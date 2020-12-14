@@ -21,7 +21,7 @@
                             </th>
                             <th
                                 v-for="(field, index) in fieldsData"
-                                :key="`${field.name}-${index}`"
+                                :key="getKey('th', index)"
                                 :style="{
                                     minWidth: field.width || undefined,
                                     width: field.width || undefined,
@@ -86,7 +86,7 @@
                                   :fields="fieldsName"
                                   :row-cursor-pointer="rowCursorPointer"
                             >
-                                <tr :key="index" :data-index="index"
+                                <tr :key="getKey('tr', index)" :data-index="index"
                                     class="fade-in"
                                     :class="{
                                         'tr-selected': isSelected(index),
@@ -124,7 +124,7 @@
                                           :index="index"
                                           :field="field"
                                     >
-                                        <td :key="`${field.name}-${i}`"
+                                        <td :key="getKey('td', index)"
                                             v-tooltip.bottom="{content: getTooltipContent(item, field, index, i), delay: {show: 500}}"
                                         >
                                             <slot
@@ -522,6 +522,8 @@ export default {
             return (item, field) => get(item, field);
         });
 
+        const getKey = (type, idx) => `${type}-${idx}${Math.random()}`;
+
         const getTableWidth = () => {
             if (props.width) return props.width;
             // if (!props.colWidth) return undefined;
@@ -582,6 +584,7 @@ export default {
             getSelectItem,
             clickColCopy,
             getValueFunc,
+            getKey,
             skeletons,
             getTableWidth,
             getTooltipContent,
