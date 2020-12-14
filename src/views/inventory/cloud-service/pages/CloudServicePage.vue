@@ -150,7 +150,7 @@
 import { get, find } from 'lodash';
 
 import {
-    reactive, computed, getCurrentInstance, ComponentRenderProxy, watch,
+    reactive, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import ServerMain from '@/views/inventory/server/modules/ServerMain.vue';
@@ -499,13 +499,15 @@ export default {
             return {};
         };
 
-        const cloudServiceTypeQuery = new ApiQueryHelper();
+        const cloudServiceTypeQuery = new ApiQueryHelper()
+            .setOnly('cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'is_primary', 'resource_type')
+            .setSort('is_primary', true);
+
         const getCloudServiceTypeQuery = () => {
             cloudServiceTypeQuery.setFilters([
                 { k: 'provider', v: props.provider, o: '=' },
                 { k: 'group', v: props.group, o: '=' },
-            ]).setOnly('cloud_service_type_id', 'name', 'group', 'provider', 'tags', 'is_primary', 'resource_type')
-                .setSort('is_primary', true);
+            ]);
             return cloudServiceTypeQuery.data;
         };
 

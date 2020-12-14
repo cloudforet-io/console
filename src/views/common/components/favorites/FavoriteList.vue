@@ -122,7 +122,8 @@ export default {
         @apply bg-secondary2 text-secondary;
     }
     .item-link {
-        @apply flex flex-grow;
+        @apply flex flex-grow items-center;
+        line-height: 1.5;
     }
     .icon {
         @apply flex-shrink-0 flex overflow-hidden;
@@ -132,7 +133,6 @@ export default {
     }
     .name {
         @apply ml-1 flex-grow truncate;
-        line-height: 1.5;
         font-size: 0.875rem;
     }
     .delete-btn {
