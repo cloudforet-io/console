@@ -5,25 +5,15 @@ import { Filter, Query } from './type';
 class ApiQueryHelper extends QueryHelper {
     private _data: Query = {};
 
-    private _keywords: Array<string> = [];
 
     get data(): Query {
         const { filter, keyword } = this.apiQuery;
 
-        if (filter.length > 0) {
-            if (this._data.filter) {
-                this._data.filter.concat(filter);
-            } else {
-                this._data.filter = filter;
-            }
-        }
-        if (keyword) {
-            if (this._keywords.length > 0) {
-                this._data.keyword = `${this._keywords.join(' ')} ${keyword}`;
-            } else {
-                this._data.keyword = keyword;
-            }
-        }
+        if (filter.length > 0) this._data.filter = filter;
+        else delete this._data.filter;
+
+        if (this._data.keyword) this._data.keyword = keyword;
+        else delete this._data.keyword;
 
         return this._data;
     }
@@ -74,30 +64,6 @@ class ApiQueryHelper extends QueryHelper {
 
     setOnly(...keys: Array<string>): ApiQueryHelper {
         this._data.only = keys;
-        return this;
-    }
-
-    addKeyword(key: string): ApiQueryHelper {
-        this._keywords.push(key);
-        return this;
-    }
-
-    setKeyword(...keys: Array<string>): ApiQueryHelper {
-        this._keywords = keys;
-        return this;
-    }
-
-    setApiFilter(...filter: Filter[]): ApiQueryHelper {
-        this.data.filter = filter;
-        return this;
-    }
-
-    addApiFilter(...filter: Filter[]): ApiQueryHelper {
-        if (!this.data.filter) {
-            this.data.filter = filter;
-        } else {
-            this.data.filter.push(...filter);
-        }
         return this;
     }
 }

@@ -150,7 +150,7 @@
 import { get, find } from 'lodash';
 
 import {
-    reactive, computed, getCurrentInstance, ComponentRenderProxy,
+    reactive, computed, getCurrentInstance, ComponentRenderProxy, watch,
 } from '@vue/composition-api';
 
 import ServerMain from '@/views/inventory/server/modules/ServerMain.vue';
@@ -324,7 +324,7 @@ export default {
         const tableState = reactive({
             schema: null as null|DynamicLayout,
             items: [],
-            selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
+            selectedItems: computed(() => typeOptionState.selectIndex.map((d, i) => tableState.items[d])),
             consoleLink: computed(() => get(tableState.selectedItems[0], 'reference.external_link')),
             dropdown: computed(() => ([
                 {
@@ -353,11 +353,6 @@ export default {
             collectModalVisible: false,
             selectedCloudServiceIds: computed(() => tableState.selectedItems.map(d => d.cloud_service_id)),
             tableHeight: cloudServiceStore.getItem('tableHeight', 'number'),
-            fixedFilters: computed<QueryStoreFilter[]>(() => [
-                { k: 'provider', o: '=', v: props.provider },
-                { k: 'cloud_service_group', o: '=', v: props.group },
-                { k: 'cloud_service_type', o: '=', v: props.name },
-            ]),
         });
 
         const onTableHeightChange = (height) => {
@@ -383,7 +378,11 @@ export default {
                     },
                 });
 
-                schemaQueryHelper.setFilters(tableState.fixedFilters);
+                schemaQueryHelper.setFilters([
+                    { k: 'provider', o: '=', v: props.provider },
+                    { k: 'cloud_service_group', o: '=', v: props.group },
+                    { k: 'cloud_service_type', o: '=', v: props.name },
+                ]);
 
                 // declare keyItemSets and valueHandlerMap with search schema
                 if (schema?.options?.search) {
@@ -407,7 +406,11 @@ export default {
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
                 .setFilters(queryHelper.filters)
-                .addFilter(...tableState.fixedFilters);
+                .addFilter(
+                    { k: 'provider', o: '=', v: props.provider },
+                    { k: 'cloud_service_group', o: '=', v: props.group },
+                    { k: 'cloud_service_type', o: '=', v: props.name },
+                );
 
             if (tableState.schema?.options?.fields) {
                 apiQuery.setOnly(...tableState.schema.options.fields.map((d) => {
@@ -424,6 +427,10 @@ export default {
             typeOptionState.loading = true;
             try {
                 const res = await cloudServiceListApi({ query: getQuery() });
+
+                // filtering select index
+                typeOptionState.selectIndex = typeOptionState.selectIndex.filter(d => !!res.results[d]);
+
                 tableState.items = res.results;
                 typeOptionState.totalCount = res.total_count;
             } catch (e) {
@@ -623,13 +630,12 @@ export default {
             await listCloudServiceTypeData();
             sidebarState.selectedItem = find(sidebarState.items, { name: props.name }) || { name: props.name };
         };
-        const init = async () => {
+
+        (async () => {
             await store.dispatch('resource/loadAll');
             await getTableSchema();
             await initSidebar();
-        };
-
-        init();
+        })();
         /** ************************* */
 
 
