@@ -278,8 +278,8 @@ export default {
                 { name: 'name', label: 'Name' },
                 { name: 'email', label: 'Email' },
                 { name: 'state', label: 'State' },
-                { name: 'mobile', label: 'Mobile' },
-                { name: 'group', label: 'Group' },
+                // { name: 'mobile', label: 'Mobile' },
+                // { name: 'group', label: 'Group' },
                 { name: 'language', label: 'Language' },
                 { name: 'timezone', label: 'Timezone' },
             ])),
@@ -300,7 +300,7 @@ export default {
                 { name: 'user_id', label: vm.$t('IDENTITY.USER.USER_ID') },
                 { name: 'name', label: vm.$t('IDENTITY.USER.NAME') },
                 { name: 'email', label: vm.$t('IDENTITY.USER.EMAIL') },
-                { name: 'group', label: vm.$t('IDENTITY.USER.GROUP') },
+                // { name: 'group', label: vm.$t('IDENTITY.USER.GROUP') },
             ])),
             dropdownMenu: computed(() => ([
                 {

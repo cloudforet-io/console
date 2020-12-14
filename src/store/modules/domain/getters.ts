@@ -1,4 +1,5 @@
-import { DomainState, AuthSystem } from './type';
+import { extendedAuthTypes } from '@/store/modules/domain/config';
+import { DomainState } from './type';
 
 export const isInternalAuth = (state: DomainState): boolean => (state.authType === 'INTERNAL');
 export const getAuthSystem = (state: DomainState): string => {
@@ -8,3 +9,4 @@ export const getAuthSystem = (state: DomainState): string => {
 
     return 'local';
 };
+export const extendedAuthTypeLabel = (state: DomainState): string => extendedAuthTypes[state.extendedAuthType as string] || state.extendedAuthType;

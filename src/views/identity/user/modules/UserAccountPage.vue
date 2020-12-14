@@ -56,7 +56,7 @@
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="password" type="password"
-                                          class="text-input"
+                                          class="text-input block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                           :class="{'is-invalid': invalid}"
                             />
                         </template>
@@ -69,7 +69,7 @@
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="passwordCheck" type="password"
-                                          class="text-input"
+                                          class="text-input block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
                                           :class="{'is-invalid': invalid}"
                             />
                         </template>
