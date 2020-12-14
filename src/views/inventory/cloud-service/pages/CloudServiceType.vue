@@ -336,36 +336,23 @@ export default {
          * */
         const cardQueryHelper = new QueryHelper();
         const getToCloudService = (item) => {
-            let res: Location;
             cardQueryHelper.setFilters(queryHelper.filters);
 
             forEach(filterState.regionFilter, (d) => {
                 cardQueryHelper.addFilter({ k: 'region_code', o: '=', v: d });
             });
 
-            if (item.resource_type === 'inventory.Server') {
-                cardQueryHelper.addFilter({ k: 'provider', o: '=', v: item.provider },
-                    { k: 'cloud_service_type', o: '=', v: item.cloud_service_type });
-
-                res = {
-                    name: 'server',
-                    query: {
-                        filters: cardQueryHelper.rawQueryStrings,
-                    },
-                };
-            } else {
-                res = {
-                    name: 'cloudServicePage',
-                    params: {
-                        provider: item.provider,
-                        group: item.cloud_service_group,
-                        name: item.cloud_service_type,
-                    },
-                    query: {
-                        filters: cardQueryHelper.rawQueryStrings,
-                    },
-                };
-            }
+            const res: Location = {
+                name: 'cloudServicePage',
+                params: {
+                    provider: item.provider,
+                    group: item.cloud_service_group,
+                    name: item.cloud_service_type,
+                },
+                query: {
+                    filters: cardQueryHelper.rawQueryStrings,
+                },
+            };
             return res;
         };
 

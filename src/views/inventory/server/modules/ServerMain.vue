@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-page-title :title="$t('INVENTORY.SERVER.MAIN.TITLE')"
+        <p-page-title :title="pageTitle"
                       use-total-count use-selected-count
                       :total-count="typeOptionState.totalCount"
                       :selected-count="tableState.selectedItems.length"
@@ -165,11 +165,11 @@ import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dyna
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
+import { QueryHelper } from '@/lib/query';
 import { Reference } from '@/lib/reference/type';
 import { ServerModel } from '@/models/inventory/server';
 import { store } from '@/store';
 import config from '@/lib/config';
-import { QueryHelper } from '@/lib/query';
 
 
 interface ProjectItemResp {
@@ -263,6 +263,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const apiQuery = new ApiQueryHelper();
+        const pageTitle = props.isCloudService ? props.cloudServiceType : vm.$t('INVENTORY.SERVER.MAIN.TITLE');
 
         const typeOptionState: Omit<QuerySearchTableTypeOptions, 'searchable'|'excelVisible'> = reactive({
             loading: true,
@@ -589,6 +590,7 @@ export default {
 
         return {
             /* Server Table */
+            pageTitle,
             tableState,
             fetchOptionState,
             typeOptionState,
