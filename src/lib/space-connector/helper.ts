@@ -12,7 +12,7 @@ class ApiQueryHelper extends QueryHelper {
         if (filter.length > 0) this._data.filter = filter;
         else delete this._data.filter;
 
-        if (this._data.keyword) this._data.keyword = keyword;
+        if (keyword) this._data.keyword = keyword;
         else delete this._data.keyword;
 
         return this._data;

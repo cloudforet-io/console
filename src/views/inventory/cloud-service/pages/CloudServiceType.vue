@@ -65,10 +65,10 @@
                     </p>
                 </div>
                 <div v-for="(region, idx) in filterState.regionList" :key="idx"
-                     :class="{selected: region}" class="region-list"
+                     class="region-list"
                 >
                     <p-check-box :selected="filterState.regionFilter" :value="region.region_code"
-                                 @change="onClickRegion(region, ...arguments)"
+                                 @change="onClickRegion"
                     />
                     <span class="region-list-text">
                         <div class="region-type">
@@ -299,27 +299,30 @@ export default {
             vm.$store.dispatch('favorite/cloudServiceType/removeItem', item);
         };
 
-        const regionApiQuery = new ApiQueryHelper();
-        const getRegionQuery = (value) => {
-            regionApiQuery.setFilters([{
-                k: 'provider',
-                v: value,
-                o: '',
-            }]);
+        const regionApiQuery = new ApiQueryHelper().setOnly('region_code', 'provider', 'name');
+        const getRegionQuery = (value?: string) => {
+            if (value) {
+                regionApiQuery.setFilters([{
+                    k: 'provider',
+                    v: value,
+                    o: '=',
+                }]);
+            } else regionApiQuery.setFilters([]);
+
             return regionApiQuery.data;
         };
 
         const listRegionByProvider = async (selectedProviderValue) => {
             try {
-                if (selectedProviderValue === 'all') {
-                    const res = await SpaceConnector.client.inventory.region.list();
-                    filterState.regionList = res.results.map(d => ({ ...d }));
-                } else if (selectedProviderValue) {
-                    const res = await SpaceConnector.client.inventory.region.list({
-                        query: getRegionQuery(selectedProviderValue),
-                    });
-                    filterState.regionList = res.results.map(d => ({ ...d }));
-                }
+                const res = await SpaceConnector.client.inventory.region.list({
+                    query: getRegionQuery(selectedProviderValue === 'all' ? undefined : selectedProviderValue),
+                });
+
+                // filtering region filter
+                const regionMap = zipObject(res.results.map(d => d.region_code), res.results);
+                filterState.regionFilter = filterState.regionFilter.filter(d => regionMap[d]);
+
+                filterState.regionList = res.results;
             } catch (e) {
                 console.error(e);
             }
@@ -327,8 +330,8 @@ export default {
         const onClickService = async (region, res, isSelected) => {
             filterState.serviceFilter = res;
         };
-        const onClickRegion = async (region, res, isSelected) => {
-            filterState.regionFilter = res;
+        const onClickRegion = async (val, isSelected) => {
+            filterState.regionFilter = val;
         };
 
         /**
