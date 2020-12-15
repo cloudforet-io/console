@@ -459,6 +459,7 @@
 			},
 			"GROUP": "Group/Company",
 			"LANGUAGE": "Language",
+			"LAST_ACTIVITY": "Last Activity",
 			"MOBILE": "Mobile",
 			"NAME": "Name",
 			"NO_SELECTED": "Select a user for more details.",

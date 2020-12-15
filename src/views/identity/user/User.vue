@@ -112,13 +112,13 @@
                     >
                         <template #detail>
                             <p-user-detail ref="userDetail"
-                                           :item="selectedUsers[0]"
+                                           :user-id="selectedUsers[0].user_id"
                             />
                         </template>
                         <template #tag>
                             <p-tags-panel :resource-id="selectedUsers[0].user_id"
-                                        resource-type="identity.User"
-                                        resource-key="user_id"
+                                          resource-type="identity.User"
+                                          resource-key="user_id"
                             />
                         </template>
                     </p-tab>

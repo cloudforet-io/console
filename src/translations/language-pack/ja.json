@@ -459,6 +459,7 @@
 			},
 			"GROUP": "グループ",
 			"LANGUAGE": "言語",
+			"LAST_ACTIVITY": "",
 			"MOBILE": "連絡先",
 			"NAME": "お名前",
 			"NO_SELECTED": "ユーザーを選択すると、詳細な情報が表示されます。",
