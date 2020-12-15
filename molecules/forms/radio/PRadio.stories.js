@@ -53,7 +53,6 @@ export const multiCase = () => ({
                         <p-radio 
                                  v-model="selected"
                                  :value="item"
-                                 :hovered="hovered"
                                  @change="onChange"
                         />
                         {{item}}
