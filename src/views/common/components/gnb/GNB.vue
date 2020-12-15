@@ -35,30 +35,26 @@
                         <router-link v-else :to="dItem.link" class="block">
                             <span>{{ dItem.key }}</span>
                         </router-link>
+                        <div v-if="openedMenu === dItem.key && dItem.menu.length > 0"
+                             v-click-outside="hideMenu"
+                             class="sub-menu-wrapper"
+                        >
+                            <template v-for="(item, index) in dItem.menu" @click.native="hideMenu">
+                                <router-link :key="index" :to="item.link">
+                                    <div class="sub-menu">
+                                        <span>{{ item.label }}</span>
+                                        <span v-if="item.isNew" class="new-text">new</span>
+                                    </div>
+                                </router-link>
+                            </template>
+                        </div>
                     </div>
-                    <p-context-menu
-                        v-if="openedMenu === dItem.key && dItem.menu.length > 0"
-                        v-click-outside="hideMenu"
-                        :menu="dItem.menu" theme="white"
-                    >
-                        <template #item-plugin>
-                            <div v-if="!userState.isDomainOwner" class="empty" />
-                        </template>
-                        <template #item--format="{item}">
-                            <router-link :to="item.link" @click.native="hideMenu">
-                                <div>
-                                    <span>{{ item.label }}</span>
-                                    <span v-if="item.isNew" class="new-text">new</span>
-                                </div>
-                            </router-link>
-                        </template>
-                    </p-context-menu>
                 </template>
             </div>
         </div>
 
         <div class="right-part">
-            <div class="menu-wrapper">
+            <div class="menu-wrapper support">
                 <div class="menu-button opacity"
                      :class="{opened: openedMenu === 'support'}"
                      @click.stop="toggleMenu('support')"
@@ -68,15 +64,21 @@
                          color="inherit transparent"
                     />
                 </div>
-                <p-context-menu
-                    v-if="openedMenu === 'support'"
-                    v-click-outside="hideMenu"
-                    class="right-align"
-                    :menu="supportMenu"
-                    theme="white"
+                <div v-if="openedMenu === 'support'"
+                     v-click-outside="hideMenu"
+                     class="sub-menu-wrapper right-align"
                 >
-                    <template #item--format="{item}" />
-                </p-context-menu>
+                    <p-anchor v-for="(item, index) in supportMenu" :key="index"
+                              :href="item.link" target="_blank"
+                              :show-icon="false"
+                              class="sub-menu"
+                    >
+                        <span>{{ item.label }}</span>
+                        <p-i class="external-link-icon" name="ic_external-link"
+                             width="0.875rem" height="0.875rem"
+                        />
+                    </p-anchor>
+                </div>
             </div>
             <div class="menu-wrapper account ml-6">
                 <div class="menu-button account"
@@ -86,49 +88,38 @@
                          :class="[{opened: openedMenu === 'account'}, userState.isDomainOwner ? 'admin' : 'member']"
                     />
                 </div>
-                <p-context-menu
-                    v-if="openedMenu === 'account'"
-                    v-click-outside="hideMenu"
-                    class="right-align"
-                    :menu="accountMenu"
-                    theme="white"
+                <div v-if="openedMenu === 'account'"
+                     v-click-outside="hideMenu"
+                     class="sub-menu-wrapper right-align account"
                 >
-                    <template #info--format>
-                        <div class="context-info">
+                    <div class="info-wrapper">
+                        <div class="info-row">
                             <p-i v-if="userState.isDomainOwner" class="icon" name="admin" />
                             <p-i v-else class="icon" name="user" />
                             <span class="value">{{ userState.email }}</span>
                         </div>
-                        <div class="context-info">
+                        <div class="info-row">
                             <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
                             <span v-if="userState.isDomainOwner" class="value">{{ $t('COMMON.GNB.ACCOUNT.ROLE_ROOT_ADMIN') }}</span>
                             <span v-else class="value">{{ $t('COMMON.GNB.ACCOUNT.ROLE_DOMAIN_ADMIN') }}</span>
                         </div>
-                        <div class="context-info">
+                        <div class="info-row">
                             <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_TIMEZONE') }}</span>
                             <span class="value">{{ userState.timezone }}</span>
                         </div>
-                        <div class="context-info">
+                        <div class="info-row">
                             <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
                             <span class="value">{{ userState.language }}</span>
                         </div>
-                    </template>
-                    <template #divider>
-                        <div class="border" />
-                    </template>
-                    <template #item--format="{item}">
-                        <div v-if="item.name === 'profile'">
-                            <div @click="openProfile">
-                                {{ item.label }}
-                            </div>
-                        </div>
-                        <div v-else>
-                            <div @click="signOut">
-                                {{ item.label }}
-                            </div>
-                        </div>
-                    </template>
-                </p-context-menu>
+                        <p-hr />
+                    </div>
+                    <div class="sub-menu" @click="openProfile">
+                        <span>{{ $t('COMMON.GNB.ACCOUNT.LABEL_PROFILE') }}</span>
+                    </div>
+                    <div class="sub-menu" @click="signOut">
+                        <span>{{ $t('COMMON.GNB.ACCOUNT.LABEL_SIGN_OUT') }}</span>
+                    </div>
+                </div>
             </div>
         </div>
         <profile-modal v-if="profileVisible"
@@ -147,19 +138,21 @@ import {
 
 import ProfileModal from '@/views/common/components/profile/ProfileModal.vue';
 import SiteMap from '@/views/common/components/gnb/SiteMap.vue';
+import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import PContextMenu from '@/components/organisms/context-menu/PContextMenu.vue';
 
 import { store } from '@/store';
 import router from '@/routes/index';
 import { Location } from 'vue-router';
+import PHr from '@/components/atoms/hr/PHr.vue';
 
 export default {
     name: 'GNB',
     components: {
+        PHr,
+        PAnchor,
         PI,
         ProfileModal,
-        PContextMenu,
         SiteMap,
     },
     directives: {
@@ -192,12 +185,8 @@ export default {
                     link: '/inventory',
                     parentRoutes: ['inventory'],
                     menu: [
-                        {
-                            type: 'item', label: vm.$t('MENU.INVENTORY.SERVER'), name: 'server', link: '/inventory/server',
-                        },
-                        {
-                            type: 'item', label: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), name: 'cloud-service', link: '/inventory/cloud-service',
-                        },
+                        { label: vm.$t('MENU.INVENTORY.SERVER'), link: '/inventory/server' },
+                        { label: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), link: '/inventory/cloud-service' },
                     ],
                 },
                 {
@@ -205,15 +194,8 @@ export default {
                     link: '/identity',
                     parentRoutes: ['identity'],
                     menu: [
-                        {
-                            type: 'item', label: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), name: 'service-account', link: '/identity/service-account',
-                        },
-                        {
-                            type: 'item', label: vm.$t('MENU.IDENTITY.USER'), name: 'user', link: '/identity/user',
-                        },
-                        // {
-                        //     type: 'item', label: vm.$t('MENU.IDENTITY.ROLE'), name: 'role', disabled: true, link: '',
-                        // },
+                        { label: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), link: '/identity/service-account' },
+                        { label: vm.$t('MENU.IDENTITY.USER'), link: '/identity/user' },
                     ],
                 },
                 {
@@ -222,9 +204,7 @@ export default {
                     link: '/automation',
                     parentRoutes: ['automation'],
                     menu: [
-                        {
-                            type: 'item', label: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), name: 'power-scheduler', link: '/automation/power-scheduler', isNew: true,
-                        },
+                        { label: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), link: '/automation/power-scheduler', isNew: true },
                     ],
                 },
                 {
@@ -232,9 +212,7 @@ export default {
                     link: '/plugin',
                     parentRoutes: ['plugin'],
                     menu: [
-                        {
-                            type: 'item', label: vm.$t('MENU.PLUGIN.COLLECTOR'), name: 'collector', link: '/plugin/collector',
-                        },
+                        { label: vm.$t('MENU.PLUGIN.COLLECTOR'), link: '/plugin/collector' },
                     ],
                 },
                 {
@@ -242,51 +220,15 @@ export default {
                     link: '/management/collector-history',
                     parentRoutes: ['management'],
                     menu: [
-                        {
-                            type: 'item', label: vm.$t('MENU.MANAGEMENT.PLUGIN'), name: 'plugin', link: '/management/supervisor/plugins',
-                        },
-                        {
-                            type: 'item', label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), name: 'collector-history', link: '/management/collector-history', isNew: true,
-                        },
+                        { label: vm.$t('MENU.MANAGEMENT.PLUGIN'), link: '/management/supervisor/plugins' },
+                        { label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), link: '/management/collector-history', isNew: true },
                     ],
                 },
             ]),
             supportMenu: computed(() => [
-                {
-                    type: 'item',
-                    label: vm.$t('COMMON.GNB.SUPPORT.LABEL_USER_GUIDE'),
-                    name: 'user-guide',
-                    link: 'https://spaceone-dev.gitbook.io/user-guide/',
-                    target: '_blank',
-                },
-                {
-                    type: 'item',
-                    label: vm.$t('COMMON.GNB.SUPPORT.LABEL_API_GUIDE'),
-                    name: 'api-guide',
-                    link: 'https://spaceone-dev.gitbook.io/spaceone-apis',
-                    target: '_blank',
-                },
-                {
-                    type: 'item',
-                    label: vm.$t('COMMON.GNB.SUPPORT.LABEL_GITHUB'),
-                    name: 'github',
-                    link: 'https://github.com/spaceone-dev',
-                    target: '_blank',
-                },
-            ]),
-            accountMenu: computed(() => [
-                {
-                    type: 'info',
-                },
-                {
-                    type: 'divider',
-                },
-                {
-                    type: 'item', label: vm.$t('COMMON.GNB.ACCOUNT.LABEL_PROFILE'), name: 'profile',
-                },
-                {
-                    type: 'item', label: vm.$t('COMMON.GNB.ACCOUNT.LABEL_SIGN_OUT'), name: 'signOut',
-                },
+                { label: vm.$t('COMMON.GNB.SUPPORT.LABEL_USER_GUIDE'), link: 'https://spaceone-dev.gitbook.io/user-guide/' },
+                { label: vm.$t('COMMON.GNB.SUPPORT.LABEL_API_GUIDE'), link: 'https://spaceone-dev.gitbook.io/spaceone-apis' },
+                { label: vm.$t('COMMON.GNB.SUPPORT.LABEL_GITHUB'), link: 'https://github.com/spaceone-dev' },
             ]),
             selectedMenu: computed(() => {
                 const pathRegex = vm.$route.path.match(/\/(\w+)/);
@@ -313,7 +255,6 @@ export default {
         const openProfile = () => {
             state.profileVisible = true;
         };
-
         const signOut = async () => {
             const res: Location = {
                 name: 'SignOut',
@@ -342,7 +283,6 @@ export default {
     .left-part, .right-part {
         line-height: 3rem;
     }
-
     .left-part {
         .site-map-wrapper {
             display: inline-block;
@@ -363,7 +303,6 @@ export default {
             }
         }
     }
-
     .right-part {
         position: absolute;
         display: inline-flex;
@@ -374,35 +313,8 @@ export default {
     .menu-wrapper {
         position: relative;
 
-        &.account {
-            .p-context-menu {
-                min-width: 15.125rem;
-            }
-            .menu-button {
-                .menu-icon {
-                    width: 2rem;
-                    height: 2rem;
-                    overflow: hidden;
-                    background-size: cover;
-                    box-shadow: inset 0 0 0 2px theme('colors.gray.200');
-                    margin-top: 0.5rem;
-
-                    &.admin {
-                        background: url('~@/assets/icons/admin.svg') no-repeat center center;
-                    }
-                    &.member {
-                        background: url('~@/assets/icons/user.svg') no-repeat center center;
-                    }
-
-                    &.opened {
-                        box-shadow: inset 0 0 0 2px theme('colors.primary');
-                    }
-                }
-            }
-        }
         .menu-button {
             @apply text-gray-900;
-            position: relative;
             font-size: .875rem;
             cursor: pointer;
             text-decoration: none;
@@ -430,44 +342,107 @@ export default {
                 margin-left: 0.5rem;
             }
         }
-        .p-context-menu {
+        .sub-menu-wrapper {
+            @apply bg-white border border-gray-200;
+            position: absolute;
+            top: 2.5rem;
+            left: -1.125rem;
+            min-width: 10rem;
+            box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
+            border-radius: 0.125rem;
+            padding: 0.5rem;
+            margin: 3px 0;
             &.right-align {
                 right: 0;
                 left: auto;
+                line-height: 1rem;
             }
-            .border {
-                @apply border-gray-200;
-                border-top: none;
-                margin: 0.5rem;
+            &.account {
+                min-width: 15.125rem;
             }
-            .context-info {
-                line-height: 1.5rem;
-                font-size: 0.75rem;
-                padding: 0 0.5rem;
-
-                &:first-child {
-                    @apply text-primary;
-                    font-size: 0.875rem;
-                    padding: 0.75rem 0.5rem;
+            .sub-menu {
+                @apply text-gray-900;
+                position: relative;
+                width: 100%;
+                height: 2rem;
+                font-size: 0.875rem;
+                line-height: 1rem;
+                text-decoration: none;
+                white-space: nowrap;
+                cursor: pointer;
+                border-radius: 0.25rem;
+                padding: 0.5rem;
+                &:hover, &:focus {
+                    @apply bg-primary4 text-primary;
                 }
-
-                .icon {
-                    border-radius: 0.625rem;
-                    margin-right: 0.5rem;
+                &:active {
+                    @apply bg-white;
                 }
-                .label {
-                    @apply text-gray-500 font-bold;
-                    padding-right: 0.5rem;
+                .external-link-icon {
+                    position: absolute;
+                    top: 0.5rem;
+                    right: 1rem;
+                }
+            }
+            .info-wrapper {
+                padding: 1rem 0.5rem 0.5rem 0.5rem;
+                .info-row {
+                    line-height: 1.5rem;
+                    font-size: 0.75rem;
+
+                    &:first-child {
+                        @apply text-primary;
+                        font-size: 0.875rem;
+                        padding-bottom: 1rem;
+                    }
+
+                    .icon {
+                        border-radius: 0.625rem;
+                        margin-right: 0.5rem;
+                    }
+                    .label {
+                        @apply text-gray-500 font-bold;
+                        padding-right: 0.5rem;
+                    }
+                }
+                .p-hr {
+                    margin-top: 1rem;
                 }
             }
             .new-text {
                 font-size: 0.75rem;
-                background: linear-gradient(to right, theme('colors.primary'), 50%, theme('colors.secondary'));
+                background: linear-gradient(to right, theme('colors.primary'), theme('colors.secondary'));
                 -webkit-background-clip: text;
                 -webkit-text-fill-color: transparent;
                 vertical-align: text-top;
                 cursor: default;
                 margin-left: 0.25rem;
+            }
+        }
+        &.account {
+            .p-context-menu {
+                min-width: 15.125rem;
+            }
+            .menu-button {
+                .menu-icon {
+                    width: 2rem;
+                    height: 2rem;
+                    overflow: hidden;
+                    background-size: cover;
+                    box-shadow: inset 0 0 0 2px theme('colors.gray.200');
+                    margin-top: 0.5rem;
+
+                    &.admin {
+                        background: url('~@/assets/icons/admin.svg') no-repeat center center;
+                    }
+                    &.member {
+                        background: url('~@/assets/icons/user.svg') no-repeat center center;
+                    }
+
+                    &.opened {
+                        box-shadow: inset 0 0 0 2px theme('colors.primary');
+                    }
+                }
             }
         }
     }
