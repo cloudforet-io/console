@@ -23,7 +23,7 @@ export default defineComponent({
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const signIn = async (googleUser) => {
             const userProfile = googleUser.getBasicProfile();
-            const userId = userProfile.du;
+            const userId = userProfile.getEmail();
             const credentials = {
                 // eslint-disable-next-line camelcase
                 access_token: googleUser.getAuthResponse().access_token,
