@@ -5,12 +5,12 @@ export const userStateColor = Object.freeze({
         iconColor: styles.safe,
         textColor: styles.gray[900],
     },
-    DISABLED: {
-        iconColor: styles.alert,
-        textColor: styles.alert,
+    PENDING: {
+        iconColor: styles.yellow,
+        textColor: styles.gray[900],
     },
-    UNIDENTIFIED: {
-        iconColor: styles.gray[500],
-        textColor: styles.gray[500],
+    DISABLED: {
+        iconColor: styles.gray[400],
+        textColor: styles.gray[400],
     },
 });

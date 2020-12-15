@@ -2,7 +2,9 @@
     <vertical-page-layout :min-width="0" :init-width="260" :max-width="400">
         <template #sidebar>
             <div class="member-profile">
-                <p-i :name="userState.isAdmin ? 'admin' : 'user'" width="3rem" height="3rem" class="member-icon" />
+                <p-i :name="userState.isAdmin ? 'admin' : 'user'" width="3rem" height="3rem"
+                     class="member-icon"
+                />
                 <p class="member-id">
                     {{ userState.userId }}
                 </p>
@@ -93,7 +95,14 @@
                                     </p-dropdown-menu-btn>
                                 </template>
                                 <template #col-state-format="{value}">
-                                    <p-status v-bind="userStateFormatter(value)" />
+                                    <p-status v-bind="userStateFormatter(value)" class="capitalize" />
+                                </template>
+                                <template #col-user_type-format="{value}">
+                                    <span v-if="value === 'API_USER'">API Only</span>
+                                    <span v-else>Console, API</span>
+                                </template>
+                                <template #col-last_accessed_at-format="{ value }">
+                                    {{ value ? timestampFormatter(value, timezone) : '' }}
                                 </template>
                             </p-query-search-table>
                         </template>
@@ -104,6 +113,12 @@
                         <template #detail>
                             <p-user-detail ref="userDetail"
                                            :item="selectedUsers[0]"
+                            />
+                        </template>
+                        <template #tag>
+                            <p-tags-panel :resource-id="selectedUsers[0].user_id"
+                                        resource-type="identity.User"
+                                        resource-key="user_id"
                             />
                         </template>
                     </p-tab>
@@ -175,12 +190,15 @@ import PStatus from '@/components/molecules/status/PStatus.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
+import PTagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 
 import { Options } from '@/components/organisms/tables/query-search-table/type';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 import { Timestamp } from '@/components/util/type';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import {
+    showErrorMessage, showSuccessMessage, timestampFormatter,
+} from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -229,6 +247,7 @@ export default {
         PDropdownMenuBtn,
         PUserDetail,
         PTab,
+        PTagsPanel,
         PDataTable,
         PTableCheckModal,
         PPageTitle,
@@ -273,14 +292,14 @@ export default {
         const state = reactive({
             loading: false,
             users: [] as UserModel[],
+            timezone: computed(() => store.state.user.timezone),
             fields: computed(() => ([
                 { name: 'user_id', label: 'User ID' },
                 { name: 'name', label: 'Name' },
-                { name: 'email', label: 'Email' },
                 { name: 'state', label: 'State' },
-                // { name: 'mobile', label: 'Mobile' },
-                // { name: 'group', label: 'Group' },
-                { name: 'language', label: 'Language' },
+                { name: 'user_type', label: 'Access Control' },
+                { name: 'backend', label: 'Auth Type' },
+                { name: 'last_accessed_at', label: 'Last Activity' },
                 { name: 'timezone', label: 'Timezone' },
             ])),
             sortBy: '',
@@ -299,8 +318,6 @@ export default {
             multiSelectFields: computed(() => ([
                 { name: 'user_id', label: vm.$t('IDENTITY.USER.USER_ID') },
                 { name: 'name', label: vm.$t('IDENTITY.USER.NAME') },
-                { name: 'email', label: vm.$t('IDENTITY.USER.EMAIL') },
-                // { name: 'group', label: vm.$t('IDENTITY.USER.GROUP') },
             ])),
             dropdownMenu: computed(() => ([
                 {
@@ -364,6 +381,7 @@ export default {
         const singleItemTabState = reactive({
             tabs: computed(() => ([
                 { name: 'detail', label: vm.$t('IDENTITY.USER.DETAILS'), keepAlive: true },
+                { label: vm.$t('IDENTITY.USER.TAG'), name: 'tag', keepAlive: true },
             ] as TabItem[])),
             activeTab: 'detail',
         });
@@ -397,7 +415,7 @@ export default {
             try {
                 const res = await SpaceConnector.client.identity.user.list({
                     query: getQuery(),
-                    only: ['user_id', 'name', 'email', 'state', 'mobile', 'group', 'timezone', 'language'],
+                    only: ['user_id', 'name', 'email', 'state', 'timezone', 'user_type', 'backend', 'last_accessed_at'],
                 });
                 state.users = res.results;
                 state.totalCount = res.total_count;
@@ -512,9 +530,8 @@ export default {
         };
         const enableUser = async (items) => {
             try {
-                await parent.$http.post('/identity/user/enable', getUsersParam(items)).then(async () => {
-                    showSuccessMessage(vm.$tc('IDENTITY.USER.ALT_S_ENABLE', state.selectedIndex.length), '', root);
-                });
+                await SpaceConnector.client.identity.user.enable(getUsersParam(items));
+                showSuccessMessage(vm.$tc('IDENTITY.USER.ALT_S_ENABLE', state.selectedIndex.length), '', root);
             } catch (e) {
                 showErrorMessage(vm.$tc('IDENTITY.USER.ALT_E_ENABLE', state.selectedIndex.length), e, root);
             } finally {
@@ -524,9 +541,8 @@ export default {
         };
         const disableUser = async (items) => {
             try {
-                await parent.$http.post('/identity/user/disable', getUsersParam(items)).then(async () => {
-                    showSuccessMessage(vm.$tc('IDENTITY.USER.ALT_S_DISABLE', state.selectedIndex.length), '', root);
-                });
+                await SpaceConnector.client.identity.user.disable(getUsersParam(items));
+                showSuccessMessage(vm.$tc('IDENTITY.USER.ALT_S_DISABLE', state.selectedIndex.length), '', root);
             } catch (e) {
                 showErrorMessage(vm.$tc('IDENTITY.USER.ALT_E_DISABLE', state.selectedIndex.length), e, root);
             } finally {
@@ -553,6 +569,7 @@ export default {
             userFormState,
             sidebarState,
             userStateFormatter,
+            timestampFormatter,
             modalState,
             singleItemTabState,
             multiItemTabState,

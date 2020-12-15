@@ -464,6 +464,7 @@
 			"NO_SELECTED": "ユーザーを選択すると、詳細な情報が表示されます。",
 			"SELECTED_DATA": "選択したユーザー",
 			"STATE": "状態",
+			"TAG": "タグ",
 			"TIMEZONE": "タイムゾーン",
 			"TITLE": "ユーザー",
 			"UPDATE": "編集",

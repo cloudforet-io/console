@@ -77,7 +77,6 @@
                 <tags-panel :resource-id="selectedItems[0].collector_id"
                             resource-type="inventory.Collector"
                             resource-key="collector_id"
-                            tag-page-name="collectorTags"
                 />
             </template>
             <template #credentials>
@@ -138,8 +137,6 @@
 /* eslint-disable camelcase */
 import { Component } from 'vue/types/umd';
 import { TranslateResult } from 'vue-i18n';
-import { Location } from 'vue-router';
-
 import {
     reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
