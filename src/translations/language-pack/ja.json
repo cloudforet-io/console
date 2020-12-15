@@ -149,6 +149,8 @@
 		},
 		"GNB": {
 			"ACCOUNT": {
+				"ALT_E_UPDATE": "",
+				"ALT_S_UPDATE": "",
 				"LABEL_LANGUAGE": "言語",
 				"LABEL_PROFILE": "プロフィール ",
 				"LABEL_ROLE": "ロール",

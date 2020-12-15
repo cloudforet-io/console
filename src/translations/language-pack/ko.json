@@ -149,6 +149,8 @@
 		},
 		"GNB": {
 			"ACCOUNT": {
+				"ALT_E_UPDATE": "언어 편집 실패",
+				"ALT_S_UPDATE": "언어 편집 완료",
 				"LABEL_LANGUAGE": "언어",
 				"LABEL_PROFILE": "프로필",
 				"LABEL_ROLE": "역할",

@@ -107,9 +107,21 @@
                             <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_TIMEZONE') }}</span>
                             <span class="value">{{ userState.timezone }}</span>
                         </div>
-                        <div class="info-row">
+                        <div class="info-row language"
+                             @click="toggleLanguageMenu"
+                        >
                             <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
                             <span class="value">{{ userState.language }}</span>
+                            <p-i name="ic_arrow_bottom"
+                                 width="1rem" height="1rem"
+                            />
+                            <div v-if="showLanguageMenu" class="sub-menu-wrapper">
+                                <template v-for="(item, index) in languageMenu" @click.native="hideMenu">
+                                    <div :key="index" class="sub-menu" @click="changeLanguage(item.name)">
+                                        <span>{{ item.label }}</span>
+                                    </div>
+                                </template>
+                            </div>
                         </div>
                         <p-hr />
                     </div>
@@ -140,11 +152,13 @@ import ProfileModal from '@/views/common/components/profile/ProfileModal.vue';
 import SiteMap from '@/views/common/components/gnb/SiteMap.vue';
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-
-import { store } from '@/store';
-import router from '@/routes/index';
-import { Location } from 'vue-router';
 import PHr from '@/components/atoms/hr/PHr.vue';
+
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { Location } from 'vue-router';
+import { store } from '@/store';
+import { languages } from '@/store/modules/user/config';
+import router from '@/routes/index';
 
 export default {
     name: 'GNB',
@@ -158,7 +172,7 @@ export default {
     directives: {
         clickOutside: vClickOutside.directive,
     },
-    setup() {
+    setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const userState = reactive({
             name: computed(() => store.state.user.name),
@@ -173,6 +187,7 @@ export default {
             sitemapVisible: false,
             profileVisible: false,
             showAutomation: store.state.user.powerSchedulerState,
+            showLanguageMenu: false,
             defaultMenuList: computed(() => [
                 {
                     key: vm.$t('MENU.PROJECT.PROJECT'),
@@ -234,10 +249,15 @@ export default {
                 const pathRegex = vm.$route.path.match(/\/(\w+)/);
                 return pathRegex ? pathRegex[1] : null;
             }),
+            languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
+                label: v, name: k,
+            }))),
         });
 
+        /* event */
         const hideMenu = () => {
             state.openedMenu = null;
+            state.showLanguageMenu = false;
         };
         const showMenu = (menu) => {
             state.openedMenu = menu;
@@ -250,16 +270,28 @@ export default {
                 showMenu(menu);
             }
         };
-
-        // account
+        const toggleLanguageMenu = () => {
+            state.showLanguageMenu = !state.showLanguageMenu;
+        };
         const openProfile = () => {
             state.profileVisible = true;
         };
+
+        /* action */
         const signOut = async () => {
             const res: Location = {
                 name: 'SignOut',
             };
             await router.push(res);
+        };
+        const changeLanguage = async (language) => {
+            try {
+                await store.dispatch('user/setUser', { language });
+                showSuccessMessage(vm.$t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '', root);
+                state.showLanguageMenu = false;
+            } catch (e) {
+                showErrorMessage(vm.$t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'), e, root);
+            }
         };
 
         return {
@@ -267,7 +299,9 @@ export default {
             userState,
             hideMenu,
             toggleMenu,
+            toggleLanguageMenu,
             openProfile,
+            changeLanguage,
             signOut,
         };
     },
@@ -387,6 +421,7 @@ export default {
             .info-wrapper {
                 padding: 1rem 0.5rem 0.5rem 0.5rem;
                 .info-row {
+                    position: relative;
                     line-height: 1.5rem;
                     font-size: 0.75rem;
 
@@ -394,6 +429,27 @@ export default {
                         @apply text-primary;
                         font-size: 0.875rem;
                         padding-bottom: 1rem;
+                    }
+                    &.language {
+                        cursor: pointer;
+                        &:hover, &:focus {
+                            @apply bg-primary4 text-primary;
+                            border-radius: 0.125rem;
+                            .p-i-icon {
+                                display: inline-block;
+                            }
+                        }
+                        .p-i-icon {
+                            display: none;
+                        }
+                        .sub-menu-wrapper {
+                            top: 1.5rem;
+                            left: 4rem;
+                            min-width: 9.25rem;
+                            max-height: 21rem;
+                            overflow-y: auto;
+                            z-index: 10;
+                        }
                     }
 
                     .icon {

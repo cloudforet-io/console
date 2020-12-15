@@ -149,6 +149,8 @@
 		},
 		"GNB": {
 			"ACCOUNT": {
+				"ALT_E_UPDATE": "Update language failure",
+				"ALT_S_UPDATE": "Language updated successfully.",
 				"LABEL_LANGUAGE": "Language",
 				"LABEL_PROFILE": "Profile",
 				"LABEL_ROLE": "Role",
