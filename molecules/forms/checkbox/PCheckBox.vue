@@ -1,14 +1,14 @@
 <template>
     <span class="p-checkbox"
-          @mouseenter="mouseover=true"
-          @mouseleave="mouseover=false"
           @click.stop.prevent="onClick"
           v-on="$listeners"
     >
         <input type="checkbox">
         <slot :slot-scope="$props" name="icon">
-            <p-i class="check-icon" width="1.25rem" height="1.25rem"
-                 :name="checkBoxBind"
+            <p-i width="1.25rem" height="1.25rem"
+                 class="check-icon" :class="{selected: isSelected}"
+                 :color="isSelected ? undefined : 'inherit transparent'"
+                 :name="isSelected ? 'ic_checkbox--checked' : 'ic_checkbox'"
             />
         </slot>
         <span v-if="$scopedSlots.default" class="text" @click.stop="onClick">
@@ -43,28 +43,14 @@ export default {
             type: [Boolean, Array],
             default: () => ([]),
         },
-        hovered: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props: CheckboxProps, context) {
         const state = reactive({
-            mouseover: false,
             isSelected: computed(() => {
                 if (typeof props.selected === 'boolean') {
                     return props.selected;
                 }
                 return indexOf(props.selected, props.value) !== -1;
-            }),
-            checkBoxBind: computed(() => {
-                let name = 'ic_checkbox';
-                if (state.isSelected) {
-                    name = 'ic_checkbox--checked';
-                } else if (props.hovered) {
-                    name = 'ic_checkbox--hover';
-                }
-                return name;
             }),
         });
         const onClick = () => {
@@ -90,7 +76,7 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
 .p-checkbox {
     input {
         position: absolute;
@@ -99,8 +85,18 @@ export default {
         height: 0;
         width: 0;
     }
+    &:hover {
+        .check-icon {
+            @apply text-gray-900;
+        }
+    }
+    &:not(:hover) {
+        .check-icon {
+            @apply text-gray-300;
+        }
+    }
     .check-icon {
-        @apply text-gray-300 cursor-pointer;
+        @apply cursor-pointer;
     }
 }
 </style>
