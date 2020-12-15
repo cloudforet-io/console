@@ -274,11 +274,14 @@ export default {
             const filters: QueryStoreFilter[] = [];
             filters.push({ k: 'data.status', o: '=', v: status });
 
-            return referenceRouter(
-                state.trustedAdvisorId,
-                { resource_type: 'inventory.CloudServiceType' },
-                { filters: queryHelper.setFilters(filters).rawQueryStrings },
-            );
+            if (state.trustedAdvisorId) {
+                return referenceRouter(
+                    state.trustedAdvisorId,
+                    { resource_type: 'inventory.CloudServiceType' },
+                    { filters: queryHelper.setFilters(filters).rawQueryStrings },
+                );
+            }
+            return '';
         };
         const projectSummaryLinkFormatter = (rowNum, colNum) => {
             const status = getProjectBoxStatus(rowNum, colNum * state.thisPage);

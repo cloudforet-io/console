@@ -385,7 +385,6 @@ export default {
         height: 1.5rem;
         border: none;
         font-size: 0.75rem;
-        font-weight: normal;
     }
     td {
         height: 2rem;

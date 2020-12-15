@@ -287,6 +287,9 @@
 			"HEALTH_DASHBOARD_HELP": "AWSのサービスの状態とスケジュール済みタスク通知を見ることができます。",
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
 			"PERSONAL_HEALTH_DASHBOARD": {
+				"EVENT": "",
+				"PROJECT_AFFECTED": "",
+				"REGION": "",
 				"TITLE": ""
 			},
 			"RESOURCE_BY_REGION_CLOUD_SERVICE": "クラウドサービス",
