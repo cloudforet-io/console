@@ -52,8 +52,14 @@
             <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')" class="input-form">
                 <p-text-input v-model="formState.name" class="text-input" />
             </p-field-group>
-            <p-field-group :label="$t('IDENTITY.USER.FORM.EMAIL')" class="input-form">
-                <p-text-input v-model="formState.email" class="text-input" />
+            <p-field-group :label="$t('IDENTITY.USER.FORM.EMAIL')"
+                           :invalid="validationState.isEmailValid === false"
+                           :invalid-text="validationState.emailInvalidText"
+                           class="input-form"
+            >
+                <template #default="{invalid}">
+                    <p-text-input v-model="formState.email" :invalid="invalid" class="text-input" />
+                </template>
             </p-field-group>
             <p-field-group :label="'Domain Role'" class="input-form">
                 <p-select-dropdown v-model="formState.domainRole"
@@ -258,10 +264,17 @@ export default {
             }
         };
 
+        const checkEmailFormat = async (userId) => {
+            const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+            if (!regex.test(userId)) {
+                validationState.isUserIdValid = false;
+                validationState.userIdInvalidText = 'Invalid e-mail format.';
+            }
+        };
+
         const checkUserID = async () => {
             validationState.isUserIdValid = undefined;
             validationState.userIdInvalidText = '';
-
             if (formState.user_id) {
                 if (formState.user_id.replace(/ /g, '').length !== formState.user_id.length) {
                     validationState.isUserIdValid = false;
@@ -271,6 +284,7 @@ export default {
                 if (formState.selectedAuthType.backend === 'EXTERNAL') {
                     await checkOauth();
                 }
+                await checkEmailFormat(formState.user_id);
                 await checkDuplicatedId();
                 if (typeof validationState.isUserIdValid !== 'boolean') validationState.isUserIdValid = true;
             } else {
@@ -279,31 +293,37 @@ export default {
             }
         };
 
-        // TODO: Email 정규식 넣기
-        // const checkEmail = async () => {
-        //     if (!formState.email) {
-        //         validationState.isEmailValid = false;
-        //         validationState.emailInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
-        //     } else {
-        //         validationState.isEmailValid = true;
-        //         validationState.emailInvalidText = '';
-        //     }
-        // };
+        const checkEmail = async () => {
+            const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
+            if (!formState.email) {
+                validationState.isEmailValid = false;
+                validationState.emailInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
+            } else if (!regex.test(formState.email)) {
+                validationState.isEmailValid = false;
+                validationState.emailInvalidText = 'Invalid e-mail format.';
+            } else {
+                validationState.isEmailValid = true;
+                validationState.emailInvalidText = '';
+            }
+        };
 
-        const checkPassword = async () => {
+        const checkPassword = async (password) => {
             // password1
-            if (!formState.password) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
-            } else if (formState.password.replace(/ /g, '').length !== formState.password.length) {
+            if (password.replace(/ /g, '').length !== password.length) {
                 validationState.isPasswordValid = false;
                 validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
-            } else if (formState.password && formState.password.length < 5) {
+            } else if (password.length < 8) {
                 validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 5 });
-            } else if (formState.password.length > 12) {
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 9 });
+            } else if (!password.match(/[a-z]/)) {
                 validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MAX_LENGTH_INVALID', { max: 12 });
+                validationState.passwordInvalidText = 'Contains at least one lowercase character';
+            } else if (!password.match(/[A-Z]/)) {
+                validationState.isPasswordValid = false;
+                validationState.passwordInvalidText = 'Contains at least one Upper character';
+            } else if (!password.match(/[0-9]/)) {
+                validationState.isPasswordValid = false;
+                validationState.passwordInvalidText = 'Contains at least one number';
             } else {
                 validationState.isPasswordValid = true;
                 validationState.passwordInvalidText = '';
@@ -314,7 +334,7 @@ export default {
                 validationState.isPasswordValid = false;
                 validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
             }
-            if (formState.password !== formState.passwordCheck) {
+            if (password !== formState.passwordCheck) {
                 validationState.isPasswordCheckValid = false;
                 validationState.passwordCheckInvalidText = vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID');
             } else {
@@ -331,9 +351,10 @@ export default {
                 }
             }
             if (formState.selectedAuthType.label === 'Local') {
-                await checkPassword();
+                await checkPassword(formState.password);
                 if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
             }
+            await checkEmail(); if (!validationState.isEmailValid) return;
             const data = {
                 user_id: formState.user_id,
                 name: formState.name,
@@ -347,11 +368,9 @@ export default {
 
         const init = () => {
             if (props.updateMode) {
-                console.log(props.item)
                 formState.user_id = props.item.user_id;
                 formState.name = props.item.name;
                 formState.email = props.item.email;
-                console.log(formState);
             }
             if (store.state.domain.extendedAuthType !== undefined) {
                 formState.authTypeList.splice(0, 0, {

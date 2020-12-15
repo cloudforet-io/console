@@ -162,33 +162,43 @@ export default {
         });
 
         const checkEmail = async () => {
+            const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
             if (!state.email) {
                 validationState.isEmailValid = false;
                 validationState.emailInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
+            } else if (!regex.test(state.email)) {
+                validationState.isEmailValid = false;
+                validationState.emailInvalidText = 'Invalid e-mail format.';
             } else {
                 validationState.isEmailValid = true;
                 validationState.emailInvalidText = '';
             }
         };
 
-        const checkPassword = async () => {
+        const checkPassword = async (password) => {
             // password1
-            if (state.password.replace(/ /g, '').length !== state.password.length) {
+            if (password.replace(/ /g, '').length !== password.length) {
                 validationState.isPasswordValid = false;
                 validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
-            } else if (state.password && state.password.length < 5) {
+            } else if (password.length < 8) {
                 validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 5 });
-            } else if (state.password.length > 12) {
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 9 });
+            } else if (!password.match(/[a-z]/)) {
                 validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MAX_LENGTH_INVALID', { max: 12 });
+                validationState.passwordInvalidText = 'Contains at least one lowercase character';
+            } else if (!password.match(/[A-Z]/)) {
+                validationState.isPasswordValid = false;
+                validationState.passwordInvalidText = 'Contains at least one Upper character';
+            } else if (!password.match(/[0-9]/)) {
+                validationState.isPasswordValid = false;
+                validationState.passwordInvalidText = 'Contains at least one number';
             } else {
                 validationState.isPasswordValid = true;
                 validationState.passwordInvalidText = '';
             }
 
             // password2
-            if (state.password !== state.passwordCheck) {
+            if (password !== state.passwordCheck) {
                 validationState.isPasswordCheckValid = false;
                 validationState.passwordCheckInvalidText = vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID');
             } else {
@@ -228,7 +238,7 @@ export default {
         };
 
         const onClickPasswordConfirm = async () => {
-            await checkPassword();
+            await checkPassword(state.password);
             if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
             const userParam: UpdateUserRequest = {
                 password: state.password,
