@@ -11,14 +11,14 @@
                 <p-text-input v-model="userRole" disabled class="text-input" />
             </p-field-group>
             <p-field-group :label="$t('COMMON.PROFILE.EMAIL')"
-                           :invalid="!validationState.isEmailValid"
+                           :invalid="validationState.isEmailValid === false"
                            :invalid-text="validationState.emailInvalidText"
                            class="input-form"
             >
                 <template #default="{invalid}">
                     <p-text-input v-model="email"
                                   class="text-input"
-                                  :class="{'is-invalid': invalid}"
+                                  :invalid="invalid"
                     />
                 </template>
             </p-field-group>
@@ -50,27 +50,27 @@
                 <form class="form">
                     <p-field-group
                         :label="$t('COMMON.PROFILE.PASSWORD')"
-                        :invalid="!validationState.isPasswordValid"
+                        :invalid="validationState.isPasswordValid === false"
                         :invalid-text="validationState.passwordInvalidText"
                         class="input-form"
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="password" type="password"
-                                          class="text-input block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
-                                          :class="{'is-invalid': invalid}"
+                                          class="text-input"
+                                          :invalid="invalid"
                             />
                         </template>
                     </p-field-group>
                     <p-field-group
                         :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
-                        :invalid="!validationState.isPasswordCheckValid"
+                        :invalid="validationState.isPasswordCheckValid === false"
                         :invalid-text="validationState.passwordCheckInvalidText"
                         class="input-form"
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="passwordCheck" type="password"
-                                          class="text-input block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
-                                          :class="{'is-invalid': invalid}"
+                                          class="text-input"
+                                          :invalid="invalid"
                             />
                         </template>
                     </p-field-group>

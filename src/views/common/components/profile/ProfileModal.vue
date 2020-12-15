@@ -24,50 +24,49 @@
                         <p-text-input :value="userId" disabled block />
                     </p-field-group>
                     <p-field-group :label="$t('COMMON.PROFILE.EMAIL')"
-                                   :invalid="!validationState.isEmailValid"
+                                   :invalid="validationState.isEmailValid === false"
                                    :invalid-text="validationState.emailInvalidText"
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="formState.email"
-                                          class="disabled block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
-                                          :class="{'is-invalid': invalid}"
+                                          class="w-full"
+                                          :invalid="invalid"
                             />
                         </template>
                     </p-field-group>
                     <p-field-group :label="$t('COMMON.PROFILE.NAME')"
-                                   :invalid="!validationState.isNameValid"
+                                   :invalid="validationState.isNameValid === false"
                                    :invalid-text="validationState.nameInvalidText"
                     >
                         <template #default="{invalid}">
                             <p-text-input v-model="formState.name" block
-                                          class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
-                                          :class="{'is-invalid': invalid}"
+                                          class="w-full"
+                                          :invalid="invalid"
                             />
                         </template>
                     </p-field-group>
                     <form class="form">
                         <p-field-group v-if="showPassword"
                                        :label="$t('COMMON.PROFILE.PASSWORD')"
-                                       :invalid="!validationState.isPasswordValid"
+                                       :invalid="validationState.isPasswordValid === false"
                                        :invalid-text="validationState.passwordInvalidText"
                         >
                             <template #default="{invalid}">
                                 <p-text-input v-model="formState.password" block type="password"
-                                              class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
-
-                                              :class="{'is-invalid': invalid}"
+                                              class="w-full"
+                                              :invalid="invalid"
                                 />
                             </template>
                         </p-field-group>
                         <p-field-group v-if="showPassword"
                                        :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
-                                       :invalid="!validationState.isPasswordCheckValid"
+                                       :invalid="validationState.isPasswordCheckValid === false"
                                        :invalid-text="validationState.passwordCheckInvalidText"
                         >
                             <template #default="{invalid}">
                                 <p-text-input v-model="formState.passwordCheck" block type="password"
-                                              class="block appearance-none w-full mb-1 text-base px-2 leading-normal bg-white text-grey-darker border border-grey rounded-sm"
-                                              :class="{'is-invalid': invalid}"
+                                              class="w-full"
+                                              :invalid="invalid"
                                 />
                             </template>
                         </p-field-group>

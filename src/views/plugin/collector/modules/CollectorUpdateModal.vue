@@ -13,7 +13,7 @@
                     }"
                     :footer-confirm-button-bind="confirmBtnBind"
                     :visible.sync="proxyVisible"
-                    :disabled="loading || !isValid"
+                    :disabled="loading"
                     @confirm="onClickConfirm"
     >
         <template #body>
@@ -32,7 +32,7 @@
                         <template #default="{invalid}">
                             <p-text-input v-model="inputModel.name" block
                                           class="block"
-                                          :class="{'is-invalid': invalid}"
+                                          :invalid="invalid"
                             />
                         </template>
                     </p-field-group>
@@ -46,7 +46,7 @@
                             <p-text-input v-model.number="inputModel.priority" block
                                           type="number"
                                           class="block"
-                                          :class="{'is-invalid': invalid}"
+                                          :invalid="invalid"
                             />
                         </template>
                     </p-field-group>

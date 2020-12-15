@@ -5,15 +5,15 @@
                                 class="add-btn" name="ic_plus_bold"
                                 @click="addPair"
             >
-                {{ $t('COMMON.COMPONENTS.TAGS.ADD') }}
+                <span>{{ $t('COMMON.COMPONENTS.TAGS.ADD') }}</span>
             </p-icon-text-button>
         </slot>
         <div v-if="showHeader" class="tag-header">
             <div class="key">
-                {{ $t('COMMON.COMPONENTS.TAGS.KEY') }}
+                <span>{{ $t('COMMON.COMPONENTS.TAGS.KEY') }}</span>
             </div>
             <div class="value">
-                {{ $t('COMMON.COMPONENTS.TAGS.VALUE') }}
+                <span>{{ $t('COMMON.COMPONENTS.TAGS.VALUE') }}</span>
             </div>
         </div>
         <div :class="{'mt-8': !showHeader}">
@@ -22,15 +22,17 @@
                                :invalid="showValidation && !validations[idx].key.isValid"
                                class="input-box key"
                 >
-                    <p-text-input v-model="d.key"
-                                  v-focus.lazy="focused"
-                                  :class="{invalid: showValidation && !validations[idx].key.isValid}"
-                                  :placeholder="$t('COMMON.COMPONENTS.TAGS.KEY')"
-                                  :disabled="disabled"
-                                  @blur="$emit('blur:key')"
-                                  @focus="$emit('focus:key')"
-                                  @input="validateKey"
-                    />
+                    <template #default="{invalid}">
+                        <p-text-input v-model="d.key"
+                                      v-focus.lazy="focused"
+                                      :invalid="invalid"
+                                      :placeholder="$t('COMMON.COMPONENTS.TAGS.KEY')"
+                                      :disabled="disabled"
+                                      @blur="$emit('blur:key')"
+                                      @focus="$emit('focus:key')"
+                                      @input="validateKey"
+                        />
+                    </template>
                 </p-field-group>
                 <span class="split">:</span>
                 <p-field-group :invalid-text="validations[idx].value.message"

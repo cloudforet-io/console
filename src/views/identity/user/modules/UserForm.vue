@@ -38,7 +38,7 @@
                                       v-focus
                                       :placeholder="$t('IDENTITY.USER.FORM.NAME_PLACEHOLDER')"
                                       :disabled="updateMode"
-                                      :class="{'is-invalid': invalid}"
+                                      :invalid="invalid"
                                       class="text-input"
                         />
                         <p-button style-type="primary-dark" :disabled="updateMode" class="user-id-check-button"
@@ -74,7 +74,7 @@
                     <template #default="{invalid}">
                         <p-text-input v-model="formState.password" type="password"
                                       class="text-input"
-                                      :class="{'is-invalid': invalid}"
+                                      :invalid="invalid"
                         />
                     </template>
                 </p-field-group>
@@ -87,7 +87,7 @@
                     <template #default="{invalid}">
                         <p-text-input v-model="formState.passwordCheck" type="password"
                                       class="text-input"
-                                      :class="{'is-invalid': invalid}"
+                                      :invalid="invalid"
                         />
                     </template>
                 </p-field-group>

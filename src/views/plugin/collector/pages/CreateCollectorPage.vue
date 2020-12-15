@@ -26,23 +26,30 @@
                                 width="5.5rem" height="5.5rem"
                     />
                     <div class="flex-grow">
-                        <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.NAME_LABEL')" :invalid-text="nameInvalidText" :invalid="!isNameValid"
+                        <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.NAME_LABEL')"
+                                       :invalid-text="nameInvalidText"
+                                       :invalid="!isNameValid"
                                        :required="true"
                         >
                             <template #default="{invalid}">
-                                <p-text-input v-model="inputModel.name" class="block" :class="{'is-invalid': invalid}" />
+                                <p-text-input v-model="inputModel.name" class="block" :invalid="invalid" />
                             </template>
                         </p-field-group>
-                        <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.PRIORITY_LABEL')" :invalid-text="priorityInvalidText" :invalid="!isPriorityValid"
+                        <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.PRIORITY_LABEL')"
+                                       :invalid-text="priorityInvalidText"
+                                       :invalid="!isPriorityValid"
                                        :required="true"
                         >
                             <template #default="{invalid}">
                                 <p-text-input v-model="inputModel.priority" type="number" class="block"
-                                              :class="{'is-invalid': invalid}"
+                                              :invalid="invalid"
                                 />
                             </template>
                         </p-field-group>
-                        <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.VERSION_LABEL')" :invalid="!isVersionValid" :required="true">
+                        <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.VERSION_LABEL')"
+                                       :invalid="!isVersionValid"
+                                       :required="true"
+                        >
                             <p-select-dropdown v-model="inputModel.version" :items="versions" auto-height />
                         </p-field-group>
                     </div>

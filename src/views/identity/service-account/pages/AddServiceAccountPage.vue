@@ -36,7 +36,9 @@
                            :required="true"
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="accountName" class="block" :class="{'invalid': invalid}"
+                    <p-text-input v-model="accountName"
+                                  class="block"
+                                  :invalid="invalid"
                                   :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.BASE_NAME_PLACEHOLDER')"
                     />
                 </template>
@@ -82,7 +84,9 @@
                            :required="true"
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="credentialName" class="block" :class="{'invalid': invalid}"
+                    <p-text-input v-model="credentialName"
+                                  class="block"
+                                  :invalid="invalid"
                                   :placeholder="$t('IDENTITY.SERVICE_ACCOUNT.ADD.CREDENTIALS_NAME_PLACEHOLDER')"
                     />
                 </template>

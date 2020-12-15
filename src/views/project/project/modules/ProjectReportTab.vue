@@ -8,7 +8,9 @@
                            :required="true"
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="inputModel.companyName" class="block" :class="{'is-invalid': invalid}" />
+                    <p-text-input v-model="inputModel.companyName" class="block"
+                                  :invalid="invalid"
+                    />
                 </template>
             </p-field-group>
             <p-field-group :label="$t('PROJECT.DETAIL.REPORT_PERIOD')" class="pl-12" :required="true">
