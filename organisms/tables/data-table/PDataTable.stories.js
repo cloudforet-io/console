@@ -24,8 +24,6 @@ const actions = {
     rowLeftClick: action('rowLeftClick'),
     rowRightClick: action('rowRightClick'),
     rowMiddleClick: action('rowMiddleClick'),
-    rowMouseOver: action('rowMouseOver'),
-    rowMouseOut: action('rowMouseOut'),
     theadClick: action('theadClick'),
     changeSort: action('changeSort'),
 };
@@ -266,8 +264,6 @@ export const rowVBind = () => ({
     @rowLeftClick="rowLeftClick"
     @rowRightClick="rowRightClick"
     @rowMiddleClick="rowMiddleClick"
-    @rowMouseOver="rowMouseOver"
-    @rowMouseOut="rowMouseOut"
 >
 </PDataTable>
 `,
@@ -314,8 +310,6 @@ export const customRowSlot = () => ({
     @rowLeftClick="rowLeftClick"
     @rowRightClick="rowRightClick"
     @rowMiddleClick="rowMiddleClick"
-    @rowMouseOver="rowMouseOver"
-    @rowMouseOut="rowMouseOut"
 >
 <template slot="row"  slot-scope="data">
 <tr  style="color: #0f69ff;">
@@ -350,8 +344,6 @@ export const customColSlot = () => ({
     @rowLeftClick="rowLeftClick"
     @rowRightClick="rowRightClick"
     @rowMiddleClick="rowMiddleClick"
-    @rowMouseOver="rowMouseOver"
-    @rowMouseOut="rowMouseOut"
 >
 <template slot="col-email"  slot-scope="data">
     <td style="color: #0f69ff;" >
@@ -384,8 +376,6 @@ export const loading = () => ({
                 @rowLeftClick="rowLeftClick"
                 @rowRightClick="rowRightClick"
                 @rowMiddleClick="rowMiddleClick"
-                @rowMouseOver="rowMouseOver"
-                @rowMouseOut="rowMouseOut"
                 >
                </PDataTable>
               `,

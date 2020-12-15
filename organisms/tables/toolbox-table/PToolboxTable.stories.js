@@ -17,8 +17,6 @@ const actions = {
     rowLeftClick: action('rowLeftClick'),
     rowRightClick: action('rowRightClick'),
     rowMiddleClick: action('rowMiddleClick'),
-    rowMouseOver: action('rowMouseOver'),
-    rowMouseOut: action('rowMouseOut'),
     changePageSize: action('changePageSize'),
     changePageNumber: action('changePageNumber'),
     theadClick: action('theadClick'),

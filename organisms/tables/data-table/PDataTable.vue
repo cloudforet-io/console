@@ -97,24 +97,18 @@
                                     @click.left="rowLeftClick( item, index, $event )"
                                     @click.right="rowRightClick( item, index, $event )"
                                     @click.middle="rowMiddleClick( item, index, $event )"
-                                    @mouseover="rowMouseOver(item,index, $event)"
-                                    @mouseout="rowMouseOut(item,index, $event)"
                                 >
                                     <td v-if="selectable"
                                         class="select-checkbox"
                                         @click.stop.prevent="selectClick"
-                                        @mouseenter="hoverIndex=index"
-                                        @mouseleave="hoverIndex=null"
                                     >
                                         <p-check-box v-if="multiSelect"
                                                      v-model="proxyState.selectIndex"
                                                      :value="index"
-                                                     :hovered="hoverIndex===index"
                                         />
                                         <p-radio v-else
                                                  v-model="proxyState.selectIndex[0]"
                                                  :value="index"
-                                                 :hovered="hoverIndex===index"
                                         />
                                     </td>
                                     <slot v-for="(field, i) in fieldsName"
@@ -291,7 +285,6 @@ export default {
         const state = reactive({
             table: null,
             allState: false,
-            hoverIndex: null,
             thHoverIndex: null,
         });
         const fieldsData: Ref<any> = computed(() => {
@@ -387,12 +380,6 @@ export default {
         };
         const rowMiddleClick = (item, index, event) => {
             context.emit('rowMiddleClick', item, index, event);
-        };
-        const rowMouseOver = (item, index, event) => {
-            context.emit('rowMouseOver', item, index, event);
-        };
-        const rowMouseOut = (item, index, event) => {
-            context.emit('rowMouseOut', item, index, event);
         };
         const theadClick = (field, index, event) => {
             if (props.sortable && field.sortable) {
@@ -576,8 +563,6 @@ export default {
             rowLeftClick,
             rowRightClick,
             rowMiddleClick,
-            rowMouseOver,
-            rowMouseOut,
             theadClick,
             selectClick,
             selectAllToggle,
