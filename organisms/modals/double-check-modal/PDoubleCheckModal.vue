@@ -34,7 +34,7 @@
                     </template>
                     <p-text-input
                         v-model="inputText"
-                        :class="{'is-invalid': invalid}"
+                        :invalid="invalid"
                         class="w-full"
                         @keyup.enter="confirm()"
                     />
