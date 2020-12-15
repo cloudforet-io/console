@@ -264,20 +264,6 @@ export default {
     &.gray900 {
         @mixin context-menu-theme theme('colors.white'), theme('colors.gray.900');
     }
-    &.white {
-        @mixin context-menu-theme theme('colors.white'), theme('colors.gray.200');
-        top: 2.5rem;
-        left: -1.125rem;
-        min-width: 10rem;
-        font-size: 0.875rem;
-        white-space: pre;
-        box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
-        padding: 0.5rem;
-    }
-    &.right-align {
-        right: 0;
-        left: auto;
-    }
 
     .context-content {
         padding-left: 0.5rem;
@@ -324,11 +310,6 @@ export default {
         &.gray900 {
             @mixin context-item-theme theme('colors.gray.900'), theme('colors.gray.100'), theme('colors.gray.900'),
                 theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
-        }
-        &.white {
-            @mixin context-item-theme theme('colors.gray.900'), theme('colors.primary4'), theme('colors.primary'),
-                theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
-            border-radius: 0.25rem;
         }
     }
     .no-drag {
