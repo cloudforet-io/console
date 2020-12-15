@@ -23,14 +23,15 @@
             <div class="page-navigation">
                 <p-page-navigation :routes="routeState.route" />
             </div>
-            <template v-if="sidebarState.selectedItem.type === 'inventory.Server'">
-                <server-main :is-cloud-service="true"
+            <template v-if="sidebarState.hasServer">
+                <server-main v-show="sidebarState.selectedItem.type === 'inventory.Server'"
+                             :is-cloud-service="true"
                              :provider="provider"
-                             :cloud-service-type="name"
+                             :cloud-service-type="sidebarState.serverCloudServiceType"
                              :cloud-service-group="group"
                 />
             </template>
-            <template v-else>
+            <template v-if="sidebarState.selectedItem.type !== 'inventory.Server'">
                 <p-page-title :title="name"
                               child
                               use-total-count
@@ -147,7 +148,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { get, find } from 'lodash';
+import { get, find, some } from 'lodash';
 
 import {
     reactive, computed, getCurrentInstance, ComponentRenderProxy,
@@ -191,7 +192,6 @@ import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import config from '@/lib/config';
 import { QueryHelper } from '@/lib/query';
-import { QueryStoreFilter } from '@/lib/query/type';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -299,6 +299,8 @@ export default {
             group: '',
             iconUrl: '',
             selectedItem: {} as SidebarItemType,
+            hasServer: computed(() => some(sidebarState.items, { type: 'inventory.Server' })),
+            serverCloudServiceType: computed(() => find(sidebarState.items, { type: 'inventory.Server' })?.name),
         });
 
         /** Main Table */
@@ -539,8 +541,10 @@ export default {
                     },
                     query: vm.$route.query,
                 });
-                await getTableSchema();
-                await listCloudServiceData();
+                if (item.type !== 'inventory.Server') {
+                    await getTableSchema();
+                    await listCloudServiceData();
+                }
                 sidebarState.selectedItem = item;
             }
         };

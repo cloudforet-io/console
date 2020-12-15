@@ -17,7 +17,6 @@
                                   :type-options="typeOptionState"
                                   :style="{height: `${height}px`}"
                                   :field-handler="fieldHandler"
-                                  @init="listServerData"
                                   @fetch="fetchTableData"
                                   @select="onSelect"
                                   @export="exportServerData"
@@ -521,24 +520,28 @@ export default {
         };
 
         /* event */
-        const fetchTableData: QuerySearchTableListeners['fetch'] = async (options, changed) => {
-            if (changed.sortBy !== undefined) {
-                fetchOptionState.sortBy = changed.sortBy;
-                fetchOptionState.sortDesc = !!changed.sortDesc;
-            }
-            if (changed.pageLimit !== undefined) {
-                fetchOptionState.pageLimit = changed.pageLimit;
-                serverStore.setItem('pageLimit', changed.pageLimit);
-            }
-            if (changed.pageStart !== undefined) {
-                fetchOptionState.pageStart = changed.pageStart;
-            }
-            if (changed.queryTags !== undefined) {
-                fetchOptionState.queryTags = changed.queryTags;
-                /* api query setting */
-                queryHelper.setFiltersAsQueryTag(changed.queryTags);
-                /* sync updated query tags to url query string */
-                await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
+        const fetchTableData: QuerySearchTableListeners['fetch'|'init'] = async (options, changed?: Partial<QuerySearchTableFetchOptions>) => {
+            if (changed) {
+                if (changed.sortBy !== undefined) {
+                    fetchOptionState.sortBy = changed.sortBy;
+                    fetchOptionState.sortDesc = !!changed.sortDesc;
+                }
+                if (changed.pageLimit !== undefined) {
+                    fetchOptionState.pageLimit = changed.pageLimit;
+                    serverStore.setItem('pageLimit', changed.pageLimit);
+                }
+                if (changed.pageStart !== undefined) {
+                    fetchOptionState.pageStart = changed.pageStart;
+                }
+                if (changed.queryTags !== undefined) {
+                    fetchOptionState.queryTags = changed.queryTags;
+                    /* api query setting */
+                    queryHelper.setFiltersAsQueryTag(changed.queryTags);
+                    /* sync updated query tags to url query string */
+                    await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
+                }
+            } else {
+                fetchOptionState.queryTags = options.queryTags;
             }
             await listServerData();
         };
@@ -583,8 +586,8 @@ export default {
 
         /* init */
         const init = async () => {
-            await store.dispatch('resource/loadAll');
             await getTableSchema();
+            await listServerData();
         };
         init();
 
