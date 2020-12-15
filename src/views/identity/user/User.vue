@@ -111,8 +111,8 @@
                            :active-tab.sync="singleItemTabState.activeTab"
                     >
                         <template #detail>
-                            <p-user-detail ref="userDetail"
-                                           :user-id="selectedUsers[0].user_id"
+                            <user-detail ref="userDetail"
+                                         :user-id="selectedUsers[0].user_id"
                             />
                         </template>
                         <template #tag>
@@ -152,12 +152,12 @@
                         :items="selectedUsers"
                         @confirm="checkModalConfirm"
                     />
-                    <p-user-form v-if="userFormState.visible"
-                                 :header-title="userFormState.headerTitle"
-                                 :update-mode="userFormState.updateMode"
-                                 :item="userFormState.item"
-                                 :visible.sync="userFormState.visible"
-                                 @confirm="userFormConfirm"
+                    <user-form v-if="userFormState.visible"
+                               :header-title="userFormState.headerTitle"
+                               :update-mode="userFormState.updateMode"
+                               :item="userFormState.item"
+                               :visible.sync="userFormState.visible"
+                               @confirm="userFormConfirm"
                     />
                 </div>
             </div>
@@ -177,8 +177,8 @@ import {
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 import UserAccountPage from '@/views/identity/user/modules/UserAccountPage.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
-import PUserForm from '@/views/identity/user/modules/UserForm.vue';
-import PUserDetail from '@/views/identity/user/modules/UserDetail.vue';
+import UserForm from '@/views/identity/user/modules/UserForm.vue';
+import UserDetail from '@/views/identity/user/modules/UserDetail.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
@@ -241,11 +241,11 @@ export default {
         PQuerySearchTable,
         PPageNavigation,
         PIconTextButton,
-        PUserForm,
+        UserForm,
         PStatus,
         PHorizontalLayout,
         PDropdownMenuBtn,
-        PUserDetail,
+        UserDetail,
         PTab,
         PTagsPanel,
         PDataTable,

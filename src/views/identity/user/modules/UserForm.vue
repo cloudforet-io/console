@@ -27,7 +27,7 @@
             </div>
             <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
                            :required="true"
-                           :invalid="!validationState.isUserIdValid"
+                           :invalid="validationState.isUserIdValid === false"
                            :invalid-text="validationState.userIdInvalidText"
                            :valid="validationState.isUserIdValid"
                            :valid-text="validationState.userIdValidText"
@@ -67,7 +67,7 @@
             >
                 <p-field-group
                     :label="$t('COMMON.PROFILE.PASSWORD')"
-                    :invalid="!validationState.isPasswordValid"
+                    :invalid="validationState.isPasswordValid === false"
                     :invalid-text="validationState.passwordInvalidText"
                     class="input-form"
                 >
@@ -80,7 +80,7 @@
                 </p-field-group>
                 <p-field-group
                     :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
-                    :invalid="!validationState.isPasswordCheckValid"
+                    :invalid="validationState.isPasswordCheckValid === false"
                     :invalid-text="validationState.passwordCheckInvalidText"
                     class="input-form"
                 >
@@ -123,7 +123,7 @@ interface AuthType {
 type AuthTypeList = AuthType[];
 
 export default {
-    name: 'PUserForm',
+    name: 'UserForm',
     components: {
         PI,
         PButtonModal,

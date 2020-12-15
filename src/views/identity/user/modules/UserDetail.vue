@@ -29,7 +29,7 @@ import { store } from '@/store';
 // const arrayFormatter = value => ((value && Array.isArray(value) && value.length > 0) ? value.join(', ') : '');
 
 export default {
-    name: 'PUserDetail',
+    name: 'UserDetail',
     components: {
         PStatus,
         PDefinitionTable,
