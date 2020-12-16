@@ -27,7 +27,8 @@
                 <template v-if="selectedType !== 'spendings'">
                     <div class="chart-wrapper col-span-12 lg:col-span-9">
                         <div class="title">
-                            {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TREND_TITLE') }}
+                            <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY_TREND_TITLE') }}</span>
+                            <span v-if="selectedType === 'storage'" class="suffix">({{ suffix.storage }})</span>
                         </div>
                         <div class="toggle-button-group">
                             <p-button v-for="(d, idx) in dateTypes"
@@ -115,6 +116,7 @@
 import {
     find, forEach, orderBy, range,
 } from 'lodash';
+import bytes from 'bytes';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -153,6 +155,7 @@ enum CLOUD_SERVICE_LABEL {
 }
 
 /* type */
+type Unit = 'b' | 'gb' | 'kb' | 'mb' | 'pb' | 'tb' | 'B' | 'GB' | 'KB' | 'MB' | 'PB' | 'TB';
 interface ChartData {
     date: string;
     count: number;
@@ -221,6 +224,7 @@ export default {
                 database: 'ea',
                 storage: 'TB',
             },
+            storageTrendSuffix: 'TB' as Unit,
             overallSpendings: computed(() => vm.$t('COMMON.WIDGETS.ALL_SUMMARY_UPCOMING')),
             dataList: computed(() => ([
                 {
@@ -262,18 +266,6 @@ export default {
         });
 
         /* util */
-        const formatBytes: any = (bytes, decimals = 2, toString = true) => {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const dm = decimals < 0 ? 0 : decimals;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            if (toString) return `${parseFloat((bytes / (k ** i)).toFixed(dm))} ${sizes[i]}`;
-            return {
-                count: parseFloat((bytes / (k ** i)).toFixed(dm)),
-                unit: sizes[i],
-            };
-        };
         const disposeChart = () => {
             if (chartState.registry[state.chartRef]) {
                 chartState.registry[state.chartRef].dispose();
@@ -383,9 +375,9 @@ export default {
                 if (count === 0) return;
 
                 if (type === 'storage') {
-                    const formattedSize = formatBytes(count, 2, false);
-                    state.count[type] = formattedSize.count;
-                    state.suffix[type] = formattedSize.unit;
+                    const formattedSize = bytes(count, { unitSeparator: ' ' });
+                    state.count[type] = formattedSize.split(' ')[0];
+                    state.suffix[type] = formattedSize.split(' ')[1];
                 } else {
                     state.count[type] = count;
                 }
@@ -407,10 +399,20 @@ export default {
                     project_id: props.projectId,
                 });
 
-                const chartData = res.results.map(d => ({
-                    date: dayjs(d.date),
-                    count: type === 'storage' ? formatBytes(d.total, 2, false).count : d.total,
-                }));
+                if (type === 'storage') {
+                    const smallestCount = Math.min(...res.results.map(d => d.total));
+                    state.storageTrendSuffix = bytes(smallestCount, { unitSeparator: ' ' }).split(' ')[1] as Unit;
+                }
+                const chartData = res.results.map((d) => {
+                    let count = d.total;
+                    if (type === 'storage') {
+                        count = bytes(d.total, { unit: state.storageTrendSuffix, unitSeparator: ' ' }).split(' ')[0];
+                    }
+                    return {
+                        date: dayjs(d.date),
+                        count,
+                    };
+                });
                 forEach(range(0, dateRange), (i) => {
                     const date = utcToday.subtract(i, dateUnit);
                     if (!find(chartData, { date })) {
@@ -538,7 +540,7 @@ export default {
                         provider: d.provider,
                         label: props.providers[d.provider].label,
                         type: d.display_name || d.cloud_service_group,
-                        count: type === 'storage' ? formatBytes(d.size, 2) : d.count,
+                        count: type === 'storage' ? bytes(d.size, { unitSeparator: ' ' }) : d.count,
                         to: detailLocation,
                     });
                 });
@@ -735,6 +737,11 @@ export default {
             font-size: 1rem;
             font-weight: bold;
             margin-bottom: 1rem;
+            .suffix {
+                font-size: 0.75rem;
+                font-weight: normal;
+                padding-left: 0.5rem;
+            }
         }
         .chart-wrapper {
             position: relative;

@@ -84,6 +84,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import { orderBy, range } from 'lodash';
+import bytes from 'bytes';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -168,14 +169,6 @@ export default {
         });
 
         /* util */
-        const formatBytes = (bytes, decimals = 2) => {
-            if (bytes === 0) return '0 Bytes';
-            const k = 1024;
-            const dm = decimals < 0 ? 0 : decimals;
-            const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-            const i = Math.floor(Math.log(bytes) / Math.log(k));
-            return `${parseFloat((bytes / (k ** i)).toFixed(dm))} ${sizes[i]}`;
-        };
         const drawChart = (chartContext) => {
             const chart = am4core.create(chartContext, am4charts.XYChart);
             chart.logo.disabled = true;
@@ -292,7 +285,7 @@ export default {
                         to: getLocation('database', d.project_id),
                     },
                     storage: {
-                        label: formatBytes(d.storage_size, 2),
+                        label: bytes(d.storage_size, { unitSeparator: ' ' }),
                         to: getLocation('storage', d.project_id),
                     },
                 }));
