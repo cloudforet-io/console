@@ -8,7 +8,15 @@
                 <p-status v-bind="userStateFormatter(data)" class="capitalize" />
             </template>
             <template #data-last_accessed_at="{data}">
-                {{ timestampFormatter(data, timezone) }}
+                <span v-if="data === 0">
+                    Today
+                </span>
+                <span v-else-if="data === 1">
+                    Yesterday
+                </span>
+                <span v-else>
+                    {{ data }} days
+                </span>
             </template>
         </p-definition-table>
     </div>
@@ -19,14 +27,35 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { timestampFormatter } from '@/lib/util';
-import { userStateFormatter } from '@/views/identity/user/lib/helper';
+import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/helper';
 import { SpaceConnector } from '@/lib/space-connector';
 
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 import PStatus from '@/components/molecules/status/PStatus.vue';
 import { store } from '@/store';
+import dayjs from 'dayjs';
+import { Timestamp } from '@/components/util/type';
+import { Tags } from '@/models';
 // const arrayFormatter = value => ((value && Array.isArray(value) && value.length > 0) ? value.join(', ') : '');
+
+interface UserDetailData {
+    roles?: unknown;
+    tags?: Tags;
+    user_id: string;
+    name: string;
+    state: string;
+    email: string;
+    // eslint-disable-next-line camelcase
+    user_type: string;
+    backend: string;
+    language: string;
+    timezone: string;
+    // eslint-disable-next-line camelcase
+    last_accessed_at: number;
+    created_at?: Timestamp;
+    domain_id: string;
+}
 
 export default {
     name: 'UserDetail',
@@ -37,6 +66,10 @@ export default {
     },
     props: {
         userId: {
+            type: String,
+            required: true,
+        },
+        timezone: {
             type: String,
             required: true,
         },
@@ -57,7 +90,7 @@ export default {
                 { name: 'language', label: vm.$t('IDENTITY.USER.LANGUAGE') },
                 { name: 'timezone', label: vm.$t('IDENTITY.USER.TIMEZONE') },
             ]),
-            data: {},
+            data: {} as UserDetailData,
         });
 
         const getUserDetailData = async (userId) => {
@@ -67,6 +100,9 @@ export default {
                     user_id: userId,
                 });
                 baseState.data = res;
+                // eslint-disable-next-line camelcase
+                baseState.data.last_accessed_at = calculateTime(baseState.data.last_accessed_at, { seconds: dayjs().unix() }, props.timezone);
+
                 baseState.loading = false;
             } catch (e) {
                 console.error(e);

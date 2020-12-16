@@ -102,7 +102,15 @@
                                     <span v-else>Console, API</span>
                                 </template>
                                 <template #col-last_accessed_at-format="{ value }">
-                                    {{ value ? timestampFormatter(value, timezone) : '' }}
+                                    <span v-if="value === 0">
+                                        Today
+                                    </span>
+                                    <span v-else-if="value === 1">
+                                        Yesterday
+                                    </span>
+                                    <span v-else>
+                                        {{ value }} days
+                                    </span>
                                 </template>
                             </p-query-search-table>
                         </template>
@@ -113,6 +121,7 @@
                         <template #detail>
                             <user-detail ref="userDetail"
                                          :user-id="selectedUsers[0].user_id"
+                                         :timezone="timezone"
                             />
                         </template>
                         <template #tag>
@@ -206,8 +215,9 @@ import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { store } from '@/store';
 import { KeyItemSet } from '@/components/organisms/search/query-search/type';
-import { userStateFormatter } from '@/views/identity/user/lib/helper';
+import { userStateFormatter, calculateTime } from '@/views/identity/user/lib/helper';
 import PI from '@/components/atoms/icons/PI.vue';
+import dayjs from 'dayjs';
 
 
 interface UserModel {
@@ -417,7 +427,10 @@ export default {
                     query: getQuery(),
                     only: ['user_id', 'name', 'email', 'state', 'timezone', 'user_type', 'backend', 'last_accessed_at'],
                 });
-                state.users = res.results;
+                state.users = res.results.map(d => ({
+                    ...d,
+                    last_accessed_at: calculateTime(d.last_accessed_at, { seconds: dayjs().unix() }, state.timezone),
+                }));
                 state.totalCount = res.total_count;
                 state.loading = false;
             } catch (e) {
