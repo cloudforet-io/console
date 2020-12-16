@@ -688,4 +688,12 @@ export default {
     margin-bottom: 0.5rem;
     font-size: 1.5rem;
 }
+
+>>> .modal-content {
+    min-width: 31.25rem;
+    max-width: 50rem;
+    min-height: 30rem;
+    max-height: calc(100vh - 4rem);
+}
+
 </style>

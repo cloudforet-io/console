@@ -285,22 +285,23 @@ export default {
 }
 .input-form {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     max-width: 33.5rem;
     .text-input {
         width: 25rem;
     }
+    >>> .invalid-feedback {
+        margin-left: 8.5rem;
+    }
     .p-select-dropdown::v-deep {
         width: 25rem;
-        .dropdown-btn {
-            margin-left: -9rem;
-        }
     }
 }
 
 .save-btn {
     display: flex;
     justify-content: flex-end;
-    margin-top: 1rem;
+    margin-top: 2rem;
 }
 </style>

@@ -33,7 +33,6 @@ import { SpaceConnector } from '@/lib/space-connector';
 import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
 import PStatus from '@/components/molecules/status/PStatus.vue';
-import { store } from '@/store';
 import dayjs from 'dayjs';
 import { Timestamp } from '@/components/util/type';
 import { Tags } from '@/models';
@@ -77,7 +76,6 @@ export default {
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const baseState = reactive({
-            timezone: computed(() => store.state.user.timezone),
             title: computed(() => vm.$t('IDENTITY.USER.BASE_INFORMATION')),
             loading: true,
             fields: computed(() => [
@@ -102,7 +100,6 @@ export default {
                 baseState.data = res;
                 // eslint-disable-next-line camelcase
                 baseState.data.last_accessed_at = calculateTime(baseState.data.last_accessed_at, { seconds: dayjs().unix() }, props.timezone);
-
                 baseState.loading = false;
             } catch (e) {
                 console.error(e);
