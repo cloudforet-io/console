@@ -286,7 +286,10 @@ export default {
         };
         const changeLanguage = async (language) => {
             try {
-                await store.dispatch('user/setUser', { language });
+                await store.dispatch('user/setUser', {
+                    language,
+                    timezone: userState.timezone,
+                });
                 showSuccessMessage(vm.$t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '', root);
                 state.showLanguageMenu = false;
             } catch (e) {
