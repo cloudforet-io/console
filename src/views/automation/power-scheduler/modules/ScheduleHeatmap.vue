@@ -23,14 +23,14 @@ export default {
             default: () => [],
         },
     },
-    setup(props, context) {
+    setup(props) {
         const state = reactive({
             timezone: computed(() => (store.state.user.timezone ? store.state.user.timezone : 'UTC')),
         });
         const getHeatMapColor = (length: number) => {
             let color = '';
             switch (true) {
-            case (length === 0):
+            case (!length || length === 0):
                 color = 'bg-gray-300';
                 break;
             case (length < 13):
@@ -57,7 +57,7 @@ export default {
                     ruleObjForSorting[r.day] = r.times;
                 });
                 const sortedRule = weekdays.map(w => ruleObjForSorting[w]);
-                const dailyHeatMapColor: string[] = map(sortedRule, d => getHeatMapColor(d.length));
+                const dailyHeatMapColor: string[] = map(sortedRule, d => getHeatMapColor(d?.length));
                 scheduleHeatMapColor.push(dailyHeatMapColor);
             });
         } else {
