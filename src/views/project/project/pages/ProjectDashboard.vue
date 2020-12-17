@@ -241,7 +241,7 @@ export default {
 
 .daily-updates {
     @apply border border-gray-200;
-    height: 39.2rem;
+    height: 33.75rem;
     border-radius: 2px;
     margin-top: 1.25rem;
 }

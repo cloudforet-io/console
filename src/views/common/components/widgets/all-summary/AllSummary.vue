@@ -381,8 +381,10 @@ export default {
 
                 if (type === 'storage') {
                     const formattedSize = bytes(count, { unitSeparator: ' ' });
-                    state.count[type] = formattedSize.split(' ')[0];
-                    state.suffix[type] = formattedSize.split(' ')[1];
+                    if (formattedSize) {
+                        state.count[type] = formattedSize.split(' ')[0];
+                        state.suffix[type] = formattedSize.split(' ')[1];
+                    }
                 } else {
                     state.count[type] = count;
                 }
@@ -406,12 +408,14 @@ export default {
 
                 if (type === 'storage') {
                     const smallestCount = Math.min(...res.results.map(d => d.total));
-                    state.storageTrendSuffix = bytes(smallestCount, { unitSeparator: ' ' }).split(' ')[1] as Unit;
+                    const formattedSize = bytes(smallestCount, { unitSeparator: ' ' });
+                    if (formattedSize) state.storageTrendSuffix = formattedSize.split(' ')[1] as Unit;
                 }
                 const chartData = res.results.map((d) => {
                     let count = d.total;
                     if (type === 'storage') {
-                        count = bytes(d.total, { unit: state.storageTrendSuffix, unitSeparator: ' ' }).split(' ')[0];
+                        const formattedSize = bytes(d.total, { unit: state.storageTrendSuffix, unitSeparator: ' ' });
+                        if (formattedSize) count = formattedSize.split(' ')[0];
                     }
                     return {
                         date: dayjs(d.date),

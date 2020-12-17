@@ -20,7 +20,7 @@
                                  class="box col-span-4" :class="legend.name"
                                  :to="linkFormatter(category.name, legend.name)"
                     >
-                        <span class="text">{{ countFormatter(category.name, legend.name) }}</span>
+                        <span class="text">{{ data ? countFormatter(category.name, legend.name) : 0 }}</span>
                     </router-link>
                 </div>
             </div>
