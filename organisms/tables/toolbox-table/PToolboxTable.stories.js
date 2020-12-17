@@ -15,11 +15,8 @@ export default {
 };
 const actions = {
     rowLeftClick: action('rowLeftClick'),
-    rowRightClick: action('rowRightClick'),
-    rowMiddleClick: action('rowMiddleClick'),
     changePageSize: action('changePageSize'),
     changePageNumber: action('changePageNumber'),
-    theadClick: action('theadClick'),
     clickSetting: action('clickSetting'),
     clickExcel: action('clickExcel'),
     clickRefresh: action('clickRefresh'),
@@ -75,13 +72,11 @@ export const toolboxTable = () => ({
     :pageSize.sync="pageSize"
     :excelVisible="true"
     @rowLeftClick="rowLeftClick"
-    @rowRightClick="rowRightClick"
     @changePageSize="changePageSize"
     @changePageNumber="changePageNumber"
     @clickSetting="clickSetting"
     @clickRefresh="clickRefresh"
     @clickExcel="clickExcel"
-    @theadClick="theadClick"
 >
     <template #toolbox-top><div class="w-full h-8 border-green" style="border-width:1px" ></div></template>
     <template #toolbox-left><div style="border: 1px solid green; min-width: 300px "></div></template>
@@ -123,13 +118,11 @@ export const rowSlot = () => ({
         :pageSize.sync="pageSize"
         :excelVisible="true"
         @rowLeftClick="rowLeftClick"
-        @rowRightClick="rowRightClick"
         @changePageSize="changePageSize"
         @changePageNumber="changePageNumber"
         @clickSetting="clickSetting"
         @clickRefresh="clickRefresh"
         @clickExcel="clickExcel"
-        @theadClick="theadClick"
     >
         <template #row="scope">
             <div>custom row </div>
@@ -171,13 +164,11 @@ export const colSlot = () => ({
         :pageSize.sync="pageSize"
         :excelVisible="true"
         @rowLeftClick="rowLeftClick"
-        @rowRightClick="rowRightClick"
         @changePageSize="changePageSize"
         @changePageNumber="changePageNumber"
         @clickSetting="clickSetting"
         @clickRefresh="clickRefresh"
         @clickExcel="clickExcel"
-        @theadClick="theadClick"
     >
         <template #col-name="scope">
             <td>hi {{scope.value}} </td>

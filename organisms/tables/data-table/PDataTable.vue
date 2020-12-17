@@ -8,49 +8,46 @@
                        'no-hover': !hover,
                        [tableStyleType]: true,
                    }"
-                   :style="{ width: getTableWidth() }"
+                   :style="{ width }"
             >
                 <thead>
-                    <slot name="head" :fields="fieldsData">
+                    <slot name="head" v-bind="getDefaultSlotProps()">
                         <tr v-if="showHeader" class="fade-in">
                             <th v-if="selectable" class="all-select">
                                 <p-check-box v-if="multiSelect"
                                              v-model="allState"
-                                             @change="selectAllToggle"
+                                             @change="onSelectAllToggle"
                                 />
                             </th>
-                            <th
-                                v-for="(field, index) in fieldsData"
-                                :key="getKey('th', index)"
+                            <th v-for="(field, index) in fieldsData"
+                                :key="`${index}-${field.name}`"
                                 :style="{
                                     minWidth: field.width || undefined,
                                     width: field.width || undefined,
                                 }"
                                 :class="{'fix-width': colCopy}"
-                                @click="theadClick(field, index, $event)"
-                                @mouseenter="thHoverIndex=index"
-                                @mouseleave="thHoverIndex=null"
+                                @click="onTheadClick(field, index, $event)"
                             >
-                                <slot :name="`th-${field.name}`" :index="index" :field="field"
-                                      :sortable="sortable"
+                                <slot :name="`th-${field.name}`"
+                                      v-bind="getHeadSlotProps(field, index)"
                                 >
                                     <span class="th-contents">
                                         <span>
                                             <slot :name="`th-${field.name}-format`"
-                                                  :value="field.label"
+                                                  v-bind="getHeadSlotProps(field, index)"
                                             >
                                                 {{ field.label ? field.label : field.name }}
                                             </slot>
                                             <p-copy-button v-if="colCopy" class="ml-2"
                                                            width="0.875rem" height="0.875rem"
-                                                           @copy="clickColCopy(index)"
+                                                           @copy="onClickColCopy(index)"
                                             />
                                         </span>
 
                                         <template v-if="sortable && field.sortable">
                                             <p-i
                                                 v-if="sortable && (field.sortKey|| field.name) === sortBy"
-                                                :name="sortIcon"
+                                                :name="proxyState.sortDesc ? 'ic_table_sort_fromZ' : 'ic_table_sort_fromA'"
                                                 class="sort-icon"
                                             />
                                             <p-i v-else
@@ -68,39 +65,34 @@
                     </slot>
                 </thead>
                 <tbody>
-                    <slot v-if="showNoData" name="no-data" :fields="fieldsData">
+                    <slot v-if="showNoData" name="no-data" v-bind="getDefaultSlotProps()">
                         <div class="no-data">
-                            <slot name="no-data-format" :fields="fieldsData">
+                            <slot name="no-data-format" v-bind="getDefaultSlotProps()">
                                 No Items
                             </slot>
                         </div>
                         <tr :colspan="selectable ? fieldsData.length +1 : fieldsData.length" class="fake-row" />
                     </slot>
                     <slot name="body" :items="items">
-                        <slot v-for="(item, index) in items" name="row" :fields="fieldsName"
-                              :item="item" :index="index"
+                        <slot v-for="(item, index) in items" name="row"
+                              v-bind="getRowSlotProps(item, index)"
                         >
                             <slot :name="'row-'+index"
-                                  :item="item"
-                                  :index="index"
-                                  :fields="fieldsName"
-                                  :row-cursor-pointer="rowCursorPointer"
+                                  v-bind="getRowSlotProps(item, index)"
                             >
-                                <tr :key="getKey('tr', index)" :data-index="index"
+                                <tr :key="getKey('tr', item, index)" :data-index="index"
                                     class="fade-in"
                                     :class="{
-                                        'tr-selected': isSelected(index),
+                                        'tr-selected': getSelectedState(index),
                                         'row-height-fixed': rowHeightFixed,
                                         'row-cursor-pointer': rowCursorPointer,
                                     } "
                                     v-bind="(item&& item.hasOwnProperty('vbind') )? item.vbind : null"
-                                    @click.left="rowLeftClick( item, index, $event )"
-                                    @click.right="rowRightClick( item, index, $event )"
-                                    @click.middle="rowMiddleClick( item, index, $event )"
+                                    @click.left="onRowLeftClick( item, index, $event )"
                                 >
                                     <td v-if="selectable"
                                         class="select-checkbox"
-                                        @click.stop.prevent="selectClick"
+                                        @click.stop.prevent="onSelectClick"
                                     >
                                         <p-check-box v-if="multiSelect"
                                                      v-model="proxyState.selectIndex"
@@ -111,31 +103,18 @@
                                                  :value="index"
                                         />
                                     </td>
-                                    <slot v-for="(field, i) in fieldsName"
-                                          :name="'col-'+field"
-                                          :item="item"
-                                          :value=" item? item[field] :''"
-                                          :index="index"
-                                          :field="field"
+                                    <slot v-for="(field, i) in fieldsData"
+                                          :name="`col-${field.name}`"
+                                          v-bind="getColSlotProps(item, index, field)"
                                     >
-                                        <td :key="getKey('td', index)"
-                                            v-tooltip.bottom="{content: getTooltipContent(item, field, index, i), delay: {show: 500}}"
-                                        >
-                                            <slot
-                                                :name="`col-${field}-format`"
-                                                :item="item"
-                                                :value="getValueFunc(item,field)"
-                                                :index="index"
-                                                :field="field"
+                                        <td :key="getKey('td', item, index, i)">
+                                            <slot :name="`col-${field.name}-format`"
+                                                  v-bind="getColSlotProps(item, index, field)"
                                             >
-                                                <slot
-                                                    :name="`col-${i}-format`"
-                                                    :item="item"
-                                                    :value="getValueFunc(item,field)"
-                                                    :index="index"
-                                                    :field="field"
+                                                <slot :name="`col-${i}-format`"
+                                                      v-bind="getColSlotProps(item, index, field)"
                                                 >
-                                                    {{ getValueFunc(item,field) }}
+                                                    {{ getValue(item,field) }}
                                                 </slot>
                                             </slot>
                                         </td>
@@ -161,21 +140,19 @@
 
 <script lang="ts">
 import {
-    flatMap, range, get, every,
-} from 'lodash';
-
-import {
-    toRefs, computed, reactive, watch, onMounted, Ref, ref, getCurrentInstance, ComponentRenderProxy,
+    toRefs, computed, reactive, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
+import { get } from 'lodash';
+import { copyAnyData } from '@/components/util/helpers';
+import { makeOptionalProxy } from '@/components/util/composition-helpers';
+import { PDataTableProps, DataTableField, DataTableFieldType } from '@/components/organisms/tables/data-table/type';
+
 
 import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
 import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
 import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PI from '@/components/atoms/icons/PI.vue';
-import { PDataTableProps, DataTableField } from '@/components/organisms/tables/data-table/type';
-import { copyAnyData, copyTextToClipboard } from '@/components/util/helpers';
-import { makeOptionalProxy, windowEventMount } from '@/components/util/composition-helpers';
 
 const color = ['default', 'light', 'primary4'];
 
@@ -237,10 +214,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        skeletonRows: {
-            type: Number,
-            default: 5,
-        },
         tableStyleType: {
             type: String,
             default: 'default',
@@ -272,6 +245,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        idKey: {
+            type: [String, Number],
+            default: undefined,
+        },
     },
     setup(props: PDataTableProps, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -283,75 +260,67 @@ export default {
         });
 
         const state = reactive({
-            table: null,
+            table: null as any,
             allState: false,
-            thHoverIndex: null,
-        });
-        const fieldsData: Ref<any> = computed(() => {
-            const data = flatMap(props.fields, (value: string|object) => {
+            fieldsData: computed<DataTableFieldType[]>(() => props.fields.map((value: string|DataTableField) => {
                 if (typeof value === 'string') { return { name: value, label: value, sortable: true }; }
                 return { sortable: true, ...value };
-            });
-            return data;
-        });
-        const fieldsName = computed(() => flatMap(fieldsData.value, field => field.name));
-        const sortIcon = computed(() => (proxyState.sortDesc ? 'ic_table_sort_fromZ' : 'ic_table_sort_fromA'));
-        // @ts-ignore
-        const copyTargetElement = computed(() => state.table.children[1].children);
-
-        const showLoading = ref(true);
-        const showHeader = ref(props.items && props.items.length > 0 && props.fields.length > 0);
-        const showNoData = computed(() => {
-            if (showHeader.value && (
-                !props.items || !Array.isArray(props.items) || props.items.length === 0
-            )) {
-                return true;
-            }
-            return false;
-        });
-        // @ts-ignore
-        const skeletons = computed(() => range(props.skeletonRows));
-
-        const makeTableText = (el) => {
-            let result = '';
-            const startIdx = props.selectable ? 1 : 0;
-            const tds = el.children;
-            // eslint-disable-next-line no-plusplus
-            for (let idx = startIdx; idx < el.childElementCount; idx++) {
-                result += `${tds[idx].innerText}\t`;
-            }
-            return `${result}\n`;
-        };
-        const copy = (event) => {
-        /**
-         * TODO: single select copy
-         */
-            const hasSelectData = () => {
-                const selection = document.getSelection();
-                if (selection && selection.type === 'Range') {
+            })),
+            copyTargetElement: computed<HTMLCollection>(() => state.table?.children[1]?.children || []),
+            showLoading: true,
+            showHeader: props.items && props.items.length > 0 && props.fields.length > 0,
+            showNoData: computed(() => {
+                if (state.showHeader && (
+                    !props.items || !Array.isArray(props.items) || props.items.length === 0
+                )) {
                     return true;
                 }
                 return false;
-            };
+            }),
+        });
 
-            if (!hasSelectData()) {
-                if (!props.multiSelect) return;
 
-                if (event.code === 'KeyC' && (event.ctrlKey || event.metaKey) && (proxyState.selectIndex as Array<any>).length > 0) {
-                    let result = '';
-                    if (Array.isArray(proxyState.selectIndex)) {
-                        proxyState.selectIndex.forEach((tr) => {
-                            result += makeTableText(copyTargetElement.value[tr]);
-                        });
-                    }
-                    copyTextToClipboard(result);
+        const getValue = (item, field: DataTableFieldType) => get(item, field.name);
+
+        const getKey = (type: 'tr'|'td', item, rowIndex, colIndex?) => {
+            if (type === 'tr') {
+                if (props.idKey) {
+                    const id = get(item, props.idKey, undefined);
+                    if (id !== undefined) return `${type}-${rowIndex}-${id}`;
                 }
+                return `${type}-${rowIndex}`;
             }
+
+            if (props.idKey) {
+                const id = get(item, props.idKey, undefined);
+                if (id !== undefined) return `${type}-${rowIndex}-${id}-${colIndex}`;
+            }
+
+            if (rowIndex === 0)console.debug('type: ', type, 'key: ', `${type}-${rowIndex}-${colIndex}-${state.fieldsData[colIndex].name}`);
+            return `${type}-${rowIndex}-${colIndex}-${state.fieldsData[colIndex].name}`;
         };
-        const isSelected = index => (props.multiSelect ? proxyState.selectIndex.indexOf(index) !== -1 : proxyState.selectIndex[0] === index);
+
+        const getDefaultSlotProps = () => ({
+            fields: state.fieldsData,
+        });
+
+        const getHeadSlotProps = (field, index) => ({
+            field, index, sortable: props.sortable,
+        });
+
+        const getRowSlotProps = (item, index) => ({
+            item, index,
+        });
+
+        const getColSlotProps = (item, index, field) => ({
+            item, index, field, value: getValue(item, field),
+        });
+
+        const getSelectedState = index => (props.multiSelect ? proxyState.selectIndex.some(d => index === d) : proxyState.selectIndex[0] === index);
+
         const checkboxToggle = (index) => {
             const newSelected = [...proxyState.selectIndex];
-            if (isSelected(index)) {
+            if (getSelectedState(index)) {
                 const idx = newSelected.indexOf(index);
                 newSelected.splice(idx, 1);
                 state.allState = false;
@@ -360,7 +329,9 @@ export default {
             }
             proxyState.selectIndex = newSelected;
         };
-        const rowLeftClick = (item, index, event) => {
+
+        /* Event Handlers */
+        const onRowLeftClick = (item, index, event) => {
             context.emit('rowLeftClick', item, index, event);
             if (!props.selectable) return;
             if (props.multiSelect) {
@@ -375,34 +346,12 @@ export default {
             }
             proxyState.selectIndex = [index];
         };
-        const rowRightClick = (item, index, event) => {
-            context.emit('rowRightClick', item, index, event);
-        };
-        const rowMiddleClick = (item, index, event) => {
-            context.emit('rowMiddleClick', item, index, event);
-        };
-        const theadClick = (field, index, event) => {
+
+        const onTheadClick = (field, index, event) => {
             if (props.sortable && field.sortable) {
                 const clickedKey = field.sortKey || field.name;
                 let sortBy = proxyState.sortBy;
                 let sortDesc: undefined|boolean = proxyState.sortDesc;
-
-                // when clicked the same thead
-                // if (sortBy === clickedKey) {
-                //     // set reverse mode
-                //     if (sortDesc) {
-                //         sortDesc = false;
-                //     // set default mode (sort nothing)
-                //     } else if (sortDesc === false) {
-                //         sortBy = '';
-                //         sortDesc = undefined;
-                //     }
-                //
-                // // when clicked the other thead
-                // } else {
-                //     sortBy = clickedKey;
-                //     sortDesc = true;
-                // }
 
                 if (sortBy === clickedKey) {
                     // set reverse mode
@@ -414,54 +363,37 @@ export default {
                     sortDesc = true;
                 }
 
-
                 // set changed values
                 proxyState.sortBy = sortBy;
                 proxyState.sortDesc = sortDesc;
                 context.emit('changeSort', sortBy, sortDesc);
             }
-            context.emit('theadClick', field, index, event);
         };
 
-        const selectClick = (event) => {
+        const onSelectClick = (event) => {
             event.target.children[0].click();
         };
-        const selectAllToggle = () => {
+        const onSelectAllToggle = () => {
             if (state.allState) {
                 proxyState.selectIndex = Array.from(new Array(props.items.length).keys());
             } else {
                 proxyState.selectIndex = [];
             }
         };
-        const getSelectItem = (sortable) => {
-            const selectedIndex = sortable ? proxyState.selectIndex : proxyState.selectIndex.sort((a, b) => a - b);
-            const selectItem = [];
-            // @ts-ignore
-            selectedIndex.forEach((index) => {
-                // @ts-ignore
-                selectItem.push(props.items[index]);
-            });
-            return selectItem;
-        };
-        const clickColCopy = (idx) => {
+        const onClickColCopy = (idx) => {
             let result = '';
-            const arr = Array.from(copyTargetElement.value as any[]);
+            const arr: Element[] = Array.from(state.copyTargetElement);
             arr.forEach((el) => {
-                // @ts-ignore
-                const children = Array.from(el.children);
+                const children = Array.from(el.children) as HTMLElement[];
                 children.forEach((td, colIdx) => {
                     if (colIdx === idx) {
-                        // @ts-ignore
-                        result += `${td.innerText}\n`;
+                        if (result) result += `\n${td.innerText}`;
+                        else result = td.innerText;
                     }
                 });
             });
             copyAnyData(result);
         };
-
-        if (props.selectable) {
-            windowEventMount('keydown', copy);
-        }
 
 
         watch(() => proxyState.selectIndex, () => {
@@ -472,15 +404,10 @@ export default {
             }
         }, { immediate: true });
 
-        onMounted(() => {
-            if (props.useCursorLoading && props.loading) {
-                document.body.style.cursor = 'progress';
-            }
-        });
         watch(() => props.loading, (value) => {
             if (typeof value !== 'boolean') {
-                showHeader.value = true;
-                showLoading.value = false;
+                state.showHeader = true;
+                state.showLoading = false;
                 return;
             }
 
@@ -493,86 +420,30 @@ export default {
             }
 
             if (value) {
-                showLoading.value = true;
+                state.showLoading = true;
             } else {
-                if (!showHeader.value) {
-                    showHeader.value = true;
+                if (!state.showHeader) {
+                    state.showHeader = true;
                 }
-                showLoading.value = false;
+                state.showLoading = false;
             }
         }, { immediate: true });
-
-        const getValueFunc = computed(() => {
-            if (every(fieldsName.value, field => !field.includes('.'))) {
-                return (item, field) => item[field];
-            }
-            return (item, field) => get(item, field);
-        });
-
-        const getKey = (type, idx) => `${type}-${idx}${Math.random()}`;
-
-        const getTableWidth = () => {
-            if (props.width) return props.width;
-            // if (!props.colWidth) return undefined;
-            // const num = props.colWidth.match(/\d+/g);
-            // const unit = props.colWidth.match(/[a-zA-Z]+/g);
-            // if (num && unit) return `${Number(num[0]) * props.fields.length}${unit[0]}`;
-            return undefined;
-        };
-
-        const trElements = computed(() => {
-            if (!state.table) return null;
-
-            const trEls = (state.table as any).children[1];
-            if (!trEls) return null;
-
-            if (trEls.children) return Array.from(trEls.children);
-            return null;
-        });
-        const getTooltipContent = (item: any, field: DataTableField, rowIndex: number, colIndex: number) => {
-            let res;
-            if (typeof field === 'string') res = item[field];
-            else res = item[field.name];
-
-            // let result = '';
-            // const arr = Array.from(copyTargetElement.value as any[]);
-            // arr.forEach((el) => {
-            //     // @ts-ignore
-            //     const children = Array.from(el.children);
-            //     children.forEach((td, colIdx) => {
-            //         if (colIdx === colIndex) {
-            //             // @ts-ignore
-            //             result += `${td.innerText}\t`;
-            //         }
-            //     });
-            // });
-            return '';
-        };
-
 
         return {
             proxyState,
             ...toRefs(state),
-            fieldsData,
-            fieldsName,
-            sortIcon,
-            showNoData,
-            showLoading,
-            showHeader,
-            isSelected,
-            rowLeftClick,
-            rowRightClick,
-            rowMiddleClick,
-            theadClick,
-            selectClick,
-            selectAllToggle,
-            getSelectItem,
-            clickColCopy,
-            getValueFunc,
+            getValue,
             getKey,
-            skeletons,
-            getTableWidth,
-            getTooltipContent,
+            getDefaultSlotProps,
+            getHeadSlotProps,
+            getRowSlotProps,
+            getColSlotProps,
+            getSelectedState,
+            onRowLeftClick,
+            onTheadClick,
+            onSelectClick,
+            onSelectAllToggle,
+            onClickColCopy,
         };
     },
 
