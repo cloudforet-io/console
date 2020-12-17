@@ -50,6 +50,7 @@
                 <form class="form">
                     <p-field-group
                         :label="$t('COMMON.PROFILE.PASSWORD')"
+                        :required="true"
                         :invalid="validationState.isPasswordValid === false"
                         :invalid-text="validationState.passwordInvalidText"
                         class="input-form"
@@ -63,6 +64,7 @@
                     </p-field-group>
                     <p-field-group
                         :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
+                        :required="true"
                         :invalid="validationState.isPasswordCheckValid === false"
                         :invalid-text="validationState.passwordCheckInvalidText"
                         class="input-form"
@@ -163,16 +165,15 @@ export default {
 
         const checkEmail = async () => {
             const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-            if (!state.email) {
-                validationState.isEmailValid = false;
-                validationState.emailInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
-            } else if (!regex.test(state.email)) {
-                validationState.isEmailValid = false;
-                validationState.emailInvalidText = 'Invalid e-mail format.';
-            } else {
-                validationState.isEmailValid = true;
-                validationState.emailInvalidText = '';
-            }
+            if (state.email) {
+                if (!regex.test(state.email)) {
+                    validationState.isEmailValid = false;
+                    validationState.emailInvalidText = 'Invalid e-mail format.';
+                } else {
+                    validationState.isEmailValid = true;
+                    validationState.emailInvalidText = '';
+                }
+            } else validationState.isEmailValid = true;
         };
 
         const checkPassword = async (password) => {

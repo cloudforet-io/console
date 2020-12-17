@@ -73,6 +73,7 @@
             >
                 <p-field-group
                     :label="$t('COMMON.PROFILE.PASSWORD')"
+                    :required="true"
                     :invalid="validationState.isPasswordValid === false"
                     :invalid-text="validationState.passwordInvalidText"
                     class="input-form"
@@ -86,6 +87,7 @@
                 </p-field-group>
                 <p-field-group
                     :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
+                    :required="true"
                     :invalid="validationState.isPasswordCheckValid === false"
                     :invalid-text="validationState.passwordCheckInvalidText"
                     class="input-form"
@@ -176,7 +178,7 @@ export default {
                     user_type: 'USER',
                     backend: 'LOCAL',
                 }, {
-                    label: 'Api Only',
+                    label: 'API Only',
                     user_type: 'API_USER',
                     backend: 'LOCAL',
                 },
@@ -295,16 +297,15 @@ export default {
 
         const checkEmail = async () => {
             const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-            if (!formState.email) {
-                validationState.isEmailValid = false;
-                validationState.emailInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
-            } else if (!regex.test(formState.email)) {
-                validationState.isEmailValid = false;
-                validationState.emailInvalidText = 'Invalid e-mail format.';
-            } else {
-                validationState.isEmailValid = true;
-                validationState.emailInvalidText = '';
-            }
+            if (formState.email) {
+                if (!regex.test(formState.email)) {
+                    validationState.isEmailValid = false;
+                    validationState.emailInvalidText = 'Invalid e-mail format.';
+                } else {
+                    validationState.isEmailValid = true;
+                    validationState.emailInvalidText = '';
+                }
+            } else validationState.isEmailValid = true;
         };
 
         const checkPassword = async (password) => {
