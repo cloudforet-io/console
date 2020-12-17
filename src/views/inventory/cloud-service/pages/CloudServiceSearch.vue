@@ -6,6 +6,7 @@
 import { isEmpty } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';
 import { locationQueryToString } from '@/lib/router-query-string';
+import { QueryHelper } from '@/lib/query';
 
 const DEFAULT_URL = '/inventory/cloud-service';
 const ERROR_URL = '/inventory/cloud-service/no-resource';
@@ -23,6 +24,7 @@ export default {
         },
     },
     beforeRouteEnter(to, from, next) {
+        const queryHelper = new QueryHelper();
         (async () => {
             let link = DEFAULT_URL;
             try {
@@ -34,7 +36,8 @@ export default {
                 if (result.url === DEFAULT_URL) {
                     next(ERROR_URL);
                 } else {
-                    link = `${result.url}?filters=${to.params.searchKey}:${to.params.id}`;
+                    queryHelper.setFilters([{ k: to.params.searchKey, v: to.params.id, o: '=' }]);
+                    link = `${result.url}?filters=${queryHelper.rawQueryStrings[0]}`;
                     if (!isEmpty(to.query)) {
                         const queryString = locationQueryToString(to.query);
                         link += `&${queryString}`;
