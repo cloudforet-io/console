@@ -3,7 +3,7 @@
         <div class="col-span-12 lg:col-span-9
                     widget-wrapper"
         >
-            <all-summary class="col-span-12" :providers="providers" />
+            <all-summary class="col-span-12" />
             <resource-map class="col-span-12" :providers="providers" />
             <personal-health-dashboard class="col-span-12" />
             <trusted-advisor class="col-span-12" :providers="providers" />

@@ -23,10 +23,8 @@
             </div>
         </template>
         <template #default>
-            <div class="grid gap-2
-                        grid-cols-1
-                        sm:grid-cols-2
-                        md:grid-cols-4"
+            <div class="card-wrapper grid gap-2 grid-cols-1
+                        sm:grid-cols-2 md:grid-cols-4"
             >
                 <template v-if="loading">
                     <div v-for="v in skeletons" :key="v" class="flex items-center p-4">

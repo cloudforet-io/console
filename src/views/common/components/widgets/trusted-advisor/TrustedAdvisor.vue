@@ -525,8 +525,12 @@ export default {
                     @apply text-gray-700;
                     position: absolute;
                     display: block;
-                    bottom: 1.5rem;
+                    width: 95%;
+                    bottom: 1.75rem;
                     left: 0;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
                     transform: rotate(-50deg);
                 }
                 .box {

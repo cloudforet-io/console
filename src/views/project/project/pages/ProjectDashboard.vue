@@ -1,52 +1,51 @@
 <template>
-    <div class="grid gap-4 grid-flow-row grid-cols-12">
-        <all-summary class="col-span-12 lg:col-span-8"
-                     :providers="providers" :project-id="projectId"
-        />
-        <cloud-services class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9
-                               sm:col-end-13 lg:row-start-2 cloud-service"
-                        :project-filter="projectFilter"
-                        :project-id="projectId"
-        />
-        <div class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9
-             lg:row-start-3 resources-tab"
-        >
-            <p-tab :tabs="tabs" :active-tab.sync="activeTab">
-                <template #server>
-                    <resources-by-region
-                        :project-filter="projectFilter"
-                        :project-id="projectId"
-                        :is-server="true"
-                    />
-                </template>
-                <template #cloud_service>
-                    <resources-by-region
-                        :project-filter="projectFilter"
-                        :project-id="projectId"
-                        :is-server="false"
-                    />
-                </template>
-            </p-tab>
+    <div class="grid grid-cols-12 gap-3">
+        <div class="col-span-12 lg:col-span-9 grid gap-3 widget-wrapper">
+            <all-summary class="col-span-12"
+                         :project-id="projectId"
+                         :chart-color="chartColor"
+                         :chart-text-color="chartTextColor"
+            />
+            <div class="col-span-12 resources-tab">
+                <p-tab :tabs="tabs" :active-tab.sync="activeTab">
+                    <template #server>
+                        <resources-by-region
+                            :project-filter="projectFilter"
+                            :project-id="projectId"
+                            :is-server="true"
+                        />
+                    </template>
+                    <template #cloud_service>
+                        <resources-by-region
+                            :project-filter="projectFilter"
+                            :project-id="projectId"
+                            :is-server="false"
+                        />
+                    </template>
+                </p-tab>
+            </div>
+            <service-accounts-table class="col-span-12 service-accounts-table" />
         </div>
-        <service-accounts-table
-            class="col-start-1 col-end-13 lg:col-start-1 lg:col-end-9 lg:row-start-4 service-accounts-table"
-        />
-        <daily-updates class="col-start-1 col-end-13 sm:col-start-1 sm:col-end-13 lg:col-start-9 col-end-13
-                              row-start-4 row-end-5 sm:row-start-2 sm:row-end-3 lg:row-start-1
-                              daily-updates"
-                       :project-id="projectId"
-                       :project-filter="projectFilter"
-        />
-        <health-dashboard class="col-start-1 col-end-13 sm:col-start-1 sm:col-end-13 lg:col-start-9 col-end-13
-                              row-start-5 row-end-8 sm:row-start-3 sm:row-end-5 lg:row-start-3
-                              health-dashboard"
-                          :project-id="projectId"
-        />
+        <div class="col-span-12 lg:col-span-3 grid gap-3">
+            <daily-updates class="col-span-12 daily-updates"
+                           :project-id="projectId"
+                           :project-filter="projectFilter"
+            />
+            <cloud-services class="col-span-12 cloud-service"
+                            :project-filter="projectFilter"
+                            :project-id="projectId"
+            />
+            <simplified-trusted-advisor class="col-span-12 trusted-advisor"
+                                        :providers="providers"
+                                        :project-id="projectId"
+            />
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import { Location } from 'vue-router';
+import { TranslateResult } from 'vue-i18n';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
@@ -56,13 +55,13 @@ import AllSummary from '@/views/common/components/widgets/all-summary/AllSummary
 import CloudServices from '@/views/common/components/widgets/cloud-services/CloudServices.vue';
 import DailyUpdates from '@/views/common/components/widgets/daily-updates/DailyUpdates.vue';
 import ServiceAccountsTable from '@/views/common/components/widgets/service-accounts-table/ServiceAccountsTable.vue';
-import HealthDashboard from '@/views/common/components/widgets/health-dashboard/HealthDashboard.vue';
 import ResourcesByRegion from '@/views/common/components/widgets/resources-by-region/ResourcesByRegion.vue';
+import SimplifiedTrustedAdvisor from '@/views/common/components/widgets/trusted-advisor/SimplifiedTrustedAdvisor.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import { blue, secondary, secondary1 } from '@/styles/colors';
-import VueI18n from 'vue-i18n';
 
-import TranslateResult = VueI18n.TranslateResult;
+import {
+    blue, secondary, secondary1, peacock,
+} from '@/styles/colors';
 
 
 interface SummaryState {
@@ -75,13 +74,13 @@ interface SummaryState {
 export default {
     name: 'ProjectDashboard',
     components: {
+        SimplifiedTrustedAdvisor,
         AllSummary,
         ResourcesByRegion,
         CloudServices,
         DailyUpdates,
         ServiceAccountsTable,
         PTab,
-        HealthDashboard,
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -98,6 +97,8 @@ export default {
                 color: secondary1,
             },
             providers: computed(() => vm.$store.state.resource.provider.items),
+            chartColor: peacock[500],
+            chartTextColor: peacock[600],
         });
         const projectId = computed<string>(() => context.root.$route.params.id as string);
         const projectFilter = `&filters=project_id%3A%3D${projectId.value}`;
@@ -129,6 +130,11 @@ export default {
             cloudService: api => api.setId(projectId.value),
         });
 
+        const init = () => {
+            vm.$store.dispatch('resource/cloudServiceType/load');
+        };
+        init();
+
         return {
             ...toRefs(state),
             ...toRefs(tabData),
@@ -143,13 +149,52 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.all-summary-page::v-deep {
+.widget-layout::v-deep {
+    .title {
+        font-size: 1rem;
+        font-weight: bold;
+    }
+}
+.widget-wrapper {
+    grid-auto-rows: max-content;
+}
+
+.all-summary::v-deep {
     margin-top: 1.25rem;
     .top-part {
         .box {
+            height: 5.25rem;
             border-radius: 2px;
+            &.selected {
+                @apply bg-peacock-600;
+                &::after {
+                    border-color: theme('colors.peacock.600') transparent;
+                }
+                .count {
+                    @apply text-white;
+                    .number {
+                        @apply text-white;
+                        font-weight: normal;
+                    }
+                }
+                .title {
+                    font-weight: normal;
+                }
+            }
+            &.spendings {
+                .count .number {
+                    font-size: 1.25rem;
+                }
+            }
             &:not(.selected) {
                 @apply border border-gray-200;
+            }
+            .count {
+                .number {
+                    @apply text-gray-700;
+                    font-size: 1.625rem;
+                    font-weight: normal;
+                }
             }
         }
     }
@@ -162,12 +207,25 @@ export default {
 }
 .cloud-service {
     @apply border border-gray-200;
-    height: 26rem;
+    height: 28rem;
     border-radius: 2px;
+    @media screen and (width < 1024px) {
+        height: 26rem;
+    }
     &::v-deep .widget-contents {
         overflow-y: auto;
-        margin-bottom: 1rem;
+        .card-wrapper {
+            display: block;
+            .card {
+                margin-bottom: 0.5rem;
+            }
+        }
     }
+}
+
+.trusted-advisor {
+    @apply border border-gray-200;
+    border-radius: 2px;
 }
 
 .resources-by-region {

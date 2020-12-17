@@ -1,5 +1,5 @@
 <template>
-    <div class="all-summary-page">
+    <div class="all-summary">
         <div class="top-part grid grid-cols-12 gap-3">
             <div v-for="(data, idx) of dataList" :key="idx"
                  class="box col-span-6 sm:col-span-3 md:col-span-3 lg:col-span-3"
@@ -134,7 +134,7 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
-import { gray, primary, primary1 } from '@/styles/colors';
+import { gray, primary1 } from '@/styles/colors';
 import { QueryStoreFilter } from '@/lib/query/type';
 import { QueryHelper } from '@/lib/query';
 
@@ -188,13 +188,17 @@ export default {
         PChartLoader,
     },
     props: {
-        providers: {
-            type: Object,
-            default: () => ({}),
-        },
         projectId: {
             type: String,
             default: undefined,
+        },
+        chartColor: {
+            type: String,
+            default: primary1,
+        },
+        chartTextColor: {
+            type: String,
+            default: primary1,
         },
     },
     setup(props) {
@@ -204,6 +208,7 @@ export default {
             loading: false,
             chartRef: null as HTMLElement | null,
             skeletons: range(4),
+            providers: computed(() => vm.$store.state.resource.provider.items),
             //
             selectedIndexInterval: undefined,
             selectedIndex: 0,
@@ -260,9 +265,9 @@ export default {
             data: [] as ChartData[],
         });
         const colorState = reactive({
-            aws: computed(() => props.providers.aws.color),
-            google: computed(() => props.providers.google_cloud.color),
-            azure: computed(() => props.providers.azure.color),
+            aws: computed(() => state.providers.aws.color),
+            google: computed(() => state.providers.google_cloud.color),
+            azure: computed(() => state.providers.azure.color),
         });
 
         /* util */
@@ -305,7 +310,7 @@ export default {
             const series = chart.series.push(new am4charts.ColumnSeries());
             series.dataFields.valueY = 'count';
             series.dataFields.categoryX = 'date';
-            series.fill = am4core.color(primary1);
+            series.fill = am4core.color(props.chartColor);
             series.columns.template.width = am4core.percent(30);
             series.columns.template.column.cornerRadiusTopLeft = 3;
             series.columns.template.column.cornerRadiusTopRight = 3;
@@ -316,7 +321,7 @@ export default {
             bullet.label.fontSize = 14;
             bullet.label.truncate = false;
             bullet.label.hideOversized = false;
-            bullet.label.fill = am4core.color(primary);
+            bullet.label.fill = am4core.color(props.chartTextColor);
             bullet.label.dy = -10;
         };
         const setBoxInterval = () => {
@@ -538,7 +543,7 @@ export default {
                     }
                     summaryData.push({
                         provider: d.provider,
-                        label: props.providers[d.provider].label,
+                        label: state.providers[d.provider].label,
                         type: d.display_name || d.cloud_service_group,
                         count: type === 'storage' ? bytes(d.size, { unitSeparator: ' ' }) : d.count,
                         to: detailLocation,
@@ -564,6 +569,8 @@ export default {
         const init = async () => {
             state.loading = true;
             await getCount('compute');
+
+            await vm.$store.dispatch('resource/provider/load');
             if (state.count.compute > 0) await getSummaryInfo('compute');
             state.loading = false;
             setBoxInterval();
@@ -700,7 +707,6 @@ export default {
                 @apply text-gray-500;
                 font-size: 1rem;
                 font-weight: normal;
-                opacity: 0.7;
                 padding-left: 0.5rem;
                 &.storage {
                     font-size: 0.875rem;
