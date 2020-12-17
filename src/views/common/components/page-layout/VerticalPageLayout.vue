@@ -6,25 +6,28 @@
             />
         </template>
         <template #default>
-            <div class="right-container">
+            <div ref="containerRef" class="right-container">
                 <div class="page-contents">
                     <slot name="default" />
                 </div>
                 <div class="fnb">
-                    <FNB />
+                    <f-n-b />
                 </div>
+                <p-back-to-top-button :container="containerRef" />
             </div>
         </template>
     </p-vertical-layout>
 </template>
 
-<script>
+<script lang="ts">
 import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/PVerticalLayout.vue';
 import FNB from '@/views/common/components/fnb/FNB.vue';
+import PBackToTopButton from '@/components/atoms/back-to-top-button/PBackToTopButton.vue';
+import { ref } from '@vue/composition-api';
 
 export default {
     name: 'VerticalPageLayout',
-    components: { PVerticalLayout, FNB },
+    components: { PBackToTopButton, PVerticalLayout, FNB },
     props: {
         height: {
             type: String,
@@ -43,25 +46,32 @@ export default {
             default: 500,
         },
     },
+    setup() {
+        const containerRef = ref(undefined);
+
+        return {
+            containerRef,
+        };
+    },
 };
 </script>
 
 <style lang="postcss" scoped>
-    .right-container {
-        height: 100%;
-        display: flex;
-        flex-direction: column;
-        justify-content: stretch;
-        overflow-y: scroll;
+.right-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: stretch;
+    overflow-y: scroll;
 
-        .page-contents {
-            width: 100%;
-            flex-grow: 1;
-            padding: 2rem 1.5rem;
-        }
-
-        .fnb {
-            width: 100%;
-        }
+    .page-contents {
+        width: 100%;
+        flex-grow: 1;
+        padding: 2rem 1.5rem;
     }
+
+    .fnb {
+        width: 100%;
+    }
+}
 </style>
