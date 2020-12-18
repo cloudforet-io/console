@@ -221,7 +221,7 @@ const RESOURCE_GROUP_TYPES = [
     },
     {
         label: '[AWS] Auto Scaling Group',
-        name: 'inventory.CloudService?provider=aws&cloud_service_group=AutoScaling&cloud_service_type=AutoScalingGroup',
+        name: 'inventory.CloudService?provider=aws&cloud_service_group=EC2&cloud_service_type=AutoScalingGroup',
         type: 'item',
     },
 ];
