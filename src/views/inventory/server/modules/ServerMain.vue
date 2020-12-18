@@ -449,34 +449,6 @@ export default {
                     }), 'server_id', 'reference', 'primary_ip_address', 'collection_info.collectors');
                 }
 
-                // TODO: remove after test
-                typeOptionState.keyItemSets.push({
-                    title: 'Advanced',
-                    items: [{
-                        label: 'Tags',
-                        name: 'tags',
-                        dataType: 'object',
-                        operators: ['!=', '!', '='],
-                    }, {
-                        label: 'Data',
-                        name: 'data',
-                        dataType: 'object',
-                        operators: ['!=', '!', '='],
-                    }, {
-                        label: 'Nics',
-                        name: 'nics',
-                        dataType: 'object',
-                        operators: ['!=', '!', '='],
-                    }, {
-                        label: 'Disks',
-                        name: 'disks',
-                        dataType: 'object',
-                        operators: ['!=', '!', '='],
-                    }],
-                });
-                typeOptionState.valueHandlerMap.tags = makeDistinctValueHandler('inventory.Server', 'tags.key');
-                typeOptionState.valueHandlerMap.data = makeDistinctValueHandler('inventory.Server', 'data');
-
                 // initiate queryTags with keyItemSets
                 fetchOptionState.queryTags = queryHelper.setKeyItemSets(typeOptionState.keyItemSets).queryTags;
 
