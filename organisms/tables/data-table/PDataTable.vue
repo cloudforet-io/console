@@ -80,7 +80,7 @@
                             <slot :name="'row-'+index"
                                   v-bind="getRowSlotProps(item, index)"
                             >
-                                <tr :key="getKey('tr', item, index)" :data-index="index"
+                                <tr :key="`tr-${index}`" :data-index="index"
                                     class="fade-in"
                                     :class="{
                                         'tr-selected': getSelectedState(index),
@@ -107,7 +107,7 @@
                                           :name="`col-${field.name}`"
                                           v-bind="getColSlotProps(item, index, field)"
                                     >
-                                        <td :key="getKey('td', item, index, i)">
+                                        <td :key="`col-${field.name}-${i}`">
                                             <slot :name="`col-${field.name}-format`"
                                                   v-bind="getColSlotProps(item, index, field)"
                                             >
@@ -296,7 +296,6 @@ export default {
                 if (id !== undefined) return `${type}-${rowIndex}-${id}-${colIndex}`;
             }
 
-            if (rowIndex === 0)console.debug('type: ', type, 'key: ', `${type}-${rowIndex}-${colIndex}-${state.fieldsData[colIndex].name}`);
             return `${type}-${rowIndex}-${colIndex}-${state.fieldsData[colIndex].name}`;
         };
 
