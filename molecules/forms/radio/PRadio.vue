@@ -2,11 +2,8 @@
     <span class="p-radio"
           :class="{
               selected: isSelected,
-              hovered: hovered || mouseover,
               disabled, errored
           }"
-          @mouseenter="mouseover = true"
-          @mouseleave="mouseover = false"
           @click.stop.prevent="onClick"
           v-on="$listeners"
     >
@@ -14,6 +11,7 @@
         <input type="radio">
         <slot :slot-scope="$props" name="icon" :icon-name="iconName">
             <p-i class="radio-icon" width="1.25rem" height="1.25rem"
+                 :color="isSelected ? undefined : 'inherit transparent'"
                  :name="iconName"
             />
         </slot>
@@ -41,10 +39,6 @@ export default {
             type: [Boolean, String, Number, Object, Array],
             default: true,
         },
-        hovered: {
-            type: Boolean,
-            default: false,
-        },
         disabled: {
             type: Boolean,
             default: false,
@@ -66,7 +60,6 @@ export default {
             }
         };
 
-        const mouseover = ref(false);
 
         const iconName = computed(() => {
             if (props.disabled) return 'ic_radio--disabled';
@@ -77,13 +70,12 @@ export default {
             isSelected,
             iconName,
             onClick,
-            mouseover,
         };
     },
 };
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
 .p-radio {
     input {
         position: absolute;
@@ -91,8 +83,18 @@ export default {
         height: 0;
         width: 0;
     }
+    &:hover {
+        .radio-icon {
+            @apply text-gray-900;
+        }
+    }
+    &:not(:hover) {
+        .radio-icon {
+            @apply text-gray-300;
+        }
+    }
     .radio-icon {
-        @apply text-gray-300 cursor-pointer;
+        @apply cursor-pointer;
     }
     .text {
         @apply cursor-pointer;

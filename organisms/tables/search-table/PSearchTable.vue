@@ -22,10 +22,6 @@
                      @clickRefresh="emitChange()"
                      @clickExcel="emitExport()"
                      @rowLeftClick="byPassEvent('rowLeftClick', ...arguments)"
-                     @rowRightClick="byPassEvent('rowRightClick', ...arguments)"
-                     @rowMiddleClick="byPassEvent('rowMiddleClick', ...arguments)"
-                     @rowMouseOver="byPassEvent('rowMouseOver', ...arguments)"
-                     @rowMouseOut="byPassEvent('rowMouseOut', ...arguments)"
     >
         <template v-if="searchable && !$scopedSlots['toolbox-left']" #toolbox-left="scope">
             <div class="left-toolbox-item w-1/2 2xs:hidden lg:block">

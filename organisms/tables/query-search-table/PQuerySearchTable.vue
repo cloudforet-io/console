@@ -22,10 +22,6 @@
                      @clickRefresh="onRefresh"
                      @clickExcel="emitExport()"
                      @rowLeftClick="byPassEvent('rowLeftClick', ...arguments)"
-                     @rowRightClick="byPassEvent('rowRightClick', ...arguments)"
-                     @rowMiddleClick="byPassEvent('rowMiddleClick', ...arguments)"
-                     @rowMouseOver="byPassEvent('rowMouseOver', ...arguments)"
-                     @rowMouseOut="byPassEvent('rowMouseOut', ...arguments)"
     >
         <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
             <template v-if="searchable">

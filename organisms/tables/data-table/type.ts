@@ -1,11 +1,6 @@
 export interface DataTableEventListeners {
     select?: (selectIndex: number[]) => void|Promise<void>;
     rowLeftClick?: (item: any, index: number, event: MouseEvent) => void|Promise<void>;
-    rowRightClick?: (item: any, index: number, event: MouseEvent) => void|Promise<void>;
-    rowMiddleClick?: (item: any, index: number, event: MouseEvent) => void|Promise<void>;
-    rowMouseOver?: (item: any, index: number, event: MouseEvent) => void|Promise<void>;
-    rowMouseOut?: (item: any, index: number, event: MouseEvent) => void|Promise<void>;
-    theadClick?: (field: DataTableField, index: number, event: MouseEvent) => void|Promise<void>;
     changeSort?: (sortBy: string, sortDesc: boolean) => void|Promise<void>;
     'update:selectIndex'?: (selectIndex: number[]) => void|Promise<void>;
     'update:sortBy'?: (sortBy: string) => void|Promise<void>;
@@ -23,7 +18,7 @@ export type DataTableField = string | DataTableFieldType
 
 export interface PDataTableProps {
     loading: boolean;
-    fields: any[] | Readonly<any[]>;
+    fields: DataTableField[];
     items: any[];
     sortable?: boolean;
     sortBy?: string;
@@ -34,7 +29,6 @@ export interface PDataTableProps {
     multiSelect?: boolean;
     rowClickMultiSelectMode?: boolean;
     useCursorLoading?: boolean;
-    skeletonRows?: number;
     tableStyleType?: string;
     striped?: boolean;
     bordered?: boolean|null|unknown;
@@ -42,4 +36,5 @@ export interface PDataTableProps {
     width?: string;
     rowHeightFixed?: boolean;
     rowCursorPointer?: boolean;
+    idKey?: string|number;
 }

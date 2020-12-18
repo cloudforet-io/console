@@ -22,11 +22,6 @@ export default {
 const actions = {
     select: action('select'),
     rowLeftClick: action('rowLeftClick'),
-    rowRightClick: action('rowRightClick'),
-    rowMiddleClick: action('rowMiddleClick'),
-    rowMouseOver: action('rowMouseOver'),
-    rowMouseOut: action('rowMouseOut'),
-    theadClick: action('theadClick'),
     changeSort: action('changeSort'),
 };
 const data = {
@@ -264,10 +259,6 @@ export const rowVBind = () => ({
     :fields="fields"
     :hover="true"
     @rowLeftClick="rowLeftClick"
-    @rowRightClick="rowRightClick"
-    @rowMiddleClick="rowMiddleClick"
-    @rowMouseOver="rowMouseOver"
-    @rowMouseOut="rowMouseOut"
 >
 </PDataTable>
 `,
@@ -312,10 +303,6 @@ export const customRowSlot = () => ({
     :fields="fields"
     :hover="true"
     @rowLeftClick="rowLeftClick"
-    @rowRightClick="rowRightClick"
-    @rowMiddleClick="rowMiddleClick"
-    @rowMouseOver="rowMouseOver"
-    @rowMouseOut="rowMouseOut"
 >
 <template slot="row"  slot-scope="data">
 <tr  style="color: #0f69ff;">
@@ -348,10 +335,6 @@ export const customColSlot = () => ({
     :items="items"
     :fields="fields"
     @rowLeftClick="rowLeftClick"
-    @rowRightClick="rowRightClick"
-    @rowMiddleClick="rowMiddleClick"
-    @rowMouseOver="rowMouseOver"
-    @rowMouseOut="rowMouseOut"
 >
 <template slot="col-email"  slot-scope="data">
     <td style="color: #0f69ff;" >
@@ -382,10 +365,6 @@ export const loading = () => ({
                 :loading="loading"
                 :useCursorLoding="useCursorLoading"
                 @rowLeftClick="rowLeftClick"
-                @rowRightClick="rowRightClick"
-                @rowMiddleClick="rowMiddleClick"
-                @rowMouseOver="rowMouseOver"
-                @rowMouseOut="rowMouseOut"
                 >
                </PDataTable>
               `,
