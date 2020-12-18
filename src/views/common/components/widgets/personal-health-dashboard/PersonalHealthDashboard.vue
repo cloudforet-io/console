@@ -48,7 +48,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { random, find } from 'lodash';
+import { random, find, shuffle } from 'lodash';
 import dayjs from 'dayjs';
 
 import {
@@ -112,7 +112,7 @@ export default {
                     }
 
                     // todo: removed
-                    const sampleProjects = Object.keys(state.projects).slice(0, random(1, 10));
+                    const sampleProjects = shuffle(Object.keys(state.projects).slice(0, random(1, 10)));
 
                     return {
                         event: {
