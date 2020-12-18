@@ -1,7 +1,7 @@
 <template>
     <div
         v-tooltip.right="{content: 'Back to Top', delay: {show: 150}, classes: ['p-tooltip']}"
-        :class="location==='bottomRight'?'p-back-to-top-button bottomRight':'p-back-to-top-button topRight'"
+        :class="returnedClass"
         :style="{margin: margin}"
         class="back-to-top-button"
         @click.stop="goToTop"
@@ -16,6 +16,7 @@
 
 <script lang="ts">
 import PI from '@/components/atoms/icons/PI.vue';
+import { computed } from '@vue/composition-api';
 
 export default {
     name: 'PBackToTopButton',
@@ -36,11 +37,16 @@ export default {
     },
     setup(props) {
         const goToTop = () => {
+            console.log(props.container);
             props.container.scroll({ top: 0, behavior: 'smooth' });
         };
 
+        const returnedClass = computed(() => (
+            props.location === 'bottomRight' ? 'p-back-to-top-button bottomRight' : 'p-back-to-top-button topRight'));
+
         return {
             goToTop,
+            returnedClass,
         };
     },
 };
