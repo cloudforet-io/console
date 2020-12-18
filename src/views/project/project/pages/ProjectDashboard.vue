@@ -6,6 +6,7 @@
                          :chart-color="chartColor"
                          :chart-text-color="chartTextColor"
             />
+            <project-personal-health-dashboard class="col-span-12 project-personal-health-dashboard" />
             <div class="col-span-12 resources-tab">
                 <p-tab :tabs="tabs" :active-tab.sync="activeTab">
                     <template #server>
@@ -62,6 +63,8 @@ import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import {
     blue, secondary, secondary1, peacock,
 } from '@/styles/colors';
+import ProjectPersonalHealthDashboard
+    from '@/views/common/components/widgets/personal-health-dashboard/ProjectPersonalHealthDashboard.vue';
 
 
 interface SummaryState {
@@ -74,6 +77,7 @@ interface SummaryState {
 export default {
     name: 'ProjectDashboard',
     components: {
+        ProjectPersonalHealthDashboard,
         SimplifiedTrustedAdvisor,
         AllSummary,
         ResourcesByRegion,
@@ -204,6 +208,10 @@ export default {
             border-radius: 2px;
         }
     }
+}
+.project-personal-health-dashboard {
+    //@apply border border-gray-200;
+    //border-radius: 2px;
 }
 .cloud-service {
     @apply border border-gray-200;

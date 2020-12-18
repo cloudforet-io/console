@@ -18,6 +18,7 @@ import {
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
+import {SpaceConnector} from "@/lib/space-connector";
 
 
 export default {
@@ -33,11 +34,27 @@ export default {
             loading: false,
             data: [],
             fields: computed(() => [
-                { name: 'event', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.EVENT') },
-                { name: 'region', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.REGION') },
-                { name: 'project_affected', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.PROJECT_AFFECTED') },
+                { name: 'event', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_EVENT') },
+                { name: 'region', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_REGION') },
+                { name: 'project_affected', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_PROJECT_AFFECTED') },
             ]),
         });
+
+        const getSummary = async () => {
+            try {
+                const res = await SpaceConnector.client.statistics.topic.phdSummary({
+                    MOCK_MODE: true,
+                });
+                console.log(res);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const init = () => {
+            getSummary();
+        };
+        init();
 
         return {
             ...toRefs(state),
