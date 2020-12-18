@@ -187,6 +187,7 @@ export default {
             sitemapVisible: false,
             profileVisible: false,
             showAutomation: store.state.user.powerSchedulerState,
+            showUser: computed(() => store.getters['user/isAdmin']).value,
             showLanguageMenu: false,
             defaultMenuList: computed(() => [
                 {
@@ -206,11 +207,12 @@ export default {
                 },
                 {
                     key: vm.$t('MENU.IDENTITY.IDENTITY'),
+                    show: state.showUser,
                     link: '/identity',
                     parentRoutes: ['identity'],
                     menu: [
                         { label: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), link: '/identity/service-account' },
-                        { label: vm.$t('MENU.IDENTITY.USER'), link: '/identity/user' },
+                        { label: vm.$t('MENU.IDENTITY.USER'), link: '/identity/user/user-management' },
                     ],
                 },
                 {
@@ -274,7 +276,7 @@ export default {
             state.showLanguageMenu = !state.showLanguageMenu;
         };
         const openProfile = () => {
-            state.profileVisible = true;
+            vm.$router.replace({ name: 'userAccount' }).catch(() => {});
         };
 
         /* action */

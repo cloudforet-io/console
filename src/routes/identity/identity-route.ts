@@ -1,9 +1,10 @@
 import { RouteConfig } from 'vue-router';
 
-const AddServiceAccountPage = () => import('@/views/identity/service-account/pages/AddServiceAccountPage.vue');
-
+const UserAccount = () => import('@/views/identity/user/modules/UserAccount.vue');
+const UserManagement = () => import('@/views/identity/user/modules/UserManagement.vue');
 const User = () => import('@/views/identity/user/User.vue');
 const ServiceAccount = () => import('@/views/identity/service-account/pages/ServiceAccountPage.vue');
+const AddServiceAccountPage = () => import('@/views/identity/service-account/pages/AddServiceAccountPage.vue');
 const ServiceAccountSearchPage = () => import('@/views/identity/service-account/pages/ServiceAccountSearchPage.vue');
 const NoResource = () => import('@/views/common/pages/NoResource.vue');
 
@@ -52,17 +53,27 @@ export default {
         },
         {
             path: 'user',
-            name: 'user',
             meta: {
                 label: 'User',
             },
-            redirect: '/identity/user',
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
-                    name: 'userMain',
+                    name: 'user',
                     component: User,
+                    children: [
+                        {
+                            path: 'user-management',
+                            name: 'userManagement',
+                            component: UserManagement,
+                        },
+                        {
+                            path: 'account',
+                            name: 'userAccount',
+                            component: UserAccount,
+                        },
+                    ]
                 },
             ],
         },

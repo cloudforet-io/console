@@ -69,6 +69,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             showAutomation: store.state.user.powerSchedulerState,
+            showUser: computed(() => store.getters['user/isAdmin']).value,
             allMenu: computed(() => ([
                 {
                     label: vm.$t('MENU.DASHBOARD.DASHBOARD'), link: '/dashboard', subMenus: [], icon: 'ic_dashboard',
@@ -87,6 +88,7 @@ export default {
                 },
                 {
                     label: vm.$t('MENU.IDENTITY.IDENTITY'),
+                    show: state.showUser,
                     link: '/identity',
                     icon: 'ic_identity',
                     subMenus: [

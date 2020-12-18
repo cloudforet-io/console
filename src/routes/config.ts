@@ -85,4 +85,5 @@ export const routerOptions = {
         },
         { path: '*', component: ErrorPage },
     ],
+    duplicateNavigationPolicy: 'reload',
 } as RouterOptions;
