@@ -11,7 +11,7 @@
                         <router-link :to="data.type !== 'spendings' ? getLocation(data.type) : ''" class="anchor" :class="data.type">
                             <span class="number">
                                 <span v-if="data.type === 'spendings'" class="dollar-sign">$</span>
-                                <span>{{ numberCommaFormatter(data.count) }}</span>
+                                <span>{{ commaFormatter(data.count) }}</span>
                             </span>
                         </router-link>
                         <span class="suffix" :class="data.type">{{ data.suffix }}</span>
@@ -24,88 +24,72 @@
         </div>
         <div class="bottom-part">
             <div class="content-wrapper grid grid-cols-12 gap-2">
-                <template v-if="selectedType !== 'spendings'">
-                    <div class="chart-wrapper col-span-12 lg:col-span-9">
-                        <div class="title">
-                            <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY_TREND_TITLE') }}</span>
-                            <span v-if="selectedType === 'storage'" class="suffix">({{ suffix.storage }})</span>
-                        </div>
-                        <div class="toggle-button-group">
-                            <p-button v-for="(d, idx) in dateTypes"
-                                      :key="idx"
-                                      :class="{'selected': selectedDateType === d.name}"
-                                      @click="onClickDateTypeButton(d.name)"
-                            >
-                                {{ d.label }}
-                            </p-button>
-                        </div>
-                        <p-chart-loader :loading="chartState.loading">
-                            <template #loader>
-                                <p-skeleton width="100%" height="100%" />
-                            </template>
-                            <div ref="chartRef" class="chart" />
-                        </p-chart-loader>
+                <div class="chart-wrapper col-span-12 lg:col-span-9">
+                    <div class="title">
+                        <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY_TREND_TITLE') }}</span>
+                        <span v-if="selectedType === 'storage'" class="suffix">({{ suffix.storage }})</span>
                     </div>
-                    <div class="summary-wrapper col-span-12 lg:col-span-3">
-                        <div class="title col-span-3">
-                            {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: dataList[selectedIndex].title }) }}
+                    <div class="toggle-button-group">
+                        <p-button v-for="(d, idx) in dateTypes"
+                                  :key="idx"
+                                  :class="{'selected': selectedDateType === d.name}"
+                                  @click="onClickDateTypeButton(d.name)"
+                        >
+                            {{ d.label }}
+                        </p-button>
+                    </div>
+                    <p-chart-loader :loading="chartState.loading">
+                        <template #loader>
+                            <p-skeleton width="100%" height="100%" />
+                        </template>
+                        <div ref="chartRef" class="chart" />
+                    </p-chart-loader>
+                </div>
+                <div class="summary-wrapper col-span-12 lg:col-span-3">
+                    <div class="title col-span-3">
+                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: dataList[selectedIndex].title }) }}
+                    </div>
+                    <template v-if="!loading && dataList[selectedIndex].count > 0">
+                        <div class="summary-content-wrapper block md:grid md:grid-cols-3 lg:block">
+                            <router-link v-for="(data, idx) of summaryData" :key="idx"
+                                         :to="data.to"
+                                         class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
+                                         :class="data.to ? 'link' : ''"
+                            >
+                                <div class="text-group">
+                                    <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">
+                                        {{ data.provider === 'all' ? $t('COMMON.WIDGETS.ALL_SUMMARY_ALL') : data.label }}
+                                    </span>
+                                    <span class="type">{{ data.type }}</span>
+                                </div>
+                                <span class="count">{{ data.count }}</span>
+                            </router-link>
                         </div>
-                        <template v-if="!loading && dataList[selectedIndex].count > 0">
-                            <div class="summary-content-wrapper block md:grid md:grid-cols-3 lg:block">
-                                <router-link v-for="(data, idx) of summaryData" :key="idx"
-                                             :to="data.to"
-                                             class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
-                                >
-                                    <div class="text-group">
-                                        <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">
-                                            {{ data.provider === 'all' ? $t('COMMON.WIDGETS.ALL_SUMMARY_ALL') : data.label }}
-                                        </span>
-                                        <span class="type">{{ data.type }}</span>
-                                    </div>
-                                    <span class="count">{{ data.count }}</span>
+                    </template>
+                    <template v-else-if="!loading">
+                        <div class="summary-content-wrapper no-data-wrapper grid">
+                            <div class="m-auto">
+                                <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
+                                <p class="text">
+                                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY_NO_SERVICE', { service: dataList[selectedIndex].title }) }}
+                                </p>
+                                <router-link to="/identity/service-account">
+                                    <p-icon-text-button
+                                        style-type="primary1"
+                                        name="ic_plus_bold"
+                                    >
+                                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY_ADD_SERVICE_ACCOUNTS') }}
+                                    </p-icon-text-button>
                                 </router-link>
                             </div>
-                        </template>
-                        <template v-else-if="!loading">
-                            <div class="summary-content-wrapper no-data-wrapper grid">
-                                <div class="m-auto">
-                                    <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
-                                    <p class="text">
-                                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY_NO_SERVICE', { service: dataList[selectedIndex].title }) }}
-                                    </p>
-                                    <router-link to="/identity/service-account">
-                                        <p-icon-text-button
-                                            style-type="primary1"
-                                            name="ic_plus_bold"
-                                        >
-                                            {{ $t('COMMON.WIDGETS.ALL_SUMMARY_ADD_SERVICE_ACCOUNTS') }}
-                                        </p-icon-text-button>
-                                    </router-link>
-                                </div>
-                            </div>
-                        </template>
-                        <template v-else>
-                            <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
-                                <p-skeleton class="flex-grow" />
-                            </div>
-                        </template>
-                    </div>
-                </template>
-                <template v-else>
-                    <div class="empty-wrapper col-span-12">
-                        <div class="content">
-                            <img src="@/assets/images/illust_spaceship.svg" class="empty-image">
-                            <div class="empty-text-group">
-                                <span class="empty-text large">
-                                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY_NO_DATA_1') }}
-                                </span>
-                                <span class="empty-text small">
-                                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY_NO_DATA_2') }}
-                                </span>
-                            </div>
                         </div>
-                    </div>
-                </template>
+                    </template>
+                    <template v-else>
+                        <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
+                            <p-skeleton class="flex-grow" />
+                        </div>
+                    </template>
+                </div>
             </div>
         </div>
     </div>
@@ -134,18 +118,29 @@ import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
-import { gray, primary1 } from '@/styles/colors';
-import { QueryStoreFilter } from '@/lib/query/type';
 import { QueryHelper } from '@/lib/query';
+import { QueryStoreFilter } from '@/lib/query/type';
+import { gray, primary1 } from '@/styles/colors';
 
 am4core.useTheme(am4themes_animated);
 am4core.options.autoSetClassName = true;
 am4core.options.classNamePrefix = 'allSummary';
 
 /* enum */
+// todo: will be deprecated
 enum DATE_TYPE {
     daily = 'daily',
     monthly = 'monthly',
+}
+enum NEW_DATE_TYPE {
+    daily = 'DAILY',
+    monthly = 'MONTHLY',
+}
+enum DATA_TYPE {
+    compute = 'compute',
+    database = 'database',
+    storage = 'storage',
+    spendings = 'spendings',
 }
 enum CLOUD_SERVICE_LABEL {
     compute = 'Compute',
@@ -172,7 +167,7 @@ interface SummaryData {
     provider: string;
     label: string | TranslateResult;
     count: number | string;
-    to: string | Location;
+    to?: string | Location;
 }
 
 const DAY_COUNT = 14;
@@ -203,6 +198,7 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryHelper = new QueryHelper();
 
         const state = reactive({
             loading: false,
@@ -223,6 +219,7 @@ export default {
                 compute: 0,
                 database: 0,
                 storage: 0,
+                spendings: 0,
             },
             suffix: {
                 compute: 'ea',
@@ -230,30 +227,29 @@ export default {
                 storage: 'TB',
             },
             storageTrendSuffix: 'TB' as Unit,
-            overallSpendings: computed(() => vm.$t('COMMON.WIDGETS.ALL_SUMMARY_UPCOMING')),
             dataList: computed(() => ([
                 {
-                    type: 'compute',
+                    type: DATA_TYPE.compute,
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_COMPUTE'),
                     count: state.count.compute,
                     suffix: state.suffix.compute,
                 },
                 {
-                    type: 'database',
+                    type: DATA_TYPE.database,
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_DATABASE'),
                     count: state.count.database,
                     suffix: state.suffix.database,
                 },
                 {
-                    type: 'storage',
+                    type: DATA_TYPE.storage,
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_STORAGE'),
                     count: state.count.storage,
                     suffix: state.suffix.storage,
                 },
                 {
-                    type: 'spendings',
+                    type: DATA_TYPE.spendings,
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_SPENDINGS'),
-                    count: state.overallSpendings,
+                    count: state.count.spendings,
                     beta: true,
                 },
             ] as Data[])),
@@ -334,24 +330,22 @@ export default {
                 }
             }, BOX_SWITCH_INTERVAL);
         };
-        const numberCommaFormatter = (num) => {
+        const commaFormatter = (num) => {
             if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             return num;
         };
-
-        const queryHelper = new QueryHelper();
         const getLocation = (type) => {
             const query: Location['query'] = {};
             let name: string;
 
             // set query
-            if (type === 'compute') {
+            if (type === DATA_TYPE.compute) {
                 name = 'server';
             } else {
                 name = 'cloudServiceMain';
                 query.provider = 'all';
                 query.service = CLOUD_SERVICE_LABEL[type];
-                if (type === 'storage') query.primary = 'false';
+                if (type === DATA_TYPE.storage) query.primary = 'false';
             }
 
             // set filters
@@ -379,7 +373,7 @@ export default {
                 const count = res.results[0]?.total || 0;
                 if (count === 0) return;
 
-                if (type === 'storage') {
+                if (type === DATA_TYPE.storage) {
                     const formattedSize = bytes(count, { unitSeparator: ' ' });
                     if (formattedSize) {
                         state.count[type] = formattedSize.split(' ')[0];
@@ -392,6 +386,15 @@ export default {
                 console.error(e);
             }
         };
+        const getBillingCount = async () => {
+            const res = await SpaceConnector.client.statistics.topic.billingSummary({
+                aggregation: null,
+                date: null,
+                project_id: props.projectId,
+            },
+            { headers: { 'Mock-Mode': true } });
+            state.count.spendings = res.results[0].cost;
+        };
         const getTrend = async (type) => {
             const utcToday = dayjs().utc();
             const dateType = state.selectedDateType;
@@ -400,20 +403,35 @@ export default {
             const dateFormat = dateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
 
             try {
-                const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
-                    label: CLOUD_SERVICE_LABEL[type],
-                    aggregate: dateType,
-                    project_id: props.projectId,
-                });
+                let data;
+                if (type === DATA_TYPE.spendings) {
+                    const res = await SpaceConnector.client.statistics.topic.dailyBillingSummary({
+                        aggregation: null,
+                        granularity: NEW_DATE_TYPE[state.selectedDateType],
+                        project_id: props.projectId,
+                    },
+                    { headers: { 'Mock-Mode': true } });
+                    data = res.results[0].billing_data.map(d => ({
+                        date: d.date,
+                        total: d.cost,
+                    }));
+                } else {
+                    const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
+                        label: CLOUD_SERVICE_LABEL[type],
+                        aggregate: dateType,
+                        project_id: props.projectId,
+                    });
+                    data = res.results;
+                }
 
-                if (type === 'storage') {
-                    const smallestCount = Math.min(...res.results.map(d => d.total));
+                if (type === DATA_TYPE.storage) {
+                    const smallestCount = Math.min(...data.map(d => d.total));
                     const formattedSize = bytes(smallestCount, { unitSeparator: ' ' });
                     if (formattedSize) state.storageTrendSuffix = formattedSize.split(' ')[1] as Unit;
                 }
-                const chartData = res.results.map((d) => {
+                const chartData = data.map((d) => {
                     let count = d.total;
-                    if (type === 'storage') {
+                    if (type === DATA_TYPE.storage) {
                         const formattedSize = bytes(d.total, { unit: state.storageTrendSuffix, unitSeparator: ' ' });
                         if (formattedSize) count = formattedSize.split(' ')[0];
                     }
@@ -466,16 +484,16 @@ export default {
                 };
             }
 
-            if (type === 'compute') {
+            if (type === DATA_TYPE.compute) {
                 param = {
                     ...defaultParam,
                     resource_type: 'inventory.Server',
                 };
-            } else if (type === 'database') {
+            } else if (type === DATA_TYPE.database) {
                 param = {
                     ...defaultParam,
                 };
-            } else if (type === 'storage') {
+            } else if (type === DATA_TYPE.storage) {
                 param = {
                     ...defaultParam,
                 };
@@ -490,15 +508,14 @@ export default {
             }
             return param;
         };
-
         const getSummaryInfo = async (type) => {
             try {
                 let count;
-                if (type === 'compute') {
-                    count = state.count.compute;
-                } else if (type === 'database') {
-                    count = state.count.database;
-                } else if (type === 'storage') {
+                if (type === DATA_TYPE.compute) {
+                    count = commaFormatter(state.count.compute);
+                } else if (type === DATA_TYPE.database) {
+                    count = commaFormatter(state.count.database);
+                } else if (type === DATA_TYPE.storage) {
                     count = `${state.count.storage} ${state.suffix.storage}`;
                 }
 
@@ -549,7 +566,7 @@ export default {
                         provider: d.provider,
                         label: state.providers[d.provider].label,
                         type: d.display_name || d.cloud_service_group,
-                        count: type === 'storage' ? bytes(d.size, { unitSeparator: ' ' }) : d.count,
+                        count: type === DATA_TYPE.storage ? bytes(d.size, { unitSeparator: ' ' }) : commaFormatter(d.count),
                         to: detailLocation,
                     });
                 });
@@ -557,6 +574,31 @@ export default {
             } catch (e) {
                 console.error(e);
             }
+        };
+        const getBillingSummaryInfo = async () => {
+            const res = await SpaceConnector.client.statistics.topic.billingSummary({
+                aggregation: 'RESOURCE_TYPE',
+                date: null,
+            },
+            { headers: { 'Mock-Mode': true } });
+            const summaryData: SummaryData[] = [
+                {
+                    provider: 'all',
+                    label: '',
+                    count: commaFormatter(state.count.spendings),
+                    to: '',
+                },
+            ];
+            res.results.forEach((d) => {
+                summaryData.push({
+                    provider: d.provider,
+                    label: state.providers[d.provider].label,
+                    type: d.display_name || d.cloud_service_group,
+                    count: commaFormatter(d.cost),
+                    to: '',
+                });
+            });
+            state.summaryData = summaryData;
         };
 
         /* event */
@@ -572,18 +614,17 @@ export default {
 
         const init = async () => {
             state.loading = true;
-            await getCount('compute');
+            await Promise.all([getCount(DATA_TYPE.compute), getBillingCount()]);
 
             await vm.$store.dispatch('resource/provider/load');
-            if (state.count.compute > 0) await getSummaryInfo('compute');
+            if (state.count.compute > 0) await getSummaryInfo(DATA_TYPE.compute);
             state.loading = false;
             setBoxInterval();
 
-            await getCount('database');
-            await getCount('storage');
+            await Promise.all([getCount(DATA_TYPE.database), getCount(DATA_TYPE.storage)]);
         };
         const chartInit = async () => {
-            await getTrend('compute');
+            await getTrend(DATA_TYPE.compute);
             setTimeout(() => {
                 chartState.loading = false;
             }, 300);
@@ -597,7 +638,10 @@ export default {
             }
         }, { immediate: false });
         watch(() => state.selectedType, async (type) => {
-            if (type !== 'spendings') {
+            if (type === DATA_TYPE.spendings) {
+                await Promise.all([getBillingSummaryInfo(), getTrend(type)]);
+                drawChart();
+            } else {
                 await Promise.all([getSummaryInfo(type), getTrend(type)]);
                 drawChart();
             }
@@ -613,7 +657,7 @@ export default {
             colorState,
             onClickBox,
             onClickDateTypeButton,
-            numberCommaFormatter,
+            commaFormatter,
             getLocation,
         };
     },
@@ -671,11 +715,6 @@ export default {
                 @screen sm {
                     display: block;
                 }
-            }
-        }
-        &.spendings {
-            .count .number {
-                font-size: 1.25rem;
             }
         }
 
@@ -782,6 +821,7 @@ export default {
                 padding: 0 0.5rem;
                 margin-bottom: 1.25rem;
             }
+
             .summary-content-wrapper {
                 height: 5rem;
                 overflow-y: auto;
@@ -790,10 +830,12 @@ export default {
                 @screen lg {
                     height: 12rem;
                 }
+
                 &.no-data-wrapper {
                     .empty-image {
                         margin: 0 auto 0.5rem auto;
                     }
+
                     .text {
                         @apply text-primary2;
                         font-size: 0.875rem;
@@ -803,6 +845,7 @@ export default {
                         opacity: 0.7;
                         margin-bottom: 0.625rem;
                     }
+
                     .p-button {
                         min-width: auto;
                         height: 1.25rem;
@@ -812,6 +855,7 @@ export default {
                     }
                 }
             }
+
             .summary-row {
                 position: relative;
                 display: block;
@@ -820,7 +864,8 @@ export default {
                 cursor: pointer;
                 padding: 0.25rem 0.5rem;
                 margin: auto 0;
-                &:hover {
+
+                &.link:hover {
                     @apply bg-secondary2;
                     .provider {
                         text-decoration: underline;
@@ -832,6 +877,9 @@ export default {
                         text-decoration: underline;
                     }
                 }
+                &:not(.link) {
+                    cursor: default;
+                }
 
                 .text-group {
                     display: inline-block;
@@ -839,43 +887,16 @@ export default {
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
+
                     .type {
                         padding-left: 0.5rem;
                     }
                 }
+
                 .count {
                     @apply text-gray-600;
                     position: absolute;
                     right: 0.5rem;
-                }
-            }
-        }
-        .empty-wrapper {
-            position: relative;
-            display: flex;
-            height: 100%;
-
-            .content {
-                display: block;
-                margin: auto;
-                .empty-image {
-                    margin: auto;
-                }
-                .empty-text-group {
-                    text-align: center;
-                    line-height: 2rem;
-                    padding-top: 0.875rem;
-                    .empty-text {
-                        display: block;
-                        &.large {
-                            @apply text-primary;
-                            font-size: 1rem;
-                        }
-                        &.small {
-                            @apply text-gray;
-                            font-size: 0.875rem;
-                        }
-                    }
                 }
             }
         }

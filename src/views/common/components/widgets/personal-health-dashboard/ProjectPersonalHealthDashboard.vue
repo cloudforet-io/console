@@ -211,7 +211,6 @@ export default {
                         affected_resources: d.affected_resources,
                     };
                 });
-                console.log(res.results);
             } catch (e) {
                 console.error(e);
             } finally {
