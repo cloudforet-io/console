@@ -42,199 +42,23 @@
             </div>
         </template>
         <template #default>
-            <div class="right-contents-container" :class="{'admin': sidebarState.selectedItem.label === 'User Management'}">
-                <p-page-navigation :routes="routes" />
-                <p-page-title :title="sidebarState.selectedItem.label" />
-                <div v-if="!sidebarState.showManagementPage">
-                    <user-account-page
-                        :user-type="userState.userType"
-                        :is-admin="userState.isAdmin"
-                        :user-id="userState.userId"
-                    />
-                </div>
-                <div v-if="sidebarState.showManagementPage">
-                    <p-horizontal-layout>
-                        <template #container="{ height }">
-                            <p-query-search-table
-                                :loading="loading"
-                                :items="users"
-                                :fields="fields"
-                                :setting-visible="false"
-                                :excel-visible="false"
-                                :responsive="true"
-                                :sort-by.sync="sortBy"
-                                :sort-desc.sync="sortDesc"
-                                :this-page.sync="thisPage"
-                                :page-size.sync="pageSize"
-                                :total-count="totalCount"
-                                :key-item-sets="keyItemSets"
-                                :value-handler-map="valueHandlerMap"
-                                :query-tags="tags"
-                                :style="{'height': height+'px'}"
-                                use-cursor-loading
-                                @select="onSelect"
-                                @change="onChange"
-                            >
-                                <template slot="toolbox-left">
-                                    <p-icon-text-button style-type="primary-dark"
-                                                        name="ic_plus_bold"
-                                                        @click="clickAdd"
-                                    >
-                                        {{ $t('IDENTITY.USER.CREATE') }}
-                                    </p-icon-text-button>
-                                    <p-dropdown-menu-btn
-                                        id="dropdown-btn"
-                                        class="left-toolbox-item mr-4"
-                                        :menu="dropdownMenu"
-                                        @click-enable="clickEnable"
-                                        @click-disable="clickDisable"
-                                        @click-delete="clickDelete"
-                                        @click-update="clickUpdate"
-                                    >
-                                        {{ $t('IDENTITY.USER.ACTION') }}
-                                    </p-dropdown-menu-btn>
-                                </template>
-                                <template #col-state-format="{value}">
-                                    <p-status v-bind="userStateFormatter(value)" class="capitalize" />
-                                </template>
-                                <template #col-user_type-format="{value}">
-                                    <span v-if="value === 'API_USER'">API Only</span>
-                                    <span v-else>Console, API</span>
-                                </template>
-                                <template #col-last_accessed_at-format="{ value }">
-                                    <span v-if="value === 0">
-                                        Today
-                                    </span>
-                                    <span v-else-if="value === 1">
-                                        Yesterday
-                                    </span>
-                                    <span v-else>
-                                        {{ value }} days
-                                    </span>
-                                </template>
-                            </p-query-search-table>
-                        </template>
-                    </p-horizontal-layout>
-                    <p-tab v-if="selectedIndex.length === 1" :tabs="singleItemTabState.tabs"
-                           :active-tab.sync="singleItemTabState.activeTab"
-                    >
-                        <template #detail>
-                            <user-detail ref="userDetail"
-                                         :user-id="selectedUsers[0].user_id"
-                                         :timezone="timezone"
-                            />
-                        </template>
-                        <template #tag>
-                            <p-tags-panel :resource-id="selectedUsers[0].user_id"
-                                          resource-type="identity.User"
-                                          resource-key="user_id"
-                            />
-                        </template>
-                    </p-tab>
-                    <p-tab v-else-if="selectedIndex.length > 1" :tabs="multiItemTabState.tabs"
-                           :active-tab.sync="multiItemTabState.activeTab"
-                    >
-                        <template #data>
-                            <p-data-table
-                                :fields="multiSelectFields"
-                                :sortable="false"
-                                :selectable="false"
-                                :items="selectedUsers"
-                                :col-copy="true"
-                            />
-                        </template>
-                    </p-tab>
-
-                    <div v-else id="empty-space">
-                        <p-empty>{{ $t('IDENTITY.USER.NO_SELECTED') }}</p-empty>
-                    </div>
-                    <p-table-check-modal
-                        v-if="!!modalState.mode"
-                        :visible.sync="modalState.visible"
-                        :header-title="modalState.title"
-                        :sub-title="modalState.subTitle"
-                        :theme-color="modalState.themeColor"
-                        :fields="multiSelectFields"
-                        size="lg"
-                        :centered="true"
-                        :selectable="false"
-                        :items="selectedUsers"
-                        @confirm="checkModalConfirm"
-                    />
-                    <user-form v-if="userFormState.visible"
-                               :header-title="userFormState.headerTitle"
-                               :update-mode="userFormState.updateMode"
-                               :item="userFormState.item"
-                               :visible.sync="userFormState.visible"
-                               @confirm="userFormConfirm"
-                    />
-                </div>
-            </div>
+            <router-view />
         </template>
     </vertical-page-layout>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { find, map } from 'lodash';
-
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
-import UserAccountPage from '@/views/identity/user/modules/UserAccountPage.vue';
 import PHr from '@/components/atoms/hr/PHr.vue';
-import UserForm from '@/views/identity/user/modules/UserForm.vue';
-import UserDetail from '@/views/identity/user/modules/UserDetail.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
-import PStatus from '@/components/molecules/status/PStatus.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PEmpty from '@/components/atoms/empty/PEmpty.vue';
-import PTagsPanel from '@/views/common/components/tags/TagsPanel.vue';
-
-import { Options } from '@/components/organisms/tables/query-search-table/type';
-import { MenuItem } from '@/components/organisms/context-menu/type';
-import { TabItem } from '@/components/organisms/tabs/tab/type';
-import { Timestamp } from '@/components/util/type';
-import {
-    showErrorMessage, showSuccessMessage, timestampFormatter,
-} from '@/lib/util';
-import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { replaceUrlQuery } from '@/lib/router-query-string';
-import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
-import { getPageStart } from '@/lib/component-utils/pagination';
 import { store } from '@/store';
-import { KeyItemSet } from '@/components/organisms/search/query-search/type';
-import { userStateFormatter, calculateTime } from '@/views/identity/user/lib/helper';
 import PI from '@/components/atoms/icons/PI.vue';
-import dayjs from 'dayjs';
-
-
-interface UserModel {
-    created_at: Timestamp;
-    domain_id: string;
-    email: string;
-    group: string;
-    language: string;
-    last_accessed_at: Timestamp;
-    mobile: string;
-    name: string;
-    roles: string[];
-    state: string;
-    tags: {};
-    timezone: string;
-    user_id: string;
-}
+import router from '@/routes';
 
 interface SidebarItemType {
     label: string;
@@ -243,124 +67,25 @@ interface SidebarItemType {
 export default {
     name: 'User',
     components: {
+        VerticalPageLayout,
         PI,
         PHr,
-        UserAccountPage,
-        VerticalPageLayout,
-        PEmpty,
-        PQuerySearchTable,
-        PPageNavigation,
-        PIconTextButton,
-        UserForm,
-        PStatus,
-        PHorizontalLayout,
-        PDropdownMenuBtn,
-        UserDetail,
-        PTab,
-        PTagsPanel,
-        PDataTable,
-        PTableCheckModal,
-        PPageTitle,
     },
-    setup(props, { root, parent }) {
+    beforeRouteEnter(to, from, next) {
+        const isAdmin = computed(() => store.getters['user/isAdmin']).value;
+        console.log(isAdmin);
+        if (isAdmin) {
+            next((vm) => {
+                vm.$router.replace({ name: 'userManagement', query: { ...router.currentRoute.query } }).catch(() => {});
+            });
+        } else {
+            next((vm) => {
+                vm.$router.replace({ name: 'userAccount', query: { ...router.currentRoute.query } }).catch(() => {});
+            });
+        }
+    },
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryHelper = new ApiQueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
-        const handlers = {
-            keyItemSets: [{
-                title: 'Filters',
-                items: [
-                    {
-                        name: 'user_id',
-                        label: 'User ID',
-                    },
-                    {
-                        name: 'name',
-                        label: 'Name',
-                    },
-                    {
-                        name: 'group',
-                        label: 'Group',
-                    },
-                    {
-                        name: 'email',
-                        label: 'E-mail',
-                    },
-                    {
-                        name: 'mobile',
-                        label: 'Phone',
-                    },
-                ],
-            }],
-            valueHandlerMap: {
-                user_id: makeDistinctValueHandler('identity.User', 'user_id'),
-                name: makeDistinctValueHandler('identity.User', 'name'),
-                group: makeDistinctValueHandler('identity.User', 'group'),
-                email: makeDistinctValueHandler('identity.User', 'email'),
-                mobile: makeDistinctValueHandler('identity.User', 'mobile'),
-            },
-        };
-        const state = reactive({
-            loading: false,
-            users: [] as UserModel[],
-            timezone: computed(() => store.state.user.timezone),
-            fields: computed(() => ([
-                { name: 'user_id', label: 'User ID' },
-                { name: 'name', label: 'Name' },
-                { name: 'state', label: 'State' },
-                { name: 'user_type', label: 'Access Control' },
-                { name: 'backend', label: 'Auth Type' },
-                { name: 'last_accessed_at', label: 'Last Activity' },
-                { name: 'timezone', label: 'Timezone' },
-            ])),
-            sortBy: '',
-            sortDesc: '',
-            pageSize: 15,
-            thisPage: 1,
-            totalCount: 0,
-            // selected
-            selectedIndex: [],
-            selectedUsers: computed(() => {
-                const users = [] as UserModel[];
-                state.selectedIndex.map(d => users.push(state.users[d]));
-                return users;
-            }),
-            isSelected: computed(() => state.selectedIndex.length > 0),
-            multiSelectFields: computed(() => ([
-                { name: 'user_id', label: vm.$t('IDENTITY.USER.USER_ID') },
-                { name: 'name', label: vm.$t('IDENTITY.USER.NAME') },
-            ])),
-            dropdownMenu: computed(() => ([
-                {
-                    type: 'item',
-                    name: 'update',
-                    label: vm.$t('IDENTITY.USER.UPDATE'),
-                    disabled: state.selectedIndex.length > 1 || !state.isSelected,
-                },
-                {
-                    type: 'item', name: 'delete', label: vm.$t('IDENTITY.USER.DELETE'), disabled: !state.isSelected,
-                },
-                { type: 'divider' },
-                {
-                    type: 'item', name: 'enable', label: vm.$t('IDENTITY.USER.ENABLE'), disabled: !state.isSelected,
-                },
-                {
-                    type: 'item', name: 'disable', label: vm.$t('IDENTITY.USER.DISABLE'), disabled: !state.isSelected,
-                },
-            ] as MenuItem[])),
-            keyItemSets: handlers.keyItemSets as KeyItemSet[],
-            valueHandlerMap: handlers.valueHandlerMap,
-            tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
-        });
-        const sidebarState = reactive({
-            showManagementPage: false,
-            userMenuList: [
-                { label: 'Account & Profile' },
-            ],
-            adminMenuList: [
-                { label: 'User Management' },
-            ],
-            selectedItem: {} as SidebarItemType,
-        });
         const userState = reactive({
             isAdmin: computed(() => store.getters['user/isAdmin']),
             userType: computed(() => store.state.user.backend) as unknown as string,
@@ -368,238 +93,45 @@ export default {
             email: computed(() => store.state.user.email),
             userId: computed(() => store.state.user.userId),
         });
-        const modalState = reactive({
-            visible: false,
-            mode: '',
-            title: '',
-            subTitle: '',
-            themeColor: '',
+        const sidebarState = reactive({
+            showManagementPage: true,
+            userMenuList: [
+                {
+                    label: 'Account & Profile',
+                },
+            ],
+            adminMenuList: [
+                {
+                    label: 'User Management',
+                },
+            ],
+            selectedItem: {} as SidebarItemType,
         });
-        const userFormState = reactive({
-            visible: false,
-            updateMode: false,
-            headerTitle: '',
-            item: undefined,
-        });
-        const routeState = reactive({
-            routes: computed(() => ([
-                { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user' },
-            ])),
-        });
-
-        const singleItemTabState = reactive({
-            tabs: computed(() => ([
-                { name: 'detail', label: vm.$t('IDENTITY.USER.DETAILS'), keepAlive: true },
-                { label: vm.$t('IDENTITY.USER.TAG'), name: 'tag', keepAlive: true },
-            ] as TabItem[])),
-            activeTab: 'detail',
-        });
-
-        const multiItemTabState = reactive({
-            tabs: computed(() => ([
-                { name: 'data', label: vm.$t('IDENTITY.USER.SELECTED_DATA'), keepAlive: true },
-            ] as TabItem[])),
-            activeTab: 'data',
-        });
-
         const showAccountPage = (item) => {
-            sidebarState.showManagementPage = false;
             sidebarState.selectedItem = item;
+            vm.$router.replace({ name: 'userAccount', query: { ...router.currentRoute.query } }).catch(() => {});
         };
         const showManagementPage = (item) => {
-            sidebarState.showManagementPage = true;
             sidebarState.selectedItem = item;
+            vm.$router.replace({ name: 'userManagement', query: { ...router.currentRoute.query } }).catch(() => {});
         };
 
-        const apiQuery = new ApiQueryHelper();
-        const getQuery = () => {
-            apiQuery.setSort(state.sortBy, state.sortDesc)
-                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setFilters(queryHelper.filters);
-            return apiQuery.data;
-        };
-
-        const getUsers = async () => {
-            state.loading = true;
-            try {
-                const res = await SpaceConnector.client.identity.user.list({
-                    query: getQuery(),
-                    only: ['user_id', 'name', 'email', 'state', 'timezone', 'user_type', 'backend', 'last_accessed_at'],
-                });
-                state.users = res.results.map(d => ({
-                    ...d,
-                    last_accessed_at: calculateTime(d.last_accessed_at, { seconds: dayjs().unix() }, state.timezone),
-                }));
-                state.totalCount = res.total_count;
-                state.loading = false;
-            } catch (e) {
-                console.error(e);
-                state.items = [];
-                state.totalCount = 0;
-            } finally {
-                state.loading = false;
+        (async () => {
+            if (!userState.isAdmin) {
+                sidebarState.selectedItem = sidebarState.userMenuList[0];
             }
-        };
-
-        const onSelect = (index) => {
-            state.selectedIndex = index;
-        };
-
-        const onChange = async (options: Options, changed: Partial<Options>) => {
-            if (changed) {
-                if (changed.pageSize !== undefined) state.pageSize = changed.pageSize;
-                if (changed.thisPage !== undefined) state.thisPage = changed.thisPage;
-                if (changed.queryTags !== undefined) {
-                    state.tags = changed.queryTags;
-                    queryHelper.setFiltersAsQueryTag(changed.queryTags);
-                    replaceUrlQuery('filters', queryHelper.rawQueryStrings);
-                }
+            if (userState.isAdmin) {
+                sidebarState.selectedItem = sidebarState.adminMenuList[0];
             }
-            await getUsers();
-        };
-
-        const clickAdd = () => {
-            userFormState.visible = true;
-            userFormState.updateMode = false;
-            userFormState.headerTitle = vm.$t('IDENTITY.USER.FORM.ADD_TITLE') as string;
-            userFormState.item = undefined;
-        };
-        const clickUpdate = () => {
-            userFormState.visible = true;
-            userFormState.updateMode = true;
-            userFormState.headerTitle = vm.$t('IDENTITY.USER.FORM.UPDATE_TITLE') as string;
-            userFormState.item = state.users[state.selectedIndex[0]];
-            userFormState.visible = true;
-        };
-        const clickDelete = () => {
-            modalState.mode = 'delete';
-            modalState.title = vm.$t('IDENTITY.USER.DELETE_MODAL_TITLE') as string;
-            modalState.subTitle = vm.$tc('IDENTITY.USER.DELETE_MODAL_DESC', state.selectedIndex.length);
-            modalState.themeColor = 'alert';
-            modalState.visible = true;
-        };
-        const clickEnable = () => {
-            modalState.mode = 'enable';
-            modalState.title = vm.$t('IDENTITY.USER.ENABLE_MODAL_TITLE') as string;
-            modalState.subTitle = vm.$tc('IDENTITY.USER.ENABLE_MODAL_DESC', state.selectedIndex.length);
-            modalState.themeColor = 'safe';
-            modalState.visible = true;
-        };
-        const clickDisable = () => {
-            modalState.mode = 'disable';
-            modalState.title = vm.$t('IDENTITY.USER.DISABLE_MODAL_TITLE') as string;
-            modalState.subTitle = vm.$tc('IDENTITY.USER.DISABLE_MODAL_DESC', state.selectedIndex.length);
-            modalState.themeColor = 'alert';
-            modalState.visible = true;
-        };
-
-        const getUsersParam = items => ({ users: map(items, 'user_id') });
-        const addUser = async (item) => {
-            try {
-                await SpaceConnector.client.identity.user.create({
-                    ...item,
-                });
-                showSuccessMessage(vm.$t('IDENTITY.USER.ALT_S_ADD_USER'), '', root);
-            } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.USER.ALT_E_ADD_USER'), e, root);
-            }
-            userFormState.visible = false;
-        };
-        const updateUser = async (item) => {
-            try {
-                await SpaceConnector.client.identity.user.update({
-                    ...item,
-                });
-                if (store.state.user.userId === item.user_id) {
-                    // await user.setUser('USER', item.user_id, vm);
-                    await store.dispatch('user/setUser', 'USER', item.user_id);
-                    vm.$i18n.locale = item.language;
-                }
-                showSuccessMessage(vm.$t('IDENTITY.USER.ALT_S_UPDATE_USER'), '', root);
-            } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.USER.ALT_E_UPDATE_USER'), e, root);
-            }
-            userFormState.visible = false;
-        };
-        const userFormConfirm = async (item) => {
-            if (userFormState.updateMode) {
-                await updateUser(item);
-            } else {
-                await addUser(item);
-            }
-            await getUsers();
-        };
-        const deleteUser = async (items) => {
-            try {
-                await SpaceConnector.client.identity.user.delete(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.ALT_S_DELETE_USER', state.selectedIndex.length), '', root);
-            } catch (e) {
-                showErrorMessage(vm.$tc('IDENTITY.USER.ALT_E_DELETE_USER', state.selectedIndex.length), e, root);
-            } finally {
-                await getUsers();
-                modalState.visible = false;
-            }
-        };
-        const enableUser = async (items) => {
-            try {
-                await SpaceConnector.client.identity.user.enable(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.ALT_S_ENABLE', state.selectedIndex.length), '', root);
-            } catch (e) {
-                showErrorMessage(vm.$tc('IDENTITY.USER.ALT_E_ENABLE', state.selectedIndex.length), e, root);
-            } finally {
-                await getUsers();
-                modalState.visible = false;
-            }
-        };
-        const disableUser = async (items) => {
-            try {
-                await SpaceConnector.client.identity.user.disable(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.ALT_S_DISABLE', state.selectedIndex.length), '', root);
-            } catch (e) {
-                showErrorMessage(vm.$tc('IDENTITY.USER.ALT_E_DISABLE', state.selectedIndex.length), e, root);
-            } finally {
-                await getUsers();
-                modalState.visible = false;
-            }
-        };
-        const checkModalConfirm = async (item) => {
-            if (modalState.mode === 'delete') await deleteUser(item);
-            if (modalState.mode === 'enable') await enableUser(item);
-            if (modalState.mode === 'disable') await disableUser(item);
-        };
-
-        const init = async () => {
-            await getUsers();
-            sidebarState.selectedItem = sidebarState.userMenuList[0];
-        };
-        init();
-
+        })();
         return {
-            ...toRefs(state),
-            ...toRefs(routeState),
             userState,
-            userFormState,
             sidebarState,
-            userStateFormatter,
-            timestampFormatter,
-            modalState,
-            singleItemTabState,
-            multiItemTabState,
             showAccountPage,
             showManagementPage,
-            getUsers,
-            clickAdd,
-            clickUpdate,
-            clickDelete,
-            clickEnable,
-            clickDisable,
-            userFormConfirm,
-            checkModalConfirm,
-            onSelect,
-            onChange,
         };
     },
+
 };
 </script>
 
@@ -666,34 +198,4 @@ export default {
 .admin-menu-wrapper {
     margin-top: 2.625rem;
 }
-.right-contents-container {
-    @apply mx-auto;
-    max-width: 53rem;
-    &.admin {
-        @apply mx-0;
-        max-width: 100%;
-    }
-}
-
-.left-toolbox-item {
-    margin-left: 1rem;
-    &:last-child {
-        flex-grow: 1;
-    }
-}
-
-#empty-space {
-    @apply text-primary2 mt-6;
-    text-align: center;
-    margin-bottom: 0.5rem;
-    font-size: 1.5rem;
-}
-
->>> .modal-content {
-    min-width: 31.25rem;
-    max-width: 50rem;
-    min-height: 30rem;
-    max-height: calc(100vh - 4rem);
-}
-
 </style>

@@ -1,5 +1,7 @@
 <template>
     <div class="user-account-page">
+        <p-page-navigation :routes="routes" />
+        <p-page-title :title="'Account & Profile'" />
         <p-pane-layout class="form-wrapper">
             <p class="form-title">
                 Base Information
@@ -104,10 +106,14 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 
 export default {
     name: 'UserAccountPage',
     components: {
+        PPageTitle,
+        PPageNavigation,
         PButton,
         PSelectDropdown,
         PTextInput,
@@ -115,29 +121,18 @@ export default {
         PPaneLayout,
     },
     props: {
-        userId: {
-            type: String,
-            default: '',
-        },
         role: {
             type: String,
             default: '',
-        },
-        userType: {
-            type: String,
-            default: '',
-        },
-        isAdmin: {
-            type: Boolean,
-            default: false,
         },
     },
     setup(props, { context, root, emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        const role = props.isAdmin;
         const state = reactive({
-            userRole: role ? 'ADMIN' : 'USER',
+            userId: computed(() => store.state.user.userId),
+            userRole: 'USER',
+            userType: computed(() => store.state.user.backend) as unknown as string,
             language: '' as LanguageCode | undefined,
             timezone: '' as Timezone | undefined,
             languages: map(languages, (d, k) => ({
@@ -161,6 +156,13 @@ export default {
             passwordInvalidText: '' as TranslateResult | string,
             isPasswordCheckValid: undefined as undefined | boolean,
             passwordCheckInvalidText: '' as TranslateResult | string,
+        });
+        const routeState = reactive({
+            routes: computed(() => ([
+                { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
+                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user' },
+                { name: 'Account & Profile', path: '/identity/user/account' },
+            ])),
         });
 
         const checkEmail = async () => {
@@ -211,11 +213,11 @@ export default {
         const updateUser = async (userParam) => {
             try {
                 await SpaceConnector.client.identity.user.update({
-                    user_id: props.userId,
+                    user_id: state.userId,
                     ...userParam,
                 });
-                if (store.state.user.userId === props.userId) {
-                    await store.dispatch('user/setUser', 'USER', props.userId);
+                if (store.state.user.userId === state.userId) {
+                    await store.dispatch('user/setUser', 'USER', state.userId);
                 }
                 if (userParam.language) {
                     vm.$i18n.locale = userParam.language as string;
@@ -259,12 +261,13 @@ export default {
         };
 
         const init = async () => {
-            await getProfile(props.userId);
+            await getProfile(state.userId);
         };
         init();
 
         return {
             ...toRefs(state),
+            ...toRefs(routeState),
             validationState,
             onClickProfileConfirm,
             onClickPasswordConfirm,
@@ -274,6 +277,10 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.user-account-page {
+    @apply mx-auto;
+    max-width: 53rem;
+}
 .form-wrapper {
     padding: 2rem;
     max-width: 53rem;
