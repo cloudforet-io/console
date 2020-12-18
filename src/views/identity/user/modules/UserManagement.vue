@@ -1,7 +1,11 @@
 <template>
     <div class="right-contents-container">
         <p-page-navigation :routes="routes" />
-        <p-page-title :title="'User Management'" />
+        <p-page-title :title="'User Management'"
+                      use-total-count use-selected-count
+                      :total-count="totalCount"
+                      :selected-count="selectedIndex.length"
+        />
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-query-search-table
@@ -90,6 +94,7 @@
                     :selectable="false"
                     :items="selectedUsers"
                     :col-copy="true"
+                    class="selected-data-tab"
                 />
             </template>
         </p-tab>
@@ -143,7 +148,6 @@ import { store } from '@/store';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
-import router from '@/routes';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { SpaceConnector } from '@/lib/space-connector';
 import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/helper';
@@ -160,6 +164,7 @@ interface UserModel {
     email: string;
     group: string;
     language: string;
+    // eslint-disable-next-line camelcase
     last_accessed_at: Timestamp;
     mobile: string;
     name: string;
@@ -295,13 +300,13 @@ export default {
             routes: computed(() => ([
                 { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
                 { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user' },
-                { name: 'User Management', path: '/identity/user/user-management' },
+                { name: vm.$t('IDENTITY.USER.USER_MANAGEMENT'), path: '/identity/user/user-management' },
             ])),
         });
 
         const singleItemTabState = reactive({
             tabs: computed(() => ([
-                { name: 'detail', label: vm.$t('IDENTITY.USER.DETAILS'), keepAlive: true },
+                { label: vm.$t('IDENTITY.USER.DETAILS'), name: 'detail', keepAlive: true },
                 { label: vm.$t('IDENTITY.USER.TAG'), name: 'tag', keepAlive: true },
             ] as TabItem[])),
             activeTab: 'detail',
@@ -309,7 +314,7 @@ export default {
 
         const multiItemTabState = reactive({
             tabs: computed(() => ([
-                { name: 'data', label: vm.$t('IDENTITY.USER.SELECTED_DATA'), keepAlive: true },
+                { name: 'data', label: vm.$t('IDENTITY.USER.TAB_SELECTED_DATA'), keepAlive: true },
             ] as TabItem[])),
             activeTab: 'data',
         });
@@ -516,14 +521,15 @@ export default {
         flex-grow: 1;
     }
 }
-
 #empty-space {
     @apply text-primary2 mt-6;
     text-align: center;
     margin-bottom: 0.5rem;
     font-size: 1.5rem;
 }
-
+.selected-data-tab {
+    @apply mt-8;
+}
 >>> .modal-content {
     min-width: 31.25rem;
     max-width: 50rem;

@@ -101,8 +101,8 @@
                         :selectable="false"
                         :items="tableState.selectedItems"
                         :col-copy="true"
+                        class="selected-data-tab"
                     >
-                        <template />
                     </p-data-table>
                 </template>
             </p-tab>
@@ -509,7 +509,7 @@ export default {
 
         const multiItemTabState = reactive({
             tabs: computed<TabItem[]>(() => [
-                { name: 'data', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_DATA') },
+                { name: 'data', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TAB_SELECTED_DATA') },
             ]),
             activeTab: 'data',
         });
@@ -611,6 +611,9 @@ export default {
     .provider-radio-btn {
         @apply float-right;
     }
+}
+.selected-data-tab {
+    @apply mt-8;
 }
 >>> .p-dynamic-layout-table .p-search-table {
     border-width: 1px;

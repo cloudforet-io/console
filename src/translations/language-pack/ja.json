@@ -414,9 +414,9 @@
 				"NO_SELECTED_ACCOUNT": "サービスアカウントを選択すると、詳細を見ることができます。",
 				"PROVIDERS_TITLE": "サービスプロバイダー",
 				"TAB_CREDENTIALS": "暗号化キー",
-				"TAB_DATA": "データ",
 				"TAB_DETAILS": "詳細情報",
 				"TAB_MEMBER": "担当者",
+				"TAB_SELECTED_DATA": "",
 				"TAB_TAG": "タグ",
 				"TITLE": "{provider}アカウント"
 			}
@@ -481,13 +481,15 @@
 			"MOBILE": "連絡先",
 			"NAME": "お名前",
 			"NO_SELECTED": "ユーザーを選択すると、詳細な情報が表示されます。",
-			"SELECTED_DATA": "選択したユーザー",
+			"SELECTED_DATA": "",
 			"STATE": "状態",
+			"TAB_SELECTED_DATA": "",
 			"TAG": "タグ",
 			"TIMEZONE": "タイムゾーン",
 			"TITLE": "ユーザー",
 			"UPDATE": "編集",
-			"USER_ID": "ID"
+			"USER_ID": "ID",
+			"USER_MANAGEMENT": ""
 		}
 	},
 	"INVENTORY": {
@@ -519,11 +521,12 @@
 				"CONSOLE": "コンソールに接続",
 				"DELETE": "削除",
 				"NO_SELECTED": "クラウドサービスを選択すると、詳細な情報が表示されます",
+				"TAB_DATA": "データ",
 				"TAB_DETAILS": "詳細情報",
 				"TAB_HISTORY": "変更履歴",
 				"TAB_MEMBER": "担当者",
 				"TAB_MONITORING": "モニタリング",
-				"TAB_SELECTED_DATA": "選択したクラウドサービス",
+				"TAB_SELECTED_DATA": "",
 				"TAB_TAG": "タグ"
 			}
 		},
@@ -543,11 +546,11 @@
 				"CONSOLE": "コンソールに接続",
 				"DELETE": "削除",
 				"NO_SELECTED_SERVER": "サーバーを選択すると、詳細な情報が表示されます",
-				"TAB_DATA": "データ",
 				"TAB_DETAILS": "詳細情報",
 				"TAB_HISTORY": "変更履歴",
 				"TAB_MEMBER": "担当者",
 				"TAB_MONITORING": "モニタリング",
+				"TAB_SELECTED_DATA": "",
 				"TAB_TAG": "タグ",
 				"TITLE": "サーバ"
 			}
@@ -591,8 +594,8 @@
 				"DETAILS_BASE_LABEL_VERSION": "プラグインバージョン",
 				"DETAILS_BASE_TITLE": "基本情報",
 				"RECOVERY": "回復",
-				"TAB_DATA": "データ",
 				"TAB_DETAILS": "詳細情報",
+				"TAB_SELECTED_DATA": "",
 				"TITLE": "インストールされてプラグイン"
 			}
 		}
@@ -775,9 +778,9 @@
 				"SCHEDULE_EDIT_MODAL_TITLE_UPDATE": "スケジュール変更",
 				"SCHEDULE_UPDATE": "変更",
 				"TAB_CREDENTIALS": "暗号化キー",
-				"TAB_DATA": "データ",
 				"TAB_DETAILS": "詳細情報",
 				"TAB_SCHEDULE": "スケジュール",
+				"TAB_SELECTED_DATA": "データ",
 				"TAB_TAG": "タグ",
 				"TITLE": "コレクタ",
 				"UPDATE": "編集",

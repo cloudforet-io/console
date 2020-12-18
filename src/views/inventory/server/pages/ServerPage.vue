@@ -16,6 +16,7 @@ import {
 import ServerMain from '@/views/inventory/server/modules/ServerMain.vue';
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
+import { store } from '@/store';
 
 
 export default {
@@ -33,6 +34,9 @@ export default {
                 { name: vm.$t('MENU.INVENTORY.SERVER'), path: '/inventory/server' },
             ]),
         });
+        (async () => {
+            await store.dispatch('resource/loadAll');
+        })();
         return {
             routeState,
         };

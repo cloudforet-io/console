@@ -414,9 +414,9 @@
 				"NO_SELECTED_ACCOUNT": "Select a service account for more details.",
 				"PROVIDERS_TITLE": "Service Providers",
 				"TAB_CREDENTIALS": "Credentials",
-				"TAB_DATA": "Data",
 				"TAB_DETAILS": "Details",
 				"TAB_MEMBER": "Member",
+				"TAB_SELECTED_DATA": "Selected Data",
 				"TAB_TAG": "Tags",
 				"TITLE": "{provider} Accounts"
 			}
@@ -481,13 +481,15 @@
 			"MOBILE": "Mobile",
 			"NAME": "Name",
 			"NO_SELECTED": "Select a user for more details.",
-			"SELECTED_DATA": "Selected Users",
+			"SELECTED_DATA": "Selected Data",
 			"STATE": "State",
+			"TAB_SELECTED_DATA": "Selected Data",
 			"TAG": "Tags",
 			"TIMEZONE": "Time Zone",
 			"TITLE": "User",
 			"UPDATE": "Update",
-			"USER_ID": "ID"
+			"USER_ID": "ID",
+			"USER_MANAGEMENT": "User Management"
 		}
 	},
 	"INVENTORY": {
@@ -519,6 +521,7 @@
 				"CONSOLE": "Connect to Console",
 				"DELETE": "Delete",
 				"NO_SELECTED": "Select a cloud service for more details.",
+				"TAB_DATA": "Data ",
 				"TAB_DETAILS": "Details",
 				"TAB_HISTORY": "History",
 				"TAB_MEMBER": "Member",
@@ -543,11 +546,11 @@
 				"CONSOLE": "Connect to Console",
 				"DELETE": "Delete",
 				"NO_SELECTED_SERVER": "Select a server for more details.",
-				"TAB_DATA": "Data",
 				"TAB_DETAILS": "Details",
 				"TAB_HISTORY": "History",
 				"TAB_MEMBER": "Member",
 				"TAB_MONITORING": "Monitoring",
+				"TAB_SELECTED_DATA": "Selected Data",
 				"TAB_TAG": "Tags",
 				"TITLE": "Server"
 			}
@@ -591,8 +594,8 @@
 				"DETAILS_BASE_LABEL_VERSION": "Version",
 				"DETAILS_BASE_TITLE": "Base Information",
 				"RECOVERY": "Recovery",
-				"TAB_DATA": "Data",
 				"TAB_DETAILS": "Details",
+				"TAB_SELECTED_DATA": "Selected Data",
 				"TITLE": "Installed Plugins"
 			}
 		}
@@ -775,9 +778,9 @@
 				"SCHEDULE_EDIT_MODAL_TITLE_UPDATE": "Update Schedule",
 				"SCHEDULE_UPDATE": "Update",
 				"TAB_CREDENTIALS": "Credentials",
-				"TAB_DATA": "Data",
 				"TAB_DETAILS": "Details",
 				"TAB_SCHEDULE": "Schedule",
+				"TAB_SELECTED_DATA": "Selected Data",
 				"TAB_TAG": "Tags",
 				"TITLE": "Collector",
 				"UPDATE": "Edit",

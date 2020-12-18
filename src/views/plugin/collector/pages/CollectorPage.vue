@@ -4,7 +4,8 @@
             <p-page-navigation :routes="routes" />
         </div>
         <p-page-title :title="$t('PLUGIN.COLLECTOR.MAIN.TITLE')"
-                      use-total-count
+                      use-total-count use-selected-count
+                      :selected-count="selectedItems.length"
                       :total-count="totalCount"
         />
         <p-horizontal-layout>
@@ -90,22 +91,18 @@
                :tabs="multiTabState.tabs" :active-tab.sync="multiTabState.activeTab"
         >
             <template #data>
-                <div>
-                    <p-panel-top use-total-count :total-count="selectedItems.length">
-                        {{ $t('PLUGIN.COLLECTOR.MAIN.TAB_DATA') }}
-                    </p-panel-top>
-                    <p-data-table
-                        :fields="selectedDataFields"
-                        :items="selectedItems"
-                        :sortable="false"
-                        :selectable="false"
-                        :col-copy="true"
-                    >
-                        <template #col-state-format="data">
-                            <p-status :text="data.value" :theme="data.value" />
-                        </template>
-                    </p-data-table>
-                </div>
+                <p-data-table
+                    :fields="selectedDataFields"
+                    :items="selectedItems"
+                    :sortable="false"
+                    :selectable="false"
+                    :col-copy="true"
+                    class="selected-data-tab"
+                >
+                    <template #col-state-format="data">
+                        <p-status :text="data.value" :theme="data.value" />
+                    </template>
+                </p-data-table>
             </template>
         </p-tab>
 
@@ -326,7 +323,7 @@ export default {
 
         const multiTabState = reactive({
             tabs: computed<TabItem[]>(() => [
-                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.TAB_DATA'), name: 'data', keepAlive: true },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.TAB_SELECTED_DATA'), name: 'data', keepAlive: true },
             ]),
             activeTab: 'data',
         });
@@ -514,6 +511,9 @@ ul {
 }
 li {
     display: list-item;
+}
+.selected-data-tab {
+    @apply mt-8;
 }
 
 .view-detail {

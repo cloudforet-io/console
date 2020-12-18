@@ -1,6 +1,11 @@
 <template>
     <general-page-layout>
-        <p-page-title :title="$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.TITLE')" />
+        <p-page-title
+            :title="$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.TITLE')"
+            use-total-count use-selected-count
+            :total-count="totalCount"
+            :selected-count="selectIndex.length"
+        />
         <p-horizontal-layout>
             <template #container="{ height }">
                 <p-query-search-table
@@ -48,6 +53,7 @@
                               :sortable="false"
                               :selectable="false"
                               :col-copy="true"
+                              class="mt-8"
                 />
             </template>
         </p-tab>
@@ -177,7 +183,7 @@ export default {
             },
             multiItemTab: {
                 tabs: computed<TabItem[]>(() => [
-                    { label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.TAB_DATA'), name: 'data', keepAlive: true },
+                    { label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.TAB_SELECTED_DATA'), name: 'data', keepAlive: true },
                 ]),
                 activeTab: 'data',
             },

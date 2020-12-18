@@ -549,6 +549,7 @@ export default {
 <style lang="postcss" scoped>
 .sidebar-title {
     @apply text-gray-500 text-sm font-bold;
+    align-items: center;
     padding-top: 2rem;
     padding-left: 1rem;
     .count {

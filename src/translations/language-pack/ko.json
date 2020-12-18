@@ -414,9 +414,9 @@
 				"NO_SELECTED_ACCOUNT": "서비스 계정을 선택하시면 세부 내용을 볼 수 있습니다.",
 				"PROVIDERS_TITLE": "서비스 제공자",
 				"TAB_CREDENTIALS": "암호화 키",
-				"TAB_DATA": "데이터",
 				"TAB_DETAILS": "상세 정보",
 				"TAB_MEMBER": "담당자",
+				"TAB_SELECTED_DATA": "선택한 데이터",
 				"TAB_TAG": "태그",
 				"TITLE": "{provider} 계정"
 			}
@@ -481,13 +481,15 @@
 			"MOBILE": "연락처",
 			"NAME": "이름",
 			"NO_SELECTED": "사용자를 선택하면 자세한 정보를 볼 수 있습니다.",
-			"SELECTED_DATA": "선택한 사용자",
+			"SELECTED_DATA": "선택한 데이터",
 			"STATE": "상태",
+			"TAB_SELECTED_DATA": "선택한 데이터 ",
 			"TAG": "태그",
 			"TIMEZONE": "타임존",
 			"TITLE": "사용자",
 			"UPDATE": "편집",
-			"USER_ID": "아이디"
+			"USER_ID": "아이디",
+			"USER_MANAGEMENT": "사용자 관리 "
 		}
 	},
 	"INVENTORY": {
@@ -519,11 +521,12 @@
 				"CONSOLE": "콘솔 연결",
 				"DELETE": "삭제",
 				"NO_SELECTED": "클라우드 서비스를 선택하면 자세한 정보를 볼 수 있습니다.",
+				"TAB_DATA": "데이터 ",
 				"TAB_DETAILS": "상세 정보",
 				"TAB_HISTORY": "변경 기록",
 				"TAB_MEMBER": "담당자",
 				"TAB_MONITORING": "모니터링",
-				"TAB_SELECTED_DATA": "선택한 클라우드 서비스",
+				"TAB_SELECTED_DATA": "선택한 데이터 ",
 				"TAB_TAG": "태그"
 			}
 		},
@@ -543,11 +546,11 @@
 				"CONSOLE": "콘솔 연결",
 				"DELETE": "삭제",
 				"NO_SELECTED_SERVER": "서버를 선택하면 자세한 정보를 볼 수 있습니다.",
-				"TAB_DATA": "데이터",
 				"TAB_DETAILS": "상세 정보",
 				"TAB_HISTORY": "변경 기록",
 				"TAB_MEMBER": "담당자",
 				"TAB_MONITORING": "모니터링",
+				"TAB_SELECTED_DATA": "선택한 데이터",
 				"TAB_TAG": "태그",
 				"TITLE": "서버"
 			}
@@ -591,8 +594,8 @@
 				"DETAILS_BASE_LABEL_VERSION": "플러그인 버전",
 				"DETAILS_BASE_TITLE": "기본 정보",
 				"RECOVERY": "복구",
-				"TAB_DATA": "데이터",
 				"TAB_DETAILS": "상세 정보",
+				"TAB_SELECTED_DATA": "선택한 데이터 ",
 				"TITLE": "설치된 플러그인"
 			}
 		}
@@ -775,9 +778,9 @@
 				"SCHEDULE_EDIT_MODAL_TITLE_UPDATE": "스케줄 변경",
 				"SCHEDULE_UPDATE": "변경",
 				"TAB_CREDENTIALS": "암호화 키",
-				"TAB_DATA": "데이터",
 				"TAB_DETAILS": "상세 정보",
 				"TAB_SCHEDULE": "스케줄",
+				"TAB_SELECTED_DATA": "선택한 데이터",
 				"TAB_TAG": "태그",
 				"TITLE": "컬렉터",
 				"UPDATE": "편집",

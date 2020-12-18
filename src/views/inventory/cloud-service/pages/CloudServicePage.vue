@@ -58,7 +58,7 @@
                                 <template #toolbox-left>
                                     <p-icon-text-button style-type="primary-dark"
                                                         name="ic_plus_bold"
-                                                        :disabled="tableState.selectedItems.length === 0"
+                                                        disabled
                                                         @click="clickCollectData"
                                     >
                                         {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.COLLECT_DATA') }}

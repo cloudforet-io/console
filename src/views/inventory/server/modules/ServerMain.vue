@@ -348,7 +348,7 @@ export default {
         const multiItemTabState = reactive({
             tabs: computed(() => [
                 {
-                    name: 'data', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_DATA') as string, type: 'item',
+                    name: 'data', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_SELECTED_DATA') as string, type: 'item',
                 }, {
                     name: 'member', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_MEMBER') as string, type: 'item',
                 }, {
