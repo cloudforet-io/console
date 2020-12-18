@@ -1,6 +1,6 @@
 <template>
     <div class="grid grid-cols-12 gap-3">
-        <div class="col-span-12 lg:col-span-9 grid gap-3 widget-wrapper">
+        <div class="col-span-12 lg:col-span-9 grid grid-cols-12 gap-3">
             <all-summary class="col-span-12"
                          :project-id="projectId"
                          :chart-color="chartColor"
@@ -27,19 +27,21 @@
             </div>
             <service-accounts-table class="col-span-12 service-accounts-table" />
         </div>
-        <div class="col-span-12 lg:col-span-3 grid gap-3">
-            <daily-updates class="col-span-12 daily-updates"
-                           :project-id="projectId"
-                           :project-filter="projectFilter"
-            />
-            <cloud-services class="col-span-12 cloud-service"
-                            :project-filter="projectFilter"
-                            :project-id="projectId"
-            />
-            <simplified-trusted-advisor class="col-span-12 trusted-advisor"
-                                        :providers="providers"
-                                        :project-id="projectId"
-            />
+        <div class="col-span-12 lg:col-span-3">
+            <div class="grid grid-cols-12 gap-3">
+                <daily-updates class="col-span-12 daily-updates"
+                               :project-id="projectId"
+                               :project-filter="projectFilter"
+                />
+                <cloud-services class="col-span-12 cloud-service"
+                                :project-filter="projectFilter"
+                                :project-id="projectId"
+                />
+                <simplified-trusted-advisor class="col-span-12 trusted-advisor"
+                                            :providers="providers"
+                                            :project-id="projectId"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -52,6 +54,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
+import ProjectPersonalHealthDashboard from '@/views/common/components/widgets/personal-health-dashboard/ProjectPersonalHealthDashboard.vue';
 import AllSummary from '@/views/common/components/widgets/all-summary/AllSummary.vue';
 import CloudServices from '@/views/common/components/widgets/cloud-services/CloudServices.vue';
 import DailyUpdates from '@/views/common/components/widgets/daily-updates/DailyUpdates.vue';
@@ -63,8 +66,6 @@ import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import {
     blue, secondary, secondary1, peacock,
 } from '@/styles/colors';
-import ProjectPersonalHealthDashboard
-    from '@/views/common/components/widgets/personal-health-dashboard/ProjectPersonalHealthDashboard.vue';
 
 
 interface SummaryState {
@@ -159,9 +160,6 @@ export default {
         font-weight: bold;
     }
 }
-.widget-wrapper {
-    grid-auto-rows: max-content;
-}
 
 .all-summary::v-deep {
     margin-top: 1.25rem;
@@ -209,10 +207,7 @@ export default {
         }
     }
 }
-.project-personal-health-dashboard {
-    //@apply border border-gray-200;
-    //border-radius: 2px;
-}
+
 .cloud-service {
     @apply border border-gray-200;
     height: 28rem;

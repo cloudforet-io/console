@@ -116,7 +116,7 @@ export default {
 
                     return {
                         event: {
-                            name: `${d.service} ${d.event_type_code} ${EVENT_CATEGORY[d.event_type_category]}`,
+                            name: `${d.event_type_code} ${EVENT_CATEGORY[d.event_type_category]}`,
                             lastUpdated: `${utcDiff} ${unit} ${vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.AGO')}`,
                         },
                         region: d.region_code, // todo: state.regions[d.region_code].name,
@@ -139,9 +139,9 @@ export default {
         };
 
         const init = async () => {
-            await store.dispatch('resource/project/load');
-            await store.dispatch('favorite/project/load');
+            state.loading = true;
             await getSummary();
+            state.loading = false;
         };
         init();
 

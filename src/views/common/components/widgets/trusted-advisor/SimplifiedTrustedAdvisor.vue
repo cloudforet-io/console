@@ -15,7 +15,7 @@
                     />
                     <span class="text">{{ category.label }}</span>
                 </div>
-                <div class="right-part grid grid-cols-12 gap-3">
+                <div class="right-part grid grid-cols-12 gap-2">
                     <router-link v-for="(legend, lIdx) in legends" :key="lIdx"
                                  class="box col-span-4" :class="legend.name"
                                  :to="linkFormatter(category.name, legend.name)"

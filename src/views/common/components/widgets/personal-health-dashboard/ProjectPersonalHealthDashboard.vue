@@ -17,39 +17,63 @@
             </div>
             <p-tab :tabs="tabState.tabs"
                    :active-tab.sync="tabState.activeTab"
+            />
+            <div class="search-wrapper">
+                <p-search v-model="search" class="p-search"
+                          :placeholder="$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SEARCH')"
+                          @search="onSearch"
+                />
+                <p-icon-button name="ic_refresh" @click="getEvents" />
+            </div>
+            <p-data-table :loading="loading"
+                          :fields="fields"
+                          :selectable="false"
+                          :items="showMore ? data : data.slice(0, 5)"
+                          :sortable="true"
+                          :sort-by.sync="sortBy"
+                          :sort-desc.sync="sortDesc"
+                          @change="onChange"
             >
-                <template #openIssues>
-                    <div class="search-wrapper">
-                        <p-search v-model="search" class="p-search"
-                                  :placeholder="$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SEARCH')"
-                                  @search="onSearch"
-                                  @delete="onSearch"
-                        />
-                        <p-icon-button
-                            name="ic_refresh"
-                            @click="onClickRefresh"
-                        />
+                <template #col-event-format="{ value }">
+                    <router-link :to="value.to" class="link-text">
+                        <span>{{ value.name }}</span>
+                    </router-link>
+                </template>
+                <template #col-start_time-format="{ value }">
+                    <span>{{ value }}</span>
+                </template>
+                <template #col-affected_resources-format="{ value }">
+                    <div v-if="value.length > 0">
+                        <div v-for="(resource, index) in value" :key="index" class="affected-resources-wrapper">
+                            <template v-if="resource.awsAccountId">
+                                <span class="label">{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SERVICE_ACCOUNT_ID') }} : </span>
+                                <span class="value">{{ resource.awsAccountId }}</span>
+                            </template>
+                        </div>
                     </div>
-                    <p-data-table :fields="fields"
-                                  :selectable="false"
-                                  :items="openIssuesData"
+                    <div v-else />
+                </template>
+            </p-data-table>
+            <div v-show="data.length > 5" class="more-button-wrapper"
+                 @click="onClickMoreButton"
+            >
+                <div class="more-button">
+                    <span>{{ showMore ? $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.HIDE') : $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.MORE') }}</span>
+                    <p-i :name="showMore ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+                         height="1rem" width="1rem" color="inherit transparent"
                     />
-                </template>
-                <template #scheduledChanges>
-                    scheduledChanges
-                </template>
-                <template #otherNotifications>
-                    otherNotifications
-                </template>
-            </p-tab>
+                </div>
+            </div>
         </widget-layout>
     </div>
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
+import dayjs from 'dayjs';
+
 import {
-    computed, reactive, toRefs,
-    ComponentRenderProxy, getCurrentInstance,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
@@ -57,11 +81,31 @@ import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue'
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { timestampFormatter } from '@/lib/util';
+import { QueryHelper } from '@/lib/query';
+import { store } from '@/store';
+
+
+enum EVENT_CATEGORY {
+    accountNotification = 'Notification',
+    scheduledChanges = 'Scheduled',
+    openIssues = 'Issue',
+}
+enum EVENT_CATEGORY_FOR_API {
+    accountNotification = 'accountNotification',
+    scheduledChanges = 'scheduledChanges',
+    openIssues = 'openIssues'
+}
 
 export default {
     name: 'ProjectPersonalHealthDashboard',
     components: {
+        PI,
         PIconButton,
         PSearch,
         PTab,
@@ -70,70 +114,146 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryHelper = new QueryHelper();
+        const apiQuery = new ApiQueryHelper();
 
         const state = reactive({
             loading: false,
+            timezone: computed(() => store.state.user.timezone),
             data: [],
             summaryData: computed(() => ([
                 {
-                    label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_OPEN_ISSUES'),
-                    count: 24,
-                    date: 'Past 7 days',
+                    label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_ISSUE'),
+                    count: state.countData.issue,
+                    date: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.PAST_7_DAYS'),
                 },
                 {
-                    label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_SCHEDULED_CHANGES'),
-                    count: 123,
-                    date: 'Upcoming and Past 7 days',
+                    label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_SCHEDULED_CHANGE'),
+                    count: state.countData.scheduledChange,
+                    date: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.UPCOMING_AND_PAST_7_DAYS'),
                 },
                 {
-                    label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_OTHER_NOTIFICATIONS'),
-                    count: 6,
-                    date: 'Past 7 days',
+                    label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_NOTIFICATION'),
+                    count: state.countData.accountNotification,
+                    date: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.PAST_7_DAYS'),
                 },
             ])),
             fields: computed(() => [
-                { name: 'event', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_EVENT') },
+                { name: 'event', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_EVENT'), sortable: false },
                 { name: 'region', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_REGION') },
-                { name: 'startTime', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_START_TIME') },
-                { name: 'lastUpdateTime', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_LAST_UPDATE_TIME') },
-                { name: 'affectedResources', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_AFFECTED_RESOURCES') },
+                { name: 'start_time', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_START_TIME') },
+                { name: 'last_updated_time', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_LAST_UPDATE_TIME') },
+                { name: 'affected_resources', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_AFFECTED_RESOURCES'), sortable: false },
             ]),
-            openIssuesData: [],
+            countData: {},
+            tags: [],
             search: '',
+            sortBy: '',
+            sortDesc: true,
+            showMore: false,
         });
         const tabState = reactive({
             tabs: computed(() => [
                 {
-                    name: 'openIssues',
-                    label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_OPEN_ISSUES'),
+                    name: EVENT_CATEGORY_FOR_API.openIssues,
+                    label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_ISSUE'),
                     type: 'item',
                 }, {
-                    name: 'scheduledChanges',
-                    label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_SCHEDULED_CHANGES'),
+                    name: EVENT_CATEGORY_FOR_API.scheduledChanges,
+                    label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_SCHEDULED_CHANGE'),
                     type: 'item',
                 }, {
-                    name: 'otherNotifications',
-                    label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_OTHER_NOTIFICATIONS'),
+                    name: EVENT_CATEGORY_FOR_API.accountNotification,
+                    label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_NOTIFICATION'),
                     type: 'item',
                 },
             ]),
-            activeTab: 'openIssues',
+            activeTab: EVENT_CATEGORY_FOR_API.openIssues,
         });
 
-        const onSearch = async (val?: string) => {
-            state.search = val || '';
-            // proxyState.searchText = val || '';
-            // emitChange({ searchText: val || '' });
+        /* api */
+        const getCount = async () => {
+            try {
+                state.countData = await SpaceConnector.client.statistics.topic.phdCountByType({},
+                    { headers: { 'Mock-Mode': true } });
+            } catch (e) {
+                console.error(e);
+            }
         };
-        const onClickRefresh = () => {
+        const getQuery = () => {
+            apiQuery
+                .setSort(state.sortBy, state.sortDesc)
+                .setFilters([{ k: 'event_type_category', v: state.search, o: '' }]);
+            return apiQuery.data;
+        };
+        const getEvents = async () => {
+            try {
+                state.loading = true;
+                const res = await SpaceConnector.client.statistics.topic.phdEvents(
+                    {
+                        event_type_category: tabState.activeTab,
+                        query: getQuery(),
+                    },
+                    { headers: { 'Mock-Mode': true } },
+                );
 
+                state.data = res.results.map((d) => {
+                    const startTime = dayjs.tz(dayjs(d.start_time).utc(), state.timezone).format('YYYY-MM-DD HH:mm:ss');
+                    const lastUpdatedTime = dayjs.tz(dayjs(d.last_updated_time).utc(), state.timezone).format('YYYY-MM-DD HH:mm:ss');
+                    return {
+                        event: {
+                            name: `${d.event_type_code} ${EVENT_CATEGORY[d.event_type_category]}`,
+                            to: referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' }),
+                        },
+                        region: d.region_code, // todo: state.regions[d.region_code].name,
+                        start_time: startTime,
+                        last_updated_time: lastUpdatedTime,
+                        affected_resources: d.affected_resources,
+                    };
+                });
+                console.log(res.results);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
         };
+
+        /* event */
+        const onSearch = (val) => {
+            state.search = val;
+            getEvents();
+        };
+        const onChange = async (item) => {
+            state.tags = item.queryTags;
+            queryHelper.setFiltersAsQueryTag(item.queryTags);
+            try {
+                await getEvents();
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        const onClickMoreButton = () => {
+            state.showMore = !state.showMore;
+        };
+
+        const init = async () => {
+            await Promise.all([getEvents(), getCount()]);
+        };
+        init();
+
+        watch(() => tabState.activeTab, () => {
+            getEvents();
+        }, { immediate: false });
 
         return {
             ...toRefs(state),
             tabState,
+            getEvents,
             onSearch,
-            onClickRefresh,
+            onChange,
+            onClickMoreButton,
+            timestampFormatter,
         };
     },
 };
@@ -192,6 +312,40 @@ export default {
         padding: 1.5rem 1rem;
         .p-icon-button {
             margin-left: 1rem;
+        }
+    }
+    .p-data-table::v-deep {
+        .link-text {
+            @apply text-secondary;
+            display: inline-block;
+            width: 15rem;
+            white-space: pre-wrap;
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+        .affected-resources-wrapper {
+            display: flex;
+            width: 10rem;
+            flex-wrap: wrap;
+            padding-bottom: 0.25rem;
+            .label {
+                @apply text-gray-600;
+            }
+        }
+    }
+    .more-button-wrapper {
+        @apply text-blue-600;
+        display: flex;
+        height: 2rem;
+        align-items: center;
+        font-size: 0.75rem;
+        cursor: pointer;
+        &:hover {
+            text-decoration: underline;
+        }
+        .more-button {
+            margin: auto;
         }
     }
 }
