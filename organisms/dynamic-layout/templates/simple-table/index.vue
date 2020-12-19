@@ -11,7 +11,7 @@
         >
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
                 <slot :name="slotName" v-bind="data">
-                    <p-dynamic-field :key="item.name"
+                    <p-dynamic-field :key="slotName"
                                      v-bind="item"
                                      :data="data.value"
                                      :before-create="beforeCreateField"

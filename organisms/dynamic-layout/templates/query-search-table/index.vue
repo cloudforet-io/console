@@ -28,15 +28,13 @@
                               @select="onSelect"
                               @export="onExport"
         >
-            <template v-for="(item, slotName, i) of dynamicFieldSlots" v-slot:[slotName]="data">
-                <slot :name="slotName" v-bind="data">
-                    <p-dynamic-field :key="i"
-                                     v-bind="item"
-                                     :data="data.value"
-                                     :before-create="beforeCreateField"
-                                     :handler="fieldHandler"
-                    />
-                </slot>
+            <template v-for="(item, slotName, i) of dynamicFieldSlots" v-slot:[slotName]="{value, field, index}">
+                <p-dynamic-field :key="slotName"
+                                 v-bind="item"
+                                 :data="value"
+                                 :before-create="beforeCreateField"
+                                 :handler="fieldHandler"
+                />
             </template>
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                 <slot v-if="!dynamicFieldSlots[slot] && slot !== 'tag-data-type-datetime'" :name="slot" v-bind="scope" />
@@ -60,9 +58,9 @@ import {
     QuerySearchTableListeners,
     QuerySearchTableDynamicLayoutProps, QuerySearchTableFetchOptions,
 } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
-import { DynamicField } from '@/components/organisms/dynamic-field/type/field-schema';
 import { getPageStart } from '@/components/util/helpers';
 import { Options } from '@/components/organisms/tables/query-search-table/type';
+import { DataTableFieldType } from '@/components/organisms/tables/data-table/type';
 
 const getThisPage = (pageStart = 1, pageLimit = 15) => Math.floor(pageStart / pageLimit) || 1;
 
@@ -109,7 +107,7 @@ export default {
             layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),
 
             /** table */
-            fields: computed(() => {
+            fields: computed<DataTableFieldType[]>(() => {
                 if (!props.options.fields) return [];
 
                 return props.options.fields.map(ds => ({
@@ -117,8 +115,8 @@ export default {
                     label: ds.name,
                     sortable: typeof ds.options?.sortable === 'boolean' ? ds.options.sortable : true,
                     // eslint-disable-next-line camelcase
-                    sortKey: ds.options?.sort_key,
-                    width: ds.options?.width,
+                    sortKey: ds.options?.sort_key as string,
+                    width: ds.options?.width as string,
                 }));
             }),
 
@@ -165,30 +163,30 @@ export default {
                 }
                 return [];
             }),
+            dynamicFieldSlots: computed((): Record<string, DynamicFieldProps> => {
+                const res = {};
+                if (!state.fields) return res;
+
+                props.options.fields.forEach((field, i) => {
+                    const item: Omit<DynamicFieldProps, 'data'> = {
+                        type: field.type || 'text',
+                        options: { ...field.options },
+                        extraData: { ...field, index: i },
+                    };
+
+                    if (item.options.translation_id) delete item.options.translation_id;
+
+                    if (field.type === 'datetime') {
+                        item.typeOptions = { timezone: state.timezone };
+                    }
+
+                    res[`col-${i}-format`] = item;
+                });
+
+                return res;
+            }),
         });
 
-        const dynamicFieldSlots = computed((): Record<string, DynamicFieldProps> => {
-            const res = {};
-            if (!props.options.fields) return res;
-
-            props.options.fields.forEach((ds: DynamicField, i) => {
-                const item: Omit<DynamicFieldProps, 'data'> = {
-                    type: ds.type || 'text',
-                    options: { ...ds.options },
-                    extraData: { ...ds, index: i },
-                };
-
-                if (item.options.translation_id) delete item.options.translation_id;
-
-                if (ds.type === 'datetime') {
-                    item.typeOptions = { timezone: state.timezone };
-                }
-
-                res[`col-${i}-format`] = item;
-            });
-
-            return res;
-        });
 
         const onSelect = (selectIndex: number[]) => {
             if (!props.typeOptions?.selectIndex) state.selectIndex = selectIndex;
@@ -233,7 +231,6 @@ export default {
             onChange,
             onSelect,
             onExport,
-            dynamicFieldSlots,
         };
     },
 };
