@@ -7,7 +7,7 @@
         </slot>
         <table v-else-if="!isNoData">
             <tbody>
-                <p-definition v-for="(bind, idx) in items" :key="idx"
+                <p-definition v-for="(bind, idx) in items" :key="`${contextKey}-${idx}`"
                               class="def-row" v-bind="bind" @copy="onCopy(bind, idx)"
                 >
                     <template #default="scope">
@@ -36,7 +36,7 @@
 import { every, range, get } from 'lodash';
 
 import {
-    computed, reactive, toRefs,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -77,9 +77,14 @@ export default {
     },
     setup(props: DefinitionTableProps, { emit }) {
         const state = reactive({
+            contextKey: Math.floor(Math.random() * Date.now()),
             isNoData: computed(() => every(state.items, def => !def.data)),
             skeletons: computed(() => range(props.skeletonRows)),
             items: computed(() => makeDefItems(props.fields, props.data)),
+        });
+
+        watch([() => props.data, () => props.fields], () => {
+            state.contextKey = Math.floor(Math.random() * Date.now());
         });
 
         return {
