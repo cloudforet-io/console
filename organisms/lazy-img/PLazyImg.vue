@@ -8,7 +8,6 @@
             <slot name="preloader" :height="height" :width="width"
                   :imgLoading="imgLoading"
             >
-
                 <p-lottie name="thin-spinner"
                           auto
                           :height="height"
@@ -23,7 +22,7 @@
             <img v-show="!imgLoading && !isError"
                  key="img"
                  :style="{height, width}"
-                 :src="proxySrc"
+                 :src="src"
                  :alt="alt"
                  class="absolute"
                  @load="onLoad"
@@ -88,21 +87,22 @@ export default {
             type: String,
             default: undefined,
         },
+        strictMode: {
+            type: Boolean,
+            default: false
+        }
     },
     setup(props: LazyImgPropsType, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             imgLoading: true,
             isError: false,
-            proxySrc: makeOptionalProxy('src', vm, ''),
         });
 
-        // watch(() => props.src, (val) => {
-        //     if (val) {
-        //         state.imgLoading = true;
-        //         state.isError = false;
-        //     }
-        // }, { immediate: true });
+        watch(() => props.src, (val) => {
+            state.imgLoading = true;
+            state.isError = false;
+        });
         return {
             ...toRefs(state),
             onLoad() {
@@ -126,7 +126,7 @@ export default {
         }
     }
     .fade-in-leave-active, .fade-in-enter-active {
-        transition: opacity 0.5s;
+        transition: opacity 0.25s;
     }
     .fade-in-leave-to, .fade-in-enter {
         opacity: 0;
