@@ -368,7 +368,7 @@ export default {
 
 
         const schemaQueryHelper = new QueryHelper();
-        const getTableSchema = async () => {
+        const getTableSchema = async (): Promise<null|DynamicLayout> => {
             try {
                 const schema = await SpaceConnector.client.addOns.pageSchema.get({
                     resource_type: 'inventory.CloudService',
@@ -396,15 +396,16 @@ export default {
                 // initiate queryTags with keyItemSets
                 fetchOptionState.queryTags = queryHelper.setKeyItemSets(typeOptionState.keyItemSets).queryTags;
 
-                // set schema to tableState -> create dynamic layout
-                tableState.schema = schema;
+                // return schema
+                return schema;
             } catch (e) {
                 console.error(e);
+                return null;
             }
         };
 
         const apiQuery = new ApiQueryHelper();
-        const getQuery = () => {
+        const getQuery = (schema?) => {
             apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
                 .setFilters(queryHelper.filters)
@@ -414,8 +415,9 @@ export default {
                     { k: 'cloud_service_type', o: '=', v: props.name },
                 );
 
-            if (tableState.schema?.options?.fields) {
-                apiQuery.setOnly(...tableState.schema.options.fields.map((d) => {
+            const fields = schema?.options?.fields || tableState.schema?.options?.fields;
+            if (fields) {
+                apiQuery.setOnly(...fields.map((d) => {
                     if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
                     return d.key;
                 }), 'reference', 'cloud_service_id');
@@ -425,20 +427,18 @@ export default {
         };
 
         const cloudServiceListApi = SpaceConnector.client.inventory.cloudService.list;
-        const listCloudServiceData = async () => {
+        const getCloudServiceTableData = async (schema?): Promise<{items: any[]; totalCount: number}> => {
             typeOptionState.loading = true;
             try {
-                const res = await cloudServiceListApi({ query: getQuery() });
+                const res = await cloudServiceListApi({ query: getQuery(schema) });
 
                 // filtering select index
                 typeOptionState.selectIndex = typeOptionState.selectIndex.filter(d => !!res.results[d]);
 
-                tableState.items = res.results;
-                typeOptionState.totalCount = res.total_count;
+                return { items: res.results, totalCount: res.total_count };
             } catch (e) {
                 console.error(e);
-                tableState.items = [];
-                typeOptionState.totalCount = 0;
+                return { items: [], totalCount: 0 };
             } finally {
                 typeOptionState.loading = false;
             }
@@ -469,7 +469,9 @@ export default {
                 fetchOptionState.queryTags = options.queryTags;
             }
 
-            await listCloudServiceData();
+            const { items, totalCount } = await getCloudServiceTableData();
+            tableState.items = items;
+            typeOptionState.totalCount = totalCount;
         };
 
         const exportApi = SpaceConnector.client.addOns.excel.export;
@@ -541,11 +543,17 @@ export default {
                     },
                     query: vm.$route.query,
                 });
-                if (item.type !== 'inventory.Server') {
-                    await getTableSchema();
-                    await listCloudServiceData();
-                }
+
                 sidebarState.selectedItem = item;
+
+                if (item.type !== 'inventory.Server') {
+                    typeOptionState.loading = true;
+                    const schema = await getTableSchema();
+                    const { items, totalCount } = await getCloudServiceTableData(schema);
+                    tableState.schema = schema;
+                    tableState.items = items;
+                    typeOptionState.totalCount = totalCount;
+                }
             }
         };
 
@@ -576,7 +584,9 @@ export default {
                     showErrorMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_E_CHANGE_PROJECT'), e, root);
                 } finally {
                     await store.dispatch('resource/project/load');
-                    await listCloudServiceData();
+                    const { items, totalCount } = await getCloudServiceTableData();
+                    tableState.items = items;
+                    typeOptionState.totalCount = totalCount;
                 }
             } else {
                 try {
@@ -586,7 +596,9 @@ export default {
                 } catch (e) {
                     showErrorMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_E_RELEASE_PROJECT_TITLE'), e, root);
                 } finally {
-                    await listCloudServiceData();
+                    const { items, totalCount } = await getCloudServiceTableData();
+                    tableState.items = items;
+                    typeOptionState.totalCount = totalCount;
                 }
             }
             changeProjectState.loading = false;
@@ -639,7 +651,7 @@ export default {
 
         (async () => {
             await store.dispatch('resource/loadAll');
-            await getTableSchema();
+            tableState.schema = await getTableSchema();
             await initSidebar();
         })();
         /** ************************* */
@@ -657,7 +669,6 @@ export default {
             onTableHeightChange,
             onSelect,
             exportCloudServiceData,
-            listCloudServiceData,
             fetchTableData,
             fieldHandler,
 

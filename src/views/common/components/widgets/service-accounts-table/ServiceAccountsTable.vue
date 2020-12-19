@@ -40,7 +40,7 @@
                         </router-link>
                     </div>
                 </template>
-                <template #col-service_account_name="{index, field, item}">
+                <template #col-service_account_name-format="{index, field, item}">
                     <td v-tooltip.bottom="{content: item.serviceAccount.label, delay: {show: 500}}">
                         <router-link :to="item.serviceAccount.href">
                             {{ item.serviceAccount.label || 0 }}
