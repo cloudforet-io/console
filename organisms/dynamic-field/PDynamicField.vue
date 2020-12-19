@@ -68,7 +68,7 @@ export default {
             state.proxy = merge(field, state.proxy);
         };
 
-        const loadComponent = async () => {
+        const loadComponent = async (init = false) => {
             try {
                 /* For types that recursively use dynamic fields, do not run handler */
                 if (state.proxy.handler && !RECURSIVE_TYPE.includes(state.proxy.type)) {
@@ -89,7 +89,9 @@ export default {
                                     ${state.proxy.type} is not acceptable.`);
                 }
 
-                state.component = () => import(`./templates/${state.proxy.type}/index.vue`);
+                if (init || props.type !== state.proxy.type) {
+                    state.component = () => import(`./templates/${state.proxy.type}/index.vue`);
+                }
             } catch (e) {
                 state.component = () => import('./templates/text/index.vue');
             }
@@ -101,12 +103,11 @@ export default {
                 const res = props.beforeCreate(props);
                 if (res) await res;
             }
-            await loadComponent();
+            await loadComponent(true);
 
             watch([() => props.type, () => props.options, () => props.data, () => props.typeOptions], async () => {
                 await loadComponent();
             });
-
         })();
 
 
