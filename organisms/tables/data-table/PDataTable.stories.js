@@ -275,9 +275,6 @@ export const rowVBind = () => ({
                 name: faker.name.firstName(),
                 phone: faker.phone.phoneNumberFormat(),
                 email: faker.internet.email(),
-                vbind: {
-                    class: [bindClass],
-                },
             };
         },
     },

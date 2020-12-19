@@ -20,7 +20,7 @@
                                 />
                             </th>
                             <th v-for="(field, index) in fieldsData"
-                                :key="`${index}-${field.name}`"
+                                :key="`th-${contextKey}-${index}`"
                                 :style="{
                                     minWidth: field.width || undefined,
                                     width: field.width || undefined,
@@ -80,14 +80,13 @@
                             <slot :name="'row-'+index"
                                   v-bind="getRowSlotProps(item, index)"
                             >
-                                <tr :key="`tr-${index}`" :data-index="index"
+                                <tr :key="`tr-${contextKey}-${index}`" :data-index="index"
                                     class="fade-in"
                                     :class="{
                                         'tr-selected': getSelectedState(index),
                                         'row-height-fixed': rowHeightFixed,
                                         'row-cursor-pointer': rowCursorPointer,
                                     } "
-                                    v-bind="(item&& item.hasOwnProperty('vbind') )? item.vbind : null"
                                     @click.left="onRowLeftClick( item, index, $event )"
                                 >
                                     <td v-if="selectable"
@@ -103,22 +102,15 @@
                                                  :value="index"
                                         />
                                     </td>
-                                    <slot v-for="(field, i) in fieldsData"
-                                          :name="`col-${field.name}`"
-                                          v-bind="getColSlotProps(item, index, field)"
+                                    <td v-for="(field, i) in fieldsData"
+                                        :key="`td-${contextKey}-${index}-${i}`"
                                     >
-                                        <td :key="`col-${field.name}-${i}`">
-                                            <slot :name="`col-${field.name}-format`"
-                                                  v-bind="getColSlotProps(item, index, field)"
-                                            >
-                                                <slot :name="`col-${i}-format`"
-                                                      v-bind="getColSlotProps(item, index, field)"
-                                                >
-                                                    {{ getValue(item,field) }}
-                                                </slot>
+                                        <slot :name="`col-${field.name}-format`" v-bind="getColSlotProps(item, index, field, )">
+                                            <slot :name="`col-${i}-format`" v-bind="getColSlotProps(item, index, field, )">
+                                                {{ getValue(item,field) }}
                                             </slot>
-                                        </td>
-                                    </slot>
+                                        </slot>
+                                    </td>
                                 </tr>
                             </slot>
                         </slot>
@@ -245,10 +237,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        idKey: {
-            type: [String, Number],
-            default: undefined,
-        },
     },
     setup(props: PDataTableProps, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -262,8 +250,8 @@ export default {
         const state = reactive({
             table: null as any,
             allState: false,
-            fieldsData: computed<DataTableFieldType[]>(() => props.fields.map((value: string|DataTableField) => {
-                if (typeof value === 'string') { return { name: value, label: value, sortable: true }; }
+            fieldsData: computed<DataTableFieldType[]>(() => props.fields.map((value: string | DataTableField) => {
+                if (typeof value === 'string') return { name: value, label: value, sortable: true };
                 return { sortable: true, ...value };
             })),
             copyTargetElement: computed<HTMLCollection>(() => state.table?.children[1]?.children || []),
@@ -277,26 +265,15 @@ export default {
                 }
                 return false;
             }),
+            contextKey: Math.floor(Math.random() * Date.now()),
         });
 
 
-        const getValue = (item, field: DataTableFieldType) => get(item, field.name);
-
-        const getKey = (type: 'tr'|'td', item, rowIndex, colIndex?) => {
-            if (type === 'tr') {
-                if (props.idKey) {
-                    const id = get(item, props.idKey, undefined);
-                    if (id !== undefined) return `${type}-${rowIndex}-${id}`;
-                }
-                return `${type}-${rowIndex}`;
+        const getValue = (item, field: DataTableFieldType) => {
+            if (typeof item === 'object') {
+                return get(item, field.name);
             }
-
-            if (props.idKey) {
-                const id = get(item, props.idKey, undefined);
-                if (id !== undefined) return `${type}-${rowIndex}-${id}-${colIndex}`;
-            }
-
-            return `${type}-${rowIndex}-${colIndex}-${state.fieldsData[colIndex].name}`;
+            return item;
         };
 
         const getDefaultSlotProps = () => ({
@@ -428,11 +405,15 @@ export default {
             }
         }, { immediate: true });
 
+        watch([() => props.items, () => props.fields], () => {
+            state.contextKey = Math.floor(Math.random() * Date.now());
+        });
+
+
         return {
             proxyState,
             ...toRefs(state),
             getValue,
-            getKey,
             getDefaultSlotProps,
             getHeadSlotProps,
             getRowSlotProps,

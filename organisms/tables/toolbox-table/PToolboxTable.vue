@@ -186,7 +186,7 @@ export default {
             type: Boolean,
             default: false,
         },
-        // PToolboxTableProps
+        /* PToolboxTableProps */
         paginationVisible: {
             type: Boolean,
             default: true,

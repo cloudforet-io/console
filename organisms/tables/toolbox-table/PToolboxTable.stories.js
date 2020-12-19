@@ -170,7 +170,7 @@ export const colSlot = () => ({
         @clickRefresh="clickRefresh"
         @clickExcel="clickExcel"
     >
-        <template #col-name="scope">
+        <template #col-name-format="scope">
             <td>hi {{scope.value}} </td>
         </template>
     </p-toolbox-table>
