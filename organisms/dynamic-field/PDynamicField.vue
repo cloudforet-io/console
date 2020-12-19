@@ -5,18 +5,18 @@
                :type-options="proxy.typeOptions"
                :extra-data="proxy.extraData"
                :before-create="proxy.beforeCreate"
-               :handler="proxy.handler"
+               :handler="nextHandler"
                v-on="$listeners"
     />
 </template>
 
 <script lang="ts">
 import {
-    computed, onMounted, reactive, toRefs, watch,
+    computed, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
 import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
 import { dynamicFieldTypes } from '@/components/organisms/dynamic-field/type/field-schema';
-import { cloneDeep, merge, debounce } from 'lodash';
+
 
 interface State {
     component: any;
@@ -60,60 +60,71 @@ export default {
         // noinspection TypeScriptCheckImport
         const state = reactive<any>({
             component: null,
-            // nextHandler: props.handler,
-            proxy: cloneDeep(props) as DynamicFieldProps,
+            nextHandler: props.handler,
         });
 
-        const setProxy = (field: Partial<DynamicFieldProps> = {}) => {
-            state.proxy = merge(field, state.proxy);
-        };
 
-        const loadComponent = async (init = false) => {
+        const loadComponent = async (fieldProps: DynamicFieldProps) => {
             try {
-                /* For types that recursively use dynamic fields, do not run handler */
-                if (state.proxy.handler && !RECURSIVE_TYPE.includes(state.proxy.type)) {
-                    let res = state.proxy.handler(state.proxy);
-                    if (res instanceof Promise) res = await res;
-
-                    setProxy(res);
-
-                    /* When type change occurs through Handler, for types that recursively use dynamic fields, do not inherit handler. */
-                    if (state.proxy.type !== props.type && RECURSIVE_TYPE.includes(res.type)) {
-                        state.proxy.handler = undefined;
-                    }
-                }
-
-                if (!dynamicFieldTypes.includes(state.proxy.type)) {
+                if (!dynamicFieldTypes.includes(fieldProps.type)) {
                     throw new Error(`[DynamicField] Unacceptable Type:
                                     field type must be one of ${dynamicFieldTypes}.
-                                    ${state.proxy.type} is not acceptable.`);
+                                    ${fieldProps.type} is not acceptable.`);
                 }
 
-                if (init || props.type !== state.proxy.type) {
-                    state.component = () => import(`./templates/${state.proxy.type}/index.vue`);
-                }
+                state.component = () => import(`./templates/${fieldProps.type}/index.vue`);
             } catch (e) {
-                state.component = () => import('./templates/text/index.vue');
             }
         };
 
+        const proxy = computed<DynamicFieldProps>(() => {
+            const res: DynamicFieldProps = {
+                type: props.type,
+                options: props.options,
+                data: props.data,
+                typeOptions: props.typeOptions,
+                extraData: props.extraData,
+                beforeCreate: props.beforeCreate,
+                handler: props.handler,
+            };
 
-        (async () => {
+            /**
+             * For types that recursively use dynamic fields, do not run handler
+             * */
+            if (props.handler && !RECURSIVE_TYPE.includes(res.type)) {
+                const handlerRes = props.handler(Object.freeze(props));
+                if (handlerRes.type) res.type = handlerRes.type;
+                if (handlerRes.data) res.data = handlerRes.data;
+                if (handlerRes.beforeCreate) res.beforeCreate = handlerRes.beforeCreate;
+                if (handlerRes.handler) res.handler = handlerRes.handler;
+                if (handlerRes.options) res.options = { ...res.options, ...handlerRes.options };
+                if (res.typeOptions) res.typeOptions = { ...res.typeOptions, ...handlerRes.typeOptions };
+                if (res.extraData) res.extraData = { ...res.extraData, ...handlerRes.extraData };
+
+                /**
+                 * Load component(=Dynamic Field) again if type change occurs through Handler.
+                 * For types that recursively use dynamic fields, do not inherit handler.
+                 */
+                if (res.type !== props.type) {
+                    if (RECURSIVE_TYPE.includes(res.type)) state.nextHandler = undefined;
+                    loadComponent(res);
+                }
+            }
+            return res;
+        });
+
+
+        onMounted(async () => {
             if (props.beforeCreate) {
                 const res = props.beforeCreate(props);
                 if (res) await res;
             }
-            await loadComponent(true);
-
-            watch([() => props.type, () => props.options, () => props.data, () => props.typeOptions], async () => {
-                await loadComponent();
-            });
-        })();
-
+            await loadComponent(props);
+        });
 
         return {
             ...toRefs(state),
-            // proxy,
+            proxy,
         };
     },
 };
