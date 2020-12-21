@@ -5,7 +5,7 @@
                 <site-map :menu-list="menuList" :visible.sync="siteMapVisible" />
             </div>
             <router-link to="/dashboard">
-                <div class="logo-wrapper">
+                <div class="logo-wrapper mr-4 lg:mr-10">
                     <img class="brand-logo" src="@/assets/images/brand/brand_logo.svg">
                     <img class="brand-logo-text hidden lg:inline-block"
                          src="@/assets/images/brand/SpaceONE_logoTypeA.svg"
@@ -14,42 +14,41 @@
             </router-link>
             <div v-for="(menu, idx) in menuList"
                  :key="idx"
-                 class="menu-wrapper hidden lg:inline-block"
+                 class="menu-wrapper hidden md:inline-block"
             >
-                <template v-if="menu.show !== false">
-                    <div class="menu-button opacity mr-4 lg:mr-8"
-                         :class="[{
-                             opened: menu.subMenuList.length > 0 && openedMenu === menu.name,
-                             selected: menu.name === selectedMenu
-                         }]"
-                         @click.stop="toggleMenu(menu.name)"
+                <div v-if="menu.show !== false"
+                     class="menu-button opacity mr-4 lg:mr-8"
+                     :class="[{
+                         opened: menu.subMenuList.length > 0 && openedMenu === menu.name,
+                         selected: menu.name === selectedMenu
+                     }]"
+                     @click.stop="toggleMenu(menu.name)"
+                >
+                    <span v-if="menu.subMenuList.length > 0">
+                        <span>{{ menu.label }}</span>
+                        <p-i class="arrow-button"
+                             :name="openedMenu === menu.name ? 'ic_arrow_top_sm' : 'ic_arrow_bottom_sm'"
+                             width="0.5rem" height="0.5rem"
+                             color="inherit transparent"
+                        />
+                    </span>
+                    <router-link v-else :to="menu.to" class="block">
+                        <span>{{ menu.label }}</span>
+                    </router-link>
+                    <div v-if="openedMenu === menu.name && menu.subMenuList.length > 0"
+                         v-click-outside="hideMenu"
+                         class="sub-menu-wrapper"
                     >
-                        <span v-if="menu.subMenuList.length > 0">
-                            <span>{{ menu.label }}</span>
-                            <p-i class="arrow-button"
-                                 :name="openedMenu === menu.name ? 'ic_arrow_top_sm' : 'ic_arrow_bottom_sm'"
-                                 width="0.5rem" height="0.5rem"
-                                 color="inherit transparent"
-                            />
-                        </span>
-                        <router-link v-else :to="menu.to" class="block">
-                            <span>{{ menu.label }}</span>
-                        </router-link>
-                        <div v-if="openedMenu === menu.name && menu.subMenuList.length > 0"
-                             v-click-outside="hideMenu"
-                             class="sub-menu-wrapper"
-                        >
-                            <template v-for="(subMenu, index) in menu.subMenuList" @click.native="hideMenu">
-                                <router-link v-if="subMenu.show" :key="index" :to="subMenu.to">
-                                    <div class="sub-menu">
-                                        <span>{{ subMenu.label }}</span>
-                                        <span v-if="subMenu.isNew" class="new-text">new</span>
-                                    </div>
-                                </router-link>
-                            </template>
-                        </div>
+                        <template v-for="(subMenu, index) in menu.subMenuList" @click.native="hideMenu">
+                            <router-link v-if="subMenu.show" :key="index" :to="subMenu.to">
+                                <div class="sub-menu">
+                                    <span>{{ subMenu.label }}</span>
+                                    <span v-if="subMenu.isNew" class="new-text">new</span>
+                                </div>
+                            </router-link>
+                        </template>
                     </div>
-                </template>
+                </div>
             </div>
         </div>
 
@@ -159,7 +158,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { Location } from 'vue-router';
 import { store } from '@/store';
 import { languages } from '@/store/modules/user/config';
-import router from '@/routes/index';
+import router from '@/routes';
 
 
 enum PARENT_CATEGORY {
@@ -360,12 +359,10 @@ export default {
         }
         .logo-wrapper {
             display: inline-block;
-            margin-right: 1.5rem;
-
             .brand-logo {
                 display: inline-block;
-                width: 2rem;
-                height: 2rem;
+                width: 1.875rem;
+                height: 1.875rem;
             }
             .brand-logo-text {
                 height: 0.875rem;
@@ -385,7 +382,7 @@ export default {
 
         .menu-button {
             @apply text-gray-900;
-            font-size: .875rem;
+            font-size: 0.875rem;
             cursor: pointer;
             text-decoration: none;
             text-transform: capitalize;
@@ -409,7 +406,7 @@ export default {
                 border-radius: 0.625rem;
             }
             .arrow-button {
-                margin-left: 0.5rem;
+                margin-left: 0.25rem;
             }
         }
         .sub-menu-wrapper {
