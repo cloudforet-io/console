@@ -111,24 +111,29 @@
                                              @update="onProjectGroupUpdate"
             />
 
-            <p-button-modal
-                :header-title="headerTitle"
-                :centered="true"
-                :scrollable="false"
-                size="md"
-                :fade="true"
-                :backdrop="true"
-                :visible.sync="projectGroupDeleteFormVisible"
-                :theme-color="themeColor"
-                :footer-confirm-button-bind="{
-                    styleType: 'alert',
-                }"
-                @confirm="projectGroupDeleteFormConfirm"
+            <p-button-modal :header-title="$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE')"
+                            centered
+                            :scrollable="false"
+                            size="md"
+                            fade
+                            :visible.sync="projectGroupDeleteFormVisible"
+                            theme-color="alert"
+                            :footer-confirm-button-bind="{
+                                styleType: 'alert',
+                            }"
+                            @confirm="projectGroupDeleteFormConfirm"
             >
                 <template #body>
-                    <p>
-                        {{ modalContent }}
-                    </p>
+                    <div class="delete-modal-contents">
+                        <p>
+                            {{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.CONTENT') }}
+                        </p>
+                        <i18n path="PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DESC" tag="p" class="desc">
+                            <template #deleteAllSubProjects>
+                                <strong>{{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DELETE_ALL_SUB_PROJECT') }}</strong>
+                            </template>
+                        </i18n>
+                    </div>
                 </template>
             </p-button-modal>
 
@@ -234,9 +239,6 @@ export default {
             projectGroupFormVisible: false,
             projectFormVisible: false,
             projectGroupDeleteFormVisible: false,
-            headerTitle: '' as TranslateResult,
-            themeColor: '',
-            modalContent: '' as TranslateResult,
             updateMode: false,
             createTargetNode: null as ProjectTreeItem|null,
         });
@@ -276,9 +278,6 @@ export default {
         /** Handling Form */
         const openProjectGroupDeleteForm = () => {
             formState.projectGroupDeleteFormVisible = true;
-            formState.headerTitle = vm.$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP_TITLE');
-            formState.themeColor = 'alert';
-            formState.modalContent = vm.$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP_CONTENT');
         };
 
         const projectGroupDeleteFormConfirm = async () => {
@@ -291,7 +290,7 @@ export default {
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '', root);
                 state.treeRef.deleteSelectedNode();
             } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: formState.headerTitle }), e, root);
+                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: vm.$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }), e, root);
             } finally {
                 formState.projectGroupDeleteFormVisible = false;
             }
@@ -505,6 +504,14 @@ export default {
                 @apply opacity-100;
             }
         }
+    }
+}
+
+.delete-modal-contents {
+    line-height: 1.4;
+    .desc {
+        @apply mt-1 text-gray-600;
+        font-size: 0.875rem;
     }
 }
 </style>

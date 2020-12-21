@@ -875,8 +875,12 @@
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "이름 ",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "프로젝트 그룹 이름 ",
 			"MODAL_CREATE_PROJECT_GROUP_TITLE": "프로젝트 그룹 생성 ",
-			"MODAL_DELETE_PROJECT_GROUP_CONTENT": "이 프로젝트 그룹을 삭제하시겠습니까? ",
-			"MODAL_DELETE_PROJECT_GROUP_TITLE": "프로젝트 그룹 삭제 ",
+			"MODAL_DELETE_PROJECT_GROUP": {
+				"CONTENT": "이 프로젝트 그룹을 삭제하시겠습니까? ",
+				"DELETE_ALL_SUB_PROJECT": "모든 하위 프로젝트를 삭제",
+				"DESC": "{deleteAllSubProjects}해야 프로젝트 그룹을 삭제할 수 있습니다.",
+				"TITLE": "프로젝트 그룹 삭제 "
+			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "프로젝트 그룹 편집",
 			"PLACE_HOLDER_EXAMPLE": "예) 프로젝트/프로젝트 그룹",
 			"PLACE_HOLDER_PROJECT": "프로젝트 ",

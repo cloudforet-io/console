@@ -875,8 +875,12 @@
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "Name",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "Project Group Name",
 			"MODAL_CREATE_PROJECT_GROUP_TITLE": "Create Project Group",
-			"MODAL_DELETE_PROJECT_GROUP_CONTENT": "Are you sure you want to delete project group?",
-			"MODAL_DELETE_PROJECT_GROUP_TITLE": "Delete Project Group ",
+			"MODAL_DELETE_PROJECT_GROUP": {
+				"CONTENT": "Are you sure you want to delete project group?",
+				"DELETE_ALL_SUB_PROJECT": "delete all sub-projects first",
+				"DESC": "Please {deleteAllSubProjects}, if you want to delete project group.",
+				"TITLE": "Delete Project Group "
+			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "Update Project Group",
 			"PLACE_HOLDER_EXAMPLE": "e.g. project/project group",
 			"PLACE_HOLDER_PROJECT": "Project",

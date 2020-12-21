@@ -875,8 +875,12 @@
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "名前",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "プロジェクトグループ名",
 			"MODAL_CREATE_PROJECT_GROUP_TITLE": "プロジェクトグループ作成",
-			"MODAL_DELETE_PROJECT_GROUP_CONTENT": "このプロジェクトのグループを削除しますか？",
-			"MODAL_DELETE_PROJECT_GROUP_TITLE": "プロジェクトグループ削除",
+			"MODAL_DELETE_PROJECT_GROUP": {
+				"CONTENT": "このプロジェクトのグループを削除しますか？",
+				"DELETE_ALL_SUB_PROJECT": "前の下位プロジェクト削除",
+				"DESC": "{deleteAllSubProjects}後にプロジェクトグループを削除してください。",
+				"TITLE": "プロジェクトグループ削除"
+			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "プロジェクトグループ編集",
 			"PLACE_HOLDER_EXAMPLE": "例）プロジェクト/プロジェクトグループ",
 			"PLACE_HOLDER_PROJECT": "プロジェクト",
