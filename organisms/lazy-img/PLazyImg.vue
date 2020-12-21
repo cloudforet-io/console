@@ -8,12 +8,7 @@
             <slot name="preloader" :height="height" :width="width"
                   :imgLoading="imgLoading"
             >
-                <p-lottie name="thin-spinner"
-                          auto
-                          :height="height"
-                          :width="width"
-                          class="w-full h-full"
-                />
+                <p-skeleton :height="height" :width="width" />
             </slot>
         </span>
         <transition-group v-if="!loading" key="images" tag="span"
@@ -55,10 +50,12 @@ import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { LazyImgPropsType } from '@/components/organisms/lazy-img/type';
 import PI from '@/components/atoms/icons/PI.vue';
 import { makeOptionalProxy } from '@/components/util/composition-helpers';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 export default {
     name: 'PLazyImg',
     components: {
+        PSkeleton,
         PLottie,
         PI,
     },
@@ -89,8 +86,8 @@ export default {
         },
         strictMode: {
             type: Boolean,
-            default: false
-        }
+            default: false,
+        },
     },
     setup(props: LazyImgPropsType, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
