@@ -314,21 +314,23 @@ export default {
 
         /* Event triggers */
         const emitSearch = (valueItem: ValueItem) => {
-            let queryItem = {
+            let queryItem: QueryItem|null = {
                 key: state.rootKey,
                 value: valueItem,
                 operator: state.operator,
-            } as QueryItem;
+            };
 
             if (formatterMap[state.rootKey?.dataType]) {
                 queryItem = formatterMap[state.rootKey.dataType](cloneDeep(queryItem), state.currentDataType, state.subPath);
             }
 
-            emit('search', queryItem);
+            if (queryItem) {
+                emit('search', queryItem);
 
-            clearAll();
-            if (state.selectedKey) updateSelectedKey(null, true);
-            hideMenu();
+                clearAll();
+                if (state.selectedKey) updateSelectedKey(null, true);
+                hideMenu();
+            }
         };
 
 

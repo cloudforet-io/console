@@ -84,9 +84,9 @@ export const defaultHandlerMap: Partial<Record<KeyDataType, ValueHandler>> = {
 /** QueryItem Formatter Map  */
 const datetimeFormatRegex = RegExp(/^(\d{4}-\d{2}-\d{2})$/);
 
-export const formatterMap: Partial<Record<KeyDataType, (queryItem: QueryItem, currentDataType?: KeyDataType, subPath?: string) => QueryItem>> = {
+export const formatterMap: Partial<Record<KeyDataType, (queryItem: QueryItem, currentDataType?: KeyDataType, subPath?: string) => QueryItem|null>> = {
     datetime(queryItem) {
-        if (queryItem.value.name === null) return queryItem;
+        if (queryItem.value.name === null) return null;
         const res = datetimeFormatRegex.exec(queryItem.value.name);
         if (res) {
             queryItem.value.label = res[0];
