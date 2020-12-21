@@ -88,12 +88,11 @@ export default {
                 },
                 {
                     label: vm.$t('MENU.IDENTITY.IDENTITY'),
-                    show: state.showUser,
                     link: '/identity',
                     icon: 'ic_identity',
                     subMenus: [
                         { label: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), link: '/identity/service-account', show: true },
-                        { label: vm.$t('MENU.IDENTITY.USER'), link: '/identity/user', show: props.isAdmin },
+                        { label: vm.$t('MENU.IDENTITY.USER'), link: '/identity/user/user-management', show: props.isAdmin },
                     ],
                 },
                 {
