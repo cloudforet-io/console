@@ -112,13 +112,11 @@ export function makeDistinctValueHandler(resourceType: string, distinct: string,
                     return results;
                 }, []),
                 totalCount: res.total_count,
-                dataType,
             };
         } catch (e) {
             return {
                 results: [],
                 totalCount: 0,
-                dataType,
             };
         }
     };

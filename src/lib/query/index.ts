@@ -175,6 +175,10 @@ export class QueryHelper {
                             filter.push({ k: f.k as string, v, o: rawQueryOperatorToApiQueryOperatorMap[f.o || ''] });
                         });
                     }
+                } else if (f.v === null || f.v === undefined) {
+                    /* null case */
+                    const op = f.o && f.o.startsWith('!') ? '!' : '=';
+                    filter.push({ k: f.k, v: null, o: rawQueryOperatorToApiQueryOperatorMap[op] });
                 } else {
                     /* general case */
                     filter.push({ k: f.k, v: f.v, o: rawQueryOperatorToApiQueryOperatorMap[f.o || ''] });
