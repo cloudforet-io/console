@@ -131,7 +131,7 @@ export default {
 
         const state = reactive({
             userId: computed(() => store.state.user.userId),
-            userRole: 'USER',
+            userRole: computed(() => store.getters['user/userTypeLabel']),
             userType: computed(() => store.state.user.backend) as unknown as string,
             language: '' as LanguageCode | undefined,
             timezone: '' as Timezone | undefined,

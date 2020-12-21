@@ -112,7 +112,7 @@
                         >
                             <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
                             <span class="value">{{ userState.language }}</span>
-                            <p-i name="ic_arrow_bottom"
+                            <p-i :name="showLanguageMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                                  width="1rem" height="1rem"
                             />
                             <div v-if="showLanguageMenu" class="sub-menu-wrapper">
@@ -443,15 +443,12 @@ export default {
                     }
                     &.language {
                         cursor: pointer;
+                        .p-i-icon {
+                            display: inline-block;
+                        }
                         &:hover, &:focus {
                             @apply bg-primary4 text-primary;
                             border-radius: 0.125rem;
-                            .p-i-icon {
-                                display: inline-block;
-                            }
-                        }
-                        .p-i-icon {
-                            display: none;
                         }
                         .sub-menu-wrapper {
                             top: 1.5rem;
