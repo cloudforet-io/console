@@ -23,7 +23,7 @@
                         <div v-for="(sItem, sIdx) in aItem.subMenus"
                              :key="sIdx"
                         >
-                            <div v-if="!sItem.isAdminMenu || isDomainOwner">
+                            <div v-if="!sItem.isAdminMenu || isAdmin">
                                 <router-link v-if="sItem" :to="sItem.link">
                                     <li class="submenu" @click="hide">
                                         {{ sItem.label }}
@@ -60,7 +60,7 @@ export default {
             type: Boolean,
             default: false,
         },
-        isDomainOwner: {
+        isAdmin: {
             type: Boolean,
             default: false,
         },
@@ -82,8 +82,8 @@ export default {
                     link: '/inventory',
                     icon: 'ic_inventory',
                     subMenus: [
-                        { label: vm.$t('MENU.INVENTORY.SERVER'), link: '/inventory/server' },
-                        { label: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), link: '/inventory/cloud-service' },
+                        { label: vm.$t('MENU.INVENTORY.SERVER'), link: '/inventory/server', show: true },
+                        { label: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), link: '/inventory/cloud-service', show: true },
                     ],
                 },
                 {
@@ -92,8 +92,8 @@ export default {
                     link: '/identity',
                     icon: 'ic_identity',
                     subMenus: [
-                        { label: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), link: '/identity/service-account' },
-                        { label: vm.$t('MENU.IDENTITY.USER'), link: '/identity/user' },
+                        { label: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), link: '/identity/service-account', show: true },
+                        { label: vm.$t('MENU.IDENTITY.USER'), link: '/identity/user', show: props.isAdmin },
                     ],
                 },
                 {
@@ -102,7 +102,9 @@ export default {
                     link: '/automation',
                     icon: 'ic_automation',
                     subMenus: [
-                        { label: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), link: '/automation/power-scheduler', isNew: true },
+                        {
+                            label: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), link: '/automation/power-scheduler', isNew: true, show: true,
+                        },
                     ],
                 },
                 {
@@ -110,7 +112,7 @@ export default {
                     link: '/plugin',
                     icon: 'ic_plugin',
                     subMenus: [
-                        { label: vm.$t('MENU.PLUGIN.COLLECTOR'), link: '/plugin/collector' },
+                        { label: vm.$t('MENU.PLUGIN.COLLECTOR'), link: '/plugin/collector', show: true },
                     ],
                 },
                 {
@@ -118,8 +120,8 @@ export default {
                     link: '/management/collector-history',
                     icon: 'ic_management',
                     subMenus: [
-                        { label: vm.$t('MENU.MANAGEMENT.PLUGIN'), link: '/management/supervisor/plugins', isAdminMenu: true },
-                        { label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), link: '/management/collector-history', isNew: true },
+                        { label: vm.$t('MENU.MANAGEMENT.PLUGIN'), link: '/management/supervisor/plugins', show: props.isAdmin },
+                        { label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), link: '/management/collector-history', show: true },
                     ],
                 },
             ])),

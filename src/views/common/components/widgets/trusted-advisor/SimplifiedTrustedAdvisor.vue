@@ -202,7 +202,7 @@ export default {
     &:hover {
         text-decoration: underline;
     }
-    .text {
+    &.error .text {
         color: $color;
     }
 }

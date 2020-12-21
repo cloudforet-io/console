@@ -2,7 +2,7 @@
     <div class="menu-container">
         <div class="left-part">
             <div class="site-map-wrapper">
-                <site-map :is-domain-owner="userState.isDomainOwner" :visible.sync="sitemapVisible" />
+                <site-map :is-admin="userState.isAdmin" :visible.sync="sitemapVisible" />
             </div>
             <router-link to="/dashboard">
                 <div class="logo-wrapper">
@@ -40,7 +40,7 @@
                              class="sub-menu-wrapper"
                         >
                             <template v-for="(item, index) in dItem.menu" @click.native="hideMenu">
-                                <router-link :key="index" :to="item.link">
+                                <router-link v-if="item.show" :key="index" :to="item.link">
                                     <div class="sub-menu">
                                         <span>{{ item.label }}</span>
                                         <span v-if="item.isNew" class="new-text">new</span>
@@ -85,7 +85,7 @@
                      @click.stop="toggleMenu('account')"
                 >
                     <div class="menu-icon"
-                         :class="[{opened: openedMenu === 'account'}, userState.isDomainOwner ? 'admin' : 'member']"
+                         :class="[{opened: openedMenu === 'account'}, userState.isAdmin ? 'admin' : 'member']"
                     />
                 </div>
                 <div v-if="openedMenu === 'account'"
@@ -94,13 +94,13 @@
                 >
                     <div class="info-wrapper">
                         <div class="info-row">
-                            <p-i v-if="userState.isDomainOwner" class="icon" name="admin" />
+                            <p-i v-if="userState.isAdmin" class="icon" name="admin" />
                             <p-i v-else class="icon" name="user" />
                             <span class="value">{{ userState.email }}</span>
                         </div>
                         <div class="info-row">
                             <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
-                            <span v-if="userState.isDomainOwner" class="value">{{ $t('COMMON.GNB.ACCOUNT.ROLE_ROOT_ADMIN') }}</span>
+                            <span v-if="userState.isAdmin" class="value">{{ $t('COMMON.GNB.ACCOUNT.ROLE_ROOT_ADMIN') }}</span>
                             <span v-else class="value">{{ $t('COMMON.GNB.ACCOUNT.ROLE_DOMAIN_ADMIN') }}</span>
                         </div>
                         <div class="info-row">
@@ -180,7 +180,7 @@ export default {
             language: computed(() => store.getters['user/languageLabel']),
             timezone: computed(() => store.state.user.timezone),
             userId: computed(() => store.state.user.userId),
-            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
+            isAdmin: computed((() => store.getters['user/isAdmin'])),
         });
         const state = reactive({
             openedMenu: null,
@@ -201,8 +201,8 @@ export default {
                     link: '/inventory',
                     parentRoutes: ['inventory'],
                     menu: [
-                        { label: vm.$t('MENU.INVENTORY.SERVER'), link: '/inventory/server' },
-                        { label: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), link: '/inventory/cloud-service' },
+                        { label: vm.$t('MENU.INVENTORY.SERVER'), link: '/inventory/server', show: true },
+                        { label: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), link: '/inventory/cloud-service', show: true },
                     ],
                 },
                 {
@@ -211,8 +211,12 @@ export default {
                     link: '/identity',
                     parentRoutes: ['identity'],
                     menu: [
-                        { label: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), link: '/identity/service-account' },
-                        { label: vm.$t('MENU.IDENTITY.USER'), link: '/identity/user/user-management' },
+                        {
+                            label: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'),
+                            link: '/identity/service-account',
+                            show: userState.isAdmin,
+                        },
+                        { label: vm.$t('MENU.IDENTITY.USER'), link: '/identity/user/user-management', show: true },
                     ],
                 },
                 {
@@ -221,7 +225,9 @@ export default {
                     link: '/automation',
                     parentRoutes: ['automation'],
                     menu: [
-                        { label: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), link: '/automation/power-scheduler', isNew: true },
+                        {
+                            label: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), link: '/automation/power-scheduler', isNew: true, show: true,
+                        },
                     ],
                 },
                 {
@@ -229,7 +235,7 @@ export default {
                     link: '/plugin',
                     parentRoutes: ['plugin'],
                     menu: [
-                        { label: vm.$t('MENU.PLUGIN.COLLECTOR'), link: '/plugin/collector' },
+                        { label: vm.$t('MENU.PLUGIN.COLLECTOR'), link: '/plugin/collector', show: true },
                     ],
                 },
                 {
@@ -237,8 +243,10 @@ export default {
                     link: '/management/collector-history',
                     parentRoutes: ['management'],
                     menu: [
-                        { label: vm.$t('MENU.MANAGEMENT.PLUGIN'), link: '/management/supervisor/plugins' },
-                        { label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), link: '/management/collector-history', isNew: true },
+                        { label: vm.$t('MENU.MANAGEMENT.PLUGIN'), link: '/management/supervisor/plugins', show: userState.isAdmin },
+                        {
+                            label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), link: '/management/collector-history', isNew: true, show: true,
+                        },
                     ],
                 },
             ]),
