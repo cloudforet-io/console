@@ -302,7 +302,7 @@
 				"HOUR": "hr | hrs",
 				"MORE": "more",
 				"PAST_7_DAYS": "Past 7 days",
-				"SEARCH": "Search",
+				"PLACEHOLDER": "Search Event",
 				"SERVICE_ACCOUNT_ID": "Service Account ID",
 				"SUMMARY_ISSUE": "Open Issues",
 				"SUMMARY_NOTIFICATION": "Other Notifications",

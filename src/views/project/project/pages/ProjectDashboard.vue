@@ -167,6 +167,7 @@ export default {
         .box {
             height: 5.25rem;
             border-radius: 2px;
+            box-shadow: none;
             &.selected {
                 @apply bg-peacock-600;
                 &::after {
@@ -183,15 +184,11 @@ export default {
                     font-weight: normal;
                 }
             }
-            &.spendings {
-                .count .number {
-                    font-size: 1.25rem;
-                }
-            }
             &:not(.selected) {
                 @apply border border-gray-200;
             }
             .count {
+                @apply text-gray-700;
                 .number {
                     @apply text-gray-700;
                     font-size: 1.625rem;

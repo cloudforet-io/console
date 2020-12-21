@@ -20,7 +20,7 @@
             />
             <div class="search-wrapper">
                 <p-search v-model="search" class="p-search"
-                          :placeholder="$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SEARCH')"
+                          :placeholder="$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.PLACEHOLDER')"
                           @search="onSearch"
                 />
                 <p-icon-button name="ic_refresh" @click="getEvents" />
@@ -32,6 +32,7 @@
                           :sortable="true"
                           :sort-by.sync="sortBy"
                           :sort-desc.sync="sortDesc"
+                          :class="{ 'more': showMore }"
                           @change="onChange"
             >
                 <template #col-event-format="{ value }">
@@ -300,6 +301,7 @@ export default {
                 display: block;
                 font-size: 0.75rem;
                 line-height: 1.2;
+                padding-top: 0.125rem;
             }
         }
     }
@@ -314,6 +316,11 @@ export default {
         }
     }
     .p-data-table::v-deep {
+        &.more {
+            .table-container {
+                max-height: 625rem;
+            }
+        }
         .link-text {
             @apply text-secondary;
             display: inline-block;
