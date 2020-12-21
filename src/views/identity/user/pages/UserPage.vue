@@ -51,7 +51,7 @@
 /* eslint-disable camelcase */
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
@@ -72,17 +72,14 @@ export default {
         PHr,
     },
     beforeRouteEnter(to, from, next) {
-        const isAdmin = computed(() => store.getters['user/isAdmin']).value;
-        console.log(isAdmin);
-        if (isAdmin) {
-            next((vm) => {
-                vm.$router.replace({ name: 'userManagement', query: { ...router.currentRoute.query } }).catch(() => {});
-            });
-        } else {
-            next((vm) => {
-                vm.$router.replace({ name: 'userAccount', query: { ...router.currentRoute.query } }).catch(() => {});
-            });
-        }
+        next((vm) => {
+            const isAdmin = vm.$store.getters['user/isAdmin'];
+            if (to.name === 'user') {
+                if (isAdmin) next({ name: 'userManagement', query: to.query });
+                else next({ name: 'userAccount', query: to.query });
+            } else if (to.name === 'userManagement' && !isAdmin) next({ name: 'userAccount', query: to.query });
+            else next(to);
+        });
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -116,14 +113,22 @@ export default {
             vm.$router.replace({ name: 'userManagement', query: { ...router.currentRoute.query } }).catch(() => {});
         };
 
-        (async () => {
-            if (!userState.isAdmin) {
+        const selectSidebarItem = (routeName) => {
+            if (routeName === 'userAccount') {
                 sidebarState.selectedItem = sidebarState.userMenuList[0];
             }
-            if (userState.isAdmin) {
+            if (routeName === 'userManagement') {
                 sidebarState.selectedItem = sidebarState.adminMenuList[0];
             }
+        };
+
+        watch(() => vm.$route.name, (after) => {
+            selectSidebarItem(after);
+        });
+        (async () => {
+            selectSidebarItem(vm.$route.name);
         })();
+
         return {
             userState,
             sidebarState,

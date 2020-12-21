@@ -7,15 +7,13 @@
             <p v-else class="input-label">
                 {{ $t('COMMON.SIGN_IN.USER_ID') }}
             </p>
-            <PFieldGroup :invalid-text="idInvalidText" :invalid="!isIdValid">
+            <PFieldGroup :invalid="isIdValid === false">
                 <template #default="{invalid}">
                     <p-text-input
                         v-model="userId"
                         placeholder="User ID"
                         autocomplete="username"
-                        :class="{
-                            'is-invalid':invalid
-                        }"
+                        :invalid="invalid"
                         class="input-box"
                         @input="checkUserId"
                     />
@@ -24,16 +22,14 @@
             <p class="input-label">
                 {{ $t('COMMON.SIGN_IN.PASSWORD') }}
             </p>
-            <PFieldGroup :invalid-text="passwordInvalidText" :invalid="!isPasswordValid">
+            <PFieldGroup :invalid="isPasswordValid === false">
                 <template v-slot:default="{invalid}">
                     <p-text-input
                         v-model="password"
                         type="password"
                         placeholder="Password"
                         autocomplete="current-password"
-                        :class="{
-                            'is-invalid':invalid
-                        }"
+                        :invalid="invalid"
                         class="input-box"
                         @input="checkPassword"
                         @keyup.enter="signIn"

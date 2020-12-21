@@ -422,6 +422,7 @@
 			}
 		},
 		"USER": {
+			"ACCESS_CONTROL": "접근 제어",
 			"ACTION": "작업",
 			"ALT_E_ADD_USER": "사용자 추가 실패",
 			"ALT_E_DELETE_USER": "사용자 삭제 실패",

@@ -422,6 +422,7 @@
 			}
 		},
 		"USER": {
+			"ACCESS_CONTROL": "",
 			"ACTION": "作業",
 			"ALT_E_ADD_USER": "ユーザー追加に失敗",
 			"ALT_E_DELETE_USER": "ユーザー削除に失敗",

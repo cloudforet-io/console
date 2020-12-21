@@ -7,6 +7,10 @@
             <template #data-state="{data}">
                 <p-status v-bind="userStateFormatter(data)" class="capitalize" />
             </template>
+            <template #data-user_type="{value}">
+                <span v-if="value === 'API_USER'">API Only</span>
+                <span v-else>Console, API</span>
+            </template>
             <template #data-last_accessed_at="{data}">
                 <span v-if="data === 0">
                     Today
@@ -82,6 +86,7 @@ export default {
                 { name: 'user_id', label: vm.$t('IDENTITY.USER.USER_ID') },
                 { name: 'name', label: vm.$t('IDENTITY.USER.NAME') },
                 { name: 'state', label: vm.$t('IDENTITY.USER.STATE') },
+                { name: 'user_type', label: vm.$t('IDENTITY.USER.ACCESS_CONTROL') },
                 { name: 'email', label: vm.$t('IDENTITY.USER.EMAIL') },
                 { name: 'last_accessed_at', label: vm.$t('IDENTITY.USER.LAST_ACTIVITY') },
                 { name: 'domain_id', label: vm.$t('IDENTITY.USER.DOMAIN_ID') },

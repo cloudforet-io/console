@@ -422,6 +422,7 @@
 			}
 		},
 		"USER": {
+			"ACCESS_CONTROL": "Access Control",
 			"ACTION": "Action",
 			"ALT_E_ADD_USER": "Add user failure",
 			"ALT_E_DELETE_USER": "Delete user failure",
