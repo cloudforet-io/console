@@ -2,7 +2,7 @@
 
 /** Metadata schema types for Dynamic field */
 
-export const dynamicFieldTypes = ['text', 'badge', 'datetime', 'dict', 'state', 'enum', 'list'];
+export const dynamicFieldTypes = ['text', 'badge', 'datetime', 'dict', 'state', 'enum', 'list', 'size'];
 
 export type DynamicFieldType = typeof dynamicFieldTypes[number];
 
@@ -54,6 +54,12 @@ export interface EnumOptions {
     };
 }
 
+export interface SizeOptions extends CommonOptions {
+    display_unit?: 'BYTES | KB | MB | GB | TB | PB';
+    source_unit?: 'BYTES | KB | MB | GB | TB | PB';
+}
+
+
 export type DictOptions = CommonOptions
 
 export type TextOptions = CommonOptions
@@ -67,6 +73,7 @@ export type DynamicFieldOptions =
     | ListOptions
     | StateOptions
     | TextOptions
+    | SizeOptions
 
 
 export interface DynamicField {

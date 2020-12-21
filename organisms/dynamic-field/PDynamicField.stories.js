@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import {
-    object,
+    object, select,
 } from '@storybook/addon-knobs';
 import {
     reactive,
@@ -386,6 +386,32 @@ export const enumType = () => ({
                 },
             },
             data: ['AWS', 'GCP', 'AZURE', 'SpaceOne', 'AWSBadge', 'GCPBadge', 'AZUREBadge'],
+        };
+    },
+});
+
+
+export const sizeType = () => ({
+    components: { PDynamicField },
+    props: {
+        displayUnit: {
+            default: select('displayUnit', [undefined, 'BYTES', 'KB', 'MB', 'GB', 'TB', 'PB'], undefined),
+        },
+        sourceUnit: {
+            default: select('sourceUnit', [undefined, 'BYTES', 'KB', 'MB', 'GB', 'TB', 'PB'], undefined),
+        },
+    },
+    template: `<div><li v-for="raw in data"><PDynamicField type="size" :data="raw" :options="{
+                    display_unit: displayUnit,
+                    source_unit: sourceUnit
+                }"/></li></div>`,
+    setup() {
+        return {
+            data: [
+                3343443434,
+                16,
+                1024,
+            ],
         };
     },
 });
