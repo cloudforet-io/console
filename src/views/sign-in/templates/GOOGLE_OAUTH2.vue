@@ -79,6 +79,13 @@ export default defineComponent({
     border-radius: 2px;
     box-shadow: none;
     overflow: hidden;
+    >>> .abcRioButtonIcon {
+        display: inline-flex;
+        float: none;
+    }
+    >>> .abcRioButtonContents {
+        vertical-align: unset;
+    }
     >>> span {
         @apply text-gray-900;
         line-height: 40px;
