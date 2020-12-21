@@ -18,9 +18,8 @@
                 <span class="help-msg">{{ $t('COMMON.SIGN_IN.NEED_HELP') }}
                     <p-anchor href="mailto:support@spaceone.dev" target="_blank"
                               :show-icon="false" highlight
-                              class="text-blue-600 ml-2"
                     >
-                        {{ $t('COMMON.SIGN_IN.CONTACT') }}
+                        <span class="text-blue-600 ml-2">{{ $t('COMMON.SIGN_IN.CONTACT') }}</span>
                     </p-anchor>
                 </span>
             </div>

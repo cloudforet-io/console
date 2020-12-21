@@ -11,7 +11,7 @@
                 <template #default="{invalid}">
                     <p-text-input
                         v-model="userId"
-                        placeholder="User ID"
+                        placeholder="E-mail Address"
                         autocomplete="username"
                         :invalid="invalid"
                         class="input-box"

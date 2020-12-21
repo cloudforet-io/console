@@ -18,14 +18,17 @@
                 <span class="help-msg">{{ $t('COMMON.SIGN_IN.NEED_HELP') }}
                     <p-anchor href="mailto:support@spaceone.dev" target="_blank"
                               :show-icon="false" highlight
-                              class="text-blue-600 ml-2"
                     >
-                        {{ $t('COMMON.SIGN_IN.CONTACT') }}
+                        <span class="text-blue-600 ml-2">{{ $t('COMMON.SIGN_IN.CONTACT') }}</span>
                     </p-anchor>
                 </span>
             </div>
         </div>
         <div class="right-container">
+            <div class="logo">
+                <img class="logo-character" src="@/assets/images/brand/brand_logo.png">
+                <img class="logo-text" src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg">
+            </div>
             <div class="template-wrapper">
                 <p class="sign-in-title">
                     {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
@@ -33,7 +36,7 @@
                 <p class="sign-in-subtitle">
                     {{ $t('COMMON.SIGN_IN.FOR_MEMBER_ACCOUNT') }}
                 </p>
-                <img class="logo-character" src="@/assets/images/brand/brand_logo.png">
+                <img class="right-logo-character" src="@/assets/images/brand/brand_logo.png">
                 <div v-if="showErrorMessage" class="error-msg-box">
                     <span class="error-msg">{{ $t('COMMON.SIGN_IN.ALT_E_SIGN_IN') }}</span>
                     <p-i name="ic_delete" width="1.5rem" height="1.5rem"
@@ -44,16 +47,16 @@
                 </div>
                 <i-d-p-w-sign-in @on-sign-in="signIn" />
                 <div class="btn-divider">
-                    <span>{{$t('COMMON.SIGN_IN.OR')}}</span>
+                    <span>{{ $t('COMMON.SIGN_IN.OR') }}</span>
                 </div>
                 <component :is="component" class="sign-in-template"
                            @on-sign-in="signIn"
                 />
-                <span class="admin-sign-in-btn" @click="goToAdminSignIn">
+                <span @click="goToAdminSignIn">
                     <p-i name="admin" width="1.5rem" height="1.5rem"
                          class="admin-icon"
                     />
-                    {{ $t('COMMON.SIGN_IN.SIGN_IN_FOR_ADMIN') }}
+                    <span class="admin-sign-in-text">{{ $t('COMMON.SIGN_IN.SIGN_IN_FOR_ADMIN') }}</span>
                 </span>
             </div>
         </div>
@@ -178,21 +181,6 @@ export default {
     justify-content: space-between;
     width: 33%;
     height: 100%;
-    .logo {
-        display: flex;
-        flex-flow: row;
-        .logo-character {
-            width: 56px;
-            height: 56px;
-            margin-top: 2rem;
-            margin-left: 2rem;
-        }
-        .logo-text {
-            width: 146px;
-            height: 40px;
-            margin-top: 2.5rem;
-        }
-    }
     .version {
         margin-left: 2.5rem;
         margin-bottom: 2.5rem;
@@ -203,7 +191,6 @@ export default {
             margin-left: 1rem;
         }
     }
-
     @media screen and (width < 478px) {
         display: none;
     }
@@ -217,10 +204,29 @@ export default {
     }
 }
 
+.logo {
+    display: flex;
+    flex-flow: row;
+    .logo-character {
+        width: 56px;
+        height: 56px;
+        margin-top: 2rem;
+        margin-left: 2rem;
+    }
+    .logo-text {
+        width: 146px;
+        height: 40px;
+        margin-top: 2.5rem;
+    }
+}
+
 .right-container {
     display: flex;
     flex-direction: column;
     flex-grow: 1;
+    .logo {
+        display: none;
+    }
     .sign-in-title {
         @apply text-primary1;
         font-size: 2rem;
@@ -232,7 +238,7 @@ export default {
         line-height: 140%;
         margin-bottom: 3.125rem;
     }
-    .logo-character {
+    .right-logo-character {
         display: none;
     }
     .template-wrapper {
@@ -241,34 +247,38 @@ export default {
         .sign-in-template {
             margin-bottom: 5.5rem;
         }
-        .admin-sign-in-btn {
+        .admin-sign-in-text {
             @apply text-blue-600 cursor-pointer;
             font-size: 0.875rem;
-            line-height: 140%;
-            .admin-icon {
-                margin-right: 0.5rem;
-                border-radius: 0.75rem;
+            line-height: 24px;
+            &:hover {
+                @apply underline;
             }
         }
+        .admin-icon {
+            margin-right: 0.5rem;
+            border-radius: 0.75rem;
+        }
     }
-
+    @media screen and (478px <= width < 768px) {
+        .logo {
+            display: flex;
+        }
+    }
     @media screen and (width < 478px) {
         .template-wrapper {
             width: 15rem;
             margin: auto 2.5rem;
             align-self: center;
-
-            .logo-character {
+            .right-logo-character {
                 @apply mx-auto;
                 display: block;
                 width: 33%;
                 margin-bottom: calc((15rem / 3) / 2 - 0.5rem);
             }
-
             .sign-in-title {
                 display: none;
             }
-
             .sign-in-subtitle {
                 display: none;
             }
@@ -288,7 +298,6 @@ export default {
         font-size: 0.875rem;
         line-height: 140%;
     }
-
     @media screen and (width < 478px) {
         height: 3.5rem;
         width: 15rem;

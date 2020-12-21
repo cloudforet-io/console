@@ -81,6 +81,7 @@ export default defineComponent({
     overflow: hidden;
     >>> span {
         @apply text-gray-900;
+        line-height: 40px;
     }
 }
 </style>
