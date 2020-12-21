@@ -26,6 +26,7 @@
                                   :disabled="loading"
                                   :show-validation="showValidation"
                                   :is-valid.sync="isTagsValid"
+                                  :show-header="showHeader"
                 >
                     <template #addButton="scope">
                         <p-icon-text-button
@@ -109,6 +110,7 @@ export default {
 
         const state = reactive({
             loading: false,
+            showHeader: computed(() => state.newTags.length > 0),
             showValidation: false,
             newTags: props.tags.slice(),
             isTagsValid: true,
