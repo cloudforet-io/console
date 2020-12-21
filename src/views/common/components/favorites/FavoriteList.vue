@@ -1,9 +1,17 @@
 <template>
-    <div class="project-favorites" @mouseleave="hoveredItem = null">
+    <div class="favorite-list" @mouseleave="hoveredItem = null">
         <template v-if="loading" />
-        <div v-else-if="items.length === 0" class="empty">
-            {{ $t('COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.NO_ITEM') }}
-        </div>
+        <i18n v-else-if="items.length === 0" class="empty" path="COMMON.COMPONENTS.FAVORITES.FAVORITE_LIST.NO_ITEM"
+              tag="p"
+        >
+            <template #icon>
+                <p-i name="ic_bookmark"
+                     width="0.875rem" height="0.875rem"
+                     color="transparent inherit"
+                     class="favorite-btn"
+                />
+            </template>
+        </i18n>
         <template v-else>
             <div v-for="item in displayItems" :key="item.id" class="item"
                  :class="{hovered: hoveredItem ? hoveredItem.id === item.id : false}"
@@ -104,14 +112,18 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.project-favorites {
+.favorite-list {
     @apply px-3;
     min-height: 7.5rem;
 }
 .empty {
     @apply pt-2 text-gray-300;
-    font-size: 1rem;
+    font-size: 0.875rem;
     line-height: 1.2;
+    white-space: break-spaces;
+    .favorite-btn {
+        @apply text-yellow-200;
+    }
 }
 .item {
     @apply pl-1 flex items-center;

@@ -121,7 +121,7 @@
 		"COMPONENTS": {
 			"FAVORITES": {
 				"FAVORITE_LIST": {
-					"NO_ITEM": "お気に入りが設定されていません。",
+					"NO_ITEM": "",
 					"TOGGLE_LESS": "隠す",
 					"TOGGLE_MORE": "もっと見る"
 				}

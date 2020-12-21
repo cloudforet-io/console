@@ -121,7 +121,7 @@
 		"COMPONENTS": {
 			"FAVORITES": {
 				"FAVORITE_LIST": {
-					"NO_ITEM": "No Favorites",
+					"NO_ITEM": "Customize Favorites by clicking star {icon}",
 					"TOGGLE_LESS": "show less",
 					"TOGGLE_MORE": "show more"
 				}

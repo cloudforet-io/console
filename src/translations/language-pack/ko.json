@@ -121,7 +121,7 @@
 		"COMPONENTS": {
 			"FAVORITES": {
 				"FAVORITE_LIST": {
-					"NO_ITEM": "즐겨찾기가 설정되지 않았습니다.",
+					"NO_ITEM": "{icon} 아이콘으로 즐겨찾기를 설정하세요.",
 					"TOGGLE_LESS": "가리기",
 					"TOGGLE_MORE": "더보기"
 				}

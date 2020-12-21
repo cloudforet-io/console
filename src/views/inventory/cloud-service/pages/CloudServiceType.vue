@@ -6,7 +6,7 @@
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FAVORITES') }} <span class="count">({{ favoriteItems.length }})</span>
                 </p>
                 <p-hr class="sidebar-divider" />
-                <favorite-list :items="favoriteItems" @delete="onFavoriteDelete">
+                <favorite-list :items="favoriteItems" @delete="onFavoriteDelete" class="favorite-list">
                     <template #icon="{item}">
                         <p-lazy-img :src="item.icon || ''"
                                     error-icon="ic_provider_other"
@@ -555,6 +555,9 @@ export default {
     .count {
         font-weight: normal;
     }
+}
+.favorite-list {
+    @apply px-4;
 }
 #region-title {
     @apply text-gray-500 text-sm font-bold;
