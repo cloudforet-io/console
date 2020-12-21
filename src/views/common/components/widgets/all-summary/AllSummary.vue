@@ -11,7 +11,7 @@
                         <router-link :to="data.type !== 'spendings' ? getLocation(data.type) : ''" class="anchor" :class="data.type">
                             <span class="number">
                                 <span v-if="data.type === 'spendings'" class="dollar-sign">$</span>
-                                <span>{{ commaFormatter(data.count) }}</span>
+                                <span>{{ data.type === 'spendings' ? numberFormatter(data.count) : commaFormatter(data.count) }}</span>
                             </span>
                         </router-link>
                         <span class="suffix" :class="data.type">{{ data.suffix }}</span>
@@ -121,6 +121,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
 import { gray, primary1 } from '@/styles/colors';
+import {store} from "@/store";
 
 am4core.useTheme(am4themes_animated);
 am4core.options.autoSetClassName = true;
@@ -267,6 +268,18 @@ export default {
         });
 
         /* util */
+        const numberFormatter = (num, digits = 2) => {
+            const options = {
+                notation: 'compact',
+                signDisplay: 'auto',
+                maximumFractionDigits: digits,
+            };
+            return Intl.NumberFormat('en', options).format(num);
+        };
+        const commaFormatter = (num) => {
+            if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return num;
+        };
         const disposeChart = () => {
             if (chartState.registry[state.chartRef]) {
                 chartState.registry[state.chartRef].dispose();
@@ -319,6 +332,9 @@ export default {
             bullet.label.hideOversized = false;
             bullet.label.fill = am4core.color(props.chartTextColor);
             bullet.label.dy = -10;
+            if (state.selectedType === DATA_TYPE.spendings) {
+                bullet.label.adapter.add('text', (text, target) => numberFormatter(target.dataItem.valueY, 1));
+            }
         };
         const setBoxInterval = () => {
             state.selectedIndexInterval = setInterval(() => {
@@ -329,10 +345,6 @@ export default {
                     state.selectedIndex = 0;
                 }
             }, BOX_SWITCH_INTERVAL);
-        };
-        const commaFormatter = (num) => {
-            if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            return num;
         };
         const getLocation = (type) => {
             const query: Location['query'] = {};
@@ -388,12 +400,11 @@ export default {
         };
         const getBillingCount = async () => {
             const res = await SpaceConnector.client.statistics.topic.billingSummary({
-                aggregation: null,
-                date: null,
+                granularity: NEW_DATE_TYPE.monthly,
+                period: 1,
                 project_id: props.projectId,
-            },
-            { headers: { 'Mock-Mode': true } });
-            state.count.spendings = res.results[0].cost;
+            });
+            state.count.spendings = res.results[0].billing_data[0].cost;
         };
         const getTrend = async (type) => {
             const utcToday = dayjs().utc();
@@ -405,12 +416,10 @@ export default {
             try {
                 let data;
                 if (type === DATA_TYPE.spendings) {
-                    const res = await SpaceConnector.client.statistics.topic.dailyBillingSummary({
-                        aggregation: null,
+                    const res = await SpaceConnector.client.statistics.topic.billingSummary({
                         granularity: NEW_DATE_TYPE[state.selectedDateType],
                         project_id: props.projectId,
-                    },
-                    { headers: { 'Mock-Mode': true } });
+                    });
                     data = res.results[0].billing_data.map(d => ({
                         date: d.date,
                         total: d.cost,
@@ -577,15 +586,16 @@ export default {
         };
         const getBillingSummaryInfo = async () => {
             const res = await SpaceConnector.client.statistics.topic.billingSummary({
-                aggregation: 'RESOURCE_TYPE',
-                date: null,
-            },
-            { headers: { 'Mock-Mode': true } });
+                granularity: NEW_DATE_TYPE.monthly,
+                aggregation: 'inventory.CloudServiceType',
+                period: 1,
+                project_id: props.projectId,
+            });
             const summaryData: SummaryData[] = [
                 {
                     provider: 'all',
                     label: '',
-                    count: commaFormatter(state.count.spendings),
+                    count: numberFormatter(state.count.spendings),
                     to: '',
                 },
             ];
@@ -593,8 +603,8 @@ export default {
                 summaryData.push({
                     provider: d.provider,
                     label: state.providers[d.provider].label,
-                    type: d.display_name || d.cloud_service_group,
-                    count: commaFormatter(d.cost),
+                    type: d.service_code,
+                    count: numberFormatter(d.billing_data[0].cost),
                     to: '',
                 });
             });
@@ -616,7 +626,7 @@ export default {
             state.loading = true;
             await Promise.all([getCount(DATA_TYPE.compute), getBillingCount()]);
 
-            await vm.$store.dispatch('resource/provider/load');
+            await store.dispatch('resource/provider/load');
             if (state.count.compute > 0) await getSummaryInfo(DATA_TYPE.compute);
             state.loading = false;
             setBoxInterval();
@@ -658,6 +668,7 @@ export default {
             onClickBox,
             onClickDateTypeButton,
             commaFormatter,
+            numberFormatter,
             getLocation,
         };
     },

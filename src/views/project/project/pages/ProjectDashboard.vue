@@ -6,7 +6,9 @@
                          :chart-color="chartColor"
                          :chart-text-color="chartTextColor"
             />
-            <project-personal-health-dashboard class="col-span-12 project-personal-health-dashboard" />
+            <project-personal-health-dashboard class="col-span-12 project-personal-health-dashboard"
+                                               :project-id="projectId"
+            />
             <div class="col-span-12 resources-tab">
                 <p-tab :tabs="tabs" :active-tab.sync="activeTab">
                     <template #server>
@@ -66,6 +68,7 @@ import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import {
     blue, secondary, secondary1, peacock,
 } from '@/styles/colors';
+import { store } from '@/store';
 
 
 interface SummaryState {
@@ -136,7 +139,8 @@ export default {
         });
 
         const init = () => {
-            vm.$store.dispatch('resource/cloudServiceType/load');
+            store.dispatch('resource/cloudServiceType/load');
+            store.dispatch('resource/region/load');
         };
         init();
 

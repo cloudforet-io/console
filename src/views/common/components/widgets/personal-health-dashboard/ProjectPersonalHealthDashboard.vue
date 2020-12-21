@@ -93,14 +93,9 @@ import { store } from '@/store';
 
 
 enum EVENT_CATEGORY {
-    accountNotification = 'Notification',
-    scheduledChanges = 'Scheduled',
-    openIssues = 'Issue',
-}
-enum EVENT_CATEGORY_FOR_API {
     accountNotification = 'accountNotification',
     scheduledChanges = 'scheduledChanges',
-    openIssues = 'openIssues'
+    issue = 'issue'
 }
 
 export default {
@@ -113,13 +108,20 @@ export default {
         PDataTable,
         WidgetLayout,
     },
-    setup() {
+    props: {
+        projectId: {
+            type: String,
+            default: undefined,
+        },
+    },
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
-        const apiQuery = new ApiQueryHelper();
+        const getEventsApiQuery = new ApiQueryHelper();
 
         const state = reactive({
             loading: false,
+            regions: computed(() => store.state.resource.region.items),
             timezone: computed(() => store.state.user.timezone),
             data: [],
             summaryData: computed(() => ([
@@ -156,46 +158,44 @@ export default {
         const tabState = reactive({
             tabs: computed(() => [
                 {
-                    name: EVENT_CATEGORY_FOR_API.openIssues,
+                    name: EVENT_CATEGORY.issue,
                     label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_ISSUE'),
                     type: 'item',
                 }, {
-                    name: EVENT_CATEGORY_FOR_API.scheduledChanges,
+                    name: EVENT_CATEGORY.scheduledChanges,
                     label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_SCHEDULED_CHANGE'),
                     type: 'item',
                 }, {
-                    name: EVENT_CATEGORY_FOR_API.accountNotification,
+                    name: EVENT_CATEGORY.accountNotification,
                     label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_NOTIFICATION'),
                     type: 'item',
                 },
             ]),
-            activeTab: EVENT_CATEGORY_FOR_API.openIssues,
+            activeTab: EVENT_CATEGORY.issue,
         });
 
         /* api */
         const getCount = async () => {
             try {
-                state.countData = await SpaceConnector.client.statistics.topic.phdCountByType({},
-                    { headers: { 'Mock-Mode': true } });
+                state.countData = await SpaceConnector.client.statistics.topic.phdCountByType({
+                    project_id: props.projectId,
+                });
             } catch (e) {
                 console.error(e);
             }
         };
-        const getQuery = () => {
-            apiQuery
-                .setSort(state.sortBy, state.sortDesc)
-                .setFilters([{ k: 'event_type_category', v: state.search, o: '' }]);
-            return apiQuery.data;
-        };
         const getEvents = async () => {
             try {
                 state.loading = true;
+                getEventsApiQuery
+                    .setSort(state.sortBy, state.sortDesc)
+                    .setFilters([{ v: state.search }]);
                 const res = await SpaceConnector.client.statistics.topic.phdEvents(
                     {
+                        project_id: props.projectId,
                         event_type_category: tabState.activeTab,
-                        query: getQuery(),
+                        query: getEventsApiQuery.data,
                     },
-                    { headers: { 'Mock-Mode': true } },
                 );
 
                 state.data = res.results.map((d) => {
@@ -203,10 +203,10 @@ export default {
                     const lastUpdatedTime = dayjs.tz(dayjs(d.last_updated_time).utc(), state.timezone).format('YYYY-MM-DD HH:mm:ss');
                     return {
                         event: {
-                            name: `${d.event_type_code} ${EVENT_CATEGORY[d.event_type_category]}`,
+                            name: d.event_title,
                             to: referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' }),
                         },
-                        region: d.region_code, // todo: state.regions[d.region_code].name,
+                        region: state.regions[d.region_code]?.name || d.region_code,
                         start_time: startTime,
                         last_updated_time: lastUpdatedTime,
                         affected_resources: d.affected_resources,
@@ -326,6 +326,7 @@ export default {
             display: inline-block;
             width: 15rem;
             white-space: pre-wrap;
+            padding: 0.5rem 0;
             &:hover {
                 text-decoration: underline;
             }

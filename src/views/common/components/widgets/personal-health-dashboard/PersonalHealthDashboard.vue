@@ -50,7 +50,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { random, find, shuffle } from 'lodash';
+import { find } from 'lodash';
 import dayjs from 'dayjs';
 
 import {
@@ -67,12 +67,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 
 
-enum EVENT_CATEGORY {
-    notification = 'Notification',
-    scheduledChange = 'Scheduled',
-    issue = 'Issue',
-}
-
 export default {
     name: 'PersonalHealthDashboard',
     components: {
@@ -87,7 +81,6 @@ export default {
             loading: false,
             projects: computed(() => store.state.resource.project.items),
             favoriteProjects: computed(() => store.state.favorite.project.items),
-            timezone: computed(() => store.state.user.timezone),
             regions: computed(() => store.state.resource.region.items),
             data: [] as any[],
             fields: computed(() => [
@@ -97,15 +90,13 @@ export default {
             ]),
         });
 
-        const getSummary = async () => {
+        const getData = async () => {
             try {
-                const res = await SpaceConnector.client.statistics.topic.phdSummary({}, {
-                    headers: { 'Mock-Mode': true },
-                });
+                const res = await SpaceConnector.client.statistics.topic.phdSummary();
 
                 state.data = res.results.map((d) => {
                     const utcNow = dayjs().utc();
-                    const lastUpdated = dayjs(d.last_updated_time).utc();
+                    const lastUpdated = dayjs(d.last_update_time).utc();
                     let utcDiff: number = utcNow.diff(lastUpdated, 'hour');
                     let unit = vm.$tc('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.HOUR', utcDiff);
                     if (utcDiff > 24) {
@@ -113,20 +104,17 @@ export default {
                         unit = vm.$tc('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.DAY', utcDiff);
                     }
 
-                    // todo: removed
-                    const sampleProjects = shuffle(Object.keys(state.projects).slice(0, random(1, 10)));
-
                     return {
                         event: {
-                            name: `${d.event_type_code} ${EVENT_CATEGORY[d.event_type_category]}`,
+                            name: d.event_title,
                             lastUpdated: `${utcDiff} ${unit} ${vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.AGO')}`,
                         },
-                        region: d.region_code, // todo: state.regions[d.region_code].name,
-                        affected_projects: sampleProjects.map(projectId => ({
+                        region: state.regions[d.region_code]?.name || d.region_code,
+                        affected_projects: d.affected_projects.map(projectId => ({
                             name: state.projects[projectId].name,
                             to: referenceRouter(projectId, { resource_type: 'identity.Project' }),
                             isFavorite: !!find(state.favoriteProjects, { id: projectId }),
-                        })), // todo: d.affected_projects,
+                        })).sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite)),
                         showAll: false,
                     };
                 });
@@ -142,9 +130,12 @@ export default {
 
         const init = async () => {
             state.loading = true;
-            await store.dispatch('resource/project/load');
-            await store.dispatch('favorite/project/load');
-            await getSummary();
+            await Promise.all([
+                store.dispatch('resource/project/load'),
+                store.dispatch('favorite/project/load'),
+                store.dispatch('resource/region/load'),
+            ]);
+            await getData();
             state.loading = false;
         };
         init();
@@ -162,6 +153,9 @@ export default {
     min-height: 8rem;
     border-radius: 0.125rem;
     margin-top: 0.75rem;
+    .table-container {
+        max-height: 25rem;
+    }
     th {
         @apply bg-gray-100 text-gray-400;
         height: 1.5rem;
@@ -184,10 +178,6 @@ export default {
         .col-event {
             .event-name {
                 display: block;
-                max-width: 14rem;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                white-space: nowrap;
                 font-size: 0.875rem;
                 line-height: 1.4;
             }
@@ -202,11 +192,7 @@ export default {
         }
         .region {
             display: block;
-            max-width: 12rem;
             line-height: 1.4;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
         }
         .affected-projects-wrapper {
             min-width: 20rem;
