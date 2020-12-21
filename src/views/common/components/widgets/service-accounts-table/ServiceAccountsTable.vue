@@ -221,8 +221,11 @@ export default {
     background: currentColor;
 }
 .custom-th {
-    @apply flex items-center justify-center uppercase font-bold px-1;
-    font-size: 0.75rem;
+    @apply justify-center;
+    display: flex;
+    text-transform: uppercase;
+    font-weight: bold;
+    padding: 0 0.25rem;
 }
 .p-data-table::v-deep {
     table-layout: fixed;

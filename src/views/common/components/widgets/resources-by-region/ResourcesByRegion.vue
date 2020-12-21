@@ -369,13 +369,12 @@ export default {
 
 <style lang="postcss" scoped>
 .resources-by-region::v-deep {
-    height: 27.1rem;
+    height: 25rem;
     .title {
         margin-bottom: 1.25rem;
     }
     .widget-contents {
         overflow-y: auto;
-        margin-bottom: 2rem;
     }
 }
 .chart {

@@ -403,6 +403,7 @@ export default {
         .text-pagination {
             position: absolute;
             right: 0;
+            font-weight: normal;
         }
     }
     .legend-wrapper {

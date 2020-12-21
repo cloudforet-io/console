@@ -6,16 +6,18 @@
             :items="data"
             :bordered="false"
         >
-            <template #col-event-format="{ value }">
-                <span class="event-name">{{ value.name }}</span>
-                <span class="event-time">{{ value.lastUpdated }}</span>
+            <template #col-event-format="{ index, value }">
+                <div class="col-event">
+                    <span class="event-name">{{ value.name }}</span>
+                    <span class="event-time" :class="{ 'show-all': data[index].showAll }">{{ value.lastUpdated }}</span>
+                </div>
             </template>
             <template #col-region-format="{ value }">
                 <span class="region">{{ value }}</span>
             </template>
             <template #col-affected_projects-format="{ index, value }">
                 <div class="affected-projects-wrapper grid grid-cols-12 gap-2">
-                    <div class="count col-span-1">
+                    <div class="count col-span-1" :class="{ 'show-all': data[index].showAll }">
                         {{ value.length }}
                     </div>
                     <div class="col-span-9 project-link-group" :class="{ 'show-all': data[index].showAll }">
@@ -91,7 +93,7 @@ export default {
             fields: computed(() => [
                 { name: 'event', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_EVENT') },
                 { name: 'region', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_REGION') },
-                { name: 'affected_projects', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_PROJECT_AFFECTED') },
+                { name: 'affected_projects', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_AFFECTED_PROJECT') },
             ]),
         });
 
@@ -140,6 +142,8 @@ export default {
 
         const init = async () => {
             state.loading = true;
+            await store.dispatch('resource/project/load');
+            await store.dispatch('favorite/project/load');
             await getSummary();
             state.loading = false;
         };
@@ -177,19 +181,24 @@ export default {
     td {
         @apply bg-white;
         height: 3.375rem;
-        .event-name {
-            display: block;
-            max-width: 14rem;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-            font-size: 0.875rem;
-            line-height: 1.4;
-        }
-        .event-time {
-            @apply text-gray-700;
-            font-size: 0.75rem;
-            line-height: 1.2;
+        .col-event {
+            .event-name {
+                display: block;
+                max-width: 14rem;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                font-size: 0.875rem;
+                line-height: 1.4;
+            }
+            .event-time {
+                @apply text-gray-700;
+                font-size: 0.75rem;
+                line-height: 1.2;
+                &.show-all {
+                    @apply text-primary-dark;
+                }
+            }
         }
         .region {
             display: block;
@@ -207,6 +216,9 @@ export default {
             .count {
                 @apply text-primary1;
                 font-weight: bold;
+                &.show-all {
+                    @apply text-primary;
+                }
             }
             .project-link-group {
                 display: flex;

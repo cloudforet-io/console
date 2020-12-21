@@ -8,7 +8,6 @@
             <personal-health-dashboard class="col-span-12" />
             <trusted-advisor class="col-span-12" :providers="providers" />
             <top-projects class="col-span-12" />
-            <cloud-services class="col-span-12" :more-info="true" :providers="providers" />
         </div>
         <div class="col-span-12 lg:col-span-3
                     widget-wrapper"
@@ -33,6 +32,7 @@
                                     :providers="providers"
                                     :timezone="timezone"
                 />
+                <cloud-services class="col-span-12 cloud-service" />
             </div>
         </div>
     </general-page-layout>

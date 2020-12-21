@@ -172,7 +172,7 @@ export default {
         const drawChart = (chartContext) => {
             const chart = am4core.create(chartContext, am4charts.XYChart);
             chart.logo.disabled = true;
-            chart.paddingRight = 20;
+            chart.paddingRight = 10;
             chart.paddingLeft = -5;
             chart.paddingTop = 5;
             chart.paddingBottom = 0;

@@ -5302,6 +5302,27 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
+                                        <name>FIELD_AFFECTED_PROJECT</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
                                         <name>FIELD_AFFECTED_RESOURCES</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -5345,27 +5366,6 @@
                                     </concept_node>
                                     <concept_node>
                                         <name>FIELD_LAST_UPDATE_TIME</name>
-                                        <definition_loaded>false</definition_loaded>
-                                        <description/>
-                                        <comment/>
-                                        <default_text/>
-                                        <translations>
-                                            <translation>
-                                                <language>en-US</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ja-JP</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                            <translation>
-                                                <language>ko-KR</language>
-                                                <approved>false</approved>
-                                            </translation>
-                                        </translations>
-                                    </concept_node>
-                                    <concept_node>
-                                        <name>FIELD_PROJECT_AFFECTED</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>

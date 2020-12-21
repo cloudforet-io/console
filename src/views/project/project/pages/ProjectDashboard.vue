@@ -207,19 +207,10 @@ export default {
 
 .cloud-service {
     @apply border border-gray-200;
-    height: 28rem;
+    max-height: 35rem;
     border-radius: 2px;
     @media screen and (width < 1024px) {
         height: 26rem;
-    }
-    &::v-deep .widget-contents {
-        overflow-y: auto;
-        .card-wrapper {
-            display: block;
-            .card {
-                margin-bottom: 0.5rem;
-            }
-        }
     }
 }
 
@@ -241,7 +232,7 @@ export default {
 
 .daily-updates {
     @apply border border-gray-200;
-    height: 33.75rem;
+    max-height: 35rem;
     border-radius: 2px;
     margin-top: 1.25rem;
 }

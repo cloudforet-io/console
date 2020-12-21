@@ -333,8 +333,12 @@ export default {
         .affected-resources-wrapper {
             display: flex;
             width: 10rem;
+            line-height: 1.4;
             flex-wrap: wrap;
-            padding-bottom: 0.25rem;
+            padding-bottom: 0.5rem;
+            &:first-child {
+                padding-top: 0.5rem;
+            }
             .label {
                 @apply text-gray-600;
             }
