@@ -7,27 +7,27 @@
             />
         </div>
         <div v-if="visible" v-click-outside="hide" class="sitemap">
-            <ul v-for="(aItem, aIdx) in allMenu"
+            <ul v-for="(menu, aIdx) in siteMapMenuList"
                 :key="aIdx"
             >
-                <template v-if="aItem.show !== false">
-                    <router-link :to="aItem.link">
+                <template v-if="menu.show !== false">
+                    <router-link :to="menu.to">
                         <li class="menu" @click="hide">
-                            <p-i :name="aItem.icon"
+                            <p-i :name="MENU_ICON[menu.name]"
                                  color="inherit inherit"
                                  height="1.5rem" width="1.5rem"
-                            /> {{ aItem.label }}
+                            /> {{ menu.label }}
                         </li>
                     </router-link>
-                    <div v-if="aItem.subMenus.length > 0">
-                        <div v-for="(sItem, sIdx) in aItem.subMenus"
+                    <div v-if="menu.subMenuList.length > 0">
+                        <div v-for="(subMenu, sIdx) in menu.subMenuList"
                              :key="sIdx"
                         >
-                            <div v-if="!sItem.isAdminMenu || isAdmin">
-                                <router-link v-if="sItem" :to="sItem.link">
+                            <div v-if="subMenu.show">
+                                <router-link v-if="subMenu" :to="subMenu.to">
                                     <li class="submenu" @click="hide">
-                                        {{ sItem.label }}
-                                        <span v-if="sItem.isNew" class="new-text">new</span>
+                                        {{ subMenu.label }}
+                                        <span v-if="subMenu.isNew" class="new-text">new</span>
                                     </li>
                                 </router-link>
                             </div>
@@ -47,6 +47,17 @@ import {
 import PI from '@/components/atoms/icons/PI.vue';
 import { store } from '@/store';
 
+
+enum MENU_ICON {
+    dashboard = 'ic_dashboard',
+    project = 'ic_project',
+    inventory = 'ic_inventory',
+    identity = 'ic_identity',
+    automation = 'ic_automation',
+    plugin = 'ic_plugin',
+    management = 'ic_management',
+}
+
 export default {
     name: 'SiteMap',
     components: {
@@ -60,74 +71,29 @@ export default {
             type: Boolean,
             default: false,
         },
-        isAdmin: {
-            type: Boolean,
-            default: false,
+        menuList: {
+            type: Array,
+            default: () => ([]),
         },
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             showAutomation: store.state.user.powerSchedulerState,
-            showUser: computed(() => store.getters['user/isAdmin']).value,
-            allMenu: computed(() => ([
+            siteMapMenuList: computed(() => ([
                 {
-                    label: vm.$t('MENU.DASHBOARD.DASHBOARD'), link: '/dashboard', subMenus: [], icon: 'ic_dashboard',
+                    name: 'dashboard',
+                    label: vm.$t('MENU.DASHBOARD.DASHBOARD'),
+                    to: { name: 'dashboard' },
+                    subMenuList: [],
                 },
-                {
-                    label: vm.$t('MENU.PROJECT.PROJECT'), link: '/project', subMenus: [], icon: 'ic_project',
-                },
-                {
-                    label: vm.$t('MENU.INVENTORY.INVENTORY'),
-                    link: '/inventory',
-                    icon: 'ic_inventory',
-                    subMenus: [
-                        { label: vm.$t('MENU.INVENTORY.SERVER'), link: '/inventory/server', show: true },
-                        { label: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), link: '/inventory/cloud-service', show: true },
-                    ],
-                },
-                {
-                    label: vm.$t('MENU.IDENTITY.IDENTITY'),
-                    link: '/identity',
-                    icon: 'ic_identity',
-                    subMenus: [
-                        { label: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), link: '/identity/service-account', show: true },
-                        { label: vm.$t('MENU.IDENTITY.USER'), link: '/identity/user/user-management', show: props.isAdmin },
-                    ],
-                },
-                {
-                    label: vm.$t('MENU.AUTOMATION.AUTOMATION'),
-                    show: state.showAutomation,
-                    link: '/automation',
-                    icon: 'ic_automation',
-                    subMenus: [
-                        {
-                            label: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), link: '/automation/power-scheduler', isNew: true, show: true,
-                        },
-                    ],
-                },
-                {
-                    label: vm.$t('MENU.PLUGIN.PLUGIN'),
-                    link: '/plugin',
-                    icon: 'ic_plugin',
-                    subMenus: [
-                        { label: vm.$t('MENU.PLUGIN.COLLECTOR'), link: '/plugin/collector', show: true },
-                    ],
-                },
-                {
-                    label: vm.$t('MENU.MANAGEMENT.MANAGEMENT'),
-                    link: '/management/collector-history',
-                    icon: 'ic_management',
-                    subMenus: [
-                        { label: vm.$t('MENU.MANAGEMENT.PLUGIN'), link: '/management/supervisor/plugins', show: props.isAdmin },
-                        { label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), link: '/management/collector-history', show: true },
-                    ],
-                },
+                ...props.menuList,
             ])),
         });
 
         return {
             ...toRefs(state),
+            MENU_ICON,
             show() { emit('update:visible', true); },
             hide() { emit('update:visible', false); },
             toggle() { emit('update:visible', !props.visible); },

@@ -2,7 +2,7 @@
     <div class="menu-container">
         <div class="left-part">
             <div class="site-map-wrapper">
-                <site-map :is-admin="userState.isAdmin" :visible.sync="sitemapVisible" />
+                <site-map :menu-list="menuList" :visible.sync="siteMapVisible" />
             </div>
             <router-link to="/dashboard">
                 <div class="logo-wrapper">
@@ -12,38 +12,38 @@
                     >
                 </div>
             </router-link>
-            <div v-for="(dItem, idx) in defaultMenuList"
+            <div v-for="(menu, idx) in menuList"
                  :key="idx"
                  class="menu-wrapper hidden lg:inline-block"
             >
-                <template v-if="dItem.show !== false">
+                <template v-if="menu.show !== false">
                     <div class="menu-button opacity mr-4 lg:mr-8"
                          :class="[{
-                             opened: dItem.menu.length > 0 && openedMenu === dItem.key,
-                             selected: dItem.parentRoutes.includes(selectedMenu)
+                             opened: menu.subMenuList.length > 0 && openedMenu === menu.name,
+                             selected: menu.name === selectedMenu
                          }]"
-                         @click.stop="toggleMenu(dItem.key)"
+                         @click.stop="toggleMenu(menu.name)"
                     >
-                        <span v-if="dItem.menu.length > 0">
-                            <span>{{ dItem.key }}</span>
+                        <span v-if="menu.subMenuList.length > 0">
+                            <span>{{ menu.label }}</span>
                             <p-i class="arrow-button"
-                                 :name="openedMenu === dItem.key ? 'ic_arrow_top_sm' : 'ic_arrow_bottom_sm'"
+                                 :name="openedMenu === menu.name ? 'ic_arrow_top_sm' : 'ic_arrow_bottom_sm'"
                                  width="0.5rem" height="0.5rem"
                                  color="inherit transparent"
                             />
                         </span>
-                        <router-link v-else :to="dItem.link" class="block">
-                            <span>{{ dItem.key }}</span>
+                        <router-link v-else :to="menu.to" class="block">
+                            <span>{{ menu.label }}</span>
                         </router-link>
-                        <div v-if="openedMenu === dItem.key && dItem.menu.length > 0"
+                        <div v-if="openedMenu === menu.name && menu.subMenuList.length > 0"
                              v-click-outside="hideMenu"
                              class="sub-menu-wrapper"
                         >
-                            <template v-for="(item, index) in dItem.menu" @click.native="hideMenu">
-                                <router-link v-if="item.show" :key="index" :to="item.link">
+                            <template v-for="(subMenu, index) in menu.subMenuList" @click.native="hideMenu">
+                                <router-link v-if="subMenu.show" :key="index" :to="subMenu.to">
                                     <div class="sub-menu">
-                                        <span>{{ item.label }}</span>
-                                        <span v-if="item.isNew" class="new-text">new</span>
+                                        <span>{{ subMenu.label }}</span>
+                                        <span v-if="subMenu.isNew" class="new-text">new</span>
                                     </div>
                                 </router-link>
                             </template>
@@ -143,6 +143,7 @@
 
 <script lang="ts">
 import vClickOutside from 'v-click-outside';
+import { TranslateResult } from 'vue-i18n';
 
 import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
@@ -159,6 +160,30 @@ import { Location } from 'vue-router';
 import { store } from '@/store';
 import { languages } from '@/store/modules/user/config';
 import router from '@/routes/index';
+
+
+enum PARENT_CATEGORY {
+    project = 'project',
+    inventory = 'inventory',
+    identity = 'identity',
+    automation = 'automation',
+    plugin = 'plugin',
+    management = 'management',
+}
+
+interface SubMenu {
+    label: TranslateResult;
+    to: Location['query'];
+    show: boolean;
+    isNew?: boolean;
+}
+interface Menu {
+    name: keyof typeof PARENT_CATEGORY;
+    label: TranslateResult;
+    to: Location['query'];
+    show?: boolean;
+    subMenuList: SubMenu[];
+}
 
 export default {
     name: 'GNB',
@@ -184,66 +209,66 @@ export default {
         });
         const state = reactive({
             openedMenu: null,
-            sitemapVisible: false,
+            siteMapVisible: false,
             profileVisible: false,
             showAutomation: store.state.user.powerSchedulerState,
             showLanguageMenu: false,
-            defaultMenuList: computed(() => [
+            menuList: computed<Menu[]>(() => [
                 {
-                    key: vm.$t('MENU.PROJECT.PROJECT'),
-                    link: '/project',
-                    parentRoutes: ['project'],
-                    menu: [],
+                    name: PARENT_CATEGORY.project,
+                    label: vm.$t('MENU.PROJECT.PROJECT'),
+                    to: { name: 'projectMain' },
+                    subMenuList: [],
                 },
                 {
-                    key: vm.$t('MENU.INVENTORY.INVENTORY'),
-                    link: '/inventory',
-                    parentRoutes: ['inventory'],
-                    menu: [
-                        { label: vm.$t('MENU.INVENTORY.SERVER'), link: '/inventory/server', show: true },
-                        { label: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), link: '/inventory/cloud-service', show: true },
+                    name: PARENT_CATEGORY.inventory,
+                    label: vm.$t('MENU.INVENTORY.INVENTORY'),
+                    to: { name: 'inventory' },
+                    subMenuList: [
+                        { label: vm.$t('MENU.INVENTORY.SERVER'), to: { name: 'server' }, show: true },
+                        { label: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), to: { name: 'cloudService' }, show: true },
                     ],
                 },
                 {
-                    key: vm.$t('MENU.IDENTITY.IDENTITY'),
-                    link: '/identity',
-                    parentRoutes: ['identity'],
-                    menu: [
+                    name: PARENT_CATEGORY.identity,
+                    label: vm.$t('MENU.IDENTITY.IDENTITY'),
+                    to: { name: 'identity' },
+                    subMenuList: [
                         {
                             label: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'),
-                            link: '/identity/service-account',
+                            to: { name: 'serviceAccount' },
                             show: true,
                         },
-                        { label: vm.$t('MENU.IDENTITY.USER'), link: '/identity/user/user-management', show: userState.isAdmin },
+                        { label: vm.$t('MENU.IDENTITY.USER'), to: { name: 'userManagement' }, show: userState.isAdmin },
                     ],
                 },
                 {
-                    key: vm.$t('MENU.AUTOMATION.AUTOMATION'),
+                    name: PARENT_CATEGORY.automation,
+                    label: vm.$t('MENU.AUTOMATION.AUTOMATION'),
                     show: state.showAutomation,
-                    link: '/automation',
-                    parentRoutes: ['automation'],
-                    menu: [
+                    to: { name: 'automation' },
+                    subMenuList: [
                         {
-                            label: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), link: '/automation/power-scheduler', isNew: true, show: true,
+                            label: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), to: { name: 'automation' }, isNew: true, show: true,
                         },
                     ],
                 },
                 {
-                    key: vm.$t('MENU.PLUGIN.PLUGIN'),
-                    link: '/plugin',
-                    parentRoutes: ['plugin'],
-                    menu: [
-                        { label: vm.$t('MENU.PLUGIN.COLLECTOR'), link: '/plugin/collector', show: true },
+                    name: PARENT_CATEGORY.plugin,
+                    label: vm.$t('MENU.PLUGIN.PLUGIN'),
+                    to: { name: 'plugin' },
+                    subMenuList: [
+                        { label: vm.$t('MENU.PLUGIN.COLLECTOR'), to: { name: 'collector' }, show: true },
                     ],
                 },
                 {
-                    key: vm.$t('MENU.MANAGEMENT.MANAGEMENT'),
-                    link: '/management/collector-history',
-                    parentRoutes: ['management'],
-                    menu: [
-                        { label: vm.$t('MENU.MANAGEMENT.PLUGIN'), link: '/management/supervisor/plugins', show: userState.isAdmin },
+                    name: PARENT_CATEGORY.management,
+                    label: vm.$t('MENU.MANAGEMENT.MANAGEMENT'),
+                    to: { name: 'collectorHistory' },
+                    subMenuList: [
+                        { label: vm.$t('MENU.MANAGEMENT.PLUGIN'), to: { name: 'supervisorPlugins' }, show: userState.isAdmin },
                         {
-                            label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), link: '/management/collector-history', isNew: true, show: true,
+                            label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), to: { name: 'collectorHistory' }, isNew: true, show: true,
                         },
                     ],
                 },
@@ -269,7 +294,7 @@ export default {
         };
         const showMenu = (menu) => {
             state.openedMenu = menu;
-            state.sitemapVisible = false;
+            state.siteMapVisible = false;
         };
         const toggleMenu = (menu) => {
             if (state.openedMenu === menu) {
