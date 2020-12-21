@@ -704,6 +704,7 @@ export default {
 
 .sidebar-title {
     display: flex;
+    align-items: center;
     margin-top: 2rem;
     margin-left: 1rem;
     margin-bottom: 0.4375rem;

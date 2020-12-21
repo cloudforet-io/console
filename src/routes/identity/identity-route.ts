@@ -2,7 +2,7 @@ import { RouteConfig } from 'vue-router';
 
 const UserAccount = () => import('@/views/identity/user/modules/UserAccount.vue');
 const UserManagement = () => import('@/views/identity/user/modules/UserManagement.vue');
-const User = () => import('@/views/identity/user/User.vue');
+const User = () => import('@/views/identity/user/pages/UserPage.vue');
 const ServiceAccount = () => import('@/views/identity/service-account/pages/ServiceAccountPage.vue');
 const AddServiceAccountPage = () => import('@/views/identity/service-account/pages/AddServiceAccountPage.vue');
 const ServiceAccountSearchPage = () => import('@/views/identity/service-account/pages/ServiceAccountSearchPage.vue');

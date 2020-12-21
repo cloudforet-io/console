@@ -299,7 +299,6 @@ export default {
         const routeState = reactive({
             routes: computed(() => ([
                 { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user' },
                 { name: vm.$t('IDENTITY.USER.USER_MANAGEMENT'), path: '/identity/user/user-management' },
             ])),
         });
