@@ -3,7 +3,7 @@
         <span v-for="(route, idx) in routes" :key="idx">
             <span v-if="route.path">
                 <router-link
-                    v-if="defaultIsShown(idx)" class="menu"
+                    v-if="isLengthOverFive(idx)" class="menu"
                     :to="getPath(route)"
                 >
                     <span v-if="idx !== routes.length - 1" class="inline-block link">{{ route.name }}</span>
@@ -17,7 +17,7 @@
             </span>
             <span v-else>
                 <div
-                    v-if="defaultIsShown(idx)" class="menu"
+                    v-if="isLengthOverFive(idx)" class="menu"
                 >
                     <span v-if="idx !== routes.length - 1" class="inline-block link"
                           @click="$emit('click', route, idx)"
@@ -30,7 +30,7 @@
                     </span>
                 </div>
             </span>
-            <span v-if="routes.length>=5&&idx===2&&!isShown">
+            <span v-if="routes.length>=5&&idx===2&&!state.isShown">
                 <span class="inline-block link" @click="showHidden">...</span>
                 <p-i name="ic_breadcrumb_arrow" width="1rem" height="1rem"
                      class="arrow-icon" color="inherit white"
@@ -42,6 +42,7 @@
 
 <script lang="ts">
 import PI from '@/components/atoms/icons/PI.vue';
+import { reactive } from '@vue/composition-api';
 
 export default {
     name: 'PPageNavigation',
@@ -53,20 +54,20 @@ export default {
             type: Array,
             default: null,
         },
-        isShown: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props) {
+        const state = reactive({
+            isShown: false,
+        });
         const getPath = route => `${route.path}`;
-        const showHidden = () => { props.isShown = true; };
-        const defaultIsShown = idx => props.routes.length < 5 || (props.routes.length >= 5 && (idx < 1 || idx > props.routes.length - 3)) || props.isShown;
+        const showHidden = () => { state.isShown = true; };
+        const isLengthOverFive = idx => props.routes.length < 5 || (props.routes.length >= 5 && (idx < 1 || idx > props.routes.length - 3)) || state.isShown;
 
         return {
+            state,
             getPath,
             showHidden,
-            defaultIsShown,
+            isLengthOverFive,
         };
     },
 };
@@ -74,6 +75,7 @@ export default {
 
 <style lang="postcss">
 .p-page-navigation {
+    display: inline-flex;
     margin-bottom: 0.5rem;
 
     .link {

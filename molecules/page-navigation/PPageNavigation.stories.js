@@ -1,5 +1,3 @@
-import { computed } from '@vue/composition-api';
-import { array, object } from '@storybook/addon-knobs';
 import PPageNavigation from './PPageNavigation.vue';
 
 export default {
