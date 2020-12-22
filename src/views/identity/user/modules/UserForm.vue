@@ -65,6 +65,7 @@
                 <p-select-dropdown v-model="formState.domainRole"
                                    :items="formState.domainRoleItem"
                                    auto-height
+                                   disabled
                                    class="dropdown"
                 />
             </p-field-group>

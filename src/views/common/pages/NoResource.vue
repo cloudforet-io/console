@@ -57,7 +57,7 @@ export default {
         const routeState = reactive({
             route: [{ name: state.resourceRoute.meta.label, path: state.resourceRoute.path },
                 { name: state.serviceRoute.meta.label, path: state.serviceRoute.path },
-                { name: 'No Resource', path: `${state.serviceRoute.path}/no-resource` }],
+                { name: 'No Resources', path: `${state.serviceRoute.path}/no-resource` }],
         });
 
         return {

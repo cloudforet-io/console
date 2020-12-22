@@ -8,7 +8,7 @@
                 <p class="member-id">
                     {{ userState.userId }}
                 </p>
-                <p v-if="userState.isAdmin" class="member-type">
+                <p v-if="userState.isDomainOwner" class="member-type">
                     {{ $t('IDENTITY.USER.MAIN.SPACEONE_ADMIN') }}
                 </p>
                 <p v-else class="member-type">
@@ -88,6 +88,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const userState = reactive({
             isAdmin: computed(() => store.getters['user/isAdmin']),
+            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
             userType: computed(() => store.state.user.backend) as unknown as string,
             userName: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),

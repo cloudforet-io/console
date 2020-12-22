@@ -39,6 +39,11 @@
                 <span class="collector-title">{{ item.collector_info.name }}</span>
                 <br><span class="time">{{ timeFormatter(item.created_at) }}</span>
             </template>
+            <template #col-progress-format="{item}">
+                <p-lottie name="lottie_working" auto
+                          :size="1.5"
+                />
+            </template>
         </p-data-table>
     </widget-layout>
 </template>
@@ -61,6 +66,7 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { TimeStamp } from '@/models';
 import { QueryHelper } from '@/lib/query';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 enum JOB_STATE {
     created = 'CREATED',
@@ -90,6 +96,7 @@ export interface JobModel {
 export default {
     name: 'CollectorRuns',
     components: {
+        PLottie,
         WidgetLayout,
         PSkeleton,
         PI,
@@ -197,6 +204,7 @@ export default {
 .widget-layout::v-deep {
     @apply border border-gray-100;
     border-radius: 0.375rem;
+    overflow-x: hidden;
 }
 .p-data-table::v-deep {
     border-radius: 0.125rem;

@@ -265,6 +265,9 @@ export default {
         @apply text-blue-600 cursor-pointer;
         font-size: 0.875rem;
         line-height: 140%;
+        &:hover {
+            text-decoration: underline;
+        }
     }
 
     @media screen and (width < 478px) {

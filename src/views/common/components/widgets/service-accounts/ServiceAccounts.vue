@@ -165,6 +165,16 @@ export default {
             state.chart = chart;
         };
 
+        const getLink = (data) => {
+            const link = {
+                name: 'serviceAccount',
+                params: {
+                    provider: data.provider,
+                },
+            };
+            return link;
+        };
+
         const getData = async () => {
             state.loading = true;
             state.data = [];
@@ -179,7 +189,7 @@ export default {
                                 provider: d.provider,
                                 // icon: providers[d.provider].icon || '',
                                 color: props.providers[d.provider].color || '',
-                                href: `/identity/service-account?p=1&ps=15&provider=${d.provider}`,
+                                href: getLink(d),
                                 service_account_count: d.service_account_count,
                                 ...d,
                             });
@@ -274,8 +284,10 @@ export default {
         height: 1.5rem;
         border: none;
         font-size: 0.75rem;
+        width: 3.75rem;
     }
     td {
+        width: 3.75rem;
         height: 2rem;
     }
 }
