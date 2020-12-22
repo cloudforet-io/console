@@ -6,6 +6,6 @@ export const languages = {
 
 export const userTypes = {
     USER: 'User',
-    DOMAIN_OWNER: 'Domain Owner',
+    DOMAIN_OWNER: 'Administrator',
     API_USER: 'API User',
 };
