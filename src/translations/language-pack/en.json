@@ -676,6 +676,7 @@
 		"HARDWARE": "Hardware",
 		"HYPER_THREADING": "Hyper-threading",
 		"ID": "ID",
+		"LAST_COLLECTED_AT": "Last Collected",
 		"MANAGEMENT_STATE": "Management State",
 		"MANUFACTURER": "Manufacturer",
 		"MEMORY": "Memory",

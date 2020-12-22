@@ -676,6 +676,7 @@
 		"HARDWARE": "ハードウェア",
 		"HYPER_THREADING": "ハイパースレッディング",
 		"ID": "ユーザ名",
+		"LAST_COLLECTED_AT": "",
 		"MANAGEMENT_STATE": "管理状態",
 		"MANUFACTURER": "メーカー",
 		"MEMORY": "メモリ",

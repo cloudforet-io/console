@@ -676,6 +676,7 @@
 		"HARDWARE": "하드웨어",
 		"HYPER_THREADING": "하이퍼 스레딩",
 		"ID": "아이디",
+		"LAST_COLLECTED_AT": "마지막 수집 날짜",
 		"MANAGEMENT_STATE": "관리 상태",
 		"MANUFACTURER": "제조사",
 		"MEMORY": "메모리",

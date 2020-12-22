@@ -102,13 +102,18 @@
                              :header-title="checkTableModalState.title"
                              :sub-title="checkTableModalState.subTitle"
                              :theme-color="checkTableModalState.themeColor"
-                             :fields="tableState.multiFields"
                              size="lg"
                              :centered="true"
                              :selectable="false"
-                             :items="tableState.selectedItems"
                              @confirm="checkModalConfirm"
-        />
+        >
+            <p-dynamic-layout v-if="tableState.multiSchema"
+                              type="simple-table"
+                              :options="tableState.multiSchema.options"
+                              :data="tableState.selectedItems"
+                              :field-handler="fieldHandler"
+            />
+        </p-table-check-modal>
         <project-tree-modal :visible.sync="changeProjectState.visible"
                             :project-id="changeProjectState.projectId"
                             :loading="changeProjectState.loading"
@@ -154,7 +159,7 @@ import {
     QuerySearchTableListeners, QuerySearchTableTypeOptions,
 } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
-import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
+import { DynamicLayout, QuerySearchTableOptions } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
@@ -293,6 +298,19 @@ export default {
                 },
             ]),
             collectModalVisible: false,
+            multiSchema: computed<null|DynamicLayout>(() => {
+                if (!tableState.schema) return null;
+
+                const res: DynamicLayout = { ...tableState.schema };
+                if (tableState.schema.options.fields) {
+                    res.options = {
+                        ...tableState.schema.options,
+                        fields: [{ name: 'Server ID', key: 'server_id' }, ...tableState.schema.options.fields],
+                    };
+                }
+
+                return res;
+            }),
             multiFields: computed<MenuItem[]>(() => [
                 { name: 'server_id', label: 'Server ID', type: 'item' },
                 { name: 'name', label: 'Name', type: 'item' },
