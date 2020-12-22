@@ -56,13 +56,13 @@
                     </template>
                     <template #col-last_accessed_at-format="{ value }">
                         <span v-if="value === 0">
-                            {{$t('IDENTITY.USER.MAIN.TODAY')}}
+                            {{ $t('IDENTITY.USER.MAIN.TODAY') }}
                         </span>
                         <span v-else-if="value === 1">
-                            {{$t('IDENTITY.USER.MAIN.YESTERDAY')}}
+                            {{ $t('IDENTITY.USER.MAIN.YESTERDAY') }}
                         </span>
                         <span v-else>
-                            {{ value }} {{$t('IDENTITY.USER.MAIN.DAYS')}}
+                            {{ value }} {{ $t('IDENTITY.USER.MAIN.DAYS') }}
                         </span>
                     </template>
                 </p-query-search-table>
@@ -88,14 +88,32 @@
                :active-tab.sync="multiItemTabState.activeTab"
         >
             <template #data>
-                <p-data-table
-                    :fields="multiSelectFields"
-                    :sortable="false"
-                    :selectable="false"
-                    :items="selectedUsers"
-                    :col-copy="true"
-                    class="selected-data-tab"
-                />
+                <p-data-table :fields="fields"
+                              :sortable="false"
+                              :selectable="false"
+                              :items="selectedUsers"
+                              :col-copy="true"
+                              class="selected-data-tab"
+                >
+                    <template #col-state-format="{value}">
+                        <p-status v-bind="userStateFormatter(value)" class="capitalize" />
+                    </template>
+                    <template #col-user_type-format="{value}">
+                        <span v-if="value === 'API_USER'">API Only</span>
+                        <span v-else>Console, API</span>
+                    </template>
+                    <template #col-last_accessed_at-format="{ value }">
+                        <span v-if="value === 0">
+                            {{ $t('IDENTITY.USER.MAIN.TODAY') }}
+                        </span>
+                        <span v-else-if="value === 1">
+                            {{ $t('IDENTITY.USER.MAIN.YESTERDAY') }}
+                        </span>
+                        <span v-else>
+                            {{ value }} {{ $t('IDENTITY.USER.MAIN.DAYS') }}
+                        </span>
+                    </template>
+                </p-data-table>
             </template>
         </p-tab>
         <div v-else id="empty-space">
@@ -107,13 +125,32 @@
             :header-title="modalState.title"
             :sub-title="modalState.subTitle"
             :theme-color="modalState.themeColor"
-            :fields="multiSelectFields"
+            :fields="fields"
             size="lg"
-            :centered="true"
+            centered
             :selectable="false"
             :items="selectedUsers"
             @confirm="checkModalConfirm"
-        />
+        >
+            <template #col-state-format="{value}">
+                <p-status v-bind="userStateFormatter(value)" class="capitalize" />
+            </template>
+            <template #col-user_type-format="{value}">
+                <span v-if="value === 'API_USER'">API Only</span>
+                <span v-else>Console, API</span>
+            </template>
+            <template #col-last_accessed_at-format="{ value }">
+                <span v-if="value === 0">
+                    {{ $t('IDENTITY.USER.MAIN.TODAY') }}
+                </span>
+                <span v-else-if="value === 1">
+                    {{ $t('IDENTITY.USER.MAIN.YESTERDAY') }}
+                </span>
+                <span v-else>
+                    {{ value }} {{ $t('IDENTITY.USER.MAIN.DAYS') }}
+                </span>
+            </template>
+        </p-table-check-modal>
         <user-form v-if="userFormState.visible"
                    :header-title="userFormState.headerTitle"
                    :update-mode="userFormState.updateMode"
@@ -256,10 +293,6 @@ export default {
                 return users;
             }),
             isSelected: computed(() => state.selectedIndex.length > 0),
-            multiSelectFields: computed(() => ([
-                { name: 'user_id', label: vm.$t('IDENTITY.USER.MAIN.USER_ID') },
-                { name: 'name', label: vm.$t('IDENTITY.USER.MAIN.NAME') },
-            ])),
             dropdownMenu: computed(() => ([
                 {
                     type: 'item',

@@ -91,16 +91,31 @@
                :tabs="multiTabState.tabs" :active-tab.sync="multiTabState.activeTab"
         >
             <template #data>
-                <p-data-table
-                    :fields="selectedDataFields"
-                    :items="selectedItems"
-                    :sortable="false"
-                    :selectable="false"
-                    :col-copy="true"
-                    class="selected-data-tab"
+                <p-data-table :fields="selectedDataFields"
+                              :items="selectedItems"
+                              :sortable="false"
+                              :selectable="false"
+                              col-copy
+                              class="selected-data-tab"
                 >
+                    <template #col-plugin_info.plugin_id-format="{index, field, item}">
+                        <p-lazy-img :src="item.plugin_icon"
+                                    width="1.5rem" height="1.5rem" class="mr-2"
+                        />
+                        {{ item.plugin_name }}
+                    </template>
                     <template #col-state-format="data">
-                        <p-status :text="data.value" :theme="data.value" />
+                        <p-status :text="data.value" :theme="data.value === 'DISABLED' ? 'red' : 'green'" />
+                    </template>
+                    <template #col-collector_history-format="{index, field, item}">
+                        <router-link :to="item.detailLink">
+                            <span class="view-detail">{{ $t('PLUGIN.COLLECTOR.MAIN.VIEW_DETAIL') }}
+                                <p-i name="ic_arrow_right" width="1rem" color="inherit transparent" />
+                            </span>
+                        </router-link>
+                    </template>
+                    <template #col-last_collected_at-format="{ value }">
+                        {{ value ? timestampFormatter(value,timezone) : '' }}
                     </template>
                 </p-data-table>
             </template>
@@ -120,13 +135,33 @@
                              :header-title="checkModalState.title"
                              :sub-title="checkModalState.subTitle"
                              :theme-color="checkModalState.themeColor"
-                             :fields="checkModalState.tableCheckFields"
+                             :fields="selectedDataFields"
                              size="lg"
                              centered
                              :selectable="false"
                              :items="selectedItems"
                              @confirm="checkModalConfirm"
-        />
+        >
+            <template #col-plugin_info.plugin_id-format="{index, field, item}">
+                <p-lazy-img :src="item.plugin_icon"
+                            width="1.5rem" height="1.5rem" class="mr-2"
+                />
+                {{ item.plugin_name }}
+            </template>
+            <template #col-state-format="data">
+                <p-status :text="data.value" :theme="data.value === 'DISABLED' ? 'red' : 'green'" />
+            </template>
+            <template #col-collector_history-format="{index, field, item}">
+                <router-link :to="item.detailLink">
+                    <span class="view-detail">{{ $t('PLUGIN.COLLECTOR.MAIN.VIEW_DETAIL') }}
+                        <p-i name="ic_arrow_right" width="1rem" color="inherit transparent" />
+                    </span>
+                </router-link>
+            </template>
+            <template #col-last_collected_at-format="{ value }">
+                {{ value ? timestampFormatter(value,timezone) : '' }}
+            </template>
+        </p-table-check-modal>
     </general-page-layout>
 </template>
 
@@ -147,7 +182,6 @@ import PQuerySearchTable from '@/components/organisms/tables/query-search-table/
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import PStatus from '@/components/molecules/status/PStatus.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -185,7 +219,6 @@ export default {
         PIconTextButton,
         PDropdownMenuBtn,
         PDataTable,
-        PPanelTop,
         PQuerySearchTable,
         PStatus,
         PTab,
@@ -247,11 +280,7 @@ export default {
                 state.selectedIndexes.map(d => items.push(state.items[d]));
                 return items;
             }),
-            selectedDataFields: [
-                { name: 'name', label: 'Name' },
-                { name: 'state', label: 'State' },
-                { name: 'priority', label: 'Priority' },
-            ],
+            selectedDataFields: computed(() => [{ name: 'collector_id', label: 'Collector Id' }, ...state.fields]),
             // query
             querySearchHandlers: makeQuerySearchPropsWithSearchSchema([{
                 title: 'Filters',
