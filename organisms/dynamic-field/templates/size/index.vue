@@ -2,7 +2,7 @@
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 import { SizeDynamicFieldProps } from '@/components/organisms/dynamic-field/templates/size/type';
 import { SizeOptions } from '@/components/organisms/dynamic-field/type/field-schema';
-import bytes, { BytesOptions } from 'bytes';
+import bytes from 'bytes';
 import { RenderContext } from 'vue/types/options';
 
 const unitMap: Record<string, bytes.Unit> = {
@@ -46,8 +46,10 @@ export default {
     },
     render(h, { props, data }: RenderContext<SizeDynamicFieldProps>) {
         let value: number|null;
+
         if (typeof props.data === 'number') value = props.data;
         else if (typeof props.data === 'string') value = Number(props.data);
+        else if (props.options.default !== undefined) value = props.options.default;
         else value = null;
 
         let formattedValue: string;
@@ -60,7 +62,13 @@ export default {
             if (sourceUnit) {
                 value = bytes.parse(`${props.data}${sourceUnit}`);
             }
-            formattedValue = bytes(value, bytesOptions);
+
+            const res = bytes(value, bytesOptions);
+            if (res.split(' ')[1] === 'B') {
+                formattedValue = `${value} bytes`;
+            } else {
+                formattedValue = res;
+            }
         }
 
         let sizeEl = h('span', data, formattedValue);
