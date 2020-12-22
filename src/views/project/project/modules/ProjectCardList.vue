@@ -72,12 +72,9 @@
                             <router-link v-if="cardSummary[item.project_id]"
                                          class="summary-item-num"
                                          :to="getLocation(item.project_id, 'server')"
-                            >{{ cardSummary[item.project_id].serverCount }}
-                            </router-link>
+                            >{{ cardSummary[item.project_id].serverCount }}</router-link>
                             <span v-else class="summary-item-num none">N/A</span>
-
                             <span class="mx-2 text-gray-300 divider">|</span>
-
                             <span class="summary-item-text">{{ $t('PROJECT.LANDING.CLOUD_SERVICES') }}</span>
                             <router-link v-if="cardSummary[item.project_id]"
                                          class="summary-item-num"
@@ -100,7 +97,7 @@
                                                  name: 'serviceAccount',
                                                  query: { provider: getProvider(provider) ? provider : null },
                                              }"
-                                             class="link"
+                                             class="icon-link"
                                              :style="{
                                                  backgroundImage: `url('${getProvider(provider).icon || require('@/assets/icons/ic_provider_other.svg')}')`
                                              }"
@@ -434,7 +431,7 @@ export default {
                 min-width: 0;
                 height: 1.25rem;
             }
-            .link {
+            .icon-link {
                 @apply flex-shrink-0 inline-block mr-2;
                 height: 1.25rem;
                 width: 1.25rem;

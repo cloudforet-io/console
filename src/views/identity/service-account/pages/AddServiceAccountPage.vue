@@ -21,7 +21,6 @@
             <template #content>
                 <p-markdown :markdown="description.options.markdown"
                             :data="description.options.markdown"
-                            class="p-4"
                 />
             </template>
         </p-collapsible-panel>

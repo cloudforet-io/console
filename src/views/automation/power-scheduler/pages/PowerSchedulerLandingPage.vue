@@ -19,7 +19,7 @@
                 :key-item-sets="keyItemSets"
                 :value-handler-map="valueHandlerMap"
                 :pagination-values="[12, 24, 36]"
-                card-height="18.25rem"
+                card-height="20.25rem"
                 card-min-width="25rem"
                 @change="onChange"
                 @refresh="onChange"

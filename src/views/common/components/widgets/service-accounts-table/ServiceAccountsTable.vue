@@ -223,7 +223,6 @@ export default {
 .custom-th {
     @apply justify-center;
     display: flex;
-    text-transform: uppercase;
     font-weight: bold;
     padding: 0 0.25rem;
 }
