@@ -1,3 +1,4 @@
+import { object } from '@storybook/addon-knobs';
 import PPageNavigation from './PPageNavigation.vue';
 
 export default {
@@ -20,15 +21,14 @@ export const pageNavigation = () => ({
     template: '<p-page-navigation :routes="route"></p-page-navigation>',
     props: {
         route: {
-            type: Array,
-            default: [
-                { name: 'Automation', path: '/automation' },
-                { name: 'Power Scheduler', path: '/automation/power-scheduler' },
-                { name: 'Page3', path: '/automation/power-scheduler' },
-                { name: 'Page4', path: '/automation/power-scheduler' },
-                { name: 'Page5', path: '/automation/power-scheduler' },
-                { name: 'Page6', path: '/automation/power-scheduler' },
-            ],
+            default: object('pages', [
+                { name: 'Page1', path: '/page1' },
+                { name: 'Page3' },
+                { name: 'Page2' },
+                { name: 'Page4' },
+                { name: 'Page5' },
+                { name: 'Page6' },
+            ]),
         },
     },
 });

@@ -31,7 +31,7 @@
                 </div>
             </span>
             <span v-if="routes.length>=5&&idx===2&&!state.isShown">
-                <span class="inline-block link" @click="showHidden">...</span>
+                <span class="inline-block link hidden-underline" @click="showHidden">...</span>
                 <p-i name="ic_breadcrumb_arrow" width="1rem" height="1rem"
                      class="arrow-icon" color="inherit white"
                 />
@@ -96,6 +96,12 @@ export default {
         @apply text-gray-200;
         margin-left: 0.25rem;
         margin-right: 0.25rem;
+    }
+
+    .hidden-underline {
+        &:hover {
+            text-decoration: underline;
+        }
     }
 }
 </style>
