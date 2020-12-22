@@ -328,7 +328,7 @@ export default {
     .p-data-table::v-deep {
         &.more {
             .table-container {
-                max-height: 62.5rem;
+                max-height: 37.5rem;
             }
         }
         .link-text {

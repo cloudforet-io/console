@@ -11,7 +11,7 @@
                         <router-link :to="data.type !== 'spendings' ? getLocation(data.type) : ''" class="anchor" :class="data.type">
                             <span class="number">
                                 <span v-if="data.type === 'spendings'" class="dollar-sign">$</span>
-                                <span>{{ data.type === 'spendings' ? numberFormatter(data.count) : commaFormatter(data.count) }}</span>
+                                <span>{{ data.type === 'storage' ? commaFormatter(data.count) : commaFormatter(numberFormatter(data.count)) }}</span>
                             </span>
                         </router-link>
                         <span class="suffix" :class="data.type">{{ data.suffix }}</span>
@@ -202,6 +202,23 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
 
+        const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
+        const numberFormatter = (num) => {
+            if (Math.abs(num) < 10000) {
+                return Math.round(num * 10) / 10;
+            }
+            const options = {
+                notation: 'compact',
+                signDisplay: 'auto',
+                maximumFractionDigits: 1,
+            };
+            return Intl.NumberFormat('en', options).format(num);
+        };
+        const commaFormatter = (num) => {
+            if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return num;
+        };
+
         const state = reactive({
             loading: false,
             chartRef: null as HTMLElement | null,
@@ -245,8 +262,8 @@ export default {
                 {
                     type: DATA_TYPE.storage,
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE'),
-                    count: state.count.storage,
-                    suffix: state.suffix.storage,
+                    count: parseFloat(byteFormatter(state.count.storage).split(' ')[0]),
+                    suffix: byteFormatter(state.count.storage).split(' ')[1],
                 },
                 {
                     type: DATA_TYPE.spendings,
@@ -270,18 +287,6 @@ export default {
         });
 
         /* util */
-        const numberFormatter = (num, digits = 2) => {
-            const options = {
-                notation: 'compact',
-                signDisplay: 'auto',
-                maximumFractionDigits: digits,
-            };
-            return Intl.NumberFormat('en', options).format(num);
-        };
-        const commaFormatter = (num) => {
-            if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            return num;
-        };
         const disposeChart = () => {
             if (chartState.registry[state.chartRef]) {
                 chartState.registry[state.chartRef].dispose();
@@ -339,7 +344,7 @@ export default {
             bullet.label.fill = am4core.color(props.chartTextColor);
             bullet.label.dy = -10;
             if (state.selectedType === DATA_TYPE.spendings) {
-                bullet.label.adapter.add('text', (text, target) => numberFormatter(target.dataItem.valueY, 1));
+                bullet.label.adapter.add('text', (text, target) => numberFormatter(target.dataItem.valueY) || undefined);
                 bullet.label.adapter.add('dy', (dy, target) => {
                     if (target.dataItem.valueY < 0) return 10;
                     return dy;
@@ -392,18 +397,7 @@ export default {
                     label: CLOUD_SERVICE_LABEL[type],
                     project_id: props.projectId,
                 });
-                const count = res.results[0]?.total || 0;
-                if (count === 0) return;
-
-                if (type === DATA_TYPE.storage) {
-                    const formattedSize = bytes(count, { unitSeparator: ' ' });
-                    if (formattedSize) {
-                        state.count[type] = formattedSize.split(' ')[0];
-                        state.suffix[type] = formattedSize.split(' ')[1];
-                    }
-                } else {
-                    state.count[type] = count;
-                }
+                state.count[type] = res.results[0]?.total || 0;
             } catch (e) {
                 console.error(e);
             }
@@ -449,13 +443,13 @@ export default {
 
                 if (type === DATA_TYPE.storage) {
                     const smallestCount = Math.min(...data.map(d => d.total));
-                    const formattedSize = bytes(smallestCount, { unitSeparator: ' ' });
+                    const formattedSize = byteFormatter(smallestCount);
                     if (formattedSize) state.storageTrendSuffix = formattedSize.split(' ')[1] as Unit;
                 }
                 const chartData = data.map((d) => {
                     let count = d.total;
                     if (type === DATA_TYPE.storage) {
-                        const formattedSize = bytes(d.total, { unit: state.storageTrendSuffix, unitSeparator: ' ' });
+                        const formattedSize = byteFormatter(d.total, { unit: state.storageTrendSuffix });
                         if (formattedSize) count = formattedSize.split(' ')[0];
                     }
                     return {
@@ -535,11 +529,11 @@ export default {
             try {
                 let count;
                 if (type === DATA_TYPE.compute) {
-                    count = commaFormatter(state.count.compute);
+                    count = commaFormatter(numberFormatter(state.count.compute));
                 } else if (type === DATA_TYPE.database) {
-                    count = commaFormatter(state.count.database);
+                    count = commaFormatter(numberFormatter(state.count.database));
                 } else if (type === DATA_TYPE.storage) {
-                    count = `${state.count.storage} ${state.suffix.storage}`;
+                    count = byteFormatter(state.count.storage);
                 }
 
                 const param = getApiParameter(type);
@@ -589,7 +583,7 @@ export default {
                         provider: d.provider,
                         label: state.providers[d.provider].label,
                         type: d.display_name || d.cloud_service_group,
-                        count: type === DATA_TYPE.storage ? bytes(d.size, { unitSeparator: ' ' }) : commaFormatter(d.count),
+                        count: type === DATA_TYPE.storage ? byteFormatter(d.size) : commaFormatter(d.count),
                         to: detailLocation,
                     });
                 });
@@ -614,13 +608,15 @@ export default {
                 },
             ];
             res.results.forEach((d) => {
-                summaryData.push({
-                    provider: d.provider,
-                    label: state.providers[d.provider].label,
-                    type: d.cloud_service_group || d.service_code,
-                    count: numberFormatter(d.billing_data[0].cost),
-                    to: '',
-                });
+                if (numberFormatter(d.billing_data[0].cost) !== 0) {
+                    summaryData.push({
+                        provider: d.provider,
+                        label: state.providers[d.provider].label,
+                        type: d.cloud_service_group || d.service_code,
+                        count: numberFormatter(d.billing_data[0].cost),
+                        to: '',
+                    });
+                }
             });
             state.summaryData = summaryData;
         };
