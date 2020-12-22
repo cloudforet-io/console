@@ -62,7 +62,10 @@ export default {
 
 <style lang="postcss">
 .p-markdown {
-    @apply w-full border-black text-gray-900 ;
+    @apply w-full border-black text-gray-900;
+    padding-top: 1.5rem;
+    padding-bottom: 1rem;
+    padding-left: 1rem;
     table {
         td,th {
             @apply px-4 py-2;
@@ -86,6 +89,7 @@ export default {
         @apply text-blue-600;
         font-size: 0.75rem;
         line-height: 150%;
+        margin-bottom: 1.5rem;
         &:hover { @apply underline; }
     }
     code {
@@ -121,28 +125,31 @@ export default {
         @apply font-bold;
     }
     h1 {
-        @apply mt-8 font-normal;
+        @apply font-normal;
         font-size: 1.5rem;
-        line-height: 120%;
+        line-height: 150%;
+        margin-bottom: 1.5rem;
     }
     h2 {
         @apply font-bold;
         font-size: 1rem;
-        line-height: 120%;
+        margin-bottom: 0.5rem;
+        line-height: 150%;
     }
     h3 {
         @apply mb-2 mt-8;
         font-size: 0.875rem;
-        line-height: 120%;
+        line-height: 150%;
     }
     h4, h5, h6 {
         @apply mb-2 mt-5;
         font-size: 0.75rem;
-        line-height: 120%;
+        line-height: 150%;
     }
     p, ul > li, ol > li {
         font-size: 0.75rem;
         line-height: 150%;
+        margin-bottom: 1.5rem;
     }
 }
 
