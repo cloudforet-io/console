@@ -110,17 +110,19 @@
                              @click="toggleLanguageMenu"
                         >
                             <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
-                            <span class="value">{{ userState.language }}</span>
+                            <div class="value">
+                                <span>{{ userState.language }}</span>
+                                <div v-if="showLanguageMenu" class="sub-menu-wrapper">
+                                    <template v-for="(item, index) in languageMenu" @click.native="hideMenu">
+                                        <div :key="index" class="sub-menu" @click="changeLanguage(item.name)">
+                                            <span>{{ item.label }}</span>
+                                        </div>
+                                    </template>
+                                </div>
+                            </div>
                             <p-i :name="showLanguageMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                                  width="1rem" height="1rem"
                             />
-                            <div v-if="showLanguageMenu" class="sub-menu-wrapper">
-                                <template v-for="(item, index) in languageMenu" @click.native="hideMenu">
-                                    <div :key="index" class="sub-menu" @click="changeLanguage(item.name)">
-                                        <span>{{ item.label }}</span>
-                                    </div>
-                                </template>
-                            </div>
                         </div>
                         <p-hr />
                     </div>
@@ -306,6 +308,7 @@ export default {
             state.showLanguageMenu = !state.showLanguageMenu;
         };
         const openProfile = () => {
+            hideMenu();
             vm.$router.replace({ name: 'userAccount' }).catch(() => {});
         };
 
@@ -323,7 +326,7 @@ export default {
                     timezone: userState.timezone,
                 });
                 showSuccessMessage(vm.$t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '', root);
-                state.showLanguageMenu = false;
+                hideMenu();
             } catch (e) {
                 showErrorMessage(vm.$t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'), e, root);
             }
@@ -464,21 +467,26 @@ export default {
                         padding-bottom: 1rem;
                     }
                     &.language {
+                        display: inline-flex;
                         cursor: pointer;
-                        .p-i-icon {
-                            display: inline-block;
-                        }
                         &:hover, &:focus {
                             @apply bg-primary4 text-primary;
                             border-radius: 0.125rem;
                         }
-                        .sub-menu-wrapper {
-                            top: 1.5rem;
-                            left: 4rem;
-                            min-width: 9.25rem;
-                            max-height: 21rem;
-                            overflow-y: auto;
-                            z-index: 10;
+                        .p-i-icon {
+                            display: inline-block;
+                            margin-top: 0.25rem;
+                        }
+                        .value {
+                            position: relative;
+                            .sub-menu-wrapper {
+                                top: 1.5rem;
+                                left: -1rem;
+                                min-width: 9.25rem;
+                                max-height: 21rem;
+                                overflow-y: auto;
+                                z-index: 10;
+                            }
                         }
                     }
 

@@ -90,6 +90,7 @@ export default {
             ]),
         });
 
+        /* api */
         const getData = async () => {
             try {
                 const res = await SpaceConnector.client.statistics.topic.phdSummary();
@@ -123,6 +124,7 @@ export default {
             }
         };
 
+        /* event */
         const onClickToggle = (index) => {
             const showAll: boolean = state.data[index].showAll;
             state.data[index].showAll = !showAll;
@@ -163,8 +165,10 @@ export default {
         font-size: 0.75rem;
     }
     tr {
-        .td {
-            @apply bg-white;
+        td {
+            vertical-align: initial;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
         }
         &:nth-child(even) {
             td {
@@ -198,7 +202,6 @@ export default {
             min-width: 20rem;
             font-size: 0.875rem;
             line-height: 1.6;
-            padding: 0.5rem 0;
             .count {
                 @apply text-primary1;
                 font-weight: bold;

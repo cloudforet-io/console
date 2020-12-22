@@ -22,6 +22,7 @@
                 <p-search v-model="search" class="p-search"
                           :placeholder="$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.PLACEHOLDER')"
                           @search="onSearch"
+                          @delete="onSearch"
                 />
                 <p-icon-button name="ic_refresh" @click="getEvents" />
             </div>
@@ -34,11 +35,15 @@
                           :sort-desc.sync="sortDesc"
                           :class="{ 'more': showMore }"
                           @change="onChange"
+                          @changeSort="onChange"
             >
                 <template #col-event-format="{ value }">
                     <router-link :to="value.to" class="link-text">
                         <span>{{ value.name }}</span>
                     </router-link>
+                </template>
+                <template #col-region-format="{ value }">
+                    <span>{{ regionFormatter(value) }}</span>
                 </template>
                 <template #col-start_time-format="{ value }">
                     <span>{{ value }}</span>
@@ -55,6 +60,9 @@
                     <div v-else />
                 </template>
             </p-data-table>
+            <p-empty v-if="!loading && data.length === 0" class="py-8">
+                <span>{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA') }}</span>
+            </p-empty>
             <div v-show="data.length > 5" class="more-button-wrapper"
                  @click="onClickMoreButton"
             >
@@ -83,24 +91,25 @@ import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
+import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { timestampFormatter } from '@/lib/util';
-import { QueryHelper } from '@/lib/query';
 import { store } from '@/store';
 
 
 enum EVENT_CATEGORY {
     accountNotification = 'accountNotification',
-    scheduledChanges = 'scheduledChanges',
+    scheduledChange = 'scheduledChange',
     issue = 'issue'
 }
 
 export default {
     name: 'ProjectPersonalHealthDashboard',
     components: {
+        PEmpty,
         PI,
         PIconButton,
         PSearch,
@@ -116,7 +125,6 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryHelper = new QueryHelper();
         const getEventsApiQuery = new ApiQueryHelper();
 
         const state = reactive({
@@ -149,7 +157,6 @@ export default {
                 { name: 'affected_resources', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_AFFECTED_RESOURCES'), sortable: false },
             ]),
             countData: {},
-            tags: [],
             search: '',
             sortBy: '',
             sortDesc: true,
@@ -162,7 +169,7 @@ export default {
                     label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_ISSUE'),
                     type: 'item',
                 }, {
-                    name: EVENT_CATEGORY.scheduledChanges,
+                    name: EVENT_CATEGORY.scheduledChange,
                     label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_SCHEDULED_CHANGE'),
                     type: 'item',
                 }, {
@@ -173,6 +180,9 @@ export default {
             ]),
             activeTab: EVENT_CATEGORY.issue,
         });
+
+        /* util */
+        const regionFormatter = val => state.regions[val]?.name || val;
 
         /* api */
         const getCount = async () => {
@@ -188,7 +198,7 @@ export default {
             try {
                 state.loading = true;
                 getEventsApiQuery
-                    .setSort(state.sortBy, state.sortDesc)
+                    .setSort(state.sortBy, state.sortDesc, 'name')
                     .setFilters([{ v: state.search }]);
                 const res = await SpaceConnector.client.statistics.topic.phdEvents(
                     {
@@ -206,7 +216,7 @@ export default {
                             name: d.event_title,
                             to: referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' }),
                         },
-                        region: state.regions[d.region_code]?.name || d.region_code,
+                        region: d.region_code,
                         start_time: startTime,
                         last_updated_time: lastUpdatedTime,
                         affected_resources: d.affected_resources,
@@ -220,18 +230,12 @@ export default {
         };
 
         /* event */
-        const onSearch = (val) => {
-            state.search = val;
-            getEvents();
+        const onSearch = async (val) => {
+            await (state.search = val);
+            await getEvents();
         };
-        const onChange = async (item) => {
-            state.tags = item.queryTags;
-            queryHelper.setFiltersAsQueryTag(item.queryTags);
-            try {
-                await getEvents();
-            } catch (e) {
-                console.error(e);
-            }
+        const onChange = async () => {
+            await getEvents();
         };
         const onClickMoreButton = () => {
             state.showMore = !state.showMore;
@@ -249,6 +253,7 @@ export default {
         return {
             ...toRefs(state),
             tabState,
+            regionFormatter,
             getEvents,
             onSearch,
             onChange,
@@ -318,7 +323,7 @@ export default {
     .p-data-table::v-deep {
         &.more {
             .table-container {
-                max-height: 625rem;
+                max-height: 62.5rem;
             }
         }
         .link-text {

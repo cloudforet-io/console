@@ -26,7 +26,7 @@
             <div class="content-wrapper grid grid-cols-12 gap-2">
                 <div class="chart-wrapper col-span-12 lg:col-span-9">
                     <div class="title">
-                        <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY_TREND_TITLE') }}</span>
+                        <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
                         <span v-if="selectedType === 'storage'" class="suffix">({{ suffix.storage }})</span>
                     </div>
                     <div class="toggle-button-group">
@@ -47,7 +47,7 @@
                 </div>
                 <div class="summary-wrapper col-span-12 lg:col-span-3">
                     <div class="title col-span-3">
-                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY_TYPE_TITLE', { service: dataList[selectedIndex].title }) }}
+                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: dataList[selectedIndex].summaryTitle || dataList[selectedIndex].title }) }}
                     </div>
                     <template v-if="!loading && dataList[selectedIndex].count > 0">
                         <div class="summary-content-wrapper block md:grid md:grid-cols-3 lg:block">
@@ -58,7 +58,7 @@
                             >
                                 <div class="text-group">
                                     <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">
-                                        {{ data.provider === 'all' ? $t('COMMON.WIDGETS.ALL_SUMMARY_ALL') : data.label }}
+                                        {{ data.provider === 'all' ? $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') : data.label }}
                                     </span>
                                     <span class="type">{{ data.type }}</span>
                                 </div>
@@ -71,14 +71,14 @@
                             <div class="m-auto">
                                 <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
                                 <p class="text">
-                                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY_NO_SERVICE', { service: dataList[selectedIndex].title }) }}
+                                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: dataList[selectedIndex].title }) }}
                                 </p>
                                 <router-link to="/identity/service-account">
                                     <p-icon-text-button
                                         style-type="primary1"
                                         name="ic_plus_bold"
                                     >
-                                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY_ADD_SERVICE_ACCOUNTS') }}
+                                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.ADD_SERVICE_ACCOUNTS') }}
                                     </p-icon-text-button>
                                 </router-link>
                             </div>
@@ -212,8 +212,8 @@ export default {
             selectedType: computed(() => state.dataList[state.selectedIndex].type),
             selectedDateType: 'daily' as keyof typeof DATE_TYPE,
             dateTypes: computed(() => ([
-                { name: 'daily', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_DAY') },
-                { name: 'monthly', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_MONTH') },
+                { name: 'daily', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DAY') },
+                { name: 'monthly', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.MONTH') },
             ])),
             //
             count: {
@@ -231,25 +231,26 @@ export default {
             dataList: computed(() => ([
                 {
                     type: DATA_TYPE.compute,
-                    title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_COMPUTE'),
+                    title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.COMPUTE'),
                     count: state.count.compute,
                     suffix: state.suffix.compute,
                 },
                 {
                     type: DATA_TYPE.database,
-                    title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_DATABASE'),
+                    title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE'),
                     count: state.count.database,
                     suffix: state.suffix.database,
                 },
                 {
                     type: DATA_TYPE.storage,
-                    title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_STORAGE'),
+                    title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE'),
                     count: state.count.storage,
                     suffix: state.suffix.storage,
                 },
                 {
                     type: DATA_TYPE.spendings,
-                    title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY_SPENDINGS'),
+                    title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.OVERALL_SPENDINGS'),
+                    summaryTitle: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.RESOURCE'),
                     count: state.count.spendings,
                     beta: true,
                 },
