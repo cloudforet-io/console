@@ -11,7 +11,9 @@
 </template>
 
 <script lang="ts">
-import { cloneDeep } from 'lodash';
+import {
+    cloneDeep, sortBy, flatMap, chain,
+} from 'lodash';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -118,7 +120,7 @@ export default {
         const generateUiSchema = (schema: JsonSchema) => {
             const properties = schema.properties;
             const required = schema.required;
-            const formUiSchema: UiSchema[] = [];
+            const formUiSchema: Record<string, UiSchema>[] = [];
             const defaultModel = {};
 
             if (properties) {
@@ -126,7 +128,7 @@ export default {
                     if (value.default) {
                         defaultModel[key] = value.default;
                     }
-                    const children: UiSchema[] = [];
+                    const children: Record<string, UiSchema> = {};
                     const labelUiSchema = {
                         component: 'label',
                         fieldOptions: {
@@ -164,30 +166,30 @@ export default {
                         },
                     };
 
-                    children.push(labelUiSchema);
-                    if (required?.includes(key)) children.push(requiredMarkUiSchema);
-                    children.push(inputUiSchema);
+                    children.label = labelUiSchema;
+                    if (required?.includes(key)) children.required = requiredMarkUiSchema;
+                    children.input = inputUiSchema;
                     // TODO: need to add number, select, etc
                     if (required?.includes(key)) {
                         const errorUiSchema = getErrorUiSchema(key, value);
-                        children.push(errorUiSchema);
+                        children.error = errorUiSchema;
                     }
 
-                    const formGroupUiSchema = {
-                        component: 'div',
-                        fieldOptions: {
-                            class: [
-                                'form-group',
-                            ],
-                        },
-                        children,
-                    };
-                    formUiSchema.push(formGroupUiSchema);
+                    formUiSchema.push(children);
                 });
                 emit('update:model', defaultModel);
             }
 
-            state.uiSchema = formUiSchema;
+            state.uiSchema = sortBy(formUiSchema, (d: any) => d.label?.fieldOptions?.attrs?.for)
+                .map(d => ({
+                    component: 'div',
+                    fieldOptions: {
+                        class: [
+                            'form-group',
+                        ],
+                    },
+                    children: flatMap(d) as UiSchema[],
+                }));
         };
 
         const onChangeState = (value) => {
