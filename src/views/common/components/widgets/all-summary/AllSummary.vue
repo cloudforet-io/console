@@ -28,6 +28,7 @@
                     <div class="title">
                         <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
                         <span v-if="selectedType === 'storage'" class="suffix">({{ suffix.storage }})</span>
+                        <span v-if="selectedType === 'spendings'" class="suffix">(USD)</span>
                     </div>
                     <div class="toggle-button-group">
                         <p-button v-for="(d, idx) in dateTypes"
@@ -121,7 +122,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
 import { gray, primary1 } from '@/styles/colors';
-import {store} from "@/store";
+import { store } from '@/store';
 
 am4core.useTheme(am4themes_animated);
 am4core.options.autoSetClassName = true;
@@ -314,8 +315,12 @@ export default {
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
             valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
             valueAxis.fontSize = 11;
-            valueAxis.min = 0;
             valueAxis.extraMax = 0.1;
+            if (state.selectedType === DATA_TYPE.spendings) {
+                valueAxis.renderer.labels.template.adapter.add('text', (text, target) => numberFormatter(target.dataItem.value));
+            } else {
+                valueAxis.min = 0;
+            }
 
             const series = chart.series.push(new am4charts.ColumnSeries());
             series.dataFields.valueY = 'count';
@@ -335,6 +340,10 @@ export default {
             bullet.label.dy = -10;
             if (state.selectedType === DATA_TYPE.spendings) {
                 bullet.label.adapter.add('text', (text, target) => numberFormatter(target.dataItem.valueY, 1));
+                bullet.label.adapter.add('dy', (dy, target) => {
+                    if (target.dataItem.valueY < 0) return 10;
+                    return dy;
+                });
             }
         };
         const setBoxInterval = () => {
@@ -405,7 +414,7 @@ export default {
                 period: 1,
                 project_id: props.projectId,
             });
-            state.count.spendings = res.results[0].billing_data[0].cost;
+            if (res.results.length > 0) state.count.spendings = res.results[0].billing_data[0].cost;
         };
         const getTrend = async (type) => {
             const utcToday = dayjs().utc();
@@ -421,10 +430,14 @@ export default {
                         granularity: NEW_DATE_TYPE[state.selectedDateType],
                         project_id: props.projectId,
                     });
-                    data = res.results[0].billing_data.map(d => ({
-                        date: d.date,
-                        total: d.cost,
-                    }));
+                    if (res.results.length > 0) {
+                        data = res.results[0].billing_data.map(d => ({
+                            date: d.date,
+                            total: d.cost,
+                        }));
+                    } else {
+                        data = [];
+                    }
                 } else {
                     const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
                         label: CLOUD_SERVICE_LABEL[type],
@@ -604,7 +617,7 @@ export default {
                 summaryData.push({
                     provider: d.provider,
                     label: state.providers[d.provider].label,
-                    type: d.service_code,
+                    type: d.cloud_service_group || d.service_code,
                     count: numberFormatter(d.billing_data[0].cost),
                     to: '',
                 });

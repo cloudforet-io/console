@@ -258,8 +258,12 @@ export default {
     overflow-y: auto;
     .card-wrapper {
         display: block;
-        .card {
-            margin-bottom: 0.5rem;
+        .item-container {
+            &.card {
+                &:hover {
+                    @apply bg-blue-100;
+                }
+            }
         }
     }
     .item-container.card .contents {
@@ -291,6 +295,7 @@ export default {
 }
 
 .card {
+    margin-bottom: 0.5rem;
     .group-name {
         @apply font-bold mb-1 truncate leading-tight;
         font-size: 0.875rem;

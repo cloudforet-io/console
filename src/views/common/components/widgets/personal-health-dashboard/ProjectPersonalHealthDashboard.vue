@@ -42,7 +42,7 @@
                         <span>{{ value.name }}</span>
                     </router-link>
                 </template>
-                <template #col-region-format="{ value }">
+                <template #col-region_code-format="{ value }">
                     <span>{{ regionFormatter(value) }}</span>
                 </template>
                 <template #col-start_time-format="{ value }">
@@ -51,10 +51,11 @@
                 <template #col-affected_resources-format="{ value }">
                     <div v-if="value.length > 0">
                         <div v-for="(resource, index) in value" :key="index" class="affected-resources-wrapper">
-                            <template v-if="resource.awsAccountId">
+                            <template v-if="resource.entity_type === 'account'">
                                 <span class="label">{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SERVICE_ACCOUNT_ID') }} : </span>
-                                <span class="value">{{ resource.awsAccountId }}</span>
+                                <span class="value">{{ resource.aws_account_id }}</span>
                             </template>
+                            <template v-else />
                         </div>
                     </div>
                     <div v-else />
@@ -151,7 +152,7 @@ export default {
             ])),
             fields: computed(() => [
                 { name: 'event', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_EVENT'), sortable: false },
-                { name: 'region', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_REGION') },
+                { name: 'region_code', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_REGION') },
                 { name: 'start_time', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_START_TIME') },
                 { name: 'last_updated_time', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_LAST_UPDATE_TIME') },
                 { name: 'affected_resources', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_AFFECTED_RESOURCES'), sortable: false },
@@ -183,6 +184,10 @@ export default {
 
         /* util */
         const regionFormatter = val => state.regions[val]?.name || val;
+        // const affectedResourcesFormatter = (val) => {
+        //     const idList = [];
+        //     const serviceAccountList = [];
+        // };
 
         /* api */
         const getCount = async () => {
@@ -216,7 +221,7 @@ export default {
                             name: d.event_title,
                             to: referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' }),
                         },
-                        region: d.region_code,
+                        region_code: d.region_code,
                         start_time: startTime,
                         last_updated_time: lastUpdatedTime,
                         affected_resources: d.affected_resources,
@@ -364,5 +369,8 @@ export default {
             margin: auto;
         }
     }
+}
+.p-empty {
+    height: 6.875rem;
 }
 </style>
