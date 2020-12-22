@@ -95,15 +95,14 @@
                    :active-tab.sync="multiItemTabState.activeTab"
             >
                 <template #data>
-                    <p-data-table
-                        :fields="tableState.multiFields"
-                        :sortable="false"
-                        :selectable="false"
-                        :items="tableState.selectedItems"
-                        :col-copy="true"
-                        class="selected-data-tab"
-                    >
-                    </p-data-table>
+                    <p-dynamic-layout v-if="tableState.multiSchema"
+                                      type="simple-table"
+                                      :options="tableState.multiSchema.options"
+                                      :type-options="{ colCopy: true, timezone: typeOptionState.timezone }"
+                                      :data="tableState.selectedItems"
+                                      :field-handler="fieldHandler"
+                                      class="selected-data-tab"
+                    />
                 </template>
             </p-tab>
             <div v-else class="empty-space">
@@ -177,6 +176,7 @@ import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TranslateResult } from 'vue-i18n';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
 import { QueryHelper } from '@/lib/query';
+import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 
 interface ProjectItemResp {
     id: string;
@@ -275,27 +275,37 @@ export default {
                     name: 'link', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CONSOLE'), type: 'item', disabled: !tableState.consoleLink, link: tableState.consoleLink, target: 'blank',
                 },
             ]),
-            multiFields: [
-                { name: 'name', label: 'Name' },
-            ],
             selectedAccountIds: computed(() => tableState.selectedItems.map(d => d?.service_account_id)),
-            schema: [],
+            schema: null as null|DynamicLayout,
+            multiSchema: computed<null|DynamicLayout>(() => {
+                if (!tableState.schema) return null;
+
+                const res: DynamicLayout = { ...tableState.schema };
+                if (tableState.schema.options.fields) {
+                    res.options = {
+                        ...tableState.schema.options,
+                        fields: [{ name: 'Account ID', key: 'service_account_id' }, ...tableState.schema.options.fields],
+                    };
+                }
+
+                return res;
+            }),
         });
 
         const getLinkTemplate = (data) => {
             let linkTemplate: string | undefined;
-            let link: string;
+            let link = '';
             switch (selectedProvider.value) {
             case 'aws':
                 linkTemplate = providerState.items[0].linkTemplate;
-                link = render(linkTemplate as string, data);
+                if (linkTemplate) link = render(linkTemplate as string, data);
                 break;
             // case 'google_cloud':
             //     linkTemplate = providerState.items[1].linkTemplate;
             //     tableState.consoleLink = render(linkTemplate, data);
             //     break;
             default:
-                link = '';
+                break;
             }
             return link;
         };
@@ -329,6 +339,10 @@ export default {
             typeOptionState.loading = true;
             try {
                 const res = await serviceAccountListApi({ query: getQuery() });
+
+                // filtering select index
+                typeOptionState.selectIndex = typeOptionState.selectIndex.filter(d => !!res.results[d]);
+
                 tableState.items = res.results;
                 typeOptionState.totalCount = res.total_count;
             } catch (e) {

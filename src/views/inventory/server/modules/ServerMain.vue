@@ -72,17 +72,14 @@
                :active-tab.sync="multiItemTabState.activeTab"
         >
             <template #data>
-                <p-data-table class="selected-data-tab"
-                              :fields="tableState.multiFields"
-                              :sortable="false"
-                              :selectable="false"
-                              :items="tableState.selectedItems"
-                              col-copy
-                >
-                    <template #col-updated_at-format="{value}">
-                        {{ timeFormatter(value) }}
-                    </template>
-                </p-data-table>
+                <p-dynamic-layout v-if="tableState.multiSchema"
+                                  type="simple-table"
+                                  :options="tableState.multiSchema.options"
+                                  :type-options="{ colCopy: true, timezone: typeOptionState.timezone }"
+                                  :data="tableState.selectedItems"
+                                  :field-handler="fieldHandler"
+                                  class="selected-data-tab"
+                />
             </template>
             <template #member>
                 <server-member :server-ids="tableState.selectedServerIds" />
@@ -144,7 +141,6 @@ import ServerHistory from '@/views/inventory/server/modules/ServerHistory.vue';
 import Monitoring from '@/views/common/components/monitoring/Monitoring.vue';
 import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
@@ -159,7 +155,7 @@ import {
     QuerySearchTableListeners, QuerySearchTableTypeOptions,
 } from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
-import { DynamicLayout, QuerySearchTableOptions } from '@/components/organisms/dynamic-layout/type/layout-schema';
+import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 import { MenuItem } from '@/components/organisms/context-menu/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
@@ -168,7 +164,6 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { QueryHelper } from '@/lib/query';
 import { Reference } from '@/lib/reference/type';
 import { ServerModel } from '@/models/inventory/server';
@@ -229,7 +224,6 @@ export default {
     name: 'ServerMain',
     components: {
         PPageTitle,
-        PDataTable,
         CollectModal,
         ServerDetails,
         ServerMember,
@@ -311,15 +305,6 @@ export default {
 
                 return res;
             }),
-            multiFields: computed<MenuItem[]>(() => [
-                { name: 'server_id', label: 'Server ID', type: 'item' },
-                { name: 'name', label: 'Name', type: 'item' },
-                { name: ' primary_ip_address', label: 'Primary IP', type: 'item' },
-                { name: 'server_type', label: 'Server Type', type: 'item' },
-                { name: 'os_type', label: 'OS Type', type: 'item' },
-                { name: 'provider', label: 'Provider', type: 'item' },
-                { name: 'updated_at', label: 'Updated', type: 'item' },
-            ]),
             selectedServerIds: computed(() => tableState.selectedItems.map(d => d.server_id)),
         });
         const fetchOptionState: QuerySearchTableFetchOptions = reactive({

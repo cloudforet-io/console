@@ -111,13 +111,13 @@
                        :active-tab.sync="multiItemTabState.activeTab"
                 >
                     <template #data>
-                        <p-dynamic-layout v-if="tableState.schema"
-                                          class="selected-data-tab"
+                        <p-dynamic-layout v-if="tableState.multiSchema"
                                           type="simple-table"
-                                          :field-handler="fieldHandler"
-                                          :options="tableState.schema.options"
+                                          :options="tableState.multiSchema.options"
                                           :type-options="{ colCopy: true, timezone: typeOptionState.timezone }"
                                           :data="tableState.selectedItems"
+                                          :field-handler="fieldHandler"
+                                          class="selected-data-tab"
                         />
                     </template>
                     <template #member>
@@ -353,6 +353,19 @@ export default {
                 },
             ] as MenuItem[])),
             collectModalVisible: false,
+            multiSchema: computed<null|DynamicLayout>(() => {
+                if (!tableState.schema) return null;
+
+                const res: DynamicLayout = { ...tableState.schema };
+                if (tableState.schema.options.fields) {
+                    res.options = {
+                        ...tableState.schema.options,
+                        fields: [{ name: 'ID', key: 'cloud_service_id' }, ...tableState.schema.options.fields],
+                    };
+                }
+
+                return res;
+            }),
             selectedCloudServiceIds: computed(() => tableState.selectedItems.map(d => d.cloud_service_id)),
             tableHeight: cloudServiceStore.getItem('tableHeight', 'number'),
         });
