@@ -1,10 +1,10 @@
 <template>
     <div class="user-account-page">
         <p-page-navigation :routes="routes" />
-        <p-page-title :title="'Account & Profile'" />
+        <p-page-title :title="$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE')" />
         <p-pane-layout class="form-wrapper">
             <p class="form-title">
-                Base Information
+                {{$t('IDENTITY.USER.MAIN.BASE_INFORMATION')}}
             </p>
             <p-field-group :label="'ID'" class="input-form">
                 <p-text-input v-model="userId" disabled class="text-input" />
@@ -40,14 +40,14 @@
             </p-field-group>
             <div class="save-btn">
                 <p-button style-type="primary-dark" @click="onClickProfileConfirm">
-                    Save Changes
+                    {{$t('IDENTITY.USER.MAIN.SAVE_CHANGES')}}
                 </p-button>
             </div>
         </p-pane-layout>
-        <div v-if="userType === 'LOCAL'">
+        <div v-if="userType == 'LOCAL'">
             <p-pane-layout class="mt-6 form-wrapper">
                 <p class="form-title">
-                    Change Password
+                    {{$t('IDENTITY.USER.MAIN.CHANGE_PASSWORD')}}
                 </p>
                 <form class="form">
                     <p-field-group
@@ -81,7 +81,7 @@
                 </form>
                 <div class="save-btn">
                     <p-button style-type="primary-dark" @click="onClickPasswordConfirm">
-                        Save Changes
+                        {{$t('IDENTITY.USER.MAIN.SAVE_CHANGES')}}
                     </p-button>
                 </div>
             </p-pane-layout>
@@ -160,7 +160,7 @@ export default {
         const routeState = reactive({
             routes: computed(() => ([
                 { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: 'Account & Profile', path: '/identity/user/account' },
+                { name: vm.$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE'), path: '/identity/user/account' },
             ])),
         });
 
@@ -169,7 +169,7 @@ export default {
             if (state.email) {
                 if (!regex.test(state.email)) {
                     validationState.isEmailValid = false;
-                    validationState.emailInvalidText = 'Invalid e-mail format.';
+                    validationState.emailInvalidText = vm.$t('IDENTITY.USER.FORM.EMAIL_INVALID');
                 } else {
                     validationState.isEmailValid = true;
                     validationState.emailInvalidText = '';
@@ -187,13 +187,13 @@ export default {
                 validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 9 });
             } else if (!password.match(/[a-z]/)) {
                 validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = 'Contains at least one lowercase character';
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
             } else if (!password.match(/[A-Z]/)) {
                 validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = 'Contains at least one Upper character';
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
             } else if (!password.match(/[0-9]/)) {
                 validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = 'Contains at least one number';
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
             } else {
                 validationState.isPasswordValid = true;
                 validationState.passwordInvalidText = '';
@@ -221,9 +221,9 @@ export default {
                 if (userParam.language) {
                     vm.$i18n.locale = userParam.language as string;
                 }
-                showSuccessMessage(vm.$t('IDENTITY.USER.ALT_S_UPDATE_USER'), '', root);
+                showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.USER.ALT_E_UPDATE_USER'), e, root);
+                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e, root);
             }
         };
 

@@ -9,35 +9,35 @@
                     {{ userState.userId }}
                 </p>
                 <p v-if="userState.isAdmin" class="member-type">
-                    SpaceONE Admin
+                    {{ $t('IDENTITY.USER.MAIN.SPACEONE_ADMIN') }}
                 </p>
                 <p v-else class="member-type">
-                    SpaceONE User
+                    {{ $t('IDENTITY.USER.MAIN.SPACEONE_USER') }}
                 </p>
             </div>
             <div class="menu-title">
-                My Account
+                {{ $t('IDENTITY.USER.MAIN.MY_ACCOUNT') }}
             </div>
             <p-hr class="menu-divider" />
             <div v-for="(item) in sidebarState.userMenuList" :key="item.label"
                  class="menu-item"
-                 :class="{'selected': item.label === sidebarState.selectedItem.label}"
+                 :class="{'selected': item.label === sidebarState.selectedItem}"
                  @click="showAccountPage(item)"
             >
                 {{ item.label }}
             </div>
             <div v-if="userState.isAdmin" class="admin-menu-wrapper">
                 <div class="menu-title">
-                    Administrator
+                    {{ $t('IDENTITY.USER.MAIN.ADMINISTRATOR') }}
                 </div>
                 <p-hr class="menu-divider" />
                 <div v-for="(item) in sidebarState.adminMenuList"
                      :key="item.label"
                      class="menu-item"
-                     :class="{'selected': item.label === sidebarState.selectedItem.label}"
+                     :class="{'selected': item.label === sidebarState.selectedItem}"
                      @click="showManagementPage(item)"
                 >
-                    User Management
+                    {{ $t('IDENTITY.USER.MAIN.USER_MANAGEMENT') }}
                 </div>
             </div>
         </template>
@@ -59,9 +59,12 @@ import PHr from '@/components/atoms/hr/PHr.vue';
 import { store } from '@/store';
 import PI from '@/components/atoms/icons/PI.vue';
 import router from '@/routes';
+import VueI18n from 'vue-i18n';
+
+import TranslateResult = VueI18n.TranslateResult;
 
 interface SidebarItemType {
-    label: string;
+    label: TranslateResult;
 }
 
 export default {
@@ -94,31 +97,31 @@ export default {
             showManagementPage: true,
             userMenuList: [
                 {
-                    label: 'Account & Profile',
+                    label: vm.$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE'),
                 },
             ],
             adminMenuList: [
                 {
-                    label: 'User Management',
+                    label: vm.$t('IDENTITY.USER.MAIN.USER_MANAGEMENT'),
                 },
             ],
-            selectedItem: {} as SidebarItemType,
+            selectedItem: '' as TranslateResult,
         });
         const showAccountPage = (item) => {
-            sidebarState.selectedItem = item;
+            sidebarState.selectedItem = item.label;
             vm.$router.replace({ name: 'userAccount', query: { ...router.currentRoute.query } }).catch(() => {});
         };
         const showManagementPage = (item) => {
-            sidebarState.selectedItem = item;
+            sidebarState.selectedItem = item.label;
             vm.$router.replace({ name: 'userManagement', query: { ...router.currentRoute.query } }).catch(() => {});
         };
 
         const selectSidebarItem = (routeName) => {
             if (routeName === 'userAccount') {
-                sidebarState.selectedItem = sidebarState.userMenuList[0];
+                sidebarState.selectedItem = sidebarState.userMenuList[0].label as TranslateResult;
             }
             if (routeName === 'userManagement') {
-                sidebarState.selectedItem = sidebarState.adminMenuList[0];
+                sidebarState.selectedItem = sidebarState.adminMenuList[0].label as TranslateResult;
             }
         };
 

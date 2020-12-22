@@ -61,7 +61,7 @@
                     <p-text-input v-model="formState.email" :invalid="invalid" class="text-input" />
                 </template>
             </p-field-group>
-            <p-field-group :label="'Domain Role'" class="input-form">
+            <p-field-group :label="$t('IDENTITY.USER.MAIN.DOMAIN_ROLE')" class="input-form">
                 <p-select-dropdown v-model="formState.domainRole"
                                    :items="formState.domainRoleItem"
                                    auto-height
@@ -189,8 +189,8 @@ export default {
             email: '',
             domainRole: '',
             domainRoleItem: [
-                { type: 'item', label: 'Not select role', name: '' },
-                { type: 'item', label: 'Domain Admin', name: '' },
+                { type: 'item', label: vm.$t('IDENTITY.USER.FORM.NOT_SELECT_ROLE'), name: '' },
+                { type: 'item', label: vm.$t('IDENTITY.USER.FORM.DOMAIN_ADMIN'), name: '' },
             ],
             password: '',
             passwordCheck: '',
@@ -270,7 +270,7 @@ export default {
             const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
             if (!regex.test(userId)) {
                 validationState.isUserIdValid = false;
-                validationState.userIdInvalidText = 'Invalid e-mail format.';
+                validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.EMAIL_INVALID');
             }
         };
 
@@ -300,7 +300,7 @@ export default {
             if (formState.email) {
                 if (!regex.test(formState.email)) {
                     validationState.isEmailValid = false;
-                    validationState.emailInvalidText = 'Invalid e-mail format.';
+                    validationState.emailInvalidText = vm.$t('IDENTITY.USER.FORM.EMAIL_INVALID');
                 } else {
                     validationState.isEmailValid = true;
                     validationState.emailInvalidText = '';
@@ -318,13 +318,13 @@ export default {
                 validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 9 });
             } else if (!password.match(/[a-z]/)) {
                 validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = 'Contains at least one lowercase character';
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
             } else if (!password.match(/[A-Z]/)) {
                 validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = 'Contains at least one Upper character';
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
             } else if (!password.match(/[0-9]/)) {
                 validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = 'Contains at least one number';
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
             } else {
                 validationState.isPasswordValid = true;
                 validationState.passwordInvalidText = '';

@@ -13,13 +13,13 @@
             </template>
             <template #data-last_accessed_at="{data}">
                 <span v-if="data === 0">
-                    Today
+                    {{$t('IDENTITY.USER.MAIN.TODAY')}}
                 </span>
                 <span v-else-if="data === 1">
-                    Yesterday
+                    {{$t('IDENTITY.USER.MAIN.YESTERDAY')}}
                 </span>
                 <span v-else>
-                    {{ data }} days
+                    {{ data }} {{$t('IDENTITY.USER.MAIN.DAYS')}}
                 </span>
             </template>
         </p-definition-table>
@@ -80,18 +80,18 @@ export default {
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const baseState = reactive({
-            title: computed(() => vm.$t('IDENTITY.USER.BASE_INFORMATION')),
+            title: computed(() => vm.$t('IDENTITY.USER.MAIN.BASE_INFORMATION')),
             loading: true,
             fields: computed(() => [
-                { name: 'user_id', label: vm.$t('IDENTITY.USER.USER_ID') },
-                { name: 'name', label: vm.$t('IDENTITY.USER.NAME') },
-                { name: 'state', label: vm.$t('IDENTITY.USER.STATE') },
-                { name: 'user_type', label: vm.$t('IDENTITY.USER.ACCESS_CONTROL') },
-                { name: 'email', label: vm.$t('IDENTITY.USER.EMAIL') },
-                { name: 'last_accessed_at', label: vm.$t('IDENTITY.USER.LAST_ACTIVITY') },
-                { name: 'domain_id', label: vm.$t('IDENTITY.USER.DOMAIN_ID') },
-                { name: 'language', label: vm.$t('IDENTITY.USER.LANGUAGE') },
-                { name: 'timezone', label: vm.$t('IDENTITY.USER.TIMEZONE') },
+                { name: 'user_id', label: vm.$t('IDENTITY.USER.MAIN.USER_ID') },
+                { name: 'name', label: vm.$t('IDENTITY.USER.MAIN.NAME') },
+                { name: 'state', label: vm.$t('IDENTITY.USER.MAIN.STATE') },
+                { name: 'user_type', label: vm.$t('IDENTITY.USER.MAIN.ACCESS_CONTROL') },
+                { name: 'email', label: vm.$t('IDENTITY.USER.MAIN.EMAIL') },
+                { name: 'last_accessed_at', label: vm.$t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
+                { name: 'domain_id', label: vm.$t('IDENTITY.USER.MAIN.DOMAIN_ID') },
+                { name: 'language', label: vm.$t('IDENTITY.USER.MAIN.LANGUAGE') },
+                { name: 'timezone', label: vm.$t('IDENTITY.USER.MAIN.TIMEZONE') },
             ]),
             data: {} as UserDetailData,
         });

@@ -1,7 +1,7 @@
 <template>
     <div class="right-contents-container">
         <p-page-navigation :routes="routes" />
-        <p-page-title :title="'User Management'"
+        <p-page-title :title="$t('IDENTITY.USER.MAIN.USER_MANAGEMENT')"
                       use-total-count use-selected-count
                       :total-count="totalCount"
                       :selected-count="selectedIndex.length"
@@ -33,7 +33,7 @@
                                             name="ic_plus_bold"
                                             @click="clickAdd"
                         >
-                            {{ $t('IDENTITY.USER.CREATE') }}
+                            {{ $t('IDENTITY.USER.MAIN.CREATE') }}
                         </p-icon-text-button>
                         <p-dropdown-menu-btn
                             id="dropdown-btn"
@@ -44,7 +44,7 @@
                             @click-delete="clickDelete"
                             @click-update="clickUpdate"
                         >
-                            {{ $t('IDENTITY.USER.ACTION') }}
+                            {{ $t('IDENTITY.USER.MAIN.ACTION') }}
                         </p-dropdown-menu-btn>
                     </template>
                     <template #col-state-format="{value}">
@@ -56,13 +56,13 @@
                     </template>
                     <template #col-last_accessed_at-format="{ value }">
                         <span v-if="value === 0">
-                            Today
+                            {{$t('IDENTITY.USER.MAIN.TODAY')}}
                         </span>
                         <span v-else-if="value === 1">
-                            Yesterday
+                            {{$t('IDENTITY.USER.MAIN.YESTERDAY')}}
                         </span>
                         <span v-else>
-                            {{ value }} days
+                            {{ value }} {{$t('IDENTITY.USER.MAIN.DAYS')}}
                         </span>
                     </template>
                 </p-query-search-table>
@@ -99,7 +99,7 @@
             </template>
         </p-tab>
         <div v-else id="empty-space">
-            <p-empty>{{ $t('IDENTITY.USER.NO_SELECTED') }}</p-empty>
+            <p-empty>{{ $t('IDENTITY.USER.MAIN.NO_SELECTED') }}</p-empty>
         </div>
         <p-table-check-modal
             v-if="!!modalState.mode"
@@ -257,25 +257,25 @@ export default {
             }),
             isSelected: computed(() => state.selectedIndex.length > 0),
             multiSelectFields: computed(() => ([
-                { name: 'user_id', label: vm.$t('IDENTITY.USER.USER_ID') },
-                { name: 'name', label: vm.$t('IDENTITY.USER.NAME') },
+                { name: 'user_id', label: vm.$t('IDENTITY.USER.MAIN.USER_ID') },
+                { name: 'name', label: vm.$t('IDENTITY.USER.MAIN.NAME') },
             ])),
             dropdownMenu: computed(() => ([
                 {
                     type: 'item',
                     name: 'update',
-                    label: vm.$t('IDENTITY.USER.UPDATE'),
+                    label: vm.$t('IDENTITY.USER.MAIN.UPDATE'),
                     disabled: state.selectedIndex.length > 1 || !state.isSelected,
                 },
                 {
-                    type: 'item', name: 'delete', label: vm.$t('IDENTITY.USER.DELETE'), disabled: !state.isSelected,
+                    type: 'item', name: 'delete', label: vm.$t('IDENTITY.USER.MAIN.DELETE'), disabled: !state.isSelected,
                 },
                 { type: 'divider' },
                 {
-                    type: 'item', name: 'enable', label: vm.$t('IDENTITY.USER.ENABLE'), disabled: !state.isSelected,
+                    type: 'item', name: 'enable', label: vm.$t('IDENTITY.USER.MAIN.ENABLE'), disabled: !state.isSelected,
                 },
                 {
-                    type: 'item', name: 'disable', label: vm.$t('IDENTITY.USER.DISABLE'), disabled: !state.isSelected,
+                    type: 'item', name: 'disable', label: vm.$t('IDENTITY.USER.MAIN.DISABLE'), disabled: !state.isSelected,
                 },
             ] as MenuItem[])),
             keyItemSets: handlers.keyItemSets as KeyItemSet[],
@@ -299,21 +299,21 @@ export default {
         const routeState = reactive({
             routes: computed(() => ([
                 { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('IDENTITY.USER.USER_MANAGEMENT'), path: '/identity/user/user-management' },
+                { name: vm.$t('IDENTITY.USER.MAIN.USER_MANAGEMENT'), path: '/identity/user/user-management' },
             ])),
         });
 
         const singleItemTabState = reactive({
             tabs: computed(() => ([
-                { label: vm.$t('IDENTITY.USER.DETAILS'), name: 'detail', keepAlive: true },
-                { label: vm.$t('IDENTITY.USER.TAG'), name: 'tag', keepAlive: true },
+                { label: vm.$t('IDENTITY.USER.MAIN.DETAILS'), name: 'detail', keepAlive: true },
+                { label: vm.$t('IDENTITY.USER.MAIN.TAG'), name: 'tag', keepAlive: true },
             ] as TabItem[])),
             activeTab: 'detail',
         });
 
         const multiItemTabState = reactive({
             tabs: computed(() => ([
-                { name: 'data', label: vm.$t('IDENTITY.USER.TAB_SELECTED_DATA'), keepAlive: true },
+                { name: 'data', label: vm.$t('IDENTITY.USER.MAIN.TAB_SELECTED_DATA'), keepAlive: true },
             ] as TabItem[])),
             activeTab: 'data',
         });
@@ -382,22 +382,22 @@ export default {
         };
         const clickDelete = () => {
             modalState.mode = 'delete';
-            modalState.title = vm.$t('IDENTITY.USER.DELETE_MODAL_TITLE') as string;
-            modalState.subTitle = vm.$tc('IDENTITY.USER.DELETE_MODAL_DESC', state.selectedIndex.length);
+            modalState.title = vm.$t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
+            modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', state.selectedIndex.length);
             modalState.themeColor = 'alert';
             modalState.visible = true;
         };
         const clickEnable = () => {
             modalState.mode = 'enable';
-            modalState.title = vm.$t('IDENTITY.USER.ENABLE_MODAL_TITLE') as string;
-            modalState.subTitle = vm.$tc('IDENTITY.USER.ENABLE_MODAL_DESC', state.selectedIndex.length);
+            modalState.title = vm.$t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
+            modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', state.selectedIndex.length);
             modalState.themeColor = 'safe';
             modalState.visible = true;
         };
         const clickDisable = () => {
             modalState.mode = 'disable';
-            modalState.title = vm.$t('IDENTITY.USER.DISABLE_MODAL_TITLE') as string;
-            modalState.subTitle = vm.$tc('IDENTITY.USER.DISABLE_MODAL_DESC', state.selectedIndex.length);
+            modalState.title = vm.$t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
+            modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', state.selectedIndex.length);
             modalState.themeColor = 'alert';
             modalState.visible = true;
         };
@@ -408,9 +408,9 @@ export default {
                 await SpaceConnector.client.identity.user.create({
                     ...item,
                 });
-                showSuccessMessage(vm.$t('IDENTITY.USER.ALT_S_ADD_USER'), '', root);
+                showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '', root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.USER.ALT_E_ADD_USER'), e, root);
+                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'), e, root);
             }
             userFormState.visible = false;
         };
@@ -424,9 +424,9 @@ export default {
                     await store.dispatch('user/setUser', 'USER', item.user_id);
                     vm.$i18n.locale = item.language;
                 }
-                showSuccessMessage(vm.$t('IDENTITY.USER.ALT_S_UPDATE_USER'), '', root);
+                showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.USER.ALT_E_UPDATE_USER'), e, root);
+                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e, root);
             }
             userFormState.visible = false;
         };
@@ -441,9 +441,9 @@ export default {
         const deleteUser = async (items) => {
             try {
                 await SpaceConnector.client.identity.user.delete(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.ALT_S_DELETE_USER', state.selectedIndex.length), '', root);
+                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DELETE_USER', state.selectedIndex.length), '', root);
             } catch (e) {
-                showErrorMessage(vm.$tc('IDENTITY.USER.ALT_E_DELETE_USER', state.selectedIndex.length), e, root);
+                showErrorMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', state.selectedIndex.length), e, root);
             } finally {
                 await getUsers();
                 modalState.visible = false;
@@ -452,9 +452,9 @@ export default {
         const enableUser = async (items) => {
             try {
                 await SpaceConnector.client.identity.user.enable(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.ALT_S_ENABLE', state.selectedIndex.length), '', root);
+                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_ENABLE', state.selectedIndex.length), '', root);
             } catch (e) {
-                showErrorMessage(vm.$tc('IDENTITY.USER.ALT_E_ENABLE', state.selectedIndex.length), e, root);
+                showErrorMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_E_ENABLE', state.selectedIndex.length), e, root);
             } finally {
                 await getUsers();
                 modalState.visible = false;
@@ -463,9 +463,9 @@ export default {
         const disableUser = async (items) => {
             try {
                 await SpaceConnector.client.identity.user.disable(getUsersParam(items));
-                showSuccessMessage(vm.$tc('IDENTITY.USER.ALT_S_DISABLE', state.selectedIndex.length), '', root);
+                showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DISABLE', state.selectedIndex.length), '', root);
             } catch (e) {
-                showErrorMessage(vm.$tc('IDENTITY.USER.ALT_E_DISABLE', state.selectedIndex.length), e, root);
+                showErrorMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_E_DISABLE', state.selectedIndex.length), e, root);
             } finally {
                 await getUsers();
                 modalState.visible = false;
