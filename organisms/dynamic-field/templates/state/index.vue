@@ -40,11 +40,10 @@ export default {
         },
     },
     render(h, { props }: {props: StateDynamicFieldProps}) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const options: StateOptions = props.options;
 
-        const text: TranslateResult = props.data === null || props.data === undefined ? '' : String(props.data);
+        const data = props.data === undefined || props.data === null ? props.options.default : props.data;
+        const text: TranslateResult = data === null || data === undefined ? '' : String(data);
 
         const statusProps: StatusProps = {
             icon: get(options, ['icon', 'image'], null),

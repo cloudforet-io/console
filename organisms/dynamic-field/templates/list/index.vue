@@ -59,9 +59,10 @@ export default {
     setup(props: ListDynamicFieldProps) {
         const state = reactive({
             items: computed(() => {
-                if (Array.isArray(props.data)) return props.data;
-                if (props.data instanceof Object && props.options.sub_key) return props.data;
-                return [props.data];
+                const data = props.data === undefined || props.data === null ? props.options.default : props.data;
+                if (Array.isArray(data)) return data;
+                if (data instanceof Object && props.options.sub_key) return data;
+                return [data];
             }),
         });
 

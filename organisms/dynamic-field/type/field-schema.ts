@@ -1,5 +1,7 @@
 /* eslint-disable camelcase */
 
+import {SearchEnumItem} from "@/components/organisms/dynamic-layout/type/layout-schema";
+
 /** Metadata schema types for Dynamic field */
 
 export const dynamicFieldTypes = ['text', 'badge', 'datetime', 'dict', 'state', 'enum', 'list', 'size'];
@@ -47,12 +49,16 @@ export interface StateOptions extends CommonOptions {
     text_color?: string;
 }
 
+export interface EnumItem {
+    name?: string;
+    type: DynamicFieldType;
+    options?: DynamicFieldOptions;
+    default?: any;
+}
 export interface EnumOptions {
-    [data: string]: {
-        name?: string;
-        type: DynamicFieldType;
-        options?: DynamicFieldOptions;
-    };
+    [data: string]: EnumItem|string|undefined;
+    items?: EnumItem|string;
+    default?: any;
 }
 
 export interface SizeOptions extends CommonOptions {

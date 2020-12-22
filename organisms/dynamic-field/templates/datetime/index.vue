@@ -45,14 +45,16 @@ export default {
     render(h, { props, data }: {props: DatetimeDynamicFieldProps; data: any}) {
         let result = '';
         const options: DatetimeOptions = props.options;
-        if (props.data) {
+        const value = props.data === undefined || props.data === null ? props.options.default : props.data;
+
+        if (value) {
             let time: Dayjs;
             if (options.source_type === 'iso8601') {
-                time = dayjs(props.data, options.source_format);
+                time = dayjs(value, options.source_format);
             } else if (options.source_format === 'seconds') {
-                time = dayjs.unix(props.data);
+                time = dayjs.unix(value);
             } else {
-                time = dayjs(props.data);
+                time = dayjs(value);
             }
 
             if (time.isValid()) {

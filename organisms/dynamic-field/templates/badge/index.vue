@@ -52,7 +52,7 @@ export default {
             badgeProps.textColor = getColor(options.text_color);
         }
 
-        let badgeEl = props.data;
+        let badgeEl = props.data === undefined || props.data === null ? props.options.default : props.data;
 
         if (badgeEl === undefined || badgeEl === null) return undefined;
 

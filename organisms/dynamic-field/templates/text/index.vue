@@ -39,8 +39,11 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         let text: TranslateResult;
-        if (props.data === null || props.data === undefined) text = '';
-        else text = typeof props.data === 'string' ? props.data : JSON.stringify(props.data);
+        if (props.data === null || props.data === undefined) {
+            text = props.options.default === undefined ? '' : props.options.default;
+        } else {
+            text = typeof props.data === 'string' ? props.data : JSON.stringify(props.data);
+        }
 
         let textEl = h('span', data, text);
 

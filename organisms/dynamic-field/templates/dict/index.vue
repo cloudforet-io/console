@@ -37,7 +37,7 @@ export default {
     render(h, { props }: {props: DictDynamicFieldProps}) {
         let dictEl = h(PDictList, {
             props: {
-                dict: props.data,
+                dict: props.data === undefined || props.data === null ? props.options.default : props.data,
             },
         });
 
