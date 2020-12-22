@@ -1,4 +1,5 @@
 import { computed } from '@vue/composition-api';
+import { array, object } from '@storybook/addon-knobs';
 import PPageNavigation from './PPageNavigation.vue';
 
 export default {
@@ -9,6 +10,10 @@ export default {
             summary: '',
             components: { PPageNavigation },
         },
+        design: {
+            type: 'figma',
+            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5894%3A178955',
+        },
     },
 };
 
@@ -18,7 +23,14 @@ export const pageNavigation = () => ({
     props: {
         route: {
             type: Array,
-            default: [{ name: 'Automation', path: '/automation' }, { name: 'Power Scheduler', path: '/automation/power-scheduler' }],
+            default: [
+                { name: 'Automation', path: '/automation' },
+                { name: 'Power Scheduler', path: '/automation/power-scheduler' },
+                { name: 'Page3', path: '/automation/power-scheduler' },
+                { name: 'Page4', path: '/automation/power-scheduler' },
+                { name: 'Page5', path: '/automation/power-scheduler' },
+                { name: 'Page6', path: '/automation/power-scheduler' },
+            ],
         },
     },
 });
