@@ -1,7 +1,14 @@
 type UserType = 'USER' | 'DOMAIN_OWNER' | 'API_USER';
 type UserBackend = 'LOCAL' | 'EXTERNAL';
+type RoleType = 'SYSTEM' | 'DOMAIN' | 'PROJECT';
 export type LanguageCode = 'ko' | 'en' | string;
 export type Timezone = 'UTC' | 'Asia/Seoul' | string;
+
+export interface UserRole {
+    roleId?: string;
+    name: string;
+    roleType: RoleType;
+}
 
 export interface UserState {
     isSessionExpired?: boolean;
@@ -12,6 +19,7 @@ export interface UserState {
     email?: string;
     language?: string;
     timezone?: string;
+    roles?: Array<UserRole>;
     reportState?: boolean;
     powerSchedulerState?: boolean;
 }

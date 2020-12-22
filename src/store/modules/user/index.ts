@@ -22,6 +22,7 @@ const state: UserState = {
     email: storedUserState.email,
     language: storedUserState.language,
     timezone: storedUserState.timezone,
+    roles: storedUserState.roles,
     reportState: storedUserState.reportState,
     powerSchedulerState: storedUserState.powerSchedulerState,
 };

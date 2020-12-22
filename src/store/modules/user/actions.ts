@@ -93,9 +93,11 @@ export const signIn = async ({ commit, state }, signInRequest: SignInRequest): P
     if (userType === 'DOMAIN_OWNER') {
         const userInfo = await getDomainOwnerInfo(userId);
         commit('setUser', userInfo);
+        commit('setRoles', [{ name: 'Administrator', roleType: 'DOMAIN' }]);
     } else {
         const userInfo = await getUserInfo(userId);
         commit('setUser', userInfo);
+        commit('setRoles', [{ name: 'Domain Admin', roleType: 'DOMAIN' }]);
     }
 
     const reportState = await getReportState();
