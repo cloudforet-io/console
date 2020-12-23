@@ -100,15 +100,15 @@ export const querySearchTable = () => ({
         },
     },
     template: `
-    <div style="width: 80vw;">
-        <PQuerySearchTable v-bind="$props"
-                           :items="items"
-                           :loading="loading"
-                           @change="onChange"
-                           @export="onExport"
-                           @select="onSelect"
-        ></PQuerySearchTable>
-    </div>`,
+        <div style="width: 80vw;">
+            <PQuerySearchTable v-bind="$props"
+                               :items="items"
+                               :loading="loading"
+                               @change="onChange"
+                               @export="onExport"
+                               @select="onSelect"
+            ></PQuerySearchTable>
+        </div>`,
     setup(props, context) {
         const state = reactive({
             items: [],

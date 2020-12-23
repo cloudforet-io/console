@@ -57,16 +57,16 @@ export default {
 export const iconButton = () => ({
     components: { PIconButton },
     template: `
-<p-icon-button 
-    @click="click"
-    :name="name"
-    :disabled="disabled"
-    :iconStyle="iconStyle"
-    :size="size"
-    :animation="animation"
-    :rotating="rotating"
-    :flip="flip"
-/>`,
+        <p-icon-button 
+            @click="click"
+            :name="name"
+            :disabled="disabled"
+            :iconStyle="iconStyle"
+            :size="size"
+            :animation="animation"
+            :rotating="rotating"
+            :flip="flip"
+        />`,
     props: {
         name: {
             default: select('name', icons, 'ic_refresh'),

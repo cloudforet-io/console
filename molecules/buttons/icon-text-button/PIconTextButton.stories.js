@@ -35,16 +35,16 @@ export default {
 export const defaultCase = () => ({
     components: { PIconTextButton },
     template: `
-<p-icon-text-button 
-    @click="click"
-    :name="name"
-    :disabled="disabled"
-    :styleType="styleType"
-    :size="size"
-    :iconDirection="iconDirection"
->
-   icon text button 
-</p-icon-text-button>`,
+        <p-icon-text-button 
+            @click="click"
+            :name="name"
+            :disabled="disabled"
+            :styleType="styleType"
+            :size="size"
+            :iconDirection="iconDirection"
+        >
+           icon text button 
+        </p-icon-text-button>`,
     props: {
         name: {
             default: select('name', icons, 'ic_plus_bold'),

@@ -29,13 +29,13 @@ export const defaultCase = () => ({
         },
     },
     template: `
-<div style="width: 80vw;">
-    <p-loading-button
-            :loading="loading"
-            :disabled="disabled"
-            :button-bind="buttonBind"
-    >
-        Loading Button
-    </p-loading-button>
-</div>`,
+        <div style="width: 80vw;">
+            <p-loading-button
+                    :loading="loading"
+                    :disabled="disabled"
+                    :button-bind="buttonBind"
+            >
+                Loading Button
+            </p-loading-button>
+        </div>`,
 });

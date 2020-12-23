@@ -10,11 +10,11 @@ export const collapsiblePanel = () => ({
     components: { PCollapsiblePanel },
     props: {},
     template: `
-<div style="width: 20rem">
-    <p-collapsible-panel v-bind="$props">
-        <template #content>
-            sample description
-        </template>
-    </p-collapsible-panel>
-</div>`,
+        <div style="width: 20rem">
+            <p-collapsible-panel v-bind="$props">
+                <template #content>
+                    sample description
+                </template>
+            </p-collapsible-panel>
+        </div>`,
 });

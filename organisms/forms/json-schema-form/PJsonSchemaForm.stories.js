@@ -79,8 +79,7 @@ export const jsonDefaultCase = () => ({
                             :is-valid.sync="isValid"
         />
         <pre>{{ model }}</pre>
-    </div>
-  `,
+    </div>`,
     setup(props, context) {
         const state = reactive({
             schema: defaultSchema,
@@ -108,8 +107,7 @@ export const customSchemaForm = () => ({
             <p>is valid {{ isValid }}</p>
             <p>show validation errors: {{ showValidationErrors }}</p>
         </div>
-    </div>
-  `,
+    </div>`,
     setup() {
         const state = reactive({
             schema: defaultSchema,

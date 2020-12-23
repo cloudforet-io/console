@@ -95,28 +95,28 @@ export const autoCompleteSearch = () => ({
         isFocused: true,
     }),
     template: `
-    <div style="width: 80vw;">
-        <PAutocompleteSearch v-model="value" 
-                             v-bind="$props"
-                             :menu="menu"
-                             @search="search"
-                             @menu:select="search"
-                             @input="input"
-                             class="mt-10"
-        >
-            
-        </PAutocompleteSearch>
-        <div class="mt-8 bg-blue-100 flex w-full">
-            <div>
-                <p>Data</p>
-                <pre>{{data}}</pre>
+        <div style="width: 80vw;">
+            <PAutocompleteSearch v-model="value" 
+                                 v-bind="$props"
+                                 :menu="menu"
+                                 @search="search"
+                                 @menu:select="search"
+                                 @input="input"
+                                 class="mt-10"
+            >
+                
+            </PAutocompleteSearch>
+            <div class="mt-8 bg-blue-100 flex w-full">
+                <div>
+                    <p>Data</p>
+                    <pre>{{data}}</pre>
+                </div>
+                <div class="ml-8">
+                    <p>Menu</p>
+                    <pre>{{menu}}</pre>
+                </div>
             </div>
-            <div class="ml-8">
-                <p>Menu</p>
-                <pre>{{menu}}</pre>
-            </div>
-        </div>
-    </div>`,
+        </div>`,
     setup(props, context) {
         const state = reactive({
             value: '',
@@ -149,33 +149,33 @@ export const controlCase = () => ({
         focused: true,
     }),
     template: `
-    <div style="width: 80vw;">
-        <p class="my-8 font-bold capitalize">Control menu visibility and focus</p>
-        <PAutocompleteSearch v-model="value"
-                             v-bind="$props"
-                             :menu="menu"
-                             :visibleMenu.sync="visibleMenu"
-                             :isFocused.sync="isFocused"
-                             @search="search"
-                             @menu:select="search"
-                             @input="input"
-                             @mousedown.stop="mousedown"
-                             @menu:hide="onMenuHide"
-                             class="mt-10"
-        >
-
-        </PAutocompleteSearch>
-        <div class="mt-8 bg-blue-100 flex w-full">
-            <div>
-                <p>Data</p>
-                <pre>{{data}}</pre>
+        <div style="width: 80vw;">
+            <p class="my-8 font-bold capitalize">Control menu visibility and focus</p>
+            <PAutocompleteSearch v-model="value"
+                                 v-bind="$props"
+                                 :menu="menu"
+                                 :visibleMenu.sync="visibleMenu"
+                                 :isFocused.sync="isFocused"
+                                 @search="search"
+                                 @menu:select="search"
+                                 @input="input"
+                                 @mousedown.stop="mousedown"
+                                 @menu:hide="onMenuHide"
+                                 class="mt-10"
+            >
+    
+            </PAutocompleteSearch>
+            <div class="mt-8 bg-blue-100 flex w-full">
+                <div>
+                    <p>Data</p>
+                    <pre>{{data}}</pre>
+                </div>
+                <div class="ml-8">
+                    <p>Menu</p>
+                    <pre>{{menu}}</pre>
+                </div>
             </div>
-            <div class="ml-8">
-                <p>Menu</p>
-                <pre>{{menu}}</pre>
-            </div>
-        </div>
-    </div>`,
+        </div>`,
     setup(props, context) {
         const state = reactive({
             value: 'test',

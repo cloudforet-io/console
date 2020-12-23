@@ -17,17 +17,15 @@ export const verticalLayout = () => ({
     components: { PVerticalLayout },
     props: {
     },
-    template: `<div style="width: 100vw; border: 1px solid gray;">
-        <p-vertical-layout>
-            <template #sidebar>
-                Left Layout
-            </template>
-            <template #default>
-                Right Layout
-            </template>
-        </p-vertical-layout>
-    </div>`,
-    setup() {
-
-    },
+    template: `
+        <div style="width: 100vw; border: 1px solid gray;">
+            <p-vertical-layout>
+                <template #sidebar>
+                    Left Layout
+                </template>
+                <template #default>
+                    Right Layout
+                </template>
+            </p-vertical-layout>
+        </div>`,
 });

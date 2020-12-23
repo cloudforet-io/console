@@ -5,12 +5,10 @@ import { action } from '@storybook/addon-actions';
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs/vue';
-import casual from '@/components/util/casual';
 import PI from '@/components/atoms/icons/PI.vue';
 import PTreeNode from '@/components/molecules/tree-node/PTreeNode.vue';
 import md from '@/components/molecules/tree-node/PTreeNode.md';
 import { getKnobProps } from '@sb/storybook-util';
-import style from './PTreeNodes.stories.scss';
 
 export default {
     title: 'Data Display/Tree',

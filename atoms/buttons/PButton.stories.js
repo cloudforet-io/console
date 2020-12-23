@@ -18,31 +18,26 @@ export default {
         },
     },
 };
+
 const actions = {
     click: action('click'),
 };
-const data = {};
 
 export const button = () => ({
     components: { PButton },
     template: `
-<p-button
-        @click="click"
-        :href="href" 
-        :styleType="styleType" 
-        :size="size"
-        :disabled="disabled"
-        :outline="outline"
-        :link="link"
-        :shpae="shape"
-        >
-       {{defaultSlot}} 
-</p-button>`,
-    data() {
-        return {
-            ...data,
-        };
-    },
+        <p-button
+            @click="click"
+            :href="href" 
+            :styleType="styleType" 
+            :size="size"
+            :disabled="disabled"
+            :outline="outline"
+            :link="link"
+            :shpae="shape"
+            >
+           {{defaultSlot}} 
+        </p-button>`,
     props: {
         styleType: {
             default: select('styleType', [
@@ -76,8 +71,10 @@ export const button = () => ({
             default: boolean('link', false),
         },
     },
-    methods: {
-        ...actions,
+    setup() {
+        return {
+            ...actions,
+        };
     },
 });
 
@@ -99,11 +96,6 @@ export const block = () => ({
        {{defaultSlot}} 
 </p-button>
 </div>`,
-    data() {
-        return {
-            ...data,
-        };
-    },
     props: {
         styleType: {
             default: select('styleType', [
@@ -139,7 +131,9 @@ export const block = () => ({
             default: boolean('block', false),
         },
     },
-    methods: {
-        ...actions,
+    setup() {
+        return {
+            ...actions,
+        };
     },
 });

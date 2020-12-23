@@ -40,16 +40,16 @@ export const defaultCase = () => ({
         },
     }),
     template: `
-    <div class="bg-white py-10" style="width: 80vw;">
-        <PSearch v-bind="$props"
-                 v-model="value"
-                 @input="onInput"
-                 @delete="onDelete"
-                 @focus="onFocus"
-                 @blur="onBlur"
-                 @search="onSearch"
-        ></PSearch>
-    </div>`,
+        <div class="bg-white py-10" style="width: 80vw;">
+            <PSearch v-bind="$props"
+                     v-model="value"
+                     @input="onInput"
+                     @delete="onDelete"
+                     @focus="onFocus"
+                     @blur="onBlur"
+                     @search="onSearch"
+            ></PSearch>
+        </div>`,
     setup(props, context) {
         const state = reactive({
             value: '',

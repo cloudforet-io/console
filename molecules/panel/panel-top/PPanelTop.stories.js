@@ -57,19 +57,19 @@ export const extraCase = () => ({
     components: { PPanelTop },
     props: getProps(),
     template: `
-    <div style="width: 80vw;">
-        <p-panel-top v-bind="$props">
-            <template>
-            {{title}}
-            </template>
-            <template #extra>
-                <div style="display: flex; justify-content: space-between;">
-                    <button style="background-color: #0f69ff; padding: .5rem;">Extra button1</button>
-                    <button style="background-color: goldenrod; padding: .5rem;">Extra button2</button>
-                </div>
-            </template>
-        </p-panel-top>
-    </div>`,
+        <div style="width: 80vw;">
+            <p-panel-top v-bind="$props">
+                <template>
+                {{title}}
+                </template>
+                <template #extra>
+                    <div style="display: flex; justify-content: space-between;">
+                        <button style="background-color: #0f69ff; padding: .5rem;">Extra button1</button>
+                        <button style="background-color: goldenrod; padding: .5rem;">Extra button2</button>
+                    </div>
+                </template>
+            </p-panel-top>
+        </div>`,
     setup(props, context) {
         const state = getState(props, context);
 

@@ -46,9 +46,9 @@ export const definitionTable = () => ({
         },
     },
     template: `
-    <div style="width: 80vw; background-color: white;">
-        <p-definition-table v-bind="$props"></p-definition-table>
-    </div>`,
+        <div style="width: 80vw; background-color: white;">
+            <p-definition-table v-bind="$props"></p-definition-table>
+        </div>`,
     setup(props, context) {
         const state = reactive({
         });
@@ -136,7 +136,7 @@ export const slotCase = () => ({
                 </template>
             </p-definition-table>
         </div>
-        `,
+    `,
     setup(props, context) {
         const state = reactive({});
 
@@ -152,9 +152,9 @@ export const noData = () => ({
         items: [],
     },
     template: `
-    <div style="width: 80vw; background-color: white;">
-        <p-definition-table v-bind="$props"></p-definition-table>
-    </div>`,
+        <div style="width: 80vw; background-color: white;">
+            <p-definition-table v-bind="$props"></p-definition-table>
+        </div>`,
     setup(props, context) {
         const state = reactive({});
 

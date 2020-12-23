@@ -4,6 +4,7 @@ import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';
 import { sizeMapping } from '@/components/molecules/modals/type';
 import PModal from '@/components/molecules/modals/PModal.vue';
+import { computed, ref } from '@vue/composition-api';
 
 export default {
     title: 'Feedbacks/Modals',
@@ -19,9 +20,6 @@ export default {
 };
 
 const sizes = Object.keys(sizeMapping);
-const data = {
-    visible: false,
-};
 
 const actions = {
     shown: action('shown'),
@@ -31,27 +29,20 @@ const actions = {
 export const modal = () => ({
     components: { PModal },
     template: `
-<div>
-<button @click="showAction">모달 열기</button>
-<p-modal
-    ref="modal"
-    :centered="centered"
-    :size="size"
-    :fade="fade"
-    :visible.sync="visible"
-    :backdrop="backdrop"
-    >
-    <p style="min-width: 300px;min-height: 200px;">{{lorem}}</p>
-    <button @click="closeAction">모달 닫기</button>
-</p-modal>
-</div>
-
-`,
-    data() {
-        return {
-            ...data,
-        };
-    },
+        <div>
+            <button @click="showAction">모달 열기</button>
+            <p-modal
+                ref="modal"
+                :centered="centered"
+                :size="size"
+                :fade="fade"
+                :visible.sync="visible"
+                :backdrop="backdrop"
+                >
+                <p style="min-width: 300px;min-height: 200px;">{{lorem}}</p>
+                <button @click="closeAction">모달 닫기</button>
+            </p-modal>
+        </div>`,
     props: {
         loremLength: {
             default: number('loremLength', 10, {
@@ -74,18 +65,21 @@ export const modal = () => ({
             default: boolean('fade', true),
         },
     },
-    computed: {
-        lorem() {
-            return faker.lorem.lines(this.loremLength);
-        },
-    },
-    methods: {
-        showAction() {
-            this.visible = true;
-        },
-        closeAction() {
-            this.visible = false;
-        },
-        ...actions,
+    setup(props) {
+        const visible = ref(false);
+        const lorem = computed(() => faker.lorem.lines(props.loremLength));
+        const showAction = () => {
+            visible.value = true;
+        };
+        const closeAction = () => {
+            visible.value = false;
+        };
+        return {
+            visible,
+            lorem,
+            showAction,
+            closeAction,
+            ...actions,
+        };
     },
 });

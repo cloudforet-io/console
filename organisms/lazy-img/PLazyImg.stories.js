@@ -10,12 +10,12 @@ export default {
 export const lazyImg = () => ({
     components: { PLazyImg },
     template: `        
-<div>
-    <p-lazy-img :src="iconUrl"
-                :loading="loading"
-                width="2rem" height="2rem"
-    />
-</div>`,
+        <div>
+            <p-lazy-img :src="iconUrl"
+                        :loading="loading"
+                        width="2rem" height="2rem"
+            />
+        </div>`,
     props: {
         loading: {
             default: boolean('loading', false),

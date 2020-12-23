@@ -10,14 +10,14 @@ export default {
 export const datePagination = () => ({
     components: { PDatePagination },
     template: `
-<div>
-    <p-date-pagination :date.sync="now" type="month" />
-    <div>
-        <p>previous month: {{ now.subtract(1, 'month').format('YYYY-MM') }}</p>
-        <b>current month: {{ now.format('YYYY-MM') }}</b>
-        <p>next month: {{ now.add(1, 'month').format('YYYY-MM') }}</p>
-    </div>
-</div>`,
+        <div>
+            <p-date-pagination :date.sync="now" type="month" />
+            <div>
+                <p>previous month: {{ now.subtract(1, 'month').format('YYYY-MM') }}</p>
+                <b>current month: {{ now.format('YYYY-MM') }}</b>
+                <p>next month: {{ now.add(1, 'month').format('YYYY-MM') }}</p>
+            </div>
+        </div>`,
     props: {},
     setup() {
         const state = reactive({
@@ -32,12 +32,12 @@ export const datePagination = () => ({
 export const weekCase = () => ({
     components: { PDatePagination },
     template: `
-<div>
-    <p-date-pagination :date.sync="now" type="week" />
-    <div>
-        <p>{{ now.startOf('week').format('YYYY-MM-DD') }} - {{ now.endOf('week').format('YYYY-MM-DD') }}</p>
-    </div>
-</div>`,
+        <div>
+            <p-date-pagination :date.sync="now" type="week" />
+            <div>
+                <p>{{ now.startOf('week').format('YYYY-MM-DD') }} - {{ now.endOf('week').format('YYYY-MM-DD') }}</p>
+            </div>
+        </div>`,
     props: {},
     setup() {
         const state = reactive({

@@ -71,9 +71,9 @@ export const defaultCase = () => ({
         theme: ['default', 'card'],
     }),
     template: `
-    <div style="width: 80vw;">
-        <PSelectableItem v-bind="$props"></PSelectableItem>
-    </div>`,
+        <div style="width: 80vw;">
+            <PSelectableItem v-bind="$props"></PSelectableItem>
+        </div>`,
     setup(props, context) {
         const state = getState(props, context);
 
@@ -89,13 +89,13 @@ export const extraSlot = () => ({
         title: 'EC2 Collector',
     }),
     template: `
-    <div style="width: 80vw; border: 1px solid gray;">
-        <PSelectableItem v-bind="$props">
-            <template #extra>
-                This is Extra!!
-            </template>
-        </PSelectableItem>
-    </div>`,
+        <div style="width: 80vw; border: 1px solid gray;">
+            <PSelectableItem v-bind="$props">
+                <template #extra>
+                    This is Extra!!
+                </template>
+            </PSelectableItem>
+        </div>`,
     setup(props, context) {
         const state = getState(props, context);
 

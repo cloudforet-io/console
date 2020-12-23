@@ -1,3 +1,4 @@
+import Vue from 'vue';
 import { text, select } from '@storybook/addon-knobs/vue';
 import PNoticeAlert from '@/components/molecules/alert/notice/PNoticeAlert.vue';
 
@@ -14,18 +15,18 @@ export default {
 
 export const noticeAlert = () => ({
     components: { PNoticeAlert },
-    template: `<div>
-                    <div> 
-                        <p-notice-alert group="noticeTopLeft" position="top left" />
-                        <p-notice-alert group="noticeTopRight" position="top right" />
-                        <p-notice-alert group="noticeBottomLeft" position="bottom left" />
-                        <p-notice-alert group="noticeBottomRight" position="bottom right" />
-                    </div>
-                    <div>
-                        <button @click="displayNotice">Launch Notice Alert</button>
-                    </div>
-                </div>
-               `,
+    template: `
+        <div>
+            <div> 
+                <p-notice-alert group="noticeTopLeft" position="top left" />
+                <p-notice-alert group="noticeTopRight" position="top right" />
+                <p-notice-alert group="noticeBottomLeft" position="bottom left" />
+                <p-notice-alert group="noticeBottomRight" position="bottom right" />
+            </div>
+            <div>
+                <button @click="displayNotice">Launch Notice Alert</button>
+            </div>
+        </div>`,
     props: {
         title: {
             default: text('title', 'This is Title.'),
@@ -40,16 +41,19 @@ export const noticeAlert = () => ({
             default: text('text', 'This is Contents.'),
         },
     },
-    methods: {
-        displayNotice() {
-            this.$notify({
-                group: this.alertPosition,
-                type: this.alertType,
-                title: this.title,
-                text: this.contents,
+    setup(props) {
+        const displayNotice = () => {
+            Vue.notify({
+                group: props.alertPosition,
+                type: props.alertType,
+                title: props.title,
+                text: props.contents,
                 duration: 2000,
                 speed: 1000,
             });
-        },
+        };
+        return {
+            displayNotice,
+        };
     },
 });

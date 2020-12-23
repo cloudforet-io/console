@@ -15,7 +15,8 @@ export const paneLayout = () => ({
     props: {
         ...autoProps(PPaneLayout),
     },
-    template: `<PPaneLayout v-bind="$props" style="height: 100px; width: 200px; display: flex; justify-content: center; align-items: center;">
-        <h3 style="">This is default slot</h3>
-    </PPaneLayout>`,
+    template: `
+        <PPaneLayout v-bind="$props" style="height: 100px; width: 200px; display: flex; justify-content: center; align-items: center;">
+            <h3 style="">This is default slot</h3>
+        </PPaneLayout>`,
 });

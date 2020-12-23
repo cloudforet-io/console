@@ -10,17 +10,17 @@ export default {
 export const iconModal = () => ({
     components: { PIconModal, PButton },
     template: `
-<div>
-    <p-button styleType="primary" @click="onClickOpen">모달 띄우기</p-button>
-    <p-icon-modal
-        :visible.sync="loading"
-        :icon-name="iconName"
-        :header-title="headerTitle"
-        :body-text="bodyText"
-        :button-text="buttonText"
-        @clickButton="onClickCancel"
-    />
-</div>`,
+        <div>
+            <p-button styleType="primary" @click="onClickOpen">모달 띄우기</p-button>
+            <p-icon-modal
+                :visible.sync="loading"
+                :icon-name="iconName"
+                :header-title="headerTitle"
+                :body-text="bodyText"
+                :button-text="buttonText"
+                @clickButton="onClickCancel"
+            />
+        </div>`,
     props: {
         iconName: {
             default: 'ic_dashboard',

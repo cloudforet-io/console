@@ -23,13 +23,11 @@ export const input = () => ({
             default: boolean('disabled', false),
         },
     },
-    data() {
+    setup() {
         return {
             value: '입력',
         };
     },
-
-
 });
 
 export const placeHolder = () => ({
@@ -43,11 +41,10 @@ export const placeHolder = () => ({
             default: boolean('disabled', false),
         },
     },
-    data() {
+    setup() {
         return {
             value: '',
         };
     },
-
 
 });

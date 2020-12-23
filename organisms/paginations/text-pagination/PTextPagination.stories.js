@@ -19,31 +19,27 @@ const actions = {
 export const textPagination = () => ({
     components: { PTextPagination },
     template: '<p-text-pagination :thisPage.sync="thisPage" :allPage="allPage" @pageChange="pageChange"/>',
-    data() {
-        return {
-            thisPage: 1,
-        };
-    },
     props: {
         allPage: {
             default: number('allPage', 10, { min: 1, max: 20 }),
         },
     },
-    methods: {
-        ...actions,
+    setup() {
+        return {
+            thisPage: 1,
+            ...actions,
+        };
     },
 });
 
 export const autoDisabledButton = () => ({
     components: { PTextPagination },
     template: '<p-text-pagination :thisPage.sync="thisPage" :allPage="allPage" @pageChange="pageChange"/>',
-    data() {
+    setup() {
         return {
             allPage: 10,
             thisPage: 10,
+            ...actions,
         };
-    },
-    methods: {
-        ...actions,
     },
 });

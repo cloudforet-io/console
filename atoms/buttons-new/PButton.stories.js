@@ -19,10 +19,10 @@ export default {
         },
     },
 };
+
 const actions = {
     click: action('click'),
 };
-const data = {};
 
 export const button = () => ({
     components: { PButton, PLottie },
@@ -49,11 +49,6 @@ export const button = () => ({
        {{defaultSlot}} 
       </p-button>
       </div>`,
-    data() {
-        return {
-            ...data,
-        };
-    },
     props: {
         styleType: {
             default: select('styleType', [
@@ -88,7 +83,9 @@ export const button = () => ({
             default: boolean('block', false),
         },
     },
-    methods: {
-        ...actions,
+    setup() {
+        return {
+            ...actions,
+        };
     },
 });

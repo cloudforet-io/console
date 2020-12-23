@@ -27,60 +27,56 @@ const data = {
 export const tab = () => ({
     components: { PTab },
     template: `
-<div style="width: 80vw;">
-    <PTab :tabs="tabs" :activeTab.sync="activeTab" >
-    <template #detail="{tabName}" >
-        <keep-alive>
-           <p> this tab is {{tabName}}</p> 
-        </keep-alive>  
-    </template>
-    <template #info="{tabName}" >
-           <p> this tab is {{tabName}}</p> 
-    </template>
-    <template #tags="{tabName}" >
-           <p> this tab is {{tabName}}</p> 
-    </template>
-
-    </PTab>
-    <p>{{activeTab}}</p>
-</div>`,
-    data() {
+        <div style="width: 80vw;">
+            <PTab :tabs="tabs" :activeTab.sync="activeTab" >
+            <template #detail="{tabName}" >
+                <keep-alive>
+                   <p> this tab is {{tabName}}</p> 
+                </keep-alive>  
+            </template>
+            <template #info="{tabName}" >
+                   <p> this tab is {{tabName}}</p> 
+            </template>
+            <template #tags="{tabName}" >
+                   <p> this tab is {{tabName}}</p> 
+            </template>
+        
+            </PTab>
+            <p>{{activeTab}}</p>
+        </div>`,
+    setup() {
         return {
             ...data,
+            ...actions,
         };
-    },
-    methods: {
-        ...actions,
     },
 });
 export const oneTab = () => ({
     components: { PTab },
     template: `
-<div style="width: 80vw;">
-    <PTab :tabs="tabs" :activeTab.sync="activeTab" >
-    <template #detail="{tabName}" >
-        <keep-alive>
-           <p> this tab is {{tabName}}</p>
-        </keep-alive>
-    </template>
-    <template #info="{tabName}" >
-           <p> this tab is {{tabName}}</p>
-    </template>
-    <template #tags="{tabName}" >
-           <p> this tab is {{tabName}}</p>
-    </template>
-
-    </PTab>
-</div>`,
-    data() {
+        <div style="width: 80vw;">
+            <PTab :tabs="tabs" :activeTab.sync="activeTab" >
+            <template #detail="{tabName}" >
+                <keep-alive>
+                   <p> this tab is {{tabName}}</p>
+                </keep-alive>
+            </template>
+            <template #info="{tabName}" >
+                   <p> this tab is {{tabName}}</p>
+            </template>
+            <template #tags="{tabName}" >
+                   <p> this tab is {{tabName}}</p>
+            </template>
+        
+            </PTab>
+        </div>`,
+    setup() {
         return {
             tabs: [
                 { name: 'detail', label: '디테일' },
             ],
             activeTab: 'detail',
+            ...actions,
         };
-    },
-    methods: {
-        ...actions,
     },
 });

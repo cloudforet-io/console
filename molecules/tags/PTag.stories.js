@@ -1,5 +1,4 @@
 import { withKnobs } from '@storybook/addon-knobs/vue';
-import { ref } from '@vue/composition-api';
 import { autoProps } from '@sb/storybook-util';
 import { action } from '@storybook/addon-actions';
 import PTag from '@/components/molecules/tags/PTag.vue';
@@ -10,14 +9,15 @@ export default {
     decorators: [withKnobs],
 };
 
-
 export const tag = () => ({
     components: { PTag },
     props: {
         ...autoProps(PTag),
     },
     template: '<p-tag v-bind="$props" @delete="onDelete">tag name</p-tag>',
-    methods: {
-        onDelete: action('delete'),
+    setup() {
+        return {
+            onDelete: action('delete'),
+        };
     },
 });

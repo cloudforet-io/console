@@ -32,23 +32,23 @@ const data = {
 };
 
 const mockupMixin = {
-    methods: {
-        getUser() {
-            return {
-                name: faker.name.firstName(),
-                phone: faker.phone.phoneNumberFormat(),
-                email: faker.internet.email(),
-            };
-        },
-    },
-    computed: {
-        items() {
+    setup() {
+        const getUser = () => ({
+            name: faker.name.firstName(),
+            phone: faker.phone.phoneNumberFormat(),
+            email: faker.internet.email(),
+        });
+        const items = computed(() => {
             const dataset = [];
             for (let step = 0; step < 5; step++) {
-                dataset.push(this.getUser());
+                dataset.push(getUser());
             }
             return dataset;
-        },
+        });
+        return {
+            items,
+            getUser,
+        };
     },
 };
 
@@ -142,17 +142,17 @@ export const sortCase = () => ({
         },
     },
     template: `
-            <div>
-                <PDataTable :sortable="sortable"
-                            :sort-by.sync="sortBy"
-                            :sort-desc.sync="sortDesc"
-                            :fields="fields"
-                            :items="items"
-                            @changeSort="onChangeSort"
-                >
-                </PDataTable>
-                <p>sort by : {{sortBy}}, sort desc : {{sortDesc}}</p>
-            </div>
+        <div>
+            <PDataTable :sortable="sortable"
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
+                        :fields="fields"
+                        :items="items"
+                        @changeSort="onChangeSort"
+            >
+            </PDataTable>
+            <p>sort by : {{sortBy}}, sort desc : {{sortDesc}}</p>
+        </div>
     `,
     setup() {
         const state = reactive({
@@ -183,34 +183,33 @@ export const selectTable = () => ({
     components: { PDataTable, PButton },
     mixins: [mockupMixin],
     template: `
-<div style="background-color: white;">
-<PDataTable
-    ref="table"
-    :items="items"
-    :fields="fields"
-    :hover="true"
-    @rowLeftClick="rowLeftClick"
-    :selectable="true"
-    :selectIndex.sync="selectIndex"
->
-</PDataTable>
-<p>select index: {{selectIndex}} </p>
-<p-button @click="getData" styleType="primary" >선택한 데이터 가져오기</p-button>
-<p>{{selected}}</p>
-</div>
-`,
-    data() {
+        <div style="background-color: white;">
+            <PDataTable
+                ref="table"
+                :items="items"
+                :fields="fields"
+                :hover="true"
+                @rowLeftClick="rowLeftClick"
+                :selectable="true"
+                :selectIndex.sync="selectIndex"
+            >
+            </PDataTable>
+            <p>select index: {{selectIndex}} </p>
+            <p-button @click="getData" styleType="primary" >선택한 데이터 가져오기</p-button>
+            <p>{{selected}}</p>
+        </div>
+    `,
+    setup(props, { table }) {
+        const getData = () => {
+            this.selected = table.getSelectItem();
+        };
         return {
             ...data,
+            ...actions,
             selectIndex: [],
             selected: [],
+            getData,
         };
-    },
-    methods: {
-        ...actions,
-        getData() {
-            this.selected = this.$refs.table.getSelectItem();
-        },
     },
 });
 
@@ -218,35 +217,34 @@ export const rowClickMultiSelectMode = () => ({
     components: { PDataTable, PButton },
     mixins: [mockupMixin],
     template: `
-<div>
-<PDataTable
-    ref="table"
-    :items="items"
-    :fields="fields"
-    :hover="true"
-    :rowClickMultiSelectMode="true"
-    @rowLeftClick="rowLeftClick"
-    :selectable="true"
-    :selectIndex.sync="selectIndex"
->
-</PDataTable>
-<p>select index: {{selectIndex}} </p>
-<p-button @click="getData" styleType="primary" >선택한 데이터 가져오기</p-button>
-<p>{{selected}}</p>
-</div>
-`,
-    data() {
+        <div>
+            <PDataTable
+                ref="table"
+                :items="items"
+                :fields="fields"
+                :hover="true"
+                :rowClickMultiSelectMode="true"
+                @rowLeftClick="rowLeftClick"
+                :selectable="true"
+                :selectIndex.sync="selectIndex"
+            >
+            </PDataTable>
+            <p>select index: {{selectIndex}} </p>
+            <p-button @click="getData" styleType="primary" >선택한 데이터 가져오기</p-button>
+            <p>{{selected}}</p>
+        </div>
+    `,
+    setup() {
+        const getData = () => {
+            this.selected = this.$refs.table.getSelectItem();
+        };
         return {
             ...data,
+            ...actions,
             selectIndex: [],
             selected: [],
+            getData,
         };
-    },
-    methods: {
-        ...actions,
-        getData() {
-            this.selected = this.$refs.table.getSelectItem();
-        },
     },
 });
 
@@ -254,38 +252,34 @@ export const rowVBind = () => ({
     components: { PDataTable },
     mixins: [mockupMixin],
     template: `
-<PDataTable
-    :items="items"
-    :fields="fields"
-    :hover="true"
-    @rowLeftClick="rowLeftClick"
->
-</PDataTable>
-`,
-    data() {
-        return {
-            ...data,
-        };
-    },
-    methods: {
-        ...actions,
-        getUser(step) {
+        <PDataTable
+            :items="items"
+            :fields="fields"
+            :hover="true"
+            @rowLeftClick="rowLeftClick"
+        >
+        </PDataTable>
+    `,
+    setup() {
+        const getUser = (step) => {
             const bindClass = step % 2 === 0 ? 'gray900' : 'light';
             return {
                 name: faker.name.firstName(),
                 phone: faker.phone.phoneNumberFormat(),
                 email: faker.internet.email(),
             };
-        },
-    },
-    computed: {
-        items() {
+        };
+        const items = computed(() => {
             const dataset = [];
             for (let step = 0; step < 20; step++) {
                 dataset.push(this.getUser(step));
             }
             return dataset;
-        },
+        });
+        return {
+            ...data,
+            ...actions,
+        };
     },
 });
 
@@ -295,28 +289,26 @@ export const customRowSlot = () => ({
     },
     mixins: [mockupMixin],
     template: `
-<PDataTable
-    :items="items"
-    :fields="fields"
-    :hover="true"
-    @rowLeftClick="rowLeftClick"
->
-<template slot="row"  slot-scope="data">
-<tr  style="color: #0f69ff;">
-    <td v-for="field in data.fields">
-        {{data.item[field]}}
-    </td>
-</tr>
-</template>
-</PDataTable>
-`,
-    data() {
+        <PDataTable
+            :items="items"
+            :fields="fields"
+            :hover="true"
+            @rowLeftClick="rowLeftClick"
+        >
+            <template slot="row"  slot-scope="data">
+                <tr  style="color: #0f69ff;">
+                    <td v-for="field in data.fields">
+                        {{data.item[field]}}
+                    </td>
+                </tr>
+            </template>
+        </PDataTable>
+    `,
+    setup() {
         return {
             ...data,
+            ...actions,
         };
-    },
-    methods: {
-        ...actions,
     },
 });
 
@@ -328,27 +320,25 @@ export const customColSlot = () => ({
     mixins: [mockupMixin],
     template: `
         <div style="background-color: white;">
-<PDataTable
-    :items="items"
-    :fields="fields"
-    @rowLeftClick="rowLeftClick"
->
-<template slot="col-email"  slot-scope="data">
-    <td style="color: #0f69ff;" >
-        <p-button styleType="primary" @click.stop="sendEmail(data.item,data.index,$event)">send email</p-button>
-    </td>
-</template>
-</PDataTable>
+            <PDataTable
+                :items="items"
+                :fields="fields"
+                @rowLeftClick="rowLeftClick"
+            >
+            <template slot="col-email"  slot-scope="data">
+                <td style="color: #0f69ff;" >
+                    <p-button styleType="primary" @click.stop="sendEmail(data.item,data.index,$event)">send email</p-button>
+                </td>
+            </template>
+            </PDataTable>
         </div>
-`,
-    data() {
+    `,
+    setup() {
         return {
             ...data,
+            ...actions,
+            sendEmail: action('send_email'),
         };
-    },
-    methods: {
-        ...actions,
-        sendEmail: action('send_email'),
     },
 });
 
@@ -373,12 +363,10 @@ export const loading = () => ({
             default: boolean('useCursorLoading', false),
         },
     },
-    data() {
+    setup() {
         return {
             ...data,
+            ...actions,
         };
-    },
-    methods: {
-        ...actions,
     },
 });

@@ -38,12 +38,12 @@ export const querySearchTags = () => ({
         },
     },
     template: `
-    <div style="width: 80vw;">
-        <PQuerySearchTags :timezone="timezone"
-                          :tags="tags"
-                          v-on="actions"
-        ></PQuerySearchTags>
-    </div>`,
+        <div style="width: 80vw;">
+            <PQuerySearchTags :timezone="timezone"
+                              :tags="tags"
+                              v-on="actions"
+            ></PQuerySearchTags>
+        </div>`,
     setup(props, context) {
         const state = reactive({
             tags: [
@@ -88,27 +88,27 @@ export const slotCase = () => ({
         },
     },
     template: `
-    <div style="width: 80vw;">
-        <div class="my-8">
-            It has slots per data type.<br>
-            - data-type-string<br>
-            - data-type-integer<br>
-            - data-type-float<br>
-            - data-type-datetime<br>
-            <br>
-            Slot props: <br>
-            - all props <br>
-            - tag: current QueryTag item.<br>
-        </div>
-        <PQuerySearchTags :timezone="timezone"
-                          :tags="tags"
-                          v-on="actions"
-        >
-            <template #data-type-datetime="{tag}">
-                {{tag.value.label}}
-            </template>
-        </PQuerySearchTags>
-    </div>`,
+        <div style="width: 80vw;">
+            <div class="my-8">
+                It has slots per data type.<br>
+                - data-type-string<br>
+                - data-type-integer<br>
+                - data-type-float<br>
+                - data-type-datetime<br>
+                <br>
+                Slot props: <br>
+                - all props <br>
+                - tag: current QueryTag item.<br>
+            </div>
+            <PQuerySearchTags :timezone="timezone"
+                              :tags="tags"
+                              v-on="actions"
+            >
+                <template #data-type-datetime="{tag}">
+                    {{tag.value.label}}
+                </template>
+            </PQuerySearchTags>
+        </div>`,
     setup(props, context) {
         const state = reactive({
             tags: [

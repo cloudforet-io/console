@@ -17,12 +17,4 @@ export const markdown = () => ({
     template: `<div style="width: 80vw;">
                     
                 </div>`,
-    data() {
-        return {
-        };
-    },
-    props: {
-    },
-    methods: {
-    },
 });

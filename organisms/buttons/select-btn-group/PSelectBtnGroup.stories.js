@@ -16,18 +16,18 @@ export default {
 export const seletButtonGroup = () => ({
     components: { PSelectBtnGroup },
     template: `
-<div style="width: 50vw">
-    <PSelectBtnGroup 
-        :buttons="btns" 
-        :selected.sync="selected"
-        @clickButton="clickButton"
-        @click-one="clickOne"
-        @click-two="clickTwo"
-        @click-three="clickThree"
-        @click-four="clickFour"
-        ></PSelectBtnGroup>
-    <p>select btn : {{selected}}</p>
-</div>`,
+        <div style="width: 50vw">
+            <PSelectBtnGroup 
+                :buttons="btns" 
+                :selected.sync="selected"
+                @clickButton="clickButton"
+                @click-one="clickOne"
+                @click-two="clickTwo"
+                @click-three="clickThree"
+                @click-four="clickFour"
+                ></PSelectBtnGroup>
+            <p>select btn : {{selected}}</p>
+        </div>`,
     setup() {
         const state = reactive({
             btns: [
@@ -82,20 +82,20 @@ const actions = {
 export const withTrHelper = () => ({
     components: { PSelectBtnGroup },
     template: `
-<div style="width: 50vw">
-    <PSelectBtnGroup
-        :buttons="btns"
-        :selected.sync="selected"
-        @clickButton="clickButton"
-        @click-ip="clickIP"
-        @click-cidr="clickCIDR"
-        @click-mac="clickMAC"
-        @click-network="clickNETWORK"
-        @click-project="clickPROJ"
-        @click-region="clickREGION"
-        ></PSelectBtnGroup>
-    <p>select btn : {{selected}}</p>
-</div>`,
+        <div style="width: 50vw">
+            <PSelectBtnGroup
+                :buttons="btns"
+                :selected.sync="selected"
+                @clickButton="clickButton"
+                @click-ip="clickIP"
+                @click-cidr="clickCIDR"
+                @click-mac="clickMAC"
+                @click-network="clickNETWORK"
+                @click-project="clickPROJ"
+                @click-region="clickREGION"
+                ></PSelectBtnGroup>
+            <p>select btn : {{selected}}</p>
+        </div>`,
     setup(_, { parent }) {
         const state = reactive({
             btns: [
@@ -130,20 +130,20 @@ export const withTrHelper = () => ({
 export const scroll = () => ({
     components: { PSelectBtnGroup },
     template: `
-<div style="width: 30vw">
-    <PSelectBtnGroup
-        :buttons="btns"
-        :selected.sync="selected"
-        @clickButton="clickButton"
-        @click-ip="clickIP"
-        @click-cidr="clickCIDR"
-        @click-mac="clickMAC"
-        @click-network="clickNETWORK"
-        @click-project="clickPROJ"
-        @click-region="clickREGION"
-        ></PSelectBtnGroup>
-    <p>select btn : {{selected}}</p>
-</div>`,
+        <div style="width: 30vw">
+            <PSelectBtnGroup
+                :buttons="btns"
+                :selected.sync="selected"
+                @clickButton="clickButton"
+                @click-ip="clickIP"
+                @click-cidr="clickCIDR"
+                @click-mac="clickMAC"
+                @click-network="clickNETWORK"
+                @click-project="clickPROJ"
+                @click-region="clickREGION"
+                ></PSelectBtnGroup>
+            <p>select btn : {{selected}}</p>
+        </div>`,
     setup(_, { parent }) {
         const state = reactive({
             btns: [

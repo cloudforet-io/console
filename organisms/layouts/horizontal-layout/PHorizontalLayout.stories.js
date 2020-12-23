@@ -24,9 +24,11 @@ export const horizontalLayout = () => ({
                                       @move="move" 
                                       @stop="stop" />
                 </div>`,
-    methods: {
-        start: action('start'),
-        move: action('move'),
-        stop: action('stop'),
+    setup() {
+        return {
+            start: action('start'),
+            move: action('move'),
+            stop: action('stop'),
+        };
     },
 });

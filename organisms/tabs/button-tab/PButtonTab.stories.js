@@ -20,22 +20,22 @@ export default {
 export const defaultCase = () => ({
     components: { PButtonTab },
     template: `
-    <div style="height: 80vh; width: 80vw;">
-        <p-button-tab :tabs="tabs" :active-tab.sync="activeTab"
-                      keep-alive-all
-                      v-on="actions"
-        >
-            <template #A>
-                <div class="m-4">This is A</div>
-            </template>
-            <template #B>
-                <div class="m-4">Hello, This is B.</div>
-            </template>
-            <template #C>
-                <div class="m-4">Hi, This is C!!!!</div>
-            </template>
-        </p-button-tab>
-    </div>`,
+        <div style="height: 80vh; width: 80vw;">
+            <p-button-tab :tabs="tabs" :active-tab.sync="activeTab"
+                          keep-alive-all
+                          v-on="actions"
+            >
+                <template #A>
+                    <div class="m-4">This is A</div>
+                </template>
+                <template #B>
+                    <div class="m-4">Hello, This is B.</div>
+                </template>
+                <template #C>
+                    <div class="m-4">Hi, This is C!!!!</div>
+                </template>
+            </p-button-tab>
+        </div>`,
     setup(props, context) {
         const state = reactive({
             tabs: ['A', 'B', 'C'],
@@ -55,16 +55,16 @@ export const defaultCase = () => ({
 export const AdvancedCase = () => ({
     components: { PButtonTab },
     template: `
-    <div style="height: 80vh; width: 80vw;">
-        <p-button-tab :tabs="tabs" :active-tab.sync="activeTab"
-                      keep-alive-all
-                      v-on="actions"
-        >
-            <template v-for="t in tabs" v-slot:[t.name]="scope" >
-                <div class="m-4" :style="scope.style">{{ scope.data }}</div>
-            </template>
-        </p-button-tab>
-    </div>`,
+        <div style="height: 80vh; width: 80vw;">
+            <p-button-tab :tabs="tabs" :active-tab.sync="activeTab"
+                          keep-alive-all
+                          v-on="actions"
+            >
+                <template v-for="t in tabs" v-slot:[t.name]="scope" >
+                    <div class="m-4" :style="scope.style">{{ scope.data }}</div>
+                </template>
+            </p-button-tab>
+        </div>`,
     setup(props, context) {
         const state = reactive({
             tabs: [

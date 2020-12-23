@@ -1,5 +1,6 @@
 import { text, number } from '@storybook/addon-knobs/vue';
 import { autoProps } from '@sb/storybook-util';
+import { ref } from '@vue/composition-api';
 import PLottie from './PLottie.vue';
 
 export default {
@@ -21,10 +22,6 @@ export const lottie = () => ({
                     <button @click="hide">stop loading</button>
                         <p-lottie v-bind="$props" ref="load"/>
                 </div>`,
-    data() {
-        return {
-        };
-    },
     props: {
         name: {
             default: text('name', 'spinner'),
@@ -34,12 +31,17 @@ export const lottie = () => ({
         },
         ...autoProps(PLottie),
     },
-    methods: {
-        show() {
-            this.$refs.load.create();
-        },
-        hide() {
-            this.$refs.load.destroy();
-        },
+    setup() {
+        const load = ref(null);
+        const show = () => {
+            load.create();
+        };
+        const hide = () => {
+            load.destroy();
+        };
+        return {
+            show,
+            hide,
+        };
     },
 });

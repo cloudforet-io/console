@@ -26,25 +26,19 @@ const data = {
 export const tabBar = () => ({
     components: { PTabBar },
     template: `
-<div>
-
-
-<p-tab-bar 
-    :tabs="tabs" 
-    :activeTab.sync="activeTab"
-    @changeTab="changeTab"
- />
- <p>{{activeTab}}</p>
- <input type="text" v-model="activeTab">
- </div>
-`,
-    data() {
+        <div>
+            <p-tab-bar 
+                :tabs="tabs" 
+                :activeTab.sync="activeTab"
+                @changeTab="changeTab"
+            />
+            <p>{{activeTab}}</p>
+            <input type="text" v-model="activeTab">
+        </div>`,
+    setup() {
         return {
             ...data,
+            ...actions,
         };
-    },
-
-    methods: {
-        ...actions,
     },
 });

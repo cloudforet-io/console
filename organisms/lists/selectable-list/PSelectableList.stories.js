@@ -104,12 +104,12 @@ export const defaultCase = () => ({
     components: { PSelectableList },
     props: getProps(),
     template: `
-    <div style="width: 80vw; border: 1px solid gray;">
-        <PSelectableList v-bind="$props"
-                         :selected-indexes.sync="selectedIndexes"
-                         v-on="actions"
-        ></PSelectableList>
-    </div>`,
+        <div style="width: 80vw; border: 1px solid gray;">
+            <PSelectableList v-bind="$props"
+                             :selected-indexes.sync="selectedIndexes"
+                             v-on="actions"
+            ></PSelectableList>
+        </div>`,
     setup(props, context) {
         const state = reactive({
             selectedIndexes: [],
@@ -127,16 +127,16 @@ export const extraSlot = () => ({
     components: { PSelectableList },
     props: getProps(),
     template: `
-    <div style="width: 80vw; border: 1px solid gray;">
-        <PSelectableList v-bind="$props"
-                         :selected-indexes.sync="selectedIndexes"
-                         v-on="actions"
-        >
-            <template #extra="{item}">
-                extra: {{item.id}}
-            </template>
-        </PSelectableList>
-    </div>`,
+        <div style="width: 80vw; border: 1px solid gray;">
+            <PSelectableList v-bind="$props"
+                             :selected-indexes.sync="selectedIndexes"
+                             v-on="actions"
+            >
+                <template #extra="{item}">
+                    extra: {{item.id}}
+                </template>
+            </PSelectableList>
+        </div>`,
     setup(props, context) {
         const state = reactive({
             selectedIndexes: [],
@@ -233,16 +233,16 @@ export const cardTheme = () => ({
         disabledIndexes: true,
     }),
     template: `
-    <div style="width: 80vw; border: 1px solid gray;">
-        <PSelectableList v-bind="$props"
-                         :selected-indexes.sync="selectedIndexes"
-                         v-on="actions"
-        >
-            <template #extra="{item}">
-                extra: {{item.id}}
-            </template>
-        </PSelectableList>
-    </div>`,
+        <div style="width: 80vw; border: 1px solid gray;">
+            <PSelectableList v-bind="$props"
+                             :selected-indexes.sync="selectedIndexes"
+                             v-on="actions"
+            >
+                <template #extra="{item}">
+                    extra: {{item.id}}
+                </template>
+            </PSelectableList>
+        </div>`,
     setup(props, context) {
         const state = reactive({
             selectedIndexes: [],

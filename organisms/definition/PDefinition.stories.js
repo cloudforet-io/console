@@ -64,9 +64,9 @@ export const defaultCase = () => ({
             
             
         </div>
-    <div style="width: 80vw;">
-        <PDefinition v-bind="$props"></PDefinition>
-    </div>`,
+        <div style="width: 80vw;">
+            <PDefinition v-bind="$props"></PDefinition>
+        </div>`,
     setup(props, context) {
         const state = reactive({});
 

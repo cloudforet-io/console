@@ -5,6 +5,7 @@ import PButton from '@/components/atoms/buttons/PButton.vue';
 import { sizeMapping } from '@/components/molecules/modals/type';
 import PContentModal from '@/components/organisms/modals/content-modal/PContentModal.vue';
 import faker from 'faker';
+import { computed, ref } from '@vue/composition-api';
 
 export default {
     title: 'Others/Modal/ContentModal',
@@ -39,11 +40,6 @@ export const modal = () => ({
                     <template #footer>this is Footer.</template>
                 </p-content-modal>
             `,
-    data() {
-        return {
-            visible: true,
-        };
-    },
     props: {
         loremLength: {
             default: number('loremLength', 10, {
@@ -75,15 +71,18 @@ export const modal = () => ({
             default: boolean('fade', true),
         },
     },
-    computed: {
-        lorem() {
-            return faker.lorem.lines(this.loremLength);
-        },
-    },
-    methods: {
-        click() {
-            this.visible = true;
-        },
+
+    setup(props) {
+        const visible = ref(false);
+        const lorem = computed(() => faker.lorem.lines(props.loremLength));
+        const click = () => {
+            visible.value = true;
+        };
+        return {
+            visible,
+            lorem,
+            click,
+        };
     },
 });
 

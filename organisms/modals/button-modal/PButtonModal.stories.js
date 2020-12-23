@@ -8,6 +8,7 @@ import PContentModal from '@/components/organisms/modals/content-modal/PContentM
 import PButton from '@/components/atoms/buttons/PButton.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import { sizeMapping } from '@/components/molecules/modals/type';
+import { computed, ref } from '@vue/composition-api';
 
 export default {
     title: 'Feedbacks/Modals',
@@ -21,17 +22,12 @@ export default {
     },
 };
 
-const data = {
-    visible: false,
-};
-
 const actions = {
     shown: action('shown'),
     hidden: action('hidden'),
     cancel: action('cancel'),
     close: action('close'),
     confirm: action('confirm'),
-
 };
 
 const pbmProps = [
@@ -77,11 +73,6 @@ export const buttonModal = () => ({
                     
                 </p-button-modal>
             </div>`,
-    data() {
-        return {
-            ...data,
-        };
-    },
 
     props: {
         loremLength: {
@@ -113,24 +104,28 @@ export const buttonModal = () => ({
         ...autoProps(PButtonModal, pbmProps),
         ...autoProps(PContentModal, pcmProps),
     },
-    computed: {
-        lorem() {
-            return faker.lorem.lines(this.loremLength);
-        },
-        ConfirmButtonBind() {
-            return {
-                styleType: 'primary',
-                disabled: this.okDisabled,
-            };
-        },
-    },
-    methods: {
-        click() {
-            this.visible = true;
-        },
-        close() {
-            this.visible = false;
-        },
-        ...actions,
+
+    setup(props) {
+        const visible = ref(false);
+        const lorem = computed(() => faker.lorem.lines(props.loremLength));
+        const ConfirmButtonBind = computed(() => ({
+            styleType: 'primary',
+            disabled: props.okDisabled,
+        }));
+        const click = () => {
+            visible.value = true;
+        };
+        const close = () => {
+            visible.value = false;
+        };
+
+        return {
+            ...actions,
+            visible,
+            lorem,
+            ConfirmButtonBind,
+            click,
+            close,
+        };
     },
 });
