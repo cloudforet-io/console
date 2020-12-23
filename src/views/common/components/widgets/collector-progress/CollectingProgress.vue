@@ -204,7 +204,6 @@ export default {
 .widget-layout::v-deep {
     @apply border border-gray-100;
     border-radius: 0.375rem;
-    overflow-x: hidden;
 }
 .p-data-table::v-deep {
     border-radius: 0.125rem;

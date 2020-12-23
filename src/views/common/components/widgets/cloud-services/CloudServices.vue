@@ -255,6 +255,8 @@ export default {
 <style lang="postcss" scoped>
 .widget-layout::v-deep {
     height: 100%;
+    max-height: 35rem;
+    overflow-y: auto;
     .card-wrapper {
         display: block;
         .item-container {
