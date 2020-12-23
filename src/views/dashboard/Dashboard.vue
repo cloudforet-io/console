@@ -32,7 +32,7 @@
                                     :providers="providers"
                                     :timezone="timezone"
                 />
-                <cloud-services class="col-span-12 cloud-services" />
+                <cloud-services class="col-span-12 cloud-services" :more-info="true" />
             </div>
         </div>
     </general-page-layout>
@@ -120,10 +120,6 @@ export default {
 
 .daily-updates {
     height: 33.75rem;
-}
-
-.cloud-services {
-    max-height: 100%;
 }
 
 @screen lg {

@@ -36,7 +36,8 @@
                                :project-id="projectId"
                                :project-filter="projectFilter"
                 />
-                <cloud-services class="col-span-12 cloud-service"
+                <cloud-services class="col-span-12 cloud-services"
+                                :more-info="true"
                                 :project-filter="projectFilter"
                                 :project-id="projectId"
                 />
@@ -210,8 +211,9 @@ export default {
     }
 }
 
-.cloud-service {
+.cloud-services {
     @apply border border-gray-200;
+    min-height: 25rem;
     max-height: 35rem;
     border-radius: 2px;
     @media screen and (width < 1024px) {

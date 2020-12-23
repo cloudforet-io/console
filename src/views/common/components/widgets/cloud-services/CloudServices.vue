@@ -14,7 +14,7 @@
                          color="inherit transparent"
                     />
                 </div>
-                <router-link v-if="moreInfo" to="/inventory/cloud-service" class="more">
+                <router-link v-if="moreInfo" :to="cloudServiceTypeLink" class="more">
                     <span class="text-xs">{{ $t('COMMON.WIDGETS.CLOUD_SERVICE_SEE_MORE') }}</span>
                     <p-i name="ic_arrow_right" width="1rem" height="1rem"
                          color="inherit transparent"
@@ -73,8 +73,7 @@
 /* eslint-disable camelcase */
 import { range } from 'lodash';
 
-import { reactive, toRefs } from '@vue/composition-api';
-import { Location } from 'vue-router';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
@@ -84,8 +83,19 @@ import PI from '@/components/atoms/icons/PI.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { QueryHelper } from '@/lib/query';
+import { QueryStoreFilter } from '@/lib/query/type';
 
+
+interface Value {
+    provider: string;
+    group: string;
+    icon: string;
+    name: string;
+    count: number;
+    href: [string, object];
+}
 const DATA_LENGTH = 8;
+
 export default {
     name: 'CloudServices',
     components: {
@@ -109,18 +119,11 @@ export default {
         },
         projectId: {
             type: String,
-            default: '',
+            default: undefined,
         },
     },
     setup(props) {
-        interface Value {
-            provider: string;
-            group: string;
-            icon: string;
-            name: string;
-            count: number;
-            href: [string, object];
-        }
+        const queryHelper = new QueryHelper();
 
         const state = reactive({
             loading: true,
@@ -133,9 +136,17 @@ export default {
                 provider: string;
                 href: string;
             }>,
+            cloudServiceTypeLink: computed(() => {
+                const filters: QueryStoreFilter[] = [];
+                if (props.projectId) filters.push({ k: 'project_id', o: '=', v: props.projectId });
+                return {
+                    name: 'cloudService',
+                    query: {
+                        filters: queryHelper.setFilters(filters).rawQueryStrings,
+                    },
+                };
+            }),
         });
-
-        const queryHelper = new QueryHelper();
 
         const getLink = (data, projectId?) => {
             let link;
@@ -254,7 +265,6 @@ export default {
 
 <style lang="postcss" scoped>
 .widget-layout::v-deep {
-    max-height: 35rem;
     overflow-y: auto;
     .card-wrapper {
         display: block;

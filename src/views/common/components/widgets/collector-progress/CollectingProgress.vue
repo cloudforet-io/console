@@ -15,41 +15,43 @@
                 </div>
             </div>
         </template>
-        <p-data-table :items="items" :loading="loading" :fields="fields"
-                      :bordered="false"
-                      @rowLeftClick="onRowClick"
-        >
-            <template #skeleton-name>
-                <div class="flex items-center">
-                    <p-skeleton class="flex-shrink-0 mr-4" width="1.5rem" height="1.5rem" />
-                    <p-skeleton />
+        <template v-if="loading">
+            <div v-for="skeleton in skeletons" :key="skeleton" class="grid grid-cols-1 gap-1 my-4 w-full">
+                <p-skeleton width="80%" height="0.625rem" />
+                <p-skeleton width="100%" height="0.625rem" />
+            </div>
+        </template>
+        <div v-else-if="!loading && items.length > 0">
+            <router-link v-for="(item, index) in items" :key="index"
+                         :to="{ name: 'collectorMain' }"
+                         class="card grid grid-cols-12"
+            >
+                <div class="left-part col-span-10">
+                    <span class="collector-provider"
+                          :style="{color: providers[item.collector_info.provider] ? providers[item.collector_info.provider].color : undefined }"
+                    >{{ providers[item.collector_info.provider] ? providers[item.collector_info.provider].label : item.collector_info.provider }}</span>
+                    <span class="collector-title">{{ item.collector_info.name }}</span>
+                    <br><span class="time">{{ timeFormatter(item.created_at) }}</span>
                 </div>
-            </template>
-            <template #no-data="{fields}">
-                <tr key="noData" class="bg-primary3">
-                    <td :colspan="fields.length" class="text-gray">
-                        {{ $t('COMMON.WIDGETS.COLLECTING_PROGRESS_NO_RUNNING') }}
-                    </td>
-                </tr>
-            </template>
-            <template #col-collector_info-format="{index, field, item}">
-                <span class="collector-provider"
-                      :style="{color: providers[item.collector_info.provider] ? providers[item.collector_info.provider].color : undefined }"
-                >{{ providers[item.collector_info.provider] ? providers[item.collector_info.provider].label : item.collector_info.provider }}</span>
-                <span class="collector-title">{{ item.collector_info.name }}</span>
-                <br><span class="time">{{ timeFormatter(item.created_at) }}</span>
-            </template>
-            <template #col-progress-format="{item}">
-                <p-lottie name="lottie_working" auto
-                          :size="1.5"
-                />
-            </template>
-        </p-data-table>
+                <div class="right-part col-span-2">
+                    <p-lottie name="lottie_working" auto
+                              :size="1.5"
+                    />
+                </div>
+            </router-link>
+        </div>
+        <div v-else class="no-data-wrapper">
+            <img src="@/assets/images/illust_star.svg" class="no-data-img">
+            <p class="no-data-text">
+                {{ $t('COMMON.WIDGETS.COLLECTING_PROGRESS_NO_RUNNING') }}
+            </p>
+        </div>
     </widget-layout>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import { range } from 'lodash';
 import dayjs from 'dayjs';
 
 import {
@@ -57,7 +59,7 @@ import {
 } from '@vue/composition-api';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 import PI from '@/components/atoms/icons/PI.vue';
 
@@ -65,8 +67,6 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { TimeStamp } from '@/models';
-import { QueryHelper } from '@/lib/query';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
 
 enum JOB_STATE {
     created = 'CREATED',
@@ -100,7 +100,6 @@ export default {
         WidgetLayout,
         PSkeleton,
         PI,
-        PDataTable,
     },
     props: {
         providers: {
@@ -116,6 +115,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
+            skeletons: range(2),
             items: [] as JobModel[],
             fields: computed(() => [
                 { label: vm.$t('COMMON.WIDGETS.COLLECTING_PROGRESS_TITLE_TIME'), name: 'collector_info' },
@@ -176,11 +176,6 @@ export default {
             ...toRefs(state),
             timeFormatter,
             getData,
-            onRowClick() {
-                vm.$router.push({
-                    name: 'collectorMain',
-                });
-            },
             goToCollectorHistory,
         };
     },
@@ -199,45 +194,69 @@ export default {
     .more-btn {
         @apply flex-shrink-0 flex justify-end;
         font-size: 0.75rem;
+        .more {
+            @apply text-sm text-blue-500 font-normal float-right inline-flex items-center cursor-pointer float-right;
+            &:hover {
+                @apply text-secondary underline;
+            }
+        }
     }
 }
 .widget-layout::v-deep {
     @apply border border-gray-100;
+    position: relative;
+    min-height: 18.75rem;
     border-radius: 0.375rem;
 }
-.p-data-table::v-deep {
-    border-radius: 0.125rem;
-    .default th {
-        @apply bg-gray-100 text-gray-400;
-        height: 1.5rem;
-        border: none;
-        font-size: 0.75rem;
-    }
-    td {
-        height: 3.5rem;
-    }
-}
-.more {
-    @apply text-sm text-blue-500 font-normal float-right inline-flex items-center cursor-pointer float-right;
-    &:hover {
-        @apply text-secondary underline;
-    }
-}
-.collector-provider {
-    @apply text-sm;
-    margin-top: 0.5rem;
-    margin-bottom: 0.75rem;
-    margin-right: 0.25rem;
-}
 
-.collector-title {
-    @apply text-sm inline-block truncate;
-    max-width: 9rem;
+.no-data-wrapper {
+    position: absolute;
+    width: 100%;
+    left: 0;
+    top: 6rem;
+    .no-data-img {
+        @apply mx-auto mb-4 flex-shrink-0;
+        width: 3.75rem;
+        opacity: 0.7;
+    }
+    .no-data-text {
+        @apply text-center text-primary2;
+        font-weight: bold;
+        font-size: 0.875rem;
+        line-height: 150%;
+    }
 }
-
-.time {
-    @apply text-gray-500;
-    font-size: 0.75rem;
-    line-height: 1.5;
+.card {
+    border-radius: 0.25rem;
+    padding: 0.75rem 1rem;
+    &:nth-child(odd) {
+        @apply bg-primary4;
+    }
+    .left-part {
+        .collector-provider {
+            font-size: 0.875rem;
+            line-height: 1.4;
+            margin-right: 0.25rem;
+        }
+        .collector-title {
+            @apply truncate;
+            display: inline-block;
+            max-width: 9rem;
+            line-height: 1.4;
+            vertical-align: top;
+            font-size: 0.875rem;
+            @media screen and (width < 576px) {
+                max-width: initial;
+            }
+        }
+        .time {
+            @apply text-gray-500;
+            font-size: 0.75rem;
+            line-height: 1.5;
+        }
+    }
+    .right-part {
+        margin: auto;
+    }
 }
 </style>
