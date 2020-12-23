@@ -22,7 +22,8 @@ router.beforeEach(async (to, from, next) => {
         }
         next();
     } else if (SpaceConnector.isTokenAlive) {
-        if (to.meta && to.meta.isDomainOwnerOnly && router.app.$store.state.user.userType !== 'DOMAIN_OWNER') {
+        const isAdmin = router.app.$store.getters['user/isAdmin'];
+        if (to.meta && to.meta.isDomainOwnerOnly && !isAdmin) {
             next({ name: 'error' });
         }
         next();
