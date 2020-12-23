@@ -2,7 +2,23 @@ import { languages, userTypes } from '@/store/modules/user/config';
 import { UserState } from './type';
 
 export const isDomainOwner = (state: UserState): boolean => state.userType === 'DOMAIN_OWNER';
-export const isAdmin = (state: UserState): boolean => state.userType === 'DOMAIN_OWNER';
+export const isAdmin = (state: UserState): boolean => {
+    let isAdminUser = false;
+
+    if (state.userType === 'DOMAIN_OWNER') {
+        isAdminUser = true;
+    }
+
+    if (state.roles) {
+        state.roles.forEach((role) => {
+            if (role.roleType === 'DOMAIN') {
+                isAdminUser = true;
+            }
+        });
+    }
+
+    return isAdminUser;
+};
 export const languageLabel = (state: UserState): string => languages[state.language as string] || state.language;
 export const userTypeLabel = (state: UserState): string => userTypes[state.userType as string] || state.userType;
 export const getRoleNames = (state: UserState): Array<string> => {
