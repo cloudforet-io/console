@@ -14,10 +14,10 @@
                 <p-page-navigation :routes="routes" />
             </div>
             <p-toolbox-grid-layout class="plugin-list"
-                                   :items="plugins"
+                                   :items="loading ? [] : plugins"
                                    :this-page.sync="thisPage"
                                    :page-size.sync="pageSize"
-                                   :loading.sync="loading"
+                                   :loading="loading"
                                    :card-class="cardClass"
                                    :card-height="cardHeight"
                                    :card-min-width="cardMinWidth"
@@ -55,16 +55,18 @@
                     </p>
                 </template>
                 <template #loading>
-                    <div v-for="s in skeletons" :key="s" class="flex w-full mb-4">
-                        <p-skeleton width="4rem" height="4rem" class="flex-shrink-0 mr-4" />
-                        <div class="w-full">
-                            <p-skeleton width="40%" height="1.5rem" class="mt-2 mb-2" />
-                            <p-skeleton height="1rem" width="90%" />
+                    <div>
+                        <div v-for="s in skeletons" :key="s" class="flex w-full mb-4">
+                            <p-skeleton width="4rem" height="4rem" class="flex-shrink-0 mr-4" />
+                            <div class="w-full">
+                                <p-skeleton width="40%" height="1.5rem" class="mt-2 mb-2" />
+                                <p-skeleton height="1rem" width="90%" />
+                            </div>
                         </div>
                     </div>
                 </template>
                 <template #no-data>
-                    <p-empty class="w-full h-full">
+                    <p-empty v-if="!loading" class="w-full h-full">
                         No Data
                     </p-empty>
                 </template>
@@ -236,7 +238,7 @@ export default {
                 const res = await SpaceConnector.client.repository.plugin.list(params);
                 state.plugins = [
                     ...res.results.map(d => ({
-                        icon: d.tags.find(tag => tag.key === 'icon').value,
+                        icon: d.tags.find(tag => tag.key === 'icon')?.value,
                         ...d,
                     })),
                 ];
