@@ -116,7 +116,7 @@ export default defineComponent({
                 return;
             }
             const credentials = {
-                password: state.password,
+                password: state.password.trim(),
             };
             context.emit('on-sign-in', state.userId, credentials);
         };

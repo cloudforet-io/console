@@ -4,7 +4,7 @@
         <p-page-title :title="$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE')" />
         <p-pane-layout class="form-wrapper">
             <p class="form-title">
-                {{$t('IDENTITY.USER.MAIN.BASE_INFORMATION')}}
+                {{ $t('IDENTITY.USER.MAIN.BASE_INFORMATION') }}
             </p>
             <p-field-group :label="'ID'" class="input-form">
                 <p-text-input v-model="userId" disabled class="text-input" />
@@ -40,14 +40,14 @@
             </p-field-group>
             <div class="save-btn">
                 <p-button style-type="primary-dark" @click="onClickProfileConfirm">
-                    {{$t('IDENTITY.USER.MAIN.SAVE_CHANGES')}}
+                    {{ $t('IDENTITY.USER.MAIN.SAVE_CHANGES') }}
                 </p-button>
             </div>
         </p-pane-layout>
         <div v-if="userType == 'LOCAL'">
             <p-pane-layout class="mt-6 form-wrapper">
                 <p class="form-title">
-                    {{$t('IDENTITY.USER.MAIN.CHANGE_PASSWORD')}}
+                    {{ $t('IDENTITY.USER.MAIN.CHANGE_PASSWORD') }}
                 </p>
                 <form class="form">
                     <p-field-group
@@ -81,7 +81,7 @@
                 </form>
                 <div class="save-btn">
                     <p-button style-type="primary-dark" @click="onClickPasswordConfirm">
-                        {{$t('IDENTITY.USER.MAIN.SAVE_CHANGES')}}
+                        {{ $t('IDENTITY.USER.MAIN.SAVE_CHANGES') }}
                     </p-button>
                 </div>
             </p-pane-layout>
@@ -131,7 +131,7 @@ export default {
 
         const state = reactive({
             userId: computed(() => store.state.user.userId),
-            userRole: computed(() => store.getters['user/userTypeLabel']),
+            userRole: '',
             userType: computed(() => store.state.user.backend) as unknown as string,
             language: '' as LanguageCode | undefined,
             timezone: '' as Timezone | undefined,
@@ -247,10 +247,15 @@ export default {
             };
             await updateUser(userParam);
         };
+        const getUserRole = async () => {
+            const roleArray = store.getters['user/getRoleNames'];
+            state.userRole = roleArray.join(', ');
+        };
 
         const getProfile = async (id) => {
             try {
                 await store.dispatch('user/getUser', id);
+                await getUserRole();
                 state.email = store.state.user.email;
                 state.language = store.state.user.language;
                 state.timezone = store.state.user.timezone;

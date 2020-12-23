@@ -99,8 +99,9 @@
                         </div>
                         <div class="info-row">
                             <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
-                            <span v-if="userState.isAdmin" class="value">{{ $t('COMMON.GNB.ACCOUNT.ROLE_ROOT_ADMIN') }}</span>
-                            <span v-else class="value">{{ $t('COMMON.GNB.ACCOUNT.ROLE_DOMAIN_ADMIN') }}</span>
+                            <span v-for="(item, i) in userState.role" :key="`${item}-${i}`" class="value">
+                                {{ item }}
+                            </span>
                         </div>
                         <div class="info-row">
                             <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_TIMEZONE') }}</span>
@@ -203,6 +204,7 @@ export default {
         const userState = reactive({
             name: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),
+            role: computed(() => store.getters['user/getRoleNames']),
             language: computed(() => store.getters['user/languageLabel']),
             timezone: computed(() => store.state.user.timezone),
             userId: computed(() => store.state.user.userId),
