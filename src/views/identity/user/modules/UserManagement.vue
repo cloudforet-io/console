@@ -33,7 +33,7 @@
                                             name="ic_plus_bold"
                                             @click="clickAdd"
                         >
-                            {{$t('IDENTITY.USER.MAIN.ADD')}}
+                            {{ $t('IDENTITY.USER.MAIN.ADD') }}
                         </p-icon-text-button>
                         <p-dropdown-menu-btn
                             id="dropdown-btn"
@@ -441,14 +441,9 @@ export default {
         };
         const updateUser = async (item) => {
             try {
-                await SpaceConnector.client.identity.user.update({
-                    ...item,
-                });
-                if (store.state.user.userId === item.user_id) {
-                    // await user.setUser('USER', item.user_id, vm);
-                    await store.dispatch('user/setUser', 'USER', item.user_id);
-                    vm.$i18n.locale = item.language;
-                }
+                await store.dispatch('user/setUser', 'USER', item.user_id);
+                vm.$i18n.locale = item.language;
+
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', root);
             } catch (e) {
                 showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e, root);

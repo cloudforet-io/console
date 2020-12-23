@@ -316,7 +316,7 @@ export default {
                 validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
             } else if (password.length < 8) {
                 validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 9 });
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 8 });
             } else if (!password.match(/[a-z]/)) {
                 validationState.isPasswordValid = false;
                 validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');

@@ -178,13 +178,14 @@ export default {
         };
 
         const checkPassword = async (password) => {
+            console.log(password.length);
             // password1
             if (password.replace(/ /g, '').length !== password.length) {
                 validationState.isPasswordValid = false;
                 validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
             } else if (password.length < 8) {
                 validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 9 });
+                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 8 });
             } else if (!password.match(/[a-z]/)) {
                 validationState.isPasswordValid = false;
                 validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
@@ -210,14 +211,10 @@ export default {
         };
 
         const updateUser = async (userParam) => {
+            console.log(userParam);
             try {
-                await SpaceConnector.client.identity.user.update({
-                    user_id: state.userId,
-                    ...userParam,
-                });
-                if (store.state.user.userId === state.userId) {
-                    await store.dispatch('user/setUser', 'USER', state.userId);
-                }
+                await store.dispatch('user/setUser', userParam);
+
                 if (userParam.language) {
                     vm.$i18n.locale = userParam.language as string;
                 }

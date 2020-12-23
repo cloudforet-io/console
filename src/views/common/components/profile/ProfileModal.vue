@@ -147,7 +147,7 @@ export default {
         const state = reactive({
             loading: false,
             proxyVisible: makeProxy('visible', props, emit),
-            showPassword: computed(() => state.isDomainOwner || state.isInternalAuth),
+            showPassword: computed(() => state.isDomainOwner),
             languages: map(languages, (d, k) => ({
                 type: 'item', label: d === 'en' ? `${d} (default)` : d, name: k,
             })),
@@ -156,7 +156,7 @@ export default {
                 { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
                 { type: 'item', label: 'Asia/Tokyo', name: 'Asia/Tokyo' },
             ],
-            isInternalAuth: computed(() => store.getters['domain/isInternalAuth']),
+            // isInternalAuth: computed(() => store.getters['domain/isInternalAuth']),
             isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
         });
         const formState = reactive({
@@ -208,9 +208,6 @@ export default {
             } else if (formState.password && formState.password.length < 5) {
                 validationState.isPasswordValid = false;
                 validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 5 });
-            } else if (formState.password.length > 12) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MAX_LENGTH_INVALID', { max: 12 });
             } else {
                 validationState.isPasswordValid = true;
                 validationState.passwordInvalidText = '';

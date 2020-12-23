@@ -84,7 +84,7 @@
                      @click.stop="toggleMenu('account')"
                 >
                     <div class="menu-icon"
-                         :class="[{opened: openedMenu === 'account'}, userState.isAdmin ? 'admin' : 'member']"
+                         :class="[{opened: openedMenu === 'account'}, userState.isDomainOwner ? 'admin' : 'member']"
                     />
                 </div>
                 <div v-if="openedMenu === 'account'"
@@ -93,7 +93,7 @@
                 >
                     <div class="info-wrapper">
                         <div class="info-row">
-                            <p-i v-if="userState.isAdmin" class="icon" name="admin" />
+                            <p-i v-if="userState.isDomainOwner" class="icon" name="admin" />
                             <p-i v-else class="icon" name="user" />
                             <span class="value">{{ userState.userId }}</span>
                         </div>
@@ -136,10 +136,6 @@
                 </div>
             </div>
         </div>
-        <profile-modal v-if="profileVisible"
-                       :visible.sync="profileVisible"
-                       :user-id="userState.userId"
-        />
     </div>
 </template>
 
@@ -151,7 +147,6 @@ import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import ProfileModal from '@/views/common/components/profile/ProfileModal.vue';
 import SiteMap from '@/views/common/components/gnb/SiteMap.vue';
 import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 import PI from '@/components/atoms/icons/PI.vue';
@@ -193,7 +188,6 @@ export default {
         PHr,
         PAnchor,
         PI,
-        ProfileModal,
         SiteMap,
     },
     directives: {
@@ -209,6 +203,7 @@ export default {
             timezone: computed(() => store.state.user.timezone),
             userId: computed(() => store.state.user.userId),
             isAdmin: computed((() => store.getters['user/isAdmin'])),
+            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
         });
         const state = reactive({
             openedMenu: null,
