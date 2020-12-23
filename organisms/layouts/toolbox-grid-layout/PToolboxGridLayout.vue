@@ -49,12 +49,6 @@
                 <slot name="toolbox-bottom" />
             </div>
         </div>
-        <slot v-if="loading" name="loading">
-            <div class="loading-backdrop fade-in" />
-            <p-lottie name="thin-spinner" :size="2.5"
-                      :auto="true" class="loading-spinner"
-            />
-        </slot>
         <transition-group name="fade-in" tag="div" class="transition-group">
             <div v-if="!items || items.length === 0" key="no-data" class="transition-item">
                 <slot name="no-data" />
@@ -65,6 +59,16 @@
                         <slot :name="slot" v-bind="scope" />
                     </template>
                 </p-grid-layout>
+            </div>
+            <div v-if="loading" key="loading" class="loading">
+                <div class="loading-backdrop fade-in" />
+                <div class="loader">
+                    <slot name="loading">
+                        <p-lottie name="thin-spinner" :size="2.5"
+                                  auto class="loading-spinner"
+                        />
+                    </slot>
+                </div>
             </div>
         </transition-group>
     </div>
@@ -253,17 +257,24 @@ export default {
         }
     }
 
-    .loading-backdrop {
+    .loading {
         @apply absolute w-full h-full overflow-hidden;
-        background-color: white;
-        opacity: 0.5;
         top: 0;
-        z-index: 1;
-    }
-    .loading-spinner {
-        @apply absolute flex justify-center items-center w-full;
-        z-index: 1;
-        height: $min-height;
+        .loading-backdrop {
+            @apply w-full h-full;
+            background-color: white;
+            opacity: 0.5;
+            z-index: 100;
+        }
+        .loader {
+            @apply absolute w-full h-full;
+            top: 0;
+            z-index: 101;
+        }
+        .loading-spinner {
+            @apply flex justify-center items-center w-full;
+            height: $min-height;
+        }
     }
 
     /* transitions */
