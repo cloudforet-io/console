@@ -36,6 +36,10 @@ Vue.use(Codemirror);
 
 Vue.prototype.$velocity = velocity;
 
+directive(Vue);
+
+
+/** ********** INIT ************** */
 webFontLoader.load({
     google: {
         families: webFonts,
@@ -43,15 +47,11 @@ webFontLoader.load({
     },
 });
 
-directive(Vue);
-
-
-/** ********** INIT ************** */
 const initConfig = async () => {
     await config.init();
     await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
         // Add session expiration process
-        store.dispatch('user/expireSession');
+        store.dispatch('user/setIsSessionExpired', true);
     });
 };
 

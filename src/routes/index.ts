@@ -9,8 +9,6 @@ Vue.use(VueRouter);
 
 const router = new VueRouter(routerOptions);
 
-const isDomainOwner = () => JSON.parse(localStorage.getItem('user/userType') as string).data === 'DOMAIN_OWNER';
-
 router.beforeEach(async (to, from, next) => {
     if (to.meta && to.meta.excludeAuth) {
         if (to.meta.isSignInPage) {
@@ -24,12 +22,11 @@ router.beforeEach(async (to, from, next) => {
         }
         next();
     } else if (SpaceConnector.isTokenAlive) {
-        if (to.meta && to.meta.isDomainOwnerOnly && !isDomainOwner()) {
+        if (to.meta && to.meta.isDomainOwnerOnly && router.app.$store.state.user.userType !== 'DOMAIN_OWNER') {
             next({ name: 'error' });
         }
         next();
     } else {
-        // await store.dispatch('user/signOut');
         next({ name: 'SignOut' });
     }
 });

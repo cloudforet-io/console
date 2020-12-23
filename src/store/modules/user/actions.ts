@@ -105,15 +105,16 @@ export const signIn = async ({ commit, state }, signInRequest: SignInRequest): P
 
     const powerSchedulerState = await getPowerSchedulerState();
     commit('setPowerSchedulerState', powerSchedulerState);
+
+    commit('setIsSessionExpired', false);
 };
 
-export const signOut = ({ commit }): void => {
+export const signOut = (): void => {
     SpaceConnector.flushToken();
-    commit('expireSession');
 };
 
-export const expireSession = ({ commit }): void => {
-    commit('expireSession');
+export const setIsSessionExpired = ({ commit }, isExpired?: boolean): void => {
+    commit('setIsSessionExpired', isExpired);
 };
 
 export const setUser = async ({ commit, state }, userRequest: UpdateUserRequest): Promise<void> => {

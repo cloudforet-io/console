@@ -14,7 +14,7 @@ try {
 }
 
 const state: UserState = {
-    isSessionExpired: storedUserState.isSessionExpired || false,
+    isSessionExpired: undefined,
     userId: storedUserState.userId,
     userType: storedUserState.userType,
     backend: storedUserState.backend,
