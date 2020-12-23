@@ -1,27 +1,7 @@
 /* eslint-disable camelcase */
 
 import { SpaceConnector } from '@/lib/space-connector';
-import { AuthType, AuthSystem, ExtendedAuthType } from './type';
-
-const AUTH_SYSTEM_MAP = {
-    google_oauth2: 'GOOGLE_OAUTH2',
-};
-
-const getAuthSystem = (authSystem): AuthSystem => {
-    if (authSystem in AUTH_SYSTEM_MAP) {
-        return AUTH_SYSTEM_MAP[authSystem];
-    }
-
-    return 'ID_PW';
-};
-
-const getAuthType = (pluginInfo): AuthType => {
-    if (pluginInfo) {
-        return 'EXTERNAL';
-    }
-
-    return 'INTERNAL';
-};
+import { ExtendedAuthType } from './type';
 
 const EXTENDED_AUTH_TYPE_MAP = {
     google_oauth2: 'GOOGLE_OAUTH2',
@@ -39,7 +19,7 @@ const getAuthOptions = (pluginInfo): any => {
     };
 };
 
-export const load = async ({ commit, state }, name: string): Promise<void|Error> => {
+export const load = async ({ commit }, name: string): Promise<void|Error> => {
     const response = await SpaceConnector.client.identity.domain.list({ name });
 
     if (response.total_count === 1) {
@@ -47,8 +27,6 @@ export const load = async ({ commit, state }, name: string): Promise<void|Error>
         commit('setDomain', {
             domainId: domainResponse.domain_id,
             name: domainResponse.name,
-            authType: getAuthType(domainResponse.plugin_info),
-            authSystem: getAuthSystem(domainResponse.plugin_info?.options?.auth_type),
             extendedAuthType: getExtendedAuthType(domainResponse.plugin_info?.options?.auth_type),
             authOptions: getAuthOptions(domainResponse.plugin_info),
         });

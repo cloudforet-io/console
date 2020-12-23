@@ -1,4 +1,4 @@
 export const extendedAuthTypes = {
-    GOOGLE_OAUTH2: 'Google Oauth2',
+    GOOGLE_OAUTH2: 'Google OAuth2',
     KEYCLOAK: 'Keycloak',
 };

@@ -6,8 +6,6 @@ import * as mutations from './mutations';
 const state: DomainState = {
     domainId: undefined,
     name: undefined,
-    authType: undefined,
-    authSystem: undefined,
     extendedAuthType: undefined,
     authOptions: undefined,
 };
