@@ -45,8 +45,8 @@
                          @click="hideErrorMessage"
                     />
                 </div>
-                <i-d-p-w-sign-in @on-sign-in="signIn" />
-                <div class="btn-divider">
+                <i-d-p-w-sign-in @on-sign-in="signIn" class="id-pw-wrapper"/>
+                <div v-if="component" class="btn-divider">
                     <span>{{ $t('COMMON.SIGN_IN.OR') }}</span>
                 </div>
                 <component :is="component" class="sign-in-template"
@@ -120,10 +120,12 @@ export default {
             component: computed(() => {
                 let component;
                 const auth = state.authType;
-                try {
-                    component = () => import(`../templates/${auth}.vue`);
-                } catch (e) {
-                    console.error(e);
+                if (auth) {
+                    try {
+                        component = () => import(`../templates/${auth}.vue`);
+                    } catch (e) {
+                        console.error(e);
+                    }
                 }
                 return component;
             }),
@@ -307,6 +309,10 @@ export default {
     }
 }
 
+.id-pw-wrapper {
+    margin-bottom: 1.5rem;
+}
+
 .btn-divider {
     @apply text-gray-200;
     display: flex;
@@ -314,7 +320,6 @@ export default {
     align-items: center;
     font-size: 0.75rem;
     line-height: 120%;
-    margin-top: 1.5rem;
     margin-bottom: 1.5rem;
 }
 .btn-divider > span {

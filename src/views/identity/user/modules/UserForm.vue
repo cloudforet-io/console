@@ -41,7 +41,8 @@
                                       :invalid="invalid"
                                       class="text-input"
                         />
-                        <p-button style-type="primary-dark" :disabled="updateMode" class="user-id-check-button"
+                        <p-button style-type="outline primary-dark" :disabled="updateMode"
+                                  class="user-id-check-button"
                                   @click="checkUserID"
                         >
                             {{ $t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
@@ -65,7 +66,6 @@
                 <p-select-dropdown v-model="formState.domainRole"
                                    :items="formState.domainRoleItem"
                                    auto-height
-                                   disabled
                                    class="dropdown"
                 />
             </p-field-group>
@@ -368,12 +368,7 @@ export default {
             emit('confirm', data);
         };
 
-        const init = () => {
-            if (props.updateMode) {
-                formState.user_id = props.item.user_id;
-                formState.name = props.item.name;
-                formState.email = props.item.email;
-            }
+        const initAuthTypeList = async () => {
             if (store.state.domain.extendedAuthType !== undefined) {
                 formState.authTypeList.splice(0, 0, {
                     label: computed(() => store.getters['domain/extendedAuthTypeLabel']).value,
@@ -383,7 +378,21 @@ export default {
             }
             formState.selectedAuthType = formState.authTypeList[0];
         };
-        init();
+
+        const getRoleList = async () => {
+            const res = await SpaceConnector.client.identity.role.list();
+            const roleList = res.results;
+        };
+
+        (async () => {
+            if (props.updateMode) {
+                formState.user_id = props.item.user_id;
+                formState.name = props.item.name;
+                formState.email = props.item.email;
+            }
+            await initAuthTypeList();
+            await getRoleList();
+        })();
 
         return {
             ...toRefs(state),
@@ -401,7 +410,7 @@ export default {
 .user-form-modal {
     .auth-type-list {
         display: flex;
-        justify-content: space-between;
+        justify-content: flex-start;
         margin-bottom: 1.5rem;
         .auth-type-item {
             @apply bg-gray-100 cursor-pointer text-gray-500;
@@ -410,6 +419,7 @@ export default {
             width: 33%;
             height: 3.25rem;
             border-radius: 0.125rem;
+            margin-right: 0.25rem;
             .auth-type-label {
                 @apply font-bold text-center;
                 align-self: center;

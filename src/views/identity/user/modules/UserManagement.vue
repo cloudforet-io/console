@@ -33,7 +33,7 @@
                                             name="ic_plus_bold"
                                             @click="clickAdd"
                         >
-                            {{ $t('IDENTITY.USER.MAIN.CREATE') }}
+                            {{$t('IDENTITY.USER.MAIN.ADD')}}
                         </p-icon-text-button>
                         <p-dropdown-menu-btn
                             id="dropdown-btn"
@@ -246,16 +246,8 @@ export default {
                         label: 'Name',
                     },
                     {
-                        name: 'group',
-                        label: 'Group',
-                    },
-                    {
                         name: 'email',
                         label: 'E-mail',
-                    },
-                    {
-                        name: 'mobile',
-                        label: 'Phone',
                     },
                 ],
             }],
@@ -370,7 +362,7 @@ export default {
                 state.users = res.results.map(d => ({
                     ...d,
                     // eslint-disable-next-line camelcase
-                    last_accessed_at: calculateTime(d.last_accessed_at, { seconds: dayjs().unix() }, state.timezone),
+                    last_accessed_at: calculateTime(d.last_accessed_at, { seconds: dayjs().unix() }, state.timezone) || 0,
                 }));
                 state.totalCount = res.total_count;
                 state.loading = false;

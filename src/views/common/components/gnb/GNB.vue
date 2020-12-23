@@ -95,7 +95,7 @@
                         <div class="info-row">
                             <p-i v-if="userState.isAdmin" class="icon" name="admin" />
                             <p-i v-else class="icon" name="user" />
-                            <span class="value">{{ userState.email }}</span>
+                            <span class="value">{{ userState.userId }}</span>
                         </div>
                         <div class="info-row">
                             <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
