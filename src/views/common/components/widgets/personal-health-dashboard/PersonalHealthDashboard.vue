@@ -1,5 +1,11 @@
 <template>
-    <widget-layout :title="$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.TITLE')">
+    <widget-layout>
+        <template #title>
+            <div class="title">
+                <span :style="{ 'color': providers.aws ? providers.aws.color : '' }">AWS </span>
+                <span>{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.TITLE') }}</span>
+            </div>
+        </template>
         <p-data-table
             :loading="loading"
             :fields="fields"
@@ -8,8 +14,12 @@
         >
             <template #col-event-format="{ index, value }">
                 <div class="col-event">
-                    <span class="event-name">{{ value.name }}</span>
-                    <span class="event-time" :class="{ 'show-all': data[index].showAll }">{{ value.lastUpdated }}</span>
+                    <span class="event-name">
+                        <router-link :to="value.to" class="link-text">
+                            <span>{{ value.name }}</span>
+                        </router-link>
+                    </span>
+                    <span class="event-time" :class="{ 'show-all': data[index].showAll }">{{ value.lastUpdate }}</span>
                 </div>
             </template>
             <template #col-region-format="{ value }">
@@ -74,11 +84,18 @@ export default {
         PDataTable,
         WidgetLayout,
     },
+    props: {
+        providers: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
             loading: false,
+            timezone: computed(() => store.state.user.timezone),
             projects: computed(() => store.state.resource.project.items),
             favoriteProjects: computed(() => store.state.favorite.project.items),
             regions: computed(() => store.state.resource.region.items),
@@ -96,19 +113,13 @@ export default {
                 const res = await SpaceConnector.client.statistics.topic.phdSummary();
 
                 state.data = res.results.map((d) => {
-                    const utcNow = dayjs().utc();
-                    const lastUpdated = dayjs(d.last_update_time).utc();
-                    let utcDiff: number = utcNow.diff(lastUpdated, 'hour');
-                    let unit = vm.$tc('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.HOUR', utcDiff);
-                    if (utcDiff > 24) {
-                        utcDiff = utcNow.diff(lastUpdated, 'day');
-                        unit = vm.$tc('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.DAY', utcDiff);
-                    }
+                    const lastUpdateTime = dayjs.tz(dayjs(d.last_update_time).utc(), state.timezone).format('YYYY-MM-DD HH:mm:ss');
 
                     return {
                         event: {
                             name: d.event_title,
-                            lastUpdated: `${utcDiff} ${unit} ${vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.AGO')}`,
+                            lastUpdate: `${vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.LAST_UPDATE')} : ${lastUpdateTime}`,
+                            to: referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' }),
                         },
                         region: state.regions[d.region_code]?.name || d.region_code,
                         affected_projects: d.affected_projects.map(projectId => ({
@@ -151,6 +162,13 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.widget-layout::v-deep {
+    .title {
+        font-size: 1.125rem;
+        font-weight: bold;
+        line-height: 1.2;
+    }
+}
 .p-data-table::v-deep {
     min-height: 8rem;
     border-radius: 0.125rem;
@@ -184,13 +202,19 @@ export default {
                 display: block;
                 font-size: 0.875rem;
                 line-height: 1.4;
+                .link-text {
+                    @apply text-secondary;
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                }
             }
             .event-time {
                 @apply text-gray-700;
                 font-size: 0.75rem;
                 line-height: 1.2;
                 &.show-all {
-                    @apply text-primary-dark;
+                    @apply text-gray-900;
                 }
             }
         }

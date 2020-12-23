@@ -1,7 +1,8 @@
 <template>
     <div class="project-personal-health-dashboard">
         <div class="title">
-            {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.TITLE') }}
+            <span :style="{ 'color': providers.aws ? providers.aws.color : '' }">AWS </span>
+            <span>{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.TITLE') }}</span>
         </div>
         <widget-layout>
             <div class="top-part">
@@ -9,7 +10,9 @@
                     <div v-for="(data, index) in summaryData" :key="index"
                          class="summary col-span-4"
                     >
-                        <span class="count">{{ data.count }}</span>
+                        <router-link :to="summaryLinkFormatter(data.name)" class="count link-text">
+                            <span>{{ data.count }}</span>
+                        </router-link>
                         <span class="label">{{ data.label }}</span>
                         <span class="date">{{ data.date }}</span>
                     </div>
@@ -24,16 +27,20 @@
                           @search="onSearch"
                           @delete="onSearch"
                 />
-                <p-icon-button name="ic_refresh" @click="getEvents" />
+                <p-text-pagination
+                    :this-page.sync="thisPage"
+                    :all-page="allPage"
+                    @pageChange="changePage"
+                />
+                <p-icon-button name="ic_refresh" @click="onRefresh" />
             </div>
             <p-data-table :loading="loading"
                           :fields="fields"
                           :selectable="false"
-                          :items="showMore ? data : data.slice(0, 5)"
+                          :items="data"
                           :sortable="true"
                           :sort-by.sync="sortBy"
                           :sort-desc.sync="sortDesc"
-                          :class="{ 'more': showMore }"
                           @change="onChange"
                           @changeSort="onChange"
             >
@@ -52,10 +59,17 @@
                     <div v-if="value.length > 0">
                         <div v-for="(resource, index) in value" :key="index" class="affected-resources-wrapper">
                             <template v-if="resource.entity_type === 'account'">
-                                <span class="label">{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SERVICE_ACCOUNT_ID') }} : </span>
+                                <span class="label">{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.ACCOUNT_ID') }} : </span>
                                 <span class="value">{{ resource.aws_account_id }}</span>
                             </template>
-                            <template v-else />
+                            <template v-else>
+                                <router-link class="link-text"
+                                             :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
+                                >
+                                    <span>{{ resource.entity_value }}</span>
+                                    <p-i name="ic_external-link" height="1em" width="1em" />
+                                </router-link>
+                            </template>
                         </div>
                     </div>
                     <div v-else />
@@ -64,16 +78,6 @@
             <p-empty v-if="!loading && data.length === 0" class="py-8">
                 <span>{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA') }}</span>
             </p-empty>
-            <div v-show="data.length > 5" class="more-button-wrapper"
-                 @click="onClickMoreButton"
-            >
-                <div class="more-button">
-                    <span>{{ showMore ? $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.HIDE') : $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.MORE') }}</span>
-                    <p-i :name="showMore ? 'ic_arrow_top' : 'ic_arrow_bottom'"
-                         height="1rem" width="1rem" color="inherit transparent"
-                    />
-                </div>
-            </div>
         </widget-layout>
     </div>
 </template>
@@ -87,17 +91,20 @@ import {
 } from '@vue/composition-api';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
+import PTextPagination from '@/components/organisms/paginations/text-pagination/PTextPagination.vue';
 import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PSearch from '@/components/molecules/search/PSearch.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 import PEmpty from '@/components/atoms/empty/PEmpty.vue';
+import PI from '@/components/atoms/icons/PI.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { timestampFormatter } from '@/lib/util';
+import { getPageStart } from '@/lib/component-utils/pagination';
+import { QueryHelper } from '@/lib/query';
+import { QueryStoreFilter } from '@/lib/query/type';
 import { store } from '@/store';
 
 
@@ -106,12 +113,16 @@ enum EVENT_CATEGORY {
     scheduledChange = 'scheduledChange',
     issue = 'issue'
 }
+const CLOUD_SERVICE_GROUP = 'PersonalHealthDashboard';
+const CLOUD_SERVICE_NAME = 'Event';
+const EVENT_PERIOD = 7;
 
 export default {
     name: 'ProjectPersonalHealthDashboard',
     components: {
-        PEmpty,
         PI,
+        PTextPagination,
+        PEmpty,
         PIconButton,
         PSearch,
         PTab,
@@ -119,6 +130,10 @@ export default {
         WidgetLayout,
     },
     props: {
+        providers: {
+            type: Object,
+            default: () => ({}),
+        },
         projectId: {
             type: String,
             default: undefined,
@@ -127,24 +142,33 @@ export default {
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const getEventsApiQuery = new ApiQueryHelper();
+        const queryHelper = new QueryHelper();
 
         const state = reactive({
             loading: false,
             regions: computed(() => store.state.resource.region.items),
             timezone: computed(() => store.state.user.timezone),
+            cloudServiceTypes: computed(() => store.state.resource.cloudServiceType.items),
+            thisPage: 1,
+            pageSize: 5,
+            totalCount: 0,
+            allPage: computed(() => Math.ceil(state.totalCount / state.pageSize) || 1),
             data: [],
             summaryData: computed(() => ([
                 {
+                    name: EVENT_CATEGORY.issue,
                     label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_ISSUE'),
                     count: state.countData.issue,
                     date: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.PAST_7_DAYS'),
                 },
                 {
+                    name: EVENT_CATEGORY.scheduledChange,
                     label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_SCHEDULED_CHANGE'),
                     count: state.countData.scheduledChange,
                     date: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.UPCOMING_AND_PAST_7_DAYS'),
                 },
                 {
+                    name: EVENT_CATEGORY.accountNotification,
                     label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.SUMMARY_NOTIFICATION'),
                     count: state.countData.accountNotification,
                     date: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.PAST_7_DAYS'),
@@ -154,14 +178,13 @@ export default {
                 { name: 'event', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_EVENT'), sortable: false },
                 { name: 'region_code', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_REGION') },
                 { name: 'start_time', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_START_TIME') },
-                { name: 'last_updated_time', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_LAST_UPDATE_TIME') },
+                { name: 'last_update_time', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_LAST_UPDATE_TIME') },
                 { name: 'affected_resources', label: vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.FIELD_AFFECTED_RESOURCES'), sortable: false },
             ]),
             countData: {},
             search: '',
-            sortBy: '',
+            sortBy: 'last_update_time',
             sortDesc: true,
-            showMore: false,
         });
         const tabState = reactive({
             tabs: computed(() => [
@@ -184,16 +207,32 @@ export default {
 
         /* util */
         const regionFormatter = val => state.regions[val]?.name || val;
-        // const affectedResourcesFormatter = (val) => {
-        //     const idList = [];
-        //     const serviceAccountList = [];
-        // };
+        const summaryLinkFormatter = (category) => {
+            const filters: QueryStoreFilter[] = [];
+            const status = ['open'];
+            if (category === EVENT_CATEGORY.scheduledChange) status.push('upcoming');
+            filters.push({ k: 'data.event_type_category', o: '=', v: category });
+            filters.push({ k: 'data.status_code', o: '=', v: status });
+
+            return {
+                name: 'cloudServicePage',
+                query: {
+                    filters: queryHelper.setFilters(filters).rawQueryStrings,
+                },
+                params: {
+                    provider: 'aws',
+                    group: CLOUD_SERVICE_GROUP,
+                    name: CLOUD_SERVICE_NAME,
+                },
+            };
+        };
 
         /* api */
         const getCount = async () => {
             try {
                 state.countData = await SpaceConnector.client.statistics.topic.phdCountByType({
                     project_id: props.projectId,
+                    period: EVENT_PERIOD,
                 });
             } catch (e) {
                 console.error(e);
@@ -204,6 +243,7 @@ export default {
                 state.loading = true;
                 getEventsApiQuery
                     .setSort(state.sortBy, state.sortDesc, 'name')
+                    .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
                     .setFilters([{ v: state.search }]);
                 const res = await SpaceConnector.client.statistics.topic.phdEvents(
                     {
@@ -213,9 +253,10 @@ export default {
                     },
                 );
 
+                state.totalCount = res.total_count;
                 state.data = res.results.map((d) => {
                     const startTime = dayjs.tz(dayjs(d.start_time).utc(), state.timezone).format('YYYY-MM-DD HH:mm:ss');
-                    const lastUpdatedTime = dayjs.tz(dayjs(d.last_updated_time).utc(), state.timezone).format('YYYY-MM-DD HH:mm:ss');
+                    const lastUpdateTime = dayjs.tz(dayjs(d.last_update_time).utc(), state.timezone).format('YYYY-MM-DD HH:mm:ss');
                     return {
                         event: {
                             name: d.event_title,
@@ -223,7 +264,7 @@ export default {
                         },
                         region_code: d.region_code,
                         start_time: startTime,
-                        last_updated_time: lastUpdatedTime,
+                        last_update_time: lastUpdateTime,
                         affected_resources: d.affected_resources,
                     };
                 });
@@ -239,11 +280,17 @@ export default {
             await (state.search = val);
             await getEvents();
         };
-        const onChange = async () => {
-            await getEvents();
+        const onChange = () => {
+            getEvents();
         };
-        const onClickMoreButton = () => {
-            state.showMore = !state.showMore;
+        const onRefresh = () => {
+            state.thisPage = 1;
+            state.search = '';
+            getEvents();
+        };
+        const changePage = (page) => {
+            state.thisPage = page;
+            getEvents();
         };
 
         const init = async () => {
@@ -259,11 +306,13 @@ export default {
             ...toRefs(state),
             tabState,
             regionFormatter,
+            summaryLinkFormatter,
             getEvents,
             onSearch,
             onChange,
-            onClickMoreButton,
-            timestampFormatter,
+            onRefresh,
+            changePage,
+            referenceRouter,
         };
     },
 };
@@ -297,12 +346,10 @@ export default {
                 @apply border-none;
             }
             .count {
-                @apply text-violet-600;
                 font-size: 1.125rem;
                 padding-right: 0.375rem;
             }
             .label {
-                @apply text-gray-600;
                 font-size: 0.875rem;
                 font-weight: bold;
             }
@@ -321,25 +368,22 @@ export default {
     .search-wrapper {
         display: flex;
         padding: 1.5rem 1rem;
+        .text-pagination {
+            padding: 0 1.25rem;
+        }
         .p-icon-button {
             margin-left: 1rem;
         }
     }
     .p-data-table::v-deep {
-        &.more {
-            .table-container {
-                max-height: 37.5rem;
-            }
+        .table-container {
+            max-height: 19.5rem;
         }
         .link-text {
-            @apply text-secondary;
             display: inline-block;
             width: 15rem;
             white-space: pre-wrap;
             padding: 0.5rem 0;
-            &:hover {
-                text-decoration: underline;
-            }
         }
         .affected-resources-wrapper {
             display: flex;
@@ -355,19 +399,14 @@ export default {
             }
         }
     }
-    .more-button-wrapper {
-        @apply text-blue-600;
-        display: flex;
-        height: 2rem;
-        align-items: center;
-        font-size: 0.75rem;
-        cursor: pointer;
-        &:hover {
-            text-decoration: underline;
-        }
-        .more-button {
-            margin: auto;
-        }
+}
+.link-text {
+    @apply text-secondary;
+    &:hover {
+        text-decoration: underline;
+    }
+    .p-i-icon {
+        margin-bottom: 0.125rem;
     }
 }
 .p-empty {

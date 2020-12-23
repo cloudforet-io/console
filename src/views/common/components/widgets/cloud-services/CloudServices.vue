@@ -254,7 +254,6 @@ export default {
 
 <style lang="postcss" scoped>
 .widget-layout::v-deep {
-    height: 100%;
     max-height: 35rem;
     overflow-y: auto;
     .card-wrapper {
@@ -275,7 +274,6 @@ export default {
     @apply mb-3 flex w-full items-center;
     .title {
         @apply flex-shrink-0;
-        font-size: 1.125rem;
         line-height: 1.2;
         font-weight: bold;
     }

@@ -59,7 +59,11 @@
                             >
                                 <template v-if="rowNum === -1">
                                     <span v-if="projectSummaryData[colNum * thisPage]" class="project-name">
-                                        {{ projectSummaryData[colNum * thisPage].projectName }}
+                                        <p-i v-if="projectSummaryData[colNum * thisPage].isFavorite" name="ic_bookmark"
+                                             class="favorite-icon"
+                                             width="0.625rem" height="0.625rem"
+                                        />
+                                        <span>{{ projectSummaryData[colNum * thisPage].projectName }}</span>
                                     </span>
                                 </template>
                                 <template v-else>
@@ -86,7 +90,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    findKey, forEach, range, size,
+    find, forEach, range, size,
 } from 'lodash';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -102,10 +106,10 @@ import PI from '@/components/atoms/icons/PI.vue';
 import { getAllPage } from '@/components/organisms/paginations/text-pagination/helper';
 
 import { SpaceConnector } from '@/lib/space-connector';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { QueryStoreFilter } from '@/lib/query/type';
 import { QueryHelper } from '@/lib/query';
+import { QueryStoreFilter } from '@/lib/query/type';
 import { green, red, yellow } from '@/styles/colors';
+import { store } from '@/store';
 
 am4core.useTheme(am4themes_animated);
 
@@ -136,9 +140,11 @@ interface ProjectSummaryData {
     projectId: string;
     projectName: string;
     counts: [STATUS, number][];
+    isFavorite: boolean;
 }
 
-const TRUSTED_ADVISER = 'TrustedAdvisor';
+const CLOUD_SERVICE_GROUP = 'TrustedAdvisor';
+const CLOUD_SERVICE_NAME = 'Check';
 const ERROR_COLOR = red[500];
 const WARNING_COLOR = yellow[500];
 const OK_COLOR = green[500];
@@ -171,15 +177,11 @@ export default {
         });
         const state = reactive({
             loading: false,
+            favoriteProjects: computed(() => store.state.favorite.project.items),
+            projects: computed(() => store.state.resource.project.items),
             chartRef: null as HTMLElement | null,
             thisPage: 1,
             allPage: 1,
-            projects: computed(() => vm.$store.state.resource.project.items),
-            trustedAdvisorId: computed<string>(() => {
-                const cloudServiceTypes = vm.$store.state.resource.cloudServiceType.items;
-                const trustedAdvisorId = findKey(cloudServiceTypes, { name: TRUSTED_ADVISER });
-                return trustedAdvisorId || '';
-            }),
             legendData: computed(() => ({
                 error: {
                     name: STATUS.error,
@@ -274,14 +276,17 @@ export default {
             const filters: QueryStoreFilter[] = [];
             filters.push({ k: 'data.status', o: '=', v: status });
 
-            if (state.trustedAdvisorId) {
-                return referenceRouter(
-                    state.trustedAdvisorId,
-                    { resource_type: 'inventory.CloudServiceType' },
-                    { filters: queryHelper.setFilters(filters).rawQueryStrings },
-                );
-            }
-            return '';
+            return {
+                name: 'cloudServicePage',
+                query: {
+                    filters: queryHelper.setFilters(filters).rawQueryStrings,
+                },
+                params: {
+                    provider: 'aws',
+                    group: CLOUD_SERVICE_GROUP,
+                    name: CLOUD_SERVICE_NAME,
+                },
+            };
         };
         const projectSummaryLinkFormatter = (rowNum, colNum) => {
             const status = getProjectBoxStatus(rowNum, colNum * state.thisPage);
@@ -293,11 +298,17 @@ export default {
             if (category) filters.push({ k: 'data.category', o: '=', v: category });
             if (projectId) filters.push({ k: 'project_id', o: '=', v: projectId });
 
-            return referenceRouter(
-                state.trustedAdvisorId,
-                { resource_type: 'inventory.CloudServiceType' },
-                { filters: queryHelper.setFilters(filters).rawQueryStrings },
-            );
+            return {
+                name: 'cloudServicePage',
+                query: {
+                    filters: queryHelper.setFilters(filters).rawQueryStrings,
+                },
+                params: {
+                    provider: 'aws',
+                    group: CLOUD_SERVICE_GROUP,
+                    name: CLOUD_SERVICE_NAME,
+                },
+            };
         };
 
         /* api */
@@ -320,7 +331,6 @@ export default {
 
                 const projectSummaryData: ProjectSummaryData[] = [];
                 forEach(res, (projectData, projectId) => {
-                    // todo: to be fixed...
                     const counts: [STATUS, number][] = Array(5).fill([STATUS.error, 0]);
                     forEach(projectData, (countData, category) => {
                         let count = 0;
@@ -340,6 +350,7 @@ export default {
                         projectId,
                         projectName: state.projects[projectId]?.name,
                         counts,
+                        isFavorite: !!find(state.favoriteProjects, { id: projectId }),
                     });
                 });
                 state.projectSummaryData = projectSummaryData;
@@ -354,8 +365,8 @@ export default {
             getOverallData();
         };
         const asyncInit = async () => {
-            // await vm.$store.dispatch('favorite/project/load');
-            await vm.$store.dispatch('resource/project/load');
+            await store.dispatch('favorite/project/load');
+            await store.dispatch('resource/project/load');
             await getProjectSummary();
         };
         init();
@@ -386,6 +397,7 @@ export default {
     .title {
         font-size: 1.125rem;
         font-weight: bold;
+        line-height: 1.2;
     }
 }
 .content-wrapper {

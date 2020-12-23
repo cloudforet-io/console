@@ -403,12 +403,16 @@ export default {
             }
         };
         const getBillingCount = async () => {
-            const res = await SpaceConnector.client.statistics.topic.billingSummary({
-                granularity: NEW_DATE_TYPE.monthly,
-                period: 1,
-                project_id: props.projectId,
-            });
-            if (res.results.length > 0) state.count.spendings = res.results[0].billing_data[0].cost;
+            try {
+                const res = await SpaceConnector.client.statistics.topic.billingSummary({
+                    granularity: NEW_DATE_TYPE.monthly,
+                    period: 1,
+                    project_id: props.projectId,
+                });
+                if (res.results.length > 0) state.count.spendings = res.results[0].billing_data[0].cost;
+            } catch (e) {
+                console.error(e);
+            }
         };
         const getTrend = async (type) => {
             const utcToday = dayjs().utc();
@@ -593,32 +597,36 @@ export default {
             }
         };
         const getBillingSummaryInfo = async () => {
-            const res = await SpaceConnector.client.statistics.topic.billingSummary({
-                granularity: NEW_DATE_TYPE.monthly,
-                aggregation: 'inventory.CloudServiceType',
-                period: 1,
-                project_id: props.projectId,
-            });
-            const summaryData: SummaryData[] = [
-                {
-                    provider: 'all',
-                    label: '',
-                    count: numberFormatter(state.count.spendings),
-                    to: '',
-                },
-            ];
-            res.results.forEach((d) => {
-                if (numberFormatter(d.billing_data[0].cost) !== 0) {
-                    summaryData.push({
-                        provider: d.provider,
-                        label: state.providers[d.provider].label,
-                        type: d.cloud_service_group || d.service_code,
-                        count: numberFormatter(d.billing_data[0].cost),
+            try {
+                const res = await SpaceConnector.client.statistics.topic.billingSummary({
+                    granularity: NEW_DATE_TYPE.monthly,
+                    aggregation: 'inventory.CloudServiceType',
+                    period: 1,
+                    project_id: props.projectId,
+                });
+                const summaryData: SummaryData[] = [
+                    {
+                        provider: 'all',
+                        label: '',
+                        count: numberFormatter(state.count.spendings),
                         to: '',
-                    });
-                }
-            });
-            state.summaryData = summaryData;
+                    },
+                ];
+                res.results.forEach((d) => {
+                    if (numberFormatter(d.billing_data[0].cost) !== 0) {
+                        summaryData.push({
+                            provider: d.provider,
+                            label: state.providers[d.provider].label,
+                            type: d.cloud_service_group || d.service_code,
+                            count: numberFormatter(d.billing_data[0].cost),
+                            to: '',
+                        });
+                    }
+                });
+                state.summaryData = summaryData;
+            } catch (e) {
+                console.error(e);
+            }
         };
 
         /* event */

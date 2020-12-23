@@ -7,6 +7,7 @@
                          :chart-text-color="chartTextColor"
             />
             <project-personal-health-dashboard class="col-span-12 project-personal-health-dashboard"
+                                               :providers="providers"
                                                :project-id="projectId"
             />
             <div class="col-span-12 resources-tab">

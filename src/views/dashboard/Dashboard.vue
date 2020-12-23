@@ -5,7 +5,7 @@
         >
             <all-summary class="col-span-12" />
             <resource-map class="col-span-12" :providers="providers" />
-            <personal-health-dashboard class="col-span-12" />
+            <personal-health-dashboard class="col-span-12" :providers="providers" />
             <trusted-advisor class="col-span-12" :providers="providers" />
             <top-projects class="col-span-12" />
         </div>
@@ -32,7 +32,7 @@
                                     :providers="providers"
                                     :timezone="timezone"
                 />
-                <cloud-services class="col-span-12 cloud-service" />
+                <cloud-services class="col-span-12 cloud-services" />
             </div>
         </div>
     </general-page-layout>
@@ -120,6 +120,10 @@ export default {
 
 .daily-updates {
     height: 33.75rem;
+}
+
+.cloud-services {
+    max-height: 100%;
 }
 
 @screen lg {

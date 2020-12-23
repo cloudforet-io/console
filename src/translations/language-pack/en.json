@@ -290,6 +290,7 @@
 			"HEALTH_DASHBOARD_HELP": "Get a notice the status of AWS services.",
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
 			"PERSONAL_HEALTH_DASHBOARD": {
+				"ACCOUNT_ID": "Account ID",
 				"AGO": "ago",
 				"ALL": "all",
 				"DAY": "day | days",
@@ -306,7 +307,6 @@
 				"NO_DATA": "No Personal Health Dashboard",
 				"PAST_7_DAYS": "Past 7 days",
 				"PLACEHOLDER": "Search Event",
-				"SERVICE_ACCOUNT_ID": "Service Account ID",
 				"SUMMARY_ISSUE": "Open Issues",
 				"SUMMARY_NOTIFICATION": "Other Notifications",
 				"SUMMARY_SCHEDULED_CHANGE": "Scheduled Changes",

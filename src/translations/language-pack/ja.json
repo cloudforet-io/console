@@ -290,6 +290,7 @@
 			"HEALTH_DASHBOARD_HELP": "AWSのサービスの状態とスケジュール済みタスク通知を見ることができます。",
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
 			"PERSONAL_HEALTH_DASHBOARD": {
+				"ACCOUNT_ID": "",
 				"AGO": "",
 				"ALL": "",
 				"DAY": "",
@@ -306,7 +307,6 @@
 				"NO_DATA": "",
 				"PAST_7_DAYS": "",
 				"PLACEHOLDER": "",
-				"SERVICE_ACCOUNT_ID": "",
 				"SUMMARY_ISSUE": "",
 				"SUMMARY_NOTIFICATION": "",
 				"SUMMARY_SCHEDULED_CHANGE": "",

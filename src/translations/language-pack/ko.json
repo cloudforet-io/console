@@ -290,6 +290,7 @@
 			"HEALTH_DASHBOARD_HELP": "AWS의 서비스 상태 및 예정된 작업 공지를 볼 수 있습니다.",
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
 			"PERSONAL_HEALTH_DASHBOARD": {
+				"ACCOUNT_ID": "",
 				"AGO": "전",
 				"ALL": "all",
 				"DAY": "일",
@@ -306,7 +307,6 @@
 				"NO_DATA": "No Personal Health Dashboard",
 				"PAST_7_DAYS": "Past 7 days",
 				"PLACEHOLDER": "Search Event",
-				"SERVICE_ACCOUNT_ID": "Service Account ID",
 				"SUMMARY_ISSUE": "Open Issues",
 				"SUMMARY_NOTIFICATION": "Other Notifications",
 				"SUMMARY_SCHEDULED_CHANGE": "Scheduled Changes",
