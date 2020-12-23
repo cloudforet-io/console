@@ -97,7 +97,7 @@ export const signIn = async ({ commit, state }, signInRequest: SignInRequest): P
     } else {
         const userInfo = await getUserInfo(userId);
         commit('setUser', userInfo);
-        commit('setRoles', [{ name: 'Domain Admin', roleType: 'DOMAIN' }]);
+        commit('setRoles', [{ name: 'Project Admin', roleType: 'USER' }, { name: 'Project Member', roleType: 'PROJECT' }]);
     }
 
     const reportState = await getReportState();

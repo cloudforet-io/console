@@ -13,7 +13,7 @@
                 <div class="fnb">
                     <f-n-b />
                 </div>
-                <p-back-to-top-button :container="containerRef" />
+<!--                <p-back-to-top-button :container="containerRef" />-->
             </div>
         </template>
     </p-vertical-layout>
@@ -22,12 +22,11 @@
 <script lang="ts">
 import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/PVerticalLayout.vue';
 import FNB from '@/views/common/components/fnb/FNB.vue';
-import PBackToTopButton from '@/components/atoms/back-to-top-button/PBackToTopButton.vue';
 import { ref } from '@vue/composition-api';
 
 export default {
     name: 'VerticalPageLayout',
-    components: { PBackToTopButton, PVerticalLayout, FNB },
+    components: { PVerticalLayout, FNB },
     props: {
         height: {
             type: String,

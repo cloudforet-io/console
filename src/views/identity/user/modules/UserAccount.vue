@@ -1,6 +1,7 @@
 <template>
     <div class="user-account-page">
-        <p-page-navigation :routes="routes" />
+        <p-page-navigation v-if="isAdmin" :routes="routeState.adminRoutes" />
+        <p-page-navigation v-else :routes="routeState.userRoutes" />
         <p-page-title :title="$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE')" />
         <p-pane-layout class="form-wrapper">
             <p class="form-title">
@@ -103,7 +104,6 @@ import { languages } from '@/store/modules/user/config';
 import { LanguageCode, Timezone, UpdateUserRequest } from '@/store/modules/user/type';
 import { TranslateResult } from 'vue-i18n';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
@@ -131,6 +131,7 @@ export default {
 
         const state = reactive({
             userId: computed(() => store.state.user.userId),
+            isAdmin: computed(() => store.getters['user/isAdmin']).value,
             userRole: '',
             userType: computed(() => store.state.user.backend) as unknown as string,
             language: '' as LanguageCode | undefined,
@@ -158,8 +159,14 @@ export default {
             passwordCheckInvalidText: '' as TranslateResult | string,
         });
         const routeState = reactive({
-            routes: computed(() => ([
+            userRoutes: computed(() => ([
+                { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
+                { name: vm.$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE'), path: '/identity/user/account' },
+            ])),
+            adminRoutes: computed(() => ([
                 { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
+                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/user-management' },
+                { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
                 { name: vm.$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE'), path: '/identity/user/account' },
             ])),
         });
@@ -268,7 +275,7 @@ export default {
 
         return {
             ...toRefs(state),
-            ...toRefs(routeState),
+            routeState,
             validationState,
             onClickProfileConfirm,
             onClickPasswordConfirm,
