@@ -66,7 +66,7 @@
                 <p-select-dropdown v-model="formState.domainRole"
                                    :items="formState.domainRoleItem"
                                    auto-height
-                                   disabled
+                                   :disabled="formState.domainRoleItem.length < 2"
                                    class="dropdown"
                 />
             </p-field-group>
@@ -190,9 +190,11 @@ export default {
             name: '',
             email: '',
             domainRole: '',
-            domainRoleItem: [
+            domainRoleItem: computed(() => [
                 { type: 'item', label: vm.$t('IDENTITY.USER.FORM.NOT_SELECT_ROLE'), name: '' },
-            ],
+                ...formState.domainRoleList,
+            ]),
+            domainRoleList: [] as any[],
             password: '',
             passwordCheck: '',
         });
@@ -381,20 +383,13 @@ export default {
 
         const getRoleList = async () => {
             const res = await SpaceConnector.client.identity.role.list({
-                query: {
-                    filter: [{
-                        k: 'role_type',
-                        v: 'DOMAIN',
-                        o: 'eq',
-                    }],
-                },
+                role_type: 'DOMAIN',
             });
-            const roleList = res.results.map(d => ({
+            formState.domainRoleList = res.results.map(d => ({
                 type: 'item',
                 label: d.name,
                 name: d.role_id,
             }));
-            formState.domainRoleItem.push(roleList[0]);
         };
 
         (async () => {
@@ -403,8 +398,7 @@ export default {
                 formState.name = props.item.name;
                 formState.email = props.item.email;
             }
-            await initAuthTypeList();
-            // await getRoleList();
+            await Promise.all([initAuthTypeList(), getRoleList()]);
         })();
 
         return {
