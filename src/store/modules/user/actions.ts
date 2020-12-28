@@ -3,7 +3,7 @@
 import jwt from 'jsonwebtoken';
 import { SpaceConnector } from '@/lib/space-connector';
 import {
-    UserState, SignInRequest, UpdateUserRequest,
+    UserState, SignInRequest, UpdateUserRequest, UserRole
 } from './type';
 
 const getDomainOwnerInfo = async (ownerId: string): Promise<UserState> => {
@@ -79,6 +79,29 @@ const getUserInfoFromToken = (token: string): [string, string] => {
     return [decodedToken.user_type, decodedToken.aud];
 };
 
+const getUserRoleBindings = async (userId: string): Promise<Array<UserRole>> => {
+    const userRoles: Array<UserRole> = [];
+    const userRoleIds: Array<string> = [];
+    const response = await SpaceConnector.client.identity.roleBinding.list({
+        resource_type: 'identity.User',
+        resource_id: userId,
+    });
+
+    response.results.forEach((roleBindingInfo) => {
+        const role = roleBindingInfo.role_info;
+        if (userRoleIds.indexOf(role.role_id) < 0) {
+            userRoles.push({
+                roleId: role.role_id,
+                name: role.name,
+                roleType: role.role_type,
+            });
+            userRoleIds.push(role.role_id);
+        }
+    });
+
+    return userRoles;
+};
+
 export const signIn = async ({ commit, state }, signInRequest: SignInRequest): Promise<void> => {
     const response = await SpaceConnector.client.identity.token.issue({
         domain_id: signInRequest.domainId,
@@ -97,7 +120,9 @@ export const signIn = async ({ commit, state }, signInRequest: SignInRequest): P
     } else {
         const userInfo = await getUserInfo(userId);
         commit('setUser', userInfo);
-        commit('setRoles', [{ name: 'Project Admin', roleType: 'USER' }, { name: 'Project Member', roleType: 'PROJECT' }]);
+
+        const userRoles = await getUserRoleBindings(userId);
+        commit('setRoles', userRoles);
     }
 
     const reportState = await getReportState();
