@@ -7,16 +7,22 @@
         </template>
         <div class="contents-wrapper">
             <div class="col-span-12 lg:col-span-9 chart-wrapper">
-                <div class="chart-loader">
-                    <div id="chartRef" ref="chartRef" />
-                </div>
+                <p-chart-loader :loading="loading">
+                    <template #loader>
+                        <p-skeleton ref="loaderRef" width="100%" height="100%" />
+                    </template>
+                    <div id="chartRef" ref="chartRef" class="chart" />
+                </p-chart-loader>
                 <div v-if="!loading" class="circle-wrapper">
                     <p class="circle" :style="{background: providers['aws'].color }" /><span>AWS</span>
                     <p class="circle" :style="{background: providers['google_cloud'].color }" /><span>Google</span>
                     <p class="circle" :style="{background: providers['azure'].color }" /><span>Azure</span>
+<!--                    <div v-for="(item) in chartState.providerList" :key="item.name">-->
+<!--                        <p class="circle" :style="{background: item.color}" /><span>{{ item.name }}</span>-->
+<!--                    </div>-->
                 </div>
             </div>
-            <div v-if="!loading" class="col-span-12 lg:col-span-3 resource-info-wrapper">
+            <div v-if="!loading && filteredData.length > 0" class="col-span-12 lg:col-span-3 resource-info-wrapper">
                 <div class="resource-info-title">
                     <span class="resource-info-provider"
                           :style="{color: providers[selectedProvider] ? providers[selectedProvider].color : undefined }"
@@ -40,11 +46,16 @@
                     </router-link>
                 </div>
             </div>
-            <div v-else class="w-full flex items-center justify-center">
-                <p-lottie name="thin-spinner"
-                          auto
-                          :size="1.5"
-                />
+            <div v-else-if="!loading && filteredData.length === 0" class="no-data-wrapper">
+                <img src="@/assets/images/illust_microscope.svg" class="no-data-img">
+                <p class="no-data-text">
+                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.NO_REGION') }}
+                </p>
+            </div>
+            <div v-else class="col-span-12 lg:col-span-3 xl:col-span-3 2xl:col-span-3">
+                <div v-for="v in chartState.skeletons" :key="v" class="flex p-2">
+                    <p-skeleton width="flex-grow" />
+                </div>
             </div>
         </div>
     </widget-layout>
@@ -56,27 +67,31 @@ import * as am4maps from '@amcharts/amcharts4/maps';
 import am4geodataWorldLow from '@amcharts/amcharts4-geodata/worldLow';
 import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import {
-    onUnmounted,
+    ComponentRenderProxy,
+    computed, getCurrentInstance,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
+import { range } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import PProgressBar from '@/components/molecules/progress-bar/PProgressBar.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
 import { store } from '@/store';
 import { coral, gray } from '@/components/styles/colors';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 import { Location } from 'vue-router';
 import { QueryHelper } from '@/lib/query';
+import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
+import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 am4core.useTheme(am4themesAnimated);
 
 export default {
     name: 'ResourceMap',
     components: {
+        PSkeleton,
+        PChartLoader,
         WidgetLayout,
-        PLottie,
         PProgressBar,
     },
     props: {
@@ -86,24 +101,48 @@ export default {
         },
     },
     setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryHelper = new QueryHelper();
+        const apiQuery = new ApiQueryHelper();
+
         const state = reactive({
-            chartRef: null as HTMLElement|null,
+            chartRef: null as HTMLElement | null,
+            loaderRef: null,
+            chartRegistry: {},
             chart: null as null|any,
             data: [] as any,
             filteredData: [] as any,
             selectedProvider: 'aws',
             selectedRegion: 'Asia Pacific (Seoul)',
             selectedRegionCode: 'ap-northeast-2',
-            loading: true,
+            provider: computed(() => vm.$store.state.resource.provider.items),
+            loading: false,
             maxValue: 0,
         });
 
-        const queryHelper = new QueryHelper();
-        /* Create map instance */
+        const chartState = reactive({
+            registry: {},
+            chartData: [] as any,
+            skeletons: range(5),
+            // providerList: [
+            //     {
+            //         name: 'aws',
+            //         color: props.providers.aws.color,
+            //     },
+            //     {
+            //         name: 'google_cloud',
+            //         color: props.providers.google_cloud.color,
+            //     },
+            //     {
+            //         name: 'azure',
+            //         color: props.providers.azure.color,
+            //     },
+            // ],
+            marker: null,
+        });
 
-        const apiQuery = new ApiQueryHelper();
+        /* Create map instance */
         const getFilteredData = async (regionCode) => {
-            // state.loading = true;
             state.selectedRegionCode = regionCode;
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
@@ -125,8 +164,6 @@ export default {
                 } else state.maxValue = 0;
             } catch (e) {
                 console.error(e);
-            } finally {
-                // state.loading = false;
             }
         };
 
@@ -161,26 +198,67 @@ export default {
             });
         };
 
-        const drawMarker = (coords, marker) => {
+        const moveMarker = (coords, marker) => {
             marker.latitude = coords.latitude;
             marker.longitude = coords.longitude;
         };
 
-        const drawChart = async () => {
-            const chart = am4core.create('chartRef', am4maps.MapChart);
+        const drawMarker = (chart) => {
+            const mapImageSeries = chart.series.push(new am4maps.MapImageSeries());
+            const mapImage = mapImageSeries.mapImages;
+            const mapImageTemplate = mapImage.template;
+            const mapMarker = mapImageTemplate.createChild(am4core.Sprite);
+            mapMarker.path = 'M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z';
+            mapMarker.width = 24;
+            mapMarker.height = 34;
+            mapMarker.scale = 0.7;
+            mapMarker.fill = am4core.color(coral[600]);
+            mapMarker.fillOpacity = 1;
+            mapMarker.horizontalCenter = 'middle';
+            mapMarker.verticalCenter = 'bottom';
+            mapMarker.nonScaling = true;
+            chartState.marker = mapImage.create();
+        };
+
+        const hitCircle = async (event) => {
+            const originTarget = state.selectedRegion;
+            const target = event.target.dataItem?.dataContext as any;
+            state.selectedProvider = target.provider;
+            state.selectedRegion = target.name;
+            await getFilteredData(target.region_code);
+            if (originTarget !== state.selectedRegion) {
+                moveMarker({ latitude: target.latitude, longitude: target.longitude }, chartState.marker);
+            }
+        };
+
+        const disposeChart = (element) => {
+            if (state.chartRegistry[element]) {
+                state.chartRegistry[element].dispose();
+                delete state.chartRegistry[element];
+            }
+        };
+        const drawChart = async (chartContext) => {
+            /* draw map */
+            const createChart = () => {
+                disposeChart(chartContext);
+                state.chartRegistry[chartContext] = am4core.create(chartContext, am4maps.MapChart);
+                return state.chartRegistry[chartContext];
+            };
+            const chart = createChart();
+            // const chart = am4core.create(chartContext, am4maps.MapChart);
             chart.geodata = am4geodataWorldLow;
             chart.projection = new am4maps.projections.Miller();
             chart.responsive.enabled = true;
             chart.logo.disabled = true;
             chart.chartContainer.wheelable = true;
             chart.zoomControl = new am4maps.ZoomControl();
-
             const polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());
             polygonSeries.useGeodata = true;
             polygonSeries.exclude = ['AQ'];
             polygonSeries.mapPolygons.template.fill = am4core.color(gray[200]);
             polygonSeries.calculateVisualCenter = true;
 
+            /* draw circles */
             const imageSeries = chart.series.push(new am4maps.MapImageSeries());
             imageSeries.mapImages.template.propertyFields.longitude = 'longitude';
             imageSeries.mapImages.template.propertyFields.latitude = 'latitude';
@@ -196,36 +274,24 @@ export default {
                 animateBullet(event.target);
             });
 
-            const mapImageSeries = chart.series.push(new am4maps.MapImageSeries());
-            const mapImage = mapImageSeries.mapImages;
-            const mapImageTemplate = mapImage.template;
-            const mapMarker = mapImageTemplate.createChild(am4core.Sprite);
-            mapMarker.path = 'M4 12 A12 12 0 0 1 28 12 C28 20, 16 32, 16 32 C16 32, 4 20 4 12 M11 12 A5 5 0 0 0 21 12 A5 5 0 0 0 11 12 Z';
-            mapMarker.width = 24;
-            mapMarker.height = 34;
-            mapMarker.scale = 0.7;
-            mapMarker.fill = am4core.color(coral[600]);
-            mapMarker.fillOpacity = 1;
-            mapMarker.horizontalCenter = 'middle';
-            mapMarker.verticalCenter = 'bottom';
-            mapMarker.nonScaling = true;
+            /* make marker */
+            drawMarker(chart);
 
-            const marker = mapImage.create();
-
+            /* click circle to move marker and get filtered data */
             circle2.events.on('hit', async (event) => {
-                const originTarget = state.selectedRegion;
-                const target = event.target.dataItem?.dataContext as any;
-                state.selectedProvider = target.provider;
-                state.selectedRegion = target.name;
-                await getFilteredData(target.region_code);
-                if (originTarget !== state.selectedRegion) {
-                    drawMarker({ latitude: target.latitude, longitude: target.longitude }, marker);
-                }
+                await hitCircle(event);
             });
-            const originCoords = { longitude: 126.871867, latitude: 37.528547 };
+
+            /* get Region List and draw circles with region data */
             await getRegionList();
             imageSeries.data = state.data;
-            drawMarker(originCoords, marker);
+
+            /* draw initial marker with initial coords */
+            if (state.data.length > 0) {
+                const initialCoords = { longitude: 126.871867, latitude: 37.528547 };
+                moveMarker(initialCoords, chartState.marker);
+            }
+
             state.chart = chart;
         };
 
@@ -260,28 +326,23 @@ export default {
             return res;
         };
 
-
         const init = async () => {
             state.loading = true;
             await store.dispatch('resource/provider/load');
-            await Promise.all([getRegionList(), getFilteredData('ap-northeast-2'), drawChart()]);
+            await Promise.all([getRegionList(), getFilteredData('ap-northeast-2')]);
             state.loading = false;
         };
-
         init();
 
-        watch(() => state.chartRef, (chartCtx) => {
-            if (chartCtx && !state.loading) {
-                drawChart();
+        watch([() => state.chartRef, () => state.loading], ([chartCtx, loading]) => {
+            if (chartCtx && !loading) {
+                drawChart(chartCtx);
             }
         }, { immediate: true });
 
-        onUnmounted(() => {
-            if (state.chart) state.chart.dispose();
-        });
-
         return {
             ...toRefs(state),
+            chartState,
             referenceRouter,
             goToCloudService,
         };
@@ -314,19 +375,16 @@ export default {
 }
 .contents-wrapper {
     @apply grid grid-cols-12 grid-flow-row gap-4 h-full;
-
     .chart-wrapper {
         @apply flex flex-col justify-between;
         flex-shrink: 0;
         flex-grow: 1;
         margin-right: 1rem;
-        .chart-loader {
+        .chart {
             @apply w-full h-full;
             height: 21.625rem;
         }
-        #chartRef {
-            @apply w-full h-full;
-        }
+
         .circle-wrapper {
             margin-top: 0.625rem;
             .circle {
@@ -341,6 +399,36 @@ export default {
                 font-size: 0.75rem;
                 line-height: 1.5;
             }
+        }
+    }
+    .no-data-wrapper {
+        @apply col-span-12;
+        justify-self: center;
+        opacity: 0.7;
+        .no-data-img {
+            @apply mx-auto;
+        }
+        .no-data-text {
+            @apply text-primary2;
+            font-size: 0.875rem;
+            line-height: 140%;
+            text-align: center;
+            margin-top: 0.5rem;
+        }
+
+        @screen lg {
+            @apply col-span-3;
+            padding-top: 50%;
+        }
+
+        @screen xl {
+            @apply col-span-3;
+            padding-top: 50%;
+        }
+
+        @screen 2xl {
+            @apply col-span-3;
+            padding-top: 50%;
         }
     }
 }
