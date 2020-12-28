@@ -8,24 +8,44 @@
                         :selectable="false"
                         :excel-visible="false"
                         :style="{height: '100%', border: 'none'}"
-                        @init="onChange"
                         @change="onChange"
-        />
+        >
+            <template #col-resource_id-format="{ value }">
+                {{ users[value].name }}
+            </template>
+            <template #col-labels-format="{value}">
+                <p-text-list :items="value" delimiter=" ">
+                    <p-badge v-slot:default="{value: d}">
+                        {{ d }}
+                    </p-badge>
+                </p-text-list>
+            </template>
+        </p-search-table>
     </div>
 </template>
 
 <script lang="ts">
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import { reactive, toRefs, watch } from '@vue/composition-api';
+/* eslint-disable camelcase */
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
+
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
+import PBadge from '@/components/atoms/badges/PBadge.vue';
+
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import { store } from '@/store';
 
 export default {
     name: 'ServiceAccountMember',
     components: {
+        PBadge,
+        PTextList,
         PSearchTable,
         PPanelTop,
     },
@@ -37,14 +57,15 @@ export default {
     },
     setup(props) {
         const state = reactive({
+            users: computed(() => store.state.resource.user.items),
             fields: [
-                { label: 'User ID', name: 'user_info.user_id' },
-                { label: 'Name', name: 'user_info.name' },
-                { label: 'Email', name: 'user_info.email' },
+                { label: 'User ID', name: 'user_id' },
+                { label: 'User Name', name: 'resource_id' },
+                { label: 'Role', name: 'role_info.name' },
                 { label: 'Labels', name: 'labels' },
             ],
             items: [],
-            loading: true,
+            loading: false,
             totalCount: 0,
             options: {} as Options,
         });
@@ -63,11 +84,13 @@ export default {
             state.loading = true;
             try {
                 const res = await api({
-                    // eslint-disable-next-line camelcase
                     service_accounts: props.serviceAccounts,
                     query: getQuery(),
                 });
-                state.items = res.results;
+                state.items = res.results.map(d => ({
+                    ...d,
+                    user_id: d.resource_id,
+                }));
                 state.totalCount = res.total_count;
             } catch (e) {
                 console.error(e);

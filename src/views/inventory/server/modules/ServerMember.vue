@@ -6,10 +6,12 @@
                         :loading="loading"
                         :total-count="totalCount"
                         :selectable="false"
-                        @init="onChange"
                         @change="onChange"
                         @export="onExport"
         >
+            <template #col-resource_id-format="{ value }">
+                {{ users[value].name }}
+            </template>
             <template #col-labels-format="{value}">
                 <p-text-list :items="value" delimiter=" ">
                     <p-badge v-slot:default="{value: d}">
@@ -22,8 +24,11 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
-import { reactive, toRefs, watch } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
@@ -47,10 +52,11 @@ export default {
     },
     setup(props) {
         const state = reactive({
+            users: computed(() => store.state.resource.user.items),
             fields: [
-                { label: 'User ID', name: 'user_info.user_id' },
-                { label: 'Name', name: 'user_info.name' },
-                { label: 'Email', name: 'user_info.email' },
+                { label: 'User ID', name: 'user_id' },
+                { label: 'User Name', name: 'resource_id' },
+                { label: 'Role', name: 'role_info.name' },
                 { label: 'Labels', name: 'labels' },
             ],
             items: [],
@@ -77,8 +83,10 @@ export default {
                     servers: props.serverIds,
                     query: getQuery(),
                 });
-
-                state.items = res.results;
+                state.items = res.results.map(d => ({
+                    ...d,
+                    user_id: d.resource_id,
+                }));
                 state.totalCount = res.total_count;
             } catch (e) {
                 console.error(e);
@@ -108,13 +116,11 @@ export default {
                             fileType: 'xlsx',
                             timezone: store.state.user.timezone,
                         },
-                        // eslint-disable-next-line camelcase
                         data_source: [
                             { name: 'User ID', key: 'user_info.user_id' },
                             { name: 'Name', key: 'user_info.name' },
                             { name: 'Email', key: 'user_info.email' },
                             {
-                                // eslint-disable-next-line camelcase
                                 name: 'Labels', key: 'labels', type: 'list', options: { item: { view_type: 'badge' } },
                             },
                         ],

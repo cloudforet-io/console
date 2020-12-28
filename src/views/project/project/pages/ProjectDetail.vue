@@ -46,7 +46,6 @@
                                 :select-index.sync="memberTableState.selectIndex"
                                 :loading="memberTableState.loading"
                                 :style="{height: '30rem', padding: 0}"
-                                @init="onChangeMemberTable"
                                 @change="onChangeMemberTable"
                 >
                     <template #toolbox-top>
@@ -67,6 +66,16 @@
                         >
                             {{ $t('PROJECT.DETAIL.DELETE') }}
                         </p-button>
+                    </template>
+                    <template #col-resource_id-format="{ value }">
+                        {{ users[value].name }}
+                    </template>
+                    <template #col-labels-format="{ value }">
+                        <p-text-list :items="value" delimiter=" ">
+                            <p-badge v-slot:default="{value: d}">
+                                {{ d }}
+                            </p-badge>
+                        </p-text-list>
                     </template>
                 </p-search-table>
             </template>
@@ -126,25 +135,27 @@ import {
 } from '@vue/composition-api';
 
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
+import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
 import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
 import ProjectDashboard from '@/views/project/project/pages/ProjectDashboard.vue';
 import ProjectReportTab from '@/views/project/project/modules/ProjectReportTab.vue';
+import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
+import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
+import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
 import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
 import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import PButton from '@/components/atoms/buttons/PButton.vue';
-import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
+import PBadge from '@/components/atoms/badges/PBadge.vue';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import { store } from '@/store';
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
 import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
@@ -152,11 +163,13 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectModel } from '@/views/project/project/type';
 import { TranslateResult } from 'vue-i18n';
 import { TabItem } from '@/components/organisms/tabs/tab/type';
-import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
+
 
 export default {
     name: 'ProjectDetail',
     components: {
+        PBadge,
+        PTextList,
         FavoriteButton,
         PSearchTable,
         PPanelTop,
@@ -176,7 +189,7 @@ export default {
         PIconTextButton,
         PPageNavigation,
     },
-    setup(props, { root, parent }) {
+    setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const projectId = computed<string>(() => root.$route.params.id as string);
         const item = ref({} as ProjectModel);
@@ -185,7 +198,8 @@ export default {
             projectGroupId: '',
             projectId,
             pageNavigation: [],
-            reportState: store.state.user.reportState,
+            reportState: computed(() => vm.$store.state.user.reportState),
+            users: computed(() => vm.$store.state.resource.user.items),
         });
 
         const getProject = async (id) => {
@@ -232,13 +246,10 @@ export default {
         const memberTableState = reactive({
             selectIndex: [] as number[],
             fields: [
-                { label: 'Name', name: 'user_info.name', type: 'item' },
-                { label: 'State', name: 'user_info.state', type: 'item' },
-                { label: 'ID', name: 'user_info.user_id', type: 'item' },
-                { label: 'Email', name: 'user_info.email', type: 'item' },
-                { label: 'Mobile', name: 'user_info.mobile', type: 'item' },
-                { label: 'Group', name: 'user_info.group', type: 'item' },
-                { label: 'Language', name: 'user_info.language', type: 'item' },
+                { label: 'User ID', name: 'user_id', type: 'item' },
+                { label: 'User Name', name: 'resource_id', type: 'item' },
+                { label: 'Role', name: 'role_info.name', type: 'item' },
+                { label: 'Labels', name: 'labels', type: 'item' },
             ],
             items: [] as any[],
             loading: true,
@@ -258,7 +269,10 @@ export default {
                     project_id: projectId.value,
                     query: memberTableQuery.data,
                 });
-                memberTableState.items = res.results;
+                memberTableState.items = res.results.map(d => ({
+                    ...d,
+                    user_id: d.resource_id,
+                }));
                 memberTableState.totalCount = res.total_count;
             } catch (e) {
                 memberTableState.items = [];
@@ -433,6 +447,7 @@ export default {
                 getPageNavigation(),
                 vm.$store.dispatch('resource/project/load'),
                 vm.$store.dispatch('favorite/project/load'),
+                vm.$store.dispatch('resource/user/load'),
             ]);
         })();
         return {

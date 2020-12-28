@@ -6,10 +6,12 @@
                         :loading="loading"
                         :total-count="totalCount"
                         :selectable="false"
-                        @init="onChange"
                         @change="onChange"
                         @export="onExport"
         >
+            <template #col-resource_id-format="{ value }">
+                {{ users[value].name }}
+            </template>
             <template #col-labels-format="{value}">
                 <p-text-list :items="value" delimiter=" ">
                     <p-badge v-slot:default="{value: d}">
@@ -23,7 +25,9 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { reactive, toRefs, watch } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
@@ -50,10 +54,11 @@ export default {
     },
     setup(props) {
         const state = reactive({
+            users: computed(() => store.state.resource.user.items),
             fields: [
-                { label: 'User ID', name: 'user_info.user_id' },
-                { label: 'Name', name: 'user_info.name' },
-                { label: 'Email', name: 'user_info.email' },
+                { label: 'User ID', name: 'user_id' },
+                { label: 'User Name', name: 'resource_id' },
+                { label: 'Role', name: 'role_info.name' },
                 { label: 'Labels', name: 'labels' },
             ],
             items: [],
@@ -80,8 +85,10 @@ export default {
                     cloud_services: props.cloudServiceIds,
                     query: getQuery(),
                 });
-
-                state.items = res.results;
+                state.items = res.results.map(d => ({
+                    ...d,
+                    user_id: d.resource_id,
+                }));
                 state.totalCount = res.total_count;
             } catch (e) {
                 console.error(e);
