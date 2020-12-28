@@ -5,14 +5,17 @@
                 <p class="title">
                     {{ $t('COMMON.WIDGETS.COLLECTING_PROGRESS') }}
                 </p>
-                <div class="more-btn" @click="goToCollectorHistory">
+                <router-link
+                    :to="{ name: 'collectorHistory' }"
+                    class="more-btn"
+                >
                     <div class="more">
                         <span class="text-xs">{{ $t('COMMON.WIDGETS.CLOUD_SERVICE_SEE_MORE') }}</span>
                         <p-i name="ic_arrow_right" width="1rem" height="1rem"
                              color="inherit transparent"
                         />
                     </div>
-                </div>
+                </router-link>
             </div>
         </template>
         <template v-if="loading">
@@ -22,9 +25,9 @@
             </div>
         </template>
         <div v-else-if="!loading && items.length > 0">
-            <router-link v-for="(item, index) in items" :key="index"
-                         :to="{ name: 'collectorMain' }"
-                         class="card grid grid-cols-12"
+            <div v-for="(item, index) in items" :key="index"
+                 class="card grid grid-cols-12 cursor-pointer"
+                 @click="goToCollectorHistory(item)"
             >
                 <div class="left-part col-span-10">
                     <span class="collector-provider"
@@ -38,7 +41,7 @@
                               :size="1.5"
                     />
                 </div>
-            </router-link>
+            </div>
         </div>
         <div v-else class="no-data-wrapper">
             <img src="@/assets/images/illust_star.svg" class="no-data-img">
@@ -161,9 +164,10 @@ export default {
             }
         };
 
-        const goToCollectorHistory = async () => {
+        const goToCollectorHistory = async (item) => {
             await vm.$router.push({
                 name: 'collectorHistory',
+                hash: item.job_id,
             });
         };
 

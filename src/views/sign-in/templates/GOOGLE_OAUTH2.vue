@@ -10,6 +10,8 @@ import {
     defineComponent, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 import PButton from '@/components/atoms/buttons/PButton.vue';
+import {getAuth2, googleOauthSignOut} from "@/views/common/pages/SignOut.vue";
+import {store} from "@/store";
 
 // @ts-ignore
 const { gapi } = window;
@@ -34,13 +36,9 @@ export default defineComponent({
             }
             context.emit('on-sign-in', userId, credentials);
         };
-        const signInFail = () => {
-            console.error('sign in failed');
-            if (gapi.auth2) {
-                gapi.auth2.signOut().then((resp) => {
-                    gapi.auth2.disconnect();
-                });
-            }
+        const signInFail = async () => {
+            const auth2 = await getAuth2(store.state.domain.authOptions.client_id);
+            await googleOauthSignOut(auth2);
         };
         const goToAdminSignIn = () => {
             context.emit('go-to-admin-sign-in');
@@ -50,7 +48,6 @@ export default defineComponent({
                 gapi.auth2.init({
                     // eslint-disable-next-line camelcase
                     client_id: vm.$store.state.domain.authOptions.client_id,
-                    // client_id: store.domain.state.pluginOption.client_id,
                     // eslint-disable-next-line camelcase
                     fetch_basic_profile: false,
                     scope: 'profile',
