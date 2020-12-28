@@ -250,6 +250,7 @@ export default {
                         project_id: props.projectId,
                         event_type_category: tabState.activeTab,
                         query: getEventsApiQuery.data,
+                        period: EVENT_PERIOD,
                     },
                 );
 

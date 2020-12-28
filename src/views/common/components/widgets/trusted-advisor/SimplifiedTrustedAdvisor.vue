@@ -70,6 +70,8 @@ enum CATEGORY {
     serviceLimits = 'service_limits',
 }
 
+const CLOUD_SERVICE_GROUP = 'TrustedAdvisor';
+const CLOUD_SERVICE_NAME = 'Check';
 const ERROR_COLOR = red[500];
 const WARNING_COLOR = yellow[500];
 const OK_COLOR = green[500];
@@ -156,11 +158,17 @@ export default {
             filters.push({ k: 'data.status', o: '=', v: status });
             filters.push({ k: 'data.category', o: '=', v: category });
 
-            return referenceRouter(
-                state.trustedAdvisorId,
-                { resource_type: 'inventory.CloudServiceType' },
-                { filters: queryHelper.setFilters(filters).rawQueryStrings },
-            );
+            return {
+                name: 'cloudServicePage',
+                query: {
+                    filters: queryHelper.setFilters(filters).rawQueryStrings,
+                },
+                params: {
+                    provider: 'aws',
+                    group: CLOUD_SERVICE_GROUP,
+                    name: CLOUD_SERVICE_NAME,
+                },
+            };
         };
         const countFormatter = (category, status) => {
             const categoryData = state.data[category];
