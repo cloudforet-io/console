@@ -432,23 +432,21 @@ export default {
         const getUsersParam = items => ({ users: map(items, 'user_id') });
         const bindRole = async (userId, roleId) => {
             try {
-                if (roleId) {
+                const res = await SpaceConnector.client.identity.roleBinding.list({
+                    resource_type: 'identity.User',
+                    resource_id: userId,
+                    role_id: roleId,
+                });
+                if (roleId && res.total_count === 0) {
                     await SpaceConnector.client.identity.roleBinding.create({
                         resource_type: 'identity.User',
                         resource_id: userId,
                         role_id: roleId,
                     });
-                } else {
-                    const res = await SpaceConnector.client.identity.roleBinding.list({
-                        resource_type: 'identity.User',
-                        resource_id: userId,
-                        role_id: roleId,
+                } else if (!roleId && res.total_count > 0) {
+                    await SpaceConnector.client.identity.roleBinding.delete({
+                        role_binding_id: res.results[0].role_binding_id,
                     });
-                    if (res.results[0]) {
-                        await SpaceConnector.client.identity.roleBinding.delete({
-                            role_binding_id: res.results[0].role_binding_id,
-                        });
-                    }
                 }
             } catch (e) {
                 console.error(e);
