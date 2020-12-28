@@ -288,7 +288,12 @@ export default {
                 }, {
                     name: 'null', type: 'divider',
                 }, {
-                    name: 'link', label: vm.$t('INVENTORY.SERVER.MAIN.CONSOLE') as string, type: 'item', disabled: !tableState.consoleLink, link: tableState.consoleLink, target: 'blank',
+                    name: 'link',
+                    label: vm.$t('INVENTORY.SERVER.MAIN.CONSOLE') as string,
+                    type: 'item',
+                    disabled: !tableState.consoleLink || tableState.selectedItems.length > 1,
+                    link: tableState.consoleLink,
+                    target: 'blank',
                 },
             ]),
             collectModalVisible: false,

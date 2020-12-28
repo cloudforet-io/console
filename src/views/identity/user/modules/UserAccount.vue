@@ -132,7 +132,10 @@ export default {
         const state = reactive({
             userId: computed(() => store.state.user.userId),
             isAdmin: computed(() => store.getters['user/isAdmin']).value,
-            userRole: '',
+            userRole: computed(() => {
+                const roleArray = store.getters['user/getRoleNames'];
+                return roleArray.join(', ');
+            }),
             userType: computed(() => store.state.user.backend) as unknown as string,
             language: '' as LanguageCode | undefined,
             timezone: '' as Timezone | undefined,
@@ -185,7 +188,6 @@ export default {
         };
 
         const checkPassword = async (password) => {
-            console.log(password.length);
             // password1
             if (password.replace(/ /g, '').length !== password.length) {
                 validationState.isPasswordValid = false;
@@ -251,15 +253,10 @@ export default {
             };
             await updateUser(userParam);
         };
-        const getUserRole = async () => {
-            const roleArray = store.getters['user/getRoleNames'];
-            state.userRole = roleArray.join(', ');
-        };
 
         const getProfile = async (id) => {
             try {
                 await store.dispatch('user/getUser', id);
-                await getUserRole();
                 state.email = store.state.user.email;
                 state.language = store.state.user.language;
                 state.timezone = store.state.user.timezone;
