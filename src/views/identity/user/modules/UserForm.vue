@@ -390,11 +390,20 @@ export default {
                 label: d.name,
                 name: d.role_id,
             }));
+        };
 
-            // await SpaceConnector.client.identity.roleBinding.list({
-            //     resource_type: 'identity.User',
-            //     resource_id: formState.user_id,
-            // });
+        const setCurrentDomainId = async () => {
+            if (props.updateMode && formState.domainRoleList[0]) {
+                const res = await SpaceConnector.client.identity.roleBinding.list({
+                    resource_type: 'identity.User',
+                    resource_id: formState.user_id,
+                    role_id: formState.domainRoleList[0].name,
+                });
+                if (res.total_count > 0) formState.domainRole = formState.domainRoleList[0].name;
+                else formState.domainRole = '';
+            } else {
+                formState.domainRole = '';
+            }
         };
 
         (async () => {
@@ -404,6 +413,8 @@ export default {
                 formState.email = props.item.email;
             }
             await Promise.all([initAuthTypeList(), getRoleList()]);
+
+            await setCurrentDomainId();
         })();
 
         return {
