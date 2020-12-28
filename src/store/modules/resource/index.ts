@@ -7,6 +7,7 @@ import collector from './collector';
 import provider from './provider';
 import region from './region';
 import plugin from './plugin';
+import user from './user';
 import * as actions from './actions';
 
 export default {
@@ -21,6 +22,7 @@ export default {
         provider,
         region,
         plugin,
+        user,
     },
     actions,
 };

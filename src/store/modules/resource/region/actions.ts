@@ -5,8 +5,7 @@ export const load = async ({ commit }): Promise<void|Error> => {
     try {
         const response = await SpaceConnector.client.inventory.region.list({
             query: {
-                only: ['name', 'region_code'],
-                distinct: 'region_code',
+                only: ['name', 'region_code']
             },
         });
         const regions: ResourceMap = {};
