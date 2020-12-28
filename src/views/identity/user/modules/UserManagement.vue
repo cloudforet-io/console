@@ -262,7 +262,7 @@ export default {
         const state = reactive({
             loading: false,
             users: [] as UserModel[],
-            timezone: computed(() => store.state.user.timezone),
+            timezone: computed(() => store.state.user.timezone || 'UTC'),
             fields: computed(() => ([
                 { name: 'user_id', label: 'User ID' },
                 { name: 'name', label: 'Name' },
@@ -430,6 +430,30 @@ export default {
         };
 
         const getUsersParam = items => ({ users: map(items, 'user_id') });
+        const bindRole = async (userId, roleId) => {
+            try {
+                if (roleId) {
+                    await SpaceConnector.client.identity.roleBinding.create({
+                        resource_type: 'identity.User',
+                        resource_id: userId,
+                        role_id: roleId,
+                    });
+                } else {
+                    const res = await SpaceConnector.client.identity.roleBinding.list({
+                        resource_type: 'identity.User',
+                        resource_id: userId,
+                        role_id: roleId,
+                    });
+                    if (res.results[0]) {
+                        await SpaceConnector.client.identity.roleBinding.delete({
+                            role_binding_id: res.results[0].role_binding_id,
+                        });
+                    }
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
         const addUser = async (item) => {
             try {
                 await SpaceConnector.client.identity.user.create({
@@ -441,10 +465,13 @@ export default {
             }
             userFormState.visible = false;
         };
-        const updateUser = async (item) => {
+        const updateUser = async (item, roleId) => {
             try {
                 await store.dispatch('user/setUser', 'USER', item.user_id);
                 vm.$i18n.locale = item.language;
+
+                console.debug('update user', item, roleId)
+                await bindRole(item.user_id, roleId);
 
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', root);
             } catch (e) {
@@ -452,9 +479,9 @@ export default {
             }
             userFormState.visible = false;
         };
-        const userFormConfirm = async (item) => {
+        const userFormConfirm = async (item, roleId) => {
             if (userFormState.updateMode) {
-                await updateUser(item);
+                await updateUser(item, roleId);
             } else {
                 await addUser(item);
             }

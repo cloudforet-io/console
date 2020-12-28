@@ -69,7 +69,10 @@ module.exports = {
           "include_provider",
           "project_group_id",
           "has_child",
-          "service_account_id"
+          "service_account_id",
+          "resource_id",
+          "role_id",
+          "role_binding_id"
         ]
       }
     ],
