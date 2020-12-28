@@ -44,5 +44,8 @@ export const getRoleNames = (state: UserState): Array<string> => {
     if (domainRoleNames.length > 0) {
         return domainRoleNames;
     }
-    return projectRoleNames;
+    if (projectRoleNames.length > 0) {
+        return projectRoleNames;
+    }
+    return ['No Role'];
 };
