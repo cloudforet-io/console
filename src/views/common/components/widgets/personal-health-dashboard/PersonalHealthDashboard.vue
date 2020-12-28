@@ -77,6 +77,8 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 
 
+const EVENT_PERIOD = 7;
+
 export default {
     name: 'PersonalHealthDashboard',
     components: {
@@ -110,7 +112,9 @@ export default {
         /* api */
         const getData = async () => {
             try {
-                const res = await SpaceConnector.client.statistics.topic.phdSummary();
+                const res = await SpaceConnector.client.statistics.topic.phdSummary({
+                    period: EVENT_PERIOD,
+                });
 
                 state.data = res.results.map((d) => {
                     const lastUpdateTime = dayjs.tz(dayjs(d.last_update_time).utc(), state.timezone).format('YYYY-MM-DD HH:mm:ss');
