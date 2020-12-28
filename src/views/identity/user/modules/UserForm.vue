@@ -367,7 +367,7 @@ export default {
                 user_type: formState.selectedAuthType.user_type,
                 password: formState.password || '',
             };
-            emit('confirm', data, formState.domainRole);
+            emit('confirm', data, formState.domainRoleList[0].name, !formState.domainRole);
         };
 
         const initAuthTypeList = async () => {
