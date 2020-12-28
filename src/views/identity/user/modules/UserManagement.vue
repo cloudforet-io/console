@@ -439,6 +439,20 @@ export default {
             if (res.total_count === 0) {
                 await SpaceConnector.client.identity.roleBinding.create({
                     resource_type: 'identity.User',
+                    resource_id: state.userId,
+                    role_id: roleId,
+                });
+            }
+        };
+        const unbindRole = async (userId, roleId) => {
+            const res = await SpaceConnector.client.identity.roleBinding.list({
+                resource_type: 'identity.User',
+                resource_id: userId,
+                role_id: roleId,
+            });
+            if (res.total_count > 0) {
+                await SpaceConnector.client.identity.roleBinding.delete({
+                    resource_type: 'identity.User',
                     resource_id: userId,
                     role_id: roleId,
                 });
