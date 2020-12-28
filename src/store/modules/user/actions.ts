@@ -34,12 +34,13 @@ const getUserInfo = async (userId: string): Promise<UserState> => {
 };
 
 const getReportState = async (): Promise<boolean> => {
-    try {
-        await SpaceConnector.client.report.domain.get();
-        return true;
-    } catch (e) {
-        return false;
-    }
+    return false;
+    // try {
+    //     await SpaceConnector.client.report.domain.get();
+    //     return true;
+    // } catch (e) {
+    //     return false;
+    // }
 };
 
 const getPowerSchedulerState = async (): Promise<boolean> => {

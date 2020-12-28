@@ -371,9 +371,10 @@ export default {
 
         const checkMemberDeleteState = reactive({
             fields: computed(() => [
-                { name: 'user_info.user_id', label: 'ID' },
-                { name: 'user_info.name', label: 'Name' },
-                { name: 'user_info.email', label: 'Email' },
+                { name: 'resource_id', label: 'User ID' },
+                // { name: '-', label: 'User Name' },
+                { name: 'role_info.name', label: 'Role' },
+                // { name: 'labels', label: 'Labels' },
             ]),
             mode: '',
             items: [] as any[],
@@ -398,7 +399,7 @@ export default {
             try {
                 await SpaceConnector.client.identity.project.member.remove({
                     project_id: projectId.value,
-                    users: items.map(it => it.user_info.user_id),
+                    users: items.map(it => it.resource_id),
                 });
                 showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '', root);
             } catch (e) {
