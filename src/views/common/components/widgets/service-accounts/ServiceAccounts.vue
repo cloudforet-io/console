@@ -54,7 +54,7 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
 import {
     computed, reactive, toRefs, watch,
-    getCurrentInstance, ComponentRenderProxy, onUnmounted,
+    getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
@@ -103,9 +103,10 @@ export default {
             skeletons: range(4),
             loading: true,
             loaderRef: null,
-            chartRef: null as HTMLElement|null,
+            chartRef: null as HTMLElement | null,
             data: [] as Data[],
-            chart: null as null|any,
+            chart: null as null | any,
+            chartRegistry: {},
             fields: computed(() => [
                 { name: 'provider', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_PROVIDER') },
                 { name: 'service_account_count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNTS_ACCOUNT') },
@@ -113,16 +114,27 @@ export default {
             ]),
         });
 
+        const disposeChart = (element) => {
+            if (state.chartRegistry[element]) {
+                state.chartRegistry[element].dispose();
+                delete state.chartRegistry[element];
+            }
+        };
         const drawChart = (element, isLoading = false) => {
-            const chart = am4core.create(element, am4charts.PieChart);
+            const createChart = () => {
+                disposeChart(element);
+                state.chartRegistry[element] = am4core.create(element, am4charts.PieChart);
+                return state.chartRegistry[element];
+            };
+            const chart = createChart();
             chart.responsive.enabled = true;
             chart.logo.disabled = true;
             chart.innerRadius = am4core.percent(63);
 
             if (isLoading) {
                 chart.data = [{
-                    name: 'Dummy',
-                    count: 1000,
+                    provider: 'Dummy',
+                    service_account_count: 1000,
                     color: DEFAULT_COLORS[0],
                 }];
             } else {
@@ -232,10 +244,6 @@ export default {
                 drawChart(chartCtx, false);
             }
         }, { immediate: true });
-
-        onUnmounted(() => {
-            if (state.chart) state.chart.dispose();
-        });
 
         return {
             ...toRefs(state),
