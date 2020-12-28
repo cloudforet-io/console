@@ -431,25 +431,31 @@ export default {
 
         const getUsersParam = items => ({ users: map(items, 'user_id') });
         const bindRole = async (userId, roleId) => {
-            try {
-                const res = await SpaceConnector.client.identity.roleBinding.list({
+            const res = await SpaceConnector.client.identity.roleBinding.list({
+                resource_type: 'identity.User',
+                resource_id: state.userId,
+                role_id: roleId,
+            });
+            if (res.total_count === 0) {
+                await SpaceConnector.client.identity.roleBinding.create({
+                    resource_type: 'identity.User',
+                    resource_id: state.userId,
+                    role_id: roleId,
+                });
+            }
+        };
+        const unbindRole = async (userId, roleId) => {
+            const res = await SpaceConnector.client.identity.roleBinding.list({
+                resource_type: 'identity.User',
+                resource_id: userId,
+                role_id: roleId,
+            });
+            if (res.total_count > 0) {
+                await SpaceConnector.client.identity.roleBinding.delete({
                     resource_type: 'identity.User',
                     resource_id: userId,
                     role_id: roleId,
                 });
-                if (roleId && res.total_count === 0) {
-                    await SpaceConnector.client.identity.roleBinding.create({
-                        resource_type: 'identity.User',
-                        resource_id: userId,
-                        role_id: roleId,
-                    });
-                } else if (!roleId && res.total_count > 0) {
-                    await SpaceConnector.client.identity.roleBinding.delete({
-                        role_binding_id: res.results[0].role_binding_id,
-                    });
-                }
-            } catch (e) {
-                console.error(e);
             }
         };
         const addUser = async (item) => {
@@ -463,13 +469,14 @@ export default {
             }
             userFormState.visible = false;
         };
-        const updateUser = async (item, roleId) => {
+        const updateUser = async (item, roleId, isBind) => {
             try {
                 await store.dispatch('user/setUser', 'USER', item.user_id);
                 vm.$i18n.locale = item.language;
 
-                console.debug('update user', item, roleId)
-                await bindRole(item.user_id, roleId);
+                console.debug('update user', item, roleId, isBind);
+                if (isBind) await bindRole(item.user_id, roleId);
+                else await unbindRole(item.user_id, roleId);
 
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', root);
             } catch (e) {
@@ -477,9 +484,9 @@ export default {
             }
             userFormState.visible = false;
         };
-        const userFormConfirm = async (item, roleId) => {
+        const userFormConfirm = async (item, roleId, isBind) => {
             if (userFormState.updateMode) {
-                await updateUser(item, roleId);
+                await updateUser(item, roleId, isBind);
             } else {
                 await addUser(item);
             }
