@@ -153,7 +153,7 @@ export default {
             data: [] as ProjectData[],
             chartData: [] as ChartData[],
             chartRef: null as HTMLElement | null,
-            chart: null,
+            chart: null as null | any,
             colors: {
                 server: COMPUTE_COLOR,
                 database: DATABASE_COLOR,

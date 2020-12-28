@@ -31,4 +31,5 @@ export const i18n = new VueI18n({
         ko: removeEmpty({ ...ko, COMPONENT: componentKO }),
         jp: removeEmpty({ ...ja, COMPONENT: componentJA }),
     },
+    silentFallbackWarn: true,
 });

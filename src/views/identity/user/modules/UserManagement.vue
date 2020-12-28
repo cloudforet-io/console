@@ -431,38 +431,34 @@ export default {
 
         const getUsersParam = items => ({ users: map(items, 'user_id') });
         const bindRole = async (userId, roleId) => {
-            const res = await SpaceConnector.client.identity.roleBinding.list({
+            await SpaceConnector.client.identity.roleBinding.create({
                 resource_type: 'identity.User',
                 resource_id: userId,
                 role_id: roleId,
             });
-            if (res.total_count === 0) {
-                await SpaceConnector.client.identity.roleBinding.create({
-                    resource_type: 'identity.User',
-                    resource_id: state.userId,
-                    role_id: roleId,
-                });
-            }
         };
         const unbindRole = async (userId, roleId) => {
             const res = await SpaceConnector.client.identity.roleBinding.list({
                 resource_type: 'identity.User',
                 resource_id: userId,
                 role_id: roleId,
+                // eslint-disable-next-line camelcase
+                role_type: 'DOMAIN',
             });
+            const roleBindingId = res.results[0].role_binding_id;
             if (res.total_count > 0) {
                 await SpaceConnector.client.identity.roleBinding.delete({
-                    resource_type: 'identity.User',
-                    resource_id: userId,
-                    role_id: roleId,
+                    role_binding_id: roleBindingId,
                 });
             }
         };
-        const addUser = async (item) => {
+        const addUser = async (item, roleId, isBind) => {
             try {
                 await SpaceConnector.client.identity.user.create({
                     ...item,
                 });
+                console.log(isBind)
+                if (isBind !== undefined) await bindRole(item.user_id, roleId);
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '', root);
             } catch (e) {
                 showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'), e, root);
@@ -471,13 +467,11 @@ export default {
         };
         const updateUser = async (item, roleId, isBind) => {
             try {
-                await store.dispatch('user/setUser', 'USER', item.user_id);
-                vm.$i18n.locale = item.language;
-
-                console.debug('update user', item, roleId, isBind);
+                await SpaceConnector.client.identity.user.update({
+                    ...item,
+                });
                 if (isBind) await bindRole(item.user_id, roleId);
                 else await unbindRole(item.user_id, roleId);
-
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', root);
             } catch (e) {
                 showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e, root);
@@ -488,7 +482,7 @@ export default {
             if (userFormState.updateMode) {
                 await updateUser(item, roleId, isBind);
             } else {
-                await addUser(item);
+                await addUser(item, roleId, isBind);
             }
             await getUsers();
         };

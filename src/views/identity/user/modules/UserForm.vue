@@ -367,7 +367,7 @@ export default {
                 user_type: formState.selectedAuthType.user_type,
                 password: formState.password || '',
             };
-            emit('confirm', data, formState.domainRoleList[0].name, !formState.domainRole);
+            emit('confirm', data, formState.domainRoleList[0].name, formState.domainRole);
         };
 
         const initAuthTypeList = async () => {
@@ -397,7 +397,7 @@ export default {
                 const res = await SpaceConnector.client.identity.roleBinding.list({
                     resource_type: 'identity.User',
                     resource_id: formState.user_id,
-                    role_id: formState.domainRoleList[0].name,
+                    role_type: 'DOMAIN',
                 });
                 if (res.total_count > 0) formState.domainRole = formState.domainRoleList[0].name;
                 else formState.domainRole = '';
