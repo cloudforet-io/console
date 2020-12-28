@@ -97,7 +97,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
@@ -177,6 +177,7 @@ export default {
         });
         const state = reactive({
             loading: false,
+            chart: null as null | any,
             favoriteProjects: computed(() => store.state.favorite.project.items),
             projects: computed(() => store.state.resource.project.items),
             chartRef: null as HTMLElement | null,
@@ -257,6 +258,8 @@ export default {
             series.hiddenState.properties.opacity = 1;
             series.hiddenState.properties.endAngle = -90;
             series.hiddenState.properties.startAngle = -90;
+
+            state.chart = chart;
         };
         const changePageNumber = (page) => {
             state.thisPage = page;
@@ -377,6 +380,10 @@ export default {
                 drawChart(chartContext);
             }
         }, { immediate: false });
+
+        onUnmounted(() => {
+            if (state.chart) state.chart.dispose();
+        });
 
         return {
             ...toRefs(state),

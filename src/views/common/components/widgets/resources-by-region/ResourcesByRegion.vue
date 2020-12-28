@@ -48,10 +48,11 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import {
     ComponentRenderProxy,
     computed,
-    getCurrentInstance, reactive, toRefs, watch,
+    getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
@@ -78,7 +79,6 @@ import { Location } from 'vue-router';
 interface Value {
     provider: string;
     count: number;
-    // eslint-disable-next-line camelcase
     region_name: string;
 }
 interface Item {
@@ -131,6 +131,7 @@ export default {
         const queryHelper = new QueryHelper();
 
         const state = reactive({
+            chart: null,
             chartRef: null,
             loaderRef: null,
             data: [],

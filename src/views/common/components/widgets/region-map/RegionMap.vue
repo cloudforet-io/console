@@ -68,7 +68,7 @@ import am4geodataWorldLow from '@amcharts/amcharts4-geodata/worldLow';
 import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance,
+    computed, getCurrentInstance, onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { range } from 'lodash';
@@ -339,6 +339,10 @@ export default {
                 drawChart(chartCtx);
             }
         }, { immediate: true });
+
+        onUnmounted(() => {
+            if (state.chart) state.chart.dispose();
+        });
 
         return {
             ...toRefs(state),

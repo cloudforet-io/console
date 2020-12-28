@@ -17,7 +17,7 @@
                 <template #loader>
                     <div ref="loaderRef" class="w-full h-full" />
                 </template>
-                <div ref="chartRef" class="w-full h-full chart-ref" />
+                <div ref="chartRef" class="w-full h-full" />
             </p-chart-loader>
         </div>
         <div class="legends">
@@ -54,7 +54,7 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
 import {
     computed, reactive, toRefs, watch,
-    getCurrentInstance, ComponentRenderProxy,
+    getCurrentInstance, ComponentRenderProxy, onUnmounted,
 } from '@vue/composition-api';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
@@ -244,6 +244,10 @@ export default {
                 drawChart(chartCtx, false);
             }
         }, { immediate: true });
+
+        onUnmounted(() => {
+            if (state.chart) state.chart.dispose();
+        });
 
         return {
             ...toRefs(state),

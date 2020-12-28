@@ -110,7 +110,7 @@ import { TranslateResult } from 'vue-i18n';
 import { Location } from 'vue-router';
 
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, onUpdated, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
@@ -221,6 +221,7 @@ export default {
 
         const state = reactive({
             loading: false,
+            chart: null,
             chartRef: null as HTMLElement | null,
             skeletons: range(4),
             providers: computed(() => vm.$store.state.resource.provider.items),
@@ -300,6 +301,7 @@ export default {
                 return chartState.registry[state.chartRef];
             };
             const chart = createChart();
+            state.chart = chart;
 
             chart.logo.disabled = true;
             chart.paddingLeft = -5;
@@ -678,6 +680,10 @@ export default {
             await getTrend(state.selectedType);
             drawChart();
         }, { immediate: false });
+
+        onUnmounted(() => {
+            if (state.chart) state.chart.dispose();
+        });
 
         return {
             ...toRefs(state),

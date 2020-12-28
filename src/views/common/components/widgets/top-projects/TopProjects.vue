@@ -91,7 +91,7 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import { Location } from 'vue-router';
 
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
@@ -153,7 +153,7 @@ export default {
             data: [] as ProjectData[],
             chartData: [] as ChartData[],
             chartRef: null as HTMLElement | null,
-            chart: null as HTMLElement | null,
+            chart: null,
             colors: {
                 server: COMPUTE_COLOR,
                 database: DATABASE_COLOR,
@@ -232,6 +232,8 @@ export default {
             chart.legend.labels.template.fill = am4core.color(gray[400]);
             chart.legend.markers.template.width = 8;
             chart.legend.markers.template.height = 8;
+
+            state.chart = chart;
         };
 
         const queryHelper = new QueryHelper();
@@ -325,6 +327,10 @@ export default {
             if (chartContext && data) {
                 drawChart(chartContext);
             }
+        });
+
+        onUnmounted(() => {
+            if (state.chart) state.chart.dispose();
         });
 
         return {
