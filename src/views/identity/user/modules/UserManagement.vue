@@ -458,20 +458,6 @@ export default {
                 });
             }
         };
-        const unbindRole = async (userId, roleId) => {
-            const res = await SpaceConnector.client.identity.roleBinding.list({
-                resource_type: 'identity.User',
-                resource_id: userId,
-                role_id: roleId,
-            });
-            if (res.total_count > 0) {
-                await SpaceConnector.client.identity.roleBinding.delete({
-                    resource_type: 'identity.User',
-                    resource_id: userId,
-                    role_id: roleId,
-                });
-            }
-        };
         const addUser = async (item) => {
             try {
                 await SpaceConnector.client.identity.user.create({
