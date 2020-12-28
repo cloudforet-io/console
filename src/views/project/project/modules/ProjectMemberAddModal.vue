@@ -135,8 +135,8 @@ export default {
 
         const state = reactive({
             fields: [
+                { label: 'User ID', name: 'user_id', type: 'item' },
                 { label: 'Name', name: 'name', type: 'item' },
-                { label: 'ID', name: 'user_id', type: 'item' },
                 { label: 'Email', name: 'email', type: 'item' },
             ],
             items: [] as any,
