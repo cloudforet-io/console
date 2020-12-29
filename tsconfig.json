@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "target": "es6",
+    "target": "esnext",
     "module": "esnext",
     "strict": true,
     "jsx": "preserve",
@@ -14,7 +14,9 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "sourceMap": true,
-    "baseUrl": "./src",
+    "baseUrl": ".",
+    "declaration": true,
+    "outDir": "dist",
     "types": ["webpack-env"],
     "paths": {
       "@/*": ["src/*"]
