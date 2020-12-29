@@ -50,5 +50,5 @@ export default {
 
 </script>
 
-<style lang="postcss" src="PTooltip.pcss">
+<style lang="postcss" src="./PTooltip.pcss">
 </style>

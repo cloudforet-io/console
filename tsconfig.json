@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
+    "declarationDir": "lib",
     "target": "esnext",
     "module": "esnext",
     "strict": true,
@@ -24,5 +25,5 @@
     "lib": ["esnext", "dom", "dom.iterable", "scripthost"]
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"],
-  "exclude": ["node_modules", "src/**/*.stories.ts"]
+  "exclude": ["node_modules", "src/**/*.stories.ts"],
 }
