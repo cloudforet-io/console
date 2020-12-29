@@ -4,7 +4,7 @@
   "description": "SpaceONE Design System",
   "author": "SpaceONE",
   "license": "Apache-2.0",
-  "private": true,
+  "private": false,
   "main": "dist/spaceone-design-system.common.js",
   "types": "dist/src/index.d.ts",
   "scripts": {
