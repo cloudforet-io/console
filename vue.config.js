@@ -81,6 +81,15 @@ module.exports = {
                     opts.configFile = 'tsconfig.json';
                     return opts;
                 });
+
+            config.externals([
+                '@vue/composition-api',
+                'vue-svgicon',
+                'velocity-animate',
+                'vue-notification',
+                'vue-fragment',
+                'v-tooltip',
+                'vue-codemirror']);
         }
     },
     parallel: false,
