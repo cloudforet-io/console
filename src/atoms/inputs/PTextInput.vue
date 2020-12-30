@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 import { getBindClass } from '@/util/functional-helpers';
 
 export default {

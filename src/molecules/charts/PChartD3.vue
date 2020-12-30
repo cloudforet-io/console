@@ -22,7 +22,7 @@
     </div>
 </template>
 
-<script>
+<script lang="ts">
 import {
     reactive, toRefs, watch, onMounted, onUnmounted,
 } from '@vue/composition-api';

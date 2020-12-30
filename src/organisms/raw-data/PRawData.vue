@@ -4,7 +4,7 @@
     />
 </template>
 
-<script>
+<script lang="ts">
 import {
     computed, reactive, watch, onMounted, toRefs,
 } from '@vue/composition-api';

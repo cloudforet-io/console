@@ -6,7 +6,7 @@
     </component>
 </template>
 
-<script>
+<script lang="ts">
 import { merge } from 'lodash';
 import { VTooltip } from 'v-tooltip';
 

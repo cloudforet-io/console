@@ -31,7 +31,7 @@
         </template>
     </notifications>
 </template>
-<script>
+<script lang="ts">
 import PI from '@/atoms/icons/PI.vue';
 
 /**

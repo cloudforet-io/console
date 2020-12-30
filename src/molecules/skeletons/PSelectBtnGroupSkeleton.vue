@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
 import PSkeleton from '@/atoms/skeletons/PSkeleton.vue';
 import { getBindClass } from '@/util/functional-helpers';
 

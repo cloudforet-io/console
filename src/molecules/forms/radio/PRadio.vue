@@ -21,7 +21,7 @@
     </span>
 </template>
 
-<script>
+<script lang="ts">
 import { ref, computed } from '@vue/composition-api';
 import PI from '@/atoms/icons/PI.vue';
 
