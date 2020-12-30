@@ -22,14 +22,14 @@
     </div>
 </template>
 
-<script lang="ts">
+<script>
 import {
     reactive, toRefs, watch, onMounted, onUnmounted,
 } from '@vue/composition-api';
 import PLottie from '@/molecules/lottie/PLottie.vue';
 
 
-export const setTooltips = () => {
+const setTooltips = () => {
     const generateTooltipTitle = (data, idx, color) => {
         const colorStyle = color;
 
@@ -82,7 +82,7 @@ export const setTooltips = () => {
     };
 };
 
-export const setSvg = (props, context) => {
+const setSvg = (props, context) => {
     const state = reactive({
         svgRatio: '',
         svgWidth: null,
@@ -139,7 +139,7 @@ export const setSvg = (props, context) => {
     };
 };
 
-export const setDrawTrigger = (props, context, svgTools) => {
+const setDrawTrigger = (props, context, svgTools) => {
     const state = reactive({
         isMounted: false,
         startDraw: props.loading || false,
