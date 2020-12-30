@@ -63,12 +63,15 @@ module.exports = {
         ],
     },
     chainWebpack: (config) => {
+        if (process.env.VUE_APP_BUILD_MOD === 'wc') {
+
+        }
         // These are some necessary steps changing the default webpack config of the Vue CLI
         // that need to be changed in order for Typescript based components to generate their
         // declaration (.d.ts) files.
         //
         // Discussed here https://github.com/vuejs/vue-cli/issues/1081
-        if (process.env.NODE_ENV === 'production' && process.env.VUE_APP_BUILD_MOD === 'lib') {
+        if (process.env.NODE_ENV === 'production') {
             config.module.rule('ts').uses.delete('cache-loader');
 
             config.module
@@ -84,6 +87,7 @@ module.exports = {
 
             config.externals([
                 '@vue/composition-api',
+                'vue-i18n',
                 'vue-svgicon',
                 'velocity-animate',
                 'vue-notification',

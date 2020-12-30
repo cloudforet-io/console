@@ -1,11 +1,10 @@
 {
   "name": "@spaceone/design-system",
-  "version": "1.0.1-3",
+  "version": "1.0.1-6",
   "description": "SpaceONE Design System",
   "author": "SpaceONE",
   "license": "Apache-2.0",
-  "main": "dist/spaceone-design-system.common.js",
-  "unpkg": "dist/spaceone-design-system.umd.min.js",
+  "main": "dist/index.umd.min.js",
   "types": "types/index.d.ts",
   "files": [
     "dist/*",
@@ -21,11 +20,14 @@
     "spaceone",
     "design system",
     "vue",
-    "vuejs"
+    "vuejs",
+    "ui library",
+    "component"
   ],
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "env VUE_APP_BUILD_MOD=lib vue-cli-service build --target lib --name spaceone-design-system src/index.ts",
+    "build": "vue-cli-service build --target lib --name index src/index.ts",
+    "build:wc": "env VUE_APP_BUILD_MOD=wc vue-cli-service build --target wc-async --name index src/**/*.vue",
     "lint": "eslint --ext .js,.vue src",
     "build-storybook": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook -s ./public -o .out",
     "storybook": "start-storybook -p 6006 -s ./public",
