@@ -1,15 +1,28 @@
 {
   "name": "@spaceone/design-system",
-  "version": "1.0.1-2",
+  "version": "1.0.1-3",
   "description": "SpaceONE Design System",
   "author": "SpaceONE",
   "license": "Apache-2.0",
   "main": "dist/spaceone-design-system.common.js",
+  "unpkg": "dist/spaceone-design-system.umd.min.js",
   "types": "types/index.d.ts",
-  "files": "dist/*",
+  "files": [
+    "dist/*",
+    "src/*",
+    "types/*",
+    "*.json",
+    "*.js"
+  ],
   "publishConfig": {
     "access": "public"
   },
+  "keywords": [
+    "spaceone",
+    "design system",
+    "vue",
+    "vuejs"
+  ],
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "env VUE_APP_BUILD_MOD=lib vue-cli-service build --target lib --name spaceone-design-system src/index.ts",

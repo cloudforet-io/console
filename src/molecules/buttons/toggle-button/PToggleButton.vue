@@ -11,12 +11,7 @@ import { ToggleButton } from 'vue-js-toggle-button';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { ToggleButtonProps } from '@/molecules/buttons/toggle-button/type';
 import color from '@/styles/colors';
-
-enum TOGGLE_BUTTON_THEME {
-    secondary = 'secondary',
-    gray900 = 'gray900',
-    white = 'white',
-}
+import { TOGGLE_BUTTON_THEME } from '@/molecules/buttons/toggle-button/config';
 
 export default {
     name: 'PToggleButton',
