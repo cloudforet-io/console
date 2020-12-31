@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
+        with:
+          submodules: true
+          token: ${{ secrets.REPOSITORY_ACCESS_KEY }}
       - uses: actions/setup-node@v1
         with:
           node-version: 12
