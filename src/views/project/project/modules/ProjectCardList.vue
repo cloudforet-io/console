@@ -212,12 +212,17 @@ export default {
             listQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
                 .setPageLimit(state.pageSize);
 
-            if (text) listQuery.setFilters([{ k: 'name', v: props.searchText, o: '' }]);
+            const params: any = { include_provider: true };
 
-            const params: any = { include_provider: true, query: listQuery.data };
-            if (id) params.project_group_id = id;
+            if (id) {
+                params.project_group_id = id;
+                listQuery.setFilters([]);
+            } else if (text) listQuery.setFilters([{ k: 'name', v: props.searchText, o: '' }]);
+            else listQuery.setFilters([]);
+
             if (state.showAllProjects) params.recursive = true;
 
+            params.query = listQuery.data;
             return params;
         };
 
