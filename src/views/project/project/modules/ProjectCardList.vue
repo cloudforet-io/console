@@ -212,17 +212,16 @@ export default {
             listQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
                 .setPageLimit(state.pageSize);
 
-            const params: any = { include_provider: true };
-
-            if (id) {
-                params.project_group_id = id;
+            if (text) {
+                listQuery.setFilters([{ k: 'name', v: props.searchText, o: '' }]);
+            } else {
                 listQuery.setFilters([]);
-            } else if (text) listQuery.setFilters([{ k: 'name', v: props.searchText, o: '' }]);
-            else listQuery.setFilters([]);
+            }
 
+            const params: any = { include_provider: true, query: listQuery.data };
+            if (id) params.project_group_id = id;
             if (state.showAllProjects) params.recursive = true;
 
-            params.query = listQuery.data;
             return params;
         };
 
@@ -255,7 +254,10 @@ export default {
         };
 
         let listProjectToken: CancelTokenSource | undefined;
-        const getData = async (id?, text?) => {
+        const getData = async (_id?, _text?, isAll = false) => {
+            const id = _id || props.groupId;
+            const text = _text || props.searchText;
+
             // if request is already exist, cancel the request
             if (listProjectToken) {
                 listProjectToken.cancel('Next request has been called.');
@@ -267,8 +269,8 @@ export default {
             state.cardSummaryLoading = true;
             try {
                 let res;
-                if (id) res = await listProjectApi(getParams(id, text), { cancelToken: listProjectToken.token });
-                else res = await listAllProjectApi(getParams(undefined, text), { cancelToken: listProjectToken.token });
+                if (isAll) res = await listAllProjectApi(getParams(undefined, text), { cancelToken: listProjectToken.token });
+                else res = await listProjectApi(getParams(id, text), { cancelToken: listProjectToken.token });
                 state.items = res.results;
                 state.totalCount = res.total_count;
                 state.loading = false;
@@ -296,9 +298,9 @@ export default {
             state.pageSize = 24;
         };
 
-        const listProjects = async (groupId?, searchText?, reset = false) => {
+        const listProjects = async (groupId?, searchText?, reset = true) => {
             if (reset) resetAll();
-            await getData(groupId, searchText);
+            await getData(groupId, searchText, !groupId);
         };
 
         const queryHelper = new QueryHelper();
