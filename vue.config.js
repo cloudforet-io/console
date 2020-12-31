@@ -50,6 +50,7 @@ module.exports = {
                 includePaths: ['./node_modules'],
             },
         },
+        extract: false,
     },
     configureWebpack: {
         resolve: {
