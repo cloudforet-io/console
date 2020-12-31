@@ -64,7 +64,7 @@ export default {
         const state = reactive({
             animation: null as any,
             lottieRef: null as any,
-            loader: computed<() => Promise<any>>(() => () => import(`./p-lotties/${props.name}.json`)) as unknown as () => Promise<any>,
+            fileName: computed(() => `./p-lotties/${props.name}.json`),
         });
 
         let stopWatch: any;
@@ -72,7 +72,7 @@ export default {
         const loadLottie = async () => {
             if (!state.lottieRef) return;
 
-            const lottieFile = await state.loader();
+            const lottieFile = await import(state.fileName);
             if (lottieFile) {
                 state.animation = await lottie.loadAnimation({
                     name: props.name,
