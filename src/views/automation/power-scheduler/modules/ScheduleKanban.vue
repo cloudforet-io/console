@@ -126,17 +126,16 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import PI from '@/components/atoms/icons/PI.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import { SpaceConnector } from '@/lib/space-connector';
-import { store } from '@/store';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
+
+import {
+    PI, PIconTextButton, PLazyImg, PButton, PIconButton,
+} from '@spaceone/design-system';
+
 import ResourceGroupPage from '@/views/automation/power-scheduler/pages/ResourceGroupPage.vue';
 import { KanbanItem, ViewMode, ResourceGroupItem } from '@/views/automation/power-scheduler/type';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
+import { SpaceConnector } from '@/lib/space-connector';
+import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-
 
 interface ColumnType {
     title: string;
@@ -156,9 +155,9 @@ interface Props {
 export default {
     name: 'ScheduleKanban',
     components: {
+        ResourceGroupPage,
         PIconButton,
         PButton,
-        ResourceGroupPage,
         PIconTextButton,
         PI,
         PLazyImg,

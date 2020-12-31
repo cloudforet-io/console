@@ -18,6 +18,7 @@ import '@/styles/style.pcss';
 import config from '@/lib/config';
 import { SpaceConnector } from '@/lib/space-connector';
 import { GTag, setGtagUserID } from '@/lib/gtag';
+import SpaceDesignSystem from '@spaceone/design-system';
 import App from './App.vue';
 
 
@@ -37,6 +38,8 @@ Vue.use(Codemirror);
 Vue.prototype.$velocity = velocity;
 
 directive(Vue);
+
+Vue.use(SpaceDesignSystem);
 
 
 /** ********** INIT ************** */

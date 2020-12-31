@@ -196,10 +196,12 @@ import {
     watch,
 } from '@vue/composition-api';
 
-import PDatePagination from '@/components/organisms/date-pagination/PDatePagination.vue';
 import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import PI from '@/components/atoms/icons/PI.vue';
+
+import {
+    PI, PDatePagination, PButton,
+} from '@spaceone/design-system';
+
 import {
     RoutineRule,
     Rule, RULE_STATE, RULE_TYPE, TicketRule, ViewMode,
