@@ -86,15 +86,15 @@ module.exports = {
                     return opts;
                 });
 
-            config.externals([
-                '@vue/composition-api',
-                'vue-i18n',
-                'vue-svgicon',
-                'velocity-animate',
-                'vue-notification',
-                'vue-fragment',
-                'v-tooltip',
-                'vue-codemirror']);
+            // config.externals([
+            //     '@vue/composition-api',
+            //     'vue-i18n',
+            //     'vue-svgicon',
+            //     'velocity-animate',
+            //     'vue-notification',
+            //     'vue-fragment',
+            //     'v-tooltip',
+            //     'vue-codemirror']);
         }
     },
     parallel: false,
