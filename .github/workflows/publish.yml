@@ -2,9 +2,6 @@ name: Publish
 
 on:
   workflow_dispatch:
-    inputs:
-      tags:
-        description: 'Publish manually'
   push:
     tags:
       - v*
