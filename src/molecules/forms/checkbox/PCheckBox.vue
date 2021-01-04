@@ -7,7 +7,7 @@
         <slot :slot-scope="$props" name="icon">
             <p-i width="1.25rem" height="1.25rem"
                  :class="iconClass"
-                 :color="isSelected ? undefined : 'inherit transparent'"
+                 :color="isSelected||disabled ? undefined : 'inherit transparent'"
                  :name="iconName"
             />
         </slot>
@@ -117,7 +117,7 @@ export default {
             @apply text-blue-500;
         }
         .check-icon {
-            @apply text-blue-500;
+            @apply text-gray-900;
         }
         .disabled {
             @apply text-gray-400;
