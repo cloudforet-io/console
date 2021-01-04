@@ -7,10 +7,11 @@
   "main": "dist/index.umd.min.js",
   "types": "types/index.d.ts",
   "files": [
-    "src/*",
-    "types/*",
-    "*.json",
-    "*.js"
+    "/dist/index.umd.min.js",
+    "/src/*",
+    "/types/*",
+    "/*.json",
+    "/*.js"
   ],
   "publishConfig": {
     "access": "public"
