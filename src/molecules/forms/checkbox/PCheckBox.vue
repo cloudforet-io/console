@@ -6,12 +6,15 @@
         <input type="checkbox">
         <slot :slot-scope="$props" name="icon">
             <p-i width="1.25rem" height="1.25rem"
-                 :class="iconClass"
+                 class="check-icon"
+                 :class="{disabled,invalid}"
                  :color="isSelected||disabled ? undefined : 'inherit transparent'"
                  :name="iconName"
             />
         </slot>
-        <span v-if="$scopedSlots.default" :class="textClass"
+        <span v-if="$scopedSlots.default"
+              class="text"
+              :class="{disabled,invalid}"
               @click.stop="onClick"
         >
             <slot name="default" />
@@ -74,16 +77,6 @@ export default {
                 }
             }
         };
-        const textClass = computed(() => {
-            if (props.disabled) return 'disabled text';
-            if (props.invalid) return 'invalid text';
-            return 'text';
-        });
-        const iconClass = computed(() => {
-            if (props.disabled) return 'disabled check-icon';
-            if (props.invalid) return 'invalid check-icon';
-            return 'check-icon';
-        });
         const iconName = computed(() => {
             if (props.disabled) return 'ic_checkbox--disabled';
             if (state.isSelected) return 'ic_checkbox--checked';
@@ -93,8 +86,6 @@ export default {
         return {
             ...toRefs(state),
             onClick,
-            textClass,
-            iconClass,
             iconName,
         };
     },

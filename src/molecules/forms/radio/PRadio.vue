@@ -1,21 +1,23 @@
 <template>
     <span class="p-radio"
-          :class="{
-              selected: isSelected,
-              disabled, invalid,
-          }"
           @click.stop.prevent="onClick"
           v-on="$listeners"
     >
         <slot name="radio-left" />
         <input type="radio">
         <slot :slot-scope="$props" name="icon" :icon-name="iconName">
-            <p-i :class="iconClass" width="1.25rem" height="1.25rem"
+            <p-i class="radio-icon"
+                 :class="{disabled,invalid}"
+                 width="1.25rem" height="1.25rem"
                  :color="isSelected||disabled ? undefined : 'inherit transparent'"
                  :name="iconName"
             />
         </slot>
-        <span v-if="$scopedSlots.default" :class="textClass" @click.stop="onClick">
+        <span v-if="$scopedSlots.default"
+              class="text"
+              :class="{disabled,invalid}"
+              @click.stop="onClick"
+        >
             <slot name="default" />
         </span>
     </span>
@@ -60,16 +62,6 @@ export default {
                 }
             }
         };
-        const textClass = computed(() => {
-            if (props.disabled) return 'text disabled';
-            if (props.invalid) return 'text invalid';
-            return 'text';
-        });
-        const iconClass = computed(() => {
-            if (props.disabled) return 'radio-icon disabled';
-            if (props.invalid) return 'radio-icon invalid';
-            return 'radio-icon';
-        });
         const iconName = computed(() => {
             if (props.disabled) return 'ic_radio--disabled';
             if (isSelected.value) return 'ic_radio--checked';
@@ -78,8 +70,6 @@ export default {
         return {
             isSelected,
             iconName,
-            textClass,
-            iconClass,
             onClick,
         };
     },
