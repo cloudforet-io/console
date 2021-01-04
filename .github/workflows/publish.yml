@@ -2,6 +2,8 @@ name: Publish
 
 on:
   push:
+    branches:
+      - github-action
     tags:
       - v*
 
@@ -9,10 +11,9 @@ jobs:
   publish-npm:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
+      - uses: actions/checkout@v2
         with:
           submodules: true
-          token: ${{ secrets.REPOSITORY_ACCESS_KEY }}
       - uses: actions/setup-node@v1
         with:
           node-version: 12

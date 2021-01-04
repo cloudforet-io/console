@@ -20,6 +20,6 @@ types
 *.swp
 *.bak
 
-src/assets
+#src/assets
 
 node_modules.nosync/
