@@ -1,3 +1,3 @@
-[submodule "assets"]
+[submodule "src/assets"]
 	path = src/assets
 	url = https://github.com/spaceone-dev/console-assets.git
