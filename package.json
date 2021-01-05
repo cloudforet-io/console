@@ -1,13 +1,13 @@
 {
   "name": "@spaceone/design-system",
-  "version": "1.0.1-15",
+  "version": "1.0.1-16",
   "description": "SpaceONE Design System",
   "author": "SpaceONE",
   "license": "Apache-2.0",
   "main": "dist/index.umd.min.js",
   "types": "types/index.d.ts",
   "files": [
-    "/dist/index.umd.min.js",
+    "/dist/*",
     "/src/*",
     "/types/*",
     "/*.json",
