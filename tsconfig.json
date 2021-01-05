@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
+    "declarationDir": "dist",
     "target": "esnext",
     "module": "esnext",
     "strict": true,
