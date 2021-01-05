@@ -18,13 +18,13 @@ import Fragment from "vue-fragment";
 import Codemirror from "vue-codemirror";
 
 import webFontLoader from 'webfontloader';
-import { fontUrls, webFonts } from '@/components/styles/web-fonts';
+import { fontUrls, webFonts } from '@spaceone/design-system/src/styles/web-fonts';
 
 import tailwindConfig from './tailwind.config';
 import _ from 'lodash';
 import VTooltip from 'v-tooltip';
-import "@/components/styles/reset.pcss";
-import "@/components/styles/style.pcss";
+import "@spaceone/design-system/src/styles/reset.pcss";
+import "@spaceone/design-system/src/styles/style.pcss";
 import SpaceOneTheme from './SpaceOneTheme';
 
 
