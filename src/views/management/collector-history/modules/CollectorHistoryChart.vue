@@ -28,9 +28,7 @@ import {
     reactive, watch, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
-import PDatePagination from '@/components/organisms/date-pagination/PDatePagination.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
+import { PChartLoader, PDatePagination, PSkeleton } from '@spaceone/design-system';
 
 import { SpaceChart } from '@/lib/chart/space-chart';
 import { SpaceConnector } from '@/lib/space-connector';
