@@ -132,22 +132,24 @@ import {
 import { get } from 'lodash';
 import { render } from 'ejs';
 
+/* spaceone design system */
+import {
+    PRadio, PI, PHr, PPageNavigation, PPageTitle, PHorizontalLayout, PIconTextButton,
+    PDropdownMenuBtn, PTab, PDataTable, PDynamicLayout, PEmpty, PDoubleCheckModal,
+} from '@spaceone/design-system';
+import {
+    TableEventListeners,
+    TableFetchOptions,
+    TableTypeOptions,
+} from '@spaceone/design-system/src/organisms/dynamic-layout/templates/table/type';
+import { DynamicLayoutFieldHandler } from '@spaceone/design-system/src/organisms/dynamic-layout/type';
+import { MenuItem } from '@spaceone/design-system/src/organisms/context-menu/type';
+import { TabItem } from '@spaceone/design-system/src/organisms/tabs/tab/type';
+import { DynamicLayout } from '@spaceone/design-system/src/organisms/dynamic-layout/type/layout-schema';
+
 /* components */
 import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
-import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-import PHr from '@/components/atoms/hr/PHr.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
-import PEmpty from '@/components/atoms/empty/PEmpty.vue';
-import PDoubleCheckModal from '@/components/organisms/modals/double-check-modal/PDoubleCheckModal.vue';
 import ProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
 
 /* page modules */
@@ -163,20 +165,11 @@ import config from '@/lib/config';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 /* types */
-import {
-    TableEventListeners,
-    TableFetchOptions,
-    TableTypeOptions,
-} from '@/components/organisms/dynamic-layout/templates/table/type';
-import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { MenuItem } from '@/components/organisms/context-menu/type';
 import { TranslateResult } from 'vue-i18n';
-import { TabItem } from '@/components/organisms/tabs/tab/type';
 import { QueryHelper } from '@/lib/query';
-import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 
 interface ProjectItemResp {
     id: string;

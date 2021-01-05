@@ -92,15 +92,13 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import PI from '@/components/atoms/icons/PI.vue';
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
+
+import {
+    PI, PPaneLayout, PSkeleton, PIconButton, PIconTextButton, PRadio, PTree,
+} from '@spaceone/design-system';
+import { TreeItem, TreeNode } from '@spaceone/design-system/src/molecules/tree-node/type';
+
 import { PROJECT_MAIN_PAGE_NAME } from '@/routes/project/project-route';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
-import { TreeItem, TreeNode } from '@/components/molecules/tree-node/type';
-import PTree from '@/components/organisms/tree/PTree.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { ProjectItemResp } from '@/views/project/project/type';

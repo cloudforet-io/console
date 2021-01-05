@@ -10,7 +10,7 @@
 <script lang="ts">
 
 import { reactive, toRefs, watch } from '@vue/composition-api';
-import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
+import { PDynamicLayout } from '@spaceone/design-system';
 import { SpaceConnector } from '@/lib/space-connector';
 
 export default {

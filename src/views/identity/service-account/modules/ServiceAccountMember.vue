@@ -30,12 +30,11 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
-import PBadge from '@/components/atoms/badges/PBadge.vue';
+import {
+    PSearchTable, PPanelTop, PTextList, PBadge,
+} from '@spaceone/design-system';
+import { Options, SearchTableListeners } from '@spaceone/design-system/src/organisms/tables/search-table/type';
 
-import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';

@@ -91,23 +91,20 @@
 </template>
 
 <script lang="ts">
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
-import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
-
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+
+import {
+    PPaneLayout, PButton, PPageNavigation, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle,
+} from '@spaceone/design-system';
+
 import { map } from 'lodash';
 import { languages } from '@/store/modules/user/config';
 import { LanguageCode, Timezone, UpdateUserRequest } from '@/store/modules/user/type';
 import { TranslateResult } from 'vue-i18n';
-import PButton from '@/components/atoms/buttons/PButton.vue';
 import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 
 export default {
     name: 'UserAccountPage',
