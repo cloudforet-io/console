@@ -166,34 +166,28 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-
-
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import {
+    PPageTitle, PPaneLayout, PFieldGroup, PTextInput, PSelectDropdown,
+    PButton, PQuerySearchTags, PTableCheckModal, PDynamicLayout,
+    // types
+    QuerySearchTableFetchOptions, QuerySearchTableListeners,
+    QuerySearchTableTypeOptions, DynamicLayoutFieldHandler,
+} from '@spaceone/design-system';
+
+
 import { makeProxy } from '@/lib/compostion-util';
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
-import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
-import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import {
-    QuerySearchTableFetchOptions, QuerySearchTableListeners,
-    QuerySearchTableTypeOptions,
-} from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { forEach, camelCase, findIndex } from 'lodash';
 import { store } from '@/store';
-import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import PQuerySearchTags from '@/components/organisms/search/query-search-tags/PQuerySearchTags.vue';
-import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import { showErrorMessage } from '@/lib/util';
 import { QueryHelper } from '@/lib/query';
 import { ResourceGroup, Resource, ResourceGroupItem } from '../type';

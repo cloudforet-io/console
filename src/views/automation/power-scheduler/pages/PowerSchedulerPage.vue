@@ -82,10 +82,8 @@ import {
     computed, reactive, toRefs, getCurrentInstance,
 } from '@vue/composition-api';
 
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
-
 import {
-    PSelectableList, PPageNavigation, PIconTextButton, PHr,
+    PSelectableList, PPageNavigation, PIconTextButton, PHr, PLottie
 } from '@spaceone/design-system';
 
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';

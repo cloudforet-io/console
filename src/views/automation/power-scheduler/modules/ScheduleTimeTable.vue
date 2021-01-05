@@ -196,10 +196,8 @@ import {
     watch,
 } from '@vue/composition-api';
 
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
-
 import {
-    PI, PDatePagination, PButton,
+    PI, PDatePagination, PButton, PLottie,
 } from '@spaceone/design-system';
 
 import {
