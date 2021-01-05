@@ -37,23 +37,24 @@
 </template>
 
 <script lang="ts">
-import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
 import {
     makeProxy,
 } from '@/lib/compostion-util';
-import PTag from '@/components/molecules/tags/PTag.vue';
+
 import {
     ComponentRenderProxy,
     getCurrentInstance,
     reactive, ref, Ref, toRefs,
 } from '@vue/composition-api';
+
+import { PButtonModal, PTag, PSearchTable } from '@spaceone/design-system';
+import { SearchTableListeners, Options } from '@spaceone/design-system/dist/src/organisms/tables/search-table/type';
+
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
 import { isEqual } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { SearchTableListeners, Options } from '@/components/organisms/tables/search-table/type';
 
 const tagList = (proxyTags?: Ref<string[]>|null, checkDuplicate = true, eventBus?: any, eventName?: string, addTagCallBack?: any) => {
     const tags: Ref<any[]> = proxyTags || ref([]);

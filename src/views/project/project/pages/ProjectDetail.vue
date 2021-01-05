@@ -134,35 +134,27 @@ import {
     computed, reactive, ref, toRefs, watch, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 
+import {
+    PSearchTable, PTab, PPageTitle, PTableCheckModal, PButtonModal, PPanelTop,
+    PTextList, PIconButton, PCopyButton, PIconTextButton, PPageNavigation, PButton, PBadge,
+} from '@spaceone/design-system';
+import { Options, SearchTableListeners } from '@spaceone/design-system/dist/src/organisms/tables/search-table/type';
+import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
+
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
 import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
 import ProjectDashboard from '@/views/project/project/pages/ProjectDashboard.vue';
-import ProjectReportTab from '@/views/project/project/modules/ProjectReportTab.vue';
-import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
-import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
-import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import PBadge from '@/components/atoms/badges/PBadge.vue';
 
+import ProjectReportTab from '@/views/project/project/modules/ProjectReportTab.vue';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectModel } from '@/views/project/project/type';
 import { TranslateResult } from 'vue-i18n';
-import { TabItem } from '@/components/organisms/tabs/tab/type';
 
 
 export default {

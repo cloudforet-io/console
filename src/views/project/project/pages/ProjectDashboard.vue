@@ -58,6 +58,8 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
+import { PTab } from '@spaceone/design-system';
+
 import ProjectPersonalHealthDashboard from '@/views/common/components/widgets/personal-health-dashboard/ProjectPersonalHealthDashboard.vue';
 import AllSummary from '@/views/common/components/widgets/all-summary/AllSummary.vue';
 import CloudServices from '@/views/common/components/widgets/cloud-services/CloudServices.vue';
@@ -65,7 +67,6 @@ import DailyUpdates from '@/views/common/components/widgets/daily-updates/DailyU
 import ServiceAccountsTable from '@/views/common/components/widgets/service-accounts-table/ServiceAccountsTable.vue';
 import ResourcesByRegion from '@/views/common/components/widgets/resources-by-region/ResourcesByRegion.vue';
 import SimplifiedTrustedAdvisor from '@/views/common/components/widgets/trusted-advisor/SimplifiedTrustedAdvisor.vue';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
 
 import {
     blue, secondary, secondary1, peacock,

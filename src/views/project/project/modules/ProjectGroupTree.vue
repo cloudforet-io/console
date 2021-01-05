@@ -51,19 +51,19 @@
 </template>
 
 <script lang="ts">
-
-import PTreeNode from '@/components/molecules/tree-node/PTreeNode.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-import {
-    TreeItem, TreeNode,
-} from '@/components/molecules/tree-node/type';
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import PTree from '@/components/organisms/tree/PTree.vue';
-import { Tree } from '@/components/organisms/tree/type';
+
+import {
+    PTreeNode, PI, PIconButton, PTree,
+} from '@spaceone/design-system';
+import {
+    TreeItem, TreeNode,
+} from '@spaceone/design-system/dist/src/molecules/tree-node/type';
+import { Tree } from '@spaceone/design-system/dist/src/organisms/tree/type';
+
 import { findIndex, reverse } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';
 import {

@@ -33,9 +33,8 @@ import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
-import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
+import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
+
 import { ProjectGroup } from '@/views/project/project/type';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
@@ -113,7 +112,7 @@ export default {
             showValidation: false,
         });
 
-        const projectGroupNameApiQuery = new ApiQueryHelper().setOnly('name')
+        const projectGroupNameApiQuery = new ApiQueryHelper().setOnly('name');
         const getProjectGroupNames = async () => {
             const res = await SpaceConnector.client.identity.projectGroup.list({
                 query: projectGroupNameApiQuery.data,

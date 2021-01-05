@@ -153,20 +153,16 @@ import {
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 
-import PI from '@/components/atoms/icons/PI.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
+import {
+    PI, PPageTitle, PPageNavigation, PIconTextButton, PButtonModal, PButton, PDropdownMenuBtn,
+} from '@spaceone/design-system';
+import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
+
 import ProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import ProjectSearch from '@/views/project/project/modules/ProjectSearch.vue';
 import ProjectGroupTree from '@/views/project/project/modules/ProjectGroupTree.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import { MenuItem } from '@/components/organisms/context-menu/type';
 import { SpaceConnector } from '@/lib/space-connector';
-import { TranslateResult } from 'vue-i18n';
 import {
     ProjectGroup, ProjectItemResp, ProjectTreeItem,
 } from '@/views/project/project/type';
