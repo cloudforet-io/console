@@ -141,11 +141,11 @@ import {
     TableEventListeners,
     TableFetchOptions,
     TableTypeOptions,
-} from '@spaceone/design-system/src/organisms/dynamic-layout/templates/table/type';
-import { DynamicLayoutFieldHandler } from '@spaceone/design-system/src/organisms/dynamic-layout/type';
-import { MenuItem } from '@spaceone/design-system/src/organisms/context-menu/type';
-import { TabItem } from '@spaceone/design-system/src/organisms/tabs/tab/type';
-import { DynamicLayout } from '@spaceone/design-system/src/organisms/dynamic-layout/type/layout-schema';
+} from '@spaceone/design-system/dist/src/organisms/dynamic-layout/templates/table/type';
+import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type';
+import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
+import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
+import { DynamicLayout } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type/layout-schema';
 
 /* components */
 import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';

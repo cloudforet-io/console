@@ -158,12 +158,12 @@ import {
     PHorizontalLayout, PDropdownMenuBtn, PTab, PDynamicLayout,
     PPageTitle, PLazyImg, PPageNavigation, PIconTextButton, PEmpty, PHr,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/src/organisms/context-menu/type';
+import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
 import {
     QuerySearchTableFetchOptions, QuerySearchTableListeners, QuerySearchTableTypeOptions,
-} from '@spaceone/design-system/src/organisms/dynamic-layout/templates/query-search-table/type';
-import { DynamicLayoutFieldHandler } from '@spaceone/design-system/src/organisms/dynamic-layout/type';
-import { DynamicLayout } from '@spaceone/design-system/src/organisms/dynamic-layout/type/layout-schema';
+} from '@spaceone/design-system/dist/src/organisms/dynamic-layout/templates/query-search-table/type';
+import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type';
+import { DynamicLayout } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type/layout-schema';
 
 import ServerMain from '@/views/inventory/server/modules/ServerMain.vue';
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';

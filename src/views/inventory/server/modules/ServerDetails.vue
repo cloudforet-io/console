@@ -35,10 +35,10 @@ import {
 import { PButtonTab, PDynamicLayout } from '@spaceone/design-system';
 import {
     DynamicLayoutEventListeners, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
-} from '@spaceone/design-system/src/organisms/dynamic-layout/type';
-import { DynamicLayout, DynamicLayoutType } from '@spaceone/design-system/src/organisms/dynamic-layout/type/layout-schema';
-import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/src/organisms/search/query-search/type';
-import { TabItem } from '@spaceone/design-system/src/organisms/tabs/tab/type';
+} from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type';
+import { DynamicLayout, DynamicLayoutType } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type/layout-schema';
+import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
+import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';

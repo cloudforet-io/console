@@ -177,8 +177,8 @@ import {
 import {
     QuerySearchTableFetchOptions, QuerySearchTableListeners,
     QuerySearchTableTypeOptions,
-} from '@spaceone/design-system/src/organisms/dynamic-layout/templates/query-search-table/type';
-import { DynamicLayoutFieldHandler } from '@spaceone/design-system/src/organisms/dynamic-layout/type';
+} from '@spaceone/design-system/dist/src/organisms/dynamic-layout/templates/query-search-table/type';
+import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type';
 
 import { makeProxy } from '@/lib/compostion-util';
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';

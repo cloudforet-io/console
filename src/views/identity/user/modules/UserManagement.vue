@@ -171,11 +171,11 @@ import {
     PHorizontalLayout, PDropdownMenuBtn, PTab, PDataTable, PTableCheckModal, PPageTitle,
 } from '@spaceone/design-system';
 
-import { MenuItem } from '@spaceone/design-system/src/organisms/context-menu/type';
-import { KeyItemSet } from '@spaceone/design-system/src/organisms/search/query-search/type';
-import { TabItem } from '@spaceone/design-system/src/organisms/tabs/tab/type';
-import { Options } from '@spaceone/design-system/src/organisms/tables/query-search-table/type';
-import { Timestamp } from '@spaceone/design-system/src/util/type';
+import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
+import { KeyItemSet } from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
+import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
+import { Options } from '@spaceone/design-system/dist/src/organisms/tables/query-search-table/type';
+import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
 
 import UserForm from '@/views/identity/user/modules/UserForm.vue';
 import UserDetail from '@/views/identity/user/modules/UserDetail.vue';

@@ -31,7 +31,7 @@ import {
 import {
     PTextList, PBadge, PPanelTop, PSearchTable,
 } from '@spaceone/design-system';
-import { Options, SearchTableListeners } from '@spaceone/design-system/src/organisms/tables/search-table/type';
+import { Options, SearchTableListeners } from '@spaceone/design-system/dist/src/organisms/tables/search-table/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';

@@ -96,7 +96,7 @@ import {
 import {
     PI, PPaneLayout, PSkeleton, PIconButton, PIconTextButton, PRadio, PTree,
 } from '@spaceone/design-system';
-import { TreeItem, TreeNode } from '@spaceone/design-system/src/molecules/tree-node/type';
+import { TreeItem, TreeNode } from '@spaceone/design-system/dist/src/molecules/tree-node/type';
 
 import { PROJECT_MAIN_PAGE_NAME } from '@/routes/project/project-route';
 import { SpaceConnector } from '@/lib/space-connector';

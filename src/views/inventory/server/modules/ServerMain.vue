@@ -141,10 +141,10 @@ import {
 import {
     QuerySearchTableFetchOptions,
     QuerySearchTableListeners, QuerySearchTableTypeOptions,
-} from '@spaceone/design-system/src/organisms/dynamic-layout/templates/query-search-table/type';
-import { DynamicLayoutFieldHandler } from '@spaceone/design-system/src/organisms/dynamic-layout/type';
-import { DynamicLayout } from '@spaceone/design-system/src/organisms/dynamic-layout/type/layout-schema';
-import { MenuItem } from '@spaceone/design-system/src/organisms/context-menu/type';
+} from '@spaceone/design-system/dist/src/organisms/dynamic-layout/templates/query-search-table/type';
+import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type';
+import { DynamicLayout } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type/layout-schema';
+import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
 
 import CollectModal from '@/views/common/components/collect-modal/CollectModal.vue';
 import ServerDetails from '@/views/inventory/server/modules/ServerDetails.vue';

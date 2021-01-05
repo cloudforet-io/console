@@ -143,7 +143,7 @@ import {
     PPageTitle, PJsonSchemaForm, PTab, PCollapsiblePanel, PFieldGroup, PLazyImg,
     PPageNavigation, PPaneLayout, PIconTextButton, PRadio, PMarkdown, PTextEditor, PButton, PTextInput,
 } from '@spaceone/design-system';
-import { TabItem } from '@spaceone/design-system/src/organisms/tabs/tab/type';
+import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
 
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import ProjectTreePanel from '@/views/identity/service-account/modules/ProjectTreePanel.vue';
