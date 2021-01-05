@@ -134,29 +134,26 @@ import {
     ComponentRenderProxy, getCurrentInstance, computed,
 } from '@vue/composition-api';
 
+import {
+    PPageTitle, PHorizontalLayout, PDynamicLayout, PIconTextButton,
+    PDropdownMenuBtn, PTab, PTableCheckModal, PEmpty,
+} from '@spaceone/design-system';
+import {
+    QuerySearchTableFetchOptions,
+    QuerySearchTableListeners, QuerySearchTableTypeOptions,
+} from '@spaceone/design-system/src/organisms/dynamic-layout/templates/query-search-table/type';
+import { DynamicLayoutFieldHandler } from '@spaceone/design-system/src/organisms/dynamic-layout/type';
+import { DynamicLayout } from '@spaceone/design-system/src/organisms/dynamic-layout/type/layout-schema';
+import { MenuItem } from '@spaceone/design-system/src/organisms/context-menu/type';
+
 import CollectModal from '@/views/common/components/collect-modal/CollectModal.vue';
 import ServerDetails from '@/views/inventory/server/modules/ServerDetails.vue';
 import ServerMember from '@/views/inventory/server/modules/ServerMember.vue';
 import ServerHistory from '@/views/inventory/server/modules/ServerHistory.vue';
 import Monitoring from '@/views/common/components/monitoring/Monitoring.vue';
 import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
 import ProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
-import PEmpty from '@/components/atoms/empty/PEmpty.vue';
 import { MonitoringProps, MonitoringResourceType } from '@/views/common/components/monitoring/type';
-import {
-    QuerySearchTableFetchOptions,
-    QuerySearchTableListeners, QuerySearchTableTypeOptions,
-} from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
-import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
-import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
-import { MenuItem } from '@/components/organisms/context-menu/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';

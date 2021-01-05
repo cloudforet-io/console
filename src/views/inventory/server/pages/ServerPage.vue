@@ -13,9 +13,10 @@ import {
     computed, getCurrentInstance, reactive,
 } from '@vue/composition-api';
 
+import { PPageNavigation } from '@spaceone/design-system';
+
 import ServerMain from '@/views/inventory/server/modules/ServerMain.vue';
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
 import { store } from '@/store';
 
 

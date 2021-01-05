@@ -154,6 +154,17 @@ import {
     reactive, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
+import {
+    PHorizontalLayout, PDropdownMenuBtn, PTab, PDynamicLayout,
+    PPageTitle, PLazyImg, PPageNavigation, PIconTextButton, PEmpty, PHr,
+} from '@spaceone/design-system';
+import { MenuItem } from '@spaceone/design-system/src/organisms/context-menu/type';
+import {
+    QuerySearchTableFetchOptions, QuerySearchTableListeners, QuerySearchTableTypeOptions,
+} from '@spaceone/design-system/src/organisms/dynamic-layout/templates/query-search-table/type';
+import { DynamicLayoutFieldHandler } from '@spaceone/design-system/src/organisms/dynamic-layout/type';
+import { DynamicLayout } from '@spaceone/design-system/src/organisms/dynamic-layout/type/layout-schema';
+
 import ServerMain from '@/views/inventory/server/modules/ServerMain.vue';
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 import ProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
@@ -163,24 +174,8 @@ import CloudServiceAdmin from '@/views/inventory/cloud-service/modules/CloudServ
 import CloudServiceHistory from '@/views/inventory/cloud-service/modules/CloudServiceHistory.vue';
 import SCollectModal from '@/views/common/components/collect-modal/CollectModal.vue';
 import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
-import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PEmpty from '@/components/atoms/empty/PEmpty.vue';
-import PHr from '@/components/atoms/hr/PHr.vue';
 import { MonitoringProps, MonitoringResourceType } from '@/views/common/components/monitoring/type';
 import { ProjectItemResp } from '@/views/project/project/type';
-import { MenuItem } from '@/components/organisms/context-menu/type';
-import {
-    QuerySearchTableFetchOptions, QuerySearchTableListeners, QuerySearchTableTypeOptions,
-} from '@/components/organisms/dynamic-layout/templates/query-search-table/type';
-import { DynamicLayoutFieldHandler } from '@/components/organisms/dynamic-layout/type';
-import { DynamicLayout } from '@/components/organisms/dynamic-layout/type/layout-schema';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';

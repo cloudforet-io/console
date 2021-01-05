@@ -173,11 +173,12 @@ import {
 import {
     PPageTitle, PPaneLayout, PFieldGroup, PTextInput, PSelectDropdown,
     PButton, PQuerySearchTags, PTableCheckModal, PDynamicLayout,
-    // types
-    QuerySearchTableFetchOptions, QuerySearchTableListeners,
-    QuerySearchTableTypeOptions, DynamicLayoutFieldHandler,
 } from '@spaceone/design-system';
-
+import {
+    QuerySearchTableFetchOptions, QuerySearchTableListeners,
+    QuerySearchTableTypeOptions,
+} from '@spaceone/design-system/src/organisms/dynamic-layout/templates/query-search-table/type';
+import { DynamicLayoutFieldHandler } from '@spaceone/design-system/src/organisms/dynamic-layout/type';
 
 import { makeProxy } from '@/lib/compostion-util';
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
@@ -190,6 +191,7 @@ import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { showErrorMessage } from '@/lib/util';
 import { QueryHelper } from '@/lib/query';
+
 import { ResourceGroup, Resource, ResourceGroupItem } from '../type';
 
 

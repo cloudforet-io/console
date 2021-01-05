@@ -31,13 +31,15 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import PDynamicLayout from '@/components/organisms/dynamic-layout/PDynamicLayout.vue';
-import PButtonTab from '@/components/organisms/tabs/button-tab/PButtonTab.vue';
-import { DynamicLayout, DynamicLayoutType } from '@/components/organisms/dynamic-layout/type/layout-schema';
-import { KeyItemSet, ValueHandlerMap } from '@/components/organisms/search/query-search/type';
+
+import { PDynamicLayout, PButtonTab } from '@spaceone/design-system';
+import { DynamicLayout, DynamicLayoutType } from '@spaceone/design-system/src/organisms/dynamic-layout/type/layout-schema';
+import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/src/organisms/search/query-search/type';
+import { TabItem } from '@spaceone/design-system/src/organisms/tabs/tab/type';
 import {
     DynamicLayoutEventListeners, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
-} from '@/components/organisms/dynamic-layout/type';
+} from '@spaceone/design-system/src/organisms/dynamic-layout/type';
+
 import { getApiActionByLayoutType, makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
@@ -45,7 +47,6 @@ import config from '@/lib/config';
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { TabItem } from '@/components/organisms/tabs/tab/type';
 import { find } from 'lodash';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {

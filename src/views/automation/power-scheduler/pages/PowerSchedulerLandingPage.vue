@@ -143,7 +143,7 @@ import {
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 
 import {
-    PI, PHr, PProgressBar, PPageTitle, PPageNavigation, PSearchGridLayout, PIconTextButton
+    PI, PHr, PProgressBar, PPageTitle, PPageNavigation, PSearchGridLayout, PIconTextButton,
 } from '@spaceone/design-system';
 
 /* Page Modules */
