@@ -54,9 +54,9 @@ import {
     toRefs,
     defineComponent, ComponentRenderProxy, computed,
 } from '@vue/composition-api';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
+
+import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
+
 import { TranslateResult } from 'vue-i18n';
 
 export default defineComponent({

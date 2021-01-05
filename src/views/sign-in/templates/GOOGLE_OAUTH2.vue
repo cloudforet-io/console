@@ -9,9 +9,11 @@ import {
     ComponentRenderProxy,
     defineComponent, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import {getAuth2, googleOauthSignOut} from "@/views/common/pages/SignOut.vue";
-import {store} from "@/store";
+
+import { PButton } from '@spaceone/design-system';
+
+import { getAuth2, googleOauthSignOut } from '@/views/common/pages/SignOut.vue';
+import { store } from '@/store';
 
 // @ts-ignore
 const { gapi } = window;

@@ -45,7 +45,7 @@
                          @click="hideErrorMessage"
                     />
                 </div>
-                <i-d-p-w-sign-in @on-sign-in="signIn" class="id-pw-wrapper"/>
+                <i-d-p-w-sign-in class="id-pw-wrapper" @on-sign-in="signIn" />
                 <div v-if="component" class="btn-divider">
                     <span>{{ $t('COMMON.SIGN_IN.OR') }}</span>
                 </div>
@@ -67,14 +67,12 @@
 import {
     toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
-import { store } from '@/store';
 
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import PBadge from '@/components/atoms/badges/PBadge.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
+import {
+    PButton, PTextInput, PLottie, PBadge, PI, PAnchor,
+} from '@spaceone/design-system';
+
+import { store } from '@/store';
 import IDPWSignIn from '@/views/sign-in/templates/ID_PW.vue';
 
 import { setGtagUserID } from '@/lib/gtag';
