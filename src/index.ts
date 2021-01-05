@@ -14,7 +14,7 @@ import componentKO from '@/translations/language-pack/ko.json';
 import componentEN from '@/translations/language-pack/en.json';
 import componentJA from '@/translations/language-pack/ja.json';
 
-import * as components from '@/components';
+// import * as components from '@/components';
 
 export * from '@/components';
 
@@ -49,18 +49,18 @@ const SpaceoneDS: PluginObject<SpaceoneDSOptions> = {
         _Vue.use(Codemirror);
 
 
-        const i18n = new VueI18n({
-            locale: 'en', // set locale
-            fallbackLocale: 'en',
-            messages: {
-                en: removeEmpty({ COMPONENT: componentEN }),
-                ko: removeEmpty({ COMPONENT: componentKO }),
-                jp: removeEmpty({ COMPONENT: componentJA }),
-            },
-            silentFallbackWarn: true,
-        });
-
-        new _Vue({ i18n }).$mount(options?.appSelector || '#app');
+        // const i18n = new VueI18n({
+        //     locale: 'en', // set locale
+        //     fallbackLocale: 'en',
+        //     messages: {
+        //         en: removeEmpty({ COMPONENT: componentEN }),
+        //         ko: removeEmpty({ COMPONENT: componentKO }),
+        //         jp: removeEmpty({ COMPONENT: componentJA }),
+        //     },
+        //     silentFallbackWarn: true,
+        // });
+        //
+        // new _Vue({ i18n }).$mount(options?.appSelector || '#app');
     },
 };
 
