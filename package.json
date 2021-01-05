@@ -5,7 +5,7 @@
   "author": "SpaceONE",
   "license": "Apache-2.0",
   "main": "dist/index.umd.min.js",
-  "types": "dist/index.d.ts",
+  "typings": "dist/index.d.ts",
   "publishConfig": {
     "access": "public"
   },
