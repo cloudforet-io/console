@@ -68,6 +68,8 @@ const SpaceoneDS: PluginObject<SpaceoneDSOptions> = {
 export default SpaceoneDS;
 
 
+export { default as PBackToTopButton } from './atoms/back-to-top-button/PBackToTopButton.vue';
+export { default as PBadge } from './atoms/badges/PBadge.vue';
 export { default as PButton } from './atoms/buttons/PButton.vue';
 export { default as PEmpty } from './atoms/empty/PEmpty.vue';
 export { default as PHr } from './atoms/hr/PHr.vue';
