@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const webpackBundleAnalyzer = require('webpack-bundle-analyzer');
+// eslint-disable-next-line import/no-extraneous-dependencies
+const CopyPlugin = require('copy-webpack-plugin');
 const postcssConfig = require('./postcss.config');
 
 
@@ -60,6 +62,12 @@ module.exports = {
         },
         devtool: 'source-map',
         plugins: [
+            new CopyPlugin([{
+                from: './public/**/*',
+                transformPath(targetPath) {
+                    return targetPath.slice(7);
+                },
+            }]),
             ...extraPlugins,
         ],
     },
@@ -72,31 +80,29 @@ module.exports = {
         // declaration (.d.ts) files.
         //
         // Discussed here https://github.com/vuejs/vue-cli/issues/1081
-        if (process.env.NODE_ENV === 'production') {
-            config.module.rule('ts').uses.delete('cache-loader');
+        config.module.rule('ts').uses.delete('cache-loader');
 
-            config.module
-                .rule('ts')
-                .use('ts-loader')
-                .loader('ts-loader')
-                .tap((opts) => {
-                    opts.transpileOnly = false;
-                    opts.happyPackMode = false;
-                    opts.configFile = 'tsconfig.json';
-                    return opts;
-                });
+        config.module
+            .rule('ts')
+            .use('ts-loader')
+            .loader('ts-loader')
+            .tap((opts) => {
+                opts.transpileOnly = false;
+                opts.happyPackMode = false;
+                opts.configFile = 'tsconfig.json';
+                return opts;
+            });
 
-            config.externals([
-                '@vue/composition-api',
-                'vue-i18n',
-                'vue-svgicon',
-                'velocity-animate',
-                'vue-notification',
-                'vue-fragment',
-                'v-tooltip',
-                'vue-codemirror',
-            ]);
-        }
+        config.externals([
+            '@vue/composition-api',
+            'vue-i18n',
+            'vue-svgicon',
+            'velocity-animate',
+            'vue-notification',
+            'vue-fragment',
+            'v-tooltip',
+            'vue-codemirror',
+        ]);
     },
     parallel: false,
 };

@@ -64,7 +64,7 @@ export default {
         const state = reactive({
             animation: null as any,
             lottieRef: null as any,
-            fileName: computed(() => `./p-lotties/${props.name}.json`),
+            fileName: computed(() => `p-lotties/${props.name}.json`),
         });
 
         let stopWatch: any;
