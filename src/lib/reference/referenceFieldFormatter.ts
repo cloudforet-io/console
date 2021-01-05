@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 import { Reference, ReferenceType } from '@/lib/reference/type';
-import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
+import { DynamicFieldProps } from '@spaceone/design-system/dist/src/organisms/dynamic-field/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 import router from '@/routes';

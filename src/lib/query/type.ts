@@ -1,4 +1,4 @@
-import { OperatorType } from '@/components/organisms/search/query-search/type';
+import { OperatorType } from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
 
 export type RawQuery = [any] | [any|null, string] | [any|null, string, RawQueryOperator]
 
