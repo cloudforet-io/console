@@ -25,7 +25,7 @@
     "build-storybook": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook -s ./public -o .out",
     "storybook": "start-storybook -p 6006 -s ./public",
     "icon": "vsvg -s ./src/assets/icons -t ./src/components/atoms/icons/p-icons --es6",
-    "lottie": "cp -r ./src/assets/lottiefiles/* ./src/components/molecules/lottie/p-lotties",
+    "lottie": "cp -r ./src/assets/lottiefiles/* ./public/p-lotties",
     "analyze": "NODE_ENV=production VUE_APP_ANALYZE_MOD=true vue-cli-service build"
   },
   "dependencies": {
