@@ -75,10 +75,9 @@ import { range } from 'lodash';
 
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
+import { PSelectableItem, PSkeleton, PI } from '@spaceone/design-system';
+
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
-import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';

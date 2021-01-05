@@ -68,9 +68,9 @@ import {
     ComponentRenderProxy, getCurrentInstance,
 } from '@vue/composition-api';
 
+import { PDataTable, PI } from '@spaceone/design-system';
+
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';

@@ -61,10 +61,10 @@ import {
     toRefs, reactive, getCurrentInstance, ComponentRenderProxy, computed, watch,
 } from '@vue/composition-api';
 
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
-import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
+import {
+    PIconTextButton, PFieldGroup, PIconButton, PTextInput,
+} from '@spaceone/design-system';
+
 import {
     TagItem, TagValidation, TagsInputGroupProps, ValidationData,
 } from '@/views/common/components/tags/type';

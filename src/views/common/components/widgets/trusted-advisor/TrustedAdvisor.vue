@@ -100,10 +100,10 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { PTextPagination, PI } from '@spaceone/design-system';
+import { getAllPage } from '@spaceone/design-system/src/organisms/paginations/text-pagination/helper';
+
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
-import PTextPagination from '@/components/organisms/paginations/text-pagination/PTextPagination.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-import { getAllPage } from '@/components/organisms/paginations/text-pagination/helper';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { QueryHelper } from '@/lib/query';

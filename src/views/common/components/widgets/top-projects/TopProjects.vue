@@ -94,12 +94,11 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import {
+    PChartLoader, PDataTable, PIconTextButton, PSkeleton, PI,
+} from '@spaceone/design-system';
+
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
-import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { SpaceConnector } from '@/lib/space-connector';

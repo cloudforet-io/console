@@ -13,18 +13,18 @@
             <div v-else-if="data.length === 0" class="empty-content">
                 <div class="info-text">
                     <p>
-                        {{$t('COMMON.WIDGETS.HEALTH_DASHBOARD_DESC_1')}}
+                        {{ $t('COMMON.WIDGETS.HEALTH_DASHBOARD_DESC_1') }}
                     </p>
                     <br>
                     <p>
-                        {{$t('COMMON.WIDGETS.HEALTH_DASHBOARD_DESC_2')}}<br>
+                        {{ $t('COMMON.WIDGETS.HEALTH_DASHBOARD_DESC_2') }}<br>
                         <a target="_blank" href="mailto:support@spaceone.dev">support@spaceone.dev</a>
                     </p>
                 </div>
                 <div class="background-wrapper">
                     <img class="logo" src="@/assets/icons/ic_provider_aws.svg">
                     <p class="text">
-                        {{$t('COMMON.WIDGETS.HEALTH_DASHBOARD_DESC_3')}}
+                        {{ $t('COMMON.WIDGETS.HEALTH_DASHBOARD_DESC_3') }}
                     </p>
                 </div>
             </div>
@@ -77,11 +77,9 @@
 /* eslint-disable camelcase */
 import { reactive, toRefs, UnwrapRef } from '@vue/composition-api';
 
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
-import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
+import {
+    PWidgetLayout, PI, PGridLayout, PSelectableItem, PSkeleton,
+} from '@spaceone/design-system';
 
 import { SpaceConnector } from '@/lib/space-connector';
 

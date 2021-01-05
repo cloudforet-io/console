@@ -12,7 +12,7 @@
 </template>
 
 <script lang="ts">
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
+import { PPaneLayout } from '@spaceone/design-system';
 
 export default {
     name: 'WidgetLayout',

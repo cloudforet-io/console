@@ -86,24 +86,22 @@
 import {
     computed, onMounted, reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
-import PSelectBtnGroup from '@/components/organisms/buttons/select-btn-group/PSelectBtnGroup.vue';
+
+import {
+    PSelectBtnGroup, PSelectDropdown, PIconButton, PMetricChart, PGridLayout, PLottie, PButton,
+} from '@spaceone/design-system';
+
 import {
     blue, coral, green, peacock, violet, yellow,
 } from '@/styles/colors';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
 import {
     some, debounce, find, capitalize, chain, range, sortBy,
 } from 'lodash';
-import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import PMetricChart from '@/components/organisms/charts/metric-chart/PMetricChart.vue';
-import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
 import { MonitoringProps } from '@/views/common/components/monitoring/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { TimeStamp } from '@/models';
 import dayjs, { Dayjs } from 'dayjs';
-import {store} from '@/store';
+import { store } from '@/store';
 
 
 export enum DataSourceState {

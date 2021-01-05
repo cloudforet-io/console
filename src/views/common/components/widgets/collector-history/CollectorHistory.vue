@@ -37,11 +37,10 @@ import {
     computed, reactive, toRefs, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
-import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
+import {
+    PWidgetLayout, PChartLoader, PSkeleton, PI,
+} from '@spaceone/design-system';
+import { QueryTag } from '@spaceone/design-system/dist/src/organisms/search/query-search-tags/type';
 
 import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -89,7 +88,7 @@ export default {
             const item = event[0];
             if (item) {
                 const clickedData = state.data[item._index];
-                const queryTags: QueryTag[] = [];
+                const queryTags: any[] = [];
                 const selectedDate = dayjs(clickedData.date).format('YYYY-MM-DD');
                 queryTags.push({
                     key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },

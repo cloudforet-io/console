@@ -77,8 +77,12 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+
+import {
+    PDataTable,
+} from '@spaceone/design-system';
+
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
 import { gray, secondary, secondary1 } from '@/styles/colors';
 import { store } from '@/store';
 import { SpaceConnector } from '@/lib/space-connector';

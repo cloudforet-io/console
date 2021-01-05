@@ -40,10 +40,12 @@
 </template>
 
 <script lang="ts">
-import PI from '@/components/atoms/icons/PI.vue';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+
+import { PI } from '@spaceone/design-system';
+
 import { FavoriteItem } from '@/store/modules/favorite/type';
 import { TranslateResult } from 'vue-i18n';
 import { FavoritesWidgetProps } from '@/views/common/components/widgets/favorites/type';

@@ -17,9 +17,9 @@
                     <p class="circle" :style="{background: providers['aws'].color }" /><span>AWS</span>
                     <p class="circle" :style="{background: providers['google_cloud'].color }" /><span>Google</span>
                     <p class="circle" :style="{background: providers['azure'].color }" /><span>Azure</span>
-<!--                    <div v-for="(item) in chartState.providerList" :key="item.name">-->
-<!--                        <p class="circle" :style="{background: item.color}" /><span>{{ item.name }}</span>-->
-<!--                    </div>-->
+                    <!--                    <div v-for="(item) in chartState.providerList" :key="item.name">-->
+                    <!--                        <p class="circle" :style="{background: item.color}" /><span>{{ item.name }}</span>-->
+                    <!--                    </div>-->
                 </div>
             </div>
             <div v-if="!loading && filteredData.length > 0" class="col-span-12 lg:col-span-3 resource-info-wrapper">
@@ -71,18 +71,18 @@ import {
     computed, getCurrentInstance, onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import { PChartLoader, PSkeleton, PProgressBar } from '@spaceone/design-system';
+
 import { range } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import PProgressBar from '@/components/molecules/progress-bar/PProgressBar.vue';
 import { store } from '@/store';
-import { coral, gray } from '@/components/styles/colors';
+import { coral, gray } from '@/styles/colors';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 import { Location } from 'vue-router';
 import { QueryHelper } from '@/lib/query';
-import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
 
 am4core.useTheme(am4themesAnimated);
 

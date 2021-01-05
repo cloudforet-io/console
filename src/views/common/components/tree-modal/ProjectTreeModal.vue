@@ -56,13 +56,14 @@ import {
     computed,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { makeProxy } from '@/components/util/composition-helpers';
-import PI from '@/components/atoms/icons/PI.vue';
-import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import { TreeItem, TreeNode } from '@/components/molecules/tree-node/type';
+
+import {
+    PI, PButtonModal, PRadio, PTree,
+} from '@spaceone/design-system';
+import { makeProxy } from '@spaceone/design-system/src/util/composition-helpers';
+import { TreeItem, TreeNode } from '@spaceone/design-system/dist/src/molecules/tree-node/type';
+
 import { ProjectItemResp, TreeSearchResp } from '@/views/project/project/type';
-import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
-import PTree from '@/components/organisms/tree/PTree.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { findIndex } from 'lodash';
 

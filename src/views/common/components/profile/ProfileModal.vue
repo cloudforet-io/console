@@ -111,10 +111,9 @@ import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
-import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
+import {
+    PButtonModal, PFieldGroup, PTextInput, PSelectDropdown,
+} from '@spaceone/design-system';
 
 import { makeProxy } from '@/lib/compostion-util';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';

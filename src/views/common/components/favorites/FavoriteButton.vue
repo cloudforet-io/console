@@ -14,7 +14,9 @@
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import PI from '@/components/atoms/icons/PI.vue';
+
+import { PI } from '@spaceone/design-system';
+
 import { FavoriteButtonProps } from '@/views/project/project/type';
 
 export default {
