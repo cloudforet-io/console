@@ -9,7 +9,7 @@
 <script lang="ts">
 import { merge } from 'lodash';
 import { VTooltip } from 'v-tooltip';
-import { computed, reactive } from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 
 export default {
     name: 'PTooltip',
