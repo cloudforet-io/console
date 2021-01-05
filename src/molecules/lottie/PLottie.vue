@@ -71,7 +71,7 @@ export default {
             if (!state.lottieRef) return;
 
             // noinspection TypeScriptCheckImport
-            const lottieFile = await import(/* webpackMode: "lazy-once" */ `./p-lotties/${props.name}.json`);
+            const lottieFile = await import(/* webpackMode: "eager" */ `./p-lotties/${props.name}.json`);
             if (lottieFile) {
                 state.animation = await lottie.loadAnimation({
                     name: props.name,
