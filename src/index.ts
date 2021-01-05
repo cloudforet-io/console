@@ -49,18 +49,18 @@ const SpaceoneDS: PluginObject<SpaceoneDSOptions> = {
         _Vue.use(Codemirror);
 
 
-        // const i18n = new VueI18n({
-        //     locale: 'en', // set locale
-        //     fallbackLocale: 'en',
-        //     messages: {
-        //         en: removeEmpty({ COMPONENT: componentEN }),
-        //         ko: removeEmpty({ COMPONENT: componentKO }),
-        //         jp: removeEmpty({ COMPONENT: componentJA }),
-        //     },
-        //     silentFallbackWarn: true,
-        // });
-        //
-        // new _Vue({ i18n }).$mount(options?.appSelector || '#app');
+        const i18n = new VueI18n({
+            locale: 'en', // set locale
+            fallbackLocale: 'en',
+            messages: {
+                en: removeEmpty({ COMPONENT: componentEN }),
+                ko: removeEmpty({ COMPONENT: componentKO }),
+                jp: removeEmpty({ COMPONENT: componentJA }),
+            },
+            silentFallbackWarn: true,
+        });
+
+        new _Vue({ i18n }).$mount(options?.appSelector || '#app');
     },
 };
 
