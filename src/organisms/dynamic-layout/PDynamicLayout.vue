@@ -73,7 +73,7 @@ export default {
         // noinspection TypeScriptCheckImport
         const state = reactive({
             component: null as any,
-            loader: computed<() => Promise<any>>(() => () => import(`./templates/${props.type}/index.vue`)) as unknown as () => Promise<any>,
+            loader: computed<() => Promise<any>>(() => () => import(/* webpackMode: "eager" */ `./templates/${props.type}/index.vue`)) as unknown as () => Promise<any>,
         });
 
         const getComponent = async () => {

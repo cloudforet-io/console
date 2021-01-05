@@ -57,7 +57,6 @@ export default {
         },
     },
     setup(props: DynamicFieldProps, { emit }) {
-        // noinspection TypeScriptCheckImport
         const state = reactive<any>({
             component: null,
             nextHandler: props.handler,
@@ -72,7 +71,8 @@ export default {
                                     ${fieldProps.type} is not acceptable.`);
                 }
 
-                state.component = () => import(`./templates/${fieldProps.type}/index.vue`);
+                // noinspection TypeScriptCheckImport
+                state.component = () => import(/* webpackMode: "eager" */ `./templates/${fieldProps.type}/index.vue`);
             } catch (e) {
             }
         };
