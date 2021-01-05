@@ -6,9 +6,10 @@
     </component>
 </template>
 
-<script>
+<script lang="ts">
 import { merge } from 'lodash';
 import { VTooltip } from 'v-tooltip';
+import { computed, reactive } from '@vue/composition-api';
 
 export default {
     name: 'PTooltip',
@@ -37,14 +38,17 @@ export default {
             },
         },
     },
-    computed: {
-        tooltipOptions() {
-            return merge({
-                content: this.contents,
-                placement: this.position,
+    setup(props) {
+        const state = reactive({
+            tooltipOptions: computed(() => merge({
+                content: props.contents,
+                placement: props.position,
                 classes: ['p-tooltip'],
-            }, this.options);
-        },
+            }, props.options)),
+        });
+        return {
+            ...toRefs(state),
+        };
     },
 };
 

@@ -85,12 +85,10 @@ export { default as PIconTextButton } from './molecules/buttons/icon-text-button
 export { default as PLoadingButton } from './molecules/buttons/loading-button/PLoadingButton.vue';
 export { default as PToggleButton } from './molecules/buttons/toggle-button/PToggleButton.vue';
 export { default as PCardItem } from './molecules/cards/PCardItem.vue';
-export { default as PChartD3 } from './molecules/charts/PChartD3.vue';
 export { default as PCollapsiblePanel } from './molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
 export { default as PCheckBox } from './molecules/forms/checkbox/PCheckBox.vue';
 export { default as PFieldGroup } from './molecules/forms/field-group/PFieldGroup.vue';
 export { default as PRadio } from './molecules/forms/radio/PRadio.vue';
-export { default as PCardLayout } from './molecules/layouts/card-layout/PCardLayout.vue';
 export { default as PGridLayout } from './molecules/layouts/grid-layout/PGridLayout.vue';
 export { default as PPaneLayout } from './molecules/layouts/pane-layout/PPaneLayout.vue';
 export { default as PTextList } from './molecules/lists/text-list/PTextList.vue';
