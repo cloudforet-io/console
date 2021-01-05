@@ -71,10 +71,10 @@ import {
     reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import PI from '@/components/atoms/icons/PI.vue';
+import {
+    PQuerySearchTable, PPanelTop, PButton, PI,
+} from '@spaceone/design-system';
+import { DataTableField } from '@spaceone/design-system/dist/src/organisms/tables/data-table/type';
 
 import { timestampFormatter } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -82,7 +82,6 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { DataTableField } from '@/components/organisms/tables/data-table/type';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
 

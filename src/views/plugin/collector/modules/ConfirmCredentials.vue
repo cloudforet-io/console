@@ -31,8 +31,7 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import PI from '@/components/atoms/icons/PI.vue';
+import { PDataTable, PI } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';

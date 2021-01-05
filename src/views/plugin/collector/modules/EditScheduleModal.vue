@@ -91,13 +91,9 @@ import {
     reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
-import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import PI from '@/components/atoms/icons/PI.vue';
+import {
+    PButtonModal, PSelectDropdown, PFieldGroup, PRadio, PButton, PTextInput, PI,
+} from '@spaceone/design-system';
 
 import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/views/plugin/collector/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';

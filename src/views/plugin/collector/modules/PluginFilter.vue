@@ -31,9 +31,7 @@
 <script lang="ts">
 import { toRefs, reactive, computed } from '@vue/composition-api';
 
-import PSearch from '@/components/molecules/search/PSearch.vue';
-import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
-import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
+import { PSearch, PRadio, PCheckBox } from '@spaceone/design-system';
 
 import { makeProxy } from '@/lib/compostion-util';
 

@@ -86,15 +86,13 @@ import {
     reactive, toRefs, computed, watch, getCurrentInstance,
 } from '@vue/composition-api';
 
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PToolboxTable from '@/components/organisms/tables/toolbox-table/PToolboxTable.vue';
-import EditScheduleModal from '@/views/plugin/collector/modules/EditScheduleModal.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import { DataTableField } from '@/components/organisms/tables/data-table/type';
-import { MenuItem } from '@/components/organisms/context-menu/type';
+import {
+    PIconTextButton, PToolboxTable, PDropdownMenuBtn, PTableCheckModal, PLottie,
+} from '@spaceone/design-system';
+import { DataTableField } from '@spaceone/design-system/dist/src/organisms/tables/data-table/type';
+import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
 
+import EditScheduleModal from '@/views/plugin/collector/modules/EditScheduleModal.vue';
 import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';

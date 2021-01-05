@@ -75,16 +75,13 @@ import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
+import {
+    PProgressWizard, PSelectDropdown, PLazyImg, PIconTextButton, PPageNavigation, PFieldGroup, PTextInput,
+} from '@spaceone/design-system';
+
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import TagsInputGroup from '@/views/common/components/tags/TagsInputGroup.vue';
 import ConfirmCredentials from '@/views/plugin/collector/modules/ConfirmCredentials.vue';
-import PProgressWizard from '@/components/organisms/wizards/progress-wizard/PProgressWizard.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
-import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';

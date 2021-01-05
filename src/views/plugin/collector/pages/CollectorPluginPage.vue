@@ -112,18 +112,13 @@ import {
     toRefs, reactive, watch, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
+import {
+    PToolboxGridLayout, PPageTitle, PSelectDropdown, PCardItem, PPageNavigation,
+    PIconTextButton, PEmpty, PSkeleton, PBadge, PI,
+} from '@spaceone/design-system';
+
 import PluginFilter from '@/views/plugin/collector/modules/PluginFilter.vue';
 import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
-import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/PToolboxGridLayout.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
-import PCardItem from '@/components/molecules/cards/PCardItem.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PEmpty from '@/components/atoms/empty/PEmpty.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PBadge from '@/components/atoms/badges/PBadge.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
