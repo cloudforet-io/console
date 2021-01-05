@@ -27,8 +27,8 @@ import { indexOf, pull } from 'lodash';
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
-import PI from '@/components/atoms/icons/PI.vue';
-import { CheckboxProps } from '@/components/molecules/forms/checkbox/type';
+import PI from '@/atoms/icons/PI.vue';
+import { CheckboxProps } from '@/molecules/forms/checkbox/type';
 
 export default {
     name: 'PCheckBox',

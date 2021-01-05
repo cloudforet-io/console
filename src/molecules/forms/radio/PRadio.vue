@@ -25,7 +25,7 @@
 
 <script>
 import { reactive, computed, toRefs } from '@vue/composition-api';
-import PI from '@/components/atoms/icons/PI.vue';
+import PI from '@/atoms/icons/PI.vue';
 
 export default {
     name: 'PRadio',

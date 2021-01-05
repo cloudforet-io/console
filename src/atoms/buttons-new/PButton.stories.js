@@ -1,9 +1,9 @@
 import { select, text, boolean } from '@storybook/addon-knobs/vue';
 import { withDesign } from 'storybook-addon-designs';
 import { action } from '@storybook/addon-actions';
-import PButton from '@/components/atoms/buttons-new/PButton.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import { BUTTON_STYLE } from '@/components/atoms/buttons-new/type';
+import PButton from '@/atoms/buttons-new/PButton.vue';
+import PLottie from '@/molecules/lottie/PLottie.vue';
+import { BUTTON_STYLE } from '@/atoms/buttons-new/type';
 
 export default {
     title: 'Inputs/Buttons/Button',
