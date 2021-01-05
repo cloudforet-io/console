@@ -65,7 +65,7 @@ module.exports = {
             new CopyPlugin([{
                 from: './public/**/*',
                 transformPath(targetPath) {
-                    return targetPath.slice(7);
+                    return `${targetPath.slice(7)}`;
                 },
             }]),
             ...extraPlugins,
