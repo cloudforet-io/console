@@ -6,13 +6,6 @@
   "license": "Apache-2.0",
   "main": "dist/index.umd.min.js",
   "types": "types/index.d.ts",
-  "files": [
-    "/dist/*",
-    "/src/*",
-    "/types/*",
-    "/*.json",
-    "/*.js"
-  ],
   "publishConfig": {
     "access": "public"
   },

@@ -1,4 +1,4 @@
-import Vue, { PluginObject, VueConstructor } from 'vue';
+import { PluginObject, VueConstructor } from 'vue';
 import VueI18n, { LocaleMessageObject } from 'vue-i18n';
 import velocity from 'velocity-animate';
 import SvgIcon from 'vue-svgicon';
