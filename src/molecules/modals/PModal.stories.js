@@ -30,7 +30,7 @@ export const modal = () => ({
     components: { PModal },
     template: `
         <div>
-            <button @click="showAction">모달 열기</button>
+            <button @click="showAction">Open Modal</button>
             <p-modal
                 ref="modal"
                 :centered="centered"
@@ -40,7 +40,7 @@ export const modal = () => ({
                 :backdrop="backdrop"
                 >
                 <p style="min-width: 300px;min-height: 200px;">{{lorem}}</p>
-                <button @click="closeAction">모달 닫기</button>
+                <button @click="closeAction">Close Modal</button>
             </p-modal>
         </div>`,
     props: {

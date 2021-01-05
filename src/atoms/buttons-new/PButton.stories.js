@@ -1,8 +1,9 @@
 import { select, text, boolean } from '@storybook/addon-knobs/vue';
 import { withDesign } from 'storybook-addon-designs';
 import { action } from '@storybook/addon-actions';
-import PButton from '@/atoms/buttons-new/PButton.vue';
-import PLottie from '@/molecules/lottie/PLottie.vue';
+import PButton from '@/components/atoms/buttons-new/PButton.vue';
+import PLottie from '@/components/molecules/lottie/PLottie.vue';
+import { BUTTON_STYLE } from '@/components/atoms/buttons-new/type';
 
 export default {
     title: 'Inputs/Buttons/Button',
@@ -51,12 +52,7 @@ export const button = () => ({
       </div>`,
     props: {
         styleType: {
-            default: select('styleType', [
-                'primary-dark', 'primary', 'primary1', 'primary2',
-                'secondary', 'secondary1',
-                'gray', 'gray900', 'gray900-hover',
-                'alert', 'safe', 'gray-border', 'transparent',
-            ], 'primary'),
+            default: select('styleType', Object.values(BUTTON_STYLE), 'primary'),
         },
         size: {
             default: select('size', ['(default)', 'sm', 'lg'], '(default)'),

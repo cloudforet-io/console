@@ -195,7 +195,7 @@ export const selectTable = () => ({
             >
             </PDataTable>
             <p>select index: {{selectIndex}} </p>
-            <p-button @click="getData" styleType="primary" >선택한 데이터 가져오기</p-button>
+            <p-button @click="getData" styleType="primary" >Import Selected Data</p-button>
             <p>{{selected}}</p>
         </div>
     `,
@@ -230,7 +230,7 @@ export const rowClickMultiSelectMode = () => ({
             >
             </PDataTable>
             <p>select index: {{selectIndex}} </p>
-            <p-button @click="getData" styleType="primary" >선택한 데이터 가져오기</p-button>
+            <p-button @click="getData" styleType="primary" >Import Selected Data</p-button>
             <p>{{selected}}</p>
         </div>
     `,

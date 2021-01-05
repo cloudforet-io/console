@@ -1,8 +1,8 @@
 import {
     select, text, color, boolean,
 } from '@storybook/addon-knobs';
-import PBadge from '@/atoms/badges/PBadge.vue';
-
+import PBadge from '@/components/atoms/badges/PBadge.vue';
+import { BADGE_STYLE } from '@/components/atoms/badges/type';
 
 export default {
     title: 'Data Display/Badges',
@@ -68,14 +68,7 @@ export const longBadge = () => ({
         >Badge with long size in length</PBadge>`,
     props: {
         styleType: {
-            default: select('styleType', [
-                '',
-                'primary', 'primary-dark', 'primary1', 'primary2', 'primary3', 'primary4',
-                'secondary', 'secondary1', 'secondary2',
-                'coral', 'yellow',
-                'gray', 'gray200', 'gray100',
-                'alert', 'safe', 'gray900',
-            ], ''),
+            default: select('styleType', Object.values(BADGE_STYLE), ''),
         },
         textColor: {
             default: color('textColor', ''),
@@ -100,14 +93,7 @@ export const linkBadge = () => ({
         >Badge with link</PBadge>`,
     props: {
         styleType: {
-            default: select('styleType', [
-                '',
-                'primary', 'primary-dark', 'primary1', 'primary2', 'primary3', 'primary4',
-                'secondary', 'secondary1', 'secondary2',
-                'coral', 'yellow',
-                'gray', 'gray200', 'gray100',
-                'alert', 'safe', 'gray900',
-            ], ''),
+            default: select('styleType', Object.values(BADGE_STYLE), ''),
         },
         textColor: {
             default: color('textColor', ''),

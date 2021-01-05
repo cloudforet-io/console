@@ -3,7 +3,6 @@ import { ref } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
 import PRadio from '@/molecules/forms/radio/PRadio.vue';
 
-
 export default {
     title: 'Inputs/RadioButton',
     component: PRadio,
@@ -12,57 +11,35 @@ export default {
 
 const setup = () => {
     const selected = ref(false);
+    const errorSelected = ref(false);
     const multi = ref(['a', 'b', 'c']);
     return {
         selected,
+        errorSelected,
         multi,
         onChange: action('onChange'),
     };
 };
 
-
-export const radio = () => ({
+export const radioButton = () => ({
     components: { PRadio },
-    props: {
-        hovered: {
-            default: boolean('hovered', false),
-        },
-    },
-    template: `<p-radio v-model="selected"
-                        :hovered="hovered"
-                        @change="onChange"
-                />`,
-    setup() {
-        return {
-            ...setup(),
-        };
-    },
-
-});
-
-
-export const multiCase = () => ({
-    components: { PRadio },
-    props: {
-        hovered: {
-            default: boolean('hovered', false),
-        },
-    },
-    template: `<div>
-                    <div v-for="(item, idx) in multi" :key="idx">
-                        <p-radio 
-                                 v-model="selected"
-                                 :value="item"
-                                 @change="onChange"
-                        />
-                        {{item}}
-                    </div>
-                </div>`,
+    template: `
+        <div>
+            <div v-for="(item, idx) in multi" :key="idx">
+                <p-radio 
+                         v-model="selected"
+                         :value="item"
+                         @change="onChange"
+                >{{ item }}</p-radio>
+            </div>
+            <p-radio @change="onChange" disabled>disabled</p-radio>
+            <p-radio v-model="errorSelected" @change="onChange" invalid>invalid</p-radio>
+        </div>
+    `,
     setup() {
         return {
             ...setup(),
             selected: ref('a'),
         };
     },
-
 });

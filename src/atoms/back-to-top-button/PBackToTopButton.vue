@@ -37,7 +37,6 @@ export default {
     },
     setup(props) {
         const goToTop = () => {
-            console.log(props.container);
             props.container.scroll({ top: 0, behavior: 'smooth' });
         };
 

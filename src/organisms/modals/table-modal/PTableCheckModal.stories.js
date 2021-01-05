@@ -44,7 +44,7 @@ export const modal = () => ({
     components: { PTableCheckModel, PButton },
     template: `
 <div>
-<p-button styleType="primary" @click="click">모달 띄우기</p-button>
+<p-button styleType="primary" @click="click">Open Modal</p-button>
 <PTableCheckModel
     ref="modal"
     :size="size"

@@ -11,7 +11,7 @@ export const iconModal = () => ({
     components: { PIconModal, PButton },
     template: `
         <div>
-            <p-button styleType="primary" @click="onClickOpen">모달 띄우기</p-button>
+            <p-button styleType="primary" @click="onClickOpen">Open Modal</p-button>
             <p-icon-modal
                 :visible.sync="loading"
                 :icon-name="iconName"
