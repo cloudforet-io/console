@@ -217,7 +217,6 @@ export default {
         };
 
         const updateUser = async (userParam) => {
-            console.log(userParam);
             try {
                 await store.dispatch('user/setUser', userParam);
 

@@ -112,17 +112,18 @@ export default {
             chart: null as null|any,
             data: [] as any,
             filteredData: [] as any,
-            selectedProvider: 'aws',
-            selectedRegion: 'Asia Pacific (Seoul)',
-            selectedRegionCode: 'ap-northeast-2',
+            selectedProvider: '', // aws
+            selectedRegion: '', // Asia Pacific (Seoul)
+            selectedRegionCode: '', // ap-northeast-2
             provider: computed(() => vm.$store.state.resource.provider.items),
             loading: false,
             maxValue: 0,
+            initialRegion: {} as any,
         });
 
         const chartState = reactive({
             registry: {},
-            chartData: [] as any,
+            chartData: [] as object[],
             skeletons: range(5),
             // providerList: [
             //     {
@@ -142,13 +143,13 @@ export default {
         });
 
         /* Create map instance */
-        const getFilteredData = async (regionCode) => {
+        const getFilteredData = async (regionCode, provider) => {
             state.selectedRegionCode = regionCode;
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
                     query: apiQuery.setFilters([
                         { k: 'region_code', v: regionCode, o: '=' },
-                        { k: 'provider', v: state.selectedProvider, o: '=' },
+                        { k: 'provider', v: provider, o: '=' },
                     ]).setPageLimit(10)
                         .setSort('count', true, 'name')
                         .data,
@@ -190,6 +191,38 @@ export default {
             ];
         };
 
+        const setInitialRegionSetting = async () => {
+            const initialRegionFromLocalStorage = store.getters['settings/getItem']('initial_region', '/dashboard');
+            state.initialRegion = initialRegionFromLocalStorage;
+            [state.selectedProvider, state.selectedRegion, state.selectedRegionCode] =
+                [initialRegionFromLocalStorage.provider, initialRegionFromLocalStorage.region_name, initialRegionFromLocalStorage.region_code];
+
+            if (!initialRegionFromLocalStorage) {
+                const resp = await SpaceConnector.client.statistics.topic.cloudServiceByRegion({
+                    query: {
+                        sort: {
+                            name: 'count',
+                            desc: true,
+                        },
+                        only: ['count', 'region_name'],
+                    },
+                });
+                let regionWithTheMostService = resp.results[0].region_name;
+                if (regionWithTheMostService === 'global') regionWithTheMostService = 'ap-northeast-2';
+                const allInitialRegionInfo = state.data.find(data => data.region_code === regionWithTheMostService);
+                const initialRegion = {
+                    longitude: allInitialRegionInfo.longitude,
+                    latitude: allInitialRegionInfo.latitude,
+                    // eslint-disable-next-line camelcase
+                    region_code: allInitialRegionInfo.region_code,
+                    name: allInitialRegionInfo.name,
+                    provider: allInitialRegionInfo.provider,
+                };
+                state.initialRegion = initialRegion;
+                [state.selectedProvider, state.selectedRegion, state.selectedRegionCode] = [initialRegion.provider, initialRegion.name, initialRegion.region_code];
+            }
+        };
+
         const animateBullet = (circle) => {
             const animation = circle.animate([{ property: 'scale', from: 1, to: 5 }, { property: 'opacity', from: 1, to: 0 }],
                 1000, am4core.ease.circleOut);
@@ -222,13 +255,26 @@ export default {
 
         const hitCircle = async (event) => {
             const originTarget = state.selectedRegion;
-            const target = event.target.dataItem?.dataContext as any;
+            const target = event.target.dataItem?.dataContext;
             state.selectedProvider = target.provider;
             state.selectedRegion = target.name;
-            await getFilteredData(target.region_code);
+            await getFilteredData(target.region_code, state.selectedProvider);
             if (originTarget !== state.selectedRegion) {
                 moveMarker({ latitude: target.latitude, longitude: target.longitude }, chartState.marker);
             }
+            await store.dispatch('settings/setItem', {
+                key: 'initial_region',
+                value: {
+                    latitude: target.latitude,
+                    longitude: target.longitude,
+                    // eslint-disable-next-line camelcase
+                    region_code: state.selectedRegionCode,
+                    // eslint-disable-next-line camelcase
+                    region_name: state.selectedRegion,
+                    provider: state.selectedProvider,
+                },
+                path: '/dashboard',
+            });
         };
 
         const disposeChart = (element) => {
@@ -245,7 +291,6 @@ export default {
                 return state.chartRegistry[chartContext];
             };
             const chart = createChart();
-            // const chart = am4core.create(chartContext, am4maps.MapChart);
             chart.geodata = am4geodataWorldLow;
             chart.projection = new am4maps.projections.Miller();
             chart.responsive.enabled = true;
@@ -282,15 +327,11 @@ export default {
                 await hitCircle(event);
             });
 
-            /* get Region List and draw circles with region data */
-            await getRegionList();
+            /* draw circles with region data */
             imageSeries.data = state.data;
 
             /* draw initial marker with initial coords */
-            if (state.data.length > 0) {
-                const initialCoords = { longitude: 126.871867, latitude: 37.528547 };
-                moveMarker(initialCoords, chartState.marker);
-            }
+            moveMarker({ longitude: state.initialRegion.longitude, latitude: state.initialRegion.latitude }, chartState.marker);
 
             state.chart = chart;
         };
@@ -329,7 +370,11 @@ export default {
         const init = async () => {
             state.loading = true;
             await store.dispatch('resource/provider/load');
-            await Promise.all([getRegionList(), getFilteredData('ap-northeast-2')]);
+            await getRegionList();
+            if (state.data.length > 0) {
+                await setInitialRegionSetting();
+                await getFilteredData(state.initialRegion.region_code, state.initialRegion.provider);
+            }
             state.loading = false;
         };
         init();

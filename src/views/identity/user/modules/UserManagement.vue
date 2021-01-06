@@ -454,7 +454,6 @@ export default {
                 await SpaceConnector.client.identity.user.create({
                     ...item,
                 });
-                console.log(isBind);
                 if (isBind !== undefined) await bindRole(item.user_id, roleId);
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '', root);
             } catch (e) {
