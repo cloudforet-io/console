@@ -8,12 +8,10 @@ import Notifications from 'vue-notification';
 
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import directive from '@/directives';
+import VueI18n from 'vue-i18n';
 import velocity from 'velocity-animate';
 import { withKnobs } from '@storybook/addon-knobs';
 import SvgIcon from 'vue-svgicon';
-import { i18n } from '@/translations';
-import LiquorTree from 'liquor-tree';
 import Fragment from "vue-fragment";
 import Codemirror from "vue-codemirror";
 
@@ -21,33 +19,54 @@ import webFontLoader from 'webfontloader';
 import { fontUrls, webFonts } from '@/styles/web-fonts';
 
 import tailwindConfig from './tailwind.config';
-import _ from 'lodash';
+import {mapValues} from 'lodash';
 import VTooltip from 'v-tooltip';
 import "@/styles/reset.pcss";
 import "@/styles/style.pcss";
 import SpaceOneTheme from './SpaceOneTheme';
+import componentEN from '@/translations/language-pack/en.json';
+import componentKO from '@/translations/language-pack/ko.json';
+import componentJA from '@/translations/language-pack/ja.json';
 
-
-Vue.use(VueRouter);
-Vue.use(Notifications, { velocity });
+Vue.use(VueRouter)
+Vue.use(VueI18n);
 Vue.use(VueCompositionApi);
+Vue.use(Notifications, { velocity });
 Vue.use(SvgIcon, {
     tagName: 'svgicon',
     classPrefix: 'p-i'
 })
-Vue.use(LiquorTree);
 Vue.use(Fragment.Plugin);
-Vue.use(VTooltip, { defaultClass: 'p-tooltip' });
+Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
 Vue.use(Codemirror);
 
-Vue.prototype.$velocity = velocity;
 webFontLoader.load({
     google: {
         families: webFonts,
         urls: fontUrls,
     },
 });
-directive(Vue);
+
+// simple recursive remove keys with empty value
+const removeEmpty = (obj) => Object.keys(obj)
+    .filter((k) => obj[k] !== null && obj[k] !== undefined && obj[k] !== '') // Remove undef. and null and empty.string.
+    .reduce(
+        (newObj, k) => (typeof obj[k] === 'object'
+            ? Object.assign(newObj, { [k]: removeEmpty(obj[k]) }) // Recurse.
+            : Object.assign(newObj, { [k]: obj[k] })), // Copy value.
+        {},
+    );
+
+const i18n = new VueI18n({
+    locale: 'en', // set locale
+    fallbackLocale: 'en',
+    messages: {
+        en: removeEmpty({ COMPONENT: componentEN }),
+        ko: removeEmpty({ COMPONENT: componentKO }),
+        jp: removeEmpty({ COMPONENT: componentJA }),
+    },
+    silentFallbackWarn: true,
+});
 
 addParameters({
     docs: {
@@ -61,7 +80,7 @@ addParameters({
     },
     viewport: {
         viewports: {
-            ..._.mapValues(tailwindConfig.theme.screens, (v, k) => ({
+            ...mapValues(tailwindConfig.theme.screens, (v, k) => ({
                 name: k,
                 styles: {
                     width: v.min || v.max,

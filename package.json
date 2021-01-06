@@ -29,10 +29,10 @@
     "build": "vue-cli-service build --target lib --name spaceone-design-system src/index.ts",
     "build:wc": "env VUE_APP_BUILD_MOD=wc vue-cli-service build --target wc-async --name spaceone-design-system src/**/*.vue",
     "lint": "eslint --ext .js,.vue src",
-    "build-storybook": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook -s ./public -o .out",
-    "storybook": "start-storybook -p 6006 -s ./public",
+    "build-storybook": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook -o .out",
+    "storybook": "start-storybook -p 6006",
     "icon": "vsvg -s ./src/assets/icons -t ./src/components/atoms/icons/p-icons --es6",
-    "lottie": "cp -r ./src/assets/lottiefiles/* ./public/p-lotties",
+    "lottie": "cp -r ./src/assets/lottiefiles/* ./src/molecules/lottie/p-lotties",
     "analyze": "NODE_ENV=production VUE_APP_ANALYZE_MOD=true vue-cli-service build"
   },
   "dependencies": {
