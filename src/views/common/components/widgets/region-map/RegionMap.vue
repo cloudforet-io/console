@@ -193,9 +193,11 @@ export default {
 
         const setInitialRegionSetting = async () => {
             const initialRegionFromLocalStorage = store.getters['settings/getItem']('initial_region', '/dashboard');
-            state.initialRegion = initialRegionFromLocalStorage;
-            [state.selectedProvider, state.selectedRegion, state.selectedRegionCode] =
-                [initialRegionFromLocalStorage.provider, initialRegionFromLocalStorage.region_name, initialRegionFromLocalStorage.region_code];
+            if (initialRegionFromLocalStorage) {
+                state.initialRegion = initialRegionFromLocalStorage;
+                [state.selectedProvider, state.selectedRegion, state.selectedRegionCode] =
+                    [initialRegionFromLocalStorage.provider, initialRegionFromLocalStorage.region_name, initialRegionFromLocalStorage.region_code];
+            }
 
             if (!initialRegionFromLocalStorage) {
                 const resp = await SpaceConnector.client.statistics.topic.cloudServiceByRegion({
