@@ -90,14 +90,11 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import {
+    PTextPagination, PDataTable, PTab, PSearch, PIconButton, PEmpty, PI,
+} from '@spaceone/design-system';
+
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
-import PTextPagination from '@/components/organisms/paginations/text-pagination/PTextPagination.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import PSearch from '@/components/molecules/search/PSearch.vue';
-import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import PEmpty from '@/components/atoms/empty/PEmpty.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';

@@ -65,17 +65,14 @@ import {
     computed, getCurrentInstance, reactive, toRefs, ComponentRenderProxy,
 } from '@vue/composition-api';
 
+import {
+    PHorizontalLayout, PTab, PDataTable, PPageTitle,
+    PQuerySearchTable, PDefinitionTable, PPanelTop, PButton,
+} from '@spaceone/design-system';
+import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
+import { KeyItemSet } from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
+
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
-import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
-import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import { TabItem } from '@/components/organisms/tabs/tab/type';
-import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 
 import { SupervisorPluginModel } from '@/views/management/supervisor/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';

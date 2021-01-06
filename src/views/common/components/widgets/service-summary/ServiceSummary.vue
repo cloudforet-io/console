@@ -35,9 +35,9 @@ import {
     computed, reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
 
+import { PWidgetLayout, PChartLoader } from '@spaceone/design-system';
+
 import AnimatedNumber from 'animated-number-vue';
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
-import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 
 import { SpaceChart, tooltips } from '@/lib/chart/space-chart';
 import { SpaceConnector } from '@/lib/space-connector';

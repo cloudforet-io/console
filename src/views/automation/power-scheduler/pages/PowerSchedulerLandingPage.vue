@@ -141,12 +141,10 @@ import {
 
 /* Components */
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
-import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PProgressBar from '@/components/molecules/progress-bar/PProgressBar.vue';
-import PHr from '@/components/atoms/hr/PHr.vue';
-import PI from '@/components/atoms/icons/PI.vue';
+
+import {
+    PI, PHr, PProgressBar, PPageTitle, PPageNavigation, PSearchGridLayout, PIconTextButton,
+} from '@spaceone/design-system';
 
 /* Page Modules */
 import PageInformation from '@/views/automation/power-scheduler/modules/PageInformation.vue';
@@ -159,11 +157,9 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import dayjs from 'dayjs';
 
 /* Types */
-import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { Location } from 'vue-router';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { QueryHelper } from '@/lib/query';
 import { store } from '@/store';
 
@@ -215,7 +211,7 @@ export default {
             items: [] as any,
             cardClass: () => ['card-item', 'power-scheduler-list'],
             loading: false,
-            keyItemSets: handlers.keyItemSets as KeyItemSet[],
+            keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
             tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
             thisPage: 1,

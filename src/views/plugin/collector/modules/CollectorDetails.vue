@@ -29,16 +29,13 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, watch,
 } from '@vue/composition-api';
 
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import PTextList from '@/components/molecules/lists/text-list/PTextList.vue';
+import {
+    PPanelTop, PDefinitionTable, PLazyImg, PDataTable, PStatus, PTextList,
+} from '@spaceone/design-system';
 
 import { timestampFormatter } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
-import PStatus from '@/components/molecules/status/PStatus.vue';
 
 export default {
     name: 'CollectorDetails',

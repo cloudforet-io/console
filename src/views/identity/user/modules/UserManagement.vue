@@ -162,38 +162,35 @@
 </template>
 
 <script lang="ts">
-import PEmpty from '@/components/atoms/empty/PEmpty.vue';
-import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import UserForm from '@/views/identity/user/modules/UserForm.vue';
-import PStatus from '@/components/molecules/status/PStatus.vue';
-import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import UserDetail from '@/views/identity/user/modules/UserDetail.vue';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import PTagsPanel from '@/views/common/components/tags/TagsPanel.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+
+import {
+    PEmpty, PQuerySearchTable, PPageNavigation, PIconTextButton, PStatus,
+    PHorizontalLayout, PDropdownMenuBtn, PTab, PDataTable, PTableCheckModal, PPageTitle,
+} from '@spaceone/design-system';
+
+import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
+import { KeyItemSet } from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
+import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
+import { Options } from '@spaceone/design-system/dist/src/organisms/tables/query-search-table/type';
+import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
+
+import UserForm from '@/views/identity/user/modules/UserForm.vue';
+import UserDetail from '@/views/identity/user/modules/UserDetail.vue';
+import PTagsPanel from '@/views/common/components/tags/TagsPanel.vue';
+
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
 import { store } from '@/store';
-import { MenuItem } from '@/components/organisms/context-menu/type';
-import { KeyItemSet } from '@/components/organisms/search/query-search/type';
-import { TabItem } from '@/components/organisms/tabs/tab/type';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { SpaceConnector } from '@/lib/space-connector';
 import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/helper';
 import dayjs from 'dayjs';
-import { Options } from '@/components/organisms/tables/query-search-table/type';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { map } from 'lodash';
 import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
-import { Timestamp } from '@/components/util/type';
 
 interface UserModel {
     created_at: Timestamp;
@@ -457,7 +454,7 @@ export default {
                 await SpaceConnector.client.identity.user.create({
                     ...item,
                 });
-                console.log(isBind)
+                console.log(isBind);
                 if (isBind !== undefined) await bindRole(item.user_id, roleId);
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '', root);
             } catch (e) {

@@ -34,10 +34,9 @@ import {
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import PNoticeAlert from '@/components/molecules/alert/notice/PNoticeAlert.vue';
-import PToastAlert from '@/components/molecules/alert/toast/PToastAlert.vue';
+import { PNoticeAlert, PToastAlert, PIconModal } from '@spaceone/design-system';
+
 import GNB from '@/views/common/components/gnb/GNB.vue';
-import PIconModal from '@/components/organisms/modals/icon-modal/PIconModal.vue';
 import { Location } from 'vue-router';
 import router from '@/routes';
 import { SpaceConnector } from '@/lib/space-connector';

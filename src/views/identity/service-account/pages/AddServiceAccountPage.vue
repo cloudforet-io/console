@@ -139,29 +139,20 @@ import {
     reactive, computed, ref, toRefs, watch,
 } from '@vue/composition-api';
 
+import {
+    PPageTitle, PJsonSchemaForm, PTab, PCollapsiblePanel, PFieldGroup, PLazyImg,
+    PPageNavigation, PPaneLayout, PIconTextButton, PRadio, PMarkdown, PTextEditor, PButton, PTextInput,
+} from '@spaceone/design-system';
+import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
+
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import ProjectTreePanel from '@/views/identity/service-account/modules/ProjectTreePanel.vue';
 import TagsInputGroup from '@/views/common/components/tags/TagsInputGroup.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PJsonSchemaForm from '@/components/organisms/forms/json-schema-form/PJsonSchemaForm.vue';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
-import PMarkdown from '@/components/molecules/markdown/PMarkdown.vue';
-import PTextEditor from '@/components/molecules/text-editor/text-editor/PTextEditor.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import { TabItem } from '@/components/organisms/tabs/tab/type';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ProviderModel } from '@/views/identity/service-account/type';
 import { TranslateResult } from 'vue-i18n';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 
 export default {
     name: 'AddServiceAccountPage',
@@ -176,12 +167,12 @@ export default {
         PPageTitle,
         PPageNavigation,
         PFieldGroup,
-        TagsInputGroup,
         PPaneLayout,
-        GeneralPageLayout,
         PIconTextButton,
         PButton,
         PRadio,
+        TagsInputGroup,
+        GeneralPageLayout,
         ProjectTreePanel,
     },
     props: {

@@ -13,13 +13,13 @@
             </template>
             <template #data-last_accessed_at="{data}">
                 <span v-if="data === 0">
-                    {{$t('IDENTITY.USER.MAIN.TODAY')}}
+                    {{ $t('IDENTITY.USER.MAIN.TODAY') }}
                 </span>
                 <span v-else-if="data === 1">
-                    {{$t('IDENTITY.USER.MAIN.YESTERDAY')}}
+                    {{ $t('IDENTITY.USER.MAIN.YESTERDAY') }}
                 </span>
                 <span v-else>
-                    {{ data }} {{$t('IDENTITY.USER.MAIN.DAYS')}}
+                    {{ data }} {{ $t('IDENTITY.USER.MAIN.DAYS') }}
                 </span>
             </template>
         </p-definition-table>
@@ -30,17 +30,21 @@
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import { PPanelTop, PDefinitionTable, PStatus } from '@spaceone/design-system';
+
 import { timestampFormatter } from '@/lib/util';
 import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/helper';
 import { SpaceConnector } from '@/lib/space-connector';
 
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import PDefinitionTable from '@/components/organisms/tables/definition-table/PDefinitionTable.vue';
-import PStatus from '@/components/molecules/status/PStatus.vue';
 import dayjs from 'dayjs';
-import { Timestamp } from '@/components/util/type';
 import { Tags } from '@/models';
 // const arrayFormatter = value => ((value && Array.isArray(value) && value.length > 0) ? value.join(', ') : '');
+
+interface Timestamp {
+    seconds: string;
+    nanos?: number;
+}
 
 interface UserDetailData {
     roles?: unknown;

@@ -52,15 +52,14 @@
 import {
     ComponentRenderProxy,
     computed,
-    getCurrentInstance, onUnmounted, reactive, toRefs, watch,
+    getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import {
+    PBadge, PGridLayout, PSelectableItem, PSkeleton, PChartLoader,
+} from '@spaceone/design-system';
+
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
-import PBadge from '@/components/atoms/badges/PBadge.vue';
-import PGridLayout from '@/components/molecules/layouts/grid-layout/PGridLayout.vue';
-import PSelectableItem from '@/components/molecules/selectable-item/PSelectableItem.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
 import {
     black,
     blue, coral, green, peacock, violet, white, yellow,

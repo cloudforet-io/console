@@ -40,11 +40,13 @@
 </template>
 
 <script lang="ts">
-import vClickOutside from 'v-click-outside';
 import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
-import PI from '@/components/atoms/icons/PI.vue';
+
+import { PI } from '@spaceone/design-system';
+
+import vClickOutside from 'v-click-outside';
 import { store } from '@/store';
 
 

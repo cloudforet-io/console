@@ -173,21 +173,14 @@ import {
     reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import PDropdownMenuBtn from '@/components/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
-import PTab from '@/components/organisms/tabs/tab/PTab.vue';
-import PTableCheckModal from '@/components/organisms/modals/table-modal/PTableCheckModal.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PStatus from '@/components/molecules/status/PStatus.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PI from '@/components/atoms/icons/PI.vue';
+import {
+    PHorizontalLayout, PDropdownMenuBtn, PLazyImg, PPageTitle, PDataTable, PQuerySearchTable,
+    PTab, PTableCheckModal, PIconTextButton, PStatus, PPageNavigation, PI,
+} from '@spaceone/design-system';
+import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
+import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
+
 import { CollectorModel } from '@/views/plugin/collector/type';
-import { MenuItem } from '@/components/organisms/context-menu/type';
-import { TabItem } from '@/components/organisms/tabs/tab/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';

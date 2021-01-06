@@ -63,14 +63,17 @@
 </template>
 
 <script lang="ts">
-import PAutocompleteSearch from '@/components/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
-import { MenuItem as ContextMenuItem } from '@/components/organisms/context-menu/type';
+
+import {
+    PAutocompleteSearch, PI,
+} from '@spaceone/design-system';
+import { MenuItem as ContextMenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
+
 import { debounce } from 'lodash';
-import PI from '@/components/atoms/icons/PI.vue';
 import { ItemType } from '@/views/project/project/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';

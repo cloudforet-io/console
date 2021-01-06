@@ -13,16 +13,18 @@
                 <div class="fnb">
                     <f-n-b />
                 </div>
-<!--                <p-back-to-top-button :container="containerRef" />-->
+                <!--                <p-back-to-top-button :container="containerRef" />-->
             </div>
         </template>
     </p-vertical-layout>
 </template>
 
 <script lang="ts">
-import PVerticalLayout from '@/components/organisms/layouts/vertical-layout/PVerticalLayout.vue';
-import FNB from '@/views/common/components/fnb/FNB.vue';
 import { ref } from '@vue/composition-api';
+
+import { PVerticalLayout } from '@spaceone/design-system';
+
+import FNB from '@/views/common/components/fnb/FNB.vue';
 
 export default {
     name: 'VerticalPageLayout',

@@ -54,10 +54,10 @@ import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { PHr, PI } from '@spaceone/design-system';
+
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
-import PHr from '@/components/atoms/hr/PHr.vue';
 import { store } from '@/store';
-import PI from '@/components/atoms/icons/PI.vue';
 import router from '@/routes';
 import VueI18n from 'vue-i18n';
 

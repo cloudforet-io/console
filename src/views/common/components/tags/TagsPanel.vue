@@ -34,10 +34,9 @@ import {
     computed, reactive, toRefs, watch, ComponentRenderProxy, getCurrentInstance,
 } from '@vue/composition-api';
 
+import { PDataTable, PPanelTop, PButton } from '@spaceone/design-system';
+
 import TagsPage from '@/views/common/components/tags/TagsPage.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
 import { TagItem } from '@/views/common/components/tags/type';
 
 import { SpaceConnector } from '@/lib/space-connector';

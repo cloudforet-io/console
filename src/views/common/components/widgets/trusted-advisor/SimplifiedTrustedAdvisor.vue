@@ -46,12 +46,12 @@ import {
     ComponentRenderProxy, getCurrentInstance,
 } from '@vue/composition-api';
 
+import { PI } from '@spaceone/design-system';
+
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 
 import { QueryHelper } from '@/lib/query';
 import { SpaceConnector } from '@/lib/space-connector';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { QueryStoreFilter } from '@/lib/query/type';
 import { green, red, yellow } from '@/styles/colors';
 

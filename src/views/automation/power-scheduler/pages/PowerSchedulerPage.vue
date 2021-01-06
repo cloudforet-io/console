@@ -82,13 +82,12 @@ import {
     computed, reactive, toRefs, getCurrentInstance,
 } from '@vue/composition-api';
 
+import {
+    PSelectableList, PPageNavigation, PIconTextButton, PHr, PLottie
+} from '@spaceone/design-system';
+
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 import ScheduleDetail from '@/views/automation/power-scheduler/modules/ScheduleDetail.vue';
-import PSelectableList from '@/components/organisms/lists/selectable-list/PSelectableList.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import PHr from '@/components/atoms/hr/PHr.vue';
 import { DESIRED_STATES, Schedule } from '@/views/automation/power-scheduler/type';
 
 import { SpaceConnector } from '@/lib/space-connector';

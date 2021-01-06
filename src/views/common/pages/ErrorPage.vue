@@ -18,7 +18,7 @@
 
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
-import PButton from '@/components/atoms/buttons/PButton';
+import { PButton } from '@spaceone/design-system';
 
 export default {
     name: 'ErrorPage',

@@ -125,22 +125,22 @@
 
 
 <script lang="ts">
-import PToolboxGridLayout from '@/components/organisms/layouts/toolbox-grid-layout/PToolboxGridLayout.vue';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { getAllPage } from '@/components/organisms/paginations/text-pagination/helper';
+
+import {
+    PCheckBox, PSkeleton, PI, PIconTextButton, PToolboxGridLayout,
+} from '@spaceone/design-system';
+import { getAllPage } from '@spaceone/design-system/src/organisms/paginations/text-pagination/helper';
+
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectGroup } from '@/views/project/project/type';
-import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 import { range, uniq } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
 import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import { QueryHelper } from '@/lib/query';
 
 interface Props {

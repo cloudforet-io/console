@@ -92,11 +92,9 @@ import utc from 'dayjs/plugin/utc';
 import {
     ComponentRenderProxy, getCurrentInstance, reactive, toRefs, UnwrapRef,
 } from '@vue/composition-api';
+import { PLazyImg, PSkeleton, PI } from '@spaceone/design-system';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { QueryHelper } from '@/lib/query';

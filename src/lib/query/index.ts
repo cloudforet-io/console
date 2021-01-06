@@ -1,5 +1,10 @@
-import { QueryTag } from '@/components/organisms/search/query-search-tags/type';
-import { KeyItem, KeyItemSet, OperatorType } from '@/components/organisms/search/query-search/type';
+import { QueryTag as Tag } from '@spaceone/design-system/dist/src/organisms/search/query-search-tags/type';
+import {
+    KeyItem,
+    KeyItemSet,
+    OperatorType,
+    QueryItem,
+} from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
 import { Filter, FilterOperator, Query } from '@/lib/space-connector/type';
 import { flatten } from 'lodash';
 import {
@@ -18,6 +23,7 @@ dayjs.extend(utc);
 dayjs.extend(tz);
 
 
+interface QueryTag extends Tag, QueryItem {}
 const filterToQueryTag = (filter: { k?: string; v: QueryStoreFilterValue; o?: RawQueryOperator }, keyMap: Record<string, KeyItem>): QueryTag | null => {
     if (filter.k === undefined || filter.k === null) {
         /* no key case */

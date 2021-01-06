@@ -114,16 +114,13 @@ import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy, watch,
 } from '@vue/composition-api';
 
-import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import PSelectDropdown from '@/components/organisms/dropdown/select-dropdown/PSelectDropdown.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
+import {
+    PButtonModal, PSelectDropdown, PFieldGroup, PButton, PTextInput, PI,
+} from '@spaceone/design-system';
 
 import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
-import PI from '@/components/atoms/icons/PI.vue';
 
 interface AuthType {
     label: string | null;

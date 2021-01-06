@@ -57,13 +57,14 @@
 import {
     toRefs, reactive, computed, SetupContext, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
+
+import {
+    PButtonModal, PFieldGroup, PTextInput, PLazyImg,
+} from '@spaceone/design-system';
+
 import { get } from 'lodash';
 import { makeProxy } from '@/lib/compostion-util';
 
-import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
-import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { TimeStamp } from '@/models';

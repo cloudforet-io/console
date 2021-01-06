@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import PI from '@/components/atoms/icons/PI.vue';
+import { PI } from '@spaceone/design-system';
 
 export default {
     name: 'FNB',

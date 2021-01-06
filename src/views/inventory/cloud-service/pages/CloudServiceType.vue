@@ -6,7 +6,7 @@
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FAVORITES') }} <span class="count">({{ favoriteItems.length }})</span>
                 </p>
                 <p-hr class="sidebar-divider" />
-                <favorite-list :items="favoriteItems" @delete="onFavoriteDelete" class="favorite-list">
+                <favorite-list :items="favoriteItems" class="favorite-list" @delete="onFavoriteDelete">
                     <template #icon="{item}">
                         <p-lazy-img :src="item.icon || ''"
                                     error-icon="ic_provider_other"
@@ -180,17 +180,12 @@ import {
     getCurrentInstance,
 } from '@vue/composition-api';
 
+import {
+    PSearchGridLayout, PPageTitle, PPagination, PLazyImg, PCheckBox,
+    PIconTextButton, PPageNavigation, PRadio, PI, PHr,
+} from '@spaceone/design-system';
+
 import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
-import PSearchGridLayout from '@/components/organisms/layouts/search-grid-layout/PSearchGridLayout.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PPagination from '@/components/organisms/paginations/pagination/PPagination.vue';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import PCheckBox from '@/components/molecules/forms/checkbox/PCheckBox.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PRadio from '@/components/molecules/forms/radio/PRadio.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-import PHr from '@/components/atoms/hr/PHr.vue';
 
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getPageStart } from '@/lib/component-utils/pagination';

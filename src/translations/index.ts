@@ -6,9 +6,9 @@ import axios from 'axios';
 import ko from '@/translations/language-pack/ko.json';
 import en from '@/translations/language-pack/en.json';
 import ja from '@/translations/language-pack/ja.json';
-import componentKO from '@/components/translations/language-pack/ko.json';
-import componentEN from '@/components/translations/language-pack/en.json';
-import componentJA from '@/components/translations/language-pack/ja.json';
+import componentKO from '@spaceone/design-system/src/translations/language-pack/ko.json';
+import componentEN from '@spaceone/design-system/src/translations/language-pack/en.json';
+import componentJA from '@spaceone/design-system/src/translations/language-pack/ja.json';
 
 
 Vue.use(VueI18n);

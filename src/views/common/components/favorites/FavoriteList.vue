@@ -48,9 +48,10 @@
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+
+import { PI, PIconButton } from '@spaceone/design-system';
+
 import { FavoriteItem } from '@/store/modules/favorite/type';
-import PI from '@/components/atoms/icons/PI.vue';
-import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
 import { FavoriteListProps } from '@/views/common/components/favorites/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 

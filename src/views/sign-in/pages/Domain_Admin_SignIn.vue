@@ -61,13 +61,14 @@
 import {
     toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
+
+import {
+    PLottie, PBadge, PI, PAnchor,
+} from '@spaceone/design-system';
+
 import { TranslateResult } from 'vue-i18n';
 import { store } from '@/store';
 
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import PBadge from '@/components/atoms/badges/PBadge.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
 import IDPWSignIn from '@/views/sign-in/templates/ID_PW.vue';
 
 import { setGtagUserID } from '@/lib/gtag';

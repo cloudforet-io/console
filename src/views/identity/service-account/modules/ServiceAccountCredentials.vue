@@ -23,9 +23,8 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import PSearchTable from '@/components/organisms/tables/search-table/PSearchTable.vue';
-import { Options, SearchTableListeners } from '@/components/organisms/tables/search-table/type';
+import { PPanelTop, PSearchTable } from '@spaceone/design-system';
+import { Options, SearchTableListeners } from '@spaceone/design-system/dist/src/organisms/tables/search-table/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';

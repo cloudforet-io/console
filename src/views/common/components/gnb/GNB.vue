@@ -145,10 +145,9 @@ import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
+import { PAnchor, PI, PHr } from '@spaceone/design-system';
+
 import SiteMap from '@/views/common/components/gnb/SiteMap.vue';
-import PAnchor from '@/components/molecules/anchors/PAnchor.vue';
-import PI from '@/components/atoms/icons/PI.vue';
-import PHr from '@/components/atoms/hr/PHr.vue';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { Location } from 'vue-router';

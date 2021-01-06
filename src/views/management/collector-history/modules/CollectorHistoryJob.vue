@@ -106,13 +106,10 @@ import {
     getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import PHorizontalLayout from '@/components/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
-import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
-import PDataTable from '@/components/organisms/tables/data-table/PDataTable.vue';
-import PPanelTop from '@/components/molecules/panel/panel-top/PPanelTop.vue';
-import PCollapsiblePanel from '@/components/molecules/collapsible/collapsible-panel/PCollapsiblePanel.vue';
-import PEmpty from '@/components/atoms/empty/PEmpty.vue';
-import PI from '@/components/atoms/icons/PI.vue';
+import {
+    PHorizontalLayout, PQuerySearchTable, PDataTable, PPanelTop, PCollapsiblePanel, PEmpty, PI,
+} from '@spaceone/design-system';
+
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';

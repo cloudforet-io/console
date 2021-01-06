@@ -138,22 +138,17 @@ import {
     computed, getCurrentInstance, reactive, toRefs, ComponentRenderProxy, watch,
 } from '@vue/composition-api';
 
+import {
+    PPageTitle, PQuerySearchTable, PPagination, PButtonModal, PLazyImg,
+    PPageNavigation, PPaneLayout, PIconTextButton, PLottie, PI,
+} from '@spaceone/design-system';
+import { QuerySearchTableFunctions } from '@spaceone/design-system/dist/src/organisms/tables/query-search-table/type';
+import { KeyItemSet } from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
+
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import CollectorHistoryJob from '@/views/management/collector-history/modules/CollectorHistoryJob.vue';
 import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectorHistoryChart.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PQuerySearchTable from '@/components/organisms/tables/query-search-table/PQuerySearchTable.vue';
-import PPagination from '@/components/organisms/paginations/pagination/PPagination.vue';
-import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import PLazyImg from '@/components/organisms/lazy-img/PLazyImg.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PPaneLayout from '@/components/molecules/layouts/pane-layout/PPaneLayout.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import PI from '@/components/atoms/icons/PI.vue';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
-import { QuerySearchTableFunctions } from '@/components/organisms/tables/query-search-table/type';
-import { KeyItemSet } from '@/components/organisms/search/query-search/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { SpaceConnector } from '@/lib/space-connector';

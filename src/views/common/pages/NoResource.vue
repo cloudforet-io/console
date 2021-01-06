@@ -27,14 +27,15 @@
 </template>
 
 <script lang="ts">
-import FNB from '@/views/common/components/fnb/FNB.vue';
-import PLottie from '@/components/molecules/lottie/PLottie.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import PPageNavigation from '@/components/molecules/page-navigation/PPageNavigation.vue';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
 import {
     ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+
+import {
+    PLottie, PButton, PPageNavigation, PPageTitle,
+} from '@spaceone/design-system';
+
+import FNB from '@/views/common/components/fnb/FNB.vue';
 
 export default {
     name: 'NoResource',

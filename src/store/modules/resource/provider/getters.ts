@@ -1,8 +1,8 @@
 /* eslint-disable camelcase */
 import { ResourceState } from '@/store/modules/resource/type';
 import { forEach } from 'lodash';
-import { DynamicFieldProps } from '@/components/organisms/dynamic-field/type';
-import { EnumOptions } from '@/components/organisms/dynamic-field/type/field-schema';
+import { DynamicFieldProps } from '@spaceone/design-system/dist/src/organisms/dynamic-field/type';
+import { EnumOptions } from '@spaceone/design-system/dist/src/organisms/dynamic-field/type/field-schema';
 import { Getter } from 'vuex';
 
 export const fieldItems: Getter<ResourceState, {}> = (state: ResourceState): Partial<DynamicFieldProps> => {

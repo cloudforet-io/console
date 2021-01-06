@@ -175,19 +175,18 @@ import {
 
 import ScheduleTimeTable from '@/views/automation/power-scheduler/modules/ScheduleTimeTable.vue';
 import ScheduleKanban from '@/views/automation/power-scheduler/modules/ScheduleKanban.vue';
-import PButtonModal from '@/components/organisms/modals/button-modal/PButtonModal.vue';
-import PFieldGroup from '@/components/molecules/forms/field-group/PFieldGroup.vue';
-import PTextInput from '@/components/atoms/inputs/PTextInput.vue';
+
 import {
     BOOTING_STATES, defaultSchedule, DESIRED_STATES, Schedule, ViewMode,
 } from '@/views/automation/power-scheduler/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
-import PPageTitle from '@/components/organisms/title/page-title/PPageTitle.vue';
-import PIconButton from '@/components/molecules/buttons/icon-button/PIconButton.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
-import PStatus from '@/components/molecules/status/PStatus.vue';
+
+import {
+    PButtonModal, PFieldGroup, PTextInput, PIconButton, PButton, PStatus, PPageTitle,
+} from '@spaceone/design-system';
+
 import { store } from '@/store';
 
 

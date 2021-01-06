@@ -113,10 +113,9 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, onUpdated, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import PChartLoader from '@/components/organisms/charts/chart-loader/PChartLoader.vue';
-import PIconTextButton from '@/components/molecules/buttons/icon-text-button/PIconTextButton.vue';
-import PSkeleton from '@/components/atoms/skeletons/PSkeleton.vue';
-import PButton from '@/components/atoms/buttons/PButton.vue';
+import {
+    PChartLoader, PIconTextButton, PSkeleton, PButton,
+} from '@spaceone/design-system';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { QueryHelper } from '@/lib/query';

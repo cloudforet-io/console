@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import PWidgetLayout from '@/components/organisms/layouts/widget-layout/PWidgetLayout.vue';
+import { PWidgetLayout } from '@spaceone/design-system';
 import CollectorHistory from '@/views/common/components/widgets/collector-history/CollectorHistory.vue';
 import CollectorRuns from '@/views/common/components/widgets/collector-runs/CollectorRuns.vue';
 
@@ -22,19 +22,18 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .widget::v-deep {
-        &.widget-layout {
-            @apply border-0 border-transparent;
-            .top {
-                @apply mt-0 mb-4 mx-0;
-            }
-            .title {
-                @apply text-base;
-            }
-            .widget-contents {
-                @apply p-0;
-            }
+.widget::v-deep {
+    &.widget-layout {
+        @apply border-0 border-transparent;
+        .top {
+            @apply mt-0 mb-4 mx-0;
         }
-
+        .title {
+            @apply text-base;
+        }
+        .widget-contents {
+            @apply p-0;
+        }
     }
+}
 </style>
