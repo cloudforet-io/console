@@ -15,8 +15,6 @@ export default {
 
 export const verticalLayout = () => ({
     components: { PVerticalLayout },
-    props: {
-    },
     template: `
         <div style="width: 100vw; border: 1px solid gray;">
             <p-vertical-layout>

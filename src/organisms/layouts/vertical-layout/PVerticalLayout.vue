@@ -37,6 +37,8 @@ import {
 } from '@vue/composition-api';
 import PI from '@/atoms/icons/PI.vue';
 
+const SCREEN_WIDTH_SM = 576;
+
 const documentEventMount = (eventName: string, func: any) => {
     onMounted(() => document.addEventListener(eventName, func));
     onUnmounted(() => document.removeEventListener(eventName, func));
@@ -135,12 +137,27 @@ export default {
         };
         documentEventMount('mousemove', isResizing);
         documentEventMount('mouseup', endResizing);
+
+        const detectWindowResizing = () => {
+            if (window.innerWidth <= SCREEN_WIDTH_SM) {
+                state.hide = false;
+                hideSidebar();
+            } else {
+                state.hide = true;
+                hideSidebar();
+            }
+        };
+
+        detectWindowResizing();
+        window.addEventListener('resize', detectWindowResizing);
+
         return {
             ...toRefs(state),
             hideSidebar,
             startResizing,
             isResizing,
             endResizing,
+            detectWindowResizing,
         };
     },
 };
