@@ -13,15 +13,10 @@ module.exports = {
   addons: [
     '@storybook/addon-actions',
     '@storybook/addon-links',
-    '@storybook/addon-knobs/preset',
+    '@storybook/addon-knobs',
     '@storybook/addon-storysource',
       '@storybook/addon-a11y',
-    {
-      name: '@storybook/addon-docs',
-      options: {
-          vueDocgenOptions: { alias: { '@': path.resolve(__dirname, '../src') }},
-      }
-    },
+      '@storybook/addon-docs',
     '@storybook/addon-google-analytics',
     'storybook-addon-designs/register'
   ],
