@@ -2,7 +2,7 @@ import PSelectBtnGroupSkeleton from '@/molecules/skeletons/PSelectBtnGroupSkelet
 import { number } from '@storybook/addon-knobs';
 
 export default {
-    title: 'Feedbacks/Loading',
+    title: 'Feedbacks/Loading/Skeleton Group',
     component: PSelectBtnGroupSkeleton,
 };
 

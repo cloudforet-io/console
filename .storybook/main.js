@@ -1,4 +1,3 @@
- // { INITIAL_VIEWPORTS } from '@storybook/addon-viewport'
  const path = require('path');
  const forkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 
@@ -9,12 +8,12 @@ const postCssLoader = {
 
 module.exports = {
   stories: [
-    '../src/**/*.stories.js',
+    '../src/**/*.stories.@(ts|js)',
   ],
   addons: [
     '@storybook/addon-actions',
     '@storybook/addon-links',
-    '@storybook/addon-knobs',
+    '@storybook/addon-knobs/preset',
     '@storybook/addon-storysource',
       '@storybook/addon-a11y',
     {
@@ -27,23 +26,6 @@ module.exports = {
     'storybook-addon-designs/register'
   ],
   webpackFinal:  async (config) => {
-
-    /* Typescript settings */
-    config.module.rules.push({
-        test: /\.(ts|tsx)$/,
-        exclude: /node_modules/,
-        use: [
-            {
-                loader: 'ts-loader',
-                options: {
-                    appendTsSuffixTo: [/\.vue$/],
-                    transpileOnly: true,
-                },
-            }
-        ],
-    });
-
-    config.resolve.extensions.push('.ts', '.tsx');
 
     /* alis settings */
     config.resolve.alias = {

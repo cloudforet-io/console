@@ -7,7 +7,7 @@ import PModal from '@/molecules/modals/PModal.vue';
 import { computed, ref } from '@vue/composition-api';
 
 export default {
-    title: 'Feedbacks/Modals',
+    title: 'Feedbacks/Modals/Modal',
     component: PModal,
     parameters: {
         info: {
@@ -15,7 +15,6 @@ export default {
             components: { PModal },
         },
         // knobs: { escapeHTML: false },
-        centered: { disable: true },
     },
 };
 

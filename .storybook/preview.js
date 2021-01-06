@@ -1,6 +1,3 @@
-import {configure, addParameters, addDecorator} from '@storybook/vue';
-import {withA11y} from '@storybook/addon-a11y';
-import centered from '@storybook/addon-centered/vue';
 import '@storybook/addon-console';
 import { withDesign } from 'storybook-addon-designs';
 import VueCompositionApi from '@vue/composition-api';
@@ -10,7 +7,6 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import VueI18n from 'vue-i18n';
 import velocity from 'velocity-animate';
-import { withKnobs } from '@storybook/addon-knobs';
 import SvgIcon from 'vue-svgicon';
 import Fragment from "vue-fragment";
 import Codemirror from "vue-codemirror";
@@ -68,7 +64,18 @@ const i18n = new VueI18n({
     silentFallbackWarn: true,
 });
 
-addParameters({
+
+export const decorators = [
+    withDesign,
+    () => ({
+        i18n,
+        router: new VueRouter(),
+        template: '<story/>',
+    })
+]
+
+export const parameters = {
+    layout: 'centered',
     docs: {
         extractComponentDescription: (component, { notes }) => {
             if (notes) {
@@ -101,13 +108,4 @@ addParameters({
         storySort: (a, b) =>
             a[1].kind === b[1].kind ? 0 : a[1].id.localeCompare(b[1].id, undefined, { numeric: true }),
     },
-});
-addDecorator(withA11y);
-addDecorator(withKnobs);
-addDecorator(centered);
-addDecorator(withDesign);
-addDecorator(() => ({
-    i18n,
-    router: new VueRouter(),
-    template: '<story/>',
-}));
+}

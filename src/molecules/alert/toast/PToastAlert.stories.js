@@ -3,7 +3,7 @@ import { text, select } from '@storybook/addon-knobs/vue';
 import PToastAlert from '@/molecules/alert/toast/PToastAlert.vue';
 
 export default {
-    title: 'Feedbacks/Alert',
+    title: 'Feedbacks/Alert/Toast',
     component: PToastAlert,
 };
 

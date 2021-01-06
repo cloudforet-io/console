@@ -11,7 +11,7 @@ import { sizeMapping } from '@/molecules/modals/type';
 import { computed, ref } from '@vue/composition-api';
 
 export default {
-    title: 'Feedbacks/Modals',
+    title: 'Feedbacks/Modals/Button Modal',
     component: PButtonModal,
     parameters: {
         info: {

@@ -68,7 +68,7 @@ export const longBadge = () => ({
         >Badge with long size in length</PBadge>`,
     props: {
         styleType: {
-            default: select('styleType', Object.values(BADGE_STYLE), ''),
+            default: select('styleType', Object.values(BADGE_STYLE), null),
         },
         textColor: {
             default: color('textColor', ''),
@@ -93,7 +93,7 @@ export const linkBadge = () => ({
         >Badge with link</PBadge>`,
     props: {
         styleType: {
-            default: select('styleType', Object.values(BADGE_STYLE), ''),
+            default: select('styleType', Object.values(BADGE_STYLE), null),
         },
         textColor: {
             default: color('textColor', ''),

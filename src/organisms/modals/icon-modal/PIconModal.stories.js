@@ -3,7 +3,7 @@ import PIconModal from '@/organisms/modals/icon-modal/PIconModal.vue';
 import PButton from '@/atoms/buttons/PButton.vue';
 
 export default {
-    title: 'Feedbacks/Modals',
+    title: 'Feedbacks/Modals/Icon Modal',
     component: PIconModal,
 };
 
