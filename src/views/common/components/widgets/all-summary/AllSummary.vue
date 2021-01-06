@@ -14,7 +14,7 @@
                                 <span>{{ data.type === 'storage' ? commaFormatter(data.count) : commaFormatter(numberFormatter(data.count)) }}</span>
                             </span>
                         </router-link>
-                        <span class="suffix" :class="data.type">{{ data.suffix }}</span>
+                        <span v-if="data.suffix" class="suffix" :class="data.type">{{ data.suffix }}</span>
                     </div>
                     <div class="title">
                         {{ data.title }}
@@ -27,7 +27,7 @@
                 <div class="chart-wrapper col-span-12 lg:col-span-9">
                     <div class="title">
                         <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
-                        <span v-if="selectedType === 'storage'" class="suffix">({{ suffix.storage }})</span>
+                        <span v-if="selectedType === 'storage'" class="suffix">({{ storageTrendSuffix }})</span>
                         <span v-if="selectedType === 'spendings'" class="suffix">(USD)</span>
                     </div>
                     <div class="toggle-button-group">
@@ -110,7 +110,7 @@ import { TranslateResult } from 'vue-i18n';
 import { Location } from 'vue-router';
 
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, onUpdated, reactive, toRefs, watch,
+    reactive, toRefs, watch, computed, onUnmounted, ComponentRenderProxy, getCurrentInstance,
 } from '@vue/composition-api';
 
 import {
@@ -240,24 +240,17 @@ export default {
                 storage: 0,
                 spendings: 0,
             },
-            suffix: {
-                compute: 'ea',
-                database: 'ea',
-                storage: 'TB',
-            },
             storageTrendSuffix: 'TB' as Unit,
             dataList: computed(() => ([
                 {
                     type: DATA_TYPE.compute,
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.COMPUTE'),
                     count: state.count.compute,
-                    suffix: state.suffix.compute,
                 },
                 {
                     type: DATA_TYPE.database,
                     title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE'),
                     count: state.count.database,
-                    suffix: state.suffix.database,
                 },
                 {
                     type: DATA_TYPE.storage,
