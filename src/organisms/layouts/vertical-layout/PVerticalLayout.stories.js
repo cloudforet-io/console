@@ -1,4 +1,4 @@
-import { withKnobs, text } from '@storybook/addon-knobs/vue';
+import { withKnobs, text } from '@storybook/addon-knobs';
 import PVerticalLayout from '@/organisms/layouts/vertical-layout/PVerticalLayout.vue';
 
 export default {

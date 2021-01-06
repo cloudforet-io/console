@@ -4,7 +4,7 @@ import {
 import { action } from '@storybook/addon-actions';
 import {
     text, number, select, object, boolean,
-} from '@storybook/addon-knobs/vue';
+} from '@storybook/addon-knobs';
 import casual, { arrayOf } from '@/util/casual';
 import PQuerySearchTable from './PQuerySearchTable.vue';
 import md from './PQuerySearchTable.md';

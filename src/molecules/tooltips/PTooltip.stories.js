@@ -1,4 +1,4 @@
-import { select } from '@storybook/addon-knobs/vue';
+import { select } from '@storybook/addon-knobs';
 import Tooltip from '@/molecules/tooltips/PTooltip.vue';
 import { PLACEMENTS } from '@/molecules/tooltips/type';
 import { autoProps } from '@sb/storybook-util';

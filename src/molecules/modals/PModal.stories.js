@@ -1,4 +1,4 @@
-import { number, select } from '@storybook/addon-knobs/vue';
+import { number, select } from '@storybook/addon-knobs';
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import { boolean } from '@storybook/addon-knobs';

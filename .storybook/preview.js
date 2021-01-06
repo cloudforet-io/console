@@ -1,3 +1,5 @@
+import "@/styles/style.pcss";
+
 import '@storybook/addon-console';
 import { withDesign } from 'storybook-addon-designs';
 import VueCompositionApi from '@vue/composition-api';
@@ -17,8 +19,7 @@ import { fontUrls, webFonts } from '@/styles/web-fonts';
 import tailwindConfig from './tailwind.config';
 import {mapValues} from 'lodash';
 import VTooltip from 'v-tooltip';
-import "@/styles/reset.pcss";
-import "@/styles/style.pcss";
+
 import SpaceOneTheme from './SpaceOneTheme';
 import componentEN from '@/translations/language-pack/en.json';
 import componentKO from '@/translations/language-pack/ko.json';

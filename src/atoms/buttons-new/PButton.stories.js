@@ -1,4 +1,4 @@
-import { select, text, boolean } from '@storybook/addon-knobs/vue';
+import { select, text, boolean } from '@storybook/addon-knobs';
 import { withDesign } from 'storybook-addon-designs';
 import { action } from '@storybook/addon-actions';
 import PButton from '@/atoms/buttons-new/PButton.vue';

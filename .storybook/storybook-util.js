@@ -1,6 +1,6 @@
 import {
     text, boolean, number, object, array, select, color,
-} from '@storybook/addon-knobs/vue';
+} from '@storybook/addon-knobs';
 import _ from 'lodash'
 
 const knobMapper = {

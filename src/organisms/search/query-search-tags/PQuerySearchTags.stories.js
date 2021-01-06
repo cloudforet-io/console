@@ -4,7 +4,7 @@ import {
 import { action } from '@storybook/addon-actions';
 import {
     text,
-} from '@storybook/addon-knobs/vue';
+} from '@storybook/addon-knobs';
 import md from './PQuerySearchTags.md';
 import PQuerySearchTags from './PQuerySearchTags.vue';
 

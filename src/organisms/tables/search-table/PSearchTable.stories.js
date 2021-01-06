@@ -5,7 +5,7 @@ import { action } from '@storybook/addon-actions';
 import { getKnobProps } from '@sb/storybook-util';
 import {
     text, number, select, object, boolean,
-} from '@storybook/addon-knobs/vue';
+} from '@storybook/addon-knobs';
 import casual, { arrayOf } from '@/util/casual';
 import PSearchTable from './PSearchTable.vue';
 

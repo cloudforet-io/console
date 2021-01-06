@@ -4,7 +4,7 @@ import {
 import { action } from '@storybook/addon-actions';
 import {
     text, number, select, object, boolean,
-} from '@storybook/addon-knobs/vue';
+} from '@storybook/addon-knobs';
 import PI from '@/atoms/icons/PI.vue';
 import PTreeNode from '@/molecules/tree-node/PTreeNode.vue';
 import md from '@/molecules/tree-node/PTreeNode.md';

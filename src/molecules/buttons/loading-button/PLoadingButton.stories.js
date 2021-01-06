@@ -1,6 +1,6 @@
 import {
     number, select, object, boolean,
-} from '@storybook/addon-knobs/vue';
+} from '@storybook/addon-knobs';
 import PLoadingButton from './PLoadingButton.vue';
 
 export default {

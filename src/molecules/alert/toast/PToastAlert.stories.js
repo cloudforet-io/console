@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { text, select } from '@storybook/addon-knobs/vue';
+import { text, select } from '@storybook/addon-knobs';
 import PToastAlert from '@/molecules/alert/toast/PToastAlert.vue';
 
 export default {

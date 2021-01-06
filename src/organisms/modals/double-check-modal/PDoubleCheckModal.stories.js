@@ -1,4 +1,4 @@
-import { select, text } from '@storybook/addon-knobs/vue';
+import { select, text } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import PButton from '@/atoms/buttons/PButton.vue';
 import { ref } from '@vue/composition-api';

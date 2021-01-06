@@ -3,7 +3,7 @@ import {
 } from '@vue/composition-api';
 import {
     text,
-} from '@storybook/addon-knobs/vue';
+} from '@storybook/addon-knobs';
 import PPanelTop from '@/molecules/panel/panel-top/PPanelTop.vue';
 
 export default {

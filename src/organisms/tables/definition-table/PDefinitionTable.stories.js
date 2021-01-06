@@ -3,7 +3,7 @@ import {
 } from '@vue/composition-api';
 import {
     text, number, select, object, boolean,
-} from '@storybook/addon-knobs/vue';
+} from '@storybook/addon-knobs';
 import PDefinitionTable from '@/organisms/tables/definition-table/PDefinitionTable.vue';
 import PIconTextButton from '@/molecules/buttons/icon-text-button/PIconTextButton.vue';
 import PLazyImg from '@/organisms/lazy-img/PLazyImg.vue';

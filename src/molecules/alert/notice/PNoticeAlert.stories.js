@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import { text, select } from '@storybook/addon-knobs/vue';
+import { text, select } from '@storybook/addon-knobs';
 import PNoticeAlert from '@/molecules/alert/notice/PNoticeAlert.vue';
 
 export default {

@@ -1,4 +1,4 @@
-import { number, select } from '@storybook/addon-knobs/vue';
+import { number, select } from '@storybook/addon-knobs';
 import { boolean } from '@storybook/addon-knobs';
 import { autoProps } from '@sb/storybook-util';
 import PButton from '@/atoms/buttons/PButton.vue';

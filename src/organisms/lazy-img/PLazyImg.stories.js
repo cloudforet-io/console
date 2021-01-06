@@ -1,5 +1,5 @@
 import { reactive, toRefs } from '@vue/composition-api';
-import { boolean } from '@storybook/addon-knobs/vue';
+import { boolean } from '@storybook/addon-knobs';
 import PLazyImg from '@/organisms/lazy-img/PLazyImg.vue';
 
 export default {

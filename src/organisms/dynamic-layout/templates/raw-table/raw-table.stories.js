@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import {
     text, number, select, object, boolean,
-} from '@storybook/addon-knobs/vue';
+} from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import casual, { arrayOf } from '@/util/casual';

@@ -1,4 +1,4 @@
-import { withKnobs, text } from '@storybook/addon-knobs/vue';
+import { withKnobs, text } from '@storybook/addon-knobs';
 import PCardItem from '@/molecules/cards/PCardItem.vue';
 import PBadge from '@/atoms/badges/PBadge.vue';
 

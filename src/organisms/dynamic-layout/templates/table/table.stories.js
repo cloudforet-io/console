@@ -6,7 +6,7 @@ import casual, { arrayOf } from '@/util/casual';
 import { action } from '@storybook/addon-actions';
 import {
     text, object,
-} from '@storybook/addon-knobs/vue';
+} from '@storybook/addon-knobs';
 import PDynamicLayout from '@/organisms/dynamic-layout/PDynamicLayout.vue';
 import md from '@/organisms/dynamic-layout/PDynamicLayout.md';
 

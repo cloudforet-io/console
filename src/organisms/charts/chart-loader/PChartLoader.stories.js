@@ -3,7 +3,7 @@ import {
 } from '@vue/composition-api';
 import {
     boolean,
-} from '@storybook/addon-knobs/vue';
+} from '@storybook/addon-knobs';
 import { PChart } from '@/organisms/charts/chart-helper';
 import PChartLoader from './PChartLoader.vue';
 

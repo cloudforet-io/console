@@ -1,5 +1,5 @@
 import { toRefs, reactive } from '@vue/composition-api';
-import { boolean, text } from '@storybook/addon-knobs/vue';
+import { boolean, text } from '@storybook/addon-knobs';
 import PTextInput from '@/atoms/inputs/PTextInput.vue';
 import PFieldGroup from './PFieldGroup.vue';
 

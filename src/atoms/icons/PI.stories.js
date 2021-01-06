@@ -1,4 +1,4 @@
-import { text, select, boolean } from '@storybook/addon-knobs/vue';
+import { text, select, boolean } from '@storybook/addon-knobs';
 import icon from 'vue-svgicon';
 import PI from '@/atoms/icons/PI.vue';
 

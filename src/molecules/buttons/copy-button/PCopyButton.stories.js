@@ -1,5 +1,5 @@
 import { action } from '@storybook/addon-actions';
-import { text } from '@storybook/addon-knobs/vue';
+import { text } from '@storybook/addon-knobs';
 import PCopyButton from '@/molecules/buttons/copy-button/PCopyButton.vue';
 import { ref } from '@vue/composition-api';
 

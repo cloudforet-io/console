@@ -1,5 +1,5 @@
 import { action } from '@storybook/addon-actions';
-import { select, boolean } from '@storybook/addon-knobs/vue';
+import { select, boolean } from '@storybook/addon-knobs';
 
 import icon from 'vue-svgicon';
 import PIconButton from '@/molecules/buttons/icon-button/PIconButton.vue';

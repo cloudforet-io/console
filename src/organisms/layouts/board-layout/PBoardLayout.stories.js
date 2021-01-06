@@ -1,4 +1,4 @@
-import { withKnobs, text, number } from '@storybook/addon-knobs/vue';
+import { withKnobs, text, number } from '@storybook/addon-knobs';
 import PBoardLayout from '@/organisms/layouts/board-layout/PBoardLayout.vue';
 import { autoProps } from '@sb/storybook-util';
 

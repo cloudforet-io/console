@@ -1,4 +1,4 @@
-import { number, text } from '@storybook/addon-knobs/vue';
+import { number, text } from '@storybook/addon-knobs';
 import PProgressBar from '@/molecules/progress-bar/PProgressBar.vue';
 
 export default {

@@ -1,4 +1,4 @@
-import { withKnobs } from '@storybook/addon-knobs/vue';
+import { withKnobs } from '@storybook/addon-knobs';
 import { toRefs, reactive } from '@vue/composition-api';
 import { getKnobProps } from '@sb/storybook-util';
 import PProgressTabBar from '@/molecules/tabs/progress-tab-bar/PProgressTabBar.vue';

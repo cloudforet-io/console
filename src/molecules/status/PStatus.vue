@@ -37,6 +37,8 @@ import { computed } from '@vue/composition-api';
 import { StatusProps } from '@/molecules/status/type';
 import { getColor } from '@/util/helpers';
 import PLottie from '@/molecules/lottie/PLottie.vue';
+import '@/styles/fontawesome.scss';
+import { themes } from '@/molecules/status/config';
 
 const fontAwesomePrefix = RegExp('fa-');
 
@@ -63,6 +65,9 @@ export default {
         theme: {
             type: String,
             default: null,
+            validator(theme) {
+                return theme === null || themes.includes(theme);
+            },
         },
         disableIcon: {
             type: Boolean,

@@ -1,4 +1,4 @@
-import { number } from '@storybook/addon-knobs/vue';
+import { number } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import PTextPagination from '@/organisms/paginations/text-pagination/PTextPagination.vue';
 

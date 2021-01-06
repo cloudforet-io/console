@@ -3,7 +3,7 @@ import {
 } from '@vue/composition-api';
 import {
     select, color,
-} from '@storybook/addon-knobs/vue';
+} from '@storybook/addon-knobs';
 import { getKnobProps } from '@sb/storybook-util';
 import PSelectableItem from '@/molecules/selectable-item/PSelectableItem.vue';
 

@@ -1,4 +1,4 @@
-import { withKnobs, boolean } from '@storybook/addon-knobs/vue';
+import { withKnobs, boolean } from '@storybook/addon-knobs';
 import { ref } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
 import PRadio from '@/molecules/forms/radio/PRadio.vue';

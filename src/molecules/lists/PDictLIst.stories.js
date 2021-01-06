@@ -1,4 +1,4 @@
-import { withKnobs, object } from '@storybook/addon-knobs/vue';
+import { withKnobs, object } from '@storybook/addon-knobs';
 import PDictList from '@/molecules/lists/PDictList.vue';
 
 

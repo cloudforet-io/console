@@ -3,7 +3,7 @@ import {
 } from '@vue/composition-api';
 import {
     text, number, select, object, boolean,
-} from '@storybook/addon-knobs/vue';
+} from '@storybook/addon-knobs';
 import PSkeleton from '@/atoms/skeletons/PSkeleton.vue';
 
 export default {

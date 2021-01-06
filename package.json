@@ -131,7 +131,7 @@
     "fork-ts-checker-webpack-plugin": "^6.0.3",
     "https-proxy-agent": "^2.2.4",
     "node-sass": "^4.13.1",
-    "postcss": "^7.0.30",
+    "postcss": "^8.2.2",
     "postcss-comment": "^2.0.0",
     "postcss-conditionals": "^2.1.0",
     "postcss-easy-import": "^3.0.0",

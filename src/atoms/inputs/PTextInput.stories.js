@@ -1,4 +1,4 @@
-import { boolean } from '@storybook/addon-knobs/vue';
+import { boolean } from '@storybook/addon-knobs';
 import PTextInput from '@/atoms/inputs/PTextInput.vue';
 
 export default {

@@ -1,6 +1,6 @@
 import {
     withKnobs, text, boolean, object, number,
-} from '@storybook/addon-knobs/vue';
+} from '@storybook/addon-knobs';
 import { toRefs, reactive, ref } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
 import { VTooltip } from 'v-tooltip';
