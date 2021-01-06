@@ -17,7 +17,6 @@ COPY pkg/nginx.conf ${NGINX_CONF_PATH}/spaceone_console_storybook.conf
 COPY package.json package-lock.json *.js ${BUILD_PATH}/
 RUN npm install
 
-COPY public ${BUILD_PATH}/public
 COPY src ${BUILD_PATH}/src
 COPY .storybook ${BUILD_PATH}/.storybook
 COPY tsconfig.json ${BUILD_PATH}/
