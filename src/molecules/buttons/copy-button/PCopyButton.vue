@@ -26,10 +26,10 @@
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
-import PI from '@/components/atoms/icons/PI.vue';
-import { copyAnyData, isNotEmpty } from '@/components/util/helpers';
-import { mouseOverState } from '@/components/util/composition-helpers';
-import color from '@/components/styles/colors';
+import PI from '@/atoms/icons/PI.vue';
+import { copyAnyData, isNotEmpty } from '@/util/helpers';
+import { mouseOverState } from '@/util/composition-helpers';
+import color from '@/styles/colors';
 
 export default {
     name: 'PCopyButton',
