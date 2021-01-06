@@ -1,6 +1,7 @@
 import { action } from '@storybook/addon-actions';
 import { text } from '@storybook/addon-knobs/vue';
-import PCopyButton from '@/molecules/buttons/copy-button/PCopyButton.vue';
+import PCopyButton from '@/components/molecules/buttons/copy-button/PCopyButton.vue';
+import { ref } from '@vue/composition-api';
 
 export default {
     title: 'Inputs/Buttons/CopyButton',
@@ -15,8 +16,8 @@ export default {
 
 export const copyButton = () => ({
     components: { PCopyButton },
-    template: ` <div> Copy Text: {{copyText}}
-                    <p-copy-button :value="copyText"/>
+    template: ` <div>
+                    <p-copy-button :value="copyText">{{copyText}}</p-copy-button>
                 </div>`,
 
     props: {
