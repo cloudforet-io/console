@@ -1,5 +1,10 @@
+/* eslint-disable camelcase */
 import PTextEditor from '@/molecules/text-editor/text-editor/PTextEditor.vue';
-import { computed } from '@vue/composition-api';
+import { object, select, boolean } from '@storybook/addon-knobs';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
+import { modes } from '@/molecules/text-editor/text-editor/config';
 
 export default {
     title: 'Inputs/TextEditor',
@@ -58,25 +63,27 @@ const value = {
     ],
 };
 
+
 export const textEditor = () => ({
     components: { PTextEditor },
     props: {
         item: {
-            type: [Object, Array],
-            default: value,
+            default: object('item', { ...value }),
         },
-        raw: {
-            type: String,
-            default: undefined,
+        mode: {
+            default: select('mode', modes, 'readOnly'),
         },
         loading: {
-            type: Boolean,
-            default: false,
+            default: boolean('loading', false),
         },
     },
     template: `
             <div style="width: 80vw; height:80vh" class="flex flex-wrap">
-                <PTextEditor :code.sync="code" class="sm:w-1/2 pr-4 pl-4"/>
+                <p-text-editor :code="code" 
+                               :mode="mode"
+                               :loading="loading"
+                               class="sm:w-1/2 pr-4 pl-4"
+                />
             </div>`,
     setup(props) {
         const code = computed(() => JSON.stringify(props.item, undefined, 4));
@@ -90,26 +97,29 @@ export const FoldingCase = () => ({
     components: { PTextEditor },
     props: {
         item: {
-            type: [Object, Array],
-            default: value,
-        },
-        raw: {
-            type: String,
-            default: undefined,
+            default: object('item', { ...value }),
         },
         loading: {
-            type: Boolean,
-            default: false,
+            default: boolean('loading', false),
         },
     },
     template: `
             <div style="width: 80vw; height:80vh" class="flex flex-wrap">
-                <PTextEditor :code.sync="code" class="sm:w-1/2 pr-4 pl-4" :mode="'readOnly'"/>
+                <p-text-editor :code.sync="code"
+                               mode="readOnly"
+                               :loading="loading"
+                               class="sm:w-1/2 pr-4 pl-4"
+                />
             </div>`,
     setup(props) {
-        const code = computed(() => JSON.stringify(props.item, undefined, 4));
+        const state = reactive({
+            code: {},
+        });
+        watch(() => props.item, (after) => {
+            state.code = JSON.stringify(after, undefined, 4);
+        }, { immediate: true });
         return {
-            code,
+            ...toRefs(state),
         };
     },
 });

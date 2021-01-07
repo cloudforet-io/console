@@ -32,10 +32,31 @@ import {
 } from '@vue/composition-api';
 
 import { codemirror } from 'vue-codemirror';
+import CodeMirror from 'codemirror';
+import 'codemirror/mode/javascript/javascript';
+
 
 import { makeProxy } from '@/util/composition-helpers';
 import PLottie from '@/molecules/lottie/PLottie.vue';
-import CodeMirror from 'codemirror';
+import { modes } from '@/molecules/text-editor/text-editor/config';
+
+let isAddonsImported = false;
+
+const importAddons = async () => {
+    await Promise.all([
+        import(/* webpackMode: "eager" */ 'codemirror/addon/fold/brace-fold'),
+        import(/* webpackMode: "eager" */ 'codemirror/addon/fold/comment-fold'),
+        import(/* webpackMode: "eager" */ 'codemirror/addon/fold/foldcode'),
+        import(/* webpackMode: "eager" */ 'codemirror/addon/fold/foldgutter'),
+        import(/* webpackMode: "eager" */ 'codemirror/addon/fold/indent-fold'),
+        import(/* webpackMode: "eager" */ 'codemirror/addon/fold/markdown-fold'),
+        import(/* webpackMode: "eager" */ 'codemirror/addon/fold/xml-fold'),
+        import(/* webpackMode: "eager" */ 'codemirror/addon/lint/json-lint'),
+        import(/* webpackMode: "eager" */ 'codemirror/addon/edit/closebrackets'),
+        import(/* webpackMode: "eager" */ 'codemirror/addon/edit/closetag'),
+    ]);
+    isAddonsImported = true;
+};
 
 export default {
     name: 'PTextEditor',
@@ -66,7 +87,9 @@ export default {
         mode: {
             type: String,
             default: 'edit',
-            required: true,
+            validator(mode) {
+                return modes.includes(mode);
+            },
         },
         loading: {
             type: Boolean,
@@ -74,33 +97,19 @@ export default {
         },
     },
     setup(props, { emit }) {
-        import 'codemirror/mode/javascript/javascript';
-        import 'codemirror/addon/lint/json-lint';
-        import 'codemirror/addon/fold/brace-fold';
-        import 'codemirror/addon/fold/comment-fold';
-        import 'codemirror/addon/fold/foldcode';
-        import 'codemirror/addon/fold/foldgutter';
-        import 'codemirror/addon/fold/indent-fold';
-        import 'codemirror/addon/fold/markdown-fold';
-        import 'codemirror/addon/fold/xml-fold';
-        import 'codemirror/addon/edit/closebrackets';
-        import 'codemirror/addon/edit/closetag';
-
         const state = reactive({
             proxyCode: makeProxy('code', props, emit),
             editor: null as any,
         });
-        watch([() => props.code, () => state.editor], ([code, editor]) => {
+        watch([() => props.code, () => state.editor], async ([code, editor]) => {
             if (props.mode === 'readOnly' && editor && code) {
-                const cm: CodeMirror = editor.codemirror;
+                if (!isAddonsImported) await importAddons();
 
+                const cm: CodeMirror = editor.codemirror;
                 cm.operation(() => {
                     for (let l = cm.firstLine() + 1; l <= cm.lastLine(); ++l) {
-                        // const line: string = cm.getLine(l);
-                        // if (line.startsWith('    ') && !line.startsWith('     ')) {
                         cm.foldCode({ line: l, ch: 0 }, null, 'fold');
                     }
-                    // }
                 });
             }
         }, { immediate: true });
