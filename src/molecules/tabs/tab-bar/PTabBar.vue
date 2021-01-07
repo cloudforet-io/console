@@ -67,7 +67,7 @@ export default {
 
 <style lang="postcss" scoped>
 .p-nav-tabs {
-    @apply flex flex-wrap pl-0 mb-0 ;
+    @apply flex flex-wrap pl-0 mb-0;
     .nav-item {
         cursor: pointer;
     }
@@ -84,9 +84,9 @@ export default {
             @apply text-gray-900;
         }
         &.active {
-            @apply text-primary;
+            @apply border-b-4 border-gray-100 text-primary;
             &:not(.single-tab) {
-                @apply border-b-4 border-primary;
+                @apply border-primary;
             }
         }
         .label {

@@ -9,6 +9,10 @@ export default {
             summary: '',
             components: { PTab },
         },
+        design: {
+            type: 'figma',
+            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6013%3A121728',
+        },
     },
 };
 const actions = {
@@ -16,9 +20,9 @@ const actions = {
 };
 const data = {
     tabs: [
-        { name: 'detail', label: '디테일' },
-        { name: 'info', label: '정보' },
-        { name: 'tags', label: '태그' },
+        { name: 'detail', label: 'Detail' },
+        { name: 'info', label: 'Info' },
+        { name: 'tags', label: 'Tags' },
     ],
     activeTab: 'detail',
 };
@@ -42,7 +46,6 @@ export const tab = () => ({
             </template>
         
             </PTab>
-            <p>{{activeTab}}</p>
         </div>`,
     setup() {
         return {
@@ -51,6 +54,7 @@ export const tab = () => ({
         };
     },
 });
+
 export const oneTab = () => ({
     components: { PTab },
     template: `
@@ -73,7 +77,38 @@ export const oneTab = () => ({
     setup() {
         return {
             tabs: [
-                { name: 'detail', label: '디테일' },
+                { name: 'detail', label: 'Detail' },
+            ],
+            activeTab: 'detail',
+            ...actions,
+        };
+    },
+});
+
+export const twoTabs = () => ({
+    components: { PTab },
+    template: `
+        <div style="width: 80vw;">
+            <PTab :tabs="tabs" :activeTab.sync="activeTab" >
+            <template #detail="{tabName}" >
+                <keep-alive>
+                   <p> this tab is {{tabName}}</p>
+                </keep-alive>
+            </template>
+            <template #info="{tabName}" >
+                   <p> this tab is {{tabName}}</p>
+            </template>
+            <template #tags="{tabName}" >
+                   <p> this tab is {{tabName}}</p>
+            </template>
+        
+            </PTab>
+        </div>`,
+    setup() {
+        return {
+            tabs: [
+                { name: 'detail', label: 'Detail' },
+                { name: 'info', label: 'Info' },
             ],
             activeTab: 'detail',
             ...actions,
