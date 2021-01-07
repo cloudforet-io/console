@@ -6,7 +6,6 @@ import VueCompositionApi from '@vue/composition-api';
 import Notifications from 'vue-notification';
 import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
-import Codemirror from 'vue-codemirror';
 import '@/styles/style.pcss';
 
 import componentKO from '@/translations/language-pack/ko.json';
@@ -41,7 +40,6 @@ const SpaceoneDS: PluginObject<SpaceoneDSOptions> = {
 
         _Vue.use(Fragment.Plugin);
         _Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
-        _Vue.use(Codemirror);
 
 
         const i18n = new VueI18n({

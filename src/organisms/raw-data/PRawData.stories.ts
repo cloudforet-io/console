@@ -1,4 +1,6 @@
+/* eslint-disable camelcase */
 import PRawData from '@/organisms/raw-data/PRawData.vue';
+import { boolean } from '@storybook/addon-knobs';
 
 export default {
     title: 'Data Display/RawData',
@@ -11,7 +13,7 @@ export default {
     },
 };
 
-const value = {
+const rawDataValue = {
     server_id: 'server-283cd170d17d',
     name: 'spaceone-dev-eks-cluster_kubectl',
     state: 'INSERVICE',
@@ -57,30 +59,45 @@ const value = {
     ],
 };
 
-export const rawData = () => ({
+export const inputObject = () => ({
     components: { PRawData },
     props: {
-        item: {
-            type: [Object, Array],
-            default: value,
-        },
-        raw: {
-            type: String,
-            default: undefined,
-        },
         loading: {
             type: Boolean,
-            default: false,
+            default: boolean('loading', false),
         },
     },
     template: `
-            <div style="width: 80vw; height:80vh" class="flex flex-wrap">
-                <p-raw-data :item="code" :loading="loading" />
+            <div style="width: 80vw; height:80vh">
+                <p-raw-data :item="code" 
+                            :loading="loading"
+                            class="w-full px-4"/>
             </div>`,
     setup(props) {
-        const code = value;
         return {
-            code,
+            code: rawDataValue,
+        };
+    },
+});
+
+
+export const inputString = () => ({
+    components: { PRawData },
+    props: {
+        loading: {
+            type: Boolean,
+            default: boolean('loading', false),
+        },
+    },
+    template: `
+            <div style="width: 80vw; height:80vh">
+                <p-raw-data :raw="code" 
+                            :loading="loading"
+                            class="w-full px-4"/>
+            </div>`,
+    setup(props) {
+        return {
+            code: JSON.stringify(rawDataValue, undefined, 4),
         };
     },
 });

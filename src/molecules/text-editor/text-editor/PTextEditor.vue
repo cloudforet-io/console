@@ -12,12 +12,9 @@
             </div>
         </transition>
         <div v-if="!loading">
-            <codemirror ref="editor"
-                        :value="code"
-                        :options="options"
-                        :mode="mode"
-                        @ready="onCmReady"
-                        @input="onCmCodeChange"
+            <textarea ref="textarea"
+                      name="codemirror"
+                      placeholder=""
             />
         </div>
     </div>
@@ -30,8 +27,11 @@
 * */
 
 import {
-    reactive, toRefs,
+    ComponentRenderProxy, computed,
+    getCurrentInstance, onBeforeUnmount,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
+import CodeMirror from 'codemirror';
 
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/fold/brace-fold';
@@ -45,6 +45,7 @@ import 'codemirror/addon/lint/json-lint';
 import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/addon/edit/closetag';
 
+import { forEach } from 'lodash';
 import PLottie from '@/molecules/lottie/PLottie.vue';
 import { modes } from '@/molecules/text-editor/text-editor/config';
 
@@ -87,23 +88,23 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            editor: null as any,
-            cm: null as any,
+            content: '',
+            cminstance: null as any,
+            textarea: null as any,
+            mergedOptions: computed(() => ({ ...props.options, readOnly: props.mode === 'readOnly' })),
         });
 
         const forceFold = () => {
-            if (props.mode === 'readOnly' && state.cm && props.code) {
-                state.cm.operation(() => {
-                    for (let l = state.cm.firstLine() + 1; l <= state.cm.lastLine(); ++l) {
-                        state.cm.foldCode({ line: l, ch: 0 }, null, 'fold');
+            if (props.mode === 'readOnly' && state.cminstance && props.code) {
+                state.cminstance.operation(() => {
+                    for (let l = state.cminstance.firstLine() + 1;
+                        l <= state.cminstance.lastLine(); ++l) {
+                        state.cminstance.foldCode({ line: l, ch: 0 }, null, 'fold');
                     }
                 });
             }
-        };
-        const onCmReady = (cm) => {
-            state.cm = cm;
-            forceFold();
         };
 
         const onCmCodeChange = (newCode) => {
@@ -111,10 +112,71 @@ export default {
             forceFold();
         };
 
+        const handleCodeChange = (newVal) => {
+            const cmValue = state.cminstance.getValue();
+            if (newVal !== cmValue) {
+                const scrollInfo = state.cminstance.getScrollInfo();
+                state.cminstance.setValue(newVal);
+                state.content = newVal;
+                state.cminstance.scrollTo(scrollInfo.left, scrollInfo.top);
+            }
+        };
+
+        const refresh = () => {
+            vm.$nextTick(() => {
+                state.cminstance.refresh();
+            });
+        };
+
+        const destroy = (cminstance) => {
+            // garbage cleanup
+            const element = cminstance?.doc?.cm?.getWrapperElement();
+            if (element?.remove) element.remove();
+        };
+
+        const init = () => {
+            state.cminstance = CodeMirror.fromTextArea(state.textarea, state.mergedOptions);
+
+            watch(() => state.mergedOptions, (options) => {
+                if (options && state.cminstance) {
+                    forEach(options, (d, k) => {
+                        state.cminstance.setOption(k, d);
+                    });
+                }
+            }, { deep: true });
+
+            state.cminstance.on('change', (cm) => {
+                state.content = cm.getValue();
+                onCmCodeChange(state.content);
+            });
+
+            watch(() => props.code, (newVal) => {
+                handleCodeChange(newVal);
+            }, { immediate: true });
+
+            forceFold();
+
+            // prevents funky dynamic rendering
+            refresh();
+        };
+
+
+        watch(() => state.textarea, (after, before) => {
+            if (after) {
+                init();
+            } else {
+                destroy(before);
+            }
+        });
+
+
+        onBeforeUnmount(() => {
+            destroy(state.cminstance);
+        });
+
+
         return {
             ...toRefs(state),
-            onCmReady,
-            onCmCodeChange,
         };
     },
 };
