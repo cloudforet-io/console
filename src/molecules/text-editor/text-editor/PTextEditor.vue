@@ -32,17 +32,17 @@ import {
 } from '@vue/composition-api';
 
 import { codemirror } from 'vue-codemirror';
-import 'codemirror/mode/javascript/javascript';
 
 
 import { makeProxy } from '@/util/composition-helpers';
 import PLottie from '@/molecules/lottie/PLottie.vue';
 import { modes } from '@/molecules/text-editor/text-editor/config';
 
-let isAddonsImported = false;
+
 
 const importAddons = async () => {
     await Promise.all([
+        import(/* webpackMode: "eager" */ 'codemirror/mode/javascript/javascript'),
         import(/* webpackMode: "eager" */ 'codemirror/addon/fold/brace-fold'),
         import(/* webpackMode: "eager" */ 'codemirror/addon/fold/comment-fold'),
         import(/* webpackMode: "eager" */ 'codemirror/addon/fold/foldcode'),
@@ -54,7 +54,6 @@ const importAddons = async () => {
         import(/* webpackMode: "eager" */ 'codemirror/addon/edit/closebrackets'),
         import(/* webpackMode: "eager" */ 'codemirror/addon/edit/closetag'),
     ]);
-    isAddonsImported = true;
 };
 
 export default {
@@ -96,17 +95,22 @@ export default {
         },
     },
     setup(props, { emit }) {
+        let isAddonsImported = false;
         const state = reactive({
             proxyCode: makeProxy('code', props, emit),
             editor: null as any,
         });
         watch([() => props.code, () => state.editor], async ([code, editor]) => {
             if (props.mode === 'readOnly' && editor && code) {
-                if (!isAddonsImported) await importAddons();
+                if (!isAddonsImported) {
+                    await importAddons();
+                    isAddonsImported = true;
+                }
 
                 const cm = editor.codemirror;
                 cm.operation(() => {
                     for (let l = cm.firstLine() + 1; l <= cm.lastLine(); ++l) {
+                        if (!cm.foldCode) console.debug('no foldCode', state.editor)
                         cm.foldCode({ line: l, ch: 0 }, null, 'fold');
                     }
                 });
