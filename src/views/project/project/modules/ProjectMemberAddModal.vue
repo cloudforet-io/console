@@ -32,6 +32,22 @@
                     {{ tag }}
                 </p-tag>
             </p>
+            <p-field-group
+                :label="'Project Role'"
+                :required="true"
+                :invalid="validationState.isProjectRoleValid === false"
+                :invalid-text="validationState.projectRoleCheckInvalidText"
+                class="dropdown"
+            >
+                <template #default="{invalid}">
+                    <p-select-dropdown v-model="projectRole"
+                                       :items="projectRoleList"
+                                       auto-height
+                                       :disabled="projectRoleList.length < 1"
+                                       :placeholder="'Select a Role'"
+                    />
+                </template>
+            </p-field-group>
         </template>
     </p-button-modal>
 </template>
@@ -42,12 +58,14 @@ import {
 } from '@/lib/compostion-util';
 
 import {
-    ComponentRenderProxy,
+    ComponentRenderProxy, computed,
     getCurrentInstance,
     reactive, ref, Ref, toRefs,
 } from '@vue/composition-api';
 
-import { PButtonModal, PTag, PSearchTable } from '@spaceone/design-system';
+import {
+    PButtonModal, PTag, PSearchTable, PSelectDropdown, PFieldGroup,
+} from '@spaceone/design-system';
 import { SearchTableListeners, Options } from '@spaceone/design-system/dist/src/organisms/tables/search-table/type';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
@@ -55,8 +73,11 @@ import { isEqual } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import VueI18n from 'vue-i18n';
 
-const tagList = (proxyTags?: Ref<string[]>|null, checkDuplicate = true, eventBus?: any, eventName?: string, addTagCallBack?: any) => {
+import TranslateResult = VueI18n.TranslateResult;
+
+const tagList = (proxyTags?: Ref<string[]>|null, checkDuplicate = true) => {
     const tags: Ref<any[]> = proxyTags || ref([]);
     if (!tags.value) tags.value = [];
 
@@ -67,14 +88,10 @@ const tagList = (proxyTags?: Ref<string[]>|null, checkDuplicate = true, eventBus
         const updatedTags = [...tags.value];
         updatedTags.splice(idx, 1);
         tags.value = updatedTags;
-        if (eventBus) { eventBus.$emit(eventName, tags.value); }
-        if (addTagCallBack) { addTagCallBack(tags.value); }
     };
 
     const deleteAllTags = () => {
         tags.value = [];
-        if (eventBus) { eventBus.$emit(eventName, tags.value); }
-        if (addTagCallBack) { addTagCallBack(tags.value); }
     };
 
     const validation = value => tags.value.every(tag => !isEqual(tag, value));
@@ -89,8 +106,6 @@ const tagList = (proxyTags?: Ref<string[]>|null, checkDuplicate = true, eventBus
         const updatedTags = [...tags.value];
         updatedTags.push(val);
         tags.value = updatedTags;
-        if (eventBus) { eventBus.$emit(eventName, tags.value); }
-        if (addTagCallBack) { addTagCallBack(tags.value); }
     };
 
     return reactive({
@@ -107,6 +122,8 @@ export default {
         PSearchTable,
         PButtonModal,
         PTag,
+        PSelectDropdown,
+        PFieldGroup,
     },
     directives: {
         focus: {
@@ -144,6 +161,12 @@ export default {
             loading: false,
             totalCount: 0,
             options: {} as Options,
+            projectRole: '' as string,
+            projectRoleList: [] as any[],
+        });
+        const validationState = reactive({
+            isProjectRoleValid: undefined as undefined | boolean,
+            projectRoleCheckInvalidText: '' as TranslateResult | string,
         });
         const formState = reactive({
             tagTools: tagList(null),
@@ -175,6 +198,18 @@ export default {
             }
         };
 
+        const getRoleList = async () => {
+            const res = await SpaceConnector.client.identity.role.list({
+                // eslint-disable-next-line camelcase
+                role_type: 'PROJECT',
+            });
+            state.projectRoleList = res.results.map(d => ({
+                type: 'item',
+                label: d.name,
+                name: d.role_id,
+            }));
+        };
+
         const onSelect = (item) => {
             formState.tagTools.addTag(item.user_id);
         };
@@ -186,27 +221,57 @@ export default {
             }
         };
 
-        const confirm = async () => {
-            const users = formState.tagTools.tags;
-            try {
-                await SpaceConnector.client.identity.project.member.add({
-                    project_id: projectId,
-                    users,
-                });
-                showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_ADD_MEMBER'), '', root);
-            } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_ADD_MEMBER'), e, root);
-            } finally {
-                emit('confirm');
-                proxyVisible.value = false;
+        const checkProjectRole = async () => {
+            if (state.projectRole === '') {
+                validationState.isProjectRoleValid = false;
+                validationState.projectRoleCheckInvalidText = 'Select a Role';
+            } else {
+                validationState.isProjectRoleValid = true;
+                validationState.projectRoleCheckInvalidText = '';
             }
         };
 
-        listUser();
+        const bindRole = async (id, roleId) => {
+            await SpaceConnector.client.identity.roleBinding.create({
+                resource_type: 'identity.User',
+                resource_id: id,
+                role_id: roleId,
+                project_id: projectId,
+            });
+        };
+
+        const confirm = async () => {
+            const users = formState.tagTools.tags;
+
+            await checkProjectRole();
+
+            if (validationState.isProjectRoleValid) {
+                try {
+                    await SpaceConnector.client.identity.project.member.add({
+                        project_id: projectId,
+                        users,
+                    });
+                    await users.forEach((id) => {
+                        bindRole(id, state.projectRole);
+                    });
+                    showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_ADD_MEMBER'), '', root);
+                } catch (e) {
+                    showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_ADD_MEMBER'), e, root);
+                } finally {
+                    emit('confirm');
+                    proxyVisible.value = false;
+                }
+            }
+        };
+
+        (async () => {
+            await Promise.all([listUser(), getRoleList()]);
+        })();
 
         return {
             ...toRefs(state),
             ...toRefs(formState),
+            validationState,
             listUser,
             confirm,
             onSelect,
@@ -223,27 +288,27 @@ export default {
     @apply font-semibold leading-normal text-sm mb-1 mt-8;
 }
 .tag-container {
+    @apply border border-gray-200;
     height: 7.5rem;
     padding: 0.5rem;
     border-radius: 0.125rem;
     background-color: theme('colors.primary4');
-    border: 0.0625rem solid theme('colors.gray.100');
-
-    /*
-    @define-mixin box-color $theme, $bg-color, $line-color {
-        &.$(theme) {
-            background-color: $bg-color;
-            border-color: $line-color;
-        }
-    }
-    @mixin box-color primary4, theme('colors.primary4'), theme('colors.gray.100');
-     */
 
     >>> .p-tag.deletable {
         @apply bg-white border border-primary;
+        margin-bottom: 0.25rem;
         .p-i-icon {
             @apply text-primary;
         }
     }
+}
+>>> .modal-content .modal-body-container {
+    overflow: visible;
+}
+.dropdown {
+    margin-top: 1rem;
+}
+.p-dropdown-menu-btn {
+    max-width: 14rem;
 }
 </style>
