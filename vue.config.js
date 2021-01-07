@@ -101,8 +101,6 @@ module.exports = {
             'vue-notification',
             'vue-fragment',
             'v-tooltip',
-            'vue-codemirror',
-            'codemirror',
         ]);
     },
     parallel: false,
