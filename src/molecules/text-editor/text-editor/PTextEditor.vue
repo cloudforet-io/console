@@ -32,7 +32,6 @@ import {
 } from '@vue/composition-api';
 
 import { codemirror } from 'vue-codemirror';
-import CodeMirror from 'codemirror';
 import 'codemirror/mode/javascript/javascript';
 
 
@@ -105,7 +104,7 @@ export default {
             if (props.mode === 'readOnly' && editor && code) {
                 if (!isAddonsImported) await importAddons();
 
-                const cm: CodeMirror = editor.codemirror;
+                const cm = editor.codemirror;
                 cm.operation(() => {
                     for (let l = cm.firstLine() + 1; l <= cm.lastLine(); ++l) {
                         cm.foldCode({ line: l, ch: 0 }, null, 'fold');
