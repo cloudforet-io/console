@@ -110,8 +110,8 @@ export default {
                 const cm = editor.codemirror;
                 cm.operation(() => {
                     for (let l = cm.firstLine() + 1; l <= cm.lastLine(); ++l) {
-                        if (!cm.foldCode) console.debug('no foldCode', state.editor)
-                        cm.foldCode({ line: l, ch: 0 }, null, 'fold');
+                        console.log('no foldCode', state.editor);
+                        if (cm.foldCode) cm.foldCode({ line: l, ch: 0 }, null, 'fold');
                     }
                 });
             }
