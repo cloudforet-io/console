@@ -32,7 +32,17 @@ import {
 } from '@vue/composition-api';
 
 import { codemirror } from 'vue-codemirror';
-
+import 'codemirror/mode/javascript/javascript';
+import 'codemirror/addon/fold/brace-fold';
+import 'codemirror/addon/fold/comment-fold';
+import 'codemirror/addon/fold/foldcode';
+import 'codemirror/addon/fold/foldgutter';
+import 'codemirror/addon/fold/indent-fold';
+import 'codemirror/addon/fold/markdown-fold';
+import 'codemirror/addon/fold/xml-fold';
+import 'codemirror/addon/lint/json-lint';
+import 'codemirror/addon/edit/closebrackets';
+import 'codemirror/addon/edit/closetag';
 
 import { makeProxy } from '@/util/composition-helpers';
 import PLottie from '@/molecules/lottie/PLottie.vue';
@@ -41,17 +51,17 @@ import { modes } from '@/molecules/text-editor/text-editor/config';
 
 const importAddons = async () => {
     await Promise.all([
-        import(/* webpackMode: "eager" */ 'codemirror/mode/javascript/javascript'),
-        import(/* webpackMode: "eager" */ 'codemirror/addon/fold/brace-fold'),
-        import(/* webpackMode: "eager" */ 'codemirror/addon/fold/comment-fold'),
-        import(/* webpackMode: "eager" */ 'codemirror/addon/fold/foldcode'),
-        import(/* webpackMode: "eager" */ 'codemirror/addon/fold/foldgutter'),
-        import(/* webpackMode: "eager" */ 'codemirror/addon/fold/indent-fold'),
-        import(/* webpackMode: "eager" */ 'codemirror/addon/fold/markdown-fold'),
-        import(/* webpackMode: "eager" */ 'codemirror/addon/fold/xml-fold'),
-        import(/* webpackMode: "eager" */ 'codemirror/addon/lint/json-lint'),
-        import(/* webpackMode: "eager" */ 'codemirror/addon/edit/closebrackets'),
-        import(/* webpackMode: "eager" */ 'codemirror/addon/edit/closetag'),
+        // import(/* webpackMode: "eager" */ 'codemirror/mode/javascript/javascript'),
+        // import(/* webpackMode: "eager" */ 'codemirror/addon/fold/brace-fold'),
+        // import(/* webpackMode: "eager" */ 'codemirror/addon/fold/comment-fold'),
+        // import(/* webpackMode: "eager" */ 'codemirror/addon/fold/foldcode'),
+        // import(/* webpackMode: "eager" */ 'codemirror/addon/fold/foldgutter'),
+        // import(/* webpackMode: "eager" */ 'codemirror/addon/fold/indent-fold'),
+        // import(/* webpackMode: "eager" */ 'codemirror/addon/fold/markdown-fold'),
+        // import(/* webpackMode: "eager" */ 'codemirror/addon/fold/xml-fold'),
+        // import(/* webpackMode: "eager" */ 'codemirror/addon/lint/json-lint'),
+        // import(/* webpackMode: "eager" */ 'codemirror/addon/edit/closebrackets'),
+        // import(/* webpackMode: "eager" */ 'codemirror/addon/edit/closetag'),
     ]);
 };
 
@@ -107,10 +117,12 @@ export default {
                 }
 
                 const cm = editor.codemirror;
+                cm.setOption('foldGutter', true);
+                cm.setOption('gutters', ['CodeMirror-linenumbers', 'CodeMirror-foldgutter']);
+                console.log('TextEditor >> ', cm);
                 cm.operation(() => {
                     for (let l = cm.firstLine() + 1; l <= cm.lastLine(); ++l) {
-                        console.log('no foldCode', state.editor);
-                        if (cm.foldCode) cm.foldCode({ line: l, ch: 0 }, null, 'fold');
+                        cm.foldCode({ line: l, ch: 0 }, null, 'fold');
                     }
                 });
             }
