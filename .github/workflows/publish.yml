@@ -17,6 +17,7 @@ jobs:
           node-version: 12
           registry-url: https://registry.npmjs.org/   
       - run: |
+          git switch -c master
           git config user.email "github-actions@github.com"
           git config user.name "github-actions"
           git pull
