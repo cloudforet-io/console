@@ -33,7 +33,6 @@ import {
     reactive, toRefs,
 } from '@vue/composition-api';
 
-import { codemirror } from 'vue-codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/fold/brace-fold';
 import 'codemirror/addon/fold/comment-fold';
@@ -49,21 +48,9 @@ import 'codemirror/addon/edit/closetag';
 import PLottie from '@/molecules/lottie/PLottie.vue';
 import { modes } from '@/molecules/text-editor/text-editor/config';
 
-// require('codemirror/mode/javascript/javascript');
-// require('codemirror/addon/fold/brace-fold');
-// require('codemirror/addon/fold/comment-fold');
-// require('codemirror/addon/fold/foldcode');
-// require('codemirror/addon/fold/foldgutter');
-// require('codemirror/addon/fold/indent-fold');
-// require('codemirror/addon/fold/markdown-fold');
-// require('codemirror/addon/fold/xml-fold');
-// require('codemirror/addon/lint/json-lint');
-// require('codemirror/addon/edit/closebrackets');
-// require('codemirror/addon/edit/closetag');
-
 export default {
     name: 'PTextEditor',
-    components: { codemirror, PLottie },
+    components: { PLottie },
     props: {
         code: {
             type: String,
