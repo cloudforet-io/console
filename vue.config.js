@@ -102,6 +102,7 @@ module.exports = {
             'vue-fragment',
             'v-tooltip',
             'vue-codemirror',
+            'codemirror',
         ]);
     },
     parallel: false,

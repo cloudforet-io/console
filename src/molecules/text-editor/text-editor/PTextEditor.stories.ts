@@ -82,13 +82,18 @@ export const textEditor = () => ({
                 <p-text-editor :code="code" 
                                :mode="mode"
                                :loading="loading"
-                               class="sm:w-1/2 pr-4 pl-4"
+                               class="w-full px-4"
                 />
             </div>`,
     setup(props) {
-        const code = computed(() => JSON.stringify(props.item, undefined, 4));
+        const state = reactive({
+            code: {},
+        });
+        watch(() => props.item, (after) => {
+            state.code = JSON.stringify(after, undefined, 4);
+        }, { immediate: true });
         return {
-            code,
+            ...toRefs(state),
         };
     },
 });
@@ -105,10 +110,10 @@ export const FoldingCase = () => ({
     },
     template: `
             <div style="width: 80vw; height:80vh" class="flex flex-wrap">
-                <p-text-editor :code.sync="code"
+                <p-text-editor :code="code"
                                mode="readOnly"
                                :loading="loading"
-                               class="sm:w-1/2 pr-4 pl-4"
+                               class="w-full px-4"
                 />
             </div>`,
     setup(props) {
