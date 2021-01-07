@@ -11,7 +11,6 @@ import VueI18n from 'vue-i18n';
 import velocity from 'velocity-animate';
 import SvgIcon from 'vue-svgicon';
 import Fragment from "vue-fragment";
-import Codemirror from "vue-codemirror";
 
 import webFontLoader from 'webfontloader';
 import { fontUrls, webFonts } from '@/styles/web-fonts';
@@ -35,7 +34,6 @@ Vue.use(SvgIcon, {
 })
 Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
-Vue.use(Codemirror);
 
 webFontLoader.load({
     google: {

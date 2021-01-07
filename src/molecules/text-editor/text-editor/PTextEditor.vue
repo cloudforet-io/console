@@ -12,11 +12,10 @@
             </div>
         </transition>
         <div v-if="!loading">
-            <codemirror
-                ref="editor"
-                v-model="proxyCode"
-                :options="options"
-                :mode="mode"
+            <codemirror ref="editor"
+                        v-model="proxyCode"
+                        :options="options"
+                        :mode="mode"
             />
         </div>
     </div>
@@ -29,9 +28,10 @@
 * */
 
 import {
-    onMounted, reactive, toRefs, watch,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import { codemirror } from 'vue-codemirror';
 import 'codemirror/mode/javascript/javascript';
 import 'codemirror/addon/lint/json-lint';
 import 'codemirror/addon/fold/brace-fold';
@@ -49,7 +49,7 @@ import PLottie from '@/molecules/lottie/PLottie.vue';
 
 export default {
     name: 'PTextEditor',
-    components: { PLottie },
+    components: { codemirror, PLottie },
     props: {
         code: {
             type: String,
@@ -110,9 +110,9 @@ export default {
 </script>
 
 <style lang="postcss">
+@import 'codemirror/lib/codemirror.css';
 @import 'codemirror/theme/ayu-mirage.css';
 @import 'codemirror/addon/lint/lint.css';
-@import 'codemirror/lib/codemirror.css';
 @import 'codemirror/addon/fold/foldgutter.css';
 .p-text-editor {
     height: 100%;
