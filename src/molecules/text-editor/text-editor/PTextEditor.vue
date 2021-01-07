@@ -39,7 +39,6 @@ import PLottie from '@/molecules/lottie/PLottie.vue';
 import { modes } from '@/molecules/text-editor/text-editor/config';
 
 
-
 const importAddons = async () => {
     await Promise.all([
         import(/* webpackMode: "eager" */ 'codemirror/mode/javascript/javascript'),
