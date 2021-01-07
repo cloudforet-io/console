@@ -32,20 +32,10 @@ import {
 } from '@vue/composition-api';
 
 import { codemirror } from 'vue-codemirror';
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/addon/lint/json-lint';
-import 'codemirror/addon/fold/brace-fold';
-import 'codemirror/addon/fold/comment-fold';
-import 'codemirror/addon/fold/foldcode';
-import 'codemirror/addon/fold/foldgutter';
-import 'codemirror/addon/fold/indent-fold';
-import 'codemirror/addon/fold/markdown-fold';
-import 'codemirror/addon/fold/xml-fold';
-import 'codemirror/addon/edit/closebrackets';
-import 'codemirror/addon/edit/closetag';
 
 import { makeProxy } from '@/util/composition-helpers';
 import PLottie from '@/molecules/lottie/PLottie.vue';
+import CodeMirror from 'codemirror';
 
 export default {
     name: 'PTextEditor',
@@ -84,13 +74,26 @@ export default {
         },
     },
     setup(props, { emit }) {
+        import 'codemirror/mode/javascript/javascript';
+        import 'codemirror/addon/lint/json-lint';
+        import 'codemirror/addon/fold/brace-fold';
+        import 'codemirror/addon/fold/comment-fold';
+        import 'codemirror/addon/fold/foldcode';
+        import 'codemirror/addon/fold/foldgutter';
+        import 'codemirror/addon/fold/indent-fold';
+        import 'codemirror/addon/fold/markdown-fold';
+        import 'codemirror/addon/fold/xml-fold';
+        import 'codemirror/addon/edit/closebrackets';
+        import 'codemirror/addon/edit/closetag';
+
         const state = reactive({
             proxyCode: makeProxy('code', props, emit),
             editor: null as any,
         });
         watch([() => props.code, () => state.editor], ([code, editor]) => {
             if (props.mode === 'readOnly' && editor && code) {
-                const cm = editor.codemirror;
+                const cm: CodeMirror = editor.codemirror;
+
                 cm.operation(() => {
                     for (let l = cm.firstLine() + 1; l <= cm.lastLine(); ++l) {
                         // const line: string = cm.getLine(l);
