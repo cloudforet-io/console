@@ -13,9 +13,11 @@
         </transition>
         <div v-if="!loading">
             <codemirror ref="editor"
-                        v-model="proxyCode"
+                        :value="code"
                         :options="options"
                         :mode="mode"
+                        @ready="onCmReady"
+                        @input="onCmCodeChange"
             />
         </div>
     </div>
@@ -28,7 +30,7 @@
 * */
 
 import {
-    reactive, toRefs, watch,
+    reactive, toRefs,
 } from '@vue/composition-api';
 
 import { codemirror } from 'vue-codemirror';
@@ -44,26 +46,20 @@ import 'codemirror/addon/lint/json-lint';
 import 'codemirror/addon/edit/closebrackets';
 import 'codemirror/addon/edit/closetag';
 
-import { makeProxy } from '@/util/composition-helpers';
 import PLottie from '@/molecules/lottie/PLottie.vue';
 import { modes } from '@/molecules/text-editor/text-editor/config';
 
-
-const importAddons = async () => {
-    await Promise.all([
-        // import(/* webpackMode: "eager" */ 'codemirror/mode/javascript/javascript'),
-        // import(/* webpackMode: "eager" */ 'codemirror/addon/fold/brace-fold'),
-        // import(/* webpackMode: "eager" */ 'codemirror/addon/fold/comment-fold'),
-        // import(/* webpackMode: "eager" */ 'codemirror/addon/fold/foldcode'),
-        // import(/* webpackMode: "eager" */ 'codemirror/addon/fold/foldgutter'),
-        // import(/* webpackMode: "eager" */ 'codemirror/addon/fold/indent-fold'),
-        // import(/* webpackMode: "eager" */ 'codemirror/addon/fold/markdown-fold'),
-        // import(/* webpackMode: "eager" */ 'codemirror/addon/fold/xml-fold'),
-        // import(/* webpackMode: "eager" */ 'codemirror/addon/lint/json-lint'),
-        // import(/* webpackMode: "eager" */ 'codemirror/addon/edit/closebrackets'),
-        // import(/* webpackMode: "eager" */ 'codemirror/addon/edit/closetag'),
-    ]);
-};
+// require('codemirror/mode/javascript/javascript');
+// require('codemirror/addon/fold/brace-fold');
+// require('codemirror/addon/fold/comment-fold');
+// require('codemirror/addon/fold/foldcode');
+// require('codemirror/addon/fold/foldgutter');
+// require('codemirror/addon/fold/indent-fold');
+// require('codemirror/addon/fold/markdown-fold');
+// require('codemirror/addon/fold/xml-fold');
+// require('codemirror/addon/lint/json-lint');
+// require('codemirror/addon/edit/closebrackets');
+// require('codemirror/addon/edit/closetag');
 
 export default {
     name: 'PTextEditor',
@@ -104,32 +100,34 @@ export default {
         },
     },
     setup(props, { emit }) {
-        let isAddonsImported = false;
         const state = reactive({
-            proxyCode: makeProxy('code', props, emit),
             editor: null as any,
+            cm: null as any,
         });
-        watch([() => props.code, () => state.editor], async ([code, editor]) => {
-            if (props.mode === 'readOnly' && editor && code) {
-                if (!isAddonsImported) {
-                    await importAddons();
-                    isAddonsImported = true;
-                }
 
-                const cm = editor.codemirror;
-                cm.setOption('foldGutter', true);
-                cm.setOption('gutters', ['CodeMirror-linenumbers', 'CodeMirror-foldgutter']);
-                console.log('TextEditor >> ', cm);
-                cm.operation(() => {
-                    for (let l = cm.firstLine() + 1; l <= cm.lastLine(); ++l) {
-                        cm.foldCode({ line: l, ch: 0 }, null, 'fold');
+        const forceFold = () => {
+            if (props.mode === 'readOnly' && state.cm && props.code) {
+                state.cm.operation(() => {
+                    for (let l = state.cm.firstLine() + 1; l <= state.cm.lastLine(); ++l) {
+                        state.cm.foldCode({ line: l, ch: 0 }, null, 'fold');
                     }
                 });
             }
-        }, { immediate: true });
+        };
+        const onCmReady = (cm) => {
+            state.cm = cm;
+            forceFold();
+        };
+
+        const onCmCodeChange = (newCode) => {
+            emit('update:code', newCode);
+            forceFold();
+        };
 
         return {
             ...toRefs(state),
+            onCmReady,
+            onCmCodeChange,
         };
     },
 };
