@@ -7,17 +7,6 @@ import Notifications from 'vue-notification';
 import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
 import '@/styles/style.pcss';
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/addon/fold/brace-fold';
-import 'codemirror/addon/fold/comment-fold';
-import 'codemirror/addon/fold/foldcode';
-import 'codemirror/addon/fold/foldgutter';
-import 'codemirror/addon/fold/indent-fold';
-import 'codemirror/addon/fold/markdown-fold';
-import 'codemirror/addon/fold/xml-fold';
-import 'codemirror/addon/lint/json-lint';
-import 'codemirror/addon/edit/closebrackets';
-import 'codemirror/addon/edit/closetag';
 
 import componentKO from '@/translations/language-pack/ko.json';
 import componentEN from '@/translations/language-pack/en.json';

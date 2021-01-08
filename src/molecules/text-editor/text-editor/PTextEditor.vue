@@ -34,21 +34,11 @@ import {
 } from '@vue/composition-api';
 import CodeMirror from 'codemirror';
 
-import 'codemirror/mode/javascript/javascript';
-import 'codemirror/addon/fold/brace-fold';
-import 'codemirror/addon/fold/comment-fold';
-import 'codemirror/addon/fold/foldcode';
-import 'codemirror/addon/fold/foldgutter';
-import 'codemirror/addon/fold/indent-fold';
-import 'codemirror/addon/fold/markdown-fold';
-import 'codemirror/addon/fold/xml-fold';
-import 'codemirror/addon/lint/json-lint';
-import 'codemirror/addon/edit/closebrackets';
-import 'codemirror/addon/edit/closetag';
-
 import { forEach } from 'lodash';
 import PLottie from '@/molecules/lottie/PLottie.vue';
 import { modes } from '@/molecules/text-editor/text-editor/config';
+
+let isAddonsImported = false;
 
 export default {
     name: 'PTextEditor',
@@ -135,7 +125,27 @@ export default {
             if (element?.remove) element.remove();
         };
 
-        const init = () => {
+        const importAddons = async () => {
+            await Promise.all([
+            import('codemirror/mode/javascript/javascript'),
+            import('codemirror/addon/fold/brace-fold'),
+            import('codemirror/addon/fold/comment-fold'),
+            import('codemirror/addon/fold/foldcode'),
+            import('codemirror/addon/fold/foldgutter'),
+            import('codemirror/addon/fold/indent-fold'),
+            import('codemirror/addon/fold/markdown-fold'),
+            import('codemirror/addon/fold/xml-fold'),
+            import('codemirror/addon/lint/json-lint'),
+            import('codemirror/addon/edit/closebrackets'),
+            import('codemirror/addon/edit/closetag'),
+            ]);
+        };
+
+        const init = async () => {
+            if (!isAddonsImported) {
+                await importAddons();
+                isAddonsImported = true;
+            }
             state.cminstance = CodeMirror.fromTextArea(state.textarea, state.mergedOptions);
 
             watch(() => state.mergedOptions, (options) => {
@@ -162,9 +172,9 @@ export default {
         };
 
 
-        watch(() => state.textarea, (after, before) => {
+        watch(() => state.textarea, async (after, before) => {
             if (after) {
-                init();
+                await init();
             } else {
                 destroy(before);
             }
