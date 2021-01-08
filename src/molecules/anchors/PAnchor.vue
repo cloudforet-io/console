@@ -1,21 +1,23 @@
 <template>
-    <a :href="href" :target="target" class="p-anchor"
-       :class="{highlight}"
+    <a :href="!disabled&&href" :target="target"
+       class="p-anchor" :class="{disabled}"
     >
-        <span class="text">
+        <span class="text" :class="{disabled}">
             <slot v-bind="$props">
                 {{ text }}
             </slot>
         </span>
         <slot v-if="showIcon && target === '_blank'" name="icon" v-bind="$props">
-            <p-i name="ic_external-link" height="1em" width="1em" />
+            <p-i name="ic_external-link"
+                 height="1em" width="1em"
+                 color="inherit"
+            />
         </slot>
     </a>
 </template>
 
 <script lang="ts">
 import PI from '@/atoms/icons/PI.vue';
-import { AnchorProps } from '@/molecules/anchors/type';
 
 export default {
     name: 'PAnchor',
@@ -37,15 +39,10 @@ export default {
             type: String,
             default: '_blank',
         },
-        highlight: {
+        disabled: {
             type: Boolean,
             default: false,
         },
-    },
-    setup(props: AnchorProps) {
-        return {
-
-        };
     },
 };
 </script>
@@ -53,14 +50,24 @@ export default {
 <style lang="postcss">
 .p-anchor {
     @apply cursor-pointer inline-flex items-center;
-    &:hover {
-        @apply underline;
-    }
-    &.highlight {
-        @apply text-secondary;
-    }
+
     .text {
         margin-right: 2px;
+        font-size: inherit;
+        color: inherit;
+        font-weight: 400;
+    }
+    &.disabled {
+        @apply text-gray-400;
+        cursor: not-allowed;
+    }
+    &:hover {
+        .text {
+          @apply underline;
+        }
+        .disabled {
+            text-decoration: none;
+        }
     }
 }
 </style>
