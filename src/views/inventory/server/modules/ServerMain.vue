@@ -258,7 +258,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const apiQuery = new ApiQueryHelper();
-        const pageTitle = props.isCloudService ? props.cloudServiceType : vm.$t('INVENTORY.SERVER.MAIN.TITLE');
+        const pageTitle = computed(() => (props.isCloudService ? props.cloudServiceType : vm.$t('INVENTORY.SERVER.MAIN.TITLE')));
 
         const typeOptionState: Omit<QuerySearchTableTypeOptions, 'searchable'|'excelVisible'> = reactive({
             loading: true,
