@@ -6,7 +6,7 @@
                      :all-page="allPage"
                      :sort-by.sync="proxyState.sortBy"
                      :sort-desc.sync="proxyState.sortDesc"
-                     :select-index.sync="proxyState.selectIndex"
+                     :select-index="proxyState.selectIndex"
                      :this-page.sync="proxyState.thisPage"
                      :page-size.sync="proxyState.pageSize"
                      :excel-visible="excelVisible"
