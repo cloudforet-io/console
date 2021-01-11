@@ -196,7 +196,7 @@ export default {
         const vm: ComponentRenderProxy = getCurrentInstance() as ComponentRenderProxy;
 
         const projectState = reactive({
-            groupId: '' as string|undefined,
+            groupId: undefined as string|undefined,
             groupName: '' as string|undefined,
             searchText: '',
         });
@@ -239,19 +239,19 @@ export default {
             createTargetNode: null as ProjectTreeItem|null,
         });
 
-        const listProject = async (id?, text?, reset?) => {
-            await state.projectListRef.listProjects(id, text, reset);
+        const listProject = async () => {
+            await state.projectListRef.listProjects(projectState.groupId, projectState.searchText);
         };
 
-        const listProjectGroup = async (id?) => {
-            if (id) await state.treeRef.findNode(id);
+        const listProjectGroup = async () => {
+            if (projectState.groupId) await state.treeRef.findNode(projectState.groupId);
             else await state.treeRef.listNodes();
         };
 
-        const listAll = async (id?) => {
+        const listAll = async () => {
             await Promise.all([
-                listProjectGroup(id),
-                listProject(id, projectState.searchText),
+                listProjectGroup(),
+                listProject(),
             ]);
         };
 
@@ -265,7 +265,9 @@ export default {
                 e.preventDefault();
                 if (projectState.groupId !== item.id) {
                     projectState.groupId = item.id;
-                    await listAll(item.id);
+                    vm.$nextTick(async () => {
+                        await listAll();
+                    });
                 }
             }
         };
@@ -325,10 +327,12 @@ export default {
             if (item.data) {
                 projectState.groupId = item.data.id;
                 projectState.groupName = item.data.name;
-                await listAll(item.data.id);
             } else {
-                await listAll();
+                projectState.groupId = undefined;
             }
+            vm.$nextTick(async () => {
+                await listAll();
+            });
         };
 
         const openProjectForm = () => {
@@ -346,7 +350,7 @@ export default {
                 showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'), e, root);
             } finally {
                 formState.projectFormVisible = false;
-                await listProject(projectState.groupId, projectState.searchText);
+                await listProject();
             }
         };
 
@@ -359,11 +363,16 @@ export default {
         /** Search */
         const onSearch = async (id, text) => {
             projectState.searchText = text;
+            const beforeId = projectState.groupId;
+            projectState.groupId = id;
 
-            if (projectState.groupId !== id) {
-                projectState.groupId = id;
-                await listAll(id);
-            }
+            vm.$nextTick(async () => {
+                if (beforeId !== id) {
+                    await listAll();
+                } else {
+                    await listProject();
+                }
+            });
         };
 
         const onSelectTreeItem = async (id, name, parents: ProjectGroup[] = []) => {
@@ -372,7 +381,9 @@ export default {
 
             if (projectState.groupId !== id) {
                 projectState.groupId = id;
-                await listAll(id);
+                vm.$nextTick(async () => {
+                    await listAll();
+                });
             }
         };
 
@@ -407,7 +418,9 @@ export default {
 
             if (groupId) {
                 projectState.groupId = groupId;
-                await Promise.all([listAll(groupId), setGroupName(groupId)]);
+                vm.$nextTick(async () => {
+                    await Promise.all([listAll(), setGroupName(groupId)]);
+                });
             } else {
                 await listAll();
             }

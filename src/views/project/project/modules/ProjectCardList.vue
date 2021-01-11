@@ -213,7 +213,7 @@ export default {
                 .setPageLimit(state.pageSize);
 
             if (text) {
-                listQuery.setFilters([{ k: 'name', v: props.searchText, o: '' }]);
+                listQuery.setFilters([{ k: 'name', v: text, o: '' }]);
             } else {
                 listQuery.setFilters([]);
             }

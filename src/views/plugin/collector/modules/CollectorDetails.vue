@@ -14,6 +14,12 @@
             <template #data-plugin_info.metadata.metadata.supported_resource_type="{data}">
                 <p-text-list :items="data || []" delimiter="<br>" class="text-list" />
             </template>
+            <template #data-created_at="{ data }">
+                {{ data ? timestampFormatter(data, baseState.timezone) : '' }}
+            </template>
+            <template #data-last_collected_at="{ data }">
+                {{ data ? timestampFormatter(data, baseState.timezone) : '' }}
+            </template>
         </p-definition-table>
         <p-panel-top :use-total-count="true" :total-count="filterState.items? filterState.items.length:0">
             {{ filterState.name }}
@@ -57,18 +63,17 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const baseState = reactive({
             name: computed(() => vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_TITLE')),
+            timezone: computed(() => vm.$store.state.user.timezone),
             loading: true,
             fields: computed(() => [
-                // { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_ID'), name: 'collector_id' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_NAME'), name: 'name' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_STATE'), name: 'state' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_PRIORITY'), name: 'priority' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_PLUGIN_NAME'), name: 'plugin_name' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_VERSION'), name: 'plugin_info.version' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_PROVIDER'), name: 'provider' },
-                // { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_RESOURCE_TYPE'), name: 'plugin_info.metadata.metadata.supported_resource_type' },
-                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_LAST_COLLECTED'), name: 'last_collected_at', formatter: timestampFormatter },
-                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_CREATED'), name: 'created_at', formatter: timestampFormatter },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_LAST_COLLECTED'), name: 'last_collected_at' },
+                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_CREATED'), name: 'created_at' },
             ]),
             data: {},
         });
@@ -112,6 +117,7 @@ export default {
         return {
             baseState,
             filterState,
+            timestampFormatter,
         };
     },
 };

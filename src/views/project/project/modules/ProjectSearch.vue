@@ -271,20 +271,21 @@ export default {
             let val = searchText;
             if (typeof searchText === 'string') val = searchText.trim();
             if (!val) val = '';
+
             emit('search', groupId, val);
             if (hide) hideMenu();
             state.isFocused = false;
         };
 
-        const onSearch = () => {
-            emitSearch(props.groupId, state.searchText);
+        const onSearch = (text: string) => {
+            emitSearch(props.groupId, text);
         };
 
         const onMenuSelect = (value: string, idx: number) => {
             const item = state.menu[idx];
             if (item.dataType === 'PROJECT_GROUP') {
                 state.searchText = '';
-                emitSearch(item.name, value, false);
+                emitSearch(item.name, '', false);
                 state.projectGroupStart = 1;
                 listProjectGroups();
                 state.isFocused = true;
@@ -310,7 +311,7 @@ export default {
         };
 
         const onDeleteAll = () => {
-            emitSearch();
+            // emitSearch();
         };
 
 
