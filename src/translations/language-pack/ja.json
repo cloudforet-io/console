@@ -486,7 +486,7 @@
 				"DISABLE_MODAL_DESC": "選択したユーザーを非活性化にしますか？ |選択したユーザーを全部非活性化にしますか？",
 				"DISABLE_MODAL_TITLE": "ユーザ非活性化",
 				"DOMAIN_ID": "ドメイン名",
-				"DOMAIN_ROLE": "ドメインロール",
+				"DOMAIN_ROLE": "",
 				"EMAIL": "メールアドレス",
 				"ENABLE": "有効化",
 				"ENABLE_MODAL_DESC": "選択したユーザーを有効にしますか？ |選択したユーザーを全部有効にしますか？",

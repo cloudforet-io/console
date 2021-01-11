@@ -486,7 +486,7 @@
 				"DISABLE_MODAL_DESC": "선택한 사용자를 비활성화 하시겠습니까?",
 				"DISABLE_MODAL_TITLE": "사용자 비활성화",
 				"DOMAIN_ID": "도메인 아이디",
-				"DOMAIN_ROLE": "도메인 롤 ",
+				"DOMAIN_ROLE": "도메인 롤 할당 ",
 				"EMAIL": "이메일",
 				"ENABLE": "활성화",
 				"ENABLE_MODAL_DESC": "선택한 사용자를 활성화 하시겠습니까?",

@@ -317,6 +317,7 @@ export default {
             updateMode: false,
             headerTitle: '',
             item: undefined,
+            roleOfSelectedUser: '',
         });
         const routeState = reactive({
             routes: computed(() => ([
@@ -374,8 +375,18 @@ export default {
             }
         };
 
-        const onSelect = (index) => {
+        const onSelect = async (index) => {
             state.selectedIndex = index;
+            if (index.length === 1) {
+                const res = await SpaceConnector.client.identity.roleBinding.list({
+                    resource_type: 'identity.User',
+                    resource_id: state.selectedUsers[0].user_id,
+                    // eslint-disable-next-line camelcase
+                    role_type: 'DOMAIN',
+                });
+                if (res.total_count > 0) userFormState.roleOfSelectedUser = res.results[0].role_info.role_id;
+                else userFormState.roleOfSelectedUser = '';
+            }
         };
 
         const onChange = async (options: Options, changed: Partial<Options>) => {
@@ -449,36 +460,44 @@ export default {
                 });
             }
         };
-        const addUser = async (item, roleId, isBind) => {
+        const addUser = async (item, roleId, role) => {
             try {
                 await SpaceConnector.client.identity.user.create({
                     ...item,
                 });
-                if (isBind !== undefined) await bindRole(item.user_id, roleId);
+                if (role !== undefined) await bindRole(item.user_id, roleId);
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '', root);
             } catch (e) {
                 showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'), e, root);
             }
             userFormState.visible = false;
         };
-        const updateUser = async (item, roleId, isBind) => {
+        const updateUser = async (item, roleId, role) => {
             try {
                 await SpaceConnector.client.identity.user.update({
                     ...item,
                 });
-                if (isBind) await bindRole(item.user_id, roleId);
-                else await unbindRole(item.user_id, roleId);
+                if (role && role !== userFormState.roleOfSelectedUser) {
+                    await bindRole(item.user_id, roleId);
+                    userFormState.roleOfSelectedUser = role;
+                }
+                if (role === '' && userFormState.roleOfSelectedUser !== '') {
+                    await unbindRole(item.user_id, roleId);
+                    userFormState.roleOfSelectedUser = role;
+                }
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', root);
             } catch (e) {
                 showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e, root);
+            } finally {
+                await getUsers();
             }
             userFormState.visible = false;
         };
-        const userFormConfirm = async (item, roleId, isBind) => {
+        const userFormConfirm = async (item, roleId, role) => {
             if (userFormState.updateMode) {
-                await updateUser(item, roleId, isBind);
+                await updateUser(item, roleId, role);
             } else {
-                await addUser(item, roleId, isBind);
+                await addUser(item, roleId, role);
             }
             await getUsers();
         };

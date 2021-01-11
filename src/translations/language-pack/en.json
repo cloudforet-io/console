@@ -486,7 +486,7 @@
 				"DISABLE_MODAL_DESC": "Are you sure you want to disable selected user? ",
 				"DISABLE_MODAL_TITLE": "Disable User",
 				"DOMAIN_ID": "Domain ID",
-				"DOMAIN_ROLE": "Domain Role",
+				"DOMAIN_ROLE": "Assign Domain Role",
 				"EMAIL": "E-mail",
 				"ENABLE": "Enable",
 				"ENABLE_MODAL_DESC": "Are you sure you want to enable selected user below?",
