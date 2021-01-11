@@ -74,6 +74,7 @@ export { default as PI } from './atoms/icons/PI.vue';
 export { default as PTextInput } from './atoms/inputs/PTextInput.vue';
 export { default as PLabel } from './atoms/labels/PLabel.vue';
 export { default as PSkeleton } from './atoms/skeletons/PSkeleton.vue';
+export { default as PCollapsibleToggle } from './atoms/collapsible-toggle/PCollapsibleToggle.vue';
 
 export { default as PNoticeAlert } from './molecules/alert/notice/PNoticeAlert.vue';
 export { default as PToastAlert } from './molecules/alert/toast/PToastAlert.vue';
