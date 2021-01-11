@@ -108,7 +108,7 @@ export default {
                 });
                 baseState.data = res;
                 // eslint-disable-next-line camelcase
-                baseState.data.last_accessed_at = calculateTime(baseState.data.last_accessed_at, { seconds: dayjs().unix() }, props.timezone);
+                baseState.data.last_accessed_at = calculateTime(baseState.data.last_accessed_at, { seconds: dayjs().unix() }, props.timezone) || 0;
                 baseState.loading = false;
             } catch (e) {
                 console.error(e);

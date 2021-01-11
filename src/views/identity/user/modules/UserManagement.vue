@@ -83,6 +83,11 @@
                               resource-key="user_id"
                 />
             </template>
+            <template #assigned_role>
+                <user-assigned-role
+                    :user-id="selectedUsers[0].user_id"
+                />
+            </template>
         </p-tab>
         <p-tab v-else-if="selectedIndex.length > 1" :tabs="multiItemTabState.tabs"
                :active-tab.sync="multiItemTabState.activeTab"
@@ -179,6 +184,7 @@ import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
 
 import UserForm from '@/views/identity/user/modules/UserForm.vue';
 import UserDetail from '@/views/identity/user/modules/UserDetail.vue';
+import UserAssignedRole from '@/views/identity/user/modules/UserAssignedRole.vue';
 import PTagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
@@ -221,6 +227,7 @@ export default {
         PHorizontalLayout,
         PDropdownMenuBtn,
         UserDetail,
+        UserAssignedRole,
         PTab,
         PTagsPanel,
         PDataTable,
@@ -265,6 +272,7 @@ export default {
                 { name: 'name', label: 'Name' },
                 { name: 'state', label: 'State' },
                 { name: 'user_type', label: 'Access Control' },
+                { name: 'role_name', label: 'Role' },
                 { name: 'backend', label: 'Auth Type' },
                 { name: 'last_accessed_at', label: 'Last Activity' },
                 { name: 'timezone', label: 'Timezone' },
@@ -332,6 +340,7 @@ export default {
             tabs: computed(() => ([
                 { label: vm.$t('IDENTITY.USER.MAIN.DETAILS'), name: 'detail', keepAlive: true },
                 { label: vm.$t('IDENTITY.USER.MAIN.TAG'), name: 'tag', keepAlive: true },
+                { label: 'Assigned Roles', name: 'assigned_role', keepAlive: true },
             ] as TabItem[])),
             activeTab: 'detail',
         });
@@ -358,9 +367,13 @@ export default {
                 const res = await SpaceConnector.client.identity.user.list({
                     query: getQuery(),
                     only: ['user_id', 'name', 'email', 'state', 'timezone', 'user_type', 'backend', 'last_accessed_at'],
+                    // eslint-disable-next-line camelcase
+                    include_role_binding: true,
                 });
-                state.users = res.results.map(d => ({
+                state.users = res.map(d => ({
                     ...d,
+                    // eslint-disable-next-line camelcase
+                    role_name: (d.role_bindings.map(data => data.role_info.name)).join(', '),
                     // eslint-disable-next-line camelcase
                     last_accessed_at: calculateTime(d.last_accessed_at, { seconds: dayjs().unix() }, state.timezone) || 0,
                 }));
@@ -541,6 +554,8 @@ export default {
         };
 
         const init = async () => {
+            await store.dispatch('resource/project/load');
+            await store.dispatch('resource/projectGroup/load');
             await getUsers();
         };
         init();

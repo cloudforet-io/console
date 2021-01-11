@@ -28,6 +28,7 @@ router.beforeEach(async (to, from, next) => {
         }
         next();
     } else {
+        console.debug('Unexpected sign out error');
         next({ name: 'SignOut' });
     }
 });
