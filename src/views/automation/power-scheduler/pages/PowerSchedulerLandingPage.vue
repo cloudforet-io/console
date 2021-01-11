@@ -221,10 +221,7 @@ export default {
             weekday: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
             currentDate: dayjs().tz(store.state.user.timezone).format('YYYY-MM-DD'),
             tooltip: computed(() => ({
-                resource: `${vm.$t('AUTOMATION.POWER_SCHEDULER.LANDING.TOOLTIP_RESOURCE')} <br>
-                                [ALL] Server <br>
-                                [AWS] RDS <br>
-                                [AWS] Auto Scaling Group`,
+                resource: `${vm.$t('AUTOMATION.POWER_SCHEDULER.LANDING.TOOLTIP_RESOURCE')}`,
                 cost: `${vm.$t('AUTOMATION.POWER_SCHEDULER.LANDING.TOOLTIP_COST_1')} <br>${vm.$t('AUTOMATION.POWER_SCHEDULER.LANDING.TOOLTIP_COST_2')}`,
             })),
         });

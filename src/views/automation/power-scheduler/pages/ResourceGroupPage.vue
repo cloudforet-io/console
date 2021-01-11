@@ -29,37 +29,6 @@
                                               @input="validateName"
                                 />
                             </p-field-group>
-
-                            <!--                            <p-field-group v-if="readMode" :label="$t('PWR_SCHED.RESRC_GRP.TAG')" class="read-mode">-->
-                            <!--                                <p-tag v-for="(v, k) in tags" :key="k" :deletable="false"-->
-                            <!--                                       style-type="primary" outline-->
-                            <!--                                >-->
-                            <!--                                    <strong>{{ k }}:</strong>&nbsp;{{ v }}-->
-                            <!--                                </p-tag>-->
-                            <!--                            </p-field-group>-->
-                            <!--                            <p-field-group v-else :label="$t('PWR_SCHED.RESRC_GRP.TAG')">-->
-                            <!--                                <template #help>-->
-                            <!--                                    {{ $t('PWR_SCHED.RESRC_GRP.TAG_DESC') }}-->
-                            <!--                                    <br>-->
-                            <!--                                    {{ $t('PWR_SCHED.RESRC_GRP.TAG_DESC2') }}-->
-                            <!--                                </template>-->
-                            <!--                            </p-field-group>-->
-                            <!--                                <p-dict-input-group ref="dictRef"-->
-                            <!--                                                    :dict="tags"-->
-                            <!--                                                    :show-validation="validState.showValidation"-->
-                            <!--                                                    :focused="false"-->
-                            <!--                                                    @change="onChangeTags"-->
-                            <!--                                >-->
-                            <!--                                    <template #addButton="scope">-->
-                            <!--                                        <p-icon-text-button class="mt-4"-->
-                            <!--                                                            outline style-type="primary-dark" :disabled="scope.disabled"-->
-                            <!--                                                            name="ic_plus_bold"-->
-                            <!--                                                            @click="scope.addPair($event)"-->
-                            <!--                                        >-->
-                            <!--                                            {{ $t('PWR_SCHED.RESRC_GRP.ADD_TAG') }}-->
-                            <!--                                        </p-icon-text-button>-->
-                            <!--                                    </template>-->
-                            <!--                                </p-dict-input-group>-->
                         </div>
                     </section>
                     <div class="separator" />
@@ -69,13 +38,13 @@
                         </div>
                         <div class="form">
                             <p-field-group v-if="readMode" :label="$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.RESOURCE_TYPE')" class="read-mode">
-                                <span class="read-value">{{ RESOURCE_GROUP_TYPES[selectedTypeIndex] ? RESOURCE_GROUP_TYPES[selectedTypeIndex].label : '' }}</span>
+                                <span class="read-value">{{ supportResourceGroupTypeItems[selectedTypeIndex] ? supportResourceGroupTypeItems[selectedTypeIndex].label : '' }}</span>
                             </p-field-group>
                             <p-field-group v-else required :label="$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.RESOURCE_TYPE_SELECT')">
                                 <p-select-dropdown :select-item="selectedTypeIndex"
                                                    index-mode
                                                    class="w-1/2"
-                                                   :items="RESOURCE_GROUP_TYPES"
+                                                   :items="supportResourceGroupTypeItems"
                                                    :placeholder="$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.RESOURCE_TYPE_DESC')"
                                                    :disabled="resourceTypeReadOnly"
                                                    :invalid="validState.showValidation && !validState.resourceType"
@@ -185,7 +154,9 @@ import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPage
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import { forEach, camelCase, findIndex } from 'lodash';
+import {
+    forEach, camelCase, findIndex, map,
+} from 'lodash';
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
@@ -204,23 +175,13 @@ interface Props {
     scheduleId?: string;
 }
 
-const RESOURCE_GROUP_TYPES = [
-    {
-        label: '[ALL] Server',
-        name: 'inventory.Server',
-        type: 'item',
-    },
-    {
-        label: '[AWS] RDS',
-        name: 'inventory.CloudService?provider=aws&cloud_service_group=RDS&cloud_service_type=Database',
-        type: 'item',
-    },
-    {
-        label: '[AWS] Auto Scaling Group',
-        name: 'inventory.CloudService?provider=aws&cloud_service_group=EC2&cloud_service_type=AutoScalingGroup',
-        type: 'item',
-    },
-];
+
+interface SupportResourceGroupTypes {
+  [resourceType: string]: {
+    name: string;
+    recommended_title: string;
+  };
+}
 
 // eslint-disable-next-line no-useless-escape
 const nameRegex = new RegExp(/^[^\s\d\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"][^\{\}\[\]\/?.,;:|\)*~`!^\_+<>@\#$%&\\\=\(\'\"]{0,127}$/);
@@ -295,6 +256,12 @@ export default {
 
             schema: null as any,
             data: null as any,
+            supportResourceGroupTypes: {} as SupportResourceGroupTypes,
+            supportResourceGroupTypeItems: computed(() => map(state.supportResourceGroupTypes, (d, k) => ({
+                label: d.name,
+                name: k,
+                type: 'item',
+            }))),
         });
 
         const fetchOptionState: QuerySearchTableFetchOptions = reactive({
@@ -321,7 +288,6 @@ export default {
         const validState = reactive({
             showValidation: false,
             name: false,
-            // tags: false,
             resourceType: false,
             resources: false,
             all: computed(() => validState.name && validState.resourceType && validState.resources),
@@ -341,12 +307,8 @@ export default {
             else validState.nameInvalidMsg = vm.$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.NAME_INVALID');
         };
 
-        // const validateTags = () => {
-        //     validState.tags = state.dictRef.allValidation();
-        // };
-
         const validateResourceType = () => {
-            validState.resourceType = !!RESOURCE_GROUP_TYPES[state.selectedTypeIndex];
+            validState.resourceType = !!state.supportResourceGroupTypeItems[state.selectedTypeIndex];
         };
 
         const validateResources = () => {
@@ -355,7 +317,6 @@ export default {
 
         const validate = () => {
             validateName(state.name);
-            // validateTags();
             validateResourceType();
             validateResources();
             return validState.all;
@@ -495,27 +456,23 @@ export default {
         /* forms */
         const onSelectedTypeIndexChange = async (idx) => {
             state.selectedTypeIndex = idx;
-            state.resource.resource_type = RESOURCE_GROUP_TYPES[idx]?.name || '';
+            state.resource.resource_type = state.supportResourceGroupTypeItems[idx]?.name || '';
             validateResourceType();
             if (idx !== -1) await resetTable();
         };
-
-        // const onChangeTags = () => {
-        //     validState.tags = state.dictRef.isAllValid;
-        // };
 
         const resetAll = async () => {
             // reset validations
             validState.showValidation = false;
             validState.name = false;
-            // validState.tags = false;
             validState.resourceType = false;
             validState.resources = false;
 
             // reset forms
             state.name = formState.resourceGroup?.name || '';
-            // state.tags = formState.resourceGroup?.tags || {};
-            state.selectedTypeIndex = findIndex(RESOURCE_GROUP_TYPES, { name: formState.resourceGroup?.resources[0]?.resource_type });
+
+
+            state.selectedTypeIndex = findIndex(state.supportResourceGroupTypeItems, { name: formState.resourceGroup?.resources[0]?.resource_type });
 
             // reset resource
             state.resource = formState.resourceGroup?.resources[0] || { filter: [], keyword: '', resource_type: '' };
@@ -552,7 +509,6 @@ export default {
                     options: {
                         raw_filter: tableQueryHelper.rawQueries,
                     },
-                    // tags: state.dictRef.getDict(),
                 },
                 recommended: false,
             };
@@ -582,8 +538,17 @@ export default {
             }
         };
 
+        const getSupportedResourceGroupTypes = async () => {
+            try {
+                state.supportResourceGroupTypes = await SpaceConnector.client.powerScheduler.schedule.getSupportedResourceTypes();
+            } catch (e) {
+                state.supportResourceGroupTypes = {};
+            }
+        };
         /* init */
         (async () => {
+            await getSupportedResourceGroupTypes();
+
             // by url enter case
             if (props.resourceGroupId) {
                 await getResourceGroup();
@@ -606,14 +571,12 @@ export default {
             validState,
             listModalState,
             validateName,
-            RESOURCE_GROUP_TYPES,
             listResources,
             onFetchTable,
             fieldHandler,
             onClickCancel,
             onClickSave,
             onSelectedTypeIndexChange,
-            // onChangeTags,
             onListModalConfirm,
         };
     },
