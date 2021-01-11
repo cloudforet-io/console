@@ -3,7 +3,7 @@
         <span v-if="$scopedSlots.default" :style="{color: color}">
             <slot name="default" />
         </span>
-        <span class="hover:cursor-pointer p-copy-icon" @mousedown="click=true"
+        <span class="hover:cursor-pointer" @mousedown="click=true"
               v-on="$listeners"
               @mouseleave="mouseOut()"
               @mouseenter="onMouseOver()"
@@ -105,13 +105,9 @@ export default {
 }
 
 .p-copy-button {
-    @apply flex;
+    display: inline-flex;
     position: relative;
     align-items: center;
-
-    .p-copy-icon {
-        margin-left: 0.5rem;
-    }
 
     .copy-button-alert {
         @apply flex text-white;
