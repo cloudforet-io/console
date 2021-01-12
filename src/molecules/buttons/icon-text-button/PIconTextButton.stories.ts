@@ -1,5 +1,5 @@
 import { action } from '@storybook/addon-actions';
-import { select, boolean } from '@storybook/addon-knobs';
+import { select, boolean, text } from '@storybook/addon-knobs';
 
 import icon from 'vue-svgicon';
 import PIconTextButton from '@/molecules/buttons/icon-text-button/PIconTextButton.vue';
@@ -42,6 +42,7 @@ export const defaultCase = () => ({
             :styleType="styleType"
             :size="size"
             :iconDirection="iconDirection"
+            :href="href"
         >
            icon text button 
         </p-icon-text-button>`,
@@ -63,6 +64,9 @@ export const defaultCase = () => ({
         },
         iconDirection: {
             default: select('iconDirection', ['left', 'right'], 'left'),
+        },
+        href: {
+            default: text('href', ''),
         },
     },
     setup() {

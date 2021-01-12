@@ -14,7 +14,7 @@ export default {
                 loading: !!attrs.loading,
                 disabled: !!attrs.disabled,
                 outline: !!attrs.outline,
-                link: !!attrs.link,
+                link: !!attrs.href,
                 block: !!attrs.block,
             };
             if (attrs.size) {
@@ -26,7 +26,7 @@ export default {
             return cls;
         }
 
-        const tag = props.link ? 'a' : 'div';
+        const tag = props.href ? 'a' : 'div';
 
         return h(tag, {
             ...data,
@@ -55,15 +55,15 @@ export default {
 
 @define-mixin btn-color $theme, $bg-color, $text-color {
     &.$(theme) {
-        background-color: $ bg-color;
-        color: $ text-color;
+        background-color: $bg-color;
+        color: $text-color;
         &.outline {
-            border-color: $ bg-color;
-            color: $ bg-color;
+            border-color: $bg-color;
+            color: $bg-color;
             background-color: transparent;
             &:not(.disabled):hover {
-               background-color: $ bg-color;
-               color: $ text-color;
+                background-color: $bg-color;
+                color: $text-color;
             }
         }
         &.disabled {
@@ -161,8 +161,8 @@ export default {
     align-items: center;
     height: 100%;
     .spinner {
-      display: inline-flex;
-      padding-right: 0.25rem;
+        display: inline-flex;
+        padding-right: 0.25rem;
     }
 }
 </style>
