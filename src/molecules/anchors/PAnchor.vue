@@ -1,6 +1,6 @@
 <template>
     <a :href="!disabled&&href" :target="target"
-       class="p-anchor" :class="{disabled}"
+       class="p-anchor" :class="{disabled, highlight}"
     >
         <span class="text" :class="{disabled}">
             <slot v-bind="$props">
@@ -43,6 +43,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        highlight: {
+            type: Boolean,
+            default: false,
+        },
     },
 };
 </script>
@@ -61,9 +65,12 @@ export default {
         @apply text-gray-400;
         cursor: not-allowed;
     }
+    &:not(.disabled).highlight {
+        @apply text-secondary;
+    }
     &:hover {
         .text {
-          @apply underline;
+            @apply underline;
         }
         .disabled {
             text-decoration: none;

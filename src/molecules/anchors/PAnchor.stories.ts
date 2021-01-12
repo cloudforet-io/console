@@ -1,5 +1,5 @@
 import PAnchor from '@/molecules/anchors/PAnchor.vue';
-import { text } from '@storybook/addon-knobs';
+import { text, color, select } from '@storybook/addon-knobs';
 
 export default {
     title: 'Inputs/Anchors',
@@ -23,20 +23,21 @@ export const anchor = () => ({
             default: text('href', 'https://www.google.com/'),
         },
         target: {
-            default: text('target', '_blank'),
+            default: select('target', ['_blank', '_self', '_parent', '_top'], '_blank'),
         },
         fontSize: {
             default: text('font-size', '1rem'),
         },
         color: {
-            default: text('text-color', 'black'),
+            default: color('text-color', 'black'),
         },
     },
     template: `
-        <div :style="{fontSize:fontSize, color: color, display:'flex', flexDirection:'column'}">
-            <p-anchor v-bind="$props">This is anchor to {{href}}</p-anchor>
-            <p-anchor v-bind="$props" :show-icon="false">This is anchor to {{href}}</p-anchor>
-            <p-anchor v-bind="$props" disabled>Disabled anchor</p-anchor>
+        <div class="grid grid-cols-1 gap-6" :style="{fontSize:fontSize, color: color}">
+            <p-anchor v-bind="$props">This is <strong>default</strong> anchor to {{href}}</p-anchor>
+            <p-anchor v-bind="$props" :show-icon="false">This is <strong>no-icon</strong> anchor to {{href}}</p-anchor>
+            <p-anchor v-bind="$props" highlight>This is <strong>highlighted</strong> anchor to {{href}}</p-anchor>
+            <p-anchor v-bind="$props" disabled>This is <strong>disabled</strong> anchor to {{href}}</p-anchor>
         </div>
     `,
 });
