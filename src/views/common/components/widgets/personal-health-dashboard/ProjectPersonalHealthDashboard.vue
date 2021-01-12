@@ -4,50 +4,42 @@
             <span :style="{ 'color': providers.aws ? providers.aws.color : '' }">AWS </span>
             <span>{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.TITLE') }}</span>
         </div>
+
+        <div class="summary-wrapper" :style="{ 'color': providers.aws ? providers.aws.color : '' }">
+            <div v-for="(data, index) in summaryData" :key="index"
+                 class="summary" :class="{active: tabState.activeTab === data.name}"
+                 @click="tabState.activeTab = data.name"
+            >
+                <p-anchor :href="summaryLinkFormatter(data.name).href"
+                          :show-icon="false" class="count" highlight
+                >
+                    {{ data.count | summaryCount }}
+                </p-anchor>
+                <span class="label">{{ data.label }}</span>
+                <span class="date">{{ data.date }}</span>
+            </div>
+        </div>
+
         <widget-layout>
-            <div class="top-part">
-                <div class="summary-wrapper grid grid-cols-12">
-                    <div v-for="(data, index) in summaryData" :key="index"
-                         class="summary col-span-4"
-                    >
-                        <router-link :to="summaryLinkFormatter(data.name)" class="count link-text">
-                            <span>{{ data.count }}</span>
-                        </router-link>
-                        <span class="label">{{ data.label }}</span>
-                        <span class="date">{{ data.date }}</span>
-                    </div>
-                </div>
-            </div>
-            <p-tab :tabs="tabState.tabs"
-                   :active-tab.sync="tabState.activeTab"
-            />
-            <div class="search-wrapper">
-                <p-search v-model="search" class="p-search"
-                          :placeholder="$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.PLACEHOLDER')"
-                          @search="onSearch"
-                          @delete="onSearch"
-                />
-                <p-text-pagination
-                    :this-page.sync="thisPage"
-                    :all-page="allPage"
-                    @pageChange="changePage"
-                />
-                <p-icon-button name="ic_refresh" @click="onRefresh" />
-            </div>
-            <p-data-table :loading="loading"
-                          :fields="fields"
-                          :selectable="false"
-                          :items="data"
-                          :sortable="true"
-                          :sort-by.sync="sortBy"
-                          :sort-desc.sync="sortDesc"
-                          @change="onChange"
-                          @changeSort="onChange"
+            <p-search-table :loading="loading"
+                            :fields="fields"
+                            :items="data"
+                            :this-page.sync="thisPage"
+                            :page-size.sync="pageSize"
+                            :sort-by.sync="sortBy"
+                            :sort-desc.sync="sortDesc"
+                            :search-text.sync="search"
+                            :placeholder="$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.PLACEHOLDER')"
+                            :excel-visible="false"
+                            :page-size-visible="false"
+                            :selectable="false"
+                            class="search-table"
+                            @change="onChange"
             >
                 <template #col-event-format="{ value }">
-                    <router-link :to="value.to" class="link-text">
-                        <span>{{ value.name }}</span>
-                    </router-link>
+                    <p-anchor :href="value.to.href" target="_self" highlight>
+                        {{ value.name }}
+                    </p-anchor>
                 </template>
                 <template #col-region_code-format="{ value }">
                     <span>{{ regionFormatter(value) }}</span>
@@ -74,10 +66,25 @@
                     </div>
                     <div v-else />
                 </template>
-            </p-data-table>
-            <p-empty v-if="!loading && data.length === 0" class="py-8">
-                <span>{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA') }}</span>
-            </p-empty>
+                <template #no-data-format>
+                    <div class="no-data-wrapper">
+                        <template v-if="providers.aws">
+                            {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA') }}
+                        </template>
+                        <template v-else>
+                            <strong class="text-primary2">{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_ACCOUNT') }}</strong><br>
+                            {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_ACCOUNT_DESC') }}<br>
+                            <p-icon-text-button name="ic_plus_bold" width="1em" height="1em"
+                                                icon-color="inherit transparent"
+                                                :href="$router.resolve({name: 'addServiceAccount', params: {provider: 'aws'}}).href"
+                                                style-type="primary1"
+                            >
+                                {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.ADD_ACCOUNT') }}
+                            </p-icon-text-button>
+                        </template>
+                    </div>
+                </template>
+            </p-search-table>
         </widget-layout>
     </div>
 </template>
@@ -91,7 +98,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PTextPagination, PDataTable, PTab, PSearch, PIconButton, PEmpty, PI,
+    PAnchor, PI, PSearchTable, PIconTextButton,
 } from '@spaceone/design-system';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
@@ -103,6 +110,7 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
 import { store } from '@/store';
+import numeral from 'numeral';
 
 
 enum EVENT_CATEGORY {
@@ -116,14 +124,16 @@ const EVENT_PERIOD = 7;
 
 export default {
     name: 'ProjectPersonalHealthDashboard',
+    filters: {
+        summaryCount(val) {
+            return val < 100000 ? numeral(val).format('0,0') : numeral(val).format('0a');
+        },
+    },
     components: {
         PI,
-        PTextPagination,
-        PEmpty,
-        PIconButton,
-        PSearch,
-        PTab,
-        PDataTable,
+        PAnchor,
+        PSearchTable,
+        PIconTextButton,
         WidgetLayout,
     },
     props: {
@@ -274,31 +284,20 @@ export default {
         };
 
         /* event */
-        const onSearch = async (val) => {
-            await (state.search = val);
-            await getEvents();
-        };
         const onChange = () => {
-            getEvents();
+            vm.$nextTick(async () => {
+                await getEvents();
+            });
         };
-        const onRefresh = () => {
-            state.thisPage = 1;
-            state.search = '';
-            getEvents();
-        };
-        const changePage = (page) => {
-            state.thisPage = page;
-            getEvents();
-        };
-
-        const init = async () => {
-            await Promise.all([getEvents(), getCount()]);
-        };
-        init();
 
         watch(() => tabState.activeTab, () => {
             getEvents();
         }, { immediate: false });
+
+        /* init */
+        (async () => {
+            await Promise.all([getEvents(), getCount()]);
+        })();
 
         return {
             ...toRefs(state),
@@ -306,11 +305,9 @@ export default {
             regionFormatter,
             summaryLinkFormatter,
             getEvents,
-            onSearch,
             onChange,
-            onRefresh,
-            changePage,
             referenceRouter,
+            EVENT_CATEGORY,
         };
     },
 };
@@ -319,85 +316,75 @@ export default {
 <style lang="postcss" scoped>
 .project-personal-health-dashboard {
     .title {
+        margin-bottom: 0.75rem;
+        margin-top: 0.875rem;
         font-size: 1.5rem;
-        line-height: 1.2;
-        margin-top: 1rem;
+        line-height: 1.4;
     }
     .widget-layout {
-        @apply border border-gray-200;
+        @apply block border border-gray-200;
         border-radius: 2px;
         padding: 0;
     }
 }
-.top-part {
-    margin: 1rem 1rem 0 1rem;
-    .summary-wrapper {
-        @apply border border-gray-200;
-        height: 4.25rem;
-        border-radius: 2px;
-        margin-bottom: 1rem;
-        .summary {
-            @apply border-r border-gray-200;
-            margin: auto 0;
-            padding-left: 1rem;
-            &:last-child {
-                @apply border-none;
-            }
-            .count {
-                font-size: 1.125rem;
-                padding-right: 0.375rem;
-            }
-            .label {
-                font-size: 0.875rem;
-                font-weight: bold;
-            }
-            .date {
-                @apply text-gray-500;
-                display: block;
-                font-size: 0.75rem;
-                line-height: 1.2;
-                padding-top: 0.125rem;
-            }
+.summary-wrapper {
+    @apply flex;
+    margin-bottom: -1px;
+    .summary {
+        @apply flex-grow border border-gray-200 border-b-0;
+        margin-right: 0.375rem;
+        max-width: 15.25rem;
+        padding: 0.625rem 1rem;
+        border-radius: 2px 2px 0 0;
+        &:last-child {
+            @apply m-0;
+        }
+        &.active {
+            box-shadow: inset 0 3px currentColor;
+        }
+        .count {
+            font-size: 1.125rem;
+            padding-right: 0.375rem;
+        }
+        .label {
+            @apply text-gray-900;
+            font-size: 0.875rem;
+            font-weight: bold;
+        }
+        .date {
+            @apply text-gray-500;
+            display: block;
+            font-size: 0.75rem;
+            line-height: 1.2;
+            padding-top: 0.125rem;
         }
     }
 }
-.p-tab {
-    border: none;
-    .search-wrapper {
+
+.search-table {
+    height: 18.75rem;
+    border-width: 0;
+    .link-text {
+        display: inline-block;
+        width: 15rem;
+        white-space: pre-wrap;
+        padding: 0.5rem 0;
+    }
+    .affected-resources-wrapper {
         display: flex;
-        padding: 1.5rem 1rem;
-        .text-pagination {
-            padding: 0 1.25rem;
+        width: 10rem;
+        line-height: 1.4;
+        flex-wrap: wrap;
+        padding-bottom: 0.5rem;
+        &:first-child {
+            padding-top: 0.5rem;
         }
-        .p-icon-button {
-            margin-left: 1rem;
-        }
-    }
-    .p-data-table::v-deep {
-        .table-container {
-            max-height: 19.5rem;
-        }
-        .link-text {
-            display: inline-block;
-            width: 15rem;
-            white-space: pre-wrap;
-            padding: 0.5rem 0;
-        }
-        .affected-resources-wrapper {
-            display: flex;
-            width: 10rem;
-            line-height: 1.4;
-            flex-wrap: wrap;
-            padding-bottom: 0.5rem;
-            &:first-child {
-                padding-top: 0.5rem;
-            }
-            .label {
-                @apply text-gray-600;
-            }
+        .label {
+            @apply text-gray-600;
         }
     }
 }
+
 .link-text {
     @apply text-secondary;
     &:hover {
@@ -407,7 +394,11 @@ export default {
         margin-bottom: 0.125rem;
     }
 }
-.p-empty {
-    height: 6.875rem;
+.no-data-wrapper {
+    line-height: 1.6;
+    font-size: 0.875rem;
+    .p-icon-text-button {
+        @apply mt-2;
+    }
 }
 </style>

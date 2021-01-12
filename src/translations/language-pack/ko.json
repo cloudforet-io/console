@@ -304,6 +304,7 @@
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "계정 ID",
+				"ADD_ACCOUNT": "",
 				"AGO": "전",
 				"ALL": "모두 보기",
 				"DAY": "일",
@@ -317,6 +318,8 @@
 				"HOUR": "시간",
 				"LAST_UPDATE": "마지막 업데이트",
 				"MORE": "더보기",
+				"NO_ACCOUNT": "",
+				"NO_ACCOUNT_DESC": "",
 				"NO_DATA": "데이터가 없습니다.",
 				"PAST_7_DAYS": "지난 7 일",
 				"PLACEHOLDER": "이벤트 검색",
