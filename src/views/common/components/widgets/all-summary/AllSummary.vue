@@ -400,8 +400,9 @@ export default {
             try {
                 const res = await SpaceConnector.client.statistics.topic.billingSummary({
                     granularity: NEW_DATE_TYPE.monthly,
-                    period: 1,
                     project_id: props.projectId,
+                    start: dayjs().utc().startOf('month').format('YYYY-MM-DD'),
+                    end: dayjs().utc().endOf('month').format('YYYY-MM-DD'),
                 });
                 if (res.results.length > 0) state.count.spendings = res.results[0].billing_data[0].cost;
             } catch (e) {
@@ -418,9 +419,20 @@ export default {
             try {
                 let data;
                 if (type === DATA_TYPE.spendings) {
+                    let start;
+                    let end;
+                    if (dateType === DATE_TYPE.monthly) {
+                        start = utcToday.subtract(MONTH_COUNT - 1, 'month').format('YYYY-MM');
+                        end = utcToday.format('YYYY-MM');
+                    } else {
+                        start = utcToday.subtract(DAY_COUNT, 'day').format('YYYY-MM-DD');
+                        end = utcToday.subtract(1, 'day').format('YYYY-MM-DD');
+                    }
                     const res = await SpaceConnector.client.statistics.topic.billingSummary({
                         granularity: NEW_DATE_TYPE[state.selectedDateType],
                         project_id: props.projectId,
+                        start,
+                        end,
                     });
                     if (res.results.length > 0) {
                         data = res.results[0].billing_data.map(d => ({
@@ -595,8 +607,9 @@ export default {
                 const res = await SpaceConnector.client.statistics.topic.billingSummary({
                     granularity: NEW_DATE_TYPE.monthly,
                     aggregation: 'inventory.CloudServiceType',
-                    period: 1,
                     project_id: props.projectId,
+                    start: dayjs().utc().startOf('month').format('YYYY-MM-DD'),
+                    end: dayjs().utc().endOf('month').format('YYYY-MM-DD'),
                 });
                 const summaryData: SummaryData[] = [
                     {
