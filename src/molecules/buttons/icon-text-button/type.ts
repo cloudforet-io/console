@@ -1,5 +1,5 @@
 export interface IconTextButtonProps {
-    link?: string;
+    href?: string;
     size?: string;
     iconColor?: string;
     iconDirection: string;

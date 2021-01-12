@@ -4,7 +4,7 @@
               :disabled="disabled"
               :size="size"
               :outline="outline"
-              :link="link"
+              :href="href"
               :block="block"
               v-on="$listeners"
               @mouseenter="onHover(true)"
@@ -41,7 +41,7 @@ export default {
     name: 'PIconTextButton',
     components: { PButton, PI },
     props: {
-        link: {
+        href: {
             type: String,
             default: undefined,
         },
