@@ -534,7 +534,7 @@ export default {
         line-height: 120%;
         font-size: 1rem;
         max-height: 16.875rem;
-        top: 0;
+        top: 2rem;
     }
 
     .loading-backdrop {
