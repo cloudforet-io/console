@@ -203,14 +203,18 @@ export default {
 
         /** Table event listeners */
         const onChangePageSize = (pageSize: number) => {
+            proxyState.pageSize = pageSize;
             emitChange({ pageSize });
         };
 
         const onChangePageNumber = (thisPage: number) => {
+            proxyState.thisPage = thisPage;
             emitChange({ thisPage });
         };
 
         const onChangeSort = (sortBy: string, sortDesc: boolean) => {
+            proxyState.sortDesc = sortDesc;
+            proxyState.sortBy = sortBy;
             emitChange({ sortBy, sortDesc });
         };
 
