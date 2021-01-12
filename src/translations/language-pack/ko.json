@@ -258,9 +258,15 @@
 			},
 			"BILLING": {
 				"DAY": "일",
+				"IN_PROCESS": "",
+				"LAST_MONTH": "",
 				"MONTH": "월",
+				"THIS_MONTH": "",
 				"TITLE": "",
-				"TREND_TITLE": "트렌드"
+				"TOOLTIP_TEXT": "",
+				"TREND_TITLE": "트렌드",
+				"TWO_DAYS_AGO": "",
+				"YESTERDAY": "어제 "
 			},
 			"CLOUD_SERVICE_CREATE_COLLECTOR": "컬렉터 생성 ",
 			"CLOUD_SERVICE_HELP": "서비스 중인 주요 클라우드 서비스 목록을 보여줍니다.",

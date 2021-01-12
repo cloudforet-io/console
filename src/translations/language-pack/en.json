@@ -258,9 +258,15 @@
 			},
 			"BILLING": {
 				"DAY": "Day",
+				"IN_PROCESS": "In Process",
+				"LAST_MONTH": "Last Month",
 				"MONTH": "Month",
+				"THIS_MONTH": "This Month",
 				"TITLE": "Billing",
-				"TREND_TITLE": "Trend"
+				"TOOLTIP_TEXT": "This month’s billing data will be processed by the 1st day of the following month.",
+				"TREND_TITLE": "Trend",
+				"TWO_DAYS_AGO": "Two days ago",
+				"YESTERDAY": "Yesterday"
 			},
 			"CLOUD_SERVICE_CREATE_COLLECTOR": "Create a collector",
 			"CLOUD_SERVICE_HELP": "Displays only major services in cloud service.",

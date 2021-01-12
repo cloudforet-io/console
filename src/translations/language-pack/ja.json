@@ -258,9 +258,15 @@
 			},
 			"BILLING": {
 				"DAY": "日",
+				"IN_PROCESS": "",
+				"LAST_MONTH": "",
 				"MONTH": "月",
+				"THIS_MONTH": "",
 				"TITLE": "",
-				"TREND_TITLE": "トレンド"
+				"TOOLTIP_TEXT": "",
+				"TREND_TITLE": "トレンド",
+				"TWO_DAYS_AGO": "",
+				"YESTERDAY": "昨日"
 			},
 			"CLOUD_SERVICE_CREATE_COLLECTOR": "コレクタ作成",
 			"CLOUD_SERVICE_HELP": "サービスしている主要なクラウドサービスリストを表示します",

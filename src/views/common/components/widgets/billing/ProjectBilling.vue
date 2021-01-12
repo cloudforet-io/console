@@ -27,11 +27,27 @@
                     </p-chart-loader>
                 </div>
             </div>
-            <div class="col-span-12 lg:col-span-3 summary-wrapper">
-                <div>
-                    <span class="label">Last Month</span>
+            <div class="col-span-12 lg:col-span-3">
+                <div class="summary-wrapper">
+                    <span class="label">{{ summaryState.pastDateText }}</span>
+                    <span class="date">({{ summaryState.pastDate }})</span>
+                    <span class="cost">${{ summaryState.pastCost }}</span>
                 </div>
-                <span class="label">Last Month</span>
+                <div class="summary-wrapper">
+                    <span class="label">{{ summaryState.currentDateText }}</span>
+                    <span class="date">({{ summaryState.currentDate }})</span>
+                    <div class="cost in-process">
+                        <span>${{ summaryState.currentCost }}</span>
+                        <span class="in-process-text">({{ $t('COMMON.WIDGETS.BILLING.IN_PROCESS') }})</span>
+                        <div class="help">
+                            <p-i v-tooltip.top="$t('COMMON.WIDGETS.BILLING.TOOLTIP_TEXT')"
+                                 name="ic_tooltip" width="1rem"
+                                 height="1rem"
+                                 color="inherit transparent"
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="col-span-12 detail-wrapper">
                 <div class="table-button-wrapper">
@@ -44,14 +60,14 @@
                     <p-icon-button class="text"
                                    name="ic_arrow_right"
                                    color="inherit transparent"
-                                   :disabled="nextButtonDisabled"
+                                   :disabled="tableState.nextButtonDisabled"
                                    @click="onClickDateButton('next')"
                     />
                 </div>
                 <p-data-table
                     :loading="tableState.loading"
-                    :fields="fields"
-                    :items="isCollapsed ? tableData.slice(0, 5) : tableData"
+                    :fields="tableState.fields"
+                    :items="tableState.isCollapsed ? tableState.data.slice(0, 5) : tableState.data"
                     :bordered="false"
                 >
                     <template #th-service-format>
@@ -62,8 +78,8 @@
                     </template>
                 </p-data-table>
                 <div class="toggle-button-wrapper">
-                    <p-collapsible-toggle :is-collapsed.sync="isCollapsed">
-                        {{ isCollapsed ? 'show all' : 'hide' }}
+                    <p-collapsible-toggle :is-collapsed.sync="tableState.isCollapsed">
+                        {{ tableState.isCollapsed ? 'show all' : 'hide' }}
                     </p-collapsible-toggle>
                 </div>
             </div>
@@ -74,7 +90,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    find, forEach, orderBy, range,
+    orderBy, range,
 } from 'lodash';
 import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
@@ -88,7 +104,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PChartLoader, PSkeleton, PButton, PDataTable, PCollapsibleToggle, PIconButton,
+    PChartLoader, PSkeleton, PButton, PDataTable, PCollapsibleToggle, PIconButton, PI,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@/lib/space-connector';
@@ -126,6 +142,7 @@ export default {
         PDataTable,
         PCollapsibleToggle,
         PIconButton,
+        PI,
     },
     props: {
         projectId: {
@@ -146,22 +163,45 @@ export default {
             ])),
             data: [],
             selectedDateType: DATE_TYPE.monthly,
-            // data table
-            fields: [] as any,
-            tableData: [],
+        });
+        const summaryState = reactive({
+            pastDateText: computed(() => {
+                if (state.selectedDateType === DATE_TYPE.monthly) return vm.$t('COMMON.WIDGETS.BILLING.LAST_MONTH');
+                return vm.$t('COMMON.WIDGETS.BILLING.TWO_DAYS_AGO');
+            }),
+            currentDateText: computed(() => {
+                if (state.selectedDateType === DATE_TYPE.monthly) return vm.$t('COMMON.WIDGETS.BILLING.THIS_MONTH');
+                return vm.$t('COMMON.WIDGETS.BILLING.YESTERDAY');
+            }),
+            pastDate: computed(() => {
+                if (state.selectedDateType === DATE_TYPE.monthly) {
+                    return dayjs().utc().subtract(1, 'month').format('MMM/YYYY');
+                }
+                return dayjs().utc().subtract(2, 'day').format('DD/MM/YYYY');
+            }),
+            currentDate: computed(() => {
+                if (state.selectedDateType === DATE_TYPE.monthly) {
+                    return dayjs().utc().format('MMM/YYYY');
+                }
+                return dayjs().utc().subtract(1, 'day').format('DD/MM/YYYY');
+            }),
+            pastCost: 0,
+            currentCost: 0,
+        });
+        const tableState = reactive({
+            loading: false,
             isCollapsed: true,
+            fields: [] as any,
+            data: [],
             endDate: dayjs().utc(),
             nextButtonDisabled: computed(() => {
                 const now = dayjs().utc();
                 if (state.selectedDateType === DATE_TYPE.monthly) {
-                    return now.isSame(state.endDate, 'month');
+                    return now.isSame(tableState.endDate, 'month');
                 }
-                return now.isSame(state.endDate, 'day');
+                return now.isSame(tableState.endDate, 'day');
             }),
         });
-        const tableState = reactive({
-            loading: false,
-        })
         const chartState = reactive({
             loading: true,
             registry: {},
@@ -269,13 +309,26 @@ export default {
 
         /* api */
         const getCount = async () => {
+            const utcToday = dayjs().utc();
+            let start;
+            let end;
+            if (state.selectedDateType === DATE_TYPE.monthly) {
+                start = utcToday.subtract(1, 'month').format('YYYY-MM');
+                end = utcToday.format('YYYY-MM');
+            } else {
+                start = utcToday.subtract(2, 'day').format('YYYY-MM-DD');
+                end = utcToday.subtract(1, 'day').format('YYYY-MM-DD');
+            }
             try {
                 const res = await SpaceConnector.client.statistics.topic.billingSummary({
-                    granularity: DATE_TYPE.monthly,
-                    period: 1,
+                    granularity: state.selectedDateType,
                     project_id: props.projectId,
+                    start,
+                    end,
                 });
-                // if (res.results.length > 0) state.count.spendings = res.results[0].billing_data[0].cost;
+                const billingData = res.results[0].billing_data;
+                summaryState.pastCost = commaFormatter(numberFormatter(billingData.find(d => d.date === start)?.cost || 0));
+                summaryState.currentCost = commaFormatter(numberFormatter(billingData.find(d => d.date === end)?.cost || 0));
             } catch (e) {
                 console.error(e);
             }
@@ -283,7 +336,6 @@ export default {
         const getTrend = async () => {
             const utcToday = dayjs().utc();
             const dateType = state.selectedDateType;
-            // const dateUnit = dateType === DATE_TYPE.monthly ? 'month' : 'day';
             const dateFormat = dateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
             let start;
             let end;
@@ -344,7 +396,7 @@ export default {
         };
         const setTableFields = () => {
             const fields: any = [];
-            let now = state.endDate.clone();
+            let now = tableState.endDate.clone();
             if (state.selectedDateType === DATE_TYPE.monthly) {
                 const start = now.subtract(DATA_TABLE_COLUMN, 'month');
                 while (now.isAfter(start, 'month')) {
@@ -355,7 +407,7 @@ export default {
                     now = now.subtract(1, 'month');
                 }
             } else {
-                now = state.endDate.clone().subtract(1, 'day');
+                now = tableState.endDate.clone().subtract(1, 'day');
                 const start = now.subtract(DATA_TABLE_COLUMN, 'day');
                 while (now.isAfter(start, 'day')) {
                     fields.unshift({
@@ -366,7 +418,7 @@ export default {
                 }
             }
             fields.unshift({ name: 'service', label: '' });
-            state.fields = fields;
+            tableState.fields = fields;
         };
         const setTableData = (res) => {
             const data: any = [];
@@ -380,12 +432,12 @@ export default {
                     ...billingData,
                 });
             });
-            state.tableData = data;
+            tableState.data = data;
         };
         const getTableData = async () => {
             tableState.loading = true;
 
-            const today = state.endDate;
+            const today = tableState.endDate;
             let start;
             let end;
             if (state.selectedDateType === DATE_TYPE.monthly) {
@@ -404,7 +456,6 @@ export default {
                     start,
                     end,
                 });
-                console.log(res);
 
                 setTableData(res);
             } catch (e) {
@@ -420,16 +471,15 @@ export default {
             let dateUnit = 'month';
             if (state.selectedDateType === DATE_TYPE.daily) dateUnit = 'day';
             if (type === 'prev') {
-                state.endDate = state.endDate.subtract(DATA_TABLE_COLUMN, dateUnit);
+                tableState.endDate = tableState.endDate.subtract(DATA_TABLE_COLUMN, dateUnit);
             } else {
-                state.endDate = state.endDate.add(DATA_TABLE_COLUMN, dateUnit);
+                tableState.endDate = tableState.endDate.add(DATA_TABLE_COLUMN, dateUnit);
             }
             getTableData();
         };
 
         const init = async () => {
-            // await getCount();
-            await Promise.all([getTrend(), getTableData()]);
+            await Promise.all([getTrend(), getTableData(), getCount()]);
         };
         init();
 
@@ -439,13 +489,14 @@ export default {
             }
         }, { immediate: false });
         watch(() => state.selectedDateType, async () => {
-            await Promise.all([getTrend(), getTableData()]);
+            await Promise.all([getTrend(), getTableData(), getCount()]);
             drawChart();
         }, { immediate: false });
 
         return {
             ...toRefs(state),
             tableState,
+            summaryState,
             chartState,
             onClickDateButton,
         };
@@ -488,7 +539,38 @@ export default {
         }
     }
     .summary-wrapper {
-        
+        line-height: 1.5;
+        padding-bottom: 0.5rem;
+        .label {
+            @apply text-gray-700;
+            font-size: 0.875rem;
+        }
+        .date {
+            @apply text-gray-500;
+            font-size: 0.75rem;
+            padding-left: 0.375rem;
+        }
+        .cost {
+            @apply text-gray-900;
+            display: block;
+            font-size: 1.125rem;
+            line-height: 1.55;
+            &.in-process {
+                @apply text-safe;
+            }
+            .in-process-text {
+                font-size: 0.75rem;
+                padding-left: 0.375rem;
+            }
+            .help {
+                @apply text-gray-300;
+                display: inline-block;
+                padding-left: 0.25rem;
+                .p-i-icon {
+                    cursor: help;
+                }
+            }
+        }
     }
     .chart-wrapper {
         min-height: 13rem;
