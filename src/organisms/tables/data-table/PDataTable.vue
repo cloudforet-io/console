@@ -530,9 +530,10 @@ export default {
     }
 
     .no-data {
-        @apply absolute justify-center items-center flex w-full h-full text-gray-300 text-center;
+        @apply absolute justify-center items-center flex w-full text-gray-300 text-center;
         line-height: 120%;
         font-size: 1rem;
+        height: calc(100% - 2rem);
         max-height: 16.875rem;
         top: 2rem;
     }
