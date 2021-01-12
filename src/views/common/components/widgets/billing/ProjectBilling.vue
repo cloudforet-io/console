@@ -27,8 +27,10 @@
                     </p-chart-loader>
                 </div>
             </div>
-            <div class="col-span-12 lg:col-span-3">
-                <span class="label">Last Month</span>
+            <div class="col-span-12 lg:col-span-3 summary-wrapper">
+                <div>
+                    <span class="label">Last Month</span>
+                </div>
                 <span class="label">Last Month</span>
             </div>
             <div class="col-span-12 detail-wrapper">
@@ -104,6 +106,7 @@ interface ChartData {
     value: number;
     color?: string;
     dash?: string;
+    bulletColor?: string;
 }
 
 enum DATE_TYPE {
@@ -259,6 +262,7 @@ export default {
             chart.cursor = new am4charts.XYCursor();
             chart.cursor.lineX.strokeOpacity = 0;
             chart.cursor.lineY.strokeOpacity = 0;
+            chart.cursor.behavior = 'none';
 
             state.chart = chart;
         };
@@ -483,6 +487,9 @@ export default {
             }
         }
     }
+    .summary-wrapper {
+        
+    }
     .chart-wrapper {
         min-height: 13rem;
         margin-bottom: 1rem;
@@ -524,6 +531,9 @@ export default {
                     td {
                         @apply bg-primary4;
                     }
+                }
+                &:hover {
+                    @apply bg-white;
                 }
             }
             td {
