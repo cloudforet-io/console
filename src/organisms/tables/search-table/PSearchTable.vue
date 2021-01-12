@@ -10,6 +10,7 @@
                      :this-page="proxyState.thisPage"
                      :page-size="proxyState.pageSize"
                      :excel-visible="excelVisible"
+                     :page-size-visible="pageSizeVisible"
                      use-cursor-loading
                      :setting-visible="false"
                      sortable
@@ -131,6 +132,10 @@ export default {
             default: true,
         },
         excelVisible: {
+            type: Boolean,
+            default: true,
+        },
+        pageSizeVisible: {
             type: Boolean,
             default: true,
         },
