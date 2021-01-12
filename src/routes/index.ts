@@ -33,5 +33,11 @@ router.beforeEach(async (to, from, next) => {
     }
 });
 
+router.onError((error) => {
+    if (/loading chunk \d* failed./i.test(error.message)) {
+        window.location.reload();
+    }
+});
+
 
 export default router;
