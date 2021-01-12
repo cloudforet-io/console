@@ -4436,6 +4436,27 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
+                                        <name>REGION_SERVICE_TITLE</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
                                         <name>RESOURCE</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
@@ -4521,6 +4542,95 @@
                                     </concept_node>
                                     <concept_node>
                                         <name>TYPE_TITLE</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                </children>
+                            </folder_node>
+                            <folder_node>
+                                <name>BILLING</name>
+                                <children>
+                                    <concept_node>
+                                        <name>DAY</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>MONTH</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>TITLE</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description/>
+                                        <comment/>
+                                        <default_text/>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>TREND_TITLE</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>

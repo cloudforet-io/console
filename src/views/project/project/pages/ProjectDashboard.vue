@@ -1,15 +1,9 @@
 <template>
     <div class="grid grid-cols-12 gap-3">
+        <project-all-summary class="col-span-12" :project-id="projectId" />
         <div class="col-span-12 lg:col-span-9 grid grid-cols-12 gap-3">
-            <all-summary class="col-span-12"
-                         :project-id="projectId"
-                         :chart-color="chartColor"
-                         :chart-text-color="chartTextColor"
-            />
-            <project-personal-health-dashboard class="col-span-12 project-personal-health-dashboard"
-                                               :providers="providers"
-                                               :project-id="projectId"
-            />
+            <project-billing class="col-span-12" :project-id="projectId" />
+            <project-personal-health-dashboard class="col-span-12" :providers="providers" :project-id="projectId" />
             <div class="col-span-12 resources-tab">
                 <p-tab :tabs="tabs" :active-tab.sync="activeTab">
                     <template #server>
@@ -61,7 +55,8 @@ import {
 import { PTab } from '@spaceone/design-system';
 
 import ProjectPersonalHealthDashboard from '@/views/common/components/widgets/personal-health-dashboard/ProjectPersonalHealthDashboard.vue';
-import AllSummary from '@/views/common/components/widgets/all-summary/AllSummary.vue';
+import ProjectAllSummary from '@/views/common/components/widgets/all-summary/ProjectAllSummary.vue';
+import ProjectBilling from '@/views/common/components/widgets/billing/ProjectBilling.vue';
 import CloudServices from '@/views/common/components/widgets/cloud-services/CloudServices.vue';
 import DailyUpdates from '@/views/common/components/widgets/daily-updates/DailyUpdates.vue';
 import ServiceAccountsTable from '@/views/common/components/widgets/service-accounts-table/ServiceAccountsTable.vue';
@@ -69,7 +64,7 @@ import ResourcesByRegion from '@/views/common/components/widgets/resources-by-re
 import SimplifiedTrustedAdvisor from '@/views/common/components/widgets/trusted-advisor/SimplifiedTrustedAdvisor.vue';
 
 import {
-    blue, secondary, secondary1, peacock,
+    blue, secondary, secondary1,
 } from '@/styles/colors';
 import { store } from '@/store';
 
@@ -84,9 +79,10 @@ interface SummaryState {
 export default {
     name: 'ProjectDashboard',
     components: {
+        ProjectBilling,
         ProjectPersonalHealthDashboard,
         SimplifiedTrustedAdvisor,
-        AllSummary,
+        ProjectAllSummary,
         ResourcesByRegion,
         CloudServices,
         DailyUpdates,
@@ -108,8 +104,6 @@ export default {
                 color: secondary1,
             },
             providers: computed(() => vm.$store.state.resource.provider.items),
-            chartColor: peacock[500],
-            chartTextColor: peacock[600],
         });
         const projectId = computed<string>(() => context.root.$route.params.id as string);
         const projectFilter = `&filters=project_id%3A%3D${projectId.value}`;
@@ -168,50 +162,6 @@ export default {
     }
 }
 
-.all-summary::v-deep {
-    margin-top: 1.25rem;
-    .top-part {
-        .box {
-            height: 5.25rem;
-            border-radius: 2px;
-            box-shadow: none;
-            &.selected {
-                @apply bg-peacock-600;
-                &::after {
-                    border-color: theme('colors.peacock.600') transparent;
-                }
-                .count {
-                    @apply text-white;
-                    .number {
-                        @apply text-white;
-                        font-weight: normal;
-                    }
-                }
-                .title {
-                    font-weight: normal;
-                }
-            }
-            &:not(.selected) {
-                @apply border border-gray-200;
-            }
-            .count {
-                @apply text-gray-700;
-                .number {
-                    @apply text-gray-700;
-                    font-size: 1.625rem;
-                    font-weight: normal;
-                }
-            }
-        }
-    }
-    .bottom-part {
-        .content-wrapper {
-            @apply border border-gray-200;
-            border-radius: 2px;
-        }
-    }
-}
-
 .cloud-services {
     @apply border border-gray-200;
     min-height: 25rem;
@@ -242,7 +192,6 @@ export default {
     @apply border border-gray-200;
     max-height: 35rem;
     border-radius: 2px;
-    margin-top: 1.25rem;
 }
 
 .health-dashboard {

@@ -249,11 +249,18 @@
 				"MONTH": "月",
 				"NO_SERVICE": "{service} なし",
 				"OVERALL_SPENDINGS": "総支出",
+				"REGION_SERVICE_TITLE": "",
 				"RESOURCE": "リソース",
 				"STORAGE": "ストレージ",
-				"TITLE": "サマリー",
+				"TITLE": "",
 				"TREND_TITLE": "トレンド",
 				"TYPE_TITLE": "{service}タイプ"
+			},
+			"BILLING": {
+				"DAY": "日",
+				"MONTH": "月",
+				"TITLE": "",
+				"TREND_TITLE": "トレンド"
 			},
 			"CLOUD_SERVICE_CREATE_COLLECTOR": "コレクタ作成",
 			"CLOUD_SERVICE_HELP": "サービスしている主要なクラウドサービスリストを表示します",

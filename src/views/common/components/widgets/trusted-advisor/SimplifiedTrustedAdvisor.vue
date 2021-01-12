@@ -25,9 +25,9 @@
                 </div>
             </div>
         </div>
-        <div class="legend-wrapper grid grid-cols-12 gap-2">
+        <div class="legend-wrapper">
             <div v-for="(legend, index) in legends" :key="index"
-                 class="legend col-span-4"
+                 class="legend"
                  :class="legend.name"
             >
                 <div class="box" />
@@ -263,6 +263,8 @@ export default {
     .legend-wrapper {
         margin-top: 1rem;
         .legend {
+            display: inline-flex;
+            padding: 0.25rem 0;
             &.error {
                 @mixin legend-theme theme('colors.coral.100'), theme('colors.red.500'), theme('colors.red.500');
             }
@@ -276,7 +278,7 @@ export default {
                 @apply border;
                 width: 10px;
                 height: 10px;
-                margin-bottom: 0.25rem;
+                margin-right: 0.375rem;
             }
             .text {
                 @apply text-gray-700;

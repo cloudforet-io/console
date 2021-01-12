@@ -249,11 +249,18 @@
 				"MONTH": "월",
 				"NO_SERVICE": "{service} 없음",
 				"OVERALL_SPENDINGS": "총 지출 비용",
+				"REGION_SERVICE_TITLE": "",
 				"RESOURCE": "리소스",
 				"STORAGE": "저장소",
-				"TITLE": "요약 정보",
+				"TITLE": "",
 				"TREND_TITLE": "트렌드",
 				"TYPE_TITLE": "{service} 타입"
+			},
+			"BILLING": {
+				"DAY": "일",
+				"MONTH": "월",
+				"TITLE": "",
+				"TREND_TITLE": "트렌드"
 			},
 			"CLOUD_SERVICE_CREATE_COLLECTOR": "컬렉터 생성 ",
 			"CLOUD_SERVICE_HELP": "서비스 중인 주요 클라우드 서비스 목록을 보여줍니다.",

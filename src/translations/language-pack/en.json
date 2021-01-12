@@ -249,11 +249,18 @@
 				"MONTH": "Month",
 				"NO_SERVICE": "No {service}",
 				"OVERALL_SPENDINGS": "Overall-Spendings",
+				"REGION_SERVICE_TITLE": "Region Service",
 				"RESOURCE": "Resource",
 				"STORAGE": "Storage",
-				"TITLE": "Summary",
+				"TITLE": "General",
 				"TREND_TITLE": "Trend",
 				"TYPE_TITLE": "{service} Type"
+			},
+			"BILLING": {
+				"DAY": "Day",
+				"MONTH": "Month",
+				"TITLE": "Billing",
+				"TREND_TITLE": "Trend"
 			},
 			"CLOUD_SERVICE_CREATE_COLLECTOR": "Create a collector",
 			"CLOUD_SERVICE_HELP": "Displays only major services in cloud service.",

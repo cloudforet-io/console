@@ -489,19 +489,18 @@ export default {
         }
     }
 }
-.p-tab {
-    &::v-deep {
-        .p-tab-bar {
-            border-color: #f8f8fc;
-        }
-        .tab-pane {
-            @apply pb-0;
+.p-tab::v-deep {
+    border: none;
+    .p-tab-bar {
+        border-bottom-width: 0;
+        .p-nav-link {
+            margin-bottom: 0;
         }
     }
-}
-
-.tab-content {
-    border: none;
+    .tab-pane {
+        @apply border border-gray-200;
+        padding: 1.5rem 1rem;
+    }
 }
 
 .delete-btn {
