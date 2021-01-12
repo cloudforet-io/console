@@ -1,19 +1,22 @@
 import { withKnobs } from '@storybook/addon-knobs';
 import { toRefs, reactive } from '@vue/composition-api';
-import { getKnobProps } from '@sb/storybook-util';
+import { getKnobProps } from '@/util/storybook-util';
 import PProgressTabBar from '@/molecules/tabs/progress-tab-bar/PProgressTabBar.vue';
-import md from '@/molecules/tabs/progress-tab-bar/PProgresTabBar.md';
+// import md from '@/molecules/tabs/progress-tab-bar/PProgresTabBar.md';
 
 export default {
     title: 'Others/Tab, Progress Tab/ProgressTabBar',
     component: PProgressTabBar,
     decorators: [withKnobs],
     parameters: {
-        notes: md,
+        info: {
+            summary: '',
+            components: { PProgressTabBar },
+        },
     },
 };
 
-const getData = (props, context) => {
+const getData = () => {
     const state = reactive({
         tabs: [
             {
@@ -84,7 +87,7 @@ export const defaultCase = () => ({
     `,
     setup(...args) {
         return {
-            ...getData(...args),
+            ...getData(),
         };
     },
 });

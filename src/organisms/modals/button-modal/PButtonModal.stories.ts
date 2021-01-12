@@ -3,7 +3,7 @@ import { action } from '@storybook/addon-actions';
 import {
     boolean, number, select, text,
 } from '@storybook/addon-knobs';
-import { autoProps } from '@sb/storybook-util';
+import { autoProps } from '@/util/storybook-util';
 import PContentModal from '@/organisms/modals/content-modal/PContentModal.vue';
 import PButton from '@/atoms/buttons/PButton.vue';
 import PButtonModal from '@/organisms/modals/button-modal/PButtonModal.vue';
@@ -99,10 +99,10 @@ export const buttonModal = () => ({
             default: boolean('ok disabled', false),
         },
         headerTitle: {
-            default: text('header title', 'this is titel'),
+            default: text('header title', 'this is title'),
         },
-        ...autoProps(PButtonModal, pbmProps),
-        ...autoProps(PContentModal, pcmProps),
+        // ...autoProps(PButtonModal, pbmProps),
+        // ...autoProps(PContentModal, pcmProps),
     },
 
     setup(props) {

@@ -1,14 +1,8 @@
 /* eslint-disable camelcase */
-import {
-    toRefs, reactive, ref, computed,
-} from '@vue/composition-api';
+import { toRefs, reactive } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import {
-    text, number, select, object, boolean,
-} from '@storybook/addon-knobs';
 import casual, { arrayOf } from '@/util/casual';
 import PQuerySearch from './PQuerySearch.vue';
-import md from './PQuerySearch.md';
 
 export default {
     title: 'Inputs/Search/QuerySearch',
@@ -19,7 +13,6 @@ export default {
             components: { PQuerySearch },
         },
         knobs: { escapeHTML: false },
-        notes: md,
     },
 };
 
@@ -71,7 +64,7 @@ export const querySearch = () => ({
             value: '',
             keyItemSets,
             valueHandlerMap,
-            queries: [],
+            queries: [] as any,
         });
 
         return {
@@ -128,7 +121,7 @@ export const defaultHandlers = () => ({
         const state = reactive({
             value: '',
             keyItemSets,
-            queries: [],
+            queries: [] as any,
         });
 
         return {

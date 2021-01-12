@@ -1,5 +1,5 @@
 import { withKnobs } from '@storybook/addon-knobs';
-import { autoProps } from '@sb/storybook-util';
+import { autoProps } from '@/util/storybook-util';
 import { action } from '@storybook/addon-actions';
 import PTag from '@/molecules/tags/PTag.vue';
 

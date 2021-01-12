@@ -1,13 +1,7 @@
-import {
-    toRefs, reactive, ref, computed,
-} from '@vue/composition-api';
+import { toRefs, reactive } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import { getKnobProps } from '@sb/storybook-util';
-import {
-    text, number, select, object, boolean,
-} from '@storybook/addon-knobs';
+import { getKnobProps } from '@/util/storybook-util';
 import casual, { arrayOf } from '@/util/casual';
-import md from '@/organisms/search/autocomplete-search/PAutocompleteSearch.md';
 import PAutocompleteSearch from '@/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
 import Fuse from 'fuse.js';
 
@@ -54,7 +48,7 @@ const autocompleteSearchProps = {
 function plainAutocompleteHandler(inputText, list, key) {
     let res = list;
     if (inputText.trim()) {
-        const options = {};
+        const options = { keys: [] as any };
         if (key) options.keys = [key];
         const fuse = new Fuse(list, options);
         res = fuse.search(inputText);
@@ -75,9 +69,8 @@ export default {
     title: 'Inputs/Search/AutoCompleteSearch',
     component: PAutocompleteSearch,
     parameters: {
-        notes: md,
         info: {
-            summary: md,
+            summary: '',
             components: { PAutocompleteSearch },
         },
         knobs: { escapeHTML: false },
@@ -179,7 +172,7 @@ export const controlCase = () => ({
     setup(props, context) {
         const state = reactive({
             value: 'test',
-            menu: [],
+            menu: [{ type: null, label: null }],
             visibleMenu: false,
             isFocused: true,
         });

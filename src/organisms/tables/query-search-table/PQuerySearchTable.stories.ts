@@ -7,15 +7,13 @@ import {
 } from '@storybook/addon-knobs';
 import casual, { arrayOf } from '@/util/casual';
 import PQuerySearchTable from './PQuerySearchTable.vue';
-import md from './PQuerySearchTable.md';
 
 export default {
     title: 'Data Display/Tables/QuerySearchTable',
     component: PQuerySearchTable,
     parameters: {
-        notes: md,
         info: {
-            summary: md,
+            summary: '',
             components: { PQuerySearchTable },
         },
         knobs: { escapeHTML: false },
@@ -111,7 +109,7 @@ export const querySearchTable = () => ({
         </div>`,
     setup(props, context) {
         const state = reactive({
-            items: [],
+            items: [] as object,
             loading: true,
         });
 

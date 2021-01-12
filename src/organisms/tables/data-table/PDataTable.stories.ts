@@ -1,13 +1,12 @@
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import {
-    text, number, select, object, boolean,
+    text, number, object, boolean,
 } from '@storybook/addon-knobs';
 import PButton from '@/atoms/buttons/PButton.vue';
-import md from '@/organisms/tables/data-table/PDataTable.md';
 import PDataTable from '@/organisms/tables/data-table/PDataTable.vue';
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, ref, toRefs, watch,
 } from '@vue/composition-api';
 import casual, { arrayOf } from '@/util/casual';
 import { orderBy } from 'lodash';
@@ -16,7 +15,7 @@ export default {
     title: 'Data Display/Tables/DataTable',
     component: PDataTable,
     parameters: {
-        notes: md,
+        info: '',
     },
 };
 const actions = {
@@ -39,7 +38,7 @@ const mockupMixin = {
             email: faker.internet.email(),
         });
         const items = computed(() => {
-            const dataset = [];
+            const dataset = [] as any;
             for (let step = 0; step < 5; step++) {
                 dataset.push(getUser());
             }
@@ -86,7 +85,7 @@ export const dataTable = () => ({
             default: boolean('rowHeightFixed', true),
         },
         width: {
-            default: text('width', undefined),
+            default: text('width', ''),
         },
     },
     template: `
@@ -109,7 +108,7 @@ export const dataTable = () => ({
     `,
     setup(props) {
         const state = reactive({
-            items: [],
+            items: [] as object,
         });
 
         const getUsers = () => {
@@ -161,7 +160,7 @@ export const sortCase = () => ({
                 name: casual.full_name,
                 phone: casual.phone,
                 email: casual.email,
-            })),
+            })) as object,
             sortBy: 'name',
             sortDesc: true,
         });
@@ -200,14 +199,15 @@ export const selectTable = () => ({
         </div>
     `,
     setup(props, { table }) {
+        const selected = ref([]);
         const getData = () => {
-            this.selected = table.getSelectItem();
+            selected.value = table.getSelectItem();
         };
         return {
             ...data,
             ...actions,
             selectIndex: [],
-            selected: [],
+            selected,
             getData,
         };
     },
@@ -235,14 +235,19 @@ export const rowClickMultiSelectMode = () => ({
         </div>
     `,
     setup() {
+        let $refs!: {
+            table: HTMLFormElement;
+        };
+        const selected = ref([]);
         const getData = () => {
-            this.selected = this.$refs.table.getSelectItem();
+            selected.value = $refs.table.getSelectItem();
         };
         return {
+            $refs,
             ...data,
             ...actions,
             selectIndex: [],
-            selected: [],
+            selected,
             getData,
         };
     },
@@ -270,14 +275,16 @@ export const rowVBind = () => ({
             };
         };
         const items = computed(() => {
-            const dataset = [];
+            const dataset = [] as any;
             for (let step = 0; step < 20; step++) {
-                dataset.push(this.getUser(step));
+                dataset.push(getUser(step));
             }
             return dataset;
         });
         return {
             ...data,
+            getUser,
+            items,
             ...actions,
         };
     },

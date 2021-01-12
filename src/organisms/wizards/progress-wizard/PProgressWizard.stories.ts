@@ -1,16 +1,14 @@
-import {
-    withKnobs, text, boolean, object, number,
-} from '@storybook/addon-knobs';
-import { toRefs, reactive, ref } from '@vue/composition-api';
+import { withKnobs } from '@storybook/addon-knobs';
+import { ref } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
 import { VTooltip } from 'v-tooltip';
-import { getKnobProps } from '@sb/storybook-util';
+import { getKnobProps } from '@/util/storybook-util';
 import PProgressWizard from '@/organisms/wizards/progress-wizard/PProgressWizard.vue';
 
 
 export default {
     title: 'Navigation/ProgressWizard',
-    component: PProgressWizard,
+    component: { PProgressWizard },
     decorators: [withKnobs],
     parameters: {
         info: {
@@ -25,7 +23,7 @@ export default {
                 optional: Boolean,
             \n
             `,
-            components: { PProgressWizard },
+            component: { PProgressWizard },
         },
     },
 };
@@ -36,63 +34,73 @@ const actions = () => ({
     onConfirm: action('confirm'),
 });
 
+const getProps = () => getKnobProps({
+    tabs: {
+        type: Array,
+        default: () => [],
+    },
+    /** sync */
+    activeIdx: {
+        type: Number,
+        default: 0,
+    },
+    invalidState: {
+        type: Object,
+        default: () => ({}),
+    },
+    cancelBtnBind: {
+        type: Object,
+        default: () => ({}),
+    },
+    navigationBtnBind: {
+        type: Object,
+        default: () => ({}),
+    },
+    confirmBtnBind: {
+        type: Object,
+        default: () => ({}),
+    },
+    loading: {
+        type: Boolean,
+        default: false,
+    },
+    disabled: {
+        type: Boolean,
+        default: false,
+    },
+    showValidation: {
+        type: Boolean,
+        default: true,
+    },
+    showConfirm: {
+        type: Boolean,
+        default: true,
+    },
+}, {
+    title: 'Wizard Title',
+    tabs: [
+        {
+            name: 'conf',
+            label: 'Configure Collector',
+        },
+        {
+            name: 'credentials',
+            label: 'Choose Credentials',
+        },
+        {
+            name: 'tags',
+            label: 'Add Tags',
+            help: 'This is description of add tags step.',
+        },
+    ],
+}, {
+    activeIdx: true,
+});
+
 
 export const progressWizard = () => ({
     components: { PProgressWizard },
-    props: getKnobProps({
-        tabs: {
-            type: Array,
-            default: () => [],
-        },
-        /** sync */
-        activeIdx: {
-            type: Number,
-            default: 0,
-        },
-        invalidState: {
-            type: Object,
-            default: () => ({}),
-        },
-        cancelBtnBind: {
-            type: Object,
-            default: () => ({}),
-        },
-        navigationBtnBind: {
-            type: Object,
-            default: () => ({}),
-        },
-        confirmBtnBind: {
-            type: Object,
-            default: () => ({}),
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
-    }, {
-        title: 'Wizard Title',
-        tabs: [
-            {
-                name: 'conf',
-                label: 'Configure Collector',
-            },
-            {
-                name: 'credentials',
-                label: 'Choose Credentials',
-            },
-            {
-                name: 'tags',
-                label: 'Add Tags',
-                help: 'This is description of add tags step.',
-            },
-        ],
-    }, {
-        activeIdx: true,
-    }),
+    props: { ...getProps() },
     template: `<p-progress-wizard v-bind="$props"
                                   :activeIdx.sync="activeIdx"
                                 style="width: 100vw;"
@@ -131,9 +139,6 @@ export const topSlot = () => ({
     props: { ...getProps() },
     template: `<p-progress-wizard :tabs.sync="tabs"
                                 :active-idx.sync="activeIdx"
-                                :show-validation="showValidation"
-                                :show-confirm="showConfirm"
-                                :title="title"
                                 style="width: 100vw;"
                                 @cancel="onCancel"
                                 @confirm="onConfirm"
@@ -144,7 +149,7 @@ export const topSlot = () => ({
                 </p-progress-wizard>`,
     setup(...args) {
         return {
-            ...getData(...args),
+            activeIdx: ref(0),
             ...actions(),
         };
     },
@@ -155,9 +160,6 @@ export const progressSlot = () => ({
     props: { ...getProps() },
     template: `<p-progress-wizard :tabs.sync="tabs"
                                 :active-idx.sync="activeIdx"
-                                :show-validation="showValidation"
-                                :show-confirm="showConfirm"
-                                :title="title"
                                 style="width: 100vw;"
                                 @cancel="onCancel"
                                 @confirm="onConfirm"
@@ -172,7 +174,7 @@ export const progressSlot = () => ({
                 </p-progress-wizard>`,
     setup(...args) {
         return {
-            ...getData(...args),
+            activeIdx: ref(0),
             ...actions(),
         };
     },
@@ -184,9 +186,6 @@ export const helpSlot = () => ({
     props: { ...getProps() },
     template: `<p-progress-wizard :tabs.sync="tabs"
                                 :active-idx.sync="activeIdx"
-                                :show-validation="showValidation"
-                                :show-confirm="showConfirm"
-                                :title="title"
                                 style="width: 100vw;"
                                 @cancel="onCancel"
                                 @confirm="onConfirm"
@@ -203,7 +202,7 @@ export const helpSlot = () => ({
                 </p-progress-wizard>`,
     setup(...args) {
         return {
-            ...getData(...args),
+            activeIdx: ref(0),
             ...actions(),
         };
     },
@@ -214,9 +213,6 @@ export const bodySlot = () => ({
     props: { ...getProps() },
     template: `<p-progress-wizard :tabs.sync="tabs"
                                 :active-idx.sync="activeIdx"
-                                :show-validation="showValidation"
-                                :show-confirm="showConfirm"
-                                :title="title"
                                 style="width: 100vw;"
                                 @cancel="onCancel"
                                 @confirm="onConfirm"
@@ -241,7 +237,7 @@ export const bodySlot = () => ({
                 </p-progress-wizard>`,
     setup(...args) {
         return {
-            ...getData(...args),
+            activeIdx: ref(0),
             ...actions(),
         };
     },
@@ -253,9 +249,6 @@ export const stepSlot = () => ({
     props: { ...getProps() },
     template: `<p-progress-wizard :tabs.sync="tabs"
                                 :active-idx.sync="activeIdx"
-                                :show-validation="showValidation"
-                                :show-confirm="showConfirm"
-                                :title="title"
                                 style="width: 100vw;"
                                 @cancel="onCancel"
                                 @confirm="onConfirm"
@@ -272,7 +265,7 @@ export const stepSlot = () => ({
                 </p-progress-wizard>`,
     setup(...args) {
         return {
-            ...getData(...args),
+            activeIdx: ref(0),
             ...actions(),
         };
     },
@@ -283,9 +276,6 @@ export const stepAppendSlot = () => ({
     props: { ...getProps() },
     template: `<p-progress-wizard :tabs.sync="tabs"
                                 :active-idx.sync="activeIdx"
-                                :show-validation="showValidation"
-                                :show-confirm="showConfirm"
-                                :title="title"
                                 style="width: 100vw;"
                                 @cancel="onCancel"
                                 @confirm="onConfirm"
@@ -296,7 +286,7 @@ export const stepAppendSlot = () => ({
                 </p-progress-wizard>`,
     setup(...args) {
         return {
-            ...getData(...args),
+            activeIdx: ref(0),
             ...actions(),
         };
     },
@@ -308,9 +298,6 @@ export const bottomSlot = () => ({
     props: { ...getProps() },
     template: `<p-progress-wizard :tabs.sync="tabs"
                                 :active-idx.sync="activeIdx"
-                                :show-validation="showValidation"
-                                :show-confirm="showConfirm"
-                                :title="title"
                                 style="width: 100vw;"
                                 @cancel="onCancel"
                                 @confirm="onConfirm"
@@ -321,7 +308,7 @@ export const bottomSlot = () => ({
                 </p-progress-wizard>`,
     setup(...args) {
         return {
-            ...getData(...args),
+            activeIdx: ref(0),
             ...actions(),
         };
     },

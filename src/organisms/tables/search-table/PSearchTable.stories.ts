@@ -1,11 +1,6 @@
-import {
-    toRefs, reactive, ref, computed,
-} from '@vue/composition-api';
+import { toRefs, reactive } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import { getKnobProps } from '@sb/storybook-util';
-import {
-    text, number, select, object, boolean,
-} from '@storybook/addon-knobs';
+import { text, number, object } from '@storybook/addon-knobs';
 import casual, { arrayOf } from '@/util/casual';
 import PSearchTable from './PSearchTable.vue';
 
@@ -61,9 +56,9 @@ export const searchTable = () => ({
                       @select="onSelect"
         ></PSearchTable>
     </div>`,
-    setup(props, context) {
+    setup() {
         const state = reactive({
-            items: [],
+            items: [] as object,
             loading: true,
         });
 

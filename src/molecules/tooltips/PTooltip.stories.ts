@@ -1,7 +1,6 @@
-import { select } from '@storybook/addon-knobs';
+import { object, select, text } from '@storybook/addon-knobs';
 import Tooltip from '@/molecules/tooltips/PTooltip.vue';
 import { PLACEMENTS } from '@/molecules/tooltips/type';
-import { autoProps } from '@sb/storybook-util';
 
 export default {
     title: 'Data Display/Tooltips',
@@ -17,10 +16,14 @@ export const toolTip = () => ({
         position: {
             default: select('position', Object.keys(PLACEMENTS), 'auto'),
         },
-        ...autoProps(Tooltip, [
-            { name: 'contents', default: 'tooltip' },
-            { name: 'options', default: {} },
-        ]),
+        contents: { default: text('contents', 'tooltip') },
+        options: {
+            default: object('options', () => ({})),
+        },
+        // ...autoProps(Tooltip, [
+        //     { name: 'contents', default: 'tooltip' },
+        //     { name: 'options', default: {} },
+        // ]),
     },
     template: `<div id="story-tooltip-container" style="display: inline-block; position: relative; height: 500px; width: 500px;">
                     <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">

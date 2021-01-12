@@ -4,7 +4,7 @@ import {
 import {
     select, color,
 } from '@storybook/addon-knobs';
-import { getKnobProps } from '@sb/storybook-util';
+import { getKnobProps } from '@/util/storybook-util';
 import PSelectableItem from '@/molecules/selectable-item/PSelectableItem.vue';
 
 const selectableItemProps = {

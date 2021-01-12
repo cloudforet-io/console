@@ -2,7 +2,7 @@ import {
     toRefs, reactive,
 } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import { getKnobProps } from '@sb/storybook-util';
+import { getKnobProps } from '@/util/storybook-util';
 import PSelectableList from '@/organisms/lists/selectable-list/PSelectableList.vue';
 
 export default {

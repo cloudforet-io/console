@@ -1,6 +1,6 @@
 import PHorizontalLayout from '@/organisms/layouts/horizontal-layout/PHorizontalLayout.vue';
 import { action } from '@storybook/addon-actions';
-import { autoProps } from '@sb/storybook-util';
+import { autoProps } from '@/util/storybook-util';
 
 export default {
     title: 'Layouts/HorizontalLayout',

@@ -1,11 +1,6 @@
-import {
-    toRefs, reactive,
-} from '@vue/composition-api';
+import { toRefs, reactive } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import {
-    text,
-} from '@storybook/addon-knobs';
-import md from './PQuerySearchTags.md';
+import { text } from '@storybook/addon-knobs';
 import PQuerySearchTags from './PQuerySearchTags.vue';
 
 export default {
@@ -17,7 +12,6 @@ export default {
             components: { PQuerySearchTags },
         },
         knobs: { escapeHTML: false },
-        notes: md,
     },
 };
 

@@ -1,9 +1,9 @@
-import { select, text } from '@storybook/addon-knobs';
+import { select, text, boolean } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
-import { boolean } from '@storybook/addon-knobs';
 import PButton from '@/atoms/buttons/PButton.vue';
 import PTableCheckModel from '@/organisms/modals/table-modal/PTableCheckModal.vue';
 import { sizeMapping } from '@/molecules/modals/type';
+import { computed, ref } from '@vue/composition-api';
 
 export default {
     title: 'Others/Modal/TableCheckModal',
@@ -69,10 +69,10 @@ export const modal = () => ({
     },
     props: {
         themeColor: {
-            default: select('color', ['primary', 'alert', 'safe']),
+            default: select('color', ['primary', 'alert', 'safe'], 'primary'),
         },
         size: {
-            default: select('size', [null, ...Object.keys(sizeMapping)]),
+            default: select('size', [null, ...Object.keys(sizeMapping)], null),
         },
         okDisabled: {
             default: boolean('ok disabled', false),
@@ -87,21 +87,24 @@ export const modal = () => ({
             default: boolean('scrollable', false),
         },
     },
-    computed: {
-        ConfirmButtonBind() {
-            return {
-                styleType: 'primary',
-                disabled: this.okDisabled,
-            };
-        },
-    },
-    methods: {
-        click() {
-            this.visible = true;
-        },
-        close() {
-            this.visible = false;
-        },
-        ...actions,
+    setup(props) {
+        const visible = ref(false);
+        const ConfirmButtonBind = computed(() => ({
+            styleType: 'primary',
+            disabled: props.okDisabled,
+        }));
+        const click = () => {
+            visible.value = true;
+        };
+        const close = () => {
+            visible.value = false;
+        };
+        return {
+            visible,
+            ConfirmButtonBind,
+            click,
+            close,
+            ...actions,
+        };
     },
 });

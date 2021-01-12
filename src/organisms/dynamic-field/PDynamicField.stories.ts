@@ -6,13 +6,12 @@ import {
     reactive,
 } from '@vue/composition-api';
 import PDynamicField from '@/organisms/dynamic-field/PDynamicField.vue';
-import md from '@/organisms/dynamic-field/PDynamicField.md';
 
 export default {
     title: 'Others/Dynamic/DynamicField',
     component: PDynamicField,
     parameters: {
-        notes: md,
+        info: '',
     },
 };
 export const playground = () => ({

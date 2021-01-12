@@ -1,6 +1,4 @@
-import { number, select } from '@storybook/addon-knobs';
-import { boolean } from '@storybook/addon-knobs';
-import { autoProps } from '@sb/storybook-util';
+import { number, select, boolean } from '@storybook/addon-knobs';
 import PButton from '@/atoms/buttons/PButton.vue';
 import { sizeMapping } from '@/molecules/modals/type';
 import PContentModal from '@/organisms/modals/content-modal/PContentModal.vue';
@@ -114,48 +112,46 @@ export const fade = () => ({
             default: number('loremLength', 10, {
                 range: true, min: 1, max: 80, step: 10,
             }),
+            headerVisible: {
+                default: boolean('headerVisible', true),
+            },
+            bodyVisible: {
+                default: boolean('headerVisible', true),
+            },
+            footerVisible: {
+                default: boolean('headerVisible', true),
+            },
+            size: {
+                default: select('size', ['', ...Object.keys(sizeMapping)], 'sm'),
+            },
+            scrollable: {
+                default: boolean('scrollable', false),
+            },
+            centered: {
+                default: boolean('centered', false),
+            },
+            backdrop: {
+                default: boolean('backdrop', true),
+            },
+            fade: {
+                default: boolean('fade', true),
+            },
         },
-        headerVisible: {
-            default: boolean('headerVisible', true),
-        },
-        bodyVisible: {
-            default: boolean('headerVisible', true),
-        },
-        footerVisible: {
-            default: boolean('headerVisible', true),
-        },
-        size: {
-            default: select('size', ['', ...Object.keys(sizeMapping)], 'sm'),
-        },
-        scrollable: {
-            default: boolean('scrollable', false),
-        },
-        centered: {
-            default: boolean('centered', false),
-        },
-        backdrop: {
-            default: boolean('backdrop', true),
-        },
-        fade: {
-            default: boolean('fade', true),
-        },
-    },
-    data() {
-        return {
-            visible: false,
-        };
-    },
-    computed: {
-        lorem() {
-            return faker.lorem.lines(this.loremLength);
-        },
-    },
-    methods: {
-        click() {
-            this.$refs.modal.show();
-        },
-        close() {
-            this.$refs.modal.hide();
+        setup(props) {
+            const visible = ref(false);
+            const lorem = computed(() => faker.lorem.lines(props.loremLength));
+            const click = () => {
+                visible.value = true;
+            };
+            const close = () => {
+                visible.value = false;
+            };
+            return {
+                visible,
+                lorem,
+                click,
+                close,
+            };
         },
     },
 });

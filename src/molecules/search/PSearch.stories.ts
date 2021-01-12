@@ -2,7 +2,7 @@ import {
     toRefs, reactive,
 } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import { getKnobProps } from '@sb/storybook-util';
+import { getKnobProps } from '@/util/storybook-util';
 import PButton from '@/atoms/buttons/PButton.vue';
 import PSearch from '@/molecules/search/PSearch.vue';
 

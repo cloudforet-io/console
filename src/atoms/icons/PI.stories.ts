@@ -30,7 +30,7 @@ export const Icons = () => ({
             default: text('height', '1.5rem'),
         },
         color: {
-            default: text('color', undefined),
+            default: text('color', ''),
         },
         original: {
             default: boolean('original', true),
@@ -59,7 +59,7 @@ export const allIcons = () => ({
             default: text('height', '1.5rem'),
         },
         color: {
-            default: text('color', undefined),
+            default: text('color', ''),
         },
 
     },

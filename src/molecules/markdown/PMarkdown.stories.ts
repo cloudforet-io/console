@@ -15,6 +15,5 @@ export default {
 export const markdown = () => ({
     components: { PMarkdown },
     template: `<div style="width: 80vw;">
-                    
                 </div>`,
 });

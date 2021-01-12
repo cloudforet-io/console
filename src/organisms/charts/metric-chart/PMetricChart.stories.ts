@@ -1,7 +1,7 @@
 import {
     toRefs, reactive,
 } from '@vue/composition-api';
-import { getKnobProps } from '@sb/storybook-util';
+import { getKnobProps } from '@/util/storybook-util';
 import casual, { arrayOf } from '@/util/casual';
 import PMetricChart from '@/organisms/charts/metric-chart/PMetricChart.vue';
 

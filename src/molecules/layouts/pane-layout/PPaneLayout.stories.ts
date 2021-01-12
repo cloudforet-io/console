@@ -1,5 +1,5 @@
 import { withKnobs } from '@storybook/addon-knobs';
-import { autoProps } from '@sb/storybook-util';
+import { autoProps } from '@/util/storybook-util';
 import PPaneLayout from '@/molecules/layouts/pane-layout/PPaneLayout.vue';
 
 

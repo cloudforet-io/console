@@ -4,15 +4,13 @@ import { reactive, ref, toRefs } from '@vue/composition-api';
 import PContextMenu from '@/organisms/context-menu/PContextMenu.vue';
 import PEmpty from '@/atoms/empty/PEmpty.vue';
 import PI from '@/atoms/icons/PI.vue';
-import md from '@/organisms/context-menu/PContextMenu.md';
 
 export default {
     title: 'Inputs/ContextMenu',
     component: PContextMenu,
     parameters: {
-        notes: md,
         info: {
-            summary: md,
+            summary: '',
             components: { PContextMenu },
         },
     },

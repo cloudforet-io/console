@@ -1,8 +1,6 @@
 import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
-import { action } from '@storybook/addon-actions';
-import { getKnobProps } from '@sb/storybook-util';
 import {
     text, object,
 } from '@storybook/addon-knobs';
@@ -32,16 +30,16 @@ export const defaultCase = () => ({
             default: text('delimiter', ', '),
         },
         subKey: {
-            default: text('subKey', undefined),
+            default: text('subKey', ''),
         },
         tag: {
             default: text('tag', 'span'),
         },
         link: {
-            default: text('link', undefined),
+            default: text('link', ''),
         },
         target: {
-            default: text('target', undefined),
+            default: text('target', ''),
         },
     },
     template: `
@@ -68,16 +66,16 @@ export const linkFormatter = () => ({
             default: text('delimiter', ', '),
         },
         subKey: {
-            default: text('subKey', undefined),
+            default: text('subKey', ''),
         },
         tag: {
             default: text('tag', 'span'),
         },
         link: {
-            default: text('link', undefined),
+            default: text('link', ''),
         },
         target: {
-            default: text('target', undefined),
+            default: text('target', ''),
         },
     },
     template: `
@@ -117,10 +115,10 @@ export const objectArray = () => ({
             default: text('tag', 'span'),
         },
         link: {
-            default: text('link', undefined),
+            default: text('link', ''),
         },
         target: {
-            default: text('target', undefined),
+            default: text('target', ''),
         },
     },
     template: `
@@ -157,10 +155,10 @@ export const defaultSlot = () => ({
             default: text('tag', 'span'),
         },
         link: {
-            default: text('link', undefined),
+            default: text('link', ''),
         },
         target: {
-            default: text('target', undefined),
+            default: text('target', ''),
         },
     },
     template: `

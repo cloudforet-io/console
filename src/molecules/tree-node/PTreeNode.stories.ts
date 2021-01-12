@@ -1,22 +1,16 @@
-import {
-    toRefs, reactive, ref, computed,
-} from '@vue/composition-api';
+import { reactive } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import {
-    text, number, select, object, boolean,
-} from '@storybook/addon-knobs';
+import { text } from '@storybook/addon-knobs';
 import PI from '@/atoms/icons/PI.vue';
 import PTreeNode from '@/molecules/tree-node/PTreeNode.vue';
-import md from '@/molecules/tree-node/PTreeNode.md';
-import { getKnobProps } from '@sb/storybook-util';
+import { getKnobProps } from '@/util/storybook-util';
 
 export default {
     title: 'Data Display/Tree',
     component: PTreeNode,
     parameters: {
-        notes: md,
         info: {
-            summary: md,
+            summary: '',
             components: { PTreeNode },
         },
         knobs: { escapeHTML: false },
@@ -125,7 +119,9 @@ export const treeNode = ({ treeNodeProps }) => ({
             state: { expanded: true },
         });
 
-        let selectedItem = null;
+        let selectedItem = {
+            state: {},
+        };
 
         return {
             state,

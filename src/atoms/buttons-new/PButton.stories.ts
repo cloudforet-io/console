@@ -52,7 +52,7 @@ export const button = () => ({
       </div>`,
     props: {
         styleType: {
-            default: select('styleType', Object.values(BUTTON_STYLE), 'primary'),
+            default: select('styleType', Object.values(BUTTON_STYLE), BUTTON_STYLE.primary),
         },
         size: {
             default: select('size', ['(default)', 'sm', 'lg'], '(default)'),

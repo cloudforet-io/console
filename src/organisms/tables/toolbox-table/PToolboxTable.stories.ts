@@ -1,6 +1,7 @@
 import { action } from '@storybook/addon-actions';
 import faker from 'faker';
 import PToolboxTable from '@/organisms/tables/toolbox-table/PToolboxTable.vue';
+import { computed } from '@vue/composition-api';
 
 export default {
     title: 'Data Display/Tables/ToolBoxTable',
@@ -10,7 +11,6 @@ export default {
             summary: '',
             components: { PToolboxTable },
         },
-        // centered: { disable: true },
     },
 };
 const actions = {
@@ -34,23 +34,23 @@ const data = {
 };
 
 const mockupMixin = {
-    methods: {
-        getUser() {
-            return {
-                name: faker.name.firstName(),
-                phone: faker.phone.phoneNumberFormat(),
-                email: faker.internet.email(),
-            };
-        },
-    },
-    computed: {
-        items() {
-            const data = [];
+    setup() {
+        const getUser = () => ({
+            name: faker.name.firstName(),
+            phone: faker.phone.phoneNumberFormat(),
+            email: faker.internet.email(),
+        } as object);
+        const items = computed(() => {
+            const itemData: object[] = [];
             for (let step = 0; step < 5; step++) {
-                data.push(this.getUser());
+                itemData.push(getUser());
             }
-            return data;
-        },
+            return itemData;
+        });
+        return {
+            items,
+            getUser,
+        };
     },
 };
 

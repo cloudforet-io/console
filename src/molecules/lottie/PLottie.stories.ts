@@ -1,5 +1,5 @@
 import { text, number } from '@storybook/addon-knobs';
-import { autoProps } from '@sb/storybook-util';
+import { autoProps } from '@/util/storybook-util';
 import { ref } from '@vue/composition-api';
 import PLottie from './PLottie.vue';
 
@@ -34,10 +34,10 @@ export const lottie = () => ({
     setup() {
         const load = ref(null);
         const show = () => {
-            load.create();
+            // load.create();
         };
         const hide = () => {
-            load.destroy();
+            // load.destroy();
         };
         return {
             show,
