@@ -245,11 +245,6 @@ export default {
         const tableState = reactive({
             items: [],
             selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
-            // consoleLink: computed(() => {
-            //     const res = get(tableState.selectedItems[0], 'data.reference.link')
-            //             || get(tableState.selectedItems[0], 'reference.external_link');
-            //     return res;
-            // }),
             consoleLink: '',
             dropdown: computed<MenuItem[]>(() => [
                 {
@@ -286,20 +281,13 @@ export default {
         });
 
         const getLinkTemplate = (data) => {
-            let linkTemplate: string | undefined;
             let link = '';
-            switch (selectedProvider.value) {
-            case 'aws':
-                linkTemplate = providerState.items[0].linkTemplate;
-                if (linkTemplate) link = render(linkTemplate as string, data);
-                break;
-            // case 'google_cloud':
-            //     linkTemplate = providerState.items[1].linkTemplate;
-            //     tableState.consoleLink = render(linkTemplate, data);
-            //     break;
-            default:
-                break;
-            }
+            const providerInfo = providerState.items.map(d => ({
+                provider: d.provider,
+                template: d.linkTemplate,
+            }));
+            const linkTemplate = providerInfo.find(item => item.provider === selectedProvider.value)?.template;
+            if (linkTemplate !== undefined) link = render(linkTemplate, data);
             return link;
         };
 
@@ -549,6 +537,7 @@ export default {
                         replaceUrlQuery('provider', after);
                         await getTableSchema();
                         await listServiceAccountData();
+                        typeOptionState.selectIndex = [];
                     }
                 }, { immediate: true });
             }
