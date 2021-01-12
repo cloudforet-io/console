@@ -33,7 +33,6 @@ export const button = () => ({
             :size="size"
             :disabled="disabled"
             :outline="outline"
-            :link="link"
             :shpae="shape"
             >
            {{defaultSlot}} 
@@ -67,9 +66,6 @@ export const button = () => ({
         outline: {
             default: boolean('outline', false),
         },
-        link: {
-            default: boolean('link', false),
-        },
     },
     setup() {
         return {
@@ -89,7 +85,6 @@ export const block = () => ({
         :size="size" 
         :disabled="disabled"
         :outline="outline"
-        :link="link"
         :block="block"
         :shpae="shape"
         >
@@ -123,9 +118,6 @@ export const block = () => ({
         },
         outline: {
             default: boolean('outline', false),
-        },
-        link: {
-            default: boolean('link', false),
         },
         block: {
             default: boolean('block', false),

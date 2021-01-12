@@ -37,7 +37,6 @@ export const button = () => ({
         :disabled="disabled"
         :loading="loading"
         :outline="outline"
-        :link="link"
         :block="block"
       >
         <div v-if="loading" class="loading-btn">
@@ -71,9 +70,6 @@ export const button = () => ({
         },
         outline: {
             default: boolean('outline', false),
-        },
-        link: {
-            default: boolean('link', false),
         },
         block: {
             default: boolean('block', false),

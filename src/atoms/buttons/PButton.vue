@@ -13,7 +13,7 @@ export default {
                 'p-button': true,
                 disabled: !!attrs.disabled,
                 outline: !!attrs.outline,
-                link: !!attrs.link,
+                link: !!attrs.href,
                 block: !!attrs.block,
             };
             if (attrs.size) {
@@ -25,7 +25,7 @@ export default {
             return cls;
         }
 
-        const tag = props.link ? 'a' : 'div';
+        const tag = props.href ? 'a' : 'div';
 
         return h(tag, {
             ...data,

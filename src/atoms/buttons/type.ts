@@ -29,7 +29,7 @@ export type ButtonStyle = keyof BUTTON_STYLE;
 export type ButtonSize = keyof BUTTON_SIZE;
 
 export interface Button {
-    link?: string;
+    href?: string;
     disabled?: boolean;
     outline?: boolean;
     styleType?: ButtonStyle;
