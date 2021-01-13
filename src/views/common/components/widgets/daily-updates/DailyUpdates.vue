@@ -20,7 +20,19 @@
                     </div>
                 </div>
             </div>
-            <div v-if="!loading" class="card-wrapper">
+
+            <div v-else-if="data.length === 0 && alertData.length === 0"
+                 class="w-full h-full flex items-center"
+            >
+                <div class="no-data-wrapper">
+                    <img class="no-data-img" src="@/assets/images/illust_spaceship_3.svg">
+                    <p class="no-data-text">
+                        {{ $t('COMMON.WIDGETS.DAILY_UPDATE_NO_DATA') }}
+                    </p>
+                </div>
+            </div>
+
+            <div v-else class="card-wrapper">
                 <div v-if="alertData.length > 0" class="daily-update-card-alert">
                     <div v-for="(item, index) in alertData" :key="index"
                          class="daily-update-card"
@@ -71,12 +83,6 @@
                         <span class="text-red-500 font-bold text-sm"> {{ item.deleted_count || 0 }}</span>
                     </router-link>
                 </div>
-            </div>
-            <div v-if="!loading && ( data.length === 0 && alertData.length === 0) " class="h-full flex flex-col justify-center">
-                <img src="@/assets/images/illust_spaceship_2.svg" class="no-data-img">
-                <p class="no-data-text">
-                    {{ $t('COMMON.WIDGETS.DAILY_UPDATE_NO_DATA') }}
-                </p>
             </div>
         </template>
     </widget-layout>
@@ -392,6 +398,7 @@ export default {
     @apply bg-white;
     &::v-deep {
         .widget-contents {
+            @apply h-full;
             overflow-y: auto;
             padding: 0;
         }
@@ -402,9 +409,8 @@ export default {
             @apply rounded;
         }
     }
-    min-height: 25.625rem;
+    min-height: 25rem;
     max-height: 35rem;
-    overflow-y: auto;
 }
 
 @screen lg {
@@ -447,16 +453,20 @@ export default {
     margin-top: -0.5rem;
 }
 
-.no-data-img {
-    @apply mx-auto mb-4 flex-shrink-0;
-    width: 8.875rem;
-    opacity: 0.7;
-}
-.no-data-text {
-    @apply text-center text-primary2;
-    font-weight: bold;
-    font-size: 0.875rem;
-    line-height: 150%;
+.no-data-wrapper {
+    @apply w-full;
+    height: 12.5rem;
+    text-align: center;
+    .no-data-img {
+        @apply h-full w-full;
+    }
+    .no-data-text {
+        @apply mb-0 text-center text-primary2;
+        margin-top: -2.25rem;
+        font-weight: bold;
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
 }
 
 .card-wrapper {
