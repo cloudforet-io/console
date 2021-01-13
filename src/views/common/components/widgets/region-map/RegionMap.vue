@@ -94,13 +94,7 @@ export default {
         WidgetLayout,
         PProgressBar,
     },
-    props: {
-        providers: {
-            type: Object,
-            default: () => ({}),
-        },
-    },
-    setup(props) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
         const apiQuery = new ApiQueryHelper();
@@ -115,7 +109,7 @@ export default {
             selectedProvider: '', // aws
             selectedRegion: '', // Asia Pacific (Seoul)
             selectedRegionCode: '', // ap-northeast-2
-            provider: computed(() => vm.$store.state.resource.provider.items),
+            providers: computed(() => store.state.resource.provider.items),
             loading: false,
             maxValue: 0,
             initialRegion: {} as any,
@@ -185,7 +179,7 @@ export default {
                     title: d.name,
                     latitude: parseFloat(d.tags.find(tag => tag.key === 'latitude').value),
                     longitude: parseFloat(d.tags.find(tag => tag.key === 'longitude').value),
-                    color: props.providers[d.provider].color as string,
+                    color: state.providers[d.provider].color as string,
                     ...d,
                 })),
             ];
@@ -371,7 +365,6 @@ export default {
 
         const init = async () => {
             state.loading = true;
-            await store.dispatch('resource/provider/load');
             await getRegionList();
             if (state.data.length > 0) {
                 await setInitialRegionSetting();

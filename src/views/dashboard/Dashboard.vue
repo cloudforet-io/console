@@ -4,9 +4,9 @@
                     widget-wrapper"
         >
             <all-summary class="col-span-12" />
-            <resource-map class="col-span-12" :providers="providers" />
-            <personal-health-dashboard class="col-span-12" :providers="providers" />
-            <trusted-advisor class="col-span-12" :providers="providers" />
+            <resource-map class="col-span-12" />
+            <personal-health-dashboard class="col-span-12" />
+            <trusted-advisor class="col-span-12" />
             <top-projects class="col-span-12" />
         </div>
         <div class="col-span-12 lg:col-span-3
@@ -28,10 +28,7 @@
                         widget-wrapper"
             >
                 <service-accounts class="col-span-12" :providers="providers" />
-                <collector-progress class="col-span-12 collector-progress"
-                                    :providers="providers"
-                                    :timezone="timezone"
-                />
+                <collector-progress class="col-span-12 collector-progress" />
                 <cloud-services class="col-span-12 cloud-services" :more-info="true" />
             </div>
         </div>

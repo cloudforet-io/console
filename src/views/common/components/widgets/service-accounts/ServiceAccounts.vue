@@ -113,17 +113,17 @@ export default {
             ]),
         });
 
-        const disposeChart = (element) => {
-            if (state.chartRegistry[element]) {
-                state.chartRegistry[element].dispose();
-                delete state.chartRegistry[element];
+        const disposeChart = (ctx) => {
+            if (state.chartRegistry[ctx]) {
+                state.chartRegistry[ctx].dispose();
+                delete state.chartRegistry[ctx];
             }
         };
-        const drawChart = (element, isLoading = false) => {
+        const drawChart = (ctx, isLoading = false) => {
             const createChart = () => {
-                disposeChart(element);
-                state.chartRegistry[element] = am4core.create(element, am4charts.PieChart);
-                return state.chartRegistry[element];
+                disposeChart(ctx);
+                state.chartRegistry[ctx] = am4core.create(ctx, am4charts.PieChart);
+                return state.chartRegistry[ctx];
             };
             const chart = createChart();
             chart.responsive.enabled = true;

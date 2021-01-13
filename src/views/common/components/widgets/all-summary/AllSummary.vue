@@ -11,13 +11,13 @@
                         <router-link :to="data.type !== 'spendings' ? getLocation(data.type) : ''" class="anchor" :class="data.type">
                             <span class="number">
                                 <span v-if="data.type === 'spendings'" class="dollar-sign">$</span>
-                                <span>{{ data.type === 'storage' ? commaFormatter(data.count) : commaFormatter(numberFormatter(data.count)) }}</span>
+                                <span>{{ count[data.type] }}</span>
                             </span>
                         </router-link>
-                        <span v-if="data.suffix" class="suffix" :class="data.type">{{ data.suffix }}</span>
+                        <span v-if="data.type === 'storage'" class="suffix">{{ storageBoxSuffix }}</span>
                     </div>
                     <div class="title">
-                        {{ data.title }}
+                        {{ data.label }}
                     </div>
                 </div>
             </div>
@@ -48,19 +48,25 @@
                 </div>
                 <div class="summary-wrapper col-span-12 lg:col-span-3">
                     <div class="title col-span-3">
-                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: dataList[selectedIndex].summaryTitle || dataList[selectedIndex].title }) }}
+                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: dataList[selectedIndex].summaryTitle || dataList[selectedIndex].label }) }}
                     </div>
-                    <template v-if="!loading && dataList[selectedIndex].count > 0">
+                    <template v-if="!loading && summaryData.length > 0">
                         <div class="summary-content-wrapper block md:grid md:grid-cols-3 lg:block">
+                            <router-link :to="selectedType !== 'spendings' ? getLocation(selectedType) : ''"
+                                         class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
+                                         :class="selectedType"
+                            >
+                                <div class="text-group">
+                                    <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
+                                </div>
+                                <span class="count">{{ count[selectedType] }}</span>
+                            </router-link>
                             <router-link v-for="(data, idx) of summaryData" :key="idx"
                                          :to="data.to"
                                          class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
-                                         :class="data.to ? 'link' : ''"
                             >
                                 <div class="text-group">
-                                    <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">
-                                        {{ data.provider === 'all' ? $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') : data.label }}
-                                    </span>
+                                    <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
                                     <span class="type">{{ data.type }}</span>
                                 </div>
                                 <span class="count">{{ data.count }}</span>
@@ -72,16 +78,8 @@
                             <div class="m-auto">
                                 <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
                                 <p class="text">
-                                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: dataList[selectedIndex].title }) }}
+                                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: dataList[selectedIndex].label }) }}
                                 </p>
-                                <router-link to="/identity/service-account">
-                                    <p-icon-text-button
-                                        style-type="primary1"
-                                        name="ic_plus_bold"
-                                    >
-                                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.ADD_SERVICE_ACCOUNTS') }}
-                                    </p-icon-text-button>
-                                </router-link>
                             </div>
                         </div>
                     </template>
@@ -114,7 +112,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PChartLoader, PIconTextButton, PSkeleton, PButton,
+    PChartLoader, PSkeleton, PButton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@/lib/space-connector';
@@ -130,10 +128,6 @@ am4core.options.classNamePrefix = 'allSummary';
 /* enum */
 // todo: will be deprecated
 enum DATE_TYPE {
-    daily = 'daily',
-    monthly = 'monthly',
-}
-enum NEW_DATE_TYPE {
     daily = 'DAILY',
     monthly = 'MONTHLY',
 }
@@ -157,18 +151,16 @@ interface ChartData {
     count: number;
 }
 interface Data {
-    type: keyof typeof CLOUD_SERVICE_LABEL;
-    title: TranslateResult;
-    count: number;
-    suffix?: string;
-    beta?: boolean;
+    type: keyof typeof DATA_TYPE;
+    label: TranslateResult;
+    summaryTitle?: TranslateResult;
 }
 interface SummaryData {
-    type?: string;
+    type: string;
     provider: string;
     label: string | TranslateResult;
     count: number | string;
-    to?: string | Location;
+    to: string | Location;
 }
 
 const DAY_COUNT = 14;
@@ -178,16 +170,11 @@ const BOX_SWITCH_INTERVAL = 5000;
 export default {
     name: 'AllSummary',
     components: {
-        PIconTextButton,
         PButton,
         PSkeleton,
         PChartLoader,
     },
     props: {
-        projectId: {
-            type: String,
-            default: undefined,
-        },
         chartColor: {
             type: String,
             default: primary1,
@@ -223,15 +210,15 @@ export default {
             chart: null,
             chartRef: null as HTMLElement | null,
             skeletons: range(4),
-            providers: computed(() => vm.$store.state.resource.provider.items),
+            providers: computed(() => store.state.resource.provider.items),
             //
             selectedIndexInterval: undefined,
             selectedIndex: 0,
             selectedType: computed(() => state.dataList[state.selectedIndex].type),
-            selectedDateType: 'daily' as keyof typeof DATE_TYPE,
+            selectedDateType: DATE_TYPE.daily,
             dateTypes: computed(() => ([
-                { name: 'daily', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DAY') },
-                { name: 'monthly', label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.MONTH') },
+                { name: DATE_TYPE.daily, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DAY') },
+                { name: DATE_TYPE.monthly, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.MONTH') },
             ])),
             //
             count: {
@@ -240,30 +227,16 @@ export default {
                 storage: 0,
                 spendings: 0,
             },
+            storageBoxSuffix: 'TB' as Unit,
             storageTrendSuffix: 'TB' as Unit,
             dataList: computed(() => ([
-                {
-                    type: DATA_TYPE.compute,
-                    title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.COMPUTE'),
-                    count: state.count.compute,
-                },
-                {
-                    type: DATA_TYPE.database,
-                    title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE'),
-                    count: state.count.database,
-                },
-                {
-                    type: DATA_TYPE.storage,
-                    title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE'),
-                    count: parseFloat(byteFormatter(state.count.storage).split(' ')[0]),
-                    suffix: byteFormatter(state.count.storage).split(' ')[1],
-                },
+                { type: DATA_TYPE.compute, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.COMPUTE') },
+                { type: DATA_TYPE.database, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE') },
+                { type: DATA_TYPE.storage, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE') },
                 {
                     type: DATA_TYPE.spendings,
-                    title: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.OVERALL_SPENDINGS'),
+                    label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.OVERALL_SPENDINGS'),
                     summaryTitle: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.RESOURCE'),
-                    count: state.count.spendings,
-                    beta: true,
                 },
             ] as Data[])),
             summaryData: [] as SummaryData[],
@@ -369,11 +342,6 @@ export default {
                 if (type === DATA_TYPE.storage) query.primary = 'false';
             }
 
-            // set filters
-            if (props.projectId) {
-                queryHelper.setFilters([{ k: 'project_id', o: '=', v: props.projectId }]);
-            }
-
             const location: Location = {
                 name,
                 query: {
@@ -386,28 +354,35 @@ export default {
 
         /* api */
         const getCount = async (type) => {
-            try {
-                const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
-                    label: CLOUD_SERVICE_LABEL[type],
-                    project_id: props.projectId,
-                });
-                state.count[type] = res.results[0]?.total || 0;
-            } catch (e) {
-                console.error(e);
+            let count = 0 as number | string;
+            if (type === DATA_TYPE.spendings) {
+                try {
+                    const res = await SpaceConnector.client.statistics.topic.billingSummary({
+                        granularity: DATE_TYPE.monthly,
+                        start: dayjs().utc().startOf('month').format('YYYY-MM-DD'),
+                        end: dayjs().utc().endOf('month').format('YYYY-MM-DD'),
+                    });
+                    if (res.results.length > 0) count = res.results[0].billing_data[0].cost;
+                } catch (e) {
+                    console.error(e);
+                }
+            } else {
+                try {
+                    const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
+                        label: CLOUD_SERVICE_LABEL[type],
+                    });
+                    if (res.results.length > 0) count = res.results[0]?.total || 0;
+                } catch (e) {
+                    console.error(e);
+                }
             }
-        };
-        const getBillingCount = async () => {
-            try {
-                const res = await SpaceConnector.client.statistics.topic.billingSummary({
-                    granularity: NEW_DATE_TYPE.monthly,
-                    project_id: props.projectId,
-                    start: dayjs().utc().startOf('month').format('YYYY-MM-DD'),
-                    end: dayjs().utc().endOf('month').format('YYYY-MM-DD'),
-                });
-                if (res.results.length > 0) state.count.spendings = res.results[0].billing_data[0].cost;
-            } catch (e) {
-                console.error(e);
+            if (type === DATA_TYPE.storage) {
+                state.storageBoxSuffix = byteFormatter(count).split(' ')[1];
+                count = parseFloat(byteFormatter(count).split(' ')[0]);
+            } else {
+                count = numberFormatter(count);
             }
+            state.count[type] = commaFormatter(count);
         };
         const getTrend = async (type) => {
             const utcToday = dayjs().utc();
@@ -429,8 +404,7 @@ export default {
                         end = utcToday.subtract(1, 'day').format('YYYY-MM-DD');
                     }
                     const res = await SpaceConnector.client.statistics.topic.billingSummary({
-                        granularity: NEW_DATE_TYPE[state.selectedDateType],
-                        project_id: props.projectId,
+                        granularity: state.selectedDateType,
                         start,
                         end,
                     });
@@ -445,8 +419,7 @@ export default {
                 } else {
                     const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
                         label: CLOUD_SERVICE_LABEL[type],
-                        aggregate: dateType,
-                        project_id: props.projectId,
+                        granularity: state.selectedDateType,
                     });
                     data = res.results;
                 }
@@ -503,14 +476,6 @@ export default {
                     },
                 },
             };
-            if (props.projectId) {
-                defaultParam.query.filter = {
-                    key: 'project_id',
-                    operator: 'eq',
-                    value: props.projectId,
-                };
-            }
-
             if (type === DATA_TYPE.compute) {
                 param = {
                     ...defaultParam,
@@ -537,37 +502,16 @@ export default {
         };
         const getSummaryInfo = async (type) => {
             try {
-                let count;
-                if (type === DATA_TYPE.compute) {
-                    count = commaFormatter(numberFormatter(state.count.compute));
-                } else if (type === DATA_TYPE.database) {
-                    count = commaFormatter(numberFormatter(state.count.database));
-                } else if (type === DATA_TYPE.storage) {
-                    count = byteFormatter(state.count.storage);
-                }
-
                 const param = getApiParameter(type);
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(param);
-                const summaryData: SummaryData[] = [
-                    {
-                        provider: 'all',
-                        label: '',
-                        count,
-                        to: getLocation(type),
-                    },
-                ];
+                const summaryData: SummaryData[] = [];
 
                 const summaryQueryHelper = new QueryHelper();
                 res.results.forEach((d) => {
                     let detailLocation: Location;
-                    const filters: QueryStoreFilter[] = [];
-                    if (props.projectId) {
-                        filters.push({
-                            k: 'project_id', o: '=', v: props.projectId,
-                        });
-                    }
 
                     if (d.resource_type === 'inventory.Server') {
+                        const filters: QueryStoreFilter[] = [];
                         filters.push({ k: 'provider', o: '=', v: d.provider },
                             { k: 'cloud_service_type', o: '=', v: d.cloud_service_type });
                         detailLocation = {
@@ -583,9 +527,6 @@ export default {
                                 provider: d.provider,
                                 group: d.cloud_service_group,
                                 name: d.cloud_service_type,
-                            },
-                            query: {
-                                filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
                             },
                         };
                     }
@@ -605,28 +546,32 @@ export default {
         const getBillingSummaryInfo = async () => {
             try {
                 const res = await SpaceConnector.client.statistics.topic.billingSummary({
-                    granularity: NEW_DATE_TYPE.monthly,
+                    granularity: DATE_TYPE.monthly,
                     aggregation: 'inventory.CloudServiceType',
-                    project_id: props.projectId,
                     start: dayjs().utc().startOf('month').format('YYYY-MM-DD'),
                     end: dayjs().utc().endOf('month').format('YYYY-MM-DD'),
                 });
-                const summaryData: SummaryData[] = [
-                    {
-                        provider: 'all',
-                        label: '',
-                        count: numberFormatter(state.count.spendings),
-                        to: '',
-                    },
-                ];
+                const summaryData: SummaryData[] = [];
                 res.results.forEach((d) => {
                     if (numberFormatter(d.billing_data[0].cost) !== 0) {
+                        let detailLocation: Location = {};
+                        if (d.provider && d.cloud_service_group && d.cloud_service_type) {
+                            detailLocation = {
+                                name: 'cloudServicePage',
+                                params: {
+                                    provider: d.provider,
+                                    group: d.cloud_service_group,
+                                    name: d.cloud_service_type,
+                                },
+                            };
+                        }
+
                         summaryData.push({
                             provider: d.provider,
                             label: state.providers[d.provider].label,
                             type: d.cloud_service_group || d.service_code,
                             count: numberFormatter(d.billing_data[0].cost),
-                            to: '',
+                            to: detailLocation,
                         });
                     }
                 });
@@ -649,14 +594,12 @@ export default {
 
         const init = async () => {
             state.loading = true;
-            await Promise.all([getCount(DATA_TYPE.compute), getBillingCount()]);
 
-            await store.dispatch('resource/provider/load');
-            if (state.count.compute > 0) await getSummaryInfo(DATA_TYPE.compute);
+            await getSummaryInfo(DATA_TYPE.compute);
             state.loading = false;
             setBoxInterval();
 
-            await Promise.all([getCount(DATA_TYPE.database), getCount(DATA_TYPE.storage)]);
+            await Promise.all([Object.keys(DATA_TYPE).map(type => getCount(type))]);
         };
         const chartInit = async () => {
             await getTrend(DATA_TYPE.compute);
@@ -788,12 +731,9 @@ export default {
             }
             .suffix {
                 @apply text-gray-500;
-                font-size: 1rem;
+                font-size: 0.875rem;
                 font-weight: normal;
                 padding-left: 0.5rem;
-                &.storage {
-                    font-size: 0.875rem;
-                }
             }
         }
         .title {
@@ -905,20 +845,11 @@ export default {
                 padding: 0.25rem 0.5rem;
                 margin: auto 0;
 
-                &.link:hover {
+                &:hover {
                     @apply bg-secondary2;
-                    .provider {
+                    .text-group, .provider, .type, .count {
                         text-decoration: underline;
                     }
-                    .type {
-                        text-decoration: underline;
-                    }
-                    .count {
-                        text-decoration: underline;
-                    }
-                }
-                &:not(.link) {
-                    cursor: default;
                 }
 
                 .text-group {

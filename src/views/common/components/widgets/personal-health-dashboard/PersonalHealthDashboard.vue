@@ -86,17 +86,12 @@ export default {
         PDataTable,
         WidgetLayout,
     },
-    props: {
-        providers: {
-            type: Object,
-            default: () => ({}),
-        },
-    },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
             loading: false,
+            providers: computed(() => store.state.resource.provider.items),
             timezone: computed(() => store.state.user.timezone),
             projects: computed(() => store.state.resource.project.items),
             favoriteProjects: computed(() => store.state.favorite.project.items),

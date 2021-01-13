@@ -156,12 +156,6 @@ export default {
         WidgetLayout,
         PI,
     },
-    props: {
-        providers: {
-            type: Object,
-            default: () => ({}),
-        },
-    },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
@@ -178,6 +172,7 @@ export default {
         const state = reactive({
             loading: false,
             chart: null as null | any,
+            providers: computed(() => store.state.resource.provider.items),
             favoriteProjects: computed(() => store.state.favorite.project.items),
             projects: computed(() => store.state.resource.project.items),
             chartRef: null as HTMLElement | null,

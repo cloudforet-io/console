@@ -69,6 +69,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { TimeStamp } from '@/models';
+import { store } from '@/store';
 
 enum JOB_STATE {
     created = 'CREATED',
@@ -103,21 +104,13 @@ export default {
         PSkeleton,
         PI,
     },
-    props: {
-        providers: {
-            type: Object,
-            default: () => ({}),
-        },
-        timezone: {
-            type: String,
-            default: '',
-        },
-    },
-    setup(props) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
             skeletons: range(2),
+            timezone: computed(() => store.state.user.timezone || 'UTC'),
+            providers: computed(() => store.state.resource.provider.items),
             items: [] as JobModel[],
             fields: computed(() => [
                 { label: vm.$t('COMMON.WIDGETS.COLLECTING_PROGRESS_TITLE_TIME'), name: 'collector_info' },
@@ -139,8 +132,8 @@ export default {
         };
         const timeFormatter = (value) => {
             let time = dayjs(dayjs.unix(value.seconds)).utc();
-            if (props.timezone !== 'UTC') {
-                time = dayjs(dayjs.unix(value.seconds)).tz(props.timezone);
+            if (state.timezone !== 'UTC') {
+                time = dayjs(dayjs.unix(value.seconds)).tz(state.timezone);
             }
             return time.format('MM-DD HH:mm ~');
         };
