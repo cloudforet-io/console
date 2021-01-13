@@ -1,5 +1,5 @@
 <template>
-    <widget-layout ref="widgetRef" class="daily-updates">
+    <widget-layout ref="widgetRef" class="daily-updates" overflow="auto">
         <template #title>
             <div class="top">
                 <p class="title">
@@ -399,7 +399,6 @@ export default {
     &::v-deep {
         .widget-contents {
             @apply h-full;
-            overflow-y: auto;
             padding: 0;
         }
         .item-container.card {

@@ -270,10 +270,12 @@
 				"TWO_DAYS_AGO": "Two days ago",
 				"YESTERDAY": "Yesterday"
 			},
-			"CLOUD_SERVICE_CREATE_COLLECTOR": "Create a collector",
-			"CLOUD_SERVICE_HELP": "Displays only major services in cloud service.",
-			"CLOUD_SERVICE_SEE_MORE": "more",
-			"CLOUD_SERVICE_TITLE": "Cloud Services",
+			"CLOUD_SERVICE": {
+				"HELP": "Displays only major services in cloud service.",
+				"NO_DATA": "No Cloud Service",
+				"SEE_MORE": "more",
+				"TITLE": "Cloud Services"
+			},
 			"COLLECTING_PROGRESS": "Collecting Progress",
 			"COLLECTING_PROGRESS_NO_RUNNING": "No Running Jobs",
 			"COLLECTING_PROGRESS_STATUS": "Status",
@@ -379,6 +381,7 @@
 				"LABEL_SECURITY": "Security",
 				"LABEL_SERVICE_LIMITS": "Service Limits",
 				"LABEL_WARNING": "Investigation recommended",
+				"NO_DATA": "No AWS Trusted Advisor",
 				"SUB_TITLE_OVERALL": "Overall",
 				"SUB_TITLE_PROJECT_SUMMARY": "Project Summary",
 				"TITLE": "Trusted Advisor"

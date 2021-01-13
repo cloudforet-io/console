@@ -1,5 +1,7 @@
 <template>
-    <widget-layout :title="$t('COMMON.WIDGETS.RESOURCE_BY_REGION_TITLE')" class="resources-by-region">
+    <widget-layout :title="$t('COMMON.WIDGETS.RESOURCE_BY_REGION_TITLE')"
+                   overflow="auto"
+                   class="resources-by-region">
         <div class="reverse">
             <div class="chart-container">
                 <p-chart-loader :loading="loading" class="chart">
@@ -372,9 +374,6 @@ export default {
     height: 25rem;
     .title {
         margin-bottom: 1.25rem;
-    }
-    .widget-contents {
-        overflow-y: auto;
     }
 }
 .chart {

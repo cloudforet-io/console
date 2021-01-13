@@ -6,34 +6,43 @@
                 <span>{{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.TITLE') }}</span>
             </div>
         </template>
-        <div class="content-wrapper">
-            <div v-for="(category, cIdx) in categories" :key="cIdx" class="data-row">
-                <div class="left-part">
-                    <p-i :name="category.icon"
-                         width="0.875rem" height="0.875rem"
-                         color="inherit transparent"
-                    />
-                    <span class="text">{{ category.label }}</span>
-                </div>
-                <div class="right-part grid grid-cols-12 gap-2">
-                    <router-link v-for="(legend, lIdx) in legends" :key="lIdx"
-                                 class="box col-span-4" :class="legend.name"
-                                 :to="linkFormatter(category.name, legend.name)"
-                    >
-                        <span class="text">{{ data ? countFormatter(category.name, legend.name) : 0 }}</span>
-                    </router-link>
-                </div>
+        <div v-if="loading" />
+        <div v-else-if="!data" class="no-data-wrapper">
+            <img src="@/assets/images/illust_star.svg">
+            <div class="text">
+                {{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.NO_DATA') }}
             </div>
         </div>
-        <div class="legend-wrapper">
-            <div v-for="(legend, index) in legends" :key="index"
-                 class="legend"
-                 :class="legend.name"
-            >
-                <div class="box" />
-                <span class="text">{{ legend.label }}</span>
+        <template v-else>
+            <div class="content-wrapper">
+                <div v-for="(category, cIdx) in categories" :key="cIdx" class="data-row">
+                    <div class="left-part">
+                        <p-i :name="category.icon"
+                             width="0.875rem" height="0.875rem"
+                             color="inherit transparent"
+                        />
+                        <span class="text">{{ category.label }}</span>
+                    </div>
+                    <div class="right-part grid grid-cols-12 gap-2">
+                        <router-link v-for="(legend, lIdx) in legends" :key="lIdx"
+                                     class="box col-span-4" :class="legend.name"
+                                     :to="linkFormatter(category.name, legend.name)"
+                        >
+                            <span class="text">{{ countFormatter(category.name, legend.name) }}</span>
+                        </router-link>
+                    </div>
+                </div>
             </div>
-        </div>
+            <div class="legend-wrapper">
+                <div v-for="(legend, index) in legends" :key="index"
+                     class="legend"
+                     :class="legend.name"
+                >
+                    <div class="box" />
+                    <span class="text">{{ legend.label }}</span>
+                </div>
+            </div>
+        </template>
     </widget-layout>
 </template>
 
@@ -147,7 +156,7 @@ export default {
                     icon: 'ic_service_limits',
                 },
             ])),
-            data: [],
+            data: null as any,
         });
 
         const linkFormatter = (category, status) => {
@@ -178,13 +187,17 @@ export default {
             return statusData;
         };
         const getData = async () => {
+            state.loading = true;
             try {
                 const res = await SpaceConnector.client.statistics.topic.trustedAdvisorByProject({
                     project_id: props.projectId,
                 });
                 state.data = res[props.projectId];
             } catch (e) {
+                state.data = null;
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
 
@@ -214,6 +227,7 @@ export default {
         color: $color;
     }
 }
+
 @define-mixin legend-theme $bg-color, $border-color, $text-color {
     .box {
         background-color: $bg-color;
@@ -225,68 +239,79 @@ export default {
 }
 
 .simplified-trusted-advisor {
-    .content-wrapper {
-        margin-top: 1rem;
-        .data-row {
-            @apply text-gray-400;
-            display: flex;
-            font-size: 0.75rem;
-            padding: 6px 0;
-            .left-part {
-                width: 55%;
-            }
-            .right-part {
-                width: 45%;
-                .box {
-                    text-align: center;
-                    &.error {
-                        @mixin data-box-theme theme('colors.coral.100'), theme('colors.red.500');
-                    }
-                    &.warning {
-                        @mixin data-box-theme theme('colors.yellow.100'), theme('colors.yellow.500');
-                    }
-                    &.ok {
-                        @mixin data-box-theme theme('colors.green.100'), theme('colors.green.500');
-                    }
-                }
-                .text {
-                    margin-left: 0;
-                }
-            }
-            .text {
-                @apply text-gray-900;
-                white-space: nowrap;
-                margin-left: 0.25rem;
-            }
+    min-height: 18.75rem;
+}
+
+.content-wrapper {
+    margin-top: 1rem;
+    .data-row {
+        @apply text-gray-400;
+        display: flex;
+        font-size: 0.75rem;
+        padding: 6px 0;
+        .text {
+            @apply text-gray-900;
+            white-space: nowrap;
+            margin-left: 0.25rem;
         }
     }
-    .legend-wrapper {
-        margin-top: 1rem;
-        .legend {
-            display: flex;
-            padding: 0.25rem 0;
+    .left-part {
+        width: 55%;
+    }
+    .right-part {
+        width: 45%;
+        .box {
+            text-align: center;
             &.error {
-                @mixin legend-theme theme('colors.coral.100'), theme('colors.red.500'), theme('colors.red.500');
+                @mixin data-box-theme theme('colors.coral.100'), theme('colors.red.500');
             }
             &.warning {
-                @mixin legend-theme theme('colors.yellow.100'), theme('colors.yellow.500');
+                @mixin data-box-theme theme('colors.yellow.100'), theme('colors.yellow.500');
             }
             &.ok {
-                @mixin legend-theme theme('colors.green.100'), theme('colors.green.500');
-            }
-            .box {
-                @apply border;
-                width: 10px;
-                height: 10px;
-                border-radius: 0.125rem;
-                margin-right: 0.375rem;
-            }
-            .text {
-                @apply text-gray-700;
-                font-size: 0.75rem;
-                line-height: 1;
+                @mixin data-box-theme theme('colors.green.100'), theme('colors.green.500');
             }
         }
+        .text {
+            margin-left: 0;
+        }
+    }
+}
+.legend-wrapper {
+    margin-top: 1rem;
+    .legend {
+        display: flex;
+        padding: 0.25rem 0;
+        &.error {
+            @mixin legend-theme theme('colors.coral.100'), theme('colors.red.500'), theme('colors.red.500');
+        }
+        &.warning {
+            @mixin legend-theme theme('colors.yellow.100'), theme('colors.yellow.500');
+        }
+        &.ok {
+            @mixin legend-theme theme('colors.green.100'), theme('colors.green.500');
+        }
+        .box {
+            @apply border;
+            width: 10px;
+            height: 10px;
+            border-radius: 0.125rem;
+            margin-right: 0.375rem;
+        }
+        .text {
+            @apply text-gray-700;
+            font-size: 0.75rem;
+            line-height: 1;
+        }
+    }
+}
+.no-data-wrapper {
+    @apply flex w-full h-full flex-col justify-center items-center;
+    .text {
+        @apply mt-5 text-center text-primary2;
+        font-weight: bold;
+        font-size: 0.875rem;
+        line-height: 1.6;
     }
 }
 </style>

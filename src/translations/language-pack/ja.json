@@ -270,10 +270,12 @@
 				"TWO_DAYS_AGO": "",
 				"YESTERDAY": "昨日"
 			},
-			"CLOUD_SERVICE_CREATE_COLLECTOR": "コレクタ作成",
-			"CLOUD_SERVICE_HELP": "サービスしている主要なクラウドサービスリストを表示します",
-			"CLOUD_SERVICE_SEE_MORE": "もっと見る",
-			"CLOUD_SERVICE_TITLE": "クラウドサービス",
+			"CLOUD_SERVICE": {
+				"HELP": "サービスしている主要なクラウドサービスリストを表示します",
+				"NO_DATA": "",
+				"SEE_MORE": "もっと見る",
+				"TITLE": "クラウドサービス"
+			},
 			"COLLECTING_PROGRESS": "収集進行率",
 			"COLLECTING_PROGRESS_NO_RUNNING": "実行中の作業がありません。",
 			"COLLECTING_PROGRESS_STATUS": "進捗率",
@@ -379,6 +381,7 @@
 				"LABEL_SECURITY": "セキュリティ",
 				"LABEL_SERVICE_LIMITS": "サービス制限",
 				"LABEL_WARNING": "調査を推奨",
+				"NO_DATA": "",
 				"SUB_TITLE_OVERALL": "サマリ",
 				"SUB_TITLE_PROJECT_SUMMARY": "サマリ情報",
 				"TITLE": "Trusted Advisor"

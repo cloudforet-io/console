@@ -270,10 +270,12 @@
 				"TWO_DAYS_AGO": "",
 				"YESTERDAY": "어제 "
 			},
-			"CLOUD_SERVICE_CREATE_COLLECTOR": "컬렉터 생성 ",
-			"CLOUD_SERVICE_HELP": "서비스 중인 주요 클라우드 서비스 목록을 보여줍니다.",
-			"CLOUD_SERVICE_SEE_MORE": "더보기 ",
-			"CLOUD_SERVICE_TITLE": "클라우드 서비스 ",
+			"CLOUD_SERVICE": {
+				"HELP": "서비스 중인 주요 클라우드 서비스 목록을 보여줍니다.",
+				"NO_DATA": "",
+				"SEE_MORE": "더보기 ",
+				"TITLE": "클라우드 서비스 "
+			},
 			"COLLECTING_PROGRESS": "수집 진행률 ",
 			"COLLECTING_PROGRESS_NO_RUNNING": "실행 중인 작업이 없습니다. ",
 			"COLLECTING_PROGRESS_STATUS": "진행률 ",
@@ -379,6 +381,7 @@
 				"LABEL_SECURITY": "보안",
 				"LABEL_SERVICE_LIMITS": "서비스 한도",
 				"LABEL_WARNING": "조사 권고",
+				"NO_DATA": "",
 				"SUB_TITLE_OVERALL": "전체요약",
 				"SUB_TITLE_PROJECT_SUMMARY": "요약 정보",
 				"TITLE": "Trusted Advisor"
