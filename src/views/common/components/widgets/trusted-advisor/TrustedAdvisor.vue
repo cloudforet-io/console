@@ -356,7 +356,7 @@ export default {
                         isFavorite: !!find(state.favoriteProjects, { id: projectId }),
                     });
                 });
-                state.projectSummaryData = projectSummaryData;
+                state.projectSummaryData = projectSummaryData.sort((a, b) => Number(b.isFavorite) - Number(a.isFavorite));
             } catch (e) {
                 console.error(e);
             } finally {
