@@ -30,11 +30,6 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
 
-  notify_to_slack:
-    if: github.repository_owner == 'spaceone-dev'
-    needs: [ condition_check, update_local_version_file, docker ]
-    runs-on: ubuntu-latest
-    steps:
       - name: Slack
         if: always()
         uses: 8398a7/action-slack@v3.2.0
