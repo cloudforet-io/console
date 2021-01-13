@@ -1,47 +1,49 @@
 <template>
     <widget-layout class="simplified-trusted-advisor">
-        <template #title>
+        <template v-show="awsProvider" #title>
             <div class="title">
-                <span :style="{ 'color': providers.aws ? providers.aws.color : '' }">AWS </span>
+                <span :style="{ color: awsProvider ? awsProvider.color : '' }">AWS </span>
                 <span>{{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.TITLE') }}</span>
             </div>
         </template>
-        <div v-if="loading" />
-        <div v-else-if="!data" class="no-data-wrapper">
-            <img src="@/assets/images/illust_star.svg">
-            <div class="text">
-                {{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.NO_DATA') }}
-            </div>
-        </div>
-        <template v-else>
-            <div class="content-wrapper">
-                <div v-for="(category, cIdx) in categories" :key="cIdx" class="data-row">
-                    <div class="left-part">
-                        <p-i :name="category.icon"
-                             width="0.875rem" height="0.875rem"
-                             color="inherit transparent"
-                        />
-                        <span class="text">{{ category.label }}</span>
-                    </div>
-                    <div class="right-part grid grid-cols-12 gap-2">
-                        <router-link v-for="(legend, lIdx) in legends" :key="lIdx"
-                                     class="box col-span-4" :class="legend.name"
-                                     :to="linkFormatter(category.name, legend.name)"
-                        >
-                            <span class="text">{{ countFormatter(category.name, legend.name) }}</span>
-                        </router-link>
-                    </div>
+        <template v-show="awsProvider">
+            <div v-if="loading" />
+            <div v-else-if="!data" class="no-data-wrapper">
+                <img src="@/assets/images/illust_star.svg">
+                <div class="text">
+                    {{ $t('COMMON.WIDGETS.TRUSTED_ADVISOR.NO_DATA') }}
                 </div>
             </div>
-            <div class="legend-wrapper">
-                <div v-for="(legend, index) in legends" :key="index"
-                     class="legend"
-                     :class="legend.name"
-                >
-                    <div class="box" />
-                    <span class="text">{{ legend.label }}</span>
+            <template v-else>
+                <div class="content-wrapper">
+                    <div v-for="(category, cIdx) in categories" :key="cIdx" class="data-row">
+                        <div class="left-part">
+                            <p-i :name="category.icon"
+                                 width="0.875rem" height="0.875rem"
+                                 color="inherit transparent"
+                            />
+                            <span class="text">{{ category.label }}</span>
+                        </div>
+                        <div class="right-part grid grid-cols-12 gap-2">
+                            <router-link v-for="(legend, lIdx) in legends" :key="lIdx"
+                                         class="box col-span-4" :class="legend.name"
+                                         :to="linkFormatter(category.name, legend.name)"
+                            >
+                                <span class="text">{{ countFormatter(category.name, legend.name) }}</span>
+                            </router-link>
+                        </div>
+                    </div>
                 </div>
-            </div>
+                <div class="legend-wrapper">
+                    <div v-for="(legend, index) in legends" :key="index"
+                         class="legend"
+                         :class="legend.name"
+                    >
+                        <div class="box" />
+                        <span class="text">{{ legend.label }}</span>
+                    </div>
+                </div>
+            </template>
         </template>
     </widget-layout>
 </template>
@@ -63,6 +65,7 @@ import { QueryHelper } from '@/lib/query';
 import { SpaceConnector } from '@/lib/space-connector';
 import { QueryStoreFilter } from '@/lib/query/type';
 import { green, red, yellow } from '@/styles/colors';
+import { store } from '@/store';
 
 
 const TRUSTED_ADVISER = 'TrustedAdvisor';
@@ -95,10 +98,6 @@ export default {
         projectId: {
             type: String,
             default: undefined,
-        },
-        providers: {
-            type: Object,
-            default: () => ({}),
         },
     },
     setup(props) {
@@ -157,6 +156,7 @@ export default {
                 },
             ])),
             data: null as any,
+            awsProvider: computed(() => store.state.resource.provider.items.aws),
         });
 
         const linkFormatter = (category, status) => {

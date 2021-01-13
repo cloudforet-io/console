@@ -1,76 +1,78 @@
 <template>
     <div class="project-personal-health-dashboard">
-        <div class="title">
-            <span :style="{ 'color': providers.aws ? providers.aws.color : '' }">AWS </span>
-            <span>{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.TITLE') }}</span>
-        </div>
-
-        <div class="summary-wrapper" :style="{ 'color': providers.aws ? providers.aws.color : '' }">
-            <div v-for="(data, index) in summaryData" :key="index"
-                 class="summary" :class="{active: tabState.activeTab === data.name}"
-                 @click="tabState.activeTab = data.name"
-            >
-                <p-anchor :href="summaryLinkFormatter(data.name).href"
-                          :show-icon="false" class="count" highlight
-                >
-                    {{ data.count | summaryCount }}
-                </p-anchor>
-                <span class="label">{{ data.label }}</span>
-                <span class="date">{{ data.date }}</span>
+        <template v-show="awsProvider">
+            <div class="title">
+                <span :style="{ color: awsProvider ? awsProvider.color : '' }">AWS </span>
+                <span>{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.TITLE') }}</span>
             </div>
-        </div>
 
-        <widget-layout>
-            <p-search-table :loading="loading"
-                            :fields="fields"
-                            :items="data"
-                            :this-page.sync="thisPage"
-                            :page-size.sync="pageSize"
-                            :sort-by.sync="sortBy"
-                            :sort-desc.sync="sortDesc"
-                            :search-text.sync="search"
-                            :placeholder="$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.PLACEHOLDER')"
-                            :excel-visible="false"
-                            :page-size-visible="false"
-                            :selectable="false"
-                            class="search-table"
-                            @change="onChange"
-            >
-                <template #col-event-format="{ value }">
-                    <p-anchor :href="value.to.href" target="_self" highlight>
-                        {{ value.name }}
+            <div class="summary-wrapper" :style="{ color: awsProvider ? awsProvider.color : '' }">
+                <div v-for="(data, index) in summaryData" :key="index"
+                     class="summary" :class="{active: tabState.activeTab === data.name}"
+                     @click="tabState.activeTab = data.name"
+                >
+                    <p-anchor :href="summaryLinkFormatter(data.name).href"
+                              :show-icon="false" class="count" highlight
+                    >
+                        {{ data.count | summaryCount }}
                     </p-anchor>
-                </template>
-                <template #col-region_code-format="{ value }">
-                    <span>{{ regionFormatter(value) }}</span>
-                </template>
-                <template #col-start_time-format="{ value }">
-                    <span>{{ value }}</span>
-                </template>
-                <template #col-affected_resources-format="{ value }">
-                    <div v-if="value.length > 0">
-                        <div v-for="(resource, index) in value" :key="index" class="affected-resources-wrapper">
-                            <template v-if="resource.entity_type === 'account'">
-                                <span class="label">{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.ACCOUNT_ID') }} : </span>
-                                <span class="value">{{ resource.aws_account_id }}</span>
-                            </template>
-                            <template v-else>
-                                <router-link class="link-text"
-                                             :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
-                                >
-                                    <span>{{ resource.entity_value }}</span>
-                                    <p-i name="ic_external-link" height="1em" width="1em" />
-                                </router-link>
-                            </template>
+                    <span class="label">{{ data.label }}</span>
+                    <span class="date">{{ data.date }}</span>
+                </div>
+            </div>
+
+            <widget-layout>
+                <p-search-table :loading="loading"
+                                :fields="fields"
+                                :items="data"
+                                :this-page.sync="thisPage"
+                                :page-size.sync="pageSize"
+                                :sort-by.sync="sortBy"
+                                :sort-desc.sync="sortDesc"
+                                :search-text.sync="search"
+                                :placeholder="$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.PLACEHOLDER')"
+                                :excel-visible="false"
+                                :page-size-visible="false"
+                                :selectable="false"
+                                class="search-table"
+                                @change="onChange"
+                >
+                    <template #col-event-format="{ value }">
+                        <p-anchor :href="value.to.href" target="_self" highlight>
+                            {{ value.name }}
+                        </p-anchor>
+                    </template>
+                    <template #col-region_code-format="{ value }">
+                        <span>{{ regionFormatter(value) }}</span>
+                    </template>
+                    <template #col-start_time-format="{ value }">
+                        <span>{{ value }}</span>
+                    </template>
+                    <template #col-affected_resources-format="{ value }">
+                        <div v-if="value.length > 0">
+                            <div v-for="(resource, index) in value" :key="index" class="affected-resources-wrapper">
+                                <template v-if="resource.entity_type === 'account'">
+                                    <span class="label">{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.ACCOUNT_ID') }} : </span>
+                                    <span class="value">{{ resource.aws_account_id }}</span>
+                                </template>
+                                <template v-else>
+                                    <router-link class="link-text"
+                                                 :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
+                                    >
+                                        <span>{{ resource.entity_value }}</span>
+                                        <p-i name="ic_external-link" height="1em" width="1em" />
+                                    </router-link>
+                                </template>
+                            </div>
                         </div>
-                    </div>
-                    <div v-else />
-                </template>
-                <template #no-data-format>
-                    {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA') }}
-                </template>
-            </p-search-table>
-        </widget-layout>
+                        <div v-else />
+                    </template>
+                    <template #no-data-format>
+                        {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA') }}
+                    </template>
+                </p-search-table>
+            </widget-layout>
+        </template>
     </div>
 </template>
 
@@ -121,10 +123,6 @@ export default {
         WidgetLayout,
     },
     props: {
-        providers: {
-            type: Object,
-            default: () => ({}),
-        },
         projectId: {
             type: String,
             default: undefined,
@@ -176,6 +174,7 @@ export default {
             search: '',
             sortBy: 'last_update_time',
             sortDesc: true,
+            awsProvider: computed(() => store.state.resource.provider.items.aws),
         });
         const tabState = reactive({
             tabs: computed(() => [
