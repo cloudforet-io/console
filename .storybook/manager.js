@@ -4,6 +4,5 @@ import { addons } from '@storybook/addons';
 import SpaceOneTheme from './SpaceOneTheme';
 
 addons.setConfig({
-    showRoots: true,
     theme: SpaceOneTheme,
 });
