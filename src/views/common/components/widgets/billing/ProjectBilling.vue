@@ -51,7 +51,6 @@
             </div>
             <div class="col-span-12 detail-wrapper">
                 <div class="table-button-wrapper">
-                    <span class="text">6 {{ selectedDateType === 'MONTHLY' ? 'months' : 'days' }}</span>
                     <p-icon-button class="text"
                                    name="ic_arrow_left"
                                    color="inherit transparent"
@@ -79,7 +78,7 @@
                 </p-data-table>
                 <div class="toggle-button-wrapper">
                     <p-collapsible-toggle :is-collapsed.sync="tableState.isCollapsed">
-                        {{ tableState.isCollapsed ? 'show all' : 'hide' }}
+                        {{ tableState.isCollapsed ? $t('COMMON.WIDGETS.BILLING.SHOW_ALL') : $t('COMMON.WIDGETS.BILLING.HIDE') }}
                     </p-collapsible-toggle>
                 </div>
             </div>
@@ -239,7 +238,7 @@ export default {
             const chart = createChart();
             chart.logo.disabled = true;
             chart.paddingLeft = -5;
-            chart.paddingBottom = 0;
+            chart.paddingBottom = -10;
             chart.paddingTop = 10;
             chart.data = chartState.data;
 
@@ -582,14 +581,10 @@ export default {
     .detail-wrapper {
         .table-button-wrapper {
             text-align: right;
-            .text {
-                font-size: 0.75rem;
-                vertical-align: middle;
-                line-height: 1.2;
-            }
         }
         .p-data-table::v-deep {
             height: auto;
+            min-height: 5rem;
             max-height: 17.5rem;
             text-align: right;
             border-radius: 0.125rem;

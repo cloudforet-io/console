@@ -263,7 +263,7 @@ export default {
     .legend-wrapper {
         margin-top: 1rem;
         .legend {
-            display: inline-flex;
+            display: flex;
             padding: 0.25rem 0;
             &.error {
                 @mixin legend-theme theme('colors.coral.100'), theme('colors.red.500'), theme('colors.red.500');
@@ -278,6 +278,7 @@ export default {
                 @apply border;
                 width: 10px;
                 height: 10px;
+                border-radius: 0.125rem;
                 margin-right: 0.375rem;
             }
             .text {

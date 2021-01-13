@@ -1,5 +1,5 @@
 <template>
-    <widget-layout :title="$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE_TITLE')" class="accounts-table">
+    <widget-layout :title="$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.TITLE')" class="accounts-table">
         <div class="mt-4 overflow-auto">
             <p-data-table :fields="fields"
                           :sortable="false"
@@ -122,11 +122,11 @@ export default {
                     credentials: gray,
                 },
                 fields: computed(() => [
-                    { name: 'provider', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE_SERVICE_PROVIDER') },
-                    { name: 'service_account_name', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE_ACCOUNT_NAME') },
-                    { name: 'server_count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE_SERVER') },
-                    { name: 'cloud_service_count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE_CLOUD_SERVICE') },
-                    { name: 'secret_count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE_CREDENTIALS') },
+                    { name: 'provider', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.SERVICE_PROVIDER') },
+                    { name: 'service_account_name', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.ACCOUNT_NAME') },
+                    { name: 'server_count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.SERVER') },
+                    { name: 'cloud_service_count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.CLOUD_SERVICE') },
+                    { name: 'secret_count', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.CREDENTIALS') },
                 ]),
                 providers: computed(() => store.state.resource.provider.items),
             });
