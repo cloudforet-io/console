@@ -306,7 +306,6 @@
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "アカウントID",
-				"ADD_ACCOUNT": "",
 				"AGO": "前",
 				"ALL": "全て見る",
 				"DAY": "日",
@@ -320,9 +319,7 @@
 				"HOUR": "時間",
 				"LAST_UPDATE": "最終更新",
 				"MORE": "もっと見る",
-				"NO_ACCOUNT": "",
-				"NO_ACCOUNT_DESC": "",
-				"NO_DATA": "データがありません。",
+				"NO_DATA": "",
 				"PAST_7_DAYS": "過去7日間",
 				"PLACEHOLDER": "イベント検索",
 				"SUMMARY_ISSUE": "発生した問題",

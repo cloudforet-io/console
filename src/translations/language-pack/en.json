@@ -306,7 +306,6 @@
 			"HEALTH_DASHBOARD_TITLE": "AWS Health Dashboard",
 			"PERSONAL_HEALTH_DASHBOARD": {
 				"ACCOUNT_ID": "Account ID",
-				"ADD_ACCOUNT": "Add Service Accounts",
 				"AGO": "ago",
 				"ALL": "all",
 				"DAY": "day | days",
@@ -320,9 +319,7 @@
 				"HOUR": "hr | hrs",
 				"LAST_UPDATE": "Last Update",
 				"MORE": "more",
-				"NO_ACCOUNT": "No AWS Personal Health Dashboard",
-				"NO_ACCOUNT_DESC": "Add Service Account to create a dashboard.",
-				"NO_DATA": "No Personal Health Dashboard",
+				"NO_DATA": "No AWS Personal Health Dashboard",
 				"PAST_7_DAYS": "Past 7 days",
 				"PLACEHOLDER": "Search Event",
 				"SUMMARY_ISSUE": "Open Issues",

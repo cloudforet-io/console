@@ -67,22 +67,7 @@
                     <div v-else />
                 </template>
                 <template #no-data-format>
-                    <div class="no-data-wrapper">
-                        <template v-if="providers.aws">
-                            {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA') }}
-                        </template>
-                        <template v-else>
-                            <strong class="text-primary2">{{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_ACCOUNT') }}</strong><br>
-                            {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_ACCOUNT_DESC') }}<br>
-                            <p-icon-text-button name="ic_plus_bold" width="1em" height="1em"
-                                                icon-color="inherit transparent"
-                                                :href="$router.resolve({name: 'addServiceAccount', params: {provider: 'aws'}}).href"
-                                                style-type="primary1"
-                            >
-                                {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.ADD_ACCOUNT') }}
-                            </p-icon-text-button>
-                        </template>
-                    </div>
+                    {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.NO_DATA') }}
                 </template>
             </p-search-table>
         </widget-layout>
@@ -98,7 +83,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PAnchor, PI, PSearchTable, PIconTextButton,
+    PAnchor, PI, PSearchTable,
 } from '@spaceone/design-system';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
@@ -133,7 +118,6 @@ export default {
         PI,
         PAnchor,
         PSearchTable,
-        PIconTextButton,
         WidgetLayout,
     },
     props: {
@@ -331,7 +315,7 @@ export default {
     @apply flex;
     margin-bottom: -1px;
     .summary {
-        @apply flex-grow border border-gray-200 border-b-0;
+        @apply flex-grow border border-gray-200 bg-white;
         margin-right: 0.375rem;
         max-width: 15.25rem;
         padding: 0.625rem 1rem;
@@ -341,6 +325,7 @@ export default {
         }
         &.active {
             box-shadow: inset 0 3px currentColor;
+            border-bottom-color: theme('colors.white');
         }
         .count {
             font-size: 1.125rem;
@@ -362,6 +347,7 @@ export default {
 }
 
 .search-table {
+    @apply bg-white;
     height: 18.75rem;
     border-width: 0;
     .link-text {
@@ -392,13 +378,6 @@ export default {
     }
     .p-i-icon {
         margin-bottom: 0.125rem;
-    }
-}
-.no-data-wrapper {
-    line-height: 1.6;
-    font-size: 0.875rem;
-    .p-icon-text-button {
-        @apply mt-2;
     }
 }
 </style>
