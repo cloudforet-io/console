@@ -1,33 +1,31 @@
 <template>
     <general-page-layout>
         <p-page-navigation :routes="pageNavigation" />
-        <div class="top flex">
-            <p-page-title :title="item.name" child @goBack="$router.go(-1)">
-                <template #extra>
-                    <div class="btns">
-                        <span class="favorite-btn-wrapper">
-                            <favorite-button :item-id="projectId"
-                                             favorite-type="project"
-                                             resource-type="identity.Project"
-                            />
-                        </span>
-                        <p-icon-button name="ic_transhcan"
-                                       width="1.5rem" height="1.5rem" class="delete-btn"
-                                       @click="openProjectDeleteForm"
-                        />
-                        <p-icon-button name="ic_edit-text"
-                                       width="1.5rem" height="1.5rem" class="edit-btn"
-                                       @click="openProjectEditForm"
-                        />
-                    </div>
-                    <p class="copy-project-id">
-                        <b>{{ $t('PROJECT.DETAIL.PROJECT_ID') }}</b> {{ projectId }}
-                        <p-copy-button class="ml-2"
-                                       :value="projectId"
-                        />
-                    </p>
-                </template>
-            </p-page-title>
+        <div class="top-wrapper">
+            <p-page-title :title="item.name" child @goBack="$router.go(-1)" />
+            <div class="btns">
+                <span class="favorite-btn-wrapper">
+                    <favorite-button :item-id="projectId"
+                                     favorite-type="project"
+                                     resource-type="identity.Project"
+                    />
+                </span>
+                <p-icon-button name="ic_transhcan"
+                               width="1.5rem" height="1.5rem" class="delete-btn"
+                               @click="openProjectDeleteForm"
+                />
+                <p-icon-button name="ic_edit-text"
+                               width="1.5rem" height="1.5rem" class="edit-btn"
+                               @click="openProjectEditForm"
+                />
+            </div>
+            <p class="copy-project-id">
+                <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
+                {{ projectId }}
+                <p-copy-button class="icon"
+                               :value="projectId"
+                />
+            </p>
         </div>
 
         <p-tab :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab"
@@ -147,7 +145,7 @@ import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.v
 import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
-import ProjectDashboard from '@/views/project/project/pages/ProjectDashboard.vue';
+import ProjectDashboard from '@/views/project/project/modules/ProjectDashboard.vue';
 
 import ProjectReportTab from '@/views/project/project/modules/ProjectReportTab.vue';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
@@ -467,27 +465,34 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.p-page-title {
-    &::v-deep {
-        .extra {
-            @apply justify-between text-base text-gray-400;
+.top-wrapper {
+    @apply mb-8 flex flex-wrap items-center;
+    .btns {
+        @apply flex-shrink-0 flex items-center;
+        .favorite-btn-wrapper {
+            @apply inline-flex ml-2;
         }
-        .title {
-            @apply text-2xl;
+        .p-icon-text-button {
+            @apply flex-shrink-0 ml-4;
         }
-        .btns {
-            @apply flex-shrink-0 flex-grow flex items-center;
-            .favorite-btn-wrapper {
-                @apply ml-2;
-            }
-            .p-icon-text-button {
-                @apply flex-shrink-0 ml-4;
-            }
+    }
+    .copy-project-id {
+        @apply flex-shrink-0 flex-grow inline-flex items-center justify-end text-gray-500;
+        font-size: 0.875rem;
+        height: 2rem;
+        .label {
+            @apply text-gray-dark;
         }
-        .copy-project-id {
-            @apply flex-shrink-0 inline-flex items-center text-gray-500;
-            font-size: 0.875rem;
+        .icon {
+            @apply ml-2 text-gray-dark;
         }
+    }
+}
+.p-page-title::v-deep {
+    @apply mb-0;
+    width: auto;
+    .title {
+        @apply text-2xl;
     }
 }
 .tab-content::v-deep {
