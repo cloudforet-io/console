@@ -7,7 +7,7 @@
                 {{ text }}
             </slot>
         </span>
-        <slot v-if="showIcon && target === '_blank'" name="icon" v-bind="$props">
+        <slot v-if="showIcon || (showIcon && target === '_blank')" name="icon" v-bind="$props">
             <p-i name="ic_external-link"
                  height="1em" width="1em"
                  color="inherit"
