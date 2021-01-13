@@ -25,7 +25,7 @@ export default {
             return cls;
         }
 
-        const tag = attrs.href ? 'a' : 'div';
+        const tag = props.href ? 'a' : 'div';
 
         return h(tag, {
             ...data,
