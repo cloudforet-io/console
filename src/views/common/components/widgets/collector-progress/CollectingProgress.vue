@@ -10,7 +10,7 @@
                     class="more-btn"
                 >
                     <div class="more">
-                        <span class="text-xs">{{ $t('COMMON.WIDGETS.CLOUD_SERVICE_SEE_MORE') }}</span>
+                        <span class="text-xs">{{ $t('COMMON.WIDGETS.CLOUD_SERVICE.SEE_MORE') }}</span>
                         <p-i name="ic_arrow_right" width="1rem" height="1rem"
                              color="inherit transparent"
                         />

@@ -5,7 +5,7 @@
                 {{ title }}
             </p>
         </slot>
-        <div class="widget-contents">
+        <div class="widget-contents" :style="{overflow}">
             <slot />
         </div>
     </p-pane-layout>
@@ -21,6 +21,10 @@ export default {
         title: {
             type: String,
             default: '',
+        },
+        overflow: {
+            type: String,
+            default: 'visible',
         },
     },
     setup() {
@@ -46,6 +50,7 @@ export default {
     }
     .widget-contents {
         flex-grow: 1;
+        height: 100%;
     }
 }
 </style>

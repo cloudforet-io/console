@@ -1,13 +1,15 @@
 <template>
-    <widget-layout class="cloud-services-widget">
+    <widget-layout class="cloud-services-widget"
+                   overflow="auto"
+    >
         <template #title>
             <div class="top">
                 <p class="title">
-                    {{ $t('COMMON.WIDGETS.CLOUD_SERVICE_TITLE') }}
+                    {{ $t('COMMON.WIDGETS.CLOUD_SERVICE.TITLE') }}
                 </p>
                 <div class="help">
                     <p-i v-if="projectId"
-                         v-tooltip.top="$t('COMMON.WIDGETS.CLOUD_SERVICE_HELP')"
+                         v-tooltip.top="$t('COMMON.WIDGETS.CLOUD_SERVICE.HELP')"
                          name="ic_tooltip" width="1rem"
                          height="1rem"
                          class="icon"
@@ -15,7 +17,7 @@
                     />
                 </div>
                 <router-link v-if="moreInfo" :to="cloudServiceTypeLink" class="more">
-                    <span class="text-xs">{{ $t('COMMON.WIDGETS.CLOUD_SERVICE_SEE_MORE') }}</span>
+                    <span class="text-xs">{{ $t('COMMON.WIDGETS.CLOUD_SERVICE.SEE_MORE') }}</span>
                     <p-i name="ic_arrow_right" width="1rem" height="1rem"
                          color="inherit transparent"
                     />
@@ -23,49 +25,39 @@
             </div>
         </template>
         <template #default>
-            <div class="card-wrapper grid gap-2 grid-cols-1
-                        sm:grid-cols-2 md:grid-cols-4"
-            >
-                <template v-if="loading">
-                    <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
-                        <p-skeleton width="2rem" height="2rem" class="mr-4" />
-                        <div class="grid grid-cols-1 gap-1 w-full">
-                            <p-skeleton width="80%" height="0.625rem" />
-                            <p-skeleton width="100%" height="0.625rem" />
-                        </div>
+            <div v-if="loading" class="card-wrapper">
+                <div v-for="v in skeletons" :key="v" class="flex items-center p-4">
+                    <p-skeleton width="2rem" height="2rem" class="mr-4" />
+                    <div class="grid grid-cols-1 gap-1 w-full">
+                        <p-skeleton width="80%" height="0.625rem" />
+                        <p-skeleton width="100%" height="0.625rem" />
                     </div>
-                </template>
-                <router-link v-else-if="data.length === 0" to="/plugin/collector"
-                             class="no-data rounded-sm flex items-center justify-center
-                              border border-gray-200 border-solid bg-transparent text-gray-900 hover:border-secondary hover:text-secondary "
-                >
-                    <p-i name="ic_plus_square" width="1rem" height="1rem"
-                         class="mr-2" color="inherit white"
-                    />
-                    {{ $t('COMMON.WIDGETS.CLOUD_SERVICE_CREATE_COLLECTOR') }}
+                </div>
+            </div>
+            <div v-else-if="data.length === 0" class="no-data-wrapper">
+                <img src="@/assets/images/illust_circle_boy.svg">
+                <div class="text">
+                    {{ $t('COMMON.WIDGETS.CLOUD_SERVICE.NO_DATA') }}
+                </div>
+            </div>
+            <div v-else class="card-wrapper">
+                <router-link v-for="(item, index) in data" :key="index" :to="item.href">
+                    <p-selectable-item :icon-url="iconUrl(item)" theme="card" class="card">
+                        <template #contents>
+                            <div class="group-name">
+                                {{ item.group }}
+                            </div>
+                            <div class="name">
+                                {{ item.name }}
+                            </div>
+                        </template>
+                        <template #extra>
+                            <span class="count">{{ item.count || 0 }}</span>
+                        </template>
+                    </p-selectable-item>
                 </router-link>
-                <template v-else>
-                    <router-link v-for="(item, index) in data" :key="index" :to="item.href">
-                        <p-selectable-item
-                            :icon-url="iconUrl(item)" theme="card" class="card"
-                        >
-                            <template #contents>
-                                <div class="group-name">
-                                    {{ item.group }}
-                                </div>
-                                <div class="name">
-                                    {{ item.name }}
-                                </div>
-                            </template>
-                            <template #extra>
-                                <span class="count">{{ item.count || 0 }}</span>
-                            </template>
-                        </p-selectable-item>
-                    </router-link>
-                </template>
             </div>
         </template>
-        <template #extra />
     </widget-layout>
 </template>
 
@@ -263,21 +255,32 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.widget-layout::v-deep {
-    overflow-y: auto;
-    .card-wrapper {
-        display: block;
-        .item-container {
-            &.card {
-                &:hover {
-                    @apply bg-blue-100;
-                }
+.card-wrapper {
+    @apply grid gap-2 grid-cols-1;
+
+    @screen sm {
+        @apply grid-cols-2;
+    }
+
+    @screen md {
+        @apply grid-cols-4;
+    }
+
+    @screen lg {
+        @apply grid-cols-1;
+    }
+
+    .item-container {
+        &.card {
+            &:hover {
+                @apply bg-blue-100;
             }
         }
     }
-    .item-container.card .contents {
-        padding: 1rem 1rem 1rem 0.75rem;
-    }
+}
+
+.item-container.card .contents {
+    padding: 1rem 1rem 1rem 0.75rem;
 }
 .top {
     @apply mb-3 flex w-full items-center;
@@ -327,7 +330,14 @@ export default {
         @apply text-secondary underline;
     }
 }
-.no-data {
-    height: 3.5rem;
+.no-data-wrapper {
+    @apply flex w-full h-full flex-col justify-center items-center;
+    .text {
+        @apply mt-5 text-center text-primary2;
+        font-weight: bold;
+        font-size: 0.875rem;
+        line-height: 1.6;
+    }
 }
+
 </style>
