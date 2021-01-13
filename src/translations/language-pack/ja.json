@@ -450,6 +450,7 @@
 		"USER": {
 			"FORM": {
 				"ADD_TITLE": "ユーザー追加",
+				"ASSIGN_DOMAIN_ROLE": "",
 				"CHECK_USER_ID": "ユーザ名を確認",
 				"DOMAIN_ADMIN": "ドメイン管理者",
 				"EMAIL": "メールアドレス",
@@ -498,6 +499,7 @@
 				"ALT_S_DISABLE": "ユーザー非活性化完了",
 				"ALT_S_ENABLE": "ユーザー有効化完了",
 				"ALT_S_UPDATE_USER": "ユーザー更新完了",
+				"ASSIGNED_ROLES": "",
 				"BASE_INFORMATION": "基本情報",
 				"CHANGE_PASSWORD": "パスワード変更",
 				"DAYS": "日",
@@ -881,7 +883,10 @@
 			"MODAL_VALIDATION_DUPLICATED": "名前が重複しています",
 			"MODAL_VALIDATION_LENGTH": "40文字以内で入力してください",
 			"MODAL_VALIDATION_REQUIRED": "名前を入力してください",
+			"MODAL_VALIDATION_SELECT_MEMBER": "",
+			"MODAL_VALIDATION_SELECT_ROLE": "",
 			"PROJECT_ID": "プロジェクトID：",
+			"PROJECT_ROLE": "",
 			"REPORT_CANCEL": "キャンセル",
 			"REPORT_DESC": "SpaceONEは、プロジェクトベースの月次レポートを提供します。今後提供するコンテンツを追加する予定です",
 			"REPORT_DOWNLOAD_FILE_DESC": "*提供するファイル形式（PDF、PPTX、CSV）",

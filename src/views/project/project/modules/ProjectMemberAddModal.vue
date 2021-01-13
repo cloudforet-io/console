@@ -17,37 +17,46 @@
                                 height: '19rem', padding: '-1rem'
                             }"
                             :selectable="false"
+                            :excel-visible="false"
                             @change="onChange"
                             @init="onChange"
                             @rowLeftClick="onSelect"
             />
-            <p class="tag-title">
-                {{ $t('PROJECT.DETAIL.MODAL_ADDED_MEMBERS') }}
-            </p>
-            <p class="tag-container">
-                <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag}`"
-                       class="tag"
-                       @delete="tagTools.deleteTag(idx)"
+            <div class="field-group-wrapper">
+                <p-field-group
+                    :label="$t('PROJECT.DETAIL.MODAL_ADD_MEMBER')"
+                    :required="true"
+                    :invalid="validationState.isMemberValid === false"
+                    :invalid-text="validationState.memberCheckInvalidText"
                 >
-                    {{ tag }}
-                </p-tag>
-            </p>
-            <p-field-group
-                :label="'Project Role'"
-                :required="true"
-                :invalid="validationState.isProjectRoleValid === false"
-                :invalid-text="validationState.projectRoleCheckInvalidText"
-                class="dropdown"
-            >
-                <template #default="{invalid}">
-                    <p-select-dropdown v-model="projectRole"
-                                       :items="projectRoleList"
-                                       auto-height
-                                       :disabled="projectRoleList.length < 1"
-                                       :placeholder="'Select a Role'"
-                    />
-                </template>
-            </p-field-group>
+                    <template #default="{invalid}">
+                        <p class="tag-container">
+                            <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag}`"
+                                   class="tag"
+                                   @delete="tagTools.deleteTag(idx)"
+                            >
+                                {{ tag }}
+                            </p-tag>
+                        </p>
+                    </template>
+                </p-field-group>
+                <p-field-group
+                    :label="$t('PROJECT.DETAIL.PROJECT_ROLE')"
+                    :required="true"
+                    :invalid="validationState.isProjectRoleValid === false"
+                    :invalid-text="validationState.projectRoleCheckInvalidText"
+                    class="dropdown"
+                >
+                    <template #default="{invalid}">
+                        <p-select-dropdown v-model="projectRole"
+                                           :items="projectRoleList"
+                                           auto-height
+                                           :disabled="projectRoleList.length < 1"
+                                           :placeholder="$t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_ROLE')"
+                        />
+                    </template>
+                </p-field-group>
+            </div>
         </template>
     </p-button-modal>
 </template>
@@ -165,6 +174,8 @@ export default {
             projectRoleList: [] as any[],
         });
         const validationState = reactive({
+            isMemberValid: undefined as undefined | boolean,
+            memberCheckInvalidText: '' as TranslateResult | string,
             isProjectRoleValid: undefined as undefined | boolean,
             projectRoleCheckInvalidText: '' as TranslateResult | string,
         });
@@ -221,10 +232,20 @@ export default {
             }
         };
 
+        const checkMember = async () => {
+            if (formState.tagTools.tags.length === 0) {
+                validationState.isMemberValid = false;
+                validationState.memberCheckInvalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_MEMBER');
+            } else {
+                validationState.isMemberValid = true;
+                validationState.memberCheckInvalidText = '';
+            }
+        };
+
         const checkProjectRole = async () => {
             if (state.projectRole === '') {
                 validationState.isProjectRoleValid = false;
-                validationState.projectRoleCheckInvalidText = 'Select a Role';
+                validationState.projectRoleCheckInvalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_ROLE');
             } else {
                 validationState.isProjectRoleValid = true;
                 validationState.projectRoleCheckInvalidText = '';
@@ -243,9 +264,10 @@ export default {
         const confirm = async () => {
             const users = formState.tagTools.tags;
 
+            await checkMember();
             await checkProjectRole();
 
-            if (validationState.isProjectRoleValid) {
+            if (validationState.isProjectRoleValid && validationState.isMemberValid) {
                 try {
                     await SpaceConnector.client.identity.project.member.add({
                         project_id: projectId,
@@ -283,32 +305,35 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-
-.tag-title {
-    @apply font-semibold leading-normal text-sm mb-1 mt-8;
+.field-group-wrapper {
+    @apply bg-primary4 border border-gray-200;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    padding: 1.5rem 1rem;
 }
+
 .tag-container {
     @apply border border-gray-200;
-    height: 7.5rem;
+    height: 3.625rem;
     padding: 0.5rem;
     border-radius: 0.125rem;
-    background-color: theme('colors.primary4');
-
+    background-color: theme('colors.white');
+    overflow-y: auto;
+    margin-bottom: 1.5rem;
     >>> .p-tag.deletable {
-        @apply bg-white border border-primary;
+        @apply bg-blue-300;
         margin-bottom: 0.25rem;
         .p-i-icon {
-            @apply text-primary;
+            @apply text-gray-400;
         }
     }
 }
 >>> .modal-content .modal-body-container {
     overflow: visible;
 }
-.dropdown {
-    margin-top: 1rem;
-}
+
 .p-dropdown-menu-btn {
+    @apply bg-white;
     max-width: 14rem;
 }
 </style>

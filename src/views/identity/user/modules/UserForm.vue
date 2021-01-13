@@ -62,7 +62,7 @@
                     <p-text-input v-model="formState.email" :invalid="invalid" class="text-input" />
                 </template>
             </p-field-group>
-            <p-field-group :label="$t('IDENTITY.USER.MAIN.ASSIGN_DOMAIN_ROLE')" class="input-form">
+            <p-field-group :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')" class="input-form">
                 <p-select-dropdown v-model="formState.domainRole"
                                    :items="formState.domainRoleItem"
                                    auto-height

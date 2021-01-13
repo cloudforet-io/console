@@ -450,6 +450,7 @@
 		"USER": {
 			"FORM": {
 				"ADD_TITLE": "Add User",
+				"ASSIGN_DOMAIN_ROLE": "Assign Domain Role",
 				"CHECK_USER_ID": "Check ID",
 				"DOMAIN_ADMIN": "Domain Admin",
 				"EMAIL": "E-mail",
@@ -498,6 +499,7 @@
 				"ALT_S_DISABLE": "Disable user success",
 				"ALT_S_ENABLE": "Enable user success",
 				"ALT_S_UPDATE_USER": "Update user success",
+				"ASSIGNED_ROLES": "Assigned Roles",
 				"BASE_INFORMATION": "Base Information",
 				"CHANGE_PASSWORD": "Change Password",
 				"DAYS": "days",
@@ -881,7 +883,10 @@
 			"MODAL_VALIDATION_DUPLICATED": "Project name is duplicated.",
 			"MODAL_VALIDATION_LENGTH": "Must be longer than 40 characters.",
 			"MODAL_VALIDATION_REQUIRED": "Required field",
+			"MODAL_VALIDATION_SELECT_MEMBER": "Select a member ",
+			"MODAL_VALIDATION_SELECT_ROLE": "Select a Role",
 			"PROJECT_ID": "Project ID:",
+			"PROJECT_ROLE": "Project Role",
 			"REPORT_CANCEL": "Cancel",
 			"REPORT_DESC": "SpaceONE offers monthly report based on this project. We will update more content soon.",
 			"REPORT_DOWNLOAD_FILE_DESC": "* Only PDF, PPTX formats are avilable.",

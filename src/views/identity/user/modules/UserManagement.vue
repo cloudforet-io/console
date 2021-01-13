@@ -340,7 +340,7 @@ export default {
             tabs: computed(() => ([
                 { label: vm.$t('IDENTITY.USER.MAIN.DETAILS'), name: 'detail', keepAlive: true },
                 { label: vm.$t('IDENTITY.USER.MAIN.TAG'), name: 'tag', keepAlive: true },
-                { label: 'Assigned Roles', name: 'assigned_role', keepAlive: true },
+                { label: vm.$t('IDENTITY.USER.MAIN.ASSIGNED_ROLES'), name: 'assigned_role', keepAlive: true },
             ] as TabItem[])),
             activeTab: 'detail',
         });
@@ -351,7 +351,6 @@ export default {
             ] as TabItem[])),
             activeTab: 'data',
         });
-
 
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
