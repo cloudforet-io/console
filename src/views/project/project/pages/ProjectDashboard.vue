@@ -4,24 +4,24 @@
         <div class="col-span-12 lg:col-span-9 grid grid-cols-12 gap-3">
             <project-billing class="col-span-12" :project-id="projectId" />
             <project-personal-health-dashboard class="col-span-12" :providers="providers" :project-id="projectId" />
-            <div class="col-span-12 resources-tab">
-                <p-tab :tabs="tabs" :active-tab.sync="activeTab">
-                    <template #server>
-                        <resources-by-region
-                            :project-filter="projectFilter"
-                            :project-id="projectId"
-                            :is-server="true"
-                        />
-                    </template>
-                    <template #cloud_service>
-                        <resources-by-region
-                            :project-filter="projectFilter"
-                            :project-id="projectId"
-                            :is-server="false"
-                        />
-                    </template>
-                </p-tab>
-            </div>
+            <!--            <div class="col-span-12 resources-tab">-->
+            <!--                <p-tab :tabs="tabs" :active-tab.sync="activeTab">-->
+            <!--                    <template #server>-->
+            <!--                        <resources-by-region-->
+            <!--                            :project-filter="projectFilter"-->
+            <!--                            :project-id="projectId"-->
+            <!--                            :is-server="true"-->
+            <!--                        />-->
+            <!--                    </template>-->
+            <!--                    <template #cloud_service>-->
+            <!--                        <resources-by-region-->
+            <!--                            :project-filter="projectFilter"-->
+            <!--                            :project-id="projectId"-->
+            <!--                            :is-server="false"-->
+            <!--                        />-->
+            <!--                    </template>-->
+            <!--                </p-tab>-->
+            <!--            </div>-->
             <service-accounts-table class="col-span-12 service-accounts-table" />
         </div>
         <div class="col-span-12 lg:col-span-3">

@@ -32,6 +32,7 @@
 
         <p-tab :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab"
                class="tab-content"
+               :class="[singleItemTabState.activeTab]"
         >
             <template #summary>
                 <project-dashboard ref="ProjectDashboard" />
@@ -489,17 +490,19 @@ export default {
         }
     }
 }
-.p-tab::v-deep {
+.tab-content::v-deep {
     border: none;
-    .p-tab-bar {
-        border-bottom-width: 0;
-        .p-nav-link {
-            margin-bottom: 0;
+    &.summary {
+        .p-tab-bar {
+            border-bottom-width: 0;
+            .p-nav-link {
+                margin-bottom: 0;
+            }
         }
-    }
-    .tab-pane {
-        @apply border border-gray-200;
-        padding: 1.5rem 1rem;
+        .tab-pane {
+            @apply border border-gray-200;
+            padding: 1.5rem 1rem;
+        }
     }
 }
 
