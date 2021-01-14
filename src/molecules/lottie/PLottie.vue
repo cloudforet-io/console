@@ -3,7 +3,6 @@
         <div ref="lottieRef" :style="{
             height: height || `${size}rem`,
             width: width || `${size}rem`,
-            margin: margin,
         }"
         />
     </div>
@@ -51,10 +50,6 @@ export default {
             default: undefined,
         },
         width: {
-            type: String,
-            default: undefined,
-        },
-        margin: {
             type: String,
             default: undefined,
         },

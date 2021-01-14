@@ -1,7 +1,7 @@
-import { text, number } from '@storybook/addon-knobs';
-import { autoProps } from '@/util/storybook-util';
-import { ref } from '@vue/composition-api';
+import { select, text, number } from '@storybook/addon-knobs';
 import PLottie from './PLottie.vue';
+import { names } from './p-lotties/names';
+
 
 export default {
     title: 'Foundation/Graphics',
@@ -17,31 +17,29 @@ export default {
 
 export const lottie = () => ({
     components: { PLottie },
-    template: `<div style="width: 80vw;">
-                    <button @click="show">display loading</button>
-                    <button @click="hide">stop loading</button>
-                        <p-lottie v-bind="$props" ref="load"/>
+    template: `<div>
+                    <p-lottie v-bind="$props"
+                              style="width: 80vw; height: 80vh;"
+                    />
                 </div>`,
     props: {
         name: {
-            default: text('name', 'spinner'),
+            default: select('name', names, names[0]),
         },
         size: {
-            default: number('size', 2),
+            default: number('size', 1),
         },
-        ...autoProps(PLottie),
+        height: {
+            type: String,
+            default: text('height', '100%'),
+        },
+        width: {
+            type: String,
+            default: text('width', '100%'),
+        },
     },
     setup() {
-        const load = ref(null);
-        const show = () => {
-            // load.create();
-        };
-        const hide = () => {
-            // load.destroy();
-        };
         return {
-            show,
-            hide,
         };
     },
 });

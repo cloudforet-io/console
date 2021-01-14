@@ -30,7 +30,7 @@
     "build-storybook": "NODE_OPTIONS=--max_old_space_size=4096 build-storybook -o .out",
     "storybook": "start-storybook -p 6006",
     "icon": "vsvg -s ./src/assets/icons -t ./src/atoms/icons/p-icons --es6",
-    "lottie": "cp -r ./src/assets/lottiefiles/* ./src/molecules/lottie/p-lotties",
+    "lottie": "node build/lottie.js",
     "analyze": "NODE_ENV=production VUE_APP_ANALYZE_MOD=true vue-cli-service build",
     "test": "jest"
   },
