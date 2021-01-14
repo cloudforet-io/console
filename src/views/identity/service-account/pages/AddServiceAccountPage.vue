@@ -106,7 +106,7 @@
                     />
                 </template>
                 <template #json>
-                    <p-text-editor :code.sync="jsonForCredential" mode="edit" />
+                    <p-text-editor class="m-4" :code.sync="jsonForCredential" mode="edit" />
                 </template>
             </p-tab>
         </p-pane-layout>
