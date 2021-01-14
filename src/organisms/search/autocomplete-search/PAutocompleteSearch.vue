@@ -92,7 +92,7 @@ export default {
         const state: any = reactive({
             searchRef: null,
             menuRef: null,
-            proxyValue: props.value !== undefined ? makeProxy('value', props, emit) : '',
+            proxyValue: listeners['update:value'] ? makeProxy('value', props, emit) : '',
             isAutoMode: computed(() => props.visibleMenu === undefined),
             proxyVisibleMenu: props.visibleMenu === undefined
                 ? false
@@ -166,11 +166,13 @@ export default {
         const onInput = async (val: string, e) => {
             if (!state.proxyVisibleMenu) showMenu();
 
+            state.proxyValue = val;
+            emit('input', val, e);
+
             if (props.handler) {
                 const res = await props.handler(val);
                 state.filteredMenu = res.results;
             }
-            emit('input', val, e);
         };
 
         const emitSearch = (val?: string) => {
@@ -184,7 +186,9 @@ export default {
 
         const onClickMenuItem = (name, idx) => {
             if (listeners['select-menu']) {
+                state.proxyValue = name;
                 emit('select-menu', name, idx);
+                hideMenu();
             } else {
                 state.proxyValue = state.filteredMenu[idx].label;
                 emitSearch(name);

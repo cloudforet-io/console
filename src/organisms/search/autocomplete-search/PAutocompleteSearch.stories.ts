@@ -1,49 +1,13 @@
 import { toRefs, reactive } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import { getKnobProps } from '@/util/storybook-util';
+import {
+    text, boolean,
+} from '@storybook/addon-knobs';
 import casual, { arrayOf } from '@/util/casual';
 import PAutocompleteSearch from '@/organisms/search/autocomplete-search/PAutocompleteSearch.vue';
+import PRawData from '@/organisms/raw-data/PRawData.vue';
 import Fuse from 'fuse.js';
 
-
-const autocompleteSearchProps = {
-    value: {
-        type: String,
-        default: '',
-    },
-    placeholder: {
-        type: String,
-        default: 'Search',
-    },
-    focused: {
-        type: Boolean,
-        default: false,
-    },
-    disableIcon: {
-        type: Boolean,
-        default: false,
-    },
-    menu: {
-        type: Array,
-        default: () => [],
-    },
-    loading: {
-        type: Boolean,
-        default: false,
-    },
-    visibleMenu: {
-        type: Boolean,
-        default: undefined,
-    },
-    isFocused: {
-        type: Boolean,
-        default: undefined,
-    },
-    handler: {
-        type: Function,
-        default: null,
-    },
-};
 
 function plainAutocompleteHandler(inputText, list, key) {
     let res = list;
@@ -77,50 +41,68 @@ export default {
     },
 };
 
+const actions = {
+    'focus-menu': action('focus-menu'),
+    input: action('input'),
+    'select-menu': action('select-menu'),
+    'hide-menu': action('hide-menu'),
+    search: action('search'),
+};
+
 
 export const autoCompleteSearch = () => ({
-    components: { PAutocompleteSearch },
-    props: getKnobProps(autocompleteSearchProps, {
-    }, {
-        menu: true,
-        value: true,
-        visibleMenu: true,
-        isFocused: true,
-    }),
+    components: { PAutocompleteSearch, PRawData },
+    props: {
+        placeholder: {
+            default: text('placeholder', 'Search'),
+        },
+        disableIcon: {
+            default: boolean('disableIcon', false),
+        },
+        loading: {
+            default: boolean('loading', false),
+        },
+    },
     template: `
         <div style="width: 80vw;">
-            <PAutocompleteSearch v-model="value" 
-                                 v-bind="$props"
-                                 :menu="menu"
-                                 @search="search"
-                                 @menu:select="search"
-                                 @input="input"
-                                 class="mt-10"
+            <p-autocomplete-search v-model="value" 
+                                   v-bind="$props" 
+                                   :menu="menu" 
+                                   @search="search" 
+                                   @select-menu="search" 
+                                   @input="input" 
+                                   v-on="actions" 
+                                   class="mt-10"
             >
                 
-            </PAutocompleteSearch>
+            </p-autocomplete-search>
             <div class="mt-8 bg-blue-100 flex w-full">
-                <div>
+                <div class="w-1/2 p-4">
                     <p>Data</p>
-                    <pre>{{data}}</pre>
+                    <p-raw-data :item="data"
+                                class="w-full"
+                    />
                 </div>
-                <div class="ml-8">
+                <div class="ml-8 w-1/2 p-4">
                     <p>Menu</p>
-                    <pre>{{menu}}</pre>
+                    <p-raw-data :item="menu"
+                                class="w-full"
+                    />
                 </div>
             </div>
         </div>`,
     setup(props, context) {
+        const data = arrayOf(10, () => ({ name: casual.name, phone: casual.phone }));
+
         const state = reactive({
             value: '',
-            menu: [],
+            menu: plainAutocompleteHandler('', data, 'name'),
         });
-
-        const data = arrayOf(10, () => ({ name: casual.name, phone: casual.phone }));
 
         return {
             ...toRefs(state),
             data,
+            actions,
             search: action('search'),
             input(val) {
                 action('input')(val);
@@ -131,41 +113,102 @@ export const autoCompleteSearch = () => ({
 });
 
 
-export const controlCase = () => ({
-    components: { PAutocompleteSearch },
-    props: getKnobProps(autocompleteSearchProps, {
-    }, {
-        menu: true,
-        value: true,
-        visibleMenu: true,
-        isFocused: true,
-        focused: true,
-    }),
+export const usingHandler = () => ({
+    components: { PAutocompleteSearch, PRawData },
+    props: {
+        placeholder: {
+            default: text('placeholder', 'Search'),
+        },
+        disableIcon: {
+            default: boolean('disableIcon', false),
+        },
+        loading: {
+            default: boolean('loading', false),
+        },
+    },
+    template: `
+        <div style="width: 80vw;">
+            <p-autocomplete-search v-bind="$props" 
+                                   :handler="handler" 
+                                   v-on="actions" 
+                                   class="mt-10"
+            >
+                
+            </p-autocomplete-search>
+            <div class="mt-8 bg-blue-100 flex w-full">
+                <div class="w-1/2 p-4">
+                    <p>Data</p>
+                    <p-raw-data :item="data"
+                                class="w-full"
+                    />
+                </div>
+<!--                <div class="ml-8 w-1/2 p-4">-->
+<!--                    <p>Menu</p>-->
+<!--                    <p-raw-data :item="menu"-->
+<!--                                class="w-full"-->
+<!--                    />-->
+<!--                </div>-->
+            </div>
+        </div>`,
+    setup(props, context) {
+        const data = arrayOf(10, () => ({ name: casual.name, phone: casual.phone }));
+
+        return {
+            data,
+            handler(val) {
+                const items = plainAutocompleteHandler(val, data, 'name');
+                return {
+                    results: items,
+                    totalCount: items.length,
+                };
+            },
+            actions,
+        };
+    },
+});
+
+export const controlMenuVisibilityAndFocus = () => ({
+    components: { PAutocompleteSearch, PRawData },
+    props: {
+        placeholder: {
+            default: text('placeholder', 'Search'),
+        },
+        disableIcon: {
+            default: boolean('disableIcon', false),
+        },
+        loading: {
+            default: boolean('loading', false),
+        },
+    },
     template: `
         <div style="width: 80vw;">
             <p class="my-8 font-bold capitalize">Control menu visibility and focus</p>
-            <PAutocompleteSearch v-model="value"
-                                 v-bind="$props"
-                                 :menu="menu"
-                                 :visibleMenu.sync="visibleMenu"
-                                 :isFocused.sync="isFocused"
-                                 @search="search"
-                                 @menu:select="search"
-                                 @input="input"
-                                 @mousedown.stop="mousedown"
-                                 @menu:hide="onMenuHide"
-                                 class="mt-10"
+            <p-autocomplete-search v-model="value" 
+                                   v-bind="$props" 
+                                   :menu="menu" 
+                                   :visibleMenu.sync="visibleMenu"
+                                   :isFocused.sync="isFocused"
+                                   @search="search" 
+                                   @input="input" 
+                                   @mousedown.stop="mousedown" 
+                                   @hide-menu="onMenuHide" 
+                                   v-on="actions" 
+                                   class="mt-10"
             >
     
-            </PAutocompleteSearch>
+            </p-autocomplete-search>
             <div class="mt-8 bg-blue-100 flex w-full">
-                <div>
+                <div class="w-1/2 p-4">
                     <p>Data</p>
-                    <pre>{{data}}</pre>
+                    <p-raw-data :item="data"
+                                class="w-full"
+                    />
                 </div>
-                <div class="ml-8">
+                <div class="ml-8 w-1/2 p-4">
                     <p>Menu</p>
-                    <pre>{{menu}}</pre>
+                    <p-raw-data :item="menu"
+                                class="w-full"
+                    />
                 </div>
             </div>
         </div>`,
@@ -190,21 +233,18 @@ export const controlCase = () => ({
                         state.isFocused = false;
                     }
                 }
-                action('search')(val);
             },
             input(val) {
-                action('input')(val);
                 state.visibleMenu = true;
                 state.menu = plainAutocompleteHandler(val, data, 'name');
             },
             mousedown(e) {
-                action('mousedown')(e);
                 state.visibleMenu = true;
             },
             onMenuHide(e) {
-                action('menu:hide')(e);
                 state.visibleMenu = false;
             },
+            actions,
         };
     },
 });

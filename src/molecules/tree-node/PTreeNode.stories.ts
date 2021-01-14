@@ -1,9 +1,15 @@
-import { reactive } from '@vue/composition-api';
-import { action } from '@storybook/addon-actions';
-import { text } from '@storybook/addon-knobs';
+import {
+    reactive, toRefs,
+} from '@vue/composition-api';
+import {
+    text, number, boolean,
+} from '@storybook/addon-knobs';
 import PI from '@/atoms/icons/PI.vue';
 import PTreeNode from '@/molecules/tree-node/PTreeNode.vue';
-import { getKnobProps } from '@/util/storybook-util';
+import { TreeNode } from '@/molecules/tree-node/type';
+import PTextEditor from '@/molecules/text-editor/text-editor/PTextEditor.vue';
+import { cloneDeep } from 'lodash';
+
 
 export default {
     title: 'Data Display/Tree',
@@ -17,31 +23,35 @@ export default {
     },
 };
 
-const childrenData = [
+const childrenData: TreeNode[] = [
     {
         data: 'a long text long text long text long text long text long text long text longlonglonglonglonglong longlonglonglonglonglonglong',
-        state: { expanded: true },
+        state: { expanded: true, selected: false, loading: false },
+        children: false,
     },
     {
         data: 'b',
-        state: { expanded: true },
+        state: { expanded: true, selected: false, loading: false },
         children: [
             {
                 data: 'hello',
+                state: { expanded: false, selected: false, loading: false },
                 children: [
                     {
                         data: 'world',
-                        state: { expanded: false },
+                        state: { expanded: false, selected: false, loading: false },
+                        children: false,
                     },
                 ],
             },
             {
                 data: 'hi',
-                state: { expanded: false },
+                state: { expanded: false, selected: false, loading: false },
                 children: [
                     {
                         data: 'mart',
-                        state: { expanded: false },
+                        state: { expanded: false, selected: false, loading: false },
+                        children: false,
                     },
                 ],
             },
@@ -49,27 +59,31 @@ const childrenData = [
     },
     {
         data: 'c',
-        state: { expanded: true },
+        state: { expanded: true, selected: false, loading: false },
         children: [
             {
                 data: 'd',
-                state: { expanded: true },
+                state: { expanded: true, selected: false, loading: false },
+                children: false,
             },
             {
                 data: 'e',
-                state: { expanded: false },
+                state: { expanded: false, selected: false, loading: false },
                 children: [
                     {
                         data: 'f',
-                        state: { expanded: false },
+                        state: { expanded: false, selected: false, loading: false },
+                        children: false,
                     },
                     {
                         data: 'g',
-                        state: { expanded: false },
+                        state: { expanded: false, selected: false, loading: false },
+                        children: false,
                     },
                     {
                         data: 'h',
-                        state: { expanded: false },
+                        state: { expanded: false, selected: false, loading: false },
+                        children: false,
                     },
                 ],
             },
@@ -78,150 +92,80 @@ const childrenData = [
 ];
 
 
-export const treeNode = ({ treeNodeProps }) => ({
-    components: { PTreeNode },
-    props: getKnobProps(treeNodeProps, {
-    }, {
-        children: true,
-        data: true,
-        state: true,
-    }),
+export const treeNode = () => ({
+    components: { PTreeNode, PTextEditor },
+    props: {
+        level: {
+            default: number('level', 0),
+        },
+        padSize: {
+            default: text('padSize', '1rem'),
+        },
+        toggleSize: {
+            default: text('toggleSize', '1rem'),
+        },
+        disableToggle: {
+            default: boolean('disableToggle', false),
+        },
+    },
     template: `
         <div class="tree-node-story" style="width: 80vw; padding: 4rem 0;">
-            <div>
-                <p>Node Click: selection</p>
-                <p>Toggle Click: expand</p>
-                <p>Data Click: deletion</p>
-            </div>
+            <p class="text-lg font-bold mb-2">Expand on toggle click</p>
             <div class="flex">
-                <div class="bg-coral-100 w-1/2">
-                    <PTreeNode v-bind="$props"
-                               :data.sync="state.data"
-                               :children.sync="state.children"
-                               :state.sync="state.state"
-                               @row:click="rowClick"
-                               @node:click="nodeClick"
-                               @toggle:click="toggleClick"
-                               @data:click="dataClick"
-                               @node:mouseenter="nodeMouseenter"
+                <div class="w-1/2 h-full p-4 bg-coral-100">
+                    <p-tree-node class="border border-gray-400"
+                                 v-bind="$props"
+                                 :data.sync="node.data"
+                                 :children.sync="node.children"
+                                 :state.sync="node.state"
+                                 @toggle:click="expandNode"
                     >
-                    </PTreeNode>
+                    </p-tree-node>
                 </div>
-                <div class="bg-yellow-200 p-4 w-1/2">
-                    <pre class="whitespace-pre-wrap">{{state}}</pre>
-                </div>
+                    <p-text-editor class="m-0 ml-2 w-1/2 h-full"
+                                   :code="JSON.stringify(node, undefined, 2)"
+                                   mode="readOnly"></p-text-editor>
             </div>
         </div>`,
-    setup(props, context) {
+    setup(props) {
         const state = reactive({
-            data: 'root',
-            children: childrenData,
-            state: { expanded: true },
+            node: {
+                data: 'node',
+                state: { expanded: false },
+                children: true,
+            },
         });
 
-        let selectedItem = {
-            state: {},
-        };
-
         return {
-            state,
-            rowClick: action('row:click'),
-            nodeClick({ node }, matched, e) {
-                e.stopPropagation();
-                if (selectedItem) {
-                    selectedItem.state = {
-                        ...selectedItem.state,
-                        selected: false,
-                    };
-                }
-                node.state = {
-                    ...node.state,
-                    selected: true,
-                };
-                selectedItem = node;
-                action('node:click')(node, matched, e);
-            },
-            toggleClick({ node }, matched, e) {
+            ...toRefs(state),
+            expandNode({ node }, matched, e) {
                 e.stopPropagation();
                 node.state = {
                     ...node.state,
                     expanded: !node.state.expanded,
                 };
-                action('toggle:click')(node, matched, e);
-            },
-            dataClick({ node, parent }, matched, e) {
-                e.stopPropagation();
-                if (Array.isArray(parent.children)) {
-                    parent.children.splice(node.key, 1);
-                }
-                action('data:click')(node, matched, e);
-            },
-            nodeMouseenter: action('node:mouseenter'),
-        };
-    },
-});
-
-
-export const apiCase = ({ treeNodeProps }) => ({
-    components: { PTreeNode },
-    props: getKnobProps(treeNodeProps, {
-    }, {
-        children: true,
-        data: true,
-        state: true,
-    }),
-    template: `
-        <div class="tree-node-story" style="display: flex; width: 80vw; padding: 4rem 0;">
-            <div class="bg-coral-100 w-1/2">
-                <PTreeNode v-bind="$props"
-                           :data.sync="state.data"
-                           :children.sync="state.children"
-                           :state.sync="state.state"
-                           @toggle:click="toggleClick"
-                >
-                </PTreeNode>
-            </div>
-            <div class="bg-yellow-200 p-4 w-1/2">
-                <pre class="whitespace-pre-wrap">{{state}}</pre>
-            </div>
-        </div>`,
-    setup(props, context) {
-        const state = reactive({
-            data: 'root',
-            children: true,
-            state: { expanded: false },
-        });
-
-        return {
-            state,
-            toggleClick(node, matched, e) {
-                e.stopPropagation();
-                if (!node.sync.state.expanded) {
-                    node.sync.children = [];
-                    setTimeout(() => {
-                        node.sync.children = [
-                            { data: `This is [${node.data}]'s child`, children: [] },
-                        ];
-                    }, 1000);
-                }
-                node.sync.state = {
-                    ...node.sync.state,
-                    expanded: !node.sync.state.expanded,
-                };
-                action('toggle:click')(node, matched, e);
             },
         };
     },
 });
+
 
 export const slotCase = ({ treeNodeProps }) => ({
     components: { PTreeNode, PI },
-    props: getKnobProps(treeNodeProps, {
-    }, {
-        children: true,
-        data: true,
-        state: true,
-    }, { data: text }),
+    props: {
+        level: {
+            default: number('level', 0),
+        },
+        padSize: {
+            default: text('padSize', '1rem'),
+        },
+        toggleSize: {
+            default: text('toggleSize', '1rem'),
+        },
+        disableToggle: {
+            default: boolean('disableToggle', false),
+        },
+    },
     template: `
         <div class="tree-node-story" style="width: 80vw; padding: 4rem 0;">
             <div>
@@ -234,27 +178,32 @@ export const slotCase = ({ treeNodeProps }) => ({
                     <li>data: <span class="color data"></span></li>
                     <li>right-extra: <span class="color right-extra"></span></li>
                 </ul>
-                <PTreeNode data="data"
-                           :classNames="() => ['basic', 'slot-case']"
-                           :children="[]"
+                <p-tree-node data="data" 
+                             :classNames="() => ({basic: true, 'slot-case': true})" 
+                             :state="{ expanded: false }"
+                             children
                 >
                     <template #left-extra><span>left</span></template>
                     <template #icon><span>icon</span></template>
                     <template #right-extra><span class="text-right">right</span></template>
-                </PTreeNode>
+                </p-tree-node>
             </div>
-            <div style="display: flex; margin-top: 2rem;">
-                <div class="bg-coral-100 w-1/2">
-                    <PTreeNode v-bind="$props"
-                               :data.sync="state.data"
-                               :children.sync="state.children"
-                               :state.sync="state.state"
-                               @toggle:click="toggleClick"
+            <div class="flex mt-8">
+                <div class="w-1/2 p-2">
+                    <p-tree-node v-for="(node, idx) in nodes" :key="idx"
+                                 v-bind="$props"
+                                 :class-names="() => ({basic: true, 'bg-coral-100 my-1 p-1': true})"
+                                 :data.sync="node.data" 
+                                 :children.sync="node.children" 
+                                 :state.sync="node.state" 
+                                 @toggle:click="toggleClick"
                     >
-                        <template #toggle>
-                            <p-i name="btn_ic_tree_hidden—folded"
-                                 :width="toggleSize" :height="toggleSize"
-                            />
+                        <template #toggle="{state}">
+                            <span class="pl-1">
+                                <p-i v-if="!state.expanded" name="btn_ic_tree_hidden—folded"
+                                    :width="toggleSize" :height="toggleSize"
+                                />
+                            </span>
                         </template>
                         <template #right-extra>
                             <div class="text-right"><p-i name="common-gear"></p-i></div>
@@ -267,87 +216,53 @@ export const slotCase = ({ treeNodeProps }) => ({
                                  class="mx-2"
                             ></p-i>
                         </template>
-                    </PTreeNode>
+                    </p-tree-node>
                 </div>
                 <div class="bg-yellow-200 p-4 w-1/2">
-                    <pre class="whitespace-pre-wrap">{{state}}</pre>
+                    <pre class="whitespace-pre-wrap">{{nodes}}</pre>
                 </div>
                 </div>
         </div>
         `,
     setup(props, context) {
         const state = reactive({
-            data: 'root',
-            children: childrenData,
-            state: { expanded: true },
+            nodes: cloneDeep(childrenData),
         });
 
         return {
-            state,
-            toggleClick(node, matched, e) {
+            ...toRefs(state),
+            toggleClick({ node }, matched, e) {
                 e.stopPropagation();
-                node.sync.state = {
-                    ...node.sync.state,
-                    expanded: !node.sync.state.expanded,
+                node.state = {
+                    ...node.state,
+                    expanded: !node.state.expanded,
                 };
-                action('toggle:click')(node, matched, e);
             },
         };
     },
 });
 
-export const levelSlotCase = ({ treeNodeProps }) => ({
-    components: { PTreeNode },
-    props: getKnobProps(treeNodeProps, {
-    }, {
-        children: true,
-        data: true,
-        state: true,
-    }, { data: text }),
-    template: `
-    <div class="tree-node-story" style="display: flex; width: 80vw; padding: 4rem 0;">
-        <div class="bg-coral-100 w-1/2">
-            <PTreeNode v-bind="$props"
-                       :data.sync="state.data"
-                       :children.sync="state.children"
-                       :state.sync="state.state"
-            >
-                <template #node-level-2>CUSTOM NODE</template>
-            </PTreeNode>
-        </div>
-        <div class="bg-yellow-200 p-4 w-1/2">
-            <pre class="whitespace-pre-wrap">{{state}}</pre>
-        </div>
-    </div>
-    `,
-    setup(props, context) {
-        const state = reactive({
-            data: 'root',
-            children: childrenData,
-            state: { expanded: true },
-        });
-
-        return {
-            state,
-        };
-    },
-});
 
 export const customEventListener = ({ treeNodeProps }) => ({
     components: { PTreeNode },
-    props: getKnobProps(treeNodeProps, {
-    }, {
-        children: true,
-        data: true,
-        state: true,
-    }, { data: text }),
+    props: {
+        padSize: {
+            default: text('padSize', '1rem'),
+        },
+        toggleSize: {
+            default: text('toggleSize', '1rem'),
+        },
+        disableToggle: {
+            default: boolean('disableToggle', false),
+        },
+    },
     template: `
     <div class="tree-node-story" style="display: flex; width: 80vw; padding: 4rem 0;">
         <div class="bg-coral-100 w-1/2">
-            <PTreeNode v-bind="$props"
-                       :data.sync="state.data"
-                       :children.sync="state.children"
-                       :state.sync="state.state"
+            <p-tree-node v-bind="$props"
+                       :data.sync="node.data"
+                       :children.sync="node.children"
+                       :state.sync="node.state"
                        @hello:click="onHelloClick"
             >
                 <template #node-level-2="{getListeners}">
@@ -355,23 +270,28 @@ export const customEventListener = ({ treeNodeProps }) => ({
                           v-on="getListeners('hello')"
                     >CLICK ME~!</span>
                 </template>
-            </PTreeNode>
+            </p-tree-node>
         </div>
         <div class="bg-yellow-200 p-4 w-1/2">
-            <pre class="whitespace-pre-wrap">{{state}}</pre>
+            <pre class="whitespace-pre-wrap">{{clickedItem}}</pre>
         </div>
     </div>
     `,
     setup(props, context) {
         const state = reactive({
-            data: 'root',
-            children: childrenData,
-            state: { expanded: true },
+            node: {
+                data: 'root',
+                children: cloneDeep(childrenData),
+                state: { expanded: true },
+            },
+            clickedItem: null,
         });
 
         return {
-            state,
-            onHelloClick: action('hello:click'),
+            ...toRefs(state),
+            onHelloClick({ node }) {
+                state.clickedItem = node;
+            },
         };
     },
 });

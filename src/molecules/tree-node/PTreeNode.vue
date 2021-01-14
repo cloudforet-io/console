@@ -15,19 +15,20 @@
                                         <slot name="left-extra" v-bind="slotBind" />
                                     </slot>
                                 </span>
-                                <span v-if="!disableToggle" class="toggle"
+                                <span v-if="!disableToggle || $scopedSlots[`toggle-${level}`] || $scopedSlots[`toggle`]"
+                                      class="toggle"
                                       :style="{width: toggleSize}"
                                       v-on="getListeners('toggle')"
                                 >
-                                    <slot v-if="$scopedSlots[`toggle-${level}`] || $scopedSlots[`toggle`]"
-                                          :name="`toggle-${level}`" v-bind="slotBind"
-                                    >
-                                        <slot name="toggle" v-bind="slotBind">
-                                            <p-i v-if="children"
-                                                 :name="state.expanded ? 'ic_tree_arrow--opened' : 'ic_tree_arrow'"
-                                                 :width="toggleSize" :height="toggleSize"
-                                                 color="inherit transparent"
-                                            />
+                                    <slot name="toggle" v-bind="slotBind">
+                                        <slot :name="`toggle-${level}`" v-bind="slotBind">
+                                            <slot name="toggle" v-bind="slotBind">
+                                                <p-i v-if="children"
+                                                     :name="state.expanded ? 'ic_tree_arrow--opened' : 'ic_tree_arrow'"
+                                                     :width="toggleSize" :height="toggleSize"
+                                                     color="inherit transparent"
+                                                />
+                                            </slot>
                                         </slot>
                                     </slot>
                                 </span>

@@ -1,6 +1,6 @@
 <template>
     <p-text-editor ref="editor" class="p-raw-data" :code="code"
-                   mode="readOnly" :loading="loading"
+                   mode="readOnly" :loading="loading" :folded="folded"
     />
 </template>
 
@@ -25,6 +25,10 @@ export default {
             default: undefined,
         },
         loading: {
+            type: Boolean,
+            default: false,
+        },
+        folded: {
             type: Boolean,
             default: false,
         },

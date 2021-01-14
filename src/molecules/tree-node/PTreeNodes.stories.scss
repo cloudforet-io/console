@@ -37,6 +37,7 @@ $right-extra: #0b5500;
         display: inline-block;
         width: 1rem;
         height: 1rem;
+
         @include color(row, $row);
         @include color(node, $node);
         @include color(left-extra, $left-extra);
@@ -46,4 +47,3 @@ $right-extra: #0b5500;
         @include color(right-extra, $right-extra);
     }
 }
-

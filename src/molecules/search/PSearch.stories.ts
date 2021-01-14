@@ -2,7 +2,7 @@ import {
     toRefs, reactive,
 } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import { getKnobProps } from '@/util/storybook-util';
+import { text, boolean } from '@storybook/addon-knobs';
 import PButton from '@/atoms/buttons/PButton.vue';
 import PSearch from '@/molecules/search/PSearch.vue';
 
@@ -21,24 +21,20 @@ export default {
 
 export const defaultCase = () => ({
     components: { PSearch },
-    props: getKnobProps({
+    props: {
         placeholder: {
-            type: String,
-            default: 'Search',
+            default: text('placeholder', 'Search'),
         },
         focused: {
-            type: Boolean,
-            default: false,
+            default: boolean('focused', false),
         },
         disabled: {
-            type: Boolean,
-            default: false,
+            default: boolean('disabled', false),
         },
         disableIcon: {
-            type: Boolean,
-            default: false,
+            default: boolean('disableIcon', false),
         },
-    }),
+    },
     template: `
         <div class="bg-white py-10" style="width: 80vw;">
             <PSearch v-bind="$props"
@@ -69,20 +65,17 @@ export const defaultCase = () => ({
 
 export const controlFocus = () => ({
     components: { PSearch, PButton },
-    props: getKnobProps({
+    props: {
         placeholder: {
-            type: String,
-            default: 'Search',
+            default: text('placeholder', 'Search'),
         },
         disabled: {
-            type: Boolean,
-            default: false,
+            default: boolean('disabled', false),
         },
         disableIcon: {
-            type: Boolean,
-            default: false,
+            default: boolean('disableIcon', false),
         },
-    }),
+    },
     template: `
         <div class="bg-white py-10" style="width: 80vw;">
             <PSearch v-bind="$props"

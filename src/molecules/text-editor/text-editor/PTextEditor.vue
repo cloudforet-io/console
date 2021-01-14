@@ -88,6 +88,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        folded: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -99,7 +103,7 @@ export default {
         });
 
         const forceFold = () => {
-            if (props.mode === 'readOnly' && state.cminstance && props.code) {
+            if (props.folded && state.cminstance && props.code) {
                 state.cminstance.operation(() => {
                     for (let l = state.cminstance.firstLine() + 1;
                         l <= state.cminstance.lastLine(); ++l) {
@@ -196,7 +200,6 @@ export default {
         font-family: Inconsolata, monospace;
         line-height: 1.5;
         height: fit-content;
-        margin: 1rem;
         padding: 1rem;
     }
     position: relative;

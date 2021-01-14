@@ -1,14 +1,14 @@
 import faker from 'faker';
 import { action } from '@storybook/addon-actions';
 import {
-    boolean, number, select, text,
+    boolean, number, select, text, array,
 } from '@storybook/addon-knobs';
-import { autoProps } from '@/util/storybook-util';
-import PContentModal from '@/organisms/modals/content-modal/PContentModal.vue';
 import PButton from '@/atoms/buttons/PButton.vue';
 import PButtonModal from '@/organisms/modals/button-modal/PButtonModal.vue';
 import { sizeMapping } from '@/molecules/modals/type';
-import { computed, ref } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs,
+} from '@vue/composition-api';
 
 export default {
     title: 'Feedbacks/Modals/Button Modal',
@@ -23,68 +23,42 @@ export default {
 };
 
 const actions = {
-    shown: action('shown'),
-    hidden: action('hidden'),
     cancel: action('cancel'),
     close: action('close'),
     confirm: action('confirm'),
 };
 
-const pbmProps = [
-    { name: 'headerTitle', default: 'This is title.' },
-    { name: 'headerCloseButtonVisible' },
-    { name: 'footerCancelButtonVisible' },
-    { name: 'footerConfirmButtonVisible' },
-    { name: 'hideOnCancel' },
-];
-const pcmProps = [
-    { name: 'headerVisible' },
-    { name: 'bodyVisible' },
-    { name: 'footerVisible' },
-];
 
 export const buttonModal = () => ({
     components: { PButtonModal, PButton },
     template: `<div>
-                <p-button styleType="primary" @click="click">Launch a modal</p-button>
-                <p-button-modal
-                    ref="modal"
-                    :scrollable="scrollable" 
-                    :centered="centered"
-                    :size="size"
-                    :fade="fade"
-                    :backdrop="backdrop"
-                    :headerTitle="headerTitle"
-                    :headerVisible="headerVisible"
-                    :bodyVisible="bodyVisible"
-                    :footerVisible="footerVisible"
-                    :headerCloseButtonVisible="headerCloseButtonVisible"
-                    :footerCancelButtonVisible="footerCancelButtonVisible"
-                    :footerConfirmButtonVisible="footerConfirmButtonVisible"
-                    :footerConfirmButtonBind="ConfirmButtonBind"
-                    :visible.sync="visible"
-                    @cancel="cancel"
-                    @close="close"
-                    @confirm="confirm"
-                    >
+                <p-button styleType="primary" @click="launchModal">Launch a modal</p-button>
+                <p-button-modal v-bind="$props"
+                                :visible.sync="visible"
+                                @close="closeModal"
+                                v-on="actions"
+                >
                     <template #body>
-                        <p>{{lorem}}</p> 
+                        <p>{{contents}}</p> 
                     </template>  
-                    
                 </p-button-modal>
             </div>`,
 
     props: {
-        loremLength: {
-            default: number('loremLength', 10, {
+        contentsHeight: {
+            default: number('contentsHeight', 10, {
                 range: true, min: 1, max: 80, step: 10,
             }),
         },
-        size: {
-            default: select('size', ['', ...Object.keys(sizeMapping)], 'sm'),
+
+        fade: {
+            default: boolean('fade', false),
         },
         scrollable: {
             default: boolean('scrollable', false),
+        },
+        size: {
+            default: select('size', ['', ...Object.keys(sizeMapping)], 'md'),
         },
         centered: {
             default: boolean('centered', false),
@@ -92,40 +66,69 @@ export const buttonModal = () => ({
         backdrop: {
             default: boolean('backdrop', true),
         },
-        fade: {
-            default: boolean('fade', true),
+        themeColor: {
+            default: text('themeColor', 'primary'),
         },
-        okDisabled: {
-            default: boolean('ok disabled', false),
+        headerClass: {
+            default: array('headerClass', []),
+        },
+        bodyClass: {
+            default: array('bodyClass', []),
+        },
+        footerClass: {
+            default: array('footerClass', []),
+        },
+        headerVisible: {
+            default: boolean('headerVisible', true),
+        },
+        bodyVisible: {
+            default: boolean('bodyVisible', true),
+        },
+        footerVisible: {
+            default: boolean('footerVisible', true),
         },
         headerTitle: {
-            default: text('header title', 'this is title'),
+            default: text('headerTitle', 'This is title'),
         },
-        // ...autoProps(PButtonModal, pbmProps),
-        // ...autoProps(PContentModal, pcmProps),
+        headerCloseButtonVisible: {
+            default: boolean('headerCloseButtonVisible', true),
+        },
+        footerCancelButtonVisible: {
+            default: boolean('footerCancelButtonVisible', true),
+        },
+        footerConfirmButtonVisible: {
+            default: boolean('footerConfirmButtonVisible', true),
+        },
+        hideOnCancel: {
+            default: boolean('hideOnCancel', true),
+        },
+        loading: {
+            default: boolean('loading', false),
+        },
+        disabled: {
+            default: boolean('disabled', false),
+        },
     },
 
     setup(props) {
-        const visible = ref(false);
-        const lorem = computed(() => faker.lorem.lines(props.loremLength));
-        const ConfirmButtonBind = computed(() => ({
-            styleType: 'primary',
-            disabled: props.okDisabled,
-        }));
-        const click = () => {
-            visible.value = true;
+        const state = reactive({
+            visible: props.visible,
+            contents: computed(() => faker.lorem.lines(props.contentsHeight)),
+        });
+
+        const launchModal = () => {
+            state.visible = true;
         };
-        const close = () => {
-            visible.value = false;
+        const closeModal = () => {
+            state.visible = false;
         };
 
+
         return {
-            ...actions,
-            visible,
-            lorem,
-            ConfirmButtonBind,
-            click,
-            close,
+            ...toRefs(state),
+            actions,
+            launchModal,
+            closeModal,
         };
     },
 });

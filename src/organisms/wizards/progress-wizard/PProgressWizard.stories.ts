@@ -1,15 +1,13 @@
-import { withKnobs } from '@storybook/addon-knobs';
 import { ref } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
+import { object, boolean } from '@storybook/addon-knobs';
 import { VTooltip } from 'v-tooltip';
-import { getKnobProps } from '@/util/storybook-util';
 import PProgressWizard from '@/organisms/wizards/progress-wizard/PProgressWizard.vue';
 
 
 export default {
     title: 'Navigation/ProgressWizard',
     component: { PProgressWizard },
-    decorators: [withKnobs],
     parameters: {
         info: {
             summary: `
@@ -34,67 +32,42 @@ const actions = () => ({
     onConfirm: action('confirm'),
 });
 
-const getProps = () => getKnobProps({
+const getProps = () => ({
     tabs: {
-        type: Array,
-        default: () => [],
-    },
-    /** sync */
-    activeIdx: {
-        type: Number,
-        default: 0,
+        default: object('tabs', [
+            {
+                name: 'conf',
+                label: 'Configure Collector',
+            },
+            {
+                name: 'credentials',
+                label: 'Choose Credentials',
+            },
+            {
+                name: 'tags',
+                label: 'Add Tags',
+                help: 'This is description of add tags step.',
+            },
+        ]),
     },
     invalidState: {
-        type: Object,
-        default: () => ({}),
+        default: object('invalidState', {}),
     },
     cancelBtnBind: {
-        type: Object,
-        default: () => ({}),
+        default: object('cancelBtnBind', {}),
     },
     navigationBtnBind: {
-        type: Object,
-        default: () => ({}),
+        default: object('navigationBtnBind', {}),
     },
     confirmBtnBind: {
-        type: Object,
-        default: () => ({}),
+        default: object('confirmBtnBind', {}),
     },
     loading: {
-        type: Boolean,
-        default: false,
+        default: boolean('loading', false),
     },
     disabled: {
-        type: Boolean,
-        default: false,
+        default: boolean('disabled', false),
     },
-    showValidation: {
-        type: Boolean,
-        default: true,
-    },
-    showConfirm: {
-        type: Boolean,
-        default: true,
-    },
-}, {
-    title: 'Wizard Title',
-    tabs: [
-        {
-            name: 'conf',
-            label: 'Configure Collector',
-        },
-        {
-            name: 'credentials',
-            label: 'Choose Credentials',
-        },
-        {
-            name: 'tags',
-            label: 'Add Tags',
-            help: 'This is description of add tags step.',
-        },
-    ],
-}, {
-    activeIdx: true,
 });
 
 
@@ -165,10 +138,10 @@ export const progressSlot = () => ({
                                 @confirm="onConfirm"
                 >
                     <template v-for="(tab) in tabs"
-                              :slot="'progress-' + tab.key"
+                              :slot="'progress-' + tab.name"
                     >
-                        <div style="color: hotpink; padding: 2rem;" :key="'progress-'+tab.key">
-                                This is progress slot for '{{ tab.key }}' tab.
+                        <div style="color: hotpink; padding: 2rem;" :key="'progress-'+tab.name">
+                                This is progress slot for '{{ tab.name }}' tab.
                         </div>
                     </template>
                 </p-progress-wizard>`,
@@ -191,7 +164,7 @@ export const helpSlot = () => ({
                                 @confirm="onConfirm"
                 >
                     <template v-for="(tab) in tabs"
-                              :slot="'help-' + tab.key"
+                              :slot="'help-' + tab.name"
                     >
                           <button v-tooltip="{
                               content: 'You can use tooltip options for customizing this help message.',
@@ -208,68 +181,6 @@ export const helpSlot = () => ({
     },
 });
 
-export const bodySlot = () => ({
-    components: { PProgressWizard },
-    props: { ...getProps() },
-    template: `<p-progress-wizard :tabs.sync="tabs"
-                                :active-idx.sync="activeIdx"
-                                style="width: 100vw;"
-                                @cancel="onCancel"
-                                @confirm="onConfirm"
-                >
-                    <template v-for="(tab) in tabs"
-                              :slot="'body-' + tab.key"
-                    >
-                    <div style="background-color: lightpink; padding: 2rem;" :key="tab.key">
-                        <h2 style="text-align: center;">
-                            This is body slot for '{{ tab.key }}' tab.
-                        </h2>
-                        <br>
-                        <h4 v-for="(item, idx) in JSON.stringify(tab).split(',')"
-                            :key="idx"
-                        >
-                            {{item}}<br>
-                        </h4>
-                        <br>
-                        <p>* There's no min height.</p>
-                        </div>
-                    </template>
-                </p-progress-wizard>`,
-    setup(...args) {
-        return {
-            activeIdx: ref(0),
-            ...actions(),
-        };
-    },
-});
-
-
-export const stepSlot = () => ({
-    components: { PProgressWizard },
-    props: { ...getProps() },
-    template: `<p-progress-wizard :tabs.sync="tabs"
-                                :active-idx.sync="activeIdx"
-                                style="width: 100vw;"
-                                @cancel="onCancel"
-                                @confirm="onConfirm"
-                >
-                    <template v-for="(tab) in tabs"
-                              :slot="'step-' + tab.key"
-                    >
-                        <div style="background-color: goldenrod; padding: 2rem;" :key="'step-'+tab.key">
-                            <h2 style="text-align: center;">
-                                This is step slot for '{{ tab.key }}' tab.
-                            </h2>
-                        </div>
-                    </template>
-                </p-progress-wizard>`,
-    setup(...args) {
-        return {
-            activeIdx: ref(0),
-            ...actions(),
-        };
-    },
-});
 
 export const stepAppendSlot = () => ({
     components: { PProgressWizard },

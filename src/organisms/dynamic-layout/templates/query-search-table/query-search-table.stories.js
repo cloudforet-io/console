@@ -2,7 +2,6 @@ import {
     toRefs, reactive, ref, computed,
 } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
-import { getKnobProps } from '@sb/storybook-util';
 import {
     text, number, select, object, boolean,
 } from '@storybook/addon-knobs';

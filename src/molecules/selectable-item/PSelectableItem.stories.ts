@@ -1,45 +1,9 @@
 import {
-    toRefs, reactive,
-} from '@vue/composition-api';
-import {
-    select, color,
+    select, color, text, boolean,
 } from '@storybook/addon-knobs';
-import { getKnobProps } from '@/util/storybook-util';
 import PSelectableItem from '@/molecules/selectable-item/PSelectableItem.vue';
+import { themes } from '@/molecules/selectable-item/config';
 
-const selectableItemProps = {
-    iconUrl: {
-        type: String,
-        default: '',
-    },
-    title: {
-        type: String,
-        default: '',
-    },
-    active: {
-        type: Boolean,
-        default: false,
-    },
-    disabled: {
-        type: Boolean,
-        default: false,
-    },
-    defaultIcon: {
-        type: String,
-        default: '',
-    },
-    color: {
-        type: String,
-        default: '',
-    },
-    theme: {
-        type: String,
-        default: 'default',
-        validator(theme) {
-            return ['default', 'card'].includes(theme);
-        },
-    },
-};
 export default {
     title: 'Others/Select/SelectableItem',
     component: PSelectableItem,
@@ -48,86 +12,96 @@ export default {
             summary: '',
             components: { PSelectableItem },
         },
-        knobs: { escapeHTML: false },
     },
 };
 
-
-const getState = (props, context) => {
-    const state = reactive({});
-
-    return state;
-};
+const imgUrl = 'https://lh3.googleusercontent.com/proxy/1mxA2dMQk7sYbPjbfVcX8PQ_14UFPDkzixnN52vQMT1zSmxyrzNUNedzEqiIStNU9y8Oev1UQPiq6JjkWlKlSy7GU10jM9ekYfFyETDbHZTJDDhjK84xGPorLN_2E3hdO3Ac';
 
 
 export const defaultCase = () => ({
     components: { PSelectableItem },
-    props: getKnobProps(selectableItemProps, {
-        iconUrl: 'https://assets-console-cloudone-dev.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
-        title: 'EC2 Collector',
-    }, {}, {
-        theme: select,
-    }, {
-        theme: ['default', 'card'],
-    }),
+    props: {
+        iconUrl: {
+            default: text('iconUrl', imgUrl),
+        },
+        title: {
+            default: text('title', 'EC2 Collector'),
+        },
+        active: {
+            default: boolean('active', false),
+        },
+        disabled: {
+            default: boolean('disabled', false),
+        },
+        defaultIcon: {
+            default: text('defaultIcon', ''),
+        },
+        color: {
+            default: color('color', ''),
+        },
+        theme: {
+            default: select('theme', themes, themes[0]),
+        },
+        iconSize: {
+            default: text('iconSize', '2rem'),
+        },
+    },
     template: `
         <div style="width: 80vw;">
-            <PSelectableItem v-bind="$props"></PSelectableItem>
+            <p-selectable-item v-bind="$props"></p-selectable-item>
         </div>`,
     setup(props, context) {
-        const state = getState(props, context);
-
         return {
-            ...toRefs(state),
         };
     },
 });
 
-export const extraSlot = () => ({
+export const usingSlots = () => ({
     components: { PSelectableItem },
-    props: getKnobProps(selectableItemProps, {
-        title: 'EC2 Collector',
-    }),
+    props: {
+        active: {
+            default: boolean('active', false),
+        },
+        disabled: {
+            default: boolean('disabled', false),
+        },
+        defaultIcon: {
+            default: text('defaultIcon', ''),
+        },
+        theme: {
+            default: select('theme', themes, themes[0]),
+        },
+    },
     template: `
         <div style="width: 80vw; border: 1px solid gray;">
-            <PSelectableItem v-bind="$props">
-                <template #extra>
-                    This is Extra!!
+            <p-selectable-item v-bind="$props">
+                <template #side>
+                    <span class="bg-primary-2">This is <strong>side</strong> slot.</span>
                 </template>
-            </PSelectableItem>
+                <template #contents>
+                    <span class="bg-green-300">This is <strong>contents</strong> slot.</span>
+                </template>
+                <template #extra>
+                    <span class="bg-blue-400">This is <strong>extra</strong> slot.</span>
+                </template>
+            </p-selectable-item>
+
+            <p-selectable-item class="mt-4" v-bind="$props">
+                <template #side>
+                    <span class="bg-primary-2">This is <strong>side</strong> slot.</span>
+                </template>
+                <template #title>
+                    <span class="bg-coral-400">This is <strong>title</strong> slot.</span>
+                </template>
+                <template #extra>
+                    <span class="bg-blue-400">This is <strong>extra</strong> slot.</span>
+                </template>
+            </p-selectable-item>
+        
+        
         </div>`,
     setup(props, context) {
-        const state = getState(props, context);
-
         return {
-            ...toRefs(state),
-        };
-    },
-});
-
-
-export const cardTheme = () => ({
-    components: { PSelectableItem },
-    props: getKnobProps(selectableItemProps, {
-        iconUrl: 'https://assets-console-cloudone-dev.s3.ap-northeast-2.amazonaws.com/console-assets/icons/aws-ec2.svg',
-        title: 'EC2 Collector',
-        color: '#222222',
-        theme: 'card',
-    }, {}, {
-        theme: select,
-        color,
-    }, {
-        theme: ['default', 'card'],
-    }),
-    template: `
-    <div style="width: 80vw;">
-        <PSelectableItem v-bind="$props"></PSelectableItem>
-    </div>`,
-    setup(props, context) {
-        const state = getState(props, context);
-
-        return {
-            ...toRefs(state),
         };
     },
 });

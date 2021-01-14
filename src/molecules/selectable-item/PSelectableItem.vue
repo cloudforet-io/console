@@ -5,9 +5,7 @@
         disabled: disabled
     }" v-on="itemListeners"
     >
-        <slot name="bar" v-bind="$props">
-            <div v-if="color" class="bar" :style="{color}" />
-        </slot>
+        <div v-if="color" class="bar" :style="{color}" />
         <div class="contents">
             <slot name="side" v-bind="$props">
                 <p-lazy-img :src="iconUrl"
@@ -35,9 +33,10 @@
 import { SelectableItemPropsType } from '@/molecules/selectable-item/type';
 import PLazyImg from '@/organisms/lazy-img/PLazyImg.vue';
 import {
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { makeByPassListeners } from '@/util/composition-helpers';
+import { themes } from '@/molecules/selectable-item/config';
 
 export default {
     name: 'PSelectableItem',
@@ -73,7 +72,7 @@ export default {
             type: String,
             default: 'default',
             validator(theme) {
-                return ['default', 'card'].includes(theme);
+                return themes.includes(theme);
             },
         },
         iconSize: {

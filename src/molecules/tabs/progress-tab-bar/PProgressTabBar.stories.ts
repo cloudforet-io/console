@@ -1,13 +1,12 @@
-import { withKnobs } from '@storybook/addon-knobs';
-import { toRefs, reactive } from '@vue/composition-api';
-import { getKnobProps } from '@/util/storybook-util';
+import { toRefs, reactive, watch } from '@vue/composition-api';
+import { object } from '@storybook/addon-knobs';
 import PProgressTabBar from '@/molecules/tabs/progress-tab-bar/PProgressTabBar.vue';
-// import md from '@/molecules/tabs/progress-tab-bar/PProgresTabBar.md';
+import PTextEditor from '@/molecules/text-editor/text-editor/PTextEditor.vue';
+// import md from '@/molecules/tabs/progress-tab-bar/PProgressTabBar.md';
 
 export default {
     title: 'Others/Tab, Progress Tab/ProgressTabBar',
     component: PProgressTabBar,
-    decorators: [withKnobs],
     parameters: {
         info: {
             summary: '',
@@ -16,9 +15,33 @@ export default {
     },
 };
 
-const getData = () => {
-    const state = reactive({
-        tabs: [
+
+export const defaultCase = () => ({
+    components: { PProgressTabBar, PTextEditor },
+    props: {
+        invalidState: {
+            default: object('invalidState', {
+                conf: true,
+                credentials: true,
+                tags: false,
+            }),
+        },
+    },
+    template: `
+    <div style="width: 100vw;">
+        <p-progress-tab-bar v-bind="$props"
+            :tabs="tabs" 
+            :active-idx.sync="activeIdx"
+            
+         />
+         <br><br><br>
+        <p-text-editor :code.sync="code"
+                       class="w-full px-4"
+        />
+     </div>
+    `,
+    setup() {
+        const tabs = [
             {
                 name: 'conf',
                 label: 'Configure Collector (conf)',
@@ -32,62 +55,23 @@ const getData = () => {
                 label: 'Add Tags (tags)',
                 help: 'This is description of add tags step.',
             },
-        ],
-        activeIdx: 0,
-    });
+        ];
+        const state = reactive({
+            tabs,
+            activeIdx: 0,
+            code: JSON.stringify(tabs, undefined, 2),
+        });
 
-    return {
-        ...toRefs(state),
-    };
-};
+        watch(() => state.code, (code) => {
+            try {
+                state.tabs = JSON.parse(code);
+            } catch (e) {
 
-export const defaultCase = () => ({
-    components: { PProgressTabBar },
-    props: getKnobProps(
-        {
-            tabs: {
-                type: Array,
-                default: () => [],
-            },
-            /** sync */
-            activeIdx: {
-                type: Number,
-                default: 0,
-            },
-            invalidState: {
-                type: Object,
-                default: () => ({}),
-            },
-        }, {
-            invalidState: {
-                conf: true,
-                credentials: true,
-                tags: false,
-            },
-            progressState: {
-                conf: true,
-                credentials: true,
-                tags: false,
-            },
-        }, {
-            tabs: true,
-            activeIdx: true,
-        },
-    ),
-    template: `
-    <div style="width: 100vw;">
-        <p-progress-tab-bar v-bind="$props"
-            :tabs="tabs" 
-            :active-idx.sync="activeIdx"
-            
-         />
-         <br><br><br>
-        <pre>{{JSON.stringify(tabs, undefined, 2)}}</pre>
-     </div>
-    `,
-    setup(...args) {
+            }
+        });
+
         return {
-            ...getData(),
+            ...toRefs(state),
         };
     },
 });

@@ -3,7 +3,9 @@
         <p-panel-top v-if="layoutName">
             {{ layoutName }}
         </p-panel-top>
-        <p-raw-data :item="rootData" :loading="loading" />
+        <p-raw-data class="m-4" :item="rootData" :loading="loading"
+                    folded
+        />
     </div>
 </template>
 

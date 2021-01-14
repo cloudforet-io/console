@@ -1,7 +1,7 @@
 import {
     toRefs, reactive,
 } from '@vue/composition-api';
-import { getKnobProps } from '@/util/storybook-util';
+import { text, boolean, object } from '@storybook/addon-knobs';
 import PDefinition from '@/organisms/definition/PDefinition.vue';
 
 export default {
@@ -19,33 +19,22 @@ export default {
 
 export const defaultCase = () => ({
     components: { PDefinition },
-    props: getKnobProps({
+    props: {
         name: {
-            type: String,
-            required: true,
+            default: text('name', 'name'),
         },
         label: {
-            type: String,
-            default: '',
+            default: text('label', ''),
         },
         data: {
-            type: [String, Object, Array, Boolean, Number],
-            default: undefined,
+            default: text('data', 'data'),
         },
-        options: {
-            type: Object,
-            // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            default: () => ({}),
+        disableCopy: {
+            default: boolean('disableCopy', false),
         },
-        type: {
-            type: String,
-            default: 'text',
-        },
-    }, {
-        name: 'name',
-        data: 'data',
-    }),
+    },
     template: `
+    <div style="width: 80vw;">
         <div class="my-8">
             <p>Slots</p>
             default : Slot for replacing definition text. <br>
@@ -55,18 +44,17 @@ export const defaultCase = () => ({
             <p>SlotScope(Props)</p>
             all Props(name, label, data, disableCopy, formatter)<br>
             field: 'td' element that wrapping definition text.<br>
-            displayData: actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'.<br> 
-            showCopy: boolean value that indicates whether show copy or not. it's related the value of 'displayData', 'disableCopy', and field element's innerText.<br>  
+            displayData: actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'.<br>
+            showCopy: boolean value that indicates whether show copy or not. it's related the value of 'displayData', 'disableCopy', and field element's innerText.<br>
             copy: function that invoked when copy button is clicked.<br>
             isMouseOver: boolean value that indicates whether copy button is mouse over or out.<br>
             onMouseOver: function that invoked when copy button is mouse over.<br>
             onMouseOut: function that invoked when copy button is mouse out.<br>
-            
-            
         </div>
-        <div style="width: 80vw;">
-            <PDefinition v-bind="$props"></PDefinition>
-        </div>`,
+        <div class="bg-primary3">
+            <p-definition v-bind="$props"></p-definition>
+        </div>
+    </div>`,
     setup(props, context) {
         const state = reactive({});
 

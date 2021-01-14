@@ -79,6 +79,10 @@ export default {
         PI, PContentModal, PButton, PLoadingButton,
     },
     props: {
+        visible: { // sync
+            type: Boolean,
+            default: false,
+        },
         fade: {
             type: Boolean,
             default: false,
@@ -99,10 +103,6 @@ export default {
         backdrop: {
             type: Boolean,
             default: true,
-        },
-        visible: { // sync
-            type: Boolean,
-            default: false,
         },
         themeColor: {
             type: String,
@@ -148,6 +148,18 @@ export default {
             type: Boolean,
             default: true,
         },
+        hideOnCancel: {
+            type: Boolean,
+            default: true,
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
         footerCancelButtonBind: {
             type: Object,
             default: () => ({
@@ -160,18 +172,6 @@ export default {
             default: () => ({
                 styleType: 'primary-dark',
             }),
-        },
-        hideOnCancel: {
-            type: Boolean,
-            default: true,
-        },
-        loading: {
-            type: Boolean,
-            default: false,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
         },
     },
     setup(props: ButtonModalProps, context) {

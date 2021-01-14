@@ -49,6 +49,7 @@ import PSelectableItem from '@/molecules/selectable-item/PSelectableItem.vue';
 import PLottie from '@/molecules/lottie/PLottie.vue';
 import { makeOptionalProxy, makeProxy } from '@/util/composition-helpers';
 import PEmpty from '@/atoms/empty/PEmpty.vue';
+import { themes } from '@/molecules/selectable-item/config';
 
 
 export default {
@@ -97,13 +98,13 @@ export default {
             type: String,
             default: 'default',
             validator(theme) {
-                return ['default', 'card'].includes(theme);
+                return themes.includes(theme);
             },
         },
         iconSize: {
             type: String,
-            default: undefined
-        }
+            default: undefined,
+        },
     },
     setup(props: SelectableListProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
