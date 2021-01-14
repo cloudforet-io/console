@@ -5,12 +5,13 @@
                 <img class="logo-character" src="@/assets/images/brand/brand_logo.png">
                 <img class="logo-text" src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg">
             </div>
+            <div class="lottie-wrapper">
             <p-lottie name="lottie_planet_signin"
                       auto
-                      :width="'80%'"
-                      :height="'80%'"
-                      :margin="'auto'"
+                      width="100%"
+                      height="80%"
             />
+            </div>
             <div class="version">
                 <p-badge style-type="primary" outline shape="square">
                     {{ $t('COMMON.SIGN_IN.VERSION') }}  {{ version }}
@@ -210,6 +211,13 @@ export default {
     @media screen and (768px <= width) {
         display: flex;
     }
+}
+
+.lottie-wrapper {
+    @apply flex justify-center items-center;
+    width: 80%;
+    max-width: 42.625rem;
+    margin: auto;
 }
 
 .right-container {
