@@ -505,15 +505,9 @@ export default {
 .tab-content::v-deep {
     border: none;
     &.summary {
-        .p-tab-bar {
-            border-bottom-width: 0;
-            .p-nav-link {
-                margin-bottom: 0;
-            }
-        }
         .tab-pane {
             @apply border border-gray-200;
-            padding: 1.5rem 1rem;
+            padding: 2rem 1rem;
         }
     }
 }

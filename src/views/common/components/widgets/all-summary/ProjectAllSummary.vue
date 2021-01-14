@@ -10,14 +10,14 @@
                  @click="onClickBox(idx)"
             >
                 <span>{{ data.label }}</span>
-                <span class="count"> ({{ count[data.type] }})</span>
+                <span class="count"> {{ count[data.type] }}</span>
             </div>
         </div>
         <div class="bottom-part">
             <div class="content-wrapper grid grid-cols-12 gap-2">
                 <div class="col-span-12 lg:col-span-9 grid grid-cols-12">
                     <div class="chart-wrapper col-span-12 lg:col-span-9">
-                        <div class="title">
+                        <div class="sub-title">
                             <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
                             <span v-if="selectedType === 'storage'" class="suffix">({{ storageTrendSuffix }})</span>
                         </div>
@@ -38,7 +38,7 @@
                         </p-chart-loader>
                     </div>
                     <div class="summary-wrapper col-span-12 lg:col-span-3">
-                        <div class="title col-span-3">
+                        <div class="sub-title col-span-3">
                             {{ $t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: dataList[selectedIndex].label }) }}
                         </div>
                         <template v-if="!loading && summaryData.length > 0">
@@ -81,7 +81,7 @@
                     </div>
                 </div>
                 <div class="col-span-12 lg:col-span-3 region-service-wrapper">
-                    <div class="title">
+                    <div class="sub-title">
                         <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.REGION_SERVICE_TITLE') }}</span>
                     </div>
                     <project-region-service :project-id="projectId" :label="selectedLabel" :count="count[selectedType]" />
@@ -137,7 +137,7 @@ enum DATA_TYPE {
     storage = 'storage',
     security = 'security',
     analytics = 'analytics',
-    cloudService = 'cloudService',
+    all = 'all',
 }
 enum CLOUD_SERVICE_LABEL {
     compute = 'Compute',
@@ -147,6 +147,7 @@ enum CLOUD_SERVICE_LABEL {
     storage = 'Storage',
     security = 'Security',
     analytics = 'Analytics',
+    all = 'All',
 }
 
 /* type */
@@ -217,7 +218,7 @@ export default {
             selectedIndex: 0,
             selectedType: computed(() => state.dataList[state.selectedIndex].type),
             selectedLabel: computed(() => CLOUD_SERVICE_LABEL[state.selectedType]),
-            selectedDateType: DATE_TYPE.daily, // 'daily' as keyof typeof DATE_TYPE,
+            selectedDateType: DATE_TYPE.daily,
             dateTypes: computed(() => ([
                 { name: DATE_TYPE.daily, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DAY') },
                 { name: DATE_TYPE.monthly, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.MONTH') },
@@ -231,7 +232,7 @@ export default {
                 storage: 0,
                 security: 0,
                 analytics: 0,
-                cloudService: 0,
+                all: 0,
             },
             storageTrendSuffix: 'TB' as Unit,
             dataList: computed(() => ([
@@ -242,7 +243,7 @@ export default {
                 { type: DATA_TYPE.storage, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE') },
                 { type: DATA_TYPE.security, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.SECURITY') },
                 { type: DATA_TYPE.analytics, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.ANALYTICS') },
-                { type: DATA_TYPE.cloudService, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.CLOUD_SERVICE') },
+                { type: DATA_TYPE.all, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.CLOUD_SERVICE') },
             ] as Data[])),
             summaryData: [] as SummaryData[],
         });
@@ -290,7 +291,7 @@ export default {
             valueAxis.renderer.minGridDistance = 30;
             valueAxis.renderer.grid.template.strokeOpacity = 1;
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
-            valueAxis.renderer.labels.template.fill = am4core.color(peacock[600]);
+            valueAxis.renderer.labels.template.fill = am4core.color(peacock[500]);
             valueAxis.fontSize = 11;
             valueAxis.extraMax = 0.1;
             valueAxis.min = 0;
@@ -348,15 +349,20 @@ export default {
         };
 
         /* api */
-        const getCount = async (type) => {
+        const getCount = async () => {
             try {
-                const param: any = { project_id: props.projectId };
-                if (type !== DATA_TYPE.cloudService) param.label = CLOUD_SERVICE_LABEL[type];
-
-                const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary(param);
-                let count = res.results[0]?.total || 0;
-                if (type === DATA_TYPE.storage) count = byteFormatter(count);
-                state.count[type] = count;
+                const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
+                    project_id: props.projectId,
+                });
+                let count = 0 as number | string;
+                res.results.forEach((d) => {
+                    if (d.label === CLOUD_SERVICE_LABEL.storage) {
+                        count = byteFormatter(count);
+                    } else {
+                        count = numberFormatter(d.total);
+                    }
+                    state.count[Object.keys(CLOUD_SERVICE_LABEL)[Object.values(CLOUD_SERVICE_LABEL).indexOf(d.label)]] = count;
+                });
             } catch (e) {
                 console.error(e);
             }
@@ -368,11 +374,12 @@ export default {
             const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
 
             try {
-                const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
-                    label: CLOUD_SERVICE_LABEL[type],
+                const param: any = {
                     granularity: state.selectedDateType,
                     project_id: props.projectId,
-                });
+                };
+                if (type !== DATA_TYPE.all) param.label = CLOUD_SERVICE_LABEL[type];
+                const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary(param);
                 const data = res.results;
 
                 if (type === DATA_TYPE.storage) {
@@ -425,7 +432,7 @@ export default {
                     },
                 },
             };
-            if (type !== DATA_TYPE.cloudService) defaultParam.labels = [CLOUD_SERVICE_LABEL[type]];
+            if (type !== DATA_TYPE.all) defaultParam.labels = [CLOUD_SERVICE_LABEL[type]];
             defaultParam.query.filter = {
                 key: 'project_id',
                 operator: 'eq',
@@ -530,7 +537,7 @@ export default {
             state.loading = false;
             setBoxInterval();
 
-            await Promise.all([Object.keys(DATA_TYPE).map(type => getCount(type))]);
+            await getCount();
         };
         const chartInit = async () => {
             await getTrend(DATA_TYPE.compute);
@@ -577,7 +584,18 @@ export default {
 .title {
     font-size: 1.5rem;
     line-height: 1.6;
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.5rem;
+}
+.sub-title {
+    font-size: 0.875rem;
+    line-height: 1.5;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    .suffix {
+        font-size: 0.75rem;
+        font-weight: normal;
+        padding-left: 0.5rem;
+    }
 }
 .top-part {
     .box {
@@ -586,14 +604,15 @@ export default {
         display: inline-block;
         width: auto;
         text-align: center;
-        font-size: 0.875rem;
+        font-size: 1rem;
         cursor: pointer;
-        border-radius: 0.125rem;
-        padding: 0.375rem 1rem;
+        border-radius: 0.375rem;
+        padding: 0.625rem 1rem;
         margin-right: 0.25rem;
         margin-bottom: 0.25rem;
         .count {
-            @apply text-gray-500;
+            @apply text-peacock-600;
+            font-weight: bold;
         }
 
         &:hover {
@@ -630,28 +649,14 @@ export default {
     .content-wrapper {
         @apply bg-white border border-gray-200;
         position: relative;
-        height: 27.5rem;
+        height: auto;
         border-radius: 0.125rem;
         padding: 1rem;
-
-        @screen md {
-            //height: 25rem;
-        }
 
         @screen lg {
             height: 17.5rem;
         }
 
-        .title {
-            font-size: 1rem;
-            font-weight: bold;
-            margin-bottom: 1rem;
-            .suffix {
-                font-size: 0.75rem;
-                font-weight: normal;
-                padding-left: 0.5rem;
-            }
-        }
         .chart-wrapper {
             position: relative;
             .toggle-button-group {
@@ -677,9 +682,9 @@ export default {
             }
         }
         .summary-wrapper {
-            .title {
+            .sub-title {
                 padding: 0 0.5rem;
-                margin-bottom: 1.25rem;
+                margin-bottom: 0.875rem;
             }
 
             .summary-content-wrapper {
@@ -688,7 +693,7 @@ export default {
                 overflow-x: hidden;
 
                 @screen lg {
-                    height: 12rem;
+                    height: 13rem;
                 }
 
                 &.no-data-wrapper {
@@ -704,14 +709,6 @@ export default {
                         text-align: center;
                         opacity: 0.7;
                         margin-bottom: 0.625rem;
-                    }
-
-                    .p-button {
-                        min-width: auto;
-                        height: 1.25rem;
-                        font-size: 0.75rem;
-                        line-height: 1.2;
-                        padding: 0.5rem;
                     }
                 }
             }

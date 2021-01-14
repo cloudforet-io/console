@@ -8,9 +8,9 @@
             >
                 <div class="content">
                     <div class="count">
-                        <router-link :to="data.type !== 'spendings' ? getLocation(data.type) : ''" class="anchor" :class="data.type">
+                        <router-link :to="data.type !== 'billing' ? getLocation(data.type) : ''" class="anchor" :class="data.type">
                             <span class="number">
-                                <span v-if="data.type === 'spendings'" class="dollar-sign">$</span>
+                                <span v-if="data.type === 'billing'" class="dollar-sign">$</span>
                                 <span>{{ count[data.type] }}</span>
                             </span>
                         </router-link>
@@ -28,7 +28,7 @@
                     <div class="title">
                         <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
                         <span v-if="selectedType === 'storage'" class="suffix">({{ storageTrendSuffix }})</span>
-                        <span v-if="selectedType === 'spendings'" class="suffix">(USD)</span>
+                        <span v-if="selectedType === 'billing'" class="suffix">(USD)</span>
                     </div>
                     <div class="toggle-button-group">
                         <p-button v-for="(d, idx) in dateTypes"
@@ -52,14 +52,14 @@
                     </div>
                     <template v-if="!loading && summaryData.length > 0">
                         <div class="summary-content-wrapper block md:grid md:grid-cols-3 lg:block">
-                            <router-link :to="selectedType !== 'spendings' ? getLocation(selectedType) : ''"
+                            <router-link :to="selectedType !== 'billing' ? getLocation(selectedType) : ''"
                                          class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
                                          :class="selectedType"
                             >
                                 <div class="text-group">
                                     <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
                                 </div>
-                                <span class="count">{{ count[selectedType] }}</span>
+                                <span class="count">{{ count[selectedType] }} {{ selectedType === 'storage' ? storageBoxSuffix : '' }}</span>
                             </router-link>
                             <router-link v-for="(data, idx) of summaryData" :key="idx"
                                          :to="data.to"
@@ -118,7 +118,7 @@ import {
 import { SpaceConnector } from '@/lib/space-connector';
 import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
-import { gray, primary1 } from '@/styles/colors';
+import { gray, primary, primary1 } from '@/styles/colors';
 import { store } from '@/store';
 
 am4core.useTheme(am4themes_animated);
@@ -135,13 +135,13 @@ enum DATA_TYPE {
     compute = 'compute',
     database = 'database',
     storage = 'storage',
-    spendings = 'spendings',
+    billing = 'billing',
 }
 enum CLOUD_SERVICE_LABEL {
     compute = 'Compute',
     database = 'Database',
     storage = 'Storage',
-    spendings = 'Spendings'
+    billing = 'Billing'
 }
 
 /* type */
@@ -174,17 +174,7 @@ export default {
         PSkeleton,
         PChartLoader,
     },
-    props: {
-        chartColor: {
-            type: String,
-            default: primary1,
-        },
-        chartTextColor: {
-            type: String,
-            default: primary1,
-        },
-    },
-    setup(props) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
 
@@ -225,7 +215,7 @@ export default {
                 compute: 0,
                 database: 0,
                 storage: 0,
-                spendings: 0,
+                billing: 0,
             },
             storageBoxSuffix: 'TB' as Unit,
             storageTrendSuffix: 'TB' as Unit,
@@ -234,7 +224,7 @@ export default {
                 { type: DATA_TYPE.database, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE') },
                 { type: DATA_TYPE.storage, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE') },
                 {
-                    type: DATA_TYPE.spendings,
+                    type: DATA_TYPE.billing,
                     label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.OVERALL_SPENDINGS'),
                     summaryTitle: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.RESOURCE'),
                 },
@@ -288,7 +278,7 @@ export default {
             valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
             valueAxis.fontSize = 11;
             valueAxis.extraMax = 0.1;
-            if (state.selectedType === DATA_TYPE.spendings) {
+            if (state.selectedType === DATA_TYPE.billing) {
                 valueAxis.renderer.labels.template.adapter.add('text', (text, target) => numberFormatter(target.dataItem.value));
             } else {
                 valueAxis.min = 0;
@@ -297,20 +287,21 @@ export default {
             const series = chart.series.push(new am4charts.ColumnSeries());
             series.dataFields.valueY = 'count';
             series.dataFields.categoryX = 'date';
-            series.fill = am4core.color(props.chartColor);
+            series.fill = am4core.color(primary1);
             series.columns.template.width = am4core.percent(30);
             series.columns.template.column.cornerRadiusTopLeft = 3;
             series.columns.template.column.cornerRadiusTopRight = 3;
             series.strokeWidth = 0;
+            series.columns.template.propertyFields.fillOpacity = 'fillOpacity';
 
             const bullet = series.bullets.push(new am4charts.LabelBullet());
             bullet.label.text = '{count}';
             bullet.label.fontSize = 14;
             bullet.label.truncate = false;
             bullet.label.hideOversized = false;
-            bullet.label.fill = am4core.color(props.chartTextColor);
+            bullet.label.propertyFields.fill = 'bulletColor';
             bullet.label.dy = -10;
-            if (state.selectedType === DATA_TYPE.spendings) {
+            if (state.selectedType === DATA_TYPE.billing) {
                 bullet.label.adapter.add('text', (text, target) => numberFormatter(target.dataItem.valueY) || undefined);
                 bullet.label.adapter.add('dy', (dy, target) => {
                     if (target.dataItem.valueY < 0) return 10;
@@ -351,57 +342,115 @@ export default {
             };
             return location;
         };
-
-        /* api */
-        const getCount = async (type) => {
-            let count = 0 as number | string;
-            if (type === DATA_TYPE.spendings) {
-                try {
-                    const res = await SpaceConnector.client.statistics.topic.billingSummary({
-                        granularity: DATE_TYPE.monthly,
-                        start: dayjs().utc().startOf('month').format('YYYY-MM-DD'),
-                        end: dayjs().utc().endOf('month').format('YYYY-MM-DD'),
-                    });
-                    if (res.results.length > 0) count = res.results[0].billing_data[0].cost;
-                } catch (e) {
-                    console.error(e);
-                }
-            } else {
-                try {
-                    const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
-                        label: CLOUD_SERVICE_LABEL[type],
-                    });
-                    if (res.results.length > 0) count = res.results[0]?.total || 0;
-                } catch (e) {
-                    console.error(e);
-                }
-            }
-            if (type === DATA_TYPE.storage) {
-                state.storageBoxSuffix = byteFormatter(count).split(' ')[1];
-                count = parseFloat(byteFormatter(count).split(' ')[0]);
-            } else {
-                count = numberFormatter(count);
-            }
-            state.count[type] = commaFormatter(count);
-        };
-        const getTrend = async (type) => {
-            const utcToday = dayjs().utc();
+        const setChartData = (data) => {
             const dateType = state.selectedDateType;
             const dateRange = dateType === DATE_TYPE.monthly ? MONTH_COUNT : DAY_COUNT;
             const dateUnit = dateType === DATE_TYPE.monthly ? 'month' : 'day';
-            const dateFormat = dateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
+            const dateFormat = dateType === DATE_TYPE.monthly ? 'YYYY-MM' : 'YYYY-MM-DD';
 
+            if (state.selectedType === DATA_TYPE.storage) {
+                const smallestCount = Math.min(...data.map(d => d.total));
+                const formattedSize = byteFormatter(smallestCount);
+                if (formattedSize) state.storageTrendSuffix = formattedSize.split(' ')[1] as Unit;
+            }
+            const chartData = data.map((d) => {
+                let count = d.total;
+                if (state.selectedType === DATA_TYPE.storage) {
+                    const formattedSize = byteFormatter(d.total, { unit: state.storageTrendSuffix });
+                    if (formattedSize) count = formattedSize.split(' ')[0];
+                }
+                return {
+                    date: d.date,
+                    count,
+                };
+            });
+
+            // fill default value
+            forEach(range(0, dateRange), (i) => {
+                let date = dayjs().utc().subtract(i, dateUnit);
+                if (state.selectedType === DATA_TYPE.billing && state.selectedDateType === DATE_TYPE.daily) {
+                    date = date.subtract(1, 'day');
+                }
+                if (!(chartData.find(d => date.format(dateFormat) === d.date))) {
+                    chartData.push({ date: date.format(dateFormat), count: null });
+                }
+            });
+
+            const orderedData = orderBy(chartData, ['date'], ['asc']);
+            chartState.data = orderedData.map((d, index) => {
+                const date = dayjs(d.date);
+                let fillOpacity = 1;
+                let bulletColor = primary;
+                if (state.selectedType === DATA_TYPE.billing && index === orderedData.length - 1) {
+                    fillOpacity = 0.5;
+                    bulletColor = primary1;
+                }
+                if (dateType === DATE_TYPE.monthly && (date.format('M') === '1' || date.format('M') === '12')) {
+                    return {
+                        date: date.format('MMM, YY'),
+                        count: d.count,
+                        fillOpacity,
+                        bulletColor,
+                    };
+                }
+                const labelFormat = dateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
+                return {
+                    date: date.format(labelFormat),
+                    count: d.count,
+                    fillOpacity,
+                    bulletColor,
+                };
+            });
+        };
+
+        /* api */
+        const getBillingCount = async () => {
+            try {
+                const res = await SpaceConnector.client.statistics.topic.billingSummary({
+                    granularity: DATE_TYPE.monthly,
+                    start: dayjs().utc().startOf('month').format('YYYY-MM-DD'),
+                    end: dayjs().utc().endOf('month').format('YYYY-MM-DD'),
+                });
+                if (res.results.length > 0) {
+                    const count = res.results[0].billing_data[0].cost;
+                    state.count.billing = commaFormatter(numberFormatter(count));
+                }
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        const getCount = async () => {
+            try {
+                const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
+                    labels: [CLOUD_SERVICE_LABEL.compute, CLOUD_SERVICE_LABEL.database, CLOUD_SERVICE_LABEL.storage],
+                });
+                let count = 0 as number | string;
+                res.results.forEach((d) => {
+                    if (d.label === CLOUD_SERVICE_LABEL.storage) {
+                        state.storageBoxSuffix = byteFormatter(d.total).split(' ')[1];
+                        count = parseFloat(byteFormatter(d.total).split(' ')[0]);
+                        count = commaFormatter(count);
+                    } else {
+                        count = numberFormatter(d.total);
+                    }
+                    state.count[Object.keys(CLOUD_SERVICE_LABEL)[Object.values(CLOUD_SERVICE_LABEL).indexOf(d.label)]] = count;
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        const getTrend = async (type) => {
             try {
                 let data;
-                if (type === DATA_TYPE.spendings) {
+                if (type === DATA_TYPE.billing) {
                     let start;
                     let end;
-                    if (dateType === DATE_TYPE.monthly) {
-                        start = utcToday.subtract(MONTH_COUNT - 1, 'month').format('YYYY-MM');
-                        end = utcToday.format('YYYY-MM');
+                    if (state.selectedDateType === DATE_TYPE.monthly) {
+                        start = dayjs().utc().subtract(MONTH_COUNT - 1, 'month').format('YYYY-MM');
+                        end = dayjs().utc().format('YYYY-MM');
                     } else {
-                        start = utcToday.subtract(DAY_COUNT, 'day').format('YYYY-MM-DD');
-                        end = utcToday.subtract(1, 'day').format('YYYY-MM-DD');
+                        start = dayjs().utc().subtract(DAY_COUNT, 'day').format('YYYY-MM-DD');
+                        end = dayjs().utc().subtract(1, 'day').format('YYYY-MM-DD');
                     }
                     const res = await SpaceConnector.client.statistics.topic.billingSummary({
                         granularity: state.selectedDateType,
@@ -423,43 +472,7 @@ export default {
                     });
                     data = res.results;
                 }
-
-                if (type === DATA_TYPE.storage) {
-                    const smallestCount = Math.min(...data.map(d => d.total));
-                    const formattedSize = byteFormatter(smallestCount);
-                    if (formattedSize) state.storageTrendSuffix = formattedSize.split(' ')[1] as Unit;
-                }
-                const chartData = data.map((d) => {
-                    let count = d.total;
-                    if (type === DATA_TYPE.storage) {
-                        const formattedSize = byteFormatter(d.total, { unit: state.storageTrendSuffix });
-                        if (formattedSize) count = formattedSize.split(' ')[0];
-                    }
-                    return {
-                        date: dayjs(d.date),
-                        count,
-                    };
-                });
-                forEach(range(0, dateRange), (i) => {
-                    const date = utcToday.subtract(i, dateUnit);
-                    if (!find(chartData, { date })) {
-                        chartData.push({ date, count: null });
-                    }
-                });
-
-                const orderedData = orderBy(chartData, ['date'], ['asc']);
-                chartState.data = orderedData.map((d) => {
-                    if (dateType === DATE_TYPE.monthly && (d.date.format('M') === '1' || d.date.format('M') === '12')) {
-                        return {
-                            date: d.date.format('MMM, YY'),
-                            count: d.count,
-                        };
-                    }
-                    return {
-                        date: d.date.format(dateFormat),
-                        count: d.count,
-                    };
-                });
+                setChartData(data);
             } catch (e) {
                 console.error(e);
             }
@@ -599,7 +612,7 @@ export default {
             state.loading = false;
             setBoxInterval();
 
-            await Promise.all([Object.keys(DATA_TYPE).map(type => getCount(type))]);
+            await Promise.all([getCount(), getBillingCount()]);
         };
         const chartInit = async () => {
             await getTrend(DATA_TYPE.compute);
@@ -616,7 +629,7 @@ export default {
             }
         }, { immediate: false });
         watch(() => state.selectedType, async (type) => {
-            if (type === DATA_TYPE.spendings) {
+            if (type === DATA_TYPE.billing) {
                 await Promise.all([getBillingSummaryInfo(), getTrend(type)]);
                 drawChart();
             } else {
@@ -714,7 +727,7 @@ export default {
             &:hover {
                 .anchor {
                     border-bottom: 2px solid;
-                    &.spendings {
+                    &.billing {
                         border: none;
                     }
                 }
