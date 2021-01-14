@@ -188,7 +188,15 @@ export default {
             projectName: '',
             projectGroupId: '',
             projectId,
-            pageNavigation: [],
+            projectGroupNames: [],
+            pageNavigation: computed(() => [
+                { name: vm.$t('MENU.PROJECT.PROJECT'), path: '/project' },
+                ...state.projectGroupNames.map(d => ({
+                    name: d.name,
+                    path: `/project?select_pg=${d.project_group_id}`,
+                })),
+                { name: state.projectName },
+            ]),
             reportState: computed(() => vm.$store.state.user.reportState),
             users: computed(() => vm.$store.state.resource.user.items),
         });
@@ -408,28 +416,27 @@ export default {
 
         const apiQuery = new ApiQueryHelper();
         const getPageNavigation = async () => {
-            const res = await SpaceConnector.client.identity.project.tree.search({
-                item_type: 'PROJECT',
-                // eslint-disable-next-line camelcase
-                item_id: projectId.value,
-            });
+            try {
+                const res = await SpaceConnector.client.identity.project.tree.search({
+                    item_type: 'PROJECT',
+                    // eslint-disable-next-line camelcase
+                    item_id: projectId.value,
+                });
 
-            apiQuery.setFilters([{
-                k: 'project_group_id',
-                v: res.open_path,
-                o: '=',
-            }]);
-            const projectGroupName = await SpaceConnector.client.identity.projectGroup.list({
-                query: apiQuery.data,
-            });
-            state.pageNavigation = [
-                { name: vm.$t('MENU.PROJECT.PROJECT'), path: '/project' },
-                ...projectGroupName.results.map(d => ({
-                    name: d.name,
-                    path: `/project?select_pg=${d.project_group_id}`,
-                })),
-                { name: state.projectName },
-            ] as any;
+                apiQuery.setFilters([{
+                    k: 'project_group_id',
+                    v: res.open_path,
+                    o: '=',
+                }]);
+                const projectGroupNames = await SpaceConnector.client.identity.projectGroup.list({
+                    query: apiQuery.data,
+                });
+
+                state.projectGroupNames = projectGroupNames.results;
+            } catch (e) {
+                state.projectGroupNames = [];
+                console.error(e);
+            }
         };
 
 
