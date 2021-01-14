@@ -252,15 +252,6 @@ export default {
             }
         };
 
-        const bindRole = async (id, roleId) => {
-            await SpaceConnector.client.identity.roleBinding.create({
-                resource_type: 'identity.User',
-                resource_id: id,
-                role_id: roleId,
-                project_id: projectId,
-            });
-        };
-
         const confirm = async () => {
             const users = formState.tagTools.tags;
 
@@ -271,10 +262,8 @@ export default {
                 try {
                     await SpaceConnector.client.identity.project.member.add({
                         project_id: projectId,
+                        role_id: state.projectRole,
                         users,
-                    });
-                    await users.forEach((id) => {
-                        bindRole(id, state.projectRole);
                     });
                     showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_ADD_MEMBER'), '', root);
                 } catch (e) {
