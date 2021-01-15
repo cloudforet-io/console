@@ -38,11 +38,14 @@ webFontLoader.load({
 
 const initConfig = async () => {
     await config.init();
+};
+
+const initApiClient = async () => {
     await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
         // Add session expiration process
         store.dispatch('user/setIsSessionExpired', true);
     });
-};
+}
 
 const initDomain = async () => {
     let domainName;
@@ -70,6 +73,7 @@ const initLanguage = () => {
 (async () => {
     try {
         await initConfig();
+        await initApiClient();
         await initDomain();
         initGtag();
         initLanguage();
