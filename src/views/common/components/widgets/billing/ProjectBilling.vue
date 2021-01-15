@@ -580,11 +580,13 @@ export default {
         }
         .p-data-table::v-deep {
             height: auto;
-            min-height: 5rem;
-            max-height: 17.5rem;
             text-align: right;
             border-radius: 0.125rem;
             margin-top: 0.5rem;
+            .table-container {
+                min-height: 5rem;
+                max-height: 17.5rem;
+            }
             th {
                 @apply bg-gray-100 text-gray-400;
                 height: 1.5rem;

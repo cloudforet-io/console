@@ -42,7 +42,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { range } from 'lodash';
+import { range, random } from 'lodash';
 import bytes from 'bytes';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -138,6 +138,7 @@ export default {
             series.slices.template.clickable = false;
             series.dataFields.value = 'count';
             series.dataFields.category = 'region';
+            series.slices.template.propertyFields.fillOpacity = 'fillOpacity';
             series.slices.template.propertyFields.fill = 'color';
             series.slices.template.stroke = am4core.color(white);
             series.slices.template.strokeWidth = 2;
@@ -177,6 +178,7 @@ export default {
                     count: props.label === 'Storage' ? byteFormatter(d.total) : d.total,
                     color: state.providers[d.provider].color,
                     to: '',
+                    fillOpacity: random(0.3, 1),
                 }));
             } catch (e) {
                 console.error(e);
