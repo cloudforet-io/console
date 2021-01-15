@@ -248,7 +248,7 @@ export default {
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
             valueAxis.tooltip.disabled = true;
             valueAxis.renderer.minGridDistance = 30;
-            valueAxis.renderer.labels.template.fill = am4core.color(secondary);
+            valueAxis.renderer.labels.template.fill = am4core.color(secondary1);
             valueAxis.renderer.labels.template.adapter.add('text', (text, target) => numberFormatter(target.dataItem.value));
             valueAxis.fontSize = 11;
             valueAxis.extraMax = 0.25;
@@ -546,9 +546,9 @@ export default {
             padding-left: 0.375rem;
         }
         .cost {
-            @apply text-gray-900;
+            @apply text-secondary;
             display: block;
-            font-size: 1.125rem;
+            font-size: 1.375rem;
             line-height: 1.55;
             &.in-process {
                 @apply text-safe;
@@ -614,11 +614,9 @@ export default {
             td {
                 height: 1.75rem;
                 .col-service {
-                    @apply text-gray-700;
+                    @apply text-gray-700 truncate;
+                    width: 5rem;
                 }
-            }
-            .table-container {
-                height: auto;
             }
         }
         .toggle-button-wrapper {

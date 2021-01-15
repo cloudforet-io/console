@@ -143,6 +143,7 @@ export default {
             series.slices.template.stroke = am4core.color(white);
             series.slices.template.strokeWidth = 2;
             series.slices.template.strokeOpacity = 1;
+            series.slices.template.states.getKey('hover').properties.scale = 1;
             series.tooltip.disabled = true;
             series.ticks.template.disabled = true;
             series.labels.template.text = '';
@@ -172,13 +173,14 @@ export default {
                 };
                 if (props.label !== 'All') param.labels = [props.label];
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary(param);
+                const opacities = [0.2, 0.4, 0.6, 0.8, 1];
                 state.data = res.results.map(d => ({
                     provider: state.providers[d.provider].label,
                     region: d.region_code,
                     count: props.label === 'Storage' ? byteFormatter(d.total) : d.total,
                     color: state.providers[d.provider].color,
                     to: '',
-                    fillOpacity: random(0.3, 1),
+                    fillOpacity: opacities[random(4)],
                 }));
             } catch (e) {
                 console.error(e);

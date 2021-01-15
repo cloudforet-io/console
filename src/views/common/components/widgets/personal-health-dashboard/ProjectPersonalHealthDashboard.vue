@@ -318,7 +318,7 @@ export default {
         margin-right: 0.375rem;
         max-width: 15.25rem;
         padding: 0.625rem 1rem;
-        border-radius: 2px 2px 0 0;
+        border-radius: 0.375rem 0.375rem 0 0;
         &:last-child {
             @apply m-0;
         }
