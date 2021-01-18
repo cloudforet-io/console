@@ -85,11 +85,11 @@ export const parameters = {
         theme: SpaceOneTheme,
         page: null,
     },
-    previewTabs: {
-        canvas: {
-            hidden: true
-        }
-    },
+    // previewTabs: {
+    //     canvas: {
+    //         hidden: true
+    //     }
+    // },
     viewport: {
         viewports: {
             ...mapValues(tailwindConfig.theme.screens, (v, k) => ({
