@@ -48,14 +48,18 @@ const initApiClient = async () => {
 }
 
 const initDomain = async () => {
-    let domainName;
-    if (config.get('DOMAIN_NAME_REF') === 'hostname') {
-        const { hostname } = window.location;
-        domainName = hostname.split('.')[0];
-    } else {
-        domainName = config.get('DOMAIN_NAME');
+    try {
+        let domainName;
+        if (config.get('DOMAIN_NAME_REF') === 'hostname') {
+            const {hostname} = window.location;
+            domainName = hostname.split('.')[0];
+        } else {
+            domainName = config.get('DOMAIN_NAME');
+        }
+        await store.dispatch('domain/load', domainName);
+    } catch (e) {
+        await router.push('/error-page');
     }
-    await store.dispatch('domain/load', domainName);
 };
 
 const initGtag = () => {
