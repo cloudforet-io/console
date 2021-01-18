@@ -445,10 +445,10 @@ export default {
                     typeOptionState.keyItemSets = searchProps.keyItemSets;
                     typeOptionState.valueHandlerMap = searchProps.valueHandlerMap;
                 }
-
                 // set api query to get only a few specified data
-                if (tableState.schema?.options?.fields) {
-                    apiQuery.setOnly(...tableState.schema.options.fields.map((d) => {
+                if (res?.options?.fields) {
+
+                    apiQuery.setOnly(...res.options.fields.map((d) => {
                         if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
                         return d.key;
                     }), 'server_id', 'reference', 'primary_ip_address', 'collection_info.collectors');
