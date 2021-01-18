@@ -13,7 +13,7 @@ import componentEN from '@/translations/language-pack/en.json';
 import componentJA from '@/translations/language-pack/ja.json';
 
 
-// simple recursive remove keys with empty value
+// simple recursive remove keys with empty value.
 const removeEmpty = (obj: object | any): LocaleMessageObject => Object.keys(obj)
     .filter((k: string) => obj[k] !== null && obj[k] !== undefined && obj[k] !== '') // Remove undef. and null and empty.string.
     .reduce(
