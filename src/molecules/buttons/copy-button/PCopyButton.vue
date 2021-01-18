@@ -10,7 +10,8 @@
               @mouseup="copyText()"
         >
             <p-i :width="width" :height="height" :name="icon"
-                 :color="color"
+                 color="inherit"
+                 class="copy-btn"
             />
         </span>
         <transition name="fade">
@@ -108,7 +109,11 @@ export default {
     display: inline-flex;
     position: relative;
     align-items: center;
-
+    .copy-btn {
+        &:hover {
+            @apply text-blue-500;
+        }
+    }
     .copy-button-alert {
         @apply flex text-white;
         background-color: rgba(theme('colors.gray.900'), 0.88);
