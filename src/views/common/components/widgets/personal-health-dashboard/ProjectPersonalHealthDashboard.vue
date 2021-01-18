@@ -38,9 +38,11 @@
                                 @change="onChange"
                 >
                     <template #col-event-format="{ value }">
-                        <p-anchor :href="value.to.href" target="_self" highlight>
-                            {{ value.name }}
-                        </p-anchor>
+                        <router-link :to="value.to">
+                            <p-anchor highlight>
+                                {{ value.name }}
+                            </p-anchor>
+                        </router-link>
                     </template>
                     <template #col-region_code-format="{ value }">
                         <span>{{ regionFormatter(value) }}</span>

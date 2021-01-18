@@ -4,7 +4,7 @@
             <div class="m-auto">
                 <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
                 <p class="text">
-                    No Region Service
+                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: $t('COMMON.WIDGETS.ALL_SUMMARY.REGION_SERVICE') }) }}
                 </p>
             </div>
         </div>
@@ -170,14 +170,14 @@ export default {
                 const param: any = {
                     project_id: props.projectId,
                     aggregation: 'inventory.Region',
+                    labels: [props.label],
                 };
-                if (props.label !== 'All') param.labels = [props.label];
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary(param);
                 const opacities = [0.2, 0.4, 0.6, 0.8, 1];
                 state.data = res.results.map(d => ({
                     provider: state.providers[d.provider].label,
                     region: d.region_code,
-                    count: props.label === 'Storage' ? byteFormatter(d.total) : d.total,
+                    count: d.label === 'Storage' ? byteFormatter(d.total) : d.total,
                     color: state.providers[d.provider].color,
                     to: '',
                     fillOpacity: opacities[random(4)],

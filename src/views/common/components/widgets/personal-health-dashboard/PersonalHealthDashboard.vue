@@ -19,7 +19,9 @@
                             <span>{{ value.name }}</span>
                         </router-link>
                     </span>
-                    <span class="event-time" :class="{ 'show-all': data[index].showAll }">{{ value.lastUpdate }}</span>
+                    <span class="event-time" :class="{ 'show-all': data[index].showAll }">
+                        {{ $t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.LAST_UPDATE') }} : {{ value.lastUpdate }}
+                    </span>
                 </div>
             </template>
             <template #col-region-format="{ value }">
@@ -117,7 +119,7 @@ export default {
                     return {
                         event: {
                             name: d.event_title,
-                            lastUpdate: `${vm.$t('COMMON.WIDGETS.PERSONAL_HEALTH_DASHBOARD.LAST_UPDATE')} : ${lastUpdateTime}`,
+                            lastUpdate: lastUpdateTime,
                             to: referenceRouter(d.resource_id, { resource_type: 'inventory.CloudService' }),
                         },
                         region: state.regions[d.region_code]?.name || d.region_code,

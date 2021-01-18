@@ -170,7 +170,6 @@ interface SummaryData {
 
 const DAY_COUNT = 14;
 const MONTH_COUNT = 12;
-const BOX_SWITCH_INTERVAL = 5000;
 
 export default {
     name: 'ProjectAllSummary',
@@ -212,9 +211,8 @@ export default {
             chart: null,
             chartRef: null as HTMLElement | null,
             skeletons: range(4),
-            providers: computed(() => vm.$store.state.resource.provider.items),
+            providers: computed(() => store.state.resource.provider.items),
             //
-            selectedIndexInterval: undefined,
             selectedIndex: 0,
             selectedType: computed(() => state.dataList[state.selectedIndex].type),
             selectedLabel: computed(() => CLOUD_SERVICE_LABEL[state.selectedType]),
@@ -311,16 +309,6 @@ export default {
             bullet.label.fill = am4core.color(peacock[600]);
             bullet.label.dy = -10;
         };
-        const setBoxInterval = () => {
-            state.selectedIndexInterval = setInterval(() => {
-                disposeChart();
-                if (state.selectedIndex < state.dataList.length - 1) {
-                    state.selectedIndex += 1;
-                } else {
-                    state.selectedIndex = 0;
-                }
-            }, BOX_SWITCH_INTERVAL);
-        };
         const getLocation = (type) => {
             const query: Location['query'] = {};
             let name: string;
@@ -357,7 +345,7 @@ export default {
                 let count = 0 as number | string;
                 res.results.forEach((d) => {
                     if (d.label === CLOUD_SERVICE_LABEL.storage) {
-                        count = byteFormatter(count);
+                        count = byteFormatter(d.total);
                     } else {
                         count = numberFormatter(d.total);
                     }
@@ -468,6 +456,7 @@ export default {
         };
         const getSummaryInfo = async (type) => {
             try {
+                state.loading = true;
                 const param = getApiParameter(type);
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(param);
                 const summaryData: SummaryData[] = [];
@@ -515,6 +504,8 @@ export default {
                 state.summaryData = summaryData;
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
 
@@ -522,22 +513,13 @@ export default {
         const onClickBox = (idx) => {
             if (idx !== state.selectedIndex) disposeChart();
             state.selectedIndex = idx;
-            clearInterval(state.selectedIndexInterval);
         };
         const onClickDateTypeButton = (type) => {
             state.selectedDateType = type;
-            clearInterval(state.selectedIndexInterval);
         };
 
         const init = async () => {
-            state.loading = true;
-
-            await store.dispatch('resource/provider/load');
-            await getSummaryInfo(DATA_TYPE.compute);
-            state.loading = false;
-            setBoxInterval();
-
-            await getCount();
+            await Promise.all([getSummaryInfo(DATA_TYPE.compute), getCount()]);
         };
         const chartInit = async () => {
             await getTrend(DATA_TYPE.compute);
