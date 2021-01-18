@@ -115,7 +115,6 @@ export default {
 
         const onCmCodeChange = (newCode) => {
             emit('update:code', newCode);
-            forceFold();
         };
 
         const handleCodeChange = (newVal) => {

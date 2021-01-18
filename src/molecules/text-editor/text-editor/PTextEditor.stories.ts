@@ -113,6 +113,7 @@ export const FoldingCase = () => ({
                 <p-text-editor :code="code"
                                mode="readOnly"
                                :loading="loading"
+                               folded
                                class="w-full px-4"
                 />
             </div>`,
