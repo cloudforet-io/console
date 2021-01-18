@@ -187,14 +187,16 @@ export default {
         const state = reactive({
             projectName: '',
             projectGroupId: '',
+            projectGroupName: '',
             projectId,
             projectGroupNames: [],
             pageNavigation: computed(() => [
                 { name: vm.$t('MENU.PROJECT.PROJECT'), path: '/project' },
-                ...state.projectGroupNames.map(d => ({
-                    name: d.name,
-                    path: `/project?select_pg=${d.project_group_id}`,
-                })),
+                { name: state.projectGroupName, path: `/project?select_pg=${state.projectGroupId}`},
+                // ...state.projectGroupNames.map(d => ({
+                //     name: d.name,
+                //     path: `/project?select_pg=${d.project_group_id}`,
+                // })),
                 { name: state.projectName },
             ]),
             reportState: computed(() => vm.$store.state.user.reportState),
@@ -208,6 +210,7 @@ export default {
             if (resp) {
                 item.value = resp;
                 state.projectGroupId = item.value.project_group_info.project_group_id;
+                state.projectGroupName = item.value.project_group_info.name;
                 state.projectName = item.value.name;
             }
         };
@@ -415,35 +418,36 @@ export default {
 
 
         const apiQuery = new ApiQueryHelper();
-        const getPageNavigation = async () => {
-            try {
-                const res = await SpaceConnector.client.identity.project.tree.search({
-                    item_type: 'PROJECT',
-                    // eslint-disable-next-line camelcase
-                    item_id: projectId.value,
-                });
-
-                apiQuery.setFilters([{
-                    k: 'project_group_id',
-                    v: res.open_path,
-                    o: '=',
-                }]);
-                const projectGroupNames = await SpaceConnector.client.identity.projectGroup.list({
-                    query: apiQuery.data,
-                });
-
-                state.projectGroupNames = projectGroupNames.results;
-            } catch (e) {
-                state.projectGroupNames = [];
-                console.error(e);
-            }
-        };
+        // const getPageNavigation = async () => {
+        //     try {
+        //         const res = await SpaceConnector.client.identity.project.tree.search({
+        //             item_type: 'PROJECT',
+        //             // eslint-disable-next-line camelcase
+        //             item_id: projectId.value,
+        //         });
+        //         console.log(res);
+        //
+        //         apiQuery.setFilters([{
+        //             k: 'project_group_id',
+        //             v: res.open_path,
+        //             o: '=',
+        //         }]);
+        //         const projectGroupNames = await SpaceConnector.client.identity.projectGroup.list({
+        //             query: apiQuery.data,
+        //         });
+        //
+        //         state.projectGroupNames = projectGroupNames.results;
+        //     } catch (e) {
+        //         state.projectGroupNames = [];
+        //         console.error(e);
+        //     }
+        // };
 
 
         /** Init */
         (async () => {
             await Promise.all([
-                getPageNavigation(),
+                // getPageNavigation(),
                 vm.$store.dispatch('resource/project/load'),
                 vm.$store.dispatch('favorite/project/load'),
                 vm.$store.dispatch('resource/user/load'),
