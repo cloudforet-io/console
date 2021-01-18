@@ -1,22 +1,24 @@
 <template>
     <span class="p-copy-button">
-        <span v-if="$scopedSlots.default" :style="{color: color}">
+        <span v-if="$scopedSlots.default">
             <slot name="default" />
         </span>
-        <span class="hover:cursor-pointer" @mousedown="click=true"
-              v-on="$listeners"
-              @mouseleave="mouseOut()"
-              @mouseenter="onMouseOver()"
-              @mouseup="copyText()"
+        <span
+            class="hover:cursor-pointer"
+            :style="{color:copyIconColor}"
+            v-on="$listeners"
+            @mousedown="click=true"
+            @mouseup="copyText()"
         >
-            <p-i :width="width" :height="height" :name="icon"
+            <p-i width="0.875rem" height="0.875rem"
+                 :name="icon"
                  color="inherit"
                  class="copy-btn"
             />
         </span>
         <transition name="fade">
-            <div v-if="isAlertVisible" class="copy-button-alert">
-                <p-i name="ic_state_active" color="inherit" width="1rem" />
+            <div v-if="isAlertVisible" class="copy-button-alert" :class="alertPosition">
+                <p-i name="ic_state_active" color="white" width="1rem" />
                 <span>Copied</span>
             </div>
         </transition>
@@ -29,7 +31,6 @@ import {
 } from '@vue/composition-api';
 import PI from '@/atoms/icons/PI.vue';
 import { copyAnyData, isNotEmpty } from '@/util/helpers';
-import { mouseOverState } from '@/util/composition-helpers';
 import color from '@/styles/colors';
 
 export default {
@@ -41,35 +42,27 @@ export default {
             type: String,
             default: null,
         },
-        width: {
+        alertPosition: {
             type: String,
-            default: '1rem',
+            default: null,
         },
-        height: {
+        iconColor: {
             type: String,
-            default: '1rem',
+            default: null,
         },
     },
     setup(props, context) {
-        const { isMouseOver, onMouseOut, onMouseOver } = mouseOverState();
-
         const state = reactive({
             click: false,
             icon: computed(() => (state.click ? 'ic_copied' : 'ic_copy')),
-            color: computed(() => {
-                if (state.click || isMouseOver.value) {
+            copyIconColor: computed(() => {
+                if (state.click) {
                     return color.blue[500];
                 }
-                return undefined;
+                return props.iconColor || color.gray[500];
             }),
-            iconColor: color.white,
             isAlertVisible: false,
         });
-
-        const mouseOut = () => {
-            state.click = false;
-            onMouseOut();
-        };
 
         const copyText = () => {
             state.isAlertVisible = true;
@@ -86,30 +79,22 @@ export default {
 
         return {
             ...toRefs(state),
-            isMouseOver,
-            onMouseOver,
-            mouseOut,
             copyText,
         };
     },
-
 };
 </script>
 
 <style lang="postcss">
 
-.fade-enter-active, .fade-leave-active {
-    transition: opacity 0.3s;
-}
-.fade-enter, .fade-leave-to {
-    opacity: 0;
-}
-
 .p-copy-button {
+    @apply text-gray-900;
     display: inline-flex;
     position: relative;
+    font-size: 0.875rem;
     align-items: center;
     .copy-btn {
+        margin-bottom: 0.1rem;
         &:hover {
             @apply text-blue-500;
         }
@@ -119,7 +104,6 @@ export default {
         background-color: rgba(theme('colors.gray.900'), 0.88);
         position: absolute;
         font-weight: 400;
-        right: -5.25rem;
         font-size: 0.75rem;
         z-index: 2;
         width: 4.75rem;
@@ -129,9 +113,20 @@ export default {
         align-items: center;
         cursor: default;
 
-        span {
-            margin-left: 0.313rem;
+        &.right {
+            right: -5.25rem;
         }
+        &.bottom-end {
+            right: 0;
+            top: 1.5rem;
+        }
+
+        &.fade-enter-active, &.fade-leave-active {
+          transition: opacity 0.3s;
+        }
+        &.fade-enter, &.fade-leave-to {
+          opacity: 0;
+}
     }
 }
 
