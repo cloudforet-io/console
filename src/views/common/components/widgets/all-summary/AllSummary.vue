@@ -97,7 +97,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    find, forEach, orderBy, range,
+    forEach, orderBy, range,
 } from 'lodash';
 import bytes from 'bytes';
 import dayjs from 'dayjs';
@@ -515,6 +515,7 @@ export default {
         };
         const getSummaryInfo = async (type) => {
             try {
+                state.loading = true;
                 const param = getApiParameter(type);
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(param);
                 const summaryData: SummaryData[] = [];
@@ -554,6 +555,8 @@ export default {
                 state.summaryData = summaryData;
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
         const getBillingSummaryInfo = async () => {
@@ -606,13 +609,8 @@ export default {
         };
 
         const init = async () => {
-            state.loading = true;
-
-            await getSummaryInfo(DATA_TYPE.compute);
-            state.loading = false;
+            await Promise.all([getSummaryInfo(DATA_TYPE.compute), getCount(), getBillingCount()]);
             setBoxInterval();
-
-            await Promise.all([getCount(), getBillingCount()]);
         };
         const chartInit = async () => {
             await getTrend(DATA_TYPE.compute);

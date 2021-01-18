@@ -31,21 +31,29 @@
                 <div class="summary-wrapper">
                     <span class="label">{{ summaryState.pastDateText }}</span>
                     <span class="date">({{ summaryState.pastDate }})</span>
-                    <span class="cost">${{ summaryState.pastCost }}</span>
+                    <span class="cost">
+                        <span v-if="summaryState.pastCost !== 0">${{ summaryState.pastCost }}</span>
+                        <span v-else class="empty" />
+                    </span>
                 </div>
                 <div class="summary-wrapper">
                     <span class="label">{{ summaryState.currentDateText }}</span>
                     <span class="date">({{ summaryState.currentDate }})</span>
                     <div class="cost in-process">
-                        <span>${{ summaryState.currentCost }}</span>
-                        <span class="in-process-text">({{ $t('COMMON.WIDGETS.BILLING.IN_PROCESS') }})</span>
-                        <div class="help">
-                            <p-i v-tooltip.top="$t('COMMON.WIDGETS.BILLING.TOOLTIP_TEXT')"
-                                 name="ic_tooltip" width="1rem"
-                                 height="1rem"
-                                 color="inherit transparent"
-                            />
-                        </div>
+                        <template v-if="summaryState.currentCost !== 0">
+                            <span>${{ summaryState.currentCost }}</span>
+                            <span class="in-process-text">({{ $t('COMMON.WIDGETS.BILLING.IN_PROCESS') }})</span>
+                            <div class="help">
+                                <p-i v-tooltip.top="$t('COMMON.WIDGETS.BILLING.TOOLTIP_TEXT')"
+                                     name="ic_tooltip" width="1rem"
+                                     height="1rem"
+                                     color="inherit transparent"
+                                />
+                            </div>
+                        </template>
+                        <template v-else>
+                            <span class="empty" />
+                        </template>
                     </div>
                 </div>
             </div>
@@ -72,11 +80,15 @@
                     <template #th-service-format>
                         <span />
                     </template>
-                    <template #col-service-format="{value}">
-                        <span class="col-service">{{ value }}</span>
+                    <template #col-service-format="{value, index}">
+                        <!--                        <router-link class="link-text" :to="">-->
+                        <div class="col-service">
+                            <span v-tooltip.bottom="{content: value}">{{ value }}</span>
+                        </div>
+                        <!--                        </router-link>-->
                     </template>
                 </p-data-table>
-                <div class="toggle-button-wrapper">
+                <div v-if="tableState.data.length > 5" class="toggle-button-wrapper">
                     <p-collapsible-toggle :is-collapsed.sync="tableState.isCollapsed">
                         {{ tableState.isCollapsed ? $t('COMMON.WIDGETS.BILLING.SHOW_ALL') : $t('COMMON.WIDGETS.BILLING.HIDE') }}
                     </p-collapsible-toggle>
@@ -88,9 +100,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import {
-    orderBy, range,
-} from 'lodash';
+import { orderBy, range } from 'lodash';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -101,12 +111,19 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PChartLoader, PSkeleton, PButton, PDataTable, PCollapsibleToggle, PIconButton, PI,
+    PButton,
+    PChartLoader,
+    PCollapsibleToggle,
+    PDataTable,
+    PI,
+    PIconButton,
+    PSkeleton,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@/lib/space-connector';
+import { QueryHelper } from '@/lib/query';
 import {
-    gray, secondary, secondary1, safe,
+    gray, safe, secondary, secondary1,
 } from '@/styles/colors';
 
 am4core.useTheme(am4themes_animated);
@@ -147,6 +164,7 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryHelper = new QueryHelper();
         const state = reactive({
             loading: false,
             chart: null,
@@ -301,6 +319,19 @@ export default {
 
             state.chart = chart;
         };
+        const getLink = data => ({
+            name: 'cloudServicePage',
+            params: {
+                provider: data.provider,
+                group: data.cloud_service_group,
+                name: data.cloud_service_type,
+            },
+            query: {
+                filters: queryHelper.setFilters([
+                    { k: 'project_id', v: props.projectId, o: '=' },
+                ]).rawQueryStrings,
+            },
+        });
 
         /* api */
         const getCount = async () => {
@@ -321,9 +352,11 @@ export default {
                     start,
                     end,
                 });
-                const billingData = res.results[0].billing_data;
-                summaryState.pastCost = commaFormatter(numberFormatter(billingData.find(d => d.date === start)?.cost || 0));
-                summaryState.currentCost = commaFormatter(numberFormatter(billingData.find(d => d.date === end)?.cost || 0));
+                if (res.results.length > 0) {
+                    const billingData = res.results[0].billing_data;
+                    summaryState.pastCost = commaFormatter(numberFormatter(billingData.find(d => d.date === start)?.cost || 0));
+                    summaryState.currentCost = commaFormatter(numberFormatter(billingData.find(d => d.date === end)?.cost || 0));
+                }
             } catch (e) {
                 console.error(e);
             }
@@ -415,20 +448,6 @@ export default {
             fields.unshift({ name: 'service', label: '' });
             tableState.fields = fields;
         };
-        const setTableData = (res) => {
-            const data: any = [];
-            res.results.forEach((d) => {
-                const billingData = {};
-                d.billing_data.forEach((b) => {
-                    billingData[b.date] = `$${commaFormatter(numberFormatter(b.cost))}`;
-                });
-                data.push({
-                    service: d.cloud_service_group || d.service_code,
-                    ...billingData,
-                });
-            });
-            tableState.data = data;
-        };
         const getTableData = async () => {
             tableState.loading = true;
 
@@ -436,10 +455,10 @@ export default {
             let start;
             let end;
             if (state.selectedDateType === DATE_TYPE.monthly) {
-                start = today.subtract(DATA_TABLE_COLUMN - 1, 'month').format('YYYY-MM');
+                start = today.subtract(DATA_TABLE_COLUMN, 'month').format('YYYY-MM');
                 end = today.format('YYYY-MM');
             } else {
-                start = today.subtract(DATA_TABLE_COLUMN, 'day').format('YYYY-MM-DD');
+                start = today.subtract(DATA_TABLE_COLUMN + 1, 'day').format('YYYY-MM-DD');
                 end = today.subtract(1, 'day').format('YYYY-MM-DD');
             }
 
@@ -451,8 +470,20 @@ export default {
                     start,
                     end,
                 });
+                console.log(res);
 
-                setTableData(res);
+                const data: any = [];
+                res.results.forEach((d) => {
+                    const billingData = {};
+                    d.billing_data.forEach((b) => {
+                        billingData[b.date] = b.cost < 0.1 ? '-' : `$${commaFormatter(numberFormatter(b.cost))}`;
+                    });
+                    data.push({
+                        service: d.cloud_service_group || d.service_code,
+                        ...billingData,
+                    });
+                });
+                tableState.data = data;
             } catch (e) {
                 console.error(e);
             } finally {
@@ -552,10 +583,10 @@ export default {
             line-height: 1.55;
             &.in-process {
                 @apply text-safe;
-            }
-            .in-process-text {
-                font-size: 0.75rem;
-                padding-left: 0.375rem;
+                .in-process-text {
+                    font-size: 0.75rem;
+                    padding-left: 0.375rem;
+                }
             }
             .help {
                 @apply text-gray-300;
@@ -564,6 +595,13 @@ export default {
                 .p-i-icon {
                     cursor: help;
                 }
+            }
+            .empty {
+                display: block;
+                width: 1rem;
+                height: 1rem;
+                border-bottom: 2px solid;
+                margin-bottom: 1rem;
             }
         }
     }
@@ -595,6 +633,7 @@ export default {
                 font-size: 0.75rem;
                 &:first-child {
                     @apply bg-white;
+                    width: 5rem;
                 }
                 .th-contents {
                     display: block;
@@ -605,6 +644,12 @@ export default {
                 &:nth-child(even) {
                     td {
                         @apply bg-primary4;
+                        &:last-child {
+                            @apply bg-green-100;
+                        }
+                        &:first-child {
+                            @apply bg-white;
+                        }
                     }
                 }
                 &:hover {
@@ -612,9 +657,11 @@ export default {
                 }
             }
             td {
+                width: auto;
                 height: 1.75rem;
                 .col-service {
                     @apply text-gray-700 truncate;
+                    display: inline-block;
                     width: 5rem;
                 }
             }

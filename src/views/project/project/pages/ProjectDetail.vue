@@ -192,7 +192,7 @@ export default {
             projectGroupNames: [],
             pageNavigation: computed(() => [
                 { name: vm.$t('MENU.PROJECT.PROJECT'), path: '/project' },
-                { name: state.projectGroupName, path: `/project?select_pg=${state.projectGroupId}`},
+                { name: state.projectGroupName, path: `/project?select_pg=${state.projectGroupId}` },
                 // ...state.projectGroupNames.map(d => ({
                 //     name: d.name,
                 //     path: `/project?select_pg=${d.project_group_id}`,
@@ -451,6 +451,7 @@ export default {
                 vm.$store.dispatch('resource/project/load'),
                 vm.$store.dispatch('favorite/project/load'),
                 vm.$store.dispatch('resource/user/load'),
+                vm.$store.dispatch('resource/provider/load'),
             ]);
         })();
         return {
