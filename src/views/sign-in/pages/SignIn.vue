@@ -142,10 +142,10 @@ export default {
                 });
                 await vm.$router.push(props.nextPath);
             } catch (e) {
-                const auth2 = await getAuth2(store.state.domain.authOptions.client_id);
-                await googleOauthSignOut(auth2);
                 console.error(e);
                 state.showErrorMessage = true;
+                const auth2 = await getAuth2(store.state.domain.authOptions.client_id);
+                await googleOauthSignOut(auth2);
             }
             setGtagUserID(vm);
         };
