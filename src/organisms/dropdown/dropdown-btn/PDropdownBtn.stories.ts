@@ -1,6 +1,7 @@
 import { action } from '@storybook/addon-actions';
 import { boolean, select } from '@storybook/addon-knobs';
 import PDropdownBtn from '@/organisms/dropdown/dropdown-btn/PDropdownBtn.vue';
+import { reactive, ref, toRefs } from '@vue/composition-api';
 
 export default {
     title: 'Others/Dropdown',
@@ -23,21 +24,6 @@ const data = {
 
 export const DefaultCase = () => ({
     components: { PDropdownBtn },
-    template: `
-<PDropdownBtn 
-    :styleType="styleType"
-    :disabled="disabled"
-    :size="size"
-    :outline="outline"
-    :popup.sync="popup"
->
-Action
-</PDropdownBtn>`,
-    data() {
-        return {
-            ...data,
-        };
-    },
     props: {
         styleType: {
             default: select('styleType', [
@@ -54,7 +40,24 @@ Action
             default: boolean('outline', false),
         },
     },
-    methods: {
-        ...actions,
+    template: `
+<PDropdownBtn 
+    :styleType="styleType"
+    :disabled="disabled"
+    :size="size"
+    :outline="outline"
+    :popup.sync="popup"
+>
+Action
+</PDropdownBtn>`,
+    setup(props) {
+        const state = reactive({
+            popup: false,
+        });
+
+        return {
+            ...toRefs(state),
+            ...actions,
+        };
     },
 });

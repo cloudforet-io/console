@@ -19,7 +19,7 @@
                            :tabindex="index"
                            class="context-content context-item no-drag"
                            :class="{ disabled: item.disabled, [theme]: true }"
-                           :href="item.link"
+                           :href="item.disabled ? undefined : item.link"
                            :target="item.target"
                            @click.stop="menuClick(item.name, index, $event)"
                            @keydown.up="onUpKey(index)"

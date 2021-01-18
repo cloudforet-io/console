@@ -1,6 +1,7 @@
 import { action } from '@storybook/addon-actions';
 import { object } from '@storybook/addon-knobs';
 import PDropdownMenuBtn from '@/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
+import { reactive, toRefs } from '@vue/composition-api';
 
 export default {
     title: 'Others/Dropdown/DropdownMenuBtn',
@@ -21,7 +22,6 @@ const actions = {
     clickRemove: action('clickRemove'),
     menuSelect: action('select'),
 };
-const data = {};
 
 export const dropdownMenuBtn = () => ({
     components: { PDropdownMenuBtn },
@@ -38,14 +38,9 @@ export const dropdownMenuBtn = () => ({
  >
 Action
 </PDropdownMenuBtn>`,
-    data() {
-        return {
-            ...data,
-        };
-    },
-    props: {
-        menu: {
-            default: object('menu', [
+    setup() {
+        const state = reactive({
+            menu: [
                 {
                     type: 'item', label: 'Add', name: 'add', disabled: false,
                 },
@@ -66,14 +61,13 @@ Action
                 },
                 { type: 'divider' },
                 {
-                    type: 'item', label: 'Remove', name: 'remove', disabled: false,
+                    type: 'item', label: 'Remove', name: 'remove', disabled: true,
                 },
-
-
-            ]),
-        },
-    },
-    methods: {
-        ...actions,
+            ],
+        });
+        return {
+            ...toRefs(state),
+            ...actions,
+        };
     },
 });
