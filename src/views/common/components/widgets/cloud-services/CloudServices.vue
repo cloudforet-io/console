@@ -141,30 +141,7 @@ export default {
 
         const getLink = (data, projectId?) => {
             let link;
-            if (data.resource_type === 'inventory.Server' && !projectId) {
-                link = {
-                    name: 'server',
-                    query: {
-                        filters: queryHelper.setFilters([
-                            { k: 'provider', v: data.provider, o: '=' },
-                            { k: 'cloud_service_type', v: data.cloud_service_type, o: '=' },
-                        ]).rawQueryStrings,
-                    },
-                };
-            }
-            if (data.resource_type === 'inventory.Server' && projectId) {
-                link = {
-                    name: 'server',
-                    query: {
-                        filters: queryHelper.setFilters([
-                            { k: 'project_id', v: projectId, o: '=' },
-                            { k: 'provider', v: data.provider, o: '=' },
-                            { k: 'cloud_service_type', v: data.cloud_service_type, o: '=' },
-                        ]).rawQueryStrings,
-                    },
-                };
-            }
-            if (data.resource_type === 'inventory.CloudService' && !projectId) {
+            if (!projectId) {
                 link = {
                     name: 'cloudServicePage',
                     params: {
@@ -174,7 +151,7 @@ export default {
                     },
                 };
             }
-            if (data.resource_type === 'inventory.CloudService' && projectId) {
+            if (projectId) {
                 link = {
                     name: 'cloudServicePage',
                     params: {
