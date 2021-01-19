@@ -6,8 +6,8 @@
                         :loading="loading"
                         :total-count="totalCount"
                         :selectable="false"
+                        :excel-visible="false"
                         @change="onChange"
-                        @export="onExport"
         >
             <template #col-resource_id-format="{ value }">
                 {{ users[value].name }}

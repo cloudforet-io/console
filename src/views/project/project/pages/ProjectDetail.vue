@@ -40,6 +40,7 @@
                                 :shadow="false"
                                 :border="false"
                                 selectable
+                                :excel-visible="false"
                                 :fields="memberTableState.fields"
                                 :items="memberTableState.items"
                                 :select-index.sync="memberTableState.selectIndex"
@@ -154,6 +155,7 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectModel } from '@/views/project/project/type';
 import { TranslateResult } from 'vue-i18n';
+import config from '@/lib/config';
 
 
 export default {
