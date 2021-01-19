@@ -174,15 +174,17 @@ export default {
                     ],
                 },
             });
-            state.data = [
-                ...resp.results.map(d => ({
-                    title: d.name,
-                    latitude: parseFloat(d.tags.find(tag => tag.key === 'latitude').value),
-                    longitude: parseFloat(d.tags.find(tag => tag.key === 'longitude').value),
-                    color: state.providers[d.provider]?.color as string,
-                    ...d,
-                })),
-            ];
+            if (state.providers !== undefined || state.providers) {
+                state.data = [
+                    ...resp.results.map(d => ({
+                        title: d.name,
+                        latitude: parseFloat(d.tags.find(tag => tag.key === 'latitude').value),
+                        longitude: parseFloat(d.tags.find(tag => tag.key === 'longitude').value),
+                        color: state.providers[d.provider].color as string,
+                        ...d,
+                    })),
+                ];
+            }
         };
 
         const setInitialRegionSetting = async () => {

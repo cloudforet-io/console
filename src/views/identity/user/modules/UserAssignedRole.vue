@@ -9,7 +9,7 @@
         >
             <template #col-project_info.project_id-format="{value}">
                 <p-anchor v-if="value" :href="getProjectLink(value, false)" target="_blank">
-                    {{ projectGroups[value] ? projectGroups[value].label : value }}
+                    {{ projects[value] ? projects[value].label : value }}
                 </p-anchor>
                 <p v-if="!value">
                     -
@@ -17,16 +17,14 @@
             </template>
             <template #col-project_group_info.project_group_id-format="{value}">
                 <p-anchor v-if="value" :href="getProjectLink(value, true)" target="_blank">
-                    {{ projects[value] ? projects[value].label : value }}
+                    {{ projectGroups[value] ? projectGroups[value].label : value }}
                 </p-anchor>
                 <p v-if="!value">
                     -
                 </p>
             </template>
             <template #col-labels-format="{value}">
-                <p v-if="value.length === 0">
-                    -
-                </p>
+                <p v-if="value.length === 0"></p>
             </template>
         </p-data-table>
     </div>
@@ -111,23 +109,7 @@ export default {
                     // eslint-disable-next-line camelcase
                     include_role_binding: true,
                 });
-
                 baseState.items = res.role_bindings;
-
-                // res.role_bindings.map(d => ({
-                //     labels: d.labels.length > 0 ? d.labels : '-',
-                //     // eslint-disable-next-line camelcase
-                //     project_group_info_id: d.project_group_info.project_group_id ? d.project_group_info.project_group_id : '-',
-                //     // eslint-disable-next-line camelcase
-                //     project_info: d.project_info ? d.project_info : '-',
-                //     resource_id: d.resource_id,
-                //     resource_type: d.resorce_type,
-                //     role_binding_id: d.role_binding_id,
-                //     // eslint-disable-next-line camelcase
-                //     role_info: d.role_info,
-                //     tags: d.tags,
-                // }));
-                console.log(baseState.items);
                 baseState.loading = false;
             } catch (e) {
                 baseState.items = [];
