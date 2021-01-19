@@ -28,7 +28,7 @@
                                 <strong>{{ $t('COMPONENT.QUERY_SEARCH_GUIDE.QUERY_KEY') }}</strong>
                             </template>
                         </i18n>
-                        <img src="@/assets/help guide/help_search_key.gif" width="248px" height="117px"
+                        <img :src="require('@/assets/help guide/help_search_key.gif')" width="248px" height="117px"
                              class="help-search-img"
                         >
                     </div>
@@ -43,7 +43,7 @@
                         </i18n>
                         <br>
                         {{ $t('COMPONENT.QUERY_SEARCH_GUIDE.STEP_2_2') }}
-                        <img src="@/assets/help guide/help_search_filter.gif" width="643px" height="114px"
+                        <img :src="require('@/assets/help guide/help_search_filter.gif')" width="643px" height="114px"
                              class="help-search-img"
                         >
                     </div>
