@@ -250,17 +250,45 @@ export default {
                         label: 'Name',
                     },
                     {
+                        name: 'state',
+                        label: 'State',
+                    },
+                    {
                         name: 'email',
                         label: 'E-mail',
+                    },
+                    {
+                        name: 'user_type',
+                        label: 'Access Control',
+                    },
+                    {
+                        name: 'role_name',
+                        label: 'Role',
+                    },
+                    {
+                        name: 'backend',
+                        label: 'Auth Type',
+                    },
+                    {
+                        name: 'last_accessed_at',
+                        label: 'Last Activity',
+                    },
+                    {
+                        name: 'timezone',
+                        label: 'Timezone',
                     },
                 ],
             }],
             valueHandlerMap: {
                 user_id: makeDistinctValueHandler('identity.User', 'user_id'),
                 name: makeDistinctValueHandler('identity.User', 'name'),
-                group: makeDistinctValueHandler('identity.User', 'group'),
+                state: makeDistinctValueHandler('identity.User', 'state'),
                 email: makeDistinctValueHandler('identity.User', 'email'),
-                mobile: makeDistinctValueHandler('identity.User', 'mobile'),
+                user_type: makeDistinctValueHandler('identity.User', 'user_type'),
+                role_name: makeDistinctValueHandler('identity.User', 'role_name'),
+                backend: makeDistinctValueHandler('identity.User', 'backend'),
+                last_accessed_at: makeDistinctValueHandler('identity.User', 'last_accessed_at'),
+                timezone: makeDistinctValueHandler('identity.User', 'timezone'),
             },
         };
         const state = reactive({
@@ -360,9 +388,7 @@ export default {
             return apiQuery.data;
         };
 
-        const getRoleNameArray = (array) => {
-            return [...new Set(array)];
-        };
+        const getRoleNameArray = array => [...new Set(array)];
         const getUsers = async () => {
             state.loading = true;
             try {
