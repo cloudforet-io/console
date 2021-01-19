@@ -2,10 +2,8 @@
     <p-button-modal class="collector-update-modal"
                     :header-title="$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_TITLE')"
                     centered
-                    size="xl"
                     fade
                     backdrop
-                    scrollable
                     :loading="loading"
                     :footer-cancel-button-bind="{
                         styleType: 'gray900',
@@ -275,9 +273,8 @@ export default {
 <style lang="postcss">
 .collector-update-modal {
     .collector-input-wrapper {
-        @apply flex border-r border-gray-200;
-        width: 50%;
-        padding: 2.5rem;
+        @apply flex;
+        padding: 0 2rem 3rem 2rem;
         .p-text-input {
             @apply text-gray-900;
             width: 100%;
@@ -288,6 +285,11 @@ export default {
             border-radius: 0.125rem;
             padding-left: 0.5rem;
             padding-right: 0.5rem;
+        }
+        .p-select-dropdown {
+            .p-context-menu {
+                max-height: 6rem;
+            }
         }
     }
 
