@@ -70,11 +70,23 @@ module.exports = {
             // }]),
             ...extraPlugins,
         ],
+        module: {
+            rules: [
+                {
+                    test: /\.(png|jpe?g|gif)$/i,
+                    loader: 'vue-loader',
+                    options: {
+                        esModule: false,
+                    },
+                },
+            ],
+        },
     },
     chainWebpack: (config) => {
         if (process.env.VUE_APP_BUILD_MOD === 'wc') {
 
         }
+
         // These are some necessary steps changing the default webpack config of the Vue CLI
         // that need to be changed in order for Typescript based components to generate their
         // declaration (.d.ts) files.
