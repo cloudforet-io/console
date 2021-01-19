@@ -37,9 +37,6 @@
                              width="1rem"
                         />
                     </span>
-                    <div class="separator" />
-                    <span class="help" @click="onHelpClick">{{ $t('COMPONENT.QUERY_SEARCH.HELP') }}</span>
-                    <p-query-search-guide v-model="visibleSearchGuide" />
                 </div>
             </template>
             <template v-for="(_, slot) of searchSlots" v-slot:[slot]="scope">
@@ -78,7 +75,6 @@ import utc from 'dayjs/plugin/utc';
 
 /* Components, Directives */
 import { focus as vFocus } from 'vue-focus';
-import PQuerySearchGuide from '@/organisms/search/query-search-guide/PQuerySearchGuide.vue';
 import PI from '@/atoms/icons/PI.vue';
 
 /* Types */
@@ -119,7 +115,6 @@ export default {
         PContextMenu,
         PSearch,
         PI,
-        PQuerySearchGuide,
     },
     directives: { focus: vFocus },
     model: {
@@ -560,18 +555,6 @@ export default {
             .icon {
                 position: absolute;
             }
-        }
-        .separator {
-            @apply border-l border-gray-300;
-            height: 1rem;
-            margin-left: 0.625rem;
-            margin-right: 0.625rem;
-        }
-        .help {
-            cursor: pointer;
-            font-size: 0.75rem;
-            margin-right: 0.125rem;
-            &:hover { @apply text-secondary; }
         }
     }
 }
