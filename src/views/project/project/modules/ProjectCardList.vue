@@ -193,6 +193,7 @@ export default {
             noProject: computed(() => !state.loading && state.totalCount === 0),
             hoveredProjectId: '',
             hoveredGroupId: '',
+            isAll: computed(() => !props.groupId),
         });
 
         const getProvider = name => vm.$store.state.resource.provider.items[name] || {};
@@ -254,7 +255,7 @@ export default {
         };
 
         let listProjectToken: CancelTokenSource | undefined;
-        const getData = async (_id?, _text?, isAll = false) => {
+        const getData = async (_id?, _text?) => {
             const id = _id || props.groupId;
             const text = _text || props.searchText;
 
@@ -269,7 +270,7 @@ export default {
             state.cardSummaryLoading = true;
             try {
                 let res;
-                if (isAll) res = await listAllProjectApi(getParams(undefined, text), { cancelToken: listProjectToken.token });
+                if (state.isAll) res = await listAllProjectApi(getParams(undefined, text), { cancelToken: listProjectToken.token });
                 else res = await listProjectApi(getParams(id, text), { cancelToken: listProjectToken.token });
                 state.items = res.results;
                 state.totalCount = res.total_count;
@@ -300,7 +301,7 @@ export default {
 
         const listProjects = async (groupId?, searchText?, reset = true) => {
             if (reset) resetAll();
-            await getData(groupId, searchText, !groupId);
+            await getData(groupId, searchText);
         };
 
         const queryHelper = new QueryHelper();
