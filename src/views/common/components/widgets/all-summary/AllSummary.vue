@@ -360,7 +360,7 @@ export default {
 
             // fill default value
             forEach(range(0, dateRange), (i) => {
-                let date = dayjs().utc().subtract(i, dateUnit);
+                let date = dayjs.utc().subtract(i, dateUnit);
                 if (state.selectedType === DATA_TYPE.billing && state.selectedDateType === DATE_TYPE.daily) {
                     date = date.subtract(1, 'day');
                 }
@@ -401,8 +401,8 @@ export default {
             try {
                 const res = await SpaceConnector.client.statistics.topic.billingSummary({
                     granularity: DATE_TYPE.monthly,
-                    start: dayjs().utc().startOf('month').format('YYYY-MM-DD'),
-                    end: dayjs().utc().endOf('month').format('YYYY-MM-DD'),
+                    start: dayjs.utc().startOf('month').format('YYYY-MM-DD'),
+                    end: dayjs.utc().endOf('month').format('YYYY-MM-DD'),
                 });
                 if (res.results.length > 0) {
                     const count = res.results[0].billing_data[0].cost;
@@ -439,11 +439,11 @@ export default {
                     let start;
                     let end;
                     if (state.selectedDateType === DATE_TYPE.monthly) {
-                        start = dayjs().utc().subtract(MONTH_COUNT - 1, 'month').format('YYYY-MM');
-                        end = dayjs().utc().format('YYYY-MM');
+                        start = dayjs.utc().subtract(MONTH_COUNT - 1, 'month').format('YYYY-MM');
+                        end = dayjs.utc().format('YYYY-MM');
                     } else {
-                        start = dayjs().utc().subtract(DAY_COUNT, 'day').format('YYYY-MM-DD');
-                        end = dayjs().utc().subtract(1, 'day').format('YYYY-MM-DD');
+                        start = dayjs.utc().subtract(DAY_COUNT, 'day').format('YYYY-MM-DD');
+                        end = dayjs.utc().subtract(1, 'day').format('YYYY-MM-DD');
                     }
                     const res = await SpaceConnector.client.statistics.topic.billingSummary({
                         granularity: state.selectedDateType,
@@ -540,8 +540,8 @@ export default {
                 const res = await SpaceConnector.client.statistics.topic.billingSummary({
                     granularity: DATE_TYPE.monthly,
                     aggregation: 'inventory.CloudServiceType',
-                    start: dayjs().utc().startOf('month').format('YYYY-MM-DD'),
-                    end: dayjs().utc().endOf('month').format('YYYY-MM-DD'),
+                    start: dayjs.utc().startOf('month').format('YYYY-MM-DD'),
+                    end: dayjs.utc().endOf('month').format('YYYY-MM-DD'),
                 });
                 const summaryData: SummaryData[] = [];
                 res.results.forEach((d) => {
