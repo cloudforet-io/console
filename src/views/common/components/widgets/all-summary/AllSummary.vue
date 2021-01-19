@@ -53,8 +53,8 @@
                     <template v-if="!loading && summaryData.length > 0">
                         <div class="summary-content-wrapper block md:grid md:grid-cols-3 lg:block">
                             <router-link :to="selectedType !== 'billing' ? getLocation(selectedType) : ''"
-                                         class="summary-row link-text col-span-3 md:col-span-1 lg:col-span-3"
-                                         :class="selectedType"
+                                         class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
+                                         :class="{'link-text': selectedType !== 'billing'}"
                             >
                                 <div class="text-group">
                                     <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
