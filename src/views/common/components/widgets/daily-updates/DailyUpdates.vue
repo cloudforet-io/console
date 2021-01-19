@@ -124,6 +124,7 @@ interface CloudService {
 
 interface Server {
     cloud_service_group: string;
+    cloud_service_type: string;
     total_count: number;
     icon: string;
     provider: string;
@@ -233,20 +234,30 @@ export default {
                     isServer: true,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
-                        name: 'server',
+                        name: 'cloudServicePage',
+                        params: {
+                            provider: d.provider,
+                            group: d.cloud_service_group,
+                            name: d.cloud_service_type,
+                        },
                         query: {
                             filters: queryHelper.setFilters([
-                                { k: 'provider', v: d.provider, o: '=' },
+                                // { k: 'provider', v: d.provider, o: '=' },
                                 { k: 'project_id', v: props.projectId, o: '=' },
                                 { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
                             ]).rawQueryStrings,
                         },
                     },
                     deletedHref: {
-                        name: 'server',
+                        name: 'cloudServicePage',
+                        params: {
+                            provider: d.provider,
+                            group: d.cloud_service_group,
+                            name: d.cloud_service_type,
+                        },
                         query: {
                             filters: queryHelper.setFilters([
-                                { k: 'provider', v: d.provider, o: '=' },
+                                // { k: 'provider', v: d.provider, o: '=' },
                                 { k: 'project_id', v: props.projectId, o: '=' },
                                 { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
                                 { k: 'state', v: 'DELETED', o: '=' },
@@ -300,19 +311,29 @@ export default {
                     isServer: true,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
-                        name: 'server',
+                        name: 'cloudServicePage',
+                        params: {
+                            provider: d.provider,
+                            group: d.cloud_service_group,
+                            name: d.cloud_service_type,
+                        },
                         query: {
                             filters: queryHelper.setFilters([
-                                { k: 'provider', v: d.provider, o: '=' },
+                                // { k: 'provider', v: d.provider, o: '=' },
                                 { k: 'created_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
                             ]).rawQueryStrings,
                         },
                     },
                     deletedHref: {
-                        name: 'server',
+                        name: 'cloudServicePage',
+                        params: {
+                            provider: d.provider,
+                            group: d.cloud_service_group,
+                            name: d.cloud_service_type,
+                        },
                         query: {
                             filters: queryHelper.setFilters([
-                                { k: 'provider', v: d.provider, o: '=' },
+                                // { k: 'provider', v: d.provider, o: '=' },
                                 { k: 'deleted_at', v: dayjs().format('YYYY-MM-DD'), o: '=t' },
                                 { k: 'state', v: 'DELETED', o: '=' },
                             ]).rawQueryStrings,

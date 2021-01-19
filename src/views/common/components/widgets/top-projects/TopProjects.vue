@@ -237,18 +237,13 @@ export default {
 
         const queryHelper = new QueryHelper();
         const getLocation = (type, projectId) => {
-            let name: string;
-            const query: Location['query'] = {};
 
-            // set query
-            if (type === 'compute') {
-                name = 'server';
-            } else {
-                name = 'cloudServiceMain';
-                query.provider = 'all';
-                query.service = CLOUD_SERVICE_LABEL[type];
-                if (type === 'storage') query.primary = 'false';
-            }
+            const query: Location['query'] = {};
+            const name = 'cloudServiceMain';
+
+            query.provider = 'all';
+            query.service = CLOUD_SERVICE_LABEL[type];
+            if (type === 'storage') query.primary = 'false';
 
             const location: Location = {
                 name,
