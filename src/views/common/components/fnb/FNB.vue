@@ -2,7 +2,7 @@
     <div class="fnb h-11 sm:h-10 ">
         <div class="fnb-contents flex flex-col sm:flex-row">
             <div class="flex-1 sm:flex-auto">
-                <span class="copyright"><span class="hidden sm:inline-block">Copyright </span>© 2020 Megazone Cloud Inc.</span>
+                <span class="copyright"><span class="hidden sm:inline-block">Copyright </span>© 2021 Megazone Cloud Inc.</span>
             </div>
             <div class="sm:flex-col-reverse ">
                 <span class="email">
