@@ -53,7 +53,7 @@
                     <template v-if="!loading && summaryData.length > 0">
                         <div class="summary-content-wrapper block md:grid md:grid-cols-3 lg:block">
                             <router-link :to="selectedType !== 'billing' ? getLocation(selectedType) : ''"
-                                         class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
+                                         class="summary-row link-text col-span-3 md:col-span-1 lg:col-span-3"
                                          :class="selectedType"
                             >
                                 <div class="text-group">
@@ -64,6 +64,7 @@
                             <router-link v-for="(data, idx) of summaryData" :key="idx"
                                          :to="data.to"
                                          class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
+                                         :class="{'link-text': !!data.to.name}"
                             >
                                 <div class="text-group">
                                     <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
@@ -117,7 +118,6 @@ import {
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { QueryHelper } from '@/lib/query';
-import { QueryStoreFilter } from '@/lib/query/type';
 import { gray, primary, primary1 } from '@/styles/colors';
 import { store } from '@/store';
 
@@ -277,7 +277,7 @@ export default {
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
             valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
             valueAxis.fontSize = 11;
-            valueAxis.extraMax = 0.1;
+            valueAxis.extraMax = 0.15;
             if (state.selectedType === DATA_TYPE.billing) {
                 valueAxis.renderer.labels.template.adapter.add('text', (text, target) => numberFormatter(target.dataItem.value));
             } else {
@@ -320,21 +320,14 @@ export default {
             }, BOX_SWITCH_INTERVAL);
         };
         const getLocation = (type) => {
-            const query: Location['query'] = {};
-            let name: string;
-
-            // set query
-            if (type === DATA_TYPE.compute) {
-                name = 'server';
-            } else {
-                name = 'cloudServiceMain';
-                query.provider = 'all';
-                query.service = CLOUD_SERVICE_LABEL[type];
-                if (type === DATA_TYPE.storage) query.primary = 'false';
-            }
+            const query: Location['query'] = {
+                provider: 'all',
+                service: CLOUD_SERVICE_LABEL[type],
+            };
+            if (type === DATA_TYPE.storage) query.primary = 'false';
 
             const location: Location = {
-                name,
+                name: 'cloudServiceMain',
                 query: {
                     filters: queryHelper.rawQueryStrings,
                     ...query,
@@ -489,18 +482,10 @@ export default {
                     },
                 },
             };
-            if (type === DATA_TYPE.compute) {
+            if (type === DATA_TYPE.storage) {
                 param = {
                     ...defaultParam,
-                    resource_type: 'inventory.Server',
-                };
-            } else if (type === DATA_TYPE.database) {
-                param = {
-                    ...defaultParam,
-                };
-            } else if (type === DATA_TYPE.storage) {
-                param = {
-                    ...defaultParam,
+                    is_major: true,
                 };
                 param.query.sort = { name: 'size', desc: true };
                 param.fields = [
@@ -510,6 +495,11 @@ export default {
                         key: 'data.size',
                     },
                 ];
+            } else {
+                param = {
+                    ...defaultParam,
+                    is_primary: true,
+                };
             }
             return param;
         };
@@ -520,30 +510,15 @@ export default {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(param);
                 const summaryData: SummaryData[] = [];
 
-                const summaryQueryHelper = new QueryHelper();
                 res.results.forEach((d) => {
-                    let detailLocation: Location;
-
-                    if (d.resource_type === 'inventory.Server') {
-                        const filters: QueryStoreFilter[] = [];
-                        filters.push({ k: 'provider', o: '=', v: d.provider },
-                            { k: 'cloud_service_type', o: '=', v: d.cloud_service_type });
-                        detailLocation = {
-                            name: 'server',
-                            query: {
-                                filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
-                            },
-                        };
-                    } else {
-                        detailLocation = {
-                            name: 'cloudServicePage',
-                            params: {
-                                provider: d.provider,
-                                group: d.cloud_service_group,
-                                name: d.cloud_service_type,
-                            },
-                        };
-                    }
+                    const detailLocation: Location = {
+                        name: 'cloudServicePage',
+                        params: {
+                            provider: d.provider,
+                            group: d.cloud_service_group,
+                            name: d.cloud_service_type,
+                        },
+                    };
                     summaryData.push({
                         provider: d.provider,
                         label: state.providers[d.provider].label,
@@ -561,6 +536,7 @@ export default {
         };
         const getBillingSummaryInfo = async () => {
             try {
+                state.loading = true;
                 const res = await SpaceConnector.client.statistics.topic.billingSummary({
                     granularity: DATE_TYPE.monthly,
                     aggregation: 'inventory.CloudServiceType',
@@ -594,6 +570,8 @@ export default {
                 state.summaryData = summaryData;
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
 
@@ -852,12 +830,13 @@ export default {
                 display: block;
                 font-size: 0.875rem;
                 line-height: 1.2;
-                cursor: pointer;
+                cursor: default;
                 padding: 0.25rem 0.5rem;
                 margin: auto 0;
 
-                &:hover {
+                &.link-text:hover {
                     @apply bg-secondary2;
+                    cursor: pointer;
                     .text-group, .provider, .type, .count {
                         text-decoration: underline;
                     }

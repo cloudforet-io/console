@@ -507,7 +507,6 @@ export default {
                         ...billingData,
                     });
                 });
-                console.log(data);
                 tableState.data = data;
             } catch (e) {
                 console.error(e);

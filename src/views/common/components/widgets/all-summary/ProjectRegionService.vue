@@ -57,9 +57,11 @@ import {
 } from '@vue/composition-api';
 
 import { SpaceConnector } from '@/lib/space-connector';
+import { QueryHelper } from '@/lib/query';
 import { gray, violet, white } from '@/styles/colors';
 import Color from 'color';
 import { store } from '@/store';
+import { Location } from 'vue-router';
 
 am4core.useTheme(am4themes_animated);
 
@@ -91,6 +93,7 @@ export default {
         },
     },
     setup(props) {
+        const queryHelper = new QueryHelper();
         const state = reactive({
             loading: true,
             skeletons: range(3),
@@ -161,6 +164,25 @@ export default {
 
             state.chart = chart;
         };
+        const getLocation = (provider, region) => {
+            const query: Location['query'] = {
+                provider,
+                region,
+            };
+            if (props.label !== 'All') query.service = props.label;
+
+            // set filters
+            queryHelper.setFilters([{ k: 'project_id', o: '=', v: props.projectId }]);
+
+            const location: Location = {
+                name: 'cloudServiceMain',
+                query: {
+                    filters: queryHelper.rawQueryStrings,
+                    ...query,
+                },
+            };
+            return location;
+        };
 
         /* api */
         const getData = async () => {
@@ -180,7 +202,7 @@ export default {
                     total: d.total,
                     count: d.label === 'Storage' ? byteFormatter(d.total) : d.total,
                     color: state.providers[d.provider].color,
-                    to: '',
+                    to: getLocation(d.provider, d.region_code),
                     fillOpacity: opacities[random(4)],
                 }));
                 data = orderBy(data, ['total'], ['desc']);

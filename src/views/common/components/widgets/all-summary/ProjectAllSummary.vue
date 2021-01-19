@@ -310,24 +310,17 @@ export default {
             bullet.label.dy = -10;
         };
         const getLocation = (type) => {
-            const query: Location['query'] = {};
-            let name: string;
-
-            // set query
-            if (type === DATA_TYPE.compute) {
-                name = 'server';
-            } else {
-                name = 'cloudServiceMain';
-                query.provider = 'all';
-                query.service = CLOUD_SERVICE_LABEL[type];
-                if (type === DATA_TYPE.storage) query.primary = 'false';
-            }
+            const query: Location['query'] = {
+                provider: 'all',
+                service: CLOUD_SERVICE_LABEL[type],
+            };
+            if (type === DATA_TYPE.storage) query.primary = 'false';
 
             // set filters
             queryHelper.setFilters([{ k: 'project_id', o: '=', v: props.projectId }]);
 
             const location: Location = {
-                name,
+                name: 'cloudServiceMain',
                 query: {
                     filters: queryHelper.rawQueryStrings,
                     ...query,
@@ -427,13 +420,7 @@ export default {
                 value: props.projectId,
             };
 
-            if (type === DATA_TYPE.compute) {
-                param = {
-                    ...defaultParam,
-                    is_primary: true,
-                    resource_type: 'inventory.Server',
-                };
-            } else if (type === DATA_TYPE.storage) {
+            if (type === DATA_TYPE.storage) {
                 param = {
                     ...defaultParam,
                     is_major: true,
@@ -463,36 +450,22 @@ export default {
 
                 const summaryQueryHelper = new QueryHelper();
                 res.results.forEach((d) => {
-                    let detailLocation: Location;
                     const filters: QueryStoreFilter[] = [];
                     filters.push({
                         k: 'project_id', o: '=', v: props.projectId,
                     });
 
-                    if (d.resource_type === 'inventory.Server') {
-                        filters.push(
-                            { k: 'provider', o: '=', v: d.provider },
-                            { k: 'cloud_service_type', o: '=', v: d.cloud_service_type },
-                        );
-                        detailLocation = {
-                            name: 'server',
-                            query: {
-                                filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
-                            },
-                        };
-                    } else {
-                        detailLocation = {
-                            name: 'cloudServicePage',
-                            params: {
-                                provider: d.provider,
-                                group: d.cloud_service_group,
-                                name: d.cloud_service_type,
-                            },
-                            query: {
-                                filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
-                            },
-                        };
-                    }
+                    const detailLocation: Location = {
+                        name: 'cloudServicePage',
+                        params: {
+                            provider: d.provider,
+                            group: d.cloud_service_group,
+                            name: d.cloud_service_type,
+                        },
+                        query: {
+                            filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
+                        },
+                    };
                     summaryData.push({
                         provider: d.provider,
                         label: state.providers[d.provider].label,
