@@ -29,6 +29,10 @@ export default {
 
         return h(tag, {
             ...data,
+            attrs: {
+                ...data.attrs,
+                href: props.disabled ? undefined : props.href,
+            },
             class: {
                 ...getClass({ ...data.attrs, ...props }),
                 ...getBindClass(data.class),

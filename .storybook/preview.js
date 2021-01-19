@@ -83,13 +83,7 @@ export const parameters = {
             return null;
         },
         theme: SpaceOneTheme,
-        page: null,
     },
-    // previewTabs: {
-    //     canvas: {
-    //         hidden: true
-    //     }
-    // },
     viewport: {
         viewports: {
             ...mapValues(tailwindConfig.theme.screens, (v, k) => ({
