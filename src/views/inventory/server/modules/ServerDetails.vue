@@ -15,6 +15,7 @@
                                           keyItemSets,
                                           valueHandlerMap,
                                           language,
+                                          excelVisible: false
                                       }"
                                       :field-handler="fieldHandler"
                                       v-on="dynamicLayoutListeners"

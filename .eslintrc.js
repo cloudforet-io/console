@@ -72,7 +72,8 @@ module.exports = {
           "service_account_id",
           "resource_id",
           "role_id",
-          "role_binding_id"
+          "role_binding_id",
+          "data_source"
         ]
       }
     ],
