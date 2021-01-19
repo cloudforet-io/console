@@ -447,7 +447,6 @@ export default {
                 }
                 // set api query to get only a few specified data
                 if (res?.options?.fields) {
-
                     apiQuery.setOnly(...res.options.fields.map((d) => {
                         if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
                         return d.key;
@@ -537,7 +536,7 @@ export default {
         const onClickCollectData = () => {
             tableState.collectModalVisible = true;
         };
-        const checkModalConfirm = async (items: ServerModel[]) => {
+        const checkModalConfirm = async () => {
             const resetCheckTableModalState = () => {
                 checkTableModalState.visible = false;
                 checkTableModalState.title = '';
@@ -549,11 +548,11 @@ export default {
             try {
                 await checkTableModalState.api({
                     ...checkTableModalState.params,
-                    servers: items.map(item => item.server_id),
+                    servers: tableState.selectedItems.map(item => item.server_id),
                 });
                 showSuccessMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_S_CHECK_MODAL', { action: checkTableModalState.title }), '', context.root);
             } catch (e) {
-                showErrorMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_E_CHECK_MODAL'), e, context.root);
+                showErrorMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_E_CHECK_MODAL', { action: checkTableModalState.title }), e, context.root);
             } finally {
                 typeOptionState.selectIndex = [];
                 resetCheckTableModalState();
