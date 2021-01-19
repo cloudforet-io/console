@@ -196,15 +196,15 @@ export default {
             }),
             pastDate: computed(() => {
                 if (state.selectedDateType === DATE_TYPE.monthly) {
-                    return dayjs().utc().subtract(1, 'month').format('MMM/YYYY');
+                    return dayjs.utc().subtract(1, 'month').format('MMM/YYYY');
                 }
-                return dayjs().utc().subtract(2, 'day').format('DD/MM/YYYY');
+                return dayjs.utc().subtract(2, 'day').format('DD/MM/YYYY');
             }),
             currentDate: computed(() => {
                 if (state.selectedDateType === DATE_TYPE.monthly) {
-                    return dayjs().utc().format('MMM/YYYY');
+                    return dayjs.utc().format('MMM/YYYY');
                 }
-                return dayjs().utc().subtract(1, 'day').format('DD/MM/YYYY');
+                return dayjs.utc().subtract(1, 'day').format('DD/MM/YYYY');
             }),
             pastCost: 0,
             currentCost: 0,
@@ -214,9 +214,9 @@ export default {
             isCollapsed: true,
             fields: [] as any,
             data: [],
-            endDate: dayjs().utc(),
+            endDate: dayjs.utc(),
             nextButtonDisabled: computed(() => {
-                const now = dayjs().utc();
+                const now = dayjs.utc();
                 if (state.selectedDateType === DATE_TYPE.monthly) {
                     return now.isSame(tableState.endDate, 'month');
                 }
@@ -338,7 +338,7 @@ export default {
 
         /* api */
         const getCount = async () => {
-            const utcToday = dayjs().utc();
+            const utcToday = dayjs.utc();
             let start;
             let end;
             if (state.selectedDateType === DATE_TYPE.monthly) {
@@ -365,7 +365,7 @@ export default {
             }
         };
         const getTrend = async () => {
-            const utcToday = dayjs().utc();
+            const utcToday = dayjs.utc();
             const dateType = state.selectedDateType;
             const dateFormat = dateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
             let start;
@@ -484,12 +484,12 @@ export default {
                     result.billing_data.forEach((d) => {
                         const dateUnit = state.selectedDateType === DATE_TYPE.monthly ? 'month' : 'day';
                         const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'YYYY-MM' : 'YYYY-MM-DD';
-                        const pastDate = dayjs(d.date).utc().subtract(1, dateUnit).format(dateFormat);
-                        const pastCost = result.billing_data.find(bd => bd.date === pastDate)?.cost;
+                        const pastDate = dayjs.utc(d.date).subtract(1, dateUnit).format(dateFormat);
+                        const pastCost = result.billing_data.find(bd => bd.date === pastDate)?.cost || 0;
                         billingData[d.date] = {
                             cost: d.cost < 0.1 ? '-' : `$${commaFormatter(numberFormatter(d.cost))}`,
                         };
-                        if (pastCost && pastCost * 1.5 < d.cost) {
+                        if (d.cost > 0.1 && pastCost && pastCost * 1.5 < d.cost) {
                             billingData[d.date].color = 'red';
                         }
                     });
