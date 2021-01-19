@@ -341,9 +341,9 @@ export default {
                 statusValues = [JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout];
             }
 
-            statusValues.forEach((d) => {
-                apiQuery.addFilter({ k: 'status', v: d, o: '=' });
-            });
+            if (statusValues.length > 0) {
+                apiQuery.addFilter({ k: 'status', v: statusValues });
+            }
 
             return apiQuery.data;
         };

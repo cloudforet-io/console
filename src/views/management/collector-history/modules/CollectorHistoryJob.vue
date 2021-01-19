@@ -308,7 +308,9 @@ export default {
             } else if (state.activatedStatus === 'failure') {
                 statusValues = [JOB_TASK_STATUS.failure];
             }
-            if (statusValues.length > 0) apiQuery.addFilter({ k: 'status', v: statusValues });
+            if (statusValues.length > 0) {
+                apiQuery.addFilter({ k: 'status', v: statusValues });
+            }
 
             return apiQuery.data;
         };
