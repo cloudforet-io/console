@@ -42,7 +42,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { range, random } from 'lodash';
+import { range, random, orderBy } from 'lodash';
 import bytes from 'bytes';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -174,14 +174,17 @@ export default {
                 };
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary(param);
                 const opacities = [0.2, 0.4, 0.6, 0.8, 1];
-                state.data = res.results.map(d => ({
+                let data = res.results.map(d => ({
                     provider: state.providers[d.provider].label,
                     region: d.region_code,
+                    total: d.total,
                     count: d.label === 'Storage' ? byteFormatter(d.total) : d.total,
                     color: state.providers[d.provider].color,
                     to: '',
                     fillOpacity: opacities[random(4)],
                 }));
+                data = orderBy(data, ['total'], ['desc']);
+                state.data = data;
             } catch (e) {
                 console.error(e);
             } finally {
