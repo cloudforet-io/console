@@ -49,7 +49,7 @@
             <div v-else-if="!loading && filteredData.length === 0" class="no-data-wrapper">
                 <img src="@/assets/images/illust_microscope.svg" class="no-data-img">
                 <p class="no-data-text">
-                    {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.NO_REGION') }}
+                    {{$t('COMMON.WIDGETS.RESOURCE_MAP.NO_REGION')}}
                 </p>
             </div>
             <div v-else class="col-span-12 lg:col-span-3 xl:col-span-3 2xl:col-span-3">

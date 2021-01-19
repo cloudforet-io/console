@@ -341,6 +341,9 @@
 			"RESOURCE_BY_REGION_REGIONS": "Regions",
 			"RESOURCE_BY_REGION_SERVER": "Server",
 			"RESOURCE_BY_REGION_TITLE": "Resources By Region",
+			"RESOURCE_MAP": {
+				"NO_REGION": "No Major Services in This Region."
+			},
 			"RUN_COLLECTOR": "Run Collectors",
 			"RUN_COLLECTOR_COLLECTOR": "Collector",
 			"RUN_COLLECTOR_COMPLETED_TOTAL": "Completed / Total",
