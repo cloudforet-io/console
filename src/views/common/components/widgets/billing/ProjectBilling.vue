@@ -80,12 +80,18 @@
                     <template #th-service-format>
                         <span />
                     </template>
-                    <template #col-service-format="{value, index}">
-                        <!--                        <router-link class="link-text" :to="">-->
-                        <div class="col-service">
-                            <span v-tooltip.bottom="{content: value}">{{ value }}</span>
-                        </div>
-                        <!--                        </router-link>-->
+                    <template v-for="field in tableState.fields" v-slot:[`col-${field.name}-format`]="{value}">
+                        <template v-if="field.name !== 'service'">
+                            <span v-if="value" :key="field.name" :style="{ 'color': value.color }">{{ value.cost }}</span>
+                            <span v-else>-</span>
+                        </template>
+                        <!--                        <span v-if="" :key="field.name" :style="{ 'color': value.color }">{{ value.cost }}</span>-->
+                        <span v-else :key="field.name" class="col-service"
+                              :class="{'link-text': !!value.to.name }"
+                        >
+                            <router-link v-if="!!value.to.name" :to="value.to">{{ value.name }}</router-link>
+                            <span v-else>{{ value.name }}</span>
+                        </span>
                     </template>
                 </p-data-table>
                 <div v-if="tableState.data.length > 5" class="toggle-button-wrapper">
@@ -123,8 +129,9 @@ import {
 import { SpaceConnector } from '@/lib/space-connector';
 import { QueryHelper } from '@/lib/query';
 import {
-    gray, safe, secondary, secondary1,
+    gray, safe, secondary, secondary1, green, blue,
 } from '@/styles/colors';
+import Color from 'color';
 
 am4core.useTheme(am4themes_animated);
 
@@ -134,7 +141,8 @@ interface ChartData {
     value: number;
     color?: string;
     dash?: string;
-    bulletColor?: string;
+    tooltipTextColor?: string;
+    tooltipBorderColor?: string;
 }
 
 enum DATE_TYPE {
@@ -278,10 +286,18 @@ export default {
             series.fill = am4core.color(secondary1);
             series.strokeWidth = 2;
             series.fillOpacity = 1;
-
             series.propertyFields.fill = 'color';
             series.propertyFields.stroke = 'color';
             series.propertyFields.strokeDasharray = 'dash';
+
+            series.adapter.add('tooltipText', (text, target) => `[bold]$${commaFormatter(numberFormatter(target.tooltipDataItem.dataContext.value))}`);
+            series.tooltip.fontSize = 14;
+            series.tooltip.strokeWidth = 0;
+            series.tooltip.dy = -5;
+            series.tooltip.getFillFromObject = false;
+            series.tooltip.pointerOrientation = 'down';
+            series.tooltip.label.propertyFields.fill = 'tooltipTextColor';
+            series.tooltip.background.propertyFields.stroke = 'tooltipBorderColor';
 
             const fillModifier = new am4core.LinearGradientModifier();
             fillModifier.opacities = [0.3, 0];
@@ -289,25 +305,12 @@ export default {
             fillModifier.gradient.rotation = 90;
             series.segments.template.fillModifier = fillModifier;
 
-            const bullet = series.bullets.push(new am4charts.LabelBullet());
-            bullet.label.text = '[bold]{value}';
-            bullet.label.fontSize = 12;
-            bullet.label.adapter.add('text', (text, target) => `$${numberFormatter(target.dataItem.valueY)}`);
-            bullet.label.fill = am4core.color(secondary);
-            bullet.label.dy = -15;
-            bullet.fillOpacity = 0;
-            bullet.strokeOpacity = 0;
-            bullet.label.propertyFields.fill = 'bulletColor';
-            bullet.label.propertyFields.stroke = 'bulletColor';
-            const bulletState = bullet.states.create('hover');
-            bulletState.properties.fillOpacity = 1;
-
             const circleBullet = series.bullets.push(new am4charts.CircleBullet());
             circleBullet.circle.strokeWidth = 0;
             circleBullet.fillOpacity = 0;
             circleBullet.circle.fill = am4core.color(secondary);
-            circleBullet.circle.propertyFields.fill = 'bulletColor';
-            circleBullet.circle.propertyFields.stroke = 'bulletColor';
+            circleBullet.circle.propertyFields.fill = 'tooltipTextColor';
+            circleBullet.circle.propertyFields.stroke = 'tooltipTextColor';
             const circleBulletState = circleBullet.states.create('hover');
             circleBulletState.properties.fillOpacity = 1;
             circleBulletState.properties.strokeOpacity = 1;
@@ -412,7 +415,11 @@ export default {
                         chartData.dash = '2, 2';
                     }
                     if (index === orderedData.length - 1) {
-                        chartData.bulletColor = safe;
+                        chartData.tooltipTextColor = safe;
+                        chartData.tooltipBorderColor = green[300];
+                    } else {
+                        chartData.tooltipTextColor = secondary;
+                        chartData.tooltipBorderColor = blue[300];
                     }
                     return chartData;
                 });
@@ -470,19 +477,37 @@ export default {
                     start,
                     end,
                 });
-                console.log(res);
 
                 const data: any = [];
-                res.results.forEach((d) => {
+                res.results.forEach((result) => {
                     const billingData = {};
-                    d.billing_data.forEach((b) => {
-                        billingData[b.date] = b.cost < 0.1 ? '-' : `$${commaFormatter(numberFormatter(b.cost))}`;
+                    result.billing_data.forEach((d) => {
+                        const dateUnit = state.selectedDateType === DATE_TYPE.monthly ? 'month' : 'day';
+                        const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'YYYY-MM' : 'YYYY-MM-DD';
+                        const pastDate = dayjs(d.date).utc().subtract(1, dateUnit).format(dateFormat);
+                        const pastCost = result.billing_data.find(bd => bd.date === pastDate)?.cost;
+                        billingData[d.date] = {
+                            cost: d.cost < 0.1 ? '-' : `$${commaFormatter(numberFormatter(d.cost))}`,
+                        };
+                        if (pastCost && pastCost * 1.5 < d.cost) {
+                            billingData[d.date].color = 'red';
+                        }
                     });
+
+                    let to = {};
+                    if (result.cloud_service_group && result.cloud_service_type) {
+                        to = getLink(result);
+                    }
+
                     data.push({
-                        service: d.cloud_service_group || d.service_code,
+                        service: {
+                            name: result.cloud_service_group || result.service_code,
+                            to,
+                        },
                         ...billingData,
                     });
                 });
+                console.log(data);
                 tableState.data = data;
             } catch (e) {
                 console.error(e);
@@ -660,9 +685,15 @@ export default {
                 width: auto;
                 height: 1.75rem;
                 .col-service {
-                    @apply text-gray-700 truncate;
-                    display: inline-block;
-                    width: 5rem;
+                    @apply text-gray-700;
+                    cursor: default;
+                    &.link-text {
+                        @apply text-secondary;
+                        cursor: pointer;
+                        &:hover {
+                            text-decoration: underline;
+                        }
+                    }
                 }
             }
         }
