@@ -476,9 +476,7 @@ export default {
         table-layout: fixed;
     }
     th {
-        position: sticky;
         z-index: 1;
-        top: 0;
         vertical-align: bottom;
         line-height: 1.25rem;
         font-size: 0.875rem;
