@@ -174,17 +174,16 @@ export default {
                     ],
                 },
             });
-            if (state.providers !== undefined || state.providers) {
-                state.data = [
-                    ...resp.results.map(d => ({
-                        title: d.name,
-                        latitude: parseFloat(d.tags.find(tag => tag.key === 'latitude').value),
-                        longitude: parseFloat(d.tags.find(tag => tag.key === 'longitude').value),
-                        color: state.providers[d.provider]?.color as string,
-                        ...d,
-                    })),
-                ];
-            }
+
+            state.data = [
+                ...resp.results.map(d => ({
+                    title: d.name,
+                    latitude: parseFloat(d.tags.find(tag => tag.key === 'latitude').value),
+                    longitude: parseFloat(d.tags.find(tag => tag.key === 'longitude').value),
+                    color: state.providers[d.provider]?.color as string,
+                    ...d,
+                })),
+            ];
         };
 
         const setInitialRegionSetting = async () => {
@@ -352,6 +351,7 @@ export default {
 
         const init = async () => {
             state.loading = true;
+            await store.dispatch('resource/provider/load', true);
             await getRegionList();
             if (state.data.length > 0) {
                 await setInitialRegionSetting();
