@@ -44,7 +44,7 @@ export default {
         },
         alertPosition: {
             type: String,
-            default: null,
+            default: 'right',
         },
         iconColor: {
             type: String,
