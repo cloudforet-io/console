@@ -9,7 +9,8 @@ const SPECIAL_LABEL_MAP = {
     azure: 'Azure',
 };
 
-export const load = async ({ commit }): Promise<void|Error> => {
+export const load = async ({ commit, state }, lazyLoad = false): Promise<void|Error> => {
+    if (lazyLoad && Object.keys(state.items).length > 0) return;
     try {
         const response = await SpaceConnector.client.identity.provider.list({
             query: {
