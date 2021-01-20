@@ -180,7 +180,7 @@ export default {
                         title: d.name,
                         latitude: parseFloat(d.tags.find(tag => tag.key === 'latitude').value),
                         longitude: parseFloat(d.tags.find(tag => tag.key === 'longitude').value),
-                        color: state.providers[d.provider].color as string,
+                        color: state.providers[d.provider]?.color as string,
                         ...d,
                     })),
                 ];
