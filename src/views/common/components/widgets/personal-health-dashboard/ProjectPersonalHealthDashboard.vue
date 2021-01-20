@@ -58,11 +58,10 @@
                                     <span class="value">{{ resource.aws_account_id }}</span>
                                 </template>
                                 <template v-else>
-                                    <router-link class="link-text"
-                                                 :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })"
-                                    >
-                                        <span>{{ resource.entity_value }}</span>
-                                        <p-i name="ic_external-link" height="1em" width="1em" />
+                                    <router-link :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })">
+                                        <p-anchor highlight>
+                                            <span class="link-text">{{ resource.entity_value }}</span>
+                                        </p-anchor>
                                     </router-link>
                                 </template>
                             </div>
@@ -352,10 +351,9 @@ export default {
     height: 18.75rem;
     border-width: 0;
     .link-text {
+        @apply truncate;
         display: inline-block;
-        width: 15rem;
-        white-space: pre-wrap;
-        padding: 0.5rem 0;
+        width: 9rem;
     }
     .affected-resources-wrapper {
         display: flex;
