@@ -162,7 +162,12 @@ export class QueryHelper {
             if (f.k) {
                 if (typeof f.v === 'string' && datetimeRawQueryOperatorToQueryTagOperatorMap[f.o as string]) {
                     /* datetime case */
-                    const time = dayjs.tz(f.v, store.state.user.timezone).utc();
+                    const time = dayjs.utc(dayjs.tz(f.v, store.state.user.timezone));
+
+                    // console.debug('time filter value: ', f.v,
+                    //     '\ntimezone: ', store.state.user.timezone,
+                    //     '\nlocal time: ', dayjs.tz(f.v, store.state.user.timezone).format('YYYY-MM-DD HH:mm:ss'),
+                    //     '\nutc time: ', time.format('YYYY-MM-DD HH:mm:ss'));
 
                     if (f.o === '>t' || f.o === '>=t') {
                         filter.push({ k: f.k, v: time.toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['>=t'] });
@@ -170,7 +175,7 @@ export class QueryHelper {
                         filter.push({ k: f.k, v: time.toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['<=t'] });
                     } else {
                         filter.push({ k: f.k, v: time.toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['>=t'] });
-                        filter.push({ k: f.k, v: time.add(1, 'day').toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['<'] });
+                        filter.push({ k: f.k, v: time.add(1, 'day').toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['<t'] });
                     }
                 } else if (Array.isArray(f.v)) {
                     /* plural case */
