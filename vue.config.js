@@ -61,6 +61,12 @@ module.exports = {
         plugins: [
             ...extraPlugins,
         ],
+        externals: function (context, request, callback) {
+            if (/xlsx|canvg|pdfmake/.test(request)) {
+                return callback(null, 'commonjs ' + request);
+            }
+            callback();
+        },
     },
     chainWebpack: (config) => {
         // These are some necessary steps changing the default webpack config of the Vue CLI
