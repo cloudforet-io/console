@@ -1,8 +1,8 @@
 import { RouteConfig } from 'vue-router';
 
-const PowerSchedulerLandingPage = () => import('@/views/automation/power-scheduler/pages/PowerSchedulerLandingPage.vue');
-const PowerSchedulerPage = () => import('@/views/automation/power-scheduler/pages/PowerSchedulerPage.vue');
-const ResourceGroupPage = () => import('@/views/automation/power-scheduler/pages/ResourceGroupPage.vue');
+const PowerSchedulerLandingPage = () => import(/* webpackChunkName: "PowerSchedulerLanding" */ '@/views/automation/power-scheduler/pages/PowerSchedulerLandingPage.vue');
+const PowerSchedulerPage = () => import(/* webpackChunkName: "PowerSchedulerPage" */ '@/views/automation/power-scheduler/pages/PowerSchedulerPage.vue');
+const ResourceGroupPage = () => import(/* webpackChunkName: "ResourceGroup" */ '@/views/automation/power-scheduler/pages/ResourceGroupPage.vue');
 
 export default {
     path: 'automation',

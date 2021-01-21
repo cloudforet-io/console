@@ -1,12 +1,12 @@
 import { RouteConfig } from 'vue-router';
 
-const CloudServicePage = () => import('@/views/inventory/cloud-service/pages/CloudServicePage.vue');
-const CloudServiceSearch = () => import('@/views/inventory/cloud-service/pages/CloudServiceSearch.vue');
-const CloudServiceTypeSearch = () => import('@/views/inventory/cloud-service/pages/CloudServiceTypeSearch.vue');
+const CloudServicePage = () => import(/* webpackChunkName: "CloudServicePage" */ '@/views/inventory/cloud-service/pages/CloudServicePage.vue');
+const CloudServiceSearch = () => import(/* webpackChunkName: "CloudServiceSearch" */ '@/views/inventory/cloud-service/pages/CloudServiceSearch.vue');
+const CloudServiceTypeSearch = () => import(/* webpackChunkName: "CloudServiceTypeSearch" */ '@/views/inventory/cloud-service/pages/CloudServiceTypeSearch.vue');
 
-const Server = () => import('@/views/inventory/server/pages/ServerPage.vue');
-const CloudService = () => import('@/views/inventory/cloud-service/pages/CloudServiceType.vue');
-const NoResource = () => import('@/views/common/pages/NoResource.vue');
+const Server = () => import(/* webpackChunkName: "Server" */ '@/views/inventory/server/pages/ServerPage.vue');
+const CloudService = () => import(/* webpackChunkName: "CloudService" */ '@/views/inventory/cloud-service/pages/CloudServiceType.vue');
+const NoResource = () => import(/* webpackChunkName: "NoResource" */ '@/views/common/pages/NoResource.vue');
 
 export default {
     path: 'inventory',

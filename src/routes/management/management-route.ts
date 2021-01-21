@@ -1,7 +1,7 @@
 import { RouteConfig } from 'vue-router';
 
-const SupervisorPluginPage = () => import('@/views/management/supervisor/pages/SupervisorPluginPage.vue');
-const CollectorHistory = () => import('@/views/management/collector-history/CollectorHistory.vue');
+const SupervisorPluginPage = () => import(/* webpackChunkName: "SupervisorPlugin" */ '@/views/management/supervisor/pages/SupervisorPluginPage.vue');
+const CollectorHistory = () => import(/* webpackChunkName: "CollectorHistory" */ '@/views/management/collector-history/CollectorHistory.vue');
 
 export default {
     path: 'management',

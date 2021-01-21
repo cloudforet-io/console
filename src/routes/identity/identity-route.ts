@@ -1,12 +1,12 @@
 import { RouteConfig } from 'vue-router';
 
-const UserAccount = () => import('@/views/identity/user/modules/UserAccount.vue');
-const UserManagement = () => import('@/views/identity/user/modules/UserManagement.vue');
-const User = () => import('@/views/identity/user/pages/UserPage.vue');
-const ServiceAccount = () => import('@/views/identity/service-account/pages/ServiceAccountPage.vue');
-const AddServiceAccountPage = () => import('@/views/identity/service-account/pages/AddServiceAccountPage.vue');
-const ServiceAccountSearchPage = () => import('@/views/identity/service-account/pages/ServiceAccountSearchPage.vue');
-const NoResource = () => import('@/views/common/pages/NoResource.vue');
+const UserAccount = () => import(/* webpackChunkName: "UserAccount" */ '@/views/identity/user/modules/UserAccount.vue');
+const UserManagement = () => import(/* webpackChunkName: "UserManagement" */ '@/views/identity/user/modules/UserManagement.vue');
+const User = () => import(/* webpackChunkName: "User" */ '@/views/identity/user/pages/UserPage.vue');
+const ServiceAccount = () => import(/* webpackChunkName: "ServiceAccount" */ '@/views/identity/service-account/pages/ServiceAccountPage.vue');
+const AddServiceAccountPage = () => import(/* webpackChunkName: "AddServiceAccount" */ '@/views/identity/service-account/pages/AddServiceAccountPage.vue');
+const ServiceAccountSearchPage = () => import(/* webpackChunkName: "ServiceAccountSearchPage" */ '@/views/identity/service-account/pages/ServiceAccountSearchPage.vue');
+const NoResource = () => import(/* webpackChunkName: "NoResource" */ '@/views/common/pages/NoResource.vue');
 
 export default {
     path: 'identity',
