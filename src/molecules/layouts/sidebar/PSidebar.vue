@@ -110,6 +110,10 @@ export default defineComponent({
         }
     }
 
+    .slide-fade-enter-active, .slide-fade-leave-active {
+        transition: all 0.3s ease-in-out;
+    }
+
     /* mobile size */
     @screen 2xs {
         flex-direction: column;
@@ -131,6 +135,10 @@ export default defineComponent({
             min-width: unset;
             z-index: 99999;
         }
+        .slide-fade-enter, .slide-fade-leave-to {
+            transform: translateY($(max-height));
+            opacity: 0;
+        }
     }
 
     @screen lg {
@@ -149,9 +157,6 @@ export default defineComponent({
             width: 25vw;
             min-width: $(min-width);
             flex-shrink: 0;
-        }
-        .slide-fade-enter-active, .slide-fade-leave-active {
-            transition: all 0.3s ease-in-out;
         }
         .slide-fade-enter, .slide-fade-leave-to {
             margin-left: -$(min-width);
