@@ -57,8 +57,8 @@
                                 <div class="resources">
                                     <div class="scheduled-resources">
                                         <p>
-                                            {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.APPLIED_RESOURCE') }} / <span v-tooltip.bottom="{content: tooltip.resource, delay: {show: 500}}">
-                                                {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.APPLICABLE_RESOURCE') }}</span>
+                                            {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.APPLIED_RESOURCE') }} /
+                                            {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.APPLICABLE_RESOURCE') }}
                                         </p>
 
                                         <span class="current-schedule-resources">{{ item.scheduledResources.managed_count }}</span>
@@ -71,14 +71,12 @@
                                     </div>
                                     <div class="saving">
                                         <p class="saving-this-month">
-                                            <span v-tooltip.bottom="{content: tooltip.cost, delay: {show: 500}}">
-                                                {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.ESTIMATED_SAVING') }}
-                                            </span>
+                                            {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.ESTIMATED_SAVING') }}
                                         </p>
                                         <p class="approximate">
                                             {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.ABOUT') }}
                                         </p>
-                                        <span class="costs"><span>$ </span><span class="approx-costs">{{ item.savingCost }}</span></span>
+                                        <span class="costs"><span>$ </span><span class="approx-costs">N/A</span></span>
                                     </div>
                                 </div>
                             </div>
