@@ -420,7 +420,13 @@ export default {
                 value: props.projectId,
             };
 
-            if (type === DATA_TYPE.storage) {
+            if (type === DATA_TYPE.compute) {
+                param = {
+                    ...defaultParam,
+                    resource_type: 'inventory.Server',
+                    is_primary: true,
+                };
+            } else if (type === DATA_TYPE.storage) {
                 param = {
                     ...defaultParam,
                     is_major: true,
@@ -450,22 +456,36 @@ export default {
 
                 const summaryQueryHelper = new QueryHelper();
                 res.results.forEach((d) => {
+                    let detailLocation: Location;
                     const filters: QueryStoreFilter[] = [];
                     filters.push({
                         k: 'project_id', o: '=', v: props.projectId,
                     });
 
-                    const detailLocation: Location = {
-                        name: 'cloudServicePage',
-                        params: {
-                            provider: d.provider,
-                            group: d.cloud_service_group,
-                            name: d.cloud_service_type,
-                        },
-                        query: {
-                            filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
-                        },
-                    };
+                    if (d.resource_type === 'inventory.Server') {
+                        filters.push(
+                            { k: 'provider', o: '=', v: d.provider },
+                            { k: 'cloud_service_type', o: '=', v: d.cloud_service_type },
+                        );
+                        detailLocation = {
+                            name: 'server',
+                            query: {
+                                filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
+                            },
+                        };
+                    } else {
+                        detailLocation = {
+                            name: 'cloudServicePage',
+                            params: {
+                                provider: d.provider,
+                                group: d.cloud_service_group,
+                                name: d.cloud_service_type,
+                            },
+                            query: {
+                                filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
+                            },
+                        };
+                    }
                     summaryData.push({
                         provider: d.provider,
                         label: state.providers[d.provider].label,
