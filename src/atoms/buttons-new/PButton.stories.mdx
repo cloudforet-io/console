@@ -1,108 +1,174 @@
-import {Meta, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
 import PButton from '@/atoms/buttons-new/PButton';
 import PLottie from '@/molecules/lottie/PLottie.vue';
 import {BUTTON_STYLE} from "@/atoms/buttons-new/type";
 
-<Meta title='Inputs/Buttons/Button' component={PButton}
-      argTypes={{
-          styleType: {
-              description: '`String`',
-              table: {
-                  type: {
-                      summary: null,
-                  },
-              },
-              defaultValue: BUTTON_STYLE.primary,
-              control: {
-                  type: 'select',
-                  options: Object.values(BUTTON_STYLE)
-              },
-          },
-          size: {
-              description: '`String`',
-              table: {
-                  type: {
-                      summary: null,
-                  },
-              },
-              defaultValue: '(default)',
-              control: {
-                  type: 'select',
-                  options: ['(default)', 'sm', 'lg']
-              }
-          },
-          defaultSlot: {
-              description: '`String`',
-              table: {
-                  type: {
-                      summary: null,
-                  },
-              },
-              defaultValue: 'button',
-              control: {
-                  type: 'text'
-              }
-          },
-          href: {
-              description: '`String`',
-              table: {
-                  type: {
-                      summary: null,
-                  },
-              },
-              control: {
-                  type: 'text'
-              }
-          },
-          disabled: {
-              description: '`Boolean`',
-              table: {
-                  type: {
-                      summary: null,
-                  },
-              },
-              defaultValue: false,
-              control: {
-                  type: 'boolean',
-              }
-          },
-          loading: {
-              description: '`Boolean`',
-              table: {
-                  type: {
-                      summary: null,
-                  },
-              },
-              defaultValue: false,
-              control: {
-                  type: 'boolean',
-              }
-          },
-          outline: {
-              description: '`Boolean`',
-              table: {
-                  type: {
-                      summary: null,
-                  },
-              },
-              defaultValue: false,
-              control: {
-                  type: 'boolean',
-              }
-          },
-          block: {
-              description: '`Boolean`',
-              table: {
-                  type: {
-                      summary: null,
-                  },
-              },
-              defaultValue: false,
-              control: {
-                  type: 'boolean',
-              }
-          },
-      }}/>
+<Meta title='Inputs/Buttons/Button' component={PButton} argTypes={{
+    styleType: {
+        name: 'styleType',
+        type: {name: 'string'},
+        description: 'Button style',
+        defaultValue: BUTTON_STYLE.primary,
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: BUTTON_STYLE.primary
+            }
+        },
+        control: {
+            type: 'select',
+            options: Object.values(BUTTON_STYLE)
+        },
+    },
+    size: {
+        name: 'size',
+        type: {name:' string'},
+        description: 'Button size',
+        defaultValue: '(default)',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '(default)',
+            }
+        },
+        control: {
+            type: 'select',
+            options: ['(default)', 'sm', 'lg']
+        }
+    },
+    default: {
+        name: 'default',
+        type: {name: 'string'},
+        description: 'Slot for contents of button',
+        defaultValue: 'button',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'slots',
+            defaultValue: {
+                summary: 'button',
+            }
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    href: {
+        name: 'href',
+        type: {name: 'string'},
+        description: 'Href of button',
+        defaultValue: 'https://www.google.com/',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'https://www.google.com/',
+            }
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    disabled: {
+        name: 'disabled',
+        type: {name: 'boolean'},
+        description: 'Disabled when true',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            }
+        },
+        control: {
+            type: 'boolean',
+        }
+    },
+    loading: {
+        name: 'loading',
+        type: {name: 'boolean'},
+        description: 'Loading when true`',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            }
+        },
+        control: {
+            type: 'boolean',
+        }
+    },
+    outline: {
+        name: 'outline',
+        type: {name: 'boolean'},
+        description: 'Outlined when true',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            }
+        },
+        control: {
+            type: 'boolean',
+        }
+    },
+    block: {
+        name: 'block',
+        type: {name: 'boolean'},
+        description: 'Width became 100% when true',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            }
+        },
+        control: {
+            type: 'boolean',
+        }
+    },
+    onClick: {
+        name:'click',
+        type: {name: 'function'},
+        description: 'Click function',
+        defaultValue: ()=>{console.log('click')},
+        table: {
+            type: {
+                summary: 'function'
+            },
+            category: 'event',
+            defaultValue: {
+                summary: ()=>{}
+            }
+        },
+        control: {
+            type: 'function'
+        }
+    }
+}}/>
 
 export const Template = (args,{argTypes})=>({
     props: Object.keys(argTypes),
@@ -110,7 +176,7 @@ export const Template = (args,{argTypes})=>({
     template: `
         <div style="display:flex; align-items:center; justify-content:center; width:1000px; height:100px;">
             <p-button
-                @click="click"
+                @click="onClick"
                 :href="href"
                 :styleType="styleType"
                 :size="size"
@@ -125,7 +191,7 @@ export const Template = (args,{argTypes})=>({
                         :size="1.5"
                     />
                 </div>
-                {{defaultSlot}}
+                {{$props.default}}
             </p-button>
         </div>`
 })
@@ -137,178 +203,193 @@ export const Template = (args,{argTypes})=>({
 <br/>
 
 ## Size
-<Story name='size' height='150px'>
-    {{
-        components:{ PButton,PLottie },
-        template: `
-            <div style="display:flex; align-items:center; justify-content:center; width:1000px; margin-top: 50px; background-color: white">
-                <p-button styleType="primary" style="margin-right: 20px" size="sm">
-                    <div>small</div>
-                </p-button>
-                <p-button styleType="primary" style="margin-right: 20px">
-                    <div>default</div>
-                </p-button>
-                <p-button styleType="primary" style="margin-right: 20px" size="lg">
-                    <div>large</div>
-                </p-button>
-            </div>`,
-    }}
-</Story>
-
-## Style Type
-<Story name='style-type' height='250px'>
-    {{
-        components:{ PButton,PLottie },
-        template: `
-            <div style="display: flex; flex-direction: column; align-items: center; width:1000px; margin-top: 50px; background-color: white">
-                <div style="display:flex">
-                    <p-button styleType="primary-dark" style="margin-right: 20px">
-                        <div>primary-dark</div>
+<Canvas>
+    <Story name='size' height='150px'>
+        {{
+            components:{ PButton,PLottie },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center; width:1000px; margin-top: 50px; background-color: white">
+                    <p-button styleType="primary" style="margin-right: 20px" size="sm">
+                        <div>small</div>
                     </p-button>
                     <p-button styleType="primary" style="margin-right: 20px">
-                        <div>primary</div>
+                        <div>default</div>
                     </p-button>
-                    <p-button styleType="primary1" style="margin-right: 20px">
-                        <div>primary1</div>
+                    <p-button styleType="primary" style="margin-right: 20px" size="lg">
+                        <div>large</div>
                     </p-button>
-                    <p-button styleType="primary2" style="margin-right: 20px">
-                        <div>primary2</div>
-                    </p-button>
-                </div>
-                <div style="display:flex; margin-top: 20px">
-                    <p-button styleType="secondary" style="margin-right: 20px">
-                        <div>secondary</div>
-                    </p-button>
-                    <p-button styleType="secondary1" style="margin-right: 20px">
-                        <div>secondary1</div>
-                    </p-button>
-                    <p-button styleType="gray" style="margin-right: 20px">
-                        <div>gray</div>
-                    </p-button>
-                    <p-button styleType="gray900" style="margin-right: 20px">
-                        <div>gray900</div>
-                    </p-button>
-                    <p-button styleType="gray900-hover" style="margin-right: 20px">
-                        <div>gray900-hover</div>
-                    </p-button>
-                </div>
-                <div style="display:flex; margin-top: 20px">
-                    <p-button styleType="alert" style="margin-right: 20px">
-                        <div>alert</div>
-                    </p-button>
-                    <p-button styleType="safe" style="margin-right: 20px">
-                        <div>safe</div>
-                    </p-button>
-                    <p-button styleType="gray-border" style="margin-right: 20px">
-                        <div>gray-border</div>
-                    </p-button>
-                    <p-button styleType="transparent">
-                        <div>transparent</div>
-                    </p-button>
-                </div>
-            </div>`,
-    }}
-</Story>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Style Type
+<Canvas>
+    <Story name='style-type' height='250px'>
+        {{
+            components:{ PButton,PLottie },
+            template: `
+                <div style="display: flex; flex-direction: column; align-items: center; width:1000px; margin-top: 50px; background-color: white">
+                    <div style="display:flex">
+                        <p-button styleType="primary-dark" style="margin-right: 20px">
+                            <div>primary-dark</div>
+                        </p-button>
+                        <p-button styleType="primary" style="margin-right: 20px">
+                            <div>primary</div>
+                        </p-button>
+                        <p-button styleType="primary1" style="margin-right: 20px">
+                            <div>primary1</div>
+                        </p-button>
+                        <p-button styleType="primary2" style="margin-right: 20px">
+                            <div>primary2</div>
+                        </p-button>
+                    </div>
+                    <div style="display:flex; margin-top: 20px">
+                        <p-button styleType="secondary" style="margin-right: 20px">
+                            <div>secondary</div>
+                        </p-button>
+                        <p-button styleType="secondary1" style="margin-right: 20px">
+                            <div>secondary1</div>
+                        </p-button>
+                        <p-button styleType="gray" style="margin-right: 20px">
+                            <div>gray</div>
+                        </p-button>
+                        <p-button styleType="gray900" style="margin-right: 20px">
+                            <div>gray900</div>
+                        </p-button>
+                        <p-button styleType="gray900-hover" style="margin-right: 20px">
+                            <div>gray900-hover</div>
+                        </p-button>
+                    </div>
+                    <div style="display:flex; margin-top: 20px">
+                        <p-button styleType="alert" style="margin-right: 20px">
+                            <div>alert</div>
+                        </p-button>
+                        <p-button styleType="safe" style="margin-right: 20px">
+                            <div>safe</div>
+                        </p-button>
+                        <p-button styleType="gray-border" style="margin-right: 20px">
+                            <div>gray-border</div>
+                        </p-button>
+                        <p-button styleType="transparent">
+                            <div>transparent</div>
+                        </p-button>
+                    </div>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
 
 ## Outlined
-<Story name='outlined' height='150px'>
-    {{
-        components:{ PButton,PLottie },
-        template: `
-            <div style="display:flex; align-items:center; justify-content:center; width:1000px; margin-top: 50px; background-color: white">
-                <p-button
-                    styleType="primary" style="margin-right: 20px"
-                    :outline="true"
-                >
-                    <div>primary</div>
-                </p-button>
-                <p-button
-                    styleType="secondary" style="margin-right: 20px"
-                    :outline="true"
-                >
-                    <div>secondary</div>
-                </p-button>
-                <p-button
-                    styleType="alert" style="margin-right: 20px"
-                    :outline="true"
-                >
-                    <div>alert</div>
-                </p-button>
-                <p-button
-                    styleType="safe" style="margin-right: 20px"
-                    :outline="true"
-                >
-                    <div>safe</div>
-                </p-button>
-                <p-button
-                    styleType="transparent"
-                    :outline="true"
-                >
-                    <div>transparent</div>
-                </p-button>
-            </div>`,
-    }}
-</Story>
+<Canvas>
+    <Story name='outlined' height='150px'>
+        {{
+            components:{ PButton,PLottie },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center; width:1000px; margin-top: 50px; background-color: white">
+                    <p-button
+                        styleType="primary" style="margin-right: 20px"
+                        :outline="true"
+                    >
+                        <div>primary</div>
+                    </p-button>
+                    <p-button
+                        styleType="secondary" style="margin-right: 20px"
+                        :outline="true"
+                    >
+                        <div>secondary</div>
+                    </p-button>
+                    <p-button
+                        styleType="alert" style="margin-right: 20px"
+                        :outline="true"
+                    >
+                        <div>alert</div>
+                    </p-button>
+                    <p-button
+                        styleType="safe" style="margin-right: 20px"
+                        :outline="true"
+                    >
+                        <div>safe</div>
+                    </p-button>
+                    <p-button
+                        styleType="transparent"
+                        :outline="true"
+                    >
+                        <div>transparent</div>
+                    </p-button>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
 
 ## Disabled
-<Story name='disabled' height='150px'>
-    {{
-        components:{ PButton,PLottie },
-        template: `
-            <div style="display:flex; align-items:center; justify-content:center; width:1000px; margin-top: 50px; background-color: white">
-                <p-button
-                    styleType="primary"
-                    :disabled="true"
-                >
-                    <div>Disabled</div>
-                </p-button>
-            </div>`,
-    }}
-</Story>
+<Canvas>
+    <Story name='disabled' height='150px'>
+        {{
+            components:{ PButton,PLottie },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center; width:1000px; margin-top: 50px; background-color: white">
+                    <p-button
+                        styleType="primary"
+                        :disabled="true"
+                    >
+                        <div>Disabled</div>
+                    </p-button>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
 
 ## Loading
-<Story name='loading' height='150px'>
-    {{
-        components:{ PButton,PLottie },
-        template: `
-            <div style="display:flex; align-items:center; justify-content:center; width:1000px; margin-top: 50px; background-color: white">
-                <p-button
-                    styleType="primary"
-                    :loading="true"
-                >
-                    <div class="loading-btn">
-                        <p-lottie
-                            class="spinner"
-                            name="thin-spinner" auto
-                            :size="1.5"
-                        />
-                        <div>Loading</div>
-                    </div>
-                </p-button>
-            </div>`,
-    }}
-</Story>
+<Canvas>
+    <Story name='loading' height='150px'>
+        {{
+            components:{ PButton,PLottie },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center; width:1000px; margin-top: 50px; background-color: white">
+                    <p-button
+                        styleType="primary"
+                        :loading="true"
+                    >
+                        <div class="loading-btn">
+                            <p-lottie
+                                class="spinner"
+                                name="thin-spinner" auto
+                                :size="1.5"
+                            />
+                            <div>Loading</div>
+                        </div>
+                    </p-button>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
 
 ## Block
-<Story name='block' height='150px'>
-    {{
-        components:{ PButton,PLottie },
-        template: `
-            <div style="display:flex; align-items:center; justify-content:center; width:1000px; margin-top: 50px; background-color: white">
-                <p-button
-                    styleType="primary"
-                    :block="true"
-                >
-                    <div>Block</div>
-                </p-button>
-            </div>`,
-    }}
-</Story>
+<Canvas>
+    <Story name='block' height='150px'>
+        {{
+            components:{ PButton,PLottie },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center; width:1000px; margin-top: 50px; background-color: white">
+                    <p-button
+                        styleType="primary"
+                        :block="true"
+                    >
+                        <div>Block</div>
+                    </p-button>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
 
 ## Playground
-<Story name="playground" height="150px">
-    {Template.bind({})}
-</Story>
+
+<Canvas>
+    <Story name="playground" height="150px">
+        {Template.bind({})}
+    </Story>
+</Canvas>
 
 <ArgsTable story="playground" />
 
