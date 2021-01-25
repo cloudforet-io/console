@@ -91,6 +91,7 @@ export { default as PFieldGroup } from './molecules/forms/field-group/PFieldGrou
 export { default as PRadio } from './molecules/forms/radio/PRadio.vue';
 export { default as PGridLayout } from './molecules/layouts/grid-layout/PGridLayout.vue';
 export { default as PPaneLayout } from './molecules/layouts/pane-layout/PPaneLayout.vue';
+export { default as PSidebar } from './molecules/layouts/sidebar/PSidebar.vue';
 export { default as PTextList } from './molecules/lists/text-list/PTextList.vue';
 export { default as PLottie } from './molecules/lottie/PLottie.vue';
 export { default as PMarkdown } from './molecules/markdown/PMarkdown.vue';
