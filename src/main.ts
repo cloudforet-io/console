@@ -45,13 +45,13 @@ const initApiClient = async () => {
         // Add session expiration process
         store.dispatch('user/setIsSessionExpired', true);
     });
-}
+};
 
 const initDomain = async () => {
     try {
         let domainName;
         if (config.get('DOMAIN_NAME_REF') === 'hostname') {
-            const {hostname} = window.location;
+            const { hostname } = window.location;
             domainName = hostname.split('.')[0];
         } else {
             domainName = config.get('DOMAIN_NAME');

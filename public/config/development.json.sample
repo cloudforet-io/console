@@ -1,2 +1,8 @@
 {
+  "VUE_APP_API": {
+    "ENDPOINT": "https://console-api.dev.spaceone.dev"
+  },
+  "GTAG_ID": "DISABLED",
+  "DOMAIN_NAME": "spaceone",
+  "DOMAIN_NAME_REF": "config"
 }
