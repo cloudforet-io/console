@@ -1,6 +1,5 @@
 /* eslint-disable camelcase */
 
-import {SearchEnumItem} from "@/organisms/dynamic-layout/type/layout-schema";
 
 /** Metadata schema types for Dynamic field */
 

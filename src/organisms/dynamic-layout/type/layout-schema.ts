@@ -20,7 +20,6 @@ export interface SearchKeyOptions {
     enums?: SearchEnums;
     // eslint-disable-next-line camelcase
     data_type?: SearchDataType;
-    reference?: string;
     icon?: string;
 }
 
