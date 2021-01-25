@@ -5,6 +5,7 @@ import settings from './modules/settings';
 import favorite from './modules/favorite';
 import domain from './modules/domain';
 import resource from './modules/resource';
+import display from './modules/display';
 import plugins from './plugins';
 
 Vue.use(Vuex);
@@ -16,6 +17,7 @@ const store = new Vuex.Store({
         domain,
         favorite,
         resource,
+        display,
     },
     plugins,
 });

@@ -13,6 +13,7 @@ import config from '@/lib/config';
 import { SpaceConnector } from '@/lib/space-connector';
 import { GTag, setGtagUserID } from '@/lib/gtag';
 import SpaceDesignSystem from '@spaceone/design-system';
+import PortalVue from 'portal-vue';
 import App from './App.vue';
 
 
@@ -21,7 +22,7 @@ Vue.use(VueCompositionApi);
 // @ts-ignore
 Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
-
+Vue.use(PortalVue);
 
 directive(Vue);
 

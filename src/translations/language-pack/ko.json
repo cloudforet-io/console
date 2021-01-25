@@ -165,6 +165,9 @@
 				"LABEL_USER_GUIDE": "유저 가이드"
 			}
 		},
+		"INFO_BUTTON": {
+			"INFO": ""
+		},
 		"MONITORING": {
 			"DISPLAY_TIMEZONE": "{timezone}으로 보여줍니다.",
 			"LIMIT_OF_RESOURCE": "표기할 수 있는 목록 최대 {limitCount}개",

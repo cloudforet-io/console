@@ -4,8 +4,9 @@ import {
     makeEnumValueHandler,
     makeReferenceValueHandler,
 } from '@/lib/component-utils/query-search';
-import { DynamicLayoutType, SearchKeyGroup } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type/layout-schema';
+import { DynamicLayoutType } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type/layout-schema';
 import { Filter } from '@/lib/space-connector/type';
+import { ConsoleSearchSchema } from '@/lib/component-utils/dynamic-layout/type';
 
 /**
  * @name makeQuerySearchPropsWithSearchSchema
@@ -13,7 +14,7 @@ import { Filter } from '@/lib/space-connector/type';
  * @param schema
  * @param resourceType
  */
-export const makeQuerySearchPropsWithSearchSchema = (schema: SearchKeyGroup[], resourceType: string, filters?: Filter[]): Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> => {
+export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema[], resourceType: string, filters?: Filter[]): Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> => {
     const res: Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> = { keyItemSets: [], valueHandlerMap: {} };
 
     res.keyItemSets = schema.map(s => ({

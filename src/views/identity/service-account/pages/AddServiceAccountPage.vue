@@ -1,7 +1,20 @@
 <template>
     <general-page-layout class="add-service-account-container">
-        <div class="page-navigation">
-            <p-page-navigation :routes="routeState.routes" />
+        <div class="flex">
+            <p-page-navigation class="flex-grow" :routes="routeState.routes" />
+            <info-button v-if="description" :visible="!!description"
+                         class="flex-shrink-0"
+            >
+                <template #title>
+                    {{ description.name }}
+                </template>
+                <template #contents>
+                    <p-markdown :markdown="description.options.markdown"
+                                :data="description.options.markdown"
+                                class="!p-0"
+                    />
+                </template>
+            </info-button>
         </div>
         <p-page-title class="mb-6"
                       child
@@ -17,13 +30,6 @@
                 </div>
             </template>
         </p-page-title>
-        <p-collapsible-panel v-if="description">
-            <template #content>
-                <p-markdown :markdown="description.options.markdown"
-                            :data="description.options.markdown"
-                />
-            </template>
-        </p-collapsible-panel>
 
         <p-pane-layout>
             <div class="title">
@@ -136,11 +142,11 @@ import { get } from 'lodash';
 
 import {
     ComponentRenderProxy, getCurrentInstance,
-    reactive, computed, ref, toRefs, watch,
+    reactive, computed, ref, toRefs, watch, onBeforeUnmount,
 } from '@vue/composition-api';
 
 import {
-    PPageTitle, PJsonSchemaForm, PTab, PCollapsiblePanel, PFieldGroup, PLazyImg,
+    PPageTitle, PJsonSchemaForm, PTab, PFieldGroup, PLazyImg,
     PPageNavigation, PPaneLayout, PIconTextButton, PRadio, PMarkdown, PTextEditor, PButton, PTextInput,
 } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
@@ -153,17 +159,18 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ProviderModel } from '@/views/identity/service-account/type';
 import { TranslateResult } from 'vue-i18n';
+import InfoButton from '@/views/common/components/info-button/InfoButton.vue';
 
 export default {
     name: 'AddServiceAccountPage',
     components: {
+        InfoButton,
         PLazyImg,
         PTab,
         PTextInput,
         PJsonSchemaForm,
         PTextEditor,
         PMarkdown,
-        PCollapsiblePanel,
         PPageTitle,
         PPageNavigation,
         PFieldGroup,
@@ -187,7 +194,7 @@ export default {
             providerLoading: true,
             providerObj: {} as ProviderModel,
             serviceAccountId: '',
-            providerIcon: computed(() => get(state.providerObj, 'tags.icon', '')),
+            providerIcon: computed(() => vm.$store.state.resource.provider.items[state.providerObj?.provider]?.icon),
             description: computed(() => get(state.providerObj, 'metadata.view.layouts.help:service_account:create', undefined)),
             selectedSecretType: '',
             serviceAccountNames: [] as string[],
@@ -276,9 +283,12 @@ export default {
         const getProvider = async () => {
             state.providerLoading = true;
             try {
-                const res = await SpaceConnector.client.identity.provider.get({
-                    provider: props.provider,
-                });
+                const [_, res] = await Promise.all([
+                    vm.$store.dispatch('resource/provider/load'),
+                    await SpaceConnector.client.identity.provider.get({
+                        provider: props.provider,
+                    }),
+                ]);
                 state.providerObj = res;
                 state.selectedSecretType = res.capability.supported_schema[0];
             } catch (e) {
@@ -401,6 +411,13 @@ export default {
             else vm.$router.back();
         };
 
+
+        watch(() => state.selectedSecretType, async (after, before) => {
+            if (after && after !== before) {
+                await getCredentialSchema(after);
+            }
+        }, { immediate: true });
+
         const init = async () => {
             await getProvider();
             await getServiceAccountNames();
@@ -409,12 +426,6 @@ export default {
             await getServiceAccountSchema();
         };
         init();
-
-        watch(() => state.selectedSecretType, async (after, before) => {
-            if (after && after !== before) {
-                await getCredentialSchema(after);
-            }
-        }, { immediate: true });
 
         return {
             ...toRefs(state),
@@ -428,6 +439,7 @@ export default {
     },
 };
 </script>
+
 
 <style lang="postcss" scoped>
 .add-service-account-container {
