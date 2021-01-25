@@ -156,6 +156,7 @@ export default defineComponent({
             max-height: 100%;
             width: 25vw;
             min-width: $(min-width);
+            z-index: unset;
             flex-shrink: 0;
         }
         .slide-fade-enter, .slide-fade-leave-to {
