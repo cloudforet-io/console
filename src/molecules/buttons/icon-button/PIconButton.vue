@@ -6,8 +6,6 @@
         :disabled="disabled"
         :size="size"
         v-on="$listeners"
-        @mouseenter="onHover(true)"
-        @mouseleave="onHover(false)"
     >
         <slot>
             <p-i :name="name"
@@ -25,13 +23,13 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
+import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 
 import PI from '@/atoms/icons/PI.vue';
 import PButton from '@/atoms/buttons/PButton.vue';
 import { IconButtonProps, BUTTON_STYLE_TYPE } from '@/molecules/buttons/icon-button/type';
 
-export default {
+export default defineComponent({
     name: 'PIconButton',
     components: { PButton, PI },
     props: {
@@ -76,7 +74,7 @@ export default {
             default: undefined,
             validator: (value) => {
                 if (value === undefined) return true;
-                return Object.keys(BUTTON_STYLE_TYPE).includes(value);
+                return Object.keys(BUTTON_STYLE_TYPE).includes(value as string);
             },
         },
         disabled: {
@@ -97,18 +95,10 @@ export default {
         },
     },
     setup(props: IconButtonProps) {
-        const state = reactive({
-            isHover: false,
-        });
-        const onHover = (value) => {
-            state.isHover = value;
-        };
         return {
-            ...toRefs(state),
-            onHover,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
@@ -153,13 +143,12 @@ export default {
         }
 
         @define-mixin button-style
-            $solid-bg-color, $solid-text-color, $outline-border-color, $outline-text-color {
+            $solid-text-color, $solid-bg-color, $outline-border-color, $outline-text-color {
             color: $outline-text-color;
 
             &.solid {
-                border-radius: 2px;
                 background-color: $solid-bg-color;
-                border-color: transparent;
+                border-color: $solid-bg-color;
                 color: $solid-text-color;
             }
 
@@ -174,13 +163,13 @@ export default {
         /* default */
         @mixin button-style
             theme('colors.gray.900'), theme('colors.white'),
-        theme('colors.gray.300'), theme('colors.gray.900');
+            theme('colors.gray.300'), theme('colors.gray.900');
 
         /* themes */
         &.icon-btn-primary-dark {
             @mixin button-style
                 theme('colors.primary-dark'), theme('colors.white'),
-            theme('colors.primary-dark'), theme('colors.primary-dark');
+                theme('colors.primary-dark'), theme('colors.primary-dark');
         }
     }
 }

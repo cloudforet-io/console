@@ -5,16 +5,21 @@
         </div>
         <transition name="slide-fade">
             <div v-if="proxyVisible" class="sidebar-wrapper">
-                <div class="top-wrapper">
+                <div class="inner">
                     <p class="title">
                         <slot name="title">
                             {{ title }}
                         </slot>
                     </p>
-                    <p-icon-button class="close-btn" name="ic_delete" @click.stop="onClickClose" />
-                </div>
-                <div class="contents-wrapper">
-                    <slot name="sidebar" />
+                    <p-icon-button class="close-btn"
+                                   name="ic_delete"
+                                   solid
+                                   width="2rem" height="2rem"
+                                   @click.stop="onClickClose"
+                    />
+                    <div class="contents-wrapper">
+                        <slot name="sidebar" />
+                    </div>
                 </div>
             </div>
         </transition>
@@ -22,10 +27,12 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from '@vue/composition-api';
 import PIconButton from '@/molecules/buttons/icon-button/PIconButton.vue';
 
-export default {
+export default defineComponent({
     name: 'PSidebar',
     components: { PIconButton },
     model: {
@@ -65,45 +72,92 @@ export default {
             onClickClose,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
 .p-sidebar {
-    @apply h-full w-full flex overflow-hidden;
-    .non-sidebar-wrapper {
-        @apply flex-grow;
-    }
+    position: relative;
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+    max-height: 100%;
+    max-width: 100%;
+    overflow: hidden;
+
     .sidebar-wrapper {
-        @apply h-full flex-shrink-0 flex flex-col bg-white;
-        width: 25vw;
-        min-width: 20rem;
-        padding: 1.5rem;
+        @apply bg-white;
+        padding: 1.5rem 0;
         box-shadow: 0 0 0.5rem rgba(theme('colors.black'), 0.08);
-    }
-    .top-wrapper {
-        @apply flex-shrink-0 flex;
+        overflow: hidden;
+        .inner {
+            padding: 0 1.5rem;
+            overflow-y: auto;
+            height: 100%;
+            width: 100%;
+        }
         .title {
-            flex-grow: 1;
+            @apply mb-4;
+            width: calc(100% - 2rem);
+            min-height: 2rem;
             font-size: 1.125rem;
             line-height: 1.4;
         }
         .close-btn {
-            @apply text-gray-400;
-            flex-shrink: 0;
+            @apply absolute text-gray-400;
+            top: 1.5rem;
+            right: 1.5rem;
         }
     }
-    .contents-wrapper {
-        @apply h-full;
+
+    /* mobile size */
+    @screen 2xs {
+        flex-direction: column;
+
+        .non-sidebar-wrapper {
+            flex-grow: 1;
+            overflow-y: auto;
+            width: 100%;
+        }
+
+        $max-height: 20rem;
+        .sidebar-wrapper {
+            position: fixed;
+            height: 32%;
+            max-height: $(max-height);
+            bottom: 0;
+            left: 0;
+            width: 100vw;
+            min-width: unset;
+            z-index: 99999;
+        }
     }
-    $translate-width: 20rem;
-    .slide-fade-enter-active, .slide-fade-leave-active {
-        transition: all 0.3s ease-in-out;
-    }
-    .slide-fade-enter, .slide-fade-leave-to {
-        margin-left: -$(translate-width);
-        transform: translateX($(translate-width));
-        opacity: 0;
+
+    @screen lg {
+        flex-direction: row;
+
+        .non-sidebar-wrapper {
+            flex-grow: 1;
+            overflow-y: auto;
+            width: auto;
+        }
+        $min-width: 20rem;
+        .sidebar-wrapper {
+            position: static;
+            height: 100%;
+            max-height: 100%;
+            width: 25vw;
+            min-width: $(min-width);
+            flex-shrink: 0;
+        }
+        .slide-fade-enter-active, .slide-fade-leave-active {
+            transition: all 0.3s ease-in-out;
+        }
+        .slide-fade-enter, .slide-fade-leave-to {
+            margin-left: -$(min-width);
+            transform: translateX($(min-width));
+            opacity: 0;
+        }
     }
 }
 </style>

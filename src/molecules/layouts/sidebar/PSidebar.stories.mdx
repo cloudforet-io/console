@@ -74,7 +74,7 @@ import faker from 'faker'
     },
     default: {
         name: 'default',
-        description: 'Non-sidebar contents',
+        description: 'Slot for non-sidebar contents',
         defaultValue: null,
         table: {
             type: {
@@ -99,17 +99,30 @@ import faker from 'faker'
             },
             category: 'slots'
         },
+    },
+    onClose: {
+        name: 'close',
+        description: `Event emitted when the close button is clicked`,
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events'
+        }
     }
 }} />
 
 
-export const Template = (args, meta) => {
-    const props = Object.keys(meta.argTypes).filter(d => d !== 'visible');
+export const Template = (args, {argTypes}) => {
     return {
-        props,
+        props: Object.keys(argTypes).filter(d => d !== 'visible'),
         components: { PSidebar, PButton },
         template: `
-            <div class="flex flex-col" style="height: 300px;">
+            <div class="flex flex-col" style="height: 500px;">
                 <p-button :style-type="visible ? 'primary' : 'secondary'"
                           @click="visible = !visible;">
                     {{visible ? 'close' : 'open' }}
@@ -117,17 +130,18 @@ export const Template = (args, meta) => {
                 <p-sidebar :title="title"
                             v-model="visible"
                             class="mt-4 flex-grow"
+                            @close="onClose"
                 >
-                    <div class="bg-primary3 h-full flex justify-center items-center">
-                        {{contents}}
+                    <div class="bg-primary3 p-4 min-h-full flex justify-center items-center">
+                        {{contents || 'Non-sidebar area'}}
                     </div>
-                    <template #sidebar>Sidebar Contents</template>
+                    <template #sidebar>{{sidebarContents || 'Sidebar contents'}}</template>
                 </p-sidebar>
             </div>
         `,
         setup(props) {
             const state = reactive({
-                visible: false,
+                visible: true,
             })
             return {
                 ...toRefs(state),
@@ -136,13 +150,12 @@ export const Template = (args, meta) => {
     }
 };
 
-export const Playground = (args, meta) => {
-    const props = Object.keys(meta.argTypes);
+export const Playground = (args, {argTypes}) => {
     return {
-        props,
+        props: Object.keys(argTypes),
         components: { PSidebar },
         template: `
-            <div class="flex flex-col" style="height: 300px;">
+            <div class="flex flex-col" style="height: 500px;">
                 <p-sidebar :title="title"
                             :visible="visible"
                             class="mt-4 flex-grow"
@@ -150,7 +163,7 @@ export const Playground = (args, meta) => {
                     <div class="bg-primary3 h-full flex justify-center items-center">
                         Non-sidebar area
                     </div>
-                    <template #sidebar>Sidebar Contents</template>
+                    <template #sidebar>Sidebar contents</template>
                 </p-sidebar>
             </div>
         `,
@@ -170,12 +183,92 @@ export const Playground = (args, meta) => {
 ## Basic
 
 <Canvas>
-    <Story name="sidebar" argTypes={{
+    <Story name="basic" argTypes={{
         contents: {
+            defaultValue: ''
+        },
+        sidebarContents: {
+            defaultValue: ''
+        }
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Long Contents
+
+<Canvas>
+    <Story name="long contents" argTypes={{
+        contents: {
+            defaultValue: faker.lorem.lines(50)
+        },
+        sidebarContents: {
             defaultValue: faker.lorem.lines(50)
         }
     }}>
         {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Long Title
+
+<Canvas>
+    <Story name="long title" argTypes={{
+        contents: {
+            defaultValue: ''
+        },
+        sidebarContents: {
+            defaultValue: faker.lorem.lines(50)
+        }
+    }} args={{
+        title: faker.lorem.lines(2)
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Custom Title
+
+<Canvas>
+    <Story name="custom title" argTypes={{
+        contents: {
+            defaultValue: ''
+        },
+        sidebarContents: {
+            defaultValue: ''
+        }
+    }}>
+        {{
+            components: { PSidebar },
+            template: `
+            <div style="height: 500px;">
+                <p-sidebar :visible="true"
+                            class="mt-4"
+                >
+                    <div class="bg-primary3 h-full flex justify-center items-center">
+                        Non-sidebar area
+                    </div>
+                    <template #title>
+                        <strong class="text-coral">This is Custom Title</strong> with title slot.
+                    </template>
+                    <template #sidebar>Sidebar Contents</template>
+                </p-sidebar>
+            </div>
+            `,
+            setup(props) {
+                return {
+                }
+            }
+        }}
     </Story>
 </Canvas>
 
