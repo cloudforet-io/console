@@ -71,11 +71,11 @@
                         {{ users[value].name }}
                     </template>
                     <template #col-labels-format="{ value }">
-                        <p-text-list :items="value" delimiter=" ">
-                            <p-badge v-slot:default="{value: d}">
-                                {{ d }}
-                            </p-badge>
-                        </p-text-list>
+                        <p v-if="value.length === 0"></p>
+                        <p-badge v-for="(label, idx) in value" :key="idx" style-type="gray200"
+                        >
+                            {{ label }}
+                        </p-badge>
                     </template>
                 </p-search-table>
             </template>
@@ -420,30 +420,6 @@ export default {
 
 
         const apiQuery = new ApiQueryHelper();
-        // const getPageNavigation = async () => {
-        //     try {
-        //         const res = await SpaceConnector.client.identity.project.tree.search({
-        //             item_type: 'PROJECT',
-        //             // eslint-disable-next-line camelcase
-        //             item_id: projectId.value,
-        //         });
-        //         console.log(res);
-        //
-        //         apiQuery.setFilters([{
-        //             k: 'project_group_id',
-        //             v: res.open_path,
-        //             o: '=',
-        //         }]);
-        //         const projectGroupNames = await SpaceConnector.client.identity.projectGroup.list({
-        //             query: apiQuery.data,
-        //         });
-        //
-        //         state.projectGroupNames = projectGroupNames.results;
-        //     } catch (e) {
-        //         state.projectGroupNames = [];
-        //         console.error(e);
-        //     }
-        // };
 
 
         /** Init */
