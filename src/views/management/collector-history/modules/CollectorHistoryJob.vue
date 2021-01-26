@@ -317,7 +317,7 @@ export default {
                 statusValues = [JOB_TASK_STATUS.failure];
             }
             if (statusValues.length > 0) {
-                apiQuery.addFilter({ k: 'status', v: statusValues });
+                apiQuery.addFilter({ k: 'status', v: statusValues, o: '=' });
             }
 
             return apiQuery.data;
