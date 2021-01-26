@@ -345,7 +345,7 @@ export default {
             }
 
             if (statusValues.length > 0) {
-                apiQuery.addFilter({ k: 'status', v: statusValues });
+                apiQuery.addFilter({ k: 'status', v: statusValues, o: '=' });
             }
 
             return apiQuery.data;
