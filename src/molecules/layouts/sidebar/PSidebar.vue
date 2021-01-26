@@ -111,7 +111,7 @@ export default defineComponent({
     }
 
     .slide-fade-enter-active, .slide-fade-leave-active {
-        transition: all 0.3s ease-in-out;
+        transition: all 0.5s linear;
     }
 
     /* mobile size */
@@ -154,14 +154,14 @@ export default defineComponent({
             position: static;
             height: 100%;
             max-height: 100%;
-            width: 25vw;
+            width: 25%;
             min-width: $(min-width);
             z-index: unset;
             flex-shrink: 0;
         }
         .slide-fade-enter, .slide-fade-leave-to {
-            margin-left: -$(min-width);
-            transform: translateX($(min-width));
+            margin-left: -25%;
+            transform: translateX(100%);
             opacity: 0;
         }
     }
