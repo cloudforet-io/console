@@ -16,7 +16,6 @@ import webFontLoader from 'webfontloader';
 import { fontUrls, webFonts } from '@/styles/web-fonts';
 
 import tailwindConfig from './tailwind.config';
-import {mapValues} from 'lodash';
 import VTooltip from 'v-tooltip';
 
 import SpaceOneTheme from './SpaceOneTheme';
@@ -63,6 +62,18 @@ const i18n = new VueI18n({
     silentFallbackWarn: true,
 });
 
+const viewports = {}
+Object.keys(tailwindConfig.theme.screens).forEach(k => {
+    const v = tailwindConfig.theme.screens[k];
+    viewports[k] = {
+        name: k,
+        styles: {
+            width: v.min || v.max,
+            height: '100%',
+        }
+    }
+})
+console.log('viewports', viewports)
 
 export const decorators = [
     withDesign,
@@ -85,22 +96,7 @@ export const parameters = {
         theme: SpaceOneTheme,
     },
     viewport: {
-        viewports: {
-            ...mapValues(tailwindConfig.theme.screens, (v, k) => ({
-                name: k,
-                styles: {
-                    width: v.min || v.max,
-                    height: '100vh',
-                }
-            })),
-            '3xl': {
-                name: '3xl',
-                styles: {
-                    width: '3440px',
-                    height: '100vh',
-                }
-            }
-        }
+        viewports,
     },
     options: {
         storySort: (a, b) =>

@@ -111,7 +111,7 @@ export default defineComponent({
     }
 
     .slide-fade-enter-active, .slide-fade-leave-active {
-        transition: all 0.5s linear;
+        transition: all 0.2s linear;
     }
 
     /* mobile size */
