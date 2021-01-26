@@ -19,9 +19,7 @@ import tailwindConfig from './tailwind.config';
 import VTooltip from 'v-tooltip';
 
 import SpaceOneTheme from './SpaceOneTheme';
-import componentEN from '@/translations/language-pack/en.json';
-import componentKO from '@/translations/language-pack/ko.json';
-import componentJA from '@/translations/language-pack/ja.json';
+import {i18n} from '@/translations'
 
 Vue.use(VueRouter)
 Vue.use(VueI18n);
@@ -41,26 +39,6 @@ webFontLoader.load({
     },
 });
 
-// simple recursive remove keys with empty value
-const removeEmpty = (obj) => Object.keys(obj)
-    .filter((k) => obj[k] !== null && obj[k] !== undefined && obj[k] !== '') // Remove undef. and null and empty.string.
-    .reduce(
-        (newObj, k) => (typeof obj[k] === 'object'
-            ? Object.assign(newObj, { [k]: removeEmpty(obj[k]) }) // Recurse.
-            : Object.assign(newObj, { [k]: obj[k] })), // Copy value.
-        {},
-    );
-
-const i18n = new VueI18n({
-    locale: 'en', // set locale
-    fallbackLocale: 'en',
-    messages: {
-        en: removeEmpty({ COMPONENT: componentEN }),
-        ko: removeEmpty({ COMPONENT: componentKO }),
-        jp: removeEmpty({ COMPONENT: componentJA }),
-    },
-    silentFallbackWarn: true,
-});
 
 const viewports = {}
 Object.keys(tailwindConfig.theme.screens).forEach(k => {
@@ -73,7 +51,6 @@ Object.keys(tailwindConfig.theme.screens).forEach(k => {
         }
     }
 })
-console.log('viewports', viewports)
 
 export const decorators = [
     withDesign,

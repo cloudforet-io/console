@@ -236,6 +236,26 @@ export const Playground = (args, {argTypes}) => {
 <br/>
 <br/>
 
+## No Title
+
+<Canvas>
+    <Story name="no title" argTypes={{
+        contents: {
+            defaultValue: ''
+        },
+        sidebarContents: {
+            defaultValue: faker.lorem.lines(50)
+        },
+    }} args={{
+        title: undefined
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Custom Title
 
 <Canvas>

@@ -6,7 +6,7 @@
         <transition name="slide-fade">
             <div v-if="proxyVisible" class="sidebar-wrapper">
                 <div class="inner">
-                    <p class="title">
+                    <p class="title" :class="{'mb-4': !!title || !!$scopedSlots.title}">
                         <slot name="title">
                             {{ title }}
                         </slot>
@@ -97,7 +97,6 @@ export default defineComponent({
             width: 100%;
         }
         .title {
-            @apply mb-4;
             width: calc(100% - 2rem);
             min-height: 2rem;
             font-size: 1.125rem;
