@@ -10,7 +10,8 @@
                  @click="onClickBox(idx)"
             >
                 <span>{{ data.label }}</span>
-                <span class="count"> {{ count[data.type] }}</span>
+                <span v-if="data.type === 'storage'" class="suffix">({{ storageSuffix }})</span>
+                <span class="count"> {{ data.type === 'storage' ? byteFormatter(count[data.type]).split(' ')[0] : commaFormatter(count[data.type]) }}</span>
             </div>
         </div>
         <div class="bottom-part">
@@ -48,7 +49,7 @@
                                 <div class="text-group">
                                     <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
                                 </div>
-                                <span class="count">{{ count[selectedType] }}</span>
+                                <span class="count">{{ selectedType === 'storage' ? byteFormatter(count[selectedType]) : commaFormatter(count[selectedType]) }}</span>
                             </router-link>
                             <router-link v-for="(data, idx) of summaryData" :key="idx"
                                          :to="data.to"
@@ -92,7 +93,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    find, forEach, orderBy, range,
+    forEach, orderBy, range,
 } from 'lodash';
 import bytes from 'bytes';
 import dayjs from 'dayjs';
@@ -103,7 +104,8 @@ import { TranslateResult } from 'vue-i18n';
 import { Location } from 'vue-router';
 
 import {
-    reactive, toRefs, watch, computed, onUnmounted, ComponentRenderProxy, getCurrentInstance,
+    reactive, toRefs, watch, computed,
+    onUnmounted, ComponentRenderProxy, getCurrentInstance,
 } from '@vue/composition-api';
 
 import ProjectRegionService from '@/views/common/components/widgets/all-summary/ProjectRegionService.vue';
@@ -118,11 +120,8 @@ import { gray, peacock } from '@/styles/colors';
 import { store } from '@/store';
 
 am4core.useTheme(am4themes_animated);
-am4core.options.autoSetClassName = true;
-am4core.options.classNamePrefix = 'allSummary';
 
 /* enum */
-// todo: will be deprecated
 enum DATE_TYPE {
     daily = 'DAILY',
     monthly = 'MONTHLY',
@@ -230,6 +229,7 @@ export default {
                 analytics: 0,
                 all: 0,
             },
+            storageSuffix: 'TB' as Unit,
             storageTrendSuffix: 'TB' as Unit,
             dataList: computed(() => ([
                 { type: DATA_TYPE.compute, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.COMPUTE') },
@@ -351,10 +351,9 @@ export default {
                 let count = 0 as number | string;
                 res.results.forEach((d) => {
                     if (d.label === CLOUD_SERVICE_LABEL.storage) {
-                        count = byteFormatter(d.total);
-                    } else {
-                        count = numberFormatter(d.total);
+                        state.storageSuffix = byteFormatter(d.total).split(' ')[1];
                     }
+                    count = d.total;
                     state.count[Object.keys(CLOUD_SERVICE_LABEL)[Object.values(CLOUD_SERVICE_LABEL).indexOf(d.label)]] = count;
                 });
             } catch (e) {
@@ -564,6 +563,7 @@ export default {
             colorState,
             onClickBox,
             onClickDateTypeButton,
+            byteFormatter,
             commaFormatter,
             numberFormatter,
             getLocation,
@@ -595,13 +595,18 @@ export default {
         position: relative;
         display: inline-block;
         width: auto;
-        text-align: center;
+        line-height: 1.6;
         font-size: 1rem;
         cursor: pointer;
         border-radius: 0.375rem;
-        padding: 0.625rem 1rem;
-        margin-right: 0.25rem;
-        margin-bottom: 0.25rem;
+        padding: 0.375rem 1rem;
+        margin-right: 0.375rem;
+        margin-bottom: 0.375rem;
+        .suffix {
+            @apply text-gray-500;
+            font-size: 0.75rem;
+            padding-left: 0.125rem;
+        }
         .count {
             @apply text-peacock-600;
             font-weight: bold;
@@ -612,7 +617,7 @@ export default {
         }
         &.selected {
             @apply bg-peacock-600 text-white border-peacock-600;
-            .count {
+            .suffix, .count {
                 @apply text-white;
             }
             &::after {
@@ -628,10 +633,34 @@ export default {
                 left: 50%;
                 margin-left: -0.5rem;
 
-                @screen sm {
+                @screen lg {
                     display: block;
                 }
             }
+        }
+        &.compute {
+            width: 8.5rem;
+        }
+        &.container {
+            width: 8.875rem;
+        }
+        &.database {
+            width: 8.625rem;
+        }
+        &.networking {
+            width: 9.75rem;
+        }
+        &.storage {
+            width: 9.625rem;
+        }
+        &.security {
+            width: 8rem;
+        }
+        &.analytics {
+            width: 8.375rem;
+        }
+        &.all {
+            width: 10.5rem;
         }
     }
 }
@@ -746,18 +775,6 @@ export default {
                 }
             }
         }
-    }
-}
-</style>
-<style lang="postcss">
-.allSummaryLabelBullet-group {
-    display: none;
-    &:last-child {
-        display: block;
-    }
-
-    @screen sm {
-        display: block;
     }
 }
 </style>

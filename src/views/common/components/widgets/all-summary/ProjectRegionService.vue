@@ -91,7 +91,7 @@ export default {
             required: true,
         },
         count: {
-            type: [String, Number],
+            type: Number,
             default: undefined,
         },
     },
@@ -162,8 +162,15 @@ export default {
             label.fontWeight = 'lighter';
             label.fill = am4core.color(gray[900]);
             if (isLoading) label.text = '';
-            else if (props.count) label.text = props.count;
-            else label.text = '{values.value.sum}';
+            else if (props.count) {
+                if (props.label === 'Storage') {
+                    label.text = byteFormatter(props.count).split(' ')[0];
+                } else {
+                    label.text = props.count;
+                }
+            } else {
+                label.text = '{values.value.sum}';
+            };
 
             state.chart = chart;
         };
