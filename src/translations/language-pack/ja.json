@@ -363,8 +363,8 @@
 				"COMPUTE": "コンピューティング",
 				"CREDENTIALS": "暗号化キー",
 				"DATABASE": "データベース",
+				"PROVIDER": "プロバイダー",
 				"SERVER": "サーバ",
-				"SERVICE_PROVIDER": "サービスプロバイダー",
 				"STORAGE": "ストレージ",
 				"TITLE": "サービスアカウント"
 			},

@@ -33,7 +33,7 @@
                :class="[singleItemTabState.activeTab]"
         >
             <template #summary>
-                <project-dashboard ref="ProjectDashboard" />
+                <project-dashboard ref="ProjectDashboard" :project-id="projectId" />
             </template>
             <template #member>
                 <p-search-table class="member-tab"
@@ -136,7 +136,7 @@ import {
 
 import {
     PSearchTable, PTab, PPageTitle, PTableCheckModal, PButtonModal, PPanelTop,
-    PTextList, PIconButton, PCopyButton, PIconTextButton, PPageNavigation, PButton, PBadge,
+    PIconButton, PCopyButton, PIconTextButton, PPageNavigation, PButton, PBadge,
 } from '@spaceone/design-system';
 import { Options, SearchTableListeners } from '@spaceone/design-system/dist/src/organisms/tables/search-table/type';
 import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
@@ -155,14 +155,12 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectModel } from '@/views/project/project/type';
 import { TranslateResult } from 'vue-i18n';
-import config from '@/lib/config';
 
 
 export default {
     name: 'ProjectDetail',
     components: {
         PBadge,
-        PTextList,
         FavoriteButton,
         PSearchTable,
         PPanelTop,
@@ -486,7 +484,10 @@ export default {
     }
 }
 .tab-content::v-deep {
+    max-width: 1368px;
     border: none;
+    margin: auto;
+
     &.summary {
         .tab-pane {
             @apply border border-gray-200;

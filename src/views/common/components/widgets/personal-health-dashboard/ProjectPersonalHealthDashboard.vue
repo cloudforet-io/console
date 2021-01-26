@@ -318,6 +318,7 @@ export default {
         @apply flex-grow border border-gray-200 bg-white;
         margin-right: 0.375rem;
         max-width: 15.25rem;
+        cursor: pointer;
         padding: 0.625rem 1rem;
         border-radius: 0.375rem 0.375rem 0 0;
         &:last-child {

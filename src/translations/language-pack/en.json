@@ -363,8 +363,8 @@
 				"COMPUTE": "Compute",
 				"CREDENTIALS": "Credentials",
 				"DATABASE": "Database",
+				"PROVIDER": "Provider",
 				"SERVER": "Server",
-				"SERVICE_PROVIDER": "Service Provider",
 				"STORAGE": "Storage",
 				"TITLE": "Service Accounts"
 			},

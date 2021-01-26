@@ -9,15 +9,15 @@
             </div>
         </div>
         <div v-else class="grid grid-cols-12">
-            <div class="chart-wrapper col-span-4">
-                <p-chart-loader :loading="loading" class="chart">
+            <div class="col-span-3 chart-wrapper">
+                <p-chart-loader :loading="loading">
                     <template #loader>
                         <div ref="loaderRef" />
                     </template>
-                    <div ref="chartRef" />
+                    <div ref="chartRef" class="chart" />
                 </p-chart-loader>
             </div>
-            <div class="col-span-8 summary-content-wrapper">
+            <div class="col-span-9 summary-content-wrapper">
                 <template v-if="loading">
                     <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
                         <p-skeleton class="flex-grow" />
@@ -28,8 +28,9 @@
                                  :to="d.to"
                                  class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
                     >
+                        <span class="circle" :style="{ 'background-color': d.color }" />
                         <div class="text-group">
-                            <span class="provider" :style="{ color: d.color }">{{ d.provider }}</span>
+                            <span :style="{ color: d.providerColor }">{{ d.provider }}</span>
                             <span class="type truncate">{{ d.region }}</span>
                         </div>
                         <span class="count">{{ d.count }}</span>
@@ -42,7 +43,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { range, random, orderBy } from 'lodash';
+import { range, orderBy } from 'lodash';
 import bytes from 'bytes';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -58,7 +59,9 @@ import {
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { QueryHelper } from '@/lib/query';
-import { gray, violet, white } from '@/styles/colors';
+import {
+    gray, violet, white, coral, yellow, secondary1,
+} from '@/styles/colors';
 import Color from 'color';
 import { store } from '@/store';
 import { Location } from 'vue-router';
@@ -139,9 +142,9 @@ export default {
             const series = chart.series.create();
             series.slices.template.togglable = false;
             series.slices.template.clickable = false;
-            series.dataFields.value = 'count';
+            series.dataFields.value = 'total';
             series.dataFields.category = 'region';
-            series.slices.template.propertyFields.fillOpacity = 'fillOpacity';
+            series.slices.template.fill = am4core.color(gray[400]);
             series.slices.template.propertyFields.fill = 'color';
             series.slices.template.stroke = am4core.color(white);
             series.slices.template.strokeWidth = 2;
@@ -195,17 +198,17 @@ export default {
                     labels: [props.label],
                 };
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary(param);
-                const opacities = [0.2, 0.4, 0.6, 0.8, 1];
-                let data = res.results.map(d => ({
+                const colors = [coral[500], yellow[400], secondary1];
+                let data = orderBy(res.results, ['total'], ['desc']);
+                data = data.map((d, idx) => ({
                     provider: state.providers[d.provider].label,
                     region: d.region_code,
                     total: d.total,
                     count: d.label === 'Storage' ? byteFormatter(d.total) : d.total,
-                    color: state.providers[d.provider].color,
+                    providerColor: state.providers[d.provider].color,
+                    color: colors[idx] || gray[400],
                     to: getLocation(d.provider, d.region_code),
-                    fillOpacity: opacities[random(4)],
                 }));
-                data = orderBy(data, ['total'], ['desc']);
                 state.data = data;
             } catch (e) {
                 console.error(e);
@@ -228,7 +231,6 @@ export default {
         }, { immediate: true });
         watch(() => props.label, async () => {
             await getData();
-            // drawChart();
         }, { immediate: false });
 
         onUnmounted(() => {
@@ -260,6 +262,18 @@ export default {
             margin-bottom: 0.625rem;
         }
     }
+    .chart-wrapper {
+        .chart {
+            max-width: 6rem;
+            max-height: 6rem;
+            margin: auto;
+
+            @screen md {
+                position: absolute;
+                top: -1rem;
+            }
+        }
+    }
     .summary-content-wrapper {
         overflow-y: auto;
         height: 13rem;
@@ -286,9 +300,18 @@ export default {
             }
         }
 
+        .circle {
+            display: inline-block;
+            width: 0.5rem;
+            height: 0.5rem;
+            border-radius: 50%;
+            margin-bottom: 0.25rem;
+            margin-right: 0.25rem;
+        }
+
         .text-group {
             display: inline-block;
-            width: 80%;
+            width: 75%;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;

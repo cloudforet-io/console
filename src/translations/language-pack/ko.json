@@ -363,8 +363,8 @@
 				"COMPUTE": "컴퓨트",
 				"CREDENTIALS": "암호화 키 ",
 				"DATABASE": "데이터베이스",
+				"PROVIDER": "서비스 제공자",
 				"SERVER": "서버 ",
-				"SERVICE_PROVIDER": "서비스 제공자",
 				"STORAGE": "저장소",
 				"TITLE": "서비스 계정"
 			},

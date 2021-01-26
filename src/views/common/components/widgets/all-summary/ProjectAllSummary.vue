@@ -15,72 +15,70 @@
         </div>
         <div class="bottom-part">
             <div class="content-wrapper grid grid-cols-12 gap-2">
-                <div class="col-span-12 lg:col-span-9 grid grid-cols-12">
-                    <div class="chart-wrapper col-span-12 lg:col-span-9">
-                        <div class="sub-title">
-                            <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
-                            <span v-if="selectedType === 'storage'" class="suffix">({{ storageTrendSuffix }})</span>
-                        </div>
-                        <div class="toggle-button-group">
-                            <p-button v-for="(d, idx) in dateTypes"
-                                      :key="idx"
-                                      :class="{'selected': selectedDateType === d.name}"
-                                      @click="onClickDateTypeButton(d.name)"
-                            >
-                                {{ d.label }}
-                            </p-button>
-                        </div>
-                        <p-chart-loader :loading="chartState.loading">
-                            <template #loader>
-                                <p-skeleton width="100%" height="100%" />
-                            </template>
-                            <div ref="chartRef" class="chart" />
-                        </p-chart-loader>
+                <div class="chart-wrapper col-span-12 lg:col-span-7">
+                    <div class="sub-title">
+                        <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
+                        <span v-if="selectedType === 'storage'" class="suffix">({{ storageTrendSuffix }})</span>
                     </div>
-                    <div class="summary-wrapper col-span-12 lg:col-span-3">
-                        <div class="sub-title col-span-3">
-                            {{ $t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: dataList[selectedIndex].label }) }}
-                        </div>
-                        <template v-if="!loading && summaryData.length > 0">
-                            <div class="summary-content-wrapper block md:grid md:grid-cols-3 lg:block">
-                                <router-link :to="getLocation(selectedType)"
-                                             class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
-                                >
-                                    <div class="text-group">
-                                        <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
-                                    </div>
-                                    <span class="count">{{ count[selectedType] }}</span>
-                                </router-link>
-                                <router-link v-for="(data, idx) of summaryData" :key="idx"
-                                             :to="data.to"
-                                             class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
-                                >
-                                    <div class="text-group">
-                                        <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
-                                        <span class="type">{{ data.type }}</span>
-                                    </div>
-                                    <span class="count">{{ data.count }}</span>
-                                </router-link>
-                            </div>
-                        </template>
-                        <template v-else-if="!loading">
-                            <div class="summary-content-wrapper no-data-wrapper grid">
-                                <div class="m-auto">
-                                    <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
-                                    <p class="text">
-                                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: dataList[selectedIndex].label }) }}
-                                    </p>
-                                </div>
-                            </div>
-                        </template>
-                        <template v-else>
-                            <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
-                                <p-skeleton class="flex-grow" />
-                            </div>
-                        </template>
+                    <div class="toggle-button-group">
+                        <p-button v-for="(d, idx) in dateTypes"
+                                  :key="idx"
+                                  :class="{'selected': selectedDateType === d.name}"
+                                  @click="onClickDateTypeButton(d.name)"
+                        >
+                            {{ d.label }}
+                        </p-button>
                     </div>
+                    <p-chart-loader :loading="chartState.loading">
+                        <template #loader>
+                            <p-skeleton width="100%" height="100%" />
+                        </template>
+                        <div ref="chartRef" class="chart" />
+                    </p-chart-loader>
                 </div>
-                <div class="col-span-12 lg:col-span-3 region-service-wrapper">
+                <div class="col-span-12 md:col-span-4 lg:col-span-2 summary-wrapper">
+                    <div class="sub-title">
+                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: dataList[selectedIndex].label }) }}
+                    </div>
+                    <template v-if="!loading && summaryData.length > 0">
+                        <div class="summary-content-wrapper">
+                            <router-link :to="getLocation(selectedType)"
+                                         class="summary-row"
+                            >
+                                <div class="text-group">
+                                    <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
+                                </div>
+                                <span class="count">{{ count[selectedType] }}</span>
+                            </router-link>
+                            <router-link v-for="(data, idx) of summaryData" :key="idx"
+                                         :to="data.to"
+                                         class="summary-row"
+                            >
+                                <div class="text-group">
+                                    <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
+                                    <span class="type">{{ data.type }}</span>
+                                </div>
+                                <span class="count">{{ data.count }}</span>
+                            </router-link>
+                        </div>
+                    </template>
+                    <template v-else-if="!loading">
+                        <div class="summary-content-wrapper no-data-wrapper grid">
+                            <div class="m-auto">
+                                <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
+                                <p class="text">
+                                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: dataList[selectedIndex].label }) }}
+                                </p>
+                            </div>
+                        </div>
+                    </template>
+                    <template v-else>
+                        <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
+                            <p-skeleton class="flex-grow" />
+                        </div>
+                    </template>
+                </div>
+                <div class="col-span-12 md:col-span-5 lg:col-span-3 region-service-wrapper">
                     <div class="sub-title">
                         <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.REGION_SERVICE_TITLE') }}</span>
                     </div>
@@ -283,6 +281,7 @@ export default {
             dateAxis.renderer.minGridDistance = 40;
             dateAxis.renderer.grid.template.disabled = true;
             dateAxis.renderer.labels.template.fill = am4core.color(gray[600]);
+            dateAxis.tooltip.disabled = true;
             dateAxis.fontSize = 11;
 
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
@@ -290,8 +289,9 @@ export default {
             valueAxis.renderer.grid.template.strokeOpacity = 1;
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
             valueAxis.renderer.labels.template.fill = am4core.color(peacock[500]);
+            valueAxis.tooltip.disabled = true;
             valueAxis.fontSize = 11;
-            valueAxis.extraMax = 0.1;
+            valueAxis.extraMax = 0.25;
             valueAxis.min = 0;
 
             const series = chart.series.push(new am4charts.ColumnSeries());
@@ -300,14 +300,27 @@ export default {
             series.fill = am4core.color(peacock[500]);
             series.columns.template.width = am4core.percent(15);
             series.strokeWidth = 0;
+            series.tooltipText = '{count}';
+            series.tooltip.pointerOrientation = 'down';
+            series.tooltip.fontSize = 14;
+            series.tooltip.strokeWidth = 0;
+            series.tooltip.dy = -5;
+            series.tooltip.getFillFromObject = false;
+            series.tooltip.label.fill = am4core.color(peacock[600]);
+            series.tooltip.background.stroke = am4core.color(peacock[400]);
 
             const bullet = series.bullets.push(new am4charts.LabelBullet());
-            bullet.label.text = '{count}';
+            bullet.label.text = '{bulletText}';
             bullet.label.fontSize = 14;
             bullet.label.truncate = false;
             bullet.label.hideOversized = false;
             bullet.label.fill = am4core.color(peacock[600]);
             bullet.label.dy = -10;
+
+            chart.cursor = new am4charts.XYCursor();
+            chart.cursor.lineX.strokeOpacity = 0;
+            chart.cursor.lineY.strokeOpacity = 0;
+            chart.cursor.behavior = 'none';
         };
         const getLocation = (type) => {
             const query: Location['query'] = {
@@ -381,22 +394,26 @@ export default {
                 });
                 forEach(range(0, dateRange), (i) => {
                     const date = utcToday.subtract(i, dateUnit);
-                    if (!find(chartData, { date })) {
+                    if (!(chartData.find(d => d.date.isSame(date, 'day')))) {
                         chartData.push({ date, count: null });
                     }
                 });
 
                 const orderedData = orderBy(chartData, ['date'], ['asc']);
-                chartState.data = orderedData.map((d) => {
+                chartState.data = orderedData.map((d, idx) => {
+                    let bulletText = '';
+                    if (idx % 3 === 1) bulletText = d.count;
                     if (state.selectedDateType === DATE_TYPE.monthly && (d.date.format('M') === '1' || d.date.format('M') === '12')) {
                         return {
                             date: d.date.format('MMM, YY'),
                             count: d.count,
+                            bulletText,
                         };
                     }
                     return {
                         date: d.date.format(dateFormat),
                         count: d.count,
+                        bulletText,
                     };
                 });
             } catch (e) {
