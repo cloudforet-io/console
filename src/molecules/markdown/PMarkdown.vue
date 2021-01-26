@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, watch,
+    computed,
 } from '@vue/composition-api';
 import { render } from 'ejs';
 import { get } from 'lodash';
