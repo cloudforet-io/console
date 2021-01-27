@@ -1,4 +1,10 @@
 {
+	"APP": {
+		"TOP_NOTI": {
+			"HAS_NO_ROLE": "",
+			"NEED_ROLE": ""
+		}
+	},
 	"AUTOMATION": {
 		"POWER_SCHEDULER": {
 			"DETAILS": {

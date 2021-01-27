@@ -15,7 +15,9 @@
             <slot name="title" />
         </portal>
         <portal to="info-contents">
-            <slot name="contents" />
+            <div class="info-contents" :class="{'no-title': !!$scopedSlots.title }">
+                <slot name="contents" />
+            </div>
         </portal>
     </fragment>
 </template>
@@ -101,6 +103,11 @@ export default {
         @apply ml-1;
         font-size: 0.75rem;
         line-height: 1.2;
+    }
+}
+.info-contents::v-deep {
+    &.no-data {
+        margin-top: -1rem;
     }
 }
 </style>

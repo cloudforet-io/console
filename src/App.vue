@@ -8,6 +8,13 @@
         <p-notice-alert group="noticeBottomLeft" position="bottom left" />
         <p-notice-alert group="noticeBottomRight" position="bottom right" />
         <p-toast-alert group="toastTopCenter" position="top center" />
+        <top-notification v-if="!$store.getters['user/hasNoRole']">
+            <i18n path="APP.TOP_NOTI.HAS_NO_ROLE">
+                <template #role>
+                    <strong>{{ $t('APP.TOP_NOTI.NEED_ROLE') }}</strong>
+                </template>
+            </i18n>
+        </top-notification>
         <p-icon-modal :visible="isExpired"
                       emoji
                       :header-title="$t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
@@ -19,19 +26,20 @@
         <template v-if="showGNB">
             <GNB class="gnb" />
             <div class="app-body">
-                <main class="main">
-                    <p-sidebar :visible="$store.state.display.visibleInfo"
-                               @close="$store.dispatch('display/hideInfo')"
-                    >
+                <p-sidebar :visible="$store.state.display.visibleInfo"
+                           @close="$store.dispatch('display/hideInfo')"
+                >
+                    <main class="main">
+                        <portal-target name="top-notification" />
                         <router-view />
-                        <template #title>
-                            <portal-target name="info-title" />
-                        </template>
-                        <template #sidebar>
-                            <portal-target name="info-contents" />
-                        </template>
-                    </p-sidebar>
-                </main>
+                    </main>
+                    <template #title>
+                        <portal-target name="info-title" />
+                    </template>
+                    <template #sidebar>
+                        <portal-target name="info-contents" />
+                    </template>
+                </p-sidebar>
             </div>
         </template>
         <router-view v-else />
@@ -41,7 +49,7 @@
 <script lang="ts">
 import {
     ComponentRenderProxy, computed,
-    defineComponent, getCurrentInstance, reactive, toRefs,
+    defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -51,11 +59,13 @@ import {
 import GNB from '@/views/common/components/gnb/GNB.vue';
 import { Location } from 'vue-router';
 import router from '@/routes';
+import TopNotification from '@/views/common/components/notification/TopNotification.vue';
 
 
 export default defineComponent({
     name: 'App',
     components: {
+        TopNotification,
         GNB: GNB as any,
         PNoticeAlert,
         PToastAlert,
@@ -76,6 +86,12 @@ export default defineComponent({
             };
             await router.push(res);
         };
+
+        watch(() => vm.$store.getters['user/hasNoRole'], (hasNoRole) => {
+            if (hasNoRole && vm.$route.name !== 'userAccount') {
+                vm.$router.replace({ name: 'userAccount' });
+            }
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
@@ -106,15 +122,18 @@ export default defineComponent({
     .app-body {
         display: flex;
         flex-direction: column;
-        overflow-y: auto;
+        overflow-y: hidden;
         width: 100%;
         height: calc(100vh - $(gnb-height));
         margin-top: $gnb-height;
         flex-grow: 1;
         .main {
+            display: flex;
+            flex-direction: column;
             height: 100%;
             margin: 0;
             overflow-x: hidden;
+            overflow-y: auto;
         }
     }
 }
