@@ -58,22 +58,21 @@
                         >
                             {{ $t('PROJECT.DETAIL.ADD') }}
                         </p-icon-text-button>
-                        <p-button class="mr-4"
-                                  :outline="true"
-                                  style-type="alert"
-                                  :disabled="!memberTableState.selectedItems.length"
-                                  @click="memberDeleteClick"
+                        <p-dropdown-menu-btn
+                            class="mr-4"
+                            :menu="memberTableState.dropdownMenu"
+                            @click-delete="memberDeleteClick"
+                            @click-update="openMemberUpdateForm"
                         >
-                            {{ $t('PROJECT.DETAIL.DELETE') }}
-                        </p-button>
+                            {{ $t('IDENTITY.USER.MAIN.ACTION') }}
+                        </p-dropdown-menu-btn>
                     </template>
                     <template #col-resource_id-format="{ value }">
                         {{ users[value].name }}
                     </template>
                     <template #col-labels-format="{ value }">
-                        <p v-if="value.length === 0"></p>
-                        <p-badge v-for="(label, idx) in value" :key="idx" style-type="gray200"
-                        >
+                        <p v-if="value.length === 0" />
+                        <p-badge v-for="(label, idx) in value" :key="idx" style-type="gray200">
                             {{ label }}
                         </p-badge>
                     </template>
@@ -115,6 +114,9 @@
                                      @confirm="projectEditFormConfirm($event)"
         />
         <s-project-member-add-modal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" @confirm="onAddMemberConfirm()" />
+        <project-member-update-modal v-if="memberUpdateFormVisible" :visible.sync="memberUpdateFormVisible" :selected-member="memberTableState.selectedItems[0]"
+                                     @confirm="onAddMemberConfirm"
+        />
         <p-table-check-modal :fields="checkMemberDeleteState.fields"
                              :mode="checkMemberDeleteState.mode"
                              :items="checkMemberDeleteState.items"
@@ -136,7 +138,7 @@ import {
 
 import {
     PSearchTable, PTab, PPageTitle, PTableCheckModal, PButtonModal, PPanelTop,
-    PIconButton, PCopyButton, PIconTextButton, PPageNavigation, PButton, PBadge,
+    PDropdownMenuBtn, PIconButton, PCopyButton, PIconTextButton, PPageNavigation, PButton, PBadge,
 } from '@spaceone/design-system';
 import { Options, SearchTableListeners } from '@spaceone/design-system/dist/src/organisms/tables/search-table/type';
 import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
@@ -146,6 +148,7 @@ import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.v
 import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
+import ProjectMemberUpdateModal from '@/views/project/project/modules/ProjectMemberUpdateModal.vue';
 import ProjectDashboard from '@/views/project/project/modules/ProjectDashboard.vue';
 
 import ProjectReportTab from '@/views/project/project/modules/ProjectReportTab.vue';
@@ -155,7 +158,7 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectModel } from '@/views/project/project/type';
 import { TranslateResult } from 'vue-i18n';
-
+import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
 
 export default {
     name: 'ProjectDetail',
@@ -174,9 +177,11 @@ export default {
         PTab,
         PIconButton,
         PCopyButton,
+        PDropdownMenuBtn,
         PButton,
         SProjectCreateFormModal,
         SProjectMemberAddModal,
+        ProjectMemberUpdateModal,
         PIconTextButton,
         PPageNavigation,
     },
@@ -260,6 +265,18 @@ export default {
                 searchText: '',
             } as Partial<Options>,
             selectedItems: computed(() => memberTableState.selectIndex.map(i => memberTableState.items[i])),
+            isSelected: computed(() => memberTableState.selectIndex.length > 0),
+            dropdownMenu: computed(() => ([
+                {
+                    type: 'item',
+                    name: 'update',
+                    label: vm.$t('IDENTITY.USER.MAIN.UPDATE'),
+                    disabled: memberTableState.selectIndex.length > 1 || !memberTableState.isSelected,
+                },
+                {
+                    type: 'item', name: 'delete', label: vm.$t('IDENTITY.USER.MAIN.DELETE'), disabled: !memberTableState.isSelected,
+                },
+            ] as MenuItem[])),
         });
 
         const listMemberApi = SpaceConnector.client.identity.project.member.list;
@@ -318,6 +335,7 @@ export default {
             modalContent: '' as TranslateResult,
             memberAddFormVisible: false,
             memberDeleteFormVisible: false,
+            memberUpdateFormVisible: false,
         });
 
         const openProjectDeleteForm = () => {
@@ -368,6 +386,14 @@ export default {
         };
 
         const onAddMemberConfirm = async () => {
+            await listMembers();
+        };
+
+        const openMemberUpdateForm = () => {
+            formState.memberUpdateFormVisible = true;
+        };
+
+        const onUpdateMemberConfirm = async () => {
             await listMembers();
         };
 
@@ -443,6 +469,8 @@ export default {
             projectEditFormConfirm,
             openMemberAddForm,
             onAddMemberConfirm,
+            openMemberUpdateForm,
+            onUpdateMemberConfirm,
             memberDeleteClick,
             memberDeleteConfirm,
             listMembers,

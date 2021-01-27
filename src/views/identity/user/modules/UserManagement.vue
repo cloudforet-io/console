@@ -405,7 +405,7 @@ export default {
                     // eslint-disable-next-line camelcase
                     last_accessed_at: calculateTime(d.last_accessed_at, { seconds: dayjs().unix() }, state.timezone) || 0,
                 }));
-                state.totalCount = res.length;
+                state.totalCount = res.total_count || res.length;
                 state.loading = false;
             } catch (e) {
                 console.error(e);
