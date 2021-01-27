@@ -113,7 +113,8 @@ export default defineComponent({
         transition: all 0.2s linear;
     }
 
-    /* mobile size */
+    /* responsible size */
+
     @screen 2xs {
         flex-direction: column;
 
