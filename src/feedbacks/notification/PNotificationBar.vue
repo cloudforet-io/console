@@ -38,7 +38,7 @@ export default defineComponent({
             type: String,
             default: 'dark',
             validator(val) {
-                return styleTypes.includes(val);
+                return styleTypes.includes(val as any);
             },
         },
     },

@@ -1,1 +1,1 @@
-export const styleTypes = ['dark'];
+export const styleTypes = ['dark'] as const;

@@ -153,3 +153,5 @@ export { default as PTab } from './organisms/tabs/tab/PTab.vue';
 export { default as PPageTitle } from './organisms/title/page-title/PPageTitle.vue';
 export { default as PTree } from './organisms/tree/PTree.vue';
 export { default as PProgressWizard } from './organisms/wizards/progress-wizard/PProgressWizard.vue';
+
+export { default as PNotificationBar } from './feedbacks/notification/PNotificationBar.vue';
