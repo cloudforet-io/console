@@ -116,8 +116,7 @@ export default {
                     // eslint-disable-next-line camelcase
                     include_role_binding: true,
                 });
-                console.log(res.role_bindings, 'test1');
-                console.log(res, 'test2');
+
                 baseState.items = res.role_bindings.map(d => ({
                     ...d,
                 }));

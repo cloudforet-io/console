@@ -1,6 +1,6 @@
 <template>
     <p-button-modal
-        :header-title="$tc('PROJECT.DETAIL.MODAL_ADD_MEMBER', items.length)"
+        :header-title="'Update Member Information'"
         :centered="true"
         size="lg"
         :fade="true"
@@ -9,37 +9,15 @@
         @confirm="confirm($event)"
     >
         <template #body>
-            <p-search-table :fields="fields"
-                            :items="items"
-                            :total-count="totalCount"
-                            :loading="loading"
-                            :style="{
-                                height: '19rem', padding: '-1rem'
-                            }"
-                            :selectable="false"
-                            :excel-visible="false"
-                            @change="onChange"
-                            @init="onChange"
-                            @rowLeftClick="onSelect"
-            />
             <div class="field-group-wrapper">
-                <p-field-group
-                    :label="$t('PROJECT.DETAIL.MODAL_ADD_MEMBER')"
-                    :required="true"
-                    :invalid="validationState.isMemberValid === false"
-                    :invalid-text="validationState.memberCheckInvalidText"
-                >
-                    <template #default="{invalid}">
-                        <p class="tag-container">
-                            <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag}`"
-                                   class="tag"
-                                   @delete="tagTools.deleteTag(idx)"
-                            >
-                                {{ tag }}
-                            </p-tag>
-                        </p>
-                    </template>
-                </p-field-group>
+                <p class="user-id-wrapper">
+                    <span class="user-id-label">
+                        {{ $t('IDENTITY.USER.MAIN.USER_ID') }}
+                    </span>
+                    <span class="user-id-content">
+                        {{ userId }}
+                    </span>
+                </p>
                 <p-field-group
                     :label="$t('PROJECT.DETAIL.PROJECT_ROLE')"
                     :required="true"
@@ -103,13 +81,10 @@ import {
 import {
     PButtonModal, PTag, PSearchTable, PSelectDropdown, PFieldGroup, PTextInput, PButton, PI,
 } from '@spaceone/design-system';
-import { SearchTableListeners, Options } from '@spaceone/design-system/dist/src/organisms/tables/search-table/type';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { isEqual } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { getPageStart } from '@/lib/component-utils/pagination';
 import VueI18n from 'vue-i18n';
 
 import TranslateResult = VueI18n.TranslateResult;
@@ -154,9 +129,8 @@ const tagList = (proxyTags?: Ref<string[]>|null, checkDuplicate = true) => {
 };
 
 export default {
-    name: 'ProjectMemberAddModal',
+    name: 'ProjectMemberUpdateModal',
     components: {
-        PSearchTable,
         PButtonModal,
         PTag,
         PSelectDropdown,
@@ -183,66 +157,34 @@ export default {
                 properties: {},
             }),
         },
-        updateMode: {
-            type: Boolean,
-            default: false,
+        selectedMember: {
+            type: Object,
+            default: () => ({
+                properties: {},
+            }),
         },
     },
     setup(props, { emit, root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            fields: [
-                { label: 'User ID', name: 'user_id', type: 'item' },
-                { label: 'Name', name: 'name', type: 'item' },
-                { label: 'Email', name: 'email', type: 'item' },
-            ],
-            items: [] as any,
             loading: false,
-            totalCount: 0,
-            options: {} as Options,
-            projectRole: '' as string,
+            projectRole: '',
             projectRoleList: [] as any[],
             memberLabel: '',
+            userId: '',
         });
         const validationState = reactive({
-            isMemberValid: undefined as undefined | boolean,
-            memberCheckInvalidText: '' as TranslateResult | string,
             isProjectRoleValid: undefined as undefined | boolean,
             projectRoleCheckInvalidText: '' as TranslateResult | string,
             isLabelValid: undefined as undefined | boolean,
             labelInvalidText: '' as TranslateResult | string,
         });
         const formState = reactive({
-            tagTools: tagList(null),
             labelTagTools: tagList(null),
         });
         const proxyVisible = makeProxy('visible', props, emit);
         const projectId = root.$route.params.id;
-
-        const apiQuery = new ApiQueryHelper();
-        const getQuery = () => apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
-            .setPage(
-                getPageStart(state.options.thisPage, state.options.pageSize),
-                state.options.pageSize,
-            ).setFilters([{ v: state.options.searchText }])
-            .data;
-
-        // List api Handler for query search table
-        const listUser = async () => {
-            state.loading = true;
-            try {
-                const resp = await SpaceConnector.client.identity.user.list({
-                    query: getQuery(),
-                });
-                state.items = resp.results;
-                state.totalCount = resp.total_count || 0;
-            } catch (e) {
-                console.error(e);
-            } finally {
-                state.loading = false;
-            }
-        };
 
         const getRoleList = async () => {
             const res = await SpaceConnector.client.identity.role.list({
@@ -254,27 +196,6 @@ export default {
                 label: d.name,
                 name: d.role_id,
             }));
-        };
-
-        const onSelect = (item) => {
-            formState.tagTools.addTag(item.user_id);
-        };
-
-        const onChange: SearchTableListeners['change'] = async (options) => {
-            if (options) {
-                state.options = options;
-                await listUser();
-            }
-        };
-
-        const checkMember = async () => {
-            if (formState.tagTools.tags.length === 0) {
-                validationState.isMemberValid = false;
-                validationState.memberCheckInvalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_MEMBER');
-            } else {
-                validationState.isMemberValid = true;
-                validationState.memberCheckInvalidText = '';
-            }
         };
 
         const checkProjectRole = async () => {
@@ -303,19 +224,17 @@ export default {
         };
 
         const confirm = async () => {
-            const users = formState.tagTools.tags;
             const labels = formState.labelTagTools.tags;
 
-            await checkMember();
             await checkProjectRole();
             await checkLabel();
 
-            if (validationState.isProjectRoleValid && validationState.isMemberValid && validationState.isLabelValid) {
+            if (validationState.isProjectRoleValid && validationState.isLabelValid) {
                 try {
-                    await SpaceConnector.client.identity.project.member.add({
+                    await SpaceConnector.client.identity.project.member.modify({
                         project_id: projectId,
                         role_id: state.projectRole,
-                        users,
+                        user_id: state.userId,
                         labels,
                     });
                     showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_ADD_MEMBER'), '', root);
@@ -328,18 +247,30 @@ export default {
             }
         };
 
+        const setCurrentProjectRole = async () => {
+            if (props.selectedMember.role_info?.name === state.projectRoleList[0].label) {
+                state.projectRole = state.projectRoleList[0].name;
+            } else {
+                state.projectRole = '';
+            }
+        };
+
+        const setCurrentUserIdAndLabel = async () => {
+            state.userId = props.selectedMember.user_id;
+            if (props.selectedMember.labels) formState.labelTagTools.tags = props.selectedMember.labels;
+        };
+
+
         (async () => {
-            await Promise.all([listUser(), getRoleList()]);
+            await getRoleList();
+            await Promise.all([setCurrentProjectRole(), setCurrentUserIdAndLabel()]);
         })();
 
         return {
             ...toRefs(state),
             ...toRefs(formState),
             validationState,
-            listUser,
             confirm,
-            onSelect,
-            onChange,
             addMemberLabel,
             proxyVisible,
         };
@@ -348,30 +279,19 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.field-group-wrapper {
-    @apply bg-primary4 border border-gray-200;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-    padding: 1.5rem 1rem;
-}
-
-.tag-container {
-    @apply border border-gray-200;
-    height: 3.625rem;
-    padding: 0.5rem;
-    border-radius: 0.125rem;
-    background-color: theme('colors.white');
-    overflow-y: auto;
-    margin-bottom: 1.5rem;
-    >>> .p-tag.deletable {
-        @apply bg-blue-300;
-        margin-bottom: 0.25rem;
-        .p-i-icon {
-            @apply text-gray-400;
-        }
+.user-id-wrapper {
+    margin-bottom: 1rem;
+    .user-id-label {
+        font-size: 0.875rem;
+        line-height: 140%;
+        font-weight: bold;
+        margin-right: 1rem;
+    }
+    .user-id-content {
+        font-size: 0.875rem;
+        line-height: 150%;
     }
 }
-
 .label-wrapper {
     display: flex;
     .add-btn {
@@ -396,7 +316,6 @@ export default {
 >>> .modal-content .modal-body-container {
     overflow: auto;
 }
-
 
 .p-dropdown-menu-btn {
     @apply bg-white;
