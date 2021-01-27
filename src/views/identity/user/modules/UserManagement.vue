@@ -398,14 +398,14 @@ export default {
                     // eslint-disable-next-line camelcase
                     include_role_binding: true,
                 });
-                state.users = res.map(d => ({
+                state.users = res.results.map(d => ({
                     ...d,
                     // eslint-disable-next-line camelcase
                     role_name: (getArrayWithNotDuplicatedItem(d.role_bindings.map(data => data.role_info.name))).join(', '),
                     // eslint-disable-next-line camelcase
                     last_accessed_at: calculateTime(d.last_accessed_at, { seconds: dayjs().unix() }, state.timezone) || 0,
                 }));
-                state.totalCount = res.total_count || res.length;
+                state.totalCount = res.total_count;
                 state.loading = false;
             } catch (e) {
                 console.error(e);
@@ -506,7 +506,8 @@ export default {
                 await SpaceConnector.client.identity.user.create({
                     ...item,
                 });
-                if (role !== undefined) await bindRole(item.user_id, roleId);
+                if (role.length > 0 || role !== '') await bindRole(item.user_id, roleId);
+                // else return;
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '', root);
             } catch (e) {
                 showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'), e, root);
@@ -550,6 +551,7 @@ export default {
                 showErrorMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', state.selectedIndex.length), e, root);
             } finally {
                 await getUsers();
+                state.selectedIndex = [];
                 modalState.visible = false;
             }
         };
