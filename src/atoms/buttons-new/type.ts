@@ -16,6 +16,7 @@ export enum BUTTON_STYLE {
 
 export enum BUTTON_SIZE {
     sm = 'sm',
+    md = 'md',
     lg = 'lg'
 }
 

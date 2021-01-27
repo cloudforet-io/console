@@ -1,5 +1,5 @@
 import { action } from '@storybook/addon-actions';
-import { select, text } from '@storybook/addon-knobs';
+import { select, text, color } from '@storybook/addon-knobs';
 import PCopyButton from '@/molecules/buttons/copy-button/PCopyButton.vue';
 
 export default {
@@ -27,7 +27,7 @@ export const copyButton = () => ({
             default: select('alertPosition', ['right', 'bottom-end'], 'right'),
         },
         iconColor: {
-            default: text('iconColor', ''),
+            default: color('iconColor', ''),
         },
     },
     setup() {

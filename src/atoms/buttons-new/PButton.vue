@@ -14,7 +14,6 @@ export default {
                 loading: !!attrs.loading,
                 disabled: !!attrs.disabled,
                 outline: !!attrs.outline,
-                link: !!attrs.href,
                 block: !!attrs.block,
             };
             if (attrs.size) {
@@ -73,9 +72,6 @@ export default {
         &.disabled {
             @apply bg-gray-200 text-gray-400 border-gray-100;
             cursor: not-allowed;
-        }
-        &.link {
-            border-color: transparent;
         }
         &.loading {
             @apply bg-gray-200 text-gray-400 border-gray-100;

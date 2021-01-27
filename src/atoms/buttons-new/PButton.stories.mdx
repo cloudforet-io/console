@@ -27,19 +27,19 @@ import {BUTTON_STYLE} from "@/atoms/buttons-new/type";
         name: 'size',
         type: {name:' string'},
         description: 'Button size',
-        defaultValue: '(default)',
+        defaultValue: 'md',
         table: {
             type: {
                 summary: 'string'
             },
             category: 'props',
             defaultValue: {
-                summary: '(default)',
+                summary: 'md',
             }
         },
         control: {
             type: 'select',
-            options: ['(default)', 'sm', 'lg']
+            options: ['md', 'sm', 'lg']
         }
     },
     default: {
@@ -49,12 +49,9 @@ import {BUTTON_STYLE} from "@/atoms/buttons-new/type";
         defaultValue: 'button',
         table: {
             type: {
-                summary: 'string'
+                summary: null
             },
             category: 'slots',
-            defaultValue: {
-                summary: 'button',
-            }
         },
         control: {
             type: 'text'
@@ -71,7 +68,7 @@ import {BUTTON_STYLE} from "@/atoms/buttons-new/type";
             },
             category: 'props',
             defaultValue: {
-                summary: 'https://www.google.com/',
+                summary: 'null',
             }
         },
         control: {
@@ -99,7 +96,7 @@ import {BUTTON_STYLE} from "@/atoms/buttons-new/type";
     loading: {
         name: 'loading',
         type: {name: 'boolean'},
-        description: 'Loading when true`',
+        description: 'Loading when true',
         defaultValue: false,
         table: {
             type: {
@@ -154,27 +151,24 @@ import {BUTTON_STYLE} from "@/atoms/buttons-new/type";
         name:'click',
         type: {name: 'function'},
         description: 'Click function',
-        defaultValue: ()=>{console.log('click')},
+        defaultValue: "()=>{console.log('click')}",
         table: {
             type: {
-                summary: 'function'
+                summary: null
             },
             category: 'event',
-            defaultValue: {
-                summary: ()=>{}
-            }
         },
         control: {
-            type: 'function'
+            type: 'text'
         }
     }
 }}/>
 
-export const Template = (args,{argTypes})=>({
+export const Template = (args, {argTypes})=>({
     props: Object.keys(argTypes),
-    components: {PButton},
+    components: {PButton, PLottie},
     template: `
-        <div style="display:flex; align-items:center; justify-content:center; width:1000px; height:100px;">
+        <div style="display:flex; align-items:center; justify-content:center; height:150px;">
             <p-button
                 @click="onClick"
                 :href="href"
@@ -206,9 +200,9 @@ export const Template = (args,{argTypes})=>({
 <Canvas>
     <Story name='size' height='150px'>
         {{
-            components:{ PButton,PLottie },
+            components:{ PButton, PLottie },
             template: `
-                <div style="display:flex; align-items:center; justify-content:center; width:1000px; margin-top: 50px; background-color: white">
+                <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
                     <p-button styleType="primary" style="margin-right: 20px" size="sm">
                         <div>small</div>
                     </p-button>
@@ -227,9 +221,9 @@ export const Template = (args,{argTypes})=>({
 <Canvas>
     <Story name='style-type' height='250px'>
         {{
-            components:{ PButton,PLottie },
+            components:{ PButton, PLottie },
             template: `
-                <div style="display: flex; flex-direction: column; align-items: center; width:1000px; margin-top: 50px; background-color: white">
+                <div style="display: flex; flex-direction: column; align-items: center; margin-top: 50px; background-color: white">
                     <div style="display:flex">
                         <p-button styleType="primary-dark" style="margin-right: 20px">
                             <div>primary-dark</div>
@@ -284,9 +278,9 @@ export const Template = (args,{argTypes})=>({
 <Canvas>
     <Story name='outlined' height='150px'>
         {{
-            components:{ PButton,PLottie },
+            components:{ PButton, PLottie },
             template: `
-                <div style="display:flex; align-items:center; justify-content:center; width:1000px; margin-top: 50px; background-color: white">
+                <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
                     <p-button
                         styleType="primary" style="margin-right: 20px"
                         :outline="true"
@@ -326,9 +320,9 @@ export const Template = (args,{argTypes})=>({
 <Canvas>
     <Story name='disabled' height='150px'>
         {{
-            components:{ PButton,PLottie },
+            components:{ PButton, PLottie },
             template: `
-                <div style="display:flex; align-items:center; justify-content:center; width:1000px; margin-top: 50px; background-color: white">
+                <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
                     <p-button
                         styleType="primary"
                         :disabled="true"
@@ -344,9 +338,9 @@ export const Template = (args,{argTypes})=>({
 <Canvas>
     <Story name='loading' height='150px'>
         {{
-            components:{ PButton,PLottie },
+            components:{ PButton, PLottie },
             template: `
-                <div style="display:flex; align-items:center; justify-content:center; width:1000px; margin-top: 50px; background-color: white">
+                <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
                     <p-button
                         styleType="primary"
                         :loading="true"
@@ -369,9 +363,9 @@ export const Template = (args,{argTypes})=>({
 <Canvas>
     <Story name='block' height='150px'>
         {{
-            components:{ PButton,PLottie },
+            components:{ PButton, PLottie },
             template: `
-                <div style="display:flex; align-items:center; justify-content:center; width:1000px; margin-top: 50px; background-color: white">
+                <div style="display:flex; align-items:center; justify-content:center; margin-top: 50px; background-color: white">
                     <p-button
                         styleType="primary"
                         :block="true"
