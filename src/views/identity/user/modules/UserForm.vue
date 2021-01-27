@@ -254,13 +254,17 @@ export default {
         };
 
         const checkDuplicatedId = async () => {
-            const res = await SpaceConnector.client.identity.user.get({ user_id: formState.user_id });
-            if (res) {
-                validationState.isUserIdValid = false;
-                validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.USER_ID_DUPLICATED');
-            } else {
-                validationState.isUserIdValid = true;
-                validationState.userIdInvalidText = '';
+            try {
+                const res = await SpaceConnector.client.identity.user.get({ user_id: formState.user_id });
+                if (res) {
+                    validationState.isUserIdValid = false;
+                    validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.USER_ID_DUPLICATED');
+                } else {
+                    validationState.isUserIdValid = true;
+                    validationState.userIdInvalidText = '';
+                }
+            } catch (e) {
+                console.error(e);
             }
         };
 
