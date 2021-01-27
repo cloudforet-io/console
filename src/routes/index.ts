@@ -28,10 +28,11 @@ router.beforeEach(async (to, from, next) => {
         }
         next();
     } else {
+        if (SpaceConnector.isTokenAlive) next();
+        else next({ name: 'SignOut' });
         console.debug('to', to);
         console.debug('token', SpaceConnector.isTokenAlive);
         console.debug('Unexpected sign out error');
-        next({ name: 'SignOut' });
     }
 });
 

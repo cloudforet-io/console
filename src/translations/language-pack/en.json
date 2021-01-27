@@ -165,6 +165,9 @@
 				"LABEL_USER_GUIDE": "User Guide"
 			}
 		},
+		"INFO_BUTTON": {
+			"INFO": "Info"
+		},
 		"MONITORING": {
 			"DISPLAY_TIMEZONE": "Every metric time displays in  {timezone}.",
 			"LIMIT_OF_RESOURCE": "Resource limit: {limitCount}",
@@ -360,8 +363,8 @@
 				"COMPUTE": "Compute",
 				"CREDENTIALS": "Credentials",
 				"DATABASE": "Database",
+				"PROVIDER": "Provider",
 				"SERVER": "Server",
-				"SERVICE_PROVIDER": "Service Provider",
 				"STORAGE": "Storage",
 				"TITLE": "Service Accounts"
 			},

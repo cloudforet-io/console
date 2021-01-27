@@ -165,6 +165,9 @@
 				"LABEL_USER_GUIDE": "ユーザーガイド"
 			}
 		},
+		"INFO_BUTTON": {
+			"INFO": ""
+		},
 		"MONITORING": {
 			"DISPLAY_TIMEZONE": "{timezone}に表示されます",
 			"LIMIT_OF_RESOURCE": "表示されるリストは最大{limitCount}個",
@@ -360,8 +363,8 @@
 				"COMPUTE": "コンピューティング",
 				"CREDENTIALS": "暗号化キー",
 				"DATABASE": "データベース",
+				"PROVIDER": "プロバイダー",
 				"SERVER": "サーバ",
-				"SERVICE_PROVIDER": "サービスプロバイダー",
 				"STORAGE": "ストレージ",
 				"TITLE": "サービスアカウント"
 			},

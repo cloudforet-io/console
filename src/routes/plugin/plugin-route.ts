@@ -1,9 +1,9 @@
 import { RouteConfig } from 'vue-router';
 
-const CollectorPage = () => import('@/views/plugin/collector/pages/CollectorPage.vue');
+const CollectorPage = () => import(/* webpackChunkName: "CollectorPage" */ '@/views/plugin/collector/pages/CollectorPage.vue');
 
-const CollectorPluginPage = () => import('@/views/plugin/collector/pages/CollectorPluginPage.vue');
-const CreateCollectorPage = () => import('@/views/plugin/collector/pages/CreateCollectorPage.vue');
+const CollectorPluginPage = () => import(/* webpackChunkName: "CollectorPlugin" */ '@/views/plugin/collector/pages/CollectorPluginPage.vue');
+const CreateCollectorPage = () => import(/* webpackChunkName: "CreateCollector" */ '@/views/plugin/collector/pages/CreateCollectorPage.vue');
 
 export default {
     path: 'plugin',

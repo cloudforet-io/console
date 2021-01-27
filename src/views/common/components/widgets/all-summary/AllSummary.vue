@@ -118,6 +118,7 @@ import {
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { QueryHelper } from '@/lib/query';
+import { QueryStoreFilter } from '@/lib/query/type';
 import { gray, primary, primary1 } from '@/styles/colors';
 import { store } from '@/store';
 
@@ -482,7 +483,13 @@ export default {
                     },
                 },
             };
-            if (type === DATA_TYPE.storage) {
+            if (type === DATA_TYPE.compute) {
+                param = {
+                    ...defaultParam,
+                    resource_type: 'inventory.Server',
+                    is_primary: true,
+                };
+            } else if (type === DATA_TYPE.storage) {
                 param = {
                     ...defaultParam,
                     is_major: true,
@@ -510,15 +517,30 @@ export default {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(param);
                 const summaryData: SummaryData[] = [];
 
+                const summaryQueryHelper = new QueryHelper();
                 res.results.forEach((d) => {
-                    const detailLocation: Location = {
-                        name: 'cloudServicePage',
-                        params: {
-                            provider: d.provider,
-                            group: d.cloud_service_group,
-                            name: d.cloud_service_type,
-                        },
-                    };
+                    let detailLocation: Location;
+
+                    if (d.resource_type === 'inventory.Server') {
+                        const filters: QueryStoreFilter[] = [];
+                        filters.push({ k: 'provider', o: '=', v: d.provider },
+                            { k: 'cloud_service_type', o: '=', v: d.cloud_service_type });
+                        detailLocation = {
+                            name: 'server',
+                            query: {
+                                filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
+                            },
+                        };
+                    } else {
+                        detailLocation = {
+                            name: 'cloudServicePage',
+                            params: {
+                                provider: d.provider,
+                                group: d.cloud_service_group,
+                                name: d.cloud_service_type,
+                            },
+                        };
+                    }
                     summaryData.push({
                         provider: d.provider,
                         label: state.providers[d.provider].label,

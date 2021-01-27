@@ -1,7 +1,6 @@
 <template>
     <p-widget-layout :title="$t('COMMON.WIDGETS.COLLECTOR_TITLE')" :help="$t('COMMON.WIDGETS.COLLECTOR_HELP')">
         <div class="grid gap-8 grid-cols-1 lg:grid-cols-2">
-            <collector-history class="widget" />
             <collector-runs class="widget" />
         </div>
     </p-widget-layout>
@@ -9,12 +8,11 @@
 
 <script lang="ts">
 import { PWidgetLayout } from '@spaceone/design-system';
-import CollectorHistory from '@/views/common/components/widgets/collector-history/CollectorHistory.vue';
 import CollectorRuns from '@/views/common/components/widgets/collector-runs/CollectorRuns.vue';
 
 export default {
     name: 'Collectors',
-    components: { PWidgetLayout, CollectorHistory, CollectorRuns },
+    components: { PWidgetLayout, CollectorRuns },
     setup() {
         return {};
     },

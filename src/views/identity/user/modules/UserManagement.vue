@@ -388,7 +388,7 @@ export default {
             return apiQuery.data;
         };
 
-        const getRoleNameArray = array => [...new Set(array)];
+        const getArrayWithNotDuplicatedItem = array => [...new Set(array)];
         const getUsers = async () => {
             state.loading = true;
             try {
@@ -401,7 +401,7 @@ export default {
                 state.users = res.map(d => ({
                     ...d,
                     // eslint-disable-next-line camelcase
-                    role_name: (getRoleNameArray(d.role_bindings.map(data => data.role_info.name))).join(', '),
+                    role_name: (getArrayWithNotDuplicatedItem(d.role_bindings.map(data => data.role_info.name))).join(', '),
                     // eslint-disable-next-line camelcase
                     last_accessed_at: calculateTime(d.last_accessed_at, { seconds: dayjs().unix() }, state.timezone) || 0,
                 }));

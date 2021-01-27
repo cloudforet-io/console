@@ -33,7 +33,7 @@
                :class="[singleItemTabState.activeTab]"
         >
             <template #summary>
-                <project-dashboard ref="ProjectDashboard" />
+                <project-dashboard ref="ProjectDashboard" :project-id="projectId" />
             </template>
             <template #member>
                 <p-search-table class="member-tab"
@@ -71,11 +71,11 @@
                         {{ users[value].name }}
                     </template>
                     <template #col-labels-format="{ value }">
-                        <p-text-list :items="value" delimiter=" ">
-                            <p-badge v-slot:default="{value: d}">
-                                {{ d }}
-                            </p-badge>
-                        </p-text-list>
+                        <p v-if="value.length === 0"></p>
+                        <p-badge v-for="(label, idx) in value" :key="idx" style-type="gray200"
+                        >
+                            {{ label }}
+                        </p-badge>
                     </template>
                 </p-search-table>
             </template>
@@ -136,7 +136,7 @@ import {
 
 import {
     PSearchTable, PTab, PPageTitle, PTableCheckModal, PButtonModal, PPanelTop,
-    PTextList, PIconButton, PCopyButton, PIconTextButton, PPageNavigation, PButton, PBadge,
+    PIconButton, PCopyButton, PIconTextButton, PPageNavigation, PButton, PBadge,
 } from '@spaceone/design-system';
 import { Options, SearchTableListeners } from '@spaceone/design-system/dist/src/organisms/tables/search-table/type';
 import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
@@ -155,14 +155,12 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectModel } from '@/views/project/project/type';
 import { TranslateResult } from 'vue-i18n';
-import config from '@/lib/config';
 
 
 export default {
     name: 'ProjectDetail',
     components: {
         PBadge,
-        PTextList,
         FavoriteButton,
         PSearchTable,
         PPanelTop,
@@ -420,30 +418,6 @@ export default {
 
 
         const apiQuery = new ApiQueryHelper();
-        // const getPageNavigation = async () => {
-        //     try {
-        //         const res = await SpaceConnector.client.identity.project.tree.search({
-        //             item_type: 'PROJECT',
-        //             // eslint-disable-next-line camelcase
-        //             item_id: projectId.value,
-        //         });
-        //         console.log(res);
-        //
-        //         apiQuery.setFilters([{
-        //             k: 'project_group_id',
-        //             v: res.open_path,
-        //             o: '=',
-        //         }]);
-        //         const projectGroupNames = await SpaceConnector.client.identity.projectGroup.list({
-        //             query: apiQuery.data,
-        //         });
-        //
-        //         state.projectGroupNames = projectGroupNames.results;
-        //     } catch (e) {
-        //         state.projectGroupNames = [];
-        //         console.error(e);
-        //     }
-        // };
 
 
         /** Init */
@@ -510,7 +484,10 @@ export default {
     }
 }
 .tab-content::v-deep {
+    max-width: 1368px;
     border: none;
+    margin: auto;
+
     &.summary {
         .tab-pane {
             @apply border border-gray-200;

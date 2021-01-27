@@ -308,8 +308,10 @@ export default {
             if (createdAt && finishedAt) {
                 const createdAtMoment = dayjs(timestampFormatter(createdAt, state.timezone));
                 const finishedAtMoment = dayjs(timestampFormatter(finishedAt, state.timezone));
-                const duration = finishedAtMoment.diff(createdAtMoment, 'minute');
-                return `${duration.toString()} min`;
+                let duration = finishedAtMoment.diff(createdAtMoment, 'second');
+                if (duration < 60) return `${duration} sec`;
+                duration = finishedAtMoment.diff(createdAtMoment, 'minute');
+                return `${duration} min`;
             }
             return null;
         };
@@ -326,6 +328,7 @@ export default {
             });
         };
 
+        /* api */
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
             apiQuery.setSort(state.sortBy, state.sortDesc)
@@ -342,12 +345,11 @@ export default {
             }
 
             if (statusValues.length > 0) {
-                apiQuery.addFilter({ k: 'status', v: statusValues });
+                apiQuery.addFilter({ k: 'status', v: statusValues, o: '=' });
             }
 
             return apiQuery.data;
         };
-
         const getJobs = async () => {
             state.loading = true;
             try {
@@ -362,6 +364,7 @@ export default {
             }
         };
 
+        /* event */
         const onSelect = (item) => {
             state.selectedJobId = item.job_id;
             // eslint-disable-next-line no-empty-function
@@ -380,7 +383,6 @@ export default {
         const onPaginationChange = async () => {
             await getJobs();
         };
-
         const onClickGoBack = () => {
             state.selectedJobId = '';
             // eslint-disable-next-line no-empty-function

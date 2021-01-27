@@ -83,9 +83,8 @@
                     <template v-for="field in tableState.fields" v-slot:[`col-${field.name}-format`]="{value}">
                         <template v-if="field.name !== 'service'">
                             <span v-if="value" :key="field.name" :style="{ 'color': value.color }">{{ value.cost }}</span>
-                            <span v-else>-</span>
+                            <span v-else :key="field.name">-</span>
                         </template>
-                        <!--                        <span v-if="" :key="field.name" :style="{ 'color': value.color }">{{ value.cost }}</span>-->
                         <span v-else :key="field.name" class="col-service"
                               :class="{'link-text': !!value.to.name }"
                         >
@@ -290,7 +289,12 @@ export default {
             series.propertyFields.stroke = 'color';
             series.propertyFields.strokeDasharray = 'dash';
 
-            series.adapter.add('tooltipText', (text, target) => `[bold]$${commaFormatter(numberFormatter(target.tooltipDataItem.dataContext.value))}`);
+            series.adapter.add('tooltipText', (text, target) => {
+                if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
+                    return `[bold]$${commaFormatter(numberFormatter(target.tooltipDataItem.dataContext.value))}`;
+                }
+                return text;
+            });
             series.tooltip.fontSize = 14;
             series.tooltip.strokeWidth = 0;
             series.tooltip.dy = -5;
@@ -566,7 +570,7 @@ export default {
     padding: 1rem;
     .title {
         position: relative;
-        font-size: 1rem;
+        font-size: 0.875rem;
         font-weight: bold;
         margin-bottom: 1rem;
         .date-button-group {

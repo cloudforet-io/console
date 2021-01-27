@@ -49,7 +49,7 @@
             <div v-else-if="!loading && filteredData.length === 0" class="no-data-wrapper">
                 <img src="@/assets/images/illust_microscope.svg" class="no-data-img">
                 <p class="no-data-text">
-                    {{$t('COMMON.WIDGETS.RESOURCE_MAP.NO_REGION')}}
+                    {{ $t('COMMON.WIDGETS.RESOURCE_MAP.NO_REGION') }}
                 </p>
             </div>
             <div v-else class="col-span-12 lg:col-span-3 xl:col-span-3 2xl:col-span-3">
@@ -174,25 +174,23 @@ export default {
                     ],
                 },
             });
-            if (state.providers !== undefined || state.providers) {
-                state.data = [
-                    ...resp.results.map(d => ({
-                        title: d.name,
-                        latitude: parseFloat(d.tags.find(tag => tag.key === 'latitude').value),
-                        longitude: parseFloat(d.tags.find(tag => tag.key === 'longitude').value),
-                        color: state.providers[d.provider].color as string,
-                        ...d,
-                    })),
-                ];
-            }
+
+            state.data = [
+                ...resp.results.map(d => ({
+                    title: d.name,
+                    latitude: parseFloat(d.tags.find(tag => tag.key === 'latitude').value),
+                    longitude: parseFloat(d.tags.find(tag => tag.key === 'longitude').value),
+                    color: state.providers[d.provider]?.color as string,
+                    ...d,
+                })),
+            ];
         };
 
         const setInitialRegionSetting = async () => {
             const initialRegionFromLocalStorage = store.getters['settings/getItem']('initial_region', '/dashboard');
             if (initialRegionFromLocalStorage) {
                 state.initialRegion = initialRegionFromLocalStorage;
-                [state.selectedProvider, state.selectedRegion, state.selectedRegionCode] =
-                    [initialRegionFromLocalStorage.provider, initialRegionFromLocalStorage.region_name, initialRegionFromLocalStorage.region_code];
+                [state.selectedProvider, state.selectedRegion, state.selectedRegionCode] = [initialRegionFromLocalStorage.provider, initialRegionFromLocalStorage.region_name, initialRegionFromLocalStorage.region_code];
             }
 
             if (!initialRegionFromLocalStorage) {
@@ -335,38 +333,25 @@ export default {
         };
 
         const goToCloudService = (item) => {
-            let res: Location;
-            if (item.resource_type === 'inventory.Server') {
-                res = {
-                    name: 'server',
-                    query: {
-                        filters: queryHelper.setFilters([
-                            { k: 'region_code', v: state.selectedRegionCode, o: '=' },
-                            { k: 'provider', v: item.provider, o: '=' },
-                            { k: 'cloud_service_type', v: item.cloud_service_type, o: '=' },
-                        ]).rawQueryStrings,
-                    },
-                };
-            } else {
-                res = {
-                    name: 'cloudServicePage',
-                    params: {
-                        provider: item.provider,
-                        group: item.cloud_service_group,
-                        name: item.cloud_service_type,
-                    },
-                    query: {
-                        filters: queryHelper.setFilters([
-                            { k: 'region_code', v: state.selectedRegionCode, o: '=' },
-                        ]).rawQueryStrings,
-                    },
-                };
-            }
+            const res: Location = {
+                name: 'cloudServicePage',
+                params: {
+                    provider: item.provider,
+                    group: item.cloud_service_group,
+                    name: item.cloud_service_type,
+                },
+                query: {
+                    filters: queryHelper.setFilters([
+                        { k: 'region_code', v: state.selectedRegionCode, o: '=' },
+                    ]).rawQueryStrings,
+                },
+            };
             return res;
         };
 
         const init = async () => {
             state.loading = true;
+            await store.dispatch('resource/provider/load', true);
             await getRegionList();
             if (state.data.length > 0) {
                 await setInitialRegionSetting();

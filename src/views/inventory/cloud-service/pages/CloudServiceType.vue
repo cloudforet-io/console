@@ -334,7 +334,11 @@ export default {
          * */
         const cardQueryHelper = new QueryHelper();
         const getToCloudService = (item) => {
-            cardQueryHelper.setFilters(queryHelper.filters);
+            const searchFilters = queryHelper.filters;
+            cardQueryHelper.setFilters(searchFilters.filter(f => f.k && [
+                'cloud_service_type',
+                'cloud_service_group',
+            ].includes(f.k)));
 
             forEach(filterState.regionFilter, (d) => {
                 cardQueryHelper.addFilter({ k: 'region_code', o: '=', v: d });

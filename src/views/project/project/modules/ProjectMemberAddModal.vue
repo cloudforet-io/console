@@ -56,6 +56,31 @@
                         />
                     </template>
                 </p-field-group>
+                <div class="label-wrapper">
+                    <p-field-group :label="'Labels'"
+                                   :invalid-text="validationState.labelInvalidText"
+                                   :invalid="validationState.isLabelValid === false"
+                                   :required="true"
+                    >
+                        <template #default="{invalid}">
+                            <p-text-input v-model="memberLabel" block
+                                          :invalid="invalid"
+                            />
+                        </template>
+                    </p-field-group>
+                    <p-icon-button name="ic_plus" class="add-btn"
+                                   width="1rem" height="1rem"
+                                   @click="addMemberLabel"
+                    />
+                </div>
+                <p class="tag-wrapper">
+                    <p-tag v-for="(tag, idx) in labelTagTools.tags" :key="`label-tag-${tag}`"
+                           class="tag"
+                           @delete="labelTagTools.deleteTag(idx)"
+                    >
+                        {{ tag }}
+                    </p-tag>
+                </p>
             </div>
         </template>
     </p-button-modal>
@@ -73,7 +98,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PTag, PSearchTable, PSelectDropdown, PFieldGroup,
+    PButtonModal, PTag, PSearchTable, PSelectDropdown, PFieldGroup, PTextInput, PIconButton,
 } from '@spaceone/design-system';
 import { SearchTableListeners, Options } from '@spaceone/design-system/dist/src/organisms/tables/search-table/type';
 
@@ -133,6 +158,8 @@ export default {
         PTag,
         PSelectDropdown,
         PFieldGroup,
+        PTextInput,
+        PIconButton,
     },
     directives: {
         focus: {
@@ -172,15 +199,19 @@ export default {
             options: {} as Options,
             projectRole: '' as string,
             projectRoleList: [] as any[],
+            memberLabel: '',
         });
         const validationState = reactive({
             isMemberValid: undefined as undefined | boolean,
             memberCheckInvalidText: '' as TranslateResult | string,
             isProjectRoleValid: undefined as undefined | boolean,
             projectRoleCheckInvalidText: '' as TranslateResult | string,
+            isLabelValid: undefined as undefined | boolean,
+            labelInvalidText: '' as TranslateResult | string,
         });
         const formState = reactive({
             tagTools: tagList(null),
+            labelTagTools: tagList(null),
         });
         const proxyVisible = makeProxy('visible', props, emit);
         const projectId = root.$route.params.id;
@@ -252,18 +283,36 @@ export default {
             }
         };
 
+        const addMemberLabel = () => {
+            formState.labelTagTools.addTag(state.memberLabel);
+            state.memberLabel = '';
+        };
+
+        const checkLabel = async () => {
+            if (formState.labelTagTools.tags.length > 5) {
+                validationState.isLabelValid = false;
+                validationState.labelInvalidText = 'Up to 5 labels';
+            } else {
+                validationState.isLabelValid = true;
+                validationState.labelInvalidText = '';
+            }
+        }
+
         const confirm = async () => {
             const users = formState.tagTools.tags;
+            const labels = formState.labelTagTools.tags;
 
             await checkMember();
             await checkProjectRole();
+            await checkLabel();
 
-            if (validationState.isProjectRoleValid && validationState.isMemberValid) {
+            if (validationState.isProjectRoleValid && validationState.isMemberValid && validationState.isLabelValid) {
                 try {
                     await SpaceConnector.client.identity.project.member.add({
                         project_id: projectId,
                         role_id: state.projectRole,
                         users,
+                        labels,
                     });
                     showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_ADD_MEMBER'), '', root);
                 } catch (e) {
@@ -287,6 +336,7 @@ export default {
             confirm,
             onSelect,
             onChange,
+            addMemberLabel,
             proxyVisible,
         };
     },
@@ -317,9 +367,21 @@ export default {
         }
     }
 }
->>> .modal-content .modal-body-container {
-    overflow: visible;
+
+.label-wrapper {
+    display: flex;
+    .add-btn {
+        align-self: center;
+    }
 }
+
+.tag-wrapper {
+    min-height: 3.625rem;
+}
+>>> .modal-content .modal-body-container {
+    overflow: auto;
+}
+
 
 .p-dropdown-menu-btn {
     @apply bg-white;

@@ -1,5 +1,5 @@
 <template>
-    <p-vertical-page-layout :min-width="270" :init-width="270" :max-width="400">
+    <p-vertical-page-layout :min-width="0" :init-width="260" :max-width="400">
         <template #sidebar="{width}">
             <p class="sidebar-title">
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.PROVIDERS_TITLE') }}

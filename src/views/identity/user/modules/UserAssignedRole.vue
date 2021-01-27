@@ -25,6 +25,10 @@
             </template>
             <template #col-labels-format="{value}">
                 <p v-if="value.length === 0"></p>
+                <p-badge v-for="(label, idx) in value" :key="idx" style-type="gray200"
+                >
+                    {{ label }}
+                </p-badge>
             </template>
         </p-data-table>
     </div>
@@ -35,7 +39,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PPanelTop, PDataTable, PAnchor } from '@spaceone/design-system';
+import { PPanelTop, PDataTable, PAnchor, PBadge } from '@spaceone/design-system';
 
 import { timestampFormatter } from '@/lib/util';
 import { userStateFormatter } from '@/views/identity/user/lib/helper';
@@ -60,6 +64,7 @@ export default {
         PDataTable,
         PPanelTop,
         PAnchor,
+        PBadge,
     },
     props: {
         userId: {
@@ -101,6 +106,8 @@ export default {
             return link.href;
         };
 
+        const getArrayWithNotDuplicatedItem = array => [...new Set(array)];
+
         const getUserDetailData = async (userId) => {
             baseState.loading = true;
             try {
@@ -109,7 +116,11 @@ export default {
                     // eslint-disable-next-line camelcase
                     include_role_binding: true,
                 });
-                baseState.items = res.role_bindings;
+                console.log(res.role_bindings, 'test1');
+                console.log(res, 'test2');
+                baseState.items = res.role_bindings.map(d => ({
+                    ...d,
+                }));
                 baseState.loading = false;
             } catch (e) {
                 baseState.items = [];

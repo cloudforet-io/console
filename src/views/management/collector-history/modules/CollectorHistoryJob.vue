@@ -49,7 +49,7 @@
                         </div>
                     </template>
                     <template #col-service_account-format="{ value }">
-                        <router-link :to="referenceRouter(
+                        <router-link v-if="value.name" :to="referenceRouter(
                             value.service_account_id,
                             { resource_type: 'identity.ServiceAccount' })"
                         >
@@ -58,6 +58,7 @@
                                 <p-i name="ic_external-link" height="1em" width="1em" />
                             </span>
                         </router-link>
+                        <span v-else>{{ value.service_account_id }}</span>
                     </template>
                     <template #col-sequence-format="{ value }">
                         <span class="float-right">{{ value }}</span>
@@ -196,11 +197,11 @@ export default {
             },
         };
         const state = reactive({
-            timezone: computed(() => store.state.user.timezone),
             loading: false,
-            job: {} as JobModel,
+            timezone: computed(() => store.state.user.timezone),
             collectorName: computed(() => state.job.collector_info?.name),
             provider: computed(() => state.job.collector_info?.provider),
+            job: {} as JobModel,
             jobTasks: [],
             serviceAccounts: [],
             projects: [],
@@ -212,7 +213,7 @@ export default {
             fields: [
                 { label: 'No.', name: 'sequence', sortable: false },
                 { label: 'Service Account', name: 'service_account', sortable: false },
-                { label: 'Project', name: 'project_id', sortable: false },
+                { label: 'Project', name: 'project', sortable: false },
                 { label: 'Status', name: 'status' },
                 { label: 'Created', name: 'created_count' },
                 { label: 'Updated', name: 'updated_count' },
@@ -261,17 +262,24 @@ export default {
             if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In-Progress';
             return capitalize(status);
         };
-        const serviceAccountFormatter = serviceAccountId => find(state.serviceAccounts, { service_account_id: serviceAccountId });
-        const convertProjectName = (projectId) => {
+        const serviceAccountFormatter = (serviceAccountId) => {
+            const serviceAccount = find(state.serviceAccounts, { service_account_id: serviceAccountId });
+            if (serviceAccount) return serviceAccount;
+            return { service_account_id: serviceAccountId };
+        };
+        const projectNameFormatter = (projectId) => {
             const project = find(state.projects, { project_id: projectId });
-            return project?.name;
+            if (project) return project.name;
+            return projectId;
         };
         const durationFormatter = (createdAt, finishedAt) => {
             if (createdAt && finishedAt) {
-                const createdAtDatetime = dayjs(timestampFormatter(createdAt, state.timezone));
-                const finishedAtDatetime = dayjs(timestampFormatter(finishedAt, state.timezone));
-                const duration = finishedAtDatetime.diff(createdAtDatetime, 'minute');
-                return `${duration.toString()} min`;
+                const createdAtTime = dayjs(timestampFormatter(createdAt, state.timezone));
+                const finishedAtTime = dayjs(timestampFormatter(finishedAt, state.timezone));
+                let duration = finishedAtTime.diff(createdAtTime, 'second');
+                if (duration < 60) return `${duration} sec`;
+                duration = finishedAtTime.diff(createdAtTime, 'minute');
+                return `${duration} min`;
             }
             return null;
         };
@@ -281,7 +289,7 @@ export default {
                 const newTask = {
                     sequence: getPageStart(state.thisPage, state.pageSize) + index,
                     service_account: serviceAccountFormatter(task.service_account_id),
-                    project_id: convertProjectName(task.project_id),
+                    project: projectNameFormatter(task.project_id),
                     status: statusFormatter(task.status),
                     created_count: task.created_count,
                     updated_count: task.updated_count,
@@ -309,7 +317,7 @@ export default {
                 statusValues = [JOB_TASK_STATUS.failure];
             }
             if (statusValues.length > 0) {
-                apiQuery.addFilter({ k: 'status', v: statusValues });
+                apiQuery.addFilter({ k: 'status', v: statusValues, o: '=' });
             }
 
             return apiQuery.data;

@@ -20,7 +20,17 @@
             <GNB class="gnb" />
             <div class="app-body">
                 <main class="main">
-                    <router-view />
+                    <p-sidebar :visible="$store.state.display.visibleInfo"
+                               @close="$store.dispatch('display/hideInfo')"
+                    >
+                        <router-view />
+                        <template #title>
+                            <portal-target name="info-title" />
+                        </template>
+                        <template #sidebar>
+                            <portal-target name="info-contents" />
+                        </template>
+                    </p-sidebar>
                 </main>
             </div>
         </template>
@@ -34,12 +44,13 @@ import {
     defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { PNoticeAlert, PToastAlert, PIconModal } from '@spaceone/design-system';
+import {
+    PNoticeAlert, PToastAlert, PIconModal, PSidebar,
+} from '@spaceone/design-system';
 
 import GNB from '@/views/common/components/gnb/GNB.vue';
 import { Location } from 'vue-router';
 import router from '@/routes';
-import { SpaceConnector } from '@/lib/space-connector';
 
 
 export default defineComponent({
@@ -49,6 +60,7 @@ export default defineComponent({
         PNoticeAlert,
         PToastAlert,
         PIconModal: PIconModal as any,
+        PSidebar,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -81,21 +93,24 @@ export default defineComponent({
 <style lang="postcss">
 #app {
     display: flex;
+    flex-direction: column;
     overflow-y: hidden;
     width: 100vw;
     .gnb {
         position: fixed;
-        width: 100vw;
-        height: 3rem;
+        width: 100%;
+        height: $gnb-height;
         z-index: 100;
+        flex-shrink: 0;
     }
     .app-body {
         display: flex;
         flex-direction: column;
         overflow-y: auto;
-        height: 100vh;
         width: 100%;
-        padding-top: 3rem;
+        height: calc(100vh - $(gnb-height));
+        margin-top: $gnb-height;
+        flex-grow: 1;
         .main {
             height: 100%;
             margin: 0;

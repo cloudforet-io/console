@@ -9,52 +9,43 @@
         <span class="y-label-text">
             {{ $t('MANAGEMENT.COLLECTOR_HISTORY.CHART.JOB_COUNT') }}
         </span>
-        <canvas ref="chartRef" />
+        <div ref="chartRef" class="chart" />
     </p-chart-loader>
 </template>
 
 <script lang="ts">
-import {
-    orderBy, max, find,
-} from 'lodash';
-import numeral from 'numeral';
+/* eslint-disable camelcase */
 import dayjs, { Dayjs } from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
-import utc from 'dayjs/plugin/utc';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import { ChartOptions } from 'chart.js';
+import * as am4core from '@amcharts/amcharts4/core';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
 import {
-    reactive, watch, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
+    reactive, watch, toRefs, computed, onUnmounted,
 } from '@vue/composition-api';
 
 import { PChartLoader, PDatePagination, PSkeleton } from '@spaceone/design-system';
 
-import { SpaceChart } from '@/lib/chart/space-chart';
 import { SpaceConnector } from '@/lib/space-connector';
-import {
-    black, red, gray, primary,
-} from '@/styles/colors';
+import { alert, primary } from '@/styles/colors';
 import { store } from '@/store';
 
 dayjs.extend(isSameOrBefore);
-dayjs.extend(utc);
-dayjs.extend(timezone);
+
+am4core.useTheme(am4themes_animated);
 
 
-const TICKS_COUNT = 5;
-const DEFAULT_MAX = 600;
-const DEFAULT_STEP_SIZE = 100;
-const LEGEND_COLORS: {[k: string]: string} = {
-    success: primary,
-    failure: red.default,
-};
-
-interface ChartDataType {
+interface ChartData {
     date: Dayjs;
     success: number | null;
     failure: number | null;
 }
+
+const LEGEND_COLORS = {
+    success: primary,
+    failure: alert,
+};
 
 export default {
     name: 'PCollectorHistoryChart',
@@ -70,60 +61,130 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,
-            chartRef: null as HTMLCanvasElement|null,
-            chart: null as null|SpaceChart,
-            chartData: [] as ChartDataType[],
+            chartRef: null as HTMLElement | null,
+            chart: null,
+            chartRegistry: {},
+            chartData: [] as ChartData[],
             successData: [] as number[],
             failureData: [] as number[],
-            noData: false,
             //
-            currentDate: dayjs().tz(store.state.user.timezone),
+            timezone: computed(() => store.state.user.timezone),
+            currentDate: dayjs.utc().tz(store.state.user.timezone),
             currentMonthStart: computed(() => dayjs(state.currentDate).startOf('month')),
             currentMonthEnd: computed(() => dayjs(state.currentDate).endOf('month')),
-            dayCount: computed(() => state.currentDate.daysInMonth()),
-            timezone: store.state.user.timezone,
         });
 
-        const initChartData = (rawData) => {
-            state.noData = rawData.length === 0;
-
-            const orderedData = orderBy(rawData, ['date'], ['asc']);
-            const dateFormattedData = orderedData.map(d => ({
-                date: dayjs(d.date).tz(store.state.user.timezone),
+        /* util */
+        const initChartData = (data) => {
+            const dataWithTimezone = data.map(d => ({
+                date: dayjs.utc(d.date).tz(state.timezone).format('YYYY-MM-DD'),
                 success: d.success,
                 failure: d.failure,
             }));
-            const chartData = [] as ChartDataType[];
-            const today = dayjs().tz(store.state.user.timezone);
+            const chartData = [] as ChartData[];
             let now = state.currentMonthStart.clone();
 
             while (now.isSameOrBefore(state.currentMonthEnd, 'day')) {
                 // eslint-disable-next-line no-loop-func
-                const existData = find(dateFormattedData, d => d.date.isSame(now, 'day'));
-                let success: number | null = 0;
-                let failure: number | null = 0;
-                const date = existData?.date || now;
+                const existData = dataWithTimezone.find(d => now.isSame(d.date, 'day'));
 
                 if (existData) {
-                    success = existData.success;
-                    failure = existData.failure;
-                } else if (now.isAfter(today, 'day')) {
-                    success = null;
-                    failure = null;
+                    chartData.push({
+                        date: now.format('YYYY-MM-DD'),
+                        success: existData.success,
+                        failure: existData.failure,
+                    });
+                } else {
+                    chartData.push({
+                        date: now.format('YYYY-MM-DD'),
+                        success: null,
+                        failure: null,
+                    });
                 }
-                chartData.push({
-                    date,
-                    success,
-                    failure,
-                });
 
                 now = now.add(1, 'day');
             }
             return chartData;
         };
+        const disposeChart = (ctx) => {
+            if (state.chartRegistry[ctx]) {
+                state.chartRegistry[ctx].dispose();
+                delete state.chartRegistry[ctx];
+            }
+        };
+        const drawChart = (ctx) => {
+            const createChart = () => {
+                disposeChart(ctx);
+                state.chartRegistry[ctx] = am4core.create(ctx, am4charts.XYChart);
+                return state.chartRegistry[ctx];
+            };
+            const chart = createChart();
+            state.chart = chart;
+            chart.logo.disabled = true;
+            chart.paddingLeft = -5;
+            chart.paddingBottom = -10;
+            chart.data = state.chartData;
+
+            const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
+            dateAxis.dataFields.category = 'date';
+            dateAxis.tooltip.disabled = true;
+            dateAxis.renderer.minGridDistance = 20;
+            dateAxis.fontSize = 12;
+            dateAxis.renderer.labels.template.adapter.add('text', (text, target) => dayjs.utc(target.dataItem.category).format('M/D'));
+
+            const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+            valueAxis.tooltip.disabled = true;
+            valueAxis.fontSize = 12;
+            valueAxis.extraMax = 0.1;
+
+            const createSeries = (type, color) => {
+                const series = chart.series.push(new am4charts.LineSeries());
+                series.dataFields.categoryX = 'date';
+                series.dataFields.valueY = type;
+                series.stroke = am4core.color(color);
+                series.tooltipText = `{date}\n${type}: {${type}}`;
+                series.tooltip.fontSize = 12;
+                series.tooltip.getFillFromObject = false;
+                series.tooltip.label.fill = color;
+                series.tooltip.background.strokeWidth = 0;
+                series.tooltip.pointerOrientation = 'vertical';
+                series.connect = false;
+                series.tensionX = 0.8;
+                series.bulletsContainer.parent = chart.seriesContainer;
+                return series;
+            };
+            const successSeries = createSeries('success', LEGEND_COLORS.success);
+            const failureSeries = createSeries('failure', LEGEND_COLORS.failure);
+
+            const createCircleBullet = (series, color) => {
+                const bullet = series.bullets.push(new am4charts.Bullet());
+                const circle = bullet.createChild(am4core.Circle);
+                circle.strokeWidth = 0;
+                circle.width = 5;
+                circle.height = 5;
+                circle.fill = am4core.color(color);
+
+                const circleState = circle.states.create('hover');
+                circleState.properties.width = 10;
+                circleState.properties.height = 10;
+
+                circle.events.on('hit', (event) => {
+                    const clickedData = event.target.dataItem.dataContext;
+                    emit('click-date', clickedData.date);
+                });
+            };
+            createCircleBullet(successSeries, LEGEND_COLORS.success);
+            createCircleBullet(failureSeries, LEGEND_COLORS.failure);
+
+            chart.cursor = new am4charts.XYCursor();
+            chart.cursor.lineX.strokeOpacity = 0;
+            chart.cursor.lineY.strokeOpacity = 0;
+            chart.cursor.behavior = 'none';
+        };
+
+        /* api */
         const getDailyJobSummary = async () => {
             state.loading = true;
             try {
@@ -138,95 +199,6 @@ export default {
                 state.loading = false;
             }
         };
-        const drawChart = (canvas) => {
-            const datasets = [
-                {
-                    label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.CHART.SUCCESS'),
-                    data: state.chartData.map(d => d.success),
-                    backgroundColor: 'transparent',
-                    borderColor: LEGEND_COLORS.success,
-                    borderWidth: 1,
-                    pointBackgroundColor: LEGEND_COLORS.success,
-                    pointRadius: 2,
-                }, {
-                    label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.CHART.FAILURE'),
-                    data: state.chartData.map(d => d.failure),
-                    backgroundColor: 'transparent',
-                    borderColor: LEGEND_COLORS.failure,
-                    borderWidth: 1,
-                    pointBackgroundColor: LEGEND_COLORS.failure,
-                    pointRadius: 2,
-                },
-            ] as any;
-            const maxNumber = state.noData ? DEFAULT_MAX : max(datasets.map(ds => max(ds.data as number[]))) as number;
-            const stepSize = state.noData ? DEFAULT_STEP_SIZE : maxNumber / (TICKS_COUNT || 1);
-            const tooltips = {
-                cornerRadius: 2,
-                caretSize: 6,
-                caretPadding: 8,
-                displayColors: false,
-                backgroundColor: gray[900],
-                callbacks: {
-                    title: tooltipItems => `${tooltipItems[0].xLabel}`,
-                },
-            };
-            const pointClickEvent = (point, event) => {
-                const item = event[0];
-                if (item) {
-                    const clickedData = state.chartData[item._index];
-                    const selectedDate = dayjs.tz(clickedData.date, store.state.user.timezone).format('YYYY-MM-DD');
-                    emit('click-date', selectedDate);
-                }
-            };
-
-            const options: ChartOptions = {
-                scales: {
-                    yAxes: [{
-                        ticks: {
-                            beginAtZero: true,
-                            stepSize,
-                            max: maxNumber,
-                            callback: (value) => {
-                                if (typeof value === 'number') {
-                                    return value < 10000 ? numeral(value).format('0,0') : numeral(value).format('0.0a');
-                                }
-                                return value;
-                            },
-                        },
-                        afterTickToLabelConversion: (scaleInstance) => {
-                            scaleInstance.ticks[0] = '';
-                            scaleInstance.ticks[scaleInstance.ticks.length - 1] = null;
-                        },
-                    }],
-                    xAxes: [{
-                        display: 'auto',
-                        gridLines: {
-                            color: gray[200],
-                            zeroLineColor: gray[200],
-                        },
-                        ticks: {
-                            padding: 10,
-                            fontColor: black,
-                        },
-                    }],
-                },
-                tooltips,
-                legend: {
-                    display: false,
-                },
-                maintainAspectRatio: false,
-                onClick: pointClickEvent,
-            };
-
-            state.chart = new SpaceChart(canvas, {
-                type: 'line',
-                data: {
-                    labels: state.chartData.map(d => d.date.format('M/D')),
-                    datasets,
-                },
-                options,
-            });
-        };
 
         const init = async () => {
             await getDailyJobSummary();
@@ -236,12 +208,15 @@ export default {
         watch(() => state.currentDate, async () => {
             await getDailyJobSummary();
         }, { immediate: false });
-
         watch([() => state.chartRef, () => state.chartData], ([ctx, chartData]) => {
             if (ctx && chartData.length > 0) {
                 drawChart(ctx);
             }
         }, { immediate: false });
+
+        onUnmounted(() => {
+            if (state.chart) disposeChart(state.chartRef);
+        });
 
         return {
             ...toRefs(state),
@@ -255,6 +230,10 @@ export default {
     height: 20rem;
     padding-top: 1rem;
     padding-bottom: 3rem;
+
+    .chart {
+        height: 16rem;
+    }
 
     .top-part {
         position: relative;

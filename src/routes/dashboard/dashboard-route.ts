@@ -1,6 +1,6 @@
 import { RouteConfig } from 'vue-router';
 
-const Dashboard = () => import('@/views/dashboard/Dashboard.vue');
+const Dashboard = () => import(/* webpackChunkName: "Dashboard" */ '@/views/dashboard/Dashboard.vue');
 
 export default {
     path: 'dashboard',
