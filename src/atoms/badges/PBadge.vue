@@ -44,6 +44,7 @@ export default {
         newData.class['p-badge'] = true;
         newData.class[`badge-${props.shape}`] = true;
         if (props.backgroundColor || props.textColor) {
+            console.log(props.textColor);
             newData.staticStyle = data.staticStyle || {};
             if (props.outline) {
                 newData.staticStyle.backgroundColor = 'transparent';
@@ -103,18 +104,16 @@ export default {
 @mixin badge-color primary-dark, theme('colors.primary-dark'), theme('colors.white'), theme('colors.secondary');
 @mixin badge-color primary1, theme('colors.primary1'), theme('colors.white'), theme('colors.secondary');
 @mixin badge-color primary2, theme('colors.primary2'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color primary3, theme('colors.primary3'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color primary4, theme('colors.primary4'), theme('colors.white'), theme('colors.secondary');
 @mixin badge-color secondary, theme('colors.secondary'), theme('colors.white'), theme('colors.secondary');
 @mixin badge-color secondary1, theme('colors.secondary1'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color secondary2, theme('colors.secondary2'), theme('colors.white'), theme('colors.secondary');
 @mixin badge-color alert, theme('colors.alert'), theme('colors.white'), theme('colors.secondary');
 @mixin badge-color safe, theme('colors.safe'), theme('colors.white'), theme('colors.secondary');
 @mixin badge-color gray900, theme('colors.gray.900'), theme('colors.white'), theme('colors.secondary');
 @mixin badge-color gray, theme('colors.gray.default'), theme('colors.white'), theme('colors.secondary');
 @mixin badge-color gray200, theme('colors.gray.200'), theme('colors.gray.900'), theme('colors.secondary');
-@mixin badge-color gray100, theme('colors.gray.100'), theme('colors.gray.default'), theme('colors.secondary');
-@mixin badge-color coral, theme('colors.coral.default'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color yellow, theme('colors.yellow.default'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color coral600, theme('colors.coral.600'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color coral500, theme('colors.coral.500'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color peacock, theme('colors.peacock.default'), theme('colors.white'), theme('colors.secondary');
+@mixin badge-color indigo, theme('colors.indigo.default'), theme('colors.white'), theme('colors.secondary');
 
 </style>

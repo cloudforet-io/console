@@ -136,7 +136,7 @@ const colorSet = {
     },
     indigo: {
         ...palette.indigo,
-        default: colors.indigo[500],
+        default: palette.indigo[500],
     },
 };
 

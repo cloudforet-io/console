@@ -8,19 +8,17 @@ export enum BADGE_STYLE {
     'primary-dark' = 'primary-dark',
     primary1 = 'primary1',
     primary2 = 'primary2',
-    primary3 = 'primary3',
-    primary4 = 'primary4',
     secondary = 'secondary',
     secondary1 = 'secondary1',
-    secondary2 = 'secondary2',
-    coral = 'coral',
-    yellow = 'yellow',
+    coral600 = 'coral600',
+    coral500 = 'coral500',
+    gray900 = 'gray900',
     gray = 'gray',
     gray200 = 'gray200',
-    gray100 = 'gray100',
     alert = 'alert',
     safe = 'safe',
-    gray900 = 'gray900',
+    peacock = 'peacock',
+    indigo = 'indigo',
 }
 
 export type BadgeStyleType = keyof BADGE_STYLE
@@ -30,6 +28,6 @@ export interface Badge {
     styleType: BadgeStyleType;
     textColor?: string;
     backgroundColor?: string;
-    shape: keyof typeof BADGE_SHAPE;
+    shape: BadgeShape;
     outline: boolean;
 }

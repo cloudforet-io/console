@@ -38,7 +38,9 @@ export const isNotEmpty = (value): boolean => {
 export const getColor = (col?: string|null) => {
     if (!col) return col;
     if (col.startsWith('#')) return col;
-    return get(colors, col);
+    const color = get(colors, col);
+    if (color) return color;
+    return col;
 };
 
 export const getPageStart = (thisPage: number, pageSize: number) => ((thisPage - 1) * pageSize) + 1;
