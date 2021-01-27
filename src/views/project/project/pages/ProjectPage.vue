@@ -461,7 +461,7 @@ export default {
         @apply flex pl-4 pt-8 pb-3 mb-3 border-b border-gray-200 items-center;
     }
     .title {
-        @apply text-sm text-gray-500 font-semibold capitalize;
+        @apply text-sm text-gray-900 font-semibold capitalize;
         line-height: 1.2;
     }
     .count {

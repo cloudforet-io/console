@@ -1,12 +1,15 @@
 <template>
     <div class="plugin-filter-container">
         <div class="rows">
+            <header>{{ $t('PLUGIN.COLLECTOR.PLUGINS.SEARCH') }}</header>
+            <p-hr class="sidebar-divider" />
             <p-search v-model="search" class="p-search" :placeholder="$t('PLUGIN.COLLECTOR.PLUGINS.SEARCH_PLACEHOLDER')"
                       @search="$emit('search', $event)"
             />
         </div>
         <div class="rows">
             <header>{{ $t('PLUGIN.COLLECTOR.PLUGINS.REPOSITORY_LABEL') }}</header>
+            <p-hr class="sidebar-divider" />
             <div v-for="(repo, idx) in repositories" :key="idx"
                  class="filter" :class="{selected: proxySelectedRepoId === repo.repository_id}"
                  @click.stop="onClickRepoText(repo.repository_id)"
@@ -17,6 +20,7 @@
         </div>
         <div class="rows">
             <header>{{ $t('PLUGIN.COLLECTOR.PLUGINS.RESOURCE_TYPE_LABEL') }}</header>
+            <p-hr class="sidebar-divider" />
             <div v-for="(checked, resource) in resourceOptions" :key="resource"
                  class="filter" :class="{selected: checked}"
                  @click.stop="onClickResourceText(resource)"
@@ -31,7 +35,7 @@
 <script lang="ts">
 import { toRefs, reactive, computed } from '@vue/composition-api';
 
-import { PSearch, PRadio, PCheckBox } from '@spaceone/design-system';
+import { PSearch, PRadio, PCheckBox, PHr } from '@spaceone/design-system';
 
 import { makeProxy } from '@/lib/compostion-util';
 
@@ -41,6 +45,7 @@ export default {
         PSearch,
         PRadio,
         PCheckBox,
+        PHr,
     },
     props: {
         repositories: {
@@ -94,9 +99,14 @@ export default {
 
 <style lang="postcss" scoped>
 .plugin-filter-container {
-    padding: 0.5rem 1rem;
+    padding: 0.5rem 0;
     .rows {
         margin-top: 1.25rem;
+        .sidebar-divider {
+          @apply w-full;
+          margin-top: 0.5625rem;
+          margin-bottom: .75rem;
+        }
     }
     .back-btn {
         @apply text-primary2;
@@ -106,16 +116,20 @@ export default {
         justify-content: flex-start;
     }
     .p-search {
-        width: 100%;
+        width: calc(100% - 1.5rem);
+        margin: 0 auto;
     }
     header {
-        font-size: 0.75rem;
-        line-height: 2rem;
+        @apply text-gray-900;
+        padding: 0 1rem;
+        font-size: 0.875rem;
+        line-height: 1.6;
         font-weight: bold;
     }
     .filter {
-        line-height: 1.5rem;
-        margin-bottom: 0.5rem;
+        padding: 0 1rem;
+        line-height: 1.6;
+        margin-bottom: 0.37rem;
         cursor: pointer;
         font-size: 0.875rem;
         &.selected {

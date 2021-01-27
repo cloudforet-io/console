@@ -863,6 +863,7 @@
 				"RECENT": "최신순으로 정렬",
 				"REPOSITORY_LABEL": "플러그인 저장소",
 				"RESOURCE_TYPE_LABEL": "리소스 타입",
+				"SEARCH": "",
 				"SEARCH_PLACEHOLDER": "키워드 입력",
 				"TITLE": "플러그인 목록"
 			}

@@ -577,7 +577,7 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .sidebar-title {
-    @apply text-gray-500 text-sm font-bold;
+    @apply text-gray-900 text-sm font-bold;
     padding-top: 2rem;
     padding-left: 1rem;
 }
