@@ -1,8 +1,8 @@
 {
 	"APP": {
 		"TOP_NOTI": {
-			"HAS_NO_ROLE": "",
-			"NEED_ROLE": ""
+			"HAS_NO_ROLE": "Every SpaceONE user {needRole}. Please, Contact administrator to get a role.",
+			"NEED_ROLE": "requires Role "
 		}
 	},
 	"AUTOMATION": {
@@ -351,7 +351,7 @@
 			"RESOURCE_BY_REGION_SERVER": "Server",
 			"RESOURCE_BY_REGION_TITLE": "Resources By Region",
 			"RESOURCE_MAP": {
-				"NO_REGION": "No running resources"
+				"NO_REGION": "No running resources."
 			},
 			"RUN_COLLECTOR": "Run Collectors",
 			"RUN_COLLECTOR_COLLECTOR": "Collector",
@@ -568,7 +568,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "Add Service Account",
-				"EMPTY_CLOUD_SERVICE": "We need your registration for monitoring cloud resources.",
+				"EMPTY_CLOUD_SERVICE": "Please, register Service Account first to collect cloud service resouces. ",
 				"FAVORITES": "Favorites",
 				"NO_REGION": "No Region",
 				"REGION": "Region",

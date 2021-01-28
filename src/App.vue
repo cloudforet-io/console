@@ -8,7 +8,7 @@
         <p-notice-alert group="noticeBottomLeft" position="bottom left" />
         <p-notice-alert group="noticeBottomRight" position="bottom right" />
         <p-toast-alert group="toastTopCenter" position="top center" />
-        <top-notification v-if="$store.getters['user/hasPermission']">
+        <top-notification v-if="!$store.getters['user/hasPermission']">
             <i18n path="APP.TOP_NOTI.HAS_NO_ROLE">
                 <template #needRole>
                     <strong>{{ $t('APP.TOP_NOTI.NEED_ROLE') }}</strong>
