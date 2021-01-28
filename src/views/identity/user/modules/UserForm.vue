@@ -51,7 +51,7 @@
                 </template>
             </p-field-group>
             <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')" class="input-form">
-                <p-text-input v-model="formState.name" class="text-input" />
+                <p-text-input v-model="formState.name" class="text-input" autocomplete="username" />
             </p-field-group>
             <p-field-group :label="$t('IDENTITY.USER.FORM.EMAIL')"
                            :invalid="validationState.isEmailValid === false"
@@ -82,6 +82,7 @@
                 >
                     <template #default="{invalid}">
                         <p-text-input v-model="formState.password" type="password"
+                                      autocomplete="current-password"
                                       class="text-input"
                                       :invalid="invalid"
                         />
@@ -97,6 +98,7 @@
                     <template #default="{invalid}">
                         <p-text-input v-model="formState.passwordCheck" type="password"
                                       class="text-input"
+                                      autocomplete="new-password"
                                       :invalid="invalid"
                         />
                     </template>

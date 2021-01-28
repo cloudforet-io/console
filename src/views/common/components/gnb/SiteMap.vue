@@ -1,18 +1,18 @@
 <template>
-    <div class="sitemap-container">
-        <div class="sitemap-button" :class="visible ? 'visible' : ''" @click="toggle">
+    <div class="sitemap-container" :class="{'disabled': disabled}">
+        <div class="sitemap-button" :class="visible ? 'visible' : ''" @click="toggleMenu">
             <p-i class="sitemap-icon" :name="visible ? 'ic_delete' : 'ic_gnb_service_2'"
                  :color="visible ? 'transparent inherit' : 'inherit transparent'"
                  width="2rem" height="2rem"
             />
         </div>
-        <div v-if="visible" v-click-outside="hide" class="sitemap">
+        <div v-if="visible" v-click-outside="hideMenu" class="sitemap">
             <ul v-for="(menu, aIdx) in siteMapMenuList"
                 :key="aIdx"
             >
                 <template v-if="menu.show !== false">
                     <router-link :to="menu.to">
-                        <li class="menu" @click="hide">
+                        <li class="menu" @click="hideMenu">
                             <p-i :name="MENU_ICON[menu.name]"
                                  color="inherit inherit"
                                  height="1.5rem" width="1.5rem"
@@ -25,7 +25,7 @@
                         >
                             <div v-if="subMenu.show">
                                 <router-link v-if="subMenu" :to="subMenu.to">
-                                    <li class="submenu" @click="hide">
+                                    <li class="submenu" @click="hideMenu">
                                         {{ subMenu.label }}
                                         <span v-if="subMenu.isNew" class="new-text">new</span>
                                     </li>
@@ -69,6 +69,10 @@ export default {
         clickOutside: vClickOutside.directive,
     },
     props: {
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
         visible: {
             type: Boolean,
             default: false,
@@ -93,12 +97,20 @@ export default {
             ])),
         });
 
+        const hideMenu = () => {
+            emit('update:visible', false);
+        };
+        const toggleMenu = () => {
+            if (!props.disabled) {
+                emit('update:visible', !props.visible);
+            }
+        };
+
         return {
             ...toRefs(state),
             MENU_ICON,
-            show() { emit('update:visible', true); },
-            hide() { emit('update:visible', false); },
-            toggle() { emit('update:visible', !props.visible); },
+            hideMenu,
+            toggleMenu,
         };
     },
 };
@@ -107,24 +119,25 @@ export default {
 <style lang="postcss" scoped>
 .sitemap-container {
     .sitemap-button {
-        @apply relative cursor-pointer;
+        position: relative;
+        cursor: pointer;
         text-decoration: none;
         opacity: 0.5;
         &:hover {
-            @apply text-primary opacity-100;
+            @apply text-primary;
+            opacity: 1;
             .sitemap-icon {
                 @apply bg-primary4;
             }
         }
         &.visible {
-            opacity: 1;
             @apply text-primary;
+            opacity: 1;
         }
         .sitemap-icon {
             @apply rounded-full;
         }
     }
-
     .sitemap {
         @apply bg-white border border-gray-200 text-gray-900;
         position: absolute;
@@ -135,7 +148,7 @@ export default {
         font-size: 0.875rem;
         box-shadow: 0 0 14px rgba(0, 0, 0, 0.1);
         overflow-y: auto;
-        z-index: 10;
+        z-index: 999;
         padding: 1.5rem 0;
         margin-left: 1.5rem;
         ul:first-child .menu {
@@ -173,13 +186,24 @@ export default {
                 }
                 .new-text {
                     font-size: 0.75rem;
-                    background: linear-gradient(to right, theme('colors.primary'), 50%, theme('colors.secondary'));
+                    background: linear-gradient(to right, theme('colors.primary'), theme('colors.secondary'));
                     -webkit-background-clip: text;
                     -webkit-text-fill-color: transparent;
                     vertical-align: super;
                     cursor: default;
                     margin-left: 0.25rem;
                 }
+            }
+        }
+    }
+
+    &.disabled {
+        .sitemap-button {
+            cursor: not-allowed;
+            opacity: 0.2;
+            &:hover {
+                @apply text-gray-900;
+                opacity: 0.2;
             }
         }
     }

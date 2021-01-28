@@ -547,7 +547,7 @@ export default {
 
 <style lang="postcss" scoped>
 .sidebar-title {
-    @apply text-gray-500 text-sm font-bold;
+    @apply text-gray-900 text-sm font-bold;
     align-items: center;
     padding-top: 2rem;
     padding-left: 1rem;
@@ -559,7 +559,7 @@ export default {
     @apply px-4;
 }
 #region-title {
-    @apply text-gray-500 text-sm font-bold;
+    @apply text-gray-900 text-sm font-bold;
     padding-top: 1.375rem;
     padding-left: 1rem;
 }

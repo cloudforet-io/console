@@ -5,9 +5,6 @@
             <info-button v-if="description" :visible="!!description"
                          class="flex-shrink-0"
             >
-                <template #title>
-                    {{ description.name }}
-                </template>
                 <template #contents>
                     <p-markdown :markdown="description.options.markdown"
                                 :data="description.options.markdown"

@@ -351,7 +351,7 @@ export default {
     @apply relative mx-1;
     min-height: 8rem;
     .title {
-        @apply font-normal text-sm text-gray-500 leading-normal mb-2 mx-4;
+        @apply font-normal text-sm text-gray-900 leading-normal mb-2 mx-4;
     }
 }
 

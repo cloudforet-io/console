@@ -1,4 +1,10 @@
 {
+	"APP": {
+		"TOP_NOTI": {
+			"HAS_NO_ROLE": "스페이스원 사용을 위해서는 {needRole}합니다.\n관리자(Administrator)를 통해 필요한 권한을 받으세요.",
+			"NEED_ROLE": "권한(Role)이 필요"
+		}
+	},
 	"AUTOMATION": {
 		"POWER_SCHEDULER": {
 			"DETAILS": {
@@ -863,6 +869,7 @@
 				"RECENT": "최신순으로 정렬",
 				"REPOSITORY_LABEL": "플러그인 저장소",
 				"RESOURCE_TYPE_LABEL": "리소스 타입",
+				"SEARCH": "",
 				"SEARCH_PLACEHOLDER": "키워드 입력",
 				"TITLE": "플러그인 목록"
 			}

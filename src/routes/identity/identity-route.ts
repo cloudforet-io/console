@@ -2,7 +2,7 @@ import { RouteConfig } from 'vue-router';
 
 const UserAccount = () => import(/* webpackChunkName: "UserAccount" */ '@/views/identity/user/modules/UserAccount.vue');
 const UserManagement = () => import(/* webpackChunkName: "UserManagement" */ '@/views/identity/user/modules/UserManagement.vue');
-const User = () => import(/* webpackChunkName: "User" */ '@/views/identity/user/pages/UserPage.vue');
+const UserPage = () => import(/* webpackChunkName: "User" */ '@/views/identity/user/pages/UserPage.vue');
 const ServiceAccount = () => import(/* webpackChunkName: "ServiceAccount" */ '@/views/identity/service-account/pages/ServiceAccountPage.vue');
 const AddServiceAccountPage = () => import(/* webpackChunkName: "AddServiceAccount" */ '@/views/identity/service-account/pages/AddServiceAccountPage.vue');
 const ServiceAccountSearchPage = () => import(/* webpackChunkName: "ServiceAccountSearchPage" */ '@/views/identity/service-account/pages/ServiceAccountSearchPage.vue');
@@ -61,7 +61,7 @@ export default {
                 {
                     path: '/',
                     name: 'user',
-                    component: User,
+                    component: UserPage,
                     children: [
                         {
                             path: 'user-management',
@@ -73,7 +73,7 @@ export default {
                             name: 'userAccount',
                             component: UserAccount,
                         },
-                    ]
+                    ],
                 },
             ],
         },

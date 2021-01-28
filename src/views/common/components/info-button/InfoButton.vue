@@ -15,7 +15,9 @@
             <slot name="title" />
         </portal>
         <portal to="info-contents">
-            <slot name="contents" />
+            <div class="info-contents" :class="{'no-title': !$scopedSlots.title }">
+                <slot name="contents" />
+            </div>
         </portal>
     </fragment>
 </template>
@@ -49,10 +51,6 @@ export default {
             type: String,
             default: undefined,
         },
-        external: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -62,14 +60,8 @@ export default {
                 const res: any = {};
                 if (props.href) {
                     res.href = props.href;
-                    res.highlight = true;
-                    if (props.external) {
-                        res.target = '_blank';
-                        res.showIcon = true;
-                    } else {
-                        res.target = '_self';
-                        res.showIcon = false;
-                    }
+                    res.target = '_blank';
+                    res.showIcon = true;
                 }
                 return res;
             }),
@@ -97,10 +89,21 @@ export default {
 .info-button {
     @apply inline-flex items-center text-gray-700;
     cursor: pointer;
+    font-size: 0.75rem;
+    line-height: 1.2;
+    &:hover {
+        @apply text-secondary;
+        .text {
+            text-decoration: underline;
+        }
+    }
     .text {
-        @apply ml-1;
-        font-size: 0.75rem;
-        line-height: 1.2;
+        @apply ml-1 mr-0;
+    }
+}
+.info-contents::v-deep {
+    &.no-title {
+        margin-top: -1rem;
     }
 }
 </style>

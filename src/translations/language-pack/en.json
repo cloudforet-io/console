@@ -1,4 +1,10 @@
 {
+	"APP": {
+		"TOP_NOTI": {
+			"HAS_NO_ROLE": "",
+			"NEED_ROLE": ""
+		}
+	},
 	"AUTOMATION": {
 		"POWER_SCHEDULER": {
 			"DETAILS": {
@@ -863,6 +869,7 @@
 				"RECENT": "Most recent",
 				"REPOSITORY_LABEL": "Repository",
 				"RESOURCE_TYPE_LABEL": "Resource type",
+				"SEARCH": "Search",
 				"SEARCH_PLACEHOLDER": "Enter keyword",
 				"TITLE": "Plugins"
 			}

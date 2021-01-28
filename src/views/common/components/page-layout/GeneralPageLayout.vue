@@ -27,13 +27,11 @@ export default {
     flex-direction: column;
     height: 100%;
     justify-content: stretch;
-    overflow-y: scroll;
 
     .page-contents {
         width: 100%;
         flex-grow: 1;
         padding: 2rem 1.5rem;
-        /*padding: 1.5rem 1.5rem 2rem 1.5rem;*/
     }
     .fnb {
         width: 100%;

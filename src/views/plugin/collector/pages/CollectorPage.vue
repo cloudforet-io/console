@@ -29,7 +29,9 @@
                     <template #toolbox-left>
                         <p-icon-text-button style-type="primary-dark"
                                             name="ic_plus_bold"
-                                            @click="$router.push({path: '/plugin/collector/create/plugins'})"
+                                            :href="$router.resolve({
+                                                name:'collectorPlugins'
+                                            }).href"
                         >
                             {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}
                         </p-icon-text-button>
