@@ -466,6 +466,7 @@ export default {
 
 .p-data-table {
     @apply h-full w-full relative overflow-auto;
+    min-height: 12rem;
     .table-container {
         @apply overflow-auto h-full w-full;
     }

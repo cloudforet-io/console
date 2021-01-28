@@ -1,8 +1,8 @@
 <template>
     <div class="p-definition-table">
         <slot v-if="!loading && isNoData" name="empty">
-            <p-empty class="py-8">
-                {{ $t('COMPONENT.DEFINITION_TABLE.NO_DATA') }}
+            <p-empty class="no-data">
+                <span>{{ $t('COMPONENT.DEFINITION_TABLE.NO_DATA') }}</span>
             </p-empty>
         </slot>
         <table v-else-if="!isNoData">
@@ -101,7 +101,10 @@ export default {
 <style lang="postcss">
 .p-definition-table {
     @apply relative;
-    min-height: 2.5rem;
+    min-height: 11.25rem;
+    .no-data {
+        min-height: 11.25rem;
+    }
     table {
         @apply w-full;
         td {
@@ -128,7 +131,7 @@ export default {
     .loading {
         @apply absolute flex w-full h-full justify-center items-center;
         top: 0;
-        max-height: 16.875rem;
+        max-height: 10rem;
     }
 
     /* transitions */

@@ -25,6 +25,13 @@ import DOMPurify from 'dompurify';
 import { iframeStyle } from './style';
 
 
+DOMPurify.addHook('afterSanitizeAttributes', (node) => {
+    // set all elements owning target to target=_blank
+    if ('target' in node) {
+        node.setAttribute('target', '_blank');
+        node.setAttribute('rel', 'noopener');
+    }
+});
 export default {
     name: 'PDynamicLayoutHtml',
     components: { PPanelTop },
@@ -62,7 +69,7 @@ export default {
                 return props.data;
             }),
             fetchOptionsParam: computed<HtmlFetchOptions>(() => ({})),
-            iframeData: computed(() => DOMPurify.sanitize(state.rootData)),
+            iframeData: computed(() => DOMPurify.sanitize(state.rootData, { allowAttributes: { a: ['target'] } })),
         });
 
 

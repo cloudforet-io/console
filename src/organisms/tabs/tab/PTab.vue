@@ -68,17 +68,18 @@ export default {
 <style lang="postcss">
 .p-tab {
     @apply rounded-sm border  border-gray-200 bg-white;
+    min-height: 19rem;
     .p-tab-bar {
         @apply border-b-4 border-gray-100;
         &.is-double {
             &.p-nav-tabs {
                 .nav-item {
-                  flex: 0.5;
+                    flex: 0.5;
                 }
                 .p-nav-link {
                     .label {
-                      @apply inline-flex;
-                      justify-content: center;
+                        @apply inline-flex;
+                        justify-content: center;
                     }
                 }
             }

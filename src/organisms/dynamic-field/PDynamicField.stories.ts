@@ -212,7 +212,7 @@ export const badgeType = () => ({
                 },
                 {
                     options: {
-                        text_color: 'peacock',
+                        text_color: 'peacock.500',
                     },
                     raw: 'named color',
                 },

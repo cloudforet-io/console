@@ -2,6 +2,7 @@ import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PDynamicLayout from './PDynamicLayout.vue';
 import mock from './mock.ts'
 import {i18n} from '@/translations'
+import {argTypes} from './story-helper'
 
 <Meta title='Others/Dynamic/Dynamic Layout' component={PDynamicLayout} argTypes={{
     name: {
@@ -70,12 +71,27 @@ import {i18n} from '@/translations'
             },
             category: 'props',
             defaultValue: {
-                summary: 'undefined'
+                summary: null
             },
         },
         control: {
             type: 'object',
         }
+    },
+    typeOptions: {
+        name: 'typeOptions',
+        type: {name: 'object'},
+        description: `Props for each layout component.Different by layout type.`,
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'object'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: null
+            },
+        },
     },
     onInit: {
         name: 'init',
@@ -99,7 +115,23 @@ export const Template = (args, { argTypes }) => ({
     components: { PDynamicLayout },
     i18n,
     template: `
-            <p-dynamic-layout v-bind="$props"
+            <p-dynamic-layout :name="name" :type="type"
+                              :options="options"
+                              :data="data"
+                              :type-options="{
+                                  loading,
+                                  totalCount,
+                                  timezone,
+                                  selectIndex,
+                                  selectable,
+                                  colCopy,
+                                  searchable,
+                                  excelVisible,
+                                  keyItemSets,
+                                  valueHandlerMap,
+                                  language,
+                                  listMap,
+                              }"
                                class="w-full"
             >
             </p-dynamic-layout>
@@ -132,10 +164,14 @@ export const Template = (args, { argTypes }) => ({
 ## item type
 
 <Canvas>
-    <Story name="item type">
+    <Story name="item type" argTypes={argTypes} args={{
+        loading: true
+    }}>
         {Template.bind({})}
     </Story>
 </Canvas>
+
+<ArgsTable story="item type"/>
 
 <br/>
 <br/>
@@ -143,7 +179,7 @@ export const Template = (args, { argTypes }) => ({
 ## html type
 
 <Canvas>
-    <Story name="html type" argTypes={{
+    <Story name="html type" argTypes={argTypes} argTypes={{
         data: {
             name: 'data',
             type: {name: 'string'},
@@ -155,7 +191,7 @@ export const Template = (args, { argTypes }) => ({
     }} args={{
         type: 'html',
         data: mock.html.data,
-        options: {}
+        options: {},
     }}>
         {Template.bind({})}
     </Story>
@@ -166,12 +202,34 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+## table type
 
 <Canvas>
-    <Story name="playground">
+    <Story name="table type" argTypes={argTypes} args={{
+        type: 'table',
+        data: mock.table.data,
+        options: {
+            fields: [
+                {
+                    key: "key",
+                    type: "text",
+                    name: "Key"
+                },
+                {
+                    key: "value",
+                    name: "Value",
+                    type: "text"
+                }
+            ],
+        }
+    }}>
         {Template.bind({})}
     </Story>
 </Canvas>
 
-<ArgsTable story="playground"/>
+<ArgsTable story="table type"/>
+
+<br/>
+<br/>
+
 
