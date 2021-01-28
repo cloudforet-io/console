@@ -26,6 +26,7 @@
             <template #col-labels-format="{value}">
                 <p v-if="value.length === 0"></p>
                 <p-badge v-for="(label, idx) in value" :key="idx" style-type="gray200"
+                         class="mr-2"
                 >
                     {{ label }}
                 </p-badge>
