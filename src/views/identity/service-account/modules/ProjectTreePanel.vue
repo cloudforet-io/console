@@ -46,9 +46,8 @@
             </div>
 
             <div class="body-container">
-                <div class="tree-container">
-                    <p-skeleton v-if="isLoading" class="tree-loader" />
-                    <p-tree v-else ref="treeRef"
+                <div class="tree-container" :style="{overflow: isLoading ? 'hidden' : 'auto'}">
+                    <p-tree ref="treeRef"
                             @toggle:click="toggle"
                             @node:click="selectItem"
                             @checkbox:click="selectItem"
@@ -73,6 +72,11 @@
                             />
                         </template>
                     </p-tree>
+                    <transition name="fade-in">
+                        <div v-if="isLoading" class="tree-loader">
+                            <p-lottie name="thin-spinner" :size="1.5" auto />
+                        </div>
+                    </transition>
                 </div>
                 <div class="no-select">
                     <p-radio class="mr-2"
@@ -94,7 +98,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PI, PPaneLayout, PSkeleton, PIconButton, PIconTextButton, PRadio, PTree,
+    PI, PPaneLayout, PLottie, PIconButton, PIconTextButton, PRadio, PTree,
 } from '@spaceone/design-system';
 import { TreeItem, TreeNode } from '@spaceone/design-system/dist/src/molecules/tree-node/type';
 
@@ -148,7 +152,7 @@ export default {
         PTree,
         PI,
         PPaneLayout,
-        PSkeleton,
+        PLottie,
         PIconButton,
         PIconTextButton,
         PRadio,
@@ -326,14 +330,27 @@ export default {
 }
 
 .body-container {
-    @apply border border-gray-200 rounded-sm flex flex-col w-full;
+    @apply relative border border-gray-200 bg-primary4 rounded-sm flex flex-col w-full;
 }
 .tree-container {
     @apply overflow-auto flex-grow px-2 py-4 w-full;
     height: 21.5rem;
 }
+.fade-in-leave-active {
+    transition: opacity 0.2s;
+}
+.fade-in-enter, .fade-in-leave-to {
+    opacity: 0;
+}
+.fade-in-leave, .fade-in-enter-to {
+    opacity: 0.5;
+}
 .tree-loader {
-    @apply h-full w-full rounded-b-sm;
+    @apply absolute h-full w-full bg-white flex justify-center;
+    padding-top: 30%;
+    top: 0;
+    left: 0;
+    opacity: 0.5;
 }
 .no-select {
     @apply border-t border-gray-200 p-4 flex items-center;
