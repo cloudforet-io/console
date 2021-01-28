@@ -568,6 +568,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "サービスアカウントの追加",
+				"EMPTY_CLOUD_SERVICE": "",
 				"FAVORITES": "お気に入り",
 				"NO_REGION": "リージョンがありません。",
 				"REGION": "リージョン",
