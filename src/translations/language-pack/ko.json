@@ -351,7 +351,7 @@
 			"RESOURCE_BY_REGION_SERVER": "서버 ",
 			"RESOURCE_BY_REGION_TITLE": "지역 별 리소스",
 			"RESOURCE_MAP": {
-				"NO_REGION": "현재 리전에 주요 서비스가 없습니다. "
+				"NO_REGION": "선택 리전에 사용중인 리소스가 없습니다. "
 			},
 			"RUN_COLLECTOR": "컬렉터 실행 ",
 			"RUN_COLLECTOR_COLLECTOR": "컬렉터 ",
