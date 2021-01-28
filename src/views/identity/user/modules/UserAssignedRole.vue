@@ -7,25 +7,26 @@
             :fields="fields"
             :striped="false"
         >
-            <template #col-project_info.project_id-format="{value}">
-                <p-anchor v-if="value" :href="getProjectLink(value, false)" target="_blank">
-                    {{ projects[value] ? projects[value].label : value }}
-                </p-anchor>
-                <p v-if="!value">
-                    -
-                </p>
-            </template>
             <template #col-project_group_info.project_group_id-format="{value}">
-                <p-anchor v-if="value" :href="getProjectLink(value, true)" target="_blank">
+                <p-anchor v-if="value" :href="getProjectLink(value, false)" target="_blank">
                     {{ projectGroups[value] ? projectGroups[value].label : value }}
                 </p-anchor>
                 <p v-if="!value">
                     -
                 </p>
             </template>
+            <template #col-project_info.project_id-format="{value}">
+                <p-anchor v-if="value" :href="getProjectLink(value, true)" target="_blank">
+                    {{ projects[value] ? projects[value].label : value }}
+                </p-anchor>
+                <p v-if="!value">
+                    -
+                </p>
+            </template>
             <template #col-labels-format="{value}">
-                <p v-if="value.length === 0"></p>
+                <p v-if="value.length === 0" />
                 <p-badge v-for="(label, idx) in value" :key="idx" style-type="gray200"
+                         class="mr-2"
                 >
                     {{ label }}
                 </p-badge>
@@ -35,11 +36,14 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PPanelTop, PDataTable, PAnchor, PBadge } from '@spaceone/design-system';
+import {
+    PPanelTop, PDataTable, PAnchor, PBadge,
+} from '@spaceone/design-system';
 
 import { timestampFormatter } from '@/lib/util';
 import { userStateFormatter } from '@/views/identity/user/lib/helper';

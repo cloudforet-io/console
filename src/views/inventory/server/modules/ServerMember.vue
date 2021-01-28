@@ -13,11 +13,12 @@
                 {{ users[value].name }}
             </template>
             <template #col-labels-format="{value}">
-                <p-text-list :items="value" delimiter=" ">
-                    <p-badge v-slot:default="{value: d}">
-                        {{ d }}
-                    </p-badge>
-                </p-text-list>
+                <p v-if="value.length === 0" />
+                <p-badge v-for="(label, idx) in value" :key="idx" style-type="gray200"
+                         class="mr-2"
+                >
+                    {{ label }}
+                </p-badge>
             </template>
         </p-search-table>
     </div>
