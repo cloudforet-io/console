@@ -123,11 +123,8 @@ import { gray, primary, primary1 } from '@/styles/colors';
 import { store } from '@/store';
 
 am4core.useTheme(am4themes_animated);
-am4core.options.autoSetClassName = true;
-am4core.options.classNamePrefix = 'allSummary';
 
 /* enum */
-// todo: will be deprecated
 enum DATE_TYPE {
     daily = 'DAILY',
     monthly = 'MONTHLY',
@@ -149,7 +146,11 @@ enum CLOUD_SERVICE_LABEL {
 type Unit = 'b' | 'gb' | 'kb' | 'mb' | 'pb' | 'tb' | 'B' | 'GB' | 'KB' | 'MB' | 'PB' | 'TB';
 interface ChartData {
     date: string;
-    count: number;
+    count: number | null;
+    fillOpacity?: number;
+    bulletColor?: string;
+    bulletText?: string | number;
+    tooltipText?: string | number;
 }
 interface Data {
     type: keyof typeof DATA_TYPE;
@@ -270,6 +271,7 @@ export default {
             dateAxis.renderer.minGridDistance = 40;
             dateAxis.renderer.grid.template.disabled = true;
             dateAxis.renderer.labels.template.fill = am4core.color(gray[400]);
+            dateAxis.tooltip.disabled = true;
             dateAxis.fontSize = 11;
 
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
@@ -277,6 +279,7 @@ export default {
             valueAxis.renderer.grid.template.strokeOpacity = 1;
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
             valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
+            valueAxis.tooltip.disabled = true;
             valueAxis.fontSize = 11;
             valueAxis.extraMax = 0.15;
             if (state.selectedType === DATA_TYPE.billing) {
@@ -295,20 +298,33 @@ export default {
             series.strokeWidth = 0;
             series.columns.template.propertyFields.fillOpacity = 'fillOpacity';
 
+            series.tooltipText = '{tooltipText}';
+            series.tooltip.pointerOrientation = 'down';
+            series.tooltip.fontSize = 14;
+            series.tooltip.strokeWidth = 0;
+            series.tooltip.dy = -5;
+            series.tooltip.getFillFromObject = false;
+            series.tooltip.label.fill = am4core.color(primary);
+            series.tooltip.background.stroke = am4core.color(primary);
+
             const bullet = series.bullets.push(new am4charts.LabelBullet());
-            bullet.label.text = '{count}';
+            bullet.label.text = '{bulletText}';
             bullet.label.fontSize = 14;
             bullet.label.truncate = false;
             bullet.label.hideOversized = false;
             bullet.label.propertyFields.fill = 'bulletColor';
             bullet.label.dy = -10;
             if (state.selectedType === DATA_TYPE.billing) {
-                bullet.label.adapter.add('text', (text, target) => numberFormatter(target.dataItem.valueY) || undefined);
                 bullet.label.adapter.add('dy', (dy, target) => {
                     if (target.dataItem.valueY < 0) return 10;
                     return dy;
                 });
             }
+
+            chart.cursor = new am4charts.XYCursor();
+            chart.cursor.lineX.strokeOpacity = 0;
+            chart.cursor.lineY.strokeOpacity = 0;
+            chart.cursor.behavior = 'none';
         };
         const setBoxInterval = () => {
             state.selectedIndexInterval = setInterval(() => {
@@ -337,6 +353,7 @@ export default {
             return location;
         };
         const setChartData = (data) => {
+            const chartData: ChartData[] = [];
             const dateType = state.selectedDateType;
             const dateRange = dateType === DATE_TYPE.monthly ? MONTH_COUNT : DAY_COUNT;
             const dateUnit = dateType === DATE_TYPE.monthly ? 'month' : 'day';
@@ -347,7 +364,7 @@ export default {
                 const formattedSize = byteFormatter(smallestCount);
                 if (formattedSize) state.storageTrendSuffix = formattedSize.split(' ')[1] as Unit;
             }
-            const chartData = data.map((d) => {
+            const formattedData = data.map((d) => {
                 let count = d.total;
                 if (state.selectedType === DATA_TYPE.storage) {
                     const formattedSize = byteFormatter(d.total, { unit: state.storageTrendSuffix });
@@ -365,34 +382,44 @@ export default {
                 if (state.selectedType === DATA_TYPE.billing && state.selectedDateType === DATE_TYPE.daily) {
                     date = date.subtract(1, 'day');
                 }
-                if (!(chartData.find(d => date.format(dateFormat) === d.date))) {
+                if (formattedData.find(d => date.format(dateFormat) === d.date)) {
+                    chartData.push(formattedData.find(d => date.format(dateFormat) === d.date));
+                } else {
                     chartData.push({ date: date.format(dateFormat), count: null });
                 }
             });
 
             const orderedData = orderBy(chartData, ['date'], ['asc']);
-            chartState.data = orderedData.map((d, index) => {
-                const date = dayjs(d.date);
+            chartState.data = orderedData.map((d, idx) => {
+                const tooltipText = state.selectedType === DATA_TYPE.billing ? numberFormatter(d.count) : d.count || '';
+                let bulletText;
+                if ((dateType === DATE_TYPE.daily && idx % 3 === 1) || (dateType === DATE_TYPE.monthly && idx % 3 === 2)) {
+                    bulletText = tooltipText;
+                }
+
                 let fillOpacity = 1;
                 let bulletColor = primary;
-                if (state.selectedType === DATA_TYPE.billing && index === orderedData.length - 1) {
+                if (state.selectedType === DATA_TYPE.billing && idx === orderedData.length - 1) {
                     fillOpacity = 0.5;
                     bulletColor = primary1;
                 }
+
+                const date = dayjs(d.date);
+                let dateLabel;
                 if (dateType === DATE_TYPE.monthly && (date.format('M') === '1' || date.format('M') === '12')) {
-                    return {
-                        date: date.format('MMM, YY'),
-                        count: d.count,
-                        fillOpacity,
-                        bulletColor,
-                    };
+                    dateLabel = date.format('MMM, YY');
+                } else {
+                    const labelFormat = dateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
+                    dateLabel = date.format(labelFormat);
                 }
-                const labelFormat = dateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
+
                 return {
-                    date: date.format(labelFormat),
+                    date: dateLabel,
                     count: d.count,
                     fillOpacity,
                     bulletColor,
+                    bulletText,
+                    tooltipText,
                 };
             });
         };
@@ -883,18 +910,6 @@ export default {
                 }
             }
         }
-    }
-}
-</style>
-<style lang="postcss">
-.allSummaryLabelBullet-group {
-    display: none;
-    &:last-child {
-        display: block;
-    }
-
-    @screen sm {
-        display: block;
     }
 }
 </style>
