@@ -1,6 +1,6 @@
 <template>
     <p-button-modal
-        :header-title="'Update Member Information'"
+        :header-title="$t('PROJECT.DETAIL.MODAL_UPDATE_MEMBER_TITLE')"
         :centered="true"
         size="lg"
         :fade="true"
