@@ -351,7 +351,7 @@
 			"RESOURCE_BY_REGION_SERVER": "サーバ",
 			"RESOURCE_BY_REGION_TITLE": "リージョン別リソース",
 			"RESOURCE_MAP": {
-				"NO_REGION": ""
+				"NO_REGION": " 選択リージョンの使用中のリソースがありません。 "
 			},
 			"RUN_COLLECTOR": "コレクタを実行",
 			"RUN_COLLECTOR_COLLECTOR": "コレクタ",
