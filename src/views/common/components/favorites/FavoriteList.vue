@@ -115,7 +115,6 @@ export default {
 <style lang="postcss" scoped>
 .favorite-list {
     @apply px-3;
-    min-height: 7.5rem;
 }
 .empty {
     @apply pt-2 text-gray-300;
