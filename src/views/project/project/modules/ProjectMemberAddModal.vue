@@ -22,68 +22,74 @@
                             @init="onChange"
                             @rowLeftClick="onSelect"
             />
-            <div class="field-group-wrapper">
-                <p-field-group
-                    :label="$t('PROJECT.DETAIL.MODAL_ADD_MEMBER')"
-                    :required="true"
-                    :invalid="validationState.isMemberValid === false"
-                    :invalid-text="validationState.memberCheckInvalidText"
-                >
-                    <template #default="{invalid}">
-                        <p class="tag-container">
-                            <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag}`"
-                                   class="tag"
-                                   @delete="tagTools.deleteTag(idx)"
-                            >
-                                {{ tag }}
-                            </p-tag>
-                        </p>
-                    </template>
-                </p-field-group>
-                <p-field-group
-                    :label="$t('PROJECT.DETAIL.PROJECT_ROLE')"
-                    :required="true"
-                    :invalid="validationState.isProjectRoleValid === false"
-                    :invalid-text="validationState.projectRoleCheckInvalidText"
-                    class="dropdown"
-                >
-                    <template #default="{invalid}">
-                        <p-select-dropdown v-model="projectRole"
-                                           :items="projectRoleList"
-                                           auto-height
-                                           :disabled="projectRoleList.length < 1"
-                                           :placeholder="$t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_ROLE')"
-                        />
-                    </template>
-                </p-field-group>
-                <div class="label-wrapper">
-                    <p-field-group :label="'Labels'"
-                                   :invalid-text="validationState.labelInvalidText"
-                                   :invalid="validationState.isLabelValid === false"
-                                   :required="true"
+            <div v-if="isSelected">
+                <div class="field-group-wrapper">
+                    <p-field-group
+                        :label="$t('PROJECT.DETAIL.MODAL_ADD_MEMBER')"
+                        :required="true"
+                        :invalid="validationState.isMemberValid === false"
+                        :invalid-text="validationState.memberCheckInvalidText"
                     >
                         <template #default="{invalid}">
-                            <p-text-input v-model="memberLabel" block
-                                          :invalid="invalid"
+                            <p class="tag-container">
+                                <p-tag v-for="(tag, idx) in tagTools.tags" :key="`tag-${tag}`"
+                                       class="tag"
+                                       @delete="tagTools.deleteTag(idx)"
+                                >
+                                    {{ tag }}
+                                </p-tag>
+                            </p>
+                        </template>
+                    </p-field-group>
+                    <p-field-group
+                        :label="$t('PROJECT.DETAIL.PROJECT_ROLE')"
+                        :required="true"
+                        :invalid="validationState.isProjectRoleValid === false"
+                        :invalid-text="validationState.projectRoleCheckInvalidText"
+                        class="dropdown"
+                    >
+                        <template #default="{invalid}">
+                            <p-select-dropdown v-model="projectRole"
+                                               :items="projectRoleList"
+                                               auto-height
+                                               :disabled="projectRoleList.length < 1"
+                                               :placeholder="$t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_ROLE')"
                             />
                         </template>
                     </p-field-group>
-                    <p-button class="icon-button" style-type="gray900"
-                              @click="addMemberLabel"
-                    >
-                        <p-i name="ic_plus" width="1.5rem" height="1.5rem"
-                             color="transparent inherit"
-                        />
-                    </p-button>
+                    <div class="label-wrapper">
+                        <p-field-group :label="$t('PROJECT.DETAIL.PROJECT_MEMBER_LABEL')"
+                                       :invalid-text="validationState.labelInvalidText"
+                                       :invalid="validationState.isLabelValid === false"
+                                       :required="true"
+                        >
+                            <template #default="{invalid}">
+                                <p-text-input v-model="memberLabel" block
+                                              :invalid="invalid"
+                                              @keyup.enter="addMemberLabel"
+                                />
+                            </template>
+                        </p-field-group>
+                        <p-button class="icon-button" style-type="gray900"
+                                  @click="addMemberLabel"
+                        >
+                            <p-i name="ic_plus" width="1.5rem" height="1.5rem"
+                                 color="transparent inherit"
+                            />
+                        </p-button>
+                    </div>
+                    <p class="tag-wrapper">
+                        <p-tag v-for="(tag, idx) in labelTagTools.tags" :key="`label-tag-${tag}`"
+                               class="tag"
+                               @delete="labelTagTools.deleteTag(idx)"
+                        >
+                            {{ tag }}
+                        </p-tag>
+                    </p>
                 </div>
-                <p class="tag-wrapper">
-                    <p-tag v-for="(tag, idx) in labelTagTools.tags" :key="`label-tag-${tag}`"
-                           class="tag"
-                           @delete="labelTagTools.deleteTag(idx)"
-                    >
-                        {{ tag }}
-                    </p-tag>
-                </p>
+            </div>
+            <div v-else>
+                <p-empty class="empty-msg">{{$t('PROJECT.DETAIL.CLICK_ADD_MEMBER')}}</p-empty>
             </div>
         </template>
     </p-button-modal>
@@ -101,7 +107,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PTag, PSearchTable, PSelectDropdown, PFieldGroup, PTextInput, PButton, PI,
+    PButtonModal, PTag, PSearchTable, PSelectDropdown, PFieldGroup, PTextInput, PButton, PI, PEmpty,
 } from '@spaceone/design-system';
 import { SearchTableListeners, Options } from '@spaceone/design-system/dist/src/organisms/tables/search-table/type';
 
@@ -164,6 +170,7 @@ export default {
         PTextInput,
         PButton,
         PI,
+        PEmpty,
     },
     directives: {
         focus: {
@@ -204,14 +211,13 @@ export default {
             projectRole: '' as string,
             projectRoleList: [] as any[],
             memberLabel: '',
+            isSelected: false,
         });
         const validationState = reactive({
             isMemberValid: undefined as undefined | boolean,
             memberCheckInvalidText: '' as TranslateResult | string,
             isProjectRoleValid: undefined as undefined | boolean,
             projectRoleCheckInvalidText: '' as TranslateResult | string,
-            isLabelValid: undefined as undefined | boolean,
-            labelInvalidText: '' as TranslateResult | string,
         });
         const formState = reactive({
             tagTools: tagList(null),
@@ -257,6 +263,7 @@ export default {
         };
 
         const onSelect = (item) => {
+            state.isSelected = true;
             formState.tagTools.addTag(item.user_id);
         };
 
@@ -288,18 +295,11 @@ export default {
         };
 
         const addMemberLabel = () => {
+            if (formState.labelTagTools.tags.length >= 5) {
+                return;
+            }
             formState.labelTagTools.addTag(state.memberLabel);
             state.memberLabel = '';
-        };
-
-        const checkLabel = async () => {
-            if (formState.labelTagTools.tags.length > 5) {
-                validationState.isLabelValid = false;
-                validationState.labelInvalidText = 'Up to 5 labels';
-            } else {
-                validationState.isLabelValid = true;
-                validationState.labelInvalidText = '';
-            }
         };
 
         const confirm = async () => {
@@ -308,9 +308,8 @@ export default {
 
             await checkMember();
             await checkProjectRole();
-            await checkLabel();
 
-            if (validationState.isProjectRoleValid && validationState.isMemberValid && validationState.isLabelValid) {
+            if (validationState.isProjectRoleValid && validationState.isMemberValid) {
                 try {
                     await SpaceConnector.client.identity.project.member.add({
                         project_id: projectId,
@@ -397,6 +396,9 @@ export default {
     overflow: auto;
 }
 
+.empty-msg {
+    margin-top: 1.5rem;
+}
 
 .p-dropdown-menu-btn {
     @apply bg-white;
