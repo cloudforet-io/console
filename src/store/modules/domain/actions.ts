@@ -5,7 +5,7 @@ import { ExtendedAuthType } from './type';
 
 const EXTENDED_AUTH_TYPE_MAP = {
     google_oauth2: 'GOOGLE_OAUTH2',
-    keyclock: 'KEYCLOCK',
+    keycloak_oidc: 'KEYCLOAK',
 };
 
 const getExtendedAuthType = (authType): ExtendedAuthType | undefined => EXTENDED_AUTH_TYPE_MAP[authType];
