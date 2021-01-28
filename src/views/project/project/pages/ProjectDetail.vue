@@ -1,134 +1,136 @@
 <template>
     <general-page-layout>
-        <p-page-navigation :routes="pageNavigation" />
-        <div class="top-wrapper">
-            <p-page-title :title="item.name" child @goBack="$router.go(-1)" />
-            <div class="btns">
-                <span class="favorite-btn-wrapper">
-                    <favorite-button :item-id="projectId"
-                                     favorite-type="project"
-                                     resource-type="identity.Project"
+        <div class="page-inner">
+            <p-page-navigation :routes="pageNavigation" />
+            <div class="top-wrapper">
+                <p-page-title :title="item.name" child @goBack="$router.go(-1)" />
+                <div class="btns">
+                    <span class="favorite-btn-wrapper">
+                        <favorite-button :item-id="projectId"
+                                         favorite-type="project"
+                                         resource-type="identity.Project"
+                        />
+                    </span>
+                    <p-icon-button name="ic_transhcan"
+                                   width="1.5rem" height="1.5rem" class="delete-btn"
+                                   @click="openProjectDeleteForm"
                     />
-                </span>
-                <p-icon-button name="ic_transhcan"
-                               width="1.5rem" height="1.5rem" class="delete-btn"
-                               @click="openProjectDeleteForm"
-                />
-                <p-icon-button name="ic_edit-text"
-                               width="1.5rem" height="1.5rem" class="edit-btn"
-                               @click="openProjectEditForm"
-                />
-            </div>
-            <p class="copy-project-id">
-                <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
-                {{ projectId }}
-                <p-copy-button class="icon"
-                               :value="projectId"
-                />
-            </p>
-        </div>
-
-        <p-tab :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab"
-               class="tab-content"
-               :class="[singleItemTabState.activeTab]"
-        >
-            <template #summary>
-                <project-dashboard ref="ProjectDashboard" :project-id="projectId" />
-            </template>
-            <template #member>
-                <p-search-table class="member-tab"
-                                :shadow="false"
-                                :border="false"
-                                selectable
-                                :excel-visible="false"
-                                :fields="memberTableState.fields"
-                                :items="memberTableState.items"
-                                :select-index.sync="memberTableState.selectIndex"
-                                :loading="memberTableState.loading"
-                                :style="{height: '30rem', padding: 0}"
-                                @change="onChangeMemberTable"
-                >
-                    <template #toolbox-top>
-                        <p-panel-top :title="$t('PROJECT.DETAIL.MEMBER_TITLE')" use-total-count :total-count="memberTableState.totalCount" />
-                    </template>
-                    <template #toolbox-left>
-                        <p-icon-text-button style-type="primary-dark" class="mr-4 add-btn"
-                                            name="ic_plus_bold"
-                                            @click="openMemberAddForm()"
-                        >
-                            {{ $t('PROJECT.DETAIL.ADD') }}
-                        </p-icon-text-button>
-                        <p-dropdown-menu-btn
-                            class="mr-4"
-                            :menu="memberTableState.dropdownMenu"
-                            @click-delete="memberDeleteClick"
-                            @click-update="openMemberUpdateForm"
-                        >
-                            {{ $t('IDENTITY.USER.MAIN.ACTION') }}
-                        </p-dropdown-menu-btn>
-                    </template>
-                    <template #col-resource_id-format="{ value }">
-                        {{ users[value].name }}
-                    </template>
-                    <template #col-labels-format="{ value }">
-                        <p v-if="value.length === 0" />
-                        <p-badge v-for="(label, idx) in value" :key="idx" style-type="gray200"
-                                 class="mr-2"
-                        >
-                            {{ label }}
-                        </p-badge>
-                    </template>
-                </p-search-table>
-            </template>
-            <template #tag>
-                <tags-panel :resource-id="projectId"
-                            resource-key="project_id"
-                            resource-type="identity.Project"
-                            class="tab-bg"
-                />
-            </template>
-            <template #report>
-                <project-report-tab :project-id="projectId" :project-name="projectName" />
-            </template>
-        </p-tab>
-        <p-button-modal :header-title="headerTitle"
-                        :centered="true"
-                        :scrollable="false"
-                        size="md"
-                        :fade="true"
-                        :backdrop="true"
-                        :visible.sync="projectDeleteFormVisible"
-                        :theme-color="themeColor"
-                        :footer-confirm-button-bind="{
-                            styleType: 'alert',
-                        }"
-                        @confirm="projectDeleteFormConfirm"
-        >
-            <template #body>
-                <p class="delete-modal-content">
-                    {{ modalContent }}
+                    <p-icon-button name="ic_edit-text"
+                                   width="1.5rem" height="1.5rem" class="edit-btn"
+                                   @click="openProjectEditForm"
+                    />
+                </div>
+                <p class="copy-project-id">
+                    <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
+                    {{ projectId }}
+                    <p-copy-button class="icon"
+                                   :value="projectId"
+                    />
                 </p>
-            </template>
-        </p-button-modal>
-        <s-project-create-form-modal v-if="projectEditFormVisible" :visible.sync="projectEditFormVisible"
-                                     :update-mode="updateMode" :project-group-id="projectGroupId"
-                                     :current-project="projectName"
-                                     @confirm="projectEditFormConfirm($event)"
-        />
-        <s-project-member-add-modal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" @confirm="onAddMemberConfirm()" />
-        <project-member-update-modal v-if="memberUpdateFormVisible" :visible.sync="memberUpdateFormVisible" :selected-member="memberTableState.selectedItems[0]"
-                                     @confirm="onAddMemberConfirm"
-        />
-        <p-table-check-modal :fields="checkMemberDeleteState.fields"
-                             :mode="checkMemberDeleteState.mode"
-                             :items="checkMemberDeleteState.items"
-                             :header-title="checkMemberDeleteState.headerTitle"
-                             :sub-title="checkMemberDeleteState.subTitle"
-                             :theme-color="checkMemberDeleteState.themeColor"
-                             size="lg"
-                             :visible.sync="checkMemberDeleteState.visible"
-                             @confirm="memberDeleteConfirm"
-        />
+            </div>
+
+            <p-tab :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab"
+                   class="tab-content"
+                   :class="[singleItemTabState.activeTab]"
+            >
+                <template #summary>
+                    <project-dashboard ref="ProjectDashboard" :project-id="projectId" />
+                </template>
+                <template #member>
+                    <p-search-table class="member-tab"
+                                    :shadow="false"
+                                    :border="false"
+                                    selectable
+                                    :excel-visible="false"
+                                    :fields="memberTableState.fields"
+                                    :items="memberTableState.items"
+                                    :select-index.sync="memberTableState.selectIndex"
+                                    :loading="memberTableState.loading"
+                                    :style="{height: '30rem', padding: 0}"
+                                    @change="onChangeMemberTable"
+                    >
+                        <template #toolbox-top>
+                            <p-panel-top :title="$t('PROJECT.DETAIL.MEMBER_TITLE')" use-total-count :total-count="memberTableState.totalCount" />
+                        </template>
+                        <template #toolbox-left>
+                            <p-icon-text-button style-type="primary-dark" class="mr-4 add-btn"
+                                                name="ic_plus_bold"
+                                                @click="openMemberAddForm()"
+                            >
+                                {{ $t('PROJECT.DETAIL.ADD') }}
+                            </p-icon-text-button>
+                            <p-dropdown-menu-btn
+                                class="mr-4"
+                                :menu="memberTableState.dropdownMenu"
+                                @click-delete="memberDeleteClick"
+                                @click-update="openMemberUpdateForm"
+                            >
+                                {{ $t('IDENTITY.USER.MAIN.ACTION') }}
+                            </p-dropdown-menu-btn>
+                        </template>
+                        <template #col-resource_id-format="{ value }">
+                            {{ users[value].name }}
+                        </template>
+                        <template #col-labels-format="{ value }">
+                            <p v-if="value.length === 0" />
+                            <p-badge v-for="(label, idx) in value" :key="idx" style-type="gray200"
+                                     class="mr-2"
+                            >
+                                {{ label }}
+                            </p-badge>
+                        </template>
+                    </p-search-table>
+                </template>
+                <template #tag>
+                    <tags-panel :resource-id="projectId"
+                                resource-key="project_id"
+                                resource-type="identity.Project"
+                                class="tab-bg"
+                    />
+                </template>
+                <template #report>
+                    <project-report-tab :project-id="projectId" :project-name="projectName" />
+                </template>
+            </p-tab>
+            <p-button-modal :header-title="headerTitle"
+                            :centered="true"
+                            :scrollable="false"
+                            size="md"
+                            :fade="true"
+                            :backdrop="true"
+                            :visible.sync="projectDeleteFormVisible"
+                            :theme-color="themeColor"
+                            :footer-confirm-button-bind="{
+                                styleType: 'alert',
+                            }"
+                            @confirm="projectDeleteFormConfirm"
+            >
+                <template #body>
+                    <p class="delete-modal-content">
+                        {{ modalContent }}
+                    </p>
+                </template>
+            </p-button-modal>
+            <s-project-create-form-modal v-if="projectEditFormVisible" :visible.sync="projectEditFormVisible"
+                                         :update-mode="updateMode" :project-group-id="projectGroupId"
+                                         :current-project="projectName"
+                                         @confirm="projectEditFormConfirm($event)"
+            />
+            <s-project-member-add-modal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" @confirm="onAddMemberConfirm()" />
+            <project-member-update-modal v-if="memberUpdateFormVisible" :visible.sync="memberUpdateFormVisible" :selected-member="memberTableState.selectedItems[0]"
+                                         @confirm="onAddMemberConfirm"
+            />
+            <p-table-check-modal :fields="checkMemberDeleteState.fields"
+                                 :mode="checkMemberDeleteState.mode"
+                                 :items="checkMemberDeleteState.items"
+                                 :header-title="checkMemberDeleteState.headerTitle"
+                                 :sub-title="checkMemberDeleteState.subTitle"
+                                 :theme-color="checkMemberDeleteState.themeColor"
+                                 size="lg"
+                                 :visible.sync="checkMemberDeleteState.visible"
+                                 @confirm="memberDeleteConfirm"
+            />
+        </div>
     </general-page-layout>
 </template>
 
@@ -483,6 +485,10 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.page-inner {
+    max-width: 1368px;
+    margin: 0 auto;
+}
 .top-wrapper {
     @apply mb-8 flex flex-wrap items-center;
     .btns {
@@ -514,7 +520,6 @@ export default {
     }
 }
 .tab-content::v-deep {
-    max-width: 1368px;
     border: none;
     margin: auto;
 
