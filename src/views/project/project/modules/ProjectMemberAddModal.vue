@@ -356,7 +356,8 @@ export default {
 
 .tag-container {
     @apply border border-gray-200;
-    height: 3.625rem;
+    min-height: 3.625rem;
+    height: auto;
     padding: 0.5rem;
     border-radius: 0.125rem;
     background-color: theme('colors.white');
