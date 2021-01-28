@@ -568,6 +568,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "Add Service Account",
+				"EMPTY_CLOUD_SERVICE": "We need your registration for monitoring cloud resources.",
 				"FAVORITES": "Favorites",
 				"NO_REGION": "No Region",
 				"REGION": "Region",

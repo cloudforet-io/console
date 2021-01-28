@@ -141,7 +141,7 @@
                         <div v-if="!loading && totalCount === 0" class="text-center empty-cloud-service">
                             <img class="empty-cloud-service-img" src="@/assets/images/illust_satellite.svg">
                             <p class="text-primary2 mb-12">
-                                We need your registration for monitoring cloud resources.
+                                {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.EMPTY_CLOUD_SERVICE') }}
                             </p>
                             <router-link :to="`/identity/service-account/?provider=${selectedProvider}`">
                                 <p-icon-text-button style-type="primary" name="ic_plus_bold"

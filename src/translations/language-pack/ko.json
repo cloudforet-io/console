@@ -568,6 +568,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "서비스 계정 추가",
+				"EMPTY_CLOUD_SERVICE": "",
 				"FAVORITES": "즐겨찾기",
 				"NO_REGION": "리전이 없습니다.",
 				"REGION": "지역",
