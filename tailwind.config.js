@@ -1,7 +1,7 @@
 const _ = require('lodash');
 const plugin = require('tailwindcss/plugin');
 const defaultTheme = require('tailwindcss/defaultTheme');
-const colors = require('./src/styles/colors');
+const colors = require('./src/styles/colors').tailwindColors;
 
 const rawSize = Array(32)
     .fill('')

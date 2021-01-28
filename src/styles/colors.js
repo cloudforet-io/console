@@ -161,7 +161,16 @@ forEach(colorSet, (d, k) => { kebabColors[kebabCase(k)] = d; });
 
 
 module.exports = {
+    /* color sets */
+    tailwindColors: {
+        ...semanticColors,
+        ...colorSet,
+        ...kebabColors,
+    },
+    palette,
+    semanticColors,
+
+    /* colors */
     ...semanticColors,
     ...colorSet,
-    ...kebabColors,
 };
