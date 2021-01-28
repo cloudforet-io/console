@@ -1,11 +1,10 @@
-import Vue from 'vue';
 import VueI18n, { LocaleMessageObject } from 'vue-i18n';
 
 
 import ko from '@/translations/language-pack/ko.json';
 import en from '@/translations/language-pack/en.json';
 import ja from '@/translations/language-pack/ja.json';
-
+import Vue from 'vue';
 
 Vue.use(VueI18n);
 
@@ -19,13 +18,15 @@ const removeEmpty = (obj: object | any): LocaleMessageObject => Object.keys(obj)
         {},
     );
 
+export const messages = {
+    en: removeEmpty({ COMPONENT: en }),
+    ko: removeEmpty({ COMPONENT: ko }),
+    jp: removeEmpty({ COMPONENT: ja }),
+};
+
 export const i18n = new VueI18n({
     locale: 'en', // set locale
     fallbackLocale: 'en',
-    messages: {
-        en: removeEmpty({ COMPONENT: en }),
-        ko: removeEmpty({ COMPONENT: ko }),
-        jp: removeEmpty({ COMPONENT: ja }),
-    },
+    messages,
     silentFallbackWarn: true,
 });

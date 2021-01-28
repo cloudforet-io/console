@@ -73,14 +73,15 @@ export default defineComponent({
         line-height: 1.6;
         max-height: 33vh;
         overflow-y: scroll;
+        text-align: left;
     }
     .close-btn {
-        @apply text-gray-400;
+        @apply text-gray-400 border-0;
         margin-left: -3.5rem;
         flex-shrink: 0;
         z-index: 1;
         &.p-icon-button.p-button:not(.disabled):hover {
-            @apply bg-gray-700 border-gray-700 text-gray-400;
+            @apply bg-transparent text-gray-400;
         }
     }
     .slide-enter-active, .slide-leave-active {
@@ -92,13 +93,6 @@ export default defineComponent({
     }
 
     /* responsible size */
-
-    @screen 2xs {
-        .contents-wrapper {
-            text-align: left;
-        }
-    }
-
     @screen lg {
         .contents-wrapper {
             text-align: center;

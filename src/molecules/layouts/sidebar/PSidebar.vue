@@ -79,17 +79,34 @@ export default defineComponent({
 .p-sidebar {
     position: relative;
     display: flex;
+    flex-direction: column;
     height: 100vh;
     width: 100vw;
     max-height: 100%;
     max-width: 100%;
     overflow: hidden;
 
+    .non-sidebar-wrapper {
+        overflow-y: auto;
+        width: 100%;
+    }
+    $max-height: 20rem;
     .sidebar-wrapper {
-        @apply bg-white;
+        @apply bg-white border-gray-200;
+        position: fixed;
+        height: 32vh;
+        max-height: $(max-height);
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        min-width: unset;
+        z-index: 99;
+        border-top-width: 1px;
+
         padding: 1.5rem 0;
         box-shadow: 0 0 0.5rem rgba(theme('colors.black'), 0.08);
         overflow: hidden;
+
         .inner {
             padding: 0 1.5rem;
             overflow-y: auto;
@@ -100,7 +117,7 @@ export default defineComponent({
             width: calc(100% - 2rem);
             min-height: 2rem;
             font-size: 1.125rem;
-            line-height: 1.4;
+            line-height: 2;
         }
         .close-btn {
             @apply absolute text-gray-400;
@@ -113,42 +130,14 @@ export default defineComponent({
         transition: all 0.2s linear;
     }
 
-    /* responsible size */
-
-    @screen 2xs {
-        flex-direction: column;
-
-        .non-sidebar-wrapper {
-            flex-grow: 1;
-            overflow-y: auto;
-            width: 100%;
-        }
-
-        $max-height: 20rem;
-        .sidebar-wrapper {
-            position: fixed;
-            height: 32%;
-            max-height: $(max-height);
-            bottom: 0;
-            left: 0;
-            width: 100vw;
-            min-width: unset;
-            z-index: 99999;
-        }
-        .slide-fade-enter, .slide-fade-leave-to {
-            transform: translateY($(max-height));
-            opacity: 0;
-        }
+    .slide-fade-enter, .slide-fade-leave-to {
+        transform: translateY($(max-height));
+        opacity: 0;
     }
 
     @screen lg {
         flex-direction: row;
 
-        .non-sidebar-wrapper {
-            flex-grow: 1;
-            overflow-y: auto;
-            width: auto;
-        }
         $min-width: 20rem;
         .sidebar-wrapper {
             position: static;
@@ -158,6 +147,8 @@ export default defineComponent({
             min-width: $(min-width);
             z-index: unset;
             flex-shrink: 0;
+            border-top-width: 0;
+            border-left-width: 1px;
         }
         .slide-fade-enter, .slide-fade-leave-to {
             margin-left: -25%;

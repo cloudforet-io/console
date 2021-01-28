@@ -1,5 +1,5 @@
 import { PluginObject, VueConstructor } from 'vue';
-import VueI18n, { LocaleMessageObject } from 'vue-i18n';
+import VueI18n from 'vue-i18n';
 import velocity from 'velocity-animate';
 import SvgIcon from 'vue-svgicon';
 import VueCompositionApi from '@vue/composition-api';
@@ -7,21 +7,7 @@ import Notifications from 'vue-notification';
 import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
 import '@/styles/style.pcss';
-
-import componentKO from '@/translations/language-pack/ko.json';
-import componentEN from '@/translations/language-pack/en.json';
-import componentJA from '@/translations/language-pack/ja.json';
-
-
-// simple recursive remove keys with empty value.
-const removeEmpty = (obj: object | any): LocaleMessageObject => Object.keys(obj)
-    .filter((k: string) => obj[k] !== null && obj[k] !== undefined && obj[k] !== '') // Remove undef. and null and empty.string.
-    .reduce(
-        (newObj, k) => (typeof obj[k] === 'object'
-            ? Object.assign(newObj, { [k]: removeEmpty(obj[k]) }) // Recurse.
-            : Object.assign(newObj, { [k]: obj[k] })), // Copy value.
-        {},
-    );
+import { i18n } from '@/translations';
 
 interface SpaceoneDSOptions {
     appSelector?: string;
@@ -41,30 +27,17 @@ const SpaceoneDS: PluginObject<SpaceoneDSOptions> = {
         _Vue.use(Fragment.Plugin);
         _Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
 
-
-        const i18n = new VueI18n({
-            locale: 'en', // set locale
-            fallbackLocale: 'en',
-            messages: {
-                en: removeEmpty({ COMPONENT: componentEN }),
-                ko: removeEmpty({ COMPONENT: componentKO }),
-                jp: removeEmpty({ COMPONENT: componentJA }),
-            },
-            silentFallbackWarn: true,
-        });
-
-        new _Vue({ i18n }).$mount(options?.appSelector || '#app');
+        _Vue.prototype.$spaceoneDS = { lang: i18n };
     },
 };
 
-// Vue.use(SpaceoneDS);
-// Object.keys(components).forEach((name) => {
-//     Vue.component(name, components[name]);
-// });
 
 export default SpaceoneDS;
 
+/* Languages */
+export { messages } from './translations';
 
+/* Components */
 export { default as PBackToTopButton } from './atoms/back-to-top-button/PBackToTopButton.vue';
 export { default as PBadge } from './atoms/badges/PBadge.vue';
 export { default as PButton } from './atoms/buttons/PButton.vue';
