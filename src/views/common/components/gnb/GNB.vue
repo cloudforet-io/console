@@ -1,23 +1,25 @@
 <template>
-    <div class="menu-container">
+    <div class="gnb" :class="{'disabled': !hasPermission}">
         <div class="left-part">
             <div class="site-map-wrapper">
-                <site-map :menu-list="menuList" :visible.sync="siteMapVisible" />
+                <site-map :menu-list="menuList" :visible.sync="showSiteMap" :disabled="!hasPermission" />
             </div>
-            <router-link to="/dashboard">
+            <component :is="hasPermission ? 'router-link' : 'div'"
+                       class="inline-block" :to="dashboardLink"
+            >
                 <div class="logo-wrapper mr-4 lg:mr-10">
                     <img class="brand-logo" src="@/assets/images/brand/brand_logo.svg">
                     <img class="brand-logo-text hidden lg:inline-block"
                          src="@/assets/images/brand/SpaceONE_logoTypeA.svg"
                     >
                 </div>
-            </router-link>
+            </component>
             <div v-for="(menu, idx) in menuList"
                  :key="idx"
                  class="menu-wrapper hidden md:inline-block"
             >
                 <div v-if="menu.show !== false"
-                     class="menu-button opacity mr-4 lg:mr-8"
+                     class="menu-button mr-4 lg:mr-8"
                      :class="[{
                          opened: menu.subMenuList.length > 0 && openedMenu === menu.name,
                          selected: menu.name === selectedMenu
@@ -32,9 +34,12 @@
                              color="inherit transparent"
                         />
                     </span>
-                    <router-link v-else :to="menu.to" class="block">
+                    <component :is="hasPermission ? 'router-link' : 'span'"
+                               v-else
+                               :to="menu.to" class="block"
+                    >
                         <span>{{ menu.label }}</span>
-                    </router-link>
+                    </component>
                     <div v-if="openedMenu === menu.name && menu.subMenuList.length > 0"
                          v-click-outside="hideMenu"
                          class="sub-menu-wrapper"
@@ -52,108 +57,30 @@
             </div>
         </div>
 
-        <div class="right-part">
-            <div class="menu-wrapper support">
-                <div class="menu-button opacity"
-                     :class="{opened: openedMenu === 'support'}"
-                     @click.stop="toggleMenu('support')"
-                >
-                    <p-i class="menu-icon"
-                         name="ic_support"
-                         color="inherit transparent"
-                    />
-                </div>
-                <div v-if="openedMenu === 'support'"
-                     v-click-outside="hideMenu"
-                     class="sub-menu-wrapper right-align"
-                >
-                    <p-anchor v-for="(item, index) in supportMenu" :key="index"
-                              :href="item.link" target="_blank"
-                              :show-icon="false"
-                              class="sub-menu"
-                    >
-                        <span>{{ item.label }}</span>
-                        <p-i class="external-link-icon" name="ic_external-link"
-                             width="0.875rem" height="0.875rem"
-                        />
-                    </p-anchor>
-                </div>
-            </div>
-            <div class="menu-wrapper account ml-6">
-                <div class="menu-button account"
-                     @click.stop="toggleMenu('account')"
-                >
-                    <div class="menu-icon"
-                         :class="[{opened: openedMenu === 'account'}, userState.isDomainOwner ? 'admin' : 'member']"
-                    />
-                </div>
-                <div v-if="openedMenu === 'account'"
-                     v-click-outside="hideMenu"
-                     class="sub-menu-wrapper right-align account"
-                >
-                    <div class="info-wrapper">
-                        <div class="info-row">
-                            <p-i v-if="userState.isDomainOwner" class="icon" name="admin" />
-                            <p-i v-else class="icon" name="user" />
-                            <span class="value">{{ userState.userId }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_ROLE') }}</span>
-                            <span class="value">{{ userState.role }}</span>
-                        </div>
-                        <div class="info-row">
-                            <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_TIMEZONE') }}</span>
-                            <span class="value">{{ userState.timezone }}</span>
-                        </div>
-                        <div class="info-row language"
-                             @click="toggleLanguageMenu"
-                        >
-                            <span class="label">{{ $t('COMMON.GNB.ACCOUNT.LABEL_LANGUAGE') }}</span>
-                            <div class="value">
-                                <span>{{ userState.language }}</span>
-                                <div v-if="showLanguageMenu" class="sub-menu-wrapper">
-                                    <template v-for="(item, index) in languageMenu" @click.native="hideMenu">
-                                        <div :key="index" class="sub-menu" @click="changeLanguage(item.name)">
-                                            <span>{{ item.label }}</span>
-                                        </div>
-                                    </template>
-                                </div>
-                            </div>
-                            <p-i :name="showLanguageMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
-                                 width="1rem" height="1rem"
-                            />
-                        </div>
-                        <p-hr />
-                    </div>
-                    <div class="sub-menu" @click="openProfile">
-                        <span>{{ $t('COMMON.GNB.ACCOUNT.LABEL_PROFILE') }}</span>
-                    </div>
-                    <div class="sub-menu" @click="signOut">
-                        <span>{{ $t('COMMON.GNB.ACCOUNT.LABEL_SIGN_OUT') }}</span>
-                    </div>
-                </div>
-            </div>
-        </div>
+        <right-side-menu class="right-part"
+                         :opened-menu="openedMenu"
+                         @toggle-menu="toggleMenu"
+                         @hide-menu="hideMenu"
+        />
     </div>
 </template>
 
 <script lang="ts">
 import vClickOutside from 'v-click-outside';
 import { TranslateResult } from 'vue-i18n';
+import { includes } from 'lodash';
 
 import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import { PAnchor, PI, PHr } from '@spaceone/design-system';
+import { PI } from '@spaceone/design-system';
 
 import SiteMap from '@/views/common/components/gnb/SiteMap.vue';
+import RightSideMenu from '@/views/common/components/gnb/RightSideMenu.vue';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { Location } from 'vue-router';
 import { store } from '@/store';
-import { languages } from '@/store/modules/user/config';
-import router from '@/routes';
 
 
 enum PARENT_CATEGORY {
@@ -179,43 +106,33 @@ interface Menu {
     subMenuList: SubMenu[];
 }
 
+const ALLOWED_MENUS_FOR_ALL_USERS = ['support', 'account'];
+
 export default {
     name: 'GNB',
     components: {
-        PHr,
-        PAnchor,
-        PI,
         SiteMap,
+        RightSideMenu,
+        PI,
     },
     directives: {
         clickOutside: vClickOutside.directive,
     },
-    setup(props, { root }) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const userState = reactive({
-            name: computed(() => store.state.user.name),
-            email: computed(() => store.state.user.email),
-            role: computed(() => {
-                const roleArray = store.getters['user/getRoleNames'];
-                return roleArray.join(', ');
-            }),
-            language: computed(() => store.getters['user/languageLabel']),
-            timezone: computed(() => store.state.user.timezone),
-            userId: computed(() => store.state.user.userId),
-            isAdmin: computed((() => store.getters['user/isAdmin'])),
-            isDomainOwner: computed(() => store.getters['user/isDomainOwner']),
-        });
         const state = reactive({
             openedMenu: null,
-            siteMapVisible: false,
-            profileVisible: false,
+            showSiteMap: false,
             showAutomation: store.state.user.powerSchedulerState,
             showLanguageMenu: false,
+            isAdmin: computed((() => store.getters['user/isAdmin'])),
+            hasPermission: computed((() => store.getters['user/hasPermission'])),
+            dashboardLink: computed(() => (state.hasPermission ? { name: 'dashboard' } : {})),
             menuList: computed<Menu[]>(() => [
                 {
                     name: PARENT_CATEGORY.project,
                     label: vm.$t('MENU.PROJECT.PROJECT'),
-                    to: { name: 'projectMain' },
+                    to: state.hasPermission ? { name: 'projectMain' } : {},
                     subMenuList: [],
                 },
                 {
@@ -237,7 +154,7 @@ export default {
                             to: { name: 'serviceAccount' },
                             show: true,
                         },
-                        { label: vm.$t('MENU.IDENTITY.USER'), to: { name: 'userManagement' }, show: userState.isAdmin },
+                        { label: vm.$t('MENU.IDENTITY.USER'), to: { name: 'userManagement' }, show: state.isAdmin },
                     ],
                 },
                 {
@@ -264,87 +181,43 @@ export default {
                     label: vm.$t('MENU.MANAGEMENT.MANAGEMENT'),
                     to: { name: 'collectorHistory' },
                     subMenuList: [
-                        { label: vm.$t('MENU.MANAGEMENT.PLUGIN'), to: { name: 'supervisorPlugins' }, show: userState.isAdmin },
+                        { label: vm.$t('MENU.MANAGEMENT.PLUGIN'), to: { name: 'supervisorPlugins' }, show: state.isAdmin },
                         {
                             label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), to: { name: 'collectorHistory' }, isNew: true, show: true,
                         },
                     ],
                 },
             ]),
-            supportMenu: computed(() => [
-                { label: vm.$t('COMMON.GNB.SUPPORT.LABEL_USER_GUIDE'), link: 'https://spaceone-dev.gitbook.io/user-guide/' },
-                { label: vm.$t('COMMON.GNB.SUPPORT.LABEL_API_GUIDE'), link: 'https://spaceone-dev.gitbook.io/spaceone-apis' },
-                { label: vm.$t('COMMON.GNB.SUPPORT.LABEL_GITHUB'), link: 'https://github.com/spaceone-dev' },
-            ]),
             selectedMenu: computed(() => {
                 const pathRegex = vm.$route.path.match(/\/(\w+)/);
                 return pathRegex ? pathRegex[1] : null;
             }),
-            languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
-                label: v, name: k,
-            }))),
         });
 
         /* event */
         const hideMenu = () => {
             state.openedMenu = null;
-            state.showLanguageMenu = false;
-        };
-        const showMenu = (menu) => {
-            state.openedMenu = menu;
-            state.siteMapVisible = false;
         };
         const toggleMenu = (menu) => {
             if (state.openedMenu === menu) {
                 hideMenu();
-            } else {
-                showMenu(menu);
-            }
-        };
-        const toggleLanguageMenu = () => {
-            state.showLanguageMenu = !state.showLanguageMenu;
-        };
-        const openProfile = () => {
-            hideMenu();
-            vm.$router.replace({ name: 'userAccount' }).catch(() => {});
-        };
-
-        /* action */
-        const signOut = async () => {
-            const res: Location = {
-                name: 'SignOut',
-            };
-            await router.push(res);
-        };
-        const changeLanguage = async (language) => {
-            try {
-                await store.dispatch('user/setUser', {
-                    language,
-                    timezone: userState.timezone,
-                });
-                showSuccessMessage(vm.$t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '', root);
-                hideMenu();
-            } catch (e) {
-                showErrorMessage(vm.$t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'), e, root);
+            } else if (state.hasPermission || includes(ALLOWED_MENUS_FOR_ALL_USERS, menu)) {
+                state.openedMenu = menu;
+                state.showSiteMap = false;
             }
         };
 
         return {
             ...toRefs(state),
-            userState,
             hideMenu,
             toggleMenu,
-            toggleLanguageMenu,
-            openProfile,
-            changeLanguage,
-            signOut,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-.menu-container {
+.gnb {
     @apply bg-white;
     display: flex !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
@@ -376,7 +249,6 @@ export default {
         right: 0;
         padding-right: 1.5rem;
     }
-
     .menu-wrapper {
         position: relative;
 
@@ -386,10 +258,8 @@ export default {
             cursor: pointer;
             text-decoration: none;
             text-transform: capitalize;
+            opacity: 0.5;
 
-            &.opacity {
-                opacity: 0.5;
-            }
             &.opened {
                 @apply text-primary;
                 opacity: 1;
@@ -402,9 +272,6 @@ export default {
                 opacity: 1;
             }
 
-            .menu-icon {
-                border-radius: 0.625rem;
-            }
             .arrow-button {
                 margin-left: 0.25rem;
             }
@@ -419,14 +286,7 @@ export default {
             border-radius: 0.125rem;
             padding: 0.5rem;
             margin: 3px 0;
-            &.right-align {
-                right: 0;
-                left: auto;
-                line-height: 1rem;
-            }
-            &.account {
-                min-width: 15.125rem;
-            }
+
             .sub-menu {
                 @apply text-gray-900;
                 position: relative;
@@ -445,60 +305,6 @@ export default {
                 &:active {
                     @apply bg-white;
                 }
-                .external-link-icon {
-                    position: absolute;
-                    top: 0.5rem;
-                    right: 1rem;
-                }
-            }
-            .info-wrapper {
-                padding: 1rem 0.5rem 0.5rem 0.5rem;
-                .info-row {
-                    position: relative;
-                    line-height: 1.5rem;
-                    font-size: 0.75rem;
-
-                    &:first-child {
-                        @apply text-primary;
-                        font-size: 0.875rem;
-                        padding-bottom: 1rem;
-                    }
-                    &.language {
-                        display: inline-flex;
-                        cursor: pointer;
-                        &:hover, &:focus {
-                            @apply bg-primary4 text-primary;
-                            border-radius: 0.125rem;
-                        }
-                        .p-i-icon {
-                            display: inline-block;
-                            margin-top: 0.25rem;
-                        }
-                        .value {
-                            position: relative;
-                            .sub-menu-wrapper {
-                                top: 1.5rem;
-                                left: -1rem;
-                                min-width: 9.25rem;
-                                max-height: 21rem;
-                                overflow-y: auto;
-                                z-index: 10;
-                            }
-                        }
-                    }
-
-                    .icon {
-                        border-radius: 0.625rem;
-                        margin-right: 0.5rem;
-                    }
-                    .label {
-                        @apply text-gray-500 font-bold;
-                        padding-right: 0.5rem;
-                    }
-                }
-                .p-hr {
-                    margin-top: 1rem;
-                }
             }
             .new-text {
                 font-size: 0.75rem;
@@ -510,30 +316,20 @@ export default {
                 margin-left: 0.25rem;
             }
         }
-        &.account {
-            .p-context-menu {
-                min-width: 15.125rem;
+    }
+
+    &.disabled {
+        .menu-button {
+            @apply text-gray-900;
+            cursor: not-allowed;
+            opacity: 0.2;
+
+            &.selected {
+                opacity: 0.2;
             }
-            .menu-button {
-                .menu-icon {
-                    width: 2rem;
-                    height: 2rem;
-                    overflow: hidden;
-                    background-size: cover;
-                    box-shadow: inset 0 0 0 2px theme('colors.gray.200');
-                    margin-top: 0.5rem;
-
-                    &.admin {
-                        background: url('~@/assets/icons/admin.svg') no-repeat center center;
-                    }
-                    &.member {
-                        background: url('~@/assets/icons/user.svg') no-repeat center center;
-                    }
-
-                    &.opened {
-                        box-shadow: inset 0 0 0 2px theme('colors.primary');
-                    }
-                }
+            &:hover {
+                @apply text-gray-900;
+                opacity: 0.2;
             }
         }
     }
