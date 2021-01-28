@@ -99,8 +99,10 @@ export const Template = (args, { argTypes }) => ({
     components: { PDynamicLayout },
     i18n,
     template: `
-        <p-dynamic-layout :type="type" :options="options" :data="data">
-        </p-dynamic-layout>
+            <p-dynamic-layout v-bind="$props"
+                               class="w-full"
+            >
+            </p-dynamic-layout>
     `,
     setup() {
         return {}
@@ -141,10 +143,25 @@ export const Template = (args, { argTypes }) => ({
 ## html type
 
 <Canvas>
-    <Story name="html type">
+    <Story name="html type" argTypes={{
+        data: {
+            name: 'data',
+            type: {name: 'string'},
+            defaultValue: '',
+            control: {
+                type: 'text'
+            }
+        }
+    }} args={{
+        type: 'html',
+        data: mock.html.data,
+        options: {}
+    }}>
         {Template.bind({})}
     </Story>
 </Canvas>
+
+<ArgsTable story="html type"/>
 
 <br/>
 <br/>

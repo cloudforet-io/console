@@ -164,7 +164,6 @@ module.exports = {
     /* color sets */
     tailwindColors: {
         ...semanticColors,
-        ...colorSet,
         ...kebabColors,
     },
     palette,
