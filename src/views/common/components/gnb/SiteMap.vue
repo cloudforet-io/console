@@ -135,7 +135,7 @@ export default {
         font-size: 0.875rem;
         box-shadow: 0 0 14px rgba(0, 0, 0, 0.1);
         overflow-y: auto;
-        z-index: 10;
+        z-index: 999;
         padding: 1.5rem 0;
         margin-left: 1.5rem;
         ul:first-child .menu {

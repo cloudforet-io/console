@@ -8,9 +8,9 @@
         <p-notice-alert group="noticeBottomLeft" position="bottom left" />
         <p-notice-alert group="noticeBottomRight" position="bottom right" />
         <p-toast-alert group="toastTopCenter" position="top center" />
-        <top-notification v-if="!$store.getters['user/hasNoRole']">
+        <top-notification v-if="$store.getters['user/hasPermission']">
             <i18n path="APP.TOP_NOTI.HAS_NO_ROLE">
-                <template #role>
+                <template #needRole>
                     <strong>{{ $t('APP.TOP_NOTI.NEED_ROLE') }}</strong>
                 </template>
             </i18n>
@@ -87,8 +87,8 @@ export default defineComponent({
             await router.push(res);
         };
 
-        watch(() => vm.$store.getters['user/hasNoRole'], (hasNoRole) => {
-            if (hasNoRole && vm.$route.name !== 'userAccount') {
+        watch(() => vm.$store.getters['user/hasPermission'], (hasPermission) => {
+            if (!hasPermission && vm.$route.name !== 'userAccount') {
                 vm.$router.replace({ name: 'userAccount' });
             }
         }, { immediate: true });

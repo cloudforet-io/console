@@ -47,6 +47,6 @@ export const getRoleNames = (state: UserState): Array<string> => {
     if (projectRoleNames.length > 0) {
         return projectRoleNames;
     }
-    return [];
+    return ['No Role'];
 };
-export const hasNoRole = (state: UserState, getters): boolean => !getters.getRoleNames.length;
+export const hasPermission = (state: UserState): boolean => !!state.roles?.length;

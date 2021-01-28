@@ -1,52 +1,50 @@
 <template>
-    <fragment>
-        <vertical-page-layout :min-width="0" :init-width="260" :max-width="400">
-            <template #sidebar>
-                <div class="member-profile">
-                    <p-i :name="userState.isDomainOwner ? 'admin' : 'user'" width="3rem" height="3rem"
-                         class="member-icon"
-                    />
-                    <p class="member-id">
-                        {{ userState.userId }}
-                    </p>
-                    <p v-if="userState.isDomainOwner" class="member-type">
-                        {{ $t('IDENTITY.USER.MAIN.SPACEONE_ADMIN') }}
-                    </p>
-                    <p v-else class="member-type">
-                        {{ $t('IDENTITY.USER.MAIN.SPACEONE_USER') }}
-                    </p>
-                </div>
+    <vertical-page-layout :min-width="0" :init-width="260" :max-width="400">
+        <template #sidebar>
+            <div class="member-profile">
+                <p-i :name="userState.isDomainOwner ? 'admin' : 'user'" width="3rem" height="3rem"
+                     class="member-icon"
+                />
+                <p class="member-id">
+                    {{ userState.userId }}
+                </p>
+                <p v-if="userState.isDomainOwner" class="member-type">
+                    {{ $t('IDENTITY.USER.MAIN.SPACEONE_ADMIN') }}
+                </p>
+                <p v-else class="member-type">
+                    {{ $t('IDENTITY.USER.MAIN.SPACEONE_USER') }}
+                </p>
+            </div>
+            <div class="menu-title">
+                {{ $t('IDENTITY.USER.MAIN.MY_ACCOUNT') }}
+            </div>
+            <p-hr class="menu-divider" />
+            <div v-for="(item) in sidebarState.userMenuList" :key="item.label"
+                 class="menu-item"
+                 :class="{'selected': item.label === sidebarState.selectedItem}"
+                 @click="showAccountPage(item)"
+            >
+                {{ item.label }}
+            </div>
+            <div v-if="userState.isAdmin" class="admin-menu-wrapper">
                 <div class="menu-title">
-                    {{ $t('IDENTITY.USER.MAIN.MY_ACCOUNT') }}
+                    {{ $t('IDENTITY.USER.MAIN.ADMINISTRATOR') }}
                 </div>
                 <p-hr class="menu-divider" />
-                <div v-for="(item) in sidebarState.userMenuList" :key="item.label"
+                <div v-for="(item) in sidebarState.adminMenuList"
+                     :key="item.label"
                      class="menu-item"
                      :class="{'selected': item.label === sidebarState.selectedItem}"
-                     @click="showAccountPage(item)"
+                     @click="showManagementPage(item)"
                 >
-                    {{ item.label }}
+                    {{ $t('IDENTITY.USER.MAIN.USER_MANAGEMENT') }}
                 </div>
-                <div v-if="userState.isAdmin" class="admin-menu-wrapper">
-                    <div class="menu-title">
-                        {{ $t('IDENTITY.USER.MAIN.ADMINISTRATOR') }}
-                    </div>
-                    <p-hr class="menu-divider" />
-                    <div v-for="(item) in sidebarState.adminMenuList"
-                         :key="item.label"
-                         class="menu-item"
-                         :class="{'selected': item.label === sidebarState.selectedItem}"
-                         @click="showManagementPage(item)"
-                    >
-                        {{ $t('IDENTITY.USER.MAIN.USER_MANAGEMENT') }}
-                    </div>
-                </div>
-            </template>
-            <template #default>
-                <router-view />
-            </template>
-        </vertical-page-layout>
-    </fragment>
+            </div>
+        </template>
+        <template #default>
+            <router-view />
+        </template>
+    </vertical-page-layout>
 </template>
 
 <script lang="ts">
