@@ -1,8 +1,8 @@
 {
 	"APP": {
 		"TOP_NOTI": {
-			"HAS_NO_ROLE": "",
-			"NEED_ROLE": ""
+			"HAS_NO_ROLE": "Space  ONE使用のため{need  Role}です。管理者(Administrator)にお問い合わせください。",
+			"NEED_ROLE": "権限(Role)が必要"
 		}
 	},
 	"AUTOMATION": {
@@ -172,7 +172,7 @@
 			}
 		},
 		"INFO_BUTTON": {
-			"INFO": ""
+			"INFO": "Info"
 		},
 		"MONITORING": {
 			"DISPLAY_TIMEZONE": "{timezone}に表示されます",
@@ -351,7 +351,7 @@
 			"RESOURCE_BY_REGION_SERVER": "サーバ",
 			"RESOURCE_BY_REGION_TITLE": "リージョン別リソース",
 			"RESOURCE_MAP": {
-				"NO_REGION": " 選択リージョンの使用中のリソースがありません。 "
+				"NO_REGION": "選択リージョンに使用中のサービスがありません。"
 			},
 			"RUN_COLLECTOR": "コレクタを実行",
 			"RUN_COLLECTOR_COLLECTOR": "コレクタ",
@@ -568,7 +568,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "サービスアカウントの追加",
-				"EMPTY_CLOUD_SERVICE": "",
+				"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",
 				"FAVORITES": "お気に入り",
 				"NO_REGION": "リージョンがありません。",
 				"REGION": "リージョン",
@@ -870,7 +870,7 @@
 				"RECENT": "日付順に並べ替え",
 				"REPOSITORY_LABEL": "プラグインストア",
 				"RESOURCE_TYPE_LABEL": "リソースタイプ",
-				"SEARCH": "",
+				"SEARCH": "検索",
 				"SEARCH_PLACEHOLDER": "キーワードを入力",
 				"TITLE": "プラグインリスト"
 			}

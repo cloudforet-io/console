@@ -1,7 +1,7 @@
 {
 	"APP": {
 		"TOP_NOTI": {
-			"HAS_NO_ROLE": "스페이스원 사용을 위해서는 {needRole}합니다.\n관리자(Administrator)를 통해 필요한 권한을 받으세요.",
+			"HAS_NO_ROLE": "스페이스원 사용을 위해서는 {needRole}  합니다.\n관리자(Administrator)를 통해 필요한 권한을 받으세요.",
 			"NEED_ROLE": "권한(Role)이 필요"
 		}
 	},
@@ -172,7 +172,7 @@
 			}
 		},
 		"INFO_BUTTON": {
-			"INFO": ""
+			"INFO": "Info"
 		},
 		"MONITORING": {
 			"DISPLAY_TIMEZONE": "{timezone}으로 보여줍니다.",
@@ -568,7 +568,7 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "서비스 계정 추가",
-				"EMPTY_CLOUD_SERVICE": "",
+				"EMPTY_CLOUD_SERVICE": "클라우드 서비스를 이용하려면 서비스 계정을 추가해주세요. ",
 				"FAVORITES": "즐겨찾기",
 				"NO_REGION": "리전이 없습니다.",
 				"REGION": "지역",
@@ -870,7 +870,7 @@
 				"RECENT": "최신순으로 정렬",
 				"REPOSITORY_LABEL": "플러그인 저장소",
 				"RESOURCE_TYPE_LABEL": "리소스 타입",
-				"SEARCH": "",
+				"SEARCH": "검색",
 				"SEARCH_PLACEHOLDER": "키워드 입력",
 				"TITLE": "플러그인 목록"
 			}
