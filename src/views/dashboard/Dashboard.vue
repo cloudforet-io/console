@@ -101,6 +101,7 @@ export default {
 <style lang="postcss" scoped>
 .dashboard::v-deep {
     @apply bg-gray-100;
+    height: auto;
     .page-contents {
         @apply grid grid-flow-row grid-cols-12 p-6 mx-auto;
         max-width: 1368px;

@@ -1,12 +1,12 @@
 <template>
-    <div class="grid grid-cols-12 gap-3 project-dashboard">
+    <div class="grid grid-cols-12 project-dashboard">
         <project-all-summary class="col-span-12" :project-id="projectId" />
-        <div class="col-span-12 lg:col-span-9 inline-grid grid-cols-12 gap-3 left-part">
+        <div class="col-span-12 lg:col-span-9 inline-grid grid-cols-12 left-part">
             <project-billing class="col-span-12" :project-id="projectId" />
             <project-personal-health-dashboard class="col-span-12" :providers="providers" :project-id="projectId" />
             <service-accounts-table class="col-span-12 service-accounts-table" :project-id="projectId" />
         </div>
-        <div class="col-span-12 lg:col-span-3 inline-grid grid-cols-12 gap-3 right-part">
+        <div class="col-span-12 lg:col-span-3 inline-grid grid-cols-12 right-part">
             <daily-updates class="col-span-12 daily-updates"
                            :project-id="projectId"
                            :project-filter="projectFilter"
@@ -89,10 +89,12 @@ export default {
 }
 
 .project-dashboard {
+    grid-gap: 1.5rem;
+
     .left-part, .right-part {
         display: inline-grid;
         grid-auto-rows: max-content;
-        grid-gap: 1.25rem;
+        grid-gap: 1.5rem;
     }
 
     .cloud-services {

@@ -301,7 +301,6 @@ export default {
 .project-personal-health-dashboard {
     .title {
         margin-bottom: 0.75rem;
-        margin-top: 0.875rem;
         font-size: 1.5rem;
         line-height: 1.4;
     }
