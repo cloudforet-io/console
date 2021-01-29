@@ -661,7 +661,7 @@ export default {
                 font-size: 0.75rem;
                 &:first-child {
                     @apply bg-white;
-                    width: 5rem;
+                    width: 10rem;
                 }
                 .th-contents {
                     display: block;

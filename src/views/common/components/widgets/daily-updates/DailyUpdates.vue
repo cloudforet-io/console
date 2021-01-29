@@ -486,6 +486,7 @@ export default {
         font-weight: bold;
         font-size: 0.875rem;
         line-height: 1.6;
+        opacity: 0.7;
     }
 }
 

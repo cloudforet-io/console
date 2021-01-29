@@ -13,7 +13,7 @@
             </div>
             <div class="item-wrapper">
                 <div v-for="(item, k) in items" :key="k" :style="{width}">
-                    <div v-if="item.length === 0" class="no-data">
+                    <div v-if="item.favorites.length === 0" class="no-data">
                         {{ $t('COMMON.WIDGETS.FAVORITES_WIDGET.NO_DATA') }}
                     </div>
                     <template v-else>
@@ -123,6 +123,12 @@ export default {
     }
     .item-wrapper {
         @apply flex;
+        .no-data {
+            @apply text-gray-400;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            padding: 0 0.5rem;
+        }
     }
     label {
         @apply px-2 text-gray-700;
