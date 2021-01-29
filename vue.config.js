@@ -53,16 +53,12 @@ module.exports = {
         },
     },
     configureWebpack: {
-        resolve: {
-            alias: {
-                '@sb': path.resolve('./.storybook'),
-            },
-        },
         devtool: 'source-map',
         plugins: [
             new CompressionPlugin(),
             ...extraPlugins,
         ],
+        // eslint-disable-next-line consistent-return
         externals(context, request, callback) {
             if (/xlsx|canvg|pdfmake/.test(request)) {
                 return callback(null, `commonjs ${request}`);
