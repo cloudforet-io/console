@@ -34,18 +34,19 @@
                         />
                     </template>
                 </p-field-group>
-                <div class="label-wrapper">
-                    <p-field-group :label="'Labels'"
-                                   :invalid-text="validationState.labelInvalidText"
-                                   :invalid="validationState.isLabelValid === false"
-                                   :required="true"
-                    >
-                        <template #default="{invalid}">
-                            <p-text-input v-model="memberLabel" block
-                                          :invalid="invalid"
-                            />
-                        </template>
-                    </p-field-group>
+                <div class="label-text-wrapper">
+                        <span class="label-text">
+                            {{ $t('PROJECT.DETAIL.PROJECT_MEMBER_LABEL') }}
+                        </span>
+                    <span class="label-help-msg">
+                            Up to 5 Labels
+                        </span>
+                </div>
+                <div class="label-input-wrapper">
+                    <p-text-input v-model="memberLabel" block
+                                  @keyup.enter="addMemberLabel"
+                                  :placeholder="'Ex. Developer'"
+                    />
                     <p-button class="icon-button" style-type="gray900"
                               @click="addMemberLabel"
                     >
@@ -292,11 +293,25 @@ export default {
         line-height: 150%;
     }
 }
-.label-wrapper {
-    display: flex;
-    .add-btn {
-        align-self: center;
+.label-text-wrapper {
+    .label-text {
+        @apply text-gray-900;
+        font-size: 0.875rem;
+        margin-right: 0.5rem;
+        line-height: 140%;
+        font-weight: bold;
     }
+    .label-help-msg {
+        @apply text-gray-500;
+        font-size: 0.75rem;
+        line-height: 150%;
+    }
+    margin-bottom: 0.25rem;
+}
+
+.label-input-wrapper {
+    display: flex;
+    margin-bottom: 1rem;
 }
 
 .icon-button::v-deep {
@@ -306,7 +321,6 @@ export default {
     min-height: 2rem;
     max-height: 2rem;
     margin-left: 0.5rem;
-    margin-top: 0.6rem;
     align-self: center;
 }
 
@@ -320,5 +334,8 @@ export default {
 .p-dropdown-menu-btn {
     @apply bg-white;
     max-width: 14rem;
+}
+.p-text-input {
+    width: 25rem;
 }
 </style>
