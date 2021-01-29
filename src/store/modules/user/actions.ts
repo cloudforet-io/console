@@ -81,26 +81,31 @@ const getUserInfoFromToken = (token: string): [string, string] => {
 };
 
 const getUserRoleBindings = async (userId: string): Promise<Array<UserRole>> => {
-    const userRoles: Array<UserRole> = [];
-    const userRoleIds: Array<string> = [];
-    const response = await SpaceConnector.client.identity.roleBinding.list({
-        resource_type: 'identity.User',
-        resource_id: userId,
-    });
+    try {
+        const userRoles: Array<UserRole> = [];
+        const userRoleIds: Array<string> = [];
+        const response = await SpaceConnector.client.identity.roleBinding.list({
+            resource_type: 'identity.User',
+            resource_id: userId,
+        });
 
-    response.results.forEach((roleBindingInfo) => {
-        const role = roleBindingInfo.role_info;
-        if (userRoleIds.indexOf(role.role_id) < 0) {
-            userRoles.push({
-                roleId: role.role_id,
-                name: role.name,
-                roleType: role.role_type,
-            });
-            userRoleIds.push(role.role_id);
-        }
-    });
+        response.results.forEach((roleBindingInfo) => {
+            const role = roleBindingInfo.role_info;
+            if (userRoleIds.indexOf(role.role_id) < 0) {
+                userRoles.push({
+                    roleId: role.role_id,
+                    name: role.name,
+                    roleType: role.role_type,
+                });
+                userRoleIds.push(role.role_id);
+            }
+        });
 
-    return userRoles;
+        return userRoles;
+    } catch (e) {
+        console.log(`RoleBinding Load Error: ${e}`);
+        return [];
+    }
 };
 
 export const signIn = async ({ commit, state }, signInRequest: SignInRequest): Promise<void> => {
