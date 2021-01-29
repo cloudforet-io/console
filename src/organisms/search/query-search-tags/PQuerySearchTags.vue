@@ -1,41 +1,50 @@
 <template>
     <div v-if="_tags.length > 0" class="p-query-search-tags">
-        <div class="left">
-            <span class="filter">{{ $t('COMPONENT.QUERY_SEARCH_TAGS.FILTER') }}: </span>
-            <div v-if="!readOnly" class="delete-btn">
-                <p-badge class="tag" outline style-type="gray900"
-                         @click="deleteAllTags"
-                >
-                    {{ $t('COMPONENT.QUERY_SEARCH_TAGS.CLEAR_ALL') }}
-                </p-badge>
+        <div class="tags-container">
+            <div>
+                <div class="left-wrapper">
+                    <span class="filter">{{ $t('COMPONENT.QUERY_SEARCH_TAGS.FILTER') }}: </span>
+                    <p-badge v-if="!readOnly" class="delete-btn" outline
+                             style-type="gray900"
+                             @click="deleteAllTags"
+                    >
+                        {{ $t('COMPONENT.QUERY_SEARCH_TAGS.CLEAR_ALL') }}
+                    </p-badge>
+                    <div v-if="!readOnly" class="divider" />
+                </div>
             </div>
-            <div v-if="!readOnly" class="divider" />
-        </div>
-        <div class="tags">
-            <p-tag v-for="(tag, idx) in _tags" :key="`${idx}-${tag.key ? tag.key.name : tag.value}`"
-                   class="tag"
-                   :class="{invalid: tag.invalid}"
-                   :deletable="!readOnly"
-                   @delete="deleteTag(idx)"
-            >
-                <p-i v-if="tag.invalid"
-                     v-tooltip.bottom="{content: tag.description, delay: {show: 200}, classes: ['p-tooltip']}"
-                     class="alert-icon"
-                     name="ic_alert" height="1em" width="1em"
-                />
-                <span v-if="tag.key">
-                    <span class="key-label">
-                        {{ tag.key.label || tag.key.name }}
+            <div class="tags-wrapper">
+                <p-tag v-for="(tag, idx) in _tags" :key="`${idx}-${tag.key ? tag.key.name : tag.value}`"
+                       class="tag"
+                       :class="{invalid: tag.invalid}"
+                       :deletable="!readOnly"
+                       @delete="deleteTag(idx)"
+                >
+                    <span class="tag-inner">
+                        <p-i v-if="tag.invalid"
+                             v-tooltip.bottom="{content: tag.description, delay: {show: 200}, classes: ['p-tooltip']}"
+                             class="alert-icon"
+                             name="ic_alert" height="1em" width="1em"
+                        />
+                        <template v-if="tag.key">
+                            <span class="key-label">
+                                {{ tag.key.label || tag.key.name }}
+                            </span>
+                            :{{ tag.operator }}
+                            <slot :name="`data-type-${tag.key.dataType || 'string'}`" v-bind="{ ...$props, tag }">
+                                <span class="value-label">
+                                    {{ tag.value.label || tag.value.name }}
+                                </span>
+                            </slot>
+                        </template>
+                        <template v-else>
+                            <span class="value-label">
+                                {{ tag.value.label || tag.value.name }}
+                            </span>
+                        </template>
                     </span>
-                    :{{ tag.operator }}
-                    <slot :name="`data-type-${tag.key.dataType || 'string'}`" v-bind="{ ...$props, tag }">
-                        <span class="value-label">{{ tag.value.label || tag.value.name }}</span>
-                    </slot>
-                </span>
-                <template v-else>
-                    <span class="value-label">{{ tag.value.label || tag.value.name }}</span>
-                </template>
-            </p-tag>
+                </p-tag>
+            </div>
         </div>
     </div>
 </template>
@@ -139,12 +148,13 @@ export default defineComponent({
 
 <style lang="postcss">
 .p-query-search-tags {
-    @apply flex flex-row w-full;
-    margin-bottom: 0.37rem;
-    .left {
-        @apply flex-shrink-0;
-        display: flex;
-        height: 1.2rem;
+    padding-bottom: 0.37rem;
+    .tags-container {
+        @apply flex flex-row w-full;
+        max-width: 100%;
+    }
+    .left-wrapper {
+        @apply flex-shrink-0 inline-flex;
         align-items: center;
     }
     .filter {
@@ -152,31 +162,52 @@ export default defineComponent({
         font-size: 0.75rem;
     }
     .delete-btn {
-        @apply flex-shrink-0;
-        .tag {
-            @apply cursor-pointer rounded-sm flex-grow-0;
-        }
+        flex: 0 0 auto;
+        border-radius: 0.125rem;
+        padding: 0.125rem 0.5rem;
+        height: auto;
+        cursor: pointer;
     }
     .divider {
         @apply inline-block my-0 mx-4 text-gray-200;
         height: 1rem;
         border-left-width: 1px;
     }
-    .tags {
+    .tags-wrapper {
         flex-grow: 1;
+        overflow-x: hidden;
         .tag {
-            @apply rounded-sm mr-3 mb-3;
+            @apply inline-flex justify-start;
+            $margin-right: 0.75rem;
+            margin-right: $margin-right;
+            max-width: calc(100% - $(margin-right));
+            margin-bottom: 0.75rem;
+            overflow-x: hidden;
+            border-radius: 0.125rem;
+            padding: 0.125rem 0.5rem;
+            height: auto;
             &.invalid {
                 @apply border-alert border bg-white;
             }
+            .icon {
+                @apply flex-shrink-0;
+            }
         }
-    }
-    .alert-icon {
-        @apply mr-1;
-        cursor: help;
-    }
-    .key-label {
-        @apply font-bold;
+        .tag-inner {
+            @apply inline-flex;
+            flex: 1;
+            .alert-icon {
+                @apply mr-1;
+                cursor: help;
+            }
+            .key-label {
+                @apply font-bold;
+            }
+            .value-label {
+                white-space: normal;
+                word-break: break-all;
+            }
+        }
     }
 }
 </style>
