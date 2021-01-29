@@ -393,6 +393,7 @@ export default {
 
 .label-input-wrapper {
     display: flex;
+    margin-bottom: 1rem;
 }
 
 .icon-button::v-deep {
@@ -419,5 +420,9 @@ export default {
 .p-dropdown-menu-btn {
     @apply bg-white;
     max-width: 14rem;
+}
+
+.p-text-input {
+    width: 25rem;
 }
 </style>
