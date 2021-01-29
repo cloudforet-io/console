@@ -128,4 +128,6 @@ export { default as PTree } from './organisms/tree/PTree.vue';
 export { default as PProgressWizard } from './organisms/wizards/progress-wizard/PProgressWizard.vue';
 
 export { default as PNotificationBar } from './feedbacks/notification/PNotificationBar.vue';
+export { default as PDataLoader } from './feedbacks/loading/PDataLoader.vue';
+
 export { default as PToolbox } from './navigation/toolbox/PToolbox.vue';

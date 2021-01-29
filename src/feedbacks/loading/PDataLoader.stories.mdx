@@ -1,0 +1,137 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PDataLoader from './PDataLoader.vue';
+import faker from 'faker'
+import {range} from 'lodash'
+import { LOADER_TYPES } from './config';
+
+
+<Meta title='Feedbacks/loading/Data Loader' argTypes={{
+    loading: {
+        name: 'loading',
+        type: {name: 'boolean'},
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    data: {
+        name: 'data',
+        type: {name: 'object'},
+        description: 'Data to display',
+        defaultValue: range(15).map(d => faker.lorem.lines()),
+        table: {
+            type: {
+                summary: 'object, array',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: undefined
+            },
+        },
+        control: {
+            type: 'object'
+        }
+    },
+    loaderType: {
+        name: 'loaderType',
+        type: {name: 'string'},
+        description: `Loader type. ${Object.values(LOADER_TYPES)} are available.`,
+        defaultValue: LOADER_TYPES.spinner,
+        table: {
+            type: {
+                summary: `string`
+            },
+            category: 'props',
+            defaultValue: {
+                summary: LOADER_TYPES.spinner
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(LOADER_TYPES)
+        }
+    },
+    loader: {
+        name: 'loader',
+        description: 'Slot to replace loader.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            category: 'slots',
+            defaultValue: {
+                summary: null
+            },
+        },
+    },
+    default: {
+        name: 'default',
+        description: 'Slot to insert data display elements.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            category: 'slots',
+            defaultValue: {
+                summary: null
+            },
+        },
+    },
+    noData: {
+        name: 'noData',
+        description: 'Slot to replace no data display.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            category: 'slots',
+            defaultValue: {
+                summary: null
+            },
+        },
+    }
+}}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDataLoader },
+    template: `
+        <p-data-loader v-bind="$props" class="p-3 bg-gray-100 border border-gray-200"  style="height: 300px;">
+            <div v-for="(d, i) in data" :key="i" class="mb-3 leading-5">
+                {{d}}
+            </div>
+        </p-data-loader>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Data Loader
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground"/>
+

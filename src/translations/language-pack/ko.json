@@ -10,6 +10,12 @@
 	"CONTEXT_MENU": {
 		"NO_ITEM": "아이템이 없습니다. "
 	},
+	"DATA_LOADER": {
+		"NO_DATA": "데이터가 없습니다."
+	},
+	"DATA_TABLE": {
+		"NO_DATA": "데이터가 없습니다."
+	},
 	"DATE_PAGINATION": {
 		"MONTH": "월 ",
 		"YEAR": "년 "

@@ -10,6 +10,12 @@
 	"CONTEXT_MENU": {
 		"NO_ITEM": "No Item"
 	},
+	"DATA_LOADER": {
+		"NO_DATA": "No Data"
+	},
+	"DATA_TABLE": {
+		"NO_DATA": "No Data"
+	},
 	"DATE_PAGINATION": {
 		"MONTH": "Month",
 		"YEAR": "Year"

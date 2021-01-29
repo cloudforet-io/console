@@ -10,6 +10,12 @@
 	"CONTEXT_MENU": {
 		"NO_ITEM": "アイテムがありません"
 	},
+	"DATA_LOADER": {
+		"NO_DATA": "データがありません"
+	},
+	"DATA_TABLE": {
+		"NO_DATA": "データがありません"
+	},
 	"DATE_PAGINATION": {
 		"MONTH": "月",
 		"YEAR": "年"
