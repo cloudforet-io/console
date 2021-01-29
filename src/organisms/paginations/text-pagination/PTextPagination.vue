@@ -22,19 +22,12 @@
 </template>
 <script lang="ts">
 import PIconButton from '@/molecules/buttons/icon-button/PIconButton.vue';
+import { computed, reactive, watch } from '@vue/composition-api';
+import { makeProxy } from '@/util/composition-helpers';
 
 export default {
     name: 'PTextPagination',
     components: { PIconButton },
-    setup(props, { emit }) {
-        return {
-            update(page) {
-                emit('update:thisPage', page);
-                emit('pageChange', page);
-            },
-            iconHoverColor: 'transparent inherit',
-        };
-    },
     props: {
         thisPage: {
             type: Number,
@@ -48,6 +41,22 @@ export default {
                 return value > 0;
             },
         },
+    },
+    setup(props, { emit }) {
+        const update = (page) => {
+            emit('update:thisPage', page);
+            emit('pageChange', page);
+        };
+        watch([() => props.allPage, () => props.thisPage], ([allPage, thisPage]) => {
+            if (thisPage > allPage) {
+                update(allPage);
+            }
+        }, { immediate: true });
+
+        return {
+            update,
+            iconHoverColor: 'transparent inherit',
+        };
     },
 };
 </script>
