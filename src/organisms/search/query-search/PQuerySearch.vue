@@ -64,7 +64,7 @@
 
 <script lang="ts">
 import {
-    computed, onMounted, onUnmounted, reactive, toRefs, watch, WatchStopHandle,
+    computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch, WatchStopHandle,
 } from '@vue/composition-api';
 import {
     throttle, reduce, cloneDeep, debounce,
@@ -109,7 +109,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const ROOT_KEY_SETTER = ':';
-export default {
+export default defineComponent({
     name: 'PQuerySearch',
     components: {
         PContextMenu,
@@ -486,7 +486,7 @@ export default {
             searchSlots,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">

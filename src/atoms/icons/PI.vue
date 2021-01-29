@@ -3,8 +3,9 @@
 </template>
 <script lang="ts">
 import '@/atoms/icons/p-icons';
+import { defineComponent } from '@vue/composition-api';
 
-export default {
+export default defineComponent({
     name: 'PI',
     props: {
         name: {
@@ -44,7 +45,7 @@ export default {
             default: undefined,
         },
     },
-};
+});
 </script>
 
 <style lang="postcss">

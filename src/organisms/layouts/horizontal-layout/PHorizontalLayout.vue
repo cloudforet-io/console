@@ -1,6 +1,6 @@
 <template>
     <div class="p-horizontal-layout">
-        <div :style="{height: `${containerHeight}px`}">
+        <div class="overflow-hidden" :style="{height: `${containerHeight}px`}">
             <slot name="container" :height="containerHeight" />
         </div>
 
@@ -55,7 +55,7 @@ export default {
         },
         minHeight: {
             type: Number,
-            default: 320,
+            default: 300,
         },
         maxHeight: {
             type: Number,

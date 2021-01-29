@@ -76,13 +76,14 @@
 
 <script lang="ts">
 import {
-    computed, ref, onMounted, Ref, watch,
+    computed, ref, onMounted, Ref, watch, defineComponent,
 } from '@vue/composition-api';
 
 import PLottie from '@/molecules/lottie/PLottie.vue';
 import PI from '@/atoms/icons/PI.vue';
 
 import { ContextMenuProps, CONTEXT_MENU_THEME } from '@/organisms/context-menu/type';
+import {i18n} from "@/translations";
 
 const setAutoHeight = (props) => {
     const contextMenu = ref(null) as Ref<HTMLElement|null>;
@@ -107,10 +108,10 @@ const setAutoHeight = (props) => {
     };
 };
 
-export default {
+export default defineComponent({
     name: 'PContextMenu',
-    events: ['select', 'keyup:up:end', 'keyup:down:end', 'keyup:esc'],
     components: { PLottie, PI },
+    i18n,
     props: {
         menu: {
             type: [Array, Object],
@@ -120,7 +121,7 @@ export default {
             type: String,
             default: 'secondary',
             validator(theme) {
-                return Object.keys(CONTEXT_MENU_THEME).includes(theme);
+                return Object.keys(CONTEXT_MENU_THEME).includes(theme as any);
             },
         },
         loading: {
@@ -198,7 +199,7 @@ export default {
             onEsc,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">

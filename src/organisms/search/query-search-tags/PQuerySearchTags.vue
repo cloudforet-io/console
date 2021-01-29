@@ -49,17 +49,19 @@ import {
     QueryTag,
 } from '@/organisms/search/query-search-tags/type';
 import {
-    computed, ref, watch,
+    computed, defineComponent, ref, watch,
 } from '@vue/composition-api';
 import { QueryItem } from '@/organisms/search/query-search/type';
 import PI from '@/atoms/icons/PI.vue';
 import { VTooltip } from 'v-tooltip';
 import { defaultConverter, defaultValidator } from '@/organisms/search/query-search-tags/helper';
+import { i18n } from '@/translations';
 
 
-export default {
+export default defineComponent({
     name: 'PQuerySearchTags',
     directives: { tooltip: VTooltip },
+    i18n,
     components: { PI, PTag, PBadge },
     props: {
         tags: {
@@ -132,7 +134,7 @@ export default {
             ...publicFunctions,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">

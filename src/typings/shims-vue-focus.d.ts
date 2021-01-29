@@ -1,10 +1,8 @@
 declare module 'vue-focus' {
-    import Vue, { AsyncComponent, ComponentOptions, PluginObject } from 'vue';
+    import { DirectiveFunction, DirectiveOptions } from 'vue';
 
-    type Component = ComponentOptions<Vue> | typeof Vue | AsyncComponent
-
-    export const focus: Component;
-    export const Plugin: PluginObject<undefined>;
+    export const focus: DirectiveFunction;
+    export const Plugin: DirectiveOptions<undefined>;
 
     export default focus;
 }

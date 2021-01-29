@@ -32,6 +32,10 @@ Vue.use(SvgIcon, {
 Vue.use(Fragment.Plugin);
 Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
 
+Vue.prototype.toJSON = function () {
+    return this;
+};
+
 webFontLoader.load({
     google: {
         families: webFonts,
@@ -62,6 +66,7 @@ export const decorators = [
 ]
 
 export const parameters = {
+    controls: { expanded: true },
     layout: 'centered',
     docs: {
         extractComponentDescription: (component, { notes }) => {
