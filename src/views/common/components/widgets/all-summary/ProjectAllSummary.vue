@@ -704,10 +704,8 @@ export default {
         }
         .summary-wrapper {
             .sub-title {
-                padding: 0 0.5rem;
-                margin-bottom: 0.875rem;
+                padding-left: 0.5rem;
             }
-
             .summary-content-wrapper {
                 height: 5rem;
                 overflow-y: auto;
@@ -733,7 +731,6 @@ export default {
                     }
                 }
             }
-
             .summary-row {
                 position: relative;
                 display: block;
@@ -773,6 +770,11 @@ export default {
                     position: absolute;
                     right: 0.5rem;
                 }
+            }
+        }
+        .region-service-wrapper {
+            .sub-title {
+                padding-left: 0.5rem;
             }
         }
     }

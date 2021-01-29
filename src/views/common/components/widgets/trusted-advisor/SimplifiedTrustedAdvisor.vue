@@ -257,6 +257,7 @@ export default {
     }
     .left-part {
         width: 55%;
+        white-space: nowrap;
     }
     .right-part {
         width: 45%;

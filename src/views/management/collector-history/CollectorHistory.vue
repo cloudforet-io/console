@@ -505,6 +505,7 @@ export default {
             .th-additional-info-text {
                 font-weight: normal;
                 font-size: 0.75rem;
+                vertical-align: initial;
             }
             .status-icon {
                 display: inline-flex;
