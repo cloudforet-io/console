@@ -51,7 +51,6 @@ module.exports = {
                 includePaths: ['./node_modules'],
             },
         },
-        extract: { ignoreOrder: true },
     },
     configureWebpack: {
         resolve: {
