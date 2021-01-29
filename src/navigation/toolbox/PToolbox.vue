@@ -51,7 +51,8 @@
                 </div>
             </div>
             <div class="filters-wrapper">
-                <p-query-search-tags v-if="searchable && filtersVisible && searchType === SEARCH_TYPES.query"
+                <p-query-search-tags v-show="searchable && filtersVisible && searchType === SEARCH_TYPES.query"
+                                     ref="tagRef"
                                      :tags="proxyState.queryTags"
                                      :timezone="timezone"
                                      @change="onQueryTagsChange"
@@ -198,6 +199,7 @@ export default defineComponent({
                     name: d, label: d, type: 'item',
                 }));
             }),
+            tagRef: null as any,
         });
 
 
@@ -231,6 +233,8 @@ export default defineComponent({
                     proxyState.searchText = val;
                     emitChange({ searchText: val });
                 }
+            } else if (state.tagRef) {
+                state.tagRef.addTag(val);
             } else {
                 proxyState.queryTags.push(val);
             }
