@@ -6,7 +6,7 @@
                     <div class="loader-backdrop" />
                     <template v-if="loaderType === LOADER_TYPES.spinner">
                         <p-lottie name="thin-spinner" :size="2.5"
-                                  auto class="loader"
+                                  auto class="loader spinner"
                         />
                     </template>
                     <template v-else-if="loaderType === LOADER_TYPES.skeleton">
