@@ -19,6 +19,7 @@ module.exports = {
         '@storybook/addon-docs',
         '@storybook/addon-viewport',
         '@storybook/addon-google-analytics',
+        '@storybook/addon-controls',
         'storybook-addon-designs/register'
     ],
     webpackFinal:  async (config) => {

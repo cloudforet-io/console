@@ -10,7 +10,7 @@
 <script lang="ts">
 import lottie from 'lottie-web';
 import {
-    computed, onMounted, onUnmounted, reactive, toRefs, watch,
+    computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { LottieProps } from '@/molecules/lottie/type';
 
@@ -33,7 +33,7 @@ import { LottieProps } from '@/molecules/lottie/type';
     }
  */
 
-export default {
+export default defineComponent({
     name: 'PLottie',
     props: {
         name: {
@@ -95,5 +95,5 @@ export default {
             ...toRefs(state),
         };
     },
-};
+});
 </script>

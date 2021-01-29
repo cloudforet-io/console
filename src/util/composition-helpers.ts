@@ -77,22 +77,6 @@ export function makeOptionalProxy <T=any>(name: string, vm, initData: any, event
 }
 
 
-export function makeVModelProxy<T extends any>(name = 'value', event = 'input', transform: ((val: any) => any)|null = null): Ref<T> {
-    const vm = getCurrentInstance() as ComponentRenderProxy;
-    let setter: (val: any) => void;
-    if (transform) {
-        setter = (val) => { vm.$emit(event, transform(val)); };
-    } else {
-        setter = (val) => { vm.$emit(event, val); };
-    }
-
-    return computed({
-        get: () => vm?.$props[name],
-        set: setter,
-    });
-}
-
-
 /**
  * state & functions for tracking elements whether they are mouse-over or out.
  * @param disabled
@@ -118,14 +102,3 @@ export const mouseOverState = (disabled?: boolean) => {
     };
 };
 
-
-/**
- * Add and remove an event listener when mounted & unmounted.
- * This is useful to automatically hide autocomplete or dropdown context menu.
- * @param eventName
- * @param func
- */
-export const windowEventMount = (eventName: string, func: any) => {
-    onMounted(() => window.addEventListener(eventName, func));
-    onUnmounted(() => window.removeEventListener(eventName, func));
-};

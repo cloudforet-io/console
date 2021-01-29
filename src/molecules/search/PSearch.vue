@@ -36,15 +36,17 @@
 import { focus } from 'vue-focus';
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PI from '@/atoms/icons/PI.vue';
-import { makeByPassListeners, makeOptionalProxy, makeProxy } from '@/util/composition-helpers';
+import { makeByPassListeners, makeOptionalProxy } from '@/util/composition-helpers';
 import { SearchProps } from '@/molecules/search/type';
+import { i18n } from '@/translations';
 
-export default {
+export default defineComponent({
     name: 'PSearch',
     components: { PI },
+    i18n,
     directives: { focus },
     model: {
         prop: 'value',
@@ -126,7 +128,7 @@ export default {
             },
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
@@ -175,6 +177,4 @@ export default {
         @apply text-gray-300 mr-1;
     }
 }
-
-
 </style>

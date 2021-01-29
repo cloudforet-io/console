@@ -27,13 +27,13 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
+import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 import PButton from '@/atoms/buttons/PButton.vue';
 import PIconButton from '@/molecules/buttons/icon-button/PIconButton.vue';
 import { DropdownBtnProps } from '@/organisms/dropdown/dropdown-btn/type';
 import { BUTTON_STYLE_TYPE } from '@/molecules/buttons/icon-button/type';
 
-export default {
+export default defineComponent({
     name: 'PDropdownBtn',
     components: { PButton, PIconButton },
     props: {
@@ -63,7 +63,7 @@ export default {
             default: undefined,
             validator: (value) => {
                 if (value === undefined) return true;
-                return Object.keys(BUTTON_STYLE_TYPE).includes(value);
+                return Object.keys(BUTTON_STYLE_TYPE).includes(value as any);
             },
         },
     },
@@ -85,7 +85,7 @@ export default {
             },
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">

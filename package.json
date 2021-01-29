@@ -80,6 +80,7 @@
     "@storybook/addon-a11y": "^6.1.11",
     "@storybook/addon-actions": "^6.1.11",
     "@storybook/addon-console": "^1.2.2",
+    "@storybook/addon-controls": "^6.1.15",
     "@storybook/addon-docs": "^6.1.11",
     "@storybook/addon-google-analytics": "^6.1.11",
     "@storybook/addon-knobs": "^6.1.11",

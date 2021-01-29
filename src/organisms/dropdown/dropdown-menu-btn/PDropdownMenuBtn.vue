@@ -34,13 +34,13 @@
 
 <script lang="ts">
 import vClickOutside from 'v-click-outside';
-import { computed, ref } from '@vue/composition-api';
+import { computed, defineComponent, ref } from '@vue/composition-api';
 import PContextMenu from '@/organisms/context-menu/PContextMenu.vue';
 import PDropdownBtn from '@/organisms/dropdown/dropdown-btn/PDropdownBtn.vue';
 import { reduce } from 'lodash';
 import { BUTTON_STYLE_TYPE } from '@/molecules/buttons/icon-button/type';
 
-export default {
+export default defineComponent({
     name: 'PDropdownMenuBtn',
     directives: {
         clickOutside: vClickOutside.directive,
@@ -80,7 +80,7 @@ export default {
             default: undefined,
             validator: (value) => {
                 if (value === undefined) return true;
-                return Object.keys(BUTTON_STYLE_TYPE).includes(value);
+                return Object.keys(BUTTON_STYLE_TYPE).includes(value as any);
             },
         },
     },
@@ -112,8 +112,9 @@ export default {
             menuSlots,
         };
     },
-};
+});
 </script>
+
 <style lang="postcss">
 .p-dropdown-menu-btn {
     position: relative;

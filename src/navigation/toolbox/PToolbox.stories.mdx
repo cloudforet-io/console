@@ -1,8 +1,18 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PToolbox from './PToolbox.vue';
+import { SEARCH_TYPES } from './config';
+import {getHandler} from './story-helper'
+import faker from 'faker'
+import {range} from 'lodash'
+import { reactive, watch, toRefs } from '@vue/composition-api';
 
 
-<Meta title='Navigation/Toolbox' argTypes={{
+<Meta title='Navigation/Toolbox' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5894%3A179180',
+    }
+}} argTypes={{
     paginationVisible: {
         name: 'paginationVisible',
         type: {name: 'boolean'},
@@ -93,24 +103,79 @@ import PToolbox from './PToolbox.vue';
                 type: 'boolean'
             }
     },
-        pageSize: {
-            name: 'pageSize',
-            type: {name: 'number'},
-            description: 'Page size to show data. sync props.',
-            defaultValue: 24,
-            table: {
-                type: {
-                    summary: 'number'
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: 24
-                },
+    searchable: {
+        name: 'searchable',
+        type: {name: 'boolean'},
+        description: 'Show search input and allow search',
+        defaultValue: true,
+        table: {
+          type: {
+              summary: 'boolean'
+          },
+          category: 'props',
+          defaultValue: {
+              summary: true
+          },
+        },
+        control: {
+          type: 'boolean'
+        }
+    },
+    filtersVisible: {
+        name: 'filtersVisible',
+        type: {name: 'boolean'},
+        description: 'Show search filters. filters exist only when search type is `query`.',
+        defaultValue: true,
+        table: {
+          type: {
+              summary: 'boolean'
+          },
+          category: 'props',
+          defaultValue: {
+              summary: true
+          },
+        },
+        control: {
+          type: 'boolean'
+        }
+    },
+    searchType: {
+        name: 'searchType',
+        type: {name: 'string'},
+        description: `Search type. ${Object.values(SEARCH_TYPES)} are available.`,
+        defaultValue: 'plain',
+        table: {
+            type: {
+                summary: 'string'
             },
-            control: {
-                type: 'select',
-                options: [24, 36, 48]
-            }
+            category: 'props',
+            defaultValue: {
+                summary: 'plain'
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(SEARCH_TYPES)
+        }
+    },
+    pageSize: {
+        name: 'pageSize',
+        type: {name: 'number'},
+        description: 'Page size to show data. sync props.',
+        defaultValue: 24,
+        table: {
+            type: {
+                summary: 'number'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 24
+            },
+        },
+        control: {
+            type: 'select',
+            options: [24, 36, 48]
+        }
     },
     totalCount: {
         name: 'totalCount',
@@ -149,24 +214,24 @@ import PToolbox from './PToolbox.vue';
             type: 'text',
         }
     },
-        pageSizeOptions: {
-            name: 'pageSizeOptions',
-            type: {name: 'array'},
-            description: 'Options for dropdown of page sizes.',
-            defaultValue: [24, 36, 48],
-            table: {
-                type: {
-                    summary: 'array'
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: '[24, 36, 48]'
-                },
+    pageSizeOptions: {
+        name: 'pageSizeOptions',
+        type: {name: 'array'},
+        description: 'Options for dropdown of page sizes.',
+        defaultValue: [24, 36, 48],
+        table: {
+            type: {
+                summary: 'array'
             },
-            control: {
-                type: 'object',
-            }
+            category: 'props',
+            defaultValue: {
+                summary: '[24, 36, 48]'
+            },
         },
+        control: {
+            type: 'object',
+        }
+    },
     sortByOptions: {
         name: 'sortByOptions',
         type: {name: 'array'},
@@ -184,6 +249,116 @@ import PToolbox from './PToolbox.vue';
         control: {
             type: 'object',
         }
+    },
+    keyItemSets: {
+        name: 'keyItemSets',
+        type: {name: 'array'},
+        description: 'Query search key item sets. Follow the QuerySearch component spec.',
+        defaultValue: [
+            {
+                title: 'Key',
+                items: [{
+                    name: 'id',
+                    label: 'ID',
+                },
+                    {
+                        name: 'name',
+                        label: 'Name',
+                    },
+                    {
+                        name: 'group',
+                        label: 'Group',
+                    }],
+            },
+        ],
+        table: {
+          type: {
+              summary: 'array'
+          },
+          category: 'props',
+          defaultValue: {
+              summary: '[]'
+          },
+        },
+        control: {
+          type: 'object',
+        }
+    },
+    valueHandlerMap: {
+        name: 'valueHandlerMap',
+        type: {name: 'object'},
+        description: 'Query search value handler map. Follow the QuerySearch component spec.',
+        defaultValue: {
+            id: getHandler(range(10).map((d, i) => faker.random.uuid())),
+            name: getHandler(range(10).map(() => faker.name.findName())),
+            group: getHandler(range(10).map(() => faker.name.jobArea())),
+        },
+        table: {
+            type: {
+                summary: 'object'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '{}'
+            },
+        },
+        control: {
+            type: 'object',
+        }
+    },
+    queryTags: {
+        name: 'queryTags',
+        type: {name: 'array'},
+        description: 'Query search tags. Follow the QuerySearchTags component spec.',
+        defaultValue: [],
+        table: {
+          type: {
+              summary: 'array'
+          },
+          category: 'props',
+          defaultValue: {
+              summary: null
+          },
+        },
+        control: {
+          type: 'object',
+        }
+    },
+    searchText: {
+        name: 'searchText',
+        type: {name: 'string'},
+        description: 'Search text for plain search. Works only with plain search.',
+        defaultValue: '',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: null
+            },
+        },
+        control: {
+            type: 'text',
+        }
+    },
+    timezone: {
+      name: 'timezone',
+      type: {name: 'string'},
+      description: 'Timezone that is used for display time value of query search tags.',
+      defaultValue: 'UTC',
+      table: {
+          type: {
+              summary: 'string'
+          },
+          category: 'props',
+          defaultValue: {
+              summary: 'UTC'
+          },
+      },
+      control: {
+          type: 'text',
+      }
     },
     onChange: {
         name: 'change',
@@ -228,6 +403,23 @@ import PToolbox from './PToolbox.vue';
             }
         }
     },
+    'left-area': {
+        name: 'left-area',
+        description: 'Slot for left area of toolbox',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            category: 'slots',
+            defaultValue: {
+                summary: null
+            }
+        },
+        control: {
+            type: 'text'
+        }
+    }
 }}/>
 
 
@@ -235,13 +427,21 @@ export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PToolbox },
     template: `
-        <div class="min-h-30 border-gray-200 border">
-            <p-toolbox v-bind="$props">
+        <div class="w-full min-h-30 border-gray-200 border">
+            <p-toolbox v-bind="$props"
+                        @change="onChange"
+                        @export="onExport"
+                        @refresh="onRefresh"
+            >
+                <template v-if="leftArea" #left-area>
+                    <span v-html="leftArea"/>
+                </template>
             </p-toolbox>
         </div>
     `,
-    setup() {
-        return {}
+    setup(props) {
+        return {
+        }
     }
 });
 
@@ -289,6 +489,7 @@ interface Options {
         sortable: true,
         'exportable': true,
         refreshable: true,
+        searchable: true,
         sortBy: 'Recent',
         sortByOptions: ['Recent']
     }}>
@@ -298,6 +499,44 @@ interface Options {
 
 <br/>
 <br/>
+
+## Query Search
+
+<Canvas>
+    <Story name="query search" args={{
+        searchable: true,
+        searchType: 'query',
+        filtersVisible: true,
+        queryTags: [
+            { key: null, value: { label: 'Hello', name: 'hello' }, operator: '' },
+        ]
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Left Area Slot
+
+<Canvas>
+    <Story name="left area slot" args={{
+        searchable: true,
+        searchType: 'query',
+        filtersVisible: true,
+        queryTags: [
+            { key: null, value: { label: 'Hello', name: 'hello' }, operator: '' },
+        ],
+        leftArea: '<button class="py-1 px-3 h-full rounded-sm bg-primary text-white font-bold text-lg">LEFT AREA</button>'
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 
 ## Playground
 
