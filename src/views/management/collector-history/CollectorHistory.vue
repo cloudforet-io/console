@@ -40,8 +40,8 @@
                             >{{ status.label }}</span>
                         </div>
                     </template>
-                    <template #th-task-format="{ value }">
-                        <span>{{ value }}</span>
+                    <template #th-task-format="{  field }">
+                        <span>{{ field.label }}</span>
                         <span class="th-additional-info-text"> (completed / total)</span>
                     </template>
                     <template #col-collector_info-format="{ value }">

@@ -60,9 +60,6 @@
                         </router-link>
                         <span v-else>{{ value.service_account_id }}</span>
                     </template>
-                    <template #col-sequence-format="{ value }">
-                        <span class="float-right">{{ value }}</span>
-                    </template>
                     <template #col-status-format="{ value }">
                         <span :class="value.toLowerCase()">{{ value }}</span>
                     </template>

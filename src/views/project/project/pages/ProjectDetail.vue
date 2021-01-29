@@ -526,7 +526,7 @@ export default {
     &.summary {
         .tab-pane {
             @apply border border-gray-200;
-            padding: 1.5rem 1rem;
+            padding: 2rem 1rem 1.5rem;
         }
     }
 }

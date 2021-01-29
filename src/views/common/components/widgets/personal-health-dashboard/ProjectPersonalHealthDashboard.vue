@@ -341,7 +341,7 @@ export default {
             display: block;
             font-size: 0.75rem;
             line-height: 1.2;
-            padding-top: 0.125rem;
+            padding-top: 0.25rem;
         }
     }
 }
