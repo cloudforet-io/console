@@ -17,7 +17,7 @@
                     </p-button>
                 </div>
             </div>
-            <div class="col-span-12 lg:col-span-9">
+            <div class="col-span-12 md:col-span-9">
                 <div class="chart-wrapper">
                     <p-chart-loader :loading="chartState.loading">
                         <template #loader>
@@ -27,8 +27,8 @@
                     </p-chart-loader>
                 </div>
             </div>
-            <div class="col-span-12 lg:col-span-3">
-                <div class="summary-wrapper">
+            <div class="col-span-12 md:col-span-3 grid grid-cols-12 summary-group">
+                <div class="summary-wrapper col-span-6 md:col-span-12">
                     <span class="label">{{ summaryState.pastDateText }}</span>
                     <span class="date">({{ summaryState.pastDate }})</span>
                     <span class="cost">
@@ -36,7 +36,7 @@
                         <span v-else class="empty" />
                     </span>
                 </div>
-                <div class="summary-wrapper">
+                <div class="summary-wrapper col-span-6 md:col-span-12">
                     <span class="label">{{ summaryState.currentDateText }}</span>
                     <span class="date">({{ summaryState.currentDate }})</span>
                     <div class="cost in-process">
@@ -592,44 +592,47 @@ export default {
             }
         }
     }
-    .summary-wrapper {
-        line-height: 1.5;
-        padding-bottom: 0.5rem;
-        .label {
-            @apply text-gray-700;
-            font-size: 0.875rem;
-        }
-        .date {
-            @apply text-gray-500;
-            font-size: 0.75rem;
-            padding-left: 0.375rem;
-        }
-        .cost {
-            @apply text-secondary;
-            display: block;
-            font-size: 1.375rem;
-            line-height: 1.55;
-            &.in-process {
-                @apply text-safe;
-                .in-process-text {
-                    font-size: 0.75rem;
-                    padding-left: 0.375rem;
-                }
+    .summary-group {
+        grid-auto-rows: max-content;
+        .summary-wrapper {
+            line-height: 1.5;
+            padding-bottom: 0.5rem;
+            .label {
+                @apply text-gray-700;
+                font-size: 0.875rem;
             }
-            .help {
-                @apply text-gray-300;
-                display: inline-block;
-                padding-left: 0.25rem;
-                .p-i-icon {
-                    cursor: help;
-                }
+            .date {
+                @apply text-gray-500;
+                font-size: 0.75rem;
+                padding-left: 0.375rem;
             }
-            .empty {
+            .cost {
+                @apply text-secondary;
                 display: block;
-                width: 1rem;
-                height: 1rem;
-                border-bottom: 2px solid;
-                margin-bottom: 1rem;
+                font-size: 1.375rem;
+                line-height: 1.55;
+                &.in-process {
+                    @apply text-safe;
+                    .in-process-text {
+                        font-size: 0.75rem;
+                        padding-left: 0.375rem;
+                    }
+                }
+                .help {
+                    @apply text-gray-300;
+                    display: inline-block;
+                    padding-left: 0.25rem;
+                    .p-i-icon {
+                        cursor: help;
+                    }
+                }
+                .empty {
+                    display: block;
+                    width: 1rem;
+                    height: 1rem;
+                    border-bottom: 2px solid;
+                    margin-bottom: 1rem;
+                }
             }
         }
     }
