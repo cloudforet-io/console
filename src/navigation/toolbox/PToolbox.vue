@@ -299,13 +299,12 @@ export default defineComponent({
             &.simple {
                 order: 2;
                 width: auto;
-                flex-grow: 1;
+                flex-grow: 100;
             }
         }
         .tools-wrapper {
             &.simple {
                 order: 3;
-                flex-grow: 0;
             }
         }
     }
@@ -313,12 +312,11 @@ export default defineComponent({
     @screen lg {
         .search-wrapper {
             order: 2;
-            flex-grow: 1;
+            flex-grow: 100;
             width: auto;
         }
         .tools-wrapper {
             order: 3;
-            flex-grow: 0;
         }
     }
 }
