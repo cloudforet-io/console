@@ -63,7 +63,7 @@ export default defineComponent({
     setup(props) {
         const state = reactive({
             isEmpty: computed(() => {
-                if (!props.data) return true;
+                if (!props.data) return false;
                 if (Array.isArray(props.data)) return props.data.length === 0;
                 return isEmpty(props.data);
             }),
