@@ -85,60 +85,64 @@
             </div>
         </template>
         <template #default>
-            <div class="page-navigation">
-                <p-page-navigation :routes="route" />
-            </div>
-            <p-page-title :title="selectedProviderName" use-total-count :total-count="totalCount"
-                          class="page-title"
-            />
-            <p-hr class="cloud-service-divider" />
-            <div class="cloud-service-list-container">
-                <p-search-grid-layout :items="items"
-                                      :card-class="cardClass"
-                                      :loading="loading"
-                                      :this-page.sync="thisPage"
-                                      :page-size.sync="pageSize"
-                                      :total-count="totalCount"
-                                      :query-tags="tags"
-                                      :key-item-sets="keyItemSets"
-                                      :value-handler-map="valueHandlerMap"
-                                      @change="onChange"
-                                      @refresh="onChange"
+            <div class="page-wrapper">
+                <div class="page-navigation">
+                    <p-page-navigation :routes="route" />
+                </div>
+                <p-page-title :title="selectedProviderName" use-total-count :total-count="totalCount"
+                              class="page-title"
+                />
+                <p-hr class="cloud-service-divider" />
+                <p-toolbox filters-visible
+                           search-type="query"
+                           :page-size.sync="pageSize"
+                           :total-count="totalCount"
+                           :query-tags="tags"
+                           :key-item-sets="keyItemSets"
+                           :value-handler-map="valueHandlerMap"
+                           @change="onChange"
+                           @refresh="onChange"
                 >
-                    <template #toolbox-left>
+                    <template #left-area>
                         <p-check-box v-model="filterState.isPrimary">
                             <span class="show-all">{{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SHOW_MAJOR') }}</span>
                         </p-check-box>
                     </template>
-                    <template #card="{item}">
-                        <router-link :to="getToCloudService(item)" class="item-wrapper">
-                            <p-lazy-img width="3rem" height="3rem"
-                                        :src="item.icon || (providers[item.provider] ? providers[item.provider].icon : '')"
-                                        error-icon="ic_provider_other"
-                                        :alt="item.name"
-                                        class="icon"
-                            />
-                            <div class="text-content">
-                                <div class="title">
-                                    {{ item.cloud_service_group }}
+                </p-toolbox>
+                <p-data-loader class="flex-grow" :data="items" :loading="loading">
+                    <div class="cloud-service-type-wrapper">
+                        <div v-for="(item, i) in items" :key="i" class="cloud-service-type-item">
+                            <router-link :to="getToCloudService(item)"
+                                         class="item-wrapper"
+                            >
+                                <p-lazy-img width="3rem" height="3rem"
+                                            :src="item.icon || (providers[item.provider] ? providers[item.provider].icon : '')"
+                                            error-icon="ic_provider_other"
+                                            :alt="item.name"
+                                            class="icon"
+                                />
+                                <div class="text-content">
+                                    <div class="title">
+                                        {{ item.cloud_service_group }}
+                                    </div>
+                                    <div class="sub-title">
+                                        <span class="sub-title-provider"> {{ providers[item.provider] ? providers[item.provider].label : item.provider }} </span>
+                                        <span class="sub-title-name">{{ item.cloud_service_type }}</span>
+                                        <span class="sub-title-count">
+                                            {{ item.count }}
+                                        </span>
+                                    </div>
                                 </div>
-                                <div class="sub-title">
-                                    <span class="sub-title-provider"> {{ providers[item.provider] ? providers[item.provider].label : item.provider }} </span>
-                                    <span class="sub-title-name">{{ item.cloud_service_type }}</span>
-                                    <span class="sub-title-count">
-                                        {{ item.count }}
-                                    </span>
-                                </div>
-                            </div>
-                            <favorite-button :item-id="item.cloud_service_type_id || ''"
-                                             favorite-type="cloudServiceType"
-                                             resource-type="inventory.CloudServiceType"
-                                             class="favorite-btn"
-                            />
-                        </router-link>
-                    </template>
+                                <favorite-button :item-id="item.cloud_service_type_id || ''"
+                                                 favorite-type="cloudServiceType"
+                                                 resource-type="inventory.CloudServiceType"
+                                                 class="favorite-btn"
+                                />
+                            </router-link>
+                        </div>
+                    </div>
                     <template #no-data>
-                        <div v-if="!loading && totalCount === 0" class="text-center empty-cloud-service">
+                        <div class="text-center empty-cloud-service">
                             <img class="empty-cloud-service-img" src="@/assets/images/illust_satellite.svg">
                             <p class="text-primary2 mb-12">
                                 {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.EMPTY_CLOUD_SERVICE') }}
@@ -152,15 +156,15 @@
                             </router-link>
                         </div>
                     </template>
-                </p-search-grid-layout>
-            </div>
+                </p-data-loader>
 
-            <div v-if="!loading && items.length > 0" class="pagination">
-                <p-pagination :total-count="totalCount"
-                              :this-page.sync="thisPage"
-                              :page-size.sync="pageSize"
-                              @change="onPaginationChange"
-                />
+                <div class="pagination">
+                    <p-pagination :total-count="totalCount"
+                                  :this-page.sync="thisPage"
+                                  :page-size.sync="pageSize"
+                                  @change="onPaginationChange"
+                    />
+                </div>
             </div>
         </template>
     </p-vertical-page-layout>
@@ -181,14 +185,14 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PSearchGridLayout, PPageTitle, PPagination, PLazyImg, PCheckBox,
-    PIconTextButton, PPageNavigation, PRadio, PI, PHr,
+    PPageTitle, PPagination, PLazyImg, PCheckBox,
+    PIconTextButton, PPageNavigation, PRadio, PI, PHr, PToolbox, PDataLoader,
 } from '@spaceone/design-system';
 
 import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import { getPageStart } from '@/lib/component-utils/pagination';
+import { getPageStart, getThisPage } from '@/lib/component-utils/pagination';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import {
@@ -224,7 +228,6 @@ export default {
         PLazyImg,
         PPagination,
         PHr,
-        PSearchGridLayout,
         PRadio,
         PIconTextButton,
         PVerticalPageLayout,
@@ -232,6 +235,8 @@ export default {
         PPageTitle,
         PPageNavigation,
         PCheckBox,
+        PToolbox,
+        PDataLoader,
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -276,9 +281,8 @@ export default {
         );
 
         const state = reactive({
-            items: [] as any,
+            items: undefined as any,
             providerName: 'All',
-            cardClass: () => ['card-item', 'cloud-service-type-item'],
             loading: true,
             keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
@@ -287,6 +291,7 @@ export default {
             pageSize: 24,
             totalCount: 0,
             providers: computed(() => vm.$store.state.resource.provider.items),
+            serviceAccounts: computed(() => vm.$store.state.resource.serviceAccount.items),
             favoriteItems: computed(() => vm.$store.getters['favorite/cloudServiceType/sortedItems']),
         });
 
@@ -334,15 +339,15 @@ export default {
          * */
         const cardQueryHelper = new QueryHelper();
         const getToCloudService = (item) => {
-            const searchFilters = queryHelper.filters;
-            cardQueryHelper.setFilters(searchFilters.filter(f => f.k && [
+            const searchFilters = [];
+            cardQueryHelper.setFilters(searchFilters.filter((f: any) => f.k && [
                 'cloud_service_type',
                 'cloud_service_group',
             ].includes(f.k)));
 
-            forEach(filterState.regionFilter, (d) => {
-                cardQueryHelper.addFilter({ k: 'region_code', o: '=', v: d });
-            });
+            if (filterState.regionFilter.length > 0) {
+                cardQueryHelper.addFilter({ k: 'region_code', o: '=', v: filterState.regionFilter });
+            }
 
             const res: Location = {
                 name: 'cloudServicePage',
@@ -365,9 +370,7 @@ export default {
                 sidebarQueryHelper.addFilter({ k: 'provider', v: selectedProvider.value, o: '=' });
             }
             if (filterState.regionFilter.length > 0) {
-                filterState.regionFilter.forEach((d) => {
-                    sidebarQueryHelper.addFilter({ k: 'region_code', v: d, o: '=' });
-                });
+                sidebarQueryHelper.addFilter({ k: 'region_code', v: filterState.regionFilter, o: '=' });
             }
 
             const res = {
@@ -415,13 +418,19 @@ export default {
                     getParams(isTriggeredBySideFilter),
                     { cancelToken: listCloudServiceRequest.token },
                 );
+
                 state.items = res.results;
                 state.totalCount = res.total_count || 0;
                 state.loading = false;
                 listCloudServiceRequest = undefined;
             } catch (e) {
-                if (!axios.isCancel(e.axiosError)) state.loading = false;
-                else console.error(e);
+                if (!axios.isCancel(e.axiosError)) {
+                    state.items = [];
+                    state.totalCount = 0;
+                    state.loading = false;
+                } else {
+                    console.error(e);
+                }
             }
         };
 
@@ -451,12 +460,16 @@ export default {
             await listCloudServiceType();
         };
 
-        const onChange = async (options?: any) => {
-            if (options) {
+        const onChange = async (options: any) => {
+            if (options.queryTags !== undefined) {
                 state.tags = options.queryTags;
-                state.pageSize = options.pageSize;
-                state.thisPage = options.thisPage;
                 await changeQueryString(options);
+            }
+            if (options.limit !== undefined) {
+                state.pageSize = options.limit;
+            }
+            if (options.start !== undefined) {
+                state.thisPage = getThisPage(options.start, state.pageSize);
             }
             await listCloudServiceType();
         };
@@ -496,6 +509,7 @@ export default {
         (async () => {
             await Promise.all([
                 vm.$store.dispatch('resource/provider/load'),
+                vm.$store.dispatch('resource/serviceAccount/load'),
                 vm.$store.dispatch('resource/cloudServiceType/load'),
                 vm.$store.dispatch('favorite/cloudServiceType/load'),
             ]);
@@ -634,6 +648,11 @@ export default {
         }
     }
 }
+
+/* right contents */
+.page-wrapper {
+    @apply flex flex-col w-full h-full;
+}
 .show-all {
     @apply text-sm mr-2;
     line-height: 2rem;
@@ -643,58 +662,62 @@ export default {
     margin-top: 1.5rem;
     margin-bottom: 1.5rem;
 }
-.cloud-service-list-container {
-    >>> .cloud-service-type-item {
-        @apply px-6 bg-white border border-gray-200;
-        height: 6rem;
-        filter: drop-shadow(0 2px 4px rgba(theme('colors.black'), 0.06));
-        border-radius: 4px;
-        .favorite-btn {
-            @apply ml-2;
-            flex-shrink: 0;
-            &:not(.active) {
-                display: none;
-            }
+.cloud-service-type-wrapper {
+    @apply grid w-full;
+    grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+    gap: 1rem;
+}
+
+.cloud-service-type-item {
+    @apply px-6 bg-white border border-gray-200;
+    height: 6rem;
+    filter: drop-shadow(0 2px 4px rgba(theme('colors.black'), 0.06));
+    border-radius: 4px;
+    .favorite-btn {
+        @apply ml-2;
+        flex-shrink: 0;
+        &:not(.active) {
+            display: none;
         }
-        &:hover {
-            @apply bg-blue-100;
-            cursor: pointer;
-            .favorite-btn:not(.active) {
-                display: block;
-            }
+    }
+    &:hover {
+        @apply border-l border-secondary bg-blue-100;
+        cursor: pointer;
+        .favorite-btn:not(.active) {
+            display: block;
         }
-        .item-wrapper {
-            @apply flex w-full h-full items-center;
-            .icon {
-                @apply overflow-hidden flex-shrink-0;
-                border-radius: 4px;
+    }
+    .item-wrapper {
+        @apply flex w-full h-full items-center;
+        .icon {
+            @apply overflow-hidden flex-shrink-0;
+            border-radius: 4px;
+        }
+        .text-content {
+            @apply ml-4 flex-grow overflow-hidden;
+            .title {
+                @apply mb-1 w-full truncate;
+                font-size: 1rem;
+                line-height: 1.2;
             }
-            .text-content {
-                @apply ml-4 flex-grow overflow-hidden;
-                .title {
-                    @apply mb-1 w-full truncate;
-                    font-size: 1rem;
-                    line-height: 1.2;
+            .sub-title {
+                @apply w-full flex items-center;
+                font-size: 0.875rem;
+                line-height: 1.5;
+
+                .sub-title-provider {
+                    @apply mr-2 text-gray-400;
+                    flex-shrink: 0;
                 }
-                .sub-title {
-                    @apply w-full flex items-center;
-                    font-size: 0.875rem;
-                    line-height: 1.5;
 
-                    .sub-title-provider {
-                        @apply mr-2 text-gray-400;
-                        flex-shrink: 0;
-                    }
+                .sub-title-name {
+                    @apply mr-2 inline-block truncate;
+                    flex-shrink: 1;
+                }
 
-                    .sub-title-name {
-                        @apply mr-2 inline-block truncate;
-                        flex-shrink: 1;
-                    }
-
-                    .sub-title-count {
-                        flex-shrink: 0;
-                        font-weight: bold;
-                    }
+                .sub-title-count {
+                    flex-shrink: 0;
+                    font-weight: bold;
                 }
             }
         }

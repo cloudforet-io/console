@@ -46,53 +46,54 @@
             </div>
         </template>
         <template #default>
-            <div class="parents-info">
-                <span v-if="projectGroupNavigation.length > 0" class="group-name">
-                    <p-page-navigation :routes="projectGroupNavigation" @click="onProjectGroupNavClick" />
-                </span>
-            </div>
-            <p-page-title :title="projectState.groupName ? projectState.groupName : $t('PROJECT.LANDING.ALL_PROJECT')"
-                          use-total-count
-                          :total-count="totalCount"
-            >
-                <template #extra>
-                    <span class="favorite-btn-wrapper">
-                        <favorite-button v-if="projectState.groupId" :item-id="projectState.groupId"
-                                         favorite-type="projectGroup"
-                                         resource-type="identity.ProjectGroup"
-                        />
+            <div class="page-wrapper">
+                <div class="parents-info">
+                    <span v-if="projectGroupNavigation.length > 0" class="group-name">
+                        <p-page-navigation :routes="projectGroupNavigation" @click="onProjectGroupNavClick" />
                     </span>
-                    <div class="btns">
-                        <p-icon-text-button v-if="!projectState.groupId"
-                                            style-type="primary-dark"
-                                            outline
-                                            name="ic_plus_bold"
-                                            @click="openProjectGroupForm(null)"
-                        >
-                            {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
-                        </p-icon-text-button>
-                        <p-dropdown-menu-btn v-if="projectState.groupId"
-                                             :menu="settingMenu"
-                                             button-only
-                                             button-icon="ic_setting"
-                                             button-style-type="primary-dark"
-                                             @edit:select="openProjectGroupEditForm"
-                                             @delete:select="openProjectGroupDeleteForm"
-                        />
-                        <p-icon-text-button v-if="projectState.groupId"
-                                            style-type="primary-dark"
-                                            name="ic_plus_bold"
-                                            @click="openProjectForm"
-                        >
-                            <div class="truncate">
-                                {{ $t('PROJECT.LANDING.CREATE_PROJECT') }}
-                            </div>
-                        </p-icon-text-button>
-                    </div>
-                </template>
-            </p-page-title>
-            <div class="pb-8">
+                </div>
+                <p-page-title :title="projectState.groupName ? projectState.groupName : $t('PROJECT.LANDING.ALL_PROJECT')"
+                              use-total-count
+                              :total-count="totalCount"
+                >
+                    <template #extra>
+                        <span class="favorite-btn-wrapper">
+                            <favorite-button v-if="projectState.groupId" :item-id="projectState.groupId"
+                                             favorite-type="projectGroup"
+                                             resource-type="identity.ProjectGroup"
+                            />
+                        </span>
+                        <div class="btns">
+                            <p-icon-text-button v-if="!projectState.groupId"
+                                                style-type="primary-dark"
+                                                outline
+                                                name="ic_plus_bold"
+                                                @click="openProjectGroupForm(null)"
+                            >
+                                {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
+                            </p-icon-text-button>
+                            <p-dropdown-menu-btn v-if="projectState.groupId"
+                                                 :menu="settingMenu"
+                                                 button-only
+                                                 button-icon="ic_setting"
+                                                 button-style-type="primary-dark"
+                                                 @edit:select="openProjectGroupEditForm"
+                                                 @delete:select="openProjectGroupDeleteForm"
+                            />
+                            <p-icon-text-button v-if="projectState.groupId"
+                                                style-type="primary-dark"
+                                                name="ic_plus_bold"
+                                                @click="openProjectForm"
+                            >
+                                <div class="truncate">
+                                    {{ $t('PROJECT.LANDING.CREATE_PROJECT') }}
+                                </div>
+                            </p-icon-text-button>
+                        </div>
+                    </template>
+                </p-page-title>
                 <project-card-list ref="projectListRef"
+                                   class="card-container"
                                    :group-id="projectState.groupId"
                                    :search-text="projectState.searchText"
                                    :parent-groups="parentGroups"
@@ -100,48 +101,48 @@
                                    @list="onProjectList"
                                    @create-project-group="openProjectGroupForm(null)"
                 />
+                <project-group-create-form-modal v-if="projectGroupFormVisible"
+                                                 :id="projectState.groupId"
+                                                 :parent="createTargetNode ? createTargetNode.node.data
+                                                     : null"
+                                                 :visible.sync="projectGroupFormVisible"
+                                                 :update-mode="updateMode"
+                                                 @create="onProjectGroupCreate"
+                                                 @update="onProjectGroupUpdate"
+                />
+
+                <p-button-modal :header-title="$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE')"
+                                centered
+                                :scrollable="false"
+                                size="md"
+                                fade
+                                :visible.sync="projectGroupDeleteFormVisible"
+                                theme-color="alert"
+                                :footer-confirm-button-bind="{
+                                    styleType: 'alert',
+                                }"
+                                @confirm="projectGroupDeleteFormConfirm"
+                >
+                    <template #body>
+                        <div class="delete-modal-contents">
+                            <p>
+                                {{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.CONTENT') }}
+                            </p>
+                            <i18n path="PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DESC" tag="p" class="desc">
+                                <template #deleteAllSubProjects>
+                                    <strong>{{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DELETE_ALL_SUB_PROJECT') }}</strong>
+                                </template>
+                            </i18n>
+                        </div>
+                    </template>
+                </p-button-modal>
+
+                <project-create-form-modal v-if="projectFormVisible && projectState.groupId"
+                                           :visible.sync="projectFormVisible"
+                                           :project-group-id="projectState.groupId"
+                                           @confirm="projectFormConfirm($event)"
+                />
             </div>
-            <project-group-create-form-modal v-if="projectGroupFormVisible"
-                                             :id="projectState.groupId"
-                                             :parent="createTargetNode ? createTargetNode.node.data
-                                                 : null"
-                                             :visible.sync="projectGroupFormVisible"
-                                             :update-mode="updateMode"
-                                             @create="onProjectGroupCreate"
-                                             @update="onProjectGroupUpdate"
-            />
-
-            <p-button-modal :header-title="$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE')"
-                            centered
-                            :scrollable="false"
-                            size="md"
-                            fade
-                            :visible.sync="projectGroupDeleteFormVisible"
-                            theme-color="alert"
-                            :footer-confirm-button-bind="{
-                                styleType: 'alert',
-                            }"
-                            @confirm="projectGroupDeleteFormConfirm"
-            >
-                <template #body>
-                    <div class="delete-modal-contents">
-                        <p>
-                            {{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.CONTENT') }}
-                        </p>
-                        <i18n path="PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DESC" tag="p" class="desc">
-                            <template #deleteAllSubProjects>
-                                <strong>{{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DELETE_ALL_SUB_PROJECT') }}</strong>
-                            </template>
-                        </i18n>
-                    </div>
-                </template>
-            </p-button-modal>
-
-            <project-create-form-modal v-if="projectFormVisible && projectState.groupId"
-                                       :visible.sync="projectFormVisible"
-                                       :project-group-id="projectState.groupId"
-                                       @confirm="projectFormConfirm($event)"
-            />
         </template>
     </p-vertical-page-layout>
 </template>
@@ -483,6 +484,11 @@ export default {
     }
 }
 
+/* right contents */
+.page-wrapper {
+    @apply flex flex-col w-full h-full;
+}
+
 .p-page-title::v-deep {
     @apply pb-5 border-b border-gray-200;
     .extra {
@@ -514,6 +520,10 @@ export default {
             }
         }
     }
+}
+
+.card-container {
+    @apply flex-grow;
 }
 
 .delete-modal-contents {

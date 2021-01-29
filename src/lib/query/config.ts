@@ -35,3 +35,10 @@ export const rawQueryOperatorToPluralApiQueryOperatorMap: Partial<Record<RawQuer
     '=': 'in',
     '!=': 'not_in',
 };
+
+// export const pluralRawQueryOperatorToSingularRawQueryOperatorMap: Partial<Record<RawQueryOperator, RawQueryOperator>> = {
+//     '': '',
+//     '!': 'not_contain_in',
+//     '=': 'in',
+//     '!=': 'not_in',
+// };

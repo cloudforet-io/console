@@ -1,126 +1,125 @@
 <template>
-    <p-toolbox-grid-layout class="project-cards"
-                           card-height="11.25rem"
-                           card-min-width="18.75rem"
-                           :items="items"
-                           :all-page="allPage"
-                           :loading="loading"
-                           :this-page.sync="thisPage"
-                           :page-size.sync="pageSize"
-                           :total-count="totalCount"
-                           @changePageNumber="getData()"
-                           @changePageSize="getData()"
-                           @clickRefresh="getData()"
-    >
-        <template #toolbox-left>
-            <div v-tooltip.bottom="{content: $t('PROJECT.LANDING.SHOW_ALL_TOOLTIP'), delay: {show: 500}}" class="show-all-wrapper">
-                <p-check-box v-model="showAllProjects">
-                    <span class="label">{{ $t('PROJECT.LANDING.SHOW_ALL') }}</span>
-                </p-check-box>
-            </div>
-        </template>
-        <template #no-data>
-            <div class="empty-container">
-                <div v-if="noProjectGroup">
-                    <p class="title">
-                        {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_TITLE') }}<br>
-                    </p>
-                    <p class="content">
-                        {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT') }}
-                    </p>
-                    <p class="content-order">
-                        <strong>1.</strong>&nbsp;{{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_1') }}
-                    </p>
-                    <p class="content-order">
-                        <strong>2.</strong>&nbsp;{{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_2') }}
-                    </p>
-                    <p-icon-text-button style-type="primary-dark" class="mt-6" name="ic_plus_bold"
-                                        width="1rem" height="1rem" @click="$emit('create-project-group')"
+    <div class="project-card-list">
+        <p-toolbox :searchable="false"
+                   :page-size="pageSize"
+                   :total-count="totalCount"
+                   @change="onChange"
+                   @refresh="getData()"
+        >
+            <template #left-area>
+                <div v-tooltip.bottom="{content: $t('PROJECT.LANDING.SHOW_ALL_TOOLTIP'), delay: {show: 500}}" class="show-all-wrapper">
+                    <p-check-box v-model="showAllProjects">
+                        <span class="label">{{ $t('PROJECT.LANDING.SHOW_ALL') }}</span>
+                    </p-check-box>
+                </div>
+            </template>
+        </p-toolbox>
+        <p-data-loader class="flex-grow" :data="items" :loading="loading">
+            <div class="project-cards">
+                <div v-for="(item, i) in items" :key="i" class="project-card-container">
+                    <router-link class="card"
+                                 :to="{ name: 'projectDetail',params: {id: item.project_id}}"
                     >
-                        {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_CREATE_BTN') }}
-                    </p-icon-text-button>
-                </div>
-                <div v-else-if="noProject" class="empty-project">
-                    <p class="text-primary2">
-                        {{ $t('PROJECT.LANDING.EMPTY_PROJECT_MSG') }}
-                    </p>
-                </div>
-            </div>
-        </template>
-        <template #card="{item}">
-            <router-link class="project-card-container"
-                         :to="{ name: 'projectDetail',params: {id: item.project_id}}"
-            >
-                <div class="card-top-wrapper">
-                    <div class="group-name">
-                        <template v-if="parentGroups.length > 0">
-                            {{ parentGroups[parentGroups.length - 1].name }} >
-                        </template>
-                        {{ item.project_group_info.name }}
-                    </div>
-                    <p class="project-name">
-                        {{ item.name }}
-                    </p>
-                    <div class="project-summary">
-                        <template v-if="cardSummaryLoading">
-                            <div v-for="v in skeletons" :key="v" class="skeleton-loading">
-                                <p-skeleton />
+                        <div class="card-top-wrapper">
+                            <div class="group-name">
+                                <template v-if="parentGroups.length > 0">
+                                    {{ parentGroups[parentGroups.length - 1].name }} >
+                                </template>
+                                {{ item.project_group_info.name }}
                             </div>
-                        </template>
-                        <span v-else>
-                            <span class="summary-item-text">{{ $t('PROJECT.LANDING.SERVER') }}</span>
-                            <router-link v-if="cardSummary[item.project_id]"
-                                         class="summary-item-num"
-                                         :to="getLocation(item.project_id, 'server')"
-                            >{{ cardSummary[item.project_id].serverCount }}</router-link>
-                            <span v-else class="summary-item-num none">N/A</span>
-                            <span class="mx-2 text-gray-300 divider">|</span>
-                            <span class="summary-item-text">{{ $t('PROJECT.LANDING.CLOUD_SERVICES') }}</span>
-                            <router-link v-if="cardSummary[item.project_id]"
-                                         class="summary-item-num"
-                                         :to="getLocation(item.project_id, 'cloudService')"
-                            >{{ cardSummary[item.project_id].cloudServiceCount }}
-                            </router-link>
-                            <span v-else class="summary-item-num none">N/A</span>
-                        </span>
-                    </div>
-                </div>
+                            <p class="project-name">
+                                {{ item.name }}
+                            </p>
+                            <div class="project-summary">
+                                <template v-if="cardSummaryLoading">
+                                    <div v-for="v in skeletons" :key="v" class="skeleton-loading">
+                                        <p-skeleton />
+                                    </div>
+                                </template>
+                                <span v-else>
+                                    <span class="summary-item-text">{{ $t('PROJECT.LANDING.SERVER') }}</span>
+                                    <router-link v-if="cardSummary[item.project_id]"
+                                                 class="summary-item-num"
+                                                 :to="getLocation(item.project_id, 'server')"
+                                    >{{ cardSummary[item.project_id].serverCount }}</router-link>
+                                    <span v-else class="summary-item-num none">N/A</span>
+                                    <span class="mx-2 text-gray-300 divider">|</span>
+                                    <span class="summary-item-text">{{ $t('PROJECT.LANDING.CLOUD_SERVICES') }}</span>
+                                    <router-link v-if="cardSummary[item.project_id]"
+                                                 class="summary-item-num"
+                                                 :to="getLocation(item.project_id, 'cloudService')"
+                                    >{{ cardSummary[item.project_id].cloudServiceCount }}
+                                    </router-link>
+                                    <span v-else class="summary-item-num none">N/A</span>
+                                </span>
+                            </div>
+                        </div>
 
-                <div class="card-bottom-wrapper">
-                    <div class="accounts">
-                        <span v-if="getDistinctProviders(item.providers).length" class="label">{{ $t('PROJECT.LANDING.SERVICE_ACCOUNTS') }}</span>
-                        <div class="provider-icon-wrapper">
-                            <div class="provider">
-                                <router-link v-for="(provider, index) in getDistinctProviders(item.providers)"
-                                             :key="index"
-                                             :to="{
-                                                 name: 'serviceAccount',
-                                                 query: { provider: getProvider(provider) ? provider : null },
-                                             }"
-                                             class="icon-link"
-                                             :style="{
-                                                 backgroundImage: `url('${getProvider(provider).icon || require('@/assets/icons/ic_provider_other.svg')}')`
-                                             }"
+                        <div class="card-bottom-wrapper">
+                            <div class="accounts">
+                                <span v-if="getDistinctProviders(item.providers).length" class="label">{{ $t('PROJECT.LANDING.SERVICE_ACCOUNTS') }}</span>
+                                <div class="provider-icon-wrapper">
+                                    <div class="provider">
+                                        <router-link v-for="(provider, index) in getDistinctProviders(item.providers)"
+                                                     :key="index"
+                                                     :to="{
+                                                         name: 'serviceAccount',
+                                                         query: { provider: getProvider(provider) ? provider : null },
+                                                     }"
+                                                     class="icon-link"
+                                                     :style="{
+                                                         backgroundImage: `url('${getProvider(provider).icon || require('@/assets/icons/ic_provider_other.svg')}')`
+                                                     }"
+                                        />
+                                    </div>
+                                </div>
+                                <div class="account-add">
+                                    <router-link class="icon-wrapper" :to="{name: 'serviceAccount'}">
+                                        <p-i name="ic_plus_thin" scale="0.8" color="inherit" />
+                                    </router-link>
+                                    <span v-if="getDistinctProviders(item.providers).length === 0" class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
+                                </div>
+                            </div>
+                            <div class="favorite-wrapper">
+                                <favorite-button :item-id="item.project_id"
+                                                 favorite-type="project"
+                                                 resource-type="identity.Project"
                                 />
                             </div>
                         </div>
-                        <div class="account-add">
-                            <router-link class="icon-wrapper" :to="{name: 'serviceAccount'}">
-                                <p-i name="ic_plus_thin" scale="0.8" color="inherit" />
-                            </router-link>
-                            <span v-if="getDistinctProviders(item.providers).length === 0" class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
-                        </div>
+                    </router-link>
+                </div>
+            </div>
+            <template #no-data>
+                <div v-if="noProjectGroup || noProject" class="empty-container">
+                    <div v-if="noProjectGroup">
+                        <p class="title">
+                            {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_TITLE') }}<br>
+                        </p>
+                        <p class="content">
+                            {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT') }}
+                        </p>
+                        <p class="content-order">
+                            <strong>1.</strong>&nbsp;{{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_1') }}
+                        </p>
+                        <p class="content-order">
+                            <strong>2.</strong>&nbsp;{{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_CONTENT_ORDER_2') }}
+                        </p>
+                        <p-icon-text-button style-type="primary-dark" class="mt-6" name="ic_plus_bold"
+                                            width="1rem" height="1rem" @click="$emit('create-project-group')"
+                        >
+                            {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_CREATE_BTN') }}
+                        </p-icon-text-button>
                     </div>
-                    <div class="favorite-wrapper">
-                        <favorite-button :item-id="item.project_id"
-                                         favorite-type="project"
-                                         resource-type="identity.Project"
-                        />
+                    <div v-else-if="noProject" class="empty-project">
+                        <p class="text-primary2">
+                            {{ $t('PROJECT.LANDING.EMPTY_PROJECT_MSG') }}
+                        </p>
                     </div>
                 </div>
-            </router-link>
-        </template>
-    </p-toolbox-grid-layout>
+            </template>
+        </p-data-loader>
+    </div>
 </template>
 
 
@@ -130,7 +129,8 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PCheckBox, PSkeleton, PI, PIconTextButton, PToolboxGridLayout,
+    PCheckBox, PSkeleton, PI, PIconTextButton,
+    PToolbox, PDataLoader,
 } from '@spaceone/design-system';
 import { getAllPage } from '@spaceone/design-system/src/organisms/paginations/text-pagination/helper';
 
@@ -158,7 +158,8 @@ export default {
         PI,
         PSkeleton,
         PCheckBox,
-        PToolboxGridLayout,
+        PToolbox,
+        PDataLoader,
     },
     props: {
         searchText: {
@@ -181,16 +182,16 @@ export default {
     setup(props: Props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            items: [],
+            items: undefined,
             totalCount: 0,
             loading: true,
             cardSummaryLoading: true,
-            thisPage: 1,
+            pageStart: 1,
             pageSize: 24,
             allPage: computed(() => getAllPage(state.totalCount, (state.pageSize))),
             cardSummary: {},
             showAllProjects: false,
-            noProject: computed(() => !state.loading && state.totalCount === 0),
+            noProject: computed(() => state.totalCount === 0),
             hoveredProjectId: '',
             hoveredGroupId: '',
             isAll: computed(() => !props.groupId),
@@ -210,7 +211,7 @@ export default {
         const listQuery = new ApiQueryHelper();
 
         const getParams = (id?, text?) => {
-            listQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
+            listQuery.setPageStart(state.pageStart)
                 .setPageLimit(state.pageSize);
 
             if (text) {
@@ -237,7 +238,7 @@ export default {
             getCardToken = axios.CancelToken.source();
             const cardSummary = {};
             try {
-                const ids = items.map(item => item.project_id);
+                const ids = items?.map(item => item.project_id);
                 const res = await SpaceConnector.client.statistics.topic.projectPage({
                     projects: ids,
                 }, { cancelToken: getCardToken.token });
@@ -292,10 +293,19 @@ export default {
             }
         };
 
+        const onChange = async (options: any) => {
+            if (options.limit !== undefined) {
+                state.pageSize = options.limit;
+            }
+            if (options.start !== undefined) {
+                state.pageStart = options.start;
+            }
+            await getData();
+        };
+
         const resetAll = () => {
-            state.items = [];
             state.totalCount = 0;
-            state.thisPage = 1;
+            state.pageStart = 1;
             state.pageSize = 24;
         };
 
@@ -323,6 +333,7 @@ export default {
             goToServiceAccount,
             getDistinctProviders,
             getData,
+            onChange,
             skeletons: range(1),
             listProjects,
             getLocation,
@@ -332,8 +343,11 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.project-card-list {
+    @apply flex flex-col h-full;
+}
 .show-all-wrapper {
-    @apply flex items-center text-base truncate leading-tight;
+    @apply flex h-full items-center text-base truncate leading-tight;
     .label {
         @apply text-sm ml-2 leading-relaxed;
     }
@@ -363,15 +377,21 @@ export default {
     }
 }
 
-.project-cards::v-deep .card-item {
-    @apply bg-white border border-gray-200 overflow-visible rounded cursor-pointer;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-    &:hover {
-        @apply border-l border-gray-200 bg-blue-100;
+.project-cards {
+    @apply grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));
+    grid-auto-rows: 11.25rem;
+    .project-card-container {
+        @apply bg-white border border-gray-200 overflow-visible rounded cursor-pointer;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+        &:hover {
+            @apply border-l border-gray-200 bg-blue-100;
+        }
     }
 }
 
-.project-card-container {
+.card {
     @apply flex flex-col w-full h-full;
     .favorite-wrapper .favorite-btn::v-deep:not(.active) {
         display: none;

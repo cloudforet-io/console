@@ -6,7 +6,6 @@ import {
     QueryItem,
 } from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
 import { Filter, FilterOperator, Query } from '@/lib/space-connector/type';
-import { flatten } from 'lodash';
 import {
     QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator,
 } from '@/lib/query/type';
@@ -17,7 +16,8 @@ import {
     datetimeRawQueryOperatorToQueryTagOperatorMap, rawQueryOperatorToApiQueryOperatorMap,
     rawQueryOperatorToPluralApiQueryOperatorMap,
 } from '@/lib/query/config';
-import { store } from '@/store';
+import { setDatetimeToFilters } from '@/lib/query/helper';
+import { flatten, forEach } from 'lodash';
 
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -72,17 +72,31 @@ export class QueryHelper {
     setFiltersAsQueryTag(queryTags: QueryTag[], keyItemSets?: KeyItemSet[]): this {
         if (keyItemSets) this.setKeyItemSets(keyItemSets);
         this._filters = [];
+        const filterMap: any = {};
         queryTags.forEach((q) => {
             if (!q.invalid) {
                 if (q.key) {
-                    this._filters.push({
-                        k: q.key.name,
-                        v: q.value.name,
-                        o: (q.key.dataType === 'datetime' ? `${q.operator}t` : q.operator) as RawQueryOperator,
-                    });
+                    const key = this._keyMap[q.key.name] || q.key;
+                    const op = (key.dataType === 'datetime' ? `${q.operator}t` : q.operator) as RawQueryOperator;
+                    if (filterMap[key.name]) {
+                        if (filterMap[key.name][op]) filterMap[key.name][op].push(q.value.name);
+                        else filterMap[key.name][op] = [q.value.name];
+                    } else {
+                        filterMap[key.name] = { [op]: [q.value.name] };
+                    }
                 } else this._filters.push({ v: q.value.name });
             }
         });
+        forEach(filterMap, (opMap, k) => {
+            forEach(opMap, (v, o) => {
+                this._filters.push({ k, v, o: o as RawQueryOperator });
+            });
+        });
+        // this._filters.push({
+        //     k: key.name,
+        //     v: q.value.name,
+        //     o: op,
+        // });
         return this;
     }
 
@@ -160,23 +174,9 @@ export class QueryHelper {
 
         this._filters.forEach((f) => {
             if (f.k) {
-                if (typeof f.v === 'string' && datetimeRawQueryOperatorToQueryTagOperatorMap[f.o as string]) {
+                if (datetimeRawQueryOperatorToQueryTagOperatorMap[f.o as string]) {
                     /* datetime case */
-                    const time = dayjs.utc(dayjs.tz(f.v, store.state.user.timezone));
-
-                    // console.debug('time filter value: ', f.v,
-                    //     '\ntimezone: ', store.state.user.timezone,
-                    //     '\nlocal time: ', dayjs.tz(f.v, store.state.user.timezone).format('YYYY-MM-DD HH:mm:ss'),
-                    //     '\nutc time: ', time.format('YYYY-MM-DD HH:mm:ss'));
-
-                    if (f.o === '>t' || f.o === '>=t') {
-                        filter.push({ k: f.k, v: time.toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['>=t'] });
-                    } else if (f.o === '<t' || f.o === '<=t') {
-                        filter.push({ k: f.k, v: time.toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['<=t'] });
-                    } else {
-                        filter.push({ k: f.k, v: time.toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['>=t'] });
-                        filter.push({ k: f.k, v: time.add(1, 'day').toISOString(), o: rawQueryOperatorToApiQueryOperatorMap['<t'] });
-                    }
+                    setDatetimeToFilters(filter, f);
                 } else if (Array.isArray(f.v)) {
                     /* plural case */
                     if (rawQueryOperatorToPluralApiQueryOperatorMap[f.o || '']) {
