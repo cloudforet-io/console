@@ -1,0 +1,311 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PToolbox from './PToolbox.vue';
+
+
+<Meta title='Navigation/Toolbox' argTypes={{
+    paginationVisible: {
+        name: 'paginationVisible',
+        type: {name: 'boolean'},
+        description: 'Show pagination',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    pageSizeChangeable: {
+        name: 'pageSizeChangeable',
+        type: {name: 'boolean'},
+        description: 'Show page size options and allow changing page size',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    sortable: {
+        name: 'sortable',
+        type: {name: 'boolean'},
+        description: 'Show sort options and allow changing sort key',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    'exportable': {
+        name: 'exportable',
+        type: {name: 'boolean'},
+        description: 'Show excel button and allow export',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    refreshable: {
+            name: 'refreshable',
+            type: {name: 'boolean'},
+            description: 'Show refresh button and allow refresh',
+            defaultValue: true,
+            table: {
+                type: {
+                    summary: 'boolean'
+                },
+                    category: 'props',
+                    defaultValue: {
+                    summary: true
+                },
+            },
+            control: {
+                type: 'boolean'
+            }
+    },
+        pageSize: {
+            name: 'pageSize',
+            type: {name: 'number'},
+            description: 'Page size to show data. sync props.',
+            defaultValue: 24,
+            table: {
+                type: {
+                    summary: 'number'
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 24
+                },
+            },
+            control: {
+                type: 'select',
+                options: [24, 36, 48]
+            }
+    },
+    totalCount: {
+        name: 'totalCount',
+        type: {name: 'number'},
+        description: 'Total count of data for calculating pagination.',
+        defaultValue: 0,
+        table: {
+        type: {
+        summary: 'number'
+    },
+        category: 'props',
+        defaultValue: {
+        summary: 0
+    },
+    },
+        control: {
+        type: 'number',
+        options: {min: 0}
+        }
+    },
+    sortBy: {
+        name: 'sortBy',
+        type: {name: 'string'},
+        description: 'Sort key',
+        defaultValue: '',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: ''
+            },
+        },
+        control: {
+            type: 'text',
+        }
+    },
+        pageSizeOptions: {
+            name: 'pageSizeOptions',
+            type: {name: 'array'},
+            description: 'Options for dropdown of page sizes.',
+            defaultValue: [24, 36, 48],
+            table: {
+                type: {
+                    summary: 'array'
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: '[24, 36, 48]'
+                },
+            },
+            control: {
+                type: 'object',
+            }
+        },
+    sortByOptions: {
+        name: 'sortByOptions',
+        type: {name: 'array'},
+        description: 'Options for dropdown of sort keys.',
+        defaultValue: [],
+        table: {
+            type: {
+                summary: 'array'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '[]'
+            },
+        },
+        control: {
+            type: 'object',
+        }
+    },
+    onChange: {
+        name: 'change',
+        description: `Event emitted when pagination or sort value is changed.
+         First argument is 'options'.`,
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            category: 'events',
+            defaultValue: {
+                summary: null
+            }
+        }
+    },
+    onExport: {
+        name: 'export',
+        description: 'Event emitted when export button clicked',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            category: 'events',
+            defaultValue: {
+                summary: null
+            }
+        }
+    },
+    onRefresh: {
+        name: 'refresh',
+        description: 'Event emitted when refresh button clicked',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            category: 'events',
+            defaultValue: {
+                summary: null
+            }
+        }
+    },
+}}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PToolbox },
+    template: `
+        <div class="min-h-30 border-gray-200 border">
+            <p-toolbox v-bind="$props">
+            </p-toolbox>
+        </div>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Toolbox
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="basic">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+### Options
+
+When pagination, page size, and sort value are changed, `change` event will be occurred.<br/>
+`change` event has one argument, `options`. <br/>
+`options` contains `sortBy`, `limit`, and `start` optionally.<br/>
+Each property in options exists only when the value is changed.<br/>
+
+```typescript
+
+interface Options {
+    start?: number;
+    limit?: number;
+    sortBy?: string;
+}
+
+```
+
+
+
+## Full Case
+
+<Canvas>
+    <Story name="full case" args={{
+        paginationVisible: true,
+        pageSizeChangeable: true,
+        sortable: true,
+        'exportable': true,
+        refreshable: true,
+        sortBy: 'Recent',
+        sortByOptions: ['Recent']
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground"/>
+
