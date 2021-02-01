@@ -72,7 +72,7 @@ export default defineComponent({
         font-size: 0.875rem;
         line-height: 1.6;
         max-height: 33vh;
-        overflow-y: scroll;
+        overflow-y: auto;
         text-align: left;
     }
     .close-btn {
