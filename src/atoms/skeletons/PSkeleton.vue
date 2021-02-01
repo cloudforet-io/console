@@ -1,6 +1,6 @@
 <script lang="ts">
 import { getBindClass } from '@/util/functional-helpers';
-import { gray, primary3 } from '@/styles/colors';
+import { gray } from '@/styles/colors';
 
 const isEmptyVNode = (nodes) => {
     if (!nodes) return true;
@@ -23,17 +23,9 @@ export default {
             type: Boolean,
             default: true,
         },
-        color: {
-            type: String,
-            default: primary3,
-        },
         duration: {
             type: Number,
             default: 2,
-        },
-        highlight: {
-            type: String,
-            default: gray[100],
         },
         width: {
             type: String,
@@ -56,18 +48,17 @@ export default {
         props, slots, data,
     }) {
         const {
-            loading, color, duration, highlight, width, height, tag, animation,
+            loading, duration, width, height, tag, animation,
         } = props;
         const style: CSSStyleDeclaration = {} as CSSStyleDeclaration;
         const showLoading = loading || isEmptyVNode(slots().default);
 
         if (showLoading) {
-            style.backgroundColor = color;
             if (width) style.width = width;
             if (height) style.height = height;
 
             if (animation) {
-                style.backgroundImage = `linear-gradient(90deg, ${color}, ${highlight}, ${color})`;
+                style.backgroundImage = `linear-gradient(90deg, ${gray[200]}, ${gray[100]}, ${gray[200]})`;
                 style.animation = `p-skeleton-loading ${duration}s ease-in-out infinite`;
             } else {
                 style.backgroundImage = '';
@@ -94,7 +85,9 @@ export default {
 
 <style lang="postcss">
 .p-skeleton {
-    @apply rounded-sm inline-block w-full;
+    @apply rounded-sm inline-block w-full bg-gray-200;
+    opacity: 0.4;
+    border-radius: 0.375rem;
     height: 0.875rem;
     line-height: inherit;
     background-repeat: no-repeat;
