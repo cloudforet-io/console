@@ -34,7 +34,7 @@
                 {{ $t('PROJECT.DETAIL.REPORT_DOWNLOAD_FILE_DESC') }}
             </p>
         </div>
-        <p-hr />
+        <p-divider />
         <div class="example-wrapper">
             <p class="title">
                 Sample Report
@@ -83,7 +83,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PSelectDropdown, PIconModal, PFieldGroup, PIconTextButton, PTextInput, PHr,
+    PSelectDropdown, PIconModal, PFieldGroup, PIconTextButton, PTextInput, PDivider,
 } from '@spaceone/design-system';
 
 import {
@@ -99,7 +99,7 @@ export default {
     components: {
         PIconModal,
         PIconTextButton,
-        PHr,
+        PDivider,
         PSelectDropdown,
         PTextInput,
         PFieldGroup,

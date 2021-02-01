@@ -1,7 +1,7 @@
 <template>
     <general-page-layout class="add-service-account-container">
         <div class="flex">
-            <p-page-navigation class="flex-grow" :routes="routeState.routes" />
+            <p-breadcrumbs class="flex-grow" :routes="routeState.routes" />
             <info-button v-if="description" :visible="!!description"
                          class="flex-shrink-0"
             >
@@ -144,9 +144,9 @@ import {
 
 import {
     PPageTitle, PJsonSchemaForm, PTab, PFieldGroup, PLazyImg,
-    PPageNavigation, PPaneLayout, PIconTextButton, PRadio, PMarkdown, PTextEditor, PButton, PTextInput,
+    PBreadcrumbs, PPaneLayout, PIconTextButton, PRadio, PMarkdown, PTextEditor, PButton, PTextInput,
 } from '@spaceone/design-system';
-import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
+import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import ProjectTreePanel from '@/views/identity/service-account/modules/ProjectTreePanel.vue';
@@ -169,7 +169,7 @@ export default {
         PTextEditor,
         PMarkdown,
         PPageTitle,
-        PPageNavigation,
+        PBreadcrumbs,
         PFieldGroup,
         PPaneLayout,
         PIconTextButton,

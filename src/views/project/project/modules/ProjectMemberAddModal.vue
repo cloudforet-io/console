@@ -112,7 +112,7 @@ import {
 import {
     PButtonModal, PTag, PSearchTable, PSelectDropdown, PFieldGroup, PTextInput, PButton, PI, PEmpty,
 } from '@spaceone/design-system';
-import { SearchTableListeners, Options } from '@spaceone/design-system/dist/src/organisms/tables/search-table/type';
+import { SearchTableListeners, Options } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { isEqual } from 'lodash';

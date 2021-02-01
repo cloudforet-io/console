@@ -2,7 +2,7 @@ import {
     SearchKeyOptions,
     SearchSchema,
     SearchDataType,
-} from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type/layout-schema';
+} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 
 export interface SearchKeyItem extends SearchKeyOptions {

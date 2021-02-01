@@ -11,7 +11,7 @@
         </template>
         <template #default>
             <div class="page-navigation">
-                <p-page-navigation :routes="routes" />
+                <p-breadcrumbs :routes="routes" />
             </div>
             <p-toolbox-grid-layout class="plugin-list"
                                    :items="loading ? [] : plugins"
@@ -113,7 +113,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PToolboxGridLayout, PPageTitle, PSelectDropdown, PCardItem, PPageNavigation,
+    PToolboxGridLayout, PPageTitle, PSelectDropdown, PCardItem, PBreadcrumbs,
     PIconTextButton, PEmpty, PSkeleton, PBadge, PI,
 } from '@spaceone/design-system';
 
@@ -166,7 +166,7 @@ export default {
     name: 'CollectorPluginPage',
     components: {
         PVerticalPageLayout,
-        PPageNavigation,
+        PBreadcrumbs,
         PSkeleton,
         PEmpty,
         PCardItem,

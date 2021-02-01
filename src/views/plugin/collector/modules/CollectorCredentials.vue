@@ -74,7 +74,7 @@ import {
 import {
     PQuerySearchTable, PPanelTop, PButton, PI,
 } from '@spaceone/design-system';
-import { DataTableField } from '@spaceone/design-system/dist/src/organisms/tables/data-table/type';
+import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 import { timestampFormatter } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';

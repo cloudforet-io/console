@@ -1,5 +1,5 @@
-import { StatusProps } from '@spaceone/design-system/dist/src/molecules/status/type';
-import { Badge } from '@spaceone/design-system/dist/src/atoms/badges/type';
+import { StatusProps } from '@spaceone/design-system/dist/src/data-display/status/type';
+import { Badge } from '@spaceone/design-system/dist/src/data-display/badges/type';
 
 
 type Enum<T> = Record<string, T>

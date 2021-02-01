@@ -1,7 +1,7 @@
 <template>
     <general-page-layout>
         <div class="page-inner">
-            <p-page-navigation :routes="pageNavigation" />
+            <p-breadcrumbs :routes="pageNavigation" />
             <div class="top-wrapper">
                 <p-page-title :title="item.name" child @goBack="$router.go(-1)" />
                 <div class="btns">
@@ -142,10 +142,10 @@ import {
 
 import {
     PSearchTable, PTab, PPageTitle, PTableCheckModal, PButtonModal, PPanelTop,
-    PDropdownMenuBtn, PIconButton, PCopyButton, PIconTextButton, PPageNavigation, PButton, PBadge,
+    PDropdownMenuBtn, PIconButton, PCopyButton, PIconTextButton, PBreadcrumbs, PButton, PBadge,
 } from '@spaceone/design-system';
-import { Options, SearchTableListeners } from '@spaceone/design-system/dist/src/organisms/tables/search-table/type';
-import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
+import { Options, SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
+import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
@@ -162,7 +162,7 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectModel } from '@/views/project/project/type';
 import { TranslateResult } from 'vue-i18n';
-import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 export default {
     name: 'ProjectDetail',
@@ -187,7 +187,7 @@ export default {
         SProjectMemberAddModal,
         ProjectMemberUpdateModal,
         PIconTextButton,
-        PPageNavigation,
+        PBreadcrumbs,
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;

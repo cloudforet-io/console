@@ -61,7 +61,7 @@ import {
     PI, PButtonModal, PRadio, PTree,
 } from '@spaceone/design-system';
 import { makeProxy } from '@spaceone/design-system/src/util/composition-helpers';
-import { TreeItem, TreeNode } from '@spaceone/design-system/dist/src/molecules/tree-node/type';
+import { TreeItem, TreeNode } from '@spaceone/design-system/dist/src/data-display/tree/tree-node/type';
 
 import { ProjectItemResp, TreeSearchResp } from '@/views/project/project/type';
 import { SpaceConnector } from '@/lib/space-connector';

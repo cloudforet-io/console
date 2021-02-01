@@ -132,7 +132,7 @@ import {
     PCheckBox, PSkeleton, PI, PIconTextButton,
     PToolbox, PDataLoader,
 } from '@spaceone/design-system';
-import { getAllPage } from '@spaceone/design-system/src/organisms/paginations/text-pagination/helper';
+import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';

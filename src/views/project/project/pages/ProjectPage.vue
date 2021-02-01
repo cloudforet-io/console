@@ -49,7 +49,7 @@
             <div class="page-wrapper">
                 <div class="parents-info">
                     <span v-if="projectGroupNavigation.length > 0" class="group-name">
-                        <p-page-navigation :routes="projectGroupNavigation" @click="onProjectGroupNavClick" />
+                        <p-breadcrumbs :routes="projectGroupNavigation" @click="onProjectGroupNavClick" />
                     </span>
                 </div>
                 <p-page-title :title="projectState.groupName ? projectState.groupName : $t('PROJECT.LANDING.ALL_PROJECT')"
@@ -155,9 +155,9 @@ import {
 import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 
 import {
-    PI, PPageTitle, PPageNavigation, PIconTextButton, PButtonModal, PButton, PDropdownMenuBtn,
+    PI, PPageTitle, PBreadcrumbs, PIconTextButton, PButtonModal, PButton, PDropdownMenuBtn,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import ProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
@@ -181,7 +181,7 @@ export default {
         FavoriteList,
         FavoriteButton,
         ProjectCardList,
-        PPageNavigation,
+        PBreadcrumbs,
         PDropdownMenuBtn,
         PButton,
         ProjectGroupTree,

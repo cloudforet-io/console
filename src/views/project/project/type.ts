@@ -1,5 +1,5 @@
 import { TimeStamp } from '@/models';
-import { TreeItem } from '@spaceone/design-system/dist/src/molecules/tree-node/type';
+import { TreeItem } from '@spaceone/design-system/dist/src/data-display/tree/tree-node/type';
 
 export type ItemType = 'PROJECT_GROUP'|'PROJECT'
 

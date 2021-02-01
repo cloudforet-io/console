@@ -18,7 +18,7 @@
             <div class="menu-title">
                 {{ $t('IDENTITY.USER.MAIN.MY_ACCOUNT') }}
             </div>
-            <p-hr class="menu-divider" />
+            <p-divider class="menu-divider" />
             <div v-for="(item) in sidebarState.userMenuList" :key="item.label"
                  class="menu-item"
                  :class="{'selected': item.label === sidebarState.selectedItem}"
@@ -30,7 +30,7 @@
                 <div class="menu-title">
                     {{ $t('IDENTITY.USER.MAIN.ADMINISTRATOR') }}
                 </div>
-                <p-hr class="menu-divider" />
+                <p-divider class="menu-divider" />
                 <div v-for="(item) in sidebarState.adminMenuList"
                      :key="item.label"
                      class="menu-item"
@@ -54,7 +54,7 @@ import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PHr, PI } from '@spaceone/design-system';
+import { PDivider, PI } from '@spaceone/design-system';
 
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 import { store } from '@/store';
@@ -72,7 +72,7 @@ export default {
     components: {
         VerticalPageLayout,
         PI,
-        PHr,
+        PDivider,
     },
     beforeRouteEnter(to, from, next) {
         next((vm) => {

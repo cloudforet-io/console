@@ -1,6 +1,6 @@
 <template>
     <div class="right-contents-container">
-        <p-page-navigation :routes="routes" />
+        <p-breadcrumbs :routes="routes" />
         <p-page-title :title="$t('IDENTITY.USER.MAIN.USER_MANAGEMENT')"
                       use-total-count use-selected-count
                       :total-count="totalCount"
@@ -172,14 +172,14 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PEmpty, PQuerySearchTable, PPageNavigation, PIconTextButton, PStatus,
+    PEmpty, PQuerySearchTable, PBreadcrumbs, PIconTextButton, PStatus,
     PHorizontalLayout, PDropdownMenuBtn, PTab, PDataTable, PTableCheckModal, PPageTitle,
 } from '@spaceone/design-system';
 
-import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
-import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
-import { Options } from '@spaceone/design-system/dist/src/organisms/tables/query-search-table/type';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import { Options } from '@spaceone/design-system/dist/src/data-display/tables/query-search-table/type';
 import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
 
 import UserForm from '@/views/identity/user/modules/UserForm.vue';
@@ -220,7 +220,7 @@ export default {
     components: {
         PEmpty,
         PQuerySearchTable,
-        PPageNavigation,
+        PBreadcrumbs,
         PIconTextButton,
         UserForm,
         PStatus,

@@ -101,7 +101,7 @@ import {
 } from '@vue/composition-api';
 
 import { PTextPagination, PI } from '@spaceone/design-system';
-import { getAllPage } from '@spaceone/design-system/src/organisms/paginations/text-pagination/helper';
+import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
 

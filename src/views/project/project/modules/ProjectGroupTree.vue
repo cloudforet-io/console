@@ -61,8 +61,8 @@ import {
 } from '@spaceone/design-system';
 import {
     TreeItem, TreeNode,
-} from '@spaceone/design-system/dist/src/molecules/tree-node/type';
-import { Tree } from '@spaceone/design-system/dist/src/organisms/tree/type';
+} from '@spaceone/design-system/dist/src/data-display/tree/tree-node/type';
+import { Tree } from '@spaceone/design-system/dist/src/data-display/tree/type';
 
 import { findIndex, reverse } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';

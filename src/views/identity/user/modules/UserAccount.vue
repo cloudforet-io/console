@@ -1,7 +1,7 @@
 <template>
     <div class="user-account-page">
-        <p-page-navigation v-if="isAdmin" :routes="routeState.adminRoutes" />
-        <p-page-navigation v-else :routes="routeState.userRoutes" />
+        <p-breadcrumbs v-if="isAdmin" :routes="routeState.adminRoutes" />
+        <p-breadcrumbs v-else :routes="routeState.userRoutes" />
         <p-page-title :title="$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE')" />
         <p-pane-layout class="form-wrapper">
             <p class="form-title">
@@ -96,7 +96,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PPaneLayout, PButton, PPageNavigation, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle,
+    PPaneLayout, PButton, PBreadcrumbs, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle,
 } from '@spaceone/design-system';
 
 import { map } from 'lodash';
@@ -110,7 +110,7 @@ export default {
     name: 'UserAccountPage',
     components: {
         PPageTitle,
-        PPageNavigation,
+        PBreadcrumbs,
         PButton,
         PSelectDropdown,
         PTextInput,

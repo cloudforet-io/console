@@ -1,8 +1,8 @@
 import { forEach } from 'lodash';
 import { Location } from 'vue-router';
 import router from '@/routes';
-import { QueryTag as Tag } from '@spaceone/design-system/dist/src/organisms/search/query-search-tags/type';
-import { QueryItem } from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
+import { QueryTag as Tag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
+import { QueryItem } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';

@@ -70,7 +70,7 @@
                              width="1rem" height="1rem"
                         />
                     </div>
-                    <p-hr />
+                    <p-divider />
                 </div>
                 <div class="sub-menu" @click="openProfile">
                     <span>{{ $t('COMMON.GNB.ACCOUNT.LABEL_PROFILE') }}</span>
@@ -90,7 +90,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { PAnchor, PI, PHr } from '@spaceone/design-system';
+import { PAnchor, PI, PDivider } from '@spaceone/design-system';
 import { Location } from 'vue-router';
 import router from '@/routes';
 import { store } from '@/store';
@@ -100,7 +100,7 @@ import { languages } from '@/store/modules/user/config';
 export default {
     name: 'RightSideMenu',
     components: {
-        PHr,
+        PDivider,
         PAnchor,
         PI,
     },
@@ -321,7 +321,7 @@ export default {
                         padding-right: 0.5rem;
                     }
                 }
-                .p-hr {
+                .p-divider {
                     margin-top: 1rem;
                 }
             }

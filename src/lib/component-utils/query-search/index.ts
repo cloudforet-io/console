@@ -4,11 +4,11 @@ import {
     ValueHandler,
     ValueHandlerMap,
     ValueItem,
-} from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
+} from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import {
     map, size, flatMap, flatten, uniq, cloneDeep,
 } from 'lodash';
-import { SearchEnumItem, SearchEnums } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type/layout-schema';
+import { SearchEnumItem, SearchEnums } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { SpaceConnector } from '@/lib/space-connector';
 import { Filter } from '@/lib/space-connector/type';
 

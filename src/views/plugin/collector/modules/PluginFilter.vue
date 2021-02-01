@@ -2,14 +2,14 @@
     <div class="plugin-filter-container">
         <div class="rows">
             <header>{{ $t('PLUGIN.COLLECTOR.PLUGINS.SEARCH') }}</header>
-            <p-hr class="sidebar-divider" />
+            <p-divider class="sidebar-divider" />
             <p-search v-model="search" class="p-search" :placeholder="$t('PLUGIN.COLLECTOR.PLUGINS.SEARCH_PLACEHOLDER')"
                       @search="$emit('search', $event)"
             />
         </div>
         <div class="rows">
             <header>{{ $t('PLUGIN.COLLECTOR.PLUGINS.REPOSITORY_LABEL') }}</header>
-            <p-hr class="sidebar-divider" />
+            <p-divider class="sidebar-divider" />
             <div v-for="(repo, idx) in repositories" :key="idx"
                  class="filter" :class="{selected: proxySelectedRepoId === repo.repository_id}"
                  @click.stop="onClickRepoText(repo.repository_id)"
@@ -20,7 +20,7 @@
         </div>
         <div class="rows">
             <header>{{ $t('PLUGIN.COLLECTOR.PLUGINS.RESOURCE_TYPE_LABEL') }}</header>
-            <p-hr class="sidebar-divider" />
+            <p-divider class="sidebar-divider" />
             <div v-for="(checked, resource) in resourceOptions" :key="resource"
                  class="filter" :class="{selected: checked}"
                  @click.stop="onClickResourceText(resource)"
@@ -35,7 +35,7 @@
 <script lang="ts">
 import { toRefs, reactive, computed } from '@vue/composition-api';
 
-import { PSearch, PRadio, PCheckBox, PHr } from '@spaceone/design-system';
+import { PSearch, PRadio, PCheckBox, PDivider } from '@spaceone/design-system';
 
 import { makeProxy } from '@/lib/compostion-util';
 
@@ -45,7 +45,7 @@ export default {
         PSearch,
         PRadio,
         PCheckBox,
-        PHr,
+        PDivider,
     },
     props: {
         repositories: {

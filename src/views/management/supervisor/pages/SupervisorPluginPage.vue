@@ -69,8 +69,8 @@ import {
     PHorizontalLayout, PTab, PDataTable, PPageTitle,
     PQuerySearchTable, PDefinitionTable, PPanelTop, PButton,
 } from '@spaceone/design-system';
-import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
+import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 

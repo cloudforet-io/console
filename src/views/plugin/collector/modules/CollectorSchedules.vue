@@ -89,8 +89,8 @@ import {
 import {
     PIconTextButton, PToolboxTable, PDropdownMenuBtn, PTableCheckModal, PLottie,
 } from '@spaceone/design-system';
-import { DataTableField } from '@spaceone/design-system/dist/src/organisms/tables/data-table/type';
-import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
+import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import EditScheduleModal from '@/views/plugin/collector/modules/EditScheduleModal.vue';
 import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';

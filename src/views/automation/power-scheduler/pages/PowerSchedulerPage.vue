@@ -14,7 +14,7 @@
                 <p class="title">
                     <strong>{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SCHEDULER_LIST') }}</strong>&nbsp;({{ totalCount }})
                 </p>
-                <p-hr />
+                <p-divider />
                 <div class="my-6 mx-3">
                     <p-selectable-list :items="scheduleList" :loading="loading" :mapper="listMapper"
                                        :selected-indexes="selectedIndexes"
@@ -48,7 +48,7 @@
                 </div>
             </section>
         </template>
-        <p-page-navigation :routes="routeState.route" />
+        <p-breadcrumbs :routes="routeState.route" />
         <div class="detail-container">
             <template v-if="loading">
                 <div class="loading-backdrop fade-in" />
@@ -83,7 +83,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PSelectableList, PPageNavigation, PIconTextButton, PHr, PLottie
+    PSelectableList, PBreadcrumbs, PIconTextButton, PDivider, PLottie
 } from '@spaceone/design-system';
 
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
@@ -119,11 +119,11 @@ export default {
     components: {
         PLottie,
         PSelectableList,
-        PHr,
+        PDivider,
         VerticalPageLayout,
         ScheduleDetail,
         PIconTextButton,
-        PPageNavigation,
+        PBreadcrumbs,
     },
     props: {
         projectId: {
