@@ -1,6 +1,6 @@
 <template>
     <div class="p-horizontal-layout">
-        <div class="overflow-hidden" :style="{height: `${containerHeight}px`}">
+        <div :style="{height: `${containerHeight}px`}">
             <slot name="container" :height="containerHeight" />
         </div>
 
