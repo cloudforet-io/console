@@ -224,10 +224,13 @@ export default {
             font-weight: bold;
             letter-spacing: 0;
             margin-bottom: 0.25rem;
-            margin-right: 0.375rem;
+            //margin-right: 0.375rem;
         }
         .required-mark {
             @apply text-alert;
+            font-size: 0.25rem;
+            line-height: 1.2rem;
+            margin-left: 0.1rem;
         }
         .form-control {
             @apply text-gray-900 border border-gray-300;
