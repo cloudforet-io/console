@@ -87,12 +87,6 @@ export default defineComponent({
             await router.push(res);
         };
 
-        watch(() => vm.$store.getters['user/hasPermission'], (hasPermission) => {
-            if (!hasPermission && vm.$route.name !== 'userAccount') {
-                vm.$router.replace({ name: 'userAccount' });
-            }
-        }, { immediate: true });
-
         return {
             ...toRefs(state),
             goToSignIn,

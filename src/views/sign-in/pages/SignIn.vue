@@ -140,7 +140,10 @@ export default {
                     userType: 'USER',
                     credentials,
                 });
-                await vm.$router.push(props.nextPath);
+                const hasPermission = vm.$store.getters['user/hasPermission'];
+                if (!hasPermission && vm.$route.name !== 'userAccount') {
+                    await vm.$router.replace({ name: 'userAccount' });
+                } else await vm.$router.push(props.nextPath);
             } catch (e) {
                 console.error(e);
                 state.showErrorMessage = true;
