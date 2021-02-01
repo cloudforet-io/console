@@ -22,8 +22,8 @@
                             @init="onChange"
                             @rowLeftClick="onSelect"
             />
-            <div v-if="isSelected">
-                <div class="field-group-wrapper">
+            <transition name="show">
+                <div v-if="isSelected" class="field-group-wrapper">
                     <p-field-group
                         :label="$t('PROJECT.DETAIL.MODAL_ADD_MEMBER')"
                         :required="true"
@@ -67,8 +67,8 @@
                     </div>
                     <div class="label-input-wrapper">
                         <p-text-input v-model="memberLabel" block
-                                      @keyup.enter="addMemberLabel"
                                       :placeholder="'Ex. Developer'"
+                                      @keyup.enter="addMemberLabel"
                         />
                         <p-button class="icon-button" style-type="gray900"
                                   @click="addMemberLabel"
@@ -88,8 +88,8 @@
                         </p-tag>
                     </p>
                 </div>
-            </div>
-            <div v-else>
+            </transition>
+            <div v-if="!isSelected">
                 <p-empty class="empty-msg">
                     {{ $t('PROJECT.DETAIL.CLICK_ADD_MEMBER') }}
                 </p-empty>
@@ -350,6 +350,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+
 .field-group-wrapper {
     @apply bg-primary4 border border-gray-200;
     margin-top: 1.5rem;
@@ -425,4 +426,18 @@ export default {
 .p-text-input {
     width: 25rem;
 }
+.show-enter-active,
+.show-leave-enter {
+    transform: translateY(0);
+    transition: all 0.5s ease;
+    height: auto;
+    opacity: 1;
+}
+.show-enter,
+.show-leave-to {
+    transform: translateY(-5%);
+    height: 0;
+    opacity: 0;
+}
+
 </style>
