@@ -18,7 +18,7 @@
 <script lang="ts">
 import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 import { makeProxy } from '@/util/composition-helpers';
-import PIconButton from '@/molecules/buttons/icon-button/PIconButton.vue';
+import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import { styleTypes } from '@/feedbacks/notification/config';
 
 export default defineComponent({

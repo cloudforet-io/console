@@ -3,7 +3,7 @@ const fs = require('fs');
 const path = require('path');
 
 const sourcePath = path.join(__dirname, '../src/assets/lottiefiles/');
-const destPath = path.join(__dirname, '../src/molecules/lottie/p-lotties/');
+const destPath = path.join(__dirname, '../src/foundation/lottie/p-lotties/');
 
 const lottieFileNames = fs.readdirSync(sourcePath)
     .filter(d => path.extname(d).toLowerCase() === '.json');

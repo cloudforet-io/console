@@ -1,0 +1,135 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import PCopyButton from "@/inputs/buttons/copy-button/PCopyButton";
+
+<Meta title='Inputs/Buttons/Copy Button' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=8075%3A2235'
+    }
+}} component={PCopyButton} argTypes={{
+    value: {
+        name: 'value',
+        type: {name: 'string'},
+        description: 'Text to be copied',
+        defaultValue: 'Please, place any string to copy by button next to.',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'null',
+            }
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    default: {
+        name: 'default',
+        type: {name: 'string'},
+        description: 'Slot for contents of copy button',
+        defaultValue: 'Please, place any string to copy by button next to.',
+        table: {
+            type: {
+                summary: null
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    alertPosition: {
+        name: 'alertPosition',
+        type: {name: 'string'},
+        description: 'Position of alert message',
+        defaultValue: 'right',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'right',
+            }
+        },
+        control: {
+            type: 'select',
+            options: ['right', 'bottom-end']
+        }
+    },
+    iconColor: {
+        name: 'iconColor',
+        type: {name: 'string'},
+        description: 'Color of copy icon',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'null'
+            }
+        },
+        control: {
+            type: 'color',
+        }
+    },
+}}/>
+
+export const Template = (args, {argTypes}) => ({
+    props: Object.keys(argTypes),
+    components: { PCopyButton },
+    template: `
+        <div style="display:flex; align-items:center; justify-content:center; height:150px;">
+            <p-copy-button
+                :icon-color="iconColor"
+                :alert-position="alertPosition"
+                :value="value">
+                {{$props.default}}
+            </p-copy-button>
+        </div>`,
+});
+
+# Copy Button
+
+<br/>
+<br/>
+<br/>
+
+## Alert Position
+
+<Canvas>
+    <Story name="alert-position" height="150px">
+        {{
+            components: {PCopyButton},
+            template: `
+                <div style="display:flex; flex-direction: column; align-items:center; justify-content:center; height:100px;">
+                    <p-copy-button
+                        style="margin-top: 30px"
+                        alert-position="right"
+                        value="copyText">
+                        right
+                    </p-copy-button>
+                    <p-copy-button
+                        style="margin-top: 40px"
+                        alert-position="bottom-end"
+                        value="copyText">
+                        bottom-end
+                    </p-copy-button>
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Playground
+
+<Canvas>
+    <Story name="playground" height="150px">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground" />

@@ -1,0 +1,235 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PDynamicLayout from './PDynamicLayout.vue';
+import mock from './mock.ts'
+import {i18n} from '@/translations'
+import {argTypes} from './story-helper'
+
+<Meta title='Data Display/Dynamic/Dynamic Layout' component={PDynamicLayout} argTypes={{
+    name: {
+        name: 'name',
+        type: {name: 'string'},
+        description: 'Name of layout',
+        defaultValue: 'Base Information',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: ''
+            },
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    type: {
+        name: 'type',
+        type: {name: 'string'},
+        description: 'Type of dynamic layout',
+        defaultValue: 'item',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'item'
+            },
+        },
+        control: {
+            type: 'select',
+            options: ['item', 'html', 'markdown', 'query-search-table', 'raw-table', 'table', 'simple-table', 'raw']
+        }
+    },
+    options: {
+        name: 'options',
+        type: {name: 'object'},
+        description: 'Meta schema options. Different by layout type.',
+        defaultValue: mock.item.options,
+        table: {
+            type: {
+                summary: 'object'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '{}'
+            },
+        },
+        control: {
+            type: 'object',
+        }
+    },
+    data: {
+        name: 'data',
+        type: {name: 'object'},
+        description: 'Data to display by layout.',
+        defaultValue: mock.item.data,
+        table: {
+            type: {
+                summary: 'object'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: null
+            },
+        },
+        control: {
+            type: 'object',
+        }
+    },
+    typeOptions: {
+        name: 'typeOptions',
+        type: {name: 'object'},
+        description: `Props for each layout component.Different by layout type.`,
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'object'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: null
+            },
+        },
+    },
+    onInit: {
+        name: 'init',
+        description: 'Event emitted before dynamic layout created',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            category: 'events',
+            defaultValue: {
+                summary: null
+            },
+        },
+    }
+}}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDynamicLayout },
+    i18n,
+    template: `
+            <p-dynamic-layout :name="name" :type="type"
+                              :options="options"
+                              :data="data"
+                              :type-options="{
+                                  loading,
+                                  totalCount,
+                                  timezone,
+                                  selectIndex,
+                                  selectable,
+                                  colCopy,
+                                  searchable,
+                                  excelVisible,
+                                  keyItemSets,
+                                  valueHandlerMap,
+                                  language,
+                                  listMap,
+                              }"
+                               class="w-full"
+            >
+            </p-dynamic-layout>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Dynamic Layout
+<br/>
+<br/>
+
+### Supported Types
+
+| Type | Description |
+| ---- | ----------- |
+| item | key / value |
+| simple-table | table without search and pagination |
+| table | table view (keyword search) |
+| query-search-table | table view (query search) |
+| raw |
+| markdown | - |
+| list | list(<dynamic_layout>) |
+
+<br/>
+<br/>
+
+## item type
+
+<Canvas>
+    <Story name="item type" argTypes={argTypes} args={{
+        loading: true
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="item type"/>
+
+<br/>
+<br/>
+
+## html type
+
+<Canvas>
+    <Story name="html type" argTypes={argTypes} argTypes={{
+        data: {
+            name: 'data',
+            type: {name: 'string'},
+            defaultValue: '',
+            control: {
+                type: 'text'
+            }
+        }
+    }} args={{
+        type: 'html',
+        data: mock.html.data,
+        options: {},
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="html type"/>
+
+<br/>
+<br/>
+
+## table type
+
+<Canvas>
+    <Story name="table type" argTypes={argTypes} args={{
+        type: 'table',
+        data: mock.table.data,
+        options: {
+            fields: [
+                {
+                    key: "key",
+                    type: "text",
+                    name: "Key"
+                },
+                {
+                    key: "value",
+                    name: "Value",
+                    type: "text"
+                }
+            ],
+        }
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="table type"/>
+
+<br/>
+<br/>
+
+

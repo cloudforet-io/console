@@ -63,18 +63,18 @@
 </template>
 
 <script lang="ts">
-import PIconButton from '@/molecules/buttons/icon-button/PIconButton.vue';
-import PDropdownMenuBtn from '@/organisms/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
-import PTextPagination from '@/organisms/paginations/text-pagination/PTextPagination.vue';
+import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import PDropdownMenuBtn from '@/inputs/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
+import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
 import {
     ComponentRenderProxy, computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { makeOptionalProxy } from '@/util/composition-helpers';
-import PQuerySearch from '@/organisms/search/query-search/PQuerySearch.vue';
-import { QueryTag } from '@/organisms/search/query-search-tags/type';
-import { QueryItem } from '@/organisms/search/query-search/type';
-import PSearch from '@/molecules/search/PSearch.vue';
-import PQuerySearchTags from '@/organisms/search/query-search-tags/PQuerySearchTags.vue';
+import PQuerySearch from '@/inputs/search/query-search/PQuerySearch.vue';
+import { QueryTag } from '@/inputs/search/query-search-tags/type';
+import { QueryItem } from '@/inputs/search/query-search/type';
+import PSearch from '@/inputs/search/search/PSearch.vue';
+import PQuerySearchTags from '@/inputs/search/query-search-tags/PQuerySearchTags.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 
 interface Options {
