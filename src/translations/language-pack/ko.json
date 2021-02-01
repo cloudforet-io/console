@@ -887,7 +887,7 @@
 			"ALT_S_DELETE_MEMBER": "구성원 삭제 완료",
 			"ALT_S_DELETE_PROJECT": "프로젝트 삭제 완료",
 			"ALT_S_UPDATE_PROJECT": "프로젝트 편집 완료",
-			"CLICK_ADD_MEMBER": "클릭한 후 구성원을 선택해주세요",
+			"CLICK_ADD_MEMBER": "테이블 정보를 클릭하면 구성원이 추가됩니다.",
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
 			"MEMBER_TITLE": "구성원",
