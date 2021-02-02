@@ -1,14 +1,8 @@
 <template>
-    <div className="google-oauth-wrapper">
-        <p-button @click="openKeycloakSignIn">
+    <div class="keycloak-wrapper">
+        <p-button @click="keycloakSignIn">
             keycloak login
         </p-button>
-        <KeycloakPage
-            v-if="keycloakVisible"
-            :visible="keycloakVisible"
-            @confirm="onKeycloakConfirm"
-            @cancel="hideKeycloakSignIn"
-        />
     </div>
 </template>
 
@@ -17,37 +11,21 @@ import {
     ComponentRenderProxy,
     defineComponent, getCurrentInstance, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
-
 import { PButton } from '@spaceone/design-system';
-import KeycloakPage from '@/views/sign-in/templates/KEYCLOAK_Page.vue';
-
-import { getAuth2, googleOauthSignOut } from '@/views/common/pages/SignOut.vue';
 import { store } from '@/store';
+import Keycloak from 'keycloak-js';
 
 export default defineComponent({
     name: 'KEYCLOAK',
     components: {
         PButton,
-        KeycloakPage,
     },
     setup(props, context) {
         const state = reactive({
-            keycloakVisible: false,
+            token: null,
         });
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        const openKeycloakSignIn = () => {
-            console.log('ete');
-            state.keycloakVisible = true;
-        };
-
-        const hideKeycloakSignIn = () => {
-            state.keycloakVisible = false;
-        };
-
-        const onKeycloakConfirm = async () => {
-            hideKeycloakSignIn();
-        }
 
         const signIn = async () => {
             const credentials = {
@@ -61,13 +39,44 @@ export default defineComponent({
             // context.emit('go-to-admin-sign-in');
         };
 
+
+
+        const keycloakSignIn = async () => {
+            const initOptions = {
+                url: 'https://sso.stargate.spaceone.dev/auth',
+                realm: 'SpaceOne',
+                clientId: 'keycloak-test-client-id',
+            };
+            const keycloak = Keycloak(initOptions);
+            keycloak.init({ onLoad: 'login-required' })
+                .then((auth) => {
+                    if (!auth) console.log('no auth');
+                    else {
+                        alert('auth')
+                        console.log('auth');
+                        state.token = keycloak.token;
+                        store.dispatch('settings/setItem', {
+                            key: 'keycloak',
+                            value: {
+                                keycloak,
+                                accessToken: keycloak.token,
+                                refreshToken: keycloak.refreshToken,
+                            },
+                            path: '/signIn',
+                        });
+                    }
+                })
+                .catch((e) => {
+                    console.error(e);
+                });
+        };
+
+
         return {
             ...toRefs(state),
             goToAdminSignIn,
             signIn,
-            openKeycloakSignIn,
-            onKeycloakConfirm,
-            hideKeycloakSignIn,
+            keycloakSignIn,
         };
     },
 });
