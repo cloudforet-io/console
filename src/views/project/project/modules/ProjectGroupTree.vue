@@ -41,7 +41,7 @@
             <template #right-extra="{data}">
                 <div v-if="hoveredNode && data.id === hoveredNode.node.data.id">
                     <p-icon-button name="ic_plus" class="group-add-btn"
-                                   width="1rem" height="1rem"
+                                   size="sm"
                                    @click.stop="$emit('create', hoveredNode)"
                     />
                 </div>

@@ -3,8 +3,9 @@
         <p-pane-layout class="page-wrapper">
             <div class="page-nav">
                 <div class="left">
-                    <p-icon-button name="ic_back" width="2rem" height="2rem"
-                                   class="mr-2"
+                    <p-icon-button name="ic_back"
+                                   size="lg"
+                                   class="go-back-button mr-2"
                                    @click="goBack()"
                     />
                     <div class="title">
@@ -161,32 +162,47 @@ export default {
 
 <style lang="postcss" scoped>
 .page-mask {
-    @apply absolute flex flex-col left-0 w-full h-full;
-    z-index: 99;
+    position: absolute;
+    display: flex;
+    width: 100%;
+    height: 100%;
     top: $gnb-height;
+    left: 0;
+    flex-direction: column;
+    z-index: 99;
 
     /* transition: opacity 0.3s ease; */
-
     max-height: calc(100vh - ($gnb-height));
     min-height: calc(100vh - ($gnb-height));
     max-width: 100vw;
+
     .page-wrapper {
-        @apply w-screen border-none flex-grow;
+        width: 100%;
+        border: none;
+        flex-grow: 1;
         .page-nav {
             @apply my-6 ml-8;
             .left {
                 @apply flex;
+                .go-back-button {
+                    min-width: 2rem;
+                    min-height: 2rem;
+                    max-width: 2rem;
+                    max-height: 2rem;
+                }
                 .title {
-                    @apply font-bold text-2xl;
-                    line-height: 120%;
+                    font-size: 1.5rem;
+                    font-weight: bold;
+                    line-height: 1.2;
                 }
             }
         }
         .comment {
-            @apply my-6;
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
             line-height: 150%;
             .highlight {
-                @apply font-bold;
+                font-weight: bold;
             }
         }
         .tag-panel {

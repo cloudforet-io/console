@@ -12,11 +12,11 @@
                         />
                     </span>
                     <p-icon-button name="ic_transhcan"
-                                   width="1.5rem" height="1.5rem" class="delete-btn"
+                                   class="delete-btn"
                                    @click="openProjectDeleteForm"
                     />
                     <p-icon-button name="ic_edit-text"
-                                   width="1.5rem" height="1.5rem" class="edit-btn"
+                                   class="edit-btn"
                                    @click="openProjectEditForm"
                     />
                 </div>
