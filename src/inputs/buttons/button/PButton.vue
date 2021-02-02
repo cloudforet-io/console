@@ -145,12 +145,16 @@ export default {
         }
     }
     &.transparent {
-        @apply bg-white text-gray-900 border-white;
+        @apply bg-transparent text-gray-900 border-white;
         &.outline {
             @apply border-white;
         }
         &:hover {
             @apply bg-blue-200 text-blue-500 bg-blue-200;
+        }
+        &.disabled {
+            @apply bg-transparent text-gray-400;
+            cursor: not-allowed;
         }
     }
 }

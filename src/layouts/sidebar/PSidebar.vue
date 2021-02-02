@@ -13,8 +13,7 @@
                     </p>
                     <p-icon-button class="close-btn"
                                    name="ic_delete"
-                                   solid
-                                   width="2rem" height="2rem"
+                                   size="lg"
                                    @click.stop="onClickClose"
                     />
                     <div class="contents-wrapper">
@@ -123,6 +122,9 @@ export default defineComponent({
             @apply absolute text-gray-400;
             top: 1.5rem;
             right: 1.5rem;
+            &:hover {
+                @apply text-secondary;
+            }
         }
     }
 

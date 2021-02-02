@@ -1,0 +1,353 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PIconButton from "@/inputs/buttons/icon-button/PIconButton";
+import { ICON_BUTTON_SHAPE, ICON_BUTTON_STYLE_TYPE } from "@/inputs/buttons/icon-button/type";
+import icon from 'vue-svgicon';
+
+<Meta title='Inputs/Buttons/IconButton' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5110%3A120777',
+    }
+}} component={ PIconButton } argTypes={{
+    name: {
+        name: 'name',
+        type: {name: 'string'},
+        description: 'Icon name',
+        defaultValue: 'ic_refresh',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'ic_refresh'
+            }
+        },
+        control: {
+            type: 'select',
+            options: Object.keys(icon.icons),
+        },
+    },
+    loading: {
+        name: 'loading',
+        type: {name: 'boolean'},
+        description: 'Loading when true',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            }
+        },
+        control: {
+            type: 'boolean',
+        }
+    },
+    styleType: {
+        name: 'styleType',
+        type: {name: 'string'},
+        description: 'Button style',
+        defaultValue: ICON_BUTTON_STYLE_TYPE.transparent,
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: ICON_BUTTON_STYLE_TYPE.transparent
+            }
+        },
+        control: {
+            type: 'select',
+            options: Object.values(ICON_BUTTON_STYLE_TYPE)
+        },
+    },
+    size: {
+        name: 'size',
+        type: {name:' string'},
+        description: 'Button size',
+        defaultValue: 'md',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'md',
+            }
+        },
+        control: {
+            type: 'select',
+            options: ['md', 'sm', 'lg']
+        }
+    },
+    disabled: {
+        name: 'disabled',
+        type: {name: 'boolean'},
+        description: 'Disabled when true',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            }
+        },
+        control: {
+            type: 'boolean',
+        }
+    },
+    activated: {
+        name: 'activated',
+        type: {name: 'boolean'},
+        description: 'Activated when true (only works with gray-border style)',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            }
+        },
+        control: {
+            type: 'boolean',
+        }
+    },
+    outline: {
+        name: 'outline',
+        type: {name: 'boolean'},
+        description: 'Outlined when true',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            }
+        },
+        control: {
+            type: 'boolean',
+        }
+    },
+    shape: {
+        name: 'shape',
+        type: {name: 'string'},
+        description: 'Button shape',
+        defaultValue: ICON_BUTTON_SHAPE.circle,
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: ICON_BUTTON_SHAPE.circle
+            }
+        },
+        control: {
+            type: 'select',
+            options: Object.values(ICON_BUTTON_SHAPE)
+        },
+    },
+    color: {
+        name: 'color',
+        type: {name: 'string'},
+        description: 'Color of icon',
+        defaultValue: 'transparent inherit',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'transparent inherit',
+            }
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    //
+    default: {
+        name: 'default',
+        type: {name: 'string'},
+        description: 'Slot for contents of button',
+        defaultValue: 'button',
+        table: {
+            type: {
+                summary: null
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text'
+        }
+    },
+}}
+/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PIconButton },
+    template: `
+        <div style="display:flex; align-items:center; justify-content:center; height:150px;">
+            <p-icon-button
+                :name="name"
+                :loading="loading"
+                :style-type="styleType"
+                :color="color"
+                :disabled="disabled"
+                :activated="activated"
+                :outline="outline"
+                :size="size"
+                :shape="shape"
+            />
+        </div>
+    `,
+    setup() {
+        return {
+        }
+    }
+});
+
+
+# Icon Button
+
+<br/>
+<br/>
+<br/>
+
+## Size
+<Canvas>
+    <Story name="size">
+        {{
+            components:{ PIconButton },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center;">
+                    <p-icon-button style="margin-right: 2rem" name="ic_refresh" size="sm" />
+                    <p-icon-button style="margin-right: 2rem" name="ic_refresh" />
+                    <p-icon-button style="margin-right: 2rem" name="ic_refresh" size="lg" />
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Style Type
+<Canvas>
+    <Story name="style type">
+        {{
+            components:{ PIconButton },
+            template: `
+                <div style="text-align:center">
+                    <p-icon-button style-type="primary" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="primary-dark" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="primary1" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="primary2" style="margin: 1rem" name="ic_refresh" />
+                    <br>
+                    <p-icon-button style-type="secondary" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="secondary1" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="gray" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="gray900" style="margin: 1rem" name="ic_refresh" />
+                    <br>
+                    <p-icon-button style-type="alert" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="safe" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="transparent" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="gray-border" style="margin: 1rem" name="ic_refresh" />
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Outlined
+
+<Canvas>
+    <Story name="outlined">
+        {{
+            components:{ PIconButton },
+            template: `
+                <div style="text-align:center">
+                    <p-icon-button style-type="primary" :outline="true" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="secondary" :outline="true" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="alert" :outline="true" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="safe" :outline="true" style="margin: 1rem" name="ic_refresh" />
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+
+## Disabled
+
+<Canvas>
+    <Story name="disabled">
+        {{
+            components:{ PIconButton },
+            template: `
+                <div style="text-align:center">
+                    <p-icon-button style-type="primary" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="primary" :disabled="true" style="margin: 1rem" name="ic_refresh" />
+                    <br>
+                    <p-icon-button style-type="transparent" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="transparent" :disabled="true" style="margin: 1rem" name="ic_refresh" />
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+
+## Loading
+
+<Canvas>
+    <Story name="loading">
+        {{
+            components:{ PIconButton },
+            template: `
+                <div style="text-align:center">
+                    <p-icon-button style-type="primary" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="primary" :loading="true" style="margin: 1rem" name="ic_refresh" />
+                    <br>
+                    <p-icon-button style-type="transparent" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="transparent" :loading="true" style="margin: 1rem" name="ic_refresh" />
+                    <br>
+                    <p-icon-button style-type="gray-border" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="gray-border" :loading="true" style="margin: 1rem" name="ic_refresh" />
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+
+## Activated
+
+<Canvas>
+    <Story name="activated">
+        {{
+            components:{ PIconButton },
+            template: `
+                <div style="text-align:center">
+                    <p-icon-button style-type="gray-border" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="gray-border" :activated="true" style="margin: 1rem" name="ic_refresh" />
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+
+## Playground
+
+<Canvas>
+    <Story name="playground" >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground" />

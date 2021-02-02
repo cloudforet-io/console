@@ -7,7 +7,7 @@
                 </div>
                 <p-icon-button class="close-btn"
                                name="ic_delete"
-                               width="2rem" height="2rem"
+                               size="lg"
                                @click.stop="onClose"
                 />
             </div>

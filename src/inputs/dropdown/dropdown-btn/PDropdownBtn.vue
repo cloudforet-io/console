@@ -18,6 +18,7 @@
                            :style-type="buttonStyleType"
                            :disabled="disabled"
                            :outline="true"
+                           shape="square"
                            @click="onClick"
                            @mouseenter="onMouseOver"
                            @mouseleave="onMouseOut"
@@ -31,7 +32,7 @@ import { defineComponent, reactive, toRefs } from '@vue/composition-api';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import { DropdownBtnProps } from '@/inputs/dropdown/dropdown-btn/type';
-import { BUTTON_STYLE_TYPE } from '@/inputs/buttons/icon-button/type';
+import { ICON_BUTTON_STYLE_TYPE } from '@/inputs/buttons/icon-button/type';
 
 export default defineComponent({
     name: 'PDropdownBtn',
@@ -63,7 +64,7 @@ export default defineComponent({
             default: undefined,
             validator: (value) => {
                 if (value === undefined) return true;
-                return Object.keys(BUTTON_STYLE_TYPE).includes(value as any);
+                return Object.keys(ICON_BUTTON_STYLE_TYPE).includes(value as any);
             },
         },
     },

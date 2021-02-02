@@ -38,7 +38,7 @@ import { computed, defineComponent, ref } from '@vue/composition-api';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import PDropdownBtn from '@/inputs/dropdown/dropdown-btn/PDropdownBtn.vue';
 import { reduce } from 'lodash';
-import { BUTTON_STYLE_TYPE } from '@/inputs/buttons/icon-button/type';
+import { ICON_BUTTON_STYLE_TYPE } from '@/inputs/buttons/icon-button/type';
 
 export default defineComponent({
     name: 'PDropdownMenuBtn',
@@ -80,7 +80,7 @@ export default defineComponent({
             default: undefined,
             validator: (value) => {
                 if (value === undefined) return true;
-                return Object.keys(BUTTON_STYLE_TYPE).includes(value as any);
+                return Object.keys(ICON_BUTTON_STYLE_TYPE).includes(value as any);
             },
         },
     },
