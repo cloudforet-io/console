@@ -23,6 +23,7 @@ export default defineComponent({
     setup(props, context) {
         const state = reactive({
             token: null,
+            authenticated: false,
         });
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
@@ -38,9 +39,6 @@ export default defineComponent({
         const goToAdminSignIn = () => {
             // context.emit('go-to-admin-sign-in');
         };
-
-
-
         const keycloakSignIn = async () => {
             const initOptions = {
                 url: 'https://sso.stargate.spaceone.dev/auth',
@@ -51,26 +49,29 @@ export default defineComponent({
             keycloak.init({ onLoad: 'login-required' })
                 .then((auth) => {
                     if (!auth) console.log('no auth');
-                    else {
-                        alert('auth')
-                        console.log('auth');
-                        state.token = keycloak.token;
+
+
+                    const payload = {
+                        idToken: keycloak.idToken,
+                        accessToken: keycloak.token,
+                    };
+                    console.log(payload)
+
+                    if (keycloak.token && keycloak.idToken && keycloak.token !== '' && keycloak.idToken !== '') {
                         store.dispatch('settings/setItem', {
-                            key: 'keycloak',
+                            key: 'login',
                             value: {
-                                keycloak,
-                                accessToken: keycloak.token,
-                                refreshToken: keycloak.refreshToken,
+                                payload,
                             },
                             path: '/signIn',
                         });
+                        console.log(`User has logged in: ${keycloak.subject}`);
                     }
                 })
                 .catch((e) => {
                     console.error(e);
                 });
         };
-
 
         return {
             ...toRefs(state),
