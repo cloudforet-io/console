@@ -145,10 +145,7 @@ export default {
         }
     }
     &.transparent {
-        @apply bg-transparent text-gray-900 border-white;
-        &.outline {
-            @apply border-white;
-        }
+        @apply bg-transparent text-gray-900;
         &:hover {
             @apply bg-blue-200 text-blue-500 bg-blue-200;
         }

@@ -44,7 +44,6 @@ export default {
         newData.class['p-badge'] = true;
         newData.class[`badge-${props.shape}`] = true;
         if (props.backgroundColor || props.textColor) {
-            console.log(props.textColor);
             newData.staticStyle = data.staticStyle || {};
             if (props.outline) {
                 newData.staticStyle.backgroundColor = 'transparent';
