@@ -11,7 +11,6 @@ import { makeProxy } from '@/lib/compostion-util';
 import Keycloak from 'keycloak-js';
 import { store } from '@/store';
 import { getAuth2, googleOauthSignOut } from '@/views/common/pages/SignOut.vue';
-import { setGtagUserID } from '@/lib/gtag';
 
 export default defineComponent({
     name: 'KeycloakPage',
@@ -30,6 +29,25 @@ export default defineComponent({
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+
+        const authOptions = vm.$store.state.domain.authOptions;
+        const issuer = authOptions.issuer;
+        const parsedIssuer = issuer.split('/');
+
+        const authIndex = parsedIssuer.indexOf('auth');
+        const baseUrl = parsedIssuer[authIndex - 1];
+        const realmIndex = parsedIssuer.indexOf('realms');
+        const realm = parsedIssuer[realmIndex + 1];
+
+        const clientId = authOptions.client_id;
+
+
+        const initOptions = {
+            url: `https://${baseUrl}/auth`,
+            realm,
+            clientId,
+        };
+        const keycloak = Keycloak(initOptions);
 
         const signInFail = async () => {
         };
@@ -56,24 +74,6 @@ export default defineComponent({
         };
 
         onMounted(async () => {
-            const authOptions = vm.$store.state.domain.authOptions;
-            const issuer = authOptions.issuer;
-            const parsedIssuer = issuer.split('/');
-
-            const authIndex = parsedIssuer.indexOf('auth');
-            const baseUrl = parsedIssuer[authIndex - 1];
-            const realmIndex = parsedIssuer.indexOf('realms');
-            const realm = parsedIssuer[realmIndex + 1];
-
-            const clientId = authOptions.client_id;
-
-
-            const initOptions = {
-                url: `https://${baseUrl}/auth`,
-                realm,
-                clientId,
-            };
-            const keycloak = Keycloak(initOptions);
             keycloak.init({ onLoad: 'login-required' })
                 .then(async (auth) => {
                     if (!auth) {
