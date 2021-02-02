@@ -76,7 +76,6 @@ import {
 import { store } from '@/store';
 import IDPWSignIn from '@/views/sign-in/templates/ID_PW.vue';
 
-import { setGtagUserID } from '@/lib/gtag';
 import { getAuth2, googleOauthSignOut } from '@/views/common/pages/SignOut.vue';
 
 
@@ -150,7 +149,6 @@ export default {
                 const auth2 = await getAuth2(store.state.domain.authOptions.client_id);
                 await googleOauthSignOut(auth2);
             }
-            setGtagUserID(vm);
         };
         const hideErrorMessage = () => {
             state.showErrorMessage = false;

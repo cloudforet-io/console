@@ -72,8 +72,6 @@ import { store } from '@/store';
 
 import IDPWSignIn from '@/views/sign-in/templates/ID_PW.vue';
 
-import { setGtagUserID } from '@/lib/gtag';
-
 
 export default {
     name: 'DomainAdminSignIn',
@@ -137,7 +135,6 @@ export default {
                 console.error(e);
                 state.showErrorMessage = true;
             }
-            setGtagUserID(vm);
         };
         const hideErrorMessage = () => {
             state.showErrorMessage = false;

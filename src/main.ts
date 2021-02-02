@@ -11,7 +11,7 @@ import VTooltip from 'v-tooltip';
 import '@/styles/style.pcss';
 import config from '@/lib/config';
 import { SpaceConnector } from '@/lib/space-connector';
-import { GTag, setGtagUserID } from '@/lib/gtag';
+import { GTag } from '@/lib/gtag';
 import SpaceDesignSystem from '@spaceone/design-system';
 import PortalVue from 'portal-vue';
 import App from './App.vue';
@@ -64,8 +64,10 @@ const initDomain = async () => {
 };
 
 const initGtag = () => {
-    if (config.get('GTAG_ID')) new GTag(config.get('GTAG_ID'), Vue, router);
-    setGtagUserID(Vue.prototype);
+    GTag.init();
+    store.watch(state => state.user.userId, (userId) => {
+        GTag.setGtagUserID(store.state.domain.domainId, userId);
+    }, { immediate: true });
 };
 
 const initLanguage = () => {

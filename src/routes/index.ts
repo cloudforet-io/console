@@ -2,6 +2,7 @@ import Vue from 'vue';
 import VueRouter from 'vue-router';
 import { SpaceConnector } from '@/lib/space-connector';
 import { routerOptions } from '@/routes/config';
+import { GTag } from '@/lib/gtag';
 
 
 Vue.use(VueRouter);
@@ -34,6 +35,10 @@ router.beforeEach(async (to, from, next) => {
         console.debug('token', SpaceConnector.isTokenAlive);
         console.debug('Unexpected sign out error');
     }
+});
+
+router.afterEach((to, from) => {
+    GTag.setPageView(to);
 });
 
 router.onError((error) => {
