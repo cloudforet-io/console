@@ -3,6 +3,7 @@ import ErrorPage from '@/views/common/pages/ErrorPage.vue';
 import SignIn from '@/views/sign-in/pages/SignIn.vue';
 import DomainAdminSignIn from '@/views/sign-in/pages/Domain_Admin_SignIn.vue';
 import SignOut from '@/views/common/pages/SignOut.vue';
+import KEYCLOAK from '@/views/sign-in/templates/KEYCLOAK_Page.vue';
 
 // Routes
 import dashboardRoute from '@/routes/dashboard/dashboard-route';
@@ -13,6 +14,7 @@ import projectRoute from '@/routes/project/project-route';
 import managementRoute from '@/routes/management/management-route';
 import automationRoute from '@/routes/automation/automation-route';
 import { RouterOptions } from 'vue-router';
+
 
 
 export const routerOptions = {
@@ -45,6 +47,18 @@ export const routerOptions = {
                         nextPath: route.query.nextPath || '/',
                     }),
                     component: SignIn,
+                },
+                {
+                    path: 'keycloak',
+                    name: 'Keycloak',
+                    meta: {
+                        excludeAuth: true,
+                        isSignInPage: true,
+                    },
+                    props: route => ({
+                        nextPath: route.query.nextPath || '/',
+                    }),
+                    component: KEYCLOAK,
                 },
                 {
                     path: 'admin',

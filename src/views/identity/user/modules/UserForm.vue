@@ -366,7 +366,11 @@ export default {
                 user_type: formState.selectedAuthType.user_type,
                 password: formState.password || '',
             };
-            emit('confirm', data, formState.domainRoleList[0].name, formState.domainRole);
+            if (formState.domainRoleList.length > 0) {
+                emit('confirm', data, formState.domainRoleList[0].name, formState.domainRole);
+            } else {
+                emit('confirm', data, null, null);
+            }
         };
 
         const initAuthTypeList = async () => {
