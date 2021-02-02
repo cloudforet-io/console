@@ -98,6 +98,8 @@ export default defineComponent({
     @apply rounded-sm p-0 inline-flex justify-center items-center;
     min-width: 2rem;
     min-height: 2rem;
+    max-width: 2rem;
+    max-height: 2rem;
 
     &.circle {
         border-radius: 50%;
@@ -105,10 +107,14 @@ export default defineComponent({
     &.lg {
         min-width: 2.5rem;
         min-height: 2.5rem;
+        max-width: 2.5rem;
+        max-height: 2.5rem;
     }
     &.sm {
         min-width: 1.5rem;
         min-height: 1.5rem;
+        max-width: 1.5rem;
+        max-height: 1.5rem;
     }
     &.loading:hover {
         cursor: not-allowed;
