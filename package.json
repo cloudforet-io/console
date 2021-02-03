@@ -12,7 +12,8 @@
     "build": "NODE_OPTIONS=--max_old_space_size=4096 vue-cli-service build",
     "lint": "eslint --ext .js,.vue src",
     "serve:docker": "docker build --tag spaceone/console . && docker run -p 80:80 spaceone/console",
-    "analyze": "NODE_ENV=production VUE_APP_ANALYZE_MOD=true vue-cli-service build"
+    "analyze": "NODE_ENV=production VUE_APP_ANALYZE_MOD=true vue-cli-service build",
+    "postcss": "node build/reset-css.js"
   },
   "dependencies": {
     "@amcharts/amcharts4": "^4.10.10",
@@ -86,7 +87,8 @@
     "https-proxy-agent": "^2.2.4",
     "mini-css-extract-plugin": "^1.3.4",
     "node-sass": "^4.13.1",
-    "postcss": "^7.0.30",
+    "postcss": "^8.2.4",
+    "postcss-cli": "^8.3.1",
     "postcss-comment": "^2.0.0",
     "postcss-conditionals": "^2.1.0",
     "postcss-easy-import": "^3.0.0",
