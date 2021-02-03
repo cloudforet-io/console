@@ -85,8 +85,8 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PSearchTable, PTab, PPageTitle, PTableCheckModal, PButtonModal, PPanelTop,
-    PDropdownMenuBtn, PIconButton, PCopyButton, PIconTextButton, PBreadcrumbs, PButton, PBadge,
+    PTab, PPageTitle, PButtonModal,
+    PIconButton, PCopyButton, PBreadcrumbs,
 } from '@spaceone/design-system';
 
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
@@ -101,7 +101,6 @@ import ProjectMemberTab from '@/views/project/project/modules/ProjectMemberTab.v
 import ProjectReportTab from '@/views/project/project/modules/ProjectReportTab.vue';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
 
 import { ProjectModel } from '@/views/project/project/type';
 import { TranslateResult } from 'vue-i18n';
@@ -110,14 +109,10 @@ import { TranslateResult } from 'vue-i18n';
 export default {
     name: 'ProjectDetail',
     components: {
-        PBadge,
         FavoriteButton,
-        PSearchTable,
-        PPanelTop,
         ProjectMemberTab,
         ProjectReportTab,
         ProjectDashboard,
-        PTableCheckModal,
         PButtonModal,
         GeneralPageLayout,
         TagsPanel,
@@ -125,10 +120,7 @@ export default {
         PTab,
         PIconButton,
         PCopyButton,
-        PDropdownMenuBtn,
-        PButton,
         SProjectCreateFormModal,
-        PIconTextButton,
         PBreadcrumbs,
     },
     setup(props, { root }) {
@@ -246,15 +238,6 @@ export default {
                 formState.projectEditFormVisible = false;
             }
         };
-
-
-        // watch(() => singleItemTabState.activeTab, (tab) => {
-        //     if (tab === 'member') listMembers();
-        // }, { immediate: true });
-
-
-        const apiQuery = new ApiQueryHelper();
-
 
         /** Init */
         (async () => {

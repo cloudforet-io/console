@@ -82,6 +82,7 @@
                             <div v-if="projectState.groupId"
                                  v-tooltip.top="$t('PROJECT.LANDING.MANAGE_PROJECT_GROUP_MEMBER')"
                                  class="project-group-member-button"
+                                 :group-id="projectState.groupId"
                                  @click="openProjectGroupMemberPage"
                             >
                                 <p-i name="ic_member"
@@ -293,10 +294,10 @@ export default {
             }
         };
 
-        const getProjectGroupMemberCount = async (groupId) => {
+        const getProjectGroupMemberCount = async () => {
             try {
                 const res = await SpaceConnector.client.identity.projectGroup.member.list({
-                    project_group_id: groupId,
+                    project_group_id: projectState.groupId,
                 });
                 projectState.groupMemberCount = res.total_count;
             } catch (e) {
@@ -462,8 +463,8 @@ export default {
             }
         };
 
-        watch(() => projectState.groupId, (groupId) => {
-            if (groupId) getProjectGroupMemberCount(groupId);
+        watch([() => projectState.groupId, () => projectState.groupMemberPageVisible], async ([groupId, visible]) => {
+            if ((groupId !== undefined && groupId) || visible) await getProjectGroupMemberCount();
         }, { immediate: true });
 
 

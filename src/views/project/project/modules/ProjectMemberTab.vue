@@ -45,8 +45,11 @@
                 </p-badge>
             </template>
         </p-search-table>
-        <s-project-member-add-modal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" @confirm="onAddMemberConfirm()" />
+        <s-project-member-add-modal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" :is-project-group="isProjectGroup"
+                                    :project-group-id="projectGroupId" @confirm="onAddMemberConfirm()"
+        />
         <project-member-update-modal v-if="memberUpdateFormVisible" :visible.sync="memberUpdateFormVisible" :selected-member="memberTableState.selectedItems[0]"
+                                     :is-project-group="isProjectGroup" :project-group-id="projectGroupId"
                                      @confirm="onAddMemberConfirm"
         />
         <p-table-check-modal
@@ -84,7 +87,26 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
 import ProjectMemberUpdateModal from '@/views/project/project/modules/ProjectMemberUpdateModal.vue';
+import { Tags, TimeStamp } from '@/models';
 
+interface MemberItem {
+    created_at?: TimeStamp;
+    domain_id?: string;
+    labels: string[];
+    // eslint-disable-next-line camelcase
+    project_group_info?: object;
+    resource_id?: string;
+    resource_type?: string;
+    role_binding_id?: string;
+    // eslint-disable-next-line camelcase
+    role_info?: object;
+    tags?: Tags;
+}
+interface MemberListApiResponse {
+    results: MemberItem[];
+    // eslint-disable-next-line camelcase
+    total_count: number;
+}
 export default {
     name: 'ProjectMemberTab',
     components: {
@@ -99,6 +121,14 @@ export default {
     },
     props: {
         projectId: {
+            type: String,
+            default: '',
+        },
+        isProjectGroup: {
+            type: Boolean,
+            default: false,
+        },
+        projectGroupId: {
             type: String,
             default: '',
         },
@@ -117,7 +147,7 @@ export default {
                 { label: 'Role', name: 'role_info.name', type: 'item' },
                 { label: 'Labels', name: 'labels', type: 'item' },
             ],
-            items: [] as any[],
+            items: [] as MemberItem[],
             loading: true,
             totalCount: 0,
             options: {
@@ -147,16 +177,28 @@ export default {
             memberUpdateFormVisible: false,
         });
 
-        const listMemberApi = SpaceConnector.client.identity.project.member.list;
+        const listMemberApi = async () => {
+            const res = await SpaceConnector.client.identity.project.member.list({
+                project_id: props.projectId,
+                query: memberTableQuery.data,
+            });
+            return res;
+        };
+        const listGroupMemberApi = async () => {
+            const res = await SpaceConnector.client.identity.projectGroup.member.list({
+                project_group_id: props.projectGroupId,
+                query: memberTableQuery.data,
+            });
+            return res;
+        };
+
         const listMembers = async () => {
             memberTableState.loading = true;
             memberTableState.selectIndex = [];
-            console.debug('memberTableQuery', memberTableQuery, memberTableQuery.data);
+            let res = [] as unknown as MemberListApiResponse;
             try {
-                const res = await listMemberApi({
-                    project_id: props.projectId,
-                    query: memberTableQuery.data,
-                });
+                if (props.isProjectGroup) res = await listGroupMemberApi();
+                else res = await listMemberApi();
                 memberTableState.items = res.results.map(d => ({
                     ...d,
                     user_id: d.resource_id,
@@ -218,31 +260,42 @@ export default {
                 // { name: 'labels', label: 'Labels' },
             ]),
             mode: '',
-            items: [] as any[],
+            items: [] as MemberItem[],
             headerTitle: '' as TranslateResult,
             subTitle: '' as TranslateResult,
             themeColor: '',
             visible: false,
-            action: null as any,
         });
 
         const memberDeleteClick = () => {
             checkMemberDeleteState.mode = 'delete';
-            // checkMemberDeleteState.action = memberDeleteAction;
-            checkMemberDeleteState.items = memberTableState.selectedItems as any[];
+            checkMemberDeleteState.items = memberTableState.selectedItems as MemberItem[];
             checkMemberDeleteState.headerTitle = vm.$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_TITLE');
             checkMemberDeleteState.subTitle = vm.$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_CONTENT');
             checkMemberDeleteState.themeColor = 'alert';
             checkMemberDeleteState.visible = true;
         };
 
+        const deleteProjectMember = async (items) => {
+            await SpaceConnector.client.identity.project.member.remove({
+                project_id: props.projectId,
+                users: items.map(it => it.resource_id),
+            });
+            showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '', root);
+        };
+
+        const deleteProjectGroupMember = async (items) => {
+            await SpaceConnector.client.identity.projectGroup.member.remove({
+                project_group_id: props.projectGroupId,
+                users: items.map(it => it.resource_id),
+            });
+            showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '', root);
+        };
+
         const memberDeleteConfirm = async (items) => {
             try {
-                await SpaceConnector.client.identity.project.member.remove({
-                    project_id: props.projectId,
-                    users: items.map(it => it.resource_id),
-                });
-                showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_DELETE_MEMBER'), '', root);
+                if (props.isProjectGroup) await deleteProjectGroupMember(items);
+                else await deleteProjectMember(items);
             } catch (e) {
                 showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'), e, root);
             } finally {
@@ -251,6 +304,9 @@ export default {
             }
         };
 
+        (async () => {
+            await vm.$store.dispatch('resource/user/load');
+        })();
 
 
         return {

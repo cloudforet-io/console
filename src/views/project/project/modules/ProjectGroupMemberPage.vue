@@ -13,9 +13,10 @@
                     </div>
                 </div>
             </div>
-            <p-pane-layout class="project-group-pane">
-
-            </p-pane-layout>
+            <project-member-tab :is-project-group="true"
+                                :project-group-id="groupId"
+                                class="mt-8"
+            />
         </p-pane-layout>
         <f-n-b class="fnb" />
     </div>
@@ -27,6 +28,7 @@ import { PPaneLayout, PIconButton, PBreadcrumbs } from '@spaceone/design-system'
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive,
 } from '@vue/composition-api';
+import ProjectMemberTab from '@/views/project/project/modules/ProjectMemberTab.vue';
 
 export default {
     name: 'ProjectGroupMemberPage',
@@ -35,6 +37,7 @@ export default {
         PPaneLayout,
         PIconButton,
         PBreadcrumbs,
+        ProjectMemberTab,
     },
     props: {
         parentGroups: {
@@ -92,7 +95,6 @@ export default {
         border: none;
         flex-grow: 1;
         padding: 2rem 1.5rem;
-
         .page-navigation {
             .title-wrapper {
                 display: flex;
