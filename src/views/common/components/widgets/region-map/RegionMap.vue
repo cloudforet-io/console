@@ -190,6 +190,7 @@ export default {
             const initialRegionFromLocalStorage = store.getters['settings/getItem']('initial_region', '/dashboard');
             if (initialRegionFromLocalStorage) {
                 state.initialRegion = initialRegionFromLocalStorage;
+                // eslint-disable-next-line max-len
                 [state.selectedProvider, state.selectedRegion, state.selectedRegionCode] = [initialRegionFromLocalStorage.provider, initialRegionFromLocalStorage.region_name, initialRegionFromLocalStorage.region_code];
             }
 
