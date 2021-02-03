@@ -57,7 +57,7 @@
                     <p-i name="admin" width="1.5rem" height="1.5rem"
                          class="admin-icon"
                     />
-                    <span class="admin-sign-in-text">{{ $t('COMMON.SIGN_IN.SIGN_IN_FOR_ADMIN') }}</span>
+                    <span class="admin-sign-in-text">{{$t('COMMON.SIGN_IN.SIGN_IN_FOR_ROOT_ACCOUNT')}}</span>
                 </span>
             </div>
         </div>

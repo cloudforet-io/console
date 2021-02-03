@@ -9,7 +9,7 @@
                     {{ userState.userId }}
                 </p>
                 <p v-if="userState.isDomainOwner" class="member-type">
-                    {{ $t('IDENTITY.USER.MAIN.SPACEONE_ADMIN') }}
+                    {{ $t('IDENTITY.USER.MAIN.ROOT_ACCOUNT') }}
                 </p>
                 <p v-else class="member-type">
                     {{ $t('IDENTITY.USER.MAIN.SPACEONE_USER') }}
@@ -28,7 +28,7 @@
             </div>
             <div v-if="userState.isAdmin" class="admin-menu-wrapper">
                 <div class="menu-title">
-                    {{ $t('IDENTITY.USER.MAIN.ADMINISTRATOR') }}
+                    {{ $t('IDENTITY.USER.MAIN.ROOT_ACCOUNT') }}
                 </div>
                 <p-divider class="menu-divider" />
                 <div v-for="(item) in sidebarState.adminMenuList"

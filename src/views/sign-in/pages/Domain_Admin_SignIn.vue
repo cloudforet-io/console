@@ -6,11 +6,11 @@
                 <img class="logo-text" src="@/assets/images/brand/spaceone-logotype-with-Service-Type.svg">
             </div>
             <div class="lottie-wrapper">
-            <p-lottie name="lottie_planet_signin"
-                      auto
-                      width="100%"
-                      height="80%"
-            />
+                <p-lottie name="lottie_planet_signin"
+                          auto
+                          width="100%"
+                          height="80%"
+                />
             </div>
             <div class="version">
                 <p-badge style-type="primary" outline shape="square">
@@ -31,7 +31,7 @@
                     {{ $t('COMMON.SIGN_IN.SIGN_IN') }}
                 </p>
                 <p class="sign-in-subtitle">
-                    {{ $t('COMMON.SIGN_IN.FOR_DOMAIN_ADMIN') }}
+                    {{ $t('COMMON.SIGN_IN.SIGN_IN_FOR_ROOT_ACCOUNT') }}
                 </p>
                 <img class="logo-character" src="@/assets/images/brand/brand_logo.png">
                 <div v-if="showErrorMessage" class="error-msg-box">
