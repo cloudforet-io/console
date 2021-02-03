@@ -61,6 +61,7 @@ export default {
 </script>
 
 <style lang="postcss">
+@import 'highlight.js/scss/atom-one-dark.scss';
 .p-markdown {
     @apply w-full border-black text-gray-900;
     padding-top: 1.5rem;

@@ -7,10 +7,9 @@ import Notifications from 'vue-notification';
 import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
 import '@/styles/style.pcss';
-import { i18n } from '@/translations';
 
 interface SpaceoneDSOptions {
-    appSelector?: string;
+    loadTailwindCss?: boolean;
 }
 
 
@@ -26,8 +25,6 @@ const SpaceoneDS: PluginObject<SpaceoneDSOptions> = {
 
         _Vue.use(Fragment.Plugin);
         _Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
-
-        _Vue.prototype.$spaceoneDS = { lang: i18n };
     },
 };
 

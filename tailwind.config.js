@@ -15,6 +15,9 @@ const rawPercent = [
 // eslint-disable-next-line no-eval
 const percent = _.fromPairs(rawPercent.map(value => [value, `${eval(value) * 100}%`]));
 module.exports = {
+    corePlugins: {
+        preflight: false,
+    },
     theme: {
         colors,
         spacing: {

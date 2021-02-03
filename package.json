@@ -11,7 +11,9 @@
     "/src/*",
     "/types/*",
     "/*.json",
-    "/*.js"
+    "/*.js",
+    "/tailwind.config.js",
+    "/css/*"
   ],
   "publishConfig": {
     "access": "public"
@@ -31,12 +33,14 @@
     "storybook": "start-storybook -p 6006",
     "icon": "vsvg -s ./src/assets/icons -t src/foundation/icons/p-icons --es6",
     "lottie": "node build/lottie.js",
+    "style": "node build/style.js",
     "analyze": "NODE_ENV=production VUE_APP_ANALYZE_MOD=true vue-cli-service build",
     "test": "jest"
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
     "@babel/runtime-corejs3": "^7.12.5",
+    "@egjs/vue-flicking": "^3.5.2",
     "@fortawesome/fontawesome-free": "^5.15.1",
     "@vue/composition-api": "^0.6.7",
     "bytes": "^3.1.0",
