@@ -41,7 +41,7 @@ export class GTag {
                 console.error('failed to init gtag', e);
             }
         } else if (config.get('GTAG_ID') !== 'DISABLED') {
-            console.error('not set $gtag');
+            console.error('GTag is not initialized.');
         }
     }
 

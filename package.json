@@ -33,6 +33,7 @@
     "jsonwebtoken": "^8.5.1",
     "keycloak-js": "^10.0.2",
     "lodash": "^4.17.15",
+    "lottie-web": "^5.7.6",
     "luxon": "^1.22.0",
     "numeral": "^2.0.6",
     "portal-vue": "^2.1.7",

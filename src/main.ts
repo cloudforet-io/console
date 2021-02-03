@@ -9,9 +9,6 @@ import { webFonts, fontUrls } from '@/styles/web-fonts';
 import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
 import '@/styles/style.pcss';
-import config from '@/lib/config';
-import { SpaceConnector } from '@/lib/space-connector';
-import { GTag } from '@/lib/gtag';
 import SpaceDesignSystem from '@spaceone/design-system';
 import PortalVue from 'portal-vue';
 import App from './App.vue';
@@ -29,7 +26,6 @@ directive(Vue);
 Vue.use(SpaceDesignSystem);
 
 
-/** ********** INIT ************** */
 webFontLoader.load({
     google: {
         families: webFonts,
@@ -37,76 +33,15 @@ webFontLoader.load({
     },
 });
 
-const initConfig = async () => {
-    await config.init();
-};
+console.debug('main');
 
-const initApiClient = async () => {
-    await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
-        // Add session expiration process
-        store.dispatch('user/setIsSessionExpired', true);
-    });
-};
-
-const initDomain = async () => {
-    try {
-        let domainName;
-        if (config.get('DOMAIN_NAME_REF') === 'hostname') {
-            const { hostname } = window.location;
-            domainName = hostname.split('.')[0];
-        } else {
-            domainName = config.get('DOMAIN_NAME');
-        }
-        await store.dispatch('domain/load', domainName);
-    } catch (e) {
-        await router.push('/error-page');
-    }
-};
-
-const initGtag = () => {
-    GTag.init();
-    store.watch(state => state.user.userId, (userId) => {
-        GTag.setGtagUserID(store.state.domain.domainId, userId);
-    }, { immediate: true });
-};
-
-const initLanguage = () => {
-    store.watch(state => state.user.language, (lang) => {
-        i18n.locale = lang as string;
-    }, { immediate: true });
-};
-
-
-(async () => {
-    try {
-        await initConfig();
-        await initApiClient();
-        await initDomain();
-        initGtag();
-        initLanguage();
-    } catch (e) {
-        console.error(e);
-    }
-
-    new Vue({
-        el: '#app',
-        router,
-        i18n,
-        store,
-        components: {
-            App,
-        },
-        template: '<App/>',
-    });
-})();
-//
-// new Vue({
-//     el: '#app',
-//     router,
-//     i18n,
-//     store,
-//     components: {
-//         App,
-//     },
-//     template: '<App/>',
-// });
+new Vue({
+    el: '#app',
+    router,
+    i18n,
+    store,
+    components: {
+        App,
+    },
+    template: '<App/>',
+});

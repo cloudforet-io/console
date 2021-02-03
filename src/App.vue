@@ -1,48 +1,50 @@
 <template>
-    <div id="app">
+    <div v-cloak id="app">
         <!--        <button style="position: fixed; z-index: 9999999; left: 20px; top: 20px;" class="bg-coral font-bold px-4 py-2 rounded" @click="flush">-->
         <!--            flush session-->
         <!--        </button>-->
-        <p-notice-alert group="noticeTopLeft" position="top left" />
-        <p-notice-alert group="noticeTopRight" position="top right" />
-        <p-notice-alert group="noticeBottomLeft" position="bottom left" />
-        <p-notice-alert group="noticeBottomRight" position="bottom right" />
-        <p-toast-alert group="toastTopCenter" position="top center" />
-        <top-notification v-if="!$store.getters['user/hasPermission']">
-            <i18n path="APP.TOP_NOTI.HAS_NO_ROLE">
-                <template #needRole>
-                    <strong>{{ $t('APP.TOP_NOTI.NEED_ROLE') }}</strong>
-                </template>
-            </i18n>
-        </top-notification>
-        <p-icon-modal :visible="isExpired"
-                      emoji
-                      :header-title="$t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
-                      :button-text="$t('COMMON.SESSION_MODAL.SIGNIN')"
-                      button-type="primary-dark"
-                      :outline="false"
-                      @clickButton="goToSignIn"
-        />
-        <template v-if="showGNB">
-            <GNB class="gnb" />
-            <div class="app-body">
-                <p-sidebar :visible="$store.state.display.visibleInfo"
-                           @close="$store.dispatch('display/hideInfo')"
-                >
-                    <main class="main">
-                        <portal-target name="top-notification" />
-                        <router-view />
-                    </main>
-                    <template #title>
-                        <portal-target name="info-title" />
+        <template v-if="!loading">
+            <p-notice-alert group="noticeTopLeft" position="top left" />
+            <p-notice-alert group="noticeTopRight" position="top right" />
+            <p-notice-alert group="noticeBottomLeft" position="bottom left" />
+            <p-notice-alert group="noticeBottomRight" position="bottom right" />
+            <p-toast-alert group="toastTopCenter" position="top center" />
+            <top-notification v-if="!$store.getters['user/hasPermission']">
+                <i18n path="APP.TOP_NOTI.HAS_NO_ROLE">
+                    <template #needRole>
+                        <strong>{{ $t('APP.TOP_NOTI.NEED_ROLE') }}</strong>
                     </template>
-                    <template #sidebar>
-                        <portal-target name="info-contents" />
-                    </template>
-                </p-sidebar>
-            </div>
+                </i18n>
+            </top-notification>
+            <p-icon-modal :visible="isExpired"
+                          emoji
+                          :header-title="$t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
+                          :button-text="$t('COMMON.SESSION_MODAL.SIGNIN')"
+                          button-type="primary-dark"
+                          :outline="false"
+                          @clickButton="goToSignIn"
+            />
+            <template v-if="showGNB">
+                <GNB class="gnb" />
+                <div class="app-body">
+                    <p-sidebar :visible="$store.state.display.visibleInfo"
+                               @close="$store.dispatch('display/hideInfo')"
+                    >
+                        <main class="main">
+                            <portal-target name="top-notification" />
+                            <router-view />
+                        </main>
+                        <template #title>
+                            <portal-target name="info-title" />
+                        </template>
+                        <template #sidebar>
+                            <portal-target name="info-contents" />
+                        </template>
+                    </p-sidebar>
+                </div>
+            </template>
+            <router-view v-else />
         </template>
-        <router-view v-else />
     </div>
 </template>
 
@@ -53,14 +55,16 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PNoticeAlert, PToastAlert, PIconModal, PSidebar,
+    PNoticeAlert, PToastAlert, PIconModal, PSidebar, PLottie,
 } from '@spaceone/design-system';
 
 import GNB from '@/views/common/components/gnb/GNB.vue';
 import { Location } from 'vue-router';
 import router from '@/routes';
 import TopNotification from '@/views/common/components/notification/TopNotification.vue';
+import { siteInit } from '@/lib/site-initializer';
 
+const MIN_LOADING_TIME = 1000;
 
 export default defineComponent({
     name: 'App',
@@ -71,6 +75,7 @@ export default defineComponent({
         PToastAlert,
         PIconModal: PIconModal as any,
         PSidebar,
+        PLottie,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -78,6 +83,9 @@ export default defineComponent({
         const state = reactive({
             showGNB: computed(() => vm.$route.matched[0]?.name === 'root'),
             isExpired: computed(() => vm.$store.state.user.isSessionExpired === true && !vm.$route.meta.excludeAuth),
+            isMinTimePassed: false,
+            isInitialized: false,
+            loading: computed(() => !state.isMinTimePassed || !state.isInitialized),
         });
 
         const goToSignIn = async () => {
@@ -86,6 +94,24 @@ export default defineComponent({
             };
             await router.push(res);
         };
+
+        setTimeout(() => {
+            state.isMinTimePassed = true;
+        }, MIN_LOADING_TIME);
+
+
+        (async () => {
+            await siteInit();
+            state.isInitialized = true;
+        })();
+
+        watch(() => state.loading, (loading) => {
+            if (!loading) {
+                const el = document.getElementById('site-loader-wrapper');
+                el.parentElement.removeChild(el);
+            }
+        });
+
 
         return {
             ...toRefs(state),
@@ -102,10 +128,13 @@ export default defineComponent({
 
 <style lang="postcss">
 #app {
+    @apply bg-white;
     display: flex;
     flex-direction: column;
     overflow-y: hidden;
     width: 100vw;
+    height: 100vh;
+
     .gnb {
         position: fixed;
         width: 100%;
