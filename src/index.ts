@@ -6,7 +6,6 @@ import VueCompositionApi from '@vue/composition-api';
 import Notifications from 'vue-notification';
 import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
-import '@/styles/style.pcss';
 
 interface SpaceoneDSOptions {
     loadTailwindCss?: boolean;
