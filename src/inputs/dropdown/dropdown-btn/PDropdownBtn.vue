@@ -17,8 +17,8 @@
                            :class="{active: popup, hovered: mouseover}"
                            :style-type="buttonStyleType"
                            :disabled="disabled"
-                           :outline="true"
-                           shape="square"
+                           :outline="outline"
+                           :shape="shape"
                            @click="onClick"
                            @mouseenter="onMouseOver"
                            @mouseleave="onMouseOut"
@@ -66,6 +66,14 @@ export default defineComponent({
                 if (value === undefined) return true;
                 return Object.keys(ICON_BUTTON_STYLE_TYPE).includes(value as any);
             },
+        },
+        outline: {
+            type: Boolean,
+            default: true,
+        },
+        shape: {
+            type: String,
+            default: 'square',
         },
     },
     setup(props: DropdownBtnProps, { emit }) {
