@@ -1,6 +1,6 @@
 {
   "name": "@spaceone/design-system",
-  "version": "0.1.1-dev.12",
+  "version": "0.1.1-dev.13",
   "description": "SpaceONE Design System",
   "keywords": [
     "spaceone",
@@ -12,8 +12,8 @@
   ],
   "homepage": "https://github.com/spaceone-dev/spaceone-design-system#readme",
   "bugs": {
-    "url" : "https://github.com/spaceone-dev/spaceone-design-system/issues",
-    "email" : "admin@spaceone.dev"
+    "url": "https://github.com/spaceone-dev/spaceone-design-system/issues",
+    "email": "admin@spaceone.dev"
   },
   "author": "SpaceONE",
   "license": "Apache-2.0",
@@ -27,8 +27,8 @@
     "/css/*"
   ],
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/spaceone-dev/spaceone-design-system.git"
+    "type": "git",
+    "url": "https://github.com/spaceone-dev/spaceone-design-system.git"
   },
   "publishConfig": {
     "access": "public"
