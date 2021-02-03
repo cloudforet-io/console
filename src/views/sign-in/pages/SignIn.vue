@@ -54,7 +54,7 @@
                            @on-sign-in="signIn"
                 />
                 <span @click="goToAdminSignIn">
-                    <p-i name="admin" width="1.5rem" height="1.5rem"
+                    <p-i name="root-account" width="1.5rem" height="1.5rem"
                          class="admin-icon"
                     />
                     <span class="admin-sign-in-text">{{$t('COMMON.SIGN_IN.SIGN_IN_FOR_ROOT_ACCOUNT')}}</span>

@@ -31,7 +31,7 @@
                  @click.stop="toggleMenu('account')"
             >
                 <div class="menu-icon"
-                     :class="[{opened: openedMenu === 'account'}, userState.isDomainOwner ? 'admin' : 'member']"
+                     :class="[{opened: openedMenu === 'account'}, userState.isDomainOwner ? 'root' : ( userState.isAdmin ? 'admin' : 'member') ]"
                 />
             </div>
             <div v-if="openedMenu === 'account'"
@@ -40,7 +40,8 @@
             >
                 <div class="info-wrapper">
                     <div class="info-row">
-                        <p-i v-if="userState.isDomainOwner" class="icon" name="admin" />
+                        <p-i v-if="userState.isDomainOwner" class="icon" name="root-account" />
+                        <p-i v-else-if="!userState.isDomainOwner && userState.isAdmin" class="icon" name="admin" />
                         <p-i v-else class="icon" name="user" />
                         <span class="value">{{ userState.userId }}</span>
                     </div>
@@ -225,6 +226,9 @@ export default {
                     }
                     &.member {
                         background: url('~@/assets/icons/user.svg') no-repeat center center;
+                    }
+                    &.root {
+                        background: url('~@/assets/icons/root-account.svg') no-repeat center center;
                     }
                     &.opened {
                         box-shadow: inset 0 0 0 2px theme('colors.primary');

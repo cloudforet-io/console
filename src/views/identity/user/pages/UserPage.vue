@@ -2,8 +2,14 @@
     <vertical-page-layout :min-width="0" :init-width="260" :max-width="400">
         <template #sidebar>
             <div class="member-profile">
-                <p-i :name="userState.isDomainOwner ? 'admin' : 'user'" width="3rem" height="3rem"
-                     class="member-icon"
+                <p-i v-if="userState.isDomainOwner" class="member-icon" name="root-account"
+                     width="3rem" height="3rem"
+                />
+                <p-i v-else-if="!userState.isDomainOwner && userState.isAdmin" class="member-icon" name="admin"
+                     width="3rem" height="3rem"
+                />
+                <p-i v-else class="member-icon" name="user"
+                     width="3rem" height="3rem"
                 />
                 <p class="member-id">
                     {{ userState.userId }}
