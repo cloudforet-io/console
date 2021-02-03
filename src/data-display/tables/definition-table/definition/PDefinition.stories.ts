@@ -5,7 +5,7 @@ import { text, boolean, withKnobs } from '@storybook/addon-knobs';
 import PDefinition from '@/data-display/tables/definition-table/definition/PDefinition.vue';
 
 export default {
-    title: 'Data Display/Tables/Definition Table',
+    title: 'Data Display/Tables/Definition Table/Definition Item',
     component: PDefinition,
     decorators: [withKnobs],
     parameters: {

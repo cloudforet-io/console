@@ -4,7 +4,7 @@ import PProgressTabBar from '@/navigation/wizards/progress-wizard/progress-tab-b
 import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 
 export default {
-    title: 'Navigation/Wizards/Progress Wizard',
+    title: 'Navigation/Wizards/Progress Wizard/Bar',
     component: PProgressTabBar,
     parameters: {
         info: {
@@ -15,7 +15,7 @@ export default {
 };
 
 
-export const barOnly = () => ({
+export const bar = () => ({
     components: { PProgressTabBar, PTextEditor },
     props: {
         invalidState: {

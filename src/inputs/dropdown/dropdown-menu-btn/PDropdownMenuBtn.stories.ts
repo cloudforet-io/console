@@ -3,7 +3,7 @@ import PDropdownMenuBtn from '@/inputs/dropdown/dropdown-menu-btn/PDropdownMenuB
 import { reactive, toRefs } from '@vue/composition-api';
 
 export default {
-    title: 'Inputs/Dropdown/Deprecated',
+    title: 'Inputs/Dropdown/Deprecated/Dropdown Menu Button',
     component: PDropdownMenuBtn,
 };
 const actions = {

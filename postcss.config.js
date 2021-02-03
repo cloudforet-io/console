@@ -7,7 +7,7 @@ module.exports = {
             require('postcss-easy-import')({
                 path: ['src', 'node_modules'],
             }),
-            require('tailwindcss'),
+            require('tailwindcss')({ config: 'tailwind.config.js' }),
             require('postcss-hexrgba'),
             require('postcss-mixins'),
             require('postcss-conditionals'),

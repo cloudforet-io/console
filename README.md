@@ -48,7 +48,7 @@ SpaceONE Design System is based on Tailwindcss.<br/>
 If your project doesn't use tailwindcss, add the code below to ```main.ts```.
 
 ```javascript
-import spaceoneStyle from '@spaceone/design-system/css/style.css';
+import '@spaceone/design-system/css/style.css';
 ```
 
 ### Case 2. Without tailwindcss styles
@@ -76,7 +76,7 @@ module.exports = {
 Also, you need to add codes below to your ```main.js```.
 
 ```javascript
-import spaceoneStyle from '@spaceone/design-system/css/light-style.css';
+import '@spaceone/design-system/css/light-style.css';
 ```
 
 

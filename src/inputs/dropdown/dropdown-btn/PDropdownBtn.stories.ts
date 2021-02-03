@@ -4,7 +4,7 @@ import PDropdownBtn from '@/inputs/dropdown/dropdown-btn/PDropdownBtn.vue';
 import { reactive, ref, toRefs } from '@vue/composition-api';
 
 export default {
-    title: 'Inputs/Dropdown/Deprecated',
+    title: 'Inputs/Dropdown/Deprecated/Dropdown Button',
     component: PDropdownBtn,
 };
 const actions = {
@@ -16,7 +16,7 @@ const data = {
     popup: false,
 };
 
-export const dropdownButtonOnly = () => ({
+export const dropdownButton = () => ({
     components: { PDropdownBtn },
     props: {
         styleType: {

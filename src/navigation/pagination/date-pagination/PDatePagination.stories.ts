@@ -3,7 +3,7 @@ import PDatePagination from '@/navigation/pagination/date-pagination/PDatePagina
 import dayjs from 'dayjs';
 
 export default {
-    title: 'Navigation/Pagination',
+    title: 'Navigation/Pagination/Date Pagination',
     component: PDatePagination,
     parameters: {
         design: {
