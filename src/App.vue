@@ -108,7 +108,7 @@ export default defineComponent({
         watch(() => state.loading, (loading) => {
             if (!loading) {
                 const el = document.getElementById('site-loader-wrapper');
-                el.parentElement.removeChild(el);
+                if (el?.parentElement) el.parentElement.removeChild(el);
             }
         });
 

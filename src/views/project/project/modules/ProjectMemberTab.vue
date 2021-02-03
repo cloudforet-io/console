@@ -151,6 +151,7 @@ export default {
         const listMembers = async () => {
             memberTableState.loading = true;
             memberTableState.selectIndex = [];
+            console.debug('memberTableQuery', memberTableQuery, memberTableQuery.data);
             try {
                 const res = await listMemberApi({
                     project_id: props.projectId,
@@ -177,11 +178,11 @@ export default {
                 memberTableState.options.sortDesc = !!changed.sortDesc;
                 memberTableQuery.setSort(changed.sortBy, changed.sortDesc);
             }
-            if (changed.pageLimit !== undefined) {
+            if (changed.pageSize !== undefined) {
                 memberTableState.options.pageSize = changed.pageSize;
                 memberTableQuery.setPageLimit(changed.pageSize);
             }
-            if (changed.pageStart !== undefined) {
+            if (changed.thisPage !== undefined) {
                 memberTableState.options.thisPage = changed.thisPage;
                 memberTableQuery.setPageStart(getPageStart(changed.thisPage, memberTableState.options.pageSize));
             }
@@ -250,9 +251,6 @@ export default {
             }
         };
 
-        (async () => {
-            await listMembers();
-        })();
 
 
         return {
