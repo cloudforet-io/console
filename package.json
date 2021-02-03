@@ -2,22 +2,6 @@
   "name": "@spaceone/design-system",
   "version": "0.1.1-dev.12",
   "description": "SpaceONE Design System",
-  "author": "SpaceONE",
-  "license": "Apache-2.0",
-  "main": "dist/spaceone-design-system.umd.js",
-  "typings": "./dist/src/index.d.ts",
-  "files": [
-    "/dist/*",
-    "/src/*",
-    "/types/*",
-    "/*.json",
-    "/*.js",
-    "/tailwind.config.js",
-    "/css/*"
-  ],
-  "publishConfig": {
-    "access": "public"
-  },
   "keywords": [
     "spaceone",
     "design system",
@@ -26,6 +10,29 @@
     "ui library",
     "component"
   ],
+  "homepage": "https://github.com/spaceone-dev/spaceone-design-system#readme",
+  "bugs": {
+    "url" : "https://github.com/spaceone-dev/spaceone-design-system/issues",
+    "email" : "admin@spaceone.dev"
+  },
+  "author": "SpaceONE",
+  "license": "Apache-2.0",
+  "main": "dist/spaceone-design-system.umd.js",
+  "typings": "./dist/src/index.d.ts",
+  "files": [
+    "/dist/*",
+    "/src/*",
+    "/types/*",
+    "/tailwind.config.js",
+    "/css/*"
+  ],
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/spaceone-dev/spaceone-design-system.git"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "vue-cli-service build --target lib --name spaceone-design-system src/index.ts",
     "lint": "eslint --ext .js,.vue src",
@@ -33,7 +40,7 @@
     "storybook": "start-storybook -p 6006",
     "icon": "vsvg -s ./src/assets/icons -t src/foundation/icons/p-icons --es6",
     "lottie": "node build/lottie.js",
-    "style": "node build/style.js",
+    "build:style": "node build/style.js",
     "analyze": "NODE_ENV=production VUE_APP_ANALYZE_MOD=true vue-cli-service build",
     "test": "jest"
   },
