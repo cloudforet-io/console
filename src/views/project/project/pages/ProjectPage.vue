@@ -76,10 +76,20 @@
                                                  :menu="settingMenu"
                                                  button-only
                                                  button-icon="ic_setting"
-                                                 button-style-type="primary-dark"
                                                  @edit:select="openProjectGroupEditForm"
                                                  @delete:select="openProjectGroupDeleteForm"
                             />
+                            <div v-if="projectState.groupId"
+                                 v-tooltip.top="$t('PROJECT.LANDING.MANAGE_PROJECT_GROUP_MEMBER')"
+                                 class="project-group-member-button"
+                                 @click="openProjectGroupMemberPage"
+                            >
+                                <p-i name="ic_member"
+                                     width="1rem" height="1rem"
+                                     color="inherit transparent"
+                                />
+                                <span class="text">{{ projectState.groupMemberCount }}</span>
+                            </div>
                             <p-icon-text-button v-if="projectState.groupId"
                                                 style-type="primary-dark"
                                                 name="ic_plus_bold"
@@ -142,6 +152,12 @@
                                            :project-group-id="projectState.groupId"
                                            @confirm="projectFormConfirm($event)"
                 />
+                <project-group-member-page v-if="projectState.groupMemberPageVisible"
+                                           :parent-groups="parentGroups"
+                                           :group-name="projectState.groupName"
+                                           :group-id="projectState.groupId"
+                                           @close="projectState.groupMemberPageVisible = false"
+                />
             </div>
         </template>
     </p-vertical-page-layout>
@@ -150,7 +166,7 @@
 <script lang="ts">
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, ref, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 
@@ -172,11 +188,13 @@ import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.v
 import { FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteList from '@/views/common/components/favorites/FavoriteList.vue';
 import ProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
+import ProjectGroupMemberPage from '@/views/project/project/modules/ProjectGroupMemberPage.vue';
 
 
 export default {
     name: 'ProjectPage',
     components: {
+        ProjectGroupMemberPage,
         ProjectCreateFormModal,
         FavoriteList,
         FavoriteButton,
@@ -199,7 +217,9 @@ export default {
         const projectState = reactive({
             groupId: undefined as string|undefined,
             groupName: '' as string|undefined,
+            groupMemberCount: 0,
             searchText: '',
+            groupMemberPageVisible: false,
         });
 
         const state = reactive({
@@ -273,6 +293,17 @@ export default {
             }
         };
 
+        const getProjectGroupMemberCount = async (groupId) => {
+            try {
+                const res = await SpaceConnector.client.identity.projectGroup.member.list({
+                    project_group_id: groupId,
+                });
+                projectState.groupMemberCount = res.total_count;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
 
         /** Handling Form */
         const openProjectGroupDeleteForm = () => {
@@ -304,6 +335,10 @@ export default {
             formState.updateMode = false;
             formState.createTargetNode = createTargetNode;
             formState.projectGroupFormVisible = true;
+        };
+
+        const openProjectGroupMemberPage = () => {
+            projectState.groupMemberPageVisible = true;
         };
 
         const onProjectGroupUpdate = async (item: ProjectGroup) => {
@@ -427,6 +462,10 @@ export default {
             }
         };
 
+        watch(() => projectState.groupId, (groupId) => {
+            if (groupId) getProjectGroupMemberCount(groupId);
+        }, { immediate: true });
+
 
         return {
             projectState,
@@ -436,6 +475,7 @@ export default {
             beforeFavoriteRoute,
             openProjectForm,
             openProjectGroupDeleteForm,
+            openProjectGroupMemberPage,
             projectGroupDeleteFormConfirm,
             openProjectGroupEditForm,
             projectFormConfirm,
@@ -501,6 +541,29 @@ export default {
         @apply inline-flex items-center;
         .p-icon-text-button {
             @apply ml-4;
+        }
+        .p-dropdown-menu-btn {
+            .p-icon-button {
+                @apply border-transparent;
+                border-radius: 50%;
+                &:hover {
+                    @apply bg-blue-200 text-secondary border-transparent;
+                }
+            }
+        }
+        .project-group-member-button {
+            height: 2rem;
+            cursor: pointer;
+            border-radius: 6.25rem;
+            padding: 0.375rem 0.5rem 0 0.5rem;
+            margin-left: 0.75rem;
+            &:hover {
+                @apply bg-blue-200 text-secondary;
+            }
+            .text {
+                vertical-align: middle;
+                padding-left: 0.25rem;
+            }
         }
     }
 }

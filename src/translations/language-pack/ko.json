@@ -947,6 +947,7 @@
 			"EMPTY_PROJECT_GROUP_MSG_TITLE": "클라우드 리소스를 관리해보세요! ",
 			"EMPTY_PROJECT_MSG": "프로젝트가 없습니다. ",
 			"FAVORITES": "즐겨찾기",
+			"MANAGE_PROJECT_GROUP_MEMBER": "",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "이름 ",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "프로젝트 그룹 이름 ",
 			"MODAL_CREATE_PROJECT_GROUP_TITLE": "프로젝트 그룹 생성 ",

@@ -947,6 +947,7 @@
 			"EMPTY_PROJECT_GROUP_MSG_TITLE": "Let's begin to manage your resource!",
 			"EMPTY_PROJECT_MSG": "Looks like you don't have any Project.",
 			"FAVORITES": "Favorites",
+			"MANAGE_PROJECT_GROUP_MEMBER": "Manage Project Group Member",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "Name",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "Project Group Name",
 			"MODAL_CREATE_PROJECT_GROUP_TITLE": "Create Project Group",

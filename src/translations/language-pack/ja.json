@@ -947,6 +947,7 @@
 			"EMPTY_PROJECT_GROUP_MSG_TITLE": "クラウドリソースを管理してみましょう！",
 			"EMPTY_PROJECT_MSG": "プロジェクトがありません",
 			"FAVORITES": "お気に入り",
+			"MANAGE_PROJECT_GROUP_MEMBER": "",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "名前",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "プロジェクトグループ名",
 			"MODAL_CREATE_PROJECT_GROUP_TITLE": "プロジェクトグループ作成",
