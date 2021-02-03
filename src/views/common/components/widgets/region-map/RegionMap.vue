@@ -194,6 +194,7 @@ export default {
             }
 
             if (!initialRegionFromLocalStorage) {
+                let regionWithTheMostService = '';
                 const resp = await SpaceConnector.client.statistics.topic.cloudServiceByRegion({
                     query: {
                         sort: {
@@ -203,19 +204,21 @@ export default {
                         only: ['count', 'region_name'],
                     },
                 });
-                let regionWithTheMostService = resp.results[0].region_name;
-                if (regionWithTheMostService === 'global') regionWithTheMostService = 'ap-northeast-2';
-                const allInitialRegionInfo = state.data.find(data => data.region_code === regionWithTheMostService);
-                const initialRegion = {
-                    longitude: allInitialRegionInfo.longitude,
-                    latitude: allInitialRegionInfo.latitude,
-                    // eslint-disable-next-line camelcase
-                    region_code: allInitialRegionInfo.region_code,
-                    name: allInitialRegionInfo.name,
-                    provider: allInitialRegionInfo.provider,
-                };
-                state.initialRegion = initialRegion;
-                [state.selectedProvider, state.selectedRegion, state.selectedRegionCode] = [initialRegion.provider, initialRegion.name, initialRegion.region_code];
+                if (resp.results.length > 0) {
+                    regionWithTheMostService = resp.results[0].region_name;
+                    if (regionWithTheMostService === 'global') regionWithTheMostService = 'ap-northeast-2';
+                    const allInitialRegionInfo = state.data.find(data => data.region_code === regionWithTheMostService);
+                    const initialRegion = {
+                        longitude: allInitialRegionInfo.longitude,
+                        latitude: allInitialRegionInfo.latitude,
+                        // eslint-disable-next-line camelcase
+                        region_code: allInitialRegionInfo.region_code,
+                        name: allInitialRegionInfo.name,
+                        provider: allInitialRegionInfo.provider,
+                    };
+                    state.initialRegion = initialRegion;
+                    [state.selectedProvider, state.selectedRegion, state.selectedRegionCode] = [initialRegion.provider, initialRegion.name, initialRegion.region_code];
+                }
             }
         };
 
