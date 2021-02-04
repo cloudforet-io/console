@@ -1,7 +1,7 @@
 <template>
     <div class="p-chart-loader">
         <transition name="fade-in">
-            <div v-if="loading" class="loader w-full h-full">
+            <div v-show="loading" class="loader w-full h-full">
                 <slot name="loader" :loading="loading">
                     <p-lottie name="thin-spinner"
                               auto
@@ -11,7 +11,7 @@
             </div>
         </transition>
         <transition name="fade-in">
-            <div v-if="!loading" class="w-full h-full">
+            <div v-show="!loading" class="w-full h-full">
                 <slot name="default" />
             </div>
         </transition>
