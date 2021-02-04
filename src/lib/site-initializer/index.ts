@@ -4,6 +4,7 @@ import { store } from '@/store';
 import router from '@/routes';
 import { GTag } from '@/lib/gtag';
 import { i18n } from '@/translations';
+import * as am4core from '@amcharts/amcharts4/core';
 
 const initConfig = async () => {
     await config.init();
@@ -44,6 +45,19 @@ const initLanguage = () => {
     }, { immediate: true });
 };
 
+const initAmchartsLicense = () => {
+    if (config.get('AMCHARTS_LICENSE.CHARTS')) {
+        am4core.addLicense(config.get('AMCHARTS_LICENSE.CHARTS'));
+    }
+    if (config.get('AMCHARTS_LICENSE.MAPS')) {
+        am4core.addLicense(config.get('AMCHARTS_LICENSE.MAPS'));
+    }
+    if (config.get('AMCHARTS_LICENSE.TIMELINE')) {
+        am4core.addLicense(config.get('AMCHARTS_LICENSE.TIMELINE'));
+    }
+};
+
+
 export const siteInit = async () => {
     try {
         await initConfig();
@@ -51,6 +65,7 @@ export const siteInit = async () => {
         await initDomain();
         initGtag();
         initLanguage();
+        initAmchartsLicense();
     } catch (e) {
         console.error(e);
     }

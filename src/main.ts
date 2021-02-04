@@ -8,10 +8,12 @@ import webFontLoader from 'webfontloader';
 import { webFonts, fontUrls } from '@/styles/web-fonts';
 import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
-import '@/styles/style.pcss';
 import SpaceDesignSystem from '@spaceone/design-system';
 import PortalVue from 'portal-vue';
 import App from './App.vue';
+
+import '@/styles/style.pcss';
+import '@spaceone/design-system/dist/css/light-style.css';
 
 
 /** ********** SET VUE PLUGINS ************** */
@@ -32,8 +34,6 @@ webFontLoader.load({
         urls: fontUrls,
     },
 });
-
-console.debug('main');
 
 new Vue({
     el: '#app',

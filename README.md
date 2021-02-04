@@ -28,6 +28,37 @@
 
 [![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/0)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/0)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/1)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/1)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/2)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/2)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/3)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/3)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/4)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/4)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/5)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/5)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/6)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/6)[![](https://sourcerer.io/fame/wesky93/spaceone-dev/console/images/7)](https://sourcerer.io/fame/wesky93/spaceone-dev/console/links/7)
 
+## How to Use
+
+### Run dev server
+
+```shell
+npm install
+
+npm run serve
+```
+
+### Chart License
+
+The console internally uses amCharts for all charts. <br/>
+Before using the console, look carefully at amCharts' license. <br/>
+If you want to purchase the amCharts license that suits you and use it on your console, 
+follow the instructions below.
+
+<br/>
+
+1. Purchase amCharts License.
+2. Add your license key to ```public/config/default.json```
+
+```json
+{
+ "AMCHARTS_LICENSE": {
+  "CHARTS": "",
+  "MAPS": "",
+  "TIMELINE": ""
+ }
+}
+```
 
 
 ## 🧩 SpaceOne Design System  
@@ -46,3 +77,4 @@ See our [OWNERS](https://github.com/spaceone-dev/console/blob/master/AUTHORS) fi
   
     
 This project is [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0) licensed.
+

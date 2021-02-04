@@ -9,7 +9,7 @@
             <div class="col-span-12 lg:col-span-9 chart-wrapper">
                 <p-chart-loader :loading="loading">
                     <template #loader>
-                        <p-skeleton ref="loaderRef" width="100%" height="100%" />
+                        <p-skeleton width="100%" height="100%" />
                     </template>
                     <div id="chartRef" ref="chartRef" class="chart" />
                 </p-chart-loader>
@@ -101,7 +101,6 @@ export default {
 
         const state = reactive({
             chartRef: null as HTMLElement | null,
-            loaderRef: null,
             chartRegistry: {},
             chart: null as null|any,
             data: [] as any,
@@ -110,7 +109,7 @@ export default {
             selectedRegion: '', // Asia Pacific (Seoul)
             selectedRegionCode: '', // ap-northeast-2
             providers: computed(() => store.state.resource.provider.items),
-            loading: false,
+            loading: true,
             maxValue: 0,
             initialRegion: {} as any,
         });
