@@ -45,10 +45,8 @@ Before using the console, look carefully at amCharts' license. <br/>
 If you want to purchase the amCharts license that suits you and use it on your console, 
 follow the instructions below.
 
-<br/>
 
-1. Purchase amCharts License.
-2. Add your license key to ```public/config/default.json```
+#### Add your license key to ```public/config/default.json```
 
 ```json
 {
