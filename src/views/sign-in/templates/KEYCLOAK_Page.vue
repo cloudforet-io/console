@@ -10,7 +10,6 @@ import { PButton } from '@spaceone/design-system';
 import { makeProxy } from '@/lib/compostion-util';
 import Keycloak from 'keycloak-js';
 import { store } from '@/store';
-import { getAuth2, googleOauthSignOut } from '@/views/common/pages/SignOut.vue';
 
 export default defineComponent({
     name: 'KeycloakPage',
@@ -50,6 +49,8 @@ export default defineComponent({
         const keycloak = Keycloak(initOptions);
 
         const signInFail = async () => {
+            await vm.$router.push({ name: 'SignIn', query: { error: 'error' } });
+            await keycloak.logout();
         };
 
         const signIn = async (userId, token) => {
@@ -69,6 +70,8 @@ export default defineComponent({
                     await vm.$router.replace({ name: 'userAccount' });
                 } else await vm.$router.push(props.nextPath);
             } catch (e) {
+                await signInFail();
+
                 console.error(e);
             }
         };

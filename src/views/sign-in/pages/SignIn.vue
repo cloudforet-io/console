@@ -57,7 +57,7 @@
                     <p-i name="root-account" width="1.5rem" height="1.5rem"
                          class="admin-icon"
                     />
-                    <span class="admin-sign-in-text">{{$t('COMMON.SIGN_IN.SIGN_IN_FOR_ROOT_ACCOUNT')}}</span>
+                    <span class="admin-sign-in-text">{{ $t('COMMON.SIGN_IN.SIGN_IN_FOR_ROOT_ACCOUNT') }}</span>
                 </span>
             </div>
         </div>
@@ -98,6 +98,10 @@ export default {
         nextPath: {
             type: String,
             default: '/',
+        },
+        error: {
+            type: String,
+            default: '',
         },
     },
     beforeRouteEnter(to, from, next) {
@@ -150,12 +154,24 @@ export default {
                 await googleOauthSignOut(auth2);
             }
         };
+
+        const showErrorByEvent = async () => {
+            state.showErrorMessage = true;
+
+        };
+
         const hideErrorMessage = () => {
             state.showErrorMessage = false;
         };
         const goToAdminSignIn = () => {
             vm.$router.replace({ name: 'AdminSignIn' });
         };
+        (async () => {
+            if (vm.$route.query.error === 'error') {
+                await showErrorByEvent();
+                await vm.$router.replace({query: {...vm.$route.query, error: null}});
+            }
+        })();
         return {
             ...toRefs(state),
             signIn,
