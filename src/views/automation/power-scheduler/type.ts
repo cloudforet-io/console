@@ -25,7 +25,7 @@ export const DESIRED_STATES = {
 
 export const BOOTING_STATES = {
     BOOTING: {
-        text: 'BOOTING',
+        text: 'STARTING',
         textColor: peacock[400],
         lottie: 'lottie_booting',
     },
