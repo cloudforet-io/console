@@ -605,6 +605,7 @@ $height: calc(100vh - ($gnb-height));
     left: 0;
     height: $height;
     width: 100vw;
+    overflow: auto;
 }
 .p-pane-layout {
     @apply pt-8 px-4;
