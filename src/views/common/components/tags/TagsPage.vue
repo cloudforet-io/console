@@ -166,14 +166,14 @@ export default {
     display: flex;
     width: 100%;
     height: 100%;
-    top: $gnb-height;
+    top: 0;
     left: 0;
     flex-direction: column;
     z-index: 99;
 
     /* transition: opacity 0.3s ease; */
-    max-height: calc(100vh - ($gnb-height));
-    min-height: calc(100vh - ($gnb-height));
+    max-height: 100%;
+    min-height: 100%;
     max-width: 100vw;
 
     .page-wrapper {

@@ -155,8 +155,6 @@
                                            @confirm="projectFormConfirm($event)"
                 />
                 <project-group-member-page v-if="projectState.groupMemberPageVisible"
-                                           :parent-groups="parentGroups"
-                                           :group-name="projectState.groupName"
                                            :group-id="projectState.groupId"
                                            @close="projectState.groupMemberPageVisible = false"
                 />
