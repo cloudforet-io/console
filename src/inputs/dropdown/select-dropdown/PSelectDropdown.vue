@@ -92,6 +92,9 @@ export default {
 
 <style lang="postcss">
 .p-select-dropdown {
+    .p-dropdown-btn {
+        width: 100%;
+    }
     &.is-invalid-btn .p-dropdown-btn {
         .menu-btn.p-button {
             @apply border border-alert;
