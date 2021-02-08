@@ -57,8 +57,12 @@ const initAmchartsLicense = () => {
     }
 };
 
+const removeInitializer = () => {
+    const el = document.getElementById('site-loader-wrapper');
+    if (el?.parentElement) el.parentElement.removeChild(el);
+};
 
-export const siteInit = async () => {
+const init = async () => {
     try {
         await initConfig();
         await initApiClient();
@@ -68,5 +72,35 @@ export const siteInit = async () => {
         initAmchartsLicense();
     } catch (e) {
         console.error(e);
+    }
+};
+
+const MIN_LOADING_TIME = 1000;
+export const siteInit = async () => {
+    store.dispatch('display/startInitializing');
+
+    store.watch(state => state.display.isInitialized, (isInitialized) => {
+        if (isInitialized) {
+            const el = document.getElementById('site-loader-wrapper');
+            if (el?.parentElement) el.parentElement.removeChild(el);
+        }
+    });
+
+    let isMinTimePassed = false;
+    let isFinishedInitializing = false;
+
+    setTimeout(() => {
+        isMinTimePassed = true;
+        if (isFinishedInitializing) {
+            store.dispatch('display/finishInitializing');
+            removeInitializer();
+        }
+    }, MIN_LOADING_TIME);
+
+    await init();
+    isFinishedInitializing = true;
+    if (isMinTimePassed) {
+        store.dispatch('display/finishInitializing');
+        removeInitializer();
     }
 };

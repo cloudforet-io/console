@@ -10,6 +10,7 @@ import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
 import SpaceDesignSystem from '@spaceone/design-system';
 import PortalVue from 'portal-vue';
+import { siteInit } from '@/lib/site-initializer';
 import App from './App.vue';
 
 import '@/styles/style.pcss';
@@ -35,13 +36,17 @@ webFontLoader.load({
     },
 });
 
-new Vue({
-    el: '#app',
-    router,
-    i18n,
-    store,
-    components: {
-        App,
-    },
-    template: '<App/>',
-});
+(async () => {
+    await siteInit();
+
+    new Vue({
+        el: '#app',
+        router,
+        i18n,
+        store,
+        components: {
+            App,
+        },
+        template: '<App/>',
+    });
+})();
