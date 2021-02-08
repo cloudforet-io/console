@@ -2,14 +2,20 @@
     <vertical-page-layout :min-width="0" :init-width="260" :max-width="400">
         <template #sidebar>
             <div class="member-profile">
-                <p-i :name="userState.isDomainOwner ? 'admin' : 'user'" width="3rem" height="3rem"
-                     class="member-icon"
+                <p-i v-if="userState.isDomainOwner" class="member-icon" name="root-account"
+                     width="3rem" height="3rem"
+                />
+                <p-i v-else-if="!userState.isDomainOwner && userState.isAdmin" class="member-icon" name="admin"
+                     width="3rem" height="3rem"
+                />
+                <p-i v-else class="member-icon" name="user"
+                     width="3rem" height="3rem"
                 />
                 <p class="member-id">
                     {{ userState.userId }}
                 </p>
                 <p v-if="userState.isDomainOwner" class="member-type">
-                    {{ $t('IDENTITY.USER.MAIN.SPACEONE_ADMIN') }}
+                    {{ $t('IDENTITY.USER.MAIN.ROOT_ACCOUNT') }}
                 </p>
                 <p v-else class="member-type">
                     {{ $t('IDENTITY.USER.MAIN.SPACEONE_USER') }}
@@ -18,7 +24,7 @@
             <div class="menu-title">
                 {{ $t('IDENTITY.USER.MAIN.MY_ACCOUNT') }}
             </div>
-            <p-hr class="menu-divider" />
+            <p-divider class="menu-divider" />
             <div v-for="(item) in sidebarState.userMenuList" :key="item.label"
                  class="menu-item"
                  :class="{'selected': item.label === sidebarState.selectedItem}"
@@ -28,9 +34,9 @@
             </div>
             <div v-if="userState.isAdmin" class="admin-menu-wrapper">
                 <div class="menu-title">
-                    {{ $t('IDENTITY.USER.MAIN.ADMINISTRATOR') }}
+                    {{ $t('IDENTITY.USER.MAIN.ROOT_ACCOUNT') }}
                 </div>
-                <p-hr class="menu-divider" />
+                <p-divider class="menu-divider" />
                 <div v-for="(item) in sidebarState.adminMenuList"
                      :key="item.label"
                      class="menu-item"
@@ -54,7 +60,7 @@ import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PHr, PI } from '@spaceone/design-system';
+import { PDivider, PI } from '@spaceone/design-system';
 
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 import { store } from '@/store';
@@ -72,7 +78,7 @@ export default {
     components: {
         VerticalPageLayout,
         PI,
-        PHr,
+        PDivider,
     },
     beforeRouteEnter(to, from, next) {
         next((vm) => {

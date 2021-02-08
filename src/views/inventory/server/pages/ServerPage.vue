@@ -1,7 +1,7 @@
 <template>
     <general-page-layout>
         <div class="page-navigation">
-            <p-page-navigation :routes="routeState.route" />
+            <p-breadcrumbs :routes="routeState.route" />
         </div>
         <server-main />
     </general-page-layout>
@@ -13,7 +13,7 @@ import {
     computed, getCurrentInstance, reactive,
 } from '@vue/composition-api';
 
-import { PPageNavigation } from '@spaceone/design-system';
+import { PBreadcrumbs } from '@spaceone/design-system';
 
 import ServerMain from '@/views/inventory/server/modules/ServerMain.vue';
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
@@ -25,7 +25,7 @@ export default {
     components: {
         ServerMain,
         GeneralPageLayout,
-        PPageNavigation,
+        PBreadcrumbs,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;

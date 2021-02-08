@@ -112,7 +112,7 @@ import {
 import {
     PButtonModal, PTag, PSearchTable, PSelectDropdown, PFieldGroup, PTextInput, PButton, PI, PEmpty,
 } from '@spaceone/design-system';
-import { SearchTableListeners, Options } from '@spaceone/design-system/dist/src/organisms/tables/search-table/type';
+import { SearchTableListeners, Options } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { isEqual } from 'lodash';
@@ -197,6 +197,14 @@ export default {
             type: Boolean,
             default: false,
         },
+        isProjectGroup: {
+            type: Boolean,
+            default: false,
+        },
+        projectGroupId: {
+            type: String,
+            default: '',
+        },
     },
     setup(props, { emit, root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -228,6 +236,7 @@ export default {
         });
         const proxyVisible = makeProxy('visible', props, emit);
         const projectId = root.$route.params.id;
+
 
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
@@ -297,12 +306,32 @@ export default {
             }
         };
 
-        const addMemberLabel = () => {
+        const addMemberLabel = async () => {
             if (formState.labelTagTools.tags.length >= 5) {
                 return;
             }
             formState.labelTagTools.addTag(state.memberLabel);
             state.memberLabel = '';
+        };
+
+        const addProjectMember = async (users, labels) => {
+            await SpaceConnector.client.identity.project.member.add({
+                project_id: projectId,
+                role_id: state.projectRole,
+                users,
+                labels,
+            });
+            showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_ADD_MEMBER'), '', root);
+        };
+
+        const addProjectGroupMember = async (users, labels) => {
+            await SpaceConnector.client.identity.projectGroup.member.add({
+                project_group_id: props.projectGroupId,
+                role_id: state.projectRole,
+                users,
+                labels,
+            });
+            showSuccessMessage('Successfully Added Project group member ', '', root);
         };
 
         const confirm = async () => {
@@ -314,13 +343,8 @@ export default {
 
             if (validationState.isProjectRoleValid && validationState.isMemberValid) {
                 try {
-                    await SpaceConnector.client.identity.project.member.add({
-                        project_id: projectId,
-                        role_id: state.projectRole,
-                        users,
-                        labels,
-                    });
-                    showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_ADD_MEMBER'), '', root);
+                    if (props.isProjectGroup) await addProjectGroupMember(users, labels);
+                    else await addProjectMember(users, labels);
                 } catch (e) {
                     showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_ADD_MEMBER'), e, root);
                 } finally {

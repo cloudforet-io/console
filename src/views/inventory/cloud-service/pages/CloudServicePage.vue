@@ -10,7 +10,7 @@
                     {{ sidebarState.group }}
                 </p>
             </div>
-            <p-hr class="sidebar-divider" />
+            <p-divider class="sidebar-divider" />
             <div v-for="(item) in sidebarState.items" :key="item.id"
                  class="sidebar-list-item"
                  :class="{'selected': item.name === sidebarState.selectedItem.name}"
@@ -21,7 +21,7 @@
         </template>
         <template #default>
             <div class="page-navigation">
-                <p-page-navigation :routes="routeState.route" />
+                <p-breadcrumbs :routes="routeState.route" />
             </div>
             <template v-if="sidebarState.hasServer">
                 <server-main v-show="sidebarState.selectedItem.type === 'inventory.Server'"
@@ -156,14 +156,14 @@ import {
 
 import {
     PHorizontalLayout, PDropdownMenuBtn, PTab, PDynamicLayout,
-    PPageTitle, PLazyImg, PPageNavigation, PIconTextButton, PEmpty, PHr,
+    PPageTitle, PLazyImg, PBreadcrumbs, PIconTextButton, PEmpty, PDivider,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import {
     QuerySearchTableFetchOptions, QuerySearchTableListeners, QuerySearchTableTypeOptions,
-} from '@spaceone/design-system/dist/src/organisms/dynamic-layout/templates/query-search-table/type';
-import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type';
-import { DynamicLayout } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type/layout-schema';
+} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/templates/query-search-table/type';
+import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
+import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import ServerMain from '@/views/inventory/server/modules/ServerMain.vue';
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
@@ -243,14 +243,14 @@ export default {
     components: {
         ServerMain,
         PLazyImg,
-        PHr,
+        PDivider,
         VerticalPageLayout,
         CloudServiceDetail,
         CloudServiceHistory,
         CloudServiceAdmin,
         PDynamicLayout,
         PHorizontalLayout,
-        PPageNavigation,
+        PBreadcrumbs,
         PPageTitle,
         PIconTextButton,
         PTab,

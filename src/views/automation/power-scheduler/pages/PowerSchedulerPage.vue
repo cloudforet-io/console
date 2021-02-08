@@ -14,7 +14,7 @@
                 <p class="title">
                     <strong>{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SCHEDULER_LIST') }}</strong>&nbsp;({{ totalCount }})
                 </p>
-                <p-hr />
+                <p-divider />
                 <div class="my-6 mx-3">
                     <p-selectable-list :items="scheduleList" :loading="loading" :mapper="listMapper"
                                        :selected-indexes="selectedIndexes"
@@ -48,7 +48,7 @@
                 </div>
             </section>
         </template>
-        <p-page-navigation :routes="routeState.route" />
+        <p-breadcrumbs :routes="routeState.route" />
         <div class="detail-container">
             <template v-if="loading">
                 <div class="loading-backdrop fade-in" />
@@ -83,12 +83,12 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PSelectableList, PPageNavigation, PIconTextButton, PHr, PLottie
+    PSelectableList, PBreadcrumbs, PIconTextButton, PDivider, PLottie,
 } from '@spaceone/design-system';
 
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 import ScheduleDetail from '@/views/automation/power-scheduler/modules/ScheduleDetail.vue';
-import { DESIRED_STATES, Schedule } from '@/views/automation/power-scheduler/type';
+import { SCHEDULE_STATUS, Schedule } from '@/views/automation/power-scheduler/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
@@ -105,7 +105,7 @@ interface Props {
 }
 
 const listMapper = {
-    icon: d => DESIRED_STATES[d.desired_state]?.icon || '',
+    icon: d => SCHEDULE_STATUS[d.desired_state]?.icon || '',
 };
 const getFormattedTime = time => dayjs.unix(time.seconds).tz(store.state.user.timezone).format('YYYY-MM-DD');
 
@@ -119,11 +119,11 @@ export default {
     components: {
         PLottie,
         PSelectableList,
-        PHr,
+        PDivider,
         VerticalPageLayout,
         ScheduleDetail,
         PIconTextButton,
-        PPageNavigation,
+        PBreadcrumbs,
     },
     props: {
         projectId: {
@@ -321,7 +321,6 @@ export default {
             onSelectItem,
             listMapper,
             getFormattedTime,
-            DESIRED_STATES,
         };
     },
 };

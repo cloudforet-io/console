@@ -54,10 +54,10 @@
                            @on-sign-in="signIn"
                 />
                 <span @click="goToAdminSignIn">
-                    <p-i name="admin" width="1.5rem" height="1.5rem"
+                    <p-i name="root-account" width="1.5rem" height="1.5rem"
                          class="admin-icon"
                     />
-                    <span class="admin-sign-in-text">{{ $t('COMMON.SIGN_IN.SIGN_IN_FOR_ADMIN') }}</span>
+                    <span class="admin-sign-in-text">{{ $t('COMMON.SIGN_IN.SIGN_IN_FOR_ROOT_ACCOUNT') }}</span>
                 </span>
             </div>
         </div>
@@ -76,7 +76,6 @@ import {
 import { store } from '@/store';
 import IDPWSignIn from '@/views/sign-in/templates/ID_PW.vue';
 
-import { setGtagUserID } from '@/lib/gtag';
 import { getAuth2, googleOauthSignOut } from '@/views/common/pages/SignOut.vue';
 
 
@@ -99,6 +98,10 @@ export default {
         nextPath: {
             type: String,
             default: '/',
+        },
+        error: {
+            type: String,
+            default: '',
         },
     },
     beforeRouteEnter(to, from, next) {
@@ -150,14 +153,25 @@ export default {
                 const auth2 = await getAuth2(store.state.domain.authOptions.client_id);
                 await googleOauthSignOut(auth2);
             }
-            setGtagUserID(vm);
         };
+
+        const showErrorByEvent = async () => {
+            state.showErrorMessage = true;
+
+        };
+
         const hideErrorMessage = () => {
             state.showErrorMessage = false;
         };
         const goToAdminSignIn = () => {
             vm.$router.replace({ name: 'AdminSignIn' });
         };
+        (async () => {
+            if (vm.$route.query.error === 'error') {
+                await showErrorByEvent();
+                await vm.$router.replace({query: {...vm.$route.query, error: null}});
+            }
+        })();
         return {
             ...toRefs(state),
             signIn,

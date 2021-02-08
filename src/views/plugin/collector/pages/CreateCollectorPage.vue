@@ -1,7 +1,7 @@
 <template>
     <general-page-layout class="collector-creator-container">
         <div class="page-navigation">
-            <p-page-navigation :routes="routes" />
+            <p-breadcrumbs :routes="routes" />
         </div>
         <p-icon-text-button name="ic_back" class="text-2xl mb-6 p-0"
                             icon-color="transparent inherit"
@@ -76,7 +76,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PProgressWizard, PSelectDropdown, PLazyImg, PIconTextButton, PPageNavigation, PFieldGroup, PTextInput,
+    PProgressWizard, PSelectDropdown, PLazyImg, PIconTextButton, PBreadcrumbs, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
 
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
@@ -97,7 +97,7 @@ export default {
         PProgressWizard,
         TagsInputGroup,
         PIconTextButton,
-        PPageNavigation,
+        PBreadcrumbs,
         PLazyImg,
     },
     setup(props, { root }) {

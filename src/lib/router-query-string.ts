@@ -1,8 +1,6 @@
 import { forEach } from 'lodash';
 import { Location } from 'vue-router';
 import router from '@/routes';
-import { QueryTag as Tag } from '@spaceone/design-system/dist/src/organisms/search/query-search-tags/type';
-import { QueryItem } from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
 
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -21,21 +19,6 @@ export const replaceUrlQuery = async (key: string, value: RouteQueryString) => {
     } catch (e) {
 
     }
-};
-
-interface QueryTag extends Tag, QueryItem {}
-export const queryTagsToQueryString = (tags: QueryTag[]): RouteQueryString => {
-    if (Array.isArray(tags)) {
-        return tags.reduce((results, tag) => {
-            if (tag.invalid) return results;
-            if (tag.key) {
-                const key = tag.key.name;
-                results.push(`${key}:${tag.operator}${tag.value?.name}`);
-            } else results.push(`${tag.value?.name}`);
-            return results;
-        }, [] as string[]);
-    }
-    return null;
 };
 
 export const queryStringToStringArray = (queryString: RouteQueryString): string[] => {

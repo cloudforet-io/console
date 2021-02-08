@@ -35,17 +35,17 @@
                     </template>
                 </p-field-group>
                 <div class="label-text-wrapper">
-                        <span class="label-text">
-                            {{ $t('PROJECT.DETAIL.PROJECT_MEMBER_LABEL') }}
-                        </span>
+                    <span class="label-text">
+                        {{ $t('PROJECT.DETAIL.PROJECT_MEMBER_LABEL') }}
+                    </span>
                     <span class="label-help-msg">
-                            Up to 5 Labels
-                        </span>
+                        Up to 5 Labels
+                    </span>
                 </div>
                 <div class="label-input-wrapper">
                     <p-text-input v-model="memberLabel" block
-                                  @keyup.enter="addMemberLabel"
                                   :placeholder="'Ex. Developer'"
+                                  @keyup.enter="addMemberLabel"
                     />
                     <p-button class="icon-button" style-type="gray900"
                               @click="addMemberLabel"
@@ -164,6 +164,14 @@ export default {
                 properties: {},
             }),
         },
+        isProjectGroup: {
+            type: Boolean,
+            default: false,
+        },
+        projectGroupId: {
+            type: String,
+            default: '',
+        },
     },
     setup(props, { emit, root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -224,6 +232,26 @@ export default {
             }
         };
 
+        const editProjectMember = async (labels) => {
+            await SpaceConnector.client.identity.project.member.modify({
+                project_id: projectId,
+                role_id: state.projectRole,
+                user_id: state.userId,
+                labels,
+            });
+            showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_ADD_MEMBER'), '', root);
+        };
+
+        const editProjectGroupMember = async (labels) => {
+            await SpaceConnector.client.identity.projectGroup.member.modify({
+                project_group_id: props.projectGroupId,
+                role_id: state.projectRole,
+                user_id: state.userId,
+                labels,
+            });
+            showSuccessMessage('Successfully modified project group member', '', root);
+        };
+
         const confirm = async () => {
             const labels = formState.labelTagTools.tags;
 
@@ -232,13 +260,8 @@ export default {
 
             if (validationState.isProjectRoleValid && validationState.isLabelValid) {
                 try {
-                    await SpaceConnector.client.identity.project.member.modify({
-                        project_id: projectId,
-                        role_id: state.projectRole,
-                        user_id: state.userId,
-                        labels,
-                    });
-                    showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_ADD_MEMBER'), '', root);
+                    if (props.isProjectGroup) await editProjectGroupMember(labels);
+                    else await editProjectMember(labels);
                 } catch (e) {
                     showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_ADD_MEMBER'), e, root);
                 } finally {

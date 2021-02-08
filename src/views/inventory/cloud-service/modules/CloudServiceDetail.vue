@@ -34,12 +34,12 @@ import {
 } from '@vue/composition-api';
 
 import { PDynamicLayout, PButtonTab } from '@spaceone/design-system';
-import { DynamicLayout, DynamicLayoutType } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type/layout-schema';
-import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
-import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
+import { DynamicLayout, DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import {
     DynamicLayoutEventListeners, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
-} from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type';
+} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 
 import { getApiActionByLayoutType, makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { SpaceConnector } from '@/lib/space-connector';

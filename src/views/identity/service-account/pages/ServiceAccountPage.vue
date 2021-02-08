@@ -4,9 +4,9 @@
             <p class="sidebar-title">
                 {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.PROVIDERS_TITLE') }}
             </p>
-            <p-hr class="sidebar-divider" />
+            <p-divider class="sidebar-divider" />
             <div v-for="provider in providerState.items" :key="provider.provider" class="provider-list">
-                <p-hr v-if="provider.provider && provider.provider !== 'megazone'" class="provider-divider" />
+                <p-divider v-if="provider.provider && provider.provider !== 'megazone'" class="provider-divider" />
                 <p-radio v-model="selectedProvider" :value="provider.provider">
                     <template #radio-left>
                         <img v-if="provider.icon"
@@ -29,7 +29,7 @@
         </template>
         <template #default>
             <div class="page-navigation">
-                <p-page-navigation :routes="route" />
+                <p-breadcrumbs :routes="route" />
             </div>
             <p-page-title :title="$t('IDENTITY.SERVICE_ACCOUNT.MAIN.TITLE', {provider: selectedProviderName})"
                           class="page-title"
@@ -134,18 +134,18 @@ import { render } from 'ejs';
 
 /* spaceone design system */
 import {
-    PRadio, PI, PHr, PPageNavigation, PPageTitle, PHorizontalLayout, PIconTextButton,
+    PRadio, PI, PDivider, PBreadcrumbs, PPageTitle, PHorizontalLayout, PIconTextButton,
     PDropdownMenuBtn, PTab, PDataTable, PDynamicLayout, PEmpty, PDoubleCheckModal,
 } from '@spaceone/design-system';
 import {
     TableEventListeners,
     TableFetchOptions,
     TableTypeOptions,
-} from '@spaceone/design-system/dist/src/organisms/dynamic-layout/templates/table/type';
-import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type';
-import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
-import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
-import { DynamicLayout } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type/layout-schema';
+} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/templates/table/type';
+import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 /* components */
 import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
@@ -195,8 +195,8 @@ export default {
         PDataTable,
         PHorizontalLayout,
         PPageTitle,
-        PPageNavigation,
-        PHr,
+        PBreadcrumbs,
+        PDivider,
         PI,
         PRadio,
         PVerticalPageLayout,

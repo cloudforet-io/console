@@ -1,6 +1,6 @@
 <template>
     <div class="wrap">
-        <p-page-navigation :routes="route" class="page-navigation" />
+        <p-breadcrumbs :routes="route" class="page-navigation" />
         <p-page-title :title="$t('COMMON.ERROR.NO_RESOURCE_TITLE')" child class="page-title"
                       @goBack="$router.go(-1)"
         />
@@ -32,7 +32,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PLottie, PButton, PPageNavigation, PPageTitle,
+    PLottie, PButton, PBreadcrumbs, PPageTitle,
 } from '@spaceone/design-system';
 
 import FNB from '@/views/common/components/fnb/FNB.vue';
@@ -41,7 +41,7 @@ export default {
     name: 'NoResource',
     components: {
         PPageTitle,
-        PPageNavigation,
+        PBreadcrumbs,
         PButton,
         PLottie,
         FNB,

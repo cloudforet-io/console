@@ -1,9 +1,18 @@
 <template>
-    <div>
+    <div class="schedule-detail">
         <p-page-title :title="title"
                       :child="mode === 'READ' || firstCreate"
                       @goBack="$router.go(-1)"
         >
+            <template #title>
+                <span>{{ title }}</span>
+                <div class="status-wrapper">
+                    <p-i :name="SCHEDULE_STATUS[status].icon" />
+                    <span class="text" :style="{color: SCHEDULE_STATUS[status].textColor}">
+                        {{ statusText[status] }}
+                    </span>
+                </div>
+            </template>
             <template #extra>
                 <p-icon-button v-if="mode === 'READ'" class="ml-2" name="ic_trashcan"
                                :disabled="disabledState.visible" @click="onClickDelete"
@@ -16,24 +25,6 @@
 
         <section>
             <div v-if="mode === 'READ'" class="section-wrapper">
-                <div class="detail-wrapper">
-                    <div class="info-group">
-                        <span class="title">{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SETTING') }}</span>
-                        <p-status v-if="DESIRED_STATES[desiredState]"
-                                  v-bind="DESIRED_STATES[desiredState]"
-                                  :icon="undefined"
-                                  class="ml-4"
-                        />
-                    </div>
-                    <div class="info-group">
-                        <span class="title">{{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.CURRENT_STATE') }}</span>
-                        <p-status v-if="BOOTING_STATES[jobStatus]"
-                                  v-bind="BOOTING_STATES[jobStatus]"
-                                  class="ml-4"
-                                  :icon-size="0.5"
-                        />
-                    </div>
-                </div>
                 <div v-if="disabledState.visible" class="section-disabled" @click.prevent />
             </div>
 
@@ -177,14 +168,14 @@ import ScheduleTimeTable from '@/views/automation/power-scheduler/modules/Schedu
 import ScheduleKanban from '@/views/automation/power-scheduler/modules/ScheduleKanban.vue';
 
 import {
-    BOOTING_STATES, defaultSchedule, DESIRED_STATES, Schedule, ViewMode,
+    defaultSchedule, SCHEDULE_STATUS, Schedule, ViewMode,
 } from '@/views/automation/power-scheduler/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput, PIconButton, PButton, PStatus, PPageTitle,
+    PButtonModal, PFieldGroup, PTextInput, PIconButton, PButton, PPageTitle, PI,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -203,13 +194,13 @@ type sectionType = 'kanban'|'time-table'
 export default {
     name: 'ScheduleDetail',
     components: {
-        PStatus,
         PButton,
         PIconButton,
         PPageTitle,
         PButtonModal,
         PTextInput,
         PFieldGroup,
+        PI,
         ScheduleTimeTable,
         ScheduleKanban,
     },
@@ -261,8 +252,13 @@ export default {
             createLoading: false,
             //
             created: '',
-            desiredState: '',
-            jobStatus: '',
+            status: 'OFF' as keyof typeof SCHEDULE_STATUS,
+            statusText: computed(() => ({
+                ON: vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.STATUS_ON'),
+                OFF: vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.STATUS_OFF'),
+                BOOTING: vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.STATUS_BOOTING'),
+                STOPPING: vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.STATUS_STOPPING'),
+            })),
         });
 
         const disabledState = reactive({
@@ -329,14 +325,11 @@ export default {
 
         const getScheduleState = async () => {
             try {
-                const res = await SpaceConnector.client.powerScheduler.schedule.getScheduleState({
+                const res = await SpaceConnector.client.powerScheduler.schedule.getScheduleStatus({
                     schedule_id: props.scheduleId,
                 });
-                state.desiredState = res.desired_state;
-                state.jobStatus = res.job_status;
+                state.status = res.status;
             } catch (e) {
-                state.desiredState = '';
-                state.jobStatus = '';
                 console.error(e);
             }
         };
@@ -457,8 +450,7 @@ export default {
             onClickCheckModalConfirm,
             onEditFinish,
             onEditStart,
-            DESIRED_STATES,
-            BOOTING_STATES,
+            SCHEDULE_STATUS,
         };
     },
 };
@@ -470,25 +462,28 @@ header {
     .p-page-title {
         margin-bottom: 2rem;
     }
-}
-.detail-wrapper {
-    @apply border border-gray-200;
-    display: flex;
-    width: 100%;
-    height: 3.5rem;
-    border-radius: 2px;
-    margin-bottom: 3.25rem;
-    .info-group {
-        @apply flex border-r border-gray-200 w-1/2;
-        font-size: 0.875rem;
-        padding: 0 1.5rem;
-        margin: auto 0;
-        &:last-of-type {
-            @apply border-none;
+
+    .section-wrapper {
+        @apply relative;
+        .section-disabled {
+            @apply absolute w-full h-full top-0 left-0 bg-white opacity-50;
         }
-        .title {
-            @apply text-gray-400;
-            font-weight: bold;
+    }
+}
+
+.schedule-detail {
+    .title-wrapper {
+        .status-wrapper {
+            display: inline-block;
+            margin-left: 1rem;
+            .text {
+                @apply text-gray-400;
+                font-size: 0.875rem;
+                font-weight: normal;
+                line-height: 1.5;
+                vertical-align: middle;
+                margin-left: 0.375rem;
+            }
         }
     }
 }
@@ -517,13 +512,6 @@ header {
 }
 .name-input {
     @apply block mt-4 w-full;
-}
-
-.section-wrapper {
-    @apply relative;
-    .section-disabled {
-        @apply absolute w-full h-full top-0 left-0 bg-white opacity-50;
-    }
 }
 
 .delete-modal-content {

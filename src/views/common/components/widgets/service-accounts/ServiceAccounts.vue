@@ -17,7 +17,10 @@
                 <template #loader>
                     <div ref="loaderRef" class="w-full h-full" />
                 </template>
-                <div ref="chartRef" class="w-full h-full" />
+                <div v-if="data.length === 0">
+                    <img src="@/assets/images/illust_ghost.svg" class="no-data-img">
+                </div>
+                <div v-else ref="chartRef" class="w-full h-full" />
             </p-chart-loader>
         </div>
         <div class="legends">
@@ -208,9 +211,7 @@ export default {
                         // else others.count += d.count;
                     });
                 } else {
-                    state.data = map(props.providers, p => ({
-                        name: p.label || '', color: p.color || '', service_account_count: 0, href: '',
-                    }));
+                    state.data = [];
                 }
                 // state.data.push(others);
             } catch (e) {
@@ -285,7 +286,9 @@ export default {
 .chart-container {
     @apply flex justify-center items-center mb-4;
 }
-
+.no-data-img {
+    @apply mx-auto;
+}
 .p-data-table::v-deep {
     border-radius: 0.125rem;
     margin-top: 1rem;

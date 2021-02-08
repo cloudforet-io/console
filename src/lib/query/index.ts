@@ -1,10 +1,10 @@
-import { QueryTag as Tag } from '@spaceone/design-system/dist/src/organisms/search/query-search-tags/type';
+import { QueryTag as Tag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import {
     KeyItem,
     KeyItemSet,
     OperatorType,
     QueryItem,
-} from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
+} from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { Filter, FilterOperator, Query } from '@/lib/space-connector/type';
 import {
     QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator,

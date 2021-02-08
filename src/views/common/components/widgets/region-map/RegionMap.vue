@@ -9,7 +9,7 @@
             <div class="col-span-12 lg:col-span-9 chart-wrapper">
                 <p-chart-loader :loading="loading">
                     <template #loader>
-                        <p-skeleton ref="loaderRef" width="100%" height="100%" />
+                        <p-skeleton width="100%" height="100%" />
                     </template>
                     <div id="chartRef" ref="chartRef" class="chart" />
                 </p-chart-loader>
@@ -101,7 +101,6 @@ export default {
 
         const state = reactive({
             chartRef: null as HTMLElement | null,
-            loaderRef: null,
             chartRegistry: {},
             chart: null as null|any,
             data: [] as any,
@@ -110,7 +109,7 @@ export default {
             selectedRegion: '', // Asia Pacific (Seoul)
             selectedRegionCode: '', // ap-northeast-2
             providers: computed(() => store.state.resource.provider.items),
-            loading: false,
+            loading: true,
             maxValue: 0,
             initialRegion: {} as any,
         });
@@ -190,10 +189,12 @@ export default {
             const initialRegionFromLocalStorage = store.getters['settings/getItem']('initial_region', '/dashboard');
             if (initialRegionFromLocalStorage) {
                 state.initialRegion = initialRegionFromLocalStorage;
+                // eslint-disable-next-line max-len
                 [state.selectedProvider, state.selectedRegion, state.selectedRegionCode] = [initialRegionFromLocalStorage.provider, initialRegionFromLocalStorage.region_name, initialRegionFromLocalStorage.region_code];
             }
 
             if (!initialRegionFromLocalStorage) {
+                let regionWithTheMostService = '';
                 const resp = await SpaceConnector.client.statistics.topic.cloudServiceByRegion({
                     query: {
                         sort: {
@@ -203,19 +204,21 @@ export default {
                         only: ['count', 'region_name'],
                     },
                 });
-                let regionWithTheMostService = resp.results[0].region_name;
-                if (regionWithTheMostService === 'global') regionWithTheMostService = 'ap-northeast-2';
-                const allInitialRegionInfo = state.data.find(data => data.region_code === regionWithTheMostService);
-                const initialRegion = {
-                    longitude: allInitialRegionInfo.longitude,
-                    latitude: allInitialRegionInfo.latitude,
-                    // eslint-disable-next-line camelcase
-                    region_code: allInitialRegionInfo.region_code,
-                    name: allInitialRegionInfo.name,
-                    provider: allInitialRegionInfo.provider,
-                };
-                state.initialRegion = initialRegion;
-                [state.selectedProvider, state.selectedRegion, state.selectedRegionCode] = [initialRegion.provider, initialRegion.name, initialRegion.region_code];
+                if (resp.results.length > 0) {
+                    regionWithTheMostService = resp.results[0].region_name;
+                    if (regionWithTheMostService === 'global') regionWithTheMostService = 'ap-northeast-2';
+                    const allInitialRegionInfo = state.data.find(data => data.region_code === regionWithTheMostService);
+                    const initialRegion = {
+                        longitude: allInitialRegionInfo.longitude,
+                        latitude: allInitialRegionInfo.latitude,
+                        // eslint-disable-next-line camelcase
+                        region_code: allInitialRegionInfo.region_code,
+                        name: allInitialRegionInfo.name,
+                        provider: allInitialRegionInfo.provider,
+                    };
+                    state.initialRegion = initialRegion;
+                    [state.selectedProvider, state.selectedRegion, state.selectedRegionCode] = [initialRegion.provider, initialRegion.name, initialRegion.region_code];
+                }
             }
         };
 

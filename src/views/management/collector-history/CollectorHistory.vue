@@ -1,7 +1,7 @@
 <template>
     <general-page-layout class="collector-history-container">
         <div v-if="!selectedJobId">
-            <p-page-navigation :routes="route" />
+            <p-breadcrumbs :routes="route" />
             <p-page-title :title="pageTitle" />
             <p-pane-layout class="collector-history-wrapper">
                 <p-collector-history-chart class="history-chart"
@@ -120,7 +120,7 @@
             </p-button-modal>
         </div>
         <div v-else>
-            <p-page-navigation v-if="selectedJobId" :routes="subRoute" />
+            <p-breadcrumbs v-if="selectedJobId" :routes="subRoute" />
             <p-page-title :title="pageTitle" child @goBack="onClickGoBack" />
             <collector-history-job :job-id="selectedJobId" />
         </div>
@@ -140,10 +140,10 @@ import {
 
 import {
     PPageTitle, PQuerySearchTable, PPagination, PButtonModal, PLazyImg,
-    PPageNavigation, PPaneLayout, PIconTextButton, PLottie, PI,
+    PBreadcrumbs, PPaneLayout, PIconTextButton, PLottie, PI,
 } from '@spaceone/design-system';
-import { QuerySearchTableFunctions } from '@spaceone/design-system/dist/src/organisms/tables/query-search-table/type';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
+import { QuerySearchTableFunctions } from '@spaceone/design-system/dist/src/data-display/tables/query-search-table/type';
+import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 import CollectorHistoryJob from '@/views/management/collector-history/modules/CollectorHistoryJob.vue';
@@ -201,7 +201,7 @@ export default {
         PIconTextButton,
         PButtonModal,
         PPaneLayout,
-        PPageNavigation,
+        PBreadcrumbs,
         PCollectorHistoryChart,
         PPagination,
         CollectorHistoryJob,

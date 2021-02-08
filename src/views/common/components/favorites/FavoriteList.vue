@@ -29,7 +29,7 @@
                     <span class="name">{{ item.name }}</span>
                 </router-link>
                 <p-icon-button v-if="hoveredItem && hoveredItem.id === item.id" name="ic_delete"
-                               width="1rem" height="1rem"
+                               size="sm"
                                class="delete-btn"
                                @click.prevent.stop="onClickDelete(item)"
                 />
@@ -149,10 +149,6 @@ export default {
     }
     .delete-btn {
         @apply float-right mr-1;
-        max-width: 1.5rem;
-        max-height: 1.5rem;
-        min-width: 1.5rem;
-        min-height: 1.5rem;
     }
 }
 .toggle-btn {

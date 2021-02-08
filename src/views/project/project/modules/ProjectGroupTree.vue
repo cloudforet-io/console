@@ -41,7 +41,7 @@
             <template #right-extra="{data}">
                 <div v-if="hoveredNode && data.id === hoveredNode.node.data.id">
                     <p-icon-button name="ic_plus" class="group-add-btn"
-                                   width="1rem" height="1rem"
+                                   size="sm"
                                    @click.stop="$emit('create', hoveredNode)"
                     />
                 </div>
@@ -61,8 +61,8 @@ import {
 } from '@spaceone/design-system';
 import {
     TreeItem, TreeNode,
-} from '@spaceone/design-system/dist/src/molecules/tree-node/type';
-import { Tree } from '@spaceone/design-system/dist/src/organisms/tree/type';
+} from '@spaceone/design-system/dist/src/data-display/tree/tree-node/type';
+import { Tree } from '@spaceone/design-system/dist/src/data-display/tree/type';
 
 import { findIndex, reverse } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';

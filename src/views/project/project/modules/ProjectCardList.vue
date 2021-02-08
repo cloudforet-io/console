@@ -91,7 +91,13 @@
                 </div>
             </div>
             <template #no-data>
-                <div v-if="noProjectGroup || noProject" class="empty-container">
+                <div v-if="isPermissionDenied" class="empty-project">
+                    <p class="text-primary2">
+                        {{ $t('PROJECT.LANDING.EMPTY_PERMISSION_REQUIRED') }} <br>
+                        {{ $t('PROJECT.LANDING.EMPTY_REQUEST_VALID_PERMISSION') }}
+                    </p>
+                </div>
+                <div v-if="(noProjectGroup || noProject) && !isPermissionDenied" class="empty-container">
                     <div v-if="noProjectGroup">
                         <p class="title">
                             {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_TITLE') }}<br>
@@ -132,7 +138,7 @@ import {
     PCheckBox, PSkeleton, PI, PIconTextButton,
     PToolbox, PDataLoader,
 } from '@spaceone/design-system';
-import { getAllPage } from '@spaceone/design-system/src/organisms/paginations/text-pagination/helper';
+import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
@@ -142,6 +148,7 @@ import { range, uniq } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
 import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
 import { QueryHelper } from '@/lib/query';
+import { PERMISSION_TYPE } from '@/views/project/project/lib/config';
 
 interface Props {
     searchText: string;
@@ -149,6 +156,10 @@ interface Props {
     parentGroups: ProjectGroup[];
     noProjectGroup?: boolean;
 }
+
+const Error = {
+    permissionDenied: 'ERROR_PERMISSION_DENIED',
+};
 
 export default {
     name: 'ProjectCardList',
@@ -179,7 +190,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props: Props) {
+    setup(props: Props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             items: undefined,
@@ -192,6 +203,7 @@ export default {
             cardSummary: {},
             showAllProjects: false,
             noProject: computed(() => state.totalCount === 0),
+            isPermissionDenied: false,
             hoveredProjectId: '',
             hoveredGroupId: '',
             isAll: computed(() => !props.groupId),
@@ -269,6 +281,7 @@ export default {
             listProjectToken = axios.CancelToken.source();
             state.loading = true;
             state.cardSummaryLoading = true;
+            state.isPermissionDenied = false;
             try {
                 let res;
                 if (state.isAll) res = await listAllProjectApi(getParams(undefined, text), { cancelToken: listProjectToken.token });
@@ -282,14 +295,21 @@ export default {
                 state.cardSummaryLoading = false;
 
                 vm.$emit('list', state.totalCount);
+                context.emit('change-permission', PERMISSION_TYPE.allow);
             } catch (e) {
+                if (e.code === Error.permissionDenied) {
+                    context.emit('change-permission', PERMISSION_TYPE.deny);
+                    state.isPermissionDenied = true;
+                }
                 if (!axios.isCancel(e.axiosError)) {
                     state.items = [];
                     state.totalCount = 0;
                     state.loading = false;
                     state.cardSummaryLoading = false;
                     vm.$emit('list', state.totalCount);
-                } else console.error(e);
+                } else {
+                    console.error(e);
+                }
             }
         };
 

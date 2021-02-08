@@ -1,12 +1,12 @@
 <template>
     <general-page-layout class="power-scheduler">
         <div class="page-navigation">
-            <p-page-navigation :routes="route" />
+            <p-breadcrumbs :routes="route" />
         </div>
         <div class="page-title">
             <p-page-title :title="$t('AUTOMATION.POWER_SCHEDULER.LANDING.TITLE')" :total-count="totalCount" />
         </div>
-        <p-hr class="cloud-service-divider" />
+        <p-divider class="cloud-service-divider" />
         <div class="power-scheduler-project">
             <p-search-grid-layout
                 :items="items"
@@ -80,7 +80,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <p-hr />
+                            <p-divider />
                             <div class="schedule" :class="{'no-schedule': item.scheduler.length === 0}">
                                 <div class="scheduler-list-wrapper">
                                     <p v-if="item.scheduler.length > 0" class="mb-4">
@@ -141,7 +141,7 @@ import {
 import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
 
 import {
-    PI, PHr, PProgressBar, PPageTitle, PPageNavigation, PSearchGridLayout, PIconTextButton,
+    PI, PDivider, PProgressBar, PPageTitle, PBreadcrumbs, PSearchGridLayout, PIconTextButton,
 } from '@spaceone/design-system';
 
 /* Page Modules */
@@ -176,8 +176,8 @@ export default {
         PageInformation,
         PProgressBar,
         PPageTitle,
-        PHr,
-        PPageNavigation,
+        PDivider,
+        PBreadcrumbs,
         GeneralPageLayout,
         PSearchGridLayout,
     },

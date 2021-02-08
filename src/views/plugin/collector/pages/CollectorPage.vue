@@ -1,7 +1,7 @@
 <template>
     <general-page-layout class="collector-page">
         <div class="page-navigation">
-            <p-page-navigation :routes="routes" />
+            <p-breadcrumbs :routes="routes" />
         </div>
         <p-page-title :title="$t('PLUGIN.COLLECTOR.MAIN.TITLE')"
                       use-total-count use-selected-count
@@ -177,10 +177,10 @@ import {
 
 import {
     PHorizontalLayout, PDropdownMenuBtn, PLazyImg, PPageTitle, PDataTable, PQuerySearchTable,
-    PTab, PTableCheckModal, PIconTextButton, PStatus, PPageNavigation, PI,
+    PTab, PTableCheckModal, PIconTextButton, PStatus, PBreadcrumbs, PI,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
-import { TabItem } from '@spaceone/design-system/dist/src/organisms/tabs/tab/type';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 import { CollectorModel } from '@/views/plugin/collector/type';
 
@@ -218,7 +218,7 @@ export default {
         PStatus,
         PTab,
         PTableCheckModal,
-        PPageNavigation,
+        PBreadcrumbs,
         GeneralPageLayout,
         CollectorUpdateModal,
         CollectDataModal,

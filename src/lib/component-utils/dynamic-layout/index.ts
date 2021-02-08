@@ -1,10 +1,10 @@
-import { QuerySearchProps } from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
+import { QuerySearchProps } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import {
     makeDistinctValueHandler,
     makeEnumValueHandler,
     makeReferenceValueHandler,
 } from '@/lib/component-utils/query-search';
-import { DynamicLayoutType } from '@spaceone/design-system/dist/src/organisms/dynamic-layout/type/layout-schema';
+import { DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { Filter } from '@/lib/space-connector/type';
 import { ConsoleSearchSchema } from '@/lib/component-utils/dynamic-layout/type';
 

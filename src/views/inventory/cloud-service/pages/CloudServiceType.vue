@@ -5,7 +5,7 @@
                 <p class="sidebar-title">
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FAVORITES') }} <span class="count">({{ favoriteItems.length }})</span>
                 </p>
-                <p-hr class="sidebar-divider" />
+                <p-divider class="sidebar-divider" />
                 <favorite-list :items="favoriteItems" class="favorite-list" @delete="onFavoriteDelete">
                     <template #icon="{item}">
                         <p-lazy-img :src="item.icon || ''"
@@ -19,9 +19,9 @@
                 <p class="sidebar-title">
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_PROVIDER') }}
                 </p>
-                <p-hr class="sidebar-divider" />
+                <p-divider class="sidebar-divider" />
                 <div v-for="provider in providerState.items" :key="provider.provider" class="provider-list">
-                    <p-hr v-if="provider.provider && provider.provider !== 'all'" class="provider-divider" />
+                    <p-divider v-if="provider.provider && provider.provider !== 'all'" class="provider-divider" />
                     <p-radio v-model="selectedProvider" :value="provider.provider">
                         <template #radio-left>
                             <img v-if="provider.icon"
@@ -44,7 +44,7 @@
                 <p class="sidebar-title">
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY') }}
                 </p>
-                <p-hr class="sidebar-divider" />
+                <p-divider class="sidebar-divider" />
                 <div v-for="(checked, service) in filterState.serviceCategories" :key="service"
                      :class="{selected: checked}"
                      class="service-categories"
@@ -58,7 +58,7 @@
                 <p id="region-title">
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.REGION') }}
                 </p>
-                <p-hr class="sidebar-divider" />
+                <p-divider class="sidebar-divider" />
                 <div v-if="filterState.regionList.length === 0">
                     <p class="no-region">
                         {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.NO_REGION') }}
@@ -87,12 +87,12 @@
         <template #default>
             <div class="page-wrapper">
                 <div class="page-navigation">
-                    <p-page-navigation :routes="route" />
+                    <p-breadcrumbs :routes="route" />
                 </div>
                 <p-page-title :title="selectedProviderName" use-total-count :total-count="totalCount"
                               class="page-title"
                 />
-                <p-hr class="cloud-service-divider" />
+                <p-divider class="cloud-service-divider" />
                 <p-toolbox filters-visible
                            search-type="query"
                            :page-size.sync="pageSize"
@@ -186,7 +186,7 @@ import {
 
 import {
     PPageTitle, PPagination, PLazyImg, PCheckBox,
-    PIconTextButton, PPageNavigation, PRadio, PI, PHr, PToolbox, PDataLoader,
+    PIconTextButton, PBreadcrumbs, PRadio, PI, PDivider, PToolbox, PDataLoader,
 } from '@spaceone/design-system';
 
 import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
@@ -227,13 +227,13 @@ export default {
         FavoriteList,
         PLazyImg,
         PPagination,
-        PHr,
+        PDivider,
         PRadio,
         PIconTextButton,
         PVerticalPageLayout,
         PI,
         PPageTitle,
-        PPageNavigation,
+        PBreadcrumbs,
         PCheckBox,
         PToolbox,
         PDataLoader,

@@ -71,7 +71,7 @@ import {
 import {
     PAutocompleteSearch, PI,
 } from '@spaceone/design-system';
-import { MenuItem as ContextMenuItem } from '@spaceone/design-system/dist/src/organisms/context-menu/type';
+import { MenuItem as ContextMenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { debounce } from 'lodash';
 import { ItemType } from '@/views/project/project/type';

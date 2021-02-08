@@ -1,52 +1,56 @@
-import VueGtag from 'vue-gtag';
+import VueGtag, { VueGtag as VueGtagType } from 'vue-gtag';
 import Hashids from 'hashids';
 import config from '@/lib/config';
-import { VueRouter } from 'vue-router/types/router';
-import { VueConstructor } from 'vue/types/umd';
-import { Vue } from 'vue/types/vue';
-import { store } from '@/store';
-
-export const setGtagUserID = (vue: Vue) => {
-    if (vue.$gtag) {
-        try {
-            if (store.state.domain.domainId && store.state.user.userId) {
-                const hashids = new Hashids(store.state.user.userId);
-                // eslint-disable-next-line camelcase
-                vue.$gtag.set({
-                    // eslint-disable-next-line camelcase
-                    user_id: `${store.state.domain.domainId}:${hashids.encode(1)}`,
-                    domain_id: store.state.domain.domainId,
-                });
-            }
-        } catch (e) {
-            console.error('failed to init gtag', e);
-        }
-    } else if (config.get('GTAG_ID') !== 'DISABLED') {
-        console.error('not set $gtag');
-    }
-};
+import { Route } from 'vue-router';
+import Vue from 'vue';
 
 export class GTag {
-    gtag: any;
+    private static _gtag: VueGtagType|null;
 
-    constructor(id: string, vue: VueConstructor|any, router: VueRouter) {
-        const gtagId: string = id || 'DISABLED';
-
+    constructor() {
+        const gtagId: string = config.get('GTAG_ID') || 'DISABLED';
+        console.debug('initGtag', gtagId);
         if (gtagId === 'DISABLED') return;
-        if (vue.use) {
-            vue.use(VueGtag, {
-                config: { id: gtagId },
-            });
-            this.gtag = vue.prototype.$gtag;
-        } else {
-            this.gtag = vue.$gtag;
-        }
 
-        router.afterEach((to, from) => {
-            this.gtag.pageview({
+        Vue.use(VueGtag, {
+            config: { id: gtagId },
+        });
+        GTag._gtag = Vue.prototype.$gtag;
+    }
+
+    static init() {
+        new GTag();
+    }
+
+    static get gtag(): VueGtagType|null {
+        return GTag._gtag;
+    }
+
+    static setGtagUserID(domainId?: string, userId?: string) {
+        if (GTag.gtag) {
+            try {
+                if (domainId && userId) {
+                    const hashids = new Hashids(userId);
+                    // eslint-disable-next-line camelcase
+                    GTag.gtag.set({
+                        user_id: `${domainId}:${hashids.encode(1)}`,
+                        domain_id: domainId,
+                    });
+                }
+            } catch (e) {
+                console.error('failed to init gtag', e);
+            }
+        } else if (config.get('GTAG_ID') !== 'DISABLED') {
+            console.error('GTag is not initialized.');
+        }
+    }
+
+    static setPageView(to: Route) {
+        if (GTag.gtag) {
+            GTag.gtag.pageview({
                 // eslint-disable-next-line camelcase
                 page_path: to.path,
             });
-        });
+        }
     }
 }

@@ -1,6 +1,6 @@
 import { RawQueryOperator } from '@/lib/query/type';
 import { FilterOperator } from '@/lib/space-connector/type';
-import { OperatorType } from '@spaceone/design-system/dist/src/organisms/search/query-search/type';
+import { OperatorType } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 export const rawQueryOperatorToApiQueryOperatorMap: Record<RawQueryOperator, FilterOperator> = {
     '': 'contain',

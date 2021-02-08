@@ -4,6 +4,7 @@
 <script lang="ts">
 import router from '@/routes/index';
 import { store } from '@/store';
+import Keycloak from 'keycloak-js';
 // @ts-ignore
 const { gapi } = window;
 export const getAuth2 = (clientId): Promise<any> => new Promise(((resolve, reject) => {
@@ -34,6 +35,10 @@ export const googleOauthSignOut = (auth2): Promise<void> => new Promise(((resolv
     });
 }));
 
+export const keycloakLogout = async () => {
+
+};
+
 export default {
     name: 'SignOut',
     props: {
@@ -62,6 +67,14 @@ export default {
                     next({ name: 'error' });
                 }
             }
+            // if (authType !== undefined && authType === 'KEYCLOAK') {
+            //     try {
+            //         await keycloakLogout();
+            //     } catch (e) {
+            //         console.error('keycloak sign out failed', e);
+            //         next({ name: 'error' });
+            //     }
+            // }
             // go sign in
             await router.push({ name: 'SignIn', query: { nextPath: from.fullPath } });
         })();
