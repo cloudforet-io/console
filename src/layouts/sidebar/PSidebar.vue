@@ -88,6 +88,7 @@ export default defineComponent({
     .non-sidebar-wrapper {
         overflow-y: auto;
         width: 100%;
+        height: 100%;
     }
     $max-height: 20rem;
     .sidebar-wrapper {
