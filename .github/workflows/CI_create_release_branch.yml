@@ -19,6 +19,8 @@ jobs:
     steps:
       - name: task
         uses: actions/checkout@v2
+      - name: delete CI workflow
+        run: rm -rf .github
       - run: |
           git checkout -b ${{ env.BRANCH }}
           git push --set-upstream origin ${{ env.BRANCH }}
