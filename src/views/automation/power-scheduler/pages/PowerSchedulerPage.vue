@@ -83,12 +83,12 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PSelectableList, PBreadcrumbs, PIconTextButton, PDivider, PLottie
+    PSelectableList, PBreadcrumbs, PIconTextButton, PDivider, PLottie,
 } from '@spaceone/design-system';
 
 import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
 import ScheduleDetail from '@/views/automation/power-scheduler/modules/ScheduleDetail.vue';
-import { DESIRED_STATES, Schedule } from '@/views/automation/power-scheduler/type';
+import { SCHEDULE_STATUS, Schedule } from '@/views/automation/power-scheduler/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
@@ -105,7 +105,7 @@ interface Props {
 }
 
 const listMapper = {
-    icon: d => DESIRED_STATES[d.desired_state]?.icon || '',
+    icon: d => SCHEDULE_STATUS[d.desired_state]?.icon || '',
 };
 const getFormattedTime = time => dayjs.unix(time.seconds).tz(store.state.user.timezone).format('YYYY-MM-DD');
 
@@ -321,7 +321,6 @@ export default {
             onSelectItem,
             listMapper,
             getFormattedTime,
-            DESIRED_STATES,
         };
     },
 };

@@ -328,12 +328,14 @@ export default {
 
 <style lang="postcss" scoped>
 .member-tab {
-    @apply border border-gray-200;
-    >>> &.p-toolbox-table .toolbox {
-        @apply pt-0;
+    &.p-toolbox-table::v-deep .toolbox {
+        padding-top: 0;
     }
     .p-panel-top {
-        @apply ml-0;
+        height: auto;
+        line-height: 1.6;
+        margin-left: 0;
+        margin-bottom: 0.5rem;
     }
 }
 </style>
