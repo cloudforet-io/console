@@ -126,6 +126,9 @@ export default defineComponent({
         height: calc(100vh - $(gnb-height));
         margin-top: $gnb-height;
         flex-grow: 1;
+        .p-sidebar .non-sidebar-wrapper {
+            min-height: 100%;
+        }
         .main {
             display: flex;
             flex-direction: column;
