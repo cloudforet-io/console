@@ -69,10 +69,11 @@ export default {
         @apply flex-shrink-0 mr-1;
     }
     .title-wrapper {
-        @apply flex-shrink overflow-x-hidden;
+        @apply flex-shrink;
         font-weight: bold;
         font-size: 1.5rem;
         line-height: 2rem;
+        overflow: hidden;
     }
     .total-count {
         font-size: 1.125rem;
