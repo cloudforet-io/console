@@ -79,7 +79,7 @@
                                                  @edit:select="openProjectGroupEditForm"
                                                  @delete:select="openProjectGroupDeleteForm"
                             />
-                            <div v-if="projectState.groupId"
+                            <div v-if="projectState.groupId && projectState.showProjectMemberBtn"
                                  v-tooltip.top="$t('PROJECT.LANDING.MANAGE_PROJECT_GROUP_MEMBER')"
                                  class="project-group-member-button"
                                  :group-id="projectState.groupId"
@@ -111,6 +111,7 @@
                                    :no-project-group="noProjectGroup"
                                    @list="onProjectList"
                                    @create-project-group="openProjectGroupForm(null)"
+                                   @change-permission="onChangePermission"
                 />
                 <project-group-create-form-modal v-if="projectGroupFormVisible"
                                                  :id="projectState.groupId"
@@ -190,6 +191,7 @@ import { FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteList from '@/views/common/components/favorites/FavoriteList.vue';
 import ProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import ProjectGroupMemberPage from '@/views/project/project/modules/ProjectGroupMemberPage.vue';
+import { PERMISSION_TYPE } from '@/views/project/project/lib/config';
 
 
 export default {
@@ -221,6 +223,7 @@ export default {
             groupMemberCount: 0,
             searchText: '',
             groupMemberPageVisible: false,
+            showProjectMemberBtn: false,
         });
 
         const state = reactive({
@@ -303,6 +306,12 @@ export default {
             } catch (e) {
                 console.error(e);
             }
+        };
+
+        const onChangePermission = async (permissionType) => {
+            if (permissionType === PERMISSION_TYPE.allow) {
+                projectState.showProjectMemberBtn = true;
+            } else projectState.showProjectMemberBtn = false;
         };
 
 
@@ -488,6 +497,7 @@ export default {
             onProjectGroupNavClick,
             onProjectGroupList,
             onProjectList,
+            onChangePermission,
             init,
         };
     },
