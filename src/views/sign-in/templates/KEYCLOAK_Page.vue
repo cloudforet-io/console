@@ -49,7 +49,7 @@ export default defineComponent({
         const keycloak = Keycloak(initOptions);
 
         const signInFail = async () => {
-            await vm.$router.push({ name: 'SignIn', query: { error: 'error' } });
+            await vm.$router.replace({ name: 'SignIn', query: { error: 'error' } });
             await keycloak.logout();
         };
 
@@ -70,9 +70,8 @@ export default defineComponent({
                     await vm.$router.replace({ name: 'userAccount' });
                 } else await vm.$router.push(props.nextPath);
             } catch (e) {
+                console.error(e, 'sign in fail error2');
                 await signInFail();
-
-                console.error(e);
             }
         };
 
