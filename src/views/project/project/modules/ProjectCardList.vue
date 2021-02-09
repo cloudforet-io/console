@@ -6,13 +6,13 @@
                    @change="onChange"
                    @refresh="getData()"
         >
-            <template #left-area>
-                <div v-tooltip.bottom="{content: $t('PROJECT.LANDING.SHOW_ALL_TOOLTIP'), delay: {show: 500}}" class="show-all-wrapper">
-                    <p-check-box v-model="showAllProjects">
-                        <span class="label">{{ $t('PROJECT.LANDING.SHOW_ALL') }}</span>
-                    </p-check-box>
-                </div>
-            </template>
+<!--            <template #left-area>-->
+<!--                <div v-tooltip.bottom="{content: $t('PROJECT.LANDING.SHOW_ALL_TOOLTIP'), delay: {show: 500}}" class="show-all-wrapper">-->
+<!--                    <p-check-box v-model="showAllProjects">-->
+<!--                        <span class="label">{{ $t('PROJECT.LANDING.SHOW_ALL') }}</span>-->
+<!--                    </p-check-box>-->
+<!--                </div>-->
+<!--            </template>-->
         </p-toolbox>
         <p-data-loader class="flex-grow" :data="items" :loading="loading">
             <div class="project-cards">
@@ -189,6 +189,10 @@ export default {
             type: Boolean,
             default: undefined,
         },
+        isPermissionDenied: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: Props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -201,9 +205,8 @@ export default {
             pageSize: 24,
             allPage: computed(() => getAllPage(state.totalCount, (state.pageSize))),
             cardSummary: {},
-            showAllProjects: false,
+            // showAllProjects: false,
             noProject: computed(() => state.totalCount === 0),
-            isPermissionDenied: false,
             hoveredProjectId: '',
             hoveredGroupId: '',
             isAll: computed(() => !props.groupId),
@@ -234,7 +237,7 @@ export default {
 
             const params: any = { include_provider: true, query: listQuery.data };
             if (id) params.project_group_id = id;
-            if (state.showAllProjects) params.recursive = true;
+            // if (state.showAllProjects) params.recursive = true;
 
             return params;
         };
@@ -281,7 +284,6 @@ export default {
             listProjectToken = axios.CancelToken.source();
             state.loading = true;
             state.cardSummaryLoading = true;
-            state.isPermissionDenied = false;
             try {
                 let res;
                 if (state.isAll) res = await listAllProjectApi(getParams(undefined, text), { cancelToken: listProjectToken.token });
@@ -295,12 +297,7 @@ export default {
                 state.cardSummaryLoading = false;
 
                 vm.$emit('list', state.totalCount);
-                context.emit('change-permission', PERMISSION_TYPE.allow);
             } catch (e) {
-                if (e.code === Error.permissionDenied) {
-                    context.emit('change-permission', PERMISSION_TYPE.deny);
-                    state.isPermissionDenied = true;
-                }
                 if (!axios.isCancel(e.axiosError)) {
                     state.items = [];
                     state.totalCount = 0;
@@ -340,11 +337,11 @@ export default {
             query: { filters: queryHelper.setFilters([{ k: 'project_id', v: projectId, o: '=' }]).rawQueryStrings },
         });
 
-        watch(() => state.showAllProjects, async (after, before) => {
-            if (after !== before) {
-                await listProjects(props.groupId, props.searchText, true);
-            }
-        }, { immediate: false });
+        // watch(() => state.showAllProjects, async (after, before) => {
+        //     if (after !== before) {
+        //         await listProjects(props.groupId, props.searchText, true);
+        //     }
+        // }, { immediate: false });
 
 
         return {

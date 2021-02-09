@@ -72,14 +72,14 @@
                             >
                                 {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
                             </p-icon-text-button>
-                            <p-dropdown-menu-btn v-if="projectState.groupId"
+                            <p-dropdown-menu-btn v-if="projectState.groupId && !projectState.isPermissionDenied"
                                                  :menu="settingMenu"
                                                  button-only
                                                  button-icon="ic_setting"
                                                  @edit:select="openProjectGroupEditForm"
                                                  @delete:select="openProjectGroupDeleteForm"
                             />
-                            <div v-if="projectState.groupId && projectState.showProjectMemberBtn"
+                            <div v-if="projectState.groupId && !projectState.isPermissionDenied"
                                  v-tooltip.top="$t('PROJECT.LANDING.MANAGE_PROJECT_GROUP_MEMBER')"
                                  class="project-group-member-button"
                                  :group-id="projectState.groupId"
@@ -91,7 +91,7 @@
                                 />
                                 <span class="text">{{ projectState.groupMemberCount }}</span>
                             </div>
-                            <p-icon-text-button v-if="projectState.groupId"
+                            <p-icon-text-button v-if="projectState.groupId && !projectState.isPermissionDenied"
                                                 style-type="primary-dark"
                                                 name="ic_plus_bold"
                                                 @click="openProjectForm"
@@ -109,9 +109,9 @@
                                    :search-text="projectState.searchText"
                                    :parent-groups="parentGroups"
                                    :no-project-group="noProjectGroup"
+                                   :isPermissionDenied="projectState.isPermissionDenied"
                                    @list="onProjectList"
                                    @create-project-group="openProjectGroupForm(null)"
-                                   @change-permission="onChangePermission"
                 />
                 <project-group-create-form-modal v-if="projectGroupFormVisible"
                                                  :id="projectState.groupId"
@@ -221,7 +221,7 @@ export default {
             groupMemberCount: 0,
             searchText: '',
             groupMemberPageVisible: false,
-            showProjectMemberBtn: false,
+            isPermissionDenied: false,
         });
 
         const state = reactive({
@@ -295,23 +295,24 @@ export default {
             }
         };
 
+        const onChangePermission = async (permissionType) => {
+            if (permissionType === PERMISSION_TYPE.allow) {
+                projectState.isPermissionDenied = false;
+            } else projectState.isPermissionDenied = true;
+        };
+
         const getProjectGroupMemberCount = async () => {
             try {
                 const res = await SpaceConnector.client.identity.projectGroup.member.list({
                     project_group_id: projectState.groupId,
                 });
                 projectState.groupMemberCount = res.total_count;
+                await onChangePermission(PERMISSION_TYPE.allow);
             } catch (e) {
+                await onChangePermission(PERMISSION_TYPE.deny);
                 console.error(e);
             }
         };
-
-        const onChangePermission = async (permissionType) => {
-            if (permissionType === PERMISSION_TYPE.allow) {
-                projectState.showProjectMemberBtn = true;
-            } else projectState.showProjectMemberBtn = false;
-        };
-
 
         /** Handling Form */
         const openProjectGroupDeleteForm = () => {
