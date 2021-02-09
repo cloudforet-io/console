@@ -34,7 +34,7 @@
             </div>
             <div v-if="userState.isAdmin" class="admin-menu-wrapper">
                 <div class="menu-title">
-                    {{ $t('IDENTITY.USER.MAIN.ROOT_ACCOUNT') }}
+                    {{$t('IDENTITY.USER.MAIN.ADMINISTRATION')}}
                 </div>
                 <p-divider class="menu-divider" />
                 <div v-for="(item) in sidebarState.adminMenuList"
