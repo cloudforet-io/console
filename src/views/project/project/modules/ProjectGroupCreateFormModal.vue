@@ -176,7 +176,7 @@ export default {
         };
 
         watch(() => props.id, async (after) => {
-            if (after) await getProjectGroup();
+            if (after && props.updateMode) await getProjectGroup();
             else state.projectGroupName = undefined; // init form
         }, { immediate: true });
 
