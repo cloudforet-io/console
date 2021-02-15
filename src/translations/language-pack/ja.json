@@ -974,7 +974,9 @@
 			"SERVER": "サーバ",
 			"SERVICE_ACCOUNTS": "サービスアカウント",
 			"SHOW_ALL": "すべてのプロジェクトを見る",
-			"SHOW_ALL_TOOLTIP": "プロジェクトグループのすべてのサブプロジェクトを見る"
+			"SHOW_ALL_TOOLTIP": "プロジェクトグループのすべてのサブプロジェクトを見る",
+			"TOP_NOTI_PERMISSION_REQUIRED_1": "プロジェクトグループとプロジェクトの操作を実行するアクセス許可が必要です",
+			"TOP_NOTI_PERMISSION_REQUIRED_2": "プロジェクト管理者/ドメイン管理者に使用許可を要求してください。"
 		}
 	}
 }

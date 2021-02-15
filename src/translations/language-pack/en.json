@@ -974,7 +974,9 @@
 			"SERVER": "Servers",
 			"SERVICE_ACCOUNTS": "Service Accounts",
 			"SHOW_ALL": "Show all project",
-			"SHOW_ALL_TOOLTIP": "Show all projects of sub project groups"
+			"SHOW_ALL_TOOLTIP": "Show all projects of sub project groups",
+			"TOP_NOTI_PERMISSION_REQUIRED_1": "Permission required for using Project groups & Projects. ",
+			"TOP_NOTI_PERMISSION_REQUIRED_2": "Please, Request valid permission to project Admin/Domain Administrator."
 		}
 	}
 }

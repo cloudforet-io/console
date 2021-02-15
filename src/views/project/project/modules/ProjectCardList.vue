@@ -6,13 +6,6 @@
                    @change="onChange"
                    @refresh="getData()"
         >
-<!--            <template #left-area>-->
-<!--                <div v-tooltip.bottom="{content: $t('PROJECT.LANDING.SHOW_ALL_TOOLTIP'), delay: {show: 500}}" class="show-all-wrapper">-->
-<!--                    <p-check-box v-model="showAllProjects">-->
-<!--                        <span class="label">{{ $t('PROJECT.LANDING.SHOW_ALL') }}</span>-->
-<!--                    </p-check-box>-->
-<!--                </div>-->
-<!--            </template>-->
         </p-toolbox>
         <p-data-loader class="flex-grow" :data="items" :loading="loading">
             <div class="project-cards">
@@ -91,13 +84,7 @@
                 </div>
             </div>
             <template #no-data>
-                <div v-if="isPermissionDenied" class="empty-project">
-                    <p class="text-primary2">
-                        {{ $t('PROJECT.LANDING.EMPTY_PERMISSION_REQUIRED') }} <br>
-                        {{ $t('PROJECT.LANDING.EMPTY_REQUEST_VALID_PERMISSION') }}
-                    </p>
-                </div>
-                <div v-if="(noProjectGroup || noProject) && !isPermissionDenied" class="empty-container">
+                <div v-if="(noProjectGroup || noProject)" class="empty-container">
                     <div v-if="noProjectGroup">
                         <p class="title">
                             {{ $t('PROJECT.LANDING.EMPTY_PROJECT_GROUP_MSG_TITLE') }}<br>

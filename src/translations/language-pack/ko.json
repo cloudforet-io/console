@@ -974,7 +974,9 @@
 			"SERVER": "서버 ",
 			"SERVICE_ACCOUNTS": "서비스 계정 ",
 			"SHOW_ALL": "모든 프로젝트 보기 ",
-			"SHOW_ALL_TOOLTIP": "프로젝트 그룹 하위의 모든 프로젝트 보기"
+			"SHOW_ALL_TOOLTIP": "프로젝트 그룹 하위의 모든 프로젝트 보기",
+			"TOP_NOTI_PERMISSION_REQUIRED_1": "프로젝트 그룹 / 프로젝트의 사용 권한이 필요합니다. ",
+			"TOP_NOTI_PERMISSION_REQUIRED_2": "프로젝트 담당자 또는 도메인 관리자에게 권한을 요청하세요."
 		}
 	}
 }
