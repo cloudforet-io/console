@@ -1,166 +1,172 @@
 <template>
-    <p-vertical-page-layout :min-width="260" :init-width="260" :max-width="400">
-        <template #sidebar="{width}">
-            <div class="sidebar-container">
-                <div class="sidebar-item-wrapper">
-                    <header>
-                        <span class="title">{{ $t('PROJECT.LANDING.FAVORITES') }}&nbsp;<span class="count">({{ favoriteItems.length }})</span></span>
-                    </header>
-                    <favorite-list :items="favoriteItems" :before-route="beforeFavoriteRoute" @delete="onFavoriteDelete">
-                        <template #icon="{item}">
-                            <p-i :name="item.id.startsWith('project') ? 'ic_tree_project' : 'ic_tree_project-group'"
-                                 width="1rem" height="1rem" color="inherit transparent"
-                            />
-                        </template>
-                    </favorite-list>
-                </div>
-
-                <div class="sidebar-item-wrapper">
-                    <header>
-                        <span class="title">{{ $t('PROJECT.LANDING.SEARCH') }}</span>
-                    </header>
-                    <project-search :group-id="projectState.groupId"
-                                    :group-name="projectState.groupName"
-                                    @search="onSearch"
-                    />
-                </div>
-
-                <div class="sidebar-item-wrapper">
-                    <header>
-                        <span class="title">{{ $t('PROJECT.LANDING.PROJECT_GROUPS') }}</span>
-                        <p-button class="action-btn" @click="openProjectGroupForm(null)">
-                            <p-i name="ic_plus" width="1rem" height="1rem"
-                                 color="transparent inherit"
-                            /> {{ $t('PROJECT.LANDING.CREATE') }}
-                        </p-button>
-                    </header>
-                    <project-group-tree ref="treeRef"
-                                        :search-text="projectState.searchText"
-                                        :project-state="projectState"
-                                        @list="onProjectGroupList"
-                                        @select="onSelectTreeItem"
-                                        @create="openProjectGroupForm"
-                                        @mounted="init"
-                    />
-                </div>
-            </div>
-        </template>
-        <template #default>
-            <div class="page-wrapper">
-                <div class="parents-info">
-                    <span v-if="projectGroupNavigation.length > 0" class="group-name">
-                        <p-breadcrumbs :routes="projectGroupNavigation" @click="onProjectGroupNavClick" />
-                    </span>
-                </div>
-                <p-page-title :title="projectState.groupName ? projectState.groupName : $t('PROJECT.LANDING.ALL_PROJECT')"
-                              use-total-count
-                              :total-count="totalCount"
-                >
-                    <template #extra>
-                        <span class="favorite-btn-wrapper">
-                            <favorite-button v-if="projectState.groupId" :item-id="projectState.groupId"
-                                             favorite-type="projectGroup"
-                                             resource-type="identity.ProjectGroup"
-                            />
-                        </span>
-                        <div class="btns">
-                            <p-icon-text-button v-if="!projectState.groupId"
-                                                style-type="primary-dark"
-                                                outline
-                                                name="ic_plus_bold"
-                                                @click="openProjectGroupForm(null)"
-                            >
-                                {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
-                            </p-icon-text-button>
-                            <p-dropdown-menu-btn v-if="projectState.groupId && !projectState.isPermissionDenied"
-                                                 :menu="settingMenu"
-                                                 button-only
-                                                 button-icon="ic_setting"
-                                                 @edit:select="openProjectGroupEditForm"
-                                                 @delete:select="openProjectGroupDeleteForm"
-                            />
-                            <div v-if="projectState.groupId && !projectState.isPermissionDenied"
-                                 v-tooltip.top="$t('PROJECT.LANDING.MANAGE_PROJECT_GROUP_MEMBER')"
-                                 class="project-group-member-button"
-                                 :group-id="projectState.groupId"
-                                 @click="openProjectGroupMemberPage"
-                            >
-                                <p-i name="ic_member"
-                                     width="1rem" height="1rem"
-                                     color="inherit transparent"
+    <fragment>
+        <top-notification v-if="projectState.isPermissionDenied">
+            <div>{{$t('PROJECT.LANDING.TOP_NOTI_PERMISSION_REQUIRED_1')}} <br>
+                {{$t('PROJECT.LANDING.TOP_NOTI_PERMISSION_REQUIRED_2')}}</div>
+        </top-notification>
+        <p-vertical-page-layout :min-width="260" :init-width="260" :max-width="400">
+            <template #sidebar="{width}">
+                <div class="sidebar-container">
+                    <div class="sidebar-item-wrapper">
+                        <header>
+                            <span class="title">{{ $t('PROJECT.LANDING.FAVORITES') }}&nbsp;<span class="count">({{ favoriteItems.length }})</span></span>
+                        </header>
+                        <favorite-list :items="favoriteItems" :before-route="beforeFavoriteRoute" @delete="onFavoriteDelete">
+                            <template #icon="{item}">
+                                <p-i :name="item.id.startsWith('project') ? 'ic_tree_project' : 'ic_tree_project-group'"
+                                     width="1rem" height="1rem" color="inherit transparent"
                                 />
-                                <span class="text">{{ projectState.groupMemberCount }}</span>
-                            </div>
-                            <p-icon-text-button v-if="projectState.groupId && !projectState.isPermissionDenied"
-                                                style-type="primary-dark"
-                                                name="ic_plus_bold"
-                                                @click="openProjectForm"
-                            >
-                                <div class="truncate">
-                                    {{ $t('PROJECT.LANDING.CREATE_PROJECT') }}
+                            </template>
+                        </favorite-list>
+                    </div>
+
+                    <div class="sidebar-item-wrapper">
+                        <header>
+                            <span class="title">{{ $t('PROJECT.LANDING.SEARCH') }}</span>
+                        </header>
+                        <project-search :group-id="projectState.groupId"
+                                        :group-name="projectState.groupName"
+                                        @search="onSearch"
+                        />
+                    </div>
+
+                    <div class="sidebar-item-wrapper">
+                        <header>
+                            <span class="title">{{ $t('PROJECT.LANDING.PROJECT_GROUPS') }}</span>
+                            <p-button class="action-btn" @click="openProjectGroupForm(null)">
+                                <p-i name="ic_plus" width="1rem" height="1rem"
+                                     color="transparent inherit"
+                                /> {{ $t('PROJECT.LANDING.CREATE') }}
+                            </p-button>
+                        </header>
+                        <project-group-tree ref="treeRef"
+                                            :search-text="projectState.searchText"
+                                            :project-state="projectState"
+                                            @list="onProjectGroupList"
+                                            @select="onSelectTreeItem"
+                                            @create="openProjectGroupForm"
+                                            @mounted="init"
+                        />
+                    </div>
+                </div>
+            </template>
+            <template #default>
+                <div class="page-wrapper">
+                    <div class="parents-info">
+                        <span v-if="projectGroupNavigation.length > 0" class="group-name">
+                            <p-breadcrumbs :routes="projectGroupNavigation" @click="onProjectGroupNavClick" />
+                        </span>
+                    </div>
+                    <p-page-title :title="projectState.groupName ? projectState.groupName : $t('PROJECT.LANDING.ALL_PROJECT')"
+                                  use-total-count
+                                  :total-count="totalCount"
+                    >
+                        <template #extra>
+                            <span class="favorite-btn-wrapper">
+                                <favorite-button v-if="projectState.groupId && !projectState.isPermissionDenied" :item-id="projectState.groupId"
+                                                 favorite-type="projectGroup"
+                                                 resource-type="identity.ProjectGroup"
+                                />
+                            </span>
+                            <div class="btns">
+                                <p-icon-text-button v-if="!projectState.groupId"
+                                                    style-type="primary-dark"
+                                                    outline
+                                                    name="ic_plus_bold"
+                                                    @click="openProjectGroupForm(null)"
+                                >
+                                    {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
+                                </p-icon-text-button>
+                                <p-dropdown-menu-btn v-if="projectState.groupId && !projectState.isPermissionDenied"
+                                                     :menu="settingMenu"
+                                                     button-only
+                                                     button-icon="ic_setting"
+                                                     @edit:select="openProjectGroupEditForm"
+                                                     @delete:select="openProjectGroupDeleteForm"
+                                />
+                                <div v-if="projectState.groupId && !projectState.isPermissionDenied"
+                                     v-tooltip.top="$t('PROJECT.LANDING.MANAGE_PROJECT_GROUP_MEMBER')"
+                                     class="project-group-member-button"
+                                     :group-id="projectState.groupId"
+                                     @click="openProjectGroupMemberPage"
+                                >
+                                    <p-i name="ic_member"
+                                         width="1rem" height="1rem"
+                                         color="inherit transparent"
+                                    />
+                                    <span class="text">{{ projectState.groupMemberCount }}</span>
                                 </div>
-                            </p-icon-text-button>
-                        </div>
-                    </template>
-                </p-page-title>
-                <project-card-list ref="projectListRef"
-                                   class="card-container"
-                                   :group-id="projectState.groupId"
-                                   :search-text="projectState.searchText"
-                                   :parent-groups="parentGroups"
-                                   :no-project-group="noProjectGroup"
-                                   :isPermissionDenied="projectState.isPermissionDenied"
-                                   @list="onProjectList"
-                                   @create-project-group="openProjectGroupForm(null)"
-                />
-                <project-group-create-form-modal v-if="projectGroupFormVisible"
-                                                 :id="projectState.groupId"
-                                                 :parent="createTargetNode ? createTargetNode.node.data
-                                                     : null"
-                                                 :visible.sync="projectGroupFormVisible"
-                                                 :update-mode="updateMode"
-                                                 @create="onProjectGroupCreate"
-                                                 @update="onProjectGroupUpdate"
-                />
+                                <p-icon-text-button v-if="projectState.groupId && !projectState.isPermissionDenied"
+                                                    style-type="primary-dark"
+                                                    name="ic_plus_bold"
+                                                    @click="openProjectForm"
+                                >
+                                    <div class="truncate">
+                                        {{ $t('PROJECT.LANDING.CREATE_PROJECT') }}
+                                    </div>
+                                </p-icon-text-button>
+                            </div>
+                        </template>
+                    </p-page-title>
+                    <project-card-list ref="projectListRef"
+                                       class="card-container"
+                                       :group-id="projectState.groupId"
+                                       :search-text="projectState.searchText"
+                                       :parent-groups="parentGroups"
+                                       :no-project-group="noProjectGroup"
+                                       :is-permission-denied="projectState.isPermissionDenied"
+                                       @list="onProjectList"
+                                       @create-project-group="openProjectGroupForm(null)"
+                    />
+                    <project-group-create-form-modal v-if="projectGroupFormVisible"
+                                                     :id="projectState.groupId"
+                                                     :parent="createTargetNode ? createTargetNode.node.data
+                                                         : null"
+                                                     :visible.sync="projectGroupFormVisible"
+                                                     :update-mode="updateMode"
+                                                     @create="onProjectGroupCreate"
+                                                     @update="onProjectGroupUpdate"
+                    />
 
-                <p-button-modal :header-title="$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE')"
-                                centered
-                                :scrollable="false"
-                                size="md"
-                                fade
-                                :visible.sync="projectGroupDeleteFormVisible"
-                                theme-color="alert"
-                                :footer-confirm-button-bind="{
-                                    styleType: 'alert',
-                                }"
-                                @confirm="projectGroupDeleteFormConfirm"
-                >
-                    <template #body>
-                        <div class="delete-modal-contents">
-                            <p>
-                                {{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.CONTENT') }}
-                            </p>
-                            <i18n path="PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DESC" tag="p" class="desc">
-                                <template #deleteAllSubProjects>
-                                    <strong>{{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DELETE_ALL_SUB_PROJECT') }}</strong>
-                                </template>
-                            </i18n>
-                        </div>
-                    </template>
-                </p-button-modal>
+                    <p-button-modal :header-title="$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE')"
+                                    centered
+                                    :scrollable="false"
+                                    size="md"
+                                    fade
+                                    :visible.sync="projectGroupDeleteFormVisible"
+                                    theme-color="alert"
+                                    :footer-confirm-button-bind="{
+                                        styleType: 'alert',
+                                    }"
+                                    @confirm="projectGroupDeleteFormConfirm"
+                    >
+                        <template #body>
+                            <div class="delete-modal-contents">
+                                <p>
+                                    {{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.CONTENT') }}
+                                </p>
+                                <i18n path="PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DESC" tag="p" class="desc">
+                                    <template #deleteAllSubProjects>
+                                        <strong>{{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DELETE_ALL_SUB_PROJECT') }}</strong>
+                                    </template>
+                                </i18n>
+                            </div>
+                        </template>
+                    </p-button-modal>
 
-                <project-create-form-modal v-if="projectFormVisible && projectState.groupId"
-                                           :visible.sync="projectFormVisible"
-                                           :project-group-id="projectState.groupId"
-                                           @confirm="projectFormConfirm($event)"
-                />
-                <project-group-member-page v-if="projectState.groupMemberPageVisible"
-                                           :group-id="projectState.groupId"
-                                           @close="projectState.groupMemberPageVisible = false"
-                />
-            </div>
-        </template>
-    </p-vertical-page-layout>
+                    <project-create-form-modal v-if="projectFormVisible && projectState.groupId"
+                                               :visible.sync="projectFormVisible"
+                                               :project-group-id="projectState.groupId"
+                                               @confirm="projectFormConfirm($event)"
+                    />
+                    <project-group-member-page v-if="projectState.groupMemberPageVisible"
+                                               :group-id="projectState.groupId"
+                                               @close="projectState.groupMemberPageVisible = false"
+                    />
+                </div>
+            </template>
+        </p-vertical-page-layout>
+    </fragment>
 </template>
 
 <script lang="ts">
@@ -190,11 +196,13 @@ import FavoriteList from '@/views/common/components/favorites/FavoriteList.vue';
 import ProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import ProjectGroupMemberPage from '@/views/project/project/modules/ProjectGroupMemberPage.vue';
 import { PERMISSION_TYPE } from '@/views/project/project/lib/config';
+import TopNotification from '@/views/common/components/notification/TopNotification.vue';
 
 
 export default {
     name: 'ProjectPage',
     components: {
+        TopNotification,
         ProjectGroupMemberPage,
         ProjectCreateFormModal,
         FavoriteList,
