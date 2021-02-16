@@ -14,3 +14,14 @@ export const userStateColor = Object.freeze({
         textColor: styles.gray[400],
     },
 });
+
+export const pluginStateColor = Object.freeze({
+    ACTIVE: {
+        iconColor: styles.safe,
+        textColor: styles.gray[900],
+    },
+    INACTIVE: {
+        iconColor: styles.gray[400],
+        textColor: styles.gray[400],
+    },
+});

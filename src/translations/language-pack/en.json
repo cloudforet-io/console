@@ -666,6 +666,7 @@
 				"DETAILS_BASE_LABEL_SUPERVISOR_ID": "Supervisor ID",
 				"DETAILS_BASE_LABEL_VERSION": "Version",
 				"DETAILS_BASE_TITLE": "Base Information",
+				"NO_SELECTED": "Select a plugin for more details.",
 				"RECOVERY": "Recovery",
 				"TAB_DETAILS": "Details",
 				"TAB_SELECTED_DATA": "Selected Data",

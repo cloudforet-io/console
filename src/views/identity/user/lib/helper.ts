@@ -1,4 +1,4 @@
-import { userStateColor } from '@/views/identity/user/lib/config';
+import { pluginStateColor, userStateColor } from '@/views/identity/user/lib/config';
 import { timestampFormatter } from '@/lib/util';
 import dayjs from 'dayjs';
 
@@ -15,3 +15,5 @@ export const calculateTime = (lastAccessedDay, today, timezone) => {
 };
 
 export const userStateFormatter = colorBindFactory(userStateColor, value => value.toLowerCase());
+
+export const pluginStateFormatter = colorBindFactory(pluginStateColor, value => value);

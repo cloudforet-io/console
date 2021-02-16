@@ -666,6 +666,7 @@
 				"DETAILS_BASE_LABEL_SUPERVISOR_ID": "スーパーバイザID",
 				"DETAILS_BASE_LABEL_VERSION": "プラグインバージョン",
 				"DETAILS_BASE_TITLE": "基本情報",
+				"NO_SELECTED": "プラグインを選択すると、詳細な情報が表示されます。",
 				"RECOVERY": "回復",
 				"TAB_DETAILS": "詳細情報",
 				"TAB_SELECTED_DATA": "選択したデータ",
