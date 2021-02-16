@@ -58,6 +58,8 @@ import {
 import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
 
 import { TranslateResult } from 'vue-i18n';
+import { SpaceAuth } from '@/views/sign-in/lib/authenticator/space-auth';
+import { loadAuth } from '@/views/sign-in/lib/authenticator/loader';
 
 export default defineComponent({
     name: 'IDPWSignIn',
@@ -118,7 +120,8 @@ export default defineComponent({
             const credentials = {
                 password: state.password.trim(),
             };
-            context.emit('on-sign-in', state.userId, credentials);
+            await loadAuth().signIn(state.userId, credentials, props.isAdmin ? 'DOMAIN_OWNER' : 'USER');
+            context.emit('on-sign-in');
         };
 
         const buttonStyleType = computed(() => (props.isAdmin ? 'primary-dark' : 'primary1'));

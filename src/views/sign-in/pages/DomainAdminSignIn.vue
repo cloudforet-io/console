@@ -121,15 +121,9 @@ export default {
             isPasswordCheckValid: undefined as undefined | boolean,
             passwordCheckInvalidText: '' as TranslateResult | string,
         });
-        const signIn = async (userId, credentials) => {
+        const signIn = async () => {
             state.showErrorMessage = false;
             try {
-                await vm.$store.dispatch('user/signIn', {
-                    domainId: vm.$store.state.domain.domainId,
-                    userId,
-                    userType: 'DOMAIN_OWNER',
-                    credentials,
-                });
                 await vm.$router.push(props.nextPath);
             } catch (e) {
                 console.error(e);

@@ -76,8 +76,6 @@ import {
 import { store } from '@/store';
 import IDPWSignIn from '@/views/sign-in/templates/ID_PW.vue';
 
-import { getAuth2, googleOauthSignOut } from '@/views/common/pages/SignOut.vue';
-
 
 export default {
     name: 'SignIn',
@@ -137,12 +135,6 @@ export default {
         const signIn = async (userId, credentials) => {
             state.showErrorMessage = false;
             try {
-                await store.dispatch('user/signIn', {
-                    domainId: store.state.domain.domainId,
-                    userId,
-                    userType: 'USER',
-                    credentials,
-                });
                 const hasPermission = vm.$store.getters['user/hasPermission'];
                 if (!hasPermission && vm.$route.name !== 'userAccount') {
                     await vm.$router.replace({ name: 'userAccount' });
@@ -150,14 +142,11 @@ export default {
             } catch (e) {
                 console.error(e);
                 state.showErrorMessage = true;
-                const auth2 = await getAuth2(store.state.domain.authOptions.client_id);
-                await googleOauthSignOut(auth2);
             }
         };
 
         const showErrorByEvent = async () => {
             state.showErrorMessage = true;
-
         };
 
         const hideErrorMessage = () => {
@@ -169,7 +158,7 @@ export default {
         (async () => {
             if (vm.$route.query.error === 'error') {
                 await showErrorByEvent();
-                await vm.$router.replace({query: {...vm.$route.query, error: null}});
+                await vm.$router.replace({ query: { ...vm.$route.query, error: null } });
             }
         })();
         return {

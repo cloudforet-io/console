@@ -1,9 +1,9 @@
 // Views
 import ErrorPage from '@/views/common/pages/ErrorPage.vue';
 import SignIn from '@/views/sign-in/pages/SignIn.vue';
-import DomainAdminSignIn from '@/views/sign-in/pages/Domain_Admin_SignIn.vue';
+import DomainAdminSignIn from '@/views/sign-in/pages/DomainAdminSignIn.vue';
 import SignOut from '@/views/common/pages/SignOut.vue';
-import KEYCLOAK from '@/views/sign-in/templates/KEYCLOAK_Page.vue';
+import KEYCLOAK from '@/views/sign-in/pages/KeycloakPage.vue';
 
 // Routes
 import dashboardRoute from '@/routes/dashboard/dashboard-route';
