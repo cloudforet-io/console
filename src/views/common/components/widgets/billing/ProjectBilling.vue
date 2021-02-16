@@ -562,6 +562,7 @@ export default {
 .title {
     font-size: 1.5rem;
     line-height: 1.6;
+    padding-top: 0.5rem;
     margin-bottom: 0.75rem;
 }
 .content-wrapper {

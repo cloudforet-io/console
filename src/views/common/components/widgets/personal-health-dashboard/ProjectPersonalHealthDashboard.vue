@@ -300,9 +300,10 @@ export default {
 <style lang="postcss" scoped>
 .project-personal-health-dashboard {
     .title {
-        margin-bottom: 0.75rem;
         font-size: 1.5rem;
         line-height: 1.4;
+        padding-top: 0.5rem;
+        margin-bottom: 0.75rem;
     }
     .widget-layout {
         @apply block border border-gray-200;
