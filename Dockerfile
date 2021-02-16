@@ -19,6 +19,7 @@ RUN npm install
 
 COPY src ${BUILD_PATH}/src
 COPY .storybook ${BUILD_PATH}/.storybook
+COPY public ${BUILD_PATH}/public
 COPY tsconfig.json ${BUILD_PATH}/
 
 ENV NODE_ENV production
