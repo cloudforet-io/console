@@ -167,7 +167,7 @@ export default {
                             label: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), to: { name: 'automation' }, isNew: true, show: true,
                         },
                         {
-                            label: vm.$t('MENU.AUTOMATION.SPOT_AUTOMATION'), to: { name: 'spotAutomation' }, isNew: true, show: true,
+                            label: vm.$t('MENU.AUTOMATION.SPOT_AUTOMATION'), to: { name: 'spotGroup' }, isNew: true, show: true,
                         },
                     ],
                 },
