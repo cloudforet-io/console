@@ -19,7 +19,7 @@ jobs:
       - run: |
           git config user.email "github-actions@github.com"
           git config user.name "github-actions"
-          git pull
+          git pull --recurse-submodules
           npm version prerelease --no-git-tag-version --preid=dev
           git add .
           git commit -m "[CI/CD] Update package version"
