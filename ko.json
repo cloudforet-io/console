@@ -676,7 +676,8 @@
 	"MENU": {
 		"AUTOMATION": {
 			"AUTOMATION": "자동화 ",
-			"POWER_SCHEDULER": "파워 스케줄러"
+			"POWER_SCHEDULER": "파워 스케줄러",
+			"SPOT_AUTOMATION": "스팟 자동화"
 		},
 		"DASHBOARD": {
 			"DASHBOARD": "대시보드 "
