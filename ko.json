@@ -114,6 +114,15 @@
 				"STANDARD": "그룹 기준",
 				"TITLE": "리소스 그룹 만들기"
 			}
+		},
+		"SPOT_AUTOMATION": {
+			"MAIN": {
+				"DASHBOARD": "대시보드 ",
+				"SPOT_GROUP": "스팟 그룹"
+			},
+			"SPOT_GROUP_LIST": {
+				"ADD_SPOT_GROUP": "스팟그룹 생성  "
+			}
 		}
 	},
 	"COMMON": {
