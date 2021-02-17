@@ -4,6 +4,12 @@ const PowerSchedulerLandingPage = () => import(/* webpackChunkName: "PowerSchedu
 const PowerSchedulerPage = () => import(/* webpackChunkName: "PowerSchedulerPage" */ '@/views/automation/power-scheduler/pages/PowerSchedulerPage.vue');
 const ResourceGroupPage = () => import(/* webpackChunkName: "ResourceGroup" */ '@/views/automation/power-scheduler/pages/ResourceGroupPage.vue');
 
+const SpotAutomationMainPage = () => import(/* webpackChunkName: "SpotAutomationMainPage" */ '@/views/automation/spot-automation/pages/SpotAutomationMainPage.vue');
+const SpotDashboardPage = () => import(/* webpackChunkName: "SpotDashboardPage" */ '@/views/automation/spot-automation/pages/SpotDashboardPage.vue');
+const SpotGroupListPage = () => import(/* webpackChunkName: "SpotGroupPage" */ '@/views/automation/spot-automation/pages/SpotGroupListPage.vue');
+const SpotGroupDetailPage = () => import(/* webpackChunkName: "SpotGroupDetailPage" */ '@/views/automation/spot-automation/pages/SpotGroupDetailPage.vue');
+const AddSpotGroupPage = () => import(/* webpackChunkName: "AddSpotGroupPage" */ '@/views/automation/spot-automation/pages/AddSpotGroupPage.vue');
+
 export default {
     path: 'automation',
     name: 'automation',
@@ -40,6 +46,42 @@ export default {
                             component: ResourceGroupPage,
                         },
                     ],
+                },
+            ],
+        },
+        {
+            path: 'spot-automation',
+            meta: { label: 'Spot Automation' },
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: 'spotAutomation',
+                    component: SpotAutomationMainPage,
+                    children: [
+                        {
+                            path: 'spot-dashboard',
+                            name: 'spotDashboard',
+                            component: SpotDashboardPage,
+                        },
+                        {
+                            path: 'spot-group',
+                            name: 'spotGroup',
+                            component: SpotGroupListPage,
+                        },
+                    ],
+                },
+                {
+                    path: ':id',
+                    name: 'spotGroupDetail',
+                    props: true,
+                    component: SpotGroupDetailPage,
+                },
+                {
+                    path: 'add',
+                    name: 'addSpotGroup',
+                    props: true,
+                    component: AddSpotGroupPage,
                 },
             ],
         },
