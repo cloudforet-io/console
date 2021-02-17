@@ -114,6 +114,15 @@
 				"STANDARD": "グループ基準",
 				"TITLE": "リソースグループの作成"
 			}
+		},
+		"SPOT_AUTOMATION": {
+			"MAIN": {
+				"DASHBOARD": "",
+				"SPOT_GROUP": ""
+			},
+			"SPOT_GROUP_LIST": {
+				"ADD_SPOT_GROUP": ""
+			}
 		}
 	},
 	"COMMON": {

@@ -114,6 +114,15 @@
 				"STANDARD": "Group Category",
 				"TITLE": "Create a resource group"
 			}
+		},
+		"SPOT_AUTOMATION": {
+			"MAIN": {
+				"DASHBOARD": "Dashboard",
+				"SPOT_GROUP": "Spot Group"
+			},
+			"SPOT_GROUP_LIST": {
+				"ADD_SPOT_GROUP": "Add Spot Group"
+			}
 		}
 	},
 	"COMMON": {
