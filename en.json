@@ -676,7 +676,8 @@
 	"MENU": {
 		"AUTOMATION": {
 			"AUTOMATION": "Automation",
-			"POWER_SCHEDULER": "Power Scheduler"
+			"POWER_SCHEDULER": "Power Scheduler",
+			"SPOT_AUTOMATION": "Spot Automation"
 		},
 		"DASHBOARD": {
 			"DASHBOARD": "Dashboard"

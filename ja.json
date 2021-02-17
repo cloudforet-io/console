@@ -676,7 +676,8 @@
 	"MENU": {
 		"AUTOMATION": {
 			"AUTOMATION": "オートメーション",
-			"POWER_SCHEDULER": "パワースケジューラ"
+			"POWER_SCHEDULER": "パワースケジューラ",
+			"SPOT_AUTOMATION": ""
 		},
 		"DASHBOARD": {
 			"DASHBOARD": "ダッシュボード"
