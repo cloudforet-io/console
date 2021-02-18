@@ -46,12 +46,16 @@
                          @click="hideErrorMessage"
                     />
                 </div>
-                <i-d-p-w-sign-in class="id-pw-wrapper" @on-sign-in="signIn" />
+                <i-d-p-w-sign-in class="id-pw-wrapper"
+                                 @sign-in="onSignIn"
+                                 @sign-in-error="onSignInError"
+                />
                 <div v-if="component" class="btn-divider">
                     <span>{{ $t('COMMON.SIGN_IN.OR') }}</span>
                 </div>
                 <component :is="component" class="sign-in-template"
-                           @on-sign-in="signIn"
+                           @sign-in="onSignIn"
+                           @sign-in-error="onSignInError"
                 />
                 <span @click="goToAdminSignIn">
                     <p-i name="root-account" width="1.5rem" height="1.5rem"
@@ -132,7 +136,7 @@ export default {
             version: process.env.VUE_APP_VERSION,
             showErrorMessage: false,
         });
-        const signIn = async (userId, credentials) => {
+        const onSignIn = async () => {
             state.showErrorMessage = false;
             try {
                 const hasPermission = vm.$store.getters['user/hasPermission'];
@@ -145,7 +149,7 @@ export default {
             }
         };
 
-        const showErrorByEvent = async () => {
+        const onSignInError = () => {
             state.showErrorMessage = true;
         };
 
@@ -157,14 +161,15 @@ export default {
         };
         (async () => {
             if (vm.$route.query.error === 'error') {
-                await showErrorByEvent();
+                await onSignInError();
                 await vm.$router.replace({ query: { ...vm.$route.query, error: null } });
             }
         })();
         return {
             ...toRefs(state),
-            signIn,
+            onSignIn,
             goToAdminSignIn,
+            onSignInError,
             hideErrorMessage,
         };
     },

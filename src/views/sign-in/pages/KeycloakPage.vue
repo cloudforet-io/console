@@ -7,9 +7,7 @@ import {
     ComponentRenderProxy, computed, defineComponent, getCurrentInstance, onMounted, reactive, toRefs,
 } from '@vue/composition-api';
 import { PButton } from '@spaceone/design-system';
-import { store } from '@/store';
-import { KeycloakAuth } from '@/views/sign-in/lib/authenticator/keycloak-auth';
-import {loadAuth} from "@/views/sign-in/lib/authenticator/loader";
+import { loadAuth } from '@/views/sign-in/lib/authenticator/loader';
 
 export default defineComponent({
     name: 'KeycloakPage',

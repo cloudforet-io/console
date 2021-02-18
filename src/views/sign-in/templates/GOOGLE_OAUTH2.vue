@@ -24,14 +24,20 @@ export default defineComponent({
     },
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const onSignIn = async () => {
-            context.emit('on-sign-in');
+        const onSignIn = () => {
+            context.emit('sign-in');
         };
         const goToAdminSignIn = () => {
             context.emit('go-to-admin-sign-in');
         };
+
         onMounted(async () => {
-            await loadAuth('GOOGLE_OAUTH2').signIn(onSignIn);
+            try {
+                await loadAuth('GOOGLE_OAUTH2').signIn(onSignIn);
+            } catch (e) {
+                context.emit('sign-in-error');
+                console.error(e);
+            }
         });
         return {
             goToAdminSignIn,

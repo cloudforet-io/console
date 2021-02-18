@@ -120,8 +120,13 @@ export default defineComponent({
             const credentials = {
                 password: state.password.trim(),
             };
-            await loadAuth().signIn(state.userId, credentials, props.isAdmin ? 'DOMAIN_OWNER' : 'USER');
-            context.emit('on-sign-in');
+            try {
+                await loadAuth().signIn(state.userId, credentials, props.isAdmin ? 'DOMAIN_OWNER' : 'USER');
+                context.emit('sign-in');
+            } catch (e) {
+                context.emit('sign-in-error');
+                console.error(e);
+            }
         };
 
         const buttonStyleType = computed(() => (props.isAdmin ? 'primary-dark' : 'primary1'));

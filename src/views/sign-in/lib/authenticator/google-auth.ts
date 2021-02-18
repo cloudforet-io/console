@@ -26,6 +26,7 @@ class GoogleAuth extends Authenticator {
             await super.signIn(userId, credentials);
         } catch (e) {
             await GoogleAuth.signOut();
+            throw new Error(e);
         }
     }
 

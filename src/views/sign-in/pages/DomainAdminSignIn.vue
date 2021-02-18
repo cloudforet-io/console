@@ -44,7 +44,8 @@
                 </div>
                 <i-d-p-w-sign-in class="local-sign-in-wrapper"
                                  :is-admin="true"
-                                 @on-sign-in="signIn"
+                                 @sign-in="onSignIn"
+                                 @sign-in-error="onSignInError"
                 />
                 <span class="user-sign-in-btn" @click="goToUserSignIn">
                     <p-i name="ic_arrow_left_sm" width="0.5rem" height="0.5rem"
@@ -121,7 +122,7 @@ export default {
             isPasswordCheckValid: undefined as undefined | boolean,
             passwordCheckInvalidText: '' as TranslateResult | string,
         });
-        const signIn = async () => {
+        const onSignIn = async () => {
             state.showErrorMessage = false;
             try {
                 await vm.$router.push(props.nextPath);
@@ -130,6 +131,11 @@ export default {
                 state.showErrorMessage = true;
             }
         };
+
+        const onSignInError = () => {
+            state.showErrorMessage = true;
+        };
+
         const hideErrorMessage = () => {
             state.showErrorMessage = false;
         };
@@ -139,8 +145,9 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(validationState),
-            signIn,
+            onSignIn,
             goToUserSignIn,
+            onSignInError,
             hideErrorMessage,
         };
     },
