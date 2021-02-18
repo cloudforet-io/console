@@ -233,7 +233,7 @@ export default {
             try {
                 state.loading = true;
                 getEventsApiQuery
-                    .setSort(state.sortBy, state.sortDesc, 'name')
+                    .setSort(state.sortBy, state.sortDesc)
                     .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
                     .setFilters([{ v: state.search }]);
                 const res = await SpaceConnector.client.statistics.topic.phdEvents(

@@ -390,7 +390,7 @@ export default {
             apiQuery.setPageLimit(state.pageSize)
                 .setFilters(filters)
                 .addFilter(...queryHelper.filters)
-                .setSort('count', true, 'name');
+                .setSort('count', true);
 
             if (isTriggeredBySideFilter) state.thisPage = 1;
             else apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize));

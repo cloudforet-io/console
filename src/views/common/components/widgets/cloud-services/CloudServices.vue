@@ -170,7 +170,7 @@ export default {
         };
         const projectApiQuery = new ApiQueryHelper();
         const getDataInProject = async () => {
-            projectApiQuery.setSort('count', true, 'name')
+            projectApiQuery.setSort('count', true)
                 .setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
             const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
                 query: projectApiQuery.data,
@@ -193,7 +193,7 @@ export default {
         const apiQuery = new ApiQueryHelper();
         const getData = async (): Promise<void> => {
             state.loading = true;
-            apiQuery.setSort('count', true, 'name')
+            apiQuery.setSort('count', true)
                 .setPage(1, 9);
             try {
                 if (props.projectFilter) {

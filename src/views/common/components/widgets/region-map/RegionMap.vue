@@ -144,7 +144,7 @@ export default {
                         { k: 'region_code', v: regionCode, o: '=' },
                         { k: 'provider', v: provider, o: '=' },
                     ]).setPageLimit(10)
-                        .setSort('count', true, 'name')
+                        .setSort('count', true)
                         .data,
                     // eslint-disable-next-line camelcase
                     is_major: true,
