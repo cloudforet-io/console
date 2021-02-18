@@ -48,7 +48,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { map, forEach, range } from 'lodash';
+import { forEach, range } from 'lodash';
 import { Location } from 'vue-router';
 import Color from 'color';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -237,10 +237,10 @@ export default {
         init();
 
         // draw loader chart or data chart
-        watch([() => state.loaderRef, () => state.chartRef], ([loaderCtx, chartCtx]) => {
-            if (loaderCtx) {
+        watch([() => state.loading, () => state.loaderRef, () => state.chartRef], ([loading, loaderCtx, chartCtx]) => {
+            if (loading && loaderCtx) {
                 drawChart(loaderCtx, true);
-            } else if (chartCtx) {
+            } else if (!loading && chartCtx) {
                 drawChart(chartCtx, false);
             }
         }, { immediate: true });

@@ -229,10 +229,10 @@ export default {
         };
         init();
 
-        watch([() => state.loaderRef, () => state.chartRef], ([loaderCtx, chartCtx]) => {
-            if (loaderCtx) {
+        watch([() => state.loading, () => state.loaderRef, () => state.chartRef], ([loading, loaderCtx, chartCtx]) => {
+            if (loading && loaderCtx) {
                 drawChart(loaderCtx, true);
-            } else if (chartCtx) {
+            } else if (!loading && chartCtx) {
                 drawChart(chartCtx, false);
             }
         }, { immediate: true });
