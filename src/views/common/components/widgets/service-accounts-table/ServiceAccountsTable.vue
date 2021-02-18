@@ -8,27 +8,29 @@
                       :items="data"
         >
             <template #col-provider-format="{ value }">
-                <router-link :to="value.href" class="link-text" :style="{color: value.color}">
+                <router-link :to="value.to" class="link-text" :style="{color: value.color}">
                     {{ value.label }}
                 </router-link>
             </template>
             <template #col-service_account-format="{ value }">
-                <router-link :to="value.href" class="link-text">
+                <router-link :to="value.to" class="link-text">
                     {{ value.label }}
                 </router-link>
             </template>
-            <template #col-server-format="{ value }">
-                <router-link :to="value.href" class="link-text">
+            <template #col-compute-format="{ value }">
+                <router-link :to="value.to" class="link-text">
                     {{ value.count }}
                 </router-link>
             </template>
-            <template #col-cloud_service-format="{ value }">
-                <router-link :to="value.href" class="link-text">
+            <template #col-database-format="{ value }">
+                <router-link :to="value.to" class="link-text">
                     {{ value.count }}
                 </router-link>
             </template>
-            <template #col-credentials-format="{ value }">
-                {{ value.count }}
+            <template #col-storage-format="{ value }">
+                <router-link :to="value.to" class="link-text">
+                    {{ value.count }}
+                </router-link>
             </template>
         </p-data-table>
     </widget-layout>
@@ -36,22 +38,33 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import bytes from 'bytes';
+import { Location } from 'vue-router';
+
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
     PDataTable,
 } from '@spaceone/design-system';
-
 import WidgetLayout from '@/views/common/components/layouts/WidgetLayout.vue';
+
 import { store } from '@/store';
 import { SpaceConnector } from '@/lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { QueryHelper } from '@/lib/query';
-import { Location } from 'vue-router';
-import { QueryStoreFilter } from '@/lib/query/type';
+
+enum DATA_TYPE {
+    compute = 'compute',
+    database = 'database',
+    storage = 'storage',
+}
+enum CLOUD_SERVICE_LABEL {
+    compute = 'Compute',
+    database = 'Database',
+    storage = 'Storage',
+}
 
 export default {
     name: 'ServiceAccountsTable',
@@ -75,48 +88,39 @@ export default {
             fields: computed(() => [
                 { name: 'provider', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.PROVIDER') },
                 { name: 'service_account', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.ACCOUNT_NAME') },
-                { name: 'server', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.SERVER') },
-                { name: 'cloud_service', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.CLOUD_SERVICE') },
-                { name: 'credentials', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.CREDENTIALS') },
+                { name: 'compute', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.COMPUTE') },
+                { name: 'database', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.DATABASE') },
+                { name: 'storage', label: vm.$t('COMMON.WIDGETS.SERVICE_ACCOUNT_TABLE.STORAGE') },
             ]),
             providers: computed(() => store.state.resource.provider.items),
         });
 
-        const getLink = (type, provider, serviceAccountId) => {
-            let link: Location = {};
-            const filters: QueryStoreFilter[] = [];
-            if (type === 'provider') {
-                link = {
-                    name: 'serviceAccount',
-                    query: {
-                        provider,
-                    },
-                };
-            }
-            if (type === 'cloudService') {
-                filters.push({ k: 'collection_info.service_accounts', v: serviceAccountId, o: '=' },
-                    { k: 'project_id', v: props.projectId, o: '=' });
-                link = {
-                    name: 'cloudServiceMain',
-                    query: {
-                        provider: 'all',
-                        filters: queryHelper.setFilters(filters).rawQueryStrings,
-                    },
-                };
-            }
-            if (type === 'server') {
-                filters.push({ k: 'collection_info.service_accounts', v: serviceAccountId, o: '=' },
-                    { k: 'project_id', v: props.projectId, o: '=' });
-                link = {
-                    name: 'server',
-                    query: {
-                        filters: queryHelper.setFilters(filters).rawQueryStrings,
-                    },
-                };
-            }
-            return link;
+        /* util */
+        const byteFormatter = (num, option = {}) => bytes(num, { ...option, unitSeparator: ' ', decimalPlaces: 1 });
+        const getLocation = (type, provider, serviceAccountId) => {
+            const query: Location['query'] = {
+                provider,
+                service: CLOUD_SERVICE_LABEL[type],
+            };
+            if (type === DATA_TYPE.storage) query.primary = 'false';
+
+            // set filters
+            queryHelper.setFilters([
+                { k: 'collection_info.service_accounts', v: serviceAccountId, o: '=' },
+                { k: 'project_id', o: '=', v: props.projectId },
+            ]);
+
+            const location: Location = {
+                name: 'cloudServiceMain',
+                query: {
+                    filters: queryHelper.rawQueryStrings,
+                    ...query,
+                },
+            };
+            return location;
         };
 
+        /* api */
         const getData = async () => {
             state.loading = true;
             state.data = [];
@@ -129,23 +133,24 @@ export default {
                     provider: {
                         label: state.providers[item.provider].label,
                         color: state.providers[item.provider].color,
-                        href: getLink('provider', item.provider, item.service_account_id),
+                        to: { name: 'serviceAccount', query: { provider: item.provider } },
                     },
                     service_account: {
                         label: item.service_account_name,
                         id: item.service_account_id,
-                        href: referenceRouter(item.service_account_id, { resource_type: 'identity.ServiceAccount' }),
+                        to: referenceRouter(item.service_account_id, { resource_type: 'identity.ServiceAccount' }),
                     },
-                    cloud_service: {
-                        count: item.cloud_service_count || 0,
-                        href: getLink('cloudService', '', item.service_account_id),
-                    },
-                    server: {
+                    compute: {
                         count: item.server_count || 0,
-                        href: getLink('server', '', item.service_account_id),
+                        to: getLocation(DATA_TYPE.compute, item.provider, item.service_account_id),
                     },
-                    credentials: {
-                        count: item.secret_count || 0,
+                    database: {
+                        count: item.database_count || 0,
+                        to: getLocation(DATA_TYPE.database, item.provider, item.service_account_id),
+                    },
+                    storage: {
+                        count: byteFormatter(item.storage_size) || 0,
+                        to: getLocation(DATA_TYPE.storage, item.provider, item.service_account_id),
                     },
                 }));
             } catch (e) {
