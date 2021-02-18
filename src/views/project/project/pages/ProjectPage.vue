@@ -280,6 +280,7 @@ export default {
         };
 
         const listAll = async () => {
+            projectState.isPermissionDenied = false;
             await Promise.all([
                 listProjectGroup(),
                 listProject(),
