@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
@@ -51,14 +51,16 @@ export default {
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            resourceRoute: vm.$route.matched[1],
-            serviceRoute: vm.$route.matched[2],
+            resourceRoute: computed(() => vm.$route.matched[1]),
+            serviceRoute: computed(() => vm.$route.matched[2]),
         });
 
         const routeState = reactive({
-            route: [{ name: state.resourceRoute.meta.label, path: state.resourceRoute.path },
+            route: computed(() => ([
+                { name: state.resourceRoute.meta.label, path: state.resourceRoute.path },
                 { name: state.serviceRoute.meta.label, path: state.serviceRoute.path },
-                { name: 'No Resources', path: `${state.serviceRoute.path}/no-resource` }],
+                { name: 'No Resources' },
+            ])),
         });
 
         return {

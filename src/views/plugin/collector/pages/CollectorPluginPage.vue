@@ -204,8 +204,11 @@ export default {
             selectedRepositoryId: undefined as unknown as string,
         });
         const routeState = reactive({
-            routes: [{ name: vm.$t('MENU.PLUGIN.PLUGIN'), path: '/plugin' }, { name: vm.$t('MENU.PLUGIN.COLLECTOR'), path: '/plugin/collector' },
-                { name: vm.$t('MENU.PLUGIN.CREATE_COLLECTOR'), path: '/plugin/collector/create/plugins' }],
+            routes: computed(() => ([
+                { name: vm.$t('MENU.PLUGIN.PLUGIN'), path: '/plugin' },
+                { name: vm.$t('MENU.PLUGIN.COLLECTOR'), path: '/plugin/collector' },
+                { name: vm.$t('MENU.PLUGIN.CREATE_COLLECTOR') },
+            ])),
         });
 
 

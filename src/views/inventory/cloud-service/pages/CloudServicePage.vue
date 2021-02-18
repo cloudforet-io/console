@@ -284,8 +284,9 @@ export default {
             route: computed(() => ([
                 { name: vm.$t('MENU.INVENTORY.INVENTORY'), path: '/inventory' },
                 { name: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), path: '/inventory/cloud-service' },
-                { name: `${props.group}` },
-                { name: `${props.name}`, path: `/inventory/cloud-service/${props.provider}/${props.group}/${props.name}` }])),
+                { name: `${props.group}`, path: `/inventory/cloud-service/${props.provider}/${props.group}/${props.name}` },
+                { name: `${props.name}` },
+            ])),
         });
 
         /** Sidebar */

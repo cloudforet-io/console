@@ -151,7 +151,7 @@ export default {
             routes: computed(() => ([
                 { name: vm.$t('MENU.PLUGIN.PLUGIN'), path: '/plugin' },
                 { name: vm.$t('MENU.PLUGIN.COLLECTOR'), path: '/plugin/collector' },
-                { name: vm.$t('MENU.PLUGIN.CREATE_COLLECTOR'), path: '/plugin/collector/create/plugins' },
+                { name: vm.$t('MENU.PLUGIN.CREATE_COLLECTOR') },
             ])),
         });
         const tabState = reactive({

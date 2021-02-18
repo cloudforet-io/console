@@ -230,7 +230,7 @@ export default {
         const routeState = reactive({
             route: computed(() => ([
                 { name: vm.$t('MENU.AUTOMATION.AUTOMATION'), path: '/automation' },
-                { name: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'), path: '/automation/power-scheduler' },
+                { name: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER') },
             ])),
         });
 

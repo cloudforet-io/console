@@ -220,7 +220,7 @@ export default {
         const routeState = reactive({
             route: computed(() => ([
                 { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'), path: '/identity/service-account' },
+                { name: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT') },
             ])),
         });
 

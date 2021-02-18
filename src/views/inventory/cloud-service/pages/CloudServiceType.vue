@@ -477,7 +477,7 @@ export default {
         const routeState = reactive({
             route: computed(() => ([
                 { name: vm.$t('MENU.INVENTORY.INVENTORY'), path: '/inventory' },
-                { name: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), path: '/inventory/cloud-service' },
+                { name: vm.$t('MENU.INVENTORY.CLOUD_SERVICE') },
             ])),
         });
 

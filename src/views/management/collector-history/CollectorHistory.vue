@@ -289,14 +289,14 @@ export default {
         const routeState = reactive({
             route: computed(() => ([
                 { name: vm.$t('MENU.MANAGEMENT.MANAGEMENT'), path: '/management/collector-history' },
-                { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), path: '/management/collector-history' },
+                { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY') },
             ])),
         });
         const subRouteState = reactive({
             subRoute: computed(() => [
                 { name: vm.$t('MENU.MANAGEMENT.MANAGEMENT'), path: '/management/collector-history' },
                 { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), path: '/management/collector-history' },
-                { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY_JOB_MANAGEMENT'), path: `/management/collector-history#${state.selectedJobId}` },
+                { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY_JOB_MANAGEMENT') },
             ]),
         });
 

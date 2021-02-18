@@ -79,7 +79,7 @@ export default {
         const routeState = reactive({
             route: computed(() => [
                 { name: vm.$t('MENU.AUTOMATION.AUTOMATION'), path: '/automation' },
-                { name: vm.$t('MENU.AUTOMATION.SPOT_AUTOMATION'), path: '/automation/spot-automation/spot-group' },
+                { name: vm.$t('MENU.AUTOMATION.SPOT_AUTOMATION') },
             ]),
         });
 

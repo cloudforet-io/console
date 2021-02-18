@@ -360,7 +360,7 @@ export default {
                 { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
                 { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/user-management' },
                 { name: vm.$t('IDENTITY.USER.MAIN.ROOT_ACCOUNT'), path: '/identity/user/user-management' },
-                { name: vm.$t('IDENTITY.USER.MAIN.USER_MANAGEMENT'), path: '/identity/user/user-management' },
+                { name: vm.$t('IDENTITY.USER.MAIN.USER_MANAGEMENT') },
             ])),
         });
 

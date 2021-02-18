@@ -161,13 +161,13 @@ export default {
         const routeState = reactive({
             userRoutes: computed(() => ([
                 { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
-                { name: vm.$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE'), path: '/identity/user/account' },
+                { name: vm.$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE') },
             ])),
             adminRoutes: computed(() => ([
                 { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
                 { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/user-management' },
                 { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
-                { name: vm.$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE'), path: '/identity/user/account' },
+                { name: vm.$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE') },
             ])),
         });
 
