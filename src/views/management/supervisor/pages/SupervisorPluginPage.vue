@@ -28,6 +28,9 @@
                             {{ $t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.RECOVERY') }}
                         </p-button>
                     </template>
+                    <template #col-state-format="{value}">
+                        <p-status v-bind="pluginStateFormatter(value)" />
+                    </template>
                 </p-query-search-table>
             </template>
         </p-horizontal-layout>
@@ -39,7 +42,18 @@
                     <p-panel-top>{{ pluginDetailState.name }}</p-panel-top>
                     <p-definition-table :fields="pluginDetailState.fields" :data="pluginDetailState.data"
                                         :skeleton-rows="7" v-on="$listeners"
-                    />
+                    >
+                        <template #data-state="{data}">
+                            <p-status v-bind="pluginStateFormatter(data)" />
+                        </template>
+                        <template #data-endpoints="{data}">
+                            <ul>
+                                <li v-for="i in data" :key="i">
+                                    {{ i }}
+                                </li>
+                            </ul>
+                        </template>
+                    </p-definition-table>
                 </div>
             </template>
         </p-tab>
@@ -54,9 +68,23 @@
                               :selectable="false"
                               :col-copy="true"
                               class="mt-8"
-                />
+                >
+                    <template #col-state-format="{value}">
+                        <p-status v-bind="pluginStateFormatter(value)" />
+                    </template>
+                    <template #col-endpoints-format="{data}">
+                        <ul>
+                            <li v-for="i in data" :key="i">
+                                {{ i }}
+                            </li>
+                        </ul>
+                    </template>
+                </p-data-table>
             </template>
         </p-tab>
+        <div v-else id="empty-space">
+            <p-empty>{{ $t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.NO_SELECTED') }}</p-empty>
+        </div>
     </general-page-layout>
 </template>
 
@@ -66,8 +94,8 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PHorizontalLayout, PTab, PDataTable, PPageTitle,
-    PQuerySearchTable, PDefinitionTable, PPanelTop, PButton,
+    PHorizontalLayout, PTab, PDataTable, PPageTitle, PStatus,
+    PQuerySearchTable, PDefinitionTable, PPanelTop, PButton, PEmpty,
 } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
@@ -84,6 +112,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import { QueryHelper } from '@/lib/query';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import { pluginStateFormatter } from '@/views/identity/user/lib/helper';
 
 enum STATE {
     active = 'ACTIVE',
@@ -102,6 +131,8 @@ export default {
         PTab,
         PPanelTop,
         PDefinitionTable,
+        PStatus,
+        PEmpty,
     },
     props: {
         queryString: {
@@ -131,14 +162,14 @@ export default {
             },
         };
         const state = reactive({
-            fields: [
-                { label: 'Plugin ID', name: 'plugin_id' },
-                { label: 'Version', name: 'version' },
-                { label: 'Supervisor Name', name: 'supervisor_name' },
-                { label: 'Supervisor ID', name: 'supervisor_id' },
-                { label: 'State', name: 'state' },
-                { label: 'Recovery', name: 'managed' },
-            ],
+            fields: computed(() => [
+                { name: 'plugin_id', label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_LABEL_PLUGIN_ID') },
+                { name: 'version', label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_LABEL_VERSION') },
+                { name: 'supervisor_name', label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_LABEL_SUPERVISOR') },
+                { name: 'supervisor_id', label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_LABEL_SUPERVISOR_ID') },
+                { name: 'state', label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_LABEL_STATE') },
+                { name: 'managed', label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_LABEL_MANAGED') },
+            ]),
             items: [] as SupervisorPluginModel[],
             sortBy: '',
             sortDesc: true,
@@ -254,7 +285,17 @@ export default {
             onSelect,
             onChange,
             onClickRecovery,
+            pluginStateFormatter,
         };
     },
 };
 </script>
+
+<style lang="postcss" scoped>
+#empty-space {
+    @apply text-primary2 mt-6;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
+</style>
