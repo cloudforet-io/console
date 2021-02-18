@@ -17,10 +17,7 @@
                     <span class="flex-shrink-0 rounded-sm h-3 w-3 mr-2"
                           :style="{ backgroundColor: colors[idx] }"
                     />
-                    <span v-tooltip.bottom="{content: legendFormatter(resource), delay: 200}"
-                          class="truncate"
-                    >{{ legendFormatter(resource) }}
-                    </span>
+                    <span>{{ legendFormatter(resource) }}</span>
                 </div>
             </div>
         </section>
@@ -57,14 +54,14 @@
                                :card-class="() => []"
                 >
                     <template #card="{item, index}">
-                        <p-metric-chart :loading="chartMetrics[index].loading"
-                                        :labels="chartMetrics[index].labels"
-                                        :dataset="chartMetrics[index].dataset"
-                                        :colors="colors"
-                                        :unit="item.metric.unit"
-                                        :timezone="timezone"
-                                        :title="item.metric.name"
-                                        :error="item.error"
+                        <metric-chart :loading="chartMetrics[index].loading"
+                                      :labels="chartMetrics[index].labels"
+                                      :dataset="chartMetrics[index].dataset"
+                                      :colors="colors"
+                                      :unit="item.metric.unit"
+                                      :timezone="timezone"
+                                      :title="item.metric.name"
+                                      :error="item.error"
                         />
                     </template>
                 </p-grid-layout>
@@ -82,13 +79,13 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-
 import {
-    computed, onMounted, reactive, toRefs, UnwrapRef, watch,
+    computed, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import MetricChart from '@/views/common/components/charts/MetricChart.vue';
 import {
-    PSelectBtnGroup, PSelectDropdown, PIconButton, PMetricChart, PGridLayout, PLottie, PButton,
+    PSelectBtnGroup, PSelectDropdown, PIconButton, PGridLayout, PLottie, PButton,
 } from '@spaceone/design-system';
 
 import {
@@ -179,7 +176,7 @@ export default {
         PSelectDropdown,
         PSelectBtnGroup,
         PIconButton,
-        PMetricChart,
+        MetricChart,
     },
     props: {
         resourceType: {
@@ -262,7 +259,6 @@ export default {
             }
             return {
                 metrics: [],
-                // eslint-disable-next-line camelcase
                 available_resources: {},
             };
         };
@@ -396,7 +392,7 @@ export default {
             colors,
             timeRanges,
             legendFormatter(resource): string {
-                return resource.name ? `${resource.id}(${resource.name})` : resource.id;
+                return resource.name ? `${resource.id} (${resource.name})` : resource.id;
             },
             listChartMetrics,
             loadChartMetrics,
@@ -417,7 +413,6 @@ section {
 }
 .legend {
     @apply inline-flex items-center text-sm leading-normal mr-4;
-    max-width: 17rem;
     margin-top: 0.625rem;
 }
 .time-range::v-deep {
