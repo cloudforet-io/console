@@ -1,0 +1,88 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PDatePagination from './PDatePagination.vue';
+import dayjs from 'dayjs';
+import { reactive, toRefs } from "@vue/composition-api";
+
+
+<Meta title='Navigation/Paginations/DatePagination' component={ PDatePagination } argTypes={{
+    date: {
+        name: 'date',
+        type: {name: 'object'},
+        description: 'Current date',
+        defaultValue: dayjs(),
+    },
+    type: {
+        name: 'type',
+        type: {name: 'string'},
+        description: 'Date type',
+        defaultValue: 'month',
+        control: {
+            type: 'select',
+            options: ['month', 'week']
+        }
+    },
+    allowFuture: {
+        name: 'allowFuture',
+        type: {name: 'boolean'},
+        description: 'Decide whether to allow the future',
+        defaultValue: false,
+    },
+    timezone: {
+        name: 'timezone',
+        type: {name: 'string'},
+        description: 'Timezone',
+        defaultValue: 'UTC',
+        control: {
+            type: 'select',
+            options: ['UTC', 'Asia/Seoul']
+        }
+    },
+}}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDatePagination },
+    template: `
+<div>
+    <PDatePagination
+        :date.sync=date
+        :type=type
+        :allowFuture=allowFuture
+        :timezone=timezone
+    />
+    <div v-if="type === 'month'">
+        <p>previous month: {{ date.subtract(1, 'month').format('YYYY-MM') }}</p>
+        <b>current month: {{ date.format('YYYY-MM') }}</b>
+        <p>next month: {{ date.add(1, 'month').format('YYYY-MM') }}</p>
+    </div>
+    <div v-else>
+        <p>previous week: {{ date.subtract(1, 'week').format('YYYY-MM-DD') }} </p>
+        <b>current week: {{ date.format('YYYY-MM-DD') }}</b>
+        <p>next week: {{ date.add(1, 'week').format('YYYY-MM-DD') }}</p>
+    </div>
+    <br>
+    <p>Timezone: {{ timezone }}</p>
+</div>
+    `,
+    setup(props) {
+    }
+});
+
+
+## Basic
+<Canvas>
+    <Story name="date pagination">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+
+## Playground
+<Canvas>
+    <Story name="playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground"/>
