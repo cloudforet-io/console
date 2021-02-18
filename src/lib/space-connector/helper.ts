@@ -44,9 +44,9 @@ class ApiQueryHelper extends QueryHelper {
         return this;
     }
 
-    setSort(key: string, desc = false, field: 'key' | 'name' = 'key'): ApiQueryHelper {
+    setSort(key: string, desc = false): ApiQueryHelper {
         this._data.sort = {
-            [field]: key,
+            key,
             desc,
         };
         return this;
