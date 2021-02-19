@@ -17,13 +17,15 @@
             :loading="loading"
             :col-copy="true"
         />
-        <tags-page v-if="tagEditPageVisible"
-                   :tags="tags"
-                   :resource-id="resourceId"
-                   :resource-key="resourceKey" :resource-type="resourceType"
-                   @close="closeTag"
-                   @update="updateTag"
-        />
+        <transition name="slide-up">
+            <tags-page v-if="tagEditPageVisible"
+                       :tags="tags"
+                       :resource-id="resourceId"
+                       :resource-key="resourceKey" :resource-type="resourceType"
+                       @close="closeTag"
+                       @update="updateTag"
+            />
+        </transition>
     </div>
 </template>
 
@@ -134,6 +136,19 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
+
+/* transition */
+.slide-up-enter-active {
+  transition: all 0.3s ease;
+}
+.slide-up-leave-active {
+  transition: all 0.3s ease-out;
+}
+.slide-up-enter, .slide-up-leave-to {
+  transform: translateY(100px);
+  opacity: 0;
+}
+
 .p-data-table {
     min-height: 10rem;
 }

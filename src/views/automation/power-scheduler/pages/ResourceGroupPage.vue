@@ -1,6 +1,6 @@
 <template>
     <div>
-        <transition name="slide-fade">
+        <transition name="slide-up">
             <general-page-layout v-show="visible === undefined || visible">
                 <p-page-title :title="title" child @goBack="onClickCancel" />
                 <p-pane-layout>
@@ -587,13 +587,13 @@ export default {
 $height: calc(100vh - ($gnb-height));
 
 /* transition */
-.slide-fade-enter-active {
+.slide-up-enter-active {
     transition: all 0.3s ease;
 }
-.slide-fade-leave-active {
+.slide-up-leave-active {
     transition: all 0.3s ease-out;
 }
-.slide-fade-enter, .slide-fade-leave-to {
+.slide-up-enter, .slide-up-leave-to {
     transform: translateY(100px);
     opacity: 0;
 }
