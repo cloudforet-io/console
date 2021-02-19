@@ -28,18 +28,21 @@ import utc from 'dayjs/plugin/utc';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
-import { PChartLoader, PSkeleton, PLottie } from '@spaceone/design-system';
+import { PChartLoader, PLottie, PSkeleton } from '@spaceone/design-system';
 
-import {
-    reactive, toRefs, watch,
-} from '@vue/composition-api';
+import { reactive, toRefs, watch } from '@vue/composition-api';
+
+import { MetricChartProps } from '@/views/common/components/charts/type';
 import { gray } from '@/styles/colors';
 
 dayjs.extend(utc);
 am4core.useTheme(am4themes_animated);
 
 
-const chartTimestampFormatter = (value, timezone) => dayjs.tz(dayjs.unix(value.seconds), timezone).format('MM/DD[\n]HH:mm');
+interface ChartData {
+    label: string;
+    [key: string]: number | string;
+}
 
 export default {
     name: 'PMetricChart',
@@ -81,43 +84,49 @@ export default {
             default: false,
         },
     },
-    setup(props) {
+    setup(props: MetricChartProps) {
+        const state = reactive({
+            chartRef: null,
+            chart: null as null | any,
+            data: [] as ChartData[],
+            chartRegistry: {},
+        });
+
+        const chartTimestampFormatter = (value, timezone) => dayjs.tz(dayjs.unix(value.seconds), timezone).format('MM/DD HH:mm');
         const getLabels = () => {
             if (props.unit.x === 'Timestamp') {
-                const labels: string[] | string[][] = props.labels.map(t => chartTimestampFormatter(t, props.timezone));
-                labels.forEach((e, i, a: string[] | string[][]) => {
-                    if (typeof e === 'string' && /\n/.test(e)) {
-                        a[i] = e.split(/\n/);
-                    }
-                });
+                const labels: string[] = props.labels.map(label => chartTimestampFormatter(label, props.timezone));
                 return labels;
             }
             return props.labels as string[];
         };
 
-        const state = reactive({
-            chartRef: null,
-            chart: null as null | any,
-            data: [], // as MetricChartData[],
-        });
-
         const convertChartData = async () => {
-            const labels = getLabels().map(d => d.join(' '));
-            const chartDataList = [];
+            const labels = getLabels();
+            const chartDataList: ChartData[] = [];
             labels.forEach((label, index) => {
-                const chartData = {};
-                chartData.label = label;
+                const chartData: ChartData = { label };
                 Object.entries(props.dataset).forEach(([key, value]) => {
-                    chartData[key] = value[index];
+                    chartData[key] = value[index] as number;
                 });
                 chartDataList.push(chartData);
             });
             state.data = chartDataList;
         };
 
+        const disposeChart = (ctx) => {
+            if (state.chartRegistry[ctx]) {
+                state.chartRegistry[ctx].dispose();
+                delete state.chartRegistry[ctx];
+            }
+        };
         const drawChart = (ctx) => {
-            convertChartData();
-            const chart = am4core.create(ctx, am4charts.XYChart);
+            const createChart = () => {
+                disposeChart(ctx);
+                state.chartRegistry[ctx] = am4core.create(ctx, am4charts.XYChart);
+                return state.chartRegistry[ctx];
+            };
+            const chart = createChart();
             chart.logo.disabled = true;
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
