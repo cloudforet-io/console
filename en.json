@@ -116,6 +116,14 @@
 			}
 		},
 		"SPOT_AUTOMATION": {
+			"DETAIL": {
+				"TAB_HISTORY": "History",
+				"TAB_INSTANCE": "Instance",
+				"TAB_LOAD_BALANCER": "Load Balancer",
+				"TAB_MEMBER": "Member",
+				"TAB_SUMMARY": "Summary",
+				"TAB_TAG": "Tags"
+			},
 			"MAIN": {
 				"DASHBOARD": "Dashboard",
 				"SPOT_GROUP": "Spot Group"
@@ -687,7 +695,8 @@
 		"AUTOMATION": {
 			"AUTOMATION": "Automation",
 			"POWER_SCHEDULER": "Power Scheduler",
-			"SPOT_AUTOMATION": "Spot Automation"
+			"SPOT_AUTOMATION": "Spot Automation",
+			"SPOT_GROUP": "Spot Group"
 		},
 		"DASHBOARD": {
 			"DASHBOARD": "Dashboard"

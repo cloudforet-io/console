@@ -116,6 +116,14 @@
 			}
 		},
 		"SPOT_AUTOMATION": {
+			"DETAIL": {
+				"TAB_HISTORY": "",
+				"TAB_INSTANCE": "",
+				"TAB_LOAD_BALANCER": "",
+				"TAB_MEMBER": "",
+				"TAB_SUMMARY": "概要情報",
+				"TAB_TAG": "タグ"
+			},
 			"MAIN": {
 				"DASHBOARD": "",
 				"SPOT_GROUP": ""
@@ -687,7 +695,8 @@
 		"AUTOMATION": {
 			"AUTOMATION": "オートメーション",
 			"POWER_SCHEDULER": "パワースケジューラ",
-			"SPOT_AUTOMATION": ""
+			"SPOT_AUTOMATION": "",
+			"SPOT_GROUP": ""
 		},
 		"DASHBOARD": {
 			"DASHBOARD": "ダッシュボード"

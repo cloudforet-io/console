@@ -116,6 +116,14 @@
 			}
 		},
 		"SPOT_AUTOMATION": {
+			"DETAIL": {
+				"TAB_HISTORY": "히스토리",
+				"TAB_INSTANCE": "인스턴스",
+				"TAB_LOAD_BALANCER": "로드밸런서",
+				"TAB_MEMBER": "구성원",
+				"TAB_SUMMARY": "요약정보",
+				"TAB_TAG": "태그"
+			},
 			"MAIN": {
 				"DASHBOARD": "대시보드 ",
 				"SPOT_GROUP": "스팟 그룹"
@@ -687,7 +695,8 @@
 		"AUTOMATION": {
 			"AUTOMATION": "자동화 ",
 			"POWER_SCHEDULER": "파워 스케줄러",
-			"SPOT_AUTOMATION": "스팟 자동화"
+			"SPOT_AUTOMATION": "스팟 자동화",
+			"SPOT_GROUP": "스팟그룹"
 		},
 		"DASHBOARD": {
 			"DASHBOARD": "대시보드 "
