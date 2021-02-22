@@ -22,7 +22,7 @@
 </template>
 
 <script lang="ts">
-import FNB from '@/views/common/components/fnb/FNB.vue';
+import FNB from '@/common/modules/FNB.vue';
 import { PPaneLayout, PIconButton } from '@spaceone/design-system';
 import ProjectMemberTab from '@/views/project/project/modules/ProjectMemberTab.vue';
 

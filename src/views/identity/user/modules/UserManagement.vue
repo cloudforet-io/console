@@ -185,7 +185,7 @@ import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
 import UserForm from '@/views/identity/user/modules/UserForm.vue';
 import UserDetail from '@/views/identity/user/modules/UserDetail.vue';
 import UserAssignedRole from '@/views/identity/user/modules/UserAssignedRole.vue';
-import PTagsPanel from '@/views/common/components/tags/TagsPanel.vue';
+import PTagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
 
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';

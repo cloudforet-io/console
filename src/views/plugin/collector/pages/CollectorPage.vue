@@ -196,8 +196,8 @@ import config from '@/lib/config';
 import { store } from '@/store';
 import { QueryHelper } from '@/lib/query';
 
-const GeneralPageLayout = (): Component => import('@/views/common/components/page-layout/GeneralPageLayout.vue') as Component;
-const TagsPanel = (): Component => import('@/views/common/components/tags/TagsPanel.vue') as Component;
+const GeneralPageLayout = (): Component => import('@/common/components/layouts/GeneralPageLayout.vue') as Component;
+const TagsPanel = (): Component => import('@/common/modules/tags-panel/TagsPanel.vue') as Component;
 const CollectorUpdateModal = (): Component => import('@/views/plugin/collector/modules/CollectorUpdateModal.vue') as Component;
 const CollectDataModal = (): Component => import('@/views/plugin/collector/modules/CollectDataModal.vue') as Component;
 const CollectorDetails = (): Component => import('@/views/plugin/collector/modules/CollectorDetails.vue') as Component;

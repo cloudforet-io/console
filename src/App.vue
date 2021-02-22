@@ -58,10 +58,10 @@ import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar, PLottie,
 } from '@spaceone/design-system';
 
-import GNB from '@/views/common/components/gnb/GNB.vue';
+import GNB from '@/common/modules/gnb/GNB.vue';
 import { Location } from 'vue-router';
 import router from '@/routes';
-import TopNotification from '@/views/common/components/notification/TopNotification.vue';
+import TopNotification from '@/common/components/TopNotification.vue';
 
 export default defineComponent({
     name: 'App',

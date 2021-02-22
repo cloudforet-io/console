@@ -23,7 +23,7 @@
 import {
     ComponentRenderProxy, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
+import VerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.vue';
 import VueI18n from 'vue-i18n';
 import { PDivider } from '@spaceone/design-system';
 

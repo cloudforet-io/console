@@ -148,15 +148,15 @@ import {
 } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
-import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import ProjectTreePanel from '@/views/identity/service-account/modules/ProjectTreePanel.vue';
-import TagsInputGroup from '@/views/common/components/tags/TagsInputGroup.vue';
+import TagsInputGroup from '@/common/components/tags-input-group/TagsInputGroup.vue';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ProviderModel } from '@/views/identity/service-account/type';
 import { TranslateResult } from 'vue-i18n';
-import InfoButton from '@/views/common/components/info-button/InfoButton.vue';
+import InfoButton from '@/common/components/InfoButton.vue';
 
 export default {
     name: 'AddServiceAccountPage',

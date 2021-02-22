@@ -6,7 +6,7 @@ const UserPage = () => import(/* webpackChunkName: "User" */ '@/views/identity/u
 const ServiceAccount = () => import(/* webpackChunkName: "ServiceAccount" */ '@/views/identity/service-account/pages/ServiceAccountPage.vue');
 const AddServiceAccountPage = () => import(/* webpackChunkName: "AddServiceAccount" */ '@/views/identity/service-account/pages/AddServiceAccountPage.vue');
 const ServiceAccountSearchPage = () => import(/* webpackChunkName: "ServiceAccountSearchPage" */ '@/views/identity/service-account/pages/ServiceAccountSearchPage.vue');
-const NoResource = () => import(/* webpackChunkName: "NoResource" */ '@/views/common/pages/NoResource.vue');
+const NoResource = () => import(/* webpackChunkName: "NoResource" */ '@/common/pages/NoResource.vue');
 
 export default {
     path: 'identity',

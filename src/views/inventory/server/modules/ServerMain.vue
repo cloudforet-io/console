@@ -146,14 +146,14 @@ import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/data
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
-import CollectModal from '@/views/common/components/collect-modal/CollectModal.vue';
+import CollectModal from '@/common/modules/collect-modal/CollectModal.vue';
 import ServerDetails from '@/views/inventory/server/modules/ServerDetails.vue';
 import ServerMember from '@/views/inventory/server/modules/ServerMember.vue';
 import ServerHistory from '@/views/inventory/server/modules/ServerHistory.vue';
-import Monitoring from '@/views/common/components/monitoring/Monitoring.vue';
-import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
-import ProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
-import { MonitoringProps, MonitoringResourceType } from '@/views/common/components/monitoring/type';
+import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
+import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
+import ProjectTreeModal from '@/common/modules/ProjectTreeModal.vue';
+import { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';

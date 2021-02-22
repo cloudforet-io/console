@@ -174,7 +174,7 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
+import PVerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.vue';
 
 import {
     PI, PPageTitle, PBreadcrumbs, PIconTextButton, PButtonModal, PButton, PDropdownMenuBtn,
@@ -190,13 +190,13 @@ import {
     ProjectGroup, ProjectItemResp, ProjectTreeItem,
 } from '@/views/project/project/type';
 import ProjectCardList from '@/views/project/project/modules/ProjectCardList.vue';
-import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
+import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { FavoriteItem } from '@/store/modules/favorite/type';
-import FavoriteList from '@/views/common/components/favorites/FavoriteList.vue';
+import FavoriteList from '@/common/modules/favorite-list/FavoriteList.vue';
 import ProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import ProjectGroupMemberPage from '@/views/project/project/modules/ProjectGroupMemberPage.vue';
 import { PERMISSION_TYPE } from '@/views/project/project/lib/config';
-import TopNotification from '@/views/common/components/notification/TopNotification.vue';
+import TopNotification from '@/common/components/TopNotification.vue';
 
 
 export default {

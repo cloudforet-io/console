@@ -138,7 +138,7 @@ import {
 } from '@vue/composition-api';
 
 /* Components */
-import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 
 import {
     PI, PDivider, PProgressBar, PPageTitle, PBreadcrumbs, PSearchGridLayout, PIconTextButton,

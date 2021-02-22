@@ -16,7 +16,7 @@ import {
 import { PBreadcrumbs } from '@spaceone/design-system';
 
 import ServerMain from '@/views/inventory/server/modules/ServerMain.vue';
-import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import { store } from '@/store';
 
 

@@ -100,7 +100,7 @@ import {
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
-import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 
 import { SupervisorPluginModel } from '@/views/management/supervisor/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';

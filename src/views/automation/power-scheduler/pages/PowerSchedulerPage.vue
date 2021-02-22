@@ -86,7 +86,7 @@ import {
     PSelectableList, PBreadcrumbs, PIconTextButton, PDivider, PLottie,
 } from '@spaceone/design-system';
 
-import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
+import VerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.vue';
 import ScheduleDetail from '@/views/automation/power-scheduler/modules/ScheduleDetail.vue';
 import { SCHEDULE_STATUS, Schedule } from '@/views/automation/power-scheduler/type';
 

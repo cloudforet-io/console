@@ -148,9 +148,9 @@ import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/ty
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 /* components */
-import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
-import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
-import ProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
+import PVerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.vue';
+import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
+import ProjectTreeModal from '@/common/modules/ProjectTreeModal.vue';
 
 /* page modules */
 import ServiceAccountDetails from '@/views/identity/service-account/modules/ServiceAccountDetails.vue';

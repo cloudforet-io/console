@@ -145,7 +145,7 @@ import {
 import { QuerySearchTableFunctions } from '@spaceone/design-system/dist/src/data-display/tables/query-search-table/type';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
-import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import CollectorHistoryJob from '@/views/management/collector-history/modules/CollectorHistoryJob.vue';
 import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectorHistoryChart.vue';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';

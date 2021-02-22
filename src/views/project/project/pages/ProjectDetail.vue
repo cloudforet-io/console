@@ -91,12 +91,12 @@ import {
 
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
-import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
-import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
-import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
+import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
+import FavoriteButton from '@/common/modules/FavoriteButton.vue';
+import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
 import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 
-import ProjectDashboard from '@/views/project/project/modules/ProjectDashboard.vue';
+import ProjectDashboard from '@/views/project/project/modules/project-dashboard/ProjectDashboard.vue';
 import ProjectMemberTab from '@/views/project/project/modules/ProjectMemberTab.vue';
 import ProjectReportTab from '@/views/project/project/modules/ProjectReportTab.vue';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';

@@ -62,7 +62,7 @@ import {
 
 import { PDivider, PI } from '@spaceone/design-system';
 
-import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
+import VerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.vue';
 import { store } from '@/store';
 import router from '@/routes';
 import VueI18n from 'vue-i18n';

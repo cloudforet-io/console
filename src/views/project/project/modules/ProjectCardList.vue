@@ -122,20 +122,17 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PCheckBox, PSkeleton, PI, PIconTextButton,
-    PToolbox, PDataLoader,
+    PSkeleton, PI, PIconTextButton, PToolbox, PDataLoader,
 } from '@spaceone/design-system';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { getPageStart } from '@/lib/component-utils/pagination';
 import { ProjectGroup } from '@/views/project/project/type';
 import { range, uniq } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
-import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
+import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { QueryHelper } from '@/lib/query';
-import { PERMISSION_TYPE } from '@/views/project/project/lib/config';
 
 interface Props {
     searchText: string;
@@ -155,7 +152,6 @@ export default {
         FavoriteButton,
         PI,
         PSkeleton,
-        PCheckBox,
         PToolbox,
         PDataLoader,
     },

@@ -41,7 +41,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive,
 } from '@vue/composition-api';
 
-import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import SpotGroupDetailDashboard from '@/views/automation/spot-automation/modules/SpotGroupDetailDashboard.vue';
 
 export default {

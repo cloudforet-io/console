@@ -118,7 +118,7 @@ import {
 } from '@spaceone/design-system';
 
 import PluginFilter from '@/views/plugin/collector/modules/PluginFilter.vue';
-import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
+import PVerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';

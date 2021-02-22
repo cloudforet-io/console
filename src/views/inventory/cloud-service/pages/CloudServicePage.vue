@@ -166,15 +166,15 @@ import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/data
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import ServerMain from '@/views/inventory/server/modules/ServerMain.vue';
-import VerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
-import ProjectTreeModal from '@/views/common/components/tree-modal/ProjectTreeModal.vue';
-import Monitoring from '@/views/common/components/monitoring/Monitoring.vue';
+import VerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.vue';
+import ProjectTreeModal from '@/common/modules/ProjectTreeModal.vue';
+import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 import CloudServiceDetail from '@/views/inventory/cloud-service/modules/CloudServiceDetail.vue';
 import CloudServiceAdmin from '@/views/inventory/cloud-service/modules/CloudServiceAdmin.vue';
 import CloudServiceHistory from '@/views/inventory/cloud-service/modules/CloudServiceHistory.vue';
-import SCollectModal from '@/views/common/components/collect-modal/CollectModal.vue';
-import TagsPanel from '@/views/common/components/tags/TagsPanel.vue';
-import { MonitoringProps, MonitoringResourceType } from '@/views/common/components/monitoring/type';
+import SCollectModal from '@/common/modules/collect-modal/CollectModal.vue';
+import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
+import { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
 import { ProjectItemResp } from '@/views/project/project/type';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';

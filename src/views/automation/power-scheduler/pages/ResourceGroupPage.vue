@@ -150,7 +150,7 @@ import {
 import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 
 import { makeProxy } from '@/lib/compostion-util';
-import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
+import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';

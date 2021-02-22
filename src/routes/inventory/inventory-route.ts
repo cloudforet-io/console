@@ -6,7 +6,7 @@ const CloudServiceTypeSearch = () => import(/* webpackChunkName: "CloudServiceTy
 
 const Server = () => import(/* webpackChunkName: "Server" */ '@/views/inventory/server/pages/ServerPage.vue');
 const CloudService = () => import(/* webpackChunkName: "CloudService" */ '@/views/inventory/cloud-service/pages/CloudServiceType.vue');
-const NoResource = () => import(/* webpackChunkName: "NoResource" */ '@/views/common/pages/NoResource.vue');
+const NoResource = () => import(/* webpackChunkName: "NoResource" */ '@/common/pages/NoResource.vue');
 
 export default {
     path: 'inventory',

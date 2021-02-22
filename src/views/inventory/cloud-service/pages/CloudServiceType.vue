@@ -189,7 +189,7 @@ import {
     PIconTextButton, PBreadcrumbs, PRadio, PI, PDivider, PToolbox, PDataLoader,
 } from '@spaceone/design-system';
 
-import PVerticalPageLayout from '@/views/common/components/page-layout/VerticalPageLayout.vue';
+import PVerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.vue';
 
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { getPageStart, getThisPage } from '@/lib/component-utils/pagination';
@@ -201,9 +201,9 @@ import {
 } from '@/lib/router-query-string';
 import { Tags, TimeStamp } from '@/models';
 import { store } from '@/store';
-import FavoriteList from '@/views/common/components/favorites/FavoriteList.vue';
+import FavoriteList from '@/common/modules/favorite-list/FavoriteList.vue';
 import { FavoriteItem } from '@/store/modules/favorite/type';
-import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
+import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
 

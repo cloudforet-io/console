@@ -69,7 +69,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import {
     ProjectGroup, ProjectItemResp, ProjectState, ProjectTreeItem,
 } from '@/views/project/project/type';
-import FavoriteButton from '@/views/common/components/favorites/FavoriteButton.vue';
+import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 
 interface TreeSearchResp {
     // eslint-disable-next-line camelcase

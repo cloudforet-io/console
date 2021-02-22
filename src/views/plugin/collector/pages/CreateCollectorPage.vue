@@ -79,8 +79,8 @@ import {
     PProgressWizard, PSelectDropdown, PLazyImg, PIconTextButton, PBreadcrumbs, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
 
-import GeneralPageLayout from '@/views/common/components/page-layout/GeneralPageLayout.vue';
-import TagsInputGroup from '@/views/common/components/tags/TagsInputGroup.vue';
+import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
+import TagsInputGroup from '@/common/components/tags-input-group/TagsInputGroup.vue';
 import ConfirmCredentials from '@/views/plugin/collector/modules/ConfirmCredentials.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';

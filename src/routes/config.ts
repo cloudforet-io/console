@@ -1,8 +1,8 @@
 // Views
-import ErrorPage from '@/views/common/pages/ErrorPage.vue';
+import ErrorPage from '@/common/pages/ErrorPage.vue';
 import SignIn from '@/views/sign-in/pages/SignIn.vue';
 import DomainAdminSignIn from '@/views/sign-in/pages/DomainAdminSignIn.vue';
-import SignOut from '@/views/common/pages/SignOut.vue';
+import SignOut from '@/common/pages/SignOut.vue';
 import KEYCLOAK from '@/views/sign-in/pages/KeycloakPage.vue';
 
 // Routes
