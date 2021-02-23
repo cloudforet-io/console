@@ -639,28 +639,28 @@ export default {
             }
         }
         &.compute {
-            width: 8.5rem;
+            min-width: 8.5rem;
         }
         &.container {
-            width: 8.875rem;
+            min-width: 8.875rem;
         }
         &.database {
-            width: 8.625rem;
+            min-width: 8.625rem;
         }
         &.networking {
-            width: 9.75rem;
+            min-width: 9.75rem;
         }
         &.storage {
-            width: 9.625rem;
+            min-width: 9.625rem;
         }
         &.security {
-            width: 8rem;
+            min-width: 8rem;
         }
         &.analytics {
-            width: 8.375rem;
+            min-width: 8.375rem;
         }
         &.all {
-            width: 10.5rem;
+            min-width: 10.5rem;
         }
     }
 }
