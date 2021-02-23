@@ -39,6 +39,7 @@ export interface TreeItem<T=any> extends TreeNode {
     addChild: (data: T) => Promise<TreeItem>;
     startEdit: (value?: string) => void;
     finishEdit: (afterFinishEdit?: (node: TreeItem<T>) => void) => void;
+    findChildNode: (id: string|number) => TreeItem|null;
     setData: (data: T) => void;
     setChildren: (children: T[] | boolean) => Promise<TreeItem[]>;
     addChildren: (children: T[]) => Promise<TreeItem[]>;

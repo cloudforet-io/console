@@ -140,7 +140,7 @@ export default {
                 return;
             }
             item.setLoading(true);
-            const res = await getChildrenData();
+            const res = await getChildrenData(item);
             item.setChildren(res);
             item.setLoading(false);
             item.setExpanded(true);

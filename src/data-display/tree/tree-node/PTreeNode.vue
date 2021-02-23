@@ -331,7 +331,7 @@ export default {
                     const res = await getChildrenNodes();
                     return res.filter(d => ids[d._id]);
                 },
-                findChildNode(id: string) {
+                findChildNode(id: string|number): TreeItem|null {
                     if (!Array.isArray(state.childrenRef)) return null;
                     const item = state.childrenRef.find(d => d.node._id === id);
                     if (item) return item.node;
