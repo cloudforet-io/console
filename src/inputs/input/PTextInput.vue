@@ -30,6 +30,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        focus: {
+            type: Boolean,
+            default: false,
+        },
     },
     render(h, { data, props, listeners }) {
         return h('input', {
@@ -48,6 +52,9 @@ export default {
             domProps: {
                 value: props.value,
             },
+            ...(data.directives?.length && {
+                directives: [data.directives[0]],
+            }),
             on: {
                 ...listeners,
                 input: (event) => {
