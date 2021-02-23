@@ -168,7 +168,6 @@ export default {
     display: flex;
     width: 100%;
     flex-direction: row;
-    z-index: 1;
     padding: 0;
     margin: unset;
 }
