@@ -6,7 +6,7 @@ export interface TreeNodeState {
 }
 
 export interface TreeNode<T=any> extends TreeNodeState {
-    _id: string;
+    _id: string|number;
     data: T;
     children?: TreeNode<T>[] | boolean;
 }

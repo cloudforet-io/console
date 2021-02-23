@@ -24,7 +24,9 @@
 </template>
 
 <script lang="ts">
-export default {
+import { defineComponent } from '@vue/composition-api';
+
+export default defineComponent({
     name: 'PFieldGroup',
     props: {
         label: {
@@ -56,7 +58,7 @@ export default {
             default: false,
         },
     },
-};
+});
 </script>
 
 <style lang="postcss">

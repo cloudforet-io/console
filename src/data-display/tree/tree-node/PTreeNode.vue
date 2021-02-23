@@ -129,7 +129,7 @@
 <script lang="ts">
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, UnwrapRef,
+    computed, defineComponent, getCurrentInstance, reactive, toRefs, UnwrapRef,
 } from '@vue/composition-api';
 import PI from '@/foundation/icons/PI.vue';
 import { makeProxy } from '@/util/composition-helpers';
@@ -146,10 +146,14 @@ import VueDraggable from 'vuedraggable';
 
 const PTreeNode = import('@/data-display/tree/tree-node/PTreeNode.vue');
 
-export default {
+export default defineComponent({
     name: 'PTreeNode',
     components: {
-        PFieldGroup, PTextInput, PI, PTreeNode, VueDraggable,
+        PFieldGroup,
+        PTextInput: (PTextInput as any),
+        PI,
+        PTreeNode: (PTreeNode as any),
+        VueDraggable,
     },
     directives: { focus },
     props: {
@@ -391,25 +395,23 @@ export default {
             if (props.dragOptions.dragValidator) {
                 let res: any = props.dragOptions.dragValidator(state.node);
                 if (res instanceof Promise) res = await res;
-                if (!res) return;
+                // TODO
             }
-            console.log('onDragChoose', e);
         };
 
         const onDragStart = (e) => {
-            console.log('drag start', e);
             state.draggingChild = proxyNode.children[e.oldIndex];
             emit('start-drag', proxyNode.children[e.oldIndex]);
         };
 
         const onDragEnd = (e) => {
-            console.log('drag end', e);
             state.draggingChild = null;
             emit('end-drag');
         };
 
         const checkMove = (e) => {
-            console.log('checkMove', e.draggedContext.element);
+            const validator = props.dragOptions.dropValidator;
+            if (validator) validator(e.draggedContext.element);
             return true;
         };
 
@@ -454,7 +456,7 @@ export default {
             childListeners,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">

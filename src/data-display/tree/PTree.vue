@@ -28,10 +28,13 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import PTreeNode from '@/data-display/tree/tree-node/PTreeNode.vue';
 import {
+    DragOptions,
+    EditOptions,
+    SelectOptions,
     TreeItem, TreeNode,
 } from '@/data-display/tree/tree-node/type';
 import { makeOptionalProxy } from '@/util/composition-helpers';
@@ -44,9 +47,23 @@ const findParentWithLevel = (item: TreeItem, level: number): TreeItem|null => {
     return findParentWithLevel(item.parent, level);
 };
 
-export default {
+
+interface Props {
+    padSize?: string;
+    disableToggle?: boolean;
+    selectOptions?: SelectOptions;
+    editOptions?: EditOptions;
+    dragOptions?: DragOptions;
+    idKey: string|number;
+    childrenKey?: string|number;
+    selectedNodes?: TreeItem[];
+    fetchOnInit?: boolean;
+    dataFetcher?: ((item?: TreeItem) => Promise<any[]|boolean>|any[]|boolean);
+    nodeFormatter?: (node: TreeNode) => TreeNode;
+}
+export default defineComponent<Props>({
     name: 'PTree',
-    components: { PTreeNode },
+    components: { PTreeNode: PTreeNode as any },
     props: {
         padSize: {
             type: String,
@@ -80,6 +97,10 @@ export default {
             type: Array,
             default: undefined,
         },
+        fetchOnInit: {
+            type: Boolean,
+            default: false,
+        },
         dataFetcher: {
             type: Function,
             default: () => ([]),
@@ -103,10 +124,17 @@ export default {
 
 
         const getDefaultNode = (data): TreeNode => {
+            let children: any[]|boolean = props.childrenKey
+                ? get<any[]|boolean>(data, props.childrenKey, false)
+                : false;
+            if (!props.dataFetcher && Array.isArray(children)) {
+                children = children.map(d => getDefaultNode(d));
+            }
+
             const node = {
-                _id: get(data, props.idKey, Math.floor(Math.random() * Date.now())),
+                _id: get<string|number>(data, props.idKey, Math.floor(Math.random() * Date.now())),
                 data,
-                children: get(data, props.childrenKey, false),
+                children,
                 expanded: false,
                 selected: false,
                 loading: false,
@@ -117,6 +145,7 @@ export default {
         };
 
         const getChildrenData = async (item?: TreeItem) => {
+            if (!props.dataFetcher) return false;
             let res = props.dataFetcher(item);
             if (res instanceof Promise) res = await res;
             return res;
@@ -126,7 +155,7 @@ export default {
         const onInit = async (root: TreeItem) => {
             state.root = root;
 
-            if (props.dataFetcher) {
+            if (props.fetchOnInit && props.dataFetcher) {
                 const res = await getChildrenData();
                 await root.setChildren(res);
             }
@@ -161,13 +190,6 @@ export default {
         };
 
 
-        const checkForSingleSelect = (item: TreeItem) => {
-            if (state.firstSelectedNode) {
-                if (state.firstSelectedNode._id === item._id) return;
-                state.firstSelectedNode.setSelected(false, true);
-            }
-        };
-
         const checkSingleSelect = (item: TreeItem, selected) => {
             if (selected) {
                 if (state.firstSelectedNode) {
@@ -185,6 +207,7 @@ export default {
             }
         };
 
+        // TODO: Apply multi select case
         const checkMultiSelect = (item: TreeItem, selected, cb) => {
             if (selected) {
                 const selectedIdx = proxyState.selectedNodes.findIndex(d => item._id === d._id);
@@ -206,9 +229,9 @@ export default {
         };
 
         const onClickNode = (item: TreeItem) => {
-            if (props.selectOptions.disabled || item.disabled) return;
+            if (props.selectOptions?.disabled || item.disabled) return;
 
-            const validator = props.selectOptions.validator;
+            const validator = props.selectOptions?.validator;
             if (validator && !validator(item)) return;
 
             if (state.firstSelectedNode) {
@@ -260,7 +283,7 @@ export default {
             onEndDrag,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
