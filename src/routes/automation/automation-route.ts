@@ -72,16 +72,16 @@ export default {
                     ],
                 },
                 {
-                    path: 'spot-group/:id',
-                    name: 'spotGroupDetail',
-                    props: true,
-                    component: SpotGroupDetailPage,
-                },
-                {
                     path: 'spot-group/add',
                     name: 'addSpotGroup',
                     props: true,
                     component: AddSpotGroupPage,
+                },
+                {
+                    path: 'spot-group/:id',
+                    name: 'spotGroupDetail',
+                    props: true,
+                    component: SpotGroupDetailPage,
                 },
             ],
         },
