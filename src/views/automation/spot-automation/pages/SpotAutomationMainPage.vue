@@ -5,13 +5,13 @@
                 {{ $t('MENU.AUTOMATION.SPOT_AUTOMATION') }}
             </p>
             <p-divider class="sidebar-divider" />
-            <div v-for="(item) in menuList" :key="item.label"
-                 class="menu-item"
-                 :class="{'selected': item.label === selectedItem.label}"
-                 @click="showPage(item.routeName)"
+            <aside v-for="(item) in menuList" :key="item.label"
+                   class="menu-item"
+                   :class="{'selected': item.label === selectedItem.label}"
+                   @click="showPage(item.routeName)"
             >
                 {{ item.label }}
-            </div>
+            </aside>
         </template>
         <template #default>
             <router-view />

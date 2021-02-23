@@ -70,7 +70,7 @@
                                    class="dropdown"
                 />
             </p-field-group>
-            <form v-if="formState.selectedAuthType.label === 'Local'"
+            <form v-if="formState.selectedAuthType.label === 'Local' && !updateMode"
                   class="form"
             >
                 <p-field-group

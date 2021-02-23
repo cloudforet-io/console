@@ -1,16 +1,16 @@
 <template>
-    <fragment>
+    <section>
         <p-breadcrumbs :routes="routeState.route" />
-        <div class="page-title">
+        <section class="page-title">
             <p-page-title :title="$t('AUTOMATION.SPOT_AUTOMATION.MAIN.SPOT_GROUP')" use-total-count :total-count="totalCount" />
             <router-link :to="{ name: 'addSpotGroup' }">
                 <p-icon-text-button style-type="primary-dark" outline name="ic_plus_bold"
                                     class="add-spot-group-btn"
                 >
-                    {{$t('AUTOMATION.SPOT_AUTOMATION.SPOT_GROUP_LIST.ADD_SPOT_GROUP')}}
+                    {{ $t('AUTOMATION.SPOT_AUTOMATION.SPOT_GROUP_LIST.ADD_SPOT_GROUP') }}
                 </p-icon-text-button>
             </router-link>
-        </div>
+        </section>
         <p-divider class="spot-group-divider" />
         <p-toolbox filters-visible
                    search-type="query"
@@ -22,7 +22,8 @@
                    @change="onChange"
                    @refresh="onChange"
         />
-    </fragment>
+        <spot-group-card />
+    </section>
 </template>
 
 <script lang="ts">
@@ -36,6 +37,7 @@ import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dyna
 import { QueryHelper } from '@/lib/query';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { getThisPage } from '@/lib/component-utils/pagination';
+import SpotGroupCard from '@/views/automation/spot-automation/modules/SpotGroupCard.vue';
 
 // TODO: change handlers with spot automation spec
 const handlers = makeQuerySearchPropsWithSearchSchema(
@@ -56,6 +58,7 @@ const handlers = makeQuerySearchPropsWithSearchSchema(
 export default {
     name: 'SpotGroupPage',
     components: {
+        SpotGroupCard,
         PBreadcrumbs,
         PPageTitle,
         PDivider,
