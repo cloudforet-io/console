@@ -1,0 +1,174 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PTree from './PTree.vue';
+import PI from '@/foundation/icons/PI.vue'
+import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue'
+import PButton from '@/inputs/buttons/button/PButton.vue'
+import PRadio from '@/inputs/radio/PRadio.vue'
+import PTextInput from '@/inputs/input/PTextInput.vue';
+import { reactive, toRefs, computed, watch } from '@vue/composition-api';
+import {getTreeList, getTreeData, getTreeNode, getRecursiveInfo} from './mock';
+import './PTree.stories.scss'
+
+<Meta title='Data Display/Tree' argTypes={{}}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PTree, PI, PIconButton, PButton, PRadio, PTextInput },
+    template: `
+    <div class="h-full w-full p-4 overflow-auto">
+        <div class="mb-4">
+            <p-button style-type="primary1" @click="refresh">Refresh</p-button>
+            <p-button style-type="secondary" @click="add">Add node to root</p-button>
+            <p-button style-type="safe" @click="dragOptions.disabled = !dragOptions.disabled">
+                {{dragOptions.disabled ? 'Enable drag' : 'Disable drag' }}
+            </p-button>
+            <p-button style-type="primary" @click="bulkAdd">Bulk Add to root</p-button>
+        </div>
+        <div class="p-tree-template flex flex-wrap">
+            <p-tree id-key="id"
+                    children-key="has_child"
+                    :selected-nodes.sync="selectedNodes"
+                    :data-fetcher="dataFetcher"
+                    :select-options="selectOptions"
+                    :edit-options="editOptions"
+                    :drag-options="dragOptions"
+                    @init="onTreeInit"
+                    class="w-1/2"
+            >
+                <template #data="{node}">
+                    {{ node.data.name }}
+                </template>
+                <template #toggle="{node}">
+                    <p-i v-if="node.loading" name="ic_working"
+                         width="1rem" height="1rem"
+                    />
+                    <p-radio v-else-if="node.data.item_type === 'PROJECT'"
+                             :selected="node.selected" :value="true"
+                             @click.stop="node.setSelected(true)"
+                    />
+                </template>
+                <template #toggle-right>
+                    <p-i name="ic_bookmark"
+                         width="1rem" height="1rem"
+                         color="transparent inherit"
+                    />
+                </template>
+                <template #icon="{node}">
+                    <p-i :name="node.data.item_type === 'PROJECT' ? 'ic_tree_project' : 'ic_tree_project-group'"
+                         width="1rem" height="1rem" color="inherit transparent"
+                    />
+                </template>
+                <template #right-extra="{node}">
+                    <p-icon-button name="ic_minus"
+                                   color="inherit transparent"
+                                   size="sm"
+                                   :disabled="node.disabled"
+                                   @click.stop="node.deleteNode()"
+                    />
+                    <p-icon-button name="ic_plus"
+                                   size="sm"
+                                   :disabled="node.disabled"
+                                   @click.stop="node.addChild(getTreeData())"
+                    />
+                    <p-icon-button name="ic_edit-text"
+                                   size="sm"
+                                   :disabled="node.disabled"
+                                   @click.stop="node.startEdit(node.data.name)"
+                    />
+                    <p-icon-button :name="node.disabled ? 'ic_tree_project-group' : 'ic_tree_project-group_locked'"
+                                   size="sm"
+                                   color="inherit"
+                                   @click.stop="node.setDisabled(!node.disabled)"
+                    />
+                </template>
+            </p-tree>
+            <div class="p-4 w-1/2">
+                <pre>{{selectedNodes.map(d => d.data)}}</pre>
+            </div>
+        </div>
+    </div>
+    `,
+    setup() {
+        const state = reactive({
+            root: null,
+            selectedNodes: [],
+            firstSelectedNode: computed(() => state.selectedNodes[0] || null),
+            selectOptions: {
+                validator({data}) {
+                    return data.item_type === 'PROJECT'
+                }
+            },
+            editOptions: {
+                validator: (text) => (text && text.length > 2 && text.length < 40),
+                invalidText: 'should NOT be shorter than 2 characters',
+                validText: '2 ~ 40 characters',
+                dataSetter(text, originData) {
+                    return {
+                        ...originData,
+                        name: text
+                    }
+                },
+            },
+            dragOptions: {
+                disabled: false,
+            },
+        })
+        const dataFetcher = () => {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    resolve(getTreeList())
+                }, 500)
+            })
+        }
+        const refresh = async () => {
+            if (state.root) {
+                state.selectedNodes = []
+                const res = await dataFetcher()
+                await state.root.setChildren(res)
+            }
+        }
+        const add = () => {
+            state.root.addChild(getTreeData())
+        }
+        const bulkAdd = async () => {
+            const {lists, paths} = getRecursiveInfo()
+            let node = state.root;
+            for(let i = 0; i < lists.length; i++) {
+                const id = paths[i];
+                const children = lists[i];
+                await node.addChildren(children)
+                node = node.findChildNode(id)
+                if (node) {
+                    if (i === lists.length - 1) node.setSelected(true)
+                    else node.setExpanded(true)
+                }
+            }
+        }
+        const onTreeInit = async (root) => {
+            state.root = root;
+        }
+        return {
+            ...toRefs(state),
+            dataFetcher,
+            refresh,
+            add,
+            bulkAdd,
+            onTreeInit,
+            getTreeData,
+            getTreeNode,
+        }
+    }
+});
+
+
+# Tree
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+

@@ -1,0 +1,12 @@
+.p-tree-template {
+    .p-tree {
+        .p-tree-node .tree-row {
+            .right-extra {
+                display: none;
+            }
+            &:hover .node .right-extra {
+                display: block;
+            }
+        }
+    }
+}
