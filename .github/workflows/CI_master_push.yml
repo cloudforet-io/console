@@ -20,6 +20,7 @@ jobs:
       version: ${{ steps.job1.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v2
+        submodules: 'recursive'
       - name: calculate current date
         run: |
           sudo ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
@@ -37,6 +38,7 @@ jobs:
       VERSION: ${{ needs.versioning.outputs.version }}
     steps:
       - uses: actions/checkout@v2
+        submodules: 'recursive'
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
@@ -63,6 +65,8 @@ jobs:
           file: ./build_Dockerfile
           push: true
           tags: pyengine/build:console
+          cache-from: pyengine/build:console
+          cache-to: pyengine/build:console
       -
         name: Build and push
         uses: docker/build-push-action@v2
