@@ -1,5 +1,5 @@
 '<template>
-    <p-vertical-layout v-bind="$props" v-on="$listeners">
+    <p-vertical-layout v-bind="$props" v-on="$listeners" class="vertical-page-layout">
         <template #sidebar="prop">
             <slot name="sidebar"
                   :width="prop.width"

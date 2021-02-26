@@ -106,4 +106,12 @@ export default {
         @apply bg-blue-200 text-blue-500 cursor-pointer;
     }
 }
+
+.vertical-page-layout::v-deep {
+    .right-container {
+        .page-contents {
+            padding: 0;
+        }
+    }
+}
 </style>

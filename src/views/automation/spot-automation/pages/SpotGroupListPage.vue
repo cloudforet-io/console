@@ -1,5 +1,5 @@
 <template>
-    <section>
+    <section class="spot-group-list-wrapper">
         <p-breadcrumbs :routes="routeState.route" />
         <section class="page-title">
             <p-page-title :title="$t('AUTOMATION.SPOT_AUTOMATION.MAIN.SPOT_GROUP')" use-total-count :total-count="totalCount" />
@@ -119,6 +119,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.spot-group-list-wrapper {
+    padding: 2rem 1.5rem;
+}
 .page-title {
     display: flex;
     justify-content: space-between;
