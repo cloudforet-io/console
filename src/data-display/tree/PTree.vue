@@ -155,6 +155,7 @@ export default defineComponent<Props>({
         const rootFunctions = {
             async findNode<T>(id: string|number, paths: Array<string|number>): Promise<TreeItem<T>|null> {
                 let node: TreeItem<T> = state.root;
+                if (!node) return null;
 
                 for (let i = 0; i < paths.length; i++) {
                     const childId = paths[i];
