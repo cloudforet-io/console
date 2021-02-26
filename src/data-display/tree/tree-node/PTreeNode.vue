@@ -273,7 +273,7 @@ export default defineComponent({
                 deleteNode() {
                     emit('delete', state.node);
                 },
-                async addChild(data): Promise<TreeItem> {
+                async addChild<T>(data): Promise<TreeItem<T>> {
                     const newNode = props.getDefaultNode(data);
                     if (Array.isArray(proxyNode.children)) proxyNode.children.push(newNode);
                     else {
@@ -308,7 +308,7 @@ export default defineComponent({
                 setData(data) {
                     proxyNode.data = data;
                 },
-                async setChildren(children): Promise<TreeItem[]> {
+                async setChildren<T>(children): Promise<TreeItem<T>[]> {
                     if (Array.isArray(children)) {
                         proxyNode.children = children.map(d => props.getDefaultNode(d));
                     } else proxyNode.children = children;
@@ -316,7 +316,7 @@ export default defineComponent({
                     const res = await getChildrenNodes();
                     return res;
                 },
-                async addChildren(children: any[]): Promise<TreeItem[]> {
+                async addChildren<T>(children: any[]): Promise<TreeItem<T>[]> {
                     const ids = {};
                     if (Array.isArray(proxyNode.children)) {
                         proxyNode.children.push(...children.map((d) => {
@@ -335,7 +335,7 @@ export default defineComponent({
                     const res = await getChildrenNodes();
                     return res.filter(d => ids[d._id]);
                 },
-                findChildNode(id: string|number): TreeItem|null {
+                findChildNode<T>(id: string|number): TreeItem<T>|null {
                     if (!Array.isArray(state.childrenRef)) return null;
                     const item = state.childrenRef.find(d => d.node._id === id);
                     if (item) return item.node;

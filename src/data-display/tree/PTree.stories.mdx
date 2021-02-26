@@ -5,6 +5,7 @@ import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue'
 import PButton from '@/inputs/buttons/button/PButton.vue'
 import PRadio from '@/inputs/radio/PRadio.vue'
 import PTextInput from '@/inputs/input/PTextInput.vue';
+import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
 import { reactive, toRefs, computed, watch } from '@vue/composition-api';
 import {getTreeList, getTreeData, getTreeNode, getRecursiveInfo} from './mock';
 import './PTree.stories.scss'
@@ -14,7 +15,7 @@ import './PTree.stories.scss'
 
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
-    components: { PTree, PI, PIconButton, PButton, PRadio, PTextInput },
+    components: { PTree, PI, PIconButton, PButton, PRadio, PTextInput, PFieldGroup },
     template: `
     <div class="h-full w-full p-4 overflow-auto">
         <div class="mb-4">
@@ -23,7 +24,8 @@ export const Template = (args, { argTypes }) => ({
             <p-button style-type="safe" @click="dragOptions.disabled = !dragOptions.disabled">
                 {{dragOptions.disabled ? 'Enable drag' : 'Disable drag' }}
             </p-button>
-            <p-button style-type="primary" @click="bulkAdd">Bulk Add to root</p-button>
+            <p-button style-type="primary" @click="findNode">Find node</p-button>
+            {{target}}
         </div>
         <div class="p-tree-template flex flex-wrap">
             <p-tree id-key="id"
@@ -33,11 +35,12 @@ export const Template = (args, { argTypes }) => ({
                     :select-options="selectOptions"
                     :edit-options="editOptions"
                     :drag-options="dragOptions"
+                    fetch-on-init
                     @init="onTreeInit"
                     class="w-1/2"
             >
                 <template #data="{node}">
-                    {{ node.data.name }}
+                    {{ node.data.name }} ({{node.data.id}})
                 </template>
                 <template #toggle="{node}">
                     <p-i v-if="node.loading" name="ic_working"
@@ -113,11 +116,17 @@ export const Template = (args, { argTypes }) => ({
             dragOptions: {
                 disabled: false,
             },
+            findMode: false,
+            lists: [],
+            target: ''
         })
-        const dataFetcher = () => {
+        let dataFetcher = (item) => {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
-                    resolve(getTreeList())
+                    if (state.findMode) {
+                        resolve(state.lists[item ? item.level : 0])
+                    }
+                    else resolve(getTreeList())
                 }, 500)
             })
         }
@@ -131,19 +140,16 @@ export const Template = (args, { argTypes }) => ({
         const add = () => {
             state.root.addChild(getTreeData())
         }
-        const bulkAdd = async () => {
+        const findNode = async () => {
             const {lists, paths} = getRecursiveInfo()
-            let node = state.root;
-            for(let i = 0; i < lists.length; i++) {
-                const id = paths[i];
-                const children = lists[i];
-                await node.addChildren(children)
-                node = node.findChildNode(id)
-                if (node) {
-                    if (i === lists.length - 1) node.setSelected(true)
-                    else node.setExpanded(true)
-                }
+            state.findMode = true;
+            state.lists = lists;
+            state.target = paths[paths.length - 1];
+            if (state.root) {
+                const res = await state.root.findNode(state.target, paths);
+                if(res) res.setSelected(true)
             }
+            state.findMode = false;
         }
         const onTreeInit = async (root) => {
             state.root = root;
@@ -153,10 +159,10 @@ export const Template = (args, { argTypes }) => ({
             dataFetcher,
             refresh,
             add,
-            bulkAdd,
             onTreeInit,
             getTreeData,
             getTreeNode,
+            findNode,
         }
     }
 });

@@ -27,6 +27,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable no-await-in-loop */
 import {
     ComponentRenderProxy, computed, defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
@@ -151,16 +152,44 @@ export default defineComponent<Props>({
             return res;
         };
 
+        const rootFunctions = {
+            async findNode<T>(id: string|number, paths: Array<string|number>): Promise<TreeItem<T>|null> {
+                let node: TreeItem<T> = state.root;
+
+                for (let i = 0; i < paths.length; i++) {
+                    const childId = paths[i];
+                    let next: TreeItem<T>|null = node.findChildNode(childId);
+
+                    if (!next) {
+                        const children = await getChildrenData(i === 0 ? undefined : node);
+                        if (Array.isArray(children)) {
+                            await node.setChildren(children);
+                            next = node.findChildNode(childId);
+                            if (!next) return null;
+                        } else return null;
+                    }
+
+                    if (i < paths.length - 1) {
+                        next.setExpanded(true);
+                    }
+
+                    node = next;
+                }
+
+                return node;
+            },
+        };
+
 
         const onInit = async (root: TreeItem) => {
-            state.root = root;
+            state.root = { ...root, ...rootFunctions };
 
             if (props.fetchOnInit && props.dataFetcher) {
                 const res = await getChildrenData();
                 await root.setChildren(res);
             }
 
-            vm.$emit('init', root);
+            vm.$emit('init', state.root);
         };
 
         const onToggle = async (item: TreeItem) => {
@@ -260,6 +289,7 @@ export default defineComponent<Props>({
 
             vm.$emit('delete', item.data);
         };
+
 
         const onStartDrag = (item: TreeItem) => {
             state.draggingNode = item;

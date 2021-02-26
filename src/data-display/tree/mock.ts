@@ -30,7 +30,7 @@ export const getRecursiveInfo = () => {
         // set last item leaf
         if (listIdx === lists.length - 1) {
             items[itemIdx].has_child = false;
-            items[itemIdx].item_type = 'PRJECT';
+            items[itemIdx].item_type = 'PROJECT';
         }
 
         return items[itemIdx].id;
