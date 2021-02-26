@@ -66,7 +66,7 @@ jobs:
           push: true
           tags: pyengine/build:console
           cache-from: pyengine/build:console
-          cache-to: inline
+          cache-to: type=inline
       -
         name: Build and push (console)
         uses: docker/build-push-action@v2
