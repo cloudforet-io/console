@@ -57,10 +57,8 @@ jobs:
         name: get service name
         run: |
           echo "SERVICE=$(echo ${{ github.repository }} | cut -d '/' -f2)" >> $GITHUB_ENV
-      - name: pull cache
-        run: docker pull pyengine/build:console
       -
-        name: Build and push
+        name: Build and push (cache)
         uses: docker/build-push-action@v2
         with:
           context: .
@@ -70,7 +68,7 @@ jobs:
           cache-from: pyengine/build:console
           cache-to: pyengine/build:console
       -
-        name: Build and push
+        name: Build and push (console)
         uses: docker/build-push-action@v2
         with:
           context: .
