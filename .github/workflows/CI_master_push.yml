@@ -20,7 +20,8 @@ jobs:
       version: ${{ steps.job1.outputs.VERSION }}
     steps:
       - uses: actions/checkout@v2
-        submodules: 'recursive'
+        with:
+          submodules: 'recursive'
       - name: calculate current date
         run: |
           sudo ln -sf /usr/share/zoneinfo/Asia/Seoul /etc/localtime
@@ -38,7 +39,8 @@ jobs:
       VERSION: ${{ needs.versioning.outputs.version }}
     steps:
       - uses: actions/checkout@v2
-        submodules: 'recursive'
+        with:
+          submodules: 'recursive'
       -
         name: Set up QEMU
         uses: docker/setup-qemu-action@v1
