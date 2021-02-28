@@ -187,9 +187,108 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
           tags: ${{ env.VERSION }}
 
+  helm:
+    if: github.repository_owner == 'spaceone-dev' && needs.condition_check.outputs.NOT_FIRST_TAG == 'false'
+    needs: [condition_check, update_local_version_file]
+    runs-on: ubuntu-latest
+    env:
+      VERSION: ${{ needs.condition_check.outputs.TAG }}
+      BRANCH: ${{ needs.condition_check.outputs.BRANCH }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ${{ env.BRANCH }}
+      - name: set version
+        run: |
+          echo ${{ env.VERSION }} | cut -c 2- > src/VERSION
+      - name: Install Helm
+        uses: azure/setup-helm@v1
+        with:
+          version: '3.4.0'
+      - name: Run chart-releaser
+        run: |
+          export cache_dir=/tmp/helm
+          mkdir -p "$cache_dir"
+          echo "Installing chart-releaser..."
+          curl -sSLo cr.tar.gz "https://github.com/helm/chart-releaser/releases/download/v1.2.0/chart-releaser_1.2.0_linux_amd64.tar.gz"
+          tar -xzf cr.tar.gz -C "$cache_dir"
+          rm -f cr.tar.gz
+
+          echo 'Adding cr directory to PATH...'
+          export PATH="$cache_dir:$PATH"
+
+          rm -rf .deploy
+
+          echo 'Print Version ...'
+          export SERVICE=$(echo ${{ github.repository }} | cut -d '/' -f2)
+          export VERSION=${{ env.VERSION }}
+          export VERSION_NUM=$(echo ${VERSION#v})
+          echo 'Update helm version in chart.yaml and values.yaml'
+          echo "SERVICE=${SERVICE}" >> $GITHUB_ENV
+          echo "ORGANIZATION=${SERVICE}.image.repository" >> $GITHUB_ENV
+          echo "VERSION_PATH=${SERVICE}.image.version" >> $GITHUB_ENV
+          echo "VERSION_NUM=${VERSION_NUM}" >> $GITHUB_ENV
+
+          sed -i "s/latest/${VERSION_NUM}/g" deploy/helm/values.yaml
+          helm package deploy/helm --app-version ${VERSION_NUM} --version ${VERSION_NUM} --destination .deploy
+          cr upload -o spaceone-dev -r charts -p .deploy --token ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+
+          git config --global user.email admin@spaceone.dev
+          git config --global user.name admin-spaceone
+          eval "$(ssh-agent -s)"
+          cat <<EOF>id_rsa
+          ${{secrets.ssh_key}}
+          EOF
+          chmod 400 ./id_rsa && ssh-add ./id_rsa
+          git clone git@github.com:spaceone-dev/charts.git
+          cd charts
+          git checkout gh-pages || true
+          rm -f *.tgz
+          cp ../.deploy/* ./
+          ls
+          cr index -i ./index.yaml -p ./ -o spaceone-dev -r charts -c https://spaceone-dev.github.io/charts --token ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+          git add index.yaml
+          git commit -m "Add helm chart ${SERVICE} - ${VERSION}"
+          git push origin gh-pages
+
+
+      - name: Check out spaceone repo (1/2)
+        uses: actions/checkout@master
+        with:
+          repository: spaceone-dev/spaceone
+          token: ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+
+      - name: Update tag in version.yaml
+        uses: fjogeleit/yaml-update-action@master
+        with:
+          valueFile: 'deploy/helm/config/version.yaml'
+          propertyPath: ${{ env.VERSION_PATH }}
+          value: ${{ env.VERSION_NUM }}
+          repository: spaceone-dev/spaceone
+          message: 'Update ${{ env.SERVICE }} VERSION to ${{ env.VERSION_NUM }}'
+          token: ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+
+      - name: Check out spaceone repo (2/2)
+        uses: actions/checkout@master
+        with:
+          repository: spaceone-dev/spaceone
+          token: ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+
+      - name: Update org in version.yaml
+        uses: fjogeleit/yaml-update-action@master
+        with:
+          valueFile: 'deploy/helm/config/version.yaml'
+          propertyPath: ${{ env.ORGANIZATION }}
+          value: spaceone
+          repository: spaceone-dev/spaceone
+          message: 'Update ${{ env.SERVICE }} REPO to spaceone'
+          token: ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+
+
+
   notify_to_slack:
     if: github.repository_owner == 'spaceone-dev'
-    needs: [condition_check, update_local_version_file, docker]
+    needs: [condition_check, update_local_version_file, docker, helm]
     runs-on: ubuntu-latest
     steps:
       - name: Slack
