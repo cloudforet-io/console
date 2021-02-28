@@ -1,0 +1,81 @@
+###############################
+# DEFAULT 
+###############################
+enabled: true
+developer: false
+name: console
+replicas: 1
+image:
+    repository: spaceone
+    name: console
+    version: latest
+imagePullPolicy: IfNotPresent
+
+console_api: https://console-api
+domainName:
+    ref: config
+    name: root
+
+# local sidecar
+##########################
+#sidecar:
+
+
+##########################
+# Local volumes
+##########################
+volumes:
+    - name: timezone
+      hostPath:
+          path: /usr/share/zoneinfo/Asia/Seoul
+    - name: log-volume
+      emptyDir: {}
+
+#######################
+# global variable
+#######################
+global:
+    shared: {}
+    sidecar: []
+#        - name: mongos
+#          image: mongo:4.4.0-bionic
+#          command: [ 'mongos', '--config', '/mnt/mongos.yml', '--bind_ip_all' ]
+#          volumeMounts:
+#            - name: mongos-conf
+#              mountPath: /mnt/mongos.yml
+#              subPath: mongos.yml
+#              readOnly: true
+#            - name: mongo-shard-key
+#              mountPath: /opt/mongos/mongo-shard.pem
+#              subPath: mongo-shard.pem
+#              readOnly: true
+#
+    volumes: []
+#        - name: mongo-shard-key
+#          secret:
+#              defaultMode: 0400
+#              secretName: mongo-shard-key
+#        - name: mongos-conf
+#          configMap:
+#              name: mongos-conf
+#        - name: shared-conf
+#          configMap:
+#              name: shared-conf
+
+    
+# Service
+#
+service:
+    type: ClusterIP
+    annotations:
+        nil: nil
+    ports:
+        - name: http
+          port: 80
+          targetPort: 80
+          protocol: TCP
+        - name: https
+          port: 443
+          targetPort: 80
+          protocol: TCP
+
