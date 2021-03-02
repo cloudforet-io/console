@@ -114,8 +114,9 @@
             </p-tab>
         </p-pane-layout>
 
-        <project-tree-panel ref="projectRef" class="tree-panel"
+        <project-tree-panel class="tree-panel"
                             :target-name="accountName"
+                            @select="selectedProject = $event"
         />
         <div class="button-group">
             <p-button class="text-button" style-type="primary-dark" size="lg"
@@ -139,7 +140,7 @@ import { get } from 'lodash';
 
 import {
     ComponentRenderProxy, getCurrentInstance,
-    reactive, computed, ref, toRefs, watch, onBeforeUnmount,
+    reactive, computed, ref, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -157,6 +158,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ProviderModel } from '@/views/identity/service-account/type';
 import { TranslateResult } from 'vue-i18n';
 import InfoButton from '@/common/components/InfoButton.vue';
+import { TreeItem } from '@spaceone/design-system/dist/src/data-display/tree/tree-node/type';
 
 export default {
     name: 'AddServiceAccountPage',
@@ -260,6 +262,8 @@ export default {
             //
             jsonForCredential: '',
             //
+            selectedProject: null as TreeItem|null,
+            //
             isValid: computed(() => {
                 if (tabState.activeTab === 'json') {
                     return formState.isAccountNameValid && formState.isAccountModelValid && formState.isCredentialNameValid;
@@ -275,7 +279,6 @@ export default {
                 { name: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT_ADD_ACCOUNT') },
             ])),
         });
-        const projectRef = ref<any>(null);
 
         const getProvider = async () => {
             state.providerLoading = true;
@@ -333,8 +336,8 @@ export default {
                 tags: formState.tags,
             };
 
-            if (projectRef.value.firstSelectedNode) {
-                item.project_id = projectRef.value.firstSelectedNode.node.data.id;
+            if (formState.selectedProject) {
+                item.project_id = formState.selectedProject.data.id;
             }
             try {
                 const res = await SpaceConnector.client.identity.serviceAccount.create({
@@ -353,7 +356,7 @@ export default {
                 schema: state.selectedSecretType,
                 secret_type: 'CREDENTIALS',
                 service_account_id: state.serviceAccountId,
-                project_id: projectRef.value.firstSelectedNode.node.data.id,
+                project_id: formState.selectedProject?.data.id,
             });
         };
         const createSecretWithJson = async (jsonData) => {
@@ -363,7 +366,7 @@ export default {
                 schema: state.selectedSecretType,
                 secret_type: 'CREDENTIALS',
                 service_account_id: state.serviceAccountId,
-                project_id: projectRef.value.firstSelectedNode.node.data.id,
+                project_id: formState.selectedProject?.data.id,
             });
         };
         const createSecret = async () => {
@@ -394,7 +397,7 @@ export default {
                     vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'), vm.$root);
                 return;
             }
-            if (formState.isTagsValid && !projectRef.value.error) {
+            if (formState.isTagsValid) {
                 await createServiceAccount();
                 if (state.serviceAccountId) {
                     if (formState.credentialModel.private_key) {
@@ -431,7 +434,6 @@ export default {
             ...toRefs(formState),
             routeState,
             tabState,
-            projectRef,
             onClickSave,
             onClickGoBack,
         };
@@ -474,10 +476,10 @@ export default {
         }
         .p-field-group {
             .p-text-input {
-                width: 100%;
                 @screen lg {
                     max-width: 50%;
                 }
+                width: 100%;
                 &.invalid {
                     @apply border border-red-500;
                 }

@@ -1,8 +1,10 @@
 <template>
     <fragment>
         <top-notification v-if="projectState.isPermissionDenied">
-            <div>{{$t('PROJECT.LANDING.TOP_NOTI_PERMISSION_REQUIRED_1')}} <br>
-                {{$t('PROJECT.LANDING.TOP_NOTI_PERMISSION_REQUIRED_2')}}</div>
+            <div>
+                {{ $t('PROJECT.LANDING.TOP_NOTI_PERMISSION_REQUIRED_1') }} <br>
+                {{ $t('PROJECT.LANDING.TOP_NOTI_PERMISSION_REQUIRED_2') }}
+            </div>
         </top-notification>
         <p-vertical-page-layout :min-width="260" :init-width="260" :max-width="400">
             <template #sidebar="{width}">
@@ -39,13 +41,11 @@
                                 /> {{ $t('PROJECT.LANDING.CREATE') }}
                             </p-button>
                         </header>
-                        <project-group-tree ref="treeRef"
-                                            :search-text="projectState.searchText"
-                                            :project-state="projectState"
+                        <project-group-tree v-if="isInitiated"
+                                            :group-id="projectState.groupId"
                                             @list="onProjectGroupList"
                                             @select="onSelectTreeItem"
                                             @create="openProjectGroupForm"
-                                            @mounted="init"
                         />
                     </div>
                 </div>
@@ -94,7 +94,7 @@
                                          width="1rem" height="1rem"
                                          color="inherit transparent"
                                     />
-                                    <span class="text">{{ projectState.groupMemberCount }}</span>
+                                    <span class="text">{{ groupMemberCount }}</span>
                                 </div>
                                 <p-icon-text-button v-if="projectState.groupId && !projectState.isPermissionDenied"
                                                     style-type="primary-dark"
@@ -159,9 +159,9 @@
                                                :project-group-id="projectState.groupId"
                                                @confirm="projectFormConfirm($event)"
                     />
-                    <project-group-member-page v-if="projectState.groupMemberPageVisible"
+                    <project-group-member-page v-if="groupMemberPageVisible"
                                                :group-id="projectState.groupId"
-                                               @close="projectState.groupMemberPageVisible = false"
+                                               @close="groupMemberPageVisible = false"
                     />
                 </div>
             </template>
@@ -197,7 +197,18 @@ import ProjectCreateFormModal from '@/views/project/project/modules/ProjectCreat
 import ProjectGroupMemberPage from '@/views/project/project/modules/ProjectGroupMemberPage.vue';
 import { PERMISSION_TYPE } from '@/views/project/project/lib/config';
 import TopNotification from '@/common/components/TopNotification.vue';
+import { reverse } from 'lodash';
+import { getProjectState } from '@/views/project/project/lib/state';
 
+
+const getParentGroup = (item: ProjectTreeItem, res: ProjectGroup[] = []): ProjectGroup[] => {
+    if (item) {
+        res.push(item.data);
+        if (item.parent) return getParentGroup(item.parent, res);
+        return res;
+    }
+    return res;
+};
 
 export default {
     name: 'ProjectPage',
@@ -223,16 +234,10 @@ export default {
     setup(props, { root }) {
         const vm: ComponentRenderProxy = getCurrentInstance() as ComponentRenderProxy;
 
-        const projectState = reactive({
-            groupId: undefined as string|undefined,
-            groupName: '' as string|undefined,
-            groupMemberCount: 0,
-            searchText: '',
-            groupMemberPageVisible: false,
-            isPermissionDenied: false,
-        });
+        const projectState = getProjectState();
 
         const state = reactive({
+            isInitiated: false,
             favoriteItems: computed<FavoriteItem[]>(() => [
                 ...vm.$store.getters['favorite/projectGroup/sortedItems'],
                 ...vm.$store.getters['favorite/project/sortedItems'],
@@ -242,7 +247,6 @@ export default {
                 { name: 'delete', label: vm.$t('PROJECT.LANDING.ACTION_DELETE_THIS_GROUP'), type: 'item' },
             ] as MenuItem[]),
             parentGroups: [] as ProjectGroup[],
-            treeRef: null as any,
             projectGroupNavigation: computed(() => {
                 const result = state.parentGroups.map(d => ({ name: d.name, data: d }));
                 if (projectState.groupId) {
@@ -260,6 +264,8 @@ export default {
                 });
                 return res;
             }),
+            groupMemberCount: 0,
+            groupMemberPageVisible: false,
         });
 
         const formState = reactive({
@@ -274,15 +280,11 @@ export default {
             await state.projectListRef.listProjects(projectState.groupId, projectState.searchText);
         };
 
-        const listProjectGroup = async () => {
-            if (projectState.groupId) await state.treeRef.findNode(projectState.groupId);
-            else await state.treeRef.listNodes();
-        };
 
         const listAll = async () => {
             projectState.isPermissionDenied = false;
             await Promise.all([
-                listProjectGroup(),
+                // listProjectGroup(),
                 listProject(),
             ]);
         };
@@ -315,7 +317,7 @@ export default {
                 const res = await SpaceConnector.client.identity.projectGroup.member.list({
                     project_group_id: projectState.groupId,
                 });
-                projectState.groupMemberCount = res.total_count;
+                state.groupMemberCount = res.total_count;
                 await onChangePermission(PERMISSION_TYPE.allow);
             } catch (e) {
                 await onChangePermission(PERMISSION_TYPE.deny);
@@ -329,14 +331,14 @@ export default {
         };
 
         const projectGroupDeleteFormConfirm = async () => {
-            if (!projectState.groupId) return;
+            if (!projectState.groupId || !projectState.selectedNode) return;
             try {
                 await SpaceConnector.client.identity.projectGroup.delete({
                     project_group_id: projectState.groupId,
                 });
                 await vm.$store.dispatch('favorite/projectGroup/removeItem', { id: projectState.groupId });
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '', root);
-                state.treeRef.deleteSelectedNode();
+                projectState.selectedNode.deleteNode();
             } catch (e) {
                 showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: vm.$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }), e, root);
             } finally {
@@ -349,30 +351,32 @@ export default {
             formState.projectGroupFormVisible = true;
         };
 
-        const openProjectGroupForm = (createTargetNode: ProjectTreeItem|null) => {
+        const openProjectGroupForm = (createTargetNode: ProjectTreeItem) => {
             formState.updateMode = false;
             formState.createTargetNode = createTargetNode;
             formState.projectGroupFormVisible = true;
         };
 
         const openProjectGroupMemberPage = () => {
-            projectState.groupMemberPageVisible = true;
+            state.groupMemberPageVisible = true;
         };
 
         const onProjectGroupUpdate = async (item: ProjectGroup) => {
-            projectState.groupName = item.name;
-            state.treeRef.updateSelectedNode(item);
+            if (projectState.selectedNode) {
+                projectState.groupName = item.name;
+                projectState.selectedNode.setData({ ...projectState.selectedNode.data, ...item });
+            }
             formState.projectGroupFormVisible = false;
         };
 
-        const onProjectGroupCreate = async (item: ProjectGroup) => {
-            const newItem: ProjectItemResp = {
-                ...item,
+        const onProjectGroupCreate = (data: ProjectItemResp) => {
+            const newData: ProjectItemResp = {
+                ...data,
                 item_type: 'PROJECT_GROUP',
                 has_child: false,
             };
 
-            await state.treeRef.addNode(newItem, formState.createTargetNode);
+            if (formState.createTargetNode) formState.createTargetNode.addChild(newData);
             formState.projectGroupFormVisible = false;
             state.noProjectGroup = false;
         };
@@ -429,17 +433,33 @@ export default {
             });
         };
 
-        const onSelectTreeItem = async (id, name, parents: ProjectGroup[] = []) => {
-            projectState.groupName = name;
-            state.parentGroups = parents;
+        const onSelectTreeItem = async (item: ProjectTreeItem|null) => {
+            console.debug('onSelectTreeItem', item);
+            projectState.selectedNode = item;
 
-            if (projectState.groupId !== id) {
-                projectState.groupId = id;
+            if (item) {
+                if (projectState.groupId !== item.data.id) {
+                    projectState.groupId = item.data.id;
+                    projectState.groupName = item.data.name;
+
+                    vm.$nextTick(async () => {
+                        await listAll();
+                    });
+
+                    let parents = [] as ProjectGroup[];
+                    if (item.parent) parents = reverse(getParentGroup(item.parent));
+                    state.parentGroups = parents;
+                }
+            } else {
+                projectState.groupId = undefined;
+                projectState.groupName = undefined;
+                state.parentGroups = [];
                 vm.$nextTick(async () => {
                     await listAll();
                 });
             }
         };
+
 
         const onProjectGroupList = (count) => {
             state.noProjectGroup = !count;
@@ -468,7 +488,7 @@ export default {
                 vm.$store.dispatch('favorite/project/load'),
             ]);
 
-            const groupId = vm.$route.query.select_pg as string;
+            const groupId = (vm.$route.query.select_pg as string) || undefined;
 
             if (groupId) {
                 projectState.groupId = groupId;
@@ -478,9 +498,15 @@ export default {
             } else {
                 await listAll();
             }
+
+            state.isInitiated = true;
         };
 
-        watch([() => projectState.groupId, () => projectState.groupMemberPageVisible], async ([groupId, visible]) => {
+        (async () => {
+            await init();
+        })();
+
+        watch([() => projectState.groupId, () => state.groupMemberPageVisible], async ([groupId, visible]) => {
             if ((groupId !== undefined && groupId) || visible) await getProjectGroupMemberCount();
         }, { immediate: true });
 

@@ -18,12 +18,6 @@
                     <template v-else-if="!hasProject">
                         {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_NO_DATA') }}
                     </template>
-                    <template v-else-if="error">
-                        <p-i name="ic_alert" width="1rem" height="1rem"
-                             class="mr-2"
-                        />
-                        <span class="alert">{{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_SELECT_ERROR') }}</span>
-                    </template>
                     <i18n v-else-if="targetName && selectProjectName"
                           path="IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_EXIST_DESC"
                           class="align-baseline"
@@ -41,33 +35,36 @@
                 </div>
 
                 <p-icon-button name="ic_refresh" class="refresh-btn"
-                               @click="refreshProject"
+                               @click="getAllData"
                 />
             </div>
 
             <div class="body-container">
                 <div class="tree-container" :style="{overflow: isLoading ? 'hidden' : 'auto'}">
-                    <p-tree ref="treeRef"
-                            @toggle:click="toggle"
-                            @node:click="selectItem"
-                            @checkbox:click="selectItem"
+                    <p-tree id-key="id" children-key="has_child"
+                            :selected-nodes.sync="selectedNodes"
+                            :data-fetcher="dataFetcher"
+                            :select-options="selectOptions"
+                            :edit-options="editOptions"
+                            :drag-options="dragOptions"
+                            @init="onTreeInit"
                     >
-                        <template #data="{data}">
+                        <template #data="{node}">
                             <span :class="{
                                 'ml-2': data.item_type === 'PROJECT'
                             }"
-                            >{{ data.name }}</span>
+                            >{{ node.data.name }}</span>
                         </template>
-                        <template #toggle="{state, toggleSize, data, getListeners}">
-                            <p-i v-if="state.loading" name="ic_working" :width="toggleSize"
-                                 :height="toggleSize"
+                        <template #toggle="{node}">
+                            <p-i v-if="node.loading" name="ic_working"
+                                 width="1rem" height="1rem"
                             />
-                            <p-radio v-else-if="data.item_type === 'PROJECT'"
-                                     :selected="state.selected" :value="true" v-on="getListeners('checkbox')"
+                            <p-radio v-else-if="node.data.item_type === 'PROJECT'"
+                                     :selected="node.selected" :value="true" @click.stop="node.setSelected(true)"
                             />
                         </template>
-                        <template #toggle-right="{data}">
-                            <p-i v-if="data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="project-group-icon"
+                        <template #toggle-right="{node}">
+                            <p-i v-if="node.data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="project-group-icon"
                                  width="1rem" height="1rem" color="inherit transparent"
                             />
                         </template>
@@ -105,46 +102,9 @@ import { TreeItem, TreeNode } from '@spaceone/design-system/dist/src/data-displa
 import { PROJECT_MAIN_PAGE_NAME } from '@/routes/project/project-route';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { ProjectItemResp } from '@/views/project/project/type';
+import { ProjectItemResp, ProjectTreeItem } from '@/views/project/project/type';
 
 
-function getTreeItem<T=ProjectItemResp>(
-    key: number, level: number, node: TreeNode<T>, parent: TreeItem<T>|null = null,
-): TreeItem<T> {
-    return {
-        key,
-        level,
-        node,
-        parent,
-    };
-}
-
-const getParam = (id?: string, type?: string) => {
-    const param: any = {
-        sort: { key: 'name', desc: false },
-        item_type: 'ROOT',
-    };
-    if (id && type) {
-        param.item_id = id;
-        param.item_type = type;
-    }
-    return param;
-};
-
-const toNodes = (resp): TreeNode[]|boolean => {
-    if (resp.items.length === 0) {
-        return false;
-    }
-    return resp.items.map(d => ({
-        data: d,
-        children: d.has_child,
-        state: {
-            expanded: false,
-            selected: false,
-            loading: false,
-        },
-    }));
-};
 
 export default {
     name: 'ProjectTreePanel',
@@ -167,65 +127,77 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            treeRef: null as null|any,
-            firstSelectedNode: computed<TreeItem|null>(() => (state.treeRef ? state.treeRef.firstSelectedNode : null)),
+            root: null as TreeItem|null,
+            selectedNodes: [] as ProjectTreeItem[],
+            firstSelectedNode: computed<ProjectTreeItem|undefined>(() => (state.selectedNodes[0])),
+            selectOptions: {
+                validator({ data }) {
+                    return data.item_type === 'PROJECT';
+                },
+            },
+            editOptions: {
+                validator: text => (text && text.length > 2 && text.length < 40),
+                invalidText: 'should NOT be shorter than 2 characters',
+                validText: '2 ~ 40 characters',
+                dataSetter(text, originData) {
+                    return {
+                        ...originData,
+                        name: text,
+                    };
+                },
+            },
+            dragOptions: {
+                disabled: false,
+            },
             hasProject: true,
             isLoading: false,
-            error: false,
         });
 
-        const requestTreeData = async (node?: TreeNode): Promise<TreeNode[]|boolean> => {
+        const requestTreeData = async (id?: string, type?: string): Promise<ProjectItemResp[]|boolean> => {
+            const params: any = {
+                sort: { key: 'name', desc: false },
+                item_type: 'ROOT',
+            };
+            if (id && type) {
+                params.item_id = id;
+                params.item_type = type;
+            }
             try {
-                const res = await SpaceConnector.client.identity.project.tree(getParam(node?.data.id, node?.data.item_type));
-                return toNodes(res);
+                const { items } = await SpaceConnector.client.identity.project.tree(params);
+                return items;
             } catch (e) {
                 console.error(e);
                 return false;
             }
         };
 
-        const getData = async (item?: TreeItem): Promise<void> => {
-            if (item) {
-                item.node.state.expanded = true;
-                item.node.state.loading = true;
-                state.treeRef.applyState(item);
+        const dataFetcher = async (node?: ProjectTreeItem): Promise<ProjectItemResp[]|boolean> => {
+            const res = await requestTreeData(node?.data.id, node?.data.item_type);
+            return res;
+        };
 
-                item.node.children = await requestTreeData(item.node);
-
-                item.node.state.loading = false;
-                state.treeRef.applyState(item);
-            } else {
-                const res = await requestTreeData();
-                if (state.treeRef) state.treeRef.nodes = Array.isArray(res) ? res : [];
+        const getRootData = async (): Promise<void> => {
+            if (state.root) {
+                state.selectedNodes = [];
+                const res = await dataFetcher(state.root);
+                await state.root.setChildren(res);
             }
         };
 
         const refreshQuery = new ApiQueryHelper().setCountOnly();
 
-        const refreshProject = async () => {
+        const getAllData = async () => {
             state.isLoading = true;
             state.hasProject = false;
             const [res] = await Promise.all([
                 SpaceConnector.client.identity.project.list({
                     query: refreshQuery.data,
-                }), getData(),
+                }), getRootData(),
             ]);
             if (res.total_count) state.hasProject = true;
             state.isLoading = false;
         };
 
-        const resetSelectedNode = (item: TreeItem<ProjectItemResp>, compare?: TreeItem<ProjectItemResp>) => {
-            if (compare) {
-                if (compare.node.data.id === item.node.data.id) {
-                    state.treeRef.selectedNodes = [];
-                } else if (compare.parent) resetSelectedNode(item, compare.parent);
-            } else {
-                if (!state.firstSelectedNode) return;
-                if (!state.firstSelectedNode.parent) return;
-                if (state.firstSelectedNode.level <= item.level) return;
-                resetSelectedNode(item, state.firstSelectedNode.parent);
-            }
-        };
 
         const projectPath = vm?.$router.resolve({ name: PROJECT_MAIN_PAGE_NAME }).href;
         const goToProject = () => {
@@ -233,37 +205,12 @@ export default {
         };
         const selectProjectName = computed(() => {
             if (state.firstSelectedNode) {
-                return state.firstSelectedNode.node.data.name;
+                return state.firstSelectedNode.data.name;
             }
             return '';
         });
 
-        const unWatch = watch(() => state.treeRef, async (treeRef) => {
-            if (treeRef) {
-                await refreshProject();
-                await getData();
-                unWatch();
-            }
-        });
 
-
-        const toggle = async (item: TreeItem<ProjectItemResp>, matched: TreeItem<ProjectItemResp>[], e: MouseEvent) => {
-            e.stopPropagation();
-            if (item.node.state.expanded) {
-                resetSelectedNode(item);
-                item.node.state.expanded = false;
-                state.treeRef.applyState(item);
-                item.node.children = !!item.node.children;
-                return;
-            }
-
-            await getData(item);
-        };
-        const selectItem = (item: TreeItem<ProjectItemResp>) => {
-            if (item.node.data.item_type === 'PROJECT') {
-                if (!item.node.state.selected) state.treeRef.setSelectedNodes(item);
-            }
-        };
         const confirm = () => {
             if (state.firstSelectedNode) {
                 emit('confirm', state.firstSelectedNode.node.data);
@@ -274,21 +221,23 @@ export default {
 
         const releaseProject = () => {
             if (state.firstSelectedNode) {
-                state.treeRef.setNodeState(state.firstSelectedNode, { selected: false });
-                state.treeRef.selectedNodes = [];
+                state.firstSelectedNode.setSelected(false);
             }
+        };
+
+        const onTreeInit = async (root) => {
+            state.root = root;
         };
 
         return {
             ...toRefs(state),
-            refreshProject,
+            dataFetcher,
+            getAllData,
             goToProject,
             selectProjectName,
-            resetSelectedNode,
-            toggle,
-            selectItem,
             confirm,
             releaseProject,
+            onTreeInit,
         };
     },
 
@@ -354,5 +303,15 @@ export default {
 }
 .no-select {
     @apply border-t border-gray-200 p-4 flex items-center;
+}
+.p-tree::v-deep {
+    .p-tree-node .tree-row {
+        .right-extra {
+            display: none;
+        }
+        &:hover .node .right-extra {
+            display: block;
+        }
+    }
 }
 </style>
