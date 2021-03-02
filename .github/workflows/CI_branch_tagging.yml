@@ -231,7 +231,7 @@ jobs:
 
           sed -i "s/latest/${VERSION_NUM}/g" deploy/helm/values.yaml
           helm package deploy/helm --app-version ${VERSION_NUM} --version ${VERSION_NUM} --destination .deploy
-          cr upload -o spaceone-dev -r charts -p .deploy --token ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+          cr upload -o spaceone-dev -r charts -p .deploy --token ${{ secrets.PAT_TOKEN }}
 
           git config --global user.email admin@spaceone.dev
           git config --global user.name admin-spaceone
@@ -246,7 +246,7 @@ jobs:
           rm -f *.tgz
           cp ../.deploy/* ./
           ls
-          cr index -i ./index.yaml -p ./ -o spaceone-dev -r charts -c https://spaceone-dev.github.io/charts --token ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+          cr index -i ./index.yaml -p ./ -o spaceone-dev -r charts -c https://spaceone-dev.github.io/charts --token ${{ secrets.PAT_TOKEN }}
           git add index.yaml
           git commit -m "Add helm chart ${SERVICE} - ${VERSION}"
           git push origin gh-pages
@@ -256,7 +256,7 @@ jobs:
         uses: actions/checkout@master
         with:
           repository: spaceone-dev/spaceone
-          token: ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Update tag in version.yaml
         uses: fjogeleit/yaml-update-action@master
@@ -266,13 +266,13 @@ jobs:
           value: ${{ env.VERSION_NUM }}
           repository: spaceone-dev/spaceone
           message: 'Update ${{ env.SERVICE }} VERSION to ${{ env.VERSION_NUM }}'
-          token: ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Check out spaceone repo (2/2)
         uses: actions/checkout@master
         with:
           repository: spaceone-dev/spaceone
-          token: ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Update org in version.yaml
         uses: fjogeleit/yaml-update-action@master
@@ -282,7 +282,7 @@ jobs:
           value: spaceone
           repository: spaceone-dev/spaceone
           message: 'Update ${{ env.SERVICE }} REPO to spaceone'
-          token: ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
 
 

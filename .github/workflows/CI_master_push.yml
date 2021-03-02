@@ -107,7 +107,7 @@ jobs:
         uses: actions/checkout@master
         with:
           repository: spaceone-dev/spaceone
-          token: ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Update tag in version.yaml
         uses: fjogeleit/yaml-update-action@master
@@ -117,13 +117,13 @@ jobs:
           value: ${{ env.VERSION_NUM }}
           repository: spaceone-dev/spaceone
           message: 'Update ${{ env.SERVICE }} VERSION to ${{ env.VERSION_NUM }}'
-          token: ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Check out spaceone repo (2/2)
         uses: actions/checkout@master
         with:
           repository: spaceone-dev/spaceone
-          token: ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
       - name: Update org in version.yaml
         uses: fjogeleit/yaml-update-action@master
@@ -133,7 +133,7 @@ jobs:
           value: pyengine
           repository: spaceone-dev/spaceone
           message: 'Update ${{ env.SERVICE }} REPO to pyengine'
-          token: ${{ secrets.SPACEONE_ADMIN_TOKEN }}
+          token: ${{ secrets.PAT_TOKEN }}
 
 
       - name: Slack
