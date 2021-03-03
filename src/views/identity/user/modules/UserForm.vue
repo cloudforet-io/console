@@ -66,7 +66,7 @@
                 <p-select-dropdown v-model="formState.domainRole"
                                    :items="formState.domainRoleItem"
                                    auto-height
-                                   :disabled="formState.domainRoleItem.length < 2"
+                                   :disabled="formState.domainRoleItem.length < 2 || isSameId"
                                    class="dropdown"
                 />
             </p-field-group>
@@ -171,6 +171,7 @@ export default {
 
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
+            isSameId: false,
         });
         const formState = reactive({
             authTypeList: [
@@ -409,11 +410,18 @@ export default {
             }
         };
 
+        const checkIsSameId = () => {
+            const userAccountId = store.state.user.userId;
+            if (formState.user_id === userAccountId) state.isSameId = true;
+            else state.isSameId = false;
+        };
+
         (async () => {
             if (props.updateMode) {
                 formState.user_id = props.item.user_id;
                 formState.name = props.item.name;
                 formState.email = props.item.email;
+                await checkIsSameId();
             }
             await Promise.all([initAuthTypeList(), getRoleList()]);
 
