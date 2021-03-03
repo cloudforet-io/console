@@ -3,19 +3,30 @@
         <div class="card-header">
             <div class="left-wrapper">
                 <p class="project-group-nav">
-                    Project Group > .. > Project
+                    <span class="project-group-info">Project Group</span>
+                    <p-i name="ic_breadcrumb_arrow" width="0.75rem" height="0.75rem"
+                         class="project-group-info opacity-50" color="inherit white"
+                    />
+                    <span class="project-info">Project</span>
                 </p>
                 <p class="spot-group-title">
                     Spot Group Name
                 </p>
             </div>
             <div class="right-wrapper">
-                <p class="spot-group-region">
+                <span class="spot-group-region-date">
+                    <span class="opacity-50 mr-2">리전</span>
                     Asia Pacific (Singapore) ap-southeast-1
-                </p>
-                <p class="spot-group-cost">
-                    Cost
-                </p>
+                    <span class="opacity-50 mr-2 ml-4">생성</span>
+                    2020-12-18 00:00:00
+                </span>
+                <div class="spot-group-cost-wrapper">
+                    <div class="spot-group-cost-text">
+                        <p>절감비용</p>
+                        <span class="text-xs">이번달 1일 ~ 어제</span>
+                    </div>
+                    <span class="spot-group-cost"><span class="text-2xl font-normal">$</span>125</span>
+                </div>
             </div>
         </div>
         <p-divider />
@@ -24,13 +35,18 @@
             <spot-group-card-mobile class="card-mobile-version" />
         </div>
         <div class="card-footer">
-            Asia Pacific (Singapore) ap-southeast-1
+            <span class="footer-region">
+                <span class="opacity-50 mr-2">리전</span>
+                Asia Pacific (Singapore) ap-southeast-1
+                <span class="opacity-50 mr-2 ml-4">생성</span>
+                2020-12-18 00:00:00
+            </span>
         </div>
     </article>
 </template>
 
 <script lang="ts">
-import { PDivider } from '@spaceone/design-system';
+import { PDivider, PI } from '@spaceone/design-system';
 import SpotGroupCardDesktop from '@/views/automation/spot-automation/modules/SpotGroupCardDesktop.vue';
 import SpotGroupCardMobile from '@/views/automation/spot-automation/modules/SpotGroupCardMobile.vue';
 
@@ -40,6 +56,7 @@ export default {
         SpotGroupCardDesktop,
         SpotGroupCardMobile,
         PDivider,
+        PI,
     },
     setup() {
         return {
@@ -65,14 +82,47 @@ export default {
         flex-direction: column;
         .spot-group-title {
             display: block;
+            font-size: 0.875rem;
+            line-height: 115%;
+            font-weight: bold;
+            margin-top: 0.25rem;
+
+            @screen md {
+                font-size: 1.25rem;
+                line-height: 120%;
+            }
         }
     }
 
-    .spot-group-region {
+    .project-group-nav {
+        font-size: 0.75rem;
+        line-height: 130%;
+        .project-group-info {
+            display: none;
+
+            @screen md {
+                display: inline-flex;
+            }
+        }
+    }
+
+    .spot-group-region-date {
         display: none;
     }
-    .spot-group-cost {
-        display: block;
+    .spot-group-cost-wrapper {
+        display: flex;
+        justify-content: space-between;
+        .spot-group-cost-text {
+            align-self: center;
+            font-size: 0.875rem;
+            line-height: 100%;
+            padding-right: 2rem;
+        }
+        .spot-group-cost {
+            font-size: 2.75rem;
+            font-weight: bold;
+            line-height: 100%;
+        }
     }
 
     @screen sm {
@@ -88,10 +138,12 @@ export default {
         .spot-group-title {
             visibility: hidden;
         }
-        .spot-group-region {
+        .spot-group-region-date {
             display: block;
+            font-size: 0.75rem;
+            line-height: 130%;
         }
-        .spot-group-cost {
+        .spot-group-cost-wrapper {
             display: none;
         }
     }
@@ -100,7 +152,6 @@ export default {
     @apply border border-gray-200;
     width: 100%;
     height: 11.6rem;
-    padding: 1.5rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
     .card-desktop-version {
         display: none;
@@ -117,6 +168,7 @@ export default {
         }
         .card-desktop-version {
             display: flex;
+            height: 100%;
         }
     }
 
@@ -127,6 +179,7 @@ export default {
         }
         .card-desktop-version {
             display: flex;
+            height: 100%;
         }
     }
 
@@ -134,11 +187,18 @@ export default {
 .card-footer {
     @apply bg-blue-100 border border-gray-200;
     display: flex;
+    justify-content: center;
     height: 3.25rem;
     border-top: 0;
     border-bottom-left-radius: 0.25rem;
     border-bottom-right-radius: 0.25rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+
+    .footer-region {
+        @apply text-gray-500;
+        font-size: 0.75rem;
+        align-self: center;
+    }
 
     @screen sm {
         height: 2.125rem;

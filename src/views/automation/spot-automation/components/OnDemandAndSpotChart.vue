@@ -91,14 +91,7 @@ export default defineComponent({
                 chart.innerRadius = am4core.percent(50);
             }
 
-            if (isLoading) {
-                chart.data = [{
-                    provider: 'Dummy',
-                    color: 'black',
-                }];
-            } else {
-                chart.data = state.data;
-            }
+            chart.data = state.data;
 
             const series = chart.series.create();
             series.slices.template.togglable = false;
