@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          persist-credentials: false
       - name: check version format
         run: |
           if [[ !(${{ env.VERSION }} =~ ^v[0-9]\.[0-9]\.[0-9](.*)$) ]];
@@ -36,10 +34,15 @@ jobs:
               echo "LATEST_TAG=true" >> $GITHUB_ENV
             fi
           fi
-      - name: Latest Update - update version file
+      - 
         if: ${{ env.LATEST_TAG }} == 'true'
         uses: actions/checkout@v2
-      - run: |
+        with:
+          persist-credentials: false
+      - 
+        name: Latest Update - update version file
+        if: ${{ env.LATEST_TAG }} == 'true'
+        run: |
           echo ${{ env.VERSION }} > src/VERSION
           if [[ $(cat src/VERSION) =~ v[0-9]\.[0-9]\.[0-9]\.([0-9]+) ]];
             then npm --no-git-tag-version version $(echo $(cat src/VERSION | cut -c 2-6)-$(cat src/VERSION | cut -c 8-))
@@ -50,6 +53,7 @@ jobs:
           git add .
           git commit -m "[CI/CD] release version ${{ env.VERSION }}"
       - name: Push changes
+        if: ${{ env.LATEST_TAG }} == 'true'
         uses: ad-m/github-push-action@master
         with:
           github_token: ${{ secrets.PAT_TOKEN }}
