@@ -10,6 +10,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
       - name: check version format
         run: |
           if [[ !(${{ env.VERSION }} =~ ^v[0-9]\.[0-9]\.[0-9](.*)$) ]];
