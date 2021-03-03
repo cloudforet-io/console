@@ -1,6 +1,6 @@
 <template>
     <general-page-layout class="spot-group-detail-page">
-        <div class="page-inner">
+        <div class="page-content">
             <p-breadcrumbs :routes="routeState.routes" />
             <div class="top-wrapper">
                 <p-page-title title="Spot Group Name" child @goBack="$router.go(-1)" />
@@ -42,7 +42,7 @@ import {
 } from '@vue/composition-api';
 
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
-import SpotGroupDetailDashboard from '@/views/automation/spot-automation/modules/SpotGroupDetailDashboard.vue';
+import SpotGroupDetailDashboard from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupDetailDashboard.vue';
 
 export default {
     name: 'SpotGroupDetailPage',
