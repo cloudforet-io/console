@@ -11,6 +11,7 @@
                 <p-query-search-table
                     :loading="loading"
                     :items="users"
+                    :select-index="selectedIndex"
                     :fields="fields"
                     :setting-visible="false"
                     :excel-visible="false"
@@ -511,6 +512,8 @@ export default {
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '', root);
             } catch (e) {
                 showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'), e, root);
+            } finally {
+                state.selectedIndex = [];
             }
             userFormState.visible = false;
         };
@@ -532,6 +535,7 @@ export default {
                 showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e, root);
             } finally {
                 await getUsers();
+                state.selectedIndex = [];
             }
             userFormState.visible = false;
         };
@@ -550,8 +554,8 @@ export default {
             } catch (e) {
                 showErrorMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', state.selectedIndex.length), e, root);
             } finally {
-                await getUsers();
                 state.selectedIndex = [];
+                await getUsers();
                 modalState.visible = false;
             }
         };
