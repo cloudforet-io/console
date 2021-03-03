@@ -5,9 +5,7 @@
             <p-page-title :title="'대시보드'" />
         </nav>
         <section class="dashboard-wrapper">
-            <p-pane-layout class="spot-group-info" />
-            <p-pane-layout class="cost-chart" />
-            <p-pane-layout class="cost-info" />
+            <spot-group-billing />
         </section>
         <p-divider class="dashboard-divider" />
         <section class="project-wrapper">
@@ -35,8 +33,10 @@
 
 <script lang="ts">
 import {
-    PPaneLayout, PDivider, PBreadcrumbs, PPageTitle, PToolbox, PDataLoader,
+    PDivider, PBreadcrumbs, PPageTitle, PToolbox, PDataLoader,
 } from '@spaceone/design-system';
+import SpotGroupBilling
+    from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupBilling.vue';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
@@ -63,7 +63,7 @@ const handlers = makeQuerySearchPropsWithSearchSchema(
 export default {
     name: 'SpotDashboardPage',
     components: {
-        PPaneLayout,
+        SpotGroupBilling,
         PDivider,
         PBreadcrumbs,
         PPageTitle,
@@ -133,7 +133,7 @@ export default {
     padding-left: 1.5rem;
 }
 .dashboard-wrapper {
-    @apply grid grid-flow-row grid-cols-12 bg-blue-100;
+    @apply bg-blue-100;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
 }
@@ -190,6 +190,4 @@ export default {
     @apply bg-white;
     padding: 2rem 1.5rem;
 }
-
-
 </style>
