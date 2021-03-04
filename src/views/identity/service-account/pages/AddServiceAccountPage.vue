@@ -356,7 +356,7 @@ export default {
                 schema: state.selectedSecretType,
                 secret_type: 'CREDENTIALS',
                 service_account_id: state.serviceAccountId,
-                project_id: formState.selectedProject?.data.id,
+                project_id: formState.selectedProject?.data.id || null,
             });
         };
         const createSecretWithJson = async (jsonData) => {
@@ -366,7 +366,7 @@ export default {
                 schema: state.selectedSecretType,
                 secret_type: 'CREDENTIALS',
                 service_account_id: state.serviceAccountId,
-                project_id: formState.selectedProject?.data.id,
+                project_id: formState.selectedProject?.data.id || null,
             });
         };
         const createSecret = async () => {
