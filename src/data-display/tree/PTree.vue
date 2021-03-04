@@ -277,8 +277,8 @@ export default defineComponent<Props>({
 
             if (state.firstSelectedNode) {
                 if (state.firstSelectedNode._id === item._id) {
-                    if (!props.editOptions.disabled && props.editOptions.editStartValidator) {
-                        if (props.editOptions.editStartValidator(item)) item.startEdit();
+                    if (!props.editOptions?.disabled && props.editOptions?.editStartValidator) {
+                        if (props.editOptions?.editStartValidator(item)) item.startEdit();
                     }
                     return;
                 }
