@@ -21,7 +21,7 @@
                      @add-drag="onAddDrag"
                      @end-drag="onEndDrag"
                      @update-drag="onUpdateDrag"
-                     @finish-edit="onFinishEdit"
+                     @update-data="applyChangesToSelectedNodes"
         >
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                 <slot :name="slot" v-bind="scope" />
@@ -232,7 +232,6 @@ export default defineComponent<Props>({
             if (selected) {
                 if (state.firstSelectedNode) {
                     if (state.firstSelectedNode._id === item._id) {
-                        proxyState.selectedNodes = [item];
                         return;
                     }
                     state.firstSelectedNode.setSelected(false, true);
@@ -291,6 +290,13 @@ export default defineComponent<Props>({
             proxyState.selectedNodes.push(item);
         };
 
+        const applyChangesToSelectedNodes = (item: TreeItem) => {
+            if (item.selected && state.firstSelectedNode && item._id === state.firstSelectedNode._id) {
+                proxyState.selectedNodes = [item];
+            }
+            // TODO: multi select mode
+        };
+
         const onDelete = (item: TreeItem) => {
             if (item.selected) {
                 checkSingleSelect(item, false);
@@ -313,7 +319,7 @@ export default defineComponent<Props>({
         };
 
         const onAddDrag = (item: TreeItem) => {
-            if (item.selected) checkSingleSelect(item, true);
+            applyChangesToSelectedNodes(item);
             emit('update-drag', item);
         };
 
@@ -325,10 +331,6 @@ export default defineComponent<Props>({
             emit('update-drag', item);
         };
 
-        const onFinishEdit = (item: TreeItem) => {
-            if (item.selected) checkSingleSelect(item, true);
-            emit('finish-edit', item);
-        };
 
         return {
             proxyState,
@@ -344,7 +346,7 @@ export default defineComponent<Props>({
             onAddDrag,
             onEndDrag,
             onUpdateDrag,
-            onFinishEdit,
+            applyChangesToSelectedNodes,
         };
     },
 });

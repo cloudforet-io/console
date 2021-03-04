@@ -305,18 +305,21 @@ export default defineComponent({
 
                     const dataSetter = props.editOptions.dataSetter;
                     const originData = proxyNode.data;
+
                     let newData;
                     if (dataSetter) {
                         newData = dataSetter(state.editText, originData);
                     } else {
                         newData = state.editText;
                     }
-                    proxyNode.data = newData;
 
-                    emit('finish-edit', state.node);
+                    state.node.setData(newData);
                 },
                 setData(data) {
                     proxyNode.data = data;
+                    vm.$nextTick(() => {
+                        emit('update-data', state.node);
+                    });
                 },
                 async setChildren<T>(children): Promise<TreeItem<T>[]> {
                     if (Array.isArray(children)) {
@@ -456,9 +459,8 @@ export default defineComponent({
             unselect: (...args) => { emit('unselect', ...args); },
             'start-drag': (...args) => { emit('start-drag', ...args); },
             'end-drag': (...args) => { emit('end-drag', ...args); },
-            'add-drag': (...args) => { emit('add-drag', ...args); },
             'update-drag': (...args) => { emit('update-drag', ...args); },
-            'finish-edit': (...args) => { emit('finish-edit', ...args); },
+            'update-data': (...args) => { emit('update-data', ...args); },
         };
 
 
