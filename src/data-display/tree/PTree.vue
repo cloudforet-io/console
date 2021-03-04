@@ -326,6 +326,7 @@ export default defineComponent<Props>({
         };
 
         const onFinishEdit = (item: TreeItem) => {
+            if (item.selected) checkSingleSelect(item, true);
             emit('finish-edit', item);
         };
 
