@@ -989,6 +989,11 @@
 			"PLACE_HOLDER_PROJECT": "프로젝트 ",
 			"PLACE_HOLDER_SHOW_MORE": "더보기",
 			"PROJECT_GROUPS": "프로젝트 그룹 ",
+			"PROJECT_GROUP_TREE": {
+				"CREATE": "",
+				"DONE": "",
+				"EDIT": ""
+			},
 			"SEARCH": "검색 ",
 			"SEARCH_PROJECT_GROUP": "프로젝트 그룹 ",
 			"SERVER": "서버 ",

@@ -989,6 +989,11 @@
 			"PLACE_HOLDER_PROJECT": "Project",
 			"PLACE_HOLDER_SHOW_MORE": "more",
 			"PROJECT_GROUPS": "Project Groups",
+			"PROJECT_GROUP_TREE": {
+				"CREATE": "Create",
+				"DONE": "Done",
+				"EDIT": "Edit"
+			},
 			"SEARCH": "Search ",
 			"SEARCH_PROJECT_GROUP": "Project Group",
 			"SERVER": "Servers",

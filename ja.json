@@ -989,6 +989,11 @@
 			"PLACE_HOLDER_PROJECT": "プロジェクト",
 			"PLACE_HOLDER_SHOW_MORE": "もっと見る",
 			"PROJECT_GROUPS": "プロジェクトグループ",
+			"PROJECT_GROUP_TREE": {
+				"CREATE": "",
+				"DONE": "",
+				"EDIT": ""
+			},
 			"SEARCH": "検索",
 			"SEARCH_PROJECT_GROUP": "プロジェクトグループ",
 			"SERVER": "サーバ",
