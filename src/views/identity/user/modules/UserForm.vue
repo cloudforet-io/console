@@ -288,7 +288,9 @@ export default {
                 if (formState.selectedAuthType.backend === 'EXTERNAL') {
                     await checkOauth();
                 }
-                await checkEmailFormat(formState.user_id);
+                if (formState.selectedAuthType.label === 'Local') {
+                    await checkEmailFormat(formState.user_id);
+                }
                 await checkDuplicatedId();
                 if (typeof validationState.isUserIdValid !== 'boolean') validationState.isUserIdValid = true;
             } else {
