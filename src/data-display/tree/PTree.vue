@@ -128,7 +128,7 @@ export default defineComponent<Props>({
             root: null as null|TreeItem,
             nodes: [] as TreeNode[],
             firstSelectedNode: computed<TreeItem>(() => proxyState.selectedNodes[0]),
-            draggingNode: null as null|TreeItem,
+            draggingNode: null as null|TreeNode,
         });
 
 
