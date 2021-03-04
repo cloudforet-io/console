@@ -97,12 +97,15 @@ import {
 
 
 am4core.useTheme(am4themes_animated);
+am4core.options.autoSetClassName = true;
+am4core.options.classNamePrefix = 'SpotGroupBilling';
 
 interface ChartData {
     date: string;
-    onDemand: number;
-    spot: number;
-    instance: number;
+    onDemand: number | null;
+    spot: number | null;
+    instance: number | null;
+    bulletText?: string | number;
 }
 
 const MONTH_COUNT = 6;
@@ -142,7 +145,7 @@ export default {
             data: [],
             //
             chartRef: null as HTMLElement | null,
-            chart: null, // as null | any,
+            chart: null as null | any,
             chartRegistry: {},
             chartData: [] as ChartData[],
             //
@@ -191,9 +194,19 @@ export default {
             dateAxis.tooltip.disabled = true;
             dateAxis.fontSize = 11;
 
+            const setTooltipStyle = (tooltip, field) => {
+                tooltip.pointerOrientation = 'down';
+                tooltip.fontSize = 14;
+                tooltip.strokeWidth = 0;
+                tooltip.dy = -5;
+                tooltip.getFillFromObject = false;
+                tooltip.label.fill = am4core.color(state.colors[field]);
+                tooltip.background.stroke = am4core.color(state.colors[field]);
+            };
             const createValueAxis = (axisName, opposite = false) => {
                 const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
                 valueAxis.renderer.minGridDistance = 50;
+                valueAxis.renderer.baseGrid.disabled = true;
                 valueAxis.renderer.grid.template.strokeOpacity = 1;
                 valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
                 valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
@@ -217,12 +230,14 @@ export default {
                 series.stacked = true;
                 series.strokeWidth = 0;
                 series.columns.template.width = am4core.percent(10);
+                series.columns.template.tooltipText = `\${${field}}`;
+                setTooltipStyle(series.tooltip, field);
             };
             createValueAxis('비용');
             createBarSeries('onDemand');
             createBarSeries('spot');
 
-            // create line axis and series
+            // create line series
             const lineValueAxis = createValueAxis('인스턴스', true);
             const lineSeries = chart.series.push(new am4charts.LineSeries());
             lineSeries.dataFields.categoryX = 'date';
@@ -232,11 +247,23 @@ export default {
             lineSeries.strokeWidth = 2;
             lineSeries.strokeDasharray = '2, 2';
             lineSeries.fillOpacity = 1;
+            lineSeries.bulletsContainer.parent = chart.seriesContainer;
             lineSeries.yAxis = lineValueAxis;
-            const bullet = lineSeries.bullets.push(new am4charts.CircleBullet());
-            bullet.circle.radius = 3;
-            bullet.circle.stroke = am4core.color('white');
-            bullet.circle.strokeWidth = 2;
+            setTooltipStyle(lineSeries.tooltip, 'instance');
+
+            const circleBullet = lineSeries.bullets.push(new am4charts.CircleBullet());
+            circleBullet.circle.radius = 3;
+            circleBullet.circle.stroke = am4core.color('white');
+            circleBullet.circle.strokeWidth = 2;
+            circleBullet.tooltipText = '{instance}';
+
+            const labelBullet = lineSeries.bullets.push(new am4charts.LabelBullet());
+            labelBullet.label.text = '{bulletText}';
+            labelBullet.label.fontSize = 14;
+            labelBullet.label.truncate = false;
+            labelBullet.label.hideOversized = false;
+            labelBullet.label.fill = am4core.color(state.colors.instance);
+            labelBullet.label.dy = -12;
 
             const fillModifier = new am4core.LinearGradientModifier();
             fillModifier.opacities = [0.1, 0];
@@ -248,16 +275,36 @@ export default {
         /* api */
         const getChartData = async () => {
             const data = [] as ChartData[];
+            let maxInstance = 0;
             forEach(range(0, MONTH_COUNT), (i) => {
-                const date = dayjs.utc().subtract(i, 'month').format('MMM');
+                let bulletText;
+                const date = dayjs.utc().subtract(i, 'month');
+                let formattedDate = date.format('MMM');
+
+                const onDemand = random(50, 100);
+                const spot = random(10, 100);
+                const instance = random(1, 300);
+                if (date.format('M') === '1' || date.format('M') === '12') {
+                    formattedDate = date.format('MMM, YY');
+                }
+                if (i === 0 || i === MONTH_COUNT - 1) {
+                    bulletText = instance;
+                }
+                if (instance > maxInstance) maxInstance = instance;
+
                 data.push({
-                    date,
-                    onDemand: random(1, 100),
-                    spot: random(1, 100),
-                    instance: random(200, 300),
+                    date: formattedDate,
+                    onDemand,
+                    spot,
+                    instance,
+                    bulletText,
                 });
             });
-            state.chartData = data;
+            data.forEach((d) => {
+                if (d.instance === maxInstance) d.bulletText = d.instance;
+            });
+
+            state.chartData = data.reverse();
         };
 
         const init = async () => {
@@ -430,5 +477,10 @@ export default {
             }
         }
     }
+}
+</style>
+<style lang="postcss">
+.SpotGroupBillingLabel {
+    text-shadow: 2px 0 white, -2px 0 white, 0 2px white, 0 -2px white, 1px 1px white, -1px -1px white, -1px 1px white, 1px -1px white;
 }
 </style>

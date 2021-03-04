@@ -87,6 +87,7 @@ interface ChartData {
     onDemand: number;
     spot: number;
     interrupt: number;
+    bulletText?: string | number;
 }
 
 enum DATE_TYPE {
@@ -106,7 +107,7 @@ export default {
         PIconButton,
         PDataTable,
     },
-    setup(props) {
+    setup() {
         const state = reactive({
             loading: false,
             legends: computed(() => ([
@@ -176,6 +177,7 @@ export default {
 
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
             valueAxis.renderer.minGridDistance = 30;
+            valueAxis.renderer.baseGrid.disabled = true;
             valueAxis.renderer.grid.template.strokeOpacity = 1;
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
             valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
@@ -184,6 +186,15 @@ export default {
             valueAxis.extraMax = 0.15;
             valueAxis.min = 0;
 
+            const setTooltipStyle = (tooltip, field) => {
+                tooltip.pointerOrientation = 'down';
+                tooltip.fontSize = 14;
+                tooltip.strokeWidth = 0;
+                tooltip.dy = -5;
+                tooltip.getFillFromObject = false;
+                tooltip.label.fill = am4core.color(state.colors[field]);
+                tooltip.background.stroke = am4core.color(state.colors[field]);
+            };
             const createBarSeries = (field) => {
                 const series = chart.series.push(new am4charts.ColumnSeries());
                 series.dataFields.categoryX = 'date';
@@ -192,6 +203,8 @@ export default {
                 series.stacked = true;
                 series.strokeWidth = 0;
                 series.columns.template.width = am4core.percent(15);
+                series.columns.template.tooltipText = `\${${field}}`;
+                setTooltipStyle(series.tooltip, field);
             };
             createBarSeries('onDemand');
             createBarSeries('spot');
@@ -205,10 +218,22 @@ export default {
             lineSeries.strokeWidth = 2;
             lineSeries.strokeDasharray = '2, 2';
             lineSeries.fillOpacity = 1;
-            const bullet = lineSeries.bullets.push(new am4charts.CircleBullet());
-            bullet.circle.radius = 3;
-            bullet.circle.stroke = am4core.color('white');
-            bullet.circle.strokeWidth = 2;
+            lineSeries.bulletsContainer.parent = chart.seriesContainer;
+            setTooltipStyle(lineSeries.tooltip, 'interrupt');
+
+            const circleBullet = lineSeries.bullets.push(new am4charts.CircleBullet());
+            circleBullet.circle.radius = 3;
+            circleBullet.circle.stroke = am4core.color('white');
+            circleBullet.circle.strokeWidth = 2;
+            circleBullet.tooltipText = '{interrupt}';
+
+            const labelBullet = lineSeries.bullets.push(new am4charts.LabelBullet());
+            labelBullet.label.text = '{bulletText}';
+            labelBullet.label.fontSize = 14;
+            labelBullet.label.truncate = false;
+            labelBullet.label.hideOversized = false;
+            labelBullet.label.fill = am4core.color(state.colors.interrupt);
+            labelBullet.label.dy = -12;
 
             const fillModifier = new am4core.LinearGradientModifier();
             fillModifier.opacities = [0.3, 0];
@@ -221,17 +246,39 @@ export default {
         const getChartData = async () => {
             const dateUnit = state.selectedDateType === DATE_TYPE.monthly ? 'month' : 'day';
             const dateCount = state.selectedDateType === DATE_TYPE.monthly ? MONTH_COUNT : DAY_COUNT;
+            const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
             const data = [] as ChartData[];
+            let maxInterrupt = 0;
+            // api 값 가져오고 비어있으면 더미데이터
             forEach(range(0, dateCount), (i) => {
-                const date = dayjs.utc().subtract(i, dateUnit).format('MM/DD');
+                let bulletText;
+                const date = dayjs.utc().subtract(i, dateUnit);
+                let formattedDate = date.format(dateFormat);
+                const onDemand = random(50, 100);
+                const spot = random(10, 100);
+                const interrupt = random(1, 10);
+
+                if (state.selectedDateType === DATE_TYPE.monthly && (date.format('M') === '1' || date.format('M') === '12')) {
+                    formattedDate = date.format('MMM, YY');
+                }
+                if (i === 0 || i === dateCount - 1) {
+                    bulletText = interrupt;
+                }
+                if (interrupt > maxInterrupt) maxInterrupt = interrupt;
+
                 data.push({
-                    date,
-                    onDemand: random(1, 100),
-                    spot: random(1, 100),
-                    interrupt: random(30, 200),
+                    date: formattedDate,
+                    onDemand,
+                    spot,
+                    interrupt,
+                    bulletText,
                 });
             });
-            state.chartData = data;
+            data.forEach((d) => {
+                if (d.interrupt === maxInterrupt) d.bulletText = d.interrupt;
+            });
+
+            state.chartData = data.reverse();
         };
 
         /* event */
@@ -254,6 +301,10 @@ export default {
                 drawChart(chartCtx);
             }
         }, { immediate: true });
+        watch(() => state.selectedDateType, async () => {
+            await getChartData();
+            drawChart(state.chartRef);
+        }, { immediate: false });
 
         return {
             ...toRefs(state),

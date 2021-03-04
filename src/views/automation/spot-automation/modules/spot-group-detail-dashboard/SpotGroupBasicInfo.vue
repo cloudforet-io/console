@@ -88,12 +88,12 @@ export default {
         PAnchor,
         PChartLoader,
     },
-    setup(props) {
+    setup() {
         const state = reactive({
             loading: false,
-            loaderRef: null,
+            loaderRef: null as HTMLElement | null,
             chartRef: null as HTMLElement | null,
-            chart: null, // as null | any,
+            chart: null as null | any,
             chartRegistry: {},
             data: [] as ChartData[],
         });
@@ -118,8 +118,8 @@ export default {
 
             if (isLoading) {
                 chart.data = [{
-                    provider: 'Dummy',
-                    service_account_count: 1000,
+                    type: 'Dummy',
+                    count: 1000,
                     color: DEFAULT_COLORS[0],
                 }];
             } else {
@@ -139,7 +139,6 @@ export default {
             series.slices.template.states.getKey('hover').properties.scale = 1;
             series.tooltip.disabled = true;
             series.ticks.template.disabled = true;
-            series.labels.template.text = '';
 
             const label = new am4core.Label();
             label.parent = series;
@@ -149,16 +148,7 @@ export default {
             label.fontWeight = 'lighter';
             label.fill = am4core.color(gray[900]);
             label.text = '{values.value.sum}';
-            // if (isLoading) label.text = '';
-            // else if (props.count) {
-            //     if (props.label === 'Storage') {
-            //         label.text = byteFormatter(props.count).split(' ')[0];
-            //     } else {
-            //         label.text = props.count;
-            //     }
-            // } else {
-            //     label.text = '{values.value.sum}';
-            // }
+            if (isLoading) label.text = '';
 
             state.chart = chart;
         };
@@ -278,6 +268,8 @@ export default {
             display: inline-flex;
             .p-chart-loader {
                 display: inline-block;
+                width: 6rem;
+                height: 6rem;
                 .chart {
                     max-width: 6rem;
                     max-height: 6rem;
@@ -288,8 +280,14 @@ export default {
                 font-size: 0.875rem;
                 padding: 0.25rem 0.5rem;
                 .legend {
-                    margin-bottom: 0.25rem;
                     line-height: 1.5;
+                    cursor: pointer;
+                    padding: 0 0.125rem;
+                    margin-bottom: 0.25rem;
+                    &:hover {
+                        @apply bg-secondary2;
+                        text-decoration: underline;
+                    }
                     .circle {
                         display: inline-block;
                         width: 0.5rem;
