@@ -1,0 +1,18 @@
+.p-tree-template {
+    .p-tree {
+        .tree-row {
+            &:not(:hover) .add-btn {
+                display: none;
+            }
+            &.no-permission > .node {
+                > .data, > .icon {
+                    @apply text-gray-400;
+                    cursor: not-allowed;
+                }
+                .add-btn {
+                    display: none;
+                }
+            }
+        }
+    }
+}

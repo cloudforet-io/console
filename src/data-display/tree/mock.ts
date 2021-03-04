@@ -39,3 +39,12 @@ export const getRecursiveInfo = () => {
         lists, paths,
     };
 };
+
+export const getPermissionInfo = (items, res = {}) => {
+    items.forEach((d) => {
+        res[d.data.id] = faker.random.boolean();
+        const children = d.getChildrenNodes();
+        getPermissionInfo(children, res);
+    });
+    return res;
+};

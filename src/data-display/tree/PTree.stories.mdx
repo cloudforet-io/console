@@ -6,9 +6,10 @@ import PButton from '@/inputs/buttons/button/PButton.vue'
 import PRadio from '@/inputs/radio/PRadio.vue'
 import PTextInput from '@/inputs/input/PTextInput.vue';
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
+import faker from 'faker';
 import { reactive, toRefs, computed, watch } from '@vue/composition-api';
-import {getTreeList, getTreeData, getTreeNode, getRecursiveInfo} from './mock';
-import './PTree.stories.scss'
+import {getTreeList, getTreeData, getTreeNode, getRecursiveInfo, getPermissionInfo} from './mock';
+import './PTree.stories.pcss'
 
 <Meta title='Data Display/Tree' argTypes={{}}/>
 
@@ -21,8 +22,8 @@ export const Template = (args, { argTypes }) => ({
         <div class="mb-4">
             <p-button style-type="primary1" @click="refresh">Refresh</p-button>
             <p-button style-type="secondary" @click="add">Add node to root</p-button>
-            <p-button style-type="safe" @click="dragOptions.disabled = !dragOptions.disabled">
-                {{dragOptions.disabled ? 'Enable drag' : 'Disable drag' }}
+            <p-button style-type="safe" @click="onClickEdit">
+                {{editMode ? 'Done' : 'Edit' }}
             </p-button>
             <p-button style-type="primary" @click="findNode">Find node</p-button>
             {{target}}
@@ -35,12 +36,13 @@ export const Template = (args, { argTypes }) => ({
                     :select-options="selectOptions"
                     :edit-options="editOptions"
                     :drag-options="dragOptions"
+                    :get-class-names="getClassNames"
                     fetch-on-init
                     @init="onTreeInit"
                     class="w-1/2"
             >
                 <template #data="{node}">
-                    {{ node.data.name }} ({{node.data.id}})
+                        {{ node.data.name }} ({{node.data.id}})
                 </template>
                 <template #toggle="{node}">
                     <p-i v-if="node.loading" name="ic_working"
@@ -58,31 +60,26 @@ export const Template = (args, { argTypes }) => ({
                     />
                 </template>
                 <template #icon="{node}">
-                    <p-i :name="node.data.item_type === 'PROJECT' ? 'ic_tree_project' : 'ic_tree_project-group'"
+                    <template v-if="editMode">
+                        <p-i v-if="node.data.item_type === 'PROJECT_GROUP'"
+                             :name="permissionInfo[node.data.id] ? 'ic_tree_project-group' : 'ic_tree_project-group_locked'"
+                             width="1rem" height="1rem" color="inherit"
+                        />
+                    </template>
+                    <p-i v-else :name="node.data.item_type === 'PROJECT' ? 'ic_tree_project' : 'ic_tree_project-group'"
                          width="1rem" height="1rem" color="inherit transparent"
                     />
                 </template>
                 <template #right-extra="{node}">
-                    <p-icon-button name="ic_minus"
+                    <p-icon-button v-if="editMode && permissionInfo[node.data.id]" name="ic_minus"
                                    color="inherit transparent"
                                    size="sm"
-                                   :disabled="node.disabled"
                                    @click.stop="node.deleteNode()"
                     />
-                    <p-icon-button name="ic_plus"
+                    <p-icon-button v-else name="ic_plus"
+                                   class="add-btn"
                                    size="sm"
-                                   :disabled="node.disabled"
                                    @click.stop="node.addChild(getTreeData())"
-                    />
-                    <p-icon-button name="ic_edit-text"
-                                   size="sm"
-                                   :disabled="node.disabled"
-                                   @click.stop="node.startEdit(node.data.name)"
-                    />
-                    <p-icon-button :name="node.disabled ? 'ic_tree_project-group' : 'ic_tree_project-group_locked'"
-                                   size="sm"
-                                   color="inherit"
-                                   @click.stop="node.setDisabled(!node.disabled)"
                     />
                 </template>
             </p-tree>
@@ -102,20 +99,34 @@ export const Template = (args, { argTypes }) => ({
                     return data.item_type === 'PROJECT'
                 }
             },
-            editOptions: {
+            editOptions: computed(() => ({
+                disabled: !state.editMode,
+                editStartValidator: (item) => {
+                    return state.permissionInfo[item.data.id]
+                },
                 validator: (text) => (text && text.length > 2 && text.length < 40),
                 invalidText: 'should NOT be shorter than 2 characters',
-                validText: '2 ~ 40 characters',
                 dataSetter(text, originData) {
                     return {
                         ...originData,
                         name: text
                     }
                 },
-            },
-            dragOptions: {
-                disabled: false,
-            },
+                dataGetter(data) {
+                    return data.name
+                }
+            })),
+            dragOptions: computed(() => ({
+                disabled: !state.editMode,
+                dragValidator(node) {
+                    return !!state.permissionInfo[node.data.id]
+                },
+                dropValidator(node) {
+                    return !!state.permissionInfo[node.data.id]
+                }
+            })),
+            editMode: false,
+            permissionInfo: {},
             findMode: false,
             lists: [],
             target: ''
@@ -123,12 +134,22 @@ export const Template = (args, { argTypes }) => ({
         let dataFetcher = (item) => {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
+                    let res;
                     if (state.findMode) {
-                        resolve(state.lists[item ? item.level : 0])
+                        res = state.lists[item ? item.level : 0]
+                    } else {
+                        res = getTreeList()
                     }
-                    else resolve(getTreeList())
+                    if (state.editMode && Array.isArray(res)) {
+                        res.forEach(d => {state.permissionInfo[d.id] = faker.random.boolean();})
+                    }
+                    resolve(res)
                 }, 500)
             })
+        }
+        const getClassNames = (item) => {
+            if (state.editMode && !state.permissionInfo[item._id]) return 'no-permission'
+            else return ''
         }
         const refresh = async () => {
             if (state.root) {
@@ -139,6 +160,12 @@ export const Template = (args, { argTypes }) => ({
         }
         const add = () => {
             state.root.addChild(getTreeData())
+        }
+        const onClickEdit = () => {
+            state.editMode = !state.editMode;
+            if (state.editMode && state.root) {
+                state.permissionInfo = getPermissionInfo(state.root.getChildrenNodes())
+            }
         }
         const findNode = async () => {
             const {lists, paths} = getRecursiveInfo()
@@ -157,8 +184,10 @@ export const Template = (args, { argTypes }) => ({
         return {
             ...toRefs(state),
             dataFetcher,
+            getClassNames,
             refresh,
             add,
+            onClickEdit,
             onTreeInit,
             getTreeData,
             getTreeNode,

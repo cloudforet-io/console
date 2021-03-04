@@ -1,7 +1,11 @@
 <template>
-    <div :class="level ? 'p-tree-node' : 'tree-root'">
+    <div :class="{
+        'p-tree-node': level !== 0,
+        dragging: draggingChild && draggingChild._id === proxyNode._id
+    }"
+    >
         <div v-if="level" class="tree-row"
-             :class="{selected, disabled, [`level-${level}`]: true}"
+             :class="classNames"
              :style="{paddingLeft: depth}"
         >
             <slot :name="`row-${level}`" v-bind="slotBind">
@@ -32,19 +36,12 @@
                                         </slot>
                                     </slot>
                                 </span>
-                                <template v-if="!editOptions.disabled && isEditMode">
-                                    <p-field-group :invalid="invalid"
-                                                   :valid="!invalid"
-                                                   :invalid-text="editOptions.invalidText"
-                                                   :valid-text="editOptions.validText"
-                                    >
-                                        <p-text-input v-model="editText" v-focus="true"
-                                                      :invalid="invalid"
-                                                      @blur="node.finishEdit()"
-                                                      @keydown.enter="node.finishEdit()"
-                                        />
-                                    </p-field-group>
-                                </template>
+                                <p-text-input v-if="!editOptions.disabled && isEditing"
+                                              v-model="editText" v-focus="true"
+                                              :invalid="invalid"
+                                              @blur="node.finishEdit()"
+                                              @keydown.enter="node.finishEdit()"
+                                />
                                 <template v-else>
                                     <span v-if="$scopedSlots[`toggle-right-${level}`] || $scopedSlots[`toggle-right`]"
                                           class="toggle-right"
@@ -89,11 +86,12 @@
                        ghost-class="ghost"
                        :sort="false"
                        :move="checkMove"
-                       @choose="onDragChoose"
                        @start="onDragStart"
+                       @add="onDragAdd"
                        @end="onDragEnd"
+                       @update="onDragUpdate"
         >
-            <transition-group type="transition">
+            <transition-group>
                 <p-tree-node v-for="(child, idx) in proxyNode.children"
                              ref="childrenRef"
                              :key="child._id"
@@ -105,16 +103,14 @@
                              :edit-options="editOptions"
                              :drag-options="dragOptions"
                              :get-default-node="getDefaultNode"
+                             :get-class-names="getClassNames"
                              :parent="node"
                              :data.sync="child.data"
                              :children.sync="child.children"
                              :expanded.sync="child.expanded"
                              :loading.sync="child.loading"
                              :selected.sync="child.selected"
-                             :disabled.sync="child.disabled"
-                             :class="{
-                                 draggable: !dragOptions.disabled && !child.disabled,
-                             }"
+                             class="draggable"
                              v-on="childListeners"
                 >
                     <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
@@ -185,6 +181,10 @@ export default defineComponent({
             type: Object,
             default: () => ({}),
         },
+        getClassNames: {
+            type: Function,
+            default: () => ({}),
+        },
         getDefaultNode: {
             type: Function,
             default: () => ({}),
@@ -201,16 +201,10 @@ export default defineComponent({
             default: '',
             required: true,
         },
-        /**
-         * sync
-         */
         children: {
             type: [Array, Boolean],
             default: false,
         },
-        /**
-         * sync
-         */
         expanded: {
             type: Boolean,
             default: false,
@@ -220,10 +214,6 @@ export default defineComponent({
             default: false,
         },
         selected: {
-            type: Boolean,
-            default: false,
-        },
-        disabled: {
             type: Boolean,
             default: false,
         },
@@ -238,13 +228,13 @@ export default defineComponent({
             expanded: makeProxy('expanded', props, emit),
             loading: makeProxy('loading', props, emit),
             selected: makeProxy('selected', props, emit),
-            disabled: makeProxy('disabled', props, emit),
         });
 
         const getChildrenNodes = (): Promise<TreeItem[]> => new Promise(((resolve) => {
             vm.$nextTick(() => {
                 // eslint-disable-next-line no-use-before-define
                 if (Array.isArray(state.childrenRef)) resolve(state.childrenRef.map(d => d.node));
+                else resolve([]);
             });
         }));
 
@@ -258,7 +248,20 @@ export default defineComponent({
                 const unit = props.padSize.match(/[a-zA-Z]+/g);
                 return `${(props.level || 0) * (size ? Number(size[0]) : 1)}${unit ? unit[0] : 'rem'}`;
             }),
-            isEditMode: false,
+            classNames: computed(() => {
+                let res = {
+                    selected: props.selected,
+                    [`level-${props.level}`]: true,
+                };
+                const custom = props.getClassNames(state.node);
+                if (!custom) return res;
+
+                if (Array.isArray(custom)) custom.forEach((d) => { res[d] = true; });
+                else if (typeof custom === 'string') res[custom] = true;
+                else res = { ...res, ...custom };
+                return res;
+            }),
+            isEditing: false,
             editText: '',
             invalid: computed(() => {
                 if (props.editOptions.validator) return !props.editOptions.validator(state.editText);
@@ -270,6 +273,10 @@ export default defineComponent({
                 level: props.level || 0,
                 parent: props.parent,
                 el: state.nodeRef,
+                getChildrenNodes() {
+                    if (Array.isArray(state.childrenRef)) return state.childrenRef.map(d => d.node);
+                    return [];
+                },
                 deleteNode() {
                     emit('delete', state.node);
                 },
@@ -284,14 +291,16 @@ export default defineComponent({
                     const res = await getChildrenNodes();
                     return res.find(d => d._id === newNode._id) as TreeItem;
                 },
-                startEdit(value) {
+                startEdit() {
                     if (props.editOptions.disabled) return;
-                    if (value) state.editText = value;
+                    if (props.editOptions.dataGetter) state.editText = props.editOptions.dataGetter(proxyNode.data);
                     else state.editText = proxyNode.data;
-                    state.isEditMode = true;
+                    state.isEditing = true;
                 },
-                finishEdit(afterFinishEdit) {
-                    state.isEditMode = false;
+                finishEdit() {
+                    if (!state.isEditing) return;
+
+                    state.isEditing = false;
                     if (state.invalid) return;
 
                     const dataSetter = props.editOptions.dataSetter;
@@ -303,7 +312,8 @@ export default defineComponent({
                         newData = state.editText;
                     }
                     proxyNode.data = newData;
-                    if (afterFinishEdit) afterFinishEdit(state.node);
+
+                    emit('finish-edit', state.node);
                 },
                 setData(data) {
                     proxyNode.data = data;
@@ -348,7 +358,6 @@ export default defineComponent({
                     proxyNode.loading = loading;
                 },
                 setSelected(selected, force = false) {
-                    if (proxyNode.disabled) return;
                     if (force) {
                         proxyNode.selected = selected;
                     } else {
@@ -358,9 +367,6 @@ export default defineComponent({
                         emit('check-select', state.node, selected);
                     }
                 },
-                setDisabled(disabled) {
-                    proxyNode.disabled = disabled;
-                },
                 /* Tree Node */
                 _id: proxyNode._id,
                 data: proxyNode.data,
@@ -368,7 +374,6 @@ export default defineComponent({
                 expanded: proxyNode.expanded,
                 loading: proxyNode.loading,
                 selected: proxyNode.selected,
-                disabled: proxyNode.disabled,
             })),
         });
 
@@ -391,27 +396,40 @@ export default defineComponent({
             getListeners,
         }));
 
-        const onDragChoose = async (e) => {
-            if (props.dragOptions.dragValidator) {
-                let res: any = props.dragOptions.dragValidator(state.node);
-                if (res instanceof Promise) res = await res;
-                // TODO
-            }
-        };
 
         const onDragStart = (e) => {
             state.draggingChild = proxyNode.children[e.oldIndex];
-            emit('start-drag', proxyNode.children[e.oldIndex]);
+            emit('start-drag', state.draggingChild);
         };
 
-        const onDragEnd = (e) => {
+        const onDragAdd = (e) => {
+            const node = proxyNode.children[e.newIndex];
+            if (node) {
+                const item = state.node.findChildNode(node._id);
+                if (item) emit('add-drag', item);
+            }
+        };
+
+        const onDragEnd = () => {
             state.draggingChild = null;
             emit('end-drag');
         };
 
-        const checkMove = (e) => {
-            const validator = props.dragOptions.dropValidator;
-            if (validator) validator(e.draggedContext.element);
+        const onDragUpdate = (e) => {
+            const node = proxyNode.children[e.newIndex];
+            if (node) {
+                const item = state.node.findChildNode(node._id);
+                if (item) emit('update-drag', item);
+            }
+        };
+
+        const checkMove = (e, t) => {
+            const dragValidator = props.dragOptions.dragValidator;
+            if (dragValidator && !dragValidator(e.draggedContext.element)) return false;
+
+            const dropValidator = props.dragOptions.dropValidator;
+            if (dropValidator && !dropValidator(e.relatedContext.element)) return false;
+
             return true;
         };
 
@@ -438,6 +456,9 @@ export default defineComponent({
             unselect: (...args) => { emit('unselect', ...args); },
             'start-drag': (...args) => { emit('start-drag', ...args); },
             'end-drag': (...args) => { emit('end-drag', ...args); },
+            'add-drag': (...args) => { emit('add-drag', ...args); },
+            'update-drag': (...args) => { emit('update-drag', ...args); },
+            'finish-edit': (...args) => { emit('finish-edit', ...args); },
         };
 
 
@@ -447,9 +468,10 @@ export default defineComponent({
             proxyNode,
             ...toRefs(state),
             slotBind,
-            onDragChoose,
             onDragStart,
+            onDragAdd,
             onDragEnd,
+            onDragUpdate,
             checkMove,
             onToggle,
             onClickNode,
@@ -478,27 +500,26 @@ export default defineComponent({
         .data {
             @apply leading-normal truncate;
         }
+        .p-text-input {
+            @apply ml-1 w-full;
+        }
         .right-extra {
             @apply flex-grow;
         }
-        &:hover:not(.disabled) {
+        &:hover {
             @apply text-secondary bg-secondary2;
         }
-        &.selected:not(.disabled) {
-            @apply bg-blue-200 border border-secondary;
-        }
-        &.disabled {
-            @apply text-gray-400;
-            cursor: not-allowed;
+        &.selected {
+            @apply bg-blue-200;
         }
     }
-    &[draggable=true] {
+    &.dragging {
         > .tree-row {
             @apply text-secondary bg-secondary2;
         }
     }
     &.ghost {
-        > .tree-row:not(.disabled) {
+        > .tree-row {
             @apply text-secondary bg-secondary2;
             opacity: 0.5;
         }

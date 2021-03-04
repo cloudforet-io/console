@@ -8,6 +8,7 @@
                      :edit-options="editOptions"
                      :drag-options="dragOptions"
                      :get-default-node="getDefaultNode"
+                     :get-class-names="getClassNames"
                      data="root"
                      :children.sync="nodes"
                      @init="onInit"
@@ -17,7 +18,10 @@
                      @click-node="onClickNode"
                      @check-select="onCheckSelect"
                      @start-drag="onStartDrag"
+                     @add-drag="onAddDrag"
                      @end-drag="onEndDrag"
+                     @update-drag="onUpdateDrag"
+                     @finish-edit="onFinishEdit"
         >
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                 <slot :name="slot" v-bind="scope" />
@@ -110,8 +114,12 @@ export default defineComponent<Props>({
             type: Function,
             default: undefined,
         },
+        getClassNames: {
+            type: Function,
+            default: undefined,
+        },
     },
-    setup(props) {
+    setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const proxyState = reactive({
             selectedNodes: makeOptionalProxy<TreeItem[]>('selectedNodes', vm, []),
@@ -139,7 +147,6 @@ export default defineComponent<Props>({
                 expanded: false,
                 selected: false,
                 loading: false,
-                disabled: false,
             };
             if (props.nodeFormatter) return props.nodeFormatter(node);
             return node;
@@ -177,7 +184,8 @@ export default defineComponent<Props>({
                     node = next;
                 }
 
-                return node;
+                if (node?.level !== 0) return node;
+                return null;
             },
         };
 
@@ -190,7 +198,7 @@ export default defineComponent<Props>({
                 await root.setChildren(res);
             }
 
-            vm.$emit('init', state.root);
+            emit('init', state.root);
         };
 
         const onToggle = async (item: TreeItem) => {
@@ -223,7 +231,10 @@ export default defineComponent<Props>({
         const checkSingleSelect = (item: TreeItem, selected) => {
             if (selected) {
                 if (state.firstSelectedNode) {
-                    if (state.firstSelectedNode._id === item._id) return;
+                    if (state.firstSelectedNode._id === item._id) {
+                        proxyState.selectedNodes = [item];
+                        return;
+                    }
                     state.firstSelectedNode.setSelected(false, true);
                 }
 
@@ -259,13 +270,18 @@ export default defineComponent<Props>({
         };
 
         const onClickNode = (item: TreeItem) => {
-            if (props.selectOptions?.disabled || item.disabled) return;
+            if (props.selectOptions?.disabled) return;
 
             const validator = props.selectOptions?.validator;
             if (validator && !validator(item)) return;
 
             if (state.firstSelectedNode) {
-                if (state.firstSelectedNode._id === item._id) return;
+                if (state.firstSelectedNode._id === item._id) {
+                    if (!props.editOptions.disabled && props.editOptions.editStartValidator) {
+                        if (props.editOptions.editStartValidator(item)) item.startEdit();
+                    }
+                    return;
+                }
 
                 state.firstSelectedNode.setSelected(false, true);
                 proxyState.selectedNodes.splice(0, 1);
@@ -288,16 +304,29 @@ export default defineComponent<Props>({
                 state.nodes.splice(item.index, 1);
             }
 
-            vm.$emit('delete', item.data);
+            emit('delete', item.data);
         };
 
 
-        const onStartDrag = (item: TreeItem) => {
-            state.draggingNode = item;
+        const onStartDrag = (node: TreeNode) => {
+            state.draggingNode = node;
         };
 
-        const onEndDrag = (item: TreeItem) => {
+        const onAddDrag = (item: TreeItem) => {
+            if (item.selected) checkSingleSelect(item, true);
+            emit('update-drag', item);
+        };
+
+        const onEndDrag = () => {
             state.draggingNode = null;
+        };
+
+        const onUpdateDrag = (item: TreeItem) => {
+            emit('update-drag', item);
+        };
+
+        const onFinishEdit = (item: TreeItem) => {
+            emit('finish-edit', item);
         };
 
         return {
@@ -311,7 +340,10 @@ export default defineComponent<Props>({
             onClickNode,
             onCheckSelect,
             onStartDrag,
+            onAddDrag,
             onEndDrag,
+            onUpdateDrag,
+            onFinishEdit,
         };
     },
 });
@@ -321,7 +353,7 @@ export default defineComponent<Props>({
 .p-tree {
     &.drag {
         .p-tree-node:not(.ghost) {
-            > .tree-row:hover:not(.disabled) {
+            > .tree-row:hover {
                 @apply text-black;
                 background-color: inherit;
             }
