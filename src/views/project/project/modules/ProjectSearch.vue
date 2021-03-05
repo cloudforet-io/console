@@ -65,7 +65,7 @@
 <script lang="ts">
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, UnwrapRef, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -77,6 +77,7 @@ import { debounce } from 'lodash';
 import { ItemType } from '@/views/project/project/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { store } from '@/store';
 
 const LIMIT = 5;
 
@@ -137,20 +138,13 @@ export default {
         PI,
         PAutocompleteSearch,
     },
-    props: {
-        groupId: {
-            type: String,
-            default: undefined,
-        },
-        groupName: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props: Props, { emit }) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const state = reactive({
-            searchText: vm.$route.query.search as string,
+            groupId: computed(() => store.getters['projectPage/groupId']),
+            groupName: computed(() => store.getters['projectPage/groupName']),
+            searchText: '' as string,
             trimmedValue: computed<string>(() => (typeof state.searchText === 'string' ? state.searchText.trim() : '')),
             regex: computed(() => {
                 if (state.trimmedValue) {
@@ -166,7 +160,7 @@ export default {
             projectStart: 1,
             menu: computed<MenuItem[]>(() => {
                 const menuOptions: MenuOption[] = [];
-                if (!props.groupId) {
+                if (!state.groupId) {
                     menuOptions.push({
                         title: 'Project group',
                         items: state.projectGroupItems,
@@ -219,10 +213,10 @@ export default {
         const listProjects = async () => {
             const param = {} as any;
             let api;
-            if (props.groupId) {
+            if (state.groupId) {
                 api = SpaceConnector.client.identity.projectGroup.listProjects;
                 param.recursive = true;
-                param.project_group_id = props.groupId;
+                param.project_group_id = state.groupId;
             } else {
                 api = SpaceConnector.client.identity.project.list;
             }
@@ -262,30 +256,37 @@ export default {
             await listItems();
         }, 300);
 
-        watch(() => props.groupId, async () => {
+        watch(() => state.groupId, async () => {
             if (state.visibleMenu) await listItems();
         }, { immediate: true });
 
 
-        const emitSearch = (groupId?: string, searchText?: string, hide = true) => {
+        const commitSearchContext = (groupId?: string, searchText?: string, hide = true) => {
             let val = searchText;
             if (typeof searchText === 'string') val = searchText.trim();
             if (!val) val = '';
 
-            emit('search', groupId, val);
+            if (state.groupId !== groupId) {
+                store.dispatch('projectPage/selectNode', groupId);
+            }
+
+            if (store.state['projectPage/searchText'] !== val) {
+                store.commit('projectPage/setSearchText', val);
+            }
+
             if (hide) hideMenu();
             state.isFocused = false;
         };
 
         const onSearch = (text: string) => {
-            emitSearch(props.groupId, text);
+            commitSearchContext(state.groupId, text);
         };
 
         const onMenuSelect = (value: string, idx: number) => {
             const item = state.menu[idx];
             if (item.dataType === 'PROJECT_GROUP') {
                 state.searchText = '';
-                emitSearch(item.name, '', false);
+                commitSearchContext(item.name, '', false);
                 state.projectGroupStart = 1;
                 listProjectGroups();
                 state.isFocused = true;
@@ -306,20 +307,25 @@ export default {
 
         const onDeletePrefix = (e: KeyboardEvent) => {
             if (!(e.target as HTMLInputElement).value) {
-                emitSearch();
+                commitSearchContext();
             }
         };
 
         const onDeleteAll = () => {
-            // emitSearch();
+            // commitSearchContext();
         };
+
+        if (vm.$route.query.search) {
+            state.searchText = vm.$route.query.search as string;
+            store.commit('projectPage/setSearchText', vm.$route.query.search as string);
+        }
 
 
         return {
             ...toRefs(state),
             onInput,
             onSearch,
-            emitSearch,
+            commitSearchContext,
             showMenu,
             hideMenu,
             onMenuSelect,

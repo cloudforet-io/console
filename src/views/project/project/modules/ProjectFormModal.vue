@@ -37,11 +37,12 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { makeProxy } from '@/lib/compostion-util';
 import VueI18n from 'vue-i18n';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 import TranslateResult = VueI18n.TranslateResult;
 
 export default {
-    name: 'ProjectCreateFormModal',
+    name: 'ProjectFormModal',
     components: {
         PTextInput,
         PFieldGroup,
@@ -58,36 +59,25 @@ export default {
         visible: {
             type: Boolean,
             default: false,
-        },
-        schemaNames: {
-            type: Array,
-            default: () => ([]),
-        },
-        item: {
-            type: Object,
-            default: () => ({
-                properties: {},
-            }),
-        },
-        updateMode: {
-            type: Boolean,
-            default: false,
+            required: true,
         },
         projectGroupId: {
             type: String,
             default: '',
+            required: true,
         },
-        currentProject: {
-            type: String,
+        project: {
+            type: Object,
             default: undefined,
         },
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            updateMode: computed(() => !!props.project),
             proxyVisible: makeProxy('visible', props, emit),
             projectNames: [] as string[],
-            projectName: props.currentProject,
+            projectName: props.project?.name as string|undefined,
             projectNameInvalidText: computed(() => {
                 let invalidText = '' as TranslateResult;
                 if (typeof state.projectName === 'string') {
@@ -122,15 +112,51 @@ export default {
             state.projectNames = res.results.map(d => d.name);
         };
 
+        const crateProject = async (params) => {
+            try {
+                await SpaceConnector.client.identity.project.create(params);
+                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '', vm.$root);
+            } catch (e) {
+                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'), e, vm.$root);
+                throw new Error(e);
+            }
+        };
+
+        const updateProject = async (params) => {
+            try {
+                await SpaceConnector.client.identity.project.update({
+                    ...params,
+                    project_id: props.project?.project_id,
+                });
+                showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '', vm.$root);
+            } catch (e) {
+                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'), e, vm.$root);
+                throw new Error(e);
+            }
+        };
+
         const confirm = async () => {
             if (!state.showValidation) state.showValidation = true;
             if (!state.isProjectNameValid) return;
 
-            const item = {
+            const params = {
+                project_group_id: props.projectGroupId,
                 name: state.projectName,
             };
-            emit('confirm', item);
-            state.showValidation = false;
+
+            try {
+                if (state.updateMode) {
+                    await updateProject(params);
+                } else {
+                    await crateProject(params);
+                }
+                emit('complete', params);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.proxyVisible = false;
+                state.showValidation = false;
+            }
         };
 
         /** Init */

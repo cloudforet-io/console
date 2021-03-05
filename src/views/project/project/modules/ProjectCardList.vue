@@ -5,8 +5,7 @@
                    :total-count="totalCount"
                    @change="onChange"
                    @refresh="getData()"
-        >
-        </p-toolbox>
+        />
         <p-data-loader class="flex-grow" :data="items" :loading="loading">
             <div class="project-cards">
                 <div v-for="(item, i) in items" :key="i" class="project-card-container">
@@ -112,6 +111,12 @@
                 </div>
             </template>
         </p-data-loader>
+
+        <project-form-modal v-if="groupId && projectFormVisible"
+                            :visible.sync="projectFormVisible"
+                            :project-group-id="groupId"
+                            @complete="listProjects(groupId, searchText)"
+        />
     </div>
 </template>
 
@@ -133,21 +138,15 @@ import { range, uniq } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { QueryHelper } from '@/lib/query';
+import { store } from '@/store';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import ProjectFormModal from '@/views/project/project/modules/ProjectFormModal.vue';
 
-interface Props {
-    searchText: string;
-    groupId: string;
-    parentGroups: ProjectGroup[];
-    noProjectGroup?: boolean;
-}
-
-const Error = {
-    permissionDenied: 'ERROR_PERMISSION_DENIED',
-};
 
 export default {
     name: 'ProjectCardList',
     components: {
+        ProjectFormModal,
         PIconTextButton,
         FavoriteButton,
         PI,
@@ -156,28 +155,12 @@ export default {
         PDataLoader,
     },
     props: {
-        searchText: {
-            type: String,
-            default: '',
-        },
-        groupId: {
-            type: String,
-            default: '',
-        },
         parentGroups: {
             type: Array,
             default: () => [],
         },
-        noProjectGroup: {
-            type: Boolean,
-            default: undefined,
-        },
-        isPermissionDenied: {
-            type: Boolean,
-            default: false,
-        },
     },
-    setup(props: Props, context) {
+    setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             items: undefined,
@@ -192,7 +175,14 @@ export default {
             noProject: computed(() => state.totalCount === 0),
             hoveredProjectId: '',
             hoveredGroupId: '',
-            isAll: computed(() => !props.groupId),
+            isAll: computed(() => !state.groupId),
+            groupId: computed(() => store.getters['projectPage/groupId']),
+            searchText: computed(() => store.state.projectPage.searchText),
+            noProjectGroup: computed(() => !store.state.projectPage.hasProjectGroup),
+            projectFormVisible: computed({
+                get() { return store.state.projectPage.projectFormVisible; },
+                set(val) { store.commit('projectPage/setProjectFormVisible', val); },
+            }),
         });
 
         const getProvider = name => vm.$store.state.resource.provider.items[name] || {};
@@ -255,8 +245,8 @@ export default {
 
         let listProjectToken: CancelTokenSource | undefined;
         const getData = async (_id?, _text?) => {
-            const id = _id || props.groupId;
-            const text = _text || props.searchText;
+            const id = _id || state.groupId;
+            const text = _text || state.searchText;
 
             // if request is already exist, cancel the request
             if (listProjectToken) {
@@ -279,14 +269,14 @@ export default {
                 state.cardSummary = await getCardSummary(res.results);
                 state.cardSummaryLoading = false;
 
-                vm.$emit('list', state.totalCount);
+                store.commit('projectPage/setProjectCount', state.totalCount);
             } catch (e) {
                 if (!axios.isCancel(e.axiosError)) {
                     state.items = [];
                     state.totalCount = 0;
                     state.loading = false;
                     state.cardSummaryLoading = false;
-                    vm.$emit('list', state.totalCount);
+                    store.commit('projectPage/setProjectCount', 0);
                 } else {
                     console.error(e);
                 }
@@ -320,11 +310,24 @@ export default {
             query: { filters: queryHelper.setFilters([{ k: 'project_id', v: projectId, o: '=' }]).rawQueryStrings },
         });
 
-        // watch(() => state.showAllProjects, async (after, before) => {
-        //     if (after !== before) {
-        //         await listProjects(props.groupId, props.searchText, true);
-        //     }
-        // }, { immediate: false });
+        const createProject = async (item) => {
+            try {
+                await SpaceConnector.client.identity.project.create({
+                    project_group_id: state.groupId,
+                    ...item,
+                });
+                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '', vm.$root);
+            } catch (e) {
+                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'), e, vm.$root);
+            } finally {
+                state.projectFormVisible = false;
+                await listProjects(state.groupId, state.searchText);
+            }
+        };
+
+        watch([() => state.groupId, () => state.searchText], async ([groupId, searchText]) => {
+            await listProjects(groupId, searchText);
+        });
 
 
         return {
@@ -337,6 +340,7 @@ export default {
             skeletons: range(1),
             listProjects,
             getLocation,
+            createProject,
         };
     },
 };

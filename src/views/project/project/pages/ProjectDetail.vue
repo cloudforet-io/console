@@ -69,10 +69,11 @@
                     </p>
                 </template>
             </p-button-modal>
-            <s-project-create-form-modal v-if="projectEditFormVisible" :visible.sync="projectEditFormVisible"
-                                         :update-mode="updateMode" :project-group-id="projectGroupId"
-                                         :current-project="projectName"
-                                         @confirm="projectEditFormConfirm($event)"
+            <project-form-modal v-if="projectEditFormVisible"
+                                :visible.sync="projectEditFormVisible"
+                                :project-group-id="projectGroupId"
+                                :project="item"
+                                @complete="onProjectFormComplete"
             />
         </div>
     </general-page-layout>
@@ -94,7 +95,7 @@ import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/ty
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
-import SProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
+import ProjectFormModal from '@/views/project/project/modules/ProjectFormModal.vue';
 
 import ProjectDashboard from '@/views/project/project/modules/project-dashboard/ProjectDashboard.vue';
 import ProjectMemberTab from '@/views/project/project/modules/ProjectMemberTab.vue';
@@ -120,7 +121,7 @@ export default {
         PTab,
         PIconButton,
         PCopyButton,
-        SProjectCreateFormModal,
+        ProjectFormModal,
         PBreadcrumbs,
     },
     setup(props, { root }) {
@@ -128,9 +129,9 @@ export default {
         const projectId = computed<string>(() => root.$route.params.id as string);
         const item = ref({} as ProjectModel);
         const state = reactive({
-            projectName: '',
-            projectGroupId: '',
-            projectGroupName: '',
+            projectName: computed(() => item.value?.name || ''),
+            projectGroupId: computed(() => item.value?.project_group_info?.project_group_id || ''),
+            projectGroupName: computed(() => item.value?.project_group_info?.name || ''),
             projectId,
             projectGroupNames: [],
             pageNavigation: computed(() => [
@@ -152,9 +153,6 @@ export default {
             });
             if (resp) {
                 item.value = resp;
-                state.projectGroupId = item.value.project_group_info.project_group_id;
-                state.projectGroupName = item.value.project_group_info.name;
-                state.projectName = item.value.name;
             }
         };
 
@@ -191,7 +189,6 @@ export default {
         const formState = reactive({
             projectDeleteFormVisible: false,
             projectEditFormVisible: false,
-            updateMode: false,
             headerTitle: '' as TranslateResult,
             themeColor: '',
             modalContent: '' as TranslateResult,
@@ -221,22 +218,10 @@ export default {
 
         const openProjectEditForm = () => {
             formState.projectEditFormVisible = true;
-            formState.updateMode = true;
         };
 
-        const projectEditFormConfirm = async (input) => {
-            try {
-                await SpaceConnector.client.identity.project.update({
-                    project_id: projectId.value,
-                    ...input,
-                });
-                showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '', root);
-                item.value.name = input.name;
-            } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'), e, root);
-            } finally {
-                formState.projectEditFormVisible = false;
-            }
+        const onProjectFormComplete = async (data) => {
+            if (data) item.value = data;
         };
 
         /** Init */
@@ -258,7 +243,7 @@ export default {
             openProjectDeleteForm,
             projectDeleteFormConfirm,
             openProjectEditForm,
-            projectEditFormConfirm,
+            onProjectFormComplete,
 
         };
     },

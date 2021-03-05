@@ -1,6 +1,6 @@
 <template>
     <fragment>
-        <top-notification v-if="projectState.isPermissionDenied">
+        <top-notification v-if="isPermissionDenied">
             <div>
                 {{ $t('PROJECT.LANDING.TOP_NOTI_PERMISSION_REQUIRED_1') }} <br>
                 {{ $t('PROJECT.LANDING.TOP_NOTI_PERMISSION_REQUIRED_2') }}
@@ -10,9 +10,11 @@
             <template #sidebar="{width}">
                 <div class="sidebar-container">
                     <div class="sidebar-item-wrapper">
-                        <header>
-                            <span class="title">{{ $t('PROJECT.LANDING.FAVORITES') }}&nbsp;<span class="count">({{ favoriteItems.length }})</span></span>
-                        </header>
+                        <sidebar-title :title="$t('PROJECT.LANDING.FAVORITES')">
+                            <template #extra>
+                                &nbsp;<span class="count">({{ favoriteItems.length }})</span>
+                            </template>
+                        </sidebar-title>
                         <favorite-list :items="favoriteItems" :before-route="beforeFavoriteRoute" @delete="onFavoriteDelete">
                             <template #icon="{item}">
                                 <p-i name="ic_tree_project-group"
@@ -23,80 +25,62 @@
                     </div>
 
                     <div class="sidebar-item-wrapper">
-                        <header>
-                            <span class="title">{{ $t('PROJECT.LANDING.SEARCH') }}</span>
-                        </header>
-                        <project-search :group-id="projectState.groupId"
-                                        :group-name="projectState.groupName"
-                                        @search="onSearch"
-                        />
+                        <sidebar-title :title="$t('PROJECT.LANDING.SEARCH')" />
+                        <project-search />
                     </div>
 
                     <div class="sidebar-item-wrapper">
-                        <header>
-                            <span class="title">{{ $t('PROJECT.LANDING.PROJECT_GROUPS') }}</span>
-                            <p-button class="action-btn" @click="openProjectGroupForm(null)">
-                                <p-i name="ic_plus" width="1rem" height="1rem"
-                                     color="transparent inherit"
-                                /> {{ $t('PROJECT.LANDING.CREATE') }}
-                            </p-button>
-                        </header>
-                        <project-group-tree v-if="isInitiated"
-                                            :group-id="projectState.groupId"
-                                            @list="onProjectGroupList"
-                                            @select="onSelectTreeItem"
-                                            @create="openProjectGroupForm"
-                        />
+                        <project-group-tree :init-group-id="initGroupId" />
                     </div>
                 </div>
             </template>
             <template #default>
                 <div class="page-wrapper">
                     <div class="parents-info">
-                        <span v-if="projectGroupNavigation.length > 0" class="group-name">
+                        <span class="group-name">
                             <p-breadcrumbs :routes="projectGroupNavigation" @click="onProjectGroupNavClick" />
                         </span>
                     </div>
-                    <p-page-title :title="projectState.groupName ? projectState.groupName : $t('PROJECT.LANDING.ALL_PROJECT')"
+                    <p-page-title :title="storeState.groupName ? storeState.groupName : $t('PROJECT.LANDING.ALL_PROJECT')"
                                   use-total-count
-                                  :total-count="totalCount"
+                                  :total-count="storeState.projectCount || 0"
                     >
                         <template #extra>
                             <span class="favorite-btn-wrapper">
-                                <favorite-button v-if="projectState.groupId && !projectState.isPermissionDenied" :item-id="projectState.groupId"
+                                <favorite-button v-if="storeState.groupId && !isPermissionDenied" :item-id="storeState.groupId"
                                                  favorite-type="projectGroup"
                                                  resource-type="identity.ProjectGroup"
                                 />
                             </span>
                             <div class="btns">
-                                <p-icon-text-button v-if="!projectState.groupId"
+                                <p-icon-text-button v-if="!storeState.groupId"
                                                     style-type="primary-dark"
                                                     outline
                                                     name="ic_plus_bold"
-                                                    @click="openProjectGroupForm(null)"
+                                                    @click="openProjectGroupCreateForm(null)"
                                 >
                                     {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
                                 </p-icon-text-button>
-                                <p-dropdown-menu-btn v-if="projectState.groupId && !projectState.isPermissionDenied"
+                                <p-dropdown-menu-btn v-if="storeState.groupId && !isPermissionDenied"
                                                      :menu="settingMenu"
                                                      button-only
                                                      button-icon="ic_setting"
-                                                     @edit:select="openProjectGroupEditForm"
-                                                     @delete:select="openProjectGroupDeleteForm"
+                                                     @edit:select="openProjectGroupUpdateForm"
+                                                     @delete:select="openProjectGroupDeleteCheckModal"
                                 />
-                                <div v-if="projectState.groupId && !projectState.isPermissionDenied"
+                                <div v-if="storeState.groupId && !isPermissionDenied"
                                      v-tooltip.top="$t('PROJECT.LANDING.MANAGE_PROJECT_GROUP_MEMBER')"
                                      class="project-group-member-button"
-                                     :group-id="projectState.groupId"
+                                     :group-id="storeState.groupId"
                                      @click="openProjectGroupMemberPage"
                                 >
                                     <p-i name="ic_member"
                                          width="1rem" height="1rem"
                                          color="inherit transparent"
                                     />
-                                    <span class="text">{{ groupMemberCount }}</span>
+                                    <span class="text">{{ groupMemberCount || 0 }}</span>
                                 </div>
-                                <p-icon-text-button v-if="projectState.groupId && !projectState.isPermissionDenied"
+                                <p-icon-text-button v-if="storeState.groupId && !isPermissionDenied"
                                                     style-type="primary-dark"
                                                     name="ic_plus_bold"
                                                     @click="openProjectForm"
@@ -108,59 +92,16 @@
                             </div>
                         </template>
                     </p-page-title>
-                    <project-card-list ref="projectListRef"
-                                       class="card-container"
-                                       :group-id="projectState.groupId"
-                                       :search-text="projectState.searchText"
-                                       :parent-groups="parentGroups"
-                                       :no-project-group="noProjectGroup"
-                                       :is-permission-denied="projectState.isPermissionDenied"
-                                       @list="onProjectList"
-                                       @create-project-group="openProjectGroupForm(null)"
-                    />
-                    <project-group-create-form-modal v-if="projectGroupFormVisible"
-                                                     :id="projectState.groupId"
-                                                     :parent="createTargetNode ? createTargetNode.node.data
-                                                         : null"
-                                                     :visible.sync="projectGroupFormVisible"
-                                                     :update-mode="updateMode"
-                                                     @create="onProjectGroupCreate"
-                                                     @update="onProjectGroupUpdate"
+                    <project-card-list class="card-container"
+                                       :parent-groups="storeState.parentGroups"
                     />
 
-                    <p-button-modal :header-title="$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE')"
-                                    centered
-                                    :scrollable="false"
-                                    size="md"
-                                    fade
-                                    :visible.sync="projectGroupDeleteFormVisible"
-                                    theme-color="alert"
-                                    :footer-confirm-button-bind="{
-                                        styleType: 'alert',
-                                    }"
-                                    @confirm="projectGroupDeleteFormConfirm"
-                    >
-                        <template #body>
-                            <div class="delete-modal-contents">
-                                <p>
-                                    {{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.CONTENT') }}
-                                </p>
-                                <i18n path="PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DESC" tag="p" class="desc">
-                                    <template #deleteAllSubProjects>
-                                        <strong>{{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DELETE_ALL_SUB_PROJECT') }}</strong>
-                                    </template>
-                                </i18n>
-                            </div>
-                        </template>
-                    </p-button-modal>
+                    <project-group-form-modal />
 
-                    <project-create-form-modal v-if="projectFormVisible && projectState.groupId"
-                                               :visible.sync="projectFormVisible"
-                                               :project-group-id="projectState.groupId"
-                                               @confirm="projectFormConfirm($event)"
-                    />
+                    <project-group-delete-check-modal />
+
                     <project-group-member-page v-if="groupMemberPageVisible"
-                                               :group-id="projectState.groupId"
+                                               :group-id="storeState.groupId"
                                                @close="groupMemberPageVisible = false"
                     />
                 </div>
@@ -172,367 +113,210 @@
 <script lang="ts">
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.vue';
 
 import {
-    PI, PPageTitle, PBreadcrumbs, PIconTextButton, PButtonModal, PButton, PDropdownMenuBtn,
+    PI, PPageTitle, PBreadcrumbs, PIconTextButton, PDropdownMenuBtn,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
-import ProjectGroupCreateFormModal from '@/views/project/project/modules/ProjectGroupCreateFormModal.vue';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import ProjectGroupFormModal from '@/views/project/project/modules/ProjectGroupFormModal.vue';
 import ProjectSearch from '@/views/project/project/modules/ProjectSearch.vue';
 import ProjectGroupTree from '@/views/project/project/modules/ProjectGroupTree.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import {
-    ProjectGroup, ProjectItemResp, ProjectTreeItem,
+    ProjectGroup, ProjectTreeItem,
 } from '@/views/project/project/type';
 import ProjectCardList from '@/views/project/project/modules/ProjectCardList.vue';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteList from '@/common/modules/favorite-list/FavoriteList.vue';
-import ProjectCreateFormModal from '@/views/project/project/modules/ProjectCreateFormModal.vue';
 import ProjectGroupMemberPage from '@/views/project/project/modules/ProjectGroupMemberPage.vue';
-import { PERMISSION_TYPE } from '@/views/project/project/lib/config';
 import TopNotification from '@/common/components/TopNotification.vue';
-import { reverse } from 'lodash';
-import { getProjectState } from '@/views/project/project/lib/state';
+import { store } from '@/store';
+import ProjectPageStoreModule from '@/views/project/project/store';
+import { ProjectPageState } from '@/views/project/project/store/type';
+import SidebarTitle from '@/common/components/SidebarTitle.vue';
+import ProjectGroupDeleteCheckModal from '@/views/project/project/modules/ProjectGroupDeleteCheckModal.vue';
 
-
-const getParentGroup = (item: ProjectTreeItem, res: ProjectGroup[] = []): ProjectGroup[] => {
-    if (item) {
-        res.push(item.data);
-        if (item.parent) return getParentGroup(item.parent, res);
-        return res;
-    }
-    return res;
-};
 
 export default {
     name: 'ProjectPage',
     components: {
+        ProjectGroupDeleteCheckModal,
+        SidebarTitle,
         TopNotification,
         ProjectGroupMemberPage,
-        ProjectCreateFormModal,
         FavoriteList,
         FavoriteButton,
         ProjectCardList,
         PBreadcrumbs,
         PDropdownMenuBtn,
-        PButton,
         ProjectGroupTree,
         PVerticalPageLayout,
         PI,
         PPageTitle,
         ProjectSearch,
-        PButtonModal,
-        ProjectGroupCreateFormModal,
+        ProjectGroupFormModal,
         PIconTextButton,
     },
-    setup(props, { root }) {
+    setup() {
         const vm: ComponentRenderProxy = getCurrentInstance() as ComponentRenderProxy;
 
-        const projectState = getProjectState();
+        /* Ready ProjectPage Store */
+        (() => {
+            if (!store.hasModule('projectPage')) store.registerModule<ProjectPageState>('projectPage', ProjectPageStoreModule);
+
+            // unregister when leave page
+            onUnmounted(() => {
+                store.unregisterModule('projectPage');
+            });
+
+            // this is for hot reloading
+            onMounted(() => {
+                if (!store.hasModule('projectPage')) store.registerModule<ProjectPageState>('projectPage', ProjectPageStoreModule);
+            });
+        })();
+
+        const storeState = reactive({
+            groupId: computed(() => store.getters['projectPage/groupId']),
+            groupName: computed(() => store.getters['projectPage/groupName']),
+            searchText: computed(() => store.state.projectPage.searchText),
+            selectedNode: computed(() => store.state.projectPage.selectedNode),
+            parentGroups: computed(() => store.getters['projectPage/parentGroups']),
+            hasProjectGroup: computed(() => store.state.projectPage.hasProjectGroup),
+            projectCount: computed(() => store.state.projectPage.projectCount),
+            actionTargetNode: computed(() => store.state.projectPage.actionTargetNode),
+        });
 
         const state = reactive({
-            isInitiated: false,
+            initGroupId: vm.$route.query.select_pg as string,
             favoriteItems: computed<FavoriteItem[]>(() => [
-                ...vm.$store.getters['favorite/projectGroup/sortedItems'],
-                ...vm.$store.getters['favorite/project/sortedItems'],
+                ...store.getters['favorite/projectGroup/sortedItems'],
+                ...store.getters['favorite/project/sortedItems'],
             ]),
             settingMenu: computed(() => [
                 { name: 'edit', label: vm.$t('PROJECT.LANDING.ACTION_EDIT_GROUP_NAME'), type: 'item' },
                 { name: 'delete', label: vm.$t('PROJECT.LANDING.ACTION_DELETE_THIS_GROUP'), type: 'item' },
             ] as MenuItem[]),
-            parentGroups: [] as ProjectGroup[],
             projectGroupNavigation: computed(() => {
-                const result = state.parentGroups.map(d => ({ name: d.name, data: d }));
-                if (projectState.groupId) {
-                    result.push({ name: projectState.groupName, data: { id: projectState.groupId, name: projectState.groupName } });
+                const result = storeState.parentGroups.map(d => ({ name: d.name, data: d }));
+                if (storeState.selectedNode) {
+                    result.push({ name: storeState.groupName, data: storeState.selectedNode.data });
                 }
                 return [{ name: vm.$t('MENU.PROJECT.PROJECT'), data: null }, ...result];
             }),
-            totalCount: 0,
-            projectListRef: null as unknown as any,
-            noProjectGroup: false,
             projectGroupFavorites: computed(() => {
                 const res = {};
-                vm.$store.state.favorite.projectGroup.items.forEach((d) => {
+                store.state.favorite.projectGroup.items.forEach((d) => {
                     res[d.id] = d;
                 });
                 return res;
             }),
-            groupMemberCount: 0,
+            groupMemberCount: 0 as number|undefined,
             groupMemberPageVisible: false,
+            isPermissionDenied: computed(() => state.groupMemberCount === undefined),
         });
 
-        const formState = reactive({
-            projectGroupFormVisible: false,
-            projectFormVisible: false,
-            projectGroupDeleteFormVisible: false,
-            updateMode: false,
-            createTargetNode: null as ProjectTreeItem|null,
-        });
 
-        const listProject = async () => {
-            await state.projectListRef.listProjects(projectState.groupId, projectState.searchText);
-        };
-
-
-        const listAll = async () => {
-            projectState.isPermissionDenied = false;
-            await Promise.all([
-                // listProjectGroup(),
-                listProject(),
-            ]);
-        };
-
+        /* Favorite */
         const onFavoriteDelete = (item: FavoriteItem) => {
-            if (item.id.startsWith('project')) vm.$store.dispatch('favorite/project/removeItem', item);
-            else vm.$store.dispatch('favorite/projectGroup/removeItem', item);
+            if (item.id.startsWith('project')) store.dispatch('favorite/project/removeItem', item);
+            else store.dispatch('favorite/projectGroup/removeItem', item);
         };
 
         const beforeFavoriteRoute = async (item: FavoriteItem, e: MouseEvent) => {
             if (item.resourceType === 'identity.ProjectGroup') {
                 e.preventDefault();
-                if (projectState.groupId !== item.id) {
-                    projectState.groupId = item.id;
-                    vm.$nextTick(async () => {
-                        await listAll();
-                    });
+                if (storeState.groupId !== item.id) {
+                    await store.dispatch('projectPage/selectNode', item.id);
                 }
             }
         };
 
-        const onChangePermission = async (permissionType) => {
-            if (permissionType === PERMISSION_TYPE.allow) {
-                projectState.isPermissionDenied = false;
-            } else projectState.isPermissionDenied = true;
+
+        /* Navigation */
+        const onProjectGroupNavClick = async (item: {name: string; data: ProjectGroup}) => {
+            if (item.data) await store.dispatch('projectPage/selectNode', item.data.id);
         };
 
-        const getProjectGroupMemberCount = async () => {
-            try {
-                const res = await SpaceConnector.client.identity.projectGroup.member.list({
-                    project_group_id: projectState.groupId,
-                });
-                state.groupMemberCount = res.total_count;
-                await onChangePermission(PERMISSION_TYPE.allow);
-            } catch (e) {
-                await onChangePermission(PERMISSION_TYPE.deny);
-                console.error(e);
-            }
+
+        /* Handling Forms */
+        const openProjectGroupDeleteCheckModal = () => {
+            store.dispatch('projectPage/openProjectGroupDeleteCheckModal', storeState.selectedNode);
         };
 
-        /** Handling Form */
-        const openProjectGroupDeleteForm = () => {
-            formState.projectGroupDeleteFormVisible = true;
+        const openProjectGroupUpdateForm = () => {
+            store.dispatch('projectPage/openProjectGroupUpdateForm', storeState.selectedNode);
         };
 
-        const projectGroupDeleteFormConfirm = async () => {
-            if (!projectState.groupId || !projectState.selectedNode) return;
-            try {
-                await SpaceConnector.client.identity.projectGroup.delete({
-                    project_group_id: projectState.groupId,
-                });
-                await vm.$store.dispatch('favorite/projectGroup/removeItem', { id: projectState.groupId });
-                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '', root);
-                projectState.selectedNode.deleteNode();
-            } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: vm.$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }), e, root);
-            } finally {
-                formState.projectGroupDeleteFormVisible = false;
-            }
-        };
-
-        const openProjectGroupEditForm = () => {
-            formState.updateMode = true;
-            formState.projectGroupFormVisible = true;
-        };
-
-        const openProjectGroupForm = (createTargetNode: ProjectTreeItem) => {
-            formState.updateMode = false;
-            formState.createTargetNode = createTargetNode;
-            formState.projectGroupFormVisible = true;
+        const openProjectGroupCreateForm = (target?: ProjectTreeItem|null) => {
+            store.dispatch('projectPage/openProjectGroupCreateForm', target);
         };
 
         const openProjectGroupMemberPage = () => {
             state.groupMemberPageVisible = true;
         };
 
-        const onProjectGroupUpdate = async (item: ProjectGroup) => {
-            if (projectState.selectedNode) {
-                projectState.groupName = item.name;
-                projectState.selectedNode.setData({ ...projectState.selectedNode.data, ...item });
-            }
-            formState.projectGroupFormVisible = false;
-        };
-
-        const onProjectGroupCreate = (data: ProjectItemResp) => {
-            const newData: ProjectItemResp = {
-                ...data,
-                item_type: 'PROJECT_GROUP',
-                has_child: false,
-            };
-
-            if (formState.createTargetNode) formState.createTargetNode.addChild(newData);
-            formState.projectGroupFormVisible = false;
-            state.noProjectGroup = false;
-        };
-
-        const onProjectGroupNavClick = async (item: {name: string; data: ProjectGroup}) => {
-            if (item.data) {
-                projectState.groupId = item.data.id;
-                projectState.groupName = item.data.name;
-            } else {
-                projectState.groupId = undefined;
-            }
-            vm.$nextTick(async () => {
-                await listAll();
-            });
-        };
-
         const openProjectForm = () => {
-            formState.projectFormVisible = true;
+            store.dispatch('projectPage/openProjectCreateForm', storeState.selectedNode);
         };
 
-        const projectFormConfirm = async (item) => {
-            try {
-                await SpaceConnector.client.identity.project.create({
-                    project_group_id: projectState.groupId,
-                    ...item,
-                });
-                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '', root);
-            } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'), e, root);
-            } finally {
-                formState.projectFormVisible = false;
-                await listProject();
+
+        /* Member Count */
+        watch(() => storeState.groupId, async (groupId) => {
+            if (groupId) {
+                try {
+                    const res = await SpaceConnector.client.identity.projectGroup.member.list({
+                        project_group_id: storeState.groupId,
+                    });
+                    state.groupMemberCount = res.total_count;
+                } catch (e) {
+                    state.groupMemberCount = undefined;
+                    console.error(e);
+                }
+            } else {
+                state.groupMemberCount = 0;
             }
-        };
-
-        /** Query String */
-        watch(() => projectState.groupId, (id) => {
-            // eslint-disable-next-line camelcase
-            vm.$router.replace({ query: { select_pg: id } }).catch(() => {});
         });
 
-        /** Search */
-        const onSearch = async (id, text) => {
-            projectState.searchText = text;
-            const beforeId = projectState.groupId;
-            projectState.groupId = id;
-
-            vm.$nextTick(async () => {
-                if (beforeId !== id) {
-                    await listAll();
-                } else {
-                    await listProject();
-                }
-            });
-        };
-
-        const onSelectTreeItem = async (item: ProjectTreeItem|null) => {
-            console.debug('onSelectTreeItem', item);
-            projectState.selectedNode = item;
-
-            if (item) {
-                if (projectState.groupId !== item.data.id) {
-                    projectState.groupId = item.data.id;
-                    projectState.groupName = item.data.name;
-
-                    vm.$nextTick(async () => {
-                        await listAll();
-                    });
-
-                    let parents = [] as ProjectGroup[];
-                    if (item.parent) parents = reverse(getParentGroup(item.parent));
-                    state.parentGroups = parents;
-                }
-            } else {
-                projectState.groupId = undefined;
-                projectState.groupName = undefined;
-                state.parentGroups = [];
-                vm.$nextTick(async () => {
-                    await listAll();
-                });
+        /* Query String */
+        store.subscribe(({ type, payload }) => {
+            if (type === 'projectPage/setSelectedNode') {
+                vm.$router.replace({
+                    query: {
+                        // eslint-disable-next-line camelcase
+                        select_pg: payload?.data.id || null,
+                    },
+                }).catch(() => {});
             }
-        };
+        });
 
-
-        const onProjectGroupList = (count) => {
-            state.noProjectGroup = !count;
-        };
-
-        const onProjectList = (count) => {
-            state.totalCount = count;
-        };
-
-        const setGroupName = async (groupId) => {
-            try {
-                const res = await SpaceConnector.client.identity.projectGroup.get({
-                    project_group_id: groupId,
-                });
-                projectState.groupName = res.name;
-            } catch (e) { console.error(e); }
-        };
-
-
-        const init = async () => {
-            await Promise.all([
-                vm.$store.dispatch('resource/provider/load'),
-                vm.$store.dispatch('resource/projectGroup/load'),
-                vm.$store.dispatch('resource/project/load'),
-                vm.$store.dispatch('favorite/projectGroup/load'),
-                vm.$store.dispatch('favorite/project/load'),
-            ]);
-
-            const groupId = (vm.$route.query.select_pg as string) || undefined;
-
-            if (groupId) {
-                projectState.groupId = groupId;
-                vm.$nextTick(async () => {
-                    await Promise.all([listAll(), setGroupName(groupId)]);
-                });
-            } else {
-                await listAll();
-            }
-
-            state.isInitiated = true;
-        };
-
+        /* Init */
         (async () => {
-            await init();
+            await Promise.all([
+                store.dispatch('resource/provider/load'),
+                store.dispatch('resource/projectGroup/load'),
+                store.dispatch('resource/project/load'),
+                store.dispatch('favorite/projectGroup/load'),
+                store.dispatch('favorite/project/load'),
+            ]);
         })();
-
-        watch([() => projectState.groupId, () => state.groupMemberPageVisible], async ([groupId, visible]) => {
-            if ((groupId !== undefined && groupId) || visible) await getProjectGroupMemberCount();
-        }, { immediate: true });
 
 
         return {
-            projectState,
+            storeState,
             ...toRefs(state),
-            ...toRefs(formState),
             onFavoriteDelete,
             beforeFavoriteRoute,
-            openProjectForm,
-            openProjectGroupDeleteForm,
+            openProjectGroupDeleteCheckModal,
             openProjectGroupMemberPage,
-            projectGroupDeleteFormConfirm,
-            openProjectGroupEditForm,
-            projectFormConfirm,
-            openProjectGroupForm,
-            onSearch,
-            onSelectTreeItem,
-            onProjectGroupUpdate,
-            onProjectGroupCreate,
+            openProjectGroupUpdateForm,
+            openProjectGroupCreateForm,
             onProjectGroupNavClick,
-            onProjectGroupList,
-            onProjectList,
-            onChangePermission,
-            init,
+            openProjectForm,
         };
     },
 };
@@ -543,29 +327,8 @@ export default {
     @apply h-full relative;
 }
 .sidebar-item-wrapper {
-    header {
-        @apply flex pl-4 pt-8 pb-3 mb-3 border-b border-gray-200 items-center;
-    }
-    .title {
-        @apply text-sm text-gray-900 font-semibold capitalize;
-        line-height: 1.2;
-    }
     .count {
         font-weight: normal;
-    }
-    .icon-help {
-        @apply ml-2;
-        cursor: help;
-    }
-    .action-btn {
-        @apply ml-auto justify-end text-primary-dark;
-        height: auto;
-        font-size: 0.75rem;
-        line-height: 1.2;
-        &:hover {
-            @apply text-secondary;
-            cursor: pointer;
-        }
     }
 }
 
@@ -634,11 +397,4 @@ export default {
     @apply flex-grow;
 }
 
-.delete-modal-contents {
-    line-height: 1.4;
-    .desc {
-        @apply mt-1 text-gray-600;
-        font-size: 0.875rem;
-    }
-}
 </style>

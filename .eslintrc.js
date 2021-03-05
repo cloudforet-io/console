@@ -73,7 +73,8 @@ module.exports = {
           "resource_id",
           "role_id",
           "role_binding_id",
-          "data_source"
+          "data_source",
+          "project_group_info"
         ]
       }
     ],

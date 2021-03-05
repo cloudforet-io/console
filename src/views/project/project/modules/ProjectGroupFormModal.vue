@@ -1,14 +1,13 @@
 <template>
-    <p-button-modal
-        :header-title="updateMode ? $t('PROJECT.LANDING.MODAL_UPDATE_PROJECT_GROUP_TITLE') : $t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_TITLE')"
-        centered
-        :scrollable="false"
-        size="md"
-        fade
-        backdrop
-        :visible.sync="proxyVisible"
-        :disabled="showValidation && !isValid"
-        @confirm="confirm"
+    <p-button-modal :header-title="updateMode ? $t('PROJECT.LANDING.MODAL_UPDATE_PROJECT_GROUP_TITLE') : $t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_TITLE')"
+                    centered
+                    :scrollable="false"
+                    size="md"
+                    fade
+                    backdrop
+                    :visible.sync="proxyVisible"
+                    :disabled="showValidation && !isValid"
+                    @confirm="confirm"
     >
         <template #body>
             <p-field-group :label="$t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_LABEL')"
@@ -42,17 +41,12 @@ import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import VueI18n from 'vue-i18n';
+import { store } from '@/store';
 
 import TranslateResult = VueI18n.TranslateResult;
 
-interface Props {
-    visible: boolean;
-    updateMode: boolean;
-    id?: string;
-    parent: ProjectGroup|null;
-}
 export default {
-    name: 'ProjectGroupCreateFormModal',
+    name: 'ProjectGroupFormModal',
     components: {
         PTextInput,
         PFieldGroup,
@@ -65,29 +59,16 @@ export default {
             },
         },
     },
-    props: {
-        visible: {
-            type: Boolean,
-            default: false,
-        },
-        updateMode: {
-            type: Boolean,
-            default: false,
-        },
-        parent: {
-            type: Object,
-            default: null,
-        },
-        id: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props: Props, { emit, root }) {
+    setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            proxyVisible: makeProxy('visible', props, emit),
+            proxyVisible: computed({
+                get() { return store.state.projectPage.projectGroupFormVisible; },
+                set(val) { store.commit('projectPage/setProjectGroupFormVisible', val); },
+            }),
+            updateMode: computed(() => store.state.projectPage.projectGroupFormUpdateMode),
+            currentGroupId: computed(() => store.state.projectPage.actionTargetNode?.data.id),
             projectGroupNames: [] as string[],
             projectGroupName: undefined as undefined | string,
             projectGroupNameInvalidText: computed(() => {
@@ -124,7 +105,7 @@ export default {
         const projectGroupApiQuery = new ApiQueryHelper().setOnly('project_group_id', 'name');
         const getProjectGroup = async () => {
             const res = await SpaceConnector.client.identity.projectGroup.get({
-                project_group_id: props.id,
+                project_group_id: state.currentGroupId,
                 query: projectGroupApiQuery.data,
             });
             state.projectGroupName = res.name;
@@ -132,33 +113,21 @@ export default {
 
         const createProjectGroup = async (item) => {
             try {
-                const params = item;
-                if (props.parent) params.parent_project_group_id = props.parent.id;
-                const res = await SpaceConnector.client.identity.projectGroup.create(params);
+                await store.dispatch('projectPage/createProjectGroup', item);
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '', root);
-
-                emit('create', {
-                    id: res.project_group_id,
-                    name: item.name,
-                } as ProjectGroup, props);
             } catch (e) {
                 showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'), e, root);
+                throw new Error(e);
             }
         };
 
         const updateProjectGroup = async (item) => {
             try {
-                const params = item;
-                if (props.id) params.project_group_id = props.id;
-                await SpaceConnector.client.identity.projectGroup.update(params);
+                await store.dispatch('projectPage/updateProjectGroup', item);
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', root);
-
-                emit('update', {
-                    id: props.id,
-                    name: item.name,
-                } as ProjectGroup, props);
             } catch (e) {
                 showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e, root);
+                throw new Error(e);
             }
         };
         const confirm = async () => {
@@ -167,16 +136,23 @@ export default {
             const item = {
                 name: state.projectGroupName,
             };
-            if (!props.updateMode) {
-                await createProjectGroup(item);
-            } else {
-                await updateProjectGroup(item);
+
+            try {
+                if (!state.updateMode) {
+                    await createProjectGroup(item);
+                } else {
+                    await updateProjectGroup(item);
+                }
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.showValidation = false;
+                store.commit('projectPage/setProjectGroupFormVisible', false);
             }
-            state.showValidation = false;
         };
 
-        watch(() => props.id, async (after) => {
-            if (after && props.updateMode) await getProjectGroup();
+        watch(() => state.currentGroupId, async (after) => {
+            if (after && state.updateMode) await getProjectGroup();
             else state.projectGroupName = undefined; // init form
         }, { immediate: true });
 
