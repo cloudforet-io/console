@@ -12,7 +12,7 @@ export interface TreeNode<T=any> extends TreeNodeState {
 
 export interface SelectOptions<T=any> {
     disabled?: boolean;
-    validator?: (item: TreeNode<T>) => boolean;
+    validator?: (item: TreeItem<T>) => boolean;
 }
 
 export interface EditOptions<T=any> {
@@ -60,7 +60,11 @@ export interface TreeNodeProps<T=any> extends TreeNodeState {
     parent?: TreeItem<T>;
     data?: T;
     children?: TreeNodeProps<T>[] | boolean;
-    nodeFormatter?: (node: TreeNode<T>) => TreeNode<T>;
     getDefaultNode?: (data: T) => TreeNode<T>;
     getClassNames?: (item: TreeItem<T>) => string|string[]|object;
+}
+
+export interface TreeNodeSlotProps<T=any> {
+    depth: string;
+    node: TreeItem<T>;
 }

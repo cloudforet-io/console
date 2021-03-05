@@ -8,77 +8,53 @@
              :class="classNames"
              :style="{paddingLeft: depth}"
         >
-            <slot :name="`row-${level}`" v-bind="slotBind">
-                <slot name="row" v-bind="slotBind">
-                    <div class="node" @click.stop="onClickNode">
-                        <slot :name="`node-level-${level}`" v-bind="slotBind">
-                            <slot name="node" v-bind="slotBind">
-                                <span v-if="$scopedSlots[`left-extra-${level}`] || $scopedSlots[`left-extra`]"
-                                      class="left-extra"
-                                >
-                                    <slot :name="`left-extra-level-${level}`" v-bind="slotBind">
-                                        <slot name="left-extra" v-bind="slotBind" />
-                                    </slot>
-                                </span>
-                                <span v-if="!disableToggle || $scopedSlots[`toggle-${level}`] || $scopedSlots[`toggle`]"
-                                      class="toggle"
-                                      @click.stop="onToggle"
-                                >
-                                    <slot name="toggle" v-bind="slotBind">
-                                        <slot :name="`toggle-${level}`" v-bind="slotBind">
-                                            <slot name="toggle" v-bind="slotBind">
-                                                <p-i v-if="children"
-                                                     :name="expanded ? 'ic_tree_arrow--opened' : 'ic_tree_arrow'"
-                                                     width="1em" height="1em"
-                                                     color="inherit transparent"
-                                                />
-                                            </slot>
-                                        </slot>
-                                    </slot>
-                                </span>
-                                <p-text-input v-if="!editOptions.disabled && isEditing"
-                                              v-model="editText" v-focus="true"
-                                              :invalid="invalid"
-                                              @blur="node.finishEdit()"
-                                              @keydown.enter="node.finishEdit()"
+            <slot name="row" v-bind="slotBind">
+                <div class="node" @click.stop="onClickNode">
+                    <slot name="node" v-bind="slotBind">
+                        <span v-if="$scopedSlots[`left-extra`]" class="left-extra">
+                            <slot name="left-extra" v-bind="slotBind" />
+                        </span>
+                        <span v-if="!disableToggle || $scopedSlots[`toggle`]" class="toggle"
+                              @click.stop="onToggle"
+                        >
+                            <slot name="toggle" v-bind="slotBind">
+                                <p-i v-if="proxyNode.loading" name="ic_working"
+                                     width="1rem" height="1rem"
                                 />
-                                <template v-else>
-                                    <span v-if="$scopedSlots[`toggle-right-${level}`] || $scopedSlots[`toggle-right`]"
-                                          class="toggle-right"
-                                    >
-                                        <slot :name="`toggle-right-level-${level}`" v-bind="slotBind">
-                                            <slot name="toggle-right" v-bind="slotBind" />
-                                        </slot>
-                                    </span>
-                                    <span v-if="$scopedSlots[`icon-${level}`] || $scopedSlots[`icon`]"
-                                          class="icon"
-                                    >
-                                        <slot :name="`icon-level-${level}`" v-bind="slotBind">
-                                            <slot name="icon" v-bind="slotBind" />
-                                        </slot>
-                                    </span>
-                                    <span class="data">
-                                        <slot :name="`data-${level}`" v-bind="slotBind">
-                                            <slot name="data" v-bind="slotBind">
-                                                {{ data }}
-                                            </slot>
-                                        </slot>
-                                    </span>
-                                    <span v-if="$scopedSlots[`right-extra-${level}`] || $scopedSlots[`right-extra`]"
-                                          class="right-extra"
-                                    >
-                                        <slot :name="`right-extra-${level}`" v-bind="slotBind">
-                                            <slot name="right-extra" v-bind="slotBind" />
-                                        </slot>
-                                    </span>
-                                </template>
+                                <p-i v-else-if="children"
+                                     :name="expanded ? 'ic_tree_arrow--opened' : 'ic_tree_arrow'"
+                                     width="1em" height="1em"
+                                     color="inherit transparent"
+                                />
                             </slot>
-                        </slot>
-                    </div>
-                </slot>
+                        </span>
+                        <p-text-input v-if="!editOptions.disabled && isEditing"
+                                      v-model="editText" v-focus="true"
+                                      :invalid="invalid"
+                                      @blur="node.finishEdit()"
+                                      @keydown.enter="node.finishEdit()"
+                        />
+                        <template v-else>
+                            <span v-if="$scopedSlots[`toggle-right`]" class="toggle-right">
+                                <slot name="toggle-right" v-bind="slotBind" />
+                            </span>
+                            <span v-if="$scopedSlots[`icon`]" class="icon">
+                                <slot name="icon" v-bind="slotBind" />
+                            </span>
+                            <span class="data">
+                                <slot name="data" v-bind="slotBind">
+                                    {{ data }}
+                                </slot>
+                            </span>
+                            <span v-if="$scopedSlots[`right-extra`]" class="right-extra">
+                                <slot name="right-extra" v-bind="slotBind" />
+                            </span>
+                        </template>
+                    </slot>
+                </div>
             </slot>
         </div>
-        <vue-draggable v-if="Array.isArray(proxyNode.children)"
+        <vue-draggable v-if="proxyNode.expanded && Array.isArray(proxyNode.children)"
                        v-model="proxyNode.children"
                        :group="{name: 'g1'}"
                        draggable=".draggable"
@@ -130,10 +106,10 @@ import {
 import PI from '@/foundation/icons/PI.vue';
 import { makeProxy } from '@/util/composition-helpers';
 import {
-    forEach,
+    forEach, get,
 } from 'lodash';
 import {
-    TreeItem, TreeNodeProps, TreeNode,
+    TreeItem, TreeNodeProps, TreeNode, TreeNodeSlotProps,
 } from '@/data-display/tree/tree-node/type';
 import PTextInput from '@/inputs/input/PTextInput.vue';
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
@@ -155,7 +131,7 @@ export default defineComponent({
     props: {
         level: {
             type: Number,
-            default: 0,
+            default: 1,
         },
         index: {
             type: Number,
@@ -187,7 +163,14 @@ export default defineComponent({
         },
         getDefaultNode: {
             type: Function,
-            default: () => ({}),
+            default: data => ({
+                _id: Math.floor(Math.random() * Date.now()),
+                data,
+                children: false,
+                expanded: false,
+                selected: false,
+                loading: false,
+            }),
         },
         parent: {
             type: Object,
@@ -396,10 +379,9 @@ export default defineComponent({
             return res;
         };
 
-        const slotBind = computed(() => ({
+        const slotBind = computed<TreeNodeSlotProps>(() => ({
             depth: state.depth,
             node: state.node,
-            getListeners,
         }));
 
 
@@ -458,10 +440,9 @@ export default defineComponent({
             'click-node': (...args) => { emit('click-node', ...args); },
             toggle: (...args) => { emit('toggle', ...args); },
             fold: (...args) => { emit('fold', ...args); },
-            select: (...args) => { emit('select', ...args); },
-            unselect: (...args) => { emit('unselect', ...args); },
             'start-drag': (...args) => { emit('start-drag', ...args); },
             'end-drag': (...args) => { emit('end-drag', ...args); },
+            'add-drag': (...args) => { emit('add-drag', ...args); },
             'update-drag': (...args) => { emit('update-drag', ...args); },
             'finish-edit': (...args) => { emit('finish-edit', ...args); },
             'update-data': (...args) => { emit('update-data', ...args); },

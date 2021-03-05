@@ -11,11 +11,88 @@ import { reactive, toRefs, computed, watch } from '@vue/composition-api';
 import {getTreeList, getTreeData, getTreeNode, getRecursiveInfo, getPermissionInfo} from './mock';
 import './PTree.stories.pcss'
 
-<Meta title='Data Display/Tree' argTypes={{}}/>
+<Meta title='Data Display/Tree' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=9570%3A199324',
+    },
+}}
+component={PTree} argTypes={{
+    onInit: {
+        name: 'init',
+        description: `Event emitted when the root node is ready`,
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events'
+        }
+    },
+    onDelete: {
+        name: 'delete',
+        description: `Event emitted when the node is deleted`,
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events'
+        }
+    },
+    onUpdateDrag: {
+        name: 'update-drag',
+        description: `Event emitted when there are changes by drag & drop`,
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events'
+        }
+    },
+    onFinishEdit: {
+        name: 'finish-edit',
+        description: `Event emitted when finish inline edit`,
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events'
+        }
+    },
+    onUpdateData: {
+        name: 'update-data',
+        description: `Event emitted when data is changed by \`setData()\``,
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events'
+        }
+    },
+}}/>
 
 
-export const Template = (args, { argTypes }) => ({
-    props: Object.keys(argTypes),
+
+export const ExpertTemplate = () => ({
     components: { PTree, PI, PIconButton, PButton, PRadio, PTextInput, PFieldGroup },
     template: `
     <div class="h-full w-full p-4 overflow-auto">
@@ -39,16 +116,14 @@ export const Template = (args, { argTypes }) => ({
                     :get-class-names="getClassNames"
                     fetch-on-init
                     @init="onTreeInit"
+                    @update-drag="onUpdateDrag"
                     class="w-1/2"
             >
                 <template #data="{node}">
                         {{ node.data.name }} ({{node.data.id}})
                 </template>
                 <template #toggle="{node}">
-                    <p-i v-if="node.loading" name="ic_working"
-                         width="1rem" height="1rem"
-                    />
-                    <p-radio v-else-if="node.data.item_type === 'PROJECT'"
+                    <p-radio v-if="!node.loading && node.data.item_type === 'PROJECT'"
                              :selected="node.selected" :value="true"
                              @click.stop="node.setSelected(true)"
                     />
@@ -181,6 +256,9 @@ export const Template = (args, { argTypes }) => ({
         const onTreeInit = async (root) => {
             state.root = root;
         }
+        const onUpdateDrag = (item) => {
+            console.log('Update Drag', item)
+        }
         return {
             ...toRefs(state),
             dataFetcher,
@@ -189,6 +267,7 @@ export const Template = (args, { argTypes }) => ({
             add,
             onClickEdit,
             onTreeInit,
+            onUpdateDrag,
             getTreeData,
             getTreeNode,
             findNode,
@@ -201,9 +280,13 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+## Expert Case
 <Canvas>
-    <Story name="playground">
-        {Template.bind({})}
+    <Story name="Expert Case">
+        {ExpertTemplate.bind({})}
     </Story>
 </Canvas>
+
+
+<ArgsTable story="Expert Case" />
 

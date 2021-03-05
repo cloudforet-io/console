@@ -1,6 +1,7 @@
 <template>
     <div class="p-tree" :class="{drag: !!draggingNode}">
         <p-tree-node key="root"
+                     :level="0"
                      :index="0"
                      :pad-size="padSize"
                      :disable-toggle="disableToggle"
@@ -11,6 +12,7 @@
                      :get-class-names="getClassNames"
                      data="root"
                      :children.sync="nodes"
+                     expanded
                      @init="onInit"
                      @delete="onDelete"
                      @toggle="onToggle"
@@ -66,6 +68,7 @@ interface Props {
     fetchOnInit?: boolean;
     dataFetcher?: ((item?: TreeItem) => Promise<any[]|boolean>|any[]|boolean);
     nodeFormatter?: (node: TreeNode) => TreeNode;
+    getClassNames?: (item: TreeItem<T>) => string|string[]|object;
 }
 export default defineComponent<Props>({
     name: 'PTree',
