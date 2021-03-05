@@ -2,24 +2,19 @@
     <vertical-page-layout :min-width="0" :init-width="260" :max-width="400">
         <template #sidebar>
             <aside class="sidebar-menu">
-                <p class="menu-item">
-                    즐겨찾기
-                </p>
-<!--                <favorite-list :items="favoriteItems" class="favorite-list" @delete="onFavoriteDelete" />-->
-
-                <p-divider class="sidebar-divider" />
+                <sidebar-title :title="$t('PROJECT.LANDING.FAVORITES')">
+                    <template #extra>
+                        <!--                        &nbsp;<span class="count">({{ favoriteItems.length }})</span>-->
+                    </template>
+                </sidebar-title>
+                <!--                <favorite-list :items="favoriteItems" class="favorite-list" @delete="onFavoriteDelete" />-->
                 <div v-for="(item) in menuList" :key="item.label"
                      @click="showPage(item.routeName)"
                 >
-                    <p class="menu-item"
-                       :class="{'selected': item.label === selectedItem.label}"
-                    >
-                        {{ item.label }}
-                        <p-i name="ic_arrow_right" width="1rem" height="1rem"
-                             color="inherit transparent"
-                        />
-                    </p>
-                    <p-divider class="sidebar-divider" />
+                    <sidebar-title :title="item.label"
+                                   :selected="item.label === selectedItem.label"
+                                   style-type="link"
+                    />
                 </div>
             </aside>
         </template>
@@ -35,9 +30,9 @@ import {
 } from '@vue/composition-api';
 import VerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.vue';
 import VueI18n from 'vue-i18n';
-import { PDivider, PI } from '@spaceone/design-system';
 import { FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteList from '@/common/modules/favorite-list/FavoriteList.vue';
+import SidebarTitle from '@/common/components/sidebar-title/SidebarTitle.vue';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -49,10 +44,9 @@ interface MenuItem {
 export default {
     name: 'SpotAutomationMainPage',
     components: {
+        SidebarTitle,
         VerticalPageLayout,
         FavoriteList,
-        PDivider,
-        PI,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -101,33 +95,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.sidebar-menu {
-    margin-left: 1rem;
-    margin-top: 2rem;
-}
-.sidebar-divider {
-    @apply w-full;
-    margin-bottom: 0.75rem;
-}
-.menu-item {
-    @apply text-gray-900 font-bold truncate;
-    width: 14.75rem;
-    font-size: 0.875rem;
-    line-height: 170%;
-    margin-bottom: 0.5rem;
-
-    &:hover {
-        @apply cursor-pointer;
-        text-decoration: underline;
-    }
-    &:active {
-        @apply text-blue-500 cursor-pointer;
-    }
-    &.selected {
-        @apply text-blue-500 cursor-pointer;
-    }
-}
-
 .vertical-page-layout::v-deep {
     .right-container {
         .page-contents {

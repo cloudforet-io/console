@@ -93,7 +93,7 @@ import {
 } from '@/views/project/project/type';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { store } from '@/store';
-import SidebarTitle from '@/common/components/SidebarTitle.vue';
+import SidebarTitle from '@/common/components/sidebar-title/SidebarTitle.vue';
 
 export default {
     name: 'ProjectGroupTree',

@@ -138,7 +138,7 @@ import TopNotification from '@/common/components/TopNotification.vue';
 import { store } from '@/store';
 import ProjectPageStoreModule from '@/views/project/project/store';
 import { ProjectPageState } from '@/views/project/project/store/type';
-import SidebarTitle from '@/common/components/SidebarTitle.vue';
+import SidebarTitle from '@/common/components/sidebar-title/SidebarTitle.vue';
 import ProjectGroupDeleteCheckModal from '@/views/project/project/modules/ProjectGroupDeleteCheckModal.vue';
 
 

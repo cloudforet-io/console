@@ -81,7 +81,7 @@ export default {
     justify-content: space-between;
     padding: 1rem 1.5rem;
     width: 100%;
-    height: 6.75rem;
+    min-height: 6.75rem;
     border-top-left-radius: 0.25rem;
     border-top-right-radius: 0.25rem;
 
@@ -133,15 +133,15 @@ export default {
     }
 
     @screen sm {
-        height: 4.75rem;
+        min-height: 4.75rem;
     }
 
     @screen md {
-        height: 4.75rem;
+        min-height: 4.75rem;
     }
 
     @screen lg {
-        height: 3rem;
+        min-height: 3rem;
         .spot-group-title {
             visibility: hidden;
         }
@@ -158,18 +158,18 @@ export default {
 .card-body {
     @apply border border-gray-200;
     width: 100%;
-    height: 11.6rem;
+    min-height: 11.6rem;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
     .card-desktop-version {
         display: none;
     }
 
     @screen sm {
-        height: 7.3125rem;
+        min-height: 7.3125rem;
     }
 
     @screen md {
-        height: 19.15rem;
+        min-height: 19.15rem;
         .card-mobile-version {
             display: none;
         }
@@ -180,7 +180,7 @@ export default {
     }
 
     @screen lg {
-        height: 19.125rem;
+        min-height: 19.125rem;
         .card-mobile-version {
             display: none;
         }
@@ -195,7 +195,7 @@ export default {
     @apply bg-blue-100 border border-gray-200;
     display: flex;
     justify-content: center;
-    height: 3.25rem;
+    min-height: 3.25rem;
     border-top: 0;
     border-bottom-left-radius: 0.25rem;
     border-bottom-right-radius: 0.25rem;
@@ -208,11 +208,11 @@ export default {
     }
 
     @screen sm {
-        height: 2.125rem;
+        min-height: 2.125rem;
     }
 
     @screen md {
-        height: 2.125rem;
+        min-height: 2.125rem;
     }
 
     @screen lg {
