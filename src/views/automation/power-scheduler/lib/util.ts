@@ -23,7 +23,7 @@ export const changeTimezoneToUTC = (rule: RoutineRule[] | TicketRule[], ruleType
         rule.forEach((r) => {
             r.times.forEach((time) => {
                 let newTime = time - offsetHours;
-                if (newTime > 0) {
+                if (newTime >= 0) {
                     tmpRule[r.day].push(newTime);
                 } else {
                     newTime += 24;

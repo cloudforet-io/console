@@ -19,15 +19,15 @@ export const SCHEDULE_STATUS = {
         textColor: gray[400],
         icon: 'ic_power-off',
     },
-    BOOTING: {
-        text: 'BOOTING',
+    STARTING: {
+        text: 'STARTING',
         textColor: safe,
-        icon: 'ic_booting',
+        lottie: 'lottie_starting',
     },
     STOPPING: {
         text: 'STOPPING',
         textColor: gray[400],
-        icon: 'ic_stopping',
+        lottie: 'lottie_stopping',
     },
 };
 

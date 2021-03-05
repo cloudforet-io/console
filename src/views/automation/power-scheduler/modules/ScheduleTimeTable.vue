@@ -825,7 +825,7 @@ export default {
                         @apply border-l border-white;
                         display: inline-flex;
                         width: calc(100% / 7);
-                        height: 0.95rem;
+                        height: 95%;
                         margin: 0;
                         &:first-child {
                             @apply border-l-0;
@@ -837,23 +837,25 @@ export default {
                                 @apply bg-point-violet;
                             }
                             &.one-time-stop, &.selected-one-time-stop {
-                                background: repeating-linear-gradient(
+                                background:
+                                    repeating-linear-gradient(
                                         45deg,
                                         rgba(theme('colors.gray.700'), 0.5),
                                         rgba(theme('colors.gray.700'), 0.5) 3px,
                                         transparent 3px,
                                         transparent 6px
-                                );
+                                    );
                             }
                         }
                         &.one-time-run, &.selected-one-time-run {
-                            background: repeating-linear-gradient(
+                            background:
+                                repeating-linear-gradient(
                                     45deg,
                                     rgba(theme('colors.point-violet'), 0.5),
                                     rgba(theme('colors.point-violet'), 0.5) 3px,
                                     theme('colors.point-violet') 3px,
                                     theme('colors.point-violet') 6px
-                            );
+                                );
                             border-radius: 0.125rem;
                         }
                         &.one-time-stop, &.selected-one-time-stop {
@@ -935,25 +937,27 @@ export default {
                 &.one-time-run {
                     @apply text-point-violet;
                     .legend-icon {
-                        background: repeating-linear-gradient(
+                        background:
+                            repeating-linear-gradient(
                                 45deg,
-                                rgba(theme('colors.pointViolet'), 0.5),
-                                rgba(theme('colors.pointViolet'), 0.5) 3px,
-                                theme('colors.pointViolet') 3px,
-                                theme('colors.pointViolet') 6px
-                        );
+                                rgba(theme('colors.point-violet'), 0.5),
+                                rgba(theme('colors.point-violet'), 0.5) 3px,
+                                theme('colors.point-violet') 3px,
+                                theme('colors.point-violet') 6px
+                            );
                     }
                 }
                 &.one-time-stop {
                     @apply text-gray-400;
                     .legend-icon {
-                        background: repeating-linear-gradient(
+                        background:
+                            repeating-linear-gradient(
                                 45deg,
                                 rgba(theme('colors.gray.700'), 0.5),
                                 rgba(theme('colors.gray.700'), 0.5) 3px,
                                 theme('colors.gray.700') 3px,
                                 theme('colors.gray.700') 6px
-                        );
+                            );
                     }
                 }
                 .legend-icon {

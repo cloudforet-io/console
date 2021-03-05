@@ -7,7 +7,8 @@
             <template #title>
                 <span>{{ title }}</span>
                 <div class="status-wrapper">
-                    <p-i :name="SCHEDULE_STATUS[status].icon" />
+                    <p-i v-if="SCHEDULE_STATUS[status].icon" :name="SCHEDULE_STATUS[status].icon" />
+                    <p-lottie v-else :name="SCHEDULE_STATUS[status].lottie" size="1.5" />
                     <span class="text" :style="{color: SCHEDULE_STATUS[status].textColor}">
                         {{ statusText[status] }}
                     </span>
@@ -175,7 +176,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput, PIconButton, PButton, PPageTitle, PI,
+    PButtonModal, PFieldGroup, PTextInput, PIconButton, PButton, PPageTitle, PI, PLottie,
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
@@ -201,6 +202,7 @@ export default {
         PTextInput,
         PFieldGroup,
         PI,
+        PLottie,
         ScheduleTimeTable,
         ScheduleKanban,
     },
@@ -256,7 +258,7 @@ export default {
             statusText: computed(() => ({
                 ON: vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.STATUS_ON'),
                 OFF: vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.STATUS_OFF'),
-                BOOTING: vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.STATUS_BOOTING'),
+                STARTING: vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.STATUS_BOOTING'),
                 STOPPING: vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.STATUS_STOPPING'),
             })),
         });
@@ -323,7 +325,7 @@ export default {
             }
         };
 
-        const getScheduleState = async () => {
+        const getScheduleStatus = async () => {
             try {
                 const res = await SpaceConnector.client.powerScheduler.schedule.getScheduleStatus({
                     schedule_id: props.scheduleId,
@@ -430,9 +432,13 @@ export default {
         watch(() => props.scheduleId, async (id) => {
             nameEditState.showValidation = false;
             const actions = [getSchedule()];
-            if (id) actions.push(getScheduleState());
+            if (id) actions.push(getScheduleStatus());
             await Promise.all(actions);
         }, { immediate: true });
+
+        setInterval(() => {
+            getScheduleStatus();
+        }, 5000);
 
         return {
             ...toRefs(state),
