@@ -78,16 +78,16 @@ export const openProjectGroupDeleteCheckModal: Action<ProjectPageState, any> = (
     commit('setProjectGroupDeleteCheckModalVisible', true);
 };
 
-interface ProjectGroupInfo {id?: string; name: string}
+interface ProjectGroupInfo {parent_project_group_id?: string; name: string}
 
 export const createProjectGroup: Action<ProjectPageState, any> = async ({ state, commit },
     projectGroupInfo: ProjectGroupInfo) => {
     try {
         const params: ProjectGroupInfo = { ...projectGroupInfo };
         if (state.actionTargetNode) {
-            params.id = state.actionTargetNode.data.id;
+            params.parent_project_group_id = state.actionTargetNode.data.id;
         }
-        const res = await SpaceConnector.client.identity.projectGroup.create(projectGroupInfo);
+        const res = await SpaceConnector.client.identity.projectGroup.create(params);
 
         const newData: ProjectItemResp = {
             ...projectGroupInfo,
@@ -96,8 +96,8 @@ export const createProjectGroup: Action<ProjectPageState, any> = async ({ state,
             has_child: false,
         };
 
-        if (state.actionTargetNode?.parent) {
-            state.actionTargetNode.parent.addChild(newData);
+        if (state.actionTargetNode) {
+            state.actionTargetNode.addChild(newData);
         } else if (state.rootNode) {
             state.rootNode.addChild(newData);
         }

@@ -17,7 +17,7 @@
                                        name="ic_plus_thin" style-type="transparent" size="sm"
                                        color="inherit"
                                        class="ml-1"
-                                       @click="openProjectGroupCreateForm"
+                                       @click="openProjectGroupCreateForm(null)"
                         />
                     </template>
                 </div>
@@ -71,7 +71,7 @@
                 <template #right-extra="{node}">
                     <p-icon-button name="ic_plus" class="group-add-btn"
                                    size="sm"
-                                   @click.stop="$emit('create', node)"
+                                   @click.stop="openProjectGroupCreateForm(node)"
                     />
                 </template>
             </p-tree>
@@ -146,8 +146,8 @@ export default {
             isAllProjectSelected: computed(() => store.state.projectPage.rootNode && !state.firstSelectedNode),
         });
 
-        const openProjectGroupCreateForm = () => {
-            store.dispatch('projectPage/openProjectGroupCreateForm', null);
+        const openProjectGroupCreateForm = (node) => {
+            store.dispatch('projectPage/openProjectGroupCreateForm', node);
         };
 
         const startTreeEdit = () => {
@@ -240,12 +240,19 @@ export default {
     }
 }
 .p-tree::v-deep {
-    .p-tree-node .tree-row {
-        .right-extra {
+
+    .tree-row {
+        &:not(:hover) > .node .right-extra {
             display: none;
         }
-        &:hover .node .right-extra {
-            display: block;
+        &.no-permission > .node {
+            > .data, > .icon {
+                @apply text-gray-400;
+                cursor: not-allowed;
+            }
+            .right-extra {
+                display: none;
+            }
         }
     }
 }

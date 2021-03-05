@@ -68,7 +68,7 @@ export default {
                 set(val) { store.commit('projectPage/setProjectGroupFormVisible', val); },
             }),
             updateMode: computed(() => store.state.projectPage.projectGroupFormUpdateMode),
-            currentGroupId: computed(() => store.state.projectPage.actionTargetNode?.data.id),
+            currentGroupId: computed(() => store.state.projectPage.actionTargetNode?.data?.id),
             projectGroupNames: [] as string[],
             projectGroupName: undefined as undefined | string,
             projectGroupNameInvalidText: computed(() => {
