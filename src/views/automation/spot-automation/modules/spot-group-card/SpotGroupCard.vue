@@ -11,6 +11,11 @@
                 </p>
                 <p class="spot-group-title">
                     Spot Group Name
+<!--                    <favorite-button :item-id="item.spot_group_id|| ''"-->
+<!--                                     favorite-type="cloudServiceType"-->
+<!--                                     resource-type="inventory.CloudServiceType"-->
+<!--                                     class="favorite-btn"-->
+<!--                    />-->
                 </p>
             </div>
             <div class="right-wrapper">
@@ -47,14 +52,16 @@
 
 <script lang="ts">
 import { PDivider, PI } from '@spaceone/design-system';
-import SpotGroupCardDesktop from '@/views/automation/spot-automation/modules/SpotGroupCardDesktop.vue';
-import SpotGroupCardMobile from '@/views/automation/spot-automation/modules/SpotGroupCardMobile.vue';
+import SpotGroupCardDesktop from '@/views/automation/spot-automation/modules/spot-group-card/SpotGroupCardDesktop.vue';
+import SpotGroupCardMobile from '@/views/automation/spot-automation/modules/spot-group-card/SpotGroupCardMobile.vue';
+import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 
 export default {
     name: 'SpotGroupCard',
     components: {
         SpotGroupCardDesktop,
         SpotGroupCardMobile,
+        FavoriteButton,
         PDivider,
         PI,
     },

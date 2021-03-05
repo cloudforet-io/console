@@ -37,7 +37,8 @@ import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dyna
 import { QueryHelper } from '@/lib/query';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { getThisPage } from '@/lib/component-utils/pagination';
-import SpotGroupCard from '@/views/automation/spot-automation/modules/SpotGroupCard.vue';
+import SpotGroupCard from '@/views/automation/spot-automation/modules/spot-group-card/SpotGroupCard.vue';
+import { SpaceConnector } from '@/lib/space-connector';
 
 // TODO: change handlers with spot automation spec
 const handlers = makeQuerySearchPropsWithSearchSchema(
@@ -86,8 +87,10 @@ export default {
             ]),
         });
 
-        const listSpotGroup = () => {
+        const listSpotGroup = async () => {
             // TODO: add list spot group api
+            const result = await SpaceConnector.client.spotAutomation.spotGroup.list();
+            console.log(result);
         };
 
         const changeQueryString = async (options) => {
@@ -108,6 +111,7 @@ export default {
             }
             await listSpotGroup();
         };
+
 
         return {
             ...toRefs(state),

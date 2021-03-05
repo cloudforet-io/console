@@ -1,16 +1,26 @@
 <template>
     <vertical-page-layout :min-width="0" :init-width="260" :max-width="400">
         <template #sidebar>
-            <p class="sidebar-title-text">
-                {{ $t('MENU.AUTOMATION.SPOT_AUTOMATION') }}
-            </p>
-            <p-divider class="sidebar-divider" />
-            <aside v-for="(item) in menuList" :key="item.label"
-                   class="menu-item"
-                   :class="{'selected': item.label === selectedItem.label}"
-                   @click="showPage(item.routeName)"
-            >
-                {{ item.label }}
+            <aside class="sidebar-menu">
+                <p class="menu-item">
+                    즐겨찾기
+                </p>
+<!--                <favorite-list :items="favoriteItems" class="favorite-list" @delete="onFavoriteDelete" />-->
+
+                <p-divider class="sidebar-divider" />
+                <div v-for="(item) in menuList" :key="item.label"
+                     @click="showPage(item.routeName)"
+                >
+                    <p class="menu-item"
+                       :class="{'selected': item.label === selectedItem.label}"
+                    >
+                        {{ item.label }}
+                        <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                             color="inherit transparent"
+                        />
+                    </p>
+                    <p-divider class="sidebar-divider" />
+                </div>
             </aside>
         </template>
         <template #default>
@@ -21,11 +31,13 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, getCurrentInstance, reactive, toRefs, watch,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import VerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.vue';
 import VueI18n from 'vue-i18n';
-import { PDivider } from '@spaceone/design-system';
+import { PDivider, PI } from '@spaceone/design-system';
+import { FavoriteItem } from '@/store/modules/favorite/type';
+import FavoriteList from '@/common/modules/favorite-list/FavoriteList.vue';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -36,11 +48,16 @@ interface MenuItem {
 
 export default {
     name: 'SpotAutomationMainPage',
-    components: { VerticalPageLayout, PDivider },
+    components: {
+        VerticalPageLayout,
+        FavoriteList,
+        PDivider,
+        PI,
+    },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            menuList: [
+            menuList: computed(() => [
                 {
                     routeName: 'spotDashboard',
                     label: vm.$t('AUTOMATION.SPOT_AUTOMATION.MAIN.DASHBOARD'),
@@ -49,9 +66,15 @@ export default {
                     routeName: 'spotGroup',
                     label: vm.$t('AUTOMATION.SPOT_AUTOMATION.MAIN.SPOT_GROUP'),
                 },
-            ] as MenuItem[],
+            ]) as unknown as MenuItem[],
             selectedItem: {} as MenuItem,
+            favoriteItems: computed(() => vm.$store.getters['favorite/spotGroup/sortedItems']),
         });
+
+        const onFavoriteDelete = (item: FavoriteItem) => {
+            vm.$store.dispatch('favorite/spotGroup/removeItem', item);
+        };
+
         const showPage = (routeName) => {
             vm.$router.replace({ name: routeName }).catch(() => {});
         };
@@ -65,45 +88,43 @@ export default {
 
         (async () => {
             selectSidebarItem(vm.$route.name);
+            // await vm.$store.dispatch('favorite/spotGroup/load');
         })();
 
         return {
             ...toRefs(state),
             showPage,
+            onFavoriteDelete,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-.sidebar-title-text {
-    @apply font-bold;
-    font-size: 0.875rem;
-    line-height: 140%;
-    margin: 2rem 0 0.5rem 1rem;
+.sidebar-menu {
+    margin-left: 1rem;
+    margin-top: 2rem;
 }
-
 .sidebar-divider {
     @apply w-full;
     margin-bottom: 0.75rem;
 }
 .menu-item {
-    @apply text-gray-900 truncate;
+    @apply text-gray-900 font-bold truncate;
     width: 14.75rem;
-    height: 2rem;
     font-size: 0.875rem;
-    line-height: 140%;
-    padding: 0.375rem 1rem;
-    margin-left: 0.75rem;
-    margin-right: 0.75rem;
+    line-height: 170%;
+    margin-bottom: 0.5rem;
+
     &:hover {
-        @apply bg-blue-100 cursor-pointer;
+        @apply cursor-pointer;
+        text-decoration: underline;
     }
     &:active {
-        @apply bg-blue-200 text-blue-500 cursor-pointer;
+        @apply text-blue-500 cursor-pointer;
     }
     &.selected {
-        @apply bg-blue-200 text-blue-500 cursor-pointer;
+        @apply text-blue-500 cursor-pointer;
     }
 }
 
