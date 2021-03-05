@@ -51,7 +51,7 @@
 <script lang="ts">
 import {
     ComponentRenderProxy, computed,
-    defineComponent, getCurrentInstance, reactive, toRefs
+    defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -88,6 +88,12 @@ export default defineComponent({
             };
             await router.push(res);
         };
+
+        watch([() => vm.$store.getters['user/hasPermission'], () => vm.$route], async ([hasPermission, route]) => {
+            if (!route.meta.excludeAuth && !hasPermission && vm.$route.name !== 'userAccount') {
+                await vm.$router.replace({ name: 'userAccount' });
+            }
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
