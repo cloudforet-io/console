@@ -313,7 +313,10 @@ export default defineComponent({
                         newData = state.editText;
                     }
 
-                    state.node.setData(newData);
+                    proxyNode.data = newData;
+                    vm.$nextTick(() => {
+                        emit('finish-edit', state.node);
+                    });
                 },
                 setData(data) {
                     proxyNode.data = data;
@@ -460,6 +463,7 @@ export default defineComponent({
             'start-drag': (...args) => { emit('start-drag', ...args); },
             'end-drag': (...args) => { emit('end-drag', ...args); },
             'update-drag': (...args) => { emit('update-drag', ...args); },
+            'finish-edit': (...args) => { emit('finish-edit', ...args); },
             'update-data': (...args) => { emit('update-data', ...args); },
         };
 

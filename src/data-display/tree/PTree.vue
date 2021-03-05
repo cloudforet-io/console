@@ -21,6 +21,7 @@
                      @add-drag="onAddDrag"
                      @end-drag="onEndDrag"
                      @update-drag="onUpdateDrag"
+                     @finish-edit="onFinishEdit"
                      @update-data="onUpdateData"
         >
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
@@ -331,6 +332,11 @@ export default defineComponent<Props>({
             emit('update-drag', item);
         };
 
+        const onFinishEdit = (item: TreeItem) => {
+            applyChangesToSelectedNodes(item);
+            emit('finish-edit', item);
+        };
+
         const onUpdateData = (item) => {
             applyChangesToSelectedNodes(item);
             emit('update-data', item);
@@ -351,6 +357,7 @@ export default defineComponent<Props>({
             onAddDrag,
             onEndDrag,
             onUpdateDrag,
+            onFinishEdit,
             onUpdateData,
         };
     },
