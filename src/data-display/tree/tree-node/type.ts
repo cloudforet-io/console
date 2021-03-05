@@ -35,7 +35,7 @@ export interface TreeItem<T=any> extends TreeNode {
     level: number;
     parent: TreeItem<T>|null;
     el?: HTMLElement;
-    getChildrenNodes: () => TreeItem<T>;
+    getChildrenNodes: () => TreeItem<T>[];
     deleteNode: () => void;
     addChild: (data: T) => Promise<TreeItem<T>>;
     startEdit: () => void;

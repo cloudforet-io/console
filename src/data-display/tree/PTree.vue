@@ -21,7 +21,7 @@
                      @add-drag="onAddDrag"
                      @end-drag="onEndDrag"
                      @update-drag="onUpdateDrag"
-                     @update-data="applyChangesToSelectedNodes"
+                     @update-data="onUpdateData"
         >
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                 <slot :name="slot" v-bind="scope" />
@@ -331,6 +331,11 @@ export default defineComponent<Props>({
             emit('update-drag', item);
         };
 
+        const onUpdateData = (item) => {
+            applyChangesToSelectedNodes(item);
+            emit('update-data', item);
+        };
+
 
         return {
             proxyState,
@@ -346,7 +351,7 @@ export default defineComponent<Props>({
             onAddDrag,
             onEndDrag,
             onUpdateDrag,
-            applyChangesToSelectedNodes,
+            onUpdateData,
         };
     },
 });
