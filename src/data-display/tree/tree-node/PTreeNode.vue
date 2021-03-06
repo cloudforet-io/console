@@ -66,6 +66,8 @@
                        @add="onDragAdd"
                        @end="onDragEnd"
                        @update="onDragUpdate"
+                       @choose="onDragChoose"
+                       @unchoose="onDragUnchoose"
         >
             <transition-group>
                 <p-tree-node v-for="(child, idx) in proxyNode.children"
@@ -310,7 +312,7 @@ export default defineComponent({
                 async setChildren<T>(children): Promise<TreeItem<T>[]> {
                     if (Array.isArray(children)) {
                         proxyNode.children = children.map(d => props.getDefaultNode(d));
-                    } else proxyNode.children = children;
+                    } else proxyNode.children = [];
 
                     const res = await getChildrenNodes();
                     return res;
@@ -411,7 +413,16 @@ export default defineComponent({
             }
         };
 
+        const onDragChoose = (e) => {
+            console.debug('onDragChoose', e);
+        };
+
+        const onDragUnchoose = (e) => {
+            console.debug('onDragUnchoose', e);
+        };
+
         const checkMove = (e, t) => {
+            console.debug(e, t);
             const dragValidator = props.dragOptions.dragValidator;
             if (dragValidator && !dragValidator(e.draggedContext.element)) return false;
 
@@ -459,6 +470,8 @@ export default defineComponent({
             onDragAdd,
             onDragEnd,
             onDragUpdate,
+            onDragChoose,
+            onDragUnchoose,
             checkMove,
             onToggle,
             onClickNode,

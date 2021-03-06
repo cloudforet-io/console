@@ -3,129 +3,77 @@ import PTree from './PTree.vue';
 import PI from '@/foundation/icons/PI.vue'
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue'
 import PButton from '@/inputs/buttons/button/PButton.vue'
-import PRadio from '@/inputs/radio/PRadio.vue'
 import PTextInput from '@/inputs/input/PTextInput.vue';
-import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup.vue';
-import faker from 'faker';
-import { reactive, toRefs, computed, watch } from '@vue/composition-api';
+import PRadio from '@/inputs/radio/PRadio.vue'
+import { reactive, toRefs, computed } from '@vue/composition-api';
 import {getTreeList, getTreeData, getTreeNode, getRecursiveInfo, getPermissionInfo} from './mock';
+import faker from 'faker';
 import './PTree.stories.pcss'
 
-<Meta title='Data Display/Tree' parameters={{
-    design: {
-        type: 'figma',
-        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=9570%3A199324',
+
+<Meta title='Data Display/Tree' component={PTree}
+argTypes={{
+    editOptions: {
+        name: 'editOptions',
+        type: {name: `object`},
+        description: `Options for inline edit.`,
+        defaultValue: {},
+        table: {
+            type: {
+                summary: 'object'
+            },
+            defaultValue: {
+                summary: '{}'
+            },
+            category: 'props'
+        },
+        control: {
+            type: 'object'
+        }
     },
 }}
-component={PTree} argTypes={{
-    onInit: {
-        name: 'init',
-        description: `Event emitted when the root node is ready`,
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            defaultValue: {
-                summary: null,
-            },
-            category: 'events'
-        }
-    },
-    onDelete: {
-        name: 'delete',
-        description: `Event emitted when the node is deleted`,
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            defaultValue: {
-                summary: null,
-            },
-            category: 'events'
-        }
-    },
-    onUpdateDrag: {
-        name: 'update-drag',
-        description: `Event emitted when there are changes by drag & drop`,
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            defaultValue: {
-                summary: null,
-            },
-            category: 'events'
-        }
-    },
-    onFinishEdit: {
-        name: 'finish-edit',
-        description: `Event emitted when finish inline edit`,
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            defaultValue: {
-                summary: null,
-            },
-            category: 'events'
-        }
-    },
-    onUpdateData: {
-        name: 'update-data',
-        description: `Event emitted when data is changed by \`setData()\``,
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            defaultValue: {
-                summary: null,
-            },
-            category: 'events'
-        }
-    },
-}}/>
+/>
 
-
-
-export const ExpertTemplate = () => ({
-    components: { PTree, PI, PIconButton, PButton, PRadio, PTextInput, PFieldGroup },
+export const ExpertTemplate = (args, { argTypes }) => ({
+    components: { PTree, PButton, PTextInput, PI, PIconButton, PRadio },
     template: `
-    <div class="h-full w-full p-4 overflow-auto">
-        <div class="mb-4">
-            <p-button style-type="primary1" @click="refresh">Refresh</p-button>
-            <p-button style-type="secondary" @click="add">Add node to root</p-button>
-            <p-button style-type="safe" @click="onClickEdit">
-                {{editMode ? 'Done' : 'Edit' }}
-            </p-button>
-            <p-button style-type="primary" @click="findNode">Find node</p-button>
-            {{target}}
-        </div>
-        <div class="p-tree-template flex flex-wrap">
-            <p-tree id-key="id"
-                    children-key="has_child"
-                    :selected-nodes.sync="selectedNodes"
-                    :data-fetcher="dataFetcher"
-                    :select-options="selectOptions"
-                    :edit-options="editOptions"
+        <div class="h-full w-full p-4 overflow-auto">
+            <div class="mb-4">
+                <p-button style-type="primary1" @click="refresh">Refresh</p-button>
+                <p-button style-type="secondary" @click="add">Add node to root</p-button>
+                <p-button style-type="safe" @click="onClickEdit">
+                    {{editMode ? 'Done' : 'Edit' }}
+                </p-button>
+                <p-button style-type="primary" @click="find">Find node</p-button>
+                <div class="mt-4">
+                    <p-text-input v-model="target"/>
+                    <p-button style-type="secondary1" @click="fetchAndFind">Fetch and find node</p-button>
+                </div>
+                <div class="mt-4">
+                    <p-text-input v-model="editText"/>
+                    <p-button style-type="alert" @click="updateData">Update selected node</p-button>
+                </div>
+            </div>
+            <p-tree :edit-options="editOptions"
                     :drag-options="dragOptions"
+                    :select-options="selectOptions"
+                    :toggle-options="toggleOptions"
+                    :data-getter="dataGetter"
+                    :data-setter="dataSetter"
+                    :data-fetcher="dataFetcher"
                     :get-class-names="getClassNames"
-                    fetch-on-init
-                    @init="onTreeInit"
+                    @init="onInit"
+                    @change-select="onChangeSelect"
                     @update-drag="onUpdateDrag"
-                    class="w-1/2"
             >
                 <template #data="{node}">
                         {{ node.data.name }} ({{node.data.id}})
                 </template>
-                <template #toggle="{node}">
-                    <p-radio v-if="!node.loading && node.data.item_type === 'PROJECT'"
-                             :selected="node.selected" :value="true"
-                             @click.stop="node.setSelected(true)"
+                <template #toggle="{node, path, selected}">
+                    <p-radio v-if="node.data.item_type === 'PROJECT'"
+                             :selected="selected"
+                             :value="true"
+                             @click.stop="changeSelectState(node, path)"
                     />
                 </template>
                 <template #toggle-right>
@@ -145,132 +93,187 @@ export const ExpertTemplate = () => ({
                          width="1rem" height="1rem" color="inherit transparent"
                     />
                 </template>
-                <template #right-extra="{node}">
+                <template #right-extra="{node, path}">
                     <p-icon-button v-if="editMode && permissionInfo[node.data.id]" name="ic_minus"
                                    color="inherit transparent"
                                    size="sm"
-                                   @click.stop="node.deleteNode()"
+                                   @click.stop="deleteNode(path)"
                     />
                     <p-icon-button v-else name="ic_plus"
                                    class="add-btn"
                                    size="sm"
-                                   @click.stop="node.addChild(getTreeData())"
+                                   @click.stop="addNode(path, getTreeData())"
                     />
                 </template>
             </p-tree>
-            <div class="p-4 w-1/2">
-                <pre>{{selectedNodes.map(d => d.data)}}</pre>
-            </div>
         </div>
-    </div>
     `,
     setup() {
         const state = reactive({
-            root: null,
-            selectedNodes: [],
-            firstSelectedNode: computed(() => state.selectedNodes[0] || null),
-            selectOptions: {
-                validator({data}) {
-                    return data.item_type === 'PROJECT'
-                }
-            },
             editOptions: computed(() => ({
                 disabled: !state.editMode,
-                editStartValidator: (item) => {
-                    return state.permissionInfo[item.data.id]
+                editStartValidator: ({ data }) => {
+                    return !!state.permissionInfo[data.id]
                 },
                 validator: (text) => (text && text.length > 2 && text.length < 40),
-                invalidText: 'should NOT be shorter than 2 characters',
-                dataSetter(text, originData) {
-                    return {
-                        ...originData,
-                        name: text
-                    }
-                },
-                dataGetter(data) {
-                    return data.name
-                }
             })),
             dragOptions: computed(() => ({
                 disabled: !state.editMode,
-                dragValidator(node) {
+                dragValidator(node, parent) {
                     return !!state.permissionInfo[node.data.id]
                 },
-                dropValidator(node) {
-                    return !!state.permissionInfo[node.data.id]
+                dropValidator(node, parent) {
+                    return !!state.permissionInfo[parent?.data?.id]
                 }
             })),
             editMode: false,
             permissionInfo: {},
+            target: '',
             findMode: false,
             lists: [],
-            target: ''
+            listIdx: 0,
+            editText: '',
+            selectedItem: {}
         })
-        let dataFetcher = (item) => {
+        const selectOptions = {
+                validator({data}) {
+                    if (data.item_type !== 'PROJECT') return false;
+                    return state.editMode ? !!state.permissionInfo[data.id] : true
+                },
+            visibleRado: true
+    }
+        const toggleOptions = {
+            validator: (node) => {
+                return node.data.has_child || node.children.length > 0
+            }
+        }
+        const getClassNames = (data) => {
+            return {'no-permission': state.editMode && !state.permissionInfo[data.id]}
+        }
+        const dataSetter = (text, node) => {
+            node.data.name = text
+        }
+        const dataGetter = (node) => {
+            return node.data.name
+        }
+        const dataFetcher = (node) => {
             return new Promise((resolve, reject) => {
                 setTimeout(() => {
                     let res;
                     if (state.findMode) {
-                        res = state.lists[item ? item.level : 0]
+                        res = state.lists[state.listIdx++]
                     } else {
                         res = getTreeList()
                     }
-                    if (state.editMode && Array.isArray(res)) {
+                    if (state.editMode) {
                         res.forEach(d => {state.permissionInfo[d.id] = faker.random.boolean();})
                     }
                     resolve(res)
                 }, 500)
             })
         }
-        const getClassNames = (item) => {
-            if (state.editMode && !state.permissionInfo[item._id]) return 'no-permission'
-            else return ''
-        }
         const refresh = async () => {
             if (state.root) {
-                state.selectedNodes = []
-                const res = await dataFetcher()
-                await state.root.setChildren(res)
+                state.root.resetSelect()
+                await state.root.fetchData()
             }
-        }
-        const add = () => {
-            state.root.addChild(getTreeData())
         }
         const onClickEdit = () => {
+            const all = state.root.getAllNodes()
+            state.permissionInfo = {}
+            all.forEach((d) => {state.permissionInfo[d.data.id] = faker.random.boolean();})
             state.editMode = !state.editMode;
-            if (state.editMode && state.root) {
-                state.permissionInfo = getPermissionInfo(state.root.getChildrenNodes())
-            }
         }
-        const findNode = async () => {
-            const {lists, paths} = getRecursiveInfo()
+        const onInit = async (root) => {
+            state.root = root
+        }
+        const add = () => {
+            if (state.root) state.root.addNode(getTreeData())
+        }
+        const find = () => {
+            if (state.root) state.root.findNode((data) => data.name === state.target)
+        }
+        const fetchAndFind = async () => {
+            const {lists, names} = getRecursiveInfo()
             state.findMode = true;
             state.lists = lists;
-            state.target = paths[paths.length - 1];
+            state.listIdx = 0;
+            const predicates = names.map(d => (data) => {
+                return data.name === d
+            })
+            state.target = names[names.length - 1];
             if (state.root) {
-                const res = await state.root.findNode(state.target, paths);
-                if(res) res.setSelected(true)
+                await state.root.fetchAndFindNode(predicates);
             }
             state.findMode = false;
         }
-        const onTreeInit = async (root) => {
-            state.root = root;
+        const deleteNode = (path) => {
+            state.root.deleteNodeByPath(path)
         }
-        const onUpdateDrag = (item) => {
-            console.log('Update Drag', item)
+        const addNode = (path, data) => {
+            state.root.addChildNodeByPath(path, data)
+        }
+        const updateData = () => {
+            if (state.root && state.selectedItem.node) {
+                state.root.updateNodeByPath(state.selectedItem.path, {
+                    ...state.selectedItem.node.data,
+                    name: state.editText
+                })
+            }
+        }
+        const onChangeSelect = (node, path) => {
+            state.selectedItem = node ? {node, path} : {}
+            state.editText = node? node.data.name : ''
+        }
+        const onUpdateDrag = (node, parent) => {
+            console.debug('update drag', node, parent)
+        }
+        const changeSelectState = (node, path) => {
+            state.root.changeSelectState(node, path)
         }
         return {
             ...toRefs(state),
-            dataFetcher,
+            selectOptions,
+            toggleOptions,
             getClassNames,
+            dataSetter,
+            dataGetter,
+            dataFetcher,
             refresh,
-            add,
             onClickEdit,
-            onTreeInit,
-            onUpdateDrag,
+            onInit,
+            add,
+            find,
+            fetchAndFind,
             getTreeData,
-            getTreeNode,
-            findNode,
+            deleteNode,
+            addNode,
+            updateData,
+            onChangeSelect,
+            onUpdateDrag,
+            changeSelectState
+        }
+    }
+});
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PTree },
+    template: `
+        <div class="h-full w-full p-4 overflow-auto">
+            <div class="mb-4">
+            </div>
+            <p-tree :data-fetcher="treeDataFetcher">
+            </p-tree>
+        </div>
+    `,
+    setup() {
+        const treeDataFetcher = () => {
+            return ['A1', 'A2', 'A3']
+        }
+        return {
+            treeDataFetcher,
         }
     }
 });
@@ -280,13 +283,39 @@ export const ExpertTemplate = () => ({
 <br/>
 <br/>
 
-## Expert Case
+## Basic
+<br/>
+<br/>
+
 <Canvas>
-    <Story name="Expert Case">
+    <Story name="Basic">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Expert
+<br/>
+<br/>
+
+<Canvas>
+    <Story name="Expert">
         {ExpertTemplate.bind({})}
     </Story>
 </Canvas>
 
+<br/>
+<br/>
 
-<ArgsTable story="Expert Case" />
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
 

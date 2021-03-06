@@ -35,8 +35,21 @@ export const getRecursiveInfo = () => {
 
         return items[itemIdx].id;
     });
+    const names = lists.map((items, listIdx) => {
+        const itemIdx = faker.random.number({ min: 0, max: items.length - 1 });
+
+        // set last item leaf
+        if (listIdx === lists.length - 1) {
+            items[itemIdx].has_child = false;
+            items[itemIdx].item_type = 'PROJECT';
+        }
+
+        items[itemIdx].has_child = true;
+
+        return items[itemIdx].name;
+    });
     return {
-        lists, paths,
+        lists, paths, names,
     };
 };
 

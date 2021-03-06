@@ -1,17 +1,15 @@
-.p-tree-template {
-    .p-tree {
-        .tree-row {
-            &:not(:hover) .add-btn {
-                display: none;
+.p-tree {
+    .tree-node-back {
+        &:not(:hover) .add-btn {
+            display: none;
+        }
+        .node.no-permission {
+            > .data, > .icon {
+                @apply text-gray-400;
+                cursor: not-allowed;
             }
-            &.no-permission > .node {
-                > .data, > .icon {
-                    @apply text-gray-400;
-                    cursor: not-allowed;
-                }
-                .add-btn {
-                    display: none;
-                }
+            .add-btn {
+                display: none;
             }
         }
     }
