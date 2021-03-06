@@ -11,7 +11,7 @@
         <template #default="{node, path, tree, index}">
             <div class="node" :class="{
                      selected: getSelectState(path),
-                     ...getClassNames(node.data)
+                     ...getClassNames(node)
                  }"
                  @click.stop="changeSelectState(node, path)"
             >

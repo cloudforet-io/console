@@ -147,7 +147,7 @@ export const ExpertTemplate = (args, { argTypes }) => ({
                 return node.data.has_child || node.children.length > 0
             }
         }
-        const getClassNames = (data) => {
+        const getClassNames = ({ data }) => {
             return {'no-permission': state.editMode && !state.permissionInfo[data.id]}
         }
         const dataSetter = (text, node) => {
