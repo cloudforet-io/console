@@ -52,6 +52,7 @@ jobs:
           git config --global user.name admin-spaceone
           cp /tmp/index.yaml ./
           git add index.yaml
+          git pull
           git commit -m "Add ${SERVICE} chart"
           git push origin gh-pages
 
