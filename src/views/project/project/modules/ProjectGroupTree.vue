@@ -151,10 +151,10 @@ export default {
                     return !!(state.permissionInfo[node.data.id] || node.data.has_permission);
                 },
                 dropValidator(node, parent) {
-                    if (parent) {
+                    if (parent?.data) {
                         return !!(state.permissionInfo[parent.data.id] || parent.data.has_permission);
                     }
-                    return !!store.getters['user/isDomainOwner'];
+                    return !!store.getters['user/isAdmin'];
                 },
             })),
             allProjectRoot: null as any,
