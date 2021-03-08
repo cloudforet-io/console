@@ -64,7 +64,9 @@ export const ExpertTemplate = (args, { argTypes }) => ({
                     :get-class-names="getClassNames"
                     @init="onInit"
                     @change-select="onChangeSelect"
+                    @start-drag="onStartDrag"
                     @update-drag="onUpdateDrag"
+                    @end-drag="onEndDrag"
             >
                 <template #data="{node}">
                         {{ node.data.name }} ({{node.data.id}})
@@ -123,6 +125,7 @@ export const ExpertTemplate = (args, { argTypes }) => ({
                     return !!state.permissionInfo[node.data.id]
                 },
                 dropValidator(node, parent) {
+                    if (state.dragParentNode === parent) return true;
                     return !!state.permissionInfo[parent?.data?.id]
                 }
             })),
@@ -133,7 +136,9 @@ export const ExpertTemplate = (args, { argTypes }) => ({
             lists: [],
             listIdx: 0,
             editText: '',
-            selectedItem: {}
+            selectedItem: {},
+            dragNode: null,
+            dragParentNode: null
         })
         const selectOptions = {
                 validator({data}) {
@@ -225,8 +230,18 @@ export const ExpertTemplate = (args, { argTypes }) => ({
             state.selectedItem = node ? {node, path} : {}
             state.editText = node? node.data.name : ''
         }
+        const onStartDrag = (node, parent) => {
+            console.debug('start drag', node, parent)
+            state.dragNode = node
+            state.dragParentNode = parent
+        }
         const onUpdateDrag = (node, parent) => {
             console.debug('update drag', node, parent)
+        }
+        const onEndDrag = (node, parent) => {
+            console.debug('end drag', node, parent)
+            state.dragNode = null
+            state.dragParentNode = null
         }
         const changeSelectState = (node, path) => {
             state.root.changeSelectState(node, path)
@@ -250,7 +265,9 @@ export const ExpertTemplate = (args, { argTypes }) => ({
             addNode,
             updateData,
             onChangeSelect,
+            onStartDrag,
             onUpdateDrag,
+            onEndDrag,
             changeSelectState
         }
     }

@@ -5,6 +5,7 @@
           :draggable="!dragOptions.disabled"
           :each-draggable="eachDraggable"
           :each-droppable="eachDroppable"
+          :ondragstart="onDragStart"
           :ondragend="onDragEnd"
           :unfold-when-dragover="false"
     >
@@ -76,7 +77,7 @@ import PTextInput from '@/inputs/input/PTextInput.vue';
 import { focus } from 'vue-focus';
 
 export default defineComponent({
-    name: 'PTreeVue',
+    name: 'PTree',
     components: {
         PTextInput,
         PI,
@@ -182,14 +183,41 @@ export default defineComponent({
             }
             setSelectItem(node, path);
         };
+
+        const onDragStart = (tree, e) => {
+            const validator = props.dragOptions.startValidator;
+            const parent = tree.getNodeParentByPath(e.startPath);
+
+            if (validator && !validator(e.dragNode, parent)) return false;
+
+            emit('start-drag', e.dragNode, parent);
+            return true;
+        };
+
         const onDragEnd = (tree, e) => {
+            const parent = tree.getNodeParentByPath(e.startPath);
+
+            if (!e.pathChanged) {
+                emit('end-drag', e.dragNode, parent);
+                return true;
+            }
+
+            const validator = props.dragOptions.endValidator;
+
+            if (validator && !validator(e.dragNode, parent)) {
+                emit('end-drag', e.dragNode, parent);
+                return false;
+            }
+
             if (state.selectedNode && e.startPath.toString() === state.selectedPath.toString()) {
                 setSelectItem(e.dragNode, e.targetPath);
             }
-            if (e.targetPathNotEqualToStartPath) {
-                emit('update-drag', e.dragNode, tree.getNodeParentByPath(e.targetPath));
-            }
+
+            emit('update-drag', e.dragNode, parent);
+            emit('end-drag', e.dragNode, parent);
+            return true;
         };
+
         const eachDraggable = (path, tree, e) => {
             const dragValidator = props.dragOptions.dragValidator;
             if (dragValidator && !dragValidator(e.dragNode, tree.getNodeParentByPath(path))) return false;
@@ -310,7 +338,7 @@ export default defineComponent({
                 }
             }
 
-            setSelectItem(node, path);
+            if (node) setSelectItem(node, path);
             return node;
         };
         const getAllNodes = (node, nodes: any[] = []) => {
@@ -385,6 +413,7 @@ export default defineComponent({
             changeSelectState,
             eachDraggable,
             eachDroppable,
+            onDragStart,
             onDragEnd,
             finishEdit,
             onToggle,
