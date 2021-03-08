@@ -155,10 +155,10 @@ import TagsInputGroup from '@/common/components/tags-input-group/TagsInputGroup.
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
-import { ProviderModel } from '@/views/identity/service-account/type';
+import {ProjectGroup, ProviderModel} from '@/views/identity/service-account/type';
 import { TranslateResult } from 'vue-i18n';
 import InfoButton from '@/common/components/InfoButton.vue';
-import { TreeItem } from '@spaceone/design-system/dist/src/data-display/tree/tree-node/type';
+
 
 export default {
     name: 'AddServiceAccountPage',
@@ -262,7 +262,7 @@ export default {
             //
             jsonForCredential: '',
             //
-            selectedProject: null as TreeItem|null,
+            selectedProject: null as ProjectGroup|null,
             //
             isValid: computed(() => {
                 if (tabState.activeTab === 'json') {
@@ -337,7 +337,7 @@ export default {
             };
 
             if (formState.selectedProject) {
-                item.project_id = formState.selectedProject.data.id;
+                item.project_id = formState.selectedProject.id;
             }
             try {
                 const res = await SpaceConnector.client.identity.serviceAccount.create({
@@ -356,7 +356,7 @@ export default {
                 schema: state.selectedSecretType,
                 secret_type: 'CREDENTIALS',
                 service_account_id: state.serviceAccountId,
-                project_id: formState.selectedProject?.data.id || null,
+                project_id: formState.selectedProject?.id || null,
             });
         };
         const createSecretWithJson = async (jsonData) => {
@@ -366,7 +366,7 @@ export default {
                 schema: state.selectedSecretType,
                 secret_type: 'CREDENTIALS',
                 service_account_id: state.serviceAccountId,
-                project_id: formState.selectedProject?.data.id || null,
+                project_id: formState.selectedProject?.id || null,
             });
         };
         const createSecret = async () => {

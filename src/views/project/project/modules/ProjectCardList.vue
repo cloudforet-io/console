@@ -325,9 +325,11 @@ export default {
             }
         };
 
-        watch([() => state.groupId, () => state.searchText], async ([groupId, searchText]) => {
-            await listProjects(groupId, searchText);
-        });
+
+        /* Init */
+        watch([() => store.state.projectPage.isInitiated, () => state.groupId, () => state.searchText], async ([isInitiated, groupId, searchText]) => {
+            if (isInitiated) await listProjects(groupId, searchText);
+        }, { immediate: true });
 
 
         return {

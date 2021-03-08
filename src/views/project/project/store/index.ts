@@ -1,21 +1,21 @@
 import { ProjectPageState } from '@/views/project/project/store/type';
-import { RootTreeNode } from '@spaceone/design-system/dist/src/data-display/tree/type';
-import { ProjectItemResp, ProjectTreeItem } from '@/views/project/project/type';
 import * as getters from './getters';
 import * as actions from './actions';
 import * as mutations from './mutations';
 
 const state: ProjectPageState = {
+    isInitiated: false,
+
     searchText: undefined,
 
-    rootNode: null as null|RootTreeNode<ProjectItemResp>,
-    selectedNode: null as ProjectTreeItem|null,
+    rootNode: null,
+    selectedItem: {},
     treeEditMode: false,
 
     hasProjectGroup: undefined,
     projectCount: undefined,
 
-    actionTargetNode: null as ProjectTreeItem|null,
+    actionTargetItem: {},
     projectGroupFormVisible: false,
     projectGroupFormUpdateMode: false,
     projectGroupDeleteCheckModalVisible: false,
@@ -24,7 +24,7 @@ const state: ProjectPageState = {
 
 export default {
     namespaced: true,
-    state,
+    state: () => ({ ...state }),
     getters,
     actions,
     mutations,

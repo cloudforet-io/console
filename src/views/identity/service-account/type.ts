@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import { Tags, TimeStamp } from '@/models';
 import { JsonSchema } from '@/lib/type';
+import { ItemType, ProjectItemResp } from '@/views/project/project/type';
 
 const idField = 'provider';
 
@@ -20,3 +21,5 @@ export interface ProviderModel extends Tags, IdParameter{
     };
     created_at: TimeStamp;
 }
+
+export type ProjectGroup = ProjectItemResp

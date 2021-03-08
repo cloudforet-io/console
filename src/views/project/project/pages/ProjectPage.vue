@@ -57,7 +57,7 @@
                                                     style-type="primary-dark"
                                                     outline
                                                     name="ic_plus_bold"
-                                                    @click="openProjectGroupCreateForm(null)"
+                                                    @click="openProjectGroupCreateForm"
                                 >
                                     {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
                                 </p-icon-text-button>
@@ -96,9 +96,9 @@
                                        :parent-groups="storeState.parentGroups"
                     />
 
-                    <project-group-form-modal />
+                    <project-group-form-modal v-if="storeState.projectGroupFormVisible" />
 
-                    <project-group-delete-check-modal />
+                    <project-group-delete-check-modal v-if="storeState.projectGroupDeleteCheckModalVisible" />
 
                     <project-group-member-page v-if="groupMemberPageVisible"
                                                :group-id="storeState.groupId"
@@ -140,6 +140,7 @@ import ProjectPageStoreModule from '@/views/project/project/store';
 import { ProjectPageState } from '@/views/project/project/store/type';
 import SidebarTitle from '@/common/components/sidebar-title/SidebarTitle.vue';
 import ProjectGroupDeleteCheckModal from '@/views/project/project/modules/ProjectGroupDeleteCheckModal.vue';
+import router from '@/routes';
 
 
 export default {
@@ -166,29 +167,45 @@ export default {
         const vm: ComponentRenderProxy = getCurrentInstance() as ComponentRenderProxy;
 
         /* Ready ProjectPage Store */
-        (() => {
-            if (!store.hasModule('projectPage')) store.registerModule<ProjectPageState>('projectPage', ProjectPageStoreModule);
+        const registerStore = () => {
+            if (!store.hasModule('projectPage')) {
+                store.registerModule<ProjectPageState>('projectPage', ProjectPageStoreModule);
+            }
 
-            // unregister when leave page
-            onUnmounted(() => {
-                store.unregisterModule('projectPage');
+            /* Query String */
+            store.subscribe(({ type, payload }) => {
+                if (type === 'projectPage/setSelectedItem') {
+                    vm.$router.replace({
+                        query: {
+                            // eslint-disable-next-line camelcase
+                            select_pg: payload.node?.data.id || null,
+                        },
+                    }).catch(() => {});
+                }
             });
+        };
 
-            // this is for hot reloading
-            onMounted(() => {
-                if (!store.hasModule('projectPage')) store.registerModule<ProjectPageState>('projectPage', ProjectPageStoreModule);
-            });
-        })();
+        registerStore();
+
+        // unregister when leave page
+        onUnmounted(() => {
+            store.unregisterModule('projectPage');
+        });
+
+        // this is for hot reloading
+        onMounted(() => { registerStore(); });
 
         const storeState = reactive({
             groupId: computed(() => store.getters['projectPage/groupId']),
             groupName: computed(() => store.getters['projectPage/groupName']),
             searchText: computed(() => store.state.projectPage.searchText),
-            selectedNode: computed(() => store.state.projectPage.selectedNode),
+            selectedItem: computed(() => store.state.projectPage.selectedItem),
+            selectedNodeData: computed(() => store.getters['projectPage/selectedNodeData']),
             parentGroups: computed(() => store.getters['projectPage/parentGroups']),
             hasProjectGroup: computed(() => store.state.projectPage.hasProjectGroup),
             projectCount: computed(() => store.state.projectPage.projectCount),
-            actionTargetNode: computed(() => store.state.projectPage.actionTargetNode),
+            projectGroupFormVisible: computed(() => store.state.projectPage.projectGroupFormVisible),
+            projectGroupDeleteCheckModalVisible: computed(() => store.state.projectPage.projectGroupDeleteCheckModalVisible),
         });
 
         const state = reactive({
@@ -203,8 +220,8 @@ export default {
             ] as MenuItem[]),
             projectGroupNavigation: computed(() => {
                 const result = storeState.parentGroups.map(d => ({ name: d.name, data: d }));
-                if (storeState.selectedNode) {
-                    result.push({ name: storeState.groupName, data: storeState.selectedNode.data });
+                if (storeState.selectedNodeData) {
+                    result.push({ name: storeState.groupName, data: storeState.selectedNodeData });
                 }
                 return [{ name: vm.$t('MENU.PROJECT.PROJECT'), data: null }, ...result];
             }),
@@ -245,15 +262,15 @@ export default {
 
         /* Handling Forms */
         const openProjectGroupDeleteCheckModal = () => {
-            store.dispatch('projectPage/openProjectGroupDeleteCheckModal', storeState.selectedNode);
+            store.dispatch('projectPage/openProjectGroupDeleteCheckModal', storeState.selectedItem);
         };
 
         const openProjectGroupUpdateForm = () => {
-            store.dispatch('projectPage/openProjectGroupUpdateForm', storeState.selectedNode);
+            store.dispatch('projectPage/openProjectGroupUpdateForm', storeState.selectedItem);
         };
 
-        const openProjectGroupCreateForm = (target?: ProjectTreeItem|null) => {
-            store.dispatch('projectPage/openProjectGroupCreateForm', target);
+        const openProjectGroupCreateForm = () => {
+            store.dispatch('projectPage/openProjectGroupCreateForm');
         };
 
         const openProjectGroupMemberPage = () => {
@@ -261,7 +278,7 @@ export default {
         };
 
         const openProjectForm = () => {
-            store.dispatch('projectPage/openProjectCreateForm', storeState.selectedNode);
+            store.dispatch('projectPage/openProjectCreateForm', storeState.selectedItem);
         };
 
 
@@ -279,18 +296,6 @@ export default {
                 }
             } else {
                 state.groupMemberCount = 0;
-            }
-        });
-
-        /* Query String */
-        store.subscribe(({ type, payload }) => {
-            if (type === 'projectPage/setSelectedNode') {
-                vm.$router.replace({
-                    query: {
-                        // eslint-disable-next-line camelcase
-                        select_pg: payload?.data.id || null,
-                    },
-                }).catch(() => {});
             }
         });
 

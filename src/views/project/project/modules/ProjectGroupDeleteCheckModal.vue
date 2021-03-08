@@ -1,6 +1,5 @@
 <template>
-    <p-button-modal v-if="proxyVisible"
-                    :header-title="$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE')"
+    <p-button-modal :header-title="$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE')"
                     centered
                     :scrollable="false"
                     size="md"
@@ -49,7 +48,7 @@ export default {
                 get() { return store.state.projectPage.projectGroupDeleteCheckModalVisible; },
                 set(val) { store.commit('projectPage/setProjectGroupDeleteCheckModalVisible', val); },
             }),
-            groupId: computed((() => store.state.projectPage.actionTargetNode?.data.id)),
+            groupId: computed((() => store.getters['projectPage/actionTargetNodeData']?.id)),
         });
 
         const deleteProjectGroup = async () => {

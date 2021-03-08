@@ -18,6 +18,7 @@
                 <template #default="{invalid}">
                     <p-text-input v-model="projectGroupName" class="block w-full" :invalid="showValidation && invalid"
                                   :placeholder="$t('PROJECT.LANDING.MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER')"
+                                  @keydown.enter="confirm"
                     />
                 </template>
             </p-field-group>
@@ -68,7 +69,7 @@ export default {
                 set(val) { store.commit('projectPage/setProjectGroupFormVisible', val); },
             }),
             updateMode: computed(() => store.state.projectPage.projectGroupFormUpdateMode),
-            currentGroupId: computed(() => store.state.projectPage.actionTargetNode?.data?.id),
+            currentGroupId: computed(() => store.getters['projectPage/actionTargetNodeData']?.id),
             projectGroupNames: [] as string[],
             projectGroupName: undefined as undefined | string,
             projectGroupNameInvalidText: computed(() => {
@@ -137,18 +138,12 @@ export default {
                 name: state.projectGroupName,
             };
 
-            try {
-                if (!state.updateMode) {
-                    await createProjectGroup(item);
-                } else {
-                    await updateProjectGroup(item);
-                }
-            } catch (e) {
-                console.error(e);
-            } finally {
-                state.showValidation = false;
-                store.commit('projectPage/setProjectGroupFormVisible', false);
-            }
+            state.showValidation = false;
+
+            if (!state.updateMode) await createProjectGroup(item);
+            else await updateProjectGroup(item);
+
+            store.commit('projectPage/setProjectGroupFormVisible', false);
         };
 
         watch(() => state.currentGroupId, async (after) => {

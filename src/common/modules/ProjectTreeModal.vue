@@ -1,7 +1,7 @@
 <template>
     <p-button-modal :header-title="$t('COMMON.TREE_MODAL.TITLE')"
                     size="md"
-                    :scrollable="false"
+                    :scrollable="true"
                     centered
                     fade
                     backdrop
@@ -14,14 +14,15 @@
                 {{ $t('COMMON.TREE_MODAL.SELECT_PROJECT') }}
             </div>
             <div class="body-container">
-                <p-tree class="tree-container"
-                        id-key="id" children-key="has_child"
-                        :selected-nodes.sync="selectedNodes"
-                        :data-fetcher="dataFetcher"
+                <p-tree :edit-options="{disabled: true}"
+                        :drag-options="{disabled: true}"
+                        :toggle-options="toggleOptions"
                         :select-options="selectOptions"
-                        :edit-options="editOptions"
-                        :drag-options="dragOptions"
+                        :data-setter="dataSetter"
+                        :data-getter="dataGetter"
+                        :data-fetcher="dataFetcher"
                         @init="onTreeInit"
+                        @change-select="onChangeSelect"
                 >
                     <template #data="{node}">
                         <span :class="{
@@ -29,23 +30,21 @@
                         }"
                         >{{ node.data.name }}</span>
                     </template>
-                    <template #toggle="{node}">
-                        <p-i v-if="node.loading" name="ic_working"
-                             width="1rem" height="1rem"
-                        />
-                        <p-radio v-else-if="node.data.item_type === 'PROJECT'"
-                                 :selected="node.selected" :value="true" @click.stop="node.setSelected(true)"
+                    <template #toggle="{node, path, selected}">
+                        <p-radio v-if="node.data.item_type === 'PROJECT'"
+                                 :selected="selected" :value="true"
+                                 @click.stop="changeSelectState(node, path)"
                         />
                     </template>
                     <template #toggle-right="{node}">
-                        <p-i v-if="node.data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="project-group-icon"
+                        <p-i v-if="node.data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="mx-1"
                              width="1rem" height="1rem" color="inherit transparent"
                         />
                     </template>
                 </p-tree>
                 <div class="no-select">
                     <p-radio class="mr-2"
-                             :selected="!firstSelectedNode"
+                             :selected="!selectedNode"
                              :value="true" @click="resetSelectedNodes"
                     /><span class="cursor-pointer" @click="resetSelectedNodes">{{ $t('COMMON.TREE_MODAL.SELECT_NO_PROJECT') }}</span>
                 </div>
@@ -65,10 +64,10 @@ import {
     PI, PButtonModal, PRadio, PTree,
 } from '@spaceone/design-system';
 import { makeProxy } from '@spaceone/design-system/src/util/composition-helpers';
-import { TreeItem, TreeNode } from '@spaceone/design-system/dist/src/data-display/tree/tree-node/type';
 
-import { ProjectItemResp, ProjectTreeItem } from '@/views/project/project/type';
+import { ProjectGroupTreeItem } from '@/views/project/project/type';
 import { SpaceConnector } from '@/lib/space-connector';
+import { ProjectGroup } from '@/views/identity/service-account/type';
 
 
 interface Props {
@@ -102,94 +101,86 @@ export default {
     setup(props: Props, { emit }) {
         const state = reactive({
             treeRef: null as null|any,
-            root: null as TreeItem|null,
-            selectedNodes: [] as ProjectTreeItem[],
-            firstSelectedNode: computed<ProjectTreeItem|undefined>(() => (state.selectedNodes[0])),
-            allProjectNode: null as TreeItem<string>|null,
-            selectOptions: {
-            },
-            editOptions: {
-                validator: text => (text && text.length > 2 && text.length < 40),
-                invalidText: 'should NOT be shorter than 2 characters',
-                validText: '2 ~ 40 characters',
-                dataSetter(text, originData) {
-                    return {
-                        ...originData,
-                        name: text,
-                    };
-                },
-            },
-            dragOptions: {
-                disabled: false,
-            },
+            root: null as any,
+            selectedItem: {} as ProjectGroupTreeItem,
+            selectedNode: computed(() => state.selectedItem.node),
             proxyVisible: makeProxy('visible', props, emit),
         });
 
-        const getSearchPath = async (id: string, type: string): Promise<string[]> => {
-            const res = await SpaceConnector.client.identity.project.tree.search({
-                item_id: id,
-                item_type: type,
-            });
-            return res.open_path || [];
+        const toggleOptions = {
+            validator: node => node.data.has_child || node.children.length > 0,
         };
 
-        const requestTreeData = async (id?: string, type?: string): Promise<ProjectItemResp[]|boolean> => {
-            const params: any = {
-                sort: { key: 'name', desc: false },
-                item_type: 'ROOT',
-            };
-            if (id && type) {
-                params.item_id = id;
-                params.item_type = type;
-            }
+        const selectOptions = {
+            validator(node) {
+                return node?.data.item_type === 'PROJECT';
+            },
+        };
+
+        const dataSetter = (text, node) => {
+            node.data.name = text;
+        };
+        const dataGetter = node => node.data.name;
+
+        const dataFetcher = async (node): Promise<ProjectGroup[]> => {
             try {
+                const params: any = {
+                    sort: { key: 'name', desc: false },
+                    item_type: 'ROOT',
+                    check_child: true,
+                };
+
+                if (node.data?.id && node.data?.item_type) {
+                    params.item_id = node.data.id;
+                    params.item_type = node.data.item_type;
+                }
+
                 const { items } = await SpaceConnector.client.identity.project.tree(params);
                 return items;
             } catch (e) {
                 console.error(e);
-                return false;
+                return [];
             }
         };
 
-
-        const dataFetcher = async (node?: ProjectTreeItem): Promise<ProjectItemResp[]|boolean> => {
-            const res = await requestTreeData(node?.data.id, node?.data.item_type);
-            return res;
+        const onChangeSelect = (node, path) => {
+            state.selectedItem = node ? { node, path } : {};
         };
 
-        const findNode = async (targetId: string) => {
-            const paths = await getSearchPath(targetId, 'PROJECT_GROUP');
-
-            let node: ProjectTreeItem = state.root;
-            for (let i = 0; i < paths.length; i++) {
-                const type = paths.length - 1 === i ? 'PROJECT' : 'PROJECT_GROUP';
-                const currentId = paths[i];
-                const children = await requestTreeData(currentId, type);
-                if (!Array.isArray(children)) return;
-
-                await node.addChildren(children);
-                // @ts-ignore
-                node = node.findChildNode(currentId);
-                if (node) {
-                    if (i === paths.length - 1) node.setSelected(true);
-                    else node.setExpanded(true);
-                }
-            }
-        };
-
-
-        const getRootData = async (): Promise<void> => {
-            if (state.root) {
-                state.selectedNodes = [];
-                const res = await dataFetcher(state.root);
-                await state.root.setChildren(res);
-                emit('list', Array.isArray(res) ? res.length : 0);
-            } else emit('list', 0);
+        const changeSelectState = (node, path) => {
+            state.root.changeSelectState(node, path);
         };
 
         const resetSelectedNodes = () => {
-            if (state.firstSelectedNode) {
-                state.firstSelectedNode.setSelected(false);
+            if (state.root) state.root.resetSelect();
+        };
+
+        const getSearchPath = async (id: string, type: string): Promise<string[]> => {
+            try {
+                const res = await SpaceConnector.client.identity.project.tree.search({
+                    item_id: id,
+                    item_type: type,
+                });
+                return res.open_path || [];
+            } catch (e) {
+                console.error(e);
+                return [];
+            }
+        };
+
+        const findNode = async (targetId: string) => {
+            if (!state.root) return;
+
+            if (!targetId) {
+                state.root.resetSelect();
+                return;
+            }
+
+            try {
+                const paths = await getSearchPath(targetId, 'PROJECT');
+                await state.root.fetchAndFindNode(paths.map(d => (data => data.id === d)));
+            } catch (e) {
+                console.error(e);
             }
         };
 
@@ -203,32 +194,26 @@ export default {
             }
         };
 
-        watch([() => props.visible, () => state.treeRef, () => state.root], async ([visible, treeRef, root]) => {
-            if (visible && treeRef && root) {
+        watch([() => props.visible, () => state.root], async ([visible, root]) => {
+            if (visible && root) {
                 if (props.projectId) {
                     await findNode(props.projectId);
                 } else {
-                    await getRootData();
-                    autoScroll(root.el);
+                    await root.fetchData();
                 }
             } else if (!visible && root) {
                 resetSelectedNodes();
-                await root.setChildren(false);
             }
         }, { immediate: true });
 
-        watch(() => state.firstSelectedNode, (node) => {
-            emit('select', node);
-        });
 
-
-        const onTreeInit = (root: TreeItem) => {
+        const onTreeInit = (root) => {
             state.root = root;
         };
 
         const confirm = () => {
-            if (state.firstSelectedNode) {
-                emit('confirm', state.firstSelectedNode.data);
+            if (state.selectedNode) {
+                emit('confirm', state.selectedNode.data);
             } else {
                 emit('confirm', null);
             }
@@ -236,7 +221,13 @@ export default {
 
         return {
             ...toRefs(state),
+            toggleOptions,
+            selectOptions,
+            dataSetter,
+            dataGetter,
             dataFetcher,
+            onChangeSelect,
+            changeSelectState,
             resetSelectedNodes,
             confirm,
             onTreeInit,

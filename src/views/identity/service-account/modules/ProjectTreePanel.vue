@@ -35,32 +35,32 @@
                 </div>
 
                 <p-icon-button name="ic_refresh" class="refresh-btn"
-                               @click="getAllData"
+                               @click="onRefresh"
                 />
             </div>
 
             <div class="body-container">
                 <div class="tree-container" :style="{overflow: isLoading ? 'hidden' : 'auto'}">
-                    <p-tree id-key="id" children-key="has_child"
-                            :selected-nodes.sync="selectedNodes"
-                            :data-fetcher="dataFetcher"
+                    <p-tree :edit-options="{disabled: true}"
+                            :drag-options="{disabled: true}"
+                            :toggle-options="toggleOptions"
                             :select-options="selectOptions"
-                            :edit-options="editOptions"
-                            :drag-options="dragOptions"
+                            :data-setter="dataSetter"
+                            :data-getter="dataGetter"
+                            :data-fetcher="dataFetcher"
                             @init="onTreeInit"
+                            @change-select="onChangeSelect"
                     >
                         <template #data="{node}">
                             <span :class="{
-                                'ml-2': data.item_type === 'PROJECT'
+                                'ml-2': node.data.item_type === 'PROJECT'
                             }"
                             >{{ node.data.name }}</span>
                         </template>
-                        <template #toggle="{node}">
-                            <p-i v-if="node.loading" name="ic_working"
-                                 width="1rem" height="1rem"
-                            />
-                            <p-radio v-else-if="node.data.item_type === 'PROJECT'"
-                                     :selected="node.selected" :value="true" @click.stop="node.setSelected(true)"
+                        <template #toggle="{node, selected}">
+                            <p-radio v-if="node.data.item_type === 'PROJECT'"
+                                     :selected="selected" :value="true"
+                                     @click.stop="changeSelectState(node, path)"
                             />
                         </template>
                         <template #toggle-right="{node}">
@@ -77,7 +77,7 @@
                 </div>
                 <div class="no-select">
                     <p-radio class="mr-2"
-                             :selected="!firstSelectedNode"
+                             :selected="!selectedNode"
                              :value="true" @click="releaseProject"
                     /><span class="cursor-pointer" @click="releaseProject">{{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_NO_SELECTION') }}</span>
                 </div>
@@ -91,19 +91,18 @@
 <script lang="ts">
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
     PI, PPaneLayout, PLottie, PIconButton, PIconTextButton, PRadio, PTree,
 } from '@spaceone/design-system';
-import { TreeItem, TreeNode } from '@spaceone/design-system/dist/src/data-display/tree/tree-node/type';
 
 import { PROJECT_MAIN_PAGE_NAME } from '@/routes/project/project-route';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { ProjectItemResp, ProjectTreeItem } from '@/views/project/project/type';
-
+import { ProjectGroupTreeItem } from '@/views/project/project/type';
+import { ProjectGroup } from '@/views/identity/service-account/type';
 
 
 export default {
@@ -127,72 +126,75 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            root: null as TreeItem|null,
-            selectedNodes: [] as ProjectTreeItem[],
-            firstSelectedNode: computed<ProjectTreeItem|undefined>(() => (state.selectedNodes[0])),
-            selectOptions: {
-                validator({ data }) {
-                    return data.item_type === 'PROJECT';
-                },
-            },
-            editOptions: {
-                validator: text => (text && text.length > 2 && text.length < 40),
-                invalidText: 'should NOT be shorter than 2 characters',
-                validText: '2 ~ 40 characters',
-                dataSetter(text, originData) {
-                    return {
-                        ...originData,
-                        name: text,
-                    };
-                },
-            },
-            dragOptions: {
-                disabled: false,
-            },
+            root: null as any,
+            selectedItem: {} as ProjectGroupTreeItem,
+            selectedNode: computed(() => state.selectedItem.node),
             hasProject: true,
             isLoading: false,
         });
 
-        const requestTreeData = async (id?: string, type?: string): Promise<ProjectItemResp[]|boolean> => {
-            const params: any = {
-                sort: { key: 'name', desc: false },
-                item_type: 'ROOT',
-            };
-            if (id && type) {
-                params.item_id = id;
-                params.item_type = type;
-            }
+        const toggleOptions = {
+            validator: node => node.data.has_child || node.children.length > 0,
+        };
+
+        const selectOptions = {
+            validator({ data }) {
+                return data.item_type === 'PROJECT';
+            },
+        };
+
+        const dataSetter = (text, node) => {
+            node.data.name = text;
+        };
+        const dataGetter = node => node.data.name;
+
+        const dataFetcher = async (node): Promise<ProjectGroup[]> => {
             try {
+                const params: any = {
+                    sort: { key: 'name', desc: false },
+                    item_type: 'ROOT',
+                    check_child: true,
+                };
+
+                if (node.data?.id && node.data?.item_type) {
+                    params.item_id = node.data.id;
+                    params.item_type = node.data.item_type;
+                }
+
                 const { items } = await SpaceConnector.client.identity.project.tree(params);
                 return items;
             } catch (e) {
                 console.error(e);
-                return false;
+                return [];
             }
         };
 
-        const dataFetcher = async (node?: ProjectTreeItem): Promise<ProjectItemResp[]|boolean> => {
-            const res = await requestTreeData(node?.data.id, node?.data.item_type);
-            return res;
+        const onChangeSelect = (node, path) => {
+            state.selectedItem = node ? { node, path } : {};
+            emit('select', node.data as ProjectGroup);
         };
 
-        const getRootData = async (): Promise<void> => {
-            if (state.root) {
-                state.selectedNodes = [];
-                const res = await dataFetcher(state.root);
-                await state.root.setChildren(res);
+        const changeSelectState = (node, path) => {
+            state.root.changeSelectState(node, path);
+        };
+
+        const releaseProject = () => {
+            if (state.selectedNode && state.root) {
+                state.root.resetSelect();
             }
         };
 
         const refreshQuery = new ApiQueryHelper().setCountOnly();
 
-        const getAllData = async () => {
+        const onRefresh = async () => {
+            if (!state.root) return;
             state.isLoading = true;
             state.hasProject = false;
+            state.root.resetSelect();
             const [res] = await Promise.all([
                 SpaceConnector.client.identity.project.list({
                     query: refreshQuery.data,
-                }), getRootData(),
+                }), state.root.fetchData(),
             ]);
             if (res.total_count) state.hasProject = true;
             state.isLoading = false;
@@ -204,24 +206,18 @@ export default {
             window.open(projectPath);
         };
         const selectProjectName = computed(() => {
-            if (state.firstSelectedNode) {
-                return state.firstSelectedNode.data.name;
+            if (state.selectedNode) {
+                return state.selectedNode.data.name;
             }
             return '';
         });
 
 
         const confirm = () => {
-            if (state.firstSelectedNode) {
-                emit('confirm', state.firstSelectedNode.node.data);
+            if (state.selectedNode) {
+                emit('confirm', state.selectedNode.data);
             } else {
                 emit('confirm', null);
-            }
-        };
-
-        const releaseProject = () => {
-            if (state.firstSelectedNode) {
-                state.firstSelectedNode.setSelected(false);
             }
         };
 
@@ -231,12 +227,18 @@ export default {
 
         return {
             ...toRefs(state),
+            toggleOptions,
+            selectOptions,
+            dataSetter,
+            dataGetter,
             dataFetcher,
-            getAllData,
+            onChangeSelect,
+            changeSelectState,
+            releaseProject,
+            onRefresh,
             goToProject,
             selectProjectName,
             confirm,
-            releaseProject,
             onTreeInit,
         };
     },
@@ -305,12 +307,9 @@ export default {
     @apply border-t border-gray-200 p-4 flex items-center;
 }
 .p-tree::v-deep {
-    .p-tree-node .tree-row {
-        .right-extra {
+    .tree-node-back {
+        &:not(:hover) .right-extra {
             display: none;
-        }
-        &:hover .node .right-extra {
-            display: block;
         }
     }
 }

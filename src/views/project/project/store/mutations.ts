@@ -1,18 +1,20 @@
 import { Mutation } from 'vuex';
 import { ProjectPageState } from '@/views/project/project/store/type';
-import { RootTreeNode } from '@spaceone/design-system/dist/src/data-display/tree/type';
-import { ProjectItemResp, ProjectTreeItem } from '@/views/project/project/type';
+import { ProjectGroupTreeItem } from '@/views/project/project/type';
 
+export const setIsInitiated: Mutation<ProjectPageState> = (state, isInitiated: boolean) => {
+    state.isInitiated = isInitiated;
+};
 
 export const setSearchText: Mutation<ProjectPageState> = (state, text?: string) => {
     state.searchText = text;
 };
 
-export const setSelectedNode: Mutation<ProjectPageState> = (state, selectedNode?: ProjectTreeItem) => {
-    state.selectedNode = selectedNode;
+export const setSelectedItem: Mutation<ProjectPageState> = (state, selectedItem) => {
+    state.selectedItem = selectedItem;
 };
 
-export const setRootNode: Mutation<ProjectPageState> = (state, root?: RootTreeNode<ProjectItemResp>|null) => {
+export const setRootNode: Mutation<ProjectPageState> = (state, root?: any|null) => {
     state.rootNode = root;
 };
 
@@ -28,8 +30,8 @@ export const setTreeEditMode: Mutation<ProjectPageState> = (state, treeEditMode:
     state.treeEditMode = treeEditMode;
 };
 
-export const setActionTargetNode: Mutation<ProjectPageState> = (state, actionTargetNode?: ProjectTreeItem|null) => {
-    state.actionTargetNode = actionTargetNode;
+export const setActionTargetItem: Mutation<ProjectPageState> = (state, actionTargetItem: ProjectGroupTreeItem = {}) => {
+    state.actionTargetItem = actionTargetItem;
 };
 
 export const setProjectGroupFormVisible: Mutation<ProjectPageState> = (state, projectGroupFormVisible: boolean) => {

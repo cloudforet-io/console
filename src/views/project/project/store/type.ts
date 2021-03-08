@@ -1,17 +1,18 @@
-import { ProjectItemResp, ProjectTreeItem } from '@/views/project/project/type';
-import { RootTreeNode } from '@spaceone/design-system/dist/src/data-display/tree/type';
+import { ProjectGroupTreeItem } from '@/views/project/project/type';
 
 export interface ProjectPageState {
+    isInitiated: boolean;
+
     searchText?: string;
 
-    rootNode?: RootTreeNode<ProjectItemResp>|null;
-    selectedNode?: ProjectTreeItem|null;
+    rootNode?: any|null;
+    selectedItem: ProjectGroupTreeItem;
     treeEditMode: boolean;
 
     hasProjectGroup?: boolean;
     projectCount?: number;
 
-    actionTargetNode?: ProjectTreeItem|null;
+    actionTargetItem: ProjectGroupTreeItem;
     projectGroupFormVisible: boolean;
     projectGroupFormUpdateMode: boolean;
     projectGroupDeleteCheckModalVisible: boolean;

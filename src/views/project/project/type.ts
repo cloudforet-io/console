@@ -1,5 +1,6 @@
 import { TimeStamp } from '@/models';
 import { TreeItem } from '@spaceone/design-system/dist/src/data-display/tree/tree-node/type';
+import { RootTreeNode } from '@spaceone/design-system/dist/src/data-display/tree/type';
 
 export type ItemType = 'PROJECT_GROUP'|'PROJECT'
 
@@ -38,28 +39,21 @@ export interface ProjectModel {
 export interface ProjectItemResp {
     id: string;
     name: string;
-    // eslint-disable-next-line camelcase
-    has_child: boolean;
     item_type: ItemType;
+    has_child?: boolean|null;
+    has_permission?: boolean|null;
 }
 
-export interface ProjectState {
-    groupId?: string;
-    groupName?: string;
-    searchText?: string;
-}
 
 export interface ProjectGroup {
     id: string;
     name: string;
 }
 
-export interface TreeSearchResp {
-    // eslint-disable-next-line camelcase
-    open_path: string[];
-}
 
 export type ProjectTreeItem = TreeItem<ProjectItemResp>
+
+export type ProjectTreeRootItem = RootTreeNode<ProjectItemResp>
 
 export interface FavoriteButtonProps {
     itemId: string;
@@ -68,4 +62,9 @@ export interface FavoriteButtonProps {
     itemMap: any;
     scale?: string;
     readOnly?: boolean;
+}
+
+export interface ProjectGroupTreeItem {
+    node?: any;
+    path?: number[];
 }
