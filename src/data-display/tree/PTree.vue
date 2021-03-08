@@ -195,7 +195,7 @@ export default defineComponent({
         };
 
         const onDragEnd = (tree, e) => {
-            const parent = tree.getNodeParentByPath(e.startPath);
+            const parent = tree.getNodeParentByPath(e.targetPath);
 
             if (e.startPath.toString() === e.targetPath.toString()) {
                 emit('end-drag', e.dragNode, parent);
