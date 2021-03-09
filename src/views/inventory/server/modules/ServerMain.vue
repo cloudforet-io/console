@@ -260,7 +260,7 @@ export default {
         const apiQuery = new ApiQueryHelper();
         const pageTitle = computed(() => (props.isCloudService ? props.cloudServiceType : vm.$t('INVENTORY.SERVER.MAIN.TITLE')));
 
-        const typeOptionState: Omit<QuerySearchTableTypeOptions, 'searchable'|'excelVisible'> = reactive({
+        const typeOptionState: Omit<QuerySearchTableTypeOptions, 'searchable'|'excelVisible'|'multiSelect'> = reactive({
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
