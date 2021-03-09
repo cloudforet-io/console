@@ -137,7 +137,7 @@ export default {
             valueHandlerMap: computed(() => (props.typeOptions?.valueHandlerMap || {})),
             selectIndex: props.typeOptions?.selectIndex ? computed(() => props.typeOptions?.selectIndex) : [],
             selectable: computed(() => (props.typeOptions?.selectable || false)),
-            multiSelect: computed(() => (props.typeOptions?.multiSelect || true)),
+            multiSelect: computed(() => (props.typeOptions?.multiSelect === undefined ? true : props.typeOptions.multiSelect)),
             colCopy: computed(() => (props.typeOptions?.colCopy || false)),
             searchable: computed(() => (props.typeOptions?.searchable === undefined ? true : props.typeOptions.searchable)),
             excelVisible: computed(() => (props.typeOptions?.excelVisible === undefined ? true : props.typeOptions.excelVisible)),
