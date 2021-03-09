@@ -149,6 +149,7 @@ export default defineComponent({
             selectedItem: {} as { path?: number[]; node?: any},
             selectedPath: computed(() => state.selectedItem.path || []),
             selectedNode: computed(() => state.selectedItem.node || null),
+            isFetchAndFinding: false,
         });
 
         const getSelectState = path => state.selectedPath.toString() === path.toString();
@@ -158,6 +159,8 @@ export default defineComponent({
         };
 
         const setSelectItem = (node, path) => {
+            if (state.isFetchAndFinding) return;
+
             if (props.selectOptions.validator) {
                 if (!props.selectOptions.validator(node)) return;
             }
@@ -314,6 +317,7 @@ export default defineComponent({
             return null;
         };
         const fetchAndFindNode = async (predicates: any[]) => {
+            state.isFetchAndFinding = true;
             let node: any = null;
             const path: number[] = [];
 
@@ -327,7 +331,10 @@ export default defineComponent({
                     await fetchData(node);
                     children = node?.children || state.treeData;
                     idx = children.findIndex(d => predicate(d.data));
-                    if (idx === -1) return null;
+                    if (idx === -1) {
+                        state.isFetchAndFinding = false;
+                        return null;
+                    }
                 }
 
                 node = children[idx] as any;
@@ -338,7 +345,10 @@ export default defineComponent({
                 }
             }
 
-            if (node) setSelectItem(node, path);
+            if (node) {
+                state.isFetchAndFinding = false;
+                setSelectItem(node, path);
+            }
             return node;
         };
         const getAllNodes = (node, nodes: any[] = []) => {
