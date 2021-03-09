@@ -48,6 +48,8 @@
                     :fetch-on-init="false"
                     @init="onTreeInit"
                     @finish-edit="onFinishEdit"
+                    @start-drag="onStartDrag"
+                    @end-drag="onEndDrag"
                     @update-drag="onUpdateDrag"
                     @change-select="onChangeSelect"
             >
@@ -147,16 +149,18 @@ export default {
             })),
             dragOptions: computed(() => ({
                 disabled: !state.treeEditMode,
-                dragValidator(node) {
+                dragValidator(node, parent) {
+                    if (!parent) return store.getters['user/isAdmin'];
                     return !!(state.permissionInfo[node.data.id] || node.data.has_permission);
                 },
                 dropValidator(node, parent) {
-                    if (parent?.data) {
-                        return !!(state.permissionInfo[parent.data.id] || parent.data.has_permission);
-                    }
-                    return !!store.getters['user/isAdmin'];
+                    if (state.dragParent?.data.id === parent?.data.id) return true;
+
+                    if (!parent) return store.getters['user/isAdmin'];
+                    return !!(state.permissionInfo[parent.data.id] || parent.data.has_permission);
                 },
             })),
+            dragParent: null as any,
             allProjectRoot: null as any,
             allProjectNode: computed(() => ([vm.$t('PROJECT.LANDING.ALL_PROJECT')])),
         });
@@ -171,9 +175,7 @@ export default {
         const dataGetter = node => node.data.name;
 
         const getClassNames = ({ data }) => ({
-            'no-permission': state.treeEditMode
-                    && !state.permissionInfo[data.id]
-                    && !data.has_permission,
+            'no-permission': state.treeEditMode ? !state.permissionInfo[data.id] && !data.has_permission : false,
         });
 
         const openProjectGroupDeleteCheckModal = (item) => {
@@ -278,6 +280,14 @@ export default {
             }
         };
 
+        const onStartDrag = (node, parent) => {
+            state.dragParent = parent;
+        };
+
+        const onEndDrag = () => {
+            state.dragParent = null;
+        };
+
         const onUpdateDrag = async (node, parent) => {
             try {
                 const params: any = {
@@ -357,6 +367,8 @@ export default {
             finishTreeEdit,
             dataFetcher,
             onFinishEdit,
+            onStartDrag,
+            onEndDrag,
             onUpdateDrag,
             onChangeSelect,
             onTreeInit,
