@@ -1,11 +1,12 @@
 import { SpaceConnector } from '@/lib/space-connector';
 import { ResourceMap } from '@/store/modules/resource/type';
 
-export const load = async ({ commit }): Promise<void|Error> => {
+export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
+    if (lazyLoad && Object.keys(state.items).length > 0) return;
     try {
         const response = await SpaceConnector.client.inventory.region.list({
             query: {
-                only: ['name', 'region_code']
+                only: ['name', 'region_code'],
             },
         });
         const regions: ResourceMap = {};
