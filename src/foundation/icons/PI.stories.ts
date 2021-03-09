@@ -67,15 +67,16 @@ export const allIcons = () => ({
 
     },
     template: `
-        <div style="width:100vw;border: 1px solid #eee;display: grid; row-gap: 0.5rem;column-gap: 0.5rem;  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));">
-            <div v-for="icon in iconList">
-                <p-i v-bind="$props" :name="icon"/> <label style="user-select: all">{{icon}}</label>
+        <div style="width:100vw;border: 1px solid #eee; overflow: auto; height: 100%; padding: 32px;">
+            <div style="display: grid; row-gap: 0.5rem;column-gap: 0.5rem;  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));">
+                <div v-for="icon in iconList">
+                    <p-i v-bind="$props" :name="icon"/> <label style="user-select: all">{{icon}}</label>
+                </div>
+               <span style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
+                    <p-i v-bind="$props"/>
+               </span>
             </div>
-
-                   <span style="position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);">
-                        <p-i v-bind="$props"/>
-                   </span>
-                </div>`,
+        </div>`,
     setup() {
         return {
             iconList: icons,
