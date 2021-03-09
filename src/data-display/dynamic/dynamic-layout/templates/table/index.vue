@@ -17,6 +17,7 @@
                         :page-size.sync="pageSize"
                         :search-text.sync="searchText"
                         :selectable="selectable"
+                        :multi-select="multiSelect"
                         :col-copy="colCopy"
                         :searchable="searchable"
                         :excel-visible="excelVisible"
@@ -24,7 +25,7 @@
                         @change="onChange"
                         @export="onExport"
         >
-            <template v-for="(item, slotName, i) of dynamicFieldSlots" v-slot:[slotName]="data">
+            <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
                 <slot :name="slotName" v-bind="data">
                     <p-dynamic-field :key="slotName"
                                      :type="item.type"
@@ -134,6 +135,7 @@ export default {
             allPage: computed(() => (state.totalCount ? Math.ceil(state.totalCount / state.pageSize) : 1)),
             selectIndex: bindExtra(props, 'selectIndex', []),
             selectable: computed(() => (props.typeOptions?.selectable || false)),
+            multiSelect: computed(() => (props.typeOptions?.multiSelect || true)),
             colCopy: computed(() => (props.typeOptions?.colCopy || false)),
             searchable: computed(() => (props.typeOptions?.searchable === undefined ? true : props.typeOptions.searchable)),
             excelVisible: computed(() => (props.typeOptions?.excelVisible === undefined ? true : props.typeOptions.excelVisible)),

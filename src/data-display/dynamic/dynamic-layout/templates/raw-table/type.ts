@@ -10,7 +10,7 @@ export type RawTableFetchOptions = Pick<DynamicLayoutFetchOptions,
     >
 
 export type RawTableTypeOptions = Pick<DynamicLayoutTypeOptions,
-    'loading'|'totalCount'|'timezone'|'selectIndex'|'selectable'|'colCopy'
+    'loading'|'totalCount'|'timezone'|'selectIndex'|'selectable'|'multiSelect'|'colCopy'
     >
 export type RawTableDynamicLayoutProps = DynamicLayoutProps<
     RawTableOptions,
