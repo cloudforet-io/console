@@ -117,6 +117,40 @@
 			}
 		},
 		"SPOT_AUTOMATION": {
+			"ADD": {
+				"BASE_INFO": {
+					"LABEL": "기본 정보",
+					"NAME_DESC_1": "공백 없이 최대 56자 / 문자로 시작해야 하고, 문자, 숫자 및 하이픈만 포함할 수 있습니다. ",
+					"NAME_DESC_2": "(스팟그룹 카드에 16자까지 표기)",
+					"NAME_LABEL": "이름",
+					"NAME_PLACEHOLDER": "스팟그룹 이름",
+					"TAG_ADD": "태그 추가",
+					"TAG_DESC_1": "관련된 태그를 추가합니다.",
+					"TAG_DESC_2": "아래 버튼을 눌러 태그를 추가해주세요.",
+					"TAG_LABEL": "태"
+				},
+				"CANCEL": "취소",
+				"CLOUD_SERVICE": {
+					"LABEL": "클라우드 서비스",
+					"RESOURCE_LABEL": "리소스",
+					"SERVICE_CATEGORY_LABEL": "서비스 카테고리"
+				},
+				"CREATE": "생성",
+				"CREATE_TITLE": "새 스팟그룹 만들기",
+				"INSTANCE_TYPE": {
+					"LABEL": "인스턴스 타입",
+					"OPTIMIZED_TYPE": "최적화된 인스턴스 타입"
+				},
+				"SCHEDULE_POLICY": {
+					"LABEL": "스케줄 정",
+					"SETTING_LABEL": "설정",
+					"SETTING_ONDEMAND": "온디맨드",
+					"SETTING_SPOT_INSTANCE": "스팟 인스턴스",
+					"SETTING_TYPE_COUNT": "개수",
+					"SETTING_TYPE_LABEL": "설정 방식",
+					"SETTING_TYPE_RATIO": "비율"
+				}
+			},
 			"DETAIL": {
 				"TAB_HISTORY": "히스토리",
 				"TAB_INSTANCE": "인스턴스",

@@ -117,6 +117,40 @@
 			}
 		},
 		"SPOT_AUTOMATION": {
+			"ADD": {
+				"BASE_INFO": {
+					"LABEL": "",
+					"NAME_DESC_1": "",
+					"NAME_DESC_2": "",
+					"NAME_LABEL": "",
+					"NAME_PLACEHOLDER": "",
+					"TAG_ADD": "",
+					"TAG_DESC_1": "",
+					"TAG_DESC_2": "",
+					"TAG_LABEL": ""
+				},
+				"CANCEL": "",
+				"CLOUD_SERVICE": {
+					"LABEL": "",
+					"RESOURCE_LABEL": "",
+					"SERVICE_CATEGORY_LABEL": ""
+				},
+				"CREATE": "",
+				"CREATE_TITLE": "",
+				"INSTANCE_TYPE": {
+					"LABEL": "",
+					"OPTIMIZED_TYPE": ""
+				},
+				"SCHEDULE_POLICY": {
+					"LABEL": "",
+					"SETTING_LABEL": "",
+					"SETTING_ONDEMAND": "",
+					"SETTING_SPOT_INSTANCE": "",
+					"SETTING_TYPE_COUNT": "",
+					"SETTING_TYPE_LABEL": "",
+					"SETTING_TYPE_RATIO": ""
+				}
+			},
 			"DETAIL": {
 				"TAB_HISTORY": "",
 				"TAB_INSTANCE": "",
