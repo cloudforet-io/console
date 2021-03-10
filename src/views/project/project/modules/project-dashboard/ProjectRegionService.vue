@@ -224,11 +224,9 @@ export default {
             }
         };
 
-        const init = () => {
-            getData();
-        };
-        init();
-
+        watch(() => state.providers, (providers) => {
+            if (providers) getData();
+        }, { immediate: false });
         watch([() => state.loading, () => state.loaderRef, () => state.chartRef], ([loading, loaderCtx, chartCtx]) => {
             if (loading && loaderCtx) {
                 drawChart(loaderCtx, true);

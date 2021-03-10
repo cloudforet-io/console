@@ -204,7 +204,7 @@ export default {
         };
 
         const state = reactive({
-            loading: false,
+            loading: true,
             chart: null,
             chartRef: null as HTMLElement | null,
             skeletons: range(4),
@@ -343,19 +343,17 @@ export default {
         };
 
         /* api */
-        const getCount = async () => {
+        const getCount = async (type) => {
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
                     project_id: props.projectId,
+                    labels: [CLOUD_SERVICE_LABEL[type]],
                 });
-                let count = 0 as number | string;
-                res.results.forEach((d) => {
-                    if (d.label === CLOUD_SERVICE_LABEL.storage) {
-                        state.storageSuffix = byteFormatter(d.total).split(' ')[1];
-                    }
-                    count = d.total;
-                    state.count[Object.keys(CLOUD_SERVICE_LABEL)[Object.values(CLOUD_SERVICE_LABEL).indexOf(d.label)]] = count;
-                });
+                const count = res.results[0].total;
+                if (type === DATA_TYPE.storage) {
+                    state.storageSuffix = byteFormatter(count).split(' ')[1];
+                }
+                state.count[type] = count;
             } catch (e) {
                 console.error(e);
             }
@@ -528,7 +526,7 @@ export default {
         };
 
         const init = async () => {
-            await Promise.all([getSummaryInfo(DATA_TYPE.compute), getCount()]);
+            await Promise.all([Object.keys(DATA_TYPE).forEach(d => getCount(d))]);
         };
         const chartInit = async () => {
             await getTrend(DATA_TYPE.compute);
@@ -539,6 +537,9 @@ export default {
         init();
         chartInit();
 
+        watch(() => state.providers, (providers) => {
+            if (providers) getSummaryInfo(DATA_TYPE.compute);
+        }, { immediate: false });
         watch([() => chartState.loading, () => state.chartRef], async ([loading, chartContext]) => {
             if (!loading && chartContext) {
                 drawChart();
