@@ -309,7 +309,7 @@ export default {
             }),
             selectedServerIds: computed(() => tableState.selectedItems.map(d => d.server_id)),
         });
-        const fetchOptionState = reactive<QuerySearchTableFetchOptions>({
+        const fetchOptionState = reactive<Partial<QuerySearchTableFetchOptions>>({
             pageStart: 1,
             pageLimit: serverStore.getItem<number>('pageLimit', 'number') || DEFAULT_PAGE_SIZE,
             sortDesc: true,
