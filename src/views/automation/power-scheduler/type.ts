@@ -22,14 +22,12 @@ export const SCHEDULE_STATUS = {
     STARTING: {
         text: 'STARTING',
         textColor: safe,
-        icon: 'ic_booting',
-        // lottie: 'lottie_starting',
+        lottie: 'lottie_starting',
     },
     STOPPING: {
         text: 'STOPPING',
         textColor: gray[400],
-        icon: 'ic_stopping',
-        // lottie: 'lottie_stopping',
+        lottie: 'lottie_stopping',
     },
 };
 

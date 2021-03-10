@@ -8,7 +8,7 @@
                 <span>{{ title }}</span>
                 <div class="status-wrapper">
                     <p-i v-if="SCHEDULE_STATUS[status].icon" :name="SCHEDULE_STATUS[status].icon" />
-                    <p-lottie v-else :name="SCHEDULE_STATUS[status].lottie" size="1.5" />
+                    <p-lottie v-else :name="SCHEDULE_STATUS[status].lottie" :size="1.5" />
                     <span class="text" :style="{color: SCHEDULE_STATUS[status].textColor}">
                         {{ statusText[status] }}
                     </span>
@@ -258,7 +258,7 @@ export default {
             statusText: computed(() => ({
                 ON: vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.STATUS_ON'),
                 OFF: vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.STATUS_OFF'),
-                STARTING: vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.STATUS_BOOTING'),
+                STARTING: vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.STATUS_STARTING'),
                 STOPPING: vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.STATUS_STOPPING'),
             })),
         });
@@ -482,13 +482,17 @@ header {
         .status-wrapper {
             display: inline-block;
             margin-left: 1rem;
+            .p-lottie {
+                vertical-align: middle;
+                display: inline-block;
+            }
             .text {
                 @apply text-gray-400;
                 font-size: 0.875rem;
                 font-weight: normal;
                 line-height: 1.5;
                 vertical-align: middle;
-                margin-left: 0.375rem;
+                margin-left: 0.25rem;
             }
         }
     }
