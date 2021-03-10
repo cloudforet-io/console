@@ -137,7 +137,7 @@ export default {
             selectIndex: bindExtra(props, 'selectIndex', []),
             selectable: computed(() => (props.typeOptions?.selectable || false)),
             multiSelect: computed(() => (props.typeOptions?.multiSelect === undefined ? true : props.typeOptions.multiSelect)),
-            invalid: computed(() => (props.typeOptions?.multiSelect || false)),
+            invalid: computed(() => (props.typeOptions?.invalid || false)),
             colCopy: computed(() => (props.typeOptions?.colCopy || false)),
             searchable: computed(() => (props.typeOptions?.searchable === undefined ? true : props.typeOptions.searchable)),
             excelVisible: computed(() => (props.typeOptions?.excelVisible === undefined ? true : props.typeOptions.excelVisible)),
