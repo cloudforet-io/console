@@ -20,19 +20,19 @@ export interface DynamicLayoutFetchOptions {
 }
 
 export interface DynamicLayoutTypeOptions {
-    loading: boolean;
-    totalCount: number;
-    timezone: string;
-    selectIndex: number[];
-    selectable: boolean;
-    colCopy: boolean;
-    searchable: boolean;
-    multiSelect: boolean;
+    loading?: boolean;
+    totalCount?: number;
+    timezone?: string;
+    selectIndex?: number[];
+    selectable?: boolean;
+    colCopy?: boolean;
+    searchable?: boolean;
+    multiSelect?: boolean;
     invalid?: boolean;
-    excelVisible: boolean;
-    keyItemSets: KeyItemSet[];
-    valueHandlerMap: ValueHandlerMap;
-    language: string;
+    excelVisible?: boolean;
+    keyItemSets?: KeyItemSet[];
+    valueHandlerMap?: ValueHandlerMap;
+    language?: string;
     listMap?: Record<string, Partial<DynamicLayoutTypeOptions>>;
 }
 
