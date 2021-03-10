@@ -381,3 +381,28 @@ export const loading = () => ({
         };
     },
 });
+
+export const invalid = () => ({
+    components: { PDataTable },
+    mixins: [mockupMixin],
+    template: `<PDataTable
+                :items="items"
+                :fields="fields"
+                :hover="true"
+                :invalid="invalid"
+                @rowLeftClick="rowLeftClick"
+                >
+               </PDataTable>
+              `,
+    props: {
+        invalid: {
+            default: boolean('invalid', true),
+        },
+    },
+    setup() {
+        return {
+            ...data,
+            ...actions,
+        };
+    },
+});

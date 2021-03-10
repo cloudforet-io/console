@@ -16,6 +16,7 @@
                      sortable
                      :selectable="selectable"
                      :multi-select="multiSelect"
+                     :invalid="invalid"
                      @changePageSize="onChangePageSize"
                      @changePageNumber="onChangePageNumber"
                      @changeSort="onChangeSort"
@@ -146,6 +147,10 @@ export default {
         searchable: {
             type: Boolean,
             default: true,
+        },
+        invalid: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: SearchTableProps, { emit }) {

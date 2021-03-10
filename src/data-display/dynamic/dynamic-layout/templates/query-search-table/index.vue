@@ -20,6 +20,7 @@
                               :query-tags.sync="queryTags"
                               :selectable="selectable"
                               :multi-select="multiSelect"
+                              :invalid="invalid"
                               :col-copy="colCopy"
                               :searchable="searchable"
                               :excel-visible="excelVisible"
@@ -138,6 +139,7 @@ export default {
             selectIndex: props.typeOptions?.selectIndex ? computed(() => props.typeOptions?.selectIndex) : [],
             selectable: computed(() => (props.typeOptions?.selectable || false)),
             multiSelect: computed(() => (props.typeOptions?.multiSelect === undefined ? true : props.typeOptions.multiSelect)),
+            invalid: computed(() => (props.typeOptions?.multiSelect || false)),
             colCopy: computed(() => (props.typeOptions?.colCopy || false)),
             searchable: computed(() => (props.typeOptions?.searchable === undefined ? true : props.typeOptions.searchable)),
             excelVisible: computed(() => (props.typeOptions?.excelVisible === undefined ? true : props.typeOptions.excelVisible)),

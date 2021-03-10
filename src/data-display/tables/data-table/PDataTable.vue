@@ -127,6 +127,7 @@
                       :auto="true" class="loading"
             />
         </slot>
+        <div v-if="invalid" class="invalid-cover" />
     </div>
 </template>
 
@@ -234,6 +235,10 @@ export default {
             default: true,
         },
         rowCursorPointer: {
+            type: Boolean,
+            default: false,
+        },
+        invalid: {
             type: Boolean,
             default: false,
         },
@@ -551,6 +556,13 @@ export default {
         @apply absolute flex w-full h-full justify-center items-center;
         top: 0;
         max-height: 16.875rem;
+        z-index: 1;
+    }
+
+    .invalid-cover {
+        @apply absolute w-full h-full overflow-hidden border border-alert;
+        background-color: rgba(theme('colors.red.100'), 0.3);
+        top: 0;
         z-index: 1;
     }
 

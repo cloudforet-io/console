@@ -74,6 +74,7 @@
             :width="width"
             :row-height-fixed="rowHeightFixed"
             :row-cursor-pointer="rowCursorPointer"
+            :invalid="invalid"
             v-on="$listeners"
             @changeSort="changeSort"
         >
@@ -183,6 +184,10 @@ export default {
             default: true,
         },
         rowCursorPointer: {
+            type: Boolean,
+            default: false,
+        },
+        invalid: {
             type: Boolean,
             default: false,
         },

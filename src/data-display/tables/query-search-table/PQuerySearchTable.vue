@@ -11,6 +11,7 @@
                      :page-size.sync="proxyState.pageSize"
                      :excel-visible="excelVisible"
                      :row-cursor-pointer="rowCursorPointer"
+                     :invalid="invalid"
                      use-cursor-loading
                      sortable
                      :selectable="selectable"
@@ -153,6 +154,10 @@ export default {
             default: true,
         },
         rowCursorPointer: {
+            type: Boolean,
+            default: false,
+        },
+        invalid: {
             type: Boolean,
             default: false,
         },
