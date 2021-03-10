@@ -133,6 +133,7 @@
 				"CLOUD_SERVICE": {
 					"LABEL": "",
 					"RESOURCE_LABEL": "",
+					"RESOURCE_REQUIRED": "",
 					"SERVICE_CATEGORY_LABEL": ""
 				},
 				"CREATE": "",

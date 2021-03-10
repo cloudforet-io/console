@@ -133,6 +133,7 @@
 				"CLOUD_SERVICE": {
 					"LABEL": "클라우드 서비스",
 					"RESOURCE_LABEL": "리소스",
+					"RESOURCE_REQUIRED": "리소스를 선택해주세요.",
 					"SERVICE_CATEGORY_LABEL": "서비스 카테고리"
 				},
 				"CREATE": "생성",
