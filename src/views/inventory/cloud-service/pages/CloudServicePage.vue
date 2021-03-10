@@ -300,7 +300,7 @@ export default {
         });
 
         /** Main Table */
-        const fetchOptionState: QuerySearchTableFetchOptions = reactive({
+        const fetchOptionState = reactive<Partial<QuerySearchTableFetchOptions>>({
             pageStart: 1,
             pageLimit: cloudServiceStore.getItem<number>('pageLimit', 'number') || DEFAULT_PAGE_SIZE,
             sortDesc: true,
@@ -308,7 +308,7 @@ export default {
             queryTags: [],
         });
 
-        const typeOptionState: Omit<QuerySearchTableTypeOptions, 'searchable'|'excelVisible'|'multiSelect'> = reactive({
+        const typeOptionState = reactive<Partial<QuerySearchTableTypeOptions>>({
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),

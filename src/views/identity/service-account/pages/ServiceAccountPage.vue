@@ -225,7 +225,7 @@ export default {
         });
 
         /** States for Dynamic Layout(search table type) * */
-        const fetchOptionState: TableFetchOptions = reactive({
+        const fetchOptionState = reactive<Partial<TableFetchOptions>>({
             pageStart: 1,
             pageLimit: 15,
             sortDesc: true,
@@ -233,7 +233,7 @@ export default {
             searchText: queryHelper.apiQuery.keyword,
         });
 
-        const typeOptionState: Omit<TableTypeOptions, 'searchable'|'excelVisible'|'multiSelect'> = reactive({
+        const typeOptionState = reactive<Partial<TableTypeOptions>>({
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
