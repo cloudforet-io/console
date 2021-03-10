@@ -260,7 +260,7 @@ export default {
         const apiQuery = new ApiQueryHelper();
         const pageTitle = computed(() => (props.isCloudService ? props.cloudServiceType : vm.$t('INVENTORY.SERVER.MAIN.TITLE')));
 
-        const typeOptionState: Omit<QuerySearchTableTypeOptions, 'searchable'|'excelVisible'|'multiSelect'> = reactive({
+        const typeOptionState = reactive<Partial<QuerySearchTableTypeOptions>>({
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
@@ -309,7 +309,7 @@ export default {
             }),
             selectedServerIds: computed(() => tableState.selectedItems.map(d => d.server_id)),
         });
-        const fetchOptionState: QuerySearchTableFetchOptions = reactive({
+        const fetchOptionState = reactive<QuerySearchTableFetchOptions>({
             pageStart: 1,
             pageLimit: serverStore.getItem<number>('pageLimit', 'number') || DEFAULT_PAGE_SIZE,
             sortDesc: true,
