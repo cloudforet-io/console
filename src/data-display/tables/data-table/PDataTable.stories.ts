@@ -390,6 +390,7 @@ export const invalid = () => ({
                 :fields="fields"
                 :hover="true"
                 :invalid="invalid"
+                selectable
                 @rowLeftClick="rowLeftClick"
                 >
                </PDataTable>
