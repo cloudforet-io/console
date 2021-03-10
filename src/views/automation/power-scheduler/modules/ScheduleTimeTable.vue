@@ -869,6 +869,7 @@ export default {
                         @apply border-b border-secondary;
                         position: absolute;
                         width: 100%;
+                        pointer-events: none;
                     }
                 }
                 .help-block {
