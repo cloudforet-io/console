@@ -339,8 +339,8 @@ export default {
          * */
         const cardQueryHelper = new QueryHelper();
         const getToCloudService = (item) => {
-            const searchFilters = [];
-            cardQueryHelper.setFilters(searchFilters.filter((f: any) => f.k && [
+            const searchFilters = queryHelper.filters;
+            cardQueryHelper.setFilters(searchFilters.filter((f: any) => f.k && ![
                 'cloud_service_type',
                 'cloud_service_group',
             ].includes(f.k)));
