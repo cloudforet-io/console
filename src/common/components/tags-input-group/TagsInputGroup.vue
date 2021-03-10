@@ -18,37 +18,39 @@
         </div>
         <div :class="{'mt-8': !showHeader}">
             <div v-for="(d, idx) in items" :key="idx" class="tags-group">
-                <p-field-group :invalid-text="validations[idx].key.message"
-                               :invalid="showValidation && !validations[idx].key.isValid"
-                               class="input-box key"
-                >
-                    <template #default="{invalid}">
-                        <p-text-input v-model="d.key"
-                                      v-focus.lazy="focused"
-                                      :invalid="invalid"
-                                      :placeholder="$t('COMMON.COMPONENTS.TAGS.KEY')"
+                <template v-if="validations[idx]">
+                    <p-field-group :invalid-text="validations[idx].key.message"
+                                   :invalid="showValidation && !validations[idx].key.isValid"
+                                   class="input-box key"
+                    >
+                        <template #default="{invalid}">
+                            <p-text-input v-model="d.key"
+                                          v-focus.lazy="focused"
+                                          :invalid="invalid"
+                                          :placeholder="$t('COMMON.COMPONENTS.TAGS.KEY')"
+                                          :disabled="disabled"
+                                          @blur="$emit('blur:key')"
+                                          @focus="$emit('focus:key')"
+                                          @input="validateKey"
+                            />
+                        </template>
+                    </p-field-group>
+                    <span class="split">:</span>
+                    <p-field-group :invalid-text="validations[idx].value.message"
+                                   :invalid="showValidation && !validations[idx].value.isValid"
+                                   class="input-box value"
+                    >
+                        <p-text-input v-model="d.value"
+                                      :class="{invalid: showValidation && !validations[idx].value.isValid}"
+                                      :placeholder="$t('COMMON.COMPONENTS.TAGS.VALUE')"
                                       :disabled="disabled"
-                                      @blur="$emit('blur:key')"
-                                      @focus="$emit('focus:key')"
-                                      @input="validateKey"
+                                      @blur="$emit('blur:value')"
+                                      @focus="$emit('focus:value')"
+                                      @input="validateValue(d.value, idx)"
                         />
-                    </template>
-                </p-field-group>
-                <span class="split">:</span>
-                <p-field-group :invalid-text="validations[idx].value.message"
-                               :invalid="showValidation && !validations[idx].value.isValid"
-                               class="input-box value"
-                >
-                    <p-text-input v-model="d.value"
-                                  :class="{invalid: showValidation && !validations[idx].value.isValid}"
-                                  :placeholder="$t('COMMON.COMPONENTS.TAGS.VALUE')"
-                                  :disabled="disabled"
-                                  @blur="$emit('blur:value')"
-                                  @focus="$emit('focus:value')"
-                                  @input="validateValue(d.value, idx)"
-                    />
-                </p-field-group>
-                <p-icon-button name="ic_delete" :disabled="disabled" @click="deletePair(idx)" />
+                    </p-field-group>
+                    <p-icon-button name="ic_delete" :disabled="disabled" @click="deletePair(idx)" />
+                </template>
             </div>
         </div>
     </div>
@@ -68,6 +70,7 @@ import {
 import {
     TagItem, TagValidation, TagsInputGroupProps, ValidationData,
 } from '@/common/components/tags-input-group/type';
+import { makeProxy } from '@/lib/compostion-util';
 
 
 export default {
@@ -112,13 +115,14 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            items: {} as TagItem[],
+            items: makeProxy<TagItem[]>('tags', props, emit),
             validations: [] as TagValidation[],
             isAllValid: computed(() => state.validations.every(d => d.key.isValid && d.value.isValid)),
         });
 
         /* util */
         const validateKey = () => {
+            console.debug('validate Key');
             const keys = state.items.map(d => d.key);
 
             state.items.forEach((item, idx) => {
@@ -156,7 +160,7 @@ export default {
         };
         const addPair = () => {
             const pair: TagItem = { key: '', value: '' };
-            state.items.push(pair);
+            state.items = [...state.items, pair];
             state.validations.push({
                 key: { isValid: false, message: vm.$t('COMMON.COMPONENTS.TAGS.INVALID_NO_KEY') },
                 value: { isValid: false, message: vm.$t('COMMON.COMPONENTS.TAGS.INVALID_NO_VALUE') },
@@ -164,22 +168,31 @@ export default {
         };
         const deletePair = (idx: number) => {
             state.items.splice(idx, 1);
+            state.items = [...state.items];
+
             state.validations.splice(idx, 1);
             if (!props.showValidation) return;
             validateKey();
         };
 
         const initValidations = () => {
-            state.validations = range(0, state.items.length).map(() => ({
+            console.debug('init validations', state.items.length);
+            state.validations = state.items.map(() => ({
                 key: { isValid: true, message: '' },
                 value: { isValid: true, message: '' },
             }));
         };
+
         const init = () => {
-            state.items = props.tags;
-            if (props.showEmptyInput) state.items.push({ key: '', value: '' });
-            initValidations();
+            if (props.showEmptyInput) {
+                state.items = [...state.items, { key: '', value: '' }];
+            }
+            vm.$nextTick(() => {
+                console.debug('init', state.items);
+                initValidations();
+            });
         };
+
         init();
 
         watch(() => state.isAllValid, (after) => {
