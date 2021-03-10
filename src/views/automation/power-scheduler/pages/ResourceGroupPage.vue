@@ -264,7 +264,7 @@ export default {
             }))),
         });
 
-        const fetchOptionState: QuerySearchTableFetchOptions = reactive({
+        const fetchOptionState = reactive<QuerySearchTableFetchOptions>({
             pageStart: 1,
             pageLimit: 15,
             sortDesc: true,
@@ -272,12 +272,13 @@ export default {
             queryTags: [],
         });
 
-        const typeOptionState: QuerySearchTableTypeOptions = reactive({
+        const typeOptionState = reactive<QuerySearchTableTypeOptions>({
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             selectIndex: [],
             selectable: false,
+            multiSelect: true,
             keyItemSets: [],
             valueHandlerMap: {},
             colCopy: false,

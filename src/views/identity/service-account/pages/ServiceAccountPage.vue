@@ -233,7 +233,7 @@ export default {
             searchText: queryHelper.apiQuery.keyword,
         });
 
-        const typeOptionState: Omit<TableTypeOptions, 'searchable'|'excelVisible'> = reactive({
+        const typeOptionState: Omit<TableTypeOptions, 'searchable'|'excelVisible'|'multiSelect'> = reactive({
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
