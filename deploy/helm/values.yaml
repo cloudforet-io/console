@@ -39,7 +39,8 @@ volumes:
 #######################
 global:
     shared: {}
-    sidecar: []
+    frontend:
+      sidecar: []
 #        - name: mongos
 #          image: mongo:4.4.0-bionic
 #          command: [ 'mongos', '--config', '/mnt/mongos.yml', '--bind_ip_all' ]
@@ -53,7 +54,7 @@ global:
 #              subPath: mongo-shard.pem
 #              readOnly: true
 #
-    volumes: []
+     volumes: []
 #        - name: mongo-shard-key
 #          secret:
 #              defaultMode: 0400
