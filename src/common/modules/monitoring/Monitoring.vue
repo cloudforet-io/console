@@ -1,6 +1,6 @@
 <template>
     <div class="pt-8 pb-16">
-        <section>
+        <section v-if="showTools">
             <p-select-btn-group class="pr-4 mb-8" :buttons="tools" :selected.sync="selectedToolId" />
         </section>
         <section class="mb-8">
@@ -89,7 +89,7 @@ import {
 } from '@spaceone/design-system';
 
 import {
-    blue, coral, green, peacock, violet, yellow,
+    blue, coral, green, peacock, violet, yellow, indigo,
 } from '@/styles/colors';
 import {
     some, debounce, find, capitalize, chain, range, sortBy,
@@ -158,7 +158,10 @@ interface DataToolType {
 }
 
 
-const colors = [coral[500], blue[500], violet[500], yellow[500], green[400], coral[400], peacock[600], coral[200], peacock[400], green[200]];
+const colors = [
+    coral[500], blue[500], violet[500], yellow[600], green[400], coral[400], peacock[600], coral[700],
+    peacock[400], green[700], green[500], blue[400], indigo[700], violet[400], indigo[400], blue[700],
+];
 const timeRanges = ['1h', '3h', '6h', '12h', '1d', '3d', '1w', '2w'];
 const LOAD_LIMIT = 12;
 
@@ -189,6 +192,10 @@ export default {
             validator(resources) {
                 return resources.every(resource => resource.id);
             },
+        },
+        showTools: {
+            type: Boolean,
+            default: true,
         },
     },
     setup(props: MonitoringProps) {
