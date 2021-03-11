@@ -6,15 +6,14 @@ developer: false
 name: console
 replicas: 1
 image:
-    repository: spaceone
-    name: console
+    name: spaceone/console
     version: latest
 imagePullPolicy: IfNotPresent
 
 console_api: https://console-api
-domainName:
-    ref: config
-    name: root
+#domainName:
+#    ref: config
+#    name: root
 
 # local sidecar
 ##########################
