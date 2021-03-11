@@ -1,0 +1,379 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PTextInput from './PTextInput.vue';
+import { inputTypes } from './config'; import { reactive, toRefs } from '@vue/composition-api';
+
+
+<Meta title='Inputs/Input' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5191%3A2'
+    }
+}} component={PTextInput} argTypes={{
+    value: {
+        name: 'value',
+        type: {name: 'string, number', required: false},
+        description: 'Input value',
+        defaultValue: '',
+        table: {
+            type: {
+                summary: 'string, number'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: ''
+            },
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    disabled: {
+        name: 'disabled',
+        type: {name: 'boolean'},
+        description: 'The same with disabled attribute.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    type: {
+        name: 'type',
+        type: {name: 'string'},
+        description: `The same with type attribute. Available: ${inputTypes}`,
+        defaultValue: inputTypes[0],
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: `'${inputTypes[0]}'`
+            }
+        },
+        control: {
+            type: 'select',
+            options: inputTypes
+        },
+    },
+    block: {
+        name: 'block',
+        type: {name: 'boolean'},
+        description: 'Make input style to be display block',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    invalid: {
+        name: 'invalid',
+        type: {name: 'boolean'},
+        description: 'Apply invalid style',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    'v-model': {
+        name: 'v-model',
+        type: {name: 'string, number', required: false},
+        description: 'Two way binding for `value` props with `input` event.',
+        defaultValue: '',
+        table: {
+            type: {
+                summary: 'string, number'
+            },
+            category: 'model',
+            defaultValue: {
+                summary: ''
+            },
+        },
+        control: null
+    },
+    rightExtraSlot: {
+        name: 'right-extra',
+        description: 'Slot for right area of input.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    onInput: {
+        name: 'input',
+        description: `Event emitted when input something. Works with v-model.`,
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events'
+        }
+    }
+}}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PTextInput },
+    template: `
+        <p-text-input :value="value" :invalid="invalid"
+                      :type="type" :disabled="disabled" :block="block"
+        >
+            <template v-if="rightExtraSlot" #right-extra>
+                <span v-html="rightExtraSlot"></span>
+            </template>
+        </p-text-input>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# TextInput
+<br/>
+<br/>
+
+
+## Basic
+<Canvas>
+    <Story name="Basic" >
+        {{
+            components: { PTextInput },
+            template: `
+                <p-text-input v-model="value" />
+            `,
+            setup() {
+                const state = reactive({
+                    value: ''
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Placeholder
+<Canvas>
+    <Story name="Placeholder" >
+        {{
+            components: { PTextInput },
+            template: `
+                <p-text-input v-model="value" placeholder="Placeholder" />
+            `,
+            setup() {
+                const state = reactive({
+                    value: ''
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Number Type
+<Canvas>
+    <Story name="Number Type">
+        {{
+            components: { PTextInput },
+            template: `
+                <p-text-input v-model="value" type="number" :min="0" :max="100" />
+            `,
+            setup() {
+                const state = reactive({
+                    value: 99
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Password Type
+<Canvas>
+    <Story name="Password Type">
+        {{
+            components: { PTextInput },
+            template: `
+                <p-text-input v-model="value" type="password" />
+            `,
+            setup() {
+                const state = reactive({
+                    value: 'password'
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Disabled
+<Canvas>
+    <Story name="Disabled">
+        {{
+            components: { PTextInput },
+            template: `
+                <p-text-input v-model="value" disabled />
+            `,
+            setup() {
+                const state = reactive({
+                    value: 'value'
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Block
+<Canvas>
+    <Story name="Block">
+        {{
+            components: { PTextInput },
+            template: `
+                <p-text-input v-model="value" block />
+            `,
+            setup() {
+                const state = reactive({
+                    value: 'value'
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Invalid
+<Canvas>
+    <Story name="Invalid">
+        {{
+            components: { PTextInput },
+            template: `
+                <p-text-input v-model="value" invalid />
+            `,
+            setup() {
+                const state = reactive({
+                    value: 'value'
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Right Extra Slot
+<Canvas>
+    <Story name="Right Extra Slot" args={{
+        value: 100,
+        type: 'number',
+        rightExtraSlot: '%'
+    }}>
+        {{
+            components: { PTextInput },
+            template: `
+                <p-text-input style="width: 80px;" v-model="value" type="number">
+                    <template #right-extra>%</template>
+                </p-text-input>
+            `,
+            setup() {
+                const state = reactive({
+                    value: 70
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Playground
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+
