@@ -12,7 +12,14 @@
             />
         </p-pane-layout>
 
-        <p-pane-layout class="base-info section" />
+        <p-pane-layout class="base-info section">
+            <p class="title">
+                {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.BASE_INFO.LABEL') }}
+            </p>
+            <base-information-input :show-validation="showValidation"
+                                    @change="onChangeBaseInfo"
+            />
+        </p-pane-layout>
 
         <p-pane-layout class="schedule-policy section" />
 
@@ -41,10 +48,12 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import ResourceSelection from '@/views/automation/spot-automation/modules/ResourceSelection.vue';
+import BaseInformationInput from '@/views/automation/spot-automation/modules/BaseInformationInput.vue';
 
 export default {
     name: 'AddSpotGroupPage',
     components: {
+        BaseInformationInput,
         ResourceSelection,
         PBreadcrumbs,
         PPageTitle,
@@ -81,6 +90,11 @@ export default {
             // TODO
         };
 
+        const onChangeBaseInfo = ({ name, tags }, isValid) => {
+            console.debug('change base info', name, tags, isValid);
+            // TODO
+        };
+
         /* Init */
         (async () => {
         })();
@@ -92,6 +106,7 @@ export default {
             onClickCreate,
             onClickGoBack,
             onChangeResource,
+            onChangeBaseInfo,
         };
     },
 };

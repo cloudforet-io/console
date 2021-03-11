@@ -122,7 +122,6 @@ export default {
 
         /* util */
         const validateKey = () => {
-            console.debug('validate Key');
             const keys = state.items.map(d => d.key);
 
             state.items.forEach((item, idx) => {
@@ -176,7 +175,6 @@ export default {
         };
 
         const initValidations = () => {
-            console.debug('init validations', state.items.length);
             state.validations = state.items.map(() => ({
                 key: { isValid: true, message: '' },
                 value: { isValid: true, message: '' },
@@ -188,7 +186,6 @@ export default {
                 state.items = [...state.items, { key: '', value: '' }];
             }
             vm.$nextTick(() => {
-                console.debug('init', state.items);
                 initValidations();
             });
         };
