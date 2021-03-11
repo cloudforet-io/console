@@ -54,7 +54,7 @@ global:
 #              subPath: mongo-shard.pem
 #              readOnly: true
 #
-     volumes: []
+      volumes: []
 #        - name: mongo-shard-key
 #          secret:
 #              defaultMode: 0400
