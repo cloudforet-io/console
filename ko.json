@@ -124,10 +124,11 @@
 					"NAME_DESC_2": "(스팟그룹 카드에 16자까지 표기)",
 					"NAME_LABEL": "이름",
 					"NAME_PLACEHOLDER": "스팟그룹 이름",
+					"NAME_REQUIRED": "필수 항목 입니다.",
 					"TAG_ADD": "태그 추가",
 					"TAG_DESC_1": "관련된 태그를 추가합니다.",
 					"TAG_DESC_2": "아래 버튼을 눌러 태그를 추가해주세요.",
-					"TAG_LABEL": "태"
+					"TAG_LABEL": "태그"
 				},
 				"CANCEL": "취소",
 				"CLOUD_SERVICE": {
