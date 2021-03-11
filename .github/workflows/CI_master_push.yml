@@ -3,7 +3,7 @@ on:
   push:
     paths-ignore:
       - '.github/**'
-      - 'deploy/helm'
+      - 'deploy/helm/**'
     branches:
       - master
 
