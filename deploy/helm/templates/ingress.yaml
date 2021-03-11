@@ -1,0 +1,35 @@
+{{- if .Values.enabled }}
+{{- if .Values.ingress.enabled }}
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  annotations:
+  {{- range $key, $value := .Values.ingress.annotations }}
+    {{- if not (eq $key "nil") }}
+    {{ $key }}: {{ $value | quote }}
+    {{- end }}
+  {{- end }}
+  labels:
+{{ include "spaceone.labels" . | indent 4 }}
+    spaceone.service: ingress
+  name: alb-ingress-console
+  namespace: {{ .Values.global.namespace | default .Release.Namespace }}
+
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /*
+            backend:
+              serviceName: ssl-redirect
+              servicePort: use-annotation
+
+    - host: "{{ .Values.ingress.host }}"
+      http:
+        paths:
+          - backend:
+              serviceName: console
+              servicePort: 80
+            path: /*
+{{- end }}
+{{- end }}

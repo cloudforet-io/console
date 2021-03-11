@@ -10,7 +10,11 @@ image:
     version: latest
 imagePullPolicy: IfNotPresent
 
+# For production.json (nodejs)
+# console_api: https://console-api.console.spaceone.dev
+# Domain name of console-api (usually ALB of console-api)
 console_api: https://console-api
+
 #domainName:
 #    ref: config
 #    name: root
@@ -63,9 +67,8 @@ global:
 
     
 # Service
-#
 service:
-    type: ClusterIP
+    type: NodePort
     annotations:
         nil: nil
     ports:
@@ -77,4 +80,17 @@ service:
           port: 443
           targetPort: 80
           protocol: TCP
+
+# Ingress
+ingress:
+  enabled: false
+  host: '*.console'   # host for ingress (ex. *.console.spaceone.dev)
+  annotations:
+      kubernetes.io/ingress.class: alb
+      alb.ingress.kubernetes.io/listen-ports: '[{"HTTP": 80}, {"HTTPS":443}]'
+      alb.ingress.kubernetes.io/actions.ssl-redirect: '{"Type": "redirect", "RedirectConfig": { "Protocol": "HTTPS", "Port": "443", "StatusCode": "HTTP_301"}}'
+      alb.ingress.kubernetes.io/inbound-cidrs: 0.0.0.0/0 # replace or leave out
+      alb.ingress.kubernetes.io/scheme: "internet-facing" # internet-facing
+      alb.ingress.kubernetes.io/target-type: instance # Your console and console-api should be NodePort for this configuration.
+      alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:... # This should be replaced with your cert arn.
 
