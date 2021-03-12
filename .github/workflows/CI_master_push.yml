@@ -83,6 +83,7 @@ jobs:
           context: .
           push: true
           tags: ${{ secrets.ECR_REPO }}/${{ env.SERVICE }}:latest, ${{ secrets.ECR_REPO }}/${{ env.SERVICE }}:${{ env.VERSION }}
+          cache-from: pyengine/${{ env.SERVICE }}:latest
          
       - name: setup environment
         run: |
