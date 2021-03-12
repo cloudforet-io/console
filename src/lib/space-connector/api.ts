@@ -138,6 +138,10 @@ class API {
 
         // Axios request interceptor to set the refresh token
         this.refreshInstance.interceptors.request.use((request) => {
+            if (!this.refreshToken) {
+                throw new Error('Session has expired.');
+            }
+
             request.headers.Authorization = `Bearer ${this.refreshToken}`;
             return request;
         });
