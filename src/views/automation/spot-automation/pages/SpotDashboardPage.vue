@@ -5,7 +5,50 @@
             <p-page-title :title="'대시보드'" />
         </nav>
         <section class="dashboard-wrapper">
-            <spot-group-billing />
+            <div class="spot-group-info widget-layout">
+                <div class="summary-wrapper">
+                    <div class="summary-row">
+                        <span class="title">사용중인 스팟그룹</span>
+                        <span class="count">13</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="title">전체 인스턴스</span>
+                        <span class="sub-title">(온디맨드+스팟)</span>
+                        <span class="count">159</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="title">스팟 인스턴스</span>
+                        <span class="count">128</span>
+                    </div>
+                </div>
+                <div class="chart-section">
+                    <spot-group-composition-chart />
+                </div>
+            </div>
+            <instance-billing-chart class="widget-layout" />
+            <div class="cost-info widget-layout">
+                <div class="cost-wrapper">
+                    <p class="title">
+                        <span>지난 달</span>
+                        <strong> 절감 비용</strong>
+                        <span class="percentage">
+                            <p-i name="ic_table_sort_fromA" />
+                            52%
+                        </span>
+                    </p>
+                    <p class="cost">
+                        ${{ commaFormatter(numberFormatter(lastMonthSavingCost)) }}
+                    </p>
+                </div>
+                <div class="cost-wrapper">
+                    <p class="title">
+                        <strong>누적 절감 비용</strong>
+                    </p>
+                    <p class="cost">
+                        ${{ commaFormatter(numberFormatter(cumulativeSavingCost)) }}
+                    </p>
+                </div>
+            </div>
         </section>
         <p-divider class="dashboard-divider" />
         <section class="project-wrapper">
@@ -33,13 +76,15 @@
 
 <script lang="ts">
 import {
-    PDivider, PBreadcrumbs, PPageTitle, PToolbox, PDataLoader,
+    PDivider, PBreadcrumbs, PPageTitle, PToolbox, PDataLoader, PI,
 } from '@spaceone/design-system';
-import SpotGroupBilling
-    from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupBilling.vue';
+import InstanceBillingChart from '@/views/automation/spot-automation/components/InstanceBillingChart.vue';
+import SpotGroupCompositionChart from '@/views/automation/spot-automation/components/SpotGroupCompositionChart.vue';
+
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { QueryHelper } from '@/lib/query';
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -63,7 +108,9 @@ const handlers = makeQuerySearchPropsWithSearchSchema(
 export default {
     name: 'SpotDashboardPage',
     components: {
-        SpotGroupBilling,
+        SpotGroupCompositionChart,
+        InstanceBillingChart,
+        PI,
         PDivider,
         PBreadcrumbs,
         PPageTitle,
@@ -83,6 +130,8 @@ export default {
             thisPage: 1,
             pageSize: 24,
             totalCount: 0,
+            lastMonthSavingCost: 1207.36234234,
+            cumulativeSavingCost: 5690.23343,
         });
 
         const routeState = reactive({
@@ -92,15 +141,29 @@ export default {
             ]),
         });
 
+        /* util */
+        const numberFormatter = (num) => {
+            if (Math.abs(num) < 10000) {
+                return Math.round(num * 100) / 100;
+            }
+            const options = { notation: 'compact', signDisplay: 'auto', maximumFractionDigits: 1 };
+            return Intl.NumberFormat('en', options).format(num);
+        };
+        const commaFormatter = (num) => {
+            if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return num;
+        };
+
+        /* api */
         const listSpotGroup = () => {
             // TODO: add list spot group api
         };
 
+        /* event */
         const changeQueryString = async (options) => {
             queryHelper.setFiltersAsQueryTag(options.queryTags);
             await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
         };
-
         const onChange = async (options: any) => {
             if (options.queryTags !== undefined) {
                 state.tags = options.queryTags;
@@ -119,6 +182,8 @@ export default {
             ...toRefs(state),
             routeState,
             onChange,
+            numberFormatter,
+            commaFormatter,
         };
     },
 };
@@ -126,58 +191,114 @@ export default {
 
 <style lang="postcss" scoped>
 .dashboard-page-wrapper {
-    @apply bg-blue-100;
+    @apply bg-secondary2;
     padding-top: 2rem;
 }
 .page-info {
     padding-left: 1.5rem;
 }
 .dashboard-wrapper {
-    @apply bg-blue-100;
+    @apply grid grid-cols-12 gap-4;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
-}
-.spot-group-info {
-    @apply col-span-12 row-start-1;
-    min-height: 16rem;
-    margin-bottom: 1rem;
-
-    @screen md {
-        @apply col-span-6 row-start-1;
-        margin-right: 1rem;
-    }
 
     @screen lg {
-        @apply col-span-3 row-start-1;
-        margin-bottom: 0;
+        grid-template-rows: auto;
+        grid-template-columns: minmax(14.25rem, 3fr) minmax(auto, 6fr) minmax(14.25rem, 3fr);
+        grid-template-areas: "spot-group chart cost";
     }
-}
 
-.cost-chart {
-    @apply col-span-12 row-start-3;
-    min-height: 16rem;
+    .widget-layout {
+        @apply bg-white border border-gray-200;
+        padding: 1rem;
+    }
 
-    @screen md {
+    .spot-group-info {
+        @apply col-span-12 row-start-1;
+
+        @screen md {
+            @apply col-span-6 row-start-1;
+        }
+
+        @screen lg {
+            grid-area: spot-group;
+        }
+
+        .summary-wrapper {
+            margin-bottom: 1rem;
+            .summary-row {
+                font-size: 0.875rem;
+                line-height: 1.5;
+                margin-bottom: 0.5rem;
+                &:last-child {
+                    margin-bottom: 0;
+                }
+                .title {
+                    @apply text-gray-600;
+                    font-size: 0.875rem;
+                    margin: 0;
+                }
+                .sub-title {
+                    @apply text-gray-400;
+                    font-size: 0.75rem;
+                    margin-left: 0.125rem;
+                }
+                .count {
+                    font-weight: bold;
+                    margin-left: 0.5rem;
+                }
+            }
+        }
+    }
+
+    .instance-billing-chart {
+        @apply col-span-12 row-start-3;
+
+        @screen md {
+            @apply col-span-12 row-start-2;
+        }
+
+        @screen lg {
+            @apply row-start-1;
+            grid-area: chart;
+        }
+    }
+
+    .cost-info {
         @apply col-span-12 row-start-2;
-    }
 
-    @screen lg {
-        @apply col-span-6 row-start-1;
-        margin-right: 1rem;
-    }
-}
-.cost-info {
-    @apply col-span-12 row-start-2;
-    min-height: 16rem;
-    margin-bottom: 1rem;
+        @screen md {
+            @apply col-span-6 row-start-1;
+        }
 
-    @screen md {
-        @apply col-span-6 row-start-1;
-    }
+        @screen lg {
+            @apply row-start-1;
+            grid-area: cost;
+        }
 
-    @screen lg {
-        @apply col-span-3 row-start-1;
-        margin-bottom: 0;
+        .cost-wrapper {
+            margin-bottom: 1.25rem;
+            .title {
+                @apply text-gray-500;
+                font-size: 0.875rem;
+                line-height: 1.5;
+                margin: 0;
+                strong {
+                    @apply text-gray-dark;
+                }
+                .percentage {
+                    margin-left: 0.375rem;
+                    .p-i-icon {
+                        margin-right: -0.25rem;
+                    }
+                }
+            }
+            .cost {
+                @apply text-indigo-500;
+                font-size: 1.375rem;
+                line-height: 1.45;
+            }
+        }
     }
 }
 
