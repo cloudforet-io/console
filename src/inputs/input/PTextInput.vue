@@ -35,7 +35,7 @@ export default {
     render(h, {
         data, props, listeners, slots,
     }) {
-        const childrenEl = [];
+        const childrenEl: any[] = [];
 
         /* Input */
         childrenEl.push(
