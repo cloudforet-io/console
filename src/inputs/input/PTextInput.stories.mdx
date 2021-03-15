@@ -202,7 +202,7 @@ export const Template = (args, { argTypes }) => ({
         {{
             components: { PTextInput },
             template: `
-                <p-text-input v-model="value" placeholder="Placeholder" />
+                <p-text-input v-model="value" class="test" placeholder="Placeholder" />
             `,
             setup() {
                 const state = reactive({
@@ -338,7 +338,38 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 
 
+## Form
+<Canvas>
+    <Story name="Form">
+        {{
+            components: { PTextInput },
+            template: `
+                <form>
+                    <p>Save ID/PW to browser and check autocomplete case.</p>
+                    <br/><br/>
+                    <p-text-input v-model="id" placeholder="ID" autocomplete="username" />
+                    <br/><br/>
+                    <p-text-input v-model="pw" type="password" placeholder="PW" autocomplete="current-password" />
+                </form>
+            `,
+            setup() {
+                const state = reactive({
+                    id: '',
+                    pw: ''
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Right Extra Slot
+
 <Canvas>
     <Story name="Right Extra Slot" args={{
         value: 100,
@@ -369,6 +400,7 @@ export const Template = (args, { argTypes }) => ({
 
 
 ## Playground
+
 <Canvas>
     <Story name="Playground">
         {Template.bind({})}

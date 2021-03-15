@@ -40,7 +40,6 @@ export default {
         /* Input */
         childrenEl.push(
             h('input', {
-                ...data,
                 attrs: {
                     ...data.attrs,
                     disabled: props.disabled,
@@ -74,13 +73,13 @@ export default {
                 }, allSlots['right-extra']),
             );
         }
-
         return h('span', {
             class: {
                 ...getBindClass(data.class),
                 'p-text-input': true,
                 block: props.block,
             },
+            staticClass: data.staticClass,
             staticStyle: data.staticStyle,
             style: data.style,
         }, [
@@ -107,8 +106,6 @@ export default {
         @apply w-full inline-flex border bg-white text-gray-900;
         min-height: 2rem;
         height: 2rem;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
         border-radius: 2px;
         font-size: 0.875rem;
         line-height: 2rem;
@@ -118,16 +115,18 @@ export default {
         &.disabled {
             @apply border-gray-200 bg-gray-100
         }
-        &:focus-within {
+        &:focus-within:not(.disabled):not(.invalid) {
             @apply border-secondary;
         }
-        &:hover:not(.disabled) {
+        &:hover:not(.disabled):not(.invalid) {
             @apply border-secondary;
         }
     }
     input {
         @apply truncate;
         display: inline-block;
+        padding-left: 0.5rem;
+        padding-right: 0.5rem;
         flex-grow: 1;
         border-width: 0;
         height: 100%;
@@ -135,6 +134,7 @@ export default {
         line-height: inherit;
         font-size: inherit;
         color: inherit;
+        background-color: transparent;
         &:disabled {
             @apply bg-transparent border-0;
         }
@@ -145,7 +145,7 @@ export default {
     .right-extra {
         @apply text-gray-400;
         display: inline-flex;
-        margin-left: 0.5rem;
+        margin-right: 0.5rem;
         flex-shrink: 0;
         height: 100%;
         overflow: hidden;
