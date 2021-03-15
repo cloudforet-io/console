@@ -3,7 +3,7 @@
 // @ts-ignore
 import icon from 'vue-svgicon'
 icon.register({
-  'ic_service_compute engine': {
+  'ic_service_compute-engine': {
     width: 16,
     height: 16,
     viewBox: '0 0 32 32',
