@@ -1,28 +1,34 @@
 <template>
-    <div class="wrap">
-        <div class="error">
-            <div class="error-contents">
-                <img src="@/assets/images/illust_whoops.png" class="w-40 sm:w-40 md:w-40 lg:w-64 xl:w-64 error-img">
-                <p class="error-code">
+    <section class="page-wrapper">
+        <div class="error-wrapper">
+            <article class="error-contents">
+                <!--                <div class="w-40 sm:w-40 md:w-40 lg:w-64 xl:w-64 error-img">-->
+                <p-lottie name="lottie_whoops" class="error-img"
+                          auto
+                          :size="16"
+                />
+                <!--                </div>-->
+                <!--                    <img src="@/assets/images/illust_whoops.png" class="w-40 sm:w-40 md:w-40 lg:w-64 xl:w-64 error-img">-->
+                <h2 class="error-code">
                     404
-                </p>
-                <p class="error-message">
+                </h2>
+                <h3 class="error-message">
                     {{ $t('COMMON.ERROR.404_MSG') }}
-                </p>
+                </h3>
                 <p-button />
-            </div>
+            </article>
         </div>
         <footer><img src="@/assets/images/SpaceONE_logo_bottom.png" class="footer-img"></footer>
-    </div>
+    </section>
 </template>
 
 <script>
 import { reactive, toRefs } from '@vue/composition-api';
-import { PButton } from '@spaceone/design-system';
+import { PButton, PLottie } from '@spaceone/design-system';
 
 export default {
     name: 'ErrorPage',
-    components: { PButton },
+    components: { PButton, PLottie },
     setup() {
         const state = reactive({
             errorStatus: '404',
@@ -38,11 +44,11 @@ export default {
 
 
 <style lang="postcss" scoped>
-.wrap {
+.page-wrapper {
     @apply m-auto flex min-h-screen flex-col;
 }
 
-.error {
+.error-wrapper {
     @apply flex-1 text-center;
     .error-contents {
         padding-top: calc(70% - 2.5rem);
