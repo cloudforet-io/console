@@ -5,11 +5,6 @@
                     fade
                     backdrop
                     :loading="loading"
-                    :footer-cancel-button-bind="{
-                        styleType: 'gray900',
-                        outline: true,
-                    }"
-                    :footer-confirm-button-bind="confirmBtnBind"
                     :visible.sync="proxyVisible"
                     :disabled="loading"
                     @confirm="onClickConfirm"
@@ -59,9 +54,8 @@
 
         <template #footer-extra>
             <p-button class="reset-btn"
-                      style-type="primary-dark"
+                      style-type="gray-border"
                       size="lg"
-                      :outline="true"
                       :disabled="loading"
                       @click="onClickReset"
             >

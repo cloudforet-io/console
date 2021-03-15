@@ -452,14 +452,14 @@ export default {
             checkModalState.mode = 'enable';
             checkModalState.title = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_ENABLE_TITLE', state.selectedItems.length);
             checkModalState.subTitle = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_ENABLE_DESC', state.selectedItems.length);
-            checkModalState.themeColor = 'primary';
+            checkModalState.themeColor = 'safe';
             checkModalState.visible = true;
         };
         const onClickDisable = (): void => {
             checkModalState.mode = 'disable';
             checkModalState.title = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_DISABLE_TITLE', state.selectedItems.length);
             checkModalState.subTitle = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_DISABLE_DESC', state.selectedItems.length);
-            checkModalState.themeColor = 'primary';
+            checkModalState.themeColor = 'alert';
             checkModalState.visible = true;
         };
         const onClickDelete = (): void => {

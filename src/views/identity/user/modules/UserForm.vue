@@ -1,9 +1,8 @@
 <template>
     <p-button-modal class="user-form-modal"
                     :header-title="headerTitle"
-                    :centered="true"
                     :scrollable="true"
-                    size="lg"
+                    size="md"
                     :fade="true"
                     :backdrop="true"
                     :visible.sync="proxyVisible"

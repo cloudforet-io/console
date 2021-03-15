@@ -6,9 +6,6 @@
                     fade
                     :visible.sync="proxyVisible"
                     theme-color="alert"
-                    :footer-confirm-button-bind="{
-                        styleType: 'alert',
-                    }"
                     @confirm="deleteProjectGroup"
     >
         <template #body>

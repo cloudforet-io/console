@@ -92,7 +92,6 @@
                         :backdrop="true"
                         :visible.sync="checkDeleteState.visible"
                         theme-color="alert"
-                        :footer-confirm-button-bind="{styleType: 'alert'}"
                         @confirm="scheduleDeleteConfirm"
         >
             <template #body>
@@ -108,9 +107,6 @@
                         fade
                         :visible.sync="checkModalState.visible"
                         theme-color="alert"
-                        :footer-confirm-button-bind="{
-                            styleType: 'alert',
-                        }"
                         :loading="createLoading"
                         @confirm="onClickCheckModalConfirm"
         >

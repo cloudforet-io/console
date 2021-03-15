@@ -132,7 +132,7 @@
             :sub-title="modalState.subTitle"
             :theme-color="modalState.themeColor"
             :fields="fields"
-            size="lg"
+            size="md"
             centered
             :selectable="false"
             :items="selectedUsers"

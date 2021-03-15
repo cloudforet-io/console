@@ -58,9 +58,6 @@
                             :backdrop="true"
                             :visible.sync="projectDeleteFormVisible"
                             :theme-color="themeColor"
-                            :footer-confirm-button-bind="{
-                                styleType: 'alert',
-                            }"
                             @confirm="projectDeleteFormConfirm"
             >
                 <template #body>

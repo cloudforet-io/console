@@ -6,11 +6,6 @@
                     backdrop
                     scrollable
                     :loading="loading"
-                    :footer-cancel-button-bind="{
-                        styleType: 'gray900',
-                        outline: true,
-                    }"
-                    :footer-confirm-button-bind="confirmBtnStyle"
                     :visible.sync="proxyVisible"
                     @confirm="onClickCollectConfirm"
     >
