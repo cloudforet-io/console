@@ -10,7 +10,7 @@
 
 <script lang="ts">
 import { computed } from '@vue/composition-api';
-import { ModalProps, sizeMapping } from '@/feedbacks/modals/modal/type';
+import { ModalProps, sizeMapping } from '@/feedbacks/modals/type';
 
 
 const setup = (props, { emit }) => {

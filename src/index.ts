@@ -98,7 +98,6 @@ export { default as PWidgetLayout } from './others/deprecated/widget-layout/PWid
 export { default as PLazyImg } from './feedbacks/loading/lazy-img/PLazyImg.vue';
 export { default as PSelectableList } from './others/deprecated/selectable-list/PSelectableList.vue';
 export { default as PButtonModal } from './feedbacks/modals/button-modal/PButtonModal.vue';
-export { default as PContentModal } from './feedbacks/modals/content-modal/PContentModal.vue';
 export { default as PDoubleCheckModal } from './others/console/modals/double-check-modal/PDoubleCheckModal.vue';
 export { default as PIconModal } from './feedbacks/modals/icon-modal/PIconModal.vue';
 export { default as PTableCheckModal } from './others/console/modals/table-modal/PTableCheckModal.vue';

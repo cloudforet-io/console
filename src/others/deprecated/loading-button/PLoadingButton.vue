@@ -1,5 +1,6 @@
 <template>
     <p-button v-bind="mergedButtonBind"
+              :style-type="styleType"
               v-on="$listeners"
     >
         <div class="loading-btn">
@@ -17,6 +18,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import { LoadingButtonProps } from '@/others/deprecated/loading-button/type';
+import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 export default {
     name: 'PLoadingButton',
@@ -29,6 +31,14 @@ export default {
         loading: {
             type: Boolean,
             required: true,
+        },
+        styleType: {
+            type: String,
+            default: undefined,
+            validator(value) {
+                if (value === undefined) return true;
+                return Object.keys(BUTTON_STYLE).indexOf(value) !== -1;
+            },
         },
         buttonBind: {
             type: Object,

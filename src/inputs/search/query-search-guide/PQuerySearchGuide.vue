@@ -1,13 +1,13 @@
 <template>
-    <p-content-modal scrollable
-                     centered
-                     size="lg"
-                     fade
-                     backdrop
-                     header-visible
-                     body-visible
-                     :footer-visible="false"
-                     :visible.sync="proxyVisible"
+    <p-button-modal scrollable
+                    centered
+                    size="lg"
+                    fade
+                    backdrop
+                    header-visible
+                    body-visible
+                    :footer-visible="false"
+                    :visible.sync="proxyVisible"
     >
         <template #header>
             <span class="header-title">
@@ -83,11 +83,11 @@
                 </i18n>
             </span>
         </template>
-    </p-content-modal>
+    </p-button-modal>
 </template>
 
 <script lang="ts">
-import PContentModal from '@/feedbacks/modals/content-modal/PContentModal.vue';
+import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 import { makeProxy } from '@/util/composition-helpers';
@@ -95,7 +95,7 @@ import PAnchor from '@/inputs/anchors/PAnchor.vue';
 
 export default {
     name: 'PQuerySearchGuide',
-    components: { PAnchor, PI, PContentModal },
+    components: { PAnchor, PI, PButtonModal },
     model: {
         prop: 'visible',
         event: 'update:visible',

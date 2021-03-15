@@ -15,7 +15,6 @@ const actions = {
     cancel: action('cancel'),
     close: action('close'),
     confirm: action('confirm'),
-
 };
 
 

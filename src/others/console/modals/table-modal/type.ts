@@ -1,5 +1,5 @@
-import { ModalThemeColor } from '@/feedbacks/modals/content-modal/type';
-import { ModalProps } from '@/feedbacks/modals/modal/type';
+import { ModalThemeColor } from '@/feedbacks/modals/button-modal/type';
+import { ModalProps } from '@/feedbacks/modals/type';
 
 
 export interface TableCheckModalProps extends ModalProps {

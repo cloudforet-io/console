@@ -5,7 +5,7 @@ import {
 } from '@storybook/addon-knobs';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
-import { sizeMapping } from '@/feedbacks/modals/modal/type';
+import { sizeMapping } from '@/feedbacks/modals/type';
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
@@ -27,15 +27,18 @@ const actions = {
     cancel: action('cancel'),
     close: action('close'),
     confirm: action('confirm'),
+    reset: action('reset'),
 };
 
 
 export const buttonModal = () => ({
     components: { PButtonModal, PButton },
     template: `<div>
-                <p-button styleType="primary" @click="launchModal">Launch a modal</p-button>
+                <p-button styleType="safe" @click="launchModal">Launch a modal</p-button>
                 <p-button-modal v-bind="$props"
                                 :visible.sync="visible"
+                                theme-color="safe"
+                                size="md"
                                 @close="closeModal"
                                 v-on="actions"
                 >
@@ -51,7 +54,6 @@ export const buttonModal = () => ({
                 range: true, min: 1, max: 80, step: 10,
             }),
         },
-
         fade: {
             default: boolean('fade', false),
         },

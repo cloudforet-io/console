@@ -7,9 +7,6 @@
                     :backdrop="backdrop"
                     :visible.sync="proxyVisible"
                     :theme-color="themeColor"
-                    :footer-cancel-button-bind="footerCancelButtonBind"
-                    :footer-confirm-button-bind="footerConfirmButtonBind"
-
                     @cancel="cancel"
                     @close="close"
                     @confirm="confirm"
@@ -43,7 +40,7 @@ import { reactive, computed, toRefs } from '@vue/composition-api';
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
 import { makeByEvent, makeProxy } from '@/util/composition-helpers';
-import { sizeMapping } from '@/feedbacks/modals/modal/type';
+import { sizeMapping } from '@/feedbacks/modals/type';
 import { orderBy } from 'lodash';
 
 export default {
@@ -96,13 +93,6 @@ export default {
             sortBy: '',
             sortDesc: true,
         });
-        const footerCancelButtonBind = reactive({
-            styleType: 'gray900',
-            outline: true,
-        });
-        const footerConfirmButtonBind = computed(() => ({
-            styleType: props.themeColor === 'primary' ? 'primary-dark' : props.themeColor,
-        }));
         const confirm = () => {
             context.emit('confirm', props.items);
         };
@@ -110,8 +100,6 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(sortState),
-            footerCancelButtonBind,
-            footerConfirmButtonBind,
             sortedItems: computed(() => {
                 // todo: move this feather to p-data-table
                 if (sortState.sortBy) {
