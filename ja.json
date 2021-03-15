@@ -883,6 +883,7 @@
 				"DETAILS_FILTER_TITLE": "フィルタ情報",
 				"DISABLE": "非活性化",
 				"ENABLE": "有効化",
+				"NO_SELECTED_COLLECTOR": "",
 				"SCHEDULE_ACTION": "作業",
 				"SCHEDULE_ADD": "追加",
 				"SCHEDULE_DELETE": "削除",
