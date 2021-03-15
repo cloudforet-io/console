@@ -4,7 +4,7 @@ const postcss = require('postcss');
 const postcssConfig = require('../postcss.config');
 
 console.log('pcss to css processing...');
-const destDir = 'dist/css';
+const destDir = 'css';
 if (!fs.existsSync(destDir)) {
     fs.mkdirSync(destDir);
 }

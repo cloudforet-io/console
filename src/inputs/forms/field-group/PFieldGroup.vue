@@ -9,14 +9,14 @@
         <small v-if="$scopedSlots.help || helpText" class="block mb-2 text-grey">
             <slot name="help">{{ helpText }}</slot>
         </small>
-        <slot :invalid="invalid" />
+        <slot name="default" :invalid="invalid" />
         <div v-if="invalidText" class="invalid-feedback" :style="{display: invalid? 'block':'none'}">
             <slot name="invalid">
                 {{ invalidText }}
             </slot>
         </div>
         <div v-if="validText" class="valid-feedback" :style="{display: valid&&!invalid? 'block':'none'}">
-            <slot name="invalid">
+            <slot name="valid">
                 {{ validText }}
             </slot>
         </div>

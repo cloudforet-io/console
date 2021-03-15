@@ -26,7 +26,6 @@ jobs:
           git push
       - run: npm install
       - run: npm run build
-      - run: npm run build:style
       - run: npm publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}

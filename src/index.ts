@@ -8,21 +8,22 @@ import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
 
 interface SpaceoneDSOptions {
-    loadTailwindCss?: boolean;
+    installVueI18n?: boolean;
+    installVueCompositionApi?: boolean;
+    installFragment?: boolean;
 }
 
 
 const SpaceoneDS: PluginObject<SpaceoneDSOptions> = {
     install(_Vue: VueConstructor, options) {
-        _Vue.use(VueI18n);
-        _Vue.use(VueCompositionApi);
+        if (options?.installVueI18n) _Vue.use(VueI18n);
+        if (options?.installVueCompositionApi) _Vue.use(VueCompositionApi);
+        if (options?.installFragment) _Vue.use(Fragment.Plugin);
         _Vue.use(Notifications, { velocity });
         _Vue.use(SvgIcon, {
             tagName: 'svgicon',
             classPrefix: 'p-i',
         });
-
-        _Vue.use(Fragment.Plugin);
         _Vue.use(VTooltip, { defaultClass: 'p-tooltip', defaultBoundariesElement: document.body });
     },
 };
