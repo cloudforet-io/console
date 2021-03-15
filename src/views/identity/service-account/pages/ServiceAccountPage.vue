@@ -615,6 +615,12 @@ export default {
 .selected-data-tab {
     @apply mt-8;
 }
+.empty-space {
+    @apply text-primary2 mt-6;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
+}
 >>> .p-dynamic-layout-table .p-search-table {
     border-width: 1px;
 }

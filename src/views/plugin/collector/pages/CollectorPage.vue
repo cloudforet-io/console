@@ -122,6 +122,9 @@
                 </p-data-table>
             </template>
         </p-tab>
+        <div v-else class="empty-space">
+            <p-empty>{{ $t('PLUGIN.COLLECTOR.MAIN.NO_SELECTED_COLLECTOR') }}</p-empty>
+        </div>
 
         <collector-update-modal :visible.sync="updateModalVisible"
                                 :collector-id="selectedItems[0] ? selectedItems[0].collector_id : undefined"
@@ -177,7 +180,7 @@ import {
 
 import {
     PHorizontalLayout, PDropdownMenuBtn, PLazyImg, PPageTitle, PDataTable, PQuerySearchTable,
-    PTab, PTableCheckModal, PIconTextButton, PStatus, PBreadcrumbs, PI,
+    PTab, PTableCheckModal, PIconTextButton, PStatus, PBreadcrumbs, PI, PEmpty,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
@@ -219,6 +222,7 @@ export default {
         PTab,
         PTableCheckModal,
         PBreadcrumbs,
+        PEmpty,
         GeneralPageLayout,
         CollectorUpdateModal,
         CollectDataModal,
@@ -548,5 +552,11 @@ li {
     font-size: 0.875rem;
     line-height: 1.5;
     margin-right: 0.3825rem;
+}
+.empty-space {
+    @apply text-primary2 mt-6;
+    text-align: center;
+    margin-bottom: 0.5rem;
+    font-size: 1.5rem;
 }
 </style>
