@@ -126,6 +126,7 @@
     "babel-eslint": "^10.0.3",
     "babel-jest": "^23.6.0",
     "babel-preset-vue": "^2.0.2",
+    "copy-webpack-plugin": "^8.0.0",
     "css-loader": "^3.2.0",
     "eslint": "^5.16.0",
     "eslint-import-resolver-typescript": "^2.0.0",
