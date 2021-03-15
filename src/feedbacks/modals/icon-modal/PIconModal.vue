@@ -119,51 +119,72 @@ export default {
 </script>
 
 <style lang="postcss">
+.p-icon-modal {
+    .content-wrapper {
+        @apply bg-white mx-auto;
+        text-align: center;
+        opacity: 0.9;
+        border-radius: 1rem;
+        padding: 3.75rem;
+        width: 100%;
+        min-width: 17rem;
+        max-width: 32rem;
+        min-height: 12.875rem;
 
-.content-wrapper {
-    @apply bg-white mx-auto;
-    text-align: center;
-    opacity: 0.9;
-    border-radius: 1rem;
-    padding: 3.75rem;
-    width: 100%;
-    min-width: 17rem;
-    max-width: 32rem;
-    min-height: 12.875rem;
+        .p-lottie {
+            display: inline-flex;
+        }
 
-    .p-lottie {
-        display: inline-flex;
-    }
-    .p-i-icon {
-        margin: auto;
-    }
-    .wave {
-        animation-name: wave-animation;
-        animation-duration: 2.5s;
-        animation-iteration-count: infinite;
-        transform-origin: 70% 70%;
-        display: inline-block;
-        font-size: 4rem;
-    }
+        .p-i-icon {
+            margin: auto;
+        }
 
-    @keyframes wave-animation {
-        0% { transform: rotate(0deg); }
-        10% { transform: rotate(14deg); }
-        20% { transform: rotate(-8deg); }
-        30% { transform: rotate(14deg); }
-        40% { transform: rotate(-4deg); }
-        50% { transform: rotate(10deg); }
-        60% { transform: rotate(0deg); }
-        100% { transform: rotate(0deg); }
-    }
-    .text-wrapper {
-        padding-top: 1.5rem;
-        padding-bottom: 1.5rem;
-        .header-title {
-            @apply text-primary-dark;
-            font-size: 1.375rem;
-            font-weight: bold;
-            padding-bottom: 0.5rem;
+        .wave {
+            animation-name: wave-animation;
+            animation-duration: 2.5s;
+            animation-iteration-count: infinite;
+            transform-origin: 70% 70%;
+            display: inline-block;
+            font-size: 4rem;
+        }
+
+        @keyframes wave-animation {
+            0% {
+                transform: rotate(0deg);
+            }
+            10% {
+                transform: rotate(14deg);
+            }
+            20% {
+                transform: rotate(-8deg);
+            }
+            30% {
+                transform: rotate(14deg);
+            }
+            40% {
+                transform: rotate(-4deg);
+            }
+            50% {
+                transform: rotate(10deg);
+            }
+            60% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(0deg);
+            }
+        }
+
+        .text-wrapper {
+            padding-top: 1.5rem;
+            padding-bottom: 1.5rem;
+
+            .header-title {
+                @apply text-primary-dark;
+                font-size: 1.375rem;
+                font-weight: bold;
+                padding-bottom: 0.5rem;
+            }
         }
     }
 }
