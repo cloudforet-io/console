@@ -179,7 +179,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { get, range } from 'lodash';
+import {get, map, range} from 'lodash';
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import utc from 'dayjs/plugin/utc';
@@ -210,6 +210,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { store } from '@/store';
+import {timezoneList} from "@/store/modules/user/config";
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(utc);
@@ -266,10 +267,9 @@ export default {
                 vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_FRI'),
                 vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.DAY_SAT'),
             ])),
-            timezones: [
-                { type: 'item', label: 'UTC (default)', name: 'UTC' },
-                { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
-            ],
+            timezones: map(timezoneList, d => ({
+                type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
+            })),
             timezone: computed(() => store.state.user.timezone),
             today: computed(() => {
                 if (state.timezone === 'UTC') return dayjs().utc().format('YYYY-MM-DD');

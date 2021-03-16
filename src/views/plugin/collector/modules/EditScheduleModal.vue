@@ -83,7 +83,7 @@
 
 <script lang="ts">
 import {
-    range, get, forEach, size,
+    range, get, forEach, size, map,
 } from 'lodash';
 import dayjs, { Dayjs } from 'dayjs';
 
@@ -100,6 +100,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { makeProxy } from '@/lib/compostion-util';
 import { store } from '@/store';
+import { timezoneList } from '@/store/modules/user/config';
 
 
 interface ScheduleHours {
@@ -167,10 +168,9 @@ export default {
             proxyVisible: makeProxy('visible', props, emit),
             //
             hoursMatrix: range(24),
-            timezones: [
-                { type: 'item', label: 'UTC (default)', name: 'UTC' },
-                { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
-            ],
+            timezones: map(timezoneList, d => ({
+                type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
+            })),
             scheduleTypes: computed(() => ({
                 hourly: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_HOURLY_LABEL'),
                 interval: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_LABEL'),

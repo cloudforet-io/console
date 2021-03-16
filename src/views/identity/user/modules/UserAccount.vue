@@ -100,8 +100,8 @@ import {
 } from '@spaceone/design-system';
 
 import { map } from 'lodash';
-import { languages } from '@/store/modules/user/config';
-import { LanguageCode, Timezone, UpdateUserRequest } from '@/store/modules/user/type';
+import { languages, timezoneList } from '@/store/modules/user/config';
+import { LanguageCode, UpdateUserRequest } from '@/store/modules/user/type';
 import { TranslateResult } from 'vue-i18n';
 import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
@@ -135,15 +135,13 @@ export default {
             }),
             userType: computed(() => store.state.user.backend) as unknown as string,
             language: '' as LanguageCode | undefined,
-            timezone: '' as Timezone | undefined,
+            timezone: '' as string | undefined,
             languages: map(languages, (d, k) => ({
                 type: 'item', label: d === 'en' ? `${d} (default)` : d, name: k,
             })),
-            timezones: [
-                { type: 'item', label: 'UTC (default)', name: 'UTC' },
-                { type: 'item', label: 'Asia/Seoul', name: 'Asia/Seoul' },
-                { type: 'item', label: 'Asia/Tokyo', name: 'Asia/Tokyo' },
-            ],
+            timezones: map(timezoneList, d => ({
+                type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
+            })),
             email: '',
             password: '',
             passwordCheck: '',
