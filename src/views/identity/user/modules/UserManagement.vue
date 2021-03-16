@@ -51,12 +51,11 @@
                     <template #col-state-format="{value}">
                         <p-status v-bind="userStateFormatter(value)" class="capitalize" />
                     </template>
-                    <template #col-user_type-format="{value}">
-                        <span v-if="value === 'API_USER'">API Only</span>
-                        <span v-else>Console, API</span>
-                    </template>
                     <template #col-last_accessed_at-format="{ value }">
-                        <span v-if="value === 0">
+                        <span v-if="value === -1">
+                            No Activity
+                        </span>
+                        <span v-else-if="value === 0">
                             {{ $t('IDENTITY.USER.MAIN.TODAY') }}
                         </span>
                         <span v-else-if="value === 1">
@@ -104,12 +103,11 @@
                     <template #col-state-format="{value}">
                         <p-status v-bind="userStateFormatter(value)" class="capitalize" />
                     </template>
-                    <template #col-user_type-format="{value}">
-                        <span v-if="value === 'API_USER'">API Only</span>
-                        <span v-else>Console, API</span>
-                    </template>
                     <template #col-last_accessed_at-format="{ value }">
-                        <span v-if="value === 0">
+                        <span v-if="value === -1">
+                            No Activity
+                        </span>
+                        <span v-else-if="value === 0">
                             {{ $t('IDENTITY.USER.MAIN.TODAY') }}
                         </span>
                         <span v-else-if="value === 1">
@@ -141,11 +139,10 @@
             <template #col-state-format="{value}">
                 <p-status v-bind="userStateFormatter(value)" class="capitalize" />
             </template>
-            <template #col-user_type-format="{value}">
-                <span v-if="value === 'API_USER'">API Only</span>
-                <span v-else>Console, API</span>
-            </template>
             <template #col-last_accessed_at-format="{ value }">
+                <span v-if="value === -1">
+                    No Activity
+                </span>
                 <span v-if="value === 0">
                     {{ $t('IDENTITY.USER.MAIN.TODAY') }}
                 </span>
@@ -189,7 +186,7 @@ import UserAssignedRole from '@/views/identity/user/modules/UserAssignedRole.vue
 import PTagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
 
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { makeDistinctValueHandler } from '@/lib/component-utils/query-search';
+import { makeDistinctValueHandler, makeEnumValueHandler } from '@/lib/component-utils/query-search';
 import { store } from '@/store';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -215,6 +212,15 @@ interface UserModel {
     timezone: string;
     user_id: string;
 }
+
+const UserType = {
+    API_USER: {
+        label: 'API Only',
+    },
+    USER: {
+        label: 'Console, API',
+    },
+};
 
 export default {
     name: 'UserManagement',
@@ -285,7 +291,7 @@ export default {
                 name: makeDistinctValueHandler('identity.User', 'name'),
                 state: makeDistinctValueHandler('identity.User', 'state'),
                 email: makeDistinctValueHandler('identity.User', 'email'),
-                user_type: makeDistinctValueHandler('identity.User', 'user_type'),
+                user_type: makeEnumValueHandler(UserType),
                 role_name: makeDistinctValueHandler('identity.User', 'role_name'),
                 backend: makeDistinctValueHandler('identity.User', 'backend'),
                 last_accessed_at: makeDistinctValueHandler('identity.User', 'last_accessed_at'),
@@ -390,6 +396,12 @@ export default {
         };
 
         const getArrayWithNotDuplicatedItem = array => [...new Set(array)];
+        const getUserType = (userType: keyof typeof UserType) => {
+            let formattedUserType;
+            if (userType === 'API_USER') formattedUserType = UserType.API_USER.label;
+            else formattedUserType = UserType.USER.label;
+            return formattedUserType;
+        };
         const getUsers = async () => {
             state.loading = true;
             try {
@@ -402,15 +414,16 @@ export default {
                 state.users = res.results.map(d => ({
                     ...d,
                     // eslint-disable-next-line camelcase
+                    user_type: getUserType(d.user_type),
+                    // eslint-disable-next-line camelcase
                     role_name: (getArrayWithNotDuplicatedItem(d.role_bindings.map(data => data.role_info.name))).join(', '),
                     // eslint-disable-next-line camelcase
-                    last_accessed_at: calculateTime(d.last_accessed_at, { seconds: dayjs().unix() }, state.timezone) || 0,
+                    last_accessed_at: calculateTime(d.last_accessed_at, { seconds: dayjs().unix() }, state.timezone),
                 }));
                 state.totalCount = res.total_count;
-                state.loading = false;
             } catch (e) {
                 console.error(e);
-                state.items = [];
+                state.users = [];
                 state.totalCount = 0;
             } finally {
                 state.loading = false;

@@ -10,7 +10,9 @@ const colorBindFactory = (colorMapping, textFnc) => value => ({
 export const calculateTime = (lastAccessedDay, today, timezone) => {
     const lastAccessedTime = timestampFormatter(lastAccessedDay, timezone);
     const todayTime = timestampFormatter(today, timezone);
-    const calculatedTime = dayjs(todayTime).diff(lastAccessedTime, 'day');
+    let calculatedTime = dayjs(todayTime).diff(lastAccessedTime, 'day');
+    // eslint-disable-next-line no-restricted-globals
+    if (isNaN(calculatedTime)) calculatedTime = -1;
     return calculatedTime;
 };
 
