@@ -1,8 +1,7 @@
 /* eslint-disable @typescript-eslint/no-var-requires */
 const path = require('path');
 const webpackBundleAnalyzer = require('webpack-bundle-analyzer');
-// eslint-disable-next-line import/no-extraneous-dependencies
-const CopyPlugin = require('copy-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const postcssConfig = require('./postcss.config');
 
 
@@ -62,13 +61,13 @@ module.exports = {
         },
         devtool: 'source-map',
         plugins: [
-            new CopyPlugin([{
+            new CopyWebpackPlugin([{
                 from: './css/*',
             }]),
             // This code is to minimize build time in development mode.
-            ...(process.env.NODE_ENV === 'development' && [new CopyPlugin([{
+            ...(process.env.NODE_ENV === 'development' ? [new CopyWebpackPlugin([{
                 from: './src/**/*',
-            }])]),
+            }])] : []),
             ...extraPlugins,
         ],
         module: {
