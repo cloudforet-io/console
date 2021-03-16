@@ -1,7 +1,7 @@
 <template>
     <p-button-modal :header-title="$t('PLUGIN.COLLECTOR.MAIN.COLLECT_MODAL_TITLE')"
                     centered
-                    size="md"
+                    size="sm"
                     fade
                     backdrop
                     scrollable

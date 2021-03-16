@@ -2,7 +2,7 @@
     <p-button-modal
         :header-title="$t('PROJECT.DETAIL.MODAL_UPDATE_MEMBER_TITLE')"
         :centered="true"
-        size="lg"
+        size="md"
         :fade="true"
         :backdrop="true"
         :visible.sync="proxyVisible"

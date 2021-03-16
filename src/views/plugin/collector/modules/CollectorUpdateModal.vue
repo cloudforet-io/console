@@ -3,6 +3,7 @@
                     :header-title="$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_TITLE')"
                     centered
                     fade
+                    size="sm"
                     backdrop
                     :loading="loading"
                     :visible.sync="proxyVisible"

@@ -113,6 +113,7 @@
                                   :sub-title="doubleCheckModalState.subTitle"
                                   :verification-text="doubleCheckModalState.verificationText"
                                   :theme-color="doubleCheckModalState.themeColor"
+                                  size="sm"
                                   :centered="true"
                                   @confirm="deleteServiceAccount"
             />

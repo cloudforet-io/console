@@ -2,7 +2,7 @@
     <p-button-modal :header-title="$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE')"
                     centered
                     :scrollable="false"
-                    size="md"
+                    size="sm"
                     fade
                     :visible.sync="proxyVisible"
                     theme-color="alert"

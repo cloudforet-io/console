@@ -2,7 +2,7 @@
     <p-button-modal
         :header-title="updateMode ? $t('PROJECT.DETAIL.MODAL_UPDATE_PROJECT_TITLE') : $t('PROJECT.DETAIL.MODAL_CREATE_PROJECT_TITLE')"
         centered
-        size="md"
+        size="sm"
         fade
         :scrollable="false"
         backdrop

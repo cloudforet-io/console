@@ -59,7 +59,7 @@
             :header-title="checkMemberDeleteState.headerTitle"
             :sub-title="checkMemberDeleteState.subTitle"
             :theme-color="checkMemberDeleteState.themeColor"
-            size="lg"
+            size="md"
             :visible.sync="checkMemberDeleteState.visible"
             @confirm="memberDeleteConfirm"
         />
