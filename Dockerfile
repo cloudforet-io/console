@@ -23,7 +23,7 @@ COPY public ${BUILD_PATH}/public
 COPY tsconfig.json ${BUILD_PATH}/
 
 ENV NODE_ENV production
-RUN npm run build-storybook && cp -ar ${BUILD_PATH}/.out/* ${ROOT_PATH}/ && rm -rf ${BUILD_PATH}
+RUN npm run build:storybook && cp -ar ${BUILD_PATH}/.out/* ${ROOT_PATH}/ && rm -rf ${BUILD_PATH}
 WORKDIR ${ROOT_PATH}
 
 EXPOSE ${PORT}

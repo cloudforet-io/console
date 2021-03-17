@@ -54,20 +54,8 @@ module.exports = {
         extract: false,
     },
     configureWebpack: {
-        resolve: {
-            alias: {
-                '@sb': path.resolve('./.storybook'),
-            },
-        },
         devtool: 'source-map',
         plugins: [
-            new CopyWebpackPlugin([{
-                from: './css/*',
-            }]),
-            // This code is to minimize build time in development mode.
-            ...(process.env.NODE_ENV === 'development' ? [new CopyWebpackPlugin([{
-                from: './src/**/*',
-            }])] : []),
             ...extraPlugins,
         ],
         module: {
@@ -90,27 +78,23 @@ module.exports = {
             .loader('url-loader')
             .tap(options => Object.assign(options, { limit: false }));
 
-        // This code is that runs only in production mode to minimize build time in development mode.
-        if (process.env.NODE_ENV === 'production') {
-            /* These are some necessary steps changing the default webpack config of the Vue CLI
-               that need to be changed in order for Typescript based components to generate their
-               declaration (.d.ts) files.
-               Discussed here https://github.com/vuejs/vue-cli/issues/1081
+        /* These are some necessary steps changing the default webpack config of the Vue CLI
+           that need to be changed in order for Typescript based components to generate their
+           declaration (.d.ts) files.
+           Discussed here https://github.com/vuejs/vue-cli/issues/1081
             */
-            config.module.rule('ts').uses.delete('cache-loader');
+        config.module.rule('ts').uses.delete('cache-loader');
 
-            config.module
-                .rule('ts')
-                .use('ts-loader')
-                .loader('ts-loader')
-                .tap((opts) => {
-                    opts.transpileOnly = false;
-                    opts.happyPackMode = false;
-                    opts.configFile = 'tsconfig.json';
-                    return opts;
-                });
-        }
-
+        config.module
+            .rule('ts')
+            .use('ts-loader')
+            .loader('ts-loader')
+            .tap((opts) => {
+                opts.transpileOnly = false;
+                opts.happyPackMode = false;
+                opts.configFile = 'tsconfig.build.json';
+                return opts;
+            });
 
         config.externals([
             '@vue/composition-api',
