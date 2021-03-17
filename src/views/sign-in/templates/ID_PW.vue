@@ -1,41 +1,34 @@
 <template>
     <div class="local-wrapper">
         <form class="form">
-            <p v-if="isAdmin" class="input-label">
-                {{ $t('COMMON.SIGN_IN.ADMIN_ID') }}
-            </p>
-            <p v-else class="input-label">
-                {{ $t('COMMON.SIGN_IN.USER_ID') }}
-            </p>
-            <PFieldGroup :invalid="isIdValid === false">
+            <p-field-group :label="isAdmin ? $t('COMMON.SIGN_IN.ADMIN_ID') : $t('COMMON.SIGN_IN.USER_ID')"
+                           :invalid="isIdValid === false"
+            >
                 <template #default="{invalid}">
-                    <p-text-input
-                        v-model="userId"
-                        placeholder="User ID"
-                        autocomplete="username"
-                        :invalid="invalid"
-                        class="input-box"
-                        @input="checkUserId"
+                    <p-text-input v-model="userId"
+                                  placeholder="User ID"
+                                  autocomplete="username"
+                                  :invalid="invalid"
+                                  block
+                                  @input="checkUserId"
                     />
                 </template>
-            </PFieldGroup>
-            <p class="input-label">
-                {{ $t('COMMON.SIGN_IN.PASSWORD') }}
-            </p>
-            <PFieldGroup :invalid="isPasswordValid === false">
-                <template v-slot:default="{invalid}">
-                    <p-text-input
-                        v-model="password"
-                        type="password"
-                        placeholder="Password"
-                        autocomplete="current-password"
-                        :invalid="invalid"
-                        class="input-box"
-                        @input="checkPassword"
-                        @keyup.enter="signIn"
+            </p-field-group>
+            <p-field-group :label="$t('COMMON.SIGN_IN.PASSWORD')"
+                           :invalid="isPasswordValid === false"
+            >
+                <template #default="{invalid}">
+                    <p-text-input v-model="password"
+                                  type="password"
+                                  placeholder="Password"
+                                  autocomplete="current-password"
+                                  :invalid="invalid"
+                                  block
+                                  @input="checkPassword"
+                                  @keyup.enter="signIn"
                     />
                 </template>
-            </PFieldGroup>
+            </p-field-group>
         </form>
         <p-button :style-type="buttonStyleType" type="submit" size="lg"
                   class="sign-in-btn"
@@ -153,10 +146,7 @@ export default defineComponent({
         line-height: 140%;
         margin-bottom: 0.375rem;
     }
-    .input-box {
-        width: 100%;
-        margin-bottom: 0.625rem;
-    }
+
     .sign-in-btn {
         width: 100%;
         margin-top: 2.5rem;
@@ -167,7 +157,7 @@ export default defineComponent({
         .form {
             margin-top: 0.5rem;
         }
-        .input-label {
+        .p-field-group::v-deep .label-box {
             display: none;
         }
     }

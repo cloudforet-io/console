@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import VueI18n, { LocaleMessageObject } from 'vue-i18n';
+import VueI18n, { IVueI18n, LocaleMessageObject } from 'vue-i18n';
 import axios from 'axios';
 
 
@@ -33,3 +33,25 @@ export const i18n = new VueI18n({
     },
     silentFallbackWarn: true,
 });
+
+declare module 'vue/types/vue' {
+    interface Vue {
+        readonly $i18n: VueI18n & IVueI18n;
+        $t: typeof VueI18n.prototype.t;
+        $tc: typeof VueI18n.prototype.tc;
+        $te: typeof VueI18n.prototype.te;
+        $d: typeof VueI18n.prototype.d;
+        $n: typeof VueI18n.prototype.n;
+    }
+}
+
+declare module 'vue/types/options' {
+    interface ComponentOptions<V extends Vue> {
+        i18n?: {
+            messages?: VueI18n.LocaleMessages;
+            dateTimeFormats?: VueI18n.DateTimeFormats;
+            numberFormats?: VueI18n.NumberFormats;
+            sharedMessages?: VueI18n.LocaleMessages;
+        };
+    }
+}

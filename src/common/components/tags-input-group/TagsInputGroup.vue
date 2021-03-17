@@ -41,7 +41,7 @@
                                    class="input-box value"
                     >
                         <p-text-input v-model="d.value"
-                                      :class="{invalid: showValidation && !validations[idx].value.isValid}"
+                                      :invalid="showValidation && !validations[idx].value.isValid"
                                       :placeholder="$t('COMMON.COMPONENTS.TAGS.VALUE')"
                                       :disabled="disabled"
                                       @blur="$emit('blur:value')"

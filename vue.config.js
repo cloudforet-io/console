@@ -54,6 +54,13 @@ module.exports = {
     },
     configureWebpack: {
         devtool: 'source-map',
+        resolve: {
+            /* The code below is for npm link case */
+            symlinks: false,
+            alias: {
+                '@vue/composition-api': path.resolve(__dirname, './node_modules/@vue/composition-api/'),
+            },
+        },
         plugins: [
             new CompressionPlugin(),
             ...extraPlugins,
@@ -87,20 +94,6 @@ module.exports = {
         // Discussed here https://github.com/vuejs/vue-cli/issues/1081
         config.output.chunkFilename('[id].[chunkhash:8].js');
         config.plugins.delete('prefetch');
-        if (process.env.NODE_ENV === 'production' && process.env.VUE_APP_BUILD_MOD === 'lib') {
-            config.module.rule('ts').uses.delete('cache-loader');
-
-            config.module
-                .rule('ts')
-                .use('ts-loader')
-                .loader('ts-loader')
-                .tap((opts) => {
-                    opts.transpileOnly = false;
-                    opts.happyPackMode = false;
-                    opts.configFile = 'tsconfig.build.json';
-                    return opts;
-                });
-        }
     },
     parallel: false,
 };

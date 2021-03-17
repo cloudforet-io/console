@@ -14,7 +14,7 @@ import { siteInit } from '@/lib/site-initializer';
 import App from './App.vue';
 
 import '@/styles/style.pcss';
-import '@spaceone/design-system/dist/css/light-style.css';
+import '@spaceone/design-system/css/light-style.css';
 
 
 /** ********** SET VUE PLUGINS ************** */
