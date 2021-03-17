@@ -1,8 +1,8 @@
 <template>
     <article class="desktop-wrapper">
-        <div class="name-column">
+        <div class="name-column" :class="{'short': isShort}">
             <p class="spot-group-title">
-                Spot group title
+                {{ cardData.name }}
             </p>
             <p class="saving-cost">
                 절감 비용
@@ -76,7 +76,7 @@
             </p>
             <p class="column-number">
                 1
-                <span class="column-number-unit"></span>
+                <span class="column-number-unit" />
             </p>
             <p class="column-title">
                 Active Sessions
@@ -102,6 +102,21 @@ import OnDemandAndSpotChart from '@/views/automation/spot-automation/components/
 export default {
     name: 'SpotGroupCardDesktop',
     components: { OnDemandAndSpotChart, SpotInterruptChart },
+    props: {
+        cardData: {
+            type: Object,
+            default: () => ({}),
+        },
+        isShort: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props) {
+        return {
+
+        };
+    },
 };
 </script>
 
@@ -123,7 +138,11 @@ export default {
     @screen lg {
         .name-column {
             display: flex;
+            &.short {
+                display: none;
+            }
         }
+
     }
 }
 .name-column {

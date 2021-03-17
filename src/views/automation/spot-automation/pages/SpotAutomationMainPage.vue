@@ -2,12 +2,12 @@
     <vertical-page-layout :min-width="0" :init-width="260" :max-width="400">
         <template #sidebar>
             <aside class="sidebar-menu">
-                <sidebar-title :title="$t('PROJECT.LANDING.FAVORITES')">
+                <sidebar-title :title="'즐겨찾기'">
                     <template #extra>
-                        <!--                        &nbsp;<span class="count">({{ favoriteItems.length }})</span>-->
+<!--                        &nbsp;<span class="count">({{ favoriteItems.length }})</span>-->
                     </template>
                 </sidebar-title>
-                <!--                <favorite-list :items="favoriteItems" class="favorite-list" @delete="onFavoriteDelete" />-->
+<!--                <favorite-list :items="favoriteItems" class="favorite-list" @delete="onFavoriteDelete" />-->
                 <div v-for="(item) in menuList" :key="item.label"
                      @click="showPage(item.routeName)"
                 >

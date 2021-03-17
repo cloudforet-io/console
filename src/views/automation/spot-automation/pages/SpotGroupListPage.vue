@@ -22,7 +22,23 @@
                    @change="onChange"
                    @refresh="onChange"
         />
-        <spot-group-card />
+        <p-i name="ic_list" width="1.5rem" height="1.5rem"
+             color="inherit transparent"
+             @click="showListView"
+        />
+        <p-i name="ic_card-list" width="1.5rem" height="1.5rem"
+             color="inherit transparent"
+             @click="showCardView"
+        />
+        <p-data-loader class="flex-grow" :data="items" :loading="loading" :class="{'short': isShort}">
+            <div class="card-wrapper" :class="{'short': isShort}">
+                <div v-for="item in items" :key="item.spot_group_id" class="spot-group-card">
+                    <spot-group-card :card-data="item"
+                                     :is-short="isShort"
+                    />
+                </div>
+            </div>
+        </p-data-loader>
     </section>
 </template>
 
@@ -31,30 +47,34 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import {
-    PBreadcrumbs, PPageTitle, PDivider, PToolbox, PIconTextButton,
+    PBreadcrumbs, PPageTitle, PDivider, PToolbox, PIconTextButton, PDataLoader, PI,
 } from '@spaceone/design-system';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { QueryHelper } from '@/lib/query';
+import { timestampFormatter } from '@/lib/util';
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { getThisPage } from '@/lib/component-utils/pagination';
+import { getPageStart, getThisPage } from '@/lib/component-utils/pagination';
 import SpotGroupCard from '@/views/automation/spot-automation/modules/spot-group-card/SpotGroupCard.vue';
 import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import dayjs from 'dayjs';
+import timezone from 'dayjs/plugin/timezone';
+import { store } from '@/store';
+
+dayjs.extend(timezone);
 
 // TODO: change handlers with spot automation spec
 const handlers = makeQuerySearchPropsWithSearchSchema(
     [{
         title: 'Filters',
         items: [
-            { key: 'cloud_service_type', name: 'Cloud Service Type' },
-            { key: 'cloud_service_group', name: 'Cloud Service Group' },
+            { key: 'cloud_service_id', name: 'Cloud Service ID', reference: 'inventory.CloudService' },
+            { key: 'provider', name: 'Provider', reference: 'identity.Provider' },
             { key: 'project_id', name: 'Project', reference: 'identity.Project' },
-            { key: 'collection_info.service_accounts', name: 'Service Account', reference: 'identity.ServiceAccount' },
-            { key: 'collection_info.secrets', name: 'Secret', reference: 'secret.Secret' },
         ],
     }],
     'inventory.CloudService',
 );
-
 
 export default {
     name: 'SpotGroupPage',
@@ -65,20 +85,27 @@ export default {
         PDivider,
         PToolbox,
         PIconTextButton,
+        PDataLoader,
+        PI,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
+        const apiQuery = new ApiQueryHelper();
 
         const state = reactive({
-            items: undefined as unknown,
+            items: undefined as any,
             loading: true,
             keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
             tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
             thisPage: 1,
             pageSize: 24,
+            sortBy: null,
+            sortDesc: true,
             totalCount: 0,
+            timezone: computed(() => store.state.user.timezone),
+            isShort: false,
         });
         const routeState = reactive({
             route: computed(() => [
@@ -87,10 +114,37 @@ export default {
             ]),
         });
 
+        const getQuery = () => {
+            apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
+                .setPageLimit(state.pageSize)
+                .setFilters(queryHelper.filters);
+
+            return apiQuery.data;
+        };
+
         const listSpotGroup = async () => {
-            // TODO: add list spot group api
-            const result = await SpaceConnector.client.spotAutomation.spotGroup.list();
-            console.log(result);
+            state.loading = true;
+            try {
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.list({ query: getQuery() });
+                state.items = res.results.map(d => ({
+                    ...d,
+                    created_at: timestampFormatter(d.created_at, state.timezone),
+                }));
+                // state.items = [{ name: '1', created_at: '111', spot_group_id: 1 }, { name: '2', created_at: '222', spot_group_id: 2 }];
+                state.totalCount = res.total_count || 0;
+                state.loading = false;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+
+        const showListView = () => {
+            state.isShort = false;
+        };
+
+        const showCardView = () => {
+            state.isShort = true;
         };
 
         const changeQueryString = async (options) => {
@@ -111,12 +165,18 @@ export default {
             }
             await listSpotGroup();
         };
+        (async () => {
+            await listSpotGroup();
+        })();
 
 
         return {
             ...toRefs(state),
             routeState,
             onChange,
+            timestampFormatter,
+            showListView,
+            showCardView,
         };
     },
 };
@@ -134,5 +194,26 @@ export default {
 .spot-group-divider {
     @apply w-full;
     margin-bottom: 1.5rem;
+}
+.card-wrapper {
+    &.short {
+        @apply grid;
+        grid-template-columns: repeat(auto-fit, minmax(259px, 1fr));
+        row-gap: 1.5rem;
+        column-gap: 1.5rem;
+        max-width: 716px;
+
+        @screen md {
+            grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
+        }
+
+        @screen lg {
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+        }
+    }
+}
+
+.spot-group-card {
+    margin-top: 1.5rem;
 }
 </style>

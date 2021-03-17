@@ -1,6 +1,6 @@
 <template>
     <article class="card-wrapper">
-        <div class="card-header">
+        <div class="card-header" :class="{'short': isShort}">
             <div class="left-wrapper">
                 <p class="project-group-nav">
                     <span class="project-group-info">Project Group</span>
@@ -11,11 +11,6 @@
                 </p>
                 <p class="spot-group-title">
                     Spot Group Name
-<!--                    <favorite-button :item-id="item.spot_group_id|| ''"-->
-<!--                                     favorite-type="cloudServiceType"-->
-<!--                                     resource-type="inventory.CloudServiceType"-->
-<!--                                     class="favorite-btn"-->
-<!--                    />-->
                 </p>
             </div>
             <div class="right-wrapper">
@@ -23,7 +18,7 @@
                     <span class="opacity-50 mr-2">리전</span>
                     Asia Pacific (Singapore) ap-southeast-1
                     <span class="opacity-50 mr-2 ml-4">생성</span>
-                    2020-12-18 00:00:00
+                    {{ cardData.created_at }}
                 </span>
                 <div class="spot-group-cost-wrapper">
                     <div class="spot-group-cost-text">
@@ -34,17 +29,20 @@
                 </div>
             </div>
         </div>
-        <p-divider />
-        <div class="card-body">
-            <spot-group-card-desktop class="card-desktop-version" />
+<!--        <p-divider />-->
+        <div class="card-body" :class="{'short': isShort}">
+            <spot-group-card-desktop class="card-desktop-version"
+                                     :card-data="cardData"
+                                     :is-short="isShort"
+            />
             <spot-group-card-mobile class="card-mobile-version" />
         </div>
-        <div class="card-footer">
+        <div class="card-footer" :class="{'short': isShort}">
             <span class="footer-region">
                 <span class="opacity-50 mr-2">리전</span>
                 Asia Pacific (Singapore) ap-southeast-1
                 <span class="opacity-50 mr-2 ml-4">생성</span>
-                2020-12-18 00:00:00
+                {{ cardData.created_at }}
             </span>
         </div>
     </article>
@@ -65,7 +63,17 @@ export default {
         PDivider,
         PI,
     },
-    setup() {
+    props: {
+        cardData: {
+            type: Object,
+            default: () => ({}),
+        },
+        isShort: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props) {
         return {
 
         };
@@ -74,14 +82,47 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+@define-mixin spread-case-card-header {
+    height: 3rem;
+
+    .spot-group-title {
+        visibility: hidden;
+    }
+
+    .spot-group-region-date {
+        display: block;
+        font-size: 0.75rem;
+        line-height: 130%;
+    }
+
+    .spot-group-cost-wrapper {
+        display: none;
+    }
+}
+
+@define-mixin spread-case-card-body {
+    min-height: 19.125rem;
+    .card-mobile-version {
+        display: none;
+    }
+    .card-desktop-version {
+        display: flex;
+        height: 100%;
+    }
+}
+
+@define-mixin spread-case-card-footer {
+    display: none;
+}
+
 .card-header {
     @apply text-white;
-    background: linear-gradient(90.01deg, #315ED1 0.01%, #5DA3F5 99.99%);
+    background: linear-gradient(90.01deg, #315ed1 0.01%, #5da3f5 99.99%);
     display: flex;
     justify-content: space-between;
     padding: 1rem 1.5rem;
     width: 100%;
-    min-height: 6.75rem;
+    height: 6.75rem;
     border-top-left-radius: 0.25rem;
     border-top-right-radius: 0.25rem;
 
@@ -133,25 +174,17 @@ export default {
     }
 
     @screen sm {
-        min-height: 4.75rem;
+        height: 4.75rem;
     }
 
     @screen md {
-        min-height: 4.75rem;
+        height: 4.75rem;
     }
 
     @screen lg {
-        min-height: 3rem;
-        .spot-group-title {
-            visibility: hidden;
-        }
-        .spot-group-region-date {
-            display: block;
-            font-size: 0.75rem;
-            line-height: 130%;
-        }
-        .spot-group-cost-wrapper {
-            display: none;
+
+        &:not(.short) {
+            @mixin spread-case-card-header;
         }
     }
 }
@@ -180,16 +213,11 @@ export default {
     }
 
     @screen lg {
-        min-height: 19.125rem;
-        .card-mobile-version {
-            display: none;
-        }
-        .card-desktop-version {
-            display: flex;
-            height: 100%;
+
+        &:not(.short) {
+            @mixin spread-case-card-body;
         }
     }
-
 }
 .card-footer {
     @apply bg-blue-100 border border-gray-200;
@@ -216,7 +244,10 @@ export default {
     }
 
     @screen lg {
-        display: none;
+
+        &:not(.short) {
+            @mixin spread-case-card-footer;
+        }
     }
 }
 </style>

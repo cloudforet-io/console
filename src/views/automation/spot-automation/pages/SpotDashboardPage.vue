@@ -63,9 +63,32 @@
                        @refresh="onChange"
             />
             <p-data-loader class="flex-grow" :data="items" :loading="loading">
-                <div class="project-card-list">
-                    <div v-for="(item, i) in items" :key="i" />
-                </div>
+                <li class="project-card-list">
+                    <article v-for="(item, i) in items" :key="i" class="project-item">
+                        <router-link :to="{name: 'spotAutomation'}" class="item-wrapper">
+                            <p class="project-group-name">
+                                {{ item.project_group_info.name }}
+                            </p>
+                            <p class="project-name">
+                                {{ item.name }}
+                            </p>
+                            <div class="cost-chart-wrapper">
+                                <div class="flex flex-col">
+                                    <span class="cost-title">
+                                        절감 비용
+                                    </span>
+                                    <span class="cost">
+                                        N/A
+                                    </span>
+                                </div>
+                                <div class="chart-wrapper">
+                                    <span class="instance">인스턴스 <span class="instance-num">10</span></span>
+                                    <on-demand-and-spot-chart chart-type="long" class="on-demand-chart" />
+                                </div>
+                            </div>
+                        </router-link>
+                    </article>
+                </li>
                 <template #no-data>
                     test
                 </template>
@@ -88,7 +111,10 @@ import {
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { QueryHelper } from '@/lib/query';
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { getThisPage } from '@/lib/component-utils/pagination';
+import { getPageStart, getThisPage } from '@/lib/component-utils/pagination';
+import OnDemandAndSpotChart from '@/views/automation/spot-automation/components/OnDemandAndSpotChart.vue';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { SpaceConnector } from '@/lib/space-connector';
 
 // TODO: change handlers with spot automation spec
 const handlers = makeQuerySearchPropsWithSearchSchema(
@@ -110,6 +136,7 @@ export default {
     components: {
         SpotGroupCompositionChart,
         InstanceBillingChart,
+        OnDemandAndSpotChart,
         PI,
         PDivider,
         PBreadcrumbs,
@@ -155,9 +182,29 @@ export default {
         };
 
         /* api */
-        const listSpotGroup = () => {
-            // TODO: add list spot group api
+        const apiQuery = new ApiQueryHelper();
+        const getParams = () => {
+            apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
+                .setPageLimit(state.pageSize)
+                .setFilters(queryHelper.filters);
+
+            return {
+                query: apiQuery.data,
+            };
         };
+
+        const listProjects = async () => {
+            state.loading = true;
+            try {
+                const res = await SpaceConnector.client.identity.project.list(getParams());
+                state.items = res.results;
+                state.totalCount = res.total_count || 0;
+                state.loading = false;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
 
         /* event */
         const changeQueryString = async (options) => {
@@ -175,8 +222,12 @@ export default {
             if (options.start !== undefined) {
                 state.thisPage = getThisPage(options.start, state.pageSize);
             }
-            await listSpotGroup();
+            await listProjects();
         };
+
+        (async () => {
+            await listProjects();
+        })();
 
         return {
             ...toRefs(state),
@@ -311,4 +362,72 @@ export default {
     @apply bg-white;
     padding: 2rem 1.5rem;
 }
+
+.project-wrapper {
+    @apply bg-white;
+    padding: 2rem 1.5rem;
+}
+
+.project-card-list {
+    @apply grid w-full;
+    grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr));
+    gap: 1rem;
+    overflow-y: hidden;
+}
+
+.project-item {
+    @apply bg-white border border-gray-200;
+    height: 12.25rem;
+    filter: drop-shadow(0 2px 4px rgba(theme('colors.black'), 0.06));
+    border-radius: 0.25rem;
+    padding: 2rem 4rem 2rem 1.5rem;
+}
+
+.project-group-name {
+    @apply text-gray-500;
+    font-size: 0.75rem;
+    line-height: 130%;
+}
+
+.project-name {
+    @apply text-gray-900 font-bold;
+    margin-top: 0.25rem;
+    font-size: 1.125rem;
+    line-height: 155%;
+}
+
+.cost-chart-wrapper {
+    @apply flex;
+    justify-content: space-between;
+    padding-top: 1.5rem;
+    .cost-title {
+        @apply text-gray-600;
+        font-size: 0.75rem;
+        line-height: 150%;
+    }
+    .cost {
+        @apply text-gray-400;
+        font-size: 1rem;
+        line-height: 160%;
+        margin-top: 0.5rem;
+    }
+}
+
+.chart-wrapper {
+    .instance {
+        @apply text-gray-600;
+        font-size: 0.75rem;
+        line-height: 150%;
+        margin-bottom: 0.5rem;
+
+        .instance-num {
+            @apply text-gray-900 font-bold;
+        }
+    }
+
+    .on-demand-chart {
+        margin-top: 0.5rem;
+    }
+}
+
 </style>
