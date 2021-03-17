@@ -27,14 +27,13 @@
                                       @export="exportCollectorDataToExcel"
                 >
                     <template #toolbox-left>
-                        <p-icon-text-button style-type="primary-dark"
-                                            name="ic_plus_bold"
-                                            :href="$router.resolve({
-                                                name:'collectorPlugins'
-                                            }).href"
-                        >
-                            {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}
-                        </p-icon-text-button>
+                        <router-link :to="{name:'collectorPlugins'}">
+                            <p-icon-text-button style-type="primary-dark"
+                                                name="ic_plus_bold"
+                            >
+                                {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}
+                            </p-icon-text-button>
+                        </router-link>
                         <p-dropdown-menu-btn class="left-toolbox-item"
                                              :menu="dropdown"
                                              @click-update="onClickUpdate"
