@@ -26,7 +26,6 @@ jobs:
           git push
       - run: npm install
       - run: npm run build
-      - run: npm run type
       - run: npm run css
       - run: npm publish --access=public
         env:
