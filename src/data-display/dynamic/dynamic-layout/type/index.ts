@@ -2,7 +2,6 @@ import { DynamicLayoutOptions, DynamicLayoutType } from '@/data-display/dynamic/
 import { QueryTag } from '@/inputs/search/query-search-tags/type';
 import { KeyItemSet, ValueHandlerMap } from '@/inputs/search/query-search/type';
 import {
-    BeforeCreateDynamicField,
     DynamicFieldHandler,
     DynamicFieldTypeOptions,
 } from '@/data-display/dynamic/dynamic-field/type';
@@ -48,7 +47,6 @@ export interface DynamicLayoutProps<
     fetchOptions?: FetchOptions;
     typeOptions?: TypeOptions;
     beforeCreate?: (props: any) => void|Promise<void>;
-    beforeCreateField?: BeforeCreateDynamicField;
     fieldHandler?: DynamicLayoutFieldHandler;
 }
 

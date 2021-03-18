@@ -26,10 +26,6 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        beforeCreate: {
-            type: Function,
-            default: undefined,
-        },
         handler: {
             type: Function,
             default: undefined,
@@ -60,7 +56,6 @@ export default {
                 options: option.options,
                 data: option.name,
                 typeOptions: props.typeOptions,
-                beforeCreate: props.beforeCreate,
                 handler: props.handler,
                 extraData: props.extraData,
             },

@@ -9,7 +9,6 @@
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="slotProps">
                 <p-dynamic-field :key="slotName" v-bind="item"
                                  :data="slotProps.data"
-                                 :before-create="beforeCreateField"
                                  :handler="fieldHandler"
                 />
             </template>
@@ -59,10 +58,6 @@ export default {
         },
         typeOptions: {
             type: Object,
-            default: undefined,
-        },
-        beforeCreateField: {
-            type: Function,
             default: undefined,
         },
         fieldHandler: {

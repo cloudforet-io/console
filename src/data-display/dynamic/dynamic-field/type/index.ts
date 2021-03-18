@@ -6,25 +6,16 @@ import {
 } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
 export interface DynamicFieldTypeOptions {
-    timezone: string;
-    typeOptionsMap: Record<string, DynamicFieldTypeOptions>;
+    timezone?: string;
 }
 
 export interface DynamicFieldProps<Options = DynamicFieldOptions, TypeOptions = DynamicFieldTypeOptions, ExtraData = any> {
     type: DynamicFieldType;
     options: Options;
     data: any;
-    typeOptions?: Partial<TypeOptions>; // a set of typeOptions props for each component
+    typeOptions?: TypeOptions; // a set of typeOptions props for each component
     extraData?: ExtraData;
-    beforeCreate?: BeforeCreateDynamicField<Options>;
     handler?: DynamicFieldHandler;
-}
-
-export interface BeforeCreateDynamicField<
-    Options = DynamicFieldOptions,
-    TypeOptions = DynamicFieldTypeOptions,
-    ExtraData = any> {
-    (props: DynamicFieldProps<Options, TypeOptions, ExtraData>): void|Promise<void>;
 }
 
 export interface DynamicFieldHandler<

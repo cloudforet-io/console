@@ -16,7 +16,6 @@
 | fetchOptions | ``` Object ``` | ``` undefined ``` | Options for fetching data.<br> Use it only for initiating fetch options.<br> Different by layout type.<br> See fetch options by type below. |
 | typeOptions | ``` Object ``` | ``` undefined ``` | props for each layout component.<br> Different by layout type.<br> See type options by type below.|
 | beforeCreate | ``` Function ``` | ``` undefined ``` | Hook that executed before create type matched component.<br> NOT supported yet. |
-| beforeCreateField | ``` Function ``` | ``` undefined ``` | Hook that executed before create each dynamic field component. |
 | fieldHandler | ``` Function ``` | ``` undefined ``` | handler that executed for handling dynamic field props that bound to dynamic field component. |
 
 <br>

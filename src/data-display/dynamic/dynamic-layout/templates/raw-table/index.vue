@@ -8,7 +8,6 @@
                             :data="rootData"
                             :fetch-options="fetchOptions"
                             :type-options="typeOptions"
-                            :before-create-field="beforeCreateField"
                             :field-handler="fieldHandler"
                             v-on="$listeners"
     >
@@ -54,10 +53,6 @@ export default {
         },
         typeOptions: {
             type: Object,
-            default: undefined,
-        },
-        beforeCreateField: {
-            type: Function,
             default: undefined,
         },
         fieldHandler: {

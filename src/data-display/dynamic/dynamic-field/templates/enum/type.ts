@@ -2,7 +2,7 @@ import { DynamicFieldProps, DynamicFieldTypeOptions } from '@/data-display/dynam
 import { EnumOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
 
-export type EnumTypeOptions = Pick<DynamicFieldTypeOptions, 'typeOptionsMap'>;
+export type EnumTypeOptions = DynamicFieldTypeOptions;
 
 export type EnumDynamicFieldProps = DynamicFieldProps<
     EnumOptions,

@@ -6,7 +6,6 @@
                :fetch-options="fetchOptions"
                :type-options="typeOptions"
                :before-create="beforeCreate"
-               :before-create-field="beforeCreateField"
                :field-handler="fieldHandler"
                v-on="$listeners"
     >
@@ -57,10 +56,6 @@ export default {
             default: undefined,
         },
         beforeCreate: {
-            type: Function,
-            default: undefined,
-        },
-        beforeCreateField: {
             type: Function,
             default: undefined,
         },

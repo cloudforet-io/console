@@ -8,7 +8,6 @@
                           :fetch-options="fetchOptionsMap[layout.name] || fetchOptions"
                           :typeOptions="extraMap[layout.name] || typeOptions"
                           :before-create="beforeCreate"
-                          :before-create-field="beforeCreateField"
                           :field-handler="fieldHandler"
                           v-on="getListeners(layout.name, idx)"
         >
@@ -57,10 +56,6 @@ export default {
             default: undefined,
         },
         beforeCreate: {
-            type: Function,
-            default: undefined,
-        },
-        beforeCreateField: {
             type: Function,
             default: undefined,
         },

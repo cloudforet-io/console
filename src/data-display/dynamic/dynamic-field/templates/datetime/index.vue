@@ -33,10 +33,6 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        beforeCreate: {
-            type: Function,
-            default: undefined,
-        },
         handler: {
             type: Function,
             default: undefined,
@@ -52,7 +48,8 @@ export default {
             if (options.source_type === 'iso8601') {
                 time = dayjs(value, options.source_format);
             } else if (options.source_format === 'seconds') {
-                time = dayjs.unix(value);
+                if (typeof value === 'object') time = dayjs.unix(value.seconds);
+                else time = dayjs.unix(value);
             } else {
                 time = dayjs(value);
             }

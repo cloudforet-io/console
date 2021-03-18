@@ -4,7 +4,6 @@
                :data="proxy.data"
                :type-options="proxy.typeOptions"
                :extra-data="proxy.extraData"
-               :before-create="proxy.beforeCreate"
                :handler="nextHandler"
                v-on="$listeners"
     />
@@ -47,10 +46,6 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        beforeCreate: {
-            type: Function,
-            default: undefined,
-        },
         handler: {
             type: Function,
             default: undefined,
@@ -84,7 +79,6 @@ export default {
                 data: props.data,
                 typeOptions: props.typeOptions,
                 extraData: props.extraData,
-                beforeCreate: props.beforeCreate,
                 handler: props.handler,
             };
 
@@ -95,7 +89,6 @@ export default {
                 const handlerRes = props.handler(Object.freeze(props));
                 if (handlerRes.type) res.type = handlerRes.type;
                 if (handlerRes.data) res.data = handlerRes.data;
-                if (handlerRes.beforeCreate) res.beforeCreate = handlerRes.beforeCreate;
                 if (handlerRes.handler) res.handler = handlerRes.handler;
                 if (handlerRes.options) res.options = { ...res.options, ...handlerRes.options };
                 if (res.typeOptions) res.typeOptions = { ...res.typeOptions, ...handlerRes.typeOptions };
@@ -115,10 +108,6 @@ export default {
 
 
         onMounted(async () => {
-            if (props.beforeCreate) {
-                const res = props.beforeCreate(props);
-                if (res) await res;
-            }
             await loadComponent(props);
         });
 

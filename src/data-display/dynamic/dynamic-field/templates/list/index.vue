@@ -10,7 +10,6 @@
                              :data="value"
                              :type-options="typeOptions"
                              :extra-data="extraData"
-                             :before-create="beforeCreate"
                              :handler="handler"
             />
         </template>
@@ -46,10 +45,6 @@ export default {
         typeOptions: {
             type: Object,
             default: () => ({}),
-        },
-        beforeCreate: {
-            type: Function,
-            default: undefined,
         },
         handler: {
             type: Function,

@@ -34,7 +34,6 @@
                                      :data="data.value"
                                      :type-options="item.typeOptions"
                                      :extra-data="item.extraData"
-                                     :before-create="beforeCreateField"
                                      :handler="fieldHandler"
                     />
                 </slot>
@@ -100,10 +99,6 @@ export default {
         },
         typeOptions: {
             type: Object,
-            default: undefined,
-        },
-        beforeCreateField: {
-            type: Function,
             default: undefined,
         },
         fieldHandler: {

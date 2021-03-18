@@ -34,7 +34,6 @@
                 <p-dynamic-field :key="slotName"
                                  v-bind="item"
                                  :data="value"
-                                 :before-create="beforeCreateField"
                                  :handler="fieldHandler"
                 />
             </template>
@@ -92,10 +91,6 @@ export default {
         },
         typeOptions: {
             type: Object,
-            default: undefined,
-        },
-        beforeCreateField: {
-            type: Function,
             default: undefined,
         },
         fieldHandler: {

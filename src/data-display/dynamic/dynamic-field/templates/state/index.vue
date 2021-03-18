@@ -30,10 +30,6 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        beforeCreate: {
-            type: Function,
-            default: undefined,
-        },
         handler: {
             type: Function,
             default: undefined,
