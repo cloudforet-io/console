@@ -1,0 +1,56 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PDynamicLayout from '../../PDynamicLayout.vue';
+import { argTypes } from '@/data-display/dynamic/dynamic-layout/story-helper';
+import {i18n} from '@/translations';
+
+<Meta title='Data Display/Dynamic/Dynamic Layout/Item'
+      component={PDynamicLayout} argTypes={{
+    name: argTypes.name,
+    options: argTypes.options,
+    data: argTypes.data,
+    loading: argTypes.loading,
+    timezone: argTypes.timezone,
+    onInit: argTypes.onInit,
+}} />
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDynamicLayout },
+    i18n,
+    template: `
+      <p-dynamic-layout :name="name" type="item"
+                          :options="options"
+                          :data="data"
+                          :type-options="{
+                              loading,
+                              timezone,
+                          }"
+                          :fetch-options="{
+                          }"
+                           class="w-full"
+                           @init="onInit"
+            >
+        </p-dynamic-layout>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+## Item Type
+
+<Canvas>
+    <Story name="Playground" args={{
+        loading: false
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+
+<br/>
+<br/>
+

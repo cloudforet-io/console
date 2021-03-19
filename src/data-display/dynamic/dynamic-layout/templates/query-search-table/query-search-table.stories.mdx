@@ -1,0 +1,165 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
+import { argTypes } from '@/data-display/dynamic/dynamic-layout/story-helper';
+import {i18n} from '@/translations'
+import mock from '@/data-display/dynamic/dynamic-layout/mock.ts'
+import { reactive, toRefs } from '@vue/composition-api';
+import faker from 'faker'
+import {range} from 'lodash'
+
+<Meta title='Data Display/Dynamic/Dynamic Layout/Query Search Table'
+      component={PDynamicLayout} argTypes={{
+    name: argTypes.name,
+    options: argTypes.options,
+    data: argTypes.data,
+    loading: argTypes.loading,
+    totalCount: argTypes.totalCount,
+    timezone: argTypes.timezone,
+    selectIndex: argTypes.selectIndex,
+    selectable: argTypes.selectable,
+    multiSelect: argTypes.multiSelect,
+    invalid: argTypes.invalid,
+    colCopy: argTypes.colCopy,
+    searchable: argTypes.searchable,
+    excelVisible: argTypes.excelVisible,
+    keyItemSets: argTypes.keyItemSets,
+    valueHandlerMap: argTypes.valueHandlerMap,
+    sortBy: argTypes.sortBy,
+    sortDesc: argTypes.sortDesc,
+    pageStart: argTypes.pageStart,
+    pageLimit: argTypes.pageLimit,
+    queryTags: argTypes.queryTags,
+    onInit: argTypes.onInit,
+    onFetch: argTypes.onFetch,
+    onSelect: argTypes.onSelect,
+    onExport: argTypes.onExport,
+}}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDynamicLayout },
+    i18n,
+    template: `
+      <p-dynamic-layout :name="name" type="query-search-table"
+                          :options="options"
+                          :data="data"
+                          :type-options="{
+                              loading,
+                              totalCount,
+                              timezone,
+                              selectIndex,
+                              selectable,
+                              multiSelect,
+                              invalid,
+                              colCopy,
+                              searchable,
+                              excelVisible,
+                              keyItemSets,
+                              valueHandlerMap
+                          }"
+                          :fetch-options="{
+                              sortBy,
+                              sortDesc,
+                              pageStart,
+                              pageLimit,
+                              queryTags
+                          }"
+                           class="w-full"
+                            @init="onInit"
+                            @fetch="onFetch"
+                            @select="onSelect"
+                            @export="onExport"
+            >
+        </p-dynamic-layout>
+    `,
+    setup() {
+        return {
+        }
+    }
+});
+
+
+# Query Search Table Type
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+    components: { PDynamicLayout },
+    i18n,
+    template: `
+      <p-dynamic-layout type="query-search-table"
+                      :options="options"
+                      :data="data"
+                      :type-options="typeOptions"
+                      :fetch-options="{}"
+                       class="w-full"
+                        @init="fetchData"
+                        @fetch="fetchData"
+            >
+        </p-dynamic-layout>
+    `,
+    setup() {
+        const state = reactive({
+            typeOptions: {
+                loading: true,
+                totalCount: 0
+            },
+            options: mock.querySearchTable.options,
+            data: null
+        })
+        const fetchData = async (options, changed) => {
+            state.typeOptions.loading = true;
+            state.data = await new Promise((resolve) => {
+                setTimeout(() => {
+                    state.typeOptions.totalCount = faker.random.number({ min: 0 });
+                    resolve(range(options.pageLimit)
+                        .map(d => ({
+                            // eslint-disable-next-line camelcase
+                            server_id: faker.random.uuid(),
+                            data: {
+                                compute: {
+                                    region: faker.random.word(),
+                                    // eslint-disable-next-line camelcase
+                                    instance_state: faker.random.arrayElements(['ACTIVE', 'DISCONNECTED']),
+                                },
+                                collection_info: {
+                                    change_history: range(faker.random.number({ min: 0, max: 10 })).map(d => ({job_id: faker.random.uuid()}))
+                                }
+                            },
+                        })))
+                }, 1000);
+            });
+            state.typeOptions.loading = false;
+        };
+        return {
+            ...toRefs(state),
+            fetchData,
+        }
+    }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" args={{
+        type: 'query-search-table',
+        data: mock.table.data,
+        options: mock.table.options,
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+
+<br/>
+<br/>
+

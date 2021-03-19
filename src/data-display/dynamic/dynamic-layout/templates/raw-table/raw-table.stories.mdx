@@ -1,0 +1,89 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
+import { argTypes } from '@/data-display/dynamic/dynamic-layout/story-helper';
+import {i18n} from '@/translations'
+import mock from '@/data-display/dynamic/dynamic-layout/mock.ts'
+
+<Meta title='Data Display/Dynamic/Dynamic Layout/Raw Table'
+      component={PDynamicLayout} argTypes={{
+    name: argTypes.name,
+    options: argTypes.options,
+    data: argTypes.data,
+    loading: argTypes.loading,
+    totalCount: argTypes.totalCount,
+    timezone: argTypes.timezone,
+    selectIndex: argTypes.selectIndex,
+    selectable: argTypes.selectable,
+    multiSelect: argTypes.multiSelect,
+    invalid: argTypes.invalid,
+    colCopy: argTypes.colCopy,
+    searchable: argTypes.searchable,
+    excelVisible: argTypes.excelVisible,
+    sortBy: argTypes.sortBy,
+    sortDesc: argTypes.sortDesc,
+    pageStart: argTypes.pageStart,
+    pageLimit: argTypes.pageLimit,
+    searchText: argTypes.searchText,
+    onInit: argTypes.onInit,
+    onFetch: argTypes.onFetch,
+    onSelect: argTypes.onSelect,
+    onExport: argTypes.onExport,
+}}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDynamicLayout },
+    i18n,
+    template: `
+      <p-dynamic-layout :name="name" type="raw-table"
+                          :options="options"
+                          :data="data"
+                          :type-options="{
+                              loading,
+                              totalCount,
+                              timezone,
+                              selectIndex,
+                              selectable,
+                              multiSelect,
+                              invalid,
+                              colCopy,
+                              searchable,
+                              excelVisible,
+                          }"
+                          :fetch-options="{
+                              sortBy,
+                              sortDesc,
+                              pageStart,
+                              pageLimit,
+                              searchText
+                          }"
+                           class="w-full"
+                            @init="onInit"
+                            @fetch="onFetch"
+                            @select="onSelect"
+                            @export="onExport"
+            >
+        </p-dynamic-layout>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+## Raw Table Type
+
+<Canvas>
+    <Story name="Playground" args={{
+        type: 'raw-table',
+        data: mock.rawTable.data,
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+
+<br/>
+<br/>

@@ -1,0 +1,130 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PDynamicLayout from '@/data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
+import { argTypes } from '@/data-display/dynamic/dynamic-layout/story-helper';
+import {i18n} from '@/translations'
+import mock from '@/data-display/dynamic/dynamic-layout/mock.ts'
+
+<Meta title='Data Display/Dynamic/Dynamic Layout/Markdown'
+      component={PDynamicLayout} argTypes={{
+    name: argTypes.name,
+    options: argTypes.options,
+    data: argTypes.data,
+    language: argTypes.language,
+    onInit: argTypes.onInit,
+}}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDynamicLayout },
+    i18n,
+    template: `
+      <p-dynamic-layout :name="name" type="markdown"
+                          :options="options"
+                          :data="data"
+                          :type-options="{
+                              language,
+                          }"
+                          :fetch-options="{
+                          }"
+                           class="w-full"
+                           @init="onInit"
+      />
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Markdown Type
+
+## With Data
+
+<Canvas>
+    <Story name="With Data" args={{
+        type: 'markdown',
+        options: {markdown: `
+# Support Template
+## Summery
+you are using {{data.compute.instance_type}}
+## Security Group Rules Raw Data
+there is {{ data.security_group_rules | length }} rules in your instance
+\`\`\`json
+{{data.security_group_rules}}
+\`\`\`
+`},
+        data: {
+            data: {
+                compute: {
+                    instance_type: 'm5.2xlarge',
+                },
+                security_group_rules: [
+                    {
+                        port_range_min: 80,
+                        port_range_max: 80,
+                        port: '80',
+                        security_group_name: 'web security group',
+                        security_group_id: '...',
+                        remote_cidr: '172.16.0.0/16',
+                        direction: 'inbound',
+                        prtocol: 'TCP',
+                        remote: '172.16.0.0/16',
+                    },
+                ]
+            }
+        },
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+
+## With Language
+
+<Canvas>
+    <Story name="With Language" argTypes={{
+        language: {
+            control: {
+                type: 'select',
+                options: ['en', 'ko', 'ch']
+            }
+        }
+    }} args={{
+        type: 'markdown',
+        options: {
+            markdown: {
+                en: '### Support English',
+                ko: '### 한국어 지원',
+            }
+        },
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" argTypes={{
+        language: {
+            control: {
+                type: 'select',
+                options: ['en', 'ko', 'ch']
+            }
+        }
+    }} args={{
+        type: 'markdown',
+        options: mock.markdown.options,
+        data: mock.markdown.data,
+    }}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+
+<br/>
+<br/>
+
