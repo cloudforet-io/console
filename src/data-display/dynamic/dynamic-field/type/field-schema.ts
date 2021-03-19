@@ -3,7 +3,7 @@
 
 /** Metadata schema types for Dynamic field */
 
-export const dynamicFieldTypes = ['text', 'badge', 'datetime', 'dict', 'state', 'enum', 'list', 'size'];
+export const dynamicFieldTypes = ['text', 'badge', 'datetime', 'dict', 'state', 'enum', 'size'];
 
 export type DynamicFieldType = typeof dynamicFieldTypes[number];
 
@@ -14,6 +14,7 @@ export interface CommonOptions {
     width?: string;
     translation_id?: string;
     default?: any;
+    delimiter?: string;
 }
 
 export interface BadgeOptions extends CommonOptions {

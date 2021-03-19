@@ -1,12 +1,32 @@
 <template>
-    <component :is="component"
-               :options="proxy.options"
-               :data="proxy.data"
-               :type-options="proxy.typeOptions"
-               :extra-data="proxy.extraData"
-               :handler="nextHandler"
-               v-on="$listeners"
-    />
+    <fragment>
+        <p-text-list v-if="Array.isArray(proxy.data)"
+                     :items="proxy.data"
+                     :delimiter="options.delimiter"
+        >
+            <template #default="{value, data}">
+                <component :is="component"
+                           :options="{...proxy.options, delimiter: undefined}"
+                           :data="value"
+                           :type-options="proxy.typeOptions"
+                           :extra-data="proxy.extraData"
+                           v-on="$listeners"
+                />
+            </template>
+            <template v-if="!options.delimiter" #delimiter>
+                <br/>
+            </template>
+        </p-text-list>
+        <component :is="component"
+                   v-else
+                   :options="proxy.options"
+                   :data="proxy.data"
+                   :type-options="proxy.typeOptions"
+                   :extra-data="proxy.extraData"
+                   :handler="nextHandler"
+                   v-on="$listeners"
+        />
+    </fragment>
 </template>
 
 <script lang="ts">
@@ -15,6 +35,7 @@ import {
 } from '@vue/composition-api';
 import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import { dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import PTextList from '@/others/console/text-list/PTextList.vue';
 
 
 interface State {
@@ -25,6 +46,7 @@ const RECURSIVE_TYPE = ['list', 'enum'];
 
 export default {
     name: 'PDynamicField',
+    components: { PTextList },
     props: {
         type: {
             type: String,
