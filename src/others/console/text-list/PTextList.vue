@@ -90,5 +90,8 @@ export default {
     .list-item.p-anchor:hover {
         @apply underline text-secondary cursor-pointer;
     }
+    .delimiter {
+        white-space: pre;
+    }
 }
 </style>
