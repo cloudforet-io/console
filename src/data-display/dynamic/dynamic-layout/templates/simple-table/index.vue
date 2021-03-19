@@ -13,7 +13,7 @@
                 <slot :name="slotName" v-bind="data">
                     <p-dynamic-field :key="slotName"
                                      v-bind="item"
-                                     :data="data.value"
+                                     :data="getValueByPath(rootData[data.index], data.field.name)"
                                      :handler="fieldHandler"
                     />
                 </slot>
@@ -37,6 +37,7 @@ import {
     SimpleTableFetchOptions,
 } from '@/data-display/dynamic/dynamic-layout/templates/simple-table/type';
 import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import { getValueByPath } from '@/data-display/dynamic/dynamic-layout/helper';
 
 
 export default {
@@ -133,6 +134,7 @@ export default {
         emit('init', state.fetchOptionsParam);
         return {
             ...toRefs(state),
+            getValueByPath,
         };
     },
 };

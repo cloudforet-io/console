@@ -5,9 +5,8 @@
                           :type="layout.type"
                           :options="layout.options"
                           :data="rootData"
-                          :fetch-options="fetchOptionsMap[layout.name] || fetchOptions"
-                          :typeOptions="extraMap[layout.name] || typeOptions"
-                          :before-create="beforeCreate"
+                          :fetch-options="fetchOptions"
+                          :typeOptions="typeOptions"
                           :field-handler="fieldHandler"
                           v-on="getListeners(layout.name, idx)"
         >
@@ -55,10 +54,6 @@ export default {
             type: Object,
             default: undefined,
         },
-        beforeCreate: {
-            type: Function,
-            default: undefined,
-        },
         fieldHandler: {
             type: Function,
             default: undefined,
@@ -72,8 +67,6 @@ export default {
                 return get(props.data, props.options.root_path, undefined);
             }),
             slotNames: computed(() => (map(slots, (slot: string, name) => replace(name, `${props.name}-`, '')))),
-            fetchOptionsMap: computed<Record<string, Partial<DynamicLayoutFetchOptions>>>(() => props.fetchOptions?.listMap || {}),
-            extraMap: computed<Record<string, Partial<DynamicLayoutTypeOptions>>>(() => props.typeOptions?.listMap || {}),
         });
 
         return {

@@ -15,7 +15,6 @@ export interface DynamicLayoutFetchOptions {
     pageLimit: number;
     queryTags: QueryTag[];
     searchText: string;
-    listMap?: Record<string, Partial<DynamicLayoutFetchOptions>>;
 }
 
 export interface DynamicLayoutTypeOptions {
@@ -32,7 +31,6 @@ export interface DynamicLayoutTypeOptions {
     keyItemSets?: KeyItemSet[];
     valueHandlerMap?: ValueHandlerMap;
     language?: string;
-    listMap?: Record<string, Partial<DynamicLayoutTypeOptions>>;
 }
 
 export interface DynamicLayoutProps<
@@ -46,7 +44,6 @@ export interface DynamicLayoutProps<
     data?: any;
     fetchOptions?: FetchOptions;
     typeOptions?: TypeOptions;
-    beforeCreate?: (props: any) => void|Promise<void>;
     fieldHandler?: DynamicLayoutFieldHandler;
 }
 

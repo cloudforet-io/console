@@ -30,10 +30,10 @@
                               @select="onSelect"
                               @export="onExport"
         >
-            <template v-for="(item, slotName, i) of dynamicFieldSlots" v-slot:[slotName]="{value, field, index}">
+            <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="{field, index}">
                 <p-dynamic-field :key="slotName"
                                  v-bind="item"
-                                 :data="value"
+                                 :data="getValueByPath(rootData[index], field.name)"
                                  :handler="fieldHandler"
                 />
             </template>
@@ -62,6 +62,7 @@ import {
 import { getPageStart } from '@/util/helpers';
 import { Options } from '@/data-display/tables/query-search-table/type';
 import { DataTableFieldType } from '@/data-display/tables/data-table/type';
+import { getValueByPath } from '@/data-display/dynamic/dynamic-layout/helper';
 
 const getThisPage = (pageStart = 1, pageLimit = 15) => Math.floor(pageStart / pageLimit) || 1;
 
@@ -230,6 +231,7 @@ export default {
             onChange,
             onSelect,
             onExport,
+            getValueByPath,
         };
     },
 };

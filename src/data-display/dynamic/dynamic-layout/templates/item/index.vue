@@ -8,7 +8,6 @@
         >
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="slotProps">
                 <p-dynamic-field :key="slotName" v-bind="item"
-                                 :data="slotProps.data"
                                  :handler="fieldHandler"
                 />
             </template>
@@ -31,6 +30,7 @@ import {
 import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { DynamicField, ListOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
+import { getValueByPath } from '@/data-display/dynamic/dynamic-layout/helper';
 
 export default {
     name: 'PDynamicLayoutItem',
@@ -112,10 +112,11 @@ export default {
             if (!props.options.fields) return res;
 
             props.options.fields.forEach((ds: DynamicField, i) => {
-                const item: Omit<DynamicFieldProps, 'data'> = {
+                const item: DynamicFieldProps = {
                     type: ds.type || 'text',
                     options: { ...ds.options },
                     extraData: { ...ds, index: i },
+                    data: getValueByPath(state.rootData, ds.key),
                 };
 
                 if (item.options.translation_id) delete item.options.translation_id;

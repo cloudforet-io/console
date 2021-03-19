@@ -3,9 +3,9 @@ import {
 } from '@/data-display/dynamic/dynamic-layout/type';
 import { ListOptions } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
 
-type ListFetchOptions = Pick<DynamicLayoutFetchOptions, 'listMap'>
+type ListFetchOptions = DynamicLayoutFetchOptions
 
-type ListTypeOptions = Pick<DynamicLayoutTypeOptions, 'listMap'>
+type ListTypeOptions = DynamicLayoutTypeOptions
 
 export type ListDynamicLayoutProps = DynamicLayoutProps<
     ListOptions,
