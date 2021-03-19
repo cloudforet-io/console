@@ -3,7 +3,7 @@
 
 /** Metadata schema types for Dynamic field */
 
-export const dynamicFieldTypes = ['text', 'badge', 'datetime', 'dict', 'state', 'enum', 'size'];
+export const dynamicFieldTypes = ['text', 'badge', 'datetime', 'state', 'enum', 'size', 'dict', 'list'];
 
 export type DynamicFieldType = typeof dynamicFieldTypes[number];
 

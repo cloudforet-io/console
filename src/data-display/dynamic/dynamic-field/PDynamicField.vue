@@ -1,12 +1,12 @@
 <template>
     <fragment>
-        <p-text-list v-if="Array.isArray(proxy.data)"
+        <p-text-list v-if="proxy.type !== 'list' && Array.isArray(proxy.data)"
                      :items="proxy.data"
                      :delimiter="options.delimiter"
         >
             <template #default="{value, data}">
                 <component :is="component"
-                           :options="{...proxy.options, delimiter: undefined}"
+                           :options="proxy.options"
                            :data="value"
                            :type-options="proxy.typeOptions"
                            :extra-data="proxy.extraData"
