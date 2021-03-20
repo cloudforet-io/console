@@ -107,9 +107,11 @@ export default {
     }
     table {
         @apply w-full;
+        table-layout: fixed;
         td {
             @apply border-white;
             line-height: 1.8;
+            word-break: break-word;
         }
     }
     .def-row:nth-child(2n+1) {

@@ -5,7 +5,6 @@
                :data="data"
                :fetch-options="fetchOptions"
                :type-options="typeOptions"
-               :before-create="beforeCreate"
                :field-handler="fieldHandler"
                v-on="$listeners"
     >
@@ -55,10 +54,6 @@ export default {
             type: Object,
             default: undefined,
         },
-        beforeCreate: {
-            type: Function,
-            default: undefined,
-        },
         fieldHandler: {
             type: Function,
             default: undefined,
@@ -74,7 +69,6 @@ export default {
         const getComponent = async () => {
             try {
                 await state.loader();
-                if (props.beforeCreate) await props.beforeCreate(props);
 
                 if (!dynamicLayoutTypes.includes(props.type)) throw new Error(`[DynamicLayout] Unacceptable Type: layout type must be one of ${dynamicLayoutTypes}. ${props.type} is not acceptable.`);
                 state.component = async () => state.loader();

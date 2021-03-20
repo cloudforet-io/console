@@ -4,109 +4,8 @@ import mock from './mock.ts'
 import {i18n} from '@/translations'
 import {argTypes} from './story-helper'
 
-<Meta title='Data Display/Dynamic/Dynamic Layout' component={PDynamicLayout} argTypes={{
-    name: {
-        name: 'name',
-        type: {name: 'string'},
-        description: 'Name of layout',
-        defaultValue: 'Base Information',
-        table: {
-            type: {
-                summary: 'string'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: ''
-            },
-        },
-        control: {
-            type: 'text'
-        }
-    },
-    type: {
-        name: 'type',
-        type: {name: 'string'},
-        description: 'Type of dynamic layout',
-        defaultValue: 'item',
-        table: {
-            type: {
-                summary: 'string'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'item'
-            },
-        },
-        control: {
-            type: 'select',
-            options: ['item', 'html', 'markdown', 'query-search-table', 'raw-table', 'table', 'simple-table', 'raw']
-        }
-    },
-    options: {
-        name: 'options',
-        type: {name: 'object'},
-        description: 'Meta schema options. Different by layout type.',
-        defaultValue: mock.item.options,
-        table: {
-            type: {
-                summary: 'object'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: '{}'
-            },
-        },
-        control: {
-            type: 'object',
-        }
-    },
-    data: {
-        name: 'data',
-        type: {name: 'object'},
-        description: 'Data to display by layout.',
-        defaultValue: mock.item.data,
-        table: {
-            type: {
-                summary: 'object'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: null
-            },
-        },
-        control: {
-            type: 'object',
-        }
-    },
-    typeOptions: {
-        name: 'typeOptions',
-        type: {name: 'object'},
-        description: `Props for each layout component.Different by layout type.`,
-        defaultValue: undefined,
-        table: {
-            type: {
-                summary: 'object'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: null
-            },
-        },
-    },
-    onInit: {
-        name: 'init',
-        description: 'Event emitted before dynamic layout created',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null
-            },
-            category: 'events',
-            defaultValue: {
-                summary: null
-            },
-        },
-    }
+<Meta title='Data Display/Dynamic/Dynamic Layout/Description' component={PDynamicLayout} argTypes={{
+    ...argTypes,
 }}/>
 
 
@@ -124,13 +23,22 @@ export const Template = (args, { argTypes }) => ({
                                   timezone,
                                   selectIndex,
                                   selectable,
+                                  multiSelect,
+                                  invalid,
                                   colCopy,
                                   searchable,
                                   excelVisible,
                                   keyItemSets,
                                   valueHandlerMap,
                                   language,
-                                  listMap,
+                              }"
+                              :fetch-options="{
+                                  sortBy,
+                                  sortDesc,
+                                  pageStart,
+                                  pageLimit,
+                                  queryTags,
+                                  searchText
                               }"
                                class="w-full"
             >
@@ -146,90 +54,183 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-### Supported Types
+## Supported Types
 
 | Type | Description |
 | ---- | ----------- |
 | item | key / value |
 | simple-table | table without search and pagination |
 | table | table view (keyword search) |
+| raw-table | table view with .csv data (keyword search) |
 | query-search-table | table view (query search) |
-| raw |
+| raw | - |
 | markdown | - |
+| html | - |
 | list | list(<dynamic_layout>) |
 
 <br/>
 <br/>
 
-## item type
 
-<Canvas>
-    <Story name="item type" argTypes={argTypes} args={{
-        loading: true
-    }}>
-        {Template.bind({})}
-    </Story>
-</Canvas>
+## Options by Types
+| Type | Options Properties |
+| ---- | ----------- |
+| item | ```root_path?: string, translation_id?: string, fields: DynamicField[]``` |
+| simple-table | ```root_path?: string, translation_id?: string, fields: DynamicField[]``` |
+| table | ```root_path?: string, translation_id?: string, fields: DynamicField[]``` |
+| raw-table | ```root_path?: string translation_id?: string``` |
+| query-search-table | ```root_path?: string, translation_id?: string, fields: DynamicField[]``` |
+| raw | ```root_path?: string translation_id?: string``` |
+| markdown | ```translation_id?: string, markdown: string``` or <br/> ```markdown: { en: string, ko: string }``` |
+| html | ```root_path?: string, translation_id?: string``` |
+| list | ```root_path?: string, layouts: DynamicLayout[]``` |
 
-<ArgsTable story="item type"/>
 
-<br/>
-<br/>
 
-## html type
-
-<Canvas>
-    <Story name="html type" argTypes={argTypes} argTypes={{
-        data: {
-            name: 'data',
-            type: {name: 'string'},
-            defaultValue: '',
-            control: {
-                type: 'text'
-            }
-        }
-    }} args={{
-        type: 'html',
-        data: mock.html.data,
-        options: {},
-    }}>
-        {Template.bind({})}
-    </Story>
-</Canvas>
-
-<ArgsTable story="html type"/>
+## Fetch Options by Types
+| Type | Fetch Options Properties |
+| ---- | ----------- |
+| item | - |
+| simple-table | - |
+| table | ```sortBy```, ```sortDesc```, ```pageStart```, ```pageLimit```, ```searchText``` |
+| raw-table | ```sortBy```, ```sortDesc```, ```pageStart```, ```pageLimit```, ```searchText``` |
+| query-search-table | ```sortBy```, ```sortDesc```, ```pageStart```, ```pageLimit```, ```queryTags``` |
+| raw | - |
+| markdown | - |
+| html | - |
+| list | The fetch options required for all layouts in the list are applied collectively. |
 
 <br/>
 <br/>
 
-## table type
+```typescript
+interface DynamicLayoutFetchOptions {
+    sortBy: string;
+    sortDesc: boolean;
+    pageStart: number;
+    pageLimit: number;
+    queryTags: QueryTag[];
+    searchText: string;
+}
+```
 
-<Canvas>
-    <Story name="table type" argTypes={argTypes} args={{
-        type: 'table',
-        data: mock.table.data,
-        options: {
-            fields: [
-                {
-                    key: "key",
-                    type: "text",
-                    name: "Key"
-                },
-                {
-                    key: "value",
-                    name: "Value",
-                    type: "text"
-                }
-            ],
-        }
-    }}>
-        {Template.bind({})}
-    </Story>
-</Canvas>
+## Components by Types
+Each type of dynamic layout corresponds to each component as the table below.<br/>
 
-<ArgsTable story="table type"/>
+| Type | Component |
+| ---- | ----------- |
+| item | DefinitionTable |
+| simple-table | DataTable |
+| table | DataTable |
+| raw-table | DataTable |
+| query-search-table | QuerySearchTable |
+| raw | Raw |
+| markdown | Markdown |
+| html | - |
+| list | - |
 
 <br/>
 <br/>
 
+## TypeOptions by Types
+| Type | Type Options Properties |
+| ---- | ----------- |
+| item | ```loading```, ```timezone``` |
+| simple-table | ```loading```, ```timezone```, ```colCopy``` |
+| table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```searchable```, ```excelVisible``` |
+| raw-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```searchable```, ```excelVisible``` |
+| query-search-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```searchable```, ```excelVisible```, ```keyItemSets```, ```valueHandlerMap``` |
+| raw | ```loading``` |
+| markdown | ```language``` |
+| html | - |
+| list | all |
 
+<br/>
+<br/>
+
+## Type Options Description
+| Name | Type | Default | Description |
+| ---- | ---- | ------- | ----------- |
+| loading | boolean | ```false``` | Used to display loading spinner. |
+| totalCount | number | ```0``` | Used to calculate pagination, displaying count next to the title. |
+| timezone | string |```'UTC'``` | Used to display datetime. |
+| selectIndex | number[] |```[]``` | Used to initiate selectIndex of tables. Works only when 'selectable' is ```true```. |
+| selectable | boolean | ```false``` | Used to make tables selectable. |
+| multiSelect | boolean | ```true``` | Used to make tables multi-selectable. Works only when 'selectable' is ```true```. |
+| invalid | boolean | ```false``` | Used to display invalid style. |
+| colCopy | boolean | ```false``` | Used to on/off each column copy. |
+| excelVisible | boolean | ```false``` | Used to on/off export button. |
+| searchable | boolean | ```true``` | Used to on/off search. |
+| keyItemSets | KeyItemSet[] |```options.fields``` or ```[]``` | Only for query-search-table's key items. |
+| valueHandlerMap | ValueHandlerMap |```{}``` | Only for query-search-table's value handler map. |
+| language | string | ```'en'``` | NOT supported yet except markdown type. |
+
+```typescript
+interface DynamicLayoutTypeOptions {
+    loading?: boolean;
+    totalCount?: number;
+    timezone?: string;
+    selectIndex?: number[];
+    selectable?: boolean;
+    colCopy?: boolean;
+    searchable?: boolean;
+    multiSelect?: boolean;
+    invalid?: boolean;
+    excelVisible?: boolean;
+    keyItemSets?: KeyItemSet[];
+    valueHandlerMap?: ValueHandlerMap;
+    language?: string;
+}
+```
+
+
+## Event Description
+| Event Name | Description |
+| ---------- | ----------- |
+| init | Emitted when the component has been created. |
+| fetch | Emitted when the new 'data' must be fetched.<br/> ex) when user clicked refresh button. |
+| select | Emitted when row(item) has been selected. |
+| export | Emitted when clicked export button. |
+
+<br/>
+<br/>
+
+## Event Handlers and Parameters
+
+```typescript
+interface DynamicLayoutEventListeners<FetchOptions = DynamicLayoutFetchOptions> {
+    init: (options: FetchOptions, layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    fetch: (options: FetchOptions,
+             changedOptions: Partial<FetchOptions>,
+             layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    select: (selectIndex: number[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    export: (options: FetchOptions, fields: DynamicField[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+}
+```
+
+| Parameter Name | Description |
+| ---------- | ----------- |
+| options | All layout fetch options. Different by layout types. |
+| changedOptions | Changed fetch options. If no fetch options has been changed, empty object will be provided. Different by layout types. |
+| selectIndex | Selected row(item) indexes. |
+| layoutName | Name props. Only provided when layout type is 'list'. |
+| layoutIndex | Layout index. Only provided when layout type is 'list'. |
+| fields (export) | Fields for exported csv/excel columns.  |
+
+<br/>
+<br/>
+
+## Supported Events by Types
+| Type | Type Options Properties |
+| ---- | ----------- |
+| item | init |
+| simple-table | init |
+| table | init, fetch, select, export |
+| raw-table | init, fetch, select, export |
+| query-search-table | init, fetch, select, export |
+| raw | init |
+| markdown | init |
+| html | init |
+| list | init, fetch, select, export |
+
+<br/>

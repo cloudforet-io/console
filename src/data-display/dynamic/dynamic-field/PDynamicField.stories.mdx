@@ -149,7 +149,6 @@ The types that can be displayed as dynamic fields are as follows.
 - datetime
 - dict
 - enum
-- list
 - size
 
 <br/>
@@ -207,7 +206,87 @@ interface DynamicFieldTypeOptions {
 
 <br/>
 
+## Field Handler
+
+If you want to replace a value of field's ```props```, give ```handler```.<br/>
+This is useful when there are mutual influences depending on given props, such as when the ```type``` or ```options``` are changed by ```data```.<br/>
+
+
+### When field handler works?
+
+**Handler works every time each props value are changed**.<br/>
+
+
+### Parameter of field handler
+
+It takes **all dynamic field props object as a parameter** and returns **an object containing only changed dynamic field props**.<br/>
+Then, the returned object will be merged with the original props values.<br/>
+
+
+### Usage of ExtraData props with field handler
+
+When you want to change field props values through a handler, and you need **additional data other than field props**, use ```extraData``` props.<br/>
+
+For example, let's say you have the following props.<br/>
+
+```json5
+ { type: 'text', data: 'hello' }
+```
+
+If you want to attach 'world!', you can do it through a field handler as below.<br/>
+
+```javascript
+ const handler = ({data}) => {
+    return {
+        data: `${data} world!`
+    }
+ }
+```
+
+If you need data that is unknown at the time you inject the handler, props and handler function will be defined as below.<br/>
+
+```json5
+ { type: 'text', data: 'hello', extraData: 'world!' }
+```
+
+```javascript
+ const handler = ({data, extraData}) => {
+    return {
+        data: `${data} ${extraData}`
+    }
+ }
+```
+
+If you give ```extraData``` props, **the handler will be executed when changes of ```extraData``` props are detected.** <br/>
+<br/>
+
+
+### Field handler doesn't work recursively
+
+If the type is ```enum``` or the given data is iterable, field handler wouldn't be passed to the child.<br/>
+It will be invoked only at the parent level.<br/>
+For example, <br/>
+
+```json5
+[
+    {
+        type: 'enum',
+        data: 'first',
+        options: {
+            first: { type: 'badge', data: 'a' },
+            second: { type: 'badge', data: 'b' }
+        },
+        handler: ...
+    }
+]
+```
+
+in this case, field handler will be invoked once with parent item.<br/>
+
+<br/>
+
 # Dynamic Field by Each Type
+
 <br/>
 
 ## Text Type

@@ -29,11 +29,8 @@
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
                 <slot :name="slotName" v-bind="data">
                     <p-dynamic-field :key="slotName"
-                                     :type="item.type"
-                                     :options="item.options"
-                                     :data="data.value"
-                                     :type-options="item.typeOptions"
-                                     :extra-data="item.extraData"
+                                     v-bind="item"
+                                     :data="getValueByPath(rootData[data.index], data.field.name)"
                                      :handler="fieldHandler"
                     />
                 </slot>
@@ -64,6 +61,7 @@ import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vu
 import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { getPageStart, getThisPage } from '@/util/helpers';
 import { Options } from '@/data-display/tables/query-search-table/type';
+import {getValueByPath} from "@/data-display/dynamic/dynamic-layout/helper";
 
 const bindExtra = (props: TableDynamicLayoutProps, name: string, init: any) => {
     if (props.typeOptions && props.typeOptions[name]) {
@@ -236,6 +234,7 @@ export default {
             onSelect,
             onChange,
             onExport,
+            getValueByPath
         };
     },
 };
