@@ -8,6 +8,7 @@
                 <template #contents>
                     <p-markdown :markdown="description.options.markdown"
                                 :data="description.options.markdown"
+                                :language="$store.state.user.language"
                                 class="!p-0"
                     />
                 </template>
