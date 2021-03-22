@@ -7,6 +7,8 @@ const SPECIAL_LABEL_MAP = {
     // eslint-disable-next-line camelcase
     google_cloud: 'Google',
     azure: 'Azure',
+    // eslint-disable-next-line camelcase
+    oracle_cloud: 'OCI',
 };
 
 export const load = async ({ commit, state }, lazyLoad = false): Promise<void|Error> => {
