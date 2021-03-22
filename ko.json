@@ -144,7 +144,7 @@
 					"OPTIMIZED_TYPE": "최적화된 인스턴스 타입"
 				},
 				"SCHEDULE_POLICY": {
-					"LABEL": "스케줄 정",
+					"LABEL": "스케줄 정책",
 					"SETTING_LABEL": "설정",
 					"SETTING_ONDEMAND": "온디맨드",
 					"SETTING_SPOT_INSTANCE": "스팟 인스턴스",
