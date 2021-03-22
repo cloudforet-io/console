@@ -654,10 +654,4 @@ export default {
 .selected-data-tab {
     @apply mt-8;
 }
->>> .modal-content {
-    min-width: 31.25rem;
-    max-width: 50rem;
-    min-height: 30rem;
-    max-height: calc(100vh - 4rem);
-}
 </style>
