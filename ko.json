@@ -150,7 +150,8 @@
 					"SETTING_SPOT_INSTANCE": "스팟 인스턴스",
 					"SETTING_TYPE_COUNT": "개수",
 					"SETTING_TYPE_LABEL": "설정 방식",
-					"SETTING_TYPE_RATIO": "비율"
+					"SETTING_TYPE_RATIO": "비율",
+					"UNIT_COUNT": "개"
 				}
 			},
 			"DETAIL": {
