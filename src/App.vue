@@ -45,6 +45,11 @@
             </template>
             <router-view v-else />
         </template>
+
+        <!-- Iframe for file download -->
+        <iframe class="hidden"
+                :src="$store.state.file.downloadSource" width="1" height="1"
+        />
     </div>
 </template>
 

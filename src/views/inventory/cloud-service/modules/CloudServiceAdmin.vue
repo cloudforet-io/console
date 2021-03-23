@@ -13,7 +13,7 @@
                 {{ users[value].name }}
             </template>
             <template #col-labels-format="{value}">
-                <p v-if="value.length === 0"></p>
+                <p v-if="value.length === 0" />
                 <p-badge v-for="(label, idx) in value" :key="idx" style-type="gray200"
                          class="mr-2"
                 >
@@ -102,33 +102,21 @@ export default {
             await listAdmin();
         };
 
-        const exportApi = SpaceConnector.client.addOns.excel.export;
         const onExport = async () => {
             try {
-                const res = await exportApi({
-                    source: {
-                        url: '/inventory/cloud-service/member/list',
-                        param: {
-                            cloud_services: props.cloudServiceIds,
-                            query: getQuery(),
-                        },
+                await store.dispatch('file/downloadExcel', {
+                    url: '/inventory/cloud-service/member/list',
+                    param: {
+                        cloud_services: props.cloudServiceIds,
+                        query: getQuery(),
                     },
-                    template: {
-                        options: {
-                            fileType: 'xlsx',
-                            timezone: store.state.user.timezone,
-                        },
-                        data_source: [
-                            { name: 'User ID', key: 'user_info.user_id' },
-                            { name: 'Name', key: 'user_info.name' },
-                            { name: 'Email', key: 'user_info.email' },
-                            {
-                                name: 'Labels', key: 'labels', type: 'list', options: { item: { view_type: 'badge' } },
-                            },
-                        ],
-                    },
+                    fields: [
+                        { name: 'User ID', key: 'user_info.user_id' },
+                        { name: 'Name', key: 'user_info.name' },
+                        { name: 'Email', key: 'user_info.email' },
+                        { name: 'Labels', key: 'labels' },
+                    ],
                 });
-                window.open(config.get('VUE_APP_API.ENDPOINT') + res.file_link);
             } catch (e) {
                 console.error(e);
             }

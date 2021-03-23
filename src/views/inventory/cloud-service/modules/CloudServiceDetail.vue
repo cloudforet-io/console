@@ -41,7 +41,11 @@ import {
     DynamicLayoutEventListeners, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 
-import { getApiActionByLayoutType, makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
+import {
+    dynamicFieldsToExcelDataFields,
+    getApiActionByLayoutType,
+    makeQuerySearchPropsWithSearchSchema,
+} from '@/lib/component-utils/dynamic-layout';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import config from '@/lib/config';
@@ -200,7 +204,6 @@ export default {
         };
 
 
-        const exportApi = SpaceConnector.client.addOns.excel.export;
         const dynamicLayoutListeners: Partial<DynamicLayoutEventListeners> = {
             fetch(options) {
                 fetchOptionsMap[state.fetchOptionKey] = options;
@@ -211,21 +214,11 @@ export default {
             },
             async export(options, fields) {
                 try {
-                    const res = await exportApi({
-                        source: {
-                            url: '/inventory/cloud-service/get-data',
-                            param: getParams(),
-                        },
-                        template: {
-                            options: {
-                                fileType: 'xlsx',
-                                timezone: state.timezone,
-                            },
-                            // eslint-disable-next-line camelcase
-                            data_source: fields,
-                        },
+                    await store.dispatch('file/downloadExcel', {
+                        url: '/inventory/cloud-service/get-data',
+                        param: getParams(),
+                        fields: dynamicFieldsToExcelDataFields(fields),
                     });
-                    window.open(config.get('VUE_APP_API.ENDPOINT') + res.file_link);
                 } catch (e) {
                     console.error(e);
                 }

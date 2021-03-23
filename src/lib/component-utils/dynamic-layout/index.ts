@@ -6,7 +6,8 @@ import {
 } from '@/lib/component-utils/query-search';
 import { DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { Filter } from '@/lib/space-connector/type';
-import { ConsoleSearchSchema } from '@/lib/component-utils/dynamic-layout/type';
+import { ConsoleDynamicField, ConsoleSearchSchema } from '@/lib/component-utils/dynamic-layout/type';
+import { ExcelDataField } from '@/store/modules/file/type';
 
 /**
  * @name makeQuerySearchPropsWithSearchSchema
@@ -52,3 +53,23 @@ export const getApiActionByLayoutType = (type: DynamicLayoutType): string => {
     if (['raw-table', 'table', 'query-search-table'].includes(type)) return 'getData';
     return 'get';
 };
+
+
+export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): ExcelDataField[] => fields.map((d) => {
+    const res: ExcelDataField = { key: d.key, name: d.name };
+
+    // lis type case will be deprecated
+    if (d.type === 'list' && (d.options as any).sub_key) {
+        res.key = `${d.key}.${(d.options as any).sub_key}`;
+    }
+
+    if (d.type === 'datetime') {
+        res.type = d.type;
+    }
+
+    if (d.reference) {
+        res.reference = d.reference;
+    }
+
+    return res;
+});

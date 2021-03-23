@@ -32,7 +32,7 @@
                             <p-i v-else name="ic_provider_other"
                                  class="provider-icon"
                             />
-                            <span class="provider-name">{{ provider.name }}</span>
+                            <span class="provider-name">{{ provider.label }}</span>
                         </template>
                         <template #icon="{ iconName }">
                             <p-i class="radio-icon float-right" width="1.25rem" height="1.25rem"

@@ -44,7 +44,11 @@ import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/ty
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 
-import { getApiActionByLayoutType, makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
+import {
+    dynamicFieldsToExcelDataFields,
+    getApiActionByLayoutType,
+    makeQuerySearchPropsWithSearchSchema,
+} from '@/lib/component-utils/dynamic-layout';
 import config from '@/lib/config';
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
@@ -200,21 +204,11 @@ export default {
             },
             async export(options, fields) {
                 try {
-                    const res = await exportApi({
-                        source: {
-                            url: '/inventory/server/get-data',
-                            param: getParams(),
-                        },
-                        template: {
-                            options: {
-                                fileType: 'xlsx',
-                                timezone: state.timezone,
-                            },
-                            // eslint-disable-next-line camelcase
-                            data_source: fields,
-                        },
+                    await store.dispatch('file/downloadExcel', {
+                        url: '/inventory/server/get-data',
+                        param: getParams(),
+                        fields: dynamicFieldsToExcelDataFields(fields),
                     });
-                    window.open(config.get('VUE_APP_API.ENDPOINT') + res.file_link);
                 } catch (e) {
                     console.error(e);
                 }

@@ -178,7 +178,10 @@ import { MonitoringProps, MonitoringResourceType } from '@/common/modules/monito
 import { ProjectItemResp } from '@/views/project/project/type';
 
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
+import {
+    dynamicFieldsToExcelDataFields,
+    makeQuerySearchPropsWithSearchSchema,
+} from '@/lib/component-utils/dynamic-layout';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
@@ -483,23 +486,13 @@ export default {
             typeOptionState.totalCount = totalCount;
         };
 
-        const exportApi = SpaceConnector.client.addOns.excel.export;
         const exportCloudServiceData = async () => {
             try {
-                const res = await exportApi({
-                    source: {
-                        url: '/inventory/cloud-service/list',
-                        param: { query: getQuery() },
-                    },
-                    template: {
-                        options: {
-                            fileType: 'xlsx',
-                            timezone: typeOptionState.timezone,
-                        },
-                        data_source: tableState.schema.options.fields,
-                    },
+                await store.dispatch('file/downloadExcel', {
+                    url: '/inventory/cloud-service/list',
+                    param: { query: getQuery() },
+                    fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
                 });
-                window.open(config.get('VUE_APP_API.ENDPOINT') + res.file_link);
             } catch (e) {
                 console.error(e);
             }

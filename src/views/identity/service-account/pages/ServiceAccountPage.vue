@@ -171,6 +171,7 @@ import { store } from '@/store';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { TranslateResult } from 'vue-i18n';
 import { QueryHelper } from '@/lib/query';
+import { dynamicFieldsToExcelDataFields } from '@/lib/component-utils/dynamic-layout';
 
 interface ProjectItemResp {
     id: string;
@@ -360,24 +361,13 @@ export default {
         };
 
         /** API for Excel export * */
-        const exportApi = SpaceConnector.client.addOns.excel.export;
         const exportServiceAccountData = async () => {
             try {
-                const res = await exportApi({
-                    source: {
-                        url: '/identity/service-account/list',
-                        param: { query: getQuery() },
-                    },
-                    template: {
-                        options: {
-                            fileType: 'xlsx',
-                            timezone: typeOptionState.timezone,
-                        },
-                        // eslint-disable-next-line camelcase
-                        data_source: tableState.schema.options.fields,
-                    },
+                await store.dispatch('file/downloadExcel', {
+                    url: '/identity/service-account/list',
+                    param: { query: getQuery() },
+                    fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
                 });
-                window.open(config.get('VUE_APP_API.ENDPOINT') + res.file_link);
             } catch (e) {
                 console.error(e);
             }

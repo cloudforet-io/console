@@ -104,35 +104,18 @@ export default {
             await listHistory();
         };
 
-        const exportApi = SpaceConnector.client.addOns.excel.export;
         const onExport = async () => {
             try {
-                const res = await exportApi({
-                    source: {
-                        url: '/inventory/cloud-service/get-data',
-                        param: getParams(),
-                    },
-                    template: {
-                        options: {
-                            fileType: 'xlsx',
-                            timezone: store.state.user.timezone,
-                        },
-                        data_source: [
-                            { name: 'Key', key: 'key' },
-                            { name: 'Job ID', key: 'job_id' },
-                            { name: 'Updated By', key: 'updated_by' },
-                            {
-                                name: 'Updated',
-                                key: 'updated_at',
-                                type: 'datetime',
-                                options: {
-                                    source_type: 'timestamp',
-                                },
-                            },
-                        ],
-                    },
+                await store.dispatch('file/downloadExcel', {
+                    url: '/inventory/cloud-service/get-data',
+                    param: getParams(),
+                    fields: [
+                        { name: 'Key', key: 'key' },
+                        { name: 'Job ID', key: 'job_id' },
+                        { name: 'Updated By', key: 'updated_by' },
+                        { name: 'Updated', key: 'updated_at', type: 'datetime' },
+                    ],
                 });
-                window.open(config.get('VUE_APP_API.ENDPOINT') + res.file_link);
             } catch (e) {
                 console.error(e);
             }

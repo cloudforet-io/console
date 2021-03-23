@@ -254,19 +254,11 @@ export default {
                     key: 'last_collected_at',
                     name: 'Last Collected',
                     type: 'datetime',
-                    options: {
-                        source_type: 'timestamp',
-                        source_format: 'seconds',
-                    },
                 },
                 {
                     key: 'created_at',
                     name: 'Created',
                     type: 'datetime',
-                    options: {
-                        source_type: 'timestamp',
-                        source_format: 'seconds',
-                    },
                 },
             ],
             items: [] as CollectorModel[],
@@ -474,20 +466,11 @@ export default {
 
         const exportCollectorDataToExcel = async () => {
             try {
-                const res = await SpaceConnector.client.addOns.excel.export({
-                    source: {
-                        url: '/inventory/collector/list',
-                        param: { query: getQuery() },
-                    },
-                    template: {
-                        options: {
-                            fileType: 'xlsx',
-                            timezone: store.state.user.timezone,
-                        },
-                        data_source: state.excelFields,
-                    },
+                await store.dispatch('file/downloadExcel', {
+                    url: '/inventory/collector/list',
+                    param: { query: getQuery() },
+                    fields: state.excelFields,
                 });
-                window.open(config.get('VUE_APP_API.ENDPOINT') + res.file_link);
             } catch (e) {
                 console.error(e);
             }
