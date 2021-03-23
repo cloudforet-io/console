@@ -67,7 +67,7 @@
                                          :class="{'link-text': !!data.to.name}"
                             >
                                 <div class="text-group">
-                                    <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
+                                    <span class="provider" :style="{ color: providers[data.provider] ? providers[data.provider].color : ''}">{{ data.label }}</span>
                                     <span class="type">{{ data.type }}</span>
                                 </div>
                                 <span class="count">{{ data.count }}</span>
@@ -237,11 +237,6 @@ export default {
             loading: true,
             registry: {},
             data: [] as ChartData[],
-        });
-        const colorState = reactive({
-            aws: computed(() => state.providers.aws.color),
-            google: computed(() => state.providers.google_cloud.color),
-            azure: computed(() => state.providers.azure.color),
         });
 
         /* util */
@@ -674,7 +669,6 @@ export default {
         return {
             ...toRefs(state),
             chartState,
-            colorState,
             onClickBox,
             onClickDateTypeButton,
             commaFormatter,
