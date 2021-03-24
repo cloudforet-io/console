@@ -48,7 +48,7 @@
 </template>
 <script lang="ts">
 import {
-    PBreadcrumbs, PPageTitle, PPaneLayout, PButton,
+    PBreadcrumbs, PButton, PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import {
@@ -57,6 +57,9 @@ import {
 import ResourceSelection from '@/views/automation/spot-automation/modules/ResourceSelection.vue';
 import BaseInformationInput from '@/views/automation/spot-automation/modules/BaseInformationInput.vue';
 import SchedulePolicySettings from '@/views/automation/spot-automation/modules/SchedulePolicySettings.vue';
+import { SETTINGS_TYPE } from '@/views/automation/spot-automation/config';
+import { SpaceConnector } from '@/lib/space-connector';
+import { store } from '@/store';
 
 export default {
     name: 'AddSpotGroupPage',
@@ -76,6 +79,27 @@ export default {
         const state = reactive({
             showValidation: false,
             selectedResource: null as any,
+            selectedResourceType: '',
+            isResourceValid: false,
+            name: '',
+            tags: [],
+            isBaseInfoValid: false,
+            onDemand: null as number|null,
+            onDemandType: SETTINGS_TYPE.ratio,
+            options: computed(() => {
+                if (state.onDemand === null) return null;
+                if (state.onDemandType === SETTINGS_TYPE.ratio) {
+                    return {
+                        // eslint-disable-next-line camelcase
+                        min_ondemand_ratio: state.onDemand,
+                    };
+                }
+                return {
+                    // eslint-disable-next-line camelcase
+                    min_ondemand_size: state.onDemand,
+                };
+            }),
+            isAllValid: computed(() => state.isResourceValid && state.isBaseInfoValid),
         });
 
         const routeState = reactive({
@@ -85,30 +109,54 @@ export default {
             ]),
         });
 
-        const onClickCreate = () => {
-            state.showValidation = true;
-        };
-
         const onClickGoBack = () => {
             const nextPath = vm?.$route.query.nextPath as string|undefined;
             if (nextPath) vm.$router.push(nextPath);
             else vm.$router.back();
         };
 
-        const onChangeResource = (item, isValid) => {
-            console.debug('change resource', item, isValid);
-            state.selectedResource = item;
+        const onChangeResource = ({ resource, resourceType }, isValid) => {
+            console.debug('change resource', resource, resourceType, isValid);
+            state.selectedResource = resource;
+            state.selectedResourceType = resourceType;
+            state.isResourceValid = isValid;
             // TODO
         };
 
         const onChangeBaseInfo = ({ name, tags }, isValid) => {
             console.debug('change base info', name, tags, isValid);
+            state.name = name;
+            state.tags = tags;
+            state.isBaseInfoValid = isValid;
             // TODO
         };
 
         const onChangeSchedulePolicy = ({ onDemand, type }) => {
             console.debug('change schedule policy', onDemand, type);
+            state.onDemand = onDemand;
+            state.onDemandType = type;
             // TODO
+        };
+
+        const onClickCreate = async () => {
+            state.showValidation = true;
+            if (!state.isAllValid) return;
+
+            const params: any = {
+                name: state.name,
+                resource_id: state.selectedResource.cloud_service_id,
+                resource_type: state.selectedResourceType,
+                tags: state.tags,
+                user_id: store.state.user.userId,
+            };
+
+            if (state.options) params.options = state.options;
+
+            try {
+                await SpaceConnector.client.spotAutomation.spotGroup.create(params);
+            } catch (e) {
+                console.error(e);
+            }
         };
 
         /* Init */

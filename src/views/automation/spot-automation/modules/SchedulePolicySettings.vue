@@ -87,13 +87,9 @@ import {
 import {
     ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
+import { SETTINGS_TYPE } from '@/views/automation/spot-automation/config';
 
 const DEFAULT_RATIO = 50;
-
-enum SETTINGS_TYPE {
-    ratio = 'ratio',
-    count = 'count'
-}
 
 interface Props {
     desiredCapacity: number;
@@ -149,6 +145,14 @@ export default {
             halfCapacity: computed(() => Math.floor(state.capacity / 2)),
         });
 
+        const emitChange = () => {
+            emit('change', {
+                onDemand: props.desiredCapacity === 0 ? null : state.onDemand,
+                type: state.selectedType,
+            });
+        };
+
+
         const changeType = (type) => {
             state.selectedType = type;
 
@@ -157,18 +161,13 @@ export default {
             } else {
                 state.onDemand = DEFAULT_RATIO;
             }
+
+            emitChange();
         };
 
         watch(() => props.desiredCapacity, () => {
             changeType(state.selectedType);
         });
-
-        const emitChange = () => {
-            emit('change', {
-                onDemand: state.onDemand,
-                type: state.selectedType,
-            });
-        };
 
         const onInput = () => {
             if (props.desiredCapacity === 0) {

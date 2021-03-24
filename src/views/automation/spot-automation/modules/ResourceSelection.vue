@@ -130,7 +130,7 @@ export default {
 
         const state = reactive({
             supportedResourceTypes: {} as SupportResourceGroupTypes,
-            supportedResourceTypeItems: computed(() => map(state.supportedResourceTypes, (d, k) => {
+            supportedResourceTypeItems: computed<SelectedResourceTypeItem[]>(() => map(state.supportedResourceTypes, (d, k) => {
                 const options: any = {};
                 const queryString = k.split('?')[1] || '';
                 if (queryString) {
@@ -143,7 +143,7 @@ export default {
                     });
                 }
 
-                const res = {
+                const res: SelectedResourceTypeItem = {
                     label: d.name,
                     name: k,
                     type: 'item',
@@ -157,7 +157,7 @@ export default {
                 return res;
             })),
             selectedResourceTypeIndex: 0,
-            selectedResourceTypeItem: computed<SelectedResourceTypeItem|undefined>(() => state.supportedResourceTypeItems[state.selectedResourceTypeIndex]),
+            selectedResourceTypeItem: computed<SelectedResourceTypeItem|null>(() => state.supportedResourceTypeItems[state.selectedResourceTypeIndex] || null),
             schema: null as any,
             data: null as any,
             selectedResource: null as any,
@@ -231,7 +231,11 @@ export default {
             if (!Array.isArray(state.data)) state.selectedResource = null;
             else state.selectedResource = state.data[selectIdx[0]] || null;
 
-            emit('change', state.selectedResource, !typeOptionState.invalid);
+            emit('change', {
+                resource: state.selectedResource,
+                resourceType: state.selectedResourceTypeItem?.data.resourceType,
+            },
+            !typeOptionState.invalid);
         };
 
         const getSupportedResourceTypes = async () => {
@@ -279,7 +283,7 @@ export default {
                         if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
                         if (d.options?.root_path) return `${d.options.root_path}.${d.key}`;
                         return d.key;
-                    }));
+                    }), 'cloud_service_id', 'cloud_service_type');
                 }
             } catch (e) {
                 console.error(e);
