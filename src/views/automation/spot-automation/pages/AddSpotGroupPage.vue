@@ -21,7 +21,14 @@
             />
         </p-pane-layout>
 
-        <p-pane-layout class="schedule-policy section" />
+        <p-pane-layout class="schedule-policy section">
+            <p class="title">
+                {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.LABEL') }}
+            </p>
+            <schedule-policy-settings :desired-capacity="selectedResource ? selectedResource.data.desired_capacity : 0"
+                                      @change="onChangeSchedulePolicy"
+            />
+        </p-pane-layout>
 
         <p-pane-layout class="instance-type section" />
 
@@ -49,10 +56,12 @@ import {
 } from '@vue/composition-api';
 import ResourceSelection from '@/views/automation/spot-automation/modules/ResourceSelection.vue';
 import BaseInformationInput from '@/views/automation/spot-automation/modules/BaseInformationInput.vue';
+import SchedulePolicySettings from '@/views/automation/spot-automation/modules/SchedulePolicySettings.vue';
 
 export default {
     name: 'AddSpotGroupPage',
     components: {
+        SchedulePolicySettings,
         BaseInformationInput,
         ResourceSelection,
         PBreadcrumbs,
@@ -66,6 +75,7 @@ export default {
 
         const state = reactive({
             showValidation: false,
+            selectedResource: null as any,
         });
 
         const routeState = reactive({
@@ -87,11 +97,17 @@ export default {
 
         const onChangeResource = (item, isValid) => {
             console.debug('change resource', item, isValid);
+            state.selectedResource = item;
             // TODO
         };
 
         const onChangeBaseInfo = ({ name, tags }, isValid) => {
             console.debug('change base info', name, tags, isValid);
+            // TODO
+        };
+
+        const onChangeSchedulePolicy = ({ onDemand, type }) => {
+            console.debug('change schedule policy', onDemand, type);
             // TODO
         };
 
@@ -107,6 +123,7 @@ export default {
             onClickGoBack,
             onChangeResource,
             onChangeBaseInfo,
+            onChangeSchedulePolicy,
         };
     },
 };
