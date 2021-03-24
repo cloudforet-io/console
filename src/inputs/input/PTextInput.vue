@@ -151,7 +151,6 @@ export default {
         overflow: hidden;
         line-height: inherit;
         font-size: inherit;
-        color: inherit;
     }
 }
 
