@@ -7,6 +7,8 @@ export interface FileState {
 export interface ExcelDataField {
     key: string;
     name: string;
-    type?: 'datetime';
+    type?: 'datetime'|'enum';
+    // eslint-disable-next-line camelcase
+    enum_items?: object;
     reference?: Reference;
 }
