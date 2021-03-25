@@ -66,8 +66,8 @@
                 </span>
                 <span class="scale-group">
                     <span class="scale" />
-                    <span>
-                        <span class="tick">{{ capacity / 2 }}</span>
+                    <span v-if="capacity !== 0 && capacity / 2 === halfCapacity">
+                        <span class="tick">{{ halfCapacity }}</span>
                         <span class="unit">{{ unit }}</span>
                     </span>
                 </span>
@@ -177,14 +177,12 @@ export default {
         const startMove = () => {
             if (props.desiredCapacity === 0) return;
             state.isMoving = true;
-            document.body.style.cursor = 'col-resize';
         };
 
 
         const endMove = () => {
             if (state.isMoving) {
                 state.isMoving = false;
-                document.body.style.cursor = 'unset';
                 emitChange();
             }
         };
@@ -282,6 +280,9 @@ export default {
         left: -1rem;
         top: -1rem;
         box-shadow: 0px 2px 4px rgba(theme('colors.black'), 0.2);
+        &.dragging, &:hover {
+            @apply bg-blue-100;
+        }
     }
     .line {
         height: 0.5rem;
