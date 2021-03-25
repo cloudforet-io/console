@@ -3,13 +3,7 @@
         <div class="page-navigation">
             <p-breadcrumbs :routes="routes" />
         </div>
-        <p-icon-text-button name="ic_back" class="text-2xl mb-6 p-0"
-                            icon-color="transparent inherit"
-                            width="1.5rem" height="1.5rem"
-                            @click="onClickBackButton"
-        >
-            {{ $t('PLUGIN.COLLECTOR.CREATE.TITLE') }}
-        </p-icon-text-button>
+        <p-page-title :title="$t('PLUGIN.COLLECTOR.CREATE.TITLE')" child @goBack="onClickBackButton" />
         <p-progress-wizard :tabs="tabState.tabs"
                            :active-idx.sync="tabState.activeIdx"
                            :invalid-state="tabState.invalidState"
@@ -76,7 +70,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PProgressWizard, PSelectDropdown, PLazyImg, PIconTextButton, PBreadcrumbs, PFieldGroup, PTextInput,
+    PProgressWizard, PSelectDropdown, PLazyImg, PBreadcrumbs, PFieldGroup, PTextInput, PPageTitle,
 } from '@spaceone/design-system';
 
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
@@ -96,7 +90,7 @@ export default {
         ConfirmCredentials,
         PProgressWizard,
         TagsInputGroup,
-        PIconTextButton,
+        PPageTitle,
         PBreadcrumbs,
         PLazyImg,
     },
@@ -282,13 +276,14 @@ export default {
         @apply flex border-r border-gray-200;
         width: 50%;
         padding: 2.5rem;
-        margin-top: 2rem;
         .p-text-input {
             width: 100%;
         }
     }
-    .tags-input-group {
-        margin-top: 2rem;
+    .p-progress-wizard::v-deep {
+        .contents {
+            margin-top: 2.5rem;
+        }
     }
 }
 </style>
