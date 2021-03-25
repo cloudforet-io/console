@@ -84,10 +84,9 @@ export default {
             name: '',
             tags: [],
             isBaseInfoValid: false,
-            onDemand: null as number|null,
+            onDemand: 0,
             onDemandType: SETTINGS_TYPE.ratio,
             options: computed(() => {
-                if (state.onDemand === null) return null;
                 if (state.onDemandType === SETTINGS_TYPE.ratio) {
                     return {
                         // eslint-disable-next-line camelcase

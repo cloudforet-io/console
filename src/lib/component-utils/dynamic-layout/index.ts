@@ -8,6 +8,8 @@ import { DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display
 import { Filter } from '@/lib/space-connector/type';
 import { ConsoleDynamicField, ConsoleSearchSchema } from '@/lib/component-utils/dynamic-layout/type';
 import { ExcelDataField } from '@/store/modules/file/type';
+import { forEach } from 'lodash';
+import { EnumOptions } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 
 /**
  * @name makeQuerySearchPropsWithSearchSchema
@@ -65,6 +67,20 @@ export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): E
 
     if (d.type === 'datetime') {
         res.type = d.type;
+    } else if (d.type === 'enum') {
+        res.type = d.type;
+
+        const options = (d.options as EnumOptions)?.items || d.options;
+        if (options) {
+            const items = {};
+            // @ts-ignore
+            forEach(options, (item, k) => {
+                if (typeof item === 'string') items[k] = item;
+                else items[k] = item.name;
+            });
+            // eslint-disable-next-line camelcase
+            res.enum_items = items;
+        }
     }
 
     if (d.reference) {

@@ -65,14 +65,16 @@
                             </p-button>
                         </div>
                         <div v-else class="interval-wrapper">
-                            <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_EVERY_LABEL')" class="w-1/2">
-                                <p-text-input v-model="formState.intervalTime" class="ml-2" type="number"
-                                              :placeholder="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_PLACEHOLDER')"
-                                />
+                            <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_EVERY_LABEL')" required class="w-full flex">
+                                <div class="ml-4 flex-grow inline-flex">
+                                    <p-text-input v-model="formState.intervalTime" class="w-1/2" type="number"
+                                                  :placeholder="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_PLACEHOLDER')"
+                                    />
+                                    <p-select-dropdown v-model="formState.intervalTimeType" class="w-1/2" :items="intervalTimeTypes"
+                                                       auto-height
+                                    />
+                                </div>
                             </p-field-group>
-                            <div class="w-1/2">
-                                <p-select-dropdown v-model="formState.intervalTimeType" :items="intervalTimeTypes" auto-height />
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -440,11 +442,11 @@ export default {
         .interval-wrapper {
             display: inline-flex;
             width: 100%;
+            .p-field-group::v-deep .label-box {
+                display: inline-flex;
+            }
             .form-label {
                 font-weight: normal;
-            }
-            .p-text-input {
-                @apply w-4/5;
             }
             .p-select-dropdown {
                 @apply bg-white;

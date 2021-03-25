@@ -66,7 +66,7 @@
                 </span>
                 <span class="scale-group">
                     <span class="scale" />
-                    <span>
+                    <span v-if="capacity !== 0 && capacity / 2 === halfCapacity">
                         <span class="tick">{{ halfCapacity }}</span>
                         <span class="unit">{{ unit }}</span>
                     </span>
@@ -88,8 +88,6 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { SETTINGS_TYPE } from '@/views/automation/spot-automation/config';
-
-const DEFAULT_RATIO = 50;
 
 interface Props {
     desiredCapacity: number;
@@ -118,7 +116,7 @@ export default {
                 { name: SETTINGS_TYPE.count, label: vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_TYPE_COUNT') },
             ]),
             selectedType: SETTINGS_TYPE.ratio,
-            onDemand: DEFAULT_RATIO,
+            onDemand: 0,
             spotInstance: computed({
                 get: () => {
                     const res = state.capacity - state.onDemand;
@@ -147,7 +145,7 @@ export default {
 
         const emitChange = () => {
             emit('change', {
-                onDemand: props.desiredCapacity === 0 ? null : state.onDemand,
+                onDemand: state.onDemand,
                 type: state.selectedType,
             });
         };
@@ -155,12 +153,7 @@ export default {
 
         const changeType = (type) => {
             state.selectedType = type;
-
-            if (type === SETTINGS_TYPE.count) {
-                state.onDemand = state.halfCapacity;
-            } else {
-                state.onDemand = DEFAULT_RATIO;
-            }
+            state.onDemand = 0;
 
             emitChange();
         };
@@ -184,14 +177,12 @@ export default {
         const startMove = () => {
             if (props.desiredCapacity === 0) return;
             state.isMoving = true;
-            document.body.style.cursor = 'col-resize';
         };
 
 
         const endMove = () => {
             if (state.isMoving) {
                 state.isMoving = false;
-                document.body.style.cursor = 'unset';
                 emitChange();
             }
         };
@@ -289,6 +280,9 @@ export default {
         left: -1rem;
         top: -1rem;
         box-shadow: 0px 2px 4px rgba(theme('colors.black'), 0.2);
+        &.dragging, &:hover {
+            @apply bg-blue-100;
+        }
     }
     .line {
         height: 0.5rem;
