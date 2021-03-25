@@ -4,12 +4,13 @@
             <slot name="label" :class="{'form-label':true}">
                 <label v-if="label" class="form-label">{{ label }}</label>
             </slot>
-            <span v-if="required" class="required-mark">*</span>
+            <!--            <span v-if="required" class="required-mark">*</span>-->
+            <span v-if="!required" class="optional-mark">(optional)</span>
         </div>
-        <small v-if="$scopedSlots.help || helpText" class="block mb-2 text-grey">
+        <small v-if="$scopedSlots.help || helpText" class="help-msg">
             <slot name="help">{{ helpText }}</slot>
         </small>
-        <slot name="default" :invalid="invalid" />
+        <slot name="default" v-bind="$props" />
         <div v-if="invalidText" class="invalid-feedback" :style="{display: invalid? 'block':'none'}">
             <slot name="invalid">
                 {{ invalidText }}
@@ -65,8 +66,8 @@ export default defineComponent({
 .p-field-group {
     margin-bottom: 1rem;
     .label-box {
-        display: inline-flex;
-        align-items: flex-start;
+        display: flex;
+        align-items: center;
     }
     .form-label {
         @apply text-gray-900;
@@ -75,13 +76,23 @@ export default defineComponent({
         font-weight: bold;
         letter-spacing: 0;
         margin-bottom: 0.25rem;
-        line-height: 1.3125rem;
+        line-height: 1.4rem;
     }
     .required-mark {
         @apply text-alert;
         font-size: 0.25rem;
         line-height: 1.2rem;
         margin-left: 0.1rem;
+    }
+    .optional-mark {
+        @apply text-gray-500;
+        font-size: 0.75rem;
+        line-height: 1.4;
+        margin-left: 0.25rem;
+        margin-bottom: 0.25rem;
+    }
+    .help-msg {
+        @apply block mb-2;
     }
     .invalid-feedback {
         @apply text-alert;

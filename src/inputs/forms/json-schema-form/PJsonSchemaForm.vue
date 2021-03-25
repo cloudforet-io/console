@@ -139,12 +139,21 @@ export default {
                             },
                         },
                     };
-                    const requiredMarkUiSchema = {
+                    // const requiredMarkUiSchema = {
+                    //     component: 'span',
+                    //     fieldOptions: {
+                    //         class: ['required-mark'],
+                    //         domProps: {
+                    //             innerHTML: '*',
+                    //         },
+                    //     },
+                    // };
+                    const optionalMarkUiSchema = {
                         component: 'span',
                         fieldOptions: {
-                            class: ['required-mark'],
+                            class: ['optional-mark'],
                             domProps: {
-                                innerHTML: '*',
+                                innerHTML: '(optional)',
                             },
                         },
                     };
@@ -167,7 +176,8 @@ export default {
                     };
 
                     children.label = labelUiSchema;
-                    if (required?.includes(key)) children.required = requiredMarkUiSchema;
+                    // if (required?.includes(key)) children.required = requiredMarkUiSchema;
+                    if (!required?.includes(key)) children.optional = optionalMarkUiSchema;
                     children.input = inputUiSchema;
                     // TODO: need to add number, select, etc
                     if (required?.includes(key)) {
@@ -231,6 +241,13 @@ export default {
             font-size: 0.25rem;
             line-height: 1.2rem;
             margin-left: 0.1rem;
+        }
+        .optional-mark {
+            @apply text-gray-500;
+            font-size: 0.75rem;
+            line-height: 1.4;
+            margin-left: 0.25rem;
+            margin-bottom: 0.25rem;
         }
         .form-control {
             @apply text-gray-900 border border-gray-300;
