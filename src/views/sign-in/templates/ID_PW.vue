@@ -2,7 +2,7 @@
     <div class="local-wrapper">
         <form class="form">
             <p-field-group :label="isAdmin ? $t('COMMON.SIGN_IN.ADMIN_ID') : $t('COMMON.SIGN_IN.USER_ID')"
-                           :invalid="isIdValid === false"
+                           :invalid="isIdValid === false" required
             >
                 <template #default="{invalid}">
                     <p-text-input v-model="userId"
@@ -15,6 +15,7 @@
                 </template>
             </p-field-group>
             <p-field-group :label="$t('COMMON.SIGN_IN.PASSWORD')"
+                           required
                            :invalid="isPasswordValid === false"
             >
                 <template #default="{invalid}">
