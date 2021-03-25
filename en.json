@@ -824,7 +824,7 @@
 				"PRIORITY_LABEL": "Priority",
 				"TAB_ADD_TAG": "Add Tags",
 				"TAB_CONFIRM_CREDENTIALS": "Confirm Credentials",
-				"TAB_SET_COLLECTOR": "Configure Credentials",
+				"TAB_SET_COLLECTOR": "Type Base Information",
 				"TITLE": "Create Collector",
 				"VERSION_INVALID_REQUIRED": "Select version.",
 				"VERSION_LABEL": "Version"
