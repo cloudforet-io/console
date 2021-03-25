@@ -57,7 +57,9 @@ export interface EnumItem {
 }
 export interface EnumOptions {
     [data: string]: EnumItem|string|undefined;
-    items?: EnumItem|string;
+
+    // @ts-ignore
+    items?: Record<string, EnumItem|string>;
     default?: any;
 }
 
