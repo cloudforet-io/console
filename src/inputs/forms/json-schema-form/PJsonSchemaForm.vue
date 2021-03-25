@@ -15,7 +15,8 @@ import {
     cloneDeep, sortBy, flatMap, chain,
 } from 'lodash';
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import VueFormJsonSchema from 'vue-form-json-schema/dist/vue-form-json-schema.esm';
@@ -49,6 +50,7 @@ export default {
         },
     },
     setup(props: JsonSchemaFormProps, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             proxyModel: makeProxy('model', props, emit),
             uiSchema: [] as UiSchema[],
@@ -153,7 +155,7 @@ export default {
                         fieldOptions: {
                             class: ['optional-mark'],
                             domProps: {
-                                innerHTML: '(optional)',
+                                innerHTML: vm.$t('COMPONENT.FIELD_GROUP.OPTIONAL'),
                             },
                         },
                     };

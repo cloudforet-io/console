@@ -5,7 +5,7 @@
                 <label v-if="label" class="form-label">{{ label }}</label>
             </slot>
             <!--            <span v-if="required" class="required-mark">*</span>-->
-            <span v-if="!required" class="optional-mark">(optional)</span>
+            <span v-if="!required" class="optional-mark">({{ $t('COMPONENT.FIELD_GROUP.OPTIONAL') }})</span>
         </div>
         <small v-if="$scopedSlots.help || helpText" class="help-msg">
             <slot name="help">{{ helpText }}</slot>
