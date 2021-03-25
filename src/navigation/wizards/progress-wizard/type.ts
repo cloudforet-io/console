@@ -1,11 +1,18 @@
-import {
-    ProgressTabBarProps,
-} from '@/navigation/wizards/progress-wizard/progress-tab-bar/type';
 
-export interface ProgressWizardProps extends ProgressTabBarProps {
-    cancelBtnBind: any;
-    navigationBtnBind: any;
-    confirmBtnBind: any;
+export interface ProgressTab {
+    name: string;
+    label?: string;
+    help?: string;
+    optional?: string;
+}
+
+
+export interface ProgressWizardProps {
+    tabs: ProgressTab[];
+    activeIdx: number;
+    invalidState: {
+        [key: string]: boolean;
+    };
     loading: boolean;
     disabled: boolean;
 }

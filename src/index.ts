@@ -72,7 +72,6 @@ export { default as PProgressBar } from './data-display/progress-bar/PProgressBa
 export { default as PSearch } from './inputs/search/search/PSearch.vue';
 export { default as PSelectableItem } from './others/deprecated/selectable-item/PSelectableItem.vue';
 export { default as PStatus } from './data-display/status/PStatus.vue';
-export { default as PProgressTabBar } from './navigation/wizards/progress-wizard/progress-tab-bar/PProgressTabBar.vue';
 export { default as PTabBar } from './navigation/tabs/tab/tab-bar/PTabBar.vue';
 export { default as PTag } from './data-display/tags/PTag.vue';
 export { default as PTextEditor } from './inputs/text-editor/PTextEditor.vue';

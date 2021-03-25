@@ -2,18 +2,38 @@
     <p-pane-layout class="p-progress-wizard">
         <slot name="top">
             <slot name="progress">
-                <p-progress-tab-bar :tabs="tabs"
-                                    :active-idx.sync="proxyActiveIdx"
-                                    :invalid-state="invalidState"
-                                    @changeTab="onChangeTab"
-                >
-                    <template v-for="(tab) in tabs" :slot="`progress-${tab.name}`">
-                        <slot :name="`progress-${tab.name}`" />
-                    </template>
-                    <template v-for="(tab) in tabs" :slot="`help-${tab.name}`">
-                        <slot :name="`help-${tab.name}`" />
-                    </template>
-                </p-progress-tab-bar>
+                <div class="progress-tab-nav">
+                    <div v-for="(tab, idx) in tabs"
+                         :key="tab.name"
+                         class="tab-nav-item"
+                         :class="{
+                             active: idx === proxyActiveIdx,
+                             invalid: invalidState[tab.name],
+                         }"
+                         :style="{width: tabWidth}"
+                         @click="onChangeTab(idx)"
+                    >
+                        <span class="triangle-bg" />
+                        <span class="triangle" />
+                        <slot :name="`progress-${tab.name}`" :tab="tab">
+                            <span>{{ Number(idx) + 1 }}.
+                                {{ tab.label || tab.name }} {{ tab.optional ? `(${$t('COMPONENT.PROGRESS_WIZARD.OPTIONAL')})`: '' }}
+                            </span>
+                        </slot>
+
+                        <slot :name="`help-${tab.name}`" :tab="tab">
+                            <p-tooltip-button v-if="tab.help"
+                                              class="help" :tooltip="tab.help" position="top"
+                            >
+                                <template #button>
+                                    <p-i name="ic_tooltip" width="1rem"
+                                         height="1rem"
+                                    />
+                                </template>
+                            </p-tooltip-button>
+                        </slot>
+                    </div>
+                </div>
             </slot>
             <template v-if="activeTab">
                 <aside v-if="activeTab.alert" class="caution">
@@ -30,18 +50,18 @@
         </slot>
 
         <template v-if="activeTab">
-            <div class="step-head">
-                <div class="step-title">
-                    <span class="step">
-                        {{ $t('COMPONENT.PROGRESS_WIZARD.STEP', {step: proxyActiveIdx + 1 }) }}.
-                    </span>
-                    <span class="title">{{ activeTab.label || activeTab.name }}</span>
-                    <span v-if="activeTab.optional" class="optional"> ({{ $t('COMPONENT.PROGRESS_WIZARD.OPTIONAL') }})</span>
-                </div>
-                <div class="step-appendix">
-                    <slot :name="`step-append-${activeTab.name}`" :tab="activeTab" />
-                </div>
-            </div>
+            <!--            <div class="step-head">-->
+            <!--                <div class="step-title">-->
+            <!--                    <span class="step">-->
+            <!--                        {{ $t('COMPONENT.PROGRESS_WIZARD.STEP', {step: proxyActiveIdx + 1 }) }}.-->
+            <!--                    </span>-->
+            <!--                    <span class="title">{{ activeTab.label || activeTab.name }}</span>-->
+            <!--                    <span v-if="activeTab.optional" class="optional"> ({{ $t('COMPONENT.PROGRESS_WIZARD.OPTIONAL') }})</span>-->
+            <!--                </div>-->
+            <!--                <div class="step-appendix">-->
+            <!--                    <slot :name="`step-append-${activeTab.name}`" :tab="activeTab" />-->
+            <!--                </div>-->
+            <!--            </div>-->
             <div class="contents">
                 <keep-alive>
                     <slot :name="`contents-${activeTab.name}`" :tab="activeTab" />
@@ -51,32 +71,39 @@
 
         <slot name="bottom">
             <div class="bottom">
-                <p-button v-bind="mergedCancelBtnBind"
+                <p-button :outline="true"
+                          style-type="gray900"
+                          size="lg"
                           class="txt-btn" @click="$emit('cancel', $event)"
                 >
                     {{ $t('COMPONENT.PROGRESS_WIZARD.CANCEL') }}
                 </p-button>
                 <div class="nav-btn-box">
                     <p-button v-if="!isFirstTab"
-                              v-bind="mergedNavBtnBind"
+                              :outline="true"
+                              style-type="secondary"
+                              size="lg"
                               @click="onClickPrev"
                     >
                         <p-i name="ic_back" color="transparent inherit" />{{ $t('COMPONENT.PROGRESS_WIZARD.PREV') }}
                     </p-button>
                     <p-button v-if="!isLastTab"
-                              v-bind="mergedNavBtnBind"
+                              :outline="true"
+                              style-type="secondary"
+                              size="lg"
                               @click="onClickNext"
                     >
                         {{ $t('COMPONENT.PROGRESS_WIZARD.NEXT') }}<p-i name="ic_back" color="transparent inherit" dir="down" />
                     </p-button>
-                    <p-loading-button :button-bind="mergedConfirmBtnBind"
-                                      :loading="loading"
-                                      :disabled="disabled"
-                                      class="txt-btn"
-                                      @click="$emit('confirm', tabs, $event)"
+                    <p-button :loading="loading"
+                              :disabled="disabled"
+                              class="txt-btn"
+                              style-type="secondary"
+                              size="lg"
+                              @click="$emit('confirm', tabs, $event)"
                     >
                         {{ $t('COMPONENT.PROGRESS_WIZARD.CONFIRM') }}
-                    </p-loading-button>
+                    </p-button>
                 </div>
             </div>
         </slot>
@@ -90,51 +117,22 @@ import {
 import { makeProxy } from '@/util/composition-helpers';
 
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
-import PProgressTabBar from '@/navigation/wizards/progress-wizard/progress-tab-bar/PProgressTabBar.vue';
 import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import {
     ProgressWizardProps,
 } from '@/navigation/wizards/progress-wizard/type';
-import PLoadingButton from '@/others/deprecated/loading-button/PLoadingButton.vue';
+import { size } from 'lodash';
+import PTooltipButton from '@/others/deprecated/tooltip-button/PTooltipButton.vue';
 
-
-const setPagination = (props, state, emit) => {
-    const isFirstTab = computed(() => state.proxyActiveIdx - 1 < 0);
-    const isLastTab = computed(() => state.proxyActiveIdx + 1 >= props.tabs.length);
-
-    const onClickPrev = () => {
-        if (isFirstTab.value) return;
-        emit('changeStep', state.proxyActiveIdx, state.proxyActiveIdx - 1);
-        state.proxyActiveIdx -= 1;
-    };
-    const onClickNext = () => {
-        if (isLastTab.value) return;
-        emit('changeStep', state.proxyActiveIdx, state.proxyActiveIdx + 1);
-        state.proxyActiveIdx += 1;
-    };
-
-    const onChangeTab = (now, beforeIdx) => {
-        emit('changeStep', beforeIdx, now);
-    };
-
-    return {
-        isFirstTab,
-        isLastTab,
-        onClickPrev,
-        onClickNext,
-        onChangeTab,
-    };
-};
 
 export default {
     name: 'PProgressWizard',
     components: {
-        PLoadingButton,
         PPaneLayout,
-        PProgressTabBar,
         PI,
         PButton,
+        PTooltipButton,
     },
     props: {
         tabs: {
@@ -150,18 +148,6 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        cancelBtnBind: {
-            type: Object,
-            default: () => ({}),
-        },
-        navigationBtnBind: {
-            type: Object,
-            default: () => ({}),
-        },
-        confirmBtnBind: {
-            type: Object,
-            default: () => ({}),
-        },
         loading: {
             type: Boolean,
             default: false,
@@ -173,37 +159,112 @@ export default {
     },
     setup(props: ProgressWizardProps, { emit }) {
         const state = reactive({
+            tabWidth: computed(() => `${100 / size(props.tabs)}%`),
             proxyActiveIdx: makeProxy('activeIdx', props, emit),
             activeTab: computed(() => props.tabs[state.proxyActiveIdx]),
-            mergedCancelBtnBind: computed(() => ({
-                styleType: 'gray900',
-                size: 'lg',
-                outline: true,
-                ...props.cancelBtnBind,
-            })),
-            mergedNavBtnBind: computed(() => ({
-                styleType: 'secondary',
-                size: 'lg',
-                outline: true,
-                ...props.navigationBtnBind,
-            })),
-            mergedConfirmBtnBind: computed(() => ({
-                styleType: 'secondary',
-                size: 'lg',
-                ...props.confirmBtnBind,
-            })),
+            isFirstTab: computed(() => state.proxyActiveIdx - 1 < 0),
+            isLastTab: computed(() => state.proxyActiveIdx + 1 >= props.tabs.length),
         });
+
+        const onClickPrev = () => {
+            if (state.isFirstTab) return;
+            emit('changeStep', state.proxyActiveIdx, state.proxyActiveIdx - 1);
+            state.proxyActiveIdx -= 1;
+        };
+        const onClickNext = () => {
+            if (state.isLastTab) return;
+            emit('changeStep', state.proxyActiveIdx, state.proxyActiveIdx + 1);
+            state.proxyActiveIdx += 1;
+        };
+
+        const onChangeTab = (idx) => {
+            if (props.activeIdx !== idx) {
+                emit('changeStep', props.activeIdx, idx);
+                state.proxyActiveIdx = idx;
+            }
+        };
 
         return {
             ...toRefs(state),
-            ...setPagination(props, state, emit),
+            onClickPrev,
+            onClickNext,
+            onChangeTab,
         };
     },
 };
 </script>
 
-<style lang="postcss" scoped>
+<style lang="postcss">
 .p-progress-wizard {
+    $height: 2.5rem;
+
+    @define-mixin triangle-color $size, $color {
+        border-left: $size solid $color;
+    }
+
+    @define-mixin triangle $size, $z-idx, $color {
+        position: absolute;
+        right: calc($(size) * -1);
+        z-index: $z-idx;
+        width: 0;
+        height: 0;
+        border-top: $size solid transparent;
+        border-bottom: $size solid transparent;
+
+        @mixin triangle-color $size, $color;
+    }
+
+    .progress-tab-nav {
+        @apply flex w-full items-center justify-center;
+        height: $height;
+        .tab-nav-item {
+            @apply relative flex items-center justify-center h-full p-0 text-sm cursor-pointer bg-white border-t border-b border-black text-black;
+            flex: 1 1 auto;
+            .triangle {
+                @mixin triangle calc(($(height) / 2) - 1px), 2, theme('colors.white');
+            }
+            .triangle-bg {
+                @mixin triangle calc($(height) / 2), 1, theme('colors.black');
+            }
+            &:last-child {
+                @apply border-r border-black;
+                .triangle, .triangle-bg {
+                    display: none;
+                }
+            }
+            &:first-child {
+                @apply border-l border-black;
+            }
+            &.active {
+                @apply text-lg font-bold bg-black text-white;
+                .triangle {
+                    @mixin triangle-color calc(($(height) / 2) - 1px), theme('colors.black');
+                }
+                .triangle-bg {
+                    @mixin triangle-color calc($(height) / 2), theme('colors.black');
+                }
+            }
+            &.invalid {
+                @apply border-alert text-alert bg-white;
+                .triangle {
+                    @mixin triangle-color calc(($(height) / 2) - 1px), theme('colors.white');
+                }
+                .triangle-bg {
+                    @mixin triangle-color calc($(height) / 2), theme('colors.alert');
+                }
+                &.active {
+                    @apply bg-alert border-alert text-white;
+                    .triangle {
+                        @mixin triangle-color calc(($(height) / 2) - 1px), theme('colors.alert');
+                    }
+                }
+            }
+            .help {
+                margin-left: 0.5rem;
+            }
+        }
+    }
+
     padding: 1.5rem 1rem 1rem 1rem;
     .step-head {
         @apply flex w-full border-b border-gray-200 pb-3;

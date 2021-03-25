@@ -44,15 +44,6 @@ const getProps = () => ({
     invalidState: {
         default: object('invalidState', {}),
     },
-    cancelBtnBind: {
-        default: object('cancelBtnBind', {}),
-    },
-    navigationBtnBind: {
-        default: object('navigationBtnBind', {}),
-    },
-    confirmBtnBind: {
-        default: object('confirmBtnBind', {}),
-    },
     loading: {
         default: boolean('loading', false),
     },
