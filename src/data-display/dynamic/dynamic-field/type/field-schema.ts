@@ -55,13 +55,14 @@ export interface EnumItem {
     options?: DynamicFieldOptions;
     default?: any;
 }
-export interface EnumOptions {
-    [data: string]: EnumItem|string|undefined;
-
-    // @ts-ignore
-    items?: Record<string, EnumItem|string>;
+type EnumValue = EnumItem|string;
+export type EnumOptions = {
+    [data: string]: EnumValue;
     default?: any;
-}
+} | {
+    items?: Record<string, EnumValue>;
+    default?: any;
+} & CommonOptions
 
 export interface SizeOptions extends CommonOptions {
     display_unit?: 'BYTES | KB | MB | GB | TB | PB';
