@@ -67,7 +67,7 @@
                 <span class="scale-group">
                     <span class="scale" />
                     <span>
-                        <span class="tick">{{ halfCapacity }}</span>
+                        <span class="tick">{{ capacity / 2 }}</span>
                         <span class="unit">{{ unit }}</span>
                     </span>
                 </span>
@@ -88,8 +88,6 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { SETTINGS_TYPE } from '@/views/automation/spot-automation/config';
-
-const DEFAULT_RATIO = 50;
 
 interface Props {
     desiredCapacity: number;
@@ -118,7 +116,7 @@ export default {
                 { name: SETTINGS_TYPE.count, label: vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_TYPE_COUNT') },
             ]),
             selectedType: SETTINGS_TYPE.ratio,
-            onDemand: DEFAULT_RATIO,
+            onDemand: 0,
             spotInstance: computed({
                 get: () => {
                     const res = state.capacity - state.onDemand;
@@ -147,7 +145,7 @@ export default {
 
         const emitChange = () => {
             emit('change', {
-                onDemand: props.desiredCapacity === 0 ? null : state.onDemand,
+                onDemand: state.onDemand,
                 type: state.selectedType,
             });
         };
@@ -155,12 +153,7 @@ export default {
 
         const changeType = (type) => {
             state.selectedType = type;
-
-            if (type === SETTINGS_TYPE.count) {
-                state.onDemand = state.halfCapacity;
-            } else {
-                state.onDemand = DEFAULT_RATIO;
-            }
+            state.onDemand = 0;
 
             emitChange();
         };
