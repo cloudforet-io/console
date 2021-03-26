@@ -141,6 +141,7 @@
 				"CREATE_TITLE": "",
 				"INSTANCE_TYPE": {
 					"LABEL": "",
+					"ONE_MORE_REQUIRED": "",
 					"OPTIMIZED_TYPE": ""
 				},
 				"SCHEDULE_POLICY": {
