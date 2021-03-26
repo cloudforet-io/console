@@ -7,8 +7,11 @@
             <section class="resource-type-list">
                 <div v-for="(item, i) in supportedResourceTypeItems" :key="i" class="resource-type-wrapper"
                      :class="{selected: item.name === selectedResourceTypeItem.name}"
+                     @click="selectedResourceTypeIndex = i"
                 >
-                    <p-radio :selected="item.name === selectedResourceTypeItem.name" :value="true" class="radio">
+                    <p-radio :selected="item.name === selectedResourceTypeItem.name" :value="true" class="radio"
+                             @click.stop="selectedResourceTypeIndex = i"
+                    >
                         <template #icon>
                             <p-i v-if="item.name === selectedResourceTypeItem.name"
                                  name="ic_checkbox_circle--checked"
@@ -39,7 +42,6 @@
                                   :type-options="typeOptionState"
                                   :fetch-options="fetchOptionState"
                                   :field-handler="fieldHandler"
-                                  @init="onFetchTable"
                                   @fetch="onFetchTable"
                                   @select="onSelectTable"
                 />
@@ -295,9 +297,13 @@ export default {
         /* Init */
         (async () => {
             await getSupportedResourceTypes();
-            if (state.selectedResourceTypeItem) {
-                await getPageSchema();
-            }
+
+            watch(() => state.selectedResourceTypeItem, async (item) => {
+                if (item) {
+                    await getPageSchema();
+                    await onFetchTable(fetchOptionState);
+                }
+            }, { immediate: true });
         })();
 
 

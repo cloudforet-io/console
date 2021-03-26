@@ -30,15 +30,26 @@
             />
         </p-pane-layout>
 
-        <p-pane-layout class="instance-type section" />
+        <p-pane-layout class="instance-type section">
+            <p class="title">
+                {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.LABEL') }}
+            </p>
+            <instance-type-selection :resource-id="selectedResource ? selectedResource.cloud_service_id : ''"
+                                     :resource-type="selectedResourceType"
+                                     @change="onChangeInstanceType"
+            />
+        </p-pane-layout>
 
         <div class="button-group">
             <p-button class="text-button" style-type="primary-dark" size="lg"
+                      :loading="loading"
+                      :disabled="showValidation && !isAllValid"
                       @click="onClickCreate"
             >
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CREATE') }}
             </p-button>
             <p-button class="text-button" style-type="outline gray900" size="lg"
+                      :disabled="loading"
                       @click="onClickGoBack"
             >
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CANCEL') }}
@@ -57,6 +68,7 @@ import {
 import ResourceSelection from '@/views/automation/spot-automation/modules/ResourceSelection.vue';
 import BaseInformationInput from '@/views/automation/spot-automation/modules/BaseInformationInput.vue';
 import SchedulePolicySettings from '@/views/automation/spot-automation/modules/SchedulePolicySettings.vue';
+import InstanceTypeSelection from '@/views/automation/spot-automation/modules/InstanceTypeSelection.vue';
 import { SETTINGS_TYPE } from '@/views/automation/spot-automation/config';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
@@ -64,6 +76,7 @@ import { store } from '@/store';
 export default {
     name: 'AddSpotGroupPage',
     components: {
+        InstanceTypeSelection,
         SchedulePolicySettings,
         BaseInformationInput,
         ResourceSelection,
@@ -99,6 +112,7 @@ export default {
                 };
             }),
             isAllValid: computed(() => state.isResourceValid && state.isBaseInfoValid),
+            loading: false,
         });
 
         const routeState = reactive({
@@ -115,32 +129,31 @@ export default {
         };
 
         const onChangeResource = ({ resource, resourceType }, isValid) => {
-            console.debug('change resource', resource, resourceType, isValid);
             state.selectedResource = resource;
             state.selectedResourceType = resourceType;
             state.isResourceValid = isValid;
-            // TODO
         };
 
         const onChangeBaseInfo = ({ name, tags }, isValid) => {
-            console.debug('change base info', name, tags, isValid);
             state.name = name;
             state.tags = tags;
             state.isBaseInfoValid = isValid;
-            // TODO
         };
 
         const onChangeSchedulePolicy = ({ onDemand, type }) => {
-            console.debug('change schedule policy', onDemand, type);
             state.onDemand = onDemand;
             state.onDemandType = type;
-            // TODO
+        };
+
+        const onChangeInstanceType = () => {
+            console.debug('change instance type');
         };
 
         const onClickCreate = async () => {
             state.showValidation = true;
             if (!state.isAllValid) return;
 
+            state.loading = true;
             const params: any = {
                 name: state.name,
                 resource_id: state.selectedResource.cloud_service_id,
@@ -153,8 +166,11 @@ export default {
 
             try {
                 await SpaceConnector.client.spotAutomation.spotGroup.create(params);
+                vm.$router.push({ name: 'spotGroup' });
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
 
@@ -171,6 +187,7 @@ export default {
             onChangeResource,
             onChangeBaseInfo,
             onChangeSchedulePolicy,
+            onChangeInstanceType,
         };
     },
 };
