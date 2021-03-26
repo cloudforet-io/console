@@ -54,24 +54,24 @@
                             </div>
                         </div>
                         <div class="right-part grid grid-cols-12 gap-1">
-                            <div v-for="colNum of range(6)" :key="colNum"
+                            <div v-for="colNum of range(1, 7)" :key="colNum"
                                  class="col-wrapper col-span-2"
                             >
                                 <template v-if="rowNum === -1">
-                                    <span v-if="projectSummaryData[colNum * thisPage]" class="project-name">
-                                        <p-i v-if="projectSummaryData[colNum * thisPage].isFavorite" name="ic_bookmark"
+                                    <span v-if="projectSummaryData[colNum * thisPage - 1]" class="project-name">
+                                        <p-i v-if="projectSummaryData[colNum * thisPage - 1].isFavorite" name="ic_bookmark"
                                              class="favorite-icon"
                                              width="0.625rem" height="0.625rem"
                                         />
-                                        <span>{{ projectSummaryData[colNum * thisPage].projectName }}</span>
+                                        <span>{{ projectSummaryData[colNum * thisPage - 1].projectName }}</span>
                                     </span>
                                 </template>
                                 <template v-else>
-                                    <router-link v-if="getProjectBoxCount(rowNum, colNum * thisPage) > 0"
-                                                 :to="projectSummaryLinkFormatter(rowNum, colNum * thisPage)"
+                                    <router-link v-if="getProjectBoxCount(rowNum, colNum * thisPage - 1) > 0"
+                                                 :to="projectSummaryLinkFormatter(rowNum, colNum * thisPage - 1)"
                                     >
-                                        <div class="box" :class="getProjectBoxStatus(rowNum, colNum * thisPage)">
-                                            <span class="box-text">{{ getProjectBoxCount(rowNum, colNum * thisPage) }}</span>
+                                        <div class="box" :class="getProjectBoxStatus(rowNum, colNum * thisPage - 1)">
+                                            <span class="box-text">{{ getProjectBoxCount(rowNum, colNum * thisPage - 1) }}</span>
                                         </div>
                                     </router-link>
                                     <div v-else class="box empty">
