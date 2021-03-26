@@ -103,9 +103,13 @@ export default {
     @apply bg-gray-100;
     height: auto;
     .page-contents {
-        @apply grid grid-flow-row grid-cols-12 p-6 mx-auto;
+        @apply bg-gray-100 grid-cols-12;
+        display: grid;
+        grid-auto-flow: row;
         max-width: 1368px;
         grid-gap: 1.25rem;
+        padding: 1.5rem;
+        margin: 0 auto;
     }
 }
 
