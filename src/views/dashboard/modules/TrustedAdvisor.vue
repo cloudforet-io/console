@@ -58,7 +58,10 @@
                                  class="col-wrapper col-span-2"
                             >
                                 <template v-if="rowNum === -1">
-                                    <span v-if="projectSummaryData[colNum * thisPage - 1]" class="project-name">
+                                    <span v-if="projectSummaryData[colNum * thisPage - 1]"
+                                          v-tooltip.top="projectSummaryData[colNum * thisPage - 1].tooltipText"
+                                          class="project-name"
+                                    >
                                         <p-i v-if="projectSummaryData[colNum * thisPage - 1].isFavorite" name="ic_bookmark"
                                              class="favorite-icon"
                                              width="0.625rem" height="0.625rem"
@@ -139,6 +142,7 @@ interface LegendData {
 interface ProjectSummaryData {
     projectId: string;
     projectName: string;
+    tooltipText: string;
     counts: [STATUS, number][];
     isFavorite: boolean;
 }
@@ -287,7 +291,7 @@ export default {
             };
         };
         const projectSummaryLinkFormatter = (rowNum, colNum) => {
-            const status = getProjectBoxStatus(rowNum, colNum * state.thisPage);
+            const status = getProjectBoxStatus(rowNum, colNum);
             const category = CATEGORY[rowNum];
             const projectId = state.projectSummaryData[colNum]?.projectId;
 
@@ -347,6 +351,7 @@ export default {
                     projectSummaryData.push({
                         projectId,
                         projectName: state.projects[projectId]?.name,
+                        tooltipText: state.projects[projectId]?.label,
                         counts,
                         isFavorite: !!find(state.favoriteProjects, { id: projectId }),
                     });
