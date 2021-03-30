@@ -3,20 +3,20 @@
         <div class="card-header" :class="{'short': isShort}">
             <div class="left-wrapper">
                 <p class="project-group-nav">
-                    <span class="project-group-info">Project Group</span>
+                    <span class="project-group-info">{{ projectGroupName }}</span>
                     <p-i name="ic_breadcrumb_arrow" width="0.75rem" height="0.75rem"
                          class="project-group-info opacity-50" color="inherit white"
                     />
-                    <span class="project-info">Project</span>
+                    <span class="project-info">{{ projectName }}</span>
                 </p>
                 <p class="spot-group-title">
-                    Spot Group Name
+                    {{ cardData.name }}
                 </p>
             </div>
             <div class="right-wrapper">
                 <span class="spot-group-region-date">
                     <span class="opacity-50 mr-2">리전</span>
-                    Asia Pacific (Singapore) ap-southeast-1
+                    {{ cardData.region_code }}
                     <span class="opacity-50 mr-2 ml-4">생성</span>
                     {{ cardData.created_at }}
                 </span>
@@ -29,18 +29,24 @@
                 </div>
             </div>
         </div>
-<!--        <p-divider />-->
         <div class="card-body" :class="{'short': isShort}">
-            <spot-group-card-desktop class="card-desktop-version"
+            <spot-group-card-desktop v-if="!loading"
+                                     class="card-desktop-version"
                                      :card-data="cardData"
+                                     :cloud-service-data="cloudServiceData"
                                      :is-short="isShort"
             />
-            <spot-group-card-mobile class="card-mobile-version" />
+            <spot-group-card-mobile v-if="!loading" class="card-mobile-version" />
+
+            <p-lottie v-if="loading" name="thin-spinner" class="loader"
+                      auto
+                      :size="2.5"
+            />
         </div>
         <div class="card-footer" :class="{'short': isShort}">
             <span class="footer-region">
                 <span class="opacity-50 mr-2">리전</span>
-                Asia Pacific (Singapore) ap-southeast-1
+                {{ cardData.region_code }}
                 <span class="opacity-50 mr-2 ml-4">생성</span>
                 {{ cardData.created_at }}
             </span>
@@ -49,10 +55,12 @@
 </template>
 
 <script lang="ts">
-import { PDivider, PI } from '@spaceone/design-system';
+import { PI, PLottie } from '@spaceone/design-system';
 import SpotGroupCardDesktop from '@/views/automation/spot-automation/modules/spot-group-card/SpotGroupCardDesktop.vue';
 import SpotGroupCardMobile from '@/views/automation/spot-automation/modules/spot-group-card/SpotGroupCardMobile.vue';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
+import { reactive, toRefs } from '@vue/composition-api';
+import { SpaceConnector } from '@/lib/space-connector';
 
 export default {
     name: 'SpotGroupCard',
@@ -60,8 +68,8 @@ export default {
         SpotGroupCardDesktop,
         SpotGroupCardMobile,
         FavoriteButton,
-        PDivider,
         PI,
+        PLottie,
     },
     props: {
         cardData: {
@@ -74,8 +82,41 @@ export default {
         },
     },
     setup(props) {
-        return {
+        const state = reactive({
+            projectName: '',
+            projectGroupName: '',
+            cloudServiceData: {} as any,
+            loading: true,
+        });
+        const getProjectName = async () => {
+            const project = await SpaceConnector.client.identity.project.get({
+                project_id: props.cardData.project_id,
+            });
+            state.projectName = project.name;
+            state.projectGroupName = project.project_group_info.name;
+        };
 
+        const getCloudServiceData = async () => {
+            state.loading = true;
+            try {
+                const cloudServiceData = await SpaceConnector.client.inventory.cloudService.get({
+                    // eslint-disable-next-line camelcase
+                    cloud_service_id: props.cardData.resource_id,
+                });
+                state.cloudServiceData.instanceNum = cloudServiceData.data.instances?.length || 0;
+                state.cloudServiceData.loadbalancerNum = cloudServiceData.data.load_balancer_arns?.length || 0;
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
+        };
+        (async () => {
+            await getProjectName();
+            await getCloudServiceData();
+        })();
+        return {
+            ...toRefs(state),
         };
     },
 };
@@ -217,6 +258,12 @@ export default {
         &:not(.short) {
             @mixin spread-case-card-body;
         }
+    }
+    .loader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding-top: 10%;
     }
 }
 .card-footer {

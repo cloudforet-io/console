@@ -37,7 +37,7 @@
         <div class="spot-card-divider" />
         <div class="instance-column">
             <p class="column-header">
-                INSTANCE
+                INSTANCE {{ cloudServiceData.status }}
             </p>
             <div class="column-title-wrapper">
                 <div>
@@ -45,7 +45,7 @@
                         인스턴스
                     </p>
                     <p class="column-number">
-                        6
+                        {{ cloudServiceData.instanceNum }}
                         <span class="column-number-unit">개</span>
                     </p>
                 </div>
@@ -68,28 +68,18 @@
         </div>
         <div class="spot-card-divider" />
         <div class="load-balancer-column">
-            <p class="column-header">
-                LOAD BALANCER
-            </p>
             <p class="column-title">
                 로드밸런서 (개수)
             </p>
             <p class="column-number">
-                1
-                <span class="column-number-unit" />
+                {{ cloudServiceData.loadbalancerNum }}
+                <span class="column-number-unit">개</span>
             </p>
             <p class="column-title">
-                Active Sessions
+                서비스 타입
             </p>
-            <p class="column-number">
-                0
-            </p>
-            <p class="column-title">
-                Throughput
-            </p>
-            <p class="column-number">
-                0
-                <span class="column-number-unit">MB/S</span>
+            <p class="column-text">
+                Auto Scaling Group
             </p>
         </div>
     </article>
@@ -110,6 +100,10 @@ export default {
         isShort: {
             type: Boolean,
             default: false,
+        },
+        cloudServiceData: {
+            type: Object,
+            default: () => ({}),
         },
     },
     setup(props) {

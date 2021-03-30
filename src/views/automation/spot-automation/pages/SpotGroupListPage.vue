@@ -30,7 +30,9 @@
              color="inherit transparent"
              @click="showCardView"
         />
-        <p-data-loader class="flex-grow" :data="items" :loading="loading" :class="{'short': isShort}">
+        <p-data-loader class="flex-grow" :data="items" :loading="loading"
+                       :class="{'short': isShort}"
+        >
             <div class="card-wrapper" :class="{'short': isShort}">
                 <div v-for="item in items" :key="item.spot_group_id" class="spot-group-card">
                     <spot-group-card :card-data="item"
@@ -130,14 +132,12 @@ export default {
                     ...d,
                     created_at: timestampFormatter(d.created_at, state.timezone),
                 }));
-                // state.items = [{ name: '1', created_at: '111', spot_group_id: 1 }, { name: '2', created_at: '222', spot_group_id: 2 }];
                 state.totalCount = res.total_count || 0;
                 state.loading = false;
             } catch (e) {
                 console.error(e);
             }
         };
-
 
         const showListView = () => {
             state.isShort = false;
@@ -208,7 +208,7 @@ export default {
         }
 
         @screen lg {
-            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
         }
     }
 }
