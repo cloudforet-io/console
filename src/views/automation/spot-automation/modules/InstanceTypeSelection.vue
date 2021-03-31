@@ -1,20 +1,52 @@
 <template>
     <div>
         <div class="toggle-wrapper" :class="{optimized: isOptimized}">
-            <p-toggle-button :value="isOptimized" @change="onToggleChange" />
+            <p-toggle-button :value="isOptimized" sync @change="onToggleChange" />
             <span class="label">{{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.OPTIMIZED_TYPE') }}</span>
         </div>
-        <table />
-        <p v-if="showValidation && !selectedInstanceType">
-            {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.ONE_MORE_REQUIRED') }}
-        </p>
+        <div class="table-wrapper">
+            <p-lottie v-if="loading" name="thin-spinner" :size="2"
+                      auto
+            />
+            <table v-else-if="types.size > 0">
+                <thead>
+                    <tr>
+                        <th />
+                        <th v-for="(type, i) in types" :key="i" class="header">
+                            {{ type }}
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr v-for="(items, size, rowIdx) in candidates" :key="rowIdx">
+                        <td class="header">
+                            {{ size }}
+                        </td>
+                        <template v-for="(type, idx) in types">
+                            <td :key="idx">
+                                <p-check-box v-if="items[type] !== undefined"
+                                             :selected="checkedTypes[size] && checkedTypes[size].includes(type)"
+                                             @change="onSelect(size, type, ...arguments)"
+                                />
+                            </td>
+                        </template>
+                    </tr>
+                </tbody>
+                <p v-if="showValidation && selectedTypes.length === 0">
+                    {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.ONE_MORE_REQUIRED') }}
+                </p>
+            </table>
+        </div>
     </div>
 </template>
 
 <script lang="ts">
-import { reactive, toRefs, watch } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
-import { PToggleButton } from '@spaceone/design-system';
+import { PCheckBox, PLottie, PToggleButton } from '@spaceone/design-system';
+import { cloneDeep, remove, forEach } from 'lodash';
 
 interface Props {
     resourceId: string;
@@ -22,9 +54,19 @@ interface Props {
     showValidation: boolean;
 }
 
+interface CandidateMap {
+    [size: string]: {
+        [type: string]: number;
+    };
+}
+
+interface SelectedType {
+    [size: string]: string[];
+}
+
 export default {
     name: 'InstanceTypeSelection',
-    components: { PToggleButton },
+    components: { PToggleButton, PCheckBox, PLottie },
     props: {
         resourceId: {
             type: String,
@@ -39,38 +81,119 @@ export default {
             default: false,
         },
     },
-    setup(props: Props) {
+    setup(props: Props, { emit }) {
         const state = reactive({
-            candidates: [],
+            loading: true,
+            candidates: {} as CandidateMap,
+            types: {} as Set<string>,
             isOptimized: true,
-            selectedInstanceType: '',
+            selectedTypes: {} as SelectedType,
+            optimizedTypes: {} as SelectedType,
+            checkedTypes: computed(() => (state.isOptimized ? state.optimizedTypes : state.selectedTypes)),
         });
+
+        const emitChange = () => {
+            const res: string[] = [];
+            forEach(state.checkedTypes, (types, size) => {
+                types.forEach(type => res.push(`${type}.${size}`));
+            });
+            emit('change', res);
+        };
 
         const onToggleChange = ({ value }) => {
             state.isOptimized = value;
+            emitChange();
         };
 
         const getCandidates = async () => {
             try {
+                state.loading = true;
                 const { results } = await SpaceConnector.client.spotAutomation.spotGroup.getCandidates({
                     resource_id: props.resourceId,
                     resource_type: props.resourceType,
+                }, { headers: { MOCK_MODE: true } });
+
+                const candidates = {} as CandidateMap;
+                const types = new Set<string>();
+                const optimizedTypes = {} as SelectedType;
+
+                results.forEach(({ type: str, priority }) => {
+                    const idx = str.indexOf('.');
+                    const size = str.slice(idx + 1);
+                    const type = str.slice(0, idx);
+
+                    if (!types.has(type)) types.add(type);
+                    if (!candidates[size]) candidates[size] = { [type]: priority };
+                    else candidates[size][type] = priority;
+
+                    if (priority > 0) {
+                        if (optimizedTypes[size]) optimizedTypes[size].push(type);
+                        else optimizedTypes[size] = [type];
+                    }
                 });
-                state.candidates = results;
-                console.debug('candidates', results);
+
+                state.candidates = candidates;
+                state.types = types;
+                state.optimizedTypes = optimizedTypes;
+                state.selectedTypes = {};
             } catch (e) {
                 console.error(e);
-                state.candidates = [];
+                state.candidates = {};
+                state.types = new Set<string>();
+                state.optimizedTypes = {};
+                state.selectedTypes = {};
+            } finally {
+                state.loading = false;
             }
         };
 
+        const checkSelectedAndOptimizedTypes = () => {
+            const selectedKeys = Object.keys(state.selectedTypes).sort();
+            const optimizedKeys = Object.keys(state.optimizedTypes).sort();
+            const selectedValues = selectedKeys.map(k => state.selectedTypes[k]);
+            const optimizedValues = optimizedKeys.map(k => state.optimizedTypes[k]);
+            return JSON.stringify(selectedKeys) === JSON.stringify(optimizedKeys)
+                && JSON.stringify(selectedValues) === JSON.stringify(optimizedValues);
+        };
+
+        const onSelect = (size, type, selected) => {
+            if (state.isOptimized) {
+                state.isOptimized = false;
+                state.selectedTypes = cloneDeep(state.optimizedTypes);
+            }
+
+            if (selected) {
+                if (!state.selectedTypes[size]) {
+                    state.selectedTypes[size] = [type];
+                } else if (!state.selectedTypes[size].includes(type)) {
+                    state.selectedTypes[size].push(type);
+                }
+            } else if (state.selectedTypes[size]) {
+                remove(state.selectedTypes[size], d => d === type);
+                if (state.selectedTypes[size].length === 0) delete state.selectedTypes[size];
+            }
+            state.selectedTypes = cloneDeep(state.selectedTypes);
+
+            if (!state.isOptimized && checkSelectedAndOptimizedTypes()) {
+                state.isOptimized = true;
+            }
+
+            emitChange();
+        };
+
         watch(() => props.resourceId, async (resourceId) => {
-            if (resourceId) await getCandidates();
+            if (resourceId) {
+                state.loading = true;
+                setTimeout(async () => {
+                    await getCandidates();
+                }, 2000);
+            }
         }, { immediate: true });
 
         return {
             ...toRefs(state),
             onToggleChange,
+            onSelect,
         };
     },
 };
@@ -89,6 +212,34 @@ export default {
         .label {
             @apply text-secondary;
         }
+    }
+}
+.table-wrapper {
+    width: 100%;
+    overflow: auto;
+    margin-top: 1.5rem;
+}
+table {
+    min-width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    table-layout: fixed;
+    tr {
+        display: flex;
+    }
+    th, td {
+        @apply border-b border-gray-200;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        min-width: 4.5rem;
+        min-height: 2rem;
+    }
+    .header {
+        font-size: 0.75rem;
+        line-height: 1.5;
+        font-weight: bold;
     }
 }
 </style>

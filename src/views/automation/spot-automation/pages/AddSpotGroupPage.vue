@@ -3,21 +3,21 @@
         <p-breadcrumbs :routes="routeState.route" />
         <p-page-title :title="$t('AUTOMATION.SPOT_AUTOMATION.ADD.CREATE_TITLE')" child @goBack="onClickGoBack" />
 
-        <p-pane-layout class="section cloud-service">
-            <p class="title">
-                {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CLOUD_SERVICE.LABEL') }}
-            </p>
-            <resource-selection :show-validation="showValidation"
-                                @change="onChangeResource"
-            />
-        </p-pane-layout>
-
         <p-pane-layout class="base-info section">
             <p class="title">
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.BASE_INFO.LABEL') }}
             </p>
             <base-information-input :show-validation="showValidation"
                                     @change="onChangeBaseInfo"
+            />
+        </p-pane-layout>
+
+        <p-pane-layout class="section cloud-service">
+            <p class="title">
+                {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CLOUD_SERVICE.LABEL') }}
+            </p>
+            <resource-selection :show-validation="showValidation"
+                                @change="onChangeResource"
             />
         </p-pane-layout>
 
@@ -99,17 +99,20 @@ export default {
             isBaseInfoValid: false,
             onDemand: 0,
             onDemandType: SETTINGS_TYPE.ratio,
+            recommendTypes: [] as string[],
             options: computed(() => {
+                const res: any = {};
                 if (state.onDemandType === SETTINGS_TYPE.ratio) {
-                    return {
-                        // eslint-disable-next-line camelcase
-                        min_ondemand_ratio: state.onDemand,
-                    };
-                }
-                return {
                     // eslint-disable-next-line camelcase
-                    min_ondemand_size: state.onDemand,
-                };
+                    res.min_ondemand_ratio = state.onDemand;
+                }
+                // eslint-disable-next-line camelcase
+                res.min_ondemand_size = state.onDemand;
+
+                // eslint-disable-next-line camelcase
+                if (state.recommendTypes.length > 0) res.recommend_types = state.recommendTypes;
+
+                return res;
             }),
             isAllValid: computed(() => state.isResourceValid && state.isBaseInfoValid),
             loading: false,
@@ -145,8 +148,8 @@ export default {
             state.onDemandType = type;
         };
 
-        const onChangeInstanceType = () => {
-            console.debug('change instance type');
+        const onChangeInstanceType = (types) => {
+            state.recommendTypes = types;
         };
 
         const onClickCreate = async () => {

@@ -19,6 +19,7 @@
                     </p>
                     <p-text-input v-model.number="onDemand" type="number"
                                   :min="0" :max="capacity"
+                                  :disabled="changeDisabled"
                                   @input="onInput"
                     >
                         <template #right-extra>
@@ -30,10 +31,7 @@
                     <p class="label spot-instance">
                         {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_SPOT_INSTANCE') }}
                     </p>
-                    <p-text-input v-model.number="spotInstance" type="number"
-                                  :min="0" :max="capacity"
-                                  @input="onInput"
-                    >
+                    <p-text-input :value="spotInstance" disabled type="number">
                         <template #right-extra>
                             {{ unit }}
                         </template>
@@ -85,7 +83,13 @@ import {
     PFieldGroup, PI, PRadio, PTextInput,
 } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed,
+    getCurrentInstance,
+    onUnmounted,
+    reactive,
+    toRefs,
+    watch,
 } from '@vue/composition-api';
 import { SETTINGS_TYPE } from '@/views/automation/spot-automation/config';
 
@@ -112,27 +116,20 @@ export default {
 
         const state = reactive({
             supportedSettingsTypeItems: computed(() => [
-                { name: SETTINGS_TYPE.ratio, label: vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_TYPE_RATIO') },
                 { name: SETTINGS_TYPE.count, label: vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_TYPE_COUNT') },
+                { name: SETTINGS_TYPE.ratio, label: vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_TYPE_RATIO') },
             ]),
-            selectedType: SETTINGS_TYPE.ratio,
+            selectedType: SETTINGS_TYPE.count,
             onDemand: 0,
-            spotInstance: computed({
-                get: () => {
-                    const res = state.capacity - state.onDemand;
-                    if (res < 0) return 0;
-                    return res;
-                },
-                set: (val) => {
-                    const res = state.capacity - val;
-                    if (res > state.capacity) state.onDemand = 0;
-                    else if (res < 0) state.onDemand = state.capacity;
-                    else state.onDemand = res;
-                },
+            spotInstance: computed(() => {
+                const res = state.capacity - state.onDemand;
+                if (res < 0) return 0;
+                return res;
             }),
+            changeDisabled: computed(() => state.selectedType === SETTINGS_TYPE.count && props.desiredCapacity === 0),
             leftWidth: computed(() => {
+                if (state.changeDisabled) return 0;
                 if (state.selectedType === SETTINGS_TYPE.ratio) return state.onDemand;
-                if (props.desiredCapacity === 0) return 50;
                 return 100 / props.desiredCapacity * state.onDemand;
             }),
             rightWidth: computed<number>(() => 100 - state.leftWidth),
@@ -163,11 +160,6 @@ export default {
         });
 
         const onInput = () => {
-            if (props.desiredCapacity === 0) {
-                state.onDemand = state.halfCapacity;
-                return;
-            }
-
             if (state.onDemand > state.capacity) state.onDemand = state.capacity;
             else if (state.onDemand < 0) state.onDemand = 0;
 
@@ -175,7 +167,7 @@ export default {
         };
 
         const startMove = () => {
-            if (props.desiredCapacity === 0) return;
+            if (state.changeDisabled) return;
             state.isMoving = true;
         };
 
@@ -188,7 +180,7 @@ export default {
         };
 
         const onMove = (event: MouseEvent) => {
-            if (state.dragContainer === null || !state.isMoving || props.desiredCapacity === 0) return;
+            if (state.dragContainer === null || !state.isMoving || state.changeDisabled) return;
 
             event.preventDefault();
 

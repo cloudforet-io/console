@@ -1,6 +1,6 @@
 {
   "CONSOLE_API": {
-    "ENDPOINT": "http://localhost:8080"
+    "ENDPOINT": "http://localhost:3000"
   },
   "GTAG_ID": "DISABLED",
   "DOMAIN_NAME": "spaceone",

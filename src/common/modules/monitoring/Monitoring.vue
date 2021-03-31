@@ -232,11 +232,11 @@ export default {
                 const res = await dataSourceApi({ monitoring_type: MONITORING_TYPE.metric });
                 state.dataTools = chain(res.results)
                     .map((d) => {
-                        if (d.plugin_info.options.supported_resource_type.some(t => props.resourceType === t)) {
+                        if (d.plugin_info.metadata.supported_resource_type.some(t => props.resourceType === t)) {
                             return {
                                 id: d.data_source_id,
                                 name: d.name,
-                                statisticsTypes: d.plugin_info.options.supported_stat || [STATISTICS_TYPE.average],
+                                statisticsTypes: d.plugin_info.metadata.supported_stat || [STATISTICS_TYPE.average],
                             };
                         }
                         return undefined;
