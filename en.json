@@ -156,9 +156,53 @@
 				}
 			},
 			"DETAIL": {
+				"BASE_INFO": {
+					"EDIT": "Edit",
+					"ON_DEMAND": "On Demand",
+					"ON_DEMAND_TOTAL_COST": "온디맨드 전체 비용",
+					"PROJECT": "Project",
+					"SPOT": "Spot",
+					"SPOT_TOTAL_COST": "실제 스팟 전체 비용",
+					"TITLE": "Base Information",
+					"USING_INSTANCE_TYPE": "사용중인 인스턴스 타입",
+					"VIEW_DETAIL": "view detail"
+				},
+				"BILLING": {
+					"BILLING_DETAIL": "비용 내역",
+					"COST": "비용",
+					"CUMULATIVE_SAVINGS_COST": "누적 절감 비용",
+					"INSTANCE": "인스턴스",
+					"INSTANCE_COUNT": "인스턴스 개수",
+					"LAST_MONTH": "지난 달",
+					"LAST_SIX_MONTH": "지난 6개월",
+					"ON_DEMAND_COST": "온디맨드 비용",
+					"SAVINGS_COST": "절감 비용",
+					"SPOT_COST": "스팟 비용",
+					"TITLE": "비용"
+				},
+				"INTERRUPT": {
+					"AFFECTED_INSTANCE": "영향받은 인스턴스",
+					"AZ": "가용 영역(AZ)",
+					"DAY": "Day",
+					"INTERRUPT_COUNT": "인터럽트 개수",
+					"INTERRUPT_DETAIL": "인터럽트 내역",
+					"LAST_TWO_WEEKS": "지난 14일",
+					"LATEST_DATE": "최근 날짜",
+					"MONTH": "Month",
+					"ON_DEMAND": "On Demand",
+					"SPOT": "Spot"
+				},
+				"MONITORING": {
+					"CPU_USAGE_RAGE": "CPU 사용률",
+					"DISK_USAGE_RATE": "디스크 사용률",
+					"HAS_PROBLEM": "문제있음",
+					"INSTNACE": "인스턴스",
+					"LOAD_BALANCER": "로드밸런서",
+					"NORMAL": "정상",
+					"TITLE": "Monitoring",
+					"TITLE_HELP_TEXT": "데이터 기준: 1일 평균값"
+				},
 				"TAB_HISTORY": "History",
-				"TAB_INSTANCE": "Instance",
-				"TAB_LOAD_BALANCER": "Load Balancer",
 				"TAB_MEMBER": "Member",
 				"TAB_SUMMARY": "Summary",
 				"TAB_TAG": "Tags"

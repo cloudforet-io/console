@@ -156,10 +156,54 @@
 				}
 			},
 			"DETAIL": {
-				"TAB_HISTORY": "",
-				"TAB_INSTANCE": "",
-				"TAB_LOAD_BALANCER": "",
-				"TAB_MEMBER": "",
+				"BASE_INFO": {
+					"EDIT": "",
+					"ON_DEMAND": "",
+					"ON_DEMAND_TOTAL_COST": "",
+					"PROJECT": "プロジェクト",
+					"SPOT": "",
+					"SPOT_TOTAL_COST": "",
+					"TITLE": "基本情報",
+					"USING_INSTANCE_TYPE": "",
+					"VIEW_DETAIL": "詳細を表示する"
+				},
+				"BILLING": {
+					"BILLING_DETAIL": "",
+					"COST": "",
+					"CUMULATIVE_SAVINGS_COST": "",
+					"INSTANCE": "",
+					"INSTANCE_COUNT": "",
+					"LAST_MONTH": "",
+					"LAST_SIX_MONTH": "",
+					"ON_DEMAND_COST": "",
+					"SAVINGS_COST": "",
+					"SPOT_COST": "",
+					"TITLE": ""
+				},
+				"INTERRUPT": {
+					"AFFECTED_INSTANCE": "",
+					"AZ": "",
+					"DAY": "日",
+					"INTERRUPT_COUNT": "",
+					"INTERRUPT_DETAIL": "",
+					"LAST_TWO_WEEKS": "",
+					"LATEST_DATE": "",
+					"MONTH": "月",
+					"ON_DEMAND": "",
+					"SPOT": ""
+				},
+				"MONITORING": {
+					"CPU_USAGE_RAGE": "",
+					"DISK_USAGE_RATE": "",
+					"HAS_PROBLEM": "",
+					"INSTNACE": "",
+					"LOAD_BALANCER": "",
+					"NORMAL": "",
+					"TITLE": "モニタリング",
+					"TITLE_HELP_TEXT": ""
+				},
+				"TAB_HISTORY": "履歴",
+				"TAB_MEMBER": "担当者",
 				"TAB_SUMMARY": "概要情報",
 				"TAB_TAG": "タグ"
 			},
