@@ -31,7 +31,10 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
-import { computed, reactive, toRefs, watch } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch, getCurrentInstance, ComponentRenderProxy,
+} from '@vue/composition-api';
+
 import {
     PChartLoader, PSkeleton,
 } from '@spaceone/design-system';
@@ -62,15 +65,16 @@ export default {
         PSkeleton,
     },
     setup() {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
             legends: computed(() => ([
                 {
-                    label: '온디맨드 비용',
+                    label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.ON_DEMAND_COST'),
                     color: blue[500],
                 },
                 {
-                    label: '스팟 비용',
+                    label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.SPOT_COST'),
                     color: peacock[400],
                 },
             ])),
@@ -139,7 +143,6 @@ export default {
                 valueAxis.renderer.opposite = opposite;
                 valueAxis.renderer.labels.template.adapter.add('text', (label, target) => {
                     if (target.dataItem && (target.dataItem.value === 0)) return axisName;
-                    if (axisName === '비용') return `$${label}`;
                     return label;
                 });
                 return valueAxis;
@@ -155,12 +158,14 @@ export default {
                 series.columns.template.tooltipText = `\${${field}}`;
                 setTooltipStyle(series.tooltip, field);
             };
-            createValueAxis('비용');
+            const costAxisName = vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.COST');
+            const instanceAxisName = vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.INSTANCE');
+            createValueAxis(costAxisName);
             createBarSeries('onDemand');
             createBarSeries('spot');
 
             // create line series
-            const lineValueAxis = createValueAxis('인스턴스', true);
+            const lineValueAxis = createValueAxis(instanceAxisName, true);
             const lineSeries = chart.series.push(new am4charts.LineSeries());
             lineSeries.dataFields.categoryX = 'date';
             lineSeries.dataFields.valueY = 'instance';
@@ -244,7 +249,7 @@ export default {
 
         return {
             ...toRefs(state),
-        }
+        };
     },
 };
 </script>

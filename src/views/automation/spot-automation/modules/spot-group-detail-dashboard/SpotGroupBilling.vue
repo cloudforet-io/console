@@ -1,12 +1,12 @@
 <template>
     <div class="spot-group-billing">
         <p class="title">
-            비용
+            {{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.TITLE') }}
         </p>
         <div class="widget-wrapper grid grid-cols-12">
             <p class="sub-title col-span-12">
-                <span>인스턴스 개수</span>
-                <span class="help-text">(지난 6개월)</span>
+                <span>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.INSTANCE_COUNT') }}</span>
+                <span class="help-text">({{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.LAST_SIX_MONTH') }})</span>
             </p>
             <section class="billing-chart-section">
                 <instance-billing-chart />
@@ -14,8 +14,8 @@
             <section class="billing-figure-section">
                 <div class="figure-wrapper">
                     <p class="title">
-                        <span>지난 달</span>
-                        <strong> 절감 비용</strong>
+                        <span>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.LAST_MONTH') }}</span>
+                        <strong> {{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.SAVINGS_COST') }}</strong>
                         <span class="percentage">
                             <p-i name="ic_table_sort_fromA" />
                             52%
@@ -27,7 +27,7 @@
                 </div>
                 <div class="figure-wrapper">
                     <p class="title">
-                        <strong>누적 절감 비용</strong>
+                        <strong>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.CUMULATIVE_SAVINGS_COST') }}</strong>
                     </p>
                     <p class="cost">
                         ${{ commaFormatter(numberFormatter(cumulativeSavingCost)) }}
@@ -35,8 +35,8 @@
                 </div>
             </section>
             <p class="sub-title col-span-12">
-                <span>비용 내역</span>
-                <span class="help-text">(지난 6개월)</span>
+                <span>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.BILLING_DETAIL') }}</span>
+                <span class="help-text">({{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.LAST_SIX_MONTH') }})</span>
             </p>
             <section class="billing-table-section" />
         </div>

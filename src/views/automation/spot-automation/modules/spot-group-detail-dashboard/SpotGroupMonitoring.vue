@@ -1,8 +1,8 @@
 <template>
     <div class="spot-group-monitoring">
         <p class="title">
-            <span>모니터링</span>
-            <span class="help-text">(데이터 기준: 1일 평균값)</span>
+            <span>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.TITLE') }}</span>
+            <span class="help-text">({{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.TITLE_HELP_TEXT') }})</span>
         </p>
         <div class="box-wrapper grid grid-cols-12 gap-3">
             <div v-for="(d, idx) of dataList" :key="idx"
@@ -50,11 +50,15 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
+    computed, reactive, toRefs, getCurrentInstance, ComponentRenderProxy,
+} from '@vue/composition-api';
+
+import {
     PI, PLottie,
 } from '@spaceone/design-system';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import { SpaceConnector } from '@/lib/space-connector';
 
 
 export default {
@@ -64,38 +68,47 @@ export default {
         PI,
         PLottie,
     },
+    props: {
+        spotGroup: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
     setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            resource: {},
+            resourceId: computed(() => props.spotGroup.resource_id),
             dataList: computed(() => ([
                 {
-                    type: '인스턴스',
-                    detail: 'CPU 사용률',
+                    type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTNACE'),
+                    detail: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.CPU_USAGE_RAGE'),
                     count: 20,
                     suffix: '%',
                 },
                 {
-                    type: '인스턴스',
-                    detail: '디스크 사용률',
+                    type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTNACE'),
+                    detail: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.DISK_USAGE_RATE'),
                     count: 3570,
                     suffix: 'IOPS',
                 },
                 // {
-                //     type: '인스턴스',
-                //     detail: '정상',
+                //     type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTNACE'),
+                //     detail: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.NORMAL'),
                 //     status: 'healthy',
                 //     count: 10,
                 //     suffix: '개',
                 // },
                 {
-                    type: '인스턴스',
-                    detail: '문제있음',
+                    type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTNACE'),
+                    detail: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.HAS_PROBLEM'),
                     status: 'unhealthy',
                     unhealthyCount: 3,
                     count: 10,
                     suffix: '개',
                 },
                 {
-                    type: '로드밸런서',
+                    type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.LOAD_BALANCER'),
                     count: 4,
                     suffix: '개',
                 },
@@ -103,10 +116,24 @@ export default {
             selectedIndex: 0,
         });
 
+        /* api */
+        const getResource = async () => {
+            try {
+                state.resource = await SpaceConnector.client.inventory.cloudService.get({ cloud_service_id: state.resourceId });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
         /* event */
         const onClickBox = (idx) => {
             state.selectedIndex = idx;
         };
+
+        const init = () => {
+            getResource();
+        };
+        init();
 
         return {
             ...toRefs(state),

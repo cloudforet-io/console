@@ -2,8 +2,8 @@
     <div class="spot-group-interrupt">
         <!-- interrupt count-->
         <section class="title-section">
-            <span class="title">인터럽트 개수</span>
-            <span class="sub-title">(2021년 2월 9일, 지난 14일)</span>
+            <span class="title">{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.INTERRUPT_COUNT') }}</span>
+            <span class="sub-title">({{ today }}, {{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.LAST_TWO_WEEKS') }})</span>
             <div class="title-right">
                 <p-button v-for="(d, idx) in dateTypes"
                           :key="idx"
@@ -25,7 +25,7 @@
                 </div>
                 <div class="right-part">
                     <span class="line" />
-                    <span class="text">인터럽트 개수</span>
+                    <span class="text">{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.INTERRUPT_COUNT') }}</span>
                 </div>
             </div>
             <div class="chart-wrapper">
@@ -39,8 +39,8 @@
         </section>
         <!-- interrupt list-->
         <section class="title-section mt-4">
-            <span class="title">인터럽트 내역</span>
-            <span class="sub-title">(최근날짜)</span>
+            <span class="title">{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.INTERRUPT_DETAIL') }}</span>
+            <span class="sub-title">({{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.LATEST_DATE') }})</span>
             <div class="title-right">
                 <p-icon-button name="ic_refresh" class="refresh-btn"
                                @click="onClickRefresh"
@@ -60,6 +60,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import { range, random, forEach } from 'lodash';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -70,13 +71,14 @@ import {
     PButton, PChartLoader, PSkeleton, PIconButton, PDataTable,
 } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
     secondary, peacock, gray, alert, blue,
 } from '@/styles/colors';
-import { range, random, forEach } from 'lodash';
+import { store } from '@/store';
 
 
 dayjs.extend(utc);
@@ -88,6 +90,11 @@ interface ChartData {
     spot: number;
     interrupt: number;
     bulletText?: string | number;
+}
+interface TableData {
+    affected_instance: string;
+    available_zone: string;
+    count: number;
 }
 
 enum DATE_TYPE {
@@ -108,15 +115,17 @@ export default {
         PDataTable,
     },
     setup() {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
+            today: dayjs().tz(store.state.user.timezone).format('YYYY-MM-DD'),
             legends: computed(() => ([
                 {
-                    label: '온디맨드',
+                    label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.ON_DEMAND'),
                     color: blue[500],
                 },
                 {
-                    label: '스팟',
+                    label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.SPOT'),
                     color: peacock[400],
                 },
             ])),
@@ -126,8 +135,8 @@ export default {
                 interrupt: alert,
             },
             dateTypes: computed(() => ([
-                { name: DATE_TYPE.daily, label: '일' },
-                { name: DATE_TYPE.monthly, label: '월' },
+                { name: DATE_TYPE.daily, label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.DAY') },
+                { name: DATE_TYPE.monthly, label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.MONTH') },
             ])),
             selectedDateType: DATE_TYPE.daily,
             //
@@ -138,11 +147,32 @@ export default {
             //
             tableLoading: false,
             fields: computed(() => [
-                { name: 'affected_instance', label: '영향받은 인스턴스' },
-                { name: 'date', label: '날짜' },
-                { name: 'transition_time', label: '전환 시간' },
+                { name: 'affected_instance', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.AFFECTED_INSTANCE') },
+                { name: 'available_zone', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.AZ') },
+                { name: 'count', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.INTERRUPT_COUNT') },
             ]),
-            tableData: [],
+            tableData: [
+                {
+                    affected_instance: 't3.nano',
+                    available_zone: 'ap-northeast-2c',
+                    count: 10,
+                },
+                {
+                    affected_instance: 't4.micro',
+                    available_zone: 'ap-northeast-3c',
+                    count: 6,
+                },
+                {
+                    affected_instance: 'm2.large',
+                    available_zone: 'ap-northeast-2a',
+                    count: 2,
+                },
+                {
+                    affected_instance: 't3.nano',
+                    available_zone: 'ap-northeast-2c',
+                    count: 10,
+                },
+            ] as TableData[],
         });
 
         /* util */
@@ -411,6 +441,16 @@ export default {
             }
             td {
                 height: 2rem;
+            }
+            tr {
+                &:nth-child(even) {
+                    td {
+                        @apply bg-gray-100;
+                    }
+                }
+            }
+            .table-container {
+                max-height: 7rem;
             }
         }
     }

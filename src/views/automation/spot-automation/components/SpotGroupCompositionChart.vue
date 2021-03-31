@@ -1,27 +1,25 @@
 <template>
-    <div class="spot-group-composition-chart" :class="chartType">
-        <div class="wrapper">
-            <div class="text-wrapper on-demand">
-                <p>온디맨드</p>
-                <p><b>60</b>%</p>
-                <template v-if="chartType === CHART_TYPE.long">
-                    <br>
-                    <p>온디맨드 전체 비용</p>
-                    <p>$<b>210.89</b></p>
-                </template>
-            </div>
-            <p-chart-loader class="" :loading="loading">
-                <div ref="chartRef" class="chart" />
-            </p-chart-loader>
-            <div class="text-wrapper spot">
-                <p>스팟</p>
-                <p><b>40</b>%</p>
-                <template v-if="chartType === CHART_TYPE.long">
-                    <br>
-                    <p>실제 스팟 전체 비용</p>
-                    <p>$<b>345.00</b></p>
-                </template>
-            </div>
+    <div class="spot-group-composition-chart grid grid-cols-12" :class="chartType">
+        <div class="col-span-5 text-wrapper on-demand">
+            <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.ON_DEMAND') }}</p>
+            <p><b>60</b>%</p>
+            <template v-if="chartType === CHART_TYPE.long">
+                <br>
+                <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.ON_DEMAND_TOTAL_COST') }}</p>
+                <p>$<b>210.89</b></p>
+            </template>
+        </div>
+        <p-chart-loader class="col-span-2" :loading="loading">
+            <div ref="chartRef" class="chart" />
+        </p-chart-loader>
+        <div class="col-span-5 text-wrapper spot">
+            <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.SPOT') }}</p>
+            <p><b>40</b>%</p>
+            <template v-if="chartType === CHART_TYPE.long">
+                <br>
+                <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.SPOT_TOTAL_COST') }}</p>
+                <p>$<b>345.00</b></p>
+            </template>
         </div>
     </div>
 </template>
@@ -160,32 +158,27 @@ export default {
 <style lang="postcss" scoped>
 .spot-group-composition-chart {
     @apply bg-secondary2;
-    display: flex;
     width: 100%;
     height: 5.5rem;
     font-size: 0.875rem;
     border-radius: 0.375rem;
 
-    .wrapper {
-        display: flex;
-        margin: auto;
-        .text-wrapper {
-            padding: 0 0.5rem;
-            margin: auto 0;
-            &.on-demand {
-                @apply text-secondary;
-                text-align: right;
-            }
-            &.spot {
-                @apply text-peacock-400;
-            }
+    .text-wrapper {
+        padding: 0 0.5rem;
+        margin: auto 0;
+        &.on-demand {
+            @apply text-secondary;
+            text-align: right;
         }
-        .p-chart-loader {
-            margin: auto 0;
-            .chart {
-                max-width: 4rem;
-                max-height: 4rem;
-            }
+        &.spot {
+            @apply text-peacock-400;
+        }
+    }
+    .p-chart-loader {
+        margin: auto 0;
+        .chart {
+            max-width: 4rem;
+            max-height: 4rem;
         }
     }
 
