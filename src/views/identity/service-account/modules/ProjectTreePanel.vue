@@ -57,7 +57,7 @@
                             }"
                             >{{ node.data.name }}</span>
                         </template>
-                        <template #toggle="{node, selected}">
+                        <template #toggle="{node, selected, path}">
                             <p-radio v-if="node.data.item_type === 'PROJECT'"
                                      :selected="selected" :value="true"
                                      @click.stop="changeSelectState(node, path)"

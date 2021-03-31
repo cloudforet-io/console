@@ -3,6 +3,7 @@ import axios, {
 } from 'axios';
 import jwt from 'jsonwebtoken';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
+import config from '@/lib/config';
 import { SessionTimeoutCallback } from './type';
 
 const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
@@ -38,6 +39,11 @@ export class APIError extends Error {
         }
     }
 }
+
+const setMockMode = (request: AxiosRequestConfig) => {
+    const mockEndpoint = config.get('MOCK.ENDPOINT');
+    if (mockEndpoint) request.baseURL = mockEndpoint;
+};
 
 class API {
     instance: AxiosInstance;
@@ -126,13 +132,25 @@ class API {
             this.defaultAxiosConfig.baseURL = baseURL;
         }
 
+        if (config.get('MOCK.ALL')) {
+            setMockMode(this.defaultAxiosConfig);
+        }
+
         return this.defaultAxiosConfig;
     }
 
+
     private setAxiosInterceptors(): void {
-        // Axios request interceptor to set the access token
+        // Axios request interceptor
         this.instance.interceptors.request.use((request) => {
+            // Set the access token
             request.headers.Authorization = `Bearer ${this.accessToken}`;
+
+            // Set mock mode
+            if (request.headers.MOCK_MODE) {
+                setMockMode(request);
+            }
+
             return request;
         });
 
