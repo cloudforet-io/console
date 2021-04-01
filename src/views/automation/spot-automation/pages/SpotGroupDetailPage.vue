@@ -23,7 +23,9 @@
                 </template>
                 <template #instance />
                 <template #loadBalancer />
-                <template #member />
+                <template #member>
+                    <SpotGroupDetailMember :spot-group-id="spotGroupId" />
+                </template>
                 <template #tag>
                     <tags-panel :resource-id="spotGroupId"
                                 resource-key="spot_group_id"
@@ -50,11 +52,14 @@ import {
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import SpotGroupDetailDashboard from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupDetailDashboard.vue';
 import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
+import SpotGroupDetailMember
+    from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupDetailMember.vue';
 
 export default {
     name: 'SpotGroupDetailPage',
     components: {
         SpotGroupDetailDashboard,
+        SpotGroupDetailMember,
         GeneralPageLayout,
         PBreadcrumbs,
         PPageTitle,
