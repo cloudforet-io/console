@@ -86,7 +86,7 @@ export default {
                 { label: 'Type', name: 'type' },
                 { label: 'Resource Type', name: 'resource_type' },
             ],
-            rootPath: 'plugin_info.options.filter_format',
+            rootPath: 'plugin_info.metadata.filter_format',
             items: computed(() => get(baseState.data, filterState.rootPath, [])),
         });
 
@@ -95,7 +95,7 @@ export default {
             const res = await SpaceConnector.client.inventory.collector.get({
                 collector_id: props.collectorId,
                 only: ['name', 'priority', 'provider', 'state', 'plugin_info.version', 'plugin_info.metadata.metadata.supported_resource_type',
-                    'last_collected_at', 'created_at', 'plugin_info.options.filter_format', 'tags', 'plugin_info.plugin_id'],
+                    'last_collected_at', 'created_at', 'plugin_info.metadata.filter_format', 'tags', 'plugin_info.plugin_id'],
 
                 // ...baseState.fields.map(d => d.name)
             });

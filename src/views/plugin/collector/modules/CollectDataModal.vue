@@ -177,7 +177,7 @@ export default {
             imageUrl: computed<string>(() => get(state.plugin, 'icon', '')),
             version: computed<string>(() => get(state.collector, 'plugin_info.version', '')),
             description: computed<string>(() => get(state.collector, 'tags.description', '')),
-            filterFormats: computed<any[]>(() => get(state.collector, 'plugin_info.options.filter_format', [])),
+            filterFormats: computed<any[]>(() => get(state.collector, 'plugin_info.metadata.filter_format', [])),
             filters: {},
             confirmBtnStyle: computed(() => ({
                 styleType: state.loading ? 'gray200' : 'primary-dark',

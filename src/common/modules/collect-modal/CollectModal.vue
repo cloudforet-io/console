@@ -124,7 +124,7 @@ export default {
             selectedCollector: computed(() => state.collectors[state.selectedIndexes[0]]),
             hasFilterFormat: computed(() => get(
                 state.selectedCollector,
-                'plugin_info.options.filter_format',
+                'plugin_info.metadata.filter_format',
                 [],
             ).some(f => f.key === props.idKey)),
             selectedResources: computed(() => (state.selectedCollector
