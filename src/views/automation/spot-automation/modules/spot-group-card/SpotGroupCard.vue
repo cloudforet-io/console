@@ -156,6 +156,15 @@ export default {
     display: none;
 }
 
+.card-wrapper {
+    @apply border border-gray-200;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+    border-radius: 0.25rem;
+    &:hover {
+        @apply bg-blue-100 border-blue-500;
+    }
+}
+
 .card-header {
     @apply text-white;
     background: linear-gradient(90.01deg, #315ed1 0.01%, #5da3f5 99.99%);
@@ -230,10 +239,12 @@ export default {
     }
 }
 .card-body {
-    @apply border border-gray-200;
+    @apply border-gray-200;
+    border-width: 1px;
+    border-right: 0;
+    border-left: 0;
     width: 100%;
     min-height: 11.6rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
     .card-desktop-version {
         display: none;
     }
@@ -243,7 +254,11 @@ export default {
     }
 
     @screen md {
-        min-height: 19.15rem;
+        min-height: 8.125rem;
+    }
+
+    @screen lg {
+        min-height: 20rem;
         .card-mobile-version {
             display: none;
         }
@@ -251,10 +266,6 @@ export default {
             display: flex;
             height: 100%;
         }
-    }
-
-    @screen lg {
-
         &:not(.short) {
             @mixin spread-case-card-body;
         }
@@ -267,14 +278,12 @@ export default {
     }
 }
 .card-footer {
-    @apply bg-blue-100 border border-gray-200;
+    @apply bg-blue-100;
     display: flex;
     justify-content: center;
     min-height: 3.25rem;
-    border-top: 0;
     border-bottom-left-radius: 0.25rem;
     border-bottom-right-radius: 0.25rem;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 
     .footer-region {
         @apply text-gray-500;

@@ -79,6 +79,12 @@
                 서비스 타입
             </p>
             <p class="column-text">
+                <p-i
+                    width="1.5rem"
+                    height="1.5rem"
+                    name="ic_provider_aws"
+                    class="mr-2"
+                />
                 Auto Scaling Group
             </p>
         </div>
@@ -88,10 +94,11 @@
 <script lang="ts">
 import SpotInterruptChart from '@/views/automation/spot-automation/components/SpotInterruptChart.vue';
 import OnDemandAndSpotChart from '@/views/automation/spot-automation/components/OnDemandAndSpotChart.vue';
+import { PI } from '@spaceone/design-system';
 
 export default {
     name: 'SpotGroupCardDesktop',
-    components: { OnDemandAndSpotChart, SpotInterruptChart },
+    components: { OnDemandAndSpotChart, SpotInterruptChart, PI },
     props: {
         cardData: {
             type: Object,
@@ -227,6 +234,10 @@ export default {
     padding-top: 2rem;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
+    .column-text {
+        font-size: 0.875rem;
+        line-height: 100%;
+    }
 }
 .spot-card-divider {
     border-left: 0.0625rem dashed rgba(theme('colors.gray.200'), 1);

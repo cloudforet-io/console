@@ -22,22 +22,24 @@
                    @change="onChange"
                    @refresh="onChange"
         />
-        <p-i name="ic_list" width="1.5rem" height="1.5rem"
-             color="inherit transparent"
-             @click="showListView"
-        />
-        <p-i name="ic_card-list" width="1.5rem" height="1.5rem"
-             color="inherit transparent"
-             @click="showCardView"
-        />
+<!--        <p-i name="ic_list" width="1.5rem" height="1.5rem"-->
+<!--             color="inherit transparent"-->
+<!--             @click="showListView"-->
+<!--        />-->
+<!--        <p-i name="ic_card-list" width="1.5rem" height="1.5rem"-->
+<!--             color="inherit transparent"-->
+<!--             @click="showCardView"-->
+<!--        />-->
         <p-data-loader class="flex-grow" :data="items" :loading="loading"
                        :class="{'short': isShort}"
         >
             <div class="card-wrapper" :class="{'short': isShort}">
                 <div v-for="item in items" :key="item.spot_group_id" class="spot-group-card">
-                    <spot-group-card :card-data="item"
-                                     :is-short="isShort"
-                    />
+                    <router-link :to="{ name: 'spotGroupDetail',params: {id: item.spot_group_id}}">
+                        <spot-group-card :card-data="item"
+                                         :is-short="isShort"
+                        />
+                    </router-link>
                 </div>
             </div>
         </p-data-loader>
@@ -107,7 +109,7 @@ export default {
             sortDesc: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone),
-            isShort: false,
+            isShort: true,
         });
         const routeState = reactive({
             route: computed(() => [
@@ -201,19 +203,19 @@ export default {
         grid-template-columns: repeat(auto-fit, minmax(259px, 1fr));
         row-gap: 1.5rem;
         column-gap: 1.5rem;
-        max-width: 716px;
 
         @screen md {
             grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
         }
 
         @screen lg {
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(700px, 1fr));
         }
     }
 }
 
 .spot-group-card {
     margin-top: 1.5rem;
+
 }
 </style>

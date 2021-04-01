@@ -10,8 +10,7 @@
         </div>
         <div class="right-desc">
             <p class="card-content-text">로드밸런서 (개수) <span class="card-content-number">1 </span>개</p>
-            <p class="card-content-text">LB Active Sessions <span class="card-content-number">0 </span></p>
-            <p class="card-content-text">LB Throughput <span class="card-content-number">0 </span>MB/s</p>
+            <p class="card-content-text">서비스 타입 <span>[AWS] Auto Scaling Group</span></p>
         </div>
     </article>
 </template>
@@ -44,10 +43,10 @@ export default {
 
     @screen sm {
         flex-direction: row;
-    }
-
-    @screen md {
-        flex-direction: row;
+        justify-content: start;
+        .left-desc {
+            width: 50%;
+        }
     }
 }
 </style>
