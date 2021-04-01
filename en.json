@@ -176,8 +176,10 @@
 					"LAST_MONTH": "지난 달",
 					"LAST_SIX_MONTH": "지난 6개월",
 					"ON_DEMAND_COST": "온디맨드 비용",
+					"ON_DEMAND_ESTIMATED_COST": "온디맨드 사용 예상 비\u001c용",
 					"SAVINGS_COST": "절감 비용",
 					"SPOT_COST": "스팟 비용",
+					"SPOT_SAVINGS": "스팟으로 절감한 비용",
 					"TITLE": "비용"
 				},
 				"INTERRUPT": {
@@ -196,7 +198,7 @@
 					"CPU_USAGE_RAGE": "CPU 사용률",
 					"DISK_USAGE_RATE": "디스크 사용률",
 					"HAS_PROBLEM": "문제있음",
-					"INSTNACE": "인스턴스",
+					"INSTANCE": "인스턴스",
 					"LOAD_BALANCER": "로드밸런서",
 					"NORMAL": "정상",
 					"TITLE": "Monitoring",

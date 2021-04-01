@@ -176,8 +176,10 @@
 					"LAST_MONTH": "",
 					"LAST_SIX_MONTH": "",
 					"ON_DEMAND_COST": "",
+					"ON_DEMAND_ESTIMATED_COST": "",
 					"SAVINGS_COST": "",
 					"SPOT_COST": "",
+					"SPOT_SAVINGS": "",
 					"TITLE": ""
 				},
 				"INTERRUPT": {
@@ -196,7 +198,7 @@
 					"CPU_USAGE_RAGE": "",
 					"DISK_USAGE_RATE": "",
 					"HAS_PROBLEM": "",
-					"INSTNACE": "",
+					"INSTANCE": "",
 					"LOAD_BALANCER": "",
 					"NORMAL": "",
 					"TITLE": "モニタリング",
