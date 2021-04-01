@@ -6,4 +6,6 @@ export interface MonitoringResourceType {
 export interface MonitoringProps {
     resourceType: string;
     resources: MonitoringResourceType[];
+    showTools?: boolean;
+    selectedMetrics?: string[];
 }

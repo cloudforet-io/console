@@ -9,7 +9,7 @@
             </div>
             <div class="right-part">
                 <span class="line" />
-                <span class="text">인스턴스 개수</span>
+                <span class="text">{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.INSTANCE_COUNT') }}</span>
             </div>
         </div>
         <div class="chart-wrapper">

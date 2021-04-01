@@ -38,35 +38,75 @@
                 <span>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.BILLING_DETAIL') }}</span>
                 <span class="help-text">({{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.LAST_SIX_MONTH') }})</span>
             </p>
-            <section class="billing-table-section" />
+            <section class="col-span-12 billing-table-section">
+                <p-data-table
+                    :loading="tableState.loading"
+                    :fields="tableState.fields"
+                    :items="tableState.data"
+                >
+                    <template #th-title-format>
+                        <span />
+                    </template>
+                </p-data-table>
+            </section>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import dayjs from 'dayjs';
+import { random } from 'lodash';
+
 import {
-    PI,
+    reactive, toRefs, watch, ComponentRenderProxy, getCurrentInstance,
+} from '@vue/composition-api';
+
+import {
+    PI, PDataTable,
 } from '@spaceone/design-system';
 import InstanceBillingChart from '@/views/automation/spot-automation/components/InstanceBillingChart.vue';
 
-import {
-    reactive, toRefs,
-} from '@vue/composition-api';
+import { SpaceConnector } from '@/lib/space-connector';
 
+
+const DATA_TABLE_COLUMN = 6;
 
 export default {
     name: 'SpotGroupBilling',
     components: {
         InstanceBillingChart,
         PI,
+        PDataTable,
     },
-    setup() {
+    props: {
+        spotGroup: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
             data: [],
             lastMonthSavingCost: 1207.36234234,
             cumulativeSavingCost: 5690.23343,
+        });
+        const tableState = reactive({
+            loading: false,
+            fields: [] as any,
+            data: [
+                {
+                    title: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.SPOT_SAVINGS'),
+                },
+                {
+                    title: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.ON_DEMAND_ESTIMATED_COST'),
+                },
+                {
+                    title: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.INSTANCE_COUNT'),
+                },
+            ],
         });
 
         /* util */
@@ -81,9 +121,36 @@ export default {
             if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             return num;
         };
+        const setTableFields = () => {
+            const fields: any = [];
+            let now = dayjs.utc();
+            const start = now.subtract(DATA_TABLE_COLUMN, 'month');
+            while (now.isAfter(start, 'month')) {
+                // todo: 아래는 가라 데이터 만들려고 넣은 거임
+                // eslint-disable-next-line no-loop-func
+                tableState.data.forEach((d, idx) => {
+                    let randomNum = random(1, 10).toString();
+                    if (idx < 2) randomNum = `$${randomNum}`;
+                    tableState.data[idx][now.format('YYYY-MM')] = randomNum;
+                });
+                fields.unshift({
+                    name: now.format('YYYY-MM'),
+                    label: now.format('MMM/YYYY'),
+                });
+                now = now.subtract(1, 'month');
+            }
+            fields.unshift({ name: 'title', label: '' });
+            tableState.fields = fields;
+        };
+
+        const init = () => {
+            setTableFields();
+        };
+        init();
 
         return {
             ...toRefs(state),
+            tableState,
             numberFormatter,
             commaFormatter,
         };
@@ -160,6 +227,17 @@ export default {
                 @apply text-indigo-500;
                 font-size: 1.375rem;
                 line-height: 1.45;
+            }
+        }
+    }
+    .billing-table-section {
+        .p-data-table::v-deep {
+            th {
+                @apply border-gray-200 text-gray-400;
+                font-size: 0.75rem;
+            }
+            td {
+                @apply border-gray-200;
             }
         }
     }

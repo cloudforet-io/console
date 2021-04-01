@@ -80,6 +80,10 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
+    some, debounce, find, capitalize, chain, range, sortBy, get,
+} from 'lodash';
+
+import {
     computed, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
@@ -91,9 +95,6 @@ import {
 import {
     blue, coral, green, peacock, violet, yellow, indigo,
 } from '@/styles/colors';
-import {
-    some, debounce, find, capitalize, chain, range, sortBy,
-} from 'lodash';
 import { MonitoringProps } from '@/common/modules/monitoring/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { TimeStamp } from '@/models';
@@ -193,6 +194,10 @@ export default {
                 return resources.every(resource => resource.id);
             },
         },
+        selectedMetrics: {
+            type: Array,
+            default: () => [],
+        },
         showTools: {
             type: Boolean,
             default: true,
@@ -219,41 +224,54 @@ export default {
                 type: 'item', label: capitalize(d), name: d,
             }))),
             selectedStat: STATISTICS_TYPE.average,
-            metricsLoading: true,
+            metricsLoading: false,
             metrics: [],
             chartMetrics: [],
             availableResources: [],
             noData: false,
         });
 
-        const dataSourceApi = SpaceConnector.client.monitoring.dataSource.list;
         const listDataSources = async () => {
             try {
-                const res = await dataSourceApi({ monitoring_type: MONITORING_TYPE.metric });
-                state.dataTools = chain(res.results)
-                    .map((d) => {
-                        if (d.plugin_info.metadata.supported_resource_type.some(t => props.resourceType === t)) {
-                            return {
-                                id: d.data_source_id,
-                                name: d.name,
-                                statisticsTypes: d.plugin_info.metadata.supported_stat || [STATISTICS_TYPE.average],
-                            };
-                        }
-                        return undefined;
-                    }).compact().uniqBy('id')
-                    .value();
+                const res = await SpaceConnector.client.monitoring.dataSource.list({
+                    monitoring_type: MONITORING_TYPE.metric,
+                });
+
+                /* code below is for Spot Group Detail Dashboard */
+                let dataSources = res.results;
+                if (props.showTools === false) {
+                    dataSources = [find(dataSources, { name: 'AWS CloudWatch' })];
+                }
+
+                // todo: 아래 코드는 완진님께 물어볼것!
+                state.dataTools = dataSources.map(d => ({
+                    id: d.data_source_id,
+                    name: d.name,
+                    statisticsTypes: get(d, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.average]),
+                }));
+                // state.dataTools = chain(dataSources)
+                //     .map((d) => {
+                //         if (d.plugin_info.metadata.supported_resource_type.some(t => props.resourceType === t)) {
+                //             return {
+                //                 id: d.data_source_id,
+                //                 name: d.name,
+                //                 statisticsTypes: d.plugin_info.metadata.supported_stat || [STATISTICS_TYPE.average],
+                //             };
+                //         }
+                //         return undefined;
+                //     }).compact().uniqBy('id')
+                //     .value();
                 state.selectedToolId = state.dataTools[0].id;
             } catch (e) {
                 console.error(e);
             }
         };
 
-        const metricListApi = SpaceConnector.client.monitoring.metric.list;
         const listMetrics = async (): Promise<MetricListResp> => {
             state.metricsLoading = true;
             try {
-                if (state.dataTools.length === 0) await listDataSources();
-                const res = await metricListApi({
+                // if (state.dataTools.length === 0) await listDataSources();
+                const res = await SpaceConnector.client.monitoring.metric.list({
                     resource_type: props.resourceType,
                     data_source_id: state.selectedToolId,
                     resources: props.resources.map(d => d.id),
@@ -368,7 +386,18 @@ export default {
             reset();
 
             const metricInfo = await listMetrics();
-            state.metrics = sortBy(metricInfo.metrics, m => m.name);
+
+            // todo: 아래는 임시 코드임
+            let metrics = [] as any;
+            if (props.selectedMetrics && props.selectedMetrics.length > 0) {
+                props.selectedMetrics.forEach((d) => {
+                    metrics.push(find(metricInfo.metrics, { key: d }));
+                });
+            } else {
+                metrics = metricInfo.metrics;
+            }
+
+            state.metrics = sortBy(metrics, m => m.name);
 
             setAvailableResources(metricInfo.available_resources);
 
@@ -383,15 +412,21 @@ export default {
                 if (types) state.selectedStat = types[0] || STATISTICS_TYPE.average;
             }, { immediate: true });
 
-            watch([() => props.resources, () => state.selectedToolId], (resources, toolId) => {
-                if (resources.length > 0 && toolId) listAll();
-            }, { immediate: false });
+            // watch([() => props.resources, () => state.selectedToolId], ([resources, toolId]) => {
+            //     if (resources.length > 0 && toolId) listAll();
+            // }, { immediate: false });
 
-            watch([() => state.selectedTimeRange, () => state.selectedStat], (timeRange, stat) => {
+            watch([() => props.resources, () => props.selectedMetrics], async () => {
+                if (props.resources) {
+                    console.log('here');
+                    await listDataSources();
+                    await listAll();
+                }
+            }, { immediate: true });
+
+            watch([() => state.selectedTimeRange, () => state.selectedStat], ([timeRange, stat]) => {
                 if (timeRange && stat) listChartMetrics();
             }, { immediate: false });
-
-            listAll();
         });
 
         return {

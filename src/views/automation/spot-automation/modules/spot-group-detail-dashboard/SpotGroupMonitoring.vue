@@ -13,7 +13,7 @@
                 <div class="content">
                     <p class="pb-2">
                         <template v-if="d.status === 'unhealthy'">
-                            <span class="count">{{ d.unhealthyCount }}</span>
+                            <span class="count">{{ instanceState.unhealthyCount }}</span>
                             <span class="suffix">/ {{ d.count }}{{ d.suffix }}</span>
                         </template>
                         <template v-else>
@@ -42,19 +42,43 @@
             </div>
         </div>
         <div class="widget-wrapper">
-            <monitoring :show-tools="false" />
+            <template v-if="selectedIndex === 0">
+                <monitoring :show-tools="false"
+                            :resources="resources"
+                            :resource-type="resourceType"
+                            :selected-metrics="['CPUUtilization']"
+                />
+            </template>
+            <template v-else-if="selectedIndex === 1">
+                <monitoring :show-tools="false"
+                            :resources="resources"
+                            :resource-type="resourceType"
+                            :selected-metrics="['EBSReadOps', 'EBSWriteOps', 'EBSReadBytes', 'EBSWriteBytes']"
+                />
+            </template>
+            <template v-else-if="selectedIndex === 2">
+                <p-dynamic-layout type="query-search-table"
+                                  class="resource-table"
+                                  :options="instanceState.schema.options"
+                                  :data="instanceState.data"
+                />
+            </template>
+            <template v-else>
+                로드밸런서
+            </template>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import { get, find } from 'lodash';
 import {
-    computed, reactive, toRefs, getCurrentInstance, ComponentRenderProxy,
+    computed, reactive, toRefs, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import {
-    PI, PLottie,
+    PI, PLottie, PDynamicLayout,
 } from '@spaceone/design-system';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 
@@ -67,6 +91,7 @@ export default {
         Monitoring,
         PI,
         PLottie,
+        PDynamicLayout,
     },
     props: {
         spotGroup: {
@@ -76,34 +101,34 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const instanceState = reactive({
+            count: 0,
+            unhealthyCount: 0,
+            schema: {},
+            fields: [],
+            data: [],
+        });
         const state = reactive({
-            resource: {},
-            resourceId: computed(() => props.spotGroup.resource_id),
+            resourceType: 'inventory.Server',
+            resources: [],
+            selectedIndex: 0,
             dataList: computed(() => ([
                 {
-                    type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTNACE'),
+                    type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTANCE'),
                     detail: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.CPU_USAGE_RAGE'),
                     count: 20,
                     suffix: '%',
                 },
                 {
-                    type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTNACE'),
+                    type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTANCE'),
                     detail: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.DISK_USAGE_RATE'),
                     count: 3570,
                     suffix: 'IOPS',
                 },
-                // {
-                //     type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTNACE'),
-                //     detail: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.NORMAL'),
-                //     status: 'healthy',
-                //     count: 10,
-                //     suffix: '개',
-                // },
                 {
-                    type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTNACE'),
-                    detail: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.HAS_PROBLEM'),
-                    status: 'unhealthy',
-                    unhealthyCount: 3,
+                    type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTANCE'),
+                    detail: instanceState.unhealthyCount > 0 ? vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.HAS_PROBLEM') : vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.NORMAL'),
+                    status: instanceState.unhealthyCount > 0 ? 'unhealthy' : 'healthy',
                     count: 10,
                     suffix: '개',
                 },
@@ -113,13 +138,46 @@ export default {
                     suffix: '개',
                 },
             ])),
-            selectedIndex: 0,
         });
 
         /* api */
-        const getResource = async () => {
+        const getInstanceSchema = async (spotGroup) => {
             try {
-                state.resource = await SpaceConnector.client.inventory.cloudService.get({ cloud_service_id: state.resourceId });
+                const schema = await SpaceConnector.client.addOns.pageSchema.get({
+                    resource_type: 'inventory.CloudService',
+                    schema: 'details',
+                    options: {
+                        provider: spotGroup.provider,
+                        cloud_service_id: spotGroup.resource_id,
+                        cloud_service_group: spotGroup.cloud_service_group,
+                        cloud_service_type: spotGroup.cloud_service_type,
+                    },
+                });
+                const instanceSchema = find(schema.details, { name: 'Instances' });
+                instanceState.schema = instanceSchema;
+                instanceState.fields = instanceSchema?.options?.fields;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        const getInstance = async (spotGroup) => {
+            try {
+                const res = await SpaceConnector.client.inventory.cloudService.get({ cloud_service_id: spotGroup.resource_id });
+                const instances = get(res, 'data.instances');
+                instanceState.data = instances;
+                instanceState.count = instances.length;
+                instanceState.unhealthyCount = instances.map(d => d.health_status !== 'Healthy').length;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        /* api */
+        const getSpotGroupServers = async (spotGroup) => {
+            try {
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupServers({
+                    spot_group_id: spotGroup.spot_group_id,
+                });
+                state.resources = res.results.map(d => ({ id: d.server_id, name: d.name }));
             } catch (e) {
                 console.error(e);
             }
@@ -127,16 +185,20 @@ export default {
 
         /* event */
         const onClickBox = (idx) => {
-            state.selectedIndex = idx;
+            if (state.selectedIndex !== idx) {
+                state.selectedIndex = idx;
+            }
         };
 
-        const init = () => {
-            getResource();
-        };
-        init();
+        watch(() => props.spotGroup, (spotGroup) => {
+            getInstanceSchema(spotGroup);
+            getInstance(spotGroup);
+            getSpotGroupServers(spotGroup);
+        }, { immediate: false });
 
         return {
             ...toRefs(state),
+            instanceState,
             onClickBox,
         };
     },

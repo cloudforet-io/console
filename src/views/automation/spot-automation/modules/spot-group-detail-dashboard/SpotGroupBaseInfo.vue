@@ -2,20 +2,21 @@
     <div class="spot-group-basic-info">
         <section class="title-section">
             <p class="title">
-                기본정보
+                {{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.TITLE') }}
             </p>
             <div class="title-right">
                 <p-button class="edit-button gray900 sm" :outline="true">
-                    <span>수정</span>
+                    <span>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.EDIT') }}</span>
                 </p-button>
             </div>
         </section>
         <section class="content-section">
-            <p class="text1">
-                AWS Auto Scaling Group
+            <p class="spot-group-name-text">
+                {{ title }}
             </p>
             <p-anchor class="link-text"
-                      text="상세보기 [원본 리소스 이름]"
+                      :text="`${$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.VIEW_DETAIL')} [${resourceName}]`"
+                      :href="resourceLink"
                       highlight
             />
         </section>
@@ -24,15 +25,15 @@
         </section>
         <section class="project-section">
             <span class="title">
-                프로젝트
+                {{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.PROJECT') }}
             </span>
             <span class="content">
-                프로젝트 그룹 > 프로젝트 이름
+                {{ projectName }}
             </span>
         </section>
         <section class="using-instance-type-section">
             <p class="title">
-                사용중인 인스턴스 타입
+                {{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.USING_INSTANCE_TYPE') }}
             </p>
             <div class="chart-wrapper">
                 <p-chart-loader :loading="loading">
@@ -55,6 +56,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import { map, get, isEmpty } from 'lodash';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -63,12 +65,18 @@ import Color from 'color';
 import {
     PButton, PAnchor, PChartLoader,
 } from '@spaceone/design-system';
-import { reactive, toRefs, watch } from '@vue/composition-api';
+import {
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import {
     coral, gray, secondary1, violet, white, yellow,
 } from '@/styles/colors';
 import SpotGroupCompositionChart
     from '@/views/automation/spot-automation/components/SpotGroupCompositionChart.vue';
+import { SpaceConnector } from '@/lib/space-connector';
+import { store } from '@/store';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 am4core.useTheme(am4themes_animated);
 
@@ -81,16 +89,40 @@ interface ChartData {
 }
 
 export default {
-    name: 'SpotGroupBasicInfo',
+    name: 'SpotGroupBaseInfo',
     components: {
         SpotGroupCompositionChart,
         PButton,
         PAnchor,
         PChartLoader,
     },
-    setup() {
+    props: {
+        spotGroup: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
+            title: '',
+            resourceName: computed(() => props.spotGroup.resource_id), // todo: name 필드가 추가되면 name으로 바뀌어야 함
+            projects: computed(() => store.state.resource.project.items),
+            projectName: computed(() => {
+                const projectId = props.spotGroup.project_id;
+                return state.projects[projectId]?.label;
+            }),
+            resourceLink: computed(() => {
+                if (!isEmpty(props.spotGroup)) {
+                    const referenceLink = referenceRouter(props.spotGroup.resource_id, {
+                        resource_type: props.spotGroup.resource_type,
+                        reference_key: 'cloud_service_id',
+                    });
+                    return vm.$router.resolve(referenceLink).href;
+                }
+                return '';
+            }),
             loaderRef: null as HTMLElement | null,
             chartRef: null as HTMLElement | null,
             chart: null as null | any,
@@ -154,7 +186,20 @@ export default {
         };
 
         /* api */
-        const getData = async () => {
+        const getRecommendedName = async (spotGroup) => {
+            const cloudServiceType = get(spotGroup, 'cloud_service_type');
+            try {
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSupportedResourceTypes();
+                map(res, (d, k) => {
+                    if (k.includes(cloudServiceType)) {
+                        state.title = d.recommended_title;
+                    }
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        const getInstanceType = async () => {
             const colors = [coral[500], yellow[400], secondary1];
             let data = [
                 {
@@ -182,10 +227,13 @@ export default {
         };
 
         const init = () => {
-            getData();
+            getInstanceType();
         };
         init();
 
+        watch(() => props.spotGroup, (spotGroup) => {
+            getRecommendedName(spotGroup);
+        }, { immediate: false });
         watch([() => state.loading, () => state.loaderRef, () => state.chartRef], ([loading, loaderCtx, chartCtx]) => {
             if (loading && loaderCtx) {
                 drawChart(loaderCtx, true);
@@ -196,6 +244,7 @@ export default {
 
         return {
             ...toRefs(state),
+            referenceRouter,
         };
     },
 };
@@ -231,7 +280,7 @@ export default {
         }
     }
     .content-section {
-        .text1 {
+        .spot-group-name-text {
             font-size: 1rem;
             line-height: 1.4;
             margin-bottom: 0.25rem;

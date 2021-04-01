@@ -3,7 +3,7 @@
         <div class="page-content">
             <p-breadcrumbs :routes="routeState.routes" />
             <div class="top-wrapper">
-                <p-page-title title="Spot Group Name" child @goBack="$router.go(-1)" />
+                <p-page-title :title="spotGroup.name" child @goBack="$router.go(-1)" />
                 <div class="button-group">
                     <p-icon-button name="ic_transhcan"
                                    class="delete-button"
@@ -19,7 +19,7 @@
                    class="tab-content"
             >
                 <template #summary>
-                    <spot-group-detail-dashboard />
+                    <spot-group-detail-dashboard :spot-group="spotGroup" />
                 </template>
                 <template #instance />
                 <template #loadBalancer />
@@ -40,17 +40,20 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
+import {
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+
+import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
+import SpotGroupDetailDashboard from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupDetailDashboard.vue';
 import {
     PBreadcrumbs, PPageTitle, PIconButton, PTab,
 } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
-import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive,
-} from '@vue/composition-api';
+import { SpaceConnector } from '@/lib/space-connector';
 
-import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
-import SpotGroupDetailDashboard from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupDetailDashboard.vue';
 import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
 import SpotGroupDetailMember
     from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupDetailMember.vue';
@@ -67,14 +70,15 @@ export default {
         PTab,
         TagsPanel,
     },
-    setup(props) {
+    setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const spotGroupId = computed<string>(() => vm.$route.params.id as string);
+        const state = reactive({
+            spotGroupId: computed(() => root.$route.params.id),
+            spotGroup: {},
+        });
         const tabState = reactive({
             tabs: computed(() => ([
                 { name: 'summary', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.TAB_SUMMARY'), keepAlive: true },
-                { name: 'instance', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.TAB_INSTANCE') },
-                { name: 'loadBalancer', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.TAB_LOAD_BALANCER') },
                 { name: 'member', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.TAB_MEMBER') },
                 { name: 'tag', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.TAB_TAG') },
                 { name: 'history', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.TAB_HISTORY') },
@@ -89,6 +93,20 @@ export default {
             ])),
         });
 
+        /* api */
+        const getSpotGroup = async () => {
+            try {
+                state.spotGroup = await SpaceConnector.client.spotAutomation.spotGroup.get({ spot_group_id: state.spotGroupId });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const init = () => {
+            getSpotGroup();
+        };
+        init();
+
         /* event */
         const openSpotGroupDeleteModal = () => {
             console.log('open delete modal');
@@ -98,9 +116,9 @@ export default {
         };
 
         return {
+            ...toRefs(state),
             tabState,
             routeState,
-            spotGroupId,
             openSpotGroupDeleteModal,
             openSpotGroupEditModal,
         };

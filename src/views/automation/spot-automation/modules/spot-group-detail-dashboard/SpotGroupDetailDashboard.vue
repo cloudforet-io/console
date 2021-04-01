@@ -1,21 +1,24 @@
 <template>
     <div class="grid grid-cols-12 gap-4 spot-group-detail-dashboard">
-        <spot-group-basic-info />
+        <spot-group-base-info :spot-group="spotGroup" />
         <spot-group-interrupt />
-        <spot-group-monitoring class="col-span-12" />
-        <spot-group-billing class="col-span-12" />
+        <spot-group-monitoring class="col-span-12" :spot-group="spotGroup" />
+        <spot-group-billing class="col-span-12" :spot-group="spotGroup" />
     </div>
 </template>
 
 <script lang="ts">
-import SpotGroupBasicInfo
-    from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupBasicInfo.vue';
+/* eslint-disable camelcase */
+import SpotGroupBaseInfo
+    from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupBaseInfo.vue';
 import SpotGroupInterrupt
     from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupInterrupt.vue';
 import SpotGroupBilling
     from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupBilling.vue';
 import SpotGroupMonitoring
     from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupMonitoring.vue';
+import { computed, reactive, toRefs } from '@vue/composition-api';
+import { store } from '@/store';
 
 export default {
     name: 'SpotGroupDetailDashboard',
@@ -23,7 +26,27 @@ export default {
         SpotGroupMonitoring,
         SpotGroupBilling,
         SpotGroupInterrupt,
-        SpotGroupBasicInfo,
+        SpotGroupBaseInfo,
+    },
+    props: {
+        spotGroup: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props) {
+        const state = reactive({
+            resourceId: computed(() => props.spotGroup.resource_id),
+        });
+
+        const init = () => {
+            store.dispatch('resource/project/load');
+        };
+        init();
+
+        return {
+            ...toRefs(state),
+        };
     },
 };
 </script>
