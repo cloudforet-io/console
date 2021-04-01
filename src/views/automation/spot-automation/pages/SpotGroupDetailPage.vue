@@ -24,7 +24,13 @@
                 <template #instance />
                 <template #loadBalancer />
                 <template #member />
-                <template #tags />
+                <template #tag>
+                    <tags-panel :resource-id="spotGroupId"
+                                resource-key="spot_group_id"
+                                resource-type="spot_automation.SpotGroup"
+                                class="tab-bg"
+                    />
+                </template>
                 <template #history />
             </p-tab>
         </div>
@@ -43,6 +49,7 @@ import {
 
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import SpotGroupDetailDashboard from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupDetailDashboard.vue';
+import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
 
 export default {
     name: 'SpotGroupDetailPage',
@@ -53,9 +60,11 @@ export default {
         PPageTitle,
         PIconButton,
         PTab,
+        TagsPanel,
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const spotGroupId = computed<string>(() => vm.$route.params.id as string);
         const tabState = reactive({
             tabs: computed(() => ([
                 { name: 'summary', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.TAB_SUMMARY'), keepAlive: true },
@@ -86,6 +95,7 @@ export default {
         return {
             tabState,
             routeState,
+            spotGroupId,
             openSpotGroupDeleteModal,
             openSpotGroupEditModal,
         };
@@ -121,6 +131,10 @@ export default {
         .button-group {
             margin-left: 0.75rem;
         }
+    }
+
+    .tab-bg {
+        @apply bg-white border border-gray-200 rounded-sm pb-8;
     }
 }
 </style>
