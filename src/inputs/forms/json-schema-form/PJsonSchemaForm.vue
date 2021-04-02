@@ -250,6 +250,7 @@ export default {
             line-height: 1.4;
             margin-left: 0.25rem;
             margin-bottom: 0.25rem;
+            font-weight: normal;
         }
         .form-control {
             @apply text-gray-900 border border-gray-300;

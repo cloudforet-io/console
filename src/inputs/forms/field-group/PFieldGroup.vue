@@ -1,11 +1,13 @@
 <template>
     <div class="p-field-group">
         <div class="label-box">
-            <slot name="label" :class="{'form-label':true}">
-                <label v-if="label" class="form-label">{{ label }}</label>
-            </slot>
-            <!--            <span v-if="required" class="required-mark">*</span>-->
-            <span v-if="!required" class="optional-mark">({{ $t('COMPONENT.FIELD_GROUP.OPTIONAL') }})</span>
+            <label v-if="label || $scopedSlots.label" class="form-label" @click="$emit('click-label')">
+                <slot name="label">
+                    {{ label }}
+                </slot>
+                <span v-if="!required" class="optional-mark">({{ $t('COMPONENT.FIELD_GROUP.OPTIONAL') }})</span>
+                <slot name="label-extra" />
+            </label>
         </div>
         <small v-if="$scopedSlots.help || helpText" class="help-msg">
             <slot name="help">{{ helpText }}</slot>
@@ -75,14 +77,8 @@ export default defineComponent({
         font-size: 0.875rem;
         font-weight: bold;
         letter-spacing: 0;
-        margin-bottom: 0.25rem;
         line-height: 1.4rem;
-    }
-    .required-mark {
-        @apply text-alert;
-        font-size: 0.25rem;
-        line-height: 1.2rem;
-        margin-left: 0.1rem;
+        margin-bottom: 0.25rem;
     }
     .optional-mark {
         @apply text-gray-500;
@@ -90,6 +86,7 @@ export default defineComponent({
         line-height: 1.4;
         margin-left: 0.25rem;
         margin-bottom: 0.25rem;
+        font-weight: normal;
     }
     .help-msg {
         @apply block mb-2;

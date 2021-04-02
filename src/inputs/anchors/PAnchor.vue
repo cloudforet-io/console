@@ -1,6 +1,7 @@
 <template>
     <a :href="!disabled&&href" :target="target"
        class="p-anchor" :class="{disabled, highlight}"
+       v-on="$listeners"
     >
         <span class="text" :class="{disabled}">
             <slot v-bind="$props">

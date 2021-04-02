@@ -10,7 +10,7 @@
 <script lang="ts">
 import lottie from 'lottie-web';
 import {
-    computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
+    defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { LottieProps } from '@/foundation/lottie/type';
 
@@ -58,6 +58,7 @@ export default defineComponent({
         const state = reactive({
             animation: null as any,
             lottieRef: null as any,
+            uuid: Math.floor(Math.random() * Date.now()),
         });
 
         let stopWatch: any;
@@ -69,7 +70,7 @@ export default defineComponent({
             const lottieFile = await import(/* webpackMode: "eager" */ `./p-lotties/${props.name}.json`);
             if (lottieFile) {
                 state.animation = await lottie.loadAnimation({
-                    name: props.name,
+                    name: state.uuid,
                     container: state.lottieRef,
                     renderer: 'svg',
                     loop: true,
@@ -86,7 +87,7 @@ export default defineComponent({
         });
 
         onUnmounted(() => {
-            lottie.destroy(props.name);
+            lottie.destroy(state.uuid);
             stopWatch();
         });
 

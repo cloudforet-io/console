@@ -153,6 +153,23 @@ import { reactive, toRefs } from '@vue/composition-api';
             type: 'text'
         }
     },
+    labelExtraSlot: {
+        name: 'label-extra',
+        description: 'Slot for add something into right area of label',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+        control: {
+            type: 'text'
+        }
+    },
     validSlot: {
         name: 'valid',
         description: 'Slot for valid text',
@@ -221,6 +238,20 @@ import { reactive, toRefs } from '@vue/composition-api';
             type: 'text'
         }
     },
+    onClickLabel: {
+        name: 'click-label',
+        description: 'Event triggered by clicking label',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'events'
+        },
+    }
 }}/>
 
 
@@ -235,6 +266,9 @@ export const Template = (args, { argTypes }) => ({
         >
             <template v-if="labelSlot" #label>
                 <div v-html="labelSlot"/>
+            </template>
+            <template v-if="labelExtraSlot" #label-extra>
+                <div v-html="labelExtraSlot"/>
             </template>
             <template v-if="validSlot" #valid>
                 <div v-html="validSlot"/>
