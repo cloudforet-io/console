@@ -17,7 +17,7 @@
                             <span class="suffix">/ {{ d.count }}{{ d.suffix }}</span>
                         </template>
                         <template v-else>
-                            <span class="count">{{ d.count }}</span>
+                            <span class="count">{{ commaFormatter(d.count) }}</span>
                             <span class="suffix">{{ d.suffix }}</span>
                         </template>
                     </p>
@@ -47,6 +47,8 @@
                             :resources="resources"
                             :resource-type="resourceType"
                             :selected-metrics="['CPUUtilization']"
+                            chart-min-width="48%"
+                            chart-max-width="48%"
                 />
             </template>
             <template v-else-if="selectedIndex === 1">
@@ -54,6 +56,8 @@
                             :resources="resources"
                             :resource-type="resourceType"
                             :selected-metrics="['EBSReadOps', 'EBSWriteOps', 'EBSReadBytes', 'EBSWriteBytes']"
+                            chart-min-width="48%"
+                            chart-max-width="48%"
                 />
             </template>
             <template v-else-if="selectedIndex === 2">
@@ -129,7 +133,7 @@ export default {
                     type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTANCE'),
                     detail: instanceState.unhealthyCount > 0 ? vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.HAS_PROBLEM') : vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.NORMAL'),
                     status: instanceState.unhealthyCount > 0 ? 'unhealthy' : 'healthy',
-                    count: 10,
+                    count: instanceState.count,
                     suffix: '개',
                 },
                 {
@@ -139,6 +143,12 @@ export default {
                 },
             ])),
         });
+
+        /* util */
+        const commaFormatter = (num) => {
+            if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return num;
+        };
 
         /* api */
         const getInstanceSchema = async (spotGroup) => {
@@ -166,12 +176,11 @@ export default {
                 const instances = get(res, 'data.instances');
                 instanceState.data = instances;
                 instanceState.count = instances.length;
-                instanceState.unhealthyCount = instances.map(d => d.health_status !== 'Healthy').length;
+                instanceState.unhealthyCount = (instances.filter(d => d.health_status !== 'Healthy')).length;
             } catch (e) {
                 console.error(e);
             }
         };
-        /* api */
         const getSpotGroupServers = async (spotGroup) => {
             try {
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupServers({
@@ -200,6 +209,7 @@ export default {
             ...toRefs(state),
             instanceState,
             onClickBox,
+            commaFormatter,
         };
     },
 };

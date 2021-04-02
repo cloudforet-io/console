@@ -49,8 +49,8 @@
             <template v-else>
                 <p-grid-layout :items="chartMetrics" row-gap="3rem" column-gap="1rem"
                                card-height="auto"
-                               card-min-width="23.125rem"
-                               card-max-width="23.125rem"
+                               :card-min-width="chartMinWidth"
+                               :card-max-width="chartMaxWidth"
                                :card-class="() => []"
                 >
                     <template #card="{item, index}">
@@ -201,6 +201,14 @@ export default {
         showTools: {
             type: Boolean,
             default: true,
+        },
+        chartMinWidth: {
+            type: String,
+            default: '23.125rem',
+        },
+        chartMaxWidth: {
+            type: String,
+            default: '23.125rem',
         },
     },
     setup(props: MonitoringProps) {
@@ -418,7 +426,6 @@ export default {
 
             watch([() => props.resources, () => props.selectedMetrics], async () => {
                 if (props.resources) {
-                    console.log('here');
                     await listDataSources();
                     await listAll();
                 }
