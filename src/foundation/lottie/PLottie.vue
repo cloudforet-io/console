@@ -58,7 +58,7 @@ export default defineComponent({
         const state = reactive({
             animation: null as any,
             lottieRef: null as any,
-            uuid: Math.floor(Math.random() * Date.now()),
+            uuid: Math.floor(Math.random() * Date.now()).toString(),
         });
 
         let stopWatch: any;
