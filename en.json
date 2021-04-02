@@ -144,6 +144,7 @@
 					"ONE_MORE_REQUIRED": "",
 					"OPTIMIZED_TYPE": ""
 				},
+				"LOAD_FAILED": "Oops, Looks like something went wrong.",
 				"SCHEDULE_POLICY": {
 					"LABEL": "",
 					"SETTING_LABEL": "",
@@ -153,7 +154,9 @@
 					"SETTING_TYPE_LABEL": "",
 					"SETTING_TYPE_RATIO": "",
 					"UNIT_COUNT": ""
-				}
+				},
+				"SELECT_RESOURCE": "",
+				"TRY_AGAIN": "Try again"
 			},
 			"DETAIL": {
 				"BASE_INFO": {

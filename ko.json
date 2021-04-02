@@ -144,6 +144,7 @@
 					"ONE_MORE_REQUIRED": "하나 이상의 인스턴스 타입이 필요합니다.",
 					"OPTIMIZED_TYPE": "최적화된 인스턴스 타입"
 				},
+				"LOAD_FAILED": "문제가 발생하여 데이터를 가져오지 못했습니다.",
 				"SCHEDULE_POLICY": {
 					"LABEL": "스케줄 정책",
 					"SETTING_LABEL": "설정",
@@ -153,7 +154,9 @@
 					"SETTING_TYPE_LABEL": "설정 방식",
 					"SETTING_TYPE_RATIO": "비율",
 					"UNIT_COUNT": "개"
-				}
+				},
+				"SELECT_RESOURCE": "리소스를 선택하면 설정이 가능합니다.",
+				"TRY_AGAIN": "다시 시도"
 			},
 			"DETAIL": {
 				"BASE_INFO": {
