@@ -37,7 +37,7 @@
         <div class="spot-card-divider" />
         <div class="instance-column">
             <p class="column-header">
-                INSTANCE {{ cloudServiceData.status }}
+                INSTANCE
             </p>
             <div class="column-title-wrapper">
                 <div>
@@ -45,11 +45,15 @@
                         인스턴스
                     </p>
                     <p class="column-number">
-                        {{ cloudServiceData.instanceNum }}
+                        {{ cardData.instanceCount.total }}
                         <span class="column-number-unit">개</span>
                     </p>
                 </div>
-                <on-demand-and-spot-chart chart-type="short" class="on-demand-chart" />
+                <on-demand-and-spot-chart chart-type="short"
+                                          :spot="cardData.instanceCount.spot"
+                                          :ondemand="cardData.instanceCount.ondemand"
+                                          class="on-demand-chart"
+                />
             </div>
             <p class="column-title">
                 인스턴스 평균 CPU 사용률
@@ -85,7 +89,7 @@
                     name="ic_provider_aws"
                     class="mr-2"
                 />
-                Auto Scaling Group
+                {{ cloudServiceData.cloudServiceType.recommended_title }}
             </p>
         </div>
     </article>

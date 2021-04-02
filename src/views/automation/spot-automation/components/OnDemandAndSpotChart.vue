@@ -52,6 +52,14 @@ export default defineComponent({
             type: String,
             default: 'long',
         },
+        spot: {
+            type: Number,
+            default: 0,
+        },
+        ondemand: {
+            type: Number,
+            default: 0,
+        },
     },
     setup(props) {
         const state = reactive({
@@ -115,11 +123,11 @@ export default defineComponent({
             try {
                 const res = [{
                     name: '스팟',
-                    count: 160,
+                    count: props.spot,
                     color: colors[0] || gray[400],
                 }, {
                     name: '온디맨드',
-                    count: 72,
+                    count: props.ondemand,
                     color: colors[1] || gray[400],
                 }];
                 state.data = res;

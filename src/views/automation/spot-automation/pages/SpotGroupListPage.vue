@@ -22,14 +22,14 @@
                    @change="onChange"
                    @refresh="onChange"
         />
-<!--        <p-i name="ic_list" width="1.5rem" height="1.5rem"-->
-<!--             color="inherit transparent"-->
-<!--             @click="showListView"-->
-<!--        />-->
-<!--        <p-i name="ic_card-list" width="1.5rem" height="1.5rem"-->
-<!--             color="inherit transparent"-->
-<!--             @click="showCardView"-->
-<!--        />-->
+        <!--        <p-i name="ic_list" width="1.5rem" height="1.5rem"-->
+        <!--             color="inherit transparent"-->
+        <!--             @click="showListView"-->
+        <!--        />-->
+        <!--        <p-i name="ic_card-list" width="1.5rem" height="1.5rem"-->
+        <!--             color="inherit transparent"-->
+        <!--             @click="showCardView"-->
+        <!--        />-->
         <p-data-loader class="flex-grow" :data="items" :loading="loading"
                        :class="{'short': isShort}"
         >
@@ -126,6 +126,16 @@ export default {
             return apiQuery.data;
         };
 
+        const getSpotGroupInstanceCount = async (spotGroupIds) => {
+            const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceCount({
+                // eslint-disable-next-line camelcase
+                spot_groups: spotGroupIds,
+            });
+            Object.keys(state.items).forEach((i) => {
+                state.items[i].instanceCount = res.spot_groups[state.items[i].spot_group_id];
+            });
+        };
+
         const listSpotGroup = async () => {
             state.loading = true;
             try {
@@ -135,19 +145,22 @@ export default {
                     created_at: timestampFormatter(d.created_at, state.timezone),
                 }));
                 state.totalCount = res.total_count || 0;
+                const spotGroupIds = res.results.map(item => item.spot_group_id) || [];
+                await getSpotGroupInstanceCount(spotGroupIds);
                 state.loading = false;
             } catch (e) {
                 console.error(e);
             }
         };
 
-        const showListView = () => {
-            state.isShort = false;
-        };
 
-        const showCardView = () => {
-            state.isShort = true;
-        };
+        // const showListView = () => {
+        //     state.isShort = false;
+        // };
+        //
+        // const showCardView = () => {
+        //     state.isShort = true;
+        // };
 
         const changeQueryString = async (options) => {
             queryHelper.setFiltersAsQueryTag(options.queryTags);
@@ -177,8 +190,8 @@ export default {
             routeState,
             onChange,
             timestampFormatter,
-            showListView,
-            showCardView,
+            // showListView,
+            // showCardView,
         };
     },
 };
@@ -201,7 +214,7 @@ export default {
     &.short {
         @apply grid;
         grid-template-columns: repeat(auto-fit, minmax(259px, 1fr));
-        row-gap: 1.5rem;
+        row-gap: 1rem;
         column-gap: 1.5rem;
 
         @screen md {
@@ -212,10 +225,5 @@ export default {
             grid-template-columns: repeat(auto-fit, minmax(700px, 1fr));
         }
     }
-}
-
-.spot-group-card {
-    margin-top: 1.5rem;
-
 }
 </style>

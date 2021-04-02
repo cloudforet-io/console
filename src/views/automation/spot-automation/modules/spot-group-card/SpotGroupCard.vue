@@ -36,8 +36,11 @@
                                      :cloud-service-data="cloudServiceData"
                                      :is-short="isShort"
             />
-            <spot-group-card-mobile v-if="!loading" class="card-mobile-version" />
-
+            <spot-group-card-mobile v-if="!loading"
+                                    :card-data="cardData"
+                                    :cloud-service-data="cloudServiceData"
+                                    class="card-mobile-version"
+            />
             <p-lottie v-if="loading" name="thin-spinner" class="loader"
                       auto
                       :size="2.5"
@@ -103,8 +106,14 @@ export default {
                     // eslint-disable-next-line camelcase
                     cloud_service_id: props.cardData.resource_id,
                 });
-                state.cloudServiceData.instanceNum = cloudServiceData.data.instances?.length || 0;
+                // state.cloudServiceData.instanceNum = cloudServiceData.data.instances?.length || 0;
                 state.cloudServiceData.loadbalancerNum = cloudServiceData.data.load_balancer_arns?.length || 0;
+                const cloudServiceType = await SpaceConnector.client.spotAutomation.spotGroup.getCloudServiceType({
+                    // eslint-disable-next-line camelcase
+                    spot_group_id: props.cardData.spot_group_id,
+                });
+                console.log(cloudServiceType);
+                state.cloudServiceData.cloudServiceType = cloudServiceType;
             } catch (e) {
                 console.error(e);
             } finally {

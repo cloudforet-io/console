@@ -4,13 +4,23 @@
             <p class="card-content-text">
                 스팟 인터럽트 <span class="card-content-number">4 </span>
             </p>
-            <p class="card-content-text">인스턴스 <span class="card-content-number">10 </span>개</p>
-            <p class="card-content-text">인스턴스 평균 CPU 사용률 <span class="card-content-number">0 </span>%</p>
-            <p class="card-content-text">평균 디스크 사용률 <span class="card-content-number">0 </span>IOPS</p>
+            <p class="card-content-text">
+                인스턴스 <span class="card-content-number">{{cardData.instanceCount.total}} </span>개
+            </p>
+            <p class="card-content-text">
+                인스턴스 평균 CPU 사용률 <span class="card-content-number">0 </span>%
+            </p>
+            <p class="card-content-text">
+                평균 디스크 사용률 <span class="card-content-number">0 </span>IOPS
+            </p>
         </div>
         <div class="right-desc">
-            <p class="card-content-text">로드밸런서 (개수) <span class="card-content-number">1 </span>개</p>
-            <p class="card-content-text">서비스 타입 <span>[AWS] Auto Scaling Group</span></p>
+            <p class="card-content-text">
+                로드밸런서 (개수) <span class="card-content-number">{{cloudServiceData.loadbalancerNum}} </span>개
+            </p>
+            <p class="card-content-text">
+                서비스 타입 <span>{{ cloudServiceData.cloudServiceType.name }}</span>
+            </p>
         </div>
     </article>
 </template>
@@ -18,6 +28,16 @@
 <script lang="ts">
 export default {
     name: 'SpotGroupCardMobile',
+    props: {
+        cardData: {
+            type: Object,
+            default: () => ({}),
+        },
+        cloudServiceData: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
 };
 </script>
 
