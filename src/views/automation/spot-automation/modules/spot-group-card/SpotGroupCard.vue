@@ -112,7 +112,6 @@ export default {
                     // eslint-disable-next-line camelcase
                     spot_group_id: props.cardData.spot_group_id,
                 });
-                console.log(cloudServiceType);
                 state.cloudServiceData.cloudServiceType = cloudServiceType;
             } catch (e) {
                 console.error(e);

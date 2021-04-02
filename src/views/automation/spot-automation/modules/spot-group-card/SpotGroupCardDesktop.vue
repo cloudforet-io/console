@@ -1,23 +1,5 @@
 <template>
     <article class="desktop-wrapper">
-        <div class="name-column" :class="{'short': isShort}">
-            <p class="spot-group-title">
-                {{ cardData.name }}
-            </p>
-            <p class="saving-cost">
-                절감 비용
-            </p>
-            <p class="duration">
-                이번달 1일 ~ 어제
-            </p>
-            <div class="cost">
-                <span class="dollar">
-                    $
-                </span>
-                125
-            </div>
-        </div>
-        <div class="spot-card-divider" />
         <div class="spot-column">
             <p class="column-header">
                 SPOT
@@ -119,7 +101,6 @@ export default {
     },
     setup(props) {
         return {
-
         };
     },
 };
@@ -131,59 +112,6 @@ export default {
     flex-direction: row;
     justify-content: space-between;
     height: 100%;
-
-    @screen md {
-        height: 3rem;
-        .name-column {
-            height: 100%;
-            display: none;
-        }
-    }
-
-    @screen lg {
-        .name-column {
-            display: flex;
-            &.short {
-                display: none;
-            }
-        }
-
-    }
-}
-.name-column {
-    flex: 1;
-    flex-direction: column;
-    padding-top: 2rem;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
-    .spot-group-title {
-        @apply font-bold;
-        font-size: 1.5rem;
-        line-height: 135%;
-        margin-bottom: 4.5rem;
-    }
-    .saving-cost {
-        @apply text-gray-900 font-bold;
-        font-size: 0.875rem;
-        line-height: 100%;
-        margin-bottom: 0.375rem;
-    }
-    .duration {
-        @apply text-gray-900;
-        font-size: 0.75rem;
-        line-height: 100%;
-        margin-bottom: 0.5rem;
-    }
-    .cost {
-        @apply text-blue-500 font-bold;
-        font-size: 2.75rem;
-        line-height: 100%;
-        .dollar {
-            font-size: 1.5rem;
-            font-weight: normal;
-            line-height: 120%;
-        }
-    }
 }
 .column-header {
     @apply font-bold text-gray-300;
@@ -211,6 +139,7 @@ export default {
     padding-top: 2rem;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
+    //border-right: 0.0625rem dashed rgba(theme('colors.gray.200'), 1);
     .spot-interrupt-desc {
         @apply text-gray-400;
         font-size: 0.75rem;
@@ -225,6 +154,7 @@ export default {
     padding-top: 2rem;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
+    //border-right: 0.0625rem dashed rgba(theme('colors.gray.200'), 1);
     .column-title-wrapper {
         display: flex;
     }
@@ -235,7 +165,7 @@ export default {
 }
 .load-balancer-column {
     flex: 1;
-    padding-top: 2rem;
+    padding-top: 4.375rem;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
     .column-text {
@@ -244,7 +174,8 @@ export default {
     }
 }
 .spot-card-divider {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
     border-left: 0.0625rem dashed rgba(theme('colors.gray.200'), 1);
-    height: 100%;
 }
 </style>

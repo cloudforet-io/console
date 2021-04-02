@@ -5,7 +5,7 @@
                 스팟 인터럽트 <span class="card-content-number">4 </span>
             </p>
             <p class="card-content-text">
-                인스턴스 <span class="card-content-number">{{cardData.instanceCount.total}} </span>개
+                인스턴스 <span class="card-content-number">{{ cardData.instanceCount.total }} </span>개
             </p>
             <p class="card-content-text">
                 인스턴스 평균 CPU 사용률 <span class="card-content-number">0 </span>%
@@ -16,7 +16,7 @@
         </div>
         <div class="right-desc">
             <p class="card-content-text">
-                로드밸런서 (개수) <span class="card-content-number">{{cloudServiceData.loadbalancerNum}} </span>개
+                로드밸런서 (개수) <span class="card-content-number">{{ cloudServiceData.loadbalancerNum }} </span>개
             </p>
             <p class="card-content-text">
                 서비스 타입 <span>{{ cloudServiceData.cloudServiceType.name }}</span>

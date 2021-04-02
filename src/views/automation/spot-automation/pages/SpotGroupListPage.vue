@@ -22,21 +22,14 @@
                    @change="onChange"
                    @refresh="onChange"
         />
-        <!--        <p-i name="ic_list" width="1.5rem" height="1.5rem"-->
-        <!--             color="inherit transparent"-->
-        <!--             @click="showListView"-->
-        <!--        />-->
-        <!--        <p-i name="ic_card-list" width="1.5rem" height="1.5rem"-->
-        <!--             color="inherit transparent"-->
-        <!--             @click="showCardView"-->
-        <!--        />-->
         <p-data-loader class="flex-grow" :data="items" :loading="loading"
                        :class="{'short': isShort}"
         >
             <div class="card-wrapper" :class="{'short': isShort}">
                 <div v-for="item in items" :key="item.spot_group_id" class="spot-group-card">
                     <router-link :to="{ name: 'spotGroupDetail',params: {id: item.spot_group_id}}">
-                        <spot-group-card :card-data="item"
+                        <spot-group-card v-if="!loading && !cardDataLoading"
+                                         :card-data="item"
                                          :is-short="isShort"
                         />
                     </router-link>
@@ -100,6 +93,7 @@ export default {
         const state = reactive({
             items: undefined as any,
             loading: true,
+            cardDataLoading: true,
             keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
             tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
@@ -138,6 +132,7 @@ export default {
 
         const listSpotGroup = async () => {
             state.loading = true;
+            state.cardDataLoading = true;
             try {
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.list({ query: getQuery() });
                 state.items = res.results.map(d => ({
@@ -145,22 +140,14 @@ export default {
                     created_at: timestampFormatter(d.created_at, state.timezone),
                 }));
                 state.totalCount = res.total_count || 0;
+                state.loading = false;
                 const spotGroupIds = res.results.map(item => item.spot_group_id) || [];
                 await getSpotGroupInstanceCount(spotGroupIds);
-                state.loading = false;
+                state.cardDataLoading = false;
             } catch (e) {
                 console.error(e);
             }
         };
-
-
-        // const showListView = () => {
-        //     state.isShort = false;
-        // };
-        //
-        // const showCardView = () => {
-        //     state.isShort = true;
-        // };
 
         const changeQueryString = async (options) => {
             queryHelper.setFiltersAsQueryTag(options.queryTags);
@@ -190,8 +177,6 @@ export default {
             routeState,
             onChange,
             timestampFormatter,
-            // showListView,
-            // showCardView,
         };
     },
 };
