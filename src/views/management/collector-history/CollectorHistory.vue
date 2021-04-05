@@ -94,7 +94,6 @@
             <p-button-modal
                 class="button-modal"
                 :header-title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_TITLE')"
-                :centered="true"
                 :scrollable="false"
                 size="md"
                 :fade="true"

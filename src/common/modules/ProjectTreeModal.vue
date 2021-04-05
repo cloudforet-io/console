@@ -2,7 +2,6 @@
     <p-button-modal :header-title="$t('COMMON.TREE_MODAL.TITLE')"
                     size="md"
                     :scrollable="true"
-                    centered
                     fade
                     backdrop
                     :visible.sync="proxyVisible"

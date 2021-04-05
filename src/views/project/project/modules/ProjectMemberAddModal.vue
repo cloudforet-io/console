@@ -1,7 +1,6 @@
 <template>
     <p-button-modal
         :header-title="$tc('PROJECT.DETAIL.MODAL_ADD_MEMBER', items.length)"
-        :centered="true"
         size="lg"
         :fade="true"
         :backdrop="true"

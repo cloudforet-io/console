@@ -114,7 +114,6 @@
                                   :verification-text="doubleCheckModalState.verificationText"
                                   :theme-color="doubleCheckModalState.themeColor"
                                   size="sm"
-                                  :centered="true"
                                   @confirm="deleteServiceAccount"
             />
             <project-tree-modal :visible.sync="changeProjectState.visible"

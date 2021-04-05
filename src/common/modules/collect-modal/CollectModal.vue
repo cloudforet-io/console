@@ -1,6 +1,5 @@
 <template>
     <p-button-modal :header-title="$t('COMMON.COLLECT_MODAL.TITLE')"
-                    centered
                     size="lg"
                     fade
                     backdrop

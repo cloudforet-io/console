@@ -131,7 +131,6 @@
             :theme-color="modalState.themeColor"
             :fields="fields"
             size="md"
-            centered
             :selectable="false"
             :items="selectedUsers"
             @confirm="checkModalConfirm"

@@ -85,7 +85,6 @@
         </section>
 
         <p-button-modal :header-title="checkDeleteState.headerTitle"
-                        :centered="true"
                         :scrollable="false"
                         size="md"
                         :fade="true"
@@ -102,7 +101,6 @@
         </p-button-modal>
 
         <p-button-modal :header-title="$t('AUTOMATION.POWER_SCHEDULER.DETAILS.CHECK_TIME_SET_MODAL_TITLE')"
-                        centered
                         size="md"
                         fade
                         :visible.sync="checkModalState.visible"
@@ -125,7 +123,7 @@
             </template>
         </p-button-modal>
 
-        <p-button-modal :header-title="nameEditState.headerTitle" centered size="md"
+        <p-button-modal :header-title="nameEditState.headerTitle" size="md"
                         :visible.sync="nameEditState.visible"
                         :disabled="nameEditState.loading ||
                             (nameEditState.showValidation && !nameEditState.isValid)"

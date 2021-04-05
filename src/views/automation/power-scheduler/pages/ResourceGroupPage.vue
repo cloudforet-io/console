@@ -103,7 +103,6 @@
         </transition>
         <p-table-check-modal theme-color="primary"
                              size="lg"
-                             centered
                              :header-title="listModalState.headerTitle"
                              :visible.sync="listModalState.visible"
                              @confirm="onListModalConfirm"

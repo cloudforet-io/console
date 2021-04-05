@@ -100,7 +100,6 @@
                              :sub-title="checkTableModalState.subTitle"
                              :theme-color="checkTableModalState.themeColor"
                              size="lg"
-                             :centered="true"
                              :selectable="false"
                              @confirm="checkModalConfirm"
         >
