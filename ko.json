@@ -131,6 +131,15 @@
 					"TAG_LABEL": "태그"
 				},
 				"CANCEL": "취소",
+				"CHECK_MODAL": {
+					"BACK": "돌아가기",
+					"CLOUD_SERVICE_CATEGORY_LABEL": "클라우드 서비스 카테고리",
+					"DESC": "모든 인스턴스는 스팟으로 운영됩니다.",
+					"RESOURCE_ID_LABEL": "리소스 아이디",
+					"RESOURCE_NAME_LABEL": "리소스 이름",
+					"SPOT_GROUP_LABEL": "스팟그룹 이름",
+					"TITLE": "세부사항 확인"
+				},
 				"CLOUD_SERVICE": {
 					"LABEL": "클라우드 서비스",
 					"RESOURCE_LABEL": "리소스",
@@ -146,6 +155,7 @@
 				},
 				"LOAD_FAILED": "문제가 발생하여 데이터를 가져오지 못했습니다.",
 				"SCHEDULE_POLICY": {
+					"DESC": "인스턴스 개수에 변화가 생기면, 온디맨드 설정 개수는 유지되고(고정값) 스팟 인스턴스의 개수가 변화합니다.",
 					"LABEL": "스케줄 정책",
 					"SETTING_LABEL": "설정",
 					"SETTING_ONDEMAND": "온디맨드",
@@ -156,7 +166,8 @@
 					"UNIT_COUNT": "개"
 				},
 				"SELECT_RESOURCE": "리소스를 선택하면 설정이 가능합니다.",
-				"TRY_AGAIN": "다시 시도"
+				"TRY_AGAIN": "다시 시도",
+				"TRY_AGAIN_DESC": "문제가 발생하여 데이터를 가져오지 못했습니다."
 			},
 			"DETAIL": {
 				"BASE_INFO": {

@@ -131,6 +131,15 @@
 					"TAG_LABEL": ""
 				},
 				"CANCEL": "",
+				"CHECK_MODAL": {
+					"BACK": "Back",
+					"CLOUD_SERVICE_CATEGORY_LABEL": "",
+					"DESC": "",
+					"RESOURCE_ID_LABEL": "",
+					"RESOURCE_NAME_LABEL": "",
+					"SPOT_GROUP_LABEL": "",
+					"TITLE": "Confirm detail"
+				},
 				"CLOUD_SERVICE": {
 					"LABEL": "",
 					"RESOURCE_LABEL": "",
@@ -146,6 +155,7 @@
 				},
 				"LOAD_FAILED": "Oops, Looks like something went wrong.",
 				"SCHEDULE_POLICY": {
+					"DESC": "",
 					"LABEL": "",
 					"SETTING_LABEL": "",
 					"SETTING_ONDEMAND": "",
@@ -156,7 +166,8 @@
 					"UNIT_COUNT": ""
 				},
 				"SELECT_RESOURCE": "",
-				"TRY_AGAIN": "Try again"
+				"TRY_AGAIN": "Try again",
+				"TRY_AGAIN_DESC": ""
 			},
 			"DETAIL": {
 				"BASE_INFO": {
