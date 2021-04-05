@@ -1,0 +1,396 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import PButtonModal from "@/feedbacks/modals/button-modal/PButtonModal";
+import { THEME_COLORS, ModalSizeType } from '@/feedbacks/modals/button-modal/type';
+import {computed, reactive, toRefs} from "@vue/composition-api";
+import PButton from "@/inputs/buttons/button/PButton";
+import faker from 'faker';
+
+<Meta title='Feedbacks/Modals/Button Modal' parameters={{
+    centered: { disable: true },
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=7654%3A182002',
+    },
+}} component={PButtonModal} argTypes={{
+    size: {
+        name: 'size',
+        type: { name: 'string' },
+        description: 'Change Modal Size',
+        defaultValue: 'md',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'md',
+            }
+        },
+        control: {
+            type: 'select',
+            options: ['sm', 'md', 'lg']
+        }
+    },
+    themeColor: {
+        name: 'themeColor',
+        type: {name: 'string'},
+        description: 'Change Modal theme',
+        defaultValue: 'primary',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'primary',
+            }
+        },
+        control: {
+            type: 'select',
+            options: THEME_COLORS
+        }
+    },
+    contentsHeight: {
+        name: 'contentsHeight',
+        type: { name: 'number' },
+        description: 'Contents Height',
+        defaultValue: 40,
+        table: {
+            type: {
+                summary: 'number',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 40,
+            }
+        },
+        control: {
+            type: 'number'
+        }
+    },
+    visible: {
+        name: 'visible',
+        type: { name: 'boolean' },
+        description: 'Visible',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            }
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    headerTitle: {
+        name: 'headerTitle',
+        type: { name: 'string' },
+        description: 'Header Title',
+        defaultValue: 'Header Title',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'Header Title'
+            }
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    fade: {
+        name: 'fade',
+        type: { name: 'boolean' },
+        description: 'Fade',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            }
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    scrollable: {
+        name: 'scrollable',
+        type: {name: 'boolean'},
+        description: 'Scrollable',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            }
+        },
+        control: {
+            type: 'boolean'
+        },
+    },
+    backdrop: {
+        name: 'backdrop',
+        type: {name: 'boolean'},
+        description: 'Backdrop',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true
+            }
+        },
+        control: {
+            type: 'boolean'
+        },
+    },
+    headerVisible: {
+        name: 'headerVisible',
+        type: {name: 'boolean'},
+        description: 'Show Header or Not',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true
+            }
+        },
+        control: {
+            type: 'boolean'
+        },
+    },
+    bodyVisible: {
+        name: 'bodyVisible',
+        type: {name: 'boolean'},
+        description: 'Show Body or Not',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true
+            }
+        },
+        control: {
+            type: 'boolean'
+        },
+    },
+    footerVisible: {
+        name: 'footerVisible',
+        type: {name: 'boolean'},
+        description: 'Show Footer or Not',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true
+            }
+        },
+        control: {
+            type: 'boolean'
+        },
+    },
+    headerCloseButtonVisible: {
+        name: 'headerCloseButtonVisible',
+        type: {name: 'boolean'},
+        description: 'Show Close Button in Header or Not',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true
+            }
+        },
+        control: {
+            type: 'boolean'
+        },
+    },
+    footerResetButtonVisible: {
+        name: 'footerResetButtonVisible',
+        type: {name: 'boolean'},
+        description: 'Show Reset Button in Footer or Not',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            }
+        },
+        control: {
+            type: 'boolean'
+        },
+    },
+    loading: {
+        name: 'loading',
+        type: {name: 'boolean'},
+        description: 'Show Loading in confirm button',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            }
+        },
+        control: {
+            type: 'boolean'
+        },
+    },
+    disabled: {
+        name: 'disabled',
+        type: {name: 'boolean'},
+        description: 'Disable confirm button or Not',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            }
+        },
+        control: {
+            type: 'boolean'
+        },
+    },
+    body: {
+        name: 'body',
+        description: 'Slot for body content',
+        defaultValue: 'Modal Content',
+        table: {
+            type: {
+                summary: 'Modal Content'
+            },
+            category: 'slots',
+            defaultValue: 'Modal Content',
+        }
+    },
+    'footer-extra': {
+        name: 'footer-extra',
+        description: 'Slot for Extra contents in Footer',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            category: 'slots',
+            defaultValue: null,
+        }
+    },
+    'reset-button': {
+        name: 'reset-button',
+        description: 'Slot for changing text in reset button',
+        defaultValue: 'Reset',
+        table: {
+            type: {
+                summary: 'Reset'
+            },
+            category: 'slots',
+            defaultValue: 'Reset',
+        }
+    },
+    'close-button': {
+        name: 'cancel-button',
+        description: 'Slot for changing text in cancel button',
+        defaultValue: 'Cancel',
+        table: {
+            type: {
+                summary: 'Cancel'
+            },
+            category: 'slots',
+            defaultValue: 'Cancel',
+        }
+    },
+    'confirm-button': {
+        name: 'confirm-button',
+        description: 'Slot for changing text in confirm button',
+        defaultValue: 'Confirm',
+        table: {
+            type: {
+                summary: 'Confirm'
+            },
+            category: 'slots',
+            defaultValue: 'Confirm',
+        }
+    },
+}} />
+
+export const Template = (args, {argTypes} ) => ({
+    props: Object.keys(argTypes),
+    components: { PButtonModal, PButton },
+    template: `<div>
+                <p-button :styleType="themeColor" @click="launchModal">Launch a modal</p-button>
+                <p-button-modal v-bind="$props"
+                                :visible.sync="_visible"
+                               @close="closeModal"
+                >
+                    <template #body>
+                        <p>{{contents}}</p>
+                    </template>
+                </p-button-modal>
+            </div>`,
+    setup(props) {
+        const state = reactive({
+            _visible: props.visible,
+            contents: computed(() => faker.lorem.lines(props.contentsHeight)),
+        })
+        const launchModal = () => {
+            state._visible = true;
+        };
+        const closeModal = () => {
+            state._visible = false;
+        };
+        return {
+            ...toRefs(state),
+            launchModal,
+            closeModal,
+        };
+    }
+});
+
+# Button Modal
+
+<br/>
+<br/>
+<br/>
+
+
+## Playground
+<Canvas>
+    <Story name="playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground"/>

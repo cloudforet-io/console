@@ -82,10 +82,10 @@ summary {
     z-index: 1;
     font-size: 0.75rem;
 }
-details ::-webkit-details-marker {
+details ::marker {
     color: transparent;
 }
-details[open] ::-webkit-details-marker {
+details[open] ::marker {
     color: transparent;
 }
 .hide-icon {
