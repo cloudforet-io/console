@@ -7,11 +7,10 @@
                      aria-modal="true"
                      aria-labelledby="headerTitle"
                      tabindex="1"
-                     @keydown.esc="onCloseClick"
                 >
                     <article class="modal-content" :class="[`modal-${themeColor}`, {'no-footer': !footerVisible}]">
                         <h3 class="header">
-                            <div v-if="headerVisible" class="modal-header" :class="headerClass">
+                            <div v-if="headerVisible" class="modal-header">
                                 <p-lottie name="lottie_error" auto :size="1.5"
                                           :class="[`modal-${themeColor}`]" class="header-lottie"
                                 />{{ headerTitle }}
@@ -27,7 +26,7 @@
                         <div v-if="bodyVisible" class="modal-body" :class="allBodyClass">
                             <slot name="body" />
                         </div>
-                        <div v-if="footerVisible" class="modal-footer" :class="footerClass">
+                        <div v-if="footerVisible" class="modal-footer">
                             <slot :slot-scope="$props" name="footer-extra" />
                             <p-button
                                 v-if="footerResetButtonVisible"
@@ -41,7 +40,6 @@
                                 </slot>
                             </p-button>
                             <p-button
-                                v-if="footerCancelButtonVisible"
                                 class="modal-btn cancel-btn"
                                 style-type="transparent"
                                 :disabled="loading"
@@ -51,12 +49,12 @@
                                     {{ $t('COMPONENT.BUTTON_MODAL.CANCEL') }}
                                 </slot>
                             </p-button>
-                            <p-loading-button v-if="footerConfirmButtonVisible"
-                                              class="modal-btn"
-                                              :style-type="themeColor"
-                                              :loading="loading"
-                                              :disabled="disabled"
-                                              @click="onConfirmClick"
+                            <p-loading-button
+                                class="modal-btn"
+                                :style-type="themeColor"
+                                :loading="loading"
+                                :disabled="disabled"
+                                @click="onConfirmClick"
                             >
                                 <slot :slot-scope="$props" name="confirm-button">
                                     {{ $t('COMPONENT.BUTTON_MODAL.CONFIRM') }}
@@ -108,10 +106,6 @@ export default {
             default: 'md',
             validator: value => Object.keys(sizeMapping).includes(value),
         },
-        centered: {
-            type: Boolean,
-            default: false,
-        },
         backdrop: {
             type: Boolean,
             default: true,
@@ -119,18 +113,6 @@ export default {
         themeColor: {
             type: String,
             default: 'primary',
-        },
-        headerClass: {
-            type: Array,
-            default: null,
-        },
-        bodyClass: {
-            type: Array,
-            default: null,
-        },
-        footerClass: {
-            type: Array,
-            default: null,
         },
         headerVisible: {
             type: Boolean,
@@ -152,21 +134,9 @@ export default {
             type: Boolean,
             default: true,
         },
-        footerCancelButtonVisible: {
-            type: Boolean,
-            default: true,
-        },
-        footerConfirmButtonVisible: {
-            type: Boolean,
-            default: true,
-        },
         footerResetButtonVisible: {
             type: Boolean,
             default: false,
-        },
-        hideOnCancel: {
-            type: Boolean,
-            default: true,
         },
         loading: {
             type: Boolean,
@@ -181,7 +151,7 @@ export default {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             allBodyClass: computed(() => {
-                const res = props.bodyClass ? [...props.bodyClass] : [];
+                const res: string[] = [];
                 if (props.size) res.push(props.size);
                 if (props.scrollable) res.push('scrollable');
                 return res;
@@ -189,7 +159,6 @@ export default {
         });
         const dialogClassObject = computed(() => [
             { scrollable: props.scrollable },
-            { centered: props.centered },
             props.size,
         ]);
         const hide = () => {
@@ -214,9 +183,7 @@ export default {
         const onCancelClick = () => {
             if (props.loading) return;
             emit('cancel');
-            if (props.hideOnCancel) {
-                state.proxyVisible = false;
-            }
+            state.proxyVisible = false;
         };
         const onConfirmClick = () => {
             emit('confirm');

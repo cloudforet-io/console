@@ -72,15 +72,6 @@ export const buttonModal = () => ({
         themeColor: {
             default: text('themeColor', 'primary'),
         },
-        headerClass: {
-            default: array('headerClass', []),
-        },
-        bodyClass: {
-            default: array('bodyClass', []),
-        },
-        footerClass: {
-            default: array('footerClass', []),
-        },
         headerVisible: {
             default: boolean('headerVisible', true),
         },
@@ -95,15 +86,6 @@ export const buttonModal = () => ({
         },
         headerCloseButtonVisible: {
             default: boolean('headerCloseButtonVisible', true),
-        },
-        footerCancelButtonVisible: {
-            default: boolean('footerCancelButtonVisible', true),
-        },
-        footerConfirmButtonVisible: {
-            default: boolean('footerConfirmButtonVisible', true),
-        },
-        hideOnCancel: {
-            default: boolean('hideOnCancel', true),
         },
         loading: {
             default: boolean('loading', false),

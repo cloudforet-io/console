@@ -16,7 +16,6 @@ import { ModalProps, sizeMapping } from '@/feedbacks/modals/type';
 const setup = (props, { emit }) => {
     const dialogClassObject = computed(() => [
         { scrollable: props.scrollable },
-        { centered: props.centered },
         props.size,
     ]);
     const hide = () => {
@@ -51,10 +50,6 @@ export default {
             default: 'md',
             validator: value => Object.keys(sizeMapping).includes(value),
         },
-        centered: {
-            type: Boolean,
-            default: false,
-        },
         backdrop: {
             type: Boolean,
             default: true,
@@ -67,7 +62,6 @@ export default {
     setup(props: ModalProps, { emit }) {
         const dialogClassObject = computed(() => [
             { scrollable: props.scrollable },
-            { centered: props.centered },
             props.size,
         ]);
         const hide = () => {
@@ -114,9 +108,6 @@ export default {
     width: 100vw;
     &.scrollable {
         overflow: auto;
-    }
-    &.centered {
-        align-self: center;
     }
     &.sm {
         min-width: 100px;

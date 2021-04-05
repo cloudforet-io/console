@@ -29,23 +29,16 @@ export interface ButtonModalProps {
     scrollable: boolean;
     size: ModalSizeType;
     visible: boolean; // sync
-    centered: boolean;
     backdrop: boolean;
 
     themeColor: ModalThemeColor;
-    headerClass: string[];
-    bodyClass: string[];
-    footerClass: string[];
     headerVisible: boolean;
     bodyVisible: boolean;
     footerVisible: boolean;
 
     headerTitle: string;
     headerCloseButtonVisible: boolean;
-    footerCancelButtonVisible: boolean;
-    footerConfirmButtonVisible: boolean;
 
-    hideOnCancel: boolean;
     loading: boolean;
     disabled: boolean;
 }

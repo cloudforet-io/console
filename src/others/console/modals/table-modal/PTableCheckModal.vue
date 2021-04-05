@@ -1,7 +1,6 @@
 <template>
     <p-button-modal :header-title="headerTitle"
                     :scrollable="scrollable"
-                    :centered="centered"
                     :size="size"
                     :fade="fade"
                     :backdrop="backdrop"
@@ -60,10 +59,6 @@ export default {
             default: 'md',
             validator: value => Object.keys(sizeMapping).includes(value),
         },
-        centered: {
-            type: Boolean,
-            default: false,
-        },
         backdrop: {
             type: Boolean,
             default: true,
@@ -75,10 +70,6 @@ export default {
         themeColor: {
             type: String,
             default: 'primary',
-        },
-        hideOnCancel: {
-            type: Boolean,
-            default: true,
         },
         headerTitle: String,
         subTitle: String,

@@ -33,7 +33,6 @@ const actions = {
 
 const pmProps = [
     { name: 'scrollable' },
-    { name: 'centered' },
     { name: 'backdrop' },
     { name: 'fade' },
     { name: 'keyboard' },

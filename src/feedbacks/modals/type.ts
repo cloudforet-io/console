@@ -11,6 +11,5 @@ export interface ModalProps {
     scrollable: boolean;
     size: ModalSizeType;
     visible: boolean; // sync
-    centered: boolean;
     backdrop: boolean;
 }
