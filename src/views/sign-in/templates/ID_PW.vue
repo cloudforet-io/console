@@ -158,7 +158,7 @@ export default defineComponent({
         .form {
             margin-top: 0.5rem;
         }
-        .p-field-group::v-deep .label-box {
+        .p-field-group::v-deep label {
             display: none;
         }
     }

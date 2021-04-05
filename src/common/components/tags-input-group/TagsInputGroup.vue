@@ -57,7 +57,7 @@
 </template>
 
 <script lang="ts">
-import { some, range } from 'lodash';
+import { some } from 'lodash';
 
 import {
     toRefs, reactive, getCurrentInstance, ComponentRenderProxy, computed, watch,
@@ -179,6 +179,12 @@ export default {
                 key: { isValid: true, message: '' },
                 value: { isValid: true, message: '' },
             }));
+
+            validateKey();
+
+            state.items.forEach((d, i) => {
+                validateValue(d.value, i);
+            });
         };
 
         const init = () => {

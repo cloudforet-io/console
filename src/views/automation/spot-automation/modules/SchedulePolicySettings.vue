@@ -11,68 +11,76 @@
             </div>
         </p-field-group>
 
-        <p-field-group required :label="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_LABEL')">
-            <div class="input-wrapper">
-                <div class="input-group">
-                    <p class="label on-demand">
-                        {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_ONDEMAND') }}
-                    </p>
-                    <p-text-input v-model.number="onDemand" type="number"
-                                  :min="0" :max="capacity"
-                                  :disabled="changeDisabled"
-                                  @input="onInput"
-                    >
-                        <template #right-extra>
-                            {{ unit }}
-                        </template>
-                    </p-text-input>
-                </div>
-                <div class="input-group">
-                    <p class="label spot-instance">
-                        {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_SPOT_INSTANCE') }}
-                    </p>
-                    <p-text-input :value="spotInstance" disabled type="number">
-                        <template #right-extra>
-                            {{ unit }}
-                        </template>
-                    </p-text-input>
-                </div>
-            </div>
-
-            <div ref="dragContainer" class="dragger-wrapper">
-                <div class="line on-demand" :style="{width: `${leftWidth}%`}" />
-                <div class="dragger-point">
-                    <div class="dragger" :class="{dragging: isMoving}"
-                         @mousedown="startMove"
-                    >
-                        <p-i name="ic_arrow_left_sm" width="0.5rem" height="0.5rem"
-                             color="inherit"
-                        />
-                        <p-i name="ic_arrow_right_sm" width="0.5rem" height="0.5rem"
-                             color="inherit"
-                        />
+        <p-field-group required :label="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_LABEL')" class="mb-0">
+            <div class="settings-wrapper">
+                <div class="input-wrapper">
+                    <div class="input-group">
+                        <p class="label on-demand">
+                            {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_ONDEMAND') }}
+                        </p>
+                        <p-text-input v-model.number="onDemand" type="number"
+                                      :min="0" :max="capacity"
+                                      :disabled="changeDisabled"
+                                      @input="onInput"
+                        >
+                            <template #right-extra>
+                                {{ unit }}
+                            </template>
+                        </p-text-input>
+                    </div>
+                    <div class="input-group">
+                        <p class="label spot-instance">
+                            {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_SPOT_INSTANCE') }}
+                        </p>
+                        <p-text-input :value="spotInstance" disabled type="number">
+                            <template #right-extra>
+                                {{ unit }}
+                            </template>
+                        </p-text-input>
                     </div>
                 </div>
-                <div class="line spot-instance" :style="{width: `${rightWidth}%`}" />
-            </div>
 
-            <div class="axes-wrapper">
-                <div class="axes" />
-                <span class="scale-group">
-                    <span class="scale" />
-                    <span class="tick">0</span>
-                </span>
-                <span class="scale-group">
-                    <span class="scale" />
-                    <span v-if="capacity !== 0 && capacity / 2 === halfCapacity">
-                        <span class="tick">{{ halfCapacity }}</span>
-                        <span class="unit">{{ unit }}</span>
+                <div ref="dragContainer" class="dragger-wrapper">
+                    <div class="line on-demand" :style="{width: `${leftWidth}%`}" />
+                    <div class="dragger-point">
+                        <div class="dragger" :class="{dragging: isMoving}"
+                             @mousedown="startMove"
+                        >
+                            <p-i name="ic_arrow_left_sm" width="0.5rem" height="0.5rem"
+                                 color="inherit"
+                            />
+                            <p-i name="ic_arrow_right_sm" width="0.5rem" height="0.5rem"
+                                 color="inherit"
+                            />
+                        </div>
+                    </div>
+                    <div class="line spot-instance" :style="{width: `${rightWidth}%`}" />
+                </div>
+
+                <div class="axes-wrapper">
+                    <div class="axes" />
+                    <span class="scale-group">
+                        <span class="scale" />
+                        <span class="tick">0</span>
                     </span>
-                </span>
-                <span class="scale-group">
-                    <span class="scale" />
-                    <span class="tick">{{ capacity }}</span>
-                </span>
+                    <span class="scale-group">
+                        <span class="scale" />
+                        <span v-if="capacity !== 0 && capacity / 2 === halfCapacity">
+                            <span class="tick">{{ halfCapacity }}</span>
+                            <span class="unit">{{ unit }}</span>
+                        </span>
+                    </span>
+                    <span class="scale-group">
+                        <span class="scale" />
+                        <span class="tick">{{ capacity }}</span>
+                    </span>
+                </div>
+
+                <div v-if="loading" class="loading-backdrop">
+                    <p-lottie name="thin-spinner" :size="2"
+                              auto
+                    />
+                </div>
             </div>
         </p-field-group>
     </div>
@@ -80,22 +88,25 @@
 
 <script lang="ts">
 import {
-    PFieldGroup, PI, PRadio, PTextInput,
+    PFieldGroup, PI, PLottie, PRadio, PTextInput,
 } from '@spaceone/design-system';
 import {
     ComponentRenderProxy,
     computed,
-    getCurrentInstance,
+    getCurrentInstance, onMounted,
     onUnmounted,
     reactive,
     toRefs,
     watch,
 } from '@vue/composition-api';
 import { SETTINGS_TYPE } from '@/views/automation/spot-automation/config';
+import { throttle } from 'lodash';
 
 interface Props {
     desiredCapacity: number;
 }
+
+const PADDING = 16;
 
 export default {
     name: 'SchedulePolicySettings',
@@ -104,6 +115,7 @@ export default {
         PRadio,
         PTextInput,
         PI,
+        PLottie,
     },
     props: {
         desiredCapacity: {
@@ -120,6 +132,7 @@ export default {
                 { name: SETTINGS_TYPE.ratio, label: vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_TYPE_RATIO') },
             ]),
             selectedType: SETTINGS_TYPE.count,
+            loading: false,
             onDemand: 0,
             spotInstance: computed(() => {
                 const res = state.capacity - state.onDemand;
@@ -127,17 +140,30 @@ export default {
                 return res;
             }),
             changeDisabled: computed(() => state.selectedType === SETTINGS_TYPE.count && props.desiredCapacity === 0),
+            dragContainer: null as null|HTMLElement,
+            dragContainerWidth: 0,
+            dragContainerX: 0,
+            pxRatio: computed(() => 100 / state.dragContainerWidth),
+            padding: computed(() => state.pxRatio * PADDING),
             leftWidth: computed(() => {
-                if (state.changeDisabled) return 0;
-                if (state.selectedType === SETTINGS_TYPE.ratio) return state.onDemand;
-                return 100 / props.desiredCapacity * state.onDemand;
+                let res;
+                if (state.changeDisabled) res = 0;
+                else if (state.selectedType === SETTINGS_TYPE.ratio) res = state.onDemand;
+                else res = 100 / props.desiredCapacity * state.onDemand;
+
+                const max = 100 - state.padding;
+                const min = state.padding;
+                if (res > max) res = max;
+                else if (res < min) res = min;
+
+                return res;
             }),
             rightWidth: computed<number>(() => 100 - state.leftWidth),
             isMoving: false,
-            dragContainer: null as null|HTMLElement,
             unit: computed(() => (state.selectedType === SETTINGS_TYPE.count ? vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.UNIT_COUNT') : '%')),
             capacity: computed(() => (state.selectedType === SETTINGS_TYPE.count ? props.desiredCapacity : 100)),
             halfCapacity: computed(() => Math.floor(state.capacity / 2)),
+            intervalByCountRatio: computed(() => 100 / props.desiredCapacity),
         });
 
         const emitChange = () => {
@@ -179,36 +205,46 @@ export default {
             }
         };
 
+        const onResize = throttle(() => {
+            if (!state.dragContainer) return;
+            const rect = state.dragContainer.getBoundingClientRect();
+            state.dragContainerWidth = rect.width;
+            state.dragContainerX = rect.x;
+        }, 500);
+
         const onMove = (event: MouseEvent) => {
             if (state.dragContainer === null || !state.isMoving || state.changeDisabled) return;
 
             event.preventDefault();
 
-            const rect = state.dragContainer.getBoundingClientRect();
-            const leftX = event.x - rect.x;
-            const ratio = 100 / rect.width;
-            const segment = 100 / props.desiredCapacity;
+            const leftX = event.x - state.dragContainerX;
 
-            let leftPercent: number;
+            let onDemandPercent: number;
             if (state.selectedType === SETTINGS_TYPE.ratio) {
-                leftPercent = Math.round(leftX * ratio);
+                onDemandPercent = Math.round(leftX * state.pxRatio);
             } else {
-                leftPercent = Math.round(leftX * ratio / segment) * segment;
+                onDemandPercent = Math.round(leftX * state.pxRatio / state.intervalByCountRatio) * state.intervalByCountRatio;
             }
 
-            if (leftPercent > 100) leftPercent = 100;
-            else if (leftPercent < 0) leftPercent = 0;
+            if (onDemandPercent > 100) onDemandPercent = 100;
+            else if (onDemandPercent < 0) onDemandPercent = 0;
 
             if (state.selectedType === SETTINGS_TYPE.ratio) {
-                state.onDemand = leftPercent;
+                state.onDemand = onDemandPercent;
             } else {
-                state.onDemand = Math.floor(leftPercent / 100 * props.desiredCapacity);
+                state.onDemand = Math.floor(onDemandPercent / 100 * props.desiredCapacity);
             }
         };
 
+
+        onMounted(() => {
+            onResize();
+        });
+        window.addEventListener('resize', onResize);
         document.addEventListener('mouseup', endMove);
         document.addEventListener('mousemove', onMove);
         onUnmounted(() => {
+            window.removeEventListener('resize', onResize);
             document.removeEventListener('mouseup', endMove);
             document.removeEventListener('mousemove', onMove);
         });
@@ -228,6 +264,19 @@ export default {
 <style lang="postcss" scoped>
 .schedule-policy-settings {
     max-width: 696px;
+}
+.settings-wrapper {
+    position: relative;
+    padding-bottom: 1rem;
+    .loading-backdrop {
+        @apply bg-white;
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0.5;
+    }
 }
 .input-wrapper {
     display: flex;
@@ -252,8 +301,8 @@ export default {
 .dragger-wrapper {
     display: flex;
     align-items: center;
-    margin-top: 0.5rem;
-    height: 2rem;
+    margin-top: 8px;
+    height: 32px;
     .dragger-point {
         position: relative;
         height: 0;
@@ -266,12 +315,12 @@ export default {
         display: inline-flex;
         align-items: center;
         justify-content: center;
-        height: 2rem;
-        width: 2rem;
+        height: 32px;
+        width: 32px;
         border-radius: 100%;
-        left: -1rem;
-        top: -1rem;
-        box-shadow: 0px 2px 4px rgba(theme('colors.black'), 0.2);
+        left: -16px;
+        top: -16px;
+        box-shadow: 0 2px 4px rgba(theme('colors.black'), 0.2);
         &.dragging, &:hover {
             @apply bg-blue-100;
         }
@@ -296,6 +345,7 @@ export default {
     width: 100%;
     position: relative;
     margin-top: 1rem;
+    padding-bottom: 0.25rem;
     .axes {
         @apply border-b border-gray-300;
         width: 100%;

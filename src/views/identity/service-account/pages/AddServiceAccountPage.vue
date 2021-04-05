@@ -141,7 +141,7 @@ import { get } from 'lodash';
 
 import {
     ComponentRenderProxy, getCurrentInstance,
-    reactive, computed, ref, toRefs, watch,
+    reactive, computed, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -156,7 +156,7 @@ import TagsInputGroup from '@/common/components/tags-input-group/TagsInputGroup.
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
-import {ProjectGroup, ProviderModel} from '@/views/identity/service-account/type';
+import { ProjectGroup, ProviderModel } from '@/views/identity/service-account/type';
 import { TranslateResult } from 'vue-i18n';
 import InfoButton from '@/common/components/InfoButton.vue';
 

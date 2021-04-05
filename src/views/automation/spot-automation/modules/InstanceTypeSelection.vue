@@ -4,39 +4,47 @@
             <p-toggle-button :value="isOptimized" sync @change="onToggleChange" />
             <span class="label">{{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.OPTIMIZED_TYPE') }}</span>
         </div>
-        <div class="table-wrapper">
-            <p-lottie v-if="loading" name="thin-spinner" :size="2"
-                      auto
-            />
-            <table v-else-if="types.size > 0">
-                <thead>
-                    <tr>
-                        <th />
-                        <th v-for="(type, i) in types" :key="i" class="header">
-                            {{ type }}
-                        </th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr v-for="(items, size, rowIdx) in candidates" :key="rowIdx">
-                        <td class="header">
-                            {{ size }}
-                        </td>
-                        <template v-for="(type, idx) in types">
-                            <td :key="idx">
-                                <p-check-box v-if="items[type] !== undefined"
-                                             :selected="checkedTypes[size] && checkedTypes[size].includes(type)"
-                                             @change="onSelect(size, type, ...arguments)"
-                                />
+        <div class="table-container">
+            <div class="table-wrapper">
+                <table v-if="types.size > 0">
+                    <thead>
+                        <tr>
+                            <th />
+                            <th v-for="(type, i) in types" :key="i" class="header">
+                                {{ type }}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr v-for="(items, size, rowIdx) in candidates" :key="rowIdx">
+                            <td class="header">
+                                {{ size }}
                             </td>
-                        </template>
-                    </tr>
-                </tbody>
-                <p v-if="showValidation && selectedTypes.length === 0">
-                    {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.ONE_MORE_REQUIRED') }}
-                </p>
-            </table>
+                            <template v-for="(type, idx) in types">
+                                <td :key="idx">
+                                    <p-check-box v-if="items[type] !== undefined"
+                                                 :selected="checkedTypes[size] && checkedTypes[size].includes(type)"
+                                                 @change="onSelect(size, type, ...arguments)"
+                                    />
+                                </td>
+                            </template>
+                        </tr>
+                    </tbody>
+                    <p v-if="showValidation && selectedTypes.length === 0">
+                        {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.ONE_MORE_REQUIRED') }}
+                    </p>
+                </table>
+            </div>
+            <div v-if="loading" class="loading-backdrop">
+                <p-lottie name="thin-spinner" :size="2"
+                          auto
+                />
+            </div>
+            <div v-if="showSelectValidation && !isValid" class="invalid-cover" />
         </div>
+        <p v-if="showSelectValidation && !isValid" class="invalid-text">
+            {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.ONE_MORE_REQUIRED') }}
+        </p>
     </div>
 </template>
 
@@ -46,7 +54,9 @@ import {
 } from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
 import { PCheckBox, PLottie, PToggleButton } from '@spaceone/design-system';
-import { cloneDeep, remove, forEach } from 'lodash';
+import {
+    cloneDeep, remove, forEach, isEmpty,
+} from 'lodash';
 
 interface Props {
     resourceId: string;
@@ -90,6 +100,8 @@ export default {
             selectedTypes: {} as SelectedType,
             optimizedTypes: {} as SelectedType,
             checkedTypes: computed(() => (state.isOptimized ? state.optimizedTypes : state.selectedTypes)),
+            showSelectValidation: props.showValidation,
+            isValid: computed(() => !isEmpty(state.checkedTypes)),
         });
 
         const emitChange = () => {
@@ -97,7 +109,7 @@ export default {
             forEach(state.checkedTypes, (types, size) => {
                 types.forEach(type => res.push(`${type}.${size}`));
             });
-            emit('change', res);
+            emit('change', res, state.isValid);
         };
 
         const onToggleChange = ({ value }) => {
@@ -111,7 +123,7 @@ export default {
                 const { results } = await SpaceConnector.client.spotAutomation.spotGroup.getCandidates({
                     resource_id: props.resourceId,
                     resource_type: props.resourceType,
-                }, { headers: { MOCK_MODE: true } });
+                });
 
                 const candidates = {} as CandidateMap;
                 const types = new Set<string>();
@@ -157,6 +169,8 @@ export default {
         };
 
         const onSelect = (size, type, selected) => {
+            if (!state.showSelectValidation) state.showSelectValidation = true;
+
             if (state.isOptimized) {
                 state.isOptimized = false;
                 state.selectedTypes = cloneDeep(state.optimizedTypes);
@@ -180,6 +194,10 @@ export default {
 
             emitChange();
         };
+
+        watch(() => props.showValidation, (showValidation) => {
+            state.showSelectValidation = showValidation;
+        });
 
         watch(() => props.resourceId, async (resourceId) => {
             if (resourceId) {
@@ -214,10 +232,14 @@ export default {
         }
     }
 }
+.table-container {
+    position: relative;
+}
 .table-wrapper {
     width: 100%;
     overflow: auto;
     margin-top: 1.5rem;
+    min-height: 12rem;
 }
 table {
     min-width: 100%;
@@ -241,5 +263,27 @@ table {
         line-height: 1.5;
         font-weight: bold;
     }
+}
+.loading-backdrop {
+    @apply bg-white;
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0.5;
+}
+.invalid-cover {
+    @apply absolute w-full h-full overflow-hidden border border-alert;
+    background-color: rgba(theme('colors.red.100'), 0.3);
+    pointer-events: none;
+    top: 0;
+    z-index: 1;
+}
+.invalid-text {
+    @apply text-alert;
+    margin-top: 0.25rem;
+    font-size: 0.875rem;
+    line-height: 1.5;
 }
 </style>

@@ -7,10 +7,10 @@
             <section class="resource-type-list">
                 <div v-for="(item, i) in supportedResourceTypeItems" :key="i" class="resource-type-wrapper"
                      :class="{selected: item.name === selectedResourceTypeItem.name}"
-                     @click="selectedResourceTypeIndex = i"
+                     @click="onSelectResourceType(i)"
                 >
                     <p-radio :selected="item.name === selectedResourceTypeItem.name" :value="true" class="radio"
-                             @click.stop="selectedResourceTypeIndex = i"
+                             @click.stop="onSelectResourceType(i)"
                     >
                         <template #icon>
                             <p-i v-if="item.name === selectedResourceTypeItem.name"
@@ -90,6 +90,10 @@ interface SelectedResourceTypeItem {
     };
 }
 
+interface Props {
+    showValidation: boolean;
+}
+
 export default {
     name: 'ResourceSelection',
     components: {
@@ -105,7 +109,7 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props: Props, { emit }) {
         const typeOptionState = reactive<QuerySearchTableTypeOptions>({
             loading: true,
             totalCount: 0,
@@ -119,7 +123,7 @@ export default {
             searchable: true,
             excelVisible: false,
             // eslint-disable-next-line no-use-before-define
-            invalid: computed<boolean>(() => props.showValidation && !state.selectedResource),
+            invalid: computed<boolean>(() => state.showSelectValidation && !state.selectedResource),
         });
 
         const fetchOptionState = reactive<QuerySearchTableFetchOptions>({
@@ -131,6 +135,7 @@ export default {
         });
 
         const state = reactive({
+            showSelectValidation: props.showValidation,
             supportedResourceTypes: {} as SupportResourceGroupTypes,
             supportedResourceTypeItems: computed<SelectedResourceTypeItem[]>(() => map(state.supportedResourceTypes, (d, k) => {
                 const options: any = {};
@@ -230,6 +235,7 @@ export default {
         };
 
         const onSelectTable = (selectIdx) => {
+            if (!state.showSelectValidation) state.showSelectValidation = true;
             if (!Array.isArray(state.data)) state.selectedResource = null;
             else state.selectedResource = state.data[selectIdx[0]] || null;
 
@@ -238,6 +244,12 @@ export default {
                 resourceType: state.selectedResourceTypeItem?.data.resourceType,
             },
             !typeOptionState.invalid);
+        };
+
+        const onSelectResourceType = (i) => {
+            state.selectedResourceTypeIndex = i;
+            typeOptionState.selectIndex = [];
+            onSelectTable(typeOptionState.selectIndex);
         };
 
         const getSupportedResourceTypes = async () => {
@@ -294,6 +306,10 @@ export default {
             }
         };
 
+        watch(() => props.showValidation, (showValidation) => {
+            state.showSelectValidation = showValidation;
+        });
+
         /* Init */
         (async () => {
             await getSupportedResourceTypes();
@@ -314,6 +330,7 @@ export default {
             fieldHandler,
             onFetchTable,
             onSelectTable,
+            onSelectResourceType,
         };
     },
 };

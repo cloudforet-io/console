@@ -12,7 +12,6 @@
     >
         <template #body>
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_NAME_LABEL')">
-                <br>
                 <p-text-input v-model="formState.name" class="name" :placeholder="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_NAME_PLACEHOLDER')" />
             </p-field-group>
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIMEZONE_LABEL')">
@@ -26,7 +25,9 @@
                            :invalid="validationState.showValidation && !validationState.isValid"
                            :invalid-text="validationState.invalidText"
             >
-                <span class="label-help-text">{{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_DESC') }}</span>
+                <template #label-extra>
+                    <span class="label-help-text">{{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_DESC') }}</span>
+                </template>
                 <div v-for="(type, idx) in Object.keys(scheduleTypes)" :key="idx"
                      class="time-schedule-wrapper block lg:flex h-48 lg:h-40"
                      :class="formState.scheduleType === type ? 'selected' : ''"
@@ -442,11 +443,8 @@ export default {
         .interval-wrapper {
             display: inline-flex;
             width: 100%;
-            .p-field-group::v-deep .label-box {
+            .p-field-group::v-deep .form-label {
                 display: inline-flex;
-            }
-            .form-label {
-                font-weight: normal;
             }
             .p-select-dropdown {
                 @apply bg-white;

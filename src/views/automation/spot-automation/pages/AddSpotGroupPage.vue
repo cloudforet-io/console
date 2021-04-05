@@ -7,9 +7,7 @@
             <p class="title">
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.BASE_INFO.LABEL') }}
             </p>
-            <base-information-input :show-validation="showValidation"
-                                    @change="onChangeBaseInfo"
-            />
+            <base-information-input :show-validation="showValidation" @change="onChangeBaseInfo" />
         </p-pane-layout>
 
         <p-pane-layout class="section cloud-service">
@@ -25,19 +23,32 @@
             <p class="title">
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.LABEL') }}
             </p>
-            <schedule-policy-settings :desired-capacity="selectedResource ? selectedResource.data.desired_capacity : 0"
+            <schedule-policy-settings v-if="selectedResource"
+                                      :desired-capacity="selectedResource.data.desired_capacity || 0"
                                       @change="onChangeSchedulePolicy"
             />
+            <p-empty v-else>
+                <div class="w-full mt-2">
+                    {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SELECT_RESOURCE') }}
+                </div>
+            </p-empty>
         </p-pane-layout>
 
         <p-pane-layout class="instance-type section">
             <p class="title">
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.LABEL') }}
             </p>
-            <instance-type-selection :resource-id="selectedResource ? selectedResource.cloud_service_id : ''"
+            <instance-type-selection v-if="selectedResource"
+                                     :resource-id="selectedResource.cloud_service_id || ''"
                                      :resource-type="selectedResourceType"
+                                     :show-validation="showValidation"
                                      @change="onChangeInstanceType"
             />
+            <p-empty v-else>
+                <div class="w-full mt-2">
+                    {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SELECT_RESOURCE') }}
+                </div>
+            </p-empty>
         </p-pane-layout>
 
         <div class="button-group">
@@ -59,7 +70,7 @@
 </template>
 <script lang="ts">
 import {
-    PBreadcrumbs, PButton, PPageTitle, PPaneLayout,
+    PBreadcrumbs, PButton, PEmpty, PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import {
@@ -85,6 +96,7 @@ export default {
         PPaneLayout,
         GeneralPageLayout,
         PButton,
+        PEmpty,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -100,6 +112,7 @@ export default {
             onDemand: 0,
             onDemandType: SETTINGS_TYPE.ratio,
             recommendTypes: [] as string[],
+            isRecommendTypesValid: false,
             options: computed(() => {
                 const res: any = {};
                 if (state.onDemandType === SETTINGS_TYPE.ratio) {
@@ -114,7 +127,7 @@ export default {
 
                 return res;
             }),
-            isAllValid: computed(() => state.isResourceValid && state.isBaseInfoValid),
+            isAllValid: computed(() => state.isResourceValid && state.isRecommendTypesValid && state.isBaseInfoValid),
             loading: false,
         });
 
@@ -148,12 +161,13 @@ export default {
             state.onDemandType = type;
         };
 
-        const onChangeInstanceType = (types) => {
+        const onChangeInstanceType = (types, isValid) => {
             state.recommendTypes = types;
+            state.isRecommendTypesValid = isValid;
         };
 
         const onClickCreate = async () => {
-            state.showValidation = true;
+            if (!state.showValidation) state.showValidation = true;
             if (!state.isAllValid) return;
 
             state.loading = true;
