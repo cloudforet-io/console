@@ -57,6 +57,12 @@ const initAmchartsLicense = () => {
     }
 };
 
+const checkAuth = async () => {
+    if (!router.currentRoute.meta?.excludeAuth && !SpaceConnector.isTokenAlive) {
+        await router.push({ name: 'SignIn', query: { nextPath: router.currentRoute.fullPath, error: router.currentRoute.query.error }  });
+    }
+};
+
 const removeInitializer = () => {
     const el = document.getElementById('site-loader-wrapper');
     if (el?.parentElement) el.parentElement.removeChild(el);
@@ -69,6 +75,7 @@ const init = async () => {
         await initDomain();
         initGtag();
         initLanguage();
+        await checkAuth();
         initAmchartsLicense();
     } catch (e) {
         console.error(e);

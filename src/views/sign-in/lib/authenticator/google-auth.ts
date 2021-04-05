@@ -8,7 +8,8 @@ const { gapi } = window;
 class GoogleAuth extends Authenticator {
     static async signOut() {
         const auth2 = await GoogleAuth.getAuth2(store.state.domain.authOptions.client_id);
-        await Promise.all([GoogleAuth.disconnectGoogleSession(auth2), super.signOut()]);
+        await GoogleAuth.disconnectGoogleSession(auth2);
+        await super.signOut();
     }
 
     private static async onSuccess(googleUser) {
