@@ -95,6 +95,17 @@ const palette = {
         800: '#434190',
         900: '#3C366B',
     },
+    peacock: {
+        100: '#E6FFFA',
+        200: '#B2F5EA',
+        300: '#81E6D9',
+        400: '#4FD1C5',
+        500: '#38B2AC',
+        600: '#319795',
+        700: '#2C7A7B',
+        800: '#285E61',
+        900: '#234E52',
+    },
 };
 const colorSet = {
     transparent: 'transparent',
@@ -131,8 +142,8 @@ const colorSet = {
         default: palette.violet[500],
     },
     peacock: {
-        ...colors.teal,
-        default: colors.teal[500],
+        ...palette.peacock,
+        default: palette.peacock[500],
     },
     indigo: {
         ...palette.indigo,
