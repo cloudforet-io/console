@@ -246,6 +246,8 @@ export default {
             } else {
                 state.onDemand = Math.floor(onDemandPercent / 100 * state.desiredCapacity);
             }
+
+            if (force) emitChange();
         };
 
         onMounted(() => {

@@ -17,7 +17,7 @@
                         </sidebar-title>
                         <favorite-list :items="favoriteItems" :before-route="beforeFavoriteRoute" @delete="onFavoriteDelete">
                             <template #icon="{item}">
-                                <p-i name="ic_tree_project-group"
+                                <p-i :name="item.id.startsWith('project') ? 'ic_tree_project' : 'ic_tree_project-group'"
                                      width="1rem" height="1rem" color="inherit transparent"
                                 />
                             </template>
