@@ -171,7 +171,7 @@ export default {
 
         const onChangeSelect = (node, path) => {
             state.selectedItem = node ? { node, path } : {};
-            emit('select', node.data as ProjectGroup);
+            emit('select', node ? node.data as ProjectGroup : null);
         };
 
         const changeSelectState = (node, path) => {

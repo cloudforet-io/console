@@ -420,6 +420,12 @@ export default {
             watch([() => state.selectedTimeRange, () => state.selectedStat], ([timeRange, stat]) => {
                 if (timeRange && stat) listMetricCharts();
             }, { immediate: false });
+
+            watch(() => state.selectedToolId, async () => {
+                if (props.resources) {
+                    await listAll();
+                }
+            }, { immediate: false });
         });
 
         return {
