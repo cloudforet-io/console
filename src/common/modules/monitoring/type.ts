@@ -8,4 +8,5 @@ export interface MonitoringProps {
     resources: MonitoringResourceType[];
     showTools?: boolean;
     selectedMetrics?: string[];
+    responsive?: boolean;
 }

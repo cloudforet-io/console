@@ -23,6 +23,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import { find } from 'lodash';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -60,9 +61,9 @@ export default {
             type: Array,
             default: () => [],
         },
-        colors: {
+        resources: {
             type: Array,
-            default: () => [],
+            default: () => ([]),
         },
         unit: {
             type: Object,
@@ -155,24 +156,26 @@ export default {
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
             valueAxis.renderer.grid.template.strokeOpacity = 1;
 
-            const createSeries = (valueName, color) => {
-                const series = chart.series.push(new am4charts.LineSeries());
+            let series;
+            let tooltipText = '<strong>{label}</strong>';
+            Object.keys(props.dataset).forEach((key) => {
+                series = chart.series.push(new am4charts.LineSeries());
                 series.dataFields.categoryX = 'label';
-                series.dataFields.valueY = valueName;
-                series.stroke = am4core.color(color);
-                series.tooltipText = `{label}\n${valueName}: {${valueName}}`;
-                series.tooltip.fontSize = 12;
-                series.tooltip.getFillFromObject = false;
-                series.tooltip.label.fill = am4core.color(gray.dark);
-                series.tooltip.background.fill = am4core.color('white');
-                series.tooltip.background.stroke = am4core.color(color);
-                series.tooltip.pointerOrientation = 'vertical';
-                return series;
-            };
+                series.dataFields.valueY = key;
 
-            Object.keys(props.dataset).forEach((key, index) => {
-                createSeries(key, props.colors[index]);
+                const resource = find(props.resources, { id: key });
+                tooltipText += `<br><span style="color: ${resource?.color};" /> ${key}</span> (${resource?.name}): {${key}}
+`;
+                series.stroke = am4core.color(resource?.color);
             });
+
+            series.tooltipHTML = tooltipText;
+            series.tooltip.fontSize = 12;
+            series.tooltip.getFillFromObject = false;
+            series.tooltip.label.fill = am4core.color(gray.dark);
+            series.tooltip.background.fill = am4core.color('white');
+            series.tooltip.background.stroke = am4core.color(gray[400]);
+            series.tooltip.pointerOrientation = 'vertical';
 
             chart.cursor = new am4charts.XYCursor();
             chart.cursor.lineX.strokeOpacity = 0;

@@ -46,18 +46,16 @@
                 <monitoring :show-tools="false"
                             :resources="resources"
                             :resource-type="resourceType"
-                            :selected-metrics="['CPUUtilization']"
-                            chart-min-width="48%"
-                            chart-max-width="48%"
+                            :selected-metrics="cpuUsageMetrics"
+                            :responsive="true"
                 />
             </template>
             <template v-else-if="selectedIndex === 1">
                 <monitoring :show-tools="false"
                             :resources="resources"
                             :resource-type="resourceType"
-                            :selected-metrics="['EBSReadOps', 'EBSWriteOps', 'EBSReadBytes', 'EBSWriteBytes']"
-                            chart-min-width="48%"
-                            chart-max-width="48%"
+                            :selected-metrics="diskUsageMetrics"
+                            :responsive="true"
                 />
             </template>
             <template v-else-if="selectedIndex === 2">
@@ -116,6 +114,8 @@ export default {
             resourceType: 'inventory.Server',
             resources: [],
             selectedIndex: 0,
+            cpuUsageMetrics: ['CPUUtilization'],
+            diskUsageMetrics: ['EBSReadOps', 'EBSWriteOps', 'EBSReadBytes', 'EBSWriteBytes'],
             dataList: computed(() => ([
                 {
                     type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTANCE'),
