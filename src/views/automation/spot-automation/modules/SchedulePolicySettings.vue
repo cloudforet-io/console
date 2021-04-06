@@ -11,70 +11,80 @@
             </div>
         </p-field-group>
 
+        <p v-if="selectedType === SETTINGS_TYPE.count" class="count-info">
+            <p-i name="ic_outlined-info" color="inherit" height="1em"
+                 width="1em"
+            />
+            <span class="desc"> {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.DESC') }}</span>
+        </p>
+
         <p-field-group required :label="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_LABEL')" class="mb-0">
             <div class="settings-wrapper">
-                <div class="input-wrapper">
-                    <div class="input-group">
-                        <p class="label on-demand">
-                            {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_ONDEMAND') }}
-                        </p>
-                        <p-text-input v-model.number="onDemand" type="number"
-                                      :min="0" :max="capacity"
-                                      :disabled="changeDisabled"
-                                      @input="onInput"
-                        >
-                            <template #right-extra>
-                                {{ unit }}
-                            </template>
-                        </p-text-input>
-                    </div>
-                    <div class="input-group">
-                        <p class="label spot-instance">
-                            {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_SPOT_INSTANCE') }}
-                        </p>
-                        <p-text-input :value="spotInstance" disabled type="number">
-                            <template #right-extra>
-                                {{ unit }}
-                            </template>
-                        </p-text-input>
-                    </div>
-                </div>
-
-                <div ref="dragContainer" class="dragger-wrapper">
-                    <div class="line on-demand" :style="{width: `${leftWidth}%`}" />
-                    <div class="dragger-point">
-                        <div class="dragger" :class="{dragging: isMoving}"
-                             @mousedown="startMove"
-                        >
-                            <p-i name="ic_arrow_left_sm" width="0.5rem" height="0.5rem"
-                                 color="inherit"
-                            />
-                            <p-i name="ic_arrow_right_sm" width="0.5rem" height="0.5rem"
-                                 color="inherit"
-                            />
+                <try-again-button v-if="showError" class="error-box" @refresh="refresh" />
+                <template v-else>
+                    <div class="input-wrapper">
+                        <div class="input-group">
+                            <p class="label on-demand">
+                                {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_ONDEMAND') }}
+                            </p>
+                            <p-text-input v-model.number="onDemand" type="number"
+                                          :min="0" :max="capacity"
+                                          :disabled="changeDisabled"
+                                          @input="onInput"
+                            >
+                                <template #right-extra>
+                                    {{ unit }}
+                                </template>
+                            </p-text-input>
+                        </div>
+                        <div class="input-group">
+                            <p class="label spot-instance">
+                                {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_SPOT_INSTANCE') }}
+                            </p>
+                            <p-text-input :value="spotInstance" disabled type="number">
+                                <template #right-extra>
+                                    {{ unit }}
+                                </template>
+                            </p-text-input>
                         </div>
                     </div>
-                    <div class="line spot-instance" :style="{width: `${rightWidth}%`}" />
-                </div>
 
-                <div class="axes-wrapper">
-                    <div class="axes" />
-                    <span class="scale-group">
-                        <span class="scale" />
-                        <span class="tick">0</span>
-                    </span>
-                    <span class="scale-group">
-                        <span class="scale" />
-                        <span v-if="capacity !== 0 && capacity / 2 === halfCapacity">
-                            <span class="tick">{{ halfCapacity }}</span>
-                            <span class="unit">{{ unit }}</span>
+                    <div ref="dragContainer" class="dragger-wrapper">
+                        <div class="line on-demand" :style="{width: `${leftWidth}%`}" @mousedown="onMove($event, true)" />
+                        <div class="dragger-point">
+                            <div class="dragger" :class="{dragging: isMoving}"
+                                 @mousedown="startMove"
+                            >
+                                <p-i name="ic_arrow_left_sm" width="0.5rem" height="0.5rem"
+                                     color="inherit"
+                                />
+                                <p-i name="ic_arrow_right_sm" width="0.5rem" height="0.5rem"
+                                     color="inherit"
+                                />
+                            </div>
+                        </div>
+                        <div class="line spot-instance" :style="{width: `${rightWidth}%`}" @mousedown="onMove($event, true)" />
+                    </div>
+
+                    <div class="axes-wrapper">
+                        <div class="axes" />
+                        <span class="scale-group">
+                            <span class="scale" />
+                            <span class="tick">0</span>
                         </span>
-                    </span>
-                    <span class="scale-group">
-                        <span class="scale" />
-                        <span class="tick">{{ capacity }}</span>
-                    </span>
-                </div>
+                        <span class="scale-group">
+                            <span class="scale" />
+                            <span v-if="capacity !== 0 && capacity / 2 === halfCapacity">
+                                <span class="tick">{{ halfCapacity }}</span>
+                                <span class="unit">{{ unit }}</span>
+                            </span>
+                        </span>
+                        <span class="scale-group">
+                            <span class="scale" />
+                            <span class="tick">{{ capacity }}</span>
+                        </span>
+                    </div>
+                </template>
 
                 <div v-if="loading" class="loading-backdrop">
                     <p-lottie name="thin-spinner" :size="2"
@@ -101,9 +111,11 @@ import {
 } from '@vue/composition-api';
 import { SETTINGS_TYPE } from '@/views/automation/spot-automation/config';
 import { throttle } from 'lodash';
+import TryAgainButton from '@/views/automation/spot-automation/components/TryAgainButton.vue';
+import { SpaceConnector } from '@/lib/space-connector';
 
 interface Props {
-    desiredCapacity: number;
+    resourceId: string;
 }
 
 const PADDING = 16;
@@ -111,6 +123,7 @@ const PADDING = 16;
 export default {
     name: 'SchedulePolicySettings',
     components: {
+        TryAgainButton,
         PFieldGroup,
         PRadio,
         PTextInput,
@@ -118,9 +131,9 @@ export default {
         PLottie,
     },
     props: {
-        desiredCapacity: {
-            type: Number,
-            default: 0,
+        resourceId: {
+            type: String,
+            default: '',
         },
     },
     setup(props: Props, { emit }) {
@@ -133,13 +146,16 @@ export default {
             ]),
             selectedType: SETTINGS_TYPE.count,
             loading: false,
+            errored: false,
+            showError: computed(() => state.errored && state.selectedType === SETTINGS_TYPE.count),
+            desiredCapacity: 0,
             onDemand: 0,
             spotInstance: computed(() => {
                 const res = state.capacity - state.onDemand;
                 if (res < 0) return 0;
                 return res;
             }),
-            changeDisabled: computed(() => state.selectedType === SETTINGS_TYPE.count && props.desiredCapacity === 0),
+            changeDisabled: computed(() => state.selectedType === SETTINGS_TYPE.count && state.desiredCapacity === 0),
             dragContainer: null as null|HTMLElement,
             dragContainerWidth: 0,
             dragContainerX: 0,
@@ -149,7 +165,7 @@ export default {
                 let res;
                 if (state.changeDisabled) res = 0;
                 else if (state.selectedType === SETTINGS_TYPE.ratio) res = state.onDemand;
-                else res = 100 / props.desiredCapacity * state.onDemand;
+                else res = 100 / state.desiredCapacity * state.onDemand;
 
                 const max = 100 - state.padding;
                 const min = state.padding;
@@ -161,16 +177,17 @@ export default {
             rightWidth: computed<number>(() => 100 - state.leftWidth),
             isMoving: false,
             unit: computed(() => (state.selectedType === SETTINGS_TYPE.count ? vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.UNIT_COUNT') : '%')),
-            capacity: computed(() => (state.selectedType === SETTINGS_TYPE.count ? props.desiredCapacity : 100)),
+            capacity: computed(() => (state.selectedType === SETTINGS_TYPE.count ? state.desiredCapacity : 100)),
             halfCapacity: computed(() => Math.floor(state.capacity / 2)),
-            intervalByCountRatio: computed(() => 100 / props.desiredCapacity),
+            intervalByCountRatio: computed(() => 100 / state.desiredCapacity),
         });
 
         const emitChange = () => {
             emit('change', {
                 onDemand: state.onDemand,
+                spotInstance: state.spotInstance,
                 type: state.selectedType,
-            });
+            }, !state.showError);
         };
 
 
@@ -180,10 +197,6 @@ export default {
 
             emitChange();
         };
-
-        watch(() => props.desiredCapacity, () => {
-            changeType(state.selectedType);
-        });
 
         const onInput = () => {
             if (state.onDemand > state.capacity) state.onDemand = state.capacity;
@@ -212,12 +225,11 @@ export default {
             state.dragContainerX = rect.x;
         }, 500);
 
-        const onMove = (event: MouseEvent) => {
-            if (state.dragContainer === null || !state.isMoving || state.changeDisabled) return;
+        const onMove = (event: MouseEvent, force = false) => {
+            if (state.dragContainer === null || (!force && !state.isMoving) || state.changeDisabled) return;
 
             event.preventDefault();
-
-            const leftX = event.x - state.dragContainerX;
+            const leftX = event.pageX - state.dragContainerX;
 
             let onDemandPercent: number;
             if (state.selectedType === SETTINGS_TYPE.ratio) {
@@ -232,10 +244,9 @@ export default {
             if (state.selectedType === SETTINGS_TYPE.ratio) {
                 state.onDemand = onDemandPercent;
             } else {
-                state.onDemand = Math.floor(onDemandPercent / 100 * props.desiredCapacity);
+                state.onDemand = Math.floor(onDemandPercent / 100 * state.desiredCapacity);
             }
         };
-
 
         onMounted(() => {
             onResize();
@@ -249,13 +260,44 @@ export default {
             document.removeEventListener('mousemove', onMove);
         });
 
+
+        const getDesiredCapacity = async () => {
+            try {
+                state.loading = true;
+                // TODO
+                await new Promise((resolve, reject) => {
+                    setTimeout(() => {
+                        reject();
+                    }, 1000);
+                });
+                state.desiredCapacity = 0;
+                state.errored = false;
+            } catch (e) {
+                state.errored = true;
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        const refresh = async () => {
+            await getDesiredCapacity();
+            changeType(state.selectedType);
+        };
+
+        watch(() => props.resourceId, async (resourceId) => {
+            state.errored = false;
+            if (resourceId) await getDesiredCapacity();
+            changeType(state.selectedType);
+        }, { immediate: true });
+
         return {
             ...toRefs(state),
             SETTINGS_TYPE,
             changeType,
             startMove,
             onInput,
-            emitChange,
+            onMove,
+            refresh,
         };
     },
 };
@@ -384,4 +426,18 @@ export default {
         }
     }
 }
+.error-box {
+    margin-top: 0.375rem;
+}
+.count-info {
+    @apply text-secondary;
+    font-size: 0.75rem;
+    vertical-align: middle;
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    .desc {
+        line-height: 1.5;
+    }
+}
+
 </style>

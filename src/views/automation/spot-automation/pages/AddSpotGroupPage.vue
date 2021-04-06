@@ -24,7 +24,7 @@
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.LABEL') }}
             </p>
             <schedule-policy-settings v-if="selectedResource"
-                                      :desired-capacity="selectedResource.data.desired_capacity || 0"
+                                      :resource-id="selectedResource.cloud_service_id"
                                       @change="onChangeSchedulePolicy"
             />
             <p-empty v-else>
@@ -39,7 +39,7 @@
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.LABEL') }}
             </p>
             <instance-type-selection v-if="selectedResource"
-                                     :resource-id="selectedResource.cloud_service_id || ''"
+                                     :resource-id="selectedResource.cloud_service_id"
                                      :resource-type="selectedResourceType"
                                      :show-validation="showValidation"
                                      @change="onChangeInstanceType"
@@ -54,7 +54,7 @@
         <div class="button-group">
             <p-button class="text-button" style-type="primary-dark" size="lg"
                       :loading="loading"
-                      :disabled="showValidation && !isAllValid"
+                      :disabled="!isAllValid"
                       @click="onClickCreate"
             >
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CREATE') }}
@@ -66,6 +66,17 @@
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CANCEL') }}
             </p-button>
         </div>
+
+        <spot-group-create-check-modal :visible.sync="visibleCheckModal"
+                                       :category="category"
+                                       :selected-resource="selectedResource"
+                                       :name="name"
+                                       :recommend-types="recommendTypes"
+                                       :on-demand="onDemand"
+                                       :spot-instance="spotInstance"
+                                       :on-demand-type="onDemandType"
+                                       @confirm="onCheckConfirm"
+        />
     </general-page-layout>
 </template>
 <script lang="ts">
@@ -83,10 +94,12 @@ import InstanceTypeSelection from '@/views/automation/spot-automation/modules/In
 import { SETTINGS_TYPE } from '@/views/automation/spot-automation/config';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
+import SpotGroupCreateCheckModal from '@/views/automation/spot-automation/modules/SpotGroupCreateCheckModal.vue';
 
 export default {
     name: 'AddSpotGroupPage',
     components: {
+        SpotGroupCreateCheckModal,
         InstanceTypeSelection,
         SchedulePolicySettings,
         BaseInformationInput,
@@ -97,12 +110,14 @@ export default {
         GeneralPageLayout,
         PButton,
         PEmpty,
+
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
             showValidation: false,
+            category: '' as string,
             selectedResource: null as any,
             selectedResourceType: '',
             isResourceValid: false,
@@ -110,7 +125,9 @@ export default {
             tags: [],
             isBaseInfoValid: false,
             onDemand: 0,
+            spotInstance: 0,
             onDemandType: SETTINGS_TYPE.ratio,
+            isSchedulePolicyValid: false,
             recommendTypes: [] as string[],
             isRecommendTypesValid: false,
             options: computed(() => {
@@ -118,17 +135,20 @@ export default {
                 if (state.onDemandType === SETTINGS_TYPE.ratio) {
                     // eslint-disable-next-line camelcase
                     res.min_ondemand_ratio = state.onDemand;
+                } else {
+                    // eslint-disable-next-line camelcase
+                    res.min_ondemand_size = state.onDemand;
                 }
-                // eslint-disable-next-line camelcase
-                res.min_ondemand_size = state.onDemand;
 
+                // TODO: replace it after backend ready
                 // eslint-disable-next-line camelcase
-                if (state.recommendTypes.length > 0) res.recommend_types = state.recommendTypes;
+                res.recommend_types = 't2.large'; // state.recommendTypes;
 
                 return res;
             }),
-            isAllValid: computed(() => state.isResourceValid && state.isRecommendTypesValid && state.isBaseInfoValid),
+            isAllValid: computed(() => state.isResourceValid && state.isSchedulePolicyValid && state.isRecommendTypesValid && state.isBaseInfoValid),
             loading: false,
+            visibleCheckModal: false,
         });
 
         const routeState = reactive({
@@ -144,7 +164,8 @@ export default {
             else vm.$router.back();
         };
 
-        const onChangeResource = ({ resource, resourceType }, isValid) => {
+        const onChangeResource = ({ category, resource, resourceType }, isValid) => {
+            state.category = category || '';
             state.selectedResource = resource;
             state.selectedResourceType = resourceType;
             state.isResourceValid = isValid;
@@ -156,9 +177,11 @@ export default {
             state.isBaseInfoValid = isValid;
         };
 
-        const onChangeSchedulePolicy = ({ onDemand, type }) => {
+        const onChangeSchedulePolicy = ({ onDemand, spotInstance, type }, isValid) => {
             state.onDemand = onDemand;
+            state.spotInstance = spotInstance;
             state.onDemandType = type;
+            state.isSchedulePolicyValid = isValid;
         };
 
         const onChangeInstanceType = (types, isValid) => {
@@ -167,9 +190,11 @@ export default {
         };
 
         const onClickCreate = async () => {
-            if (!state.showValidation) state.showValidation = true;
             if (!state.isAllValid) return;
+            state.visibleCheckModal = true;
+        };
 
+        const onCheckConfirm = async () => {
             state.loading = true;
             const params: any = {
                 name: state.name,
@@ -177,9 +202,9 @@ export default {
                 resource_type: state.selectedResourceType,
                 tags: state.tags,
                 user_id: store.state.user.userId,
+                options: state.options,
             };
 
-            if (state.options) params.options = state.options;
 
             try {
                 await SpaceConnector.client.spotAutomation.spotGroup.create(params);
@@ -188,6 +213,7 @@ export default {
                 console.error(e);
             } finally {
                 state.loading = false;
+                state.visibleCheckModal = false;
             }
         };
 
@@ -199,12 +225,13 @@ export default {
         return {
             ...toRefs(state),
             routeState,
-            onClickCreate,
             onClickGoBack,
             onChangeResource,
             onChangeBaseInfo,
             onChangeSchedulePolicy,
             onChangeInstanceType,
+            onClickCreate,
+            onCheckConfirm,
         };
     },
 };

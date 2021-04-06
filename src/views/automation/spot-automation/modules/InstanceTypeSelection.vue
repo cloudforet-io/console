@@ -5,8 +5,9 @@
             <span class="label">{{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.OPTIMIZED_TYPE') }}</span>
         </div>
         <div class="table-container">
-            <div class="table-wrapper">
-                <table v-if="types.size > 0">
+            <try-again-button v-if="errored" class="mt-4" @refresh="refresh" />
+            <div v-else class="table-wrapper">
+                <table v-if="types.length > 0">
                     <thead>
                         <tr>
                             <th />
@@ -16,7 +17,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr v-for="(items, size, rowIdx) in candidates" :key="rowIdx">
+                        <tr v-for="([size, items]) in candidates" :key="size">
                             <td class="header">
                                 {{ size }}
                             </td>
@@ -30,9 +31,6 @@
                             </template>
                         </tr>
                     </tbody>
-                    <p v-if="showValidation && selectedTypes.length === 0">
-                        {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.ONE_MORE_REQUIRED') }}
-                    </p>
                 </table>
             </div>
             <div v-if="loading" class="loading-backdrop">
@@ -40,9 +38,9 @@
                           auto
                 />
             </div>
-            <div v-if="showSelectValidation && !isValid" class="invalid-cover" />
+            <div v-else-if="!errored && showSelectValidation && !isValid" class="invalid-cover" />
         </div>
-        <p v-if="showSelectValidation && !isValid" class="invalid-text">
+        <p v-if="!errored && !loading && showSelectValidation && !isValid" class="invalid-text">
             {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.ONE_MORE_REQUIRED') }}
         </p>
     </div>
@@ -55,8 +53,9 @@ import {
 import { SpaceConnector } from '@/lib/space-connector';
 import { PCheckBox, PLottie, PToggleButton } from '@spaceone/design-system';
 import {
-    cloneDeep, remove, forEach, isEmpty,
+    cloneDeep, remove, forEach, isEmpty, sortBy,
 } from 'lodash';
+import TryAgainButton from '@/views/automation/spot-automation/components/TryAgainButton.vue';
 
 interface Props {
     resourceId: string;
@@ -64,11 +63,9 @@ interface Props {
     showValidation: boolean;
 }
 
-interface CandidateMap {
-    [size: string]: {
-        [type: string]: number;
-    };
-}
+type CandidateTuple = [string, {
+    [type: string]: number;
+}]
 
 interface SelectedType {
     [size: string]: string[];
@@ -76,7 +73,9 @@ interface SelectedType {
 
 export default {
     name: 'InstanceTypeSelection',
-    components: { PToggleButton, PCheckBox, PLottie },
+    components: {
+        TryAgainButton, PToggleButton, PCheckBox, PLottie,
+    },
     props: {
         resourceId: {
             type: String,
@@ -94,14 +93,15 @@ export default {
     setup(props: Props, { emit }) {
         const state = reactive({
             loading: true,
-            candidates: {} as CandidateMap,
-            types: {} as Set<string>,
+            errored: false,
+            candidates: [] as CandidateTuple[],
+            types: [] as string[],
             isOptimized: true,
             selectedTypes: {} as SelectedType,
             optimizedTypes: {} as SelectedType,
             checkedTypes: computed(() => (state.isOptimized ? state.optimizedTypes : state.selectedTypes)),
             showSelectValidation: props.showValidation,
-            isValid: computed(() => !isEmpty(state.checkedTypes)),
+            isValid: computed(() => !state.errored && !isEmpty(state.checkedTypes)),
         });
 
         const emitChange = () => {
@@ -117,6 +117,42 @@ export default {
             emitChange();
         };
 
+        const candidates = new Map<string, {[size: string]: number}>();
+        const types = new Set<string>();
+        const setVariables = (items) => {
+            candidates.clear();
+            types.clear();
+
+            state.optimizedTypes = {};
+            state.selectedTypes = {};
+
+            items.forEach(({ type: str, priority }) => {
+                const idx = str.indexOf('.');
+                const size = str.slice(idx + 1);
+                const type = str.slice(0, idx);
+
+                if (!types.has(type)) types.add(type);
+
+                if (candidates.has(size)) {
+                    const obj = candidates.get(size);
+                    if (obj) obj[type] = priority;
+                } else candidates.set(size, { [type]: priority });
+
+                if (priority > 0) {
+                    if (state.optimizedTypes[size]) state.optimizedTypes[size].push(type);
+                    else state.optimizedTypes[size] = [type];
+                }
+            });
+
+            const sizes = sortBy<string>(Array.from(candidates.keys()), [
+                size => size.replace(/[^a-zA-Z]/g, ''), // sort by alphabet
+                size => parseInt(size.replace(/[^0-9]/g, '')) || 0, // sort by numbers
+            ]);
+
+            state.candidates = sizes.map(k => [k, candidates.get(k)]);
+            state.types = Array.from(types).sort();
+        };
+
         const getCandidates = async () => {
             try {
                 state.loading = true;
@@ -125,33 +161,13 @@ export default {
                     resource_type: props.resourceType,
                 });
 
-                const candidates = {} as CandidateMap;
-                const types = new Set<string>();
-                const optimizedTypes = {} as SelectedType;
-
-                results.forEach(({ type: str, priority }) => {
-                    const idx = str.indexOf('.');
-                    const size = str.slice(idx + 1);
-                    const type = str.slice(0, idx);
-
-                    if (!types.has(type)) types.add(type);
-                    if (!candidates[size]) candidates[size] = { [type]: priority };
-                    else candidates[size][type] = priority;
-
-                    if (priority > 0) {
-                        if (optimizedTypes[size]) optimizedTypes[size].push(type);
-                        else optimizedTypes[size] = [type];
-                    }
-                });
-
-                state.candidates = candidates;
-                state.types = types;
-                state.optimizedTypes = optimizedTypes;
-                state.selectedTypes = {};
+                state.errored = false;
+                setVariables(results);
             } catch (e) {
                 console.error(e);
-                state.candidates = {};
-                state.types = new Set<string>();
+                state.errored = true;
+                state.candidates = [];
+                state.types = [];
                 state.optimizedTypes = {};
                 state.selectedTypes = {};
             } finally {
@@ -195,16 +211,23 @@ export default {
             emitChange();
         };
 
+        const refresh = async () => {
+            await getCandidates();
+            emitChange();
+        };
+
         watch(() => props.showValidation, (showValidation) => {
             state.showSelectValidation = showValidation;
         });
 
         watch(() => props.resourceId, async (resourceId) => {
+            state.errored = false;
             if (resourceId) {
-                state.loading = true;
-                setTimeout(async () => {
-                    await getCandidates();
-                }, 2000);
+                state.selectedTypes = {};
+                state.optimizedTypes = {};
+                emitChange();
+                await getCandidates();
+                emitChange();
             }
         }, { immediate: true });
 
@@ -212,6 +235,7 @@ export default {
             ...toRefs(state),
             onToggleChange,
             onSelect,
+            refresh,
         };
     },
 };
@@ -248,6 +272,9 @@ table {
     table-layout: fixed;
     tr {
         display: flex;
+        &:hover {
+            @apply bg-secondary2;
+        }
     }
     th, td {
         @apply border-b border-gray-200;
