@@ -435,21 +435,21 @@ export default {
                 console.error(e);
             }
         };
-        const getCount = async () => {
+        const getCount = async (type) => {
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
-                    labels: [CLOUD_SERVICE_LABEL.compute, CLOUD_SERVICE_LABEL.database, CLOUD_SERVICE_LABEL.storage],
+                    labels: [CLOUD_SERVICE_LABEL[type]],
                 });
                 let count = 0 as number | string;
                 res.results.forEach((d) => {
-                    if (d.label === CLOUD_SERVICE_LABEL.storage) {
+                    if (type === DATA_TYPE.storage) {
                         state.storageBoxSuffix = byteFormatter(d.total).split(' ')[1];
                         count = parseFloat(byteFormatter(d.total).split(' ')[0]);
                         count = commaFormatter(count);
                     } else {
                         count = numberFormatter(d.total);
                     }
-                    state.count[Object.keys(CLOUD_SERVICE_LABEL)[Object.values(CLOUD_SERVICE_LABEL).indexOf(d.label)]] = count;
+                    state.count[type] = count;
                 });
             } catch (e) {
                 console.error(e);
@@ -631,7 +631,7 @@ export default {
         };
 
         const init = async () => {
-            await Promise.all([getSummaryInfo(DATA_TYPE.compute), getCount(), getBillingCount()]);
+            await Promise.all([getSummaryInfo(DATA_TYPE.compute), Object.keys(DATA_TYPE).forEach(d => getCount(d)), getBillingCount()]);
             setBoxInterval();
         };
         const chartInit = async () => {
