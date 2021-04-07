@@ -42,31 +42,23 @@
             </div>
         </div>
         <div class="widget-wrapper">
-            <template v-if="selectedIndex === 0">
-                <monitoring :show-tools="false"
+            <template v-if="selectedIndex < 2">
+                <monitoring v-if="resources.length > 0"
+                            :show-tools="false"
                             :resources="resources"
                             :resource-type="resourceType"
-                            :selected-metrics="cpuUsageMetrics"
+                            :selected-metrics="metrics"
                             :responsive="true"
-                />
-            </template>
-            <template v-else-if="selectedIndex === 1">
-                <monitoring :show-tools="false"
-                            :resources="resources"
-                            :resource-type="resourceType"
-                            :selected-metrics="diskUsageMetrics"
-                            :responsive="true"
-                />
-            </template>
-            <template v-else-if="selectedIndex === 2">
-                <p-dynamic-layout type="query-search-table"
-                                  class="resource-table"
-                                  :options="instanceState.schema.options"
-                                  :data="instanceState.data"
                 />
             </template>
             <template v-else>
-                로드밸런서
+                <p-dynamic-layout type="table"
+                                  class="resource-table"
+                                  :data="instanceState.data"
+                                  :options="instanceState.schema.options"
+                                  :fetch-options="fetchOptionState"
+                                  @fetch="fetchTableData"
+                />
             </template>
         </div>
     </div>
@@ -74,18 +66,26 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { get, find } from 'lodash';
+import { get } from 'lodash';
 import {
-    computed, reactive, toRefs, watch, getCurrentInstance, ComponentRenderProxy,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import {
-    PI, PLottie, PDynamicLayout,
-} from '@spaceone/design-system';
+import { PDynamicLayout, PI, PLottie } from '@spaceone/design-system';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 
+
+enum SCHEMA_TYPE {
+    INSTANCE = 'INSTANCE',
+    LOAD_BALANCER = 'LOAD_BALANCER',
+}
+enum METRIC_TYPE {
+    CPU = 'CPU',
+    DISK = 'DISK',
+}
 
 export default {
     name: 'SpotGroupMonitoring',
@@ -103,45 +103,59 @@ export default {
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const apiQuery = new ApiQueryHelper();
         const instanceState = reactive({
             count: 0,
             unhealthyCount: 0,
+            status: 'healthy',
             schema: {},
             fields: [],
             data: [],
         });
         const state = reactive({
+            cloudServiceId: '',
             resourceType: 'inventory.Server',
             resources: [],
             selectedIndex: 0,
-            cpuUsageMetrics: ['CPUUtilization'],
-            diskUsageMetrics: ['EBSReadOps', 'EBSWriteOps', 'EBSReadBytes', 'EBSWriteBytes'],
+            schemaType: '' as keyof typeof SCHEMA_TYPE,
+            metricType: METRIC_TYPE.CPU as keyof typeof METRIC_TYPE,
+            metrics: [] as string[],
+            instanceCpuUsage: 0,
+            instanceDiskUsage: 0,
+            loadBalancerCount: 0,
             dataList: computed(() => ([
                 {
                     type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTANCE'),
                     detail: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.CPU_USAGE_RAGE'),
-                    count: 20,
+                    count: state.instanceCpuUsage,
                     suffix: '%',
                 },
                 {
                     type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTANCE'),
                     detail: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.DISK_USAGE_RATE'),
-                    count: 3570,
+                    count: state.instanceDiskUsage,
                     suffix: 'IOPS',
                 },
                 {
                     type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTANCE'),
-                    detail: instanceState.unhealthyCount > 0 ? vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.HAS_PROBLEM') : vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.NORMAL'),
-                    status: instanceState.unhealthyCount > 0 ? 'unhealthy' : 'healthy',
+                    detail: instanceState.status === 'healthy' ? vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.NORMAL') : vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.HAS_PROBLEM'),
+                    status: instanceState.status === 'healthy' ? 'healthy' : 'unhealthy',
                     count: instanceState.count,
                     suffix: '개',
                 },
                 {
                     type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.LOAD_BALANCER'),
-                    count: 4,
+                    count: state.loadBalancerCount,
                     suffix: '개',
                 },
             ])),
+        });
+        const fetchOptionState = reactive({
+            pageStart: 1,
+            pageLimit: 15,
+            sortDesc: true,
+            sortBy: '',
+            searchText: '',
         });
 
         /* util */
@@ -151,36 +165,50 @@ export default {
         };
 
         /* api */
-        const getInstanceSchema = async (spotGroup) => {
+        const getInstanceCpuUsage = async (spotGroup) => {
             try {
-                const schema = await SpaceConnector.client.addOns.pageSchema.get({
-                    resource_type: 'inventory.CloudService',
-                    schema: 'details',
-                    options: {
-                        provider: spotGroup.provider,
-                        cloud_service_id: spotGroup.resource_id,
-                        cloud_service_group: spotGroup.cloud_service_group,
-                        cloud_service_type: spotGroup.cloud_service_type,
-                    },
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceCpu({
+                    spot_groups: [spotGroup.spot_group_id],
                 });
-                const instanceSchema = find(schema.details, { name: 'Instances' });
-                instanceState.schema = instanceSchema;
-                instanceState.fields = instanceSchema?.options?.fields;
+                state.instanceCpuUsage = get(res, `spot_groups.${spotGroup.spot_group_id}.cpu_utilization`);
             } catch (e) {
                 console.error(e);
             }
         };
-        const getInstance = async (spotGroup) => {
+        const getInstanceDiskUsage = async (spotGroup) => {
             try {
-                const res = await SpaceConnector.client.inventory.cloudService.get({ cloud_service_id: spotGroup.resource_id });
-                const instances = get(res, 'data.instances');
-                instanceState.data = instances;
-                instanceState.count = instances.length;
-                instanceState.unhealthyCount = (instances.filter(d => d.health_status !== 'Healthy')).length;
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceDisk({
+                    spot_groups: [spotGroup.spot_group_id],
+                });
+                state.instanceDiskUsage = get(res, `spot_groups.${spotGroup.spot_group_id}.total_iops`);
             } catch (e) {
                 console.error(e);
             }
         };
+        const getInstanceState = async (spotGroup) => {
+            try {
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceState({
+                    spot_groups: [spotGroup.spot_group_id],
+                });
+                const spotGroupId = spotGroup.spot_group_id;
+                instanceState.count = get(res, `spot_groups.${spotGroupId}.total`);
+                instanceState.unhealthyCount = get(res, `spot_groups.${spotGroupId}.unhealthy`);
+                instanceState.status = get(res, `spot_groups.${spotGroupId}.state`);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        const getLoadBalancerCount = async (spotGroup) => {
+            try {
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupLoadbalancerCount({
+                    spot_groups: [spotGroup.spot_group_id],
+                });
+                state.loadBalancerCount = get(res, `spot_groups.${spotGroup.spot_group_id}`);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
         const getSpotGroupServers = async (spotGroup) => {
             try {
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupServers({
@@ -191,25 +219,117 @@ export default {
                 console.error(e);
             }
         };
+        const getSpotGroupMetrics = async (spotGroup) => {
+            try {
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupMetrics({
+                    spot_group_id: spotGroup.spot_group_id,
+                    metric_type: state.metricType,
+                });
+                state.metrics = res.metrics;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        const getInstanceSchema = async (spotGroup) => {
+            try {
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupSchema({
+                    spot_group_id: spotGroup.spot_group_id,
+                    schema_type: state.schemaType,
+                });
+                state.cloudServiceId = res.cloud_service_id;
+                instanceState.schema = res.schema;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        const getInstanceQuery = () => {
+            apiQuery
+                .setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc)
+                .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
+                .setFilters([{ v: fetchOptionState.searchText }]);
+            return apiQuery.data;
+        };
+        const getInstance = async (spotGroup) => {
+            await getInstanceSchema(spotGroup);
+
+            try {
+                const res = await SpaceConnector.client.inventory.cloudService.getData({
+                    cloud_service_id: state.cloudServiceId,
+                    query: getInstanceQuery(),
+                    key_path: get(instanceState.schema, 'options.root_path'),
+                });
+                instanceState.data = res.results;
+            } catch (e) {
+                console.error(e);
+            }
+        };
 
         /* event */
         const onClickBox = (idx) => {
             if (state.selectedIndex !== idx) {
                 state.selectedIndex = idx;
+                switch (idx) {
+                case 0:
+                    state.metricType = METRIC_TYPE.CPU;
+                    break;
+                case 1:
+                    state.metricType = METRIC_TYPE.DISK;
+                    break;
+                case 2:
+                    state.schemaType = SCHEMA_TYPE.INSTANCE;
+                    break;
+                case 3:
+                    state.schemaType = SCHEMA_TYPE.LOAD_BALANCER;
+                    break;
+                default:
+                    break;
+                }
             }
+        };
+        const fetchTableData = (options, changed) => {
+            if (changed) {
+                if (changed.sortBy !== undefined) {
+                    fetchOptionState.sortBy = changed.sortBy;
+                    fetchOptionState.sortDesc = !!changed.sortDesc;
+                }
+                if (changed.pageLimit !== undefined) {
+                    fetchOptionState.pageLimit = changed.pageLimit;
+                }
+                if (changed.pageStart !== undefined) {
+                    fetchOptionState.pageStart = changed.pageStart;
+                }
+                if (changed.searchText !== undefined) {
+                    fetchOptionState.searchText = changed.searchText;
+                }
+            }
+            getInstance(props.spotGroup);
         };
 
         watch(() => props.spotGroup, (spotGroup) => {
-            getInstanceSchema(spotGroup);
-            getInstance(spotGroup);
+            getInstanceCpuUsage(spotGroup);
+            getInstanceDiskUsage(spotGroup);
+            getInstanceState(spotGroup);
+            getLoadBalancerCount(spotGroup);
+
             getSpotGroupServers(spotGroup);
+            getSpotGroupMetrics(spotGroup);
+        }, { immediate: false });
+
+        watch(() => state.metricType, () => {
+            getSpotGroupMetrics(props.spotGroup);
+        }, { immediate: false });
+
+        watch(() => state.schemaType, () => {
+            getInstance(props.spotGroup);
         }, { immediate: false });
 
         return {
             ...toRefs(state),
             instanceState,
+            fetchOptionState,
             onClickBox,
             commaFormatter,
+            fetchTableData,
         };
     },
 };
