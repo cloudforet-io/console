@@ -55,6 +55,7 @@
             <p-toolbox filters-visible
                        search-type="query"
                        :page-size.sync="pageSize"
+                       :page-size-options="[12, 24, 36]"
                        :total-count="totalCount"
                        :query-tags="tags"
                        :key-item-sets="keyItemSets"
@@ -62,10 +63,10 @@
                        @change="onChange"
                        @refresh="onChange"
             />
-            <p-data-loader class="flex-grow" :data="items" :loading="loading">
+            <p-data-loader class="flex-grow" :data="items" :loading="dataLoading">
                 <li class="project-card-list">
                     <article v-for="(item, i) in items" :key="i" class="project-item">
-                        <router-link :to="{name: 'spotAutomation'}" class="item-wrapper">
+                        <router-link :to="{name: 'spotGroup'}" class="item-wrapper">
                             <p class="project-group-name">
                                 {{ item.project_group_info.name }}
                             </p>
@@ -73,6 +74,14 @@
                                 {{ item.name }}
                             </p>
                             <div class="cost-chart-wrapper">
+                                <div class="chart-wrapper">
+                                    <span class="instance">인스턴스 <span class="instance-num">10</span></span>
+                                    <on-demand-and-spot-chart chart-type="long"
+                                                              :spot="10"
+                                                              :ondemand="30"
+                                                              class="on-demand-chart"
+                                    />
+                                </div>
                                 <div class="flex flex-col">
                                     <span class="cost-title">
                                         절감 비용
@@ -80,10 +89,6 @@
                                     <span class="cost">
                                         N/A
                                     </span>
-                                </div>
-                                <div class="chart-wrapper">
-                                    <span class="instance">인스턴스 <span class="instance-num">10</span></span>
-                                    <on-demand-and-spot-chart chart-type="long" class="on-demand-chart" />
                                 </div>
                             </div>
                         </router-link>
@@ -150,12 +155,12 @@ export default {
 
         const state = reactive({
             items: undefined,
-            loading: true,
+            dataLoading: true,
             keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
             tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
             thisPage: 1,
-            pageSize: 24,
+            pageSize: 12,
             totalCount: 0,
             lastMonthSavingCost: 1207.36234234,
             cumulativeSavingCost: 5690.23343,
@@ -194,12 +199,12 @@ export default {
         };
 
         const listProjects = async () => {
-            state.loading = true;
+            state.dataLoading = true;
             try {
                 const res = await SpaceConnector.client.identity.project.list(getParams());
                 state.items = res.results;
                 state.totalCount = res.total_count || 0;
-                state.loading = false;
+                state.dataLoading = false;
             } catch (e) {
                 console.error(e);
             }
@@ -370,7 +375,7 @@ export default {
 
 .project-card-list {
     @apply grid w-full;
-    grid-template-columns: repeat(auto-fill, minmax(21rem, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(24.4rem, 1fr));
     gap: 1rem;
     overflow-y: hidden;
 }
@@ -398,8 +403,8 @@ export default {
 
 .cost-chart-wrapper {
     @apply flex;
-    justify-content: space-between;
     padding-top: 1.5rem;
+    width: 100%;
     .cost-title {
         @apply text-gray-600;
         font-size: 0.75rem;
@@ -414,6 +419,7 @@ export default {
 }
 
 .chart-wrapper {
+    width: 50%;
     .instance {
         @apply text-gray-600;
         font-size: 0.75rem;

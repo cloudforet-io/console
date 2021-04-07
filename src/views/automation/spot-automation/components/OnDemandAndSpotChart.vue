@@ -168,14 +168,13 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 .on-demand-chart-wrapper {
-    @apply flex bg-blue-100;
+    @apply flex;
     flex-direction: row;
-    border-radius: 6.25rem;
 
     .chart-wrapper {
         .chart {
             max-width: 3rem;
-            max-height: 3rem;
+            max-height: 3.5rem;
         }
     }
 
@@ -184,9 +183,12 @@ export default defineComponent({
         height: 2.25rem;
         .chart {
             margin-top: -0.45rem;
+            margin-left: -1rem;
         }
     }
     &.short {
+        @apply bg-blue-100;
+        border-radius: 6.25rem;
         width: 8rem;
         height: 3.5rem;
     }
