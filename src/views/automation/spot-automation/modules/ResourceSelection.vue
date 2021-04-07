@@ -44,7 +44,11 @@
                                   :field-handler="fieldHandler"
                                   @fetch="onFetchTable"
                                   @select="onSelectTable"
-                />
+                >
+                    <template #col-spaceone_occupied-format="{item}">
+                        {{ occupiedResources[item.cloud_service_id] ? '이미 설정되었어요' : '' }}
+                    </template>
+                </p-dynamic-layout>
             </div>
         </p-field-group>
     </div>
@@ -58,18 +62,19 @@ import { camelCase, forEach, map } from 'lodash';
 import {
     PDynamicLayout, PFieldGroup, PI, PLazyImg, PRadio,
 } from '@spaceone/design-system';
-import {
-    QuerySearchTableFetchOptions, QuerySearchTableListeners,
-    QuerySearchTableTypeOptions,
-} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/templates/query-search-table/type';
 import { store } from '@/store';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { QueryHelper } from '@/lib/query';
-import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
+import {
+    DynamicLayoutEventListener,
+    DynamicLayoutFieldHandler,
+} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { SpaceConnector } from '@/lib/space-connector';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
+import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
+import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 interface SupportResourceGroupTypes {
     [resourceType: string]: {
@@ -110,15 +115,15 @@ export default {
         },
     },
     setup(props: Props, { emit }) {
-        const typeOptionState = reactive<QuerySearchTableTypeOptions>({
+        const typeOptionState = reactive({
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             selectIndex: [],
             selectable: true,
             multiSelect: false,
-            keyItemSets: [],
-            valueHandlerMap: {},
+            keyItemSets: [] as KeyItemSet[],
+            valueHandlerMap: {} as ValueHandlerMap,
             colCopy: false,
             searchable: true,
             excelVisible: false,
@@ -126,12 +131,12 @@ export default {
             invalid: computed<boolean>(() => state.showSelectValidation && !state.selectedResource),
         });
 
-        const fetchOptionState = reactive<QuerySearchTableFetchOptions>({
+        const fetchOptionState = reactive({
             pageStart: 1,
             pageLimit: 15,
             sortDesc: true,
             sortBy: 'created_at',
-            queryTags: [],
+            queryTags: [] as QueryTag[],
         });
 
         const state = reactive({
@@ -168,6 +173,7 @@ export default {
             schema: null as any,
             data: null as any,
             selectedResource: null as any,
+            occupiedResources: {},
         });
 
         const apiQuery = new ApiQueryHelper();
@@ -210,9 +216,7 @@ export default {
             }
         };
 
-        const onFetchTable: QuerySearchTableListeners['init'|'fetch'] = async (options, _changed?) => {
-            const changed = _changed || options;
-
+        const onFetchTable: DynamicLayoutEventListener['fetch'] = async (changed) => {
             if (changed.sortBy !== undefined) {
                 fetchOptionState.sortBy = changed.sortBy;
                 fetchOptionState.sortDesc = !!changed.sortDesc;
@@ -299,11 +303,25 @@ export default {
                         if (d.options?.root_path) return `${d.options.root_path}.${d.key}`;
                         return d.key;
                     }), 'cloud_service_id', 'cloud_service_type', 'reference');
+
+                    state.schema.options.fields.splice(0, 0, { key: 'spaceone_occupied', name: ' ', options: { sortable: false } });
                 }
             } catch (e) {
                 console.error(e);
                 state.schema = null;
                 typeOptionState.selectIndex = [];
+            }
+        };
+
+        const getOccupiedResourceList = async () => {
+            state.occupiedResources = {};
+            try {
+                const { results } = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupResources();
+                results.forEach((d) => {
+                    state.occupiedResources[d.cloud_service_id] = true;
+                });
+            } catch (e) {
+
             }
         };
 
@@ -313,7 +331,7 @@ export default {
 
         /* Init */
         (async () => {
-            await getSupportedResourceTypes();
+            await Promise.all([getSupportedResourceTypes(), getOccupiedResourceList(), store.dispatch('resource/loadAll', true)]);
 
             watch(() => state.selectedResourceTypeItem, async (item) => {
                 if (item) {

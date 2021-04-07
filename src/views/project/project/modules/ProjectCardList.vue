@@ -284,11 +284,11 @@ export default {
         };
 
         const onChange = async (options: any) => {
-            if (options.limit !== undefined) {
-                state.pageSize = options.limit;
+            if (options.pageLimit !== undefined) {
+                state.pageSize = options.pageLimit;
             }
-            if (options.start !== undefined) {
-                state.pageStart = options.start;
+            if (options.pageStart !== undefined) {
+                state.pageStart = options.pageStart;
             }
             await getData();
         };

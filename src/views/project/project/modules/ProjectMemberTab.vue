@@ -1,18 +1,16 @@
 <template>
     <div class="member-tab">
-        <p-search-table class="member-tab"
-                        :shadow="false"
-                        :border="false"
-                        selectable
-                        :excel-visible="false"
-                        :fields="memberTableState.fields"
-                        :items="memberTableState.items"
-                        :select-index.sync="memberTableState.selectIndex"
-                        :loading="memberTableState.loading"
-                        :style="{height: '30rem', padding: 0}"
-                        :total-count="memberTableState.totalCount"
-                        @change="onChangeMemberTable"
-                        @init="onChangeMemberTable"
+        <p-toolbox-table :excel-visible="false"
+                         selectable
+                         sortable
+                         :fields="memberTableState.fields"
+                         :items="memberTableState.items"
+                         :select-index.sync="memberTableState.selectIndex"
+                         :loading="memberTableState.loading"
+                         :total-count="memberTableState.totalCount"
+                         class="mb-2 px-4"
+                         @change="onChangeMemberTable"
+                         @refresh="onChangeMemberTable()"
         >
             <template #toolbox-top>
                 <p-panel-top :title="$t('PROJECT.DETAIL.MEMBER_TITLE')" use-total-count :total-count="memberTableState.totalCount" />
@@ -24,11 +22,9 @@
                 >
                     {{ $t('PROJECT.DETAIL.ADD') }}
                 </p-icon-text-button>
-                <p-dropdown-menu-btn
-                    class="mr-4"
-                    :menu="memberTableState.dropdownMenu"
-                    @click-delete="memberDeleteClick"
-                    @click-update="openMemberUpdateForm"
+                <p-dropdown-menu-btn :menu="memberTableState.dropdownMenu"
+                                     @click-delete="memberDeleteClick"
+                                     @click-update="openMemberUpdateForm"
                 >
                     {{ $t('IDENTITY.USER.MAIN.ACTION') }}
                 </p-dropdown-menu-btn>
@@ -44,7 +40,8 @@
                     {{ label }}
                 </p-badge>
             </template>
-        </p-search-table>
+        </p-toolbox-table>
+
         <s-project-member-add-modal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" :is-project-group="isProjectGroup"
                                     :project-group-id="projectGroupId" @confirm="onAddMemberConfirm()"
         />
@@ -68,10 +65,16 @@
 
 <script lang="ts">
 import {
-    PBadge, PDropdownMenuBtn, PIconTextButton, PPanelTop, PSearchTable, PTableCheckModal,
+    PBadge,
+    PDropdownMenuBtn,
+    PIconTextButton,
+    PPaneLayout,
+    PPanelTop,
+    PTableCheckModal,
+    PToolboxTable,
 } from '@spaceone/design-system';
 import {
-    Options, SearchTableListeners,
+    Options,
 } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import {
@@ -80,7 +83,6 @@ import {
 
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { SpaceConnector } from '@/lib/space-connector';
-import { getPageStart } from '@/lib/component-utils/pagination';
 
 import { TranslateResult } from 'vue-i18n';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
@@ -110,7 +112,8 @@ interface MemberListApiResponse {
 export default {
     name: 'ProjectMemberTab',
     components: {
-        PSearchTable,
+        PPaneLayout,
+        PToolboxTable,
         PPanelTop,
         PIconTextButton,
         PDropdownMenuBtn,
@@ -137,7 +140,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         // List api Handler for query search table
-        const memberTableQuery = new ApiQueryHelper();
+        const memberTableQuery = new ApiQueryHelper().setPageLimit(15);
         const memberTableState = reactive({
             users: computed(() => vm.$store.state.resource.user.items),
             selectIndex: [] as number[],
@@ -212,24 +215,17 @@ export default {
             memberTableState.loading = false;
         };
 
-        const onChangeMemberTable: SearchTableListeners['init'|'change'] = async (options, _changed?) => {
-            const changed = _changed || options;
-
+        const onChangeMemberTable = async (changed: any = {}) => {
             if (changed.sortBy !== undefined) {
-                memberTableState.options.sortBy = changed.sortBy;
-                memberTableState.options.sortDesc = !!changed.sortDesc;
                 memberTableQuery.setSort(changed.sortBy, changed.sortDesc);
             }
-            if (changed.pageSize !== undefined) {
-                memberTableState.options.pageSize = changed.pageSize;
-                memberTableQuery.setPageLimit(changed.pageSize);
+            if (changed.pageLimit !== undefined) {
+                memberTableQuery.setPageLimit(changed.pageLimit);
             }
-            if (changed.thisPage !== undefined) {
-                memberTableState.options.thisPage = changed.thisPage;
-                memberTableQuery.setPageStart(getPageStart(changed.thisPage, memberTableState.options.pageSize));
+            if (changed.pageStart !== undefined) {
+                memberTableQuery.setPageStart(changed.pageStart);
             }
             if (changed.searchText !== undefined) {
-                memberTableState.options.searchText = changed.searchText;
                 memberTableQuery.setFilters([{ v: changed.searchText }]);
             }
             await listMembers();
@@ -306,6 +302,7 @@ export default {
 
         (async () => {
             await vm.$store.dispatch('resource/user/load');
+            await listMembers();
         })();
 
 
@@ -328,14 +325,15 @@ export default {
 
 <style lang="postcss" scoped>
 .member-tab {
-    &.p-toolbox-table::v-deep .toolbox {
-        padding-top: 0;
-    }
     .p-panel-top {
         height: auto;
         line-height: 1.6;
         margin-left: 0;
         margin-bottom: 0.5rem;
+    }
+    .p-toolbox-table::v-deep .p-toolbox {
+        padding-left: 0;
+        padding-right: 0;
     }
 }
 </style>

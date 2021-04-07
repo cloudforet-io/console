@@ -242,11 +242,11 @@ export default {
                 state.tags = options.queryTags;
                 await changeQueryString(options);
             }
-            if (options.limit !== undefined) {
-                state.pageSize = options.limit;
+            if (options.pageLimit !== undefined) {
+                state.pageSize = options.pageLimit;
             }
-            if (options.start !== undefined) {
-                state.thisPage = getThisPage(options.start, state.pageSize);
+            if (options.pageStart !== undefined) {
+                state.thisPage = getThisPage(options.pageStart, state.pageSize);
             }
             await listSpotGroup();
         };

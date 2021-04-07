@@ -17,8 +17,9 @@
                             }"
                             :selectable="false"
                             :excel-visible="false"
+                            :sort-by.sync="options.sortBy"
+                            :sort-desc.sync="options.sortDesc"
                             @change="onChange"
-                            @init="onChange"
                             @rowLeftClick="onSelect"
             />
             <transition name="show">
@@ -217,7 +218,13 @@ export default {
             items: [] as any,
             loading: false,
             totalCount: 0,
-            options: {} as Options,
+            options: {
+                sortBy: 'user_id',
+                sortDesc: true,
+                pageStart: 1,
+                pageLimit: 15,
+                searchText: '',
+            },
             projectRole: '' as string,
             projectRoleList: [] as any[],
             memberLabel: '',
@@ -240,8 +247,8 @@ export default {
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
             .setPage(
-                getPageStart(state.options.thisPage, state.options.pageSize),
-                state.options.pageSize,
+                state.options.pageStart,
+                state.options.pageLimit,
             ).setFilters([{ v: state.options.searchText }])
             .data;
 
@@ -278,11 +285,9 @@ export default {
             formState.tagTools.addTag(item.user_id);
         };
 
-        const onChange: SearchTableListeners['change'] = async (options) => {
-            if (options) {
-                state.options = options;
-                await listUser();
-            }
+        const onChange = async (options = {}) => {
+            state.options = { ...state.options, ...options };
+            await listUser();
         };
 
         const checkMember = async () => {

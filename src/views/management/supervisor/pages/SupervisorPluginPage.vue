@@ -13,8 +13,7 @@
                     :items="items"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
-                    :this-page.sync="thisPage"
-                    :page-size.sync="pageSize"
+                    :page-size.sync="pageLimit"
                     :total-count="totalCount"
                     :key-item-sets="keyItemSets"
                     :value-handler-map="valueHandlerMap"
@@ -171,10 +170,10 @@ export default {
                 { name: 'managed', label: vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.DETAILS_BASE_LABEL_MANAGED') },
             ]),
             items: [] as SupervisorPluginModel[],
-            sortBy: '',
+            sortBy: 'plugin_id',
             sortDesc: true,
-            pageSize: 15,
-            thisPage: 1,
+            pageLimit: 15,
+            pageStart: 1,
             totalCount: 0,
             selectIndex: [],
             selectedItems: computed(() => {
@@ -221,7 +220,7 @@ export default {
         const getQuery = () => {
             const apiQuery = new ApiQueryHelper();
             apiQuery.setSort(state.sortBy, state.sortDesc)
-                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                .setPage(state.pageStart, state.pageLimit)
                 .setFilters(queryHelper.filters);
             return apiQuery.data;
         };
@@ -246,11 +245,19 @@ export default {
             state.selectIndex = index;
             getPluginDetailData(index);
         };
-        const onChange = async (item) => {
+        const onChange = async (options) => {
             try {
-                state.tags = item.queryTags;
-                await queryHelper.setFiltersAsQueryTag(item.queryTags);
-                await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
+                if (options.sortBy !== undefined) {
+                    state.sortBy = options.sortBy;
+                    state.sortDesc = options.sortDesc;
+                }
+                if (options.pageStart !== undefined) state.pageStart = options.pageStart;
+                if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+                if (options.queryTags !== undefined) {
+                    state.tags = options.queryTags;
+                    await queryHelper.setFiltersAsQueryTag(options.queryTags);
+                    await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
+                }
 
                 await listPlugins();
                 state.selectIndex = [];

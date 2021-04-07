@@ -73,7 +73,6 @@
                                                   :type-options="typeOptionState"
                                                   :fetch-options="fetchOptionState"
                                                   :field-handler="fieldHandler"
-                                                  @init="onFetchTable"
                                                   @fetch="onFetchTable"
                                 >
                                     <template #no-data-format>
@@ -125,7 +124,6 @@
                               }"
                               :fetch-options="fetchOptionState"
                               :field-handler="fieldHandler"
-                              @init="onFetchTable"
                               @fetch="onFetchTable"
             />
         </p-table-check-modal>
@@ -143,10 +141,8 @@ import {
     PButton, PQuerySearchTags, PTableCheckModal, PDynamicLayout,
 } from '@spaceone/design-system';
 import {
-    QuerySearchTableFetchOptions, QuerySearchTableListeners,
-    QuerySearchTableTypeOptions,
-} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/templates/query-search-table/type';
-import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
+    DynamicLayoutFieldHandler,
+} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 
 import { makeProxy } from '@/lib/compostion-util';
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
@@ -162,6 +158,8 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import { showErrorMessage } from '@/lib/util';
 import { QueryHelper } from '@/lib/query';
 
+import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { ResourceGroup, Resource, ResourceGroupItem } from '../type';
 
 
@@ -263,23 +261,23 @@ export default {
             }))),
         });
 
-        const fetchOptionState = reactive<Partial<QuerySearchTableFetchOptions>>({
+        const fetchOptionState = reactive({
             pageStart: 1,
             pageLimit: 15,
             sortDesc: true,
             sortBy: 'created_at',
-            queryTags: [],
+            queryTags: [] as QueryTag[],
         });
 
-        const typeOptionState = reactive<Partial<QuerySearchTableTypeOptions>>({
+        const typeOptionState = reactive({
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             selectIndex: [],
             selectable: false,
             multiSelect: true,
-            keyItemSets: [],
-            valueHandlerMap: {},
+            keyItemSets: [] as KeyItemSet[],
+            valueHandlerMap: {} as ValueHandlerMap,
             colCopy: false,
             searchable: computed(() => !props.readMode),
             excelVisible: false,
@@ -403,9 +401,7 @@ export default {
             }
         };
 
-        const onFetchTable: QuerySearchTableListeners['init'|'fetch'] = async (options, _changed?) => {
-            const changed = _changed || options;
-
+        const onFetchTable = async (changed: any = {}) => {
             if (changed.sortBy !== undefined) {
                 fetchOptionState.sortBy = changed.sortBy;
                 fetchOptionState.sortDesc = !!changed.sortDesc;
@@ -450,7 +446,15 @@ export default {
             fetchOptionState.queryTags = tableQueryHelper.queryTags;
 
             // set table schema
-            if (state.selectedTypeIndex !== -1) await getPageSchema();
+            if (state.selectedTypeIndex !== -1) {
+                await getPageSchema();
+
+                apiQuery.setPageStart(fetchOptionState.pageStart);
+                apiQuery.setPageLimit(fetchOptionState.pageLimit);
+                apiQuery.setSort(fetchOptionState.sortBy, fetchOptionState.sortDesc);
+
+                await onFetchTable();
+            }
         };
 
         /* forms */

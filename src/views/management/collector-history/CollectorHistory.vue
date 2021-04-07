@@ -29,15 +29,17 @@
                     @rowLeftClick="onSelect"
                 >
                     <template #toolbox-top>
-                        <div v-for="(status, idx) in statusList"
-                             :key="idx"
-                             class="filter-button-wrapper"
-                        >
-                            <span v-if="status.icon" class="legend-icon" :class="status.class" />
-                            <span class="filter-button"
-                                  :class="[activatedStatus === status.key ? 'active' : '', status.class]"
-                                  @click="onClickStatus(status.key)"
-                            >{{ status.label }}</span>
+                        <div class="flex ml-4">
+                            <div v-for="(status, idx) in statusList"
+                                 :key="idx"
+                                 class="filter-button-wrapper"
+                            >
+                                <span v-if="status.icon" class="legend-icon" :class="status.class" />
+                                <span class="filter-button"
+                                      :class="[activatedStatus === status.key ? 'active' : '', status.class]"
+                                      @click="onClickStatus(status.key)"
+                                >{{ status.label }}</span>
+                            </div>
                         </div>
                     </template>
                     <template #th-task-format="{  field }">
@@ -273,9 +275,10 @@ export default {
             jobs: [] as JobModel[],
             items: [],
             //
+            pageStart: 1,
             pageSize: 15,
             thisPage: 1,
-            sortBy: '',
+            sortBy: 'created_at',
             sortDesc: true,
             totalCount: 0,
             rowCursorPointer: true,
@@ -318,7 +321,7 @@ export default {
             state.items = [];
             jobs.forEach((job, index) => {
                 const newJob = {
-                    sequence: getPageStart(state.thisPage, state.pageSize) + index,
+                    sequence: state.pageStart + index,
                     task: `${job.total_tasks - job.remained_tasks} / ${job.total_tasks}`,
                     duration: durationFormatter(job.created_at, job.finished_at),
                     ...job,
@@ -331,7 +334,7 @@ export default {
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
             apiQuery.setSort(state.sortBy, state.sortDesc)
-                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                .setPage(state.pageStart, state.pageSize)
                 .setFilters(queryHelper.filters);
 
             let statusValues: JOB_STATUS[] = [];
@@ -370,17 +373,28 @@ export default {
             vm.$router.push({ path: router.currentRoute.fullPath, query: { ...router.currentRoute.query }, hash: item.job_id }).catch(() => {});
         };
         const onChange = async (item) => {
-            state.tags = item.queryTags;
-            queryHelper.setFiltersAsQueryTag(item.queryTags);
-            await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
+            if (item.sortBy !== undefined) {
+                state.sortBy = item.sortBy;
+                state.sortDesc = item.sortDesc;
+            }
+            if (item.pageStart !== undefined) state.pageStart = item.pageStart;
+            if (item.pageLimit !== undefined) state.pageSize = item.pageLimit;
+            if (item.queryTags !== undefined) {
+                state.tags = item.queryTags;
+                queryHelper.setFiltersAsQueryTag(item.queryTags);
+                await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
+            }
             try {
                 await getJobs();
             } catch (e) {
                 console.error(e);
             }
         };
-        const onPaginationChange = async () => {
-            await getJobs();
+        const onPaginationChange = () => {
+            vm.$nextTick(() => {
+                state.pageStart = getPageStart(state.thisPage, state.pageSize);
+                getJobs();
+            });
         };
         const onClickGoBack = () => {
             state.selectedJobId = '';
@@ -390,6 +404,7 @@ export default {
         const onClickStatus = (status) => {
             state.activatedStatus = status;
             state.thisPage = 1;
+            state.pageStart = 1;
             getJobs();
         };
         const onClickDate = (date) => {
@@ -442,44 +457,42 @@ export default {
 
 <style lang="postcss" scoped>
 .collector-history-container {
-    .toolbox-top {
-        .filter-button-wrapper {
-            @apply border-r border-gray-200;
+    .filter-button-wrapper {
+        @apply border-r border-gray-200;
+        display: inline-block;
+        padding: 0 1rem;
+        &:first-child {
+            padding-left: 0;
+        }
+        &:last-child {
+            @apply border-none;
+        }
+        .legend-icon {
             display: inline-block;
-            padding: 0 1rem;
-            &:first-child {
-                padding-left: 0;
+            width: 0.75rem;
+            height: 0.75rem;
+            border-radius: 2px;
+            margin-right: 7px;
+            &.success {
+                @apply bg-primary;
             }
-            &:last-child {
-                @apply border-none;
+            &.failure {
+                @apply bg-red-500;
             }
-            .legend-icon {
-                display: inline-block;
-                width: 0.75rem;
-                height: 0.75rem;
-                border-radius: 2px;
-                margin-right: 7px;
-                &.success {
-                    @apply bg-primary;
-                }
-                &.failure {
-                    @apply bg-red-500;
-                }
+        }
+        .filter-button {
+            @apply text-gray-400;
+            font-size: 0.875rem;
+            cursor: pointer;
+            &:hover, &:focus {
+                @apply text-gray-900;
             }
-            .filter-button {
-                @apply text-gray-400;
-                font-size: 0.875rem;
-                cursor: pointer;
-                &:hover, &:focus {
-                    @apply text-gray-900;
-                }
-                &.active {
-                    @apply text-gray-900;
-                    font-weight: bold;
-                }
-                &.failure:hover, &.failure:focus, &.failure.active {
-                    @apply text-red-500;
-                }
+            &.active {
+                @apply text-gray-900;
+                font-weight: bold;
+            }
+            &.failure:hover, &.failure:focus, &.failure.active {
+                @apply text-red-500;
             }
         }
     }

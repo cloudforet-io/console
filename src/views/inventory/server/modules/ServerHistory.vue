@@ -5,8 +5,9 @@
                         :items="items"
                         :loading="loading"
                         :total-count="totalCount"
+                        :sort-by.sync="options.sortBy"
+                        :sort-desc.sync="options.sortDesc"
                         :selectable="false"
-                        @init="onChange"
                         @change="onChange"
                         @export="onExport"
         >
@@ -64,7 +65,13 @@ export default {
             items: [],
             loading: true,
             totalCount: 0,
-            options: {} as Options,
+            options: {
+                sortBy: 'updated_at',
+                sortDesc: true,
+                pageStart: 1,
+                pageLimit: 15,
+                searchText: '',
+            },
         });
 
         const apiQuery = new ApiQueryHelper();
@@ -74,10 +81,8 @@ export default {
             // eslint-disable-next-line camelcase
             key_path: 'collection_info.change_history',
             query: apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
-                .setPage(
-                    getPageStart(state.options.thisPage, state.options.pageSize),
-                    state.options.pageSize,
-                ).setFilters([{ v: state.options.searchText }])
+                .setPage(state.options.pageStart, state.options.pageLimit)
+                .setFilters([{ v: state.options.searchText }])
                 .data,
         });
 
@@ -98,8 +103,8 @@ export default {
             }
         };
 
-        const onChange: SearchTableListeners['change'] = async (options) => {
-            state.options = options;
+        const onChange = async (options) => {
+            state.options = { ...state.options, ...options };
             await listHistory();
         };
 
@@ -122,7 +127,7 @@ export default {
 
         watch(() => props.serverId, (after, before) => {
             if (after !== before) listHistory();
-        }, { immediate: false });
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

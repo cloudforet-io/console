@@ -9,8 +9,7 @@
                               :value-handler-map="querySearchHandlers.valueHandlerMap"
                               :sort-by.sync="sortBy"
                               :sort-desc.sync="sortDesc"
-                              :this-page.sync="thisPage"
-                              :page-size.sync="pageSize"
+                              :page-size.sync="pageLimit"
                               :selectable="false"
                               :excel-visible="false"
                               use-cursor-loading
@@ -157,9 +156,9 @@ export default {
                     name: 'collect', label: ' ', sortable: false,
                 },
             ] as DataTableField[],
-            pageSize: 15,
-            thisPage: 1,
-            sortBy: '',
+            pageLimit: 15,
+            pageStart: 1,
+            sortBy: 'name',
             sortDesc: true,
             collectDataVisible: false,
             targetCredentialId: null,
@@ -168,7 +167,7 @@ export default {
 
         const apiQuery = new ApiQueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);
         const getQuery = () => {
-            apiQuery.setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+            apiQuery.setPage(state.pageStart, state.pageLimit)
                 .setSort(state.sortBy, state.sortDesc)
                 .setFiltersAsQueryTag(state.queryTags)
                 .addFilter({ k: 'provider', v: props.provider, o: '=' });
@@ -195,8 +194,15 @@ export default {
             }
         };
 
-        const onChange = async (item) => {
-            state.queryTags = item.queryTags;
+        const onChange = async (options) => {
+            if (options.sortBy !== undefined) {
+                state.sortBy = options.sortBy;
+                state.sortDesc = options.sortDesc;
+            }
+            if (options.pageStart !== undefined) state.pageStart = options.pageStart;
+            if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+            if (options.queryTags !== undefined) state.queryTags = options.queryTags;
+
             await listCredentials();
         };
 

@@ -35,7 +35,8 @@ import {
 
 import { PButtonTab, PDynamicLayout } from '@spaceone/design-system';
 import {
-    DynamicLayoutEventListeners, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
+    DynamicLayoutEventListener,
+    DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import { DynamicLayout, DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
@@ -49,7 +50,6 @@ import {
     getApiActionByLayoutType,
     makeQuerySearchPropsWithSearchSchema,
 } from '@/lib/component-utils/dynamic-layout';
-import config from '@/lib/config';
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
@@ -193,8 +193,7 @@ export default {
             dataMap[state.fetchOptionKey] = state.data;
         };
 
-        const exportApi = SpaceConnector.client.addOns.excel.export;
-        const dynamicLayoutListeners: Partial<DynamicLayoutEventListeners> = {
+        const dynamicLayoutListeners: DynamicLayoutEventListener = {
             fetch(options) {
                 fetchOptionsMap[state.fetchOptionKey] = options;
                 getData();
@@ -202,7 +201,9 @@ export default {
             select(selectIndex) {
                 state.selectIndex = selectIndex;
             },
-            async export(options, fields) {
+            async export() {
+                const fields = state.currentLayout?.options?.fields;
+                if (!fields) return;
                 try {
                     await store.dispatch('file/downloadExcel', {
                         url: '/inventory/server/get-data',

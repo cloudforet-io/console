@@ -38,7 +38,7 @@ import { DynamicLayout, DynamicLayoutType } from '@spaceone/design-system/dist/s
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import {
-    DynamicLayoutEventListeners, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
+    DynamicLayoutEventListener, DynamicLayoutFetchOptions, DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 
 import {
@@ -204,7 +204,7 @@ export default {
         };
 
 
-        const dynamicLayoutListeners: Partial<DynamicLayoutEventListeners> = {
+        const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
             fetch(options) {
                 fetchOptionsMap[state.fetchOptionKey] = options;
                 getData();
@@ -212,7 +212,9 @@ export default {
             select(selectIndex) {
                 state.selectIndex = selectIndex;
             },
-            async export(options, fields) {
+            async export() {
+                const fields = state.currentLayout?.options?.fields;
+                if (!fields) return;
                 try {
                     await store.dispatch('file/downloadExcel', {
                         url: '/inventory/cloud-service/get-data',

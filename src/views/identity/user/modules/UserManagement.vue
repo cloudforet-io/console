@@ -18,8 +18,7 @@
                     :responsive="true"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
-                    :this-page.sync="thisPage"
-                    :page-size.sync="pageSize"
+                    :page-size.sync="pageLimit"
                     :total-count="totalCount"
                     :key-item-sets="keyItemSets"
                     :value-handler-map="valueHandlerMap"
@@ -313,8 +312,8 @@ export default {
             ])),
             sortBy: '',
             sortDesc: '',
-            pageSize: 15,
-            thisPage: 1,
+            pageStart: 1,
+            pageLimit: 15,
             totalCount: 0,
             // selected
             selectedIndex: [],
@@ -389,7 +388,7 @@ export default {
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
             apiQuery.setSort(state.sortBy, state.sortDesc)
-                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                .setPage(state.pageStart, state.pageLimit)
                 .setFilters(queryHelper.filters);
             return apiQuery.data;
         };
@@ -443,15 +442,13 @@ export default {
             }
         };
 
-        const onChange = async (options: Options, changed: Partial<Options>) => {
-            if (changed) {
-                if (changed.pageSize !== undefined) state.pageSize = changed.pageSize;
-                if (changed.thisPage !== undefined) state.thisPage = changed.thisPage;
-                if (changed.queryTags !== undefined) {
-                    state.tags = changed.queryTags;
-                    queryHelper.setFiltersAsQueryTag(changed.queryTags);
-                    replaceUrlQuery('filters', queryHelper.rawQueryStrings);
-                }
+        const onChange = async (changed) => {
+            if (changed.pageLimit !== undefined) state.pageLimit = changed.pageLimit;
+            if (changed.pageStart !== undefined) state.pageStart = changed.pageStart;
+            if (changed.queryTags !== undefined) {
+                state.tags = changed.queryTags;
+                queryHelper.setFiltersAsQueryTag(changed.queryTags);
+                replaceUrlQuery('filters', queryHelper.rawQueryStrings);
             }
             await getUsers();
         };

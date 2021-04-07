@@ -50,7 +50,6 @@
                                               :type-options="typeOptionState"
                                               :style="{height: `${height}px`}"
                                               :field-handler="fieldHandler"
-                                              @init="fetchTableData"
                                               @fetch="fetchTableData"
                                               @select="onSelect"
                                               @export="exportCloudServiceData"
@@ -160,9 +159,9 @@ import {
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import {
-    QuerySearchTableFetchOptions, QuerySearchTableListeners, QuerySearchTableTypeOptions,
-} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/templates/query-search-table/type';
-import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
+    DynamicLayoutEventListener,
+    DynamicLayoutFieldHandler,
+} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 import ServerMain from '@/views/inventory/server/modules/ServerMain.vue';
@@ -188,8 +187,9 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
-import config from '@/lib/config';
 import { QueryHelper } from '@/lib/query';
+import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
+import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -303,22 +303,22 @@ export default {
         });
 
         /** Main Table */
-        const fetchOptionState = reactive<Partial<QuerySearchTableFetchOptions>>({
+        const fetchOptionState = reactive({
             pageStart: 1,
             pageLimit: cloudServiceStore.getItem<number>('pageLimit', 'number') || DEFAULT_PAGE_SIZE,
             sortDesc: true,
             sortBy: 'created_at',
-            queryTags: [],
+            queryTags: [] as QueryTag[],
         });
 
-        const typeOptionState = reactive<Partial<QuerySearchTableTypeOptions>>({
+        const typeOptionState = reactive({
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
-            selectIndex: [],
+            selectIndex: [] as number[],
             selectable: true,
-            keyItemSets: [],
-            valueHandlerMap: {},
+            keyItemSets: [] as KeyItemSet[],
+            valueHandlerMap: {} as ValueHandlerMap,
             colCopy: false,
         });
 
@@ -374,7 +374,7 @@ export default {
             cloudServiceStore.setItem('tableHeight', height, 'number');
         };
 
-        const onSelect: QuerySearchTableListeners['select'] = (selectIndex) => {
+        const onSelect: DynamicLayoutEventListener['select'] = (selectIndex) => {
             typeOptionState.selectIndex = selectIndex;
         };
 
@@ -456,29 +456,24 @@ export default {
             }
         };
 
-        const fetchTableData: QuerySearchTableListeners['fetch'|'init'] = async (options, changed?: Partial<QuerySearchTableFetchOptions>) => {
-            if (changed) {
-                if (changed.sortBy !== undefined) {
-                    fetchOptionState.sortBy = changed.sortBy;
-                    fetchOptionState.sortDesc = !!changed.sortDesc;
-                }
-                if (changed.pageLimit !== undefined) {
-                    fetchOptionState.pageLimit = changed.pageLimit;
-                    cloudServiceStore.setItem('pageLimit', changed.pageLimit);
-                }
-                if (changed.pageStart !== undefined) {
-                    fetchOptionState.pageStart = changed.pageStart;
-                }
-                if (changed.queryTags !== undefined) {
-                    fetchOptionState.queryTags = changed.queryTags;
-                    /* api query setting */
-                    queryHelper.setFiltersAsQueryTag(changed.queryTags);
-                    /* sync updated query tags to url query string */
-                    replaceUrlQuery('filters', queryHelper.rawQueryStrings);
-                }
-            } else {
-                // init
-                fetchOptionState.queryTags = options.queryTags;
+        const fetchTableData = async (changed: any = {}) => {
+            if (changed.sortBy !== undefined) {
+                fetchOptionState.sortBy = changed.sortBy;
+                fetchOptionState.sortDesc = !!changed.sortDesc;
+            }
+            if (changed.pageLimit !== undefined) {
+                fetchOptionState.pageLimit = changed.pageLimit;
+                cloudServiceStore.setItem('pageLimit', changed.pageLimit);
+            }
+            if (changed.pageStart !== undefined) {
+                fetchOptionState.pageStart = changed.pageStart;
+            }
+            if (changed.queryTags !== undefined) {
+                fetchOptionState.queryTags = changed.queryTags;
+                /* api query setting */
+                queryHelper.setFiltersAsQueryTag(changed.queryTags);
+                /* sync updated query tags to url query string */
+                replaceUrlQuery('filters', queryHelper.rawQueryStrings);
             }
 
             const { items, totalCount } = await getCloudServiceTableData();
@@ -654,6 +649,7 @@ export default {
         (async () => {
             await store.dispatch('resource/loadAll');
             tableState.schema = await getTableSchema();
+            await fetchTableData();
             await initSidebar();
         })();
         /** ************************* */

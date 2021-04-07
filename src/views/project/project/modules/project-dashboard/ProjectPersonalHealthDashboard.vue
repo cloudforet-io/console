@@ -25,8 +25,6 @@
                 <p-search-table :loading="loading"
                                 :fields="fields"
                                 :items="data"
-                                :this-page.sync="thisPage"
-                                :page-size.sync="pageSize"
                                 :sort-by.sync="sortBy"
                                 :sort-desc.sync="sortDesc"
                                 :search-text.sync="search"
@@ -139,10 +137,9 @@ export default {
             regions: computed(() => store.state.resource.region.items),
             timezone: computed(() => store.state.user.timezone),
             cloudServiceTypes: computed(() => store.state.resource.cloudServiceType.items),
-            thisPage: 1,
-            pageSize: 5,
+            pageStart: 1,
+            pageLimit: 5,
             totalCount: 0,
-            allPage: computed(() => Math.ceil(state.totalCount / state.pageSize) || 1),
             data: [],
             summaryData: computed(() => ([
                 {
@@ -234,7 +231,7 @@ export default {
                 state.loading = true;
                 getEventsApiQuery
                     .setSort(state.sortBy, state.sortDesc)
-                    .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                    .setPage(state.pageStart, state.pageLimit)
                     .setFilters([{ v: state.search }]);
                 const res = await SpaceConnector.client.statistics.topic.phdEvents(
                     {

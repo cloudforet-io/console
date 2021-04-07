@@ -25,8 +25,7 @@
                     :value-handler-map="querySearchHandlers.valueHandlerMap"
                     :sort-by.sync="sortBy"
                     :sort-desc.sync="sortDesc"
-                    :this-page.sync="thisPage"
-                    :page-size.sync="pageSize"
+                    :page-size.sync="pageLimit"
                     :total-count="totalCount"
                     :style="{height: `${height}px`}"
                     :multi-select="false"
@@ -37,15 +36,17 @@
                     @rowLeftClick="onSelect"
                 >
                     <template #toolbox-top>
-                        <div v-for="(status, idx) in statusList"
-                             :key="idx"
-                             class="filter-button-wrapper"
-                        >
-                            <span v-if="status.icon" class="legend-icon" :class="status.class" />
-                            <span class="filter-button"
-                                  :class="[activatedStatus === status.key ? 'active' : '', status.class]"
-                                  @click="onClickStatus(status.key)"
-                            >{{ status.label }}</span>
+                        <div class="flex ml-4 mt-6">
+                            <div v-for="(status, idx) in statusList"
+                                 :key="idx"
+                                 class="filter-button-wrapper"
+                            >
+                                <span v-if="status.icon" class="legend-icon" :class="status.class" />
+                                <span class="filter-button"
+                                      :class="[activatedStatus === status.key ? 'active' : '', status.class]"
+                                      @click="onClickStatus(status.key)"
+                                >{{ status.label }}</span>
+                            </div>
                         </div>
                     </template>
                     <template #col-service_account-format="{ value }">
@@ -245,8 +246,8 @@ export default {
             selectedIndexes: [],
             selectedItem: computed(() => state.jobTasks[state.selectedIndexes[0]]),
             //
-            pageSize: 15,
-            thisPage: 1,
+            pageLimit: 15,
+            pageStart: 1,
             sortBy: '',
             sortDesc: true,
             totalCount: 0,
@@ -284,7 +285,7 @@ export default {
             state.items = [];
             jobTasks.forEach((task, index) => {
                 const newTask = {
-                    sequence: getPageStart(state.thisPage, state.pageSize) + index,
+                    sequence: state.pageStart + index,
                     service_account: serviceAccountFormatter(task.service_account_id),
                     project: projectNameFormatter(task.project_id),
                     status: statusFormatter(task.status),
@@ -302,7 +303,8 @@ export default {
         const apiQuery = new ApiQueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);
         const getQuery = () => {
             apiQuery.setSort(state.sortBy, state.sortDesc)
-                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                .setPage(state.pageStart,
+                    state.pageLimit)
                 .setFiltersAsQueryTag(state.searchTags);
 
             let statusValues: JOB_TASK_STATUS[] = [];
@@ -367,8 +369,15 @@ export default {
         const onSelect = (item, index) => {
             state.selectedIndexes = index;
         };
-        const onChange = async (item) => {
-            state.searchTags = item.queryTags;
+        const onChange = async (options) => {
+            if (options.sortBy !== undefined) {
+                state.sortBy = options.sortBy;
+                state.sortDesc = options.sortDesc;
+            }
+            if (options.pageStart !== undefined) state.pageStart = options.pageStart;
+            if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+            if (options.queryTags !== undefined) state.searchTags = options.queryTags;
+
             await getJobTasks();
         };
         const onClickStatus = (status) => {
@@ -431,44 +440,43 @@ export default {
                 }
             }
         }
-        .toolbox-top {
-            .filter-button-wrapper {
-                @apply border-r border-gray-200;
+
+        .filter-button-wrapper {
+            @apply border-r border-gray-200;
+            display: inline-block;
+            padding: 0 1rem;
+            &:first-child {
+                padding-left: 0;
+            }
+            &:last-child {
+                @apply border-none;
+            }
+            .legend-icon {
                 display: inline-block;
-                padding: 0 1rem;
-                &:first-child {
-                    padding-left: 0;
+                width: 0.75rem;
+                height: 0.75rem;
+                border-radius: 2px;
+                margin-right: 7px;
+                &.success {
+                    @apply bg-primary;
                 }
-                &:last-child {
-                    @apply border-none;
+                &.failure {
+                    @apply bg-red-500;
                 }
-                .legend-icon {
-                    display: inline-block;
-                    width: 0.75rem;
-                    height: 0.75rem;
-                    border-radius: 2px;
-                    margin-right: 7px;
-                    &.success {
-                        @apply bg-primary;
-                    }
-                    &.failure {
-                        @apply bg-red-500;
-                    }
+            }
+            .filter-button {
+                @apply text-gray-400;
+                font-size: 0.875rem;
+                cursor: pointer;
+                &:hover, &:focus {
+                    @apply text-gray-900;
                 }
-                .filter-button {
-                    @apply text-gray-400;
-                    font-size: 0.875rem;
-                    cursor: pointer;
-                    &:hover, &:focus {
-                        @apply text-gray-900;
-                    }
-                    &.active {
-                        @apply text-gray-900;
-                        font-weight: bold;
-                    }
-                    &.failure:hover, &.failure:focus, &.failure.active {
-                        @apply text-red-500;
-                    }
+                &.active {
+                    @apply text-gray-900;
+                    font-weight: bold;
+                }
+                &.failure:hover, &.failure:focus, &.failure.active {
+                    @apply text-red-500;
                 }
             }
         }

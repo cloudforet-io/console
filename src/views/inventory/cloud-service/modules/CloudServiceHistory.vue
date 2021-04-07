@@ -5,8 +5,10 @@
                         :items="items"
                         :loading="loading"
                         :total-count="totalCount"
+                        :sort-by.sync="options.sortBy"
+                        :sort-desc.sync="options.sortDesc"
+                        :page-size.sync="options.pageLimit"
                         :selectable="false"
-                        @init="onChange"
                         @change="onChange"
                         @export="onExport"
         >
@@ -39,7 +41,6 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { iso8601Formatter } from '@/lib/util';
-import config from '@/lib/config';
 import { store } from '@/store';
 
 export default {
@@ -66,7 +67,13 @@ export default {
             items: [],
             loading: true,
             totalCount: 0,
-            options: {} as Options,
+            options: {
+                sortBy: 'updated_at',
+                sortDesc: true,
+                pageStart: 1,
+                pageLimit: 15,
+                searchText: '',
+            },
         });
 
         const apiQuery = new ApiQueryHelper();
@@ -75,8 +82,8 @@ export default {
             key_path: 'collection_info.change_history',
             query: apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
                 .setPage(
-                    getPageStart(state.options.thisPage, state.options.pageSize),
-                    state.options.pageSize,
+                    state.options.pageStart,
+                    state.options.pageLimit,
                 )
                 .setFilters([{ v: state.options.searchText }])
                 .data,
@@ -99,8 +106,8 @@ export default {
             }
         };
 
-        const onChange: SearchTableListeners['change'] = async (options) => {
-            state.options = options;
+        const onChange = async (options = {}) => {
+            state.options = { ...state.options, ...options };
             await listHistory();
         };
 
@@ -124,6 +131,11 @@ export default {
         watch(() => props.cloudServiceId, (after, before) => {
             if (after !== before) listHistory();
         }, { immediate: false });
+
+        /* Init */
+        (async () => {
+            await onChange();
+        })();
 
         return {
             ...toRefs(state),

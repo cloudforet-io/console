@@ -7,8 +7,9 @@
                         :total-count="totalCount"
                         :selectable="false"
                         :excel-visible="false"
+                        :sort-by.sync="options.sortBy"
+                        :sort-desc.sync="options.sortDesc"
                         :style="{height: '100%', border: 'none'}"
-                        @init="onChange"
                         @change="onChange"
         >
             <template #col-created_at-format="{value}">
@@ -64,7 +65,13 @@ export default {
             items: [],
             loading: true,
             totalCount: 0,
-            options: {} as Options,
+            options: {
+                sortBy: 'secret_id',
+                sortDesc: true,
+                pageStart: 1,
+                pageLimit: 15,
+                searchText: '',
+            },
         });
 
         const apiQuery = new ApiQueryHelper();
@@ -75,8 +82,8 @@ export default {
         }, { v: state.options.searchText }])
             .setSort(state.options.sortBy, state.options.sortDesc)
             .setPage(
-                getPageStart(state.options.thisPage, state.options.pageSize),
-                state.options.pageSize,
+                state.options.pageStart,
+                state.options.pageLimit,
             )
             .setOnly('secret_id', 'name', 'schema', 'created_at')
             .data;
@@ -96,8 +103,8 @@ export default {
             }
         };
 
-        const onChange: SearchTableListeners['change'] = async (options) => {
-            state.options = options;
+        const onChange = async (options) => {
+            state.options = { ...state.options, ...options };
             await listCredentials();
         };
 

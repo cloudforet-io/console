@@ -7,6 +7,8 @@
                         :total-count="totalCount"
                         :selectable="false"
                         :excel-visible="false"
+                        :sort-by.sync="options.sortBy"
+                        :sort-desc.sync="options.sortDesc"
                         :style="{height: '100%', border: 'none'}"
                         @change="onChange"
         >
@@ -34,18 +36,16 @@ import {
 import {
     PSearchTable, PPanelTop, PTextList, PBadge,
 } from '@spaceone/design-system';
-import { Options, SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
+import { SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { getPageStart } from '@/lib/component-utils/pagination';
 import { store } from '@/store';
 
 export default {
     name: 'ServiceAccountMember',
     components: {
         PBadge,
-        PTextList,
         PSearchTable,
         PPanelTop,
     },
@@ -67,14 +67,20 @@ export default {
             items: [],
             loading: false,
             totalCount: 0,
-            options: {} as Options,
+            options: {
+                sortBy: 'user_id',
+                sortDesc: true,
+                pageStart: 1,
+                pageLimit: 15,
+                searchText: '',
+            },
         });
 
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
             .setPage(
-                getPageStart(state.options.thisPage, state.options.pageSize),
-                state.options.pageSize,
+                state.options.pageStart,
+                state.options.pageLimit,
             ).setFilters([{ v: state.options.searchText }])
             .data;
 
@@ -100,7 +106,7 @@ export default {
         };
 
         const onChange: SearchTableListeners['change'] = async (options) => {
-            state.options = options;
+            state.options = { ...state.options, ...options };
             await listMember();
         };
 

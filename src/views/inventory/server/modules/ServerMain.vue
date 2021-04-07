@@ -22,22 +22,24 @@
                                   @export="exportServerData"
                 >
                     <template #toolbox-left>
-                        <p-icon-text-button style-type="primary-dark"
-                                            name="ic_plus_bold"
-                                            :disabled="true"
-                                            @click="onClickCollectData"
-                        >
-                            {{ $t('INVENTORY.SERVER.MAIN.COLLECT_DATA') }}
-                        </p-icon-text-button>
-                        <p-dropdown-menu-btn
-                            id="server-dropdown-btn"
-                            class="left-toolbox-item mr-4"
-                            :menu="tableState.dropdown"
-                            @click-delete="onClickDelete"
-                            @click-project="onClickChangeProject"
-                        >
-                            {{ $t('INVENTORY.SERVER.MAIN.ACTION') }}
-                        </p-dropdown-menu-btn>
+                        <div class="flex">
+                            <p-icon-text-button style-type="primary-dark"
+                                                name="ic_plus_bold"
+                                                :disabled="true"
+                                                @click="onClickCollectData"
+                            >
+                                {{ $t('INVENTORY.SERVER.MAIN.COLLECT_DATA') }}
+                            </p-icon-text-button>
+                            <p-dropdown-menu-btn
+                                id="server-dropdown-btn"
+                                class="left-toolbox-item"
+                                :menu="tableState.dropdown"
+                                @click-delete="onClickDelete"
+                                @click-project="onClickChangeProject"
+                            >
+                                {{ $t('INVENTORY.SERVER.MAIN.ACTION') }}
+                            </p-dropdown-menu-btn>
+                        </div>
                     </template>
                 </p-dynamic-layout>
             </template>
@@ -138,10 +140,9 @@ import {
     PDropdownMenuBtn, PTab, PTableCheckModal, PEmpty,
 } from '@spaceone/design-system';
 import {
-    QuerySearchTableFetchOptions,
-    QuerySearchTableListeners, QuerySearchTableTypeOptions,
-} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/templates/query-search-table/type';
-import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
+    DynamicLayoutEventListener,
+    DynamicLayoutFieldHandler,
+} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
@@ -166,7 +167,8 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { QueryHelper } from '@/lib/query';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
-import config from '@/lib/config';
+import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 
 
 interface ProjectItemResp {
@@ -261,14 +263,14 @@ export default {
         const apiQuery = new ApiQueryHelper();
         const pageTitle = computed(() => (props.isCloudService ? props.cloudServiceType : vm.$t('INVENTORY.SERVER.MAIN.TITLE')));
 
-        const typeOptionState = reactive<Partial<QuerySearchTableTypeOptions>>({
+        const typeOptionState = reactive({
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
-            selectIndex: [],
+            selectIndex: [] as number[],
             selectable: true,
-            keyItemSets: [],
-            valueHandlerMap: {},
+            keyItemSets: [] as KeyItemSet[],
+            valueHandlerMap: {} as ValueHandlerMap,
             colCopy: false,
         });
         const tableState = reactive({
@@ -310,12 +312,12 @@ export default {
             }),
             selectedServerIds: computed(() => tableState.selectedItems.map(d => d.server_id)),
         });
-        const fetchOptionState = reactive<Partial<QuerySearchTableFetchOptions>>({
+        const fetchOptionState = reactive({
             pageStart: 1,
             pageLimit: serverStore.getItem<number>('pageLimit', 'number') || DEFAULT_PAGE_SIZE,
             sortDesc: true,
             sortBy: 'created_at',
-            queryTags: [],
+            queryTags: [] as QueryTag[],
         });
         const checkTableModalState = reactive({
             visible: false,
@@ -488,7 +490,7 @@ export default {
         };
 
         /* event */
-        const fetchTableData: QuerySearchTableListeners['fetch'|'init'] = async (options, changed?: Partial<QuerySearchTableFetchOptions>) => {
+        const fetchTableData: DynamicLayoutEventListener['fetch'] = async (changed) => {
             if (changed) {
                 if (changed.sortBy !== undefined) {
                     fetchOptionState.sortBy = changed.sortBy;
@@ -508,12 +510,11 @@ export default {
                     /* sync updated query tags to url query string */
                     await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
                 }
-            } else {
-                fetchOptionState.queryTags = options.queryTags;
             }
+
             await listServerData();
         };
-        const onSelect: QuerySearchTableListeners['select'] = (selectIndex) => {
+        const onSelect: DynamicLayoutEventListener['select'] = (selectIndex) => {
             typeOptionState.selectIndex = selectIndex;
         };
         const onClickChangeProject = () => { changeProjectState.visible = true; };

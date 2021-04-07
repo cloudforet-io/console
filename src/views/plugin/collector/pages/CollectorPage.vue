@@ -19,8 +19,7 @@
                                       :query-tags="searchTags"
                                       :sort-by.sync="sortBy"
                                       :sort-desc.sync="sortDesc"
-                                      :this-page.sync="thisPage"
-                                      :page-size.sync="pageSize"
+                                      :page-size.sync="pageLimit"
                                       :style="{height: `${height}px`}"
                                       @select="onSelect"
                                       @change="onChange"
@@ -288,8 +287,8 @@ export default {
             }], 'inventory.Collector'),
             loading: false,
             searchTags: [],
-            pageSize: 15,
-            thisPage: 1,
+            pageLimit: 15,
+            pageStart: 1,
             sortBy: null,
             sortDesc: true,
             // dropdown action
@@ -365,7 +364,7 @@ export default {
         );
         const getQuery = () => {
             apiQuery.setSort(state.sortBy, state.sortDesc)
-                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                .setPage(state.pageStart, state.pageLimit)
                 .setFilters(queryHelper.filters);
             return apiQuery.data;
         };
@@ -395,12 +394,19 @@ export default {
         const onSelect = (index) => {
             state.selectedIndexes = index;
         };
-        const onChange = async (item) => {
-            state.selectedIndexes = [];
-            state.searchTags = item.queryTags;
+        const onChange = async (options) => {
+            if (options.sortBy !== undefined) {
+                state.sortBy = options.sortBy;
+                state.sortDesc = options.sortDesc;
+            }
+            if (options.pageStart !== undefined) state.pageStart = options.pageStart;
+            if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+            if (options.queryTags !== undefined) {
+                state.searchTags = options.queryTags;
+                queryHelper.setFiltersAsQueryTag(options.queryTags);
+                await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
+            }
 
-            queryHelper.setFiltersAsQueryTag(item.queryTags);
-            await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
             try {
                 await getCollectors();
             } catch (e) {

@@ -135,14 +135,12 @@ import { render } from 'ejs';
 /* spaceone design system */
 import {
     PRadio, PI, PDivider, PBreadcrumbs, PPageTitle, PHorizontalLayout, PIconTextButton,
-    PDropdownMenuBtn, PTab, PDataTable, PDynamicLayout, PEmpty, PDoubleCheckModal,
+    PDropdownMenuBtn, PTab, PDynamicLayout, PEmpty, PDoubleCheckModal,
 } from '@spaceone/design-system';
 import {
-    TableEventListeners,
-    TableFetchOptions,
-    TableTypeOptions,
-} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/templates/table/type';
-import { DynamicLayoutFieldHandler } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
+    DynamicLayoutEventListener,
+    DynamicLayoutFieldHandler,
+} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
@@ -161,16 +159,16 @@ import ServiceAccountMember from '@/views/identity/service-account/modules/Servi
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import config from '@/lib/config';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { QueryHelper } from '@/lib/query';
+import { dynamicFieldsToExcelDataFields } from '@/lib/component-utils/dynamic-layout';
+import { store } from '@/store';
+import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 
 /* types */
 import { Reference } from '@/lib/reference/type';
-import { store } from '@/store';
-import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { TranslateResult } from 'vue-i18n';
-import { QueryHelper } from '@/lib/query';
-import { dynamicFieldsToExcelDataFields } from '@/lib/component-utils/dynamic-layout';
+
 
 interface ProjectItemResp {
     id: string;
@@ -193,7 +191,6 @@ export default {
         ServiceAccountCredentials,
         TagsPanel,
         PDynamicLayout,
-        PDataTable,
         PHorizontalLayout,
         PPageTitle,
         PBreadcrumbs,
@@ -203,7 +200,7 @@ export default {
         PVerticalPageLayout,
         PTab,
     },
-    setup(props, context) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
 
@@ -226,7 +223,7 @@ export default {
         });
 
         /** States for Dynamic Layout(search table type) * */
-        const fetchOptionState = reactive<Partial<TableFetchOptions>>({
+        const fetchOptionState = reactive({
             pageStart: 1,
             pageLimit: 15,
             sortDesc: true,
@@ -234,11 +231,11 @@ export default {
             searchText: queryHelper.apiQuery.keyword,
         });
 
-        const typeOptionState = reactive<Partial<TableTypeOptions>>({
+        const typeOptionState = reactive({
             loading: true,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone || 'UTC'),
-            selectIndex: [],
+            selectIndex: [] as number[],
             selectable: true,
             colCopy: false,
         });
@@ -300,7 +297,7 @@ export default {
             }
         };
 
-        const onSelect: TableEventListeners['select'] = (selectIndex) => {
+        const onSelect: DynamicLayoutEventListener['select'] = (selectIndex) => {
             typeOptionState.selectIndex = selectIndex;
             getConsoleLink();
         };
@@ -337,24 +334,22 @@ export default {
         };
 
         /** Change Detection of Main Table * */
-        const fetchTableData: TableEventListeners['fetch'] = (options, changed) => {
-            if (changed) {
-                if (changed.sortBy !== undefined) {
-                    fetchOptionState.sortBy = changed.sortBy;
-                    fetchOptionState.sortDesc = !!changed.sortDesc;
-                }
-                if (changed.pageLimit !== undefined) {
-                    fetchOptionState.pageLimit = changed.pageLimit;
-                }
-                if (changed.pageStart !== undefined) {
-                    fetchOptionState.pageStart = changed.pageStart;
-                }
-                if (changed.searchText !== undefined) {
-                    fetchOptionState.searchText = changed.searchText;
-                    // sync updated query tags to url query string
-                    queryHelper.setFilters([{ v: changed.searchText }]);
-                    replaceUrlQuery('filters', queryHelper.rawQueryStrings);
-                }
+        const fetchTableData: DynamicLayoutEventListener['fetch'] = (changed) => {
+            if (changed.sortBy !== undefined) {
+                fetchOptionState.sortBy = changed.sortBy;
+                fetchOptionState.sortDesc = !!changed.sortDesc;
+            }
+            if (changed.pageLimit !== undefined) {
+                fetchOptionState.pageLimit = changed.pageLimit;
+            }
+            if (changed.pageStart !== undefined) {
+                fetchOptionState.pageStart = changed.pageStart;
+            }
+            if (changed.searchText !== undefined) {
+                fetchOptionState.searchText = changed.searchText;
+                // sync updated query tags to url query string
+                queryHelper.setFilters([{ v: changed.searchText }]);
+                replaceUrlQuery('filters', queryHelper.rawQueryStrings);
             }
             listServiceAccountData();
         };

@@ -64,14 +64,20 @@ export default {
             items: [],
             loading: true,
             totalCount: 0,
-            options: {} as Options,
+            options: {
+                sortBy: 'user_id',
+                sortDesc: true,
+                pageStart: 1,
+                pageLimit: 15,
+                searchText: '',
+            },
         });
 
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
             .setPage(
-                getPageStart(state.options.thisPage, state.options.pageSize),
-                state.options.pageSize,
+                state.options.pageStart,
+                state.options.pageLimit,
             )
             .setFilters([{ v: state.options.searchText }])
             .data;
@@ -98,7 +104,7 @@ export default {
         };
 
         const onChange: SearchTableListeners['change'] = async (options) => {
-            state.options = options;
+            state.options = { ...state.options, ...options };
             await listAdmin();
         };
 
