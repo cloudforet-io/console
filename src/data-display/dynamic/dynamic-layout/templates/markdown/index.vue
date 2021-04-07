@@ -21,7 +21,6 @@ import PMarkdown from '@/data-display/markdown/PMarkdown.vue';
 import { get } from 'lodash';
 import {
     MarkdownDynamicLayoutProps,
-    MarkdownFetchOptions,
 } from '@/data-display/dynamic/dynamic-layout/templates/markdown/type';
 
 
@@ -63,11 +62,7 @@ export default {
                 return props.data;
             }),
             language: computed(() => props.typeOptions?.language || 'en'),
-            fetchOptionsParam: computed<MarkdownFetchOptions>(() => ({})),
         });
-
-        emit('init', state.fetchOptionsParam);
-
 
         return {
             ...toRefs(state),

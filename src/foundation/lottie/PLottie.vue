@@ -33,7 +33,7 @@ import { LottieProps } from '@/foundation/lottie/type';
     }
  */
 
-export default defineComponent({
+export default defineComponent<LottieProps>({
     name: 'PLottie',
     props: {
         name: {

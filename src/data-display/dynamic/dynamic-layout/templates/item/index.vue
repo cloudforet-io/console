@@ -103,7 +103,6 @@ export default {
                 return props.data;
             }),
             loading: computed(() => (props.typeOptions === undefined ? undefined : props.typeOptions.loading)),
-            fetchOptionsParam: computed<ItemFetchOptions>(() => ({})),
             timezone: computed(() => props.typeOptions?.timezone || 'UTC'),
         });
 
@@ -130,8 +129,6 @@ export default {
 
             return res;
         });
-
-        emit('init', state.fetchOptionsParam);
 
         return {
             ...toRefs(state),

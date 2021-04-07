@@ -17,7 +17,7 @@ import {
 import { get } from 'lodash';
 import PRawData from '@/data-display/raw-data/PRawData.vue';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
-import { RawDynamicLayoutProps, RawFetchOptions } from '@/data-display/dynamic/dynamic-layout/templates/raw/type';
+import { RawDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw/type';
 
 export default {
     name: 'PDynamicLayoutRaw',
@@ -56,11 +56,9 @@ export default {
                 if (typeof props.data !== 'object') return {};
                 return props.data;
             }),
-            fetchOptionsParam: computed<RawFetchOptions>(() => ({})),
             loading: computed(() => (props.typeOptions?.loading || false)),
         });
 
-        emit('init', state.fetchOptionsParam);
 
         return {
             ...toRefs(state),

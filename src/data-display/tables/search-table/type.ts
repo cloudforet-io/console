@@ -20,11 +20,11 @@ export interface SearchTableProps {
 }
 
 export interface Options {
-    sortBy: string;
-    sortDesc: boolean;
-    thisPage: number;
-    pageSize: number;
-    searchText: string;
+    sortBy?: string;
+    sortDesc?: boolean;
+    pageStart?: number;
+    pageLimit?: number;
+    searchText?: string;
 }
 
 export interface SearchTableListeners {

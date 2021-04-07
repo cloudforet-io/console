@@ -6,7 +6,7 @@
                           :options="layout.options"
                           :data="rootData"
                           :fetch-options="fetchOptions"
-                          :typeOptions="typeOptions"
+                          :type-options="typeOptions"
                           :field-handler="fieldHandler"
                           v-on="getListeners(layout.name, idx)"
         >
@@ -74,14 +74,14 @@ export default {
             getListeners(name, idx) {
                 return {
                     ...listeners,
-                    init(...args) {
-                        makeByPassListeners(listeners, 'init', ...args, name, idx);
-                    },
                     fetch(...args) {
                         makeByPassListeners(listeners, 'fetch', ...args, name, idx);
                     },
                     select(...args) {
                         makeByPassListeners(listeners, 'select', ...args, name, idx);
+                    },
+                    export() {
+                        makeByPassListeners(listeners, 'export', name, idx);
                     },
                 };
             },

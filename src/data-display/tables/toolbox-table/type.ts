@@ -1,3 +1,5 @@
+import { QueryTag } from '@/inputs/search/query-search-tags/type';
+
 export interface PToolboxTableProps {
     // PDataTableProps
     loading: boolean;
@@ -12,7 +14,6 @@ export interface PToolboxTableProps {
     multiSelect?: boolean;
     rowClickMultiSelectMode?: boolean;
     useCursorLoading?: boolean;
-    skeletonRows?: number;
     tableStyleType?: string;
     striped?: boolean;
     bordered?: boolean|null|unknown;
@@ -30,4 +31,13 @@ export interface PToolboxTableProps {
     allPage?: number;
     thisPage?: number;
     pageNationValues?: number[];
+}
+
+export interface ToolboxTableOptions {
+    sortBy?: string;
+    sortDesc?: boolean;
+    pageStart?: number;
+    pageLimit?: number;
+    searchText?: string;
+    queryTags?: QueryTag[];
 }

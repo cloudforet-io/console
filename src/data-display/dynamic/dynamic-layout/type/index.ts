@@ -9,12 +9,12 @@ import { DynamicField, DynamicFieldOptions } from '@/data-display/dynamic/dynami
 
 
 export interface DynamicLayoutFetchOptions {
-    sortBy: string;
-    sortDesc: boolean;
-    pageStart: number;
-    pageLimit: number;
-    queryTags: QueryTag[];
-    searchText: string;
+    sortBy?: string;
+    sortDesc?: boolean;
+    pageStart?: number;
+    pageLimit?: number;
+    queryTags?: QueryTag[];
+    searchText?: string;
 }
 
 export interface DynamicLayoutTypeOptions {
@@ -35,15 +35,13 @@ export interface DynamicLayoutTypeOptions {
 
 export interface DynamicLayoutProps<
     SchemaOptions = DynamicLayoutOptions,
-        FetchOptions = DynamicLayoutFetchOptions,
-    TypeOptions = DynamicLayoutTypeOptions
     > {
     name: string;
     type: DynamicLayoutType;
     options: SchemaOptions;
     data?: any;
-    fetchOptions?: FetchOptions;
-    typeOptions?: TypeOptions;
+    fetchOptions?: DynamicLayoutFetchOptions;
+    typeOptions?: DynamicLayoutTypeOptions;
     fieldHandler?: DynamicLayoutFieldHandler;
 }
 
@@ -58,11 +56,8 @@ export type DynamicLayoutFieldHandler<T = undefined> = DynamicFieldHandler<
     >
 
 
-export interface DynamicLayoutEventListeners<FetchOptions = DynamicLayoutFetchOptions> {
-    init: (options: FetchOptions, layoutName?: string, layoutIndex?: number) => void|Promise<void>;
-    fetch: (options: FetchOptions,
-             changedOptions: Partial<FetchOptions>,
-             layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+export interface DynamicLayoutEventListener {
+    fetch: (options: DynamicLayoutFetchOptions, layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     select: (selectIndex: number[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
-    export: (options: FetchOptions, fields: DynamicField[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    export: (layoutName?: string, layoutIndex?: number) => void|Promise<void>;
 }

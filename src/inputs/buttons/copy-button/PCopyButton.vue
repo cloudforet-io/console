@@ -27,16 +27,21 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 import PI from '@/foundation/icons/PI.vue';
 import { copyAnyData, isNotEmpty } from '@/util/helpers';
 import color from '@/styles/colors';
 
-export default {
+interface Props {
+    value: string|null;
+    alertPosition: 'right';
+    iconColor: string|null;
+}
+
+export default defineComponent({
     name: 'PCopyButton',
     components: { PI },
-    event: ['copy'],
     props: {
         value: {
             type: String,
@@ -51,7 +56,7 @@ export default {
             default: null,
         },
     },
-    setup(props, context) {
+    setup(props: Props, context) {
         const state = reactive({
             click: false,
             icon: computed(() => (state.click ? 'ic_copied' : 'ic_copy')),
@@ -82,7 +87,7 @@ export default {
             copyText,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">

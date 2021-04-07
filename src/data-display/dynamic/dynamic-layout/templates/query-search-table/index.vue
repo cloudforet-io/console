@@ -13,7 +13,6 @@
                               :sort-by.sync="sortBy"
                               :sort-desc.sync="sortDesc"
                               :select-index="selectIndex"
-                              :this-page.sync="thisPage"
                               :page-size.sync="pageSize"
                               :key-item-sets="keyItemSets"
                               :value-handler-map="valueHandlerMap"
@@ -25,7 +24,6 @@
                               :searchable="searchable"
                               :excel-visible="excelVisible"
                               :timezone="timezone"
-                              @init="onInit"
                               @change="onChange"
                               @select="onSelect"
                               @export="onExport"
@@ -56,13 +54,12 @@ import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import { KeyItemSet } from '@/inputs/search/query-search/type';
 import { forEach, get } from 'lodash';
 import {
-    QuerySearchTableListeners,
-    QuerySearchTableDynamicLayoutProps, QuerySearchTableFetchOptions,
+    QuerySearchTableDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/query-search-table/type';
-import { getPageStart } from '@/util/helpers';
 import { Options } from '@/data-display/tables/query-search-table/type';
 import { DataTableFieldType } from '@/data-display/tables/data-table/type';
 import { getValueByPath } from '@/data-display/dynamic/dynamic-layout/helper';
+import { DynamicLayoutFetchOptions } from '@/data-display/dynamic/dynamic-layout/type';
 
 const getThisPage = (pageStart = 1, pageLimit = 15) => Math.floor(pageStart / pageLimit) || 1;
 
@@ -143,19 +140,18 @@ export default {
             /** get data from fetch options */
             sortBy: props.fetchOptions?.sortBy || '',
             sortDesc: (props.fetchOptions?.sortDesc !== undefined) ? props.fetchOptions.sortDesc : true,
-            thisPage: getThisPage(props.fetchOptions?.pageStart, props.fetchOptions?.pageLimit),
             pageSize: props.fetchOptions?.pageLimit || 15,
             queryTags: props.fetchOptions?.queryTags || [],
 
             /** others */
-            pageStart: computed(() => getPageStart(state.thisPage, state.pageSize)),
+            pageStart: 1,
             fetchOptionsParam: computed(() => ({
                 sortBy: state.sortBy,
                 sortDesc: state.sortDesc,
                 pageStart: state.pageStart,
                 pageLimit: state.pageSize,
                 queryTags: state.queryTags,
-            } as QuerySearchTableFetchOptions)),
+            } as DynamicLayoutFetchOptions)),
             rootData: computed<any[]>(() => {
                 if (Array.isArray(props.data)) return props.data;
                 if (typeof props.data === 'object' && props.options.root_path) {
@@ -194,40 +190,17 @@ export default {
         };
 
         const onExport = () => {
-            emit('export', state.fetchOptionsParam, props.options.fields || []);
+            emit('export');
         };
 
-        const onInit = (options: Options) => {
-            // apply changed options to state.
-            forEach(options, (d, k) => {
-                state[k] = d;
-            });
 
-            emit('init', state.fetchOptionsParam);
-        };
-
-        const onChange = (options: Options, changedOptions: Partial<Options>) => {
-            const changedFetchOptions: Partial<QuerySearchTableFetchOptions> = {};
-
-            // apply changed options to state and rename for dynamic fetch options
-            forEach(changedOptions, (d, k) => {
-                state[k] = d;
-                if (k === 'thisPage') changedFetchOptions.pageStart = getPageStart(d as number, changedOptions.pageSize || options.pageSize);
-                else if (k === 'pageSize') changedFetchOptions.pageLimit = d as number;
-                else changedFetchOptions[k] = d;
-            });
-
-            // emit
-            const args: Parameters<QuerySearchTableListeners['fetch']> = [
-                state.fetchOptionsParam, changedFetchOptions,
-            ];
-            emit('fetch', ...args);
+        const onChange = (options: Options) => {
+            emit('fetch', options);
         };
 
 
         return {
             ...toRefs(state),
-            onInit,
             onChange,
             onSelect,
             onExport,

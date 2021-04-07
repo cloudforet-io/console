@@ -25,12 +25,12 @@
 <script lang="ts">
 import { indexOf, pull } from 'lodash';
 import {
-    computed, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 import PI from '@/foundation/icons/PI.vue';
 import { CheckboxProps } from '@/inputs/checkbox/type';
 
-export default {
+export default defineComponent<CheckboxProps>({
     name: 'PCheckBox',
     components: { PI },
     model: {
@@ -89,7 +89,7 @@ export default {
             iconName,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
@@ -133,7 +133,6 @@ export default {
     .invalid {
         @apply text-red-500 cursor-pointer;
     }
-
 }
 
 </style>

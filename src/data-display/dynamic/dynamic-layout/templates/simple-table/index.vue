@@ -34,7 +34,6 @@ import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import {
     SimpleTableDynamicLayoutProps,
-    SimpleTableFetchOptions,
 } from '@/data-display/dynamic/dynamic-layout/templates/simple-table/type';
 import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { getValueByPath } from '@/data-display/dynamic/dynamic-layout/helper';
@@ -128,10 +127,8 @@ export default {
 
                 return res;
             }),
-            fetchOptionsParam: computed<SimpleTableFetchOptions>(() => ({})),
         });
 
-        emit('init', state.fetchOptionsParam);
         return {
             ...toRefs(state),
             getValueByPath,

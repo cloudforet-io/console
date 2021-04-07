@@ -76,8 +76,10 @@ export default {
             pageY: null as null|number,
         });
 
-        const onMousemove = throttle((e) => {
+        const onMousemove = (e) => {
             if (state.dragging) {
+                e.preventDefault();
+
                 if (state.pageY === null) {
                     state.pageY = e.pageY;
                     return;
@@ -90,7 +92,8 @@ export default {
                 state.containerHeight = newHeight;
                 state.pageY = e.pageY;
             }
-        }, 150);
+        };
+
         const onMouseup = () => {
             if (state.dragging) {
                 // @ts-ignore

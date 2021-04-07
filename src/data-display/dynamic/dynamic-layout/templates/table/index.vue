@@ -13,7 +13,6 @@
                         :sort-by.sync="sortBy"
                         :sort-desc.sync="sortDesc"
                         :select-index="selectIndex"
-                        :this-page.sync="thisPage"
                         :page-size.sync="pageSize"
                         :search-text.sync="searchText"
                         :selectable="selectable"
@@ -52,16 +51,13 @@ import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import {
     TableDynamicLayoutProps,
-    TableEventListeners,
-    TableFetchOptions,
 } from '@/data-display/dynamic/dynamic-layout/templates/table/type';
-import { forEach, get } from 'lodash';
+import { get } from 'lodash';
 import PSearchTable from '@/data-display/tables/search-table/PSearchTable.vue';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { DynamicField } from '@/data-display/dynamic/dynamic-field/type/field-schema';
-import { getPageStart, getThisPage } from '@/util/helpers';
 import { Options } from '@/data-display/tables/query-search-table/type';
-import {getValueByPath} from "@/data-display/dynamic/dynamic-layout/helper";
+import { getValueByPath } from '@/data-display/dynamic/dynamic-layout/helper';
 
 const bindExtra = (props: TableDynamicLayoutProps, name: string, init: any) => {
     if (props.typeOptions && props.typeOptions[name]) {
@@ -138,12 +134,11 @@ export default {
             /** get data from fetch options */
             sortBy: props.fetchOptions?.sortBy || '',
             sortDesc: props.fetchOptions?.sortDesc || true,
-            thisPage: getThisPage(props.fetchOptions?.pageStart, props.fetchOptions?.pageLimit),
             pageSize: props.fetchOptions?.pageLimit || 15,
             searchText: props.fetchOptions?.searchText || '',
 
             /** others */
-            pageStart: computed(() => getPageStart(state.thisPage, state.pageSize)),
+            pageStart: 1,
             rootData: computed<any[]>(() => {
                 if (Array.isArray(props.data)) return props.data;
                 if (typeof props.data === 'object' && props.options.root_path) {
@@ -185,48 +180,13 @@ export default {
             emit('select', selectIndex);
         };
 
-        const onChange = (options: Options, changedOptions: Partial<Options>) => {
-            const changedFetchOptions: Partial<TableFetchOptions> = {};
-
-            // apply changed options to state and rename for dynamic fetch options
-            forEach(changedOptions, (d, k) => {
-                state[k] = d;
-                if (k === 'thisPage') changedFetchOptions.pageStart = getPageStart(d as number, changedOptions.pageSize || options.pageSize);
-                else if (k === 'pageSize') changedFetchOptions.pageLimit = d as number;
-                else changedFetchOptions[k] = d;
-            });
-
-            // emit
-            const args: Parameters<TableEventListeners['fetch']> = [
-                {
-                    sortBy: state.sortBy,
-                    sortDesc: state.sortDesc,
-                    pageStart: state.pageStart,
-                    pageLimit: state.pageSize,
-                    searchText: state.searchText,
-                } as TableFetchOptions, changedFetchOptions,
-            ];
-            emit('fetch', ...args);
+        const onChange = (options: Options) => {
+            emit('fetch', options);
         };
 
         const onExport = () => {
-            emit('export', {
-                sortBy: state.sortBy,
-                sortDesc: state.sortDesc,
-                pageStart: state.pageStart,
-                pageLimit: state.pageSize,
-                searchText: state.searchText,
-            } as TableFetchOptions, props.options.fields || []);
+            emit('export');
         };
-
-
-        emit('init', {
-            sortBy: state.sortBy,
-            sortDesc: state.sortDesc,
-            pageStart: state.pageStart,
-            pageLimit: state.pageSize,
-            searchText: state.searchText,
-        } as TableFetchOptions);
 
         return {
             ...toRefs(state),
@@ -234,7 +194,7 @@ export default {
             onSelect,
             onChange,
             onExport,
-            getValueByPath
+            getValueByPath,
         };
     },
 };

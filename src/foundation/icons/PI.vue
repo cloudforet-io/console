@@ -5,7 +5,18 @@
 import '@/foundation/icons/p-icons';
 import { defineComponent } from '@vue/composition-api';
 
-export default defineComponent({
+interface Props {
+    name: string;
+    dir: string|null;
+    fill: boolean;
+    width: string;
+    height: string;
+    scale?: string;
+    color?: string;
+    original: boolean;
+    title?: string;
+}
+export default defineComponent<Props>({
     name: 'PI',
     props: {
         name: {

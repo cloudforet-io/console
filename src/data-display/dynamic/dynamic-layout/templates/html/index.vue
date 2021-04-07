@@ -19,7 +19,7 @@ import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { get } from 'lodash';
-import { HtmlDynamicLayoutProps, HtmlFetchOptions } from '@/data-display/dynamic/dynamic-layout/templates/html/type';
+import { HtmlDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/html/type';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 import DOMPurify from 'dompurify';
 import { iframeStyle } from './style';
@@ -68,7 +68,6 @@ export default {
                 if (typeof props.data !== 'string') return '';
                 return props.data;
             }),
-            fetchOptionsParam: computed<HtmlFetchOptions>(() => ({})),
             iframeData: computed(() => DOMPurify.sanitize(state.rootData, { allowAttributes: { a: ['target'] } })),
         });
 
@@ -82,7 +81,6 @@ export default {
             e.target.contentDocument.head.appendChild(el);
             resizeIframe(e);
         };
-        emit('init', state.fetchOptionsParam);
 
         return {
             ...toRefs(state),

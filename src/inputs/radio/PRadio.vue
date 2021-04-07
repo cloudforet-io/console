@@ -24,12 +24,20 @@
 </template>
 
 <script lang="ts">
-import { reactive, computed, toRefs } from '@vue/composition-api';
+import {
+    reactive, computed, toRefs, defineComponent,
+} from '@vue/composition-api';
 import PI from '@/foundation/icons/PI.vue';
+import * as events from 'events';
 
-export default {
+interface Props {
+    selected: any;
+    value: any;
+    disabled: boolean;
+    invalid: boolean;
+}
+export default defineComponent<Props>({
     name: 'PRadio',
-    events: ['change'],
     components: { PI },
     model: {
         prop: 'selected',
@@ -50,7 +58,7 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props: Props, { emit }) {
         const isSelected = computed(() => props.selected === props.value);
         const onClick = () => {
             if (!props.disabled) {
@@ -73,7 +81,7 @@ export default {
             onClick,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
