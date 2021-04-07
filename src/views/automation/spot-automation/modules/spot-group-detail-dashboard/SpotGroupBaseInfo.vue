@@ -21,7 +21,10 @@
             />
         </section>
         <section class="composition-chart-section">
-            <spot-group-composition-chart chart-type="short" />
+            <spot-group-ratio-chart
+                chart-type="short"
+                :spot-group-id="spotGroup.spot_group_id"
+            />
         </section>
         <section class="project-section">
             <span class="title">
@@ -43,6 +46,11 @@
                     <div ref="chartRef" class="chart" />
                 </p-chart-loader>
                 <div class="legend-group">
+                    <template v-if="loading">
+                        <div v-for="v in skeletons" :key="v" class="items-center p-2">
+                            <p-skeleton class="flex-grow" />
+                        </div>
+                    </template>
                     <div v-for="d in data" :key="d.type" class="legend">
                         <span class="circle" :style="{ 'background-color': d.color }" />
                         <span class="type">{{ d.type }}</span>
@@ -56,27 +64,23 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { map, get, isEmpty } from 'lodash';
+import { get, isEmpty, map, range } from 'lodash';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import Color from 'color';
 
+import { PAnchor, PButton, PChartLoader, PSkeleton } from '@spaceone/design-system';
 import {
-    PButton, PAnchor, PChartLoader,
-} from '@spaceone/design-system';
-import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
     coral, gray, secondary1, violet, white, yellow,
 } from '@/styles/colors';
-import SpotGroupCompositionChart
-    from '@/views/automation/spot-automation/components/SpotGroupCompositionChart.vue';
+import SpotGroupRatioChart from '@/views/automation/spot-automation/components/SpotGroupRatioChart.vue';
 import { SpaceConnector } from '@/lib/space-connector';
-import { store } from '@/store';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { store } from '@/store';
 
 am4core.useTheme(am4themes_animated);
 
@@ -91,10 +95,11 @@ interface ChartData {
 export default {
     name: 'SpotGroupBaseInfo',
     components: {
-        SpotGroupCompositionChart,
+        SpotGroupRatioChart,
         PButton,
         PAnchor,
         PChartLoader,
+        PSkeleton,
     },
     props: {
         spotGroup: {
@@ -106,6 +111,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
+            skeletons: range(3),
             title: '',
             resourceName: computed(() => props.spotGroup.resource_id), // todo: name 필드가 추가되면 name으로 바뀌어야 함
             projects: computed(() => store.state.resource.project.items),
@@ -199,40 +205,29 @@ export default {
                 console.error(e);
             }
         };
-        const getInstanceType = async () => {
-            const colors = [coral[500], yellow[400], secondary1];
-            let data = [
-                {
-                    type: 'm2.micro',
-                    count: 4,
-                },
-                {
-                    type: 't3.micro',
-                    count: 3,
-                },
-                {
-                    type: 't4.micro',
-                    count: 2,
-                },
-                {
-                    type: 'm2.large',
-                    count: 1,
-                },
-            ];
-            data = data.map((d, idx) => ({
-                ...d,
-                color: colors[idx] || gray[400],
-            }));
-            state.data = data;
+        const getInstanceType = async (spotGroup) => {
+            try {
+                state.loading = true;
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceTypes({
+                    spot_groups: [spotGroup.spot_group_id],
+                });
+                const colors = [coral[500], yellow[400], secondary1];
+                const instanceTypeData = get(res, `spot_groups.${spotGroup.spot_group_id}`);
+                state.data = Object.entries(instanceTypeData).map(([k, v], idx) => ({
+                    type: k,
+                    count: v,
+                    color: colors[idx] || gray[400],
+                }));
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
         };
-
-        const init = () => {
-            getInstanceType();
-        };
-        init();
 
         watch(() => props.spotGroup, (spotGroup) => {
             getRecommendedName(spotGroup);
+            getInstanceType(spotGroup);
         }, { immediate: false });
         watch([() => state.loading, () => state.loaderRef, () => state.chartRef], ([loading, loaderCtx, chartCtx]) => {
             if (loading && loaderCtx) {
@@ -315,6 +310,7 @@ export default {
         }
         .chart-wrapper {
             display: inline-flex;
+            width: 100%;
             .p-chart-loader {
                 display: inline-block;
                 width: 6rem;
@@ -326,6 +322,7 @@ export default {
             }
             .legend-group {
                 display: inline-block;
+                width: 65%;
                 font-size: 0.875rem;
                 padding: 0.25rem 0.5rem;
                 .legend {

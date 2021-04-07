@@ -2,11 +2,11 @@
     <div class="spot-group-composition-chart grid grid-cols-12" :class="chartType">
         <div class="col-span-5 text-wrapper on-demand">
             <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.ON_DEMAND') }}</p>
-            <p><b>60</b>%</p>
+            <p><b>{{ onDemandPercentage }}</b>%</p>
             <template v-if="chartType === CHART_TYPE.long">
                 <br>
                 <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.ON_DEMAND_TOTAL_COST') }}</p>
-                <p>$<b>210.89</b></p>
+                <p>$<b>{{ onDemandCount }}</b></p>
             </template>
         </div>
         <p-chart-loader class="col-span-2" :loading="loading">
@@ -14,11 +14,11 @@
         </p-chart-loader>
         <div class="col-span-5 text-wrapper spot">
             <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.SPOT') }}</p>
-            <p><b>40</b>%</p>
+            <p><b>{{ spotPercentage }}</b>%</p>
             <template v-if="chartType === CHART_TYPE.long">
                 <br>
                 <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.SPOT_TOTAL_COST') }}</p>
-                <p>$<b>345.00</b></p>
+                <p>$<b>{{ spotCount }}</b></p>
             </template>
         </div>
     </div>
@@ -26,6 +26,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import { get } from 'lodash';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -36,6 +37,7 @@ import { PChartLoader } from '@spaceone/design-system';
 import {
     gray, peacock, secondary, white,
 } from '@/styles/colors';
+import { SpaceConnector } from '@/lib/space-connector';
 
 
 am4core.useTheme(am4themes_animated);
@@ -52,7 +54,7 @@ enum CHART_TYPE {
 }
 
 export default {
-    name: 'SpotGroupCompositionChart',
+    name: 'SpotGroupRatioChart',
     components: {
         PChartLoader,
     },
@@ -61,18 +63,26 @@ export default {
             type: String,
             default: 'long',
         },
+        spotGroupId: {
+            type: String,
+            default: '',
+        },
     },
     setup(props) {
         const state = reactive({
             loading: false,
             chartRef: null as HTMLElement | null,
-            chart: null, // as null | any,
+            chart: null as null | any,
             chartRegistry: {},
             data: [] as ChartData[],
             colors: {
                 onDemand: secondary,
                 spot: peacock[400],
             },
+            onDemandPercentage: 0,
+            spotPercentage: 0,
+            onDemandCount: 0,
+            spotCount: 0,
         });
 
         /* util */
@@ -121,26 +131,40 @@ export default {
         };
 
         /* api */
-        const getData = async () => {
-            state.data = [
-                {
-                    type: 'spot',
-                    count: 4,
-                    color: state.colors.spot,
-                },
-                {
-                    type: 'onDemand',
-                    count: 6,
-                    color: state.colors.onDemand,
-                },
-            ];
+        const getData = async (spotGroupId) => {
+            try {
+                state.loading = true;
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceCount({
+                    spot_groups: [spotGroupId],
+                });
+                const totalCount = get(res, `spot_groups.${spotGroupId}.total`);
+                state.onDemandCount = get(res, `spot_groups.${spotGroupId}.ondemand`);
+                state.spotCount = get(res, `spot_groups.${spotGroupId}.spot`);
+                state.onDemandPercentage = (state.onDemandCount / totalCount) * 100;
+                state.spotPercentage = 100 - state.onDemandPercentage;
+
+                state.data = [
+                    {
+                        type: 'spot',
+                        count: state.spotCount,
+                        color: state.colors.spot,
+                    },
+                    {
+                        type: 'onDemand',
+                        count: state.onDemandCount,
+                        color: state.colors.onDemand,
+                    },
+                ];
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
         };
 
-        const init = () => {
-            getData();
-        };
-        init();
-
+        watch(() => props.spotGroupId, (spotGroupId) => {
+            getData(spotGroupId);
+        });
         watch([() => state.loading, () => state.chartRef], ([loading, chartCtx]) => {
             if (!loading && chartCtx) {
                 drawChart(chartCtx);

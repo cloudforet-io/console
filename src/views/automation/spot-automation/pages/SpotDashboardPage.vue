@@ -22,7 +22,7 @@
                     </div>
                 </div>
                 <div class="chart-section">
-                    <spot-group-composition-chart />
+                    <spot-group-ratio-chart />
                 </div>
             </div>
             <instance-billing-chart class="widget-layout" />
@@ -102,7 +102,7 @@ import {
     PDivider, PBreadcrumbs, PPageTitle, PToolbox, PDataLoader, PI,
 } from '@spaceone/design-system';
 import InstanceBillingChart from '@/views/automation/spot-automation/components/InstanceBillingChart.vue';
-import SpotGroupCompositionChart from '@/views/automation/spot-automation/components/SpotGroupCompositionChart.vue';
+import SpotGroupRatioChart from '@/views/automation/spot-automation/components/SpotGroupRatioChart.vue';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
@@ -134,7 +134,7 @@ const handlers = makeQuerySearchPropsWithSearchSchema(
 export default {
     name: 'SpotDashboardPage',
     components: {
-        SpotGroupCompositionChart,
+        SpotGroupRatioChart,
         InstanceBillingChart,
         OnDemandAndSpotChart,
         PI,
