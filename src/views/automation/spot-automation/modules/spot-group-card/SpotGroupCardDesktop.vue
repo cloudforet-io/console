@@ -27,7 +27,7 @@
                         인스턴스
                     </p>
                     <p class="column-number">
-                        {{ cardData.instanceCount.total }}
+                        {{ cardData.instanceCount.total || 0 }}
                         <span class="column-number-unit">개</span>
                     </p>
                 </div>
@@ -41,14 +41,14 @@
                 인스턴스 평균 CPU 사용률
             </p>
             <p class="column-number">
-                {{ cardData.instanceCpu }}
+                {{ cardData.instanceCpu || 0}}
                 <span class="column-number-unit">%</span>
             </p>
             <p class="column-title">
                 평균 디스크 사용률
             </p>
             <p class="column-number">
-                {{ cardData.instanceDisk }}
+                {{ cardData.instanceDisk || 0 }}
                 <span class="column-number-unit">IOPS</span>
             </p>
         </div>
@@ -58,7 +58,7 @@
                 로드밸런서 (개수)
             </p>
             <p class="column-number">
-                {{ cardData.loadbalancerCount }}
+                {{ cardData.loadbalancerCount || 0 }}
                 <span class="column-number-unit">개</span>
             </p>
             <p class="column-title">
@@ -71,7 +71,7 @@
                     name="ic_provider_aws"
                     class="mr-2"
                 />
-                {{ cardData.cloudServiceType.recommended_title }}
+                {{ cardData.cloudServiceType.recommended_title || 'N/A' }}
             </p>
         </div>
     </article>

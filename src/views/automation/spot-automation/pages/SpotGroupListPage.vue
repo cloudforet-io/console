@@ -180,7 +180,7 @@ export default {
                     spot_groups: spotGroupIds,
                 });
                 Object.keys(state.items).forEach((i) => {
-                    const instanceCount = instanceResponse.spot_groups[state.items[i].spot_group_id] as unknown as InstanceCountType;
+                    const instanceCount = instanceResponse.spot_groups[state.items[i].spot_group_id] as unknown as InstanceCountType || 0;
                     state.items[i].instanceCount = instanceCount;
                 });
             } catch (e) {
@@ -195,7 +195,7 @@ export default {
                     spot_groups: spotGroupIds,
                 });
                 Object.keys(state.items).forEach((i) => {
-                    const instanceCpu = CpuResponse.spot_groups[state.items[i].spot_group_id] as unknown as InstanceCpuType;
+                    const instanceCpu = CpuResponse.spot_groups[state.items[i].spot_group_id] as unknown as InstanceCpuType || 0;
                     state.items[i].instanceCpu = Math.round(instanceCpu.cpu_utilization * 100) / 100;
                 });
             } catch (e) {
@@ -210,7 +210,7 @@ export default {
                     spot_groups: spotGroupIds,
                 });
                 Object.keys(state.items).forEach((i) => {
-                    const instanceDisk = DiskResponse.spot_groups[state.items[i].spot_group_id] as unknown as InstanceDiskType;
+                    const instanceDisk = DiskResponse.spot_groups[state.items[i].spot_group_id] as unknown as InstanceDiskType || 0;
                     state.items[i].instanceDisk = Math.round(instanceDisk.total_iops * 100) / 100;
                 });
             } catch (e) {
@@ -225,7 +225,7 @@ export default {
                     spot_groups: spotGroupIds,
                 });
                 Object.keys(state.items).forEach((i) => {
-                    const loadbalancerCount = LoadbalancerResponse.spot_groups[state.items[i].spot_group_id];
+                    const loadbalancerCount = LoadbalancerResponse.spot_groups[state.items[i].spot_group_id] || 0;
                     state.items[i].loadbalancerCount = loadbalancerCount;
                 });
             } catch (e) {
@@ -240,7 +240,7 @@ export default {
                     spot_groups: spotGroupIds,
                 });
                 Object.keys(state.items).forEach((i) => {
-                    const cloudServiceType = CloudServiceTypeResponse.spot_groups[state.items[i].spot_group_id] as unknown as CloudServiceType;
+                    const cloudServiceType = CloudServiceTypeResponse.spot_groups[state.items[i].spot_group_id] as unknown as CloudServiceType || {};
                     state.items[i].cloudServiceType = cloudServiceType;
                 });
             } catch (e) {

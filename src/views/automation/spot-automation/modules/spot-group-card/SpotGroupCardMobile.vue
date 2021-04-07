@@ -5,21 +5,21 @@
                 스팟 인터럽트 <span class="card-content-number">4 </span>
             </p>
             <p class="card-content-text">
-                인스턴스 <span class="card-content-number">{{ cardData.instanceCount.total }} </span>개
+                인스턴스 <span class="card-content-number">{{ cardData.instanceCount.total || 0 }} </span>개
             </p>
             <p class="card-content-text">
-                인스턴스 평균 CPU 사용률 <span class="card-content-number">{{ cardData.instanceCpu }} </span>%
+                인스턴스 평균 CPU 사용률 <span class="card-content-number">{{ cardData.instanceCpu || 0 }} </span>%
             </p>
             <p class="card-content-text">
-                평균 디스크 사용률 <span class="card-content-number">{{ cardData.instanceDisk }} </span>IOPS
+                평균 디스크 사용률 <span class="card-content-number">{{ cardData.instanceDisk || 0 }} </span>IOPS
             </p>
         </div>
         <div class="right-desc">
             <p class="card-content-text">
-                로드밸런서 (개수) <span class="card-content-number">{{ cardData.loadbalancerCount }} </span>개
+                로드밸런서 (개수) <span class="card-content-number">{{ cardData.loadbalancerCount || 0 }} </span>개
             </p>
             <p class="card-content-text">
-                서비스 타입 <span>{{ cardData.cloudServiceType.name }}</span>
+                서비스 타입 <span>{{ cardData.cloudServiceType.name || 'N/A' }}</span>
             </p>
         </div>
     </article>
