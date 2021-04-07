@@ -41,14 +41,14 @@
                 인스턴스 평균 CPU 사용률
             </p>
             <p class="column-number">
-                0
+                {{ cardData.instanceCpu }}
                 <span class="column-number-unit">%</span>
             </p>
             <p class="column-title">
                 평균 디스크 사용률
             </p>
             <p class="column-number">
-                0
+                {{ cardData.instanceDisk }}
                 <span class="column-number-unit">IOPS</span>
             </p>
         </div>

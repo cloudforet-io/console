@@ -8,10 +8,10 @@
                 인스턴스 <span class="card-content-number">{{ cardData.instanceCount.total }} </span>개
             </p>
             <p class="card-content-text">
-                인스턴스 평균 CPU 사용률 <span class="card-content-number">0 </span>%
+                인스턴스 평균 CPU 사용률 <span class="card-content-number">{{ cardData.instanceCpu }} </span>%
             </p>
             <p class="card-content-text">
-                평균 디스크 사용률 <span class="card-content-number">0 </span>IOPS
+                평균 디스크 사용률 <span class="card-content-number">{{ cardData.instanceDisk }} </span>IOPS
             </p>
         </div>
         <div class="right-desc">
@@ -59,7 +59,6 @@ export default {
         font-size: 0.75rem;
         line-height: 150%;
     }
-
 
     @screen sm {
         flex-direction: row;

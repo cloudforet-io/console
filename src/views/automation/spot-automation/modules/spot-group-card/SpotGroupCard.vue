@@ -65,6 +65,17 @@ import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
 
+interface CloudServiceType {
+    name: string;
+    provider: string;
+    recommended_title: string;
+}
+
+interface CloudServiceData {
+    cloudServiceType: CloudServiceType;
+    loadbalancerNum: number;
+}
+
 export default {
     name: 'SpotGroupCard',
     components: {
@@ -88,7 +99,7 @@ export default {
         const state = reactive({
             projectName: '',
             projectGroupName: '',
-            cloudServiceData: {} as any,
+            cloudServiceData: {} as CloudServiceData,
             loading: true,
         });
         const getProjectName = async () => {
@@ -106,7 +117,6 @@ export default {
                     // eslint-disable-next-line camelcase
                     cloud_service_id: props.cardData.resource_id,
                 });
-                // state.cloudServiceData.instanceNum = cloudServiceData.data.instances?.length || 0;
                 state.cloudServiceData.loadbalancerNum = cloudServiceData.data.load_balancer_arns?.length || 0;
                 const cloudServiceType = await SpaceConnector.client.spotAutomation.spotGroup.getCloudServiceType({
                     // eslint-disable-next-line camelcase

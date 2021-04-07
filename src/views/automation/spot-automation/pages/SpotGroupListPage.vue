@@ -28,7 +28,7 @@
             <div class="card-wrapper" :class="{'short': isShort}">
                 <div v-for="item in items" :key="item.spot_group_id" class="spot-group-card">
                     <router-link :to="{ name: 'spotGroupDetail',params: {id: item.spot_group_id}}">
-                        <spot-group-card v-if="!loading && !cardDataLoading"
+                        <spot-group-card v-if="!loading"
                                          :card-data="item"
                                          :is-short="isShort"
                         />
@@ -44,7 +44,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import {
-    PBreadcrumbs, PPageTitle, PDivider, PToolbox, PIconTextButton, PDataLoader, PI,
+    PBreadcrumbs, PPageTitle, PDivider, PToolbox, PIconTextButton, PDataLoader,
 } from '@spaceone/design-system';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { QueryHelper } from '@/lib/query';
@@ -57,6 +57,7 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import { store } from '@/store';
+import { Tags, TimeStamp } from '@/models';
 
 dayjs.extend(timezone);
 
@@ -73,6 +74,53 @@ const handlers = makeQuerySearchPropsWithSearchSchema(
     'inventory.CloudService',
 );
 
+interface Options {
+    min_ondemand_ratio: number;
+    recommend_types: string;
+}
+
+interface Reference {
+    external_link: string;
+    resource_id: string;
+}
+
+interface CardData {
+    cloud_service_group: string;
+    cloud_service_type: string;
+    created_at: TimeStamp;
+    created_by: string;
+    instanceCount: object;
+    instanceCpu: number;
+    instanceDisk: number;
+    name: string;
+    options: Options;
+    project_id: string;
+    provider: string;
+    reference: Reference;
+    region_code: string;
+    resource_id: string;
+    resource_type: string;
+    spot_group_id: string;
+    tags: Tags;
+}
+
+interface InstanceCountType {
+    total: number;
+    ondemand: number;
+    spot: number;
+}
+interface InstanceCpuType {
+    cpu_utilization: number;
+}
+interface InstanceDiskType {
+    write_iops: number;
+    read_iops: number;
+    total_iops: number;
+}
+
+interface InstanceRes<T> {
+    spot_groups: Record<string, T>[];
+}
 export default {
     name: 'SpotGroupPage',
     components: {
@@ -83,7 +131,6 @@ export default {
         PToolbox,
         PIconTextButton,
         PDataLoader,
-        PI,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -91,9 +138,8 @@ export default {
         const apiQuery = new ApiQueryHelper();
 
         const state = reactive({
-            items: undefined as any,
+            items: undefined as unknown as CardData[],
             loading: true,
-            cardDataLoading: true,
             keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
             tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
@@ -120,19 +166,54 @@ export default {
             return apiQuery.data;
         };
 
+
         const getSpotGroupInstanceCount = async (spotGroupIds) => {
-            const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceCount({
-                // eslint-disable-next-line camelcase
-                spot_groups: spotGroupIds,
-            });
-            Object.keys(state.items).forEach((i) => {
-                state.items[i].instanceCount = res.spot_groups[state.items[i].spot_group_id];
-            });
+            try {
+                const instanceResponse: InstanceRes<InstanceCountType> = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceCount({
+                    // eslint-disable-next-line camelcase
+                    spot_groups: spotGroupIds,
+                });
+                Object.keys(state.items).forEach((i) => {
+                    const instanceCount = instanceResponse.spot_groups[state.items[i].spot_group_id] as unknown as InstanceCountType;
+                    state.items[i].instanceCount = instanceCount;
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const getSpotGroupCpuInfo = async (spotGroupIds) => {
+            try {
+                const CpuResponse: InstanceRes<InstanceCpuType> = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceCpu({
+                    // eslint-disable-next-line camelcase
+                    spot_groups: spotGroupIds,
+                });
+                Object.keys(state.items).forEach((i) => {
+                    const instanceCpu = CpuResponse.spot_groups[state.items[i].spot_group_id] as unknown as InstanceCpuType;
+                    state.items[i].instanceCpu = Math.round(instanceCpu.cpu_utilization * 100) / 100;
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const getSpotGroupDiskInfo = async (spotGroupIds) => {
+            try {
+                const DiskResponse: InstanceRes<InstanceDiskType> = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceDisk({
+                    // eslint-disable-next-line camelcase
+                    spot_groups: spotGroupIds,
+                });
+                Object.keys(state.items).forEach((i) => {
+                    const instanceDisk = DiskResponse.spot_groups[state.items[i].spot_group_id] as unknown as InstanceDiskType;
+                    state.items[i].instanceDisk = Math.round(instanceDisk.total_iops * 100) / 100;
+                });
+            } catch (e) {
+                console.error(e);
+            }
         };
 
         const listSpotGroup = async () => {
             state.loading = true;
-            state.cardDataLoading = true;
             try {
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.list({ query: getQuery() });
                 state.items = res.results.map(d => ({
@@ -140,10 +221,12 @@ export default {
                     created_at: timestampFormatter(d.created_at, state.timezone),
                 }));
                 state.totalCount = res.total_count || 0;
-                state.loading = false;
                 const spotGroupIds = res.results.map(item => item.spot_group_id) || [];
-                await getSpotGroupInstanceCount(spotGroupIds);
-                state.cardDataLoading = false;
+                await Promise.all([getSpotGroupInstanceCount(spotGroupIds),
+                    getSpotGroupCpuInfo(spotGroupIds),
+                    getSpotGroupDiskInfo(spotGroupIds),
+                ]);
+                state.loading = false;
             } catch (e) {
                 console.error(e);
             }
