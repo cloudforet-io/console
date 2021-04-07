@@ -16,10 +16,10 @@
         </div>
         <div class="right-desc">
             <p class="card-content-text">
-                로드밸런서 (개수) <span class="card-content-number">{{ cloudServiceData.loadbalancerNum }} </span>개
+                로드밸런서 (개수) <span class="card-content-number">{{ cardData.loadbalancerCount }} </span>개
             </p>
             <p class="card-content-text">
-                서비스 타입 <span>{{ cloudServiceData.cloudServiceType.name }}</span>
+                서비스 타입 <span>{{ cardData.cloudServiceType.name }}</span>
             </p>
         </div>
     </article>
@@ -30,10 +30,6 @@ export default {
     name: 'SpotGroupCardMobile',
     props: {
         cardData: {
-            type: Object,
-            default: () => ({}),
-        },
-        cloudServiceData: {
             type: Object,
             default: () => ({}),
         },

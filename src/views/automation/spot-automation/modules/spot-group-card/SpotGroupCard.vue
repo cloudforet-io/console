@@ -30,20 +30,14 @@
             </div>
         </div>
         <div class="card-body" :class="{'short': isShort}">
-            <spot-group-card-desktop v-if="!loading"
-                                     class="card-desktop-version"
-                                     :card-data="cardData"
-                                     :cloud-service-data="cloudServiceData"
-                                     :is-short="isShort"
+            <spot-group-card-desktop
+                class="card-desktop-version"
+                :card-data="cardData"
+                :is-short="isShort"
             />
-            <spot-group-card-mobile v-if="!loading"
-                                    :card-data="cardData"
-                                    :cloud-service-data="cloudServiceData"
-                                    class="card-mobile-version"
-            />
-            <p-lottie v-if="loading" name="thin-spinner" class="loader"
-                      auto
-                      :size="2.5"
+            <spot-group-card-mobile
+                :card-data="cardData"
+                class="card-mobile-version"
             />
         </div>
         <div class="card-footer" :class="{'short': isShort}">
@@ -71,11 +65,6 @@ interface CloudServiceType {
     recommended_title: string;
 }
 
-interface CloudServiceData {
-    cloudServiceType: CloudServiceType;
-    loadbalancerNum: number;
-}
-
 export default {
     name: 'SpotGroupCard',
     components: {
@@ -99,39 +88,26 @@ export default {
         const state = reactive({
             projectName: '',
             projectGroupName: '',
-            cloudServiceData: {} as CloudServiceData,
             loading: true,
+            spotGroupId: props.cardData.spot_group_id,
         });
         const getProjectName = async () => {
-            const project = await SpaceConnector.client.identity.project.get({
-                project_id: props.cardData.project_id,
-            });
-            state.projectName = project.name;
-            state.projectGroupName = project.project_group_info.name;
-        };
-
-        const getCloudServiceData = async () => {
             state.loading = true;
             try {
-                const cloudServiceData = await SpaceConnector.client.inventory.cloudService.get({
-                    // eslint-disable-next-line camelcase
-                    cloud_service_id: props.cardData.resource_id,
+                const project = await SpaceConnector.client.identity.project.get({
+                    project_id: props.cardData.project_id,
                 });
-                state.cloudServiceData.loadbalancerNum = cloudServiceData.data.load_balancer_arns?.length || 0;
-                const cloudServiceType = await SpaceConnector.client.spotAutomation.spotGroup.getCloudServiceType({
-                    // eslint-disable-next-line camelcase
-                    spot_group_id: props.cardData.spot_group_id,
-                });
-                state.cloudServiceData.cloudServiceType = cloudServiceType;
+                state.projectName = project.name;
+                state.projectGroupName = project.project_group_info.name;
             } catch (e) {
                 console.error(e);
             } finally {
                 state.loading = false;
             }
         };
+
         (async () => {
             await getProjectName();
-            await getCloudServiceData();
         })();
         return {
             ...toRefs(state),

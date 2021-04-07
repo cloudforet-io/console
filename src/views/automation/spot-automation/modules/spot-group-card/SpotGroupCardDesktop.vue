@@ -58,7 +58,7 @@
                 로드밸런서 (개수)
             </p>
             <p class="column-number">
-                {{ cloudServiceData.loadbalancerNum }}
+                {{ cardData.loadbalancerCount }}
                 <span class="column-number-unit">개</span>
             </p>
             <p class="column-title">
@@ -71,7 +71,7 @@
                     name="ic_provider_aws"
                     class="mr-2"
                 />
-                {{ cloudServiceData.cloudServiceType.recommended_title }}
+                {{ cardData.cloudServiceType.recommended_title }}
             </p>
         </div>
     </article>
@@ -93,10 +93,6 @@ export default {
         isShort: {
             type: Boolean,
             default: false,
-        },
-        cloudServiceData: {
-            type: Object,
-            default: () => ({}),
         },
     },
     setup(props) {

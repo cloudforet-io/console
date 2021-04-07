@@ -92,6 +92,7 @@ interface CardData {
     instanceCount: object;
     instanceCpu: number;
     instanceDisk: number;
+    loadbalancerCount: number;
     name: string;
     options: Options;
     project_id: string;
@@ -116,6 +117,11 @@ interface InstanceDiskType {
     write_iops: number;
     read_iops: number;
     total_iops: number;
+}
+interface CloudServiceType {
+    name: string;
+    recommended_title: string;
+    provider: string;
 }
 
 interface InstanceRes<T> {
@@ -212,6 +218,36 @@ export default {
             }
         };
 
+        const getSpotGroupLoadbalancerInfo = async (spotGroupIds) => {
+            try {
+                const LoadbalancerResponse = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupLoadbalancerCount({
+                    // eslint-disable-next-line camelcase
+                    spot_groups: spotGroupIds,
+                });
+                Object.keys(state.items).forEach((i) => {
+                    const loadbalancerCount = LoadbalancerResponse.spot_groups[state.items[i].spot_group_id];
+                    state.items[i].loadbalancerCount = loadbalancerCount;
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const getSpotGroupCloudServiceType = async (spotGroupIds) => {
+            try {
+                const CloudServiceTypeResponse = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupCloudServiceType({
+                    // eslint-disable-next-line camelcase
+                    spot_groups: spotGroupIds,
+                });
+                Object.keys(state.items).forEach((i) => {
+                    const cloudServiceType = CloudServiceTypeResponse.spot_groups[state.items[i].spot_group_id] as unknown as CloudServiceType;
+                    state.items[i].cloudServiceType = cloudServiceType;
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
         const listSpotGroup = async () => {
             state.loading = true;
             try {
@@ -225,10 +261,13 @@ export default {
                 await Promise.all([getSpotGroupInstanceCount(spotGroupIds),
                     getSpotGroupCpuInfo(spotGroupIds),
                     getSpotGroupDiskInfo(spotGroupIds),
+                    getSpotGroupLoadbalancerInfo(spotGroupIds),
+                    getSpotGroupCloudServiceType(spotGroupIds),
                 ]);
-                state.loading = false;
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
 
