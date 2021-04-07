@@ -22,7 +22,7 @@ export default {
             } catch (e) {
                 console.error(e);
             } finally {
-                await router.push({ name: 'SignIn', query: { nextPath: from.fullPath, error: to.query.error } });
+                await router.push({ name: 'SignIn', query: { ...to.query, nextPath: to.query.nextPath, error: to.query.error  }});
             }
         })();
     },

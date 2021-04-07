@@ -28,6 +28,9 @@ router.beforeEach(async (to, from, next) => {
             next({ name: 'error' });
         }
         next();
+    } else if (!to.meta?.excludeAuth && !SpaceConnector.isTokenAlive) {
+        await router.push({ name: 'SignOut', query: { nextPath: to.fullPath, error: to.query.error } });
+        next();
     } else {
         next();
     }

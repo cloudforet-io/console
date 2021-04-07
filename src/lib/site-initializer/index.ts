@@ -57,11 +57,11 @@ const initAmchartsLicense = () => {
     }
 };
 
-const checkAuth = async () => {
-    if (!router.currentRoute.meta?.excludeAuth && !SpaceConnector.isTokenAlive) {
-        await router.push({ name: 'SignIn', query: { nextPath: router.currentRoute.fullPath, error: router.currentRoute.query.error }  });
-    }
-};
+// const checkAuth = async () => {
+//     if (!router.currentRoute.meta && !router.currentRoute.meta.excludeAuth && !SpaceConnector.isTokenAlive) {
+//         await router.push({ name: 'SignIn', query: { nextPath: router.currentRoute.fullPath, error: router.currentRoute.query.error } });
+//     }
+// };
 
 const removeInitializer = () => {
     const el = document.getElementById('site-loader-wrapper');
@@ -71,11 +71,11 @@ const removeInitializer = () => {
 const init = async () => {
     try {
         await initConfig();
+        // await checkAuth();
         await initApiClient();
         await initDomain();
         initGtag();
         initLanguage();
-        await checkAuth();
         initAmchartsLicense();
     } catch (e) {
         console.error(e);
