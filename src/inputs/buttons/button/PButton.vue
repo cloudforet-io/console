@@ -1,10 +1,20 @@
 <script lang="ts">
 import { getBindClass } from '@/util/functional-helpers';
 import { Button } from '@/inputs/buttons/button/type';
+import PLottie from '@/foundation/lottie/PLottie.vue';
+import { VNode } from 'vue/types/vnode';
 
+const LOADING_SIZE = {
+    sm: 0.75,
+    md: 1,
+    lg: 1,
+};
 export default {
     name: 'PButton',
     functional: true,
+    components: {
+        PLottie,
+    },
     render(h, {
         props, listeners, children, data,
     }) {
@@ -25,11 +35,24 @@ export default {
             return cls;
         }
 
-        const tag = props.href ? 'a' : 'div';
+        const tag = props.href ? 'a' : 'button';
+
+        const childrenEl: VNode[] = [...children];
+        if (props.loading) {
+            childrenEl.splice(0, 0, h(PLottie, {
+                class: 'spinner',
+                props: {
+                    name: 'thin-spinner',
+                    auto: true,
+                    size: LOADING_SIZE[props.size] || LOADING_SIZE.md,
+                },
+            }));
+        }
 
         return h(tag, {
             ...data,
             attrs: {
+                role: 'button',
                 ...data.attrs,
                 href: props.disabled ? undefined : props.href,
             },
@@ -49,7 +72,7 @@ export default {
                 },
             },
         },
-        children);
+        childrenEl);
     },
 };
 </script>
@@ -76,6 +99,9 @@ export default {
         &.loading {
             @apply bg-gray-200 text-gray-400 border-gray-100;
             cursor: not-allowed;
+            .spinner {
+                margin-right: 0.5em;
+            }
         }
     }
 }
@@ -153,17 +179,6 @@ export default {
             @apply bg-transparent text-gray-400;
             cursor: not-allowed;
         }
-    }
-}
-
-.loading-btn {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    .spinner {
-        display: inline-flex;
-        padding-right: 0.25rem;
     }
 }
 </style>
