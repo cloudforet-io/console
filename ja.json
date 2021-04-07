@@ -118,6 +118,8 @@
 		},
 		"SPOT_AUTOMATION": {
 			"ADD": {
+				"ALT_E_CREATE_SPOT_GROUP": "",
+				"ALT_S_CREATE_SPOT_GROUP": "",
 				"BASE_INFO": {
 					"LABEL": "",
 					"NAME_DESC_1": "",
