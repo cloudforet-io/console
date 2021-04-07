@@ -18,7 +18,7 @@
             </div>
             <div class="tools-wrapper" :class="{simple: !$scopedSlots['left-area']}">
                 <div v-if="paginationVisible" class="tool">
-                    <p-text-pagination :this-page="thisPage"
+                    <p-text-pagination :this-page="proxyState.thisPage"
                                        :all-page="allPage"
                                        @pageChange="onChangeThisPage"
                     />
