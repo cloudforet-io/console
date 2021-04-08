@@ -51,15 +51,16 @@ header {
     margin-bottom: 0.75rem;
     &.link {
         padding-top: 0;
+        &:hover {
+             @apply cursor-pointer;
+             text-decoration: underline;
+         }
     }
     .title {
         @apply text-sm text-gray-900 font-semibold capitalize truncate;
         font-size: 0.875rem;
         line-height: 170%;
-        &:hover {
-            @apply cursor-pointer;
-            text-decoration: underline;
-        }
+
         &:active {
             @apply text-blue-500 cursor-pointer;
         }
