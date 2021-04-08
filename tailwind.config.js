@@ -53,7 +53,7 @@ module.exports = {
             sm: { min: '576px' },
             md: { min: '768px' },
             lg: { min: '1024px' },
-            xl: { min: '1368px' },
+            xl: { min: '1440px' },
             '2xl': { min: '1920px' },
             '3xl': { min: '2560px' },
         },

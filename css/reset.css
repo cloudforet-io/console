@@ -69,3 +69,7 @@ a:hover {
 p {
   margin: 0;
 }
+
+summary {
+  display: block;
+}

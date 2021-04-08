@@ -74,46 +74,42 @@
                         <tr :colspan="selectable ? fieldsData.length +1 : fieldsData.length" class="fake-row" />
                     </slot>
                     <slot name="body" :items="items">
-                        <slot v-for="(item, index) in items" name="row"
-                              v-bind="getRowSlotProps(item, index)"
+                        <tr v-for="(item, index) in items"
+                            :key="`tr-${contextKey}-${index}`" :data-index="index"
+                            class="fade-in"
+                            :class="{
+                                ...(getRowClassNames && getRowClassNames()),
+                                'tr-selected': getSelectedState(item, index),
+                                'row-height-fixed': rowHeightFixed,
+                                'row-cursor-pointer': rowCursorPointer,
+                            } "
+                            @click.left="onRowLeftClick( item, index, $event )"
                         >
-                            <slot :name="'row-'+index"
-                                  v-bind="getRowSlotProps(item, index)"
+                            <td v-if="selectable"
+                                class="select-checkbox"
+                                @click.stop.prevent="onSelectClick"
                             >
-                                <tr :key="`tr-${contextKey}-${index}`" :data-index="index"
-                                    class="fade-in"
-                                    :class="{
-                                        'tr-selected': getSelectedState(index),
-                                        'row-height-fixed': rowHeightFixed,
-                                        'row-cursor-pointer': rowCursorPointer,
-                                    } "
-                                    @click.left="onRowLeftClick( item, index, $event )"
-                                >
-                                    <td v-if="selectable"
-                                        class="select-checkbox"
-                                        @click.stop.prevent="onSelectClick"
-                                    >
-                                        <p-check-box v-if="multiSelect"
-                                                     v-model="proxyState.selectIndex"
-                                                     :value="index"
-                                        />
-                                        <p-radio v-else
-                                                 v-model="proxyState.selectIndex[0]"
-                                                 :value="index"
-                                        />
-                                    </td>
-                                    <td v-for="(field, i) in fieldsData"
-                                        :key="`td-${contextKey}-${index}-${i}`"
-                                    >
-                                        <slot :name="`col-${field.name}-format`" v-bind="getColSlotProps(item, index, field, )">
-                                            <slot :name="`col-${i}-format`" v-bind="getColSlotProps(item, index, field, )">
-                                                {{ getValue(item,field) }}
-                                            </slot>
-                                        </slot>
-                                    </td>
-                                </tr>
-                            </slot>
-                        </slot>
+                                <p-check-box v-if="multiSelect"
+                                             v-model="proxyState.selectIndex"
+                                             :disabled="getRowSelectable ? getRowSelectable(item, index): false"
+                                             :value="index"
+                                />
+                                <p-radio v-else
+                                         v-model="proxyState.selectIndex[0]"
+                                         :disabled="getRowSelectable ? getRowSelectable(item, index): false"
+                                         :value="index"
+                                />
+                            </td>
+                            <td v-for="(field, i) in fieldsData"
+                                :key="`td-${contextKey}-${index}-${i}`"
+                            >
+                                <slot :name="`col-${field.name}-format`" v-bind="getColSlotProps(item, index, field, )">
+                                    <slot :name="`col-${i}-format`" v-bind="getColSlotProps(item, index, field, )">
+                                        {{ getValue(item,field) }}
+                                    </slot>
+                                </slot>
+                            </td>
+                        </tr>
                     </slot>
                 </tbody>
                 <tfoot>
@@ -133,13 +129,12 @@
 
 <script lang="ts">
 import {
-    toRefs, computed, reactive, watch, getCurrentInstance, ComponentRenderProxy,
+    toRefs, computed, reactive, watch, getCurrentInstance, ComponentRenderProxy, defineComponent,
 } from '@vue/composition-api';
 import { get } from 'lodash';
 import { copyAnyData } from '@/util/helpers';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 import { PDataTableProps, DataTableField, DataTableFieldType } from '@/data-display/tables/data-table/type';
-
 
 import PCheckBox from '@/inputs/checkbox/PCheckBox.vue';
 import PRadio from '@/inputs/radio/PRadio.vue';
@@ -149,7 +144,7 @@ import PI from '@/foundation/icons/PI.vue';
 
 const color = ['default', 'light', 'primary4'];
 
-export default {
+export default defineComponent<PDataTableProps>({
     name: 'PDataTable',
     components: {
         PI,
@@ -210,7 +205,7 @@ export default {
         tableStyleType: {
             type: String,
             default: 'default',
-            validator(value) {
+            validator(value: string) {
                 return [null, ...color].indexOf(value) !== -1;
             },
         },
@@ -241,6 +236,14 @@ export default {
         invalid: {
             type: Boolean,
             default: false,
+        },
+        getRowClassNames: {
+            type: Function,
+            default: undefined,
+        },
+        getRowSelectable: {
+            type: Function,
+            default: undefined,
         },
     },
     setup(props: PDataTableProps, context) {
@@ -289,19 +292,18 @@ export default {
             field, index, sortable: props.sortable,
         });
 
-        const getRowSlotProps = (item, index) => ({
-            item, index,
-        });
-
         const getColSlotProps = (item, index, field) => ({
             item, index, field, value: getValue(item, field),
         });
 
-        const getSelectedState = index => (props.multiSelect ? proxyState.selectIndex.some(d => index === d) : proxyState.selectIndex[0] === index);
+        const getSelectedState = (item, index) => {
+            if (props.getRowSelectable) return props.getRowSelectable(item, index);
+            return props.multiSelect ? proxyState.selectIndex.some(d => index === d) : proxyState.selectIndex[0] === index;
+        };
 
-        const checkboxToggle = (index) => {
+        const checkboxToggle = (item, index) => {
             const newSelected = [...proxyState.selectIndex];
-            if (getSelectedState(index)) {
+            if (getSelectedState(item, index)) {
                 const idx = newSelected.indexOf(index);
                 newSelected.splice(idx, 1);
                 state.allState = false;
@@ -317,11 +319,11 @@ export default {
             if (!props.selectable) return;
             if (props.multiSelect) {
                 if (props.rowClickMultiSelectMode) {
-                    checkboxToggle(index);
+                    checkboxToggle(item, index);
                     return;
                 }
                 if (event.shiftKey) {
-                    checkboxToggle(index);
+                    checkboxToggle(item, index);
                     return;
                 }
             }
@@ -421,7 +423,6 @@ export default {
             getValue,
             getDefaultSlotProps,
             getHeadSlotProps,
-            getRowSlotProps,
             getColSlotProps,
             getSelectedState,
             onRowLeftClick,
@@ -431,8 +432,7 @@ export default {
             onClickColCopy,
         };
     },
-
-};
+});
 </script>
 
 <style lang="postcss">

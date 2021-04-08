@@ -72,6 +72,10 @@ p {
   margin: 0;
 }
 
+summary {
+  display: block;
+}
+
 /* Components */
 
 .p-tooltip {

@@ -36,5 +36,7 @@ export interface PDataTableProps {
     width?: string;
     rowHeightFixed?: boolean;
     rowCursorPointer?: boolean;
-    idKey?: string|number;
+    invalid?: boolean;
+    getRowClassNames?: (item: any, i: number) => Record<string, boolean>;
+    getRowSelectable?: (item: any, i: number) => boolean;
 }

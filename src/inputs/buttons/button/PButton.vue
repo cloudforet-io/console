@@ -4,6 +4,23 @@ import { Button } from '@/inputs/buttons/button/type';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import { VNode } from 'vue/types/vnode';
 
+const getClass = (attrs: Button) => {
+    const cls = {
+        'p-button': true,
+        loading: !!attrs.loading,
+        disabled: !!attrs.disabled,
+        outline: !!attrs.outline,
+        block: !!attrs.block,
+    };
+    if (attrs.size) {
+        cls[attrs.size] = true;
+    }
+    if (attrs.styleType) {
+        cls[attrs.styleType] = true;
+    }
+    return cls;
+};
+
 const LOADING_SIZE = {
     sm: 0.75,
     md: 1,
@@ -18,23 +35,6 @@ export default {
     render(h, {
         props, listeners, children, data,
     }) {
-        function getClass(attrs: Button) {
-            const cls = {
-                'p-button': true,
-                loading: !!attrs.loading,
-                disabled: !!attrs.disabled,
-                outline: !!attrs.outline,
-                block: !!attrs.block,
-            };
-            if (attrs.size) {
-                cls[attrs.size] = true;
-            }
-            if (attrs.styleType) {
-                cls[attrs.styleType] = true;
-            }
-            return cls;
-        }
-
         const tag = props.href ? 'a' : 'button';
 
         const childrenEl: VNode[] = [...children];
@@ -52,7 +52,6 @@ export default {
         return h(tag, {
             ...data,
             attrs: {
-                role: 'button',
                 ...data.attrs,
                 href: props.disabled ? undefined : props.href,
             },

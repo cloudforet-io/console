@@ -76,9 +76,6 @@ export const dataTable = () => ({
         useCursorLoading: {
             default: boolean('useCursorLoading', false),
         },
-        skeletonRows: {
-            default: number('skeletonRows', 5),
-        },
         multiSelect: {
             default: boolean('multiSelect', false),
         },
