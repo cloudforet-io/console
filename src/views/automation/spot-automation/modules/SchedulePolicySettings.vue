@@ -266,16 +266,15 @@ export default {
         const getDesiredCapacity = async () => {
             try {
                 state.loading = true;
-                // TODO
-                await new Promise((resolve, reject) => {
-                    setTimeout(() => {
-                        reject();
-                    }, 1000);
+                const { count } = await SpaceConnector.client.spotAutomation.spotGroup.getCloudServiceInstanceCount({
+                    // eslint-disable-next-line camelcase
+                    cloud_service_id: props.resourceId,
                 });
-                state.desiredCapacity = 0;
+                state.desiredCapacity = count;
                 state.errored = false;
             } catch (e) {
                 state.errored = true;
+                state.desiredCapacity = 0;
             } finally {
                 state.loading = false;
             }

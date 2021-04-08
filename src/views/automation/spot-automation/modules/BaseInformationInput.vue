@@ -139,11 +139,13 @@ export default {
 }
 .tags-field::v-deep {
     label {
-        &:hover {
-            @apply text-secondary;
-            cursor: pointer;
-            .optional-mark {
+        @media (hover: hover) {
+            &:hover {
                 @apply text-secondary;
+                cursor: pointer;
+                .optional-mark {
+                    @apply text-secondary;
+                }
             }
         }
     }

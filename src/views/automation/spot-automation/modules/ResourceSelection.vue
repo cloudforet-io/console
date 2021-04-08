@@ -44,11 +44,7 @@
                                   :field-handler="fieldHandler"
                                   @fetch="onFetchTable"
                                   @select="onSelectTable"
-                >
-                    <template #col-spaceone_occupied-format="{item}">
-                        {{ occupiedResources[item.cloud_service_id] ? '이미 설정되었어요' : '' }}
-                    </template>
-                </p-dynamic-layout>
+                />
             </div>
         </p-field-group>
     </div>
@@ -303,8 +299,6 @@ export default {
                         if (d.options?.root_path) return `${d.options.root_path}.${d.key}`;
                         return d.key;
                     }), 'cloud_service_id', 'cloud_service_type', 'reference');
-
-                    state.schema.options.fields.splice(0, 0, { key: 'spaceone_occupied', name: ' ', options: { sortable: false } });
                 }
             } catch (e) {
                 console.error(e);
@@ -386,9 +380,6 @@ export default {
     &.selected {
         @apply border-secondary text-secondary;
     }
-    &:hover {
-        @apply bg-secondary2;
-    }
     .radio {
         @apply absolute;
         left: 0.75rem;
@@ -403,10 +394,16 @@ export default {
         font-weight: bold;
         line-height: 1.2;
     }
+
+    @media (hover: hover) {
+        &:hover {
+            @apply bg-secondary2;
+        }
+    }
 }
-.resource-table::v-deep .p-query-search-table.p-toolbox-table .toolbox {
+.resource-table::v-deep .p-toolbox-table .p-toolbox {
     padding-left: 0;
     padding-right: 0;
-    padding-top: 0;
+    padding-top: 0.25rem;
 }
 </style>

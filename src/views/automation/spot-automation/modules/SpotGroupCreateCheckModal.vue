@@ -17,9 +17,9 @@
                         </td>
                     </tr>
                     <tr>
-                        <td>{{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CHECK_MODAL.RESOURCE_ID_LABEL') }}</td>
+                        <td>{{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CHECK_MODAL.RESOURCE_NAME_LABEL') }}</td>
                         <td>
-                            {{ selectedResource.reference.resource_id }}
+                            {{ selectedResource.data.auto_scaling_group_name }}
                         </td>
                     </tr>
                     <tr>

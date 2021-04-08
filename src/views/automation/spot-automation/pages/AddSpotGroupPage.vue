@@ -95,6 +95,7 @@ import { SETTINGS_TYPE } from '@/views/automation/spot-automation/config';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 import SpotGroupCreateCheckModal from '@/views/automation/spot-automation/modules/SpotGroupCreateCheckModal.vue';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 export default {
     name: 'AddSpotGroupPage',
@@ -208,9 +209,12 @@ export default {
 
             try {
                 await SpaceConnector.client.spotAutomation.spotGroup.create(params);
+
+                showSuccessMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.ALT_S_CREATE_SPOT_GROUP'), '', vm.$root);
                 vm.$router.push({ name: 'spotGroup' });
             } catch (e) {
                 console.error(e);
+                showErrorMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.ALT_E_CREATE_SPOT_GROUP'), e, vm.$root);
             } finally {
                 state.loading = false;
                 state.visibleCheckModal = false;

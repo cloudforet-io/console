@@ -7,22 +7,24 @@
         <div class="table-container">
             <try-again-button v-if="errored" class="mt-4" @refresh="refresh" />
             <div v-else class="table-wrapper">
-                <table v-if="types.length > 0">
+                <table v-if="types.length > 0" :class="{optimized: isOptimized}">
                     <thead>
                         <tr>
-                            <th />
-                            <th v-for="(type, i) in types" :key="i" class="header">
+                            <th scope="col" class="has-optimized" />
+                            <th v-for="(type, i) in types" :key="i" scope="col"
+                                :class="{'has-optimized': optimizedTypeList.includes(type)}"
+                            >
                                 {{ type }}
                             </th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr v-for="([size, items]) in candidates" :key="size">
-                            <td class="header">
+                            <th :class="{'has-optimized': !!optimizedTypes[size]}" scope="row">
                                 {{ size }}
-                            </td>
+                            </th>
                             <template v-for="(type, idx) in types">
-                                <td :key="idx">
+                                <td :key="idx" :class="{'has-optimized': optimizedTypes[size] && optimizedTypeList.includes(type)}">
                                     <p-check-box v-if="items[type] !== undefined"
                                                  :selected="checkedTypes[size] && checkedTypes[size].includes(type)"
                                                  @change="onSelect(size, type, ...arguments)"
@@ -53,7 +55,7 @@ import {
 import { SpaceConnector } from '@/lib/space-connector';
 import { PCheckBox, PLottie, PToggleButton } from '@spaceone/design-system';
 import {
-    cloneDeep, remove, forEach, isEmpty, sortBy,
+    cloneDeep, remove, forEach, isEmpty, sortBy, flatMap, uniq,
 } from 'lodash';
 import TryAgainButton from '@/views/automation/spot-automation/components/TryAgainButton.vue';
 
@@ -99,6 +101,7 @@ export default {
             isOptimized: true,
             selectedTypes: {} as SelectedType,
             optimizedTypes: {} as SelectedType,
+            optimizedTypeList: computed(() => uniq(flatMap(state.optimizedTypes))),
             checkedTypes: computed(() => (state.isOptimized ? state.optimizedTypes : state.selectedTypes)),
             showSelectValidation: props.showValidation,
             isValid: computed(() => !state.errored && !isEmpty(state.checkedTypes)),
@@ -138,7 +141,7 @@ export default {
                     if (obj) obj[type] = priority;
                 } else candidates.set(size, { [type]: priority });
 
-                if (priority > 0) {
+                if (priority === 0) {
                     if (state.optimizedTypes[size]) state.optimizedTypes[size].push(type);
                     else state.optimizedTypes[size] = [type];
                 }
@@ -159,6 +162,7 @@ export default {
                 const { results } = await SpaceConnector.client.spotAutomation.spotGroup.getCandidates({
                     resource_id: props.resourceId,
                     resource_type: props.resourceType,
+                    limit: 50,
                 });
 
                 state.errored = false;
@@ -277,7 +281,7 @@ table {
         }
     }
     th, td {
-        @apply border-b border-gray-200;
+        @apply border-b border-gray-200 bg-white;
         display: inline-flex;
         align-items: center;
         justify-content: center;
@@ -285,10 +289,17 @@ table {
         min-width: 4.5rem;
         min-height: 2rem;
     }
-    .header {
+    th {
         font-size: 0.75rem;
         line-height: 1.5;
         font-weight: bold;
+        position: sticky;
+        &[scope=col] {
+            top: 0;
+        }
+        &[scope=row] {
+            left: 0;
+        }
     }
 }
 .loading-backdrop {
@@ -312,5 +323,15 @@ table {
     margin-top: 0.25rem;
     font-size: 0.875rem;
     line-height: 1.5;
+}
+
+@screen mobile {
+    table.optimized {
+        th, td {
+            &:not(.has-optimized) {
+                display: none;
+            }
+        }
+    }
 }
 </style>
