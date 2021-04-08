@@ -24,7 +24,7 @@
                 <template #instance />
                 <template #loadBalancer />
                 <template #member>
-                    <SpotGroupDetailMember :spot-group-id="spotGroupId" />
+                    <spot-group-detail-member :spot-group-id="spotGroupId" />
                 </template>
                 <template #tag>
                     <tags-panel :resource-id="spotGroupId"
@@ -157,7 +157,7 @@ export default {
     }
 
     .tab-bg {
-        @apply bg-white border border-gray-200 rounded-sm pb-8;
+        @apply bg-white rounded-sm pb-8;
     }
 }
 </style>

@@ -30,9 +30,11 @@
             <span class="title">
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.PROJECT') }}
             </span>
-            <span class="content">
-                {{ projectName }}
-            </span>
+            <p-anchor class="content"
+                      :text="projectName"
+                      :href="projectLink"
+                      highlight
+            />
         </section>
         <section class="using-instance-type-section">
             <p class="title">
@@ -64,13 +66,17 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { get, isEmpty, map, range } from 'lodash';
+import {
+    get, isEmpty, map, range,
+} from 'lodash';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import Color from 'color';
 
-import { PAnchor, PButton, PChartLoader, PSkeleton } from '@spaceone/design-system';
+import {
+    PAnchor, PButton, PChartLoader, PSkeleton,
+} from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -115,9 +121,11 @@ export default {
             title: '',
             resourceName: computed(() => props.spotGroup.resource_id), // todo: name 필드가 추가되면 name으로 바뀌어야 함
             projects: computed(() => store.state.resource.project.items),
-            projectName: computed(() => {
-                const projectId = props.spotGroup.project_id;
-                return state.projects[projectId]?.label;
+            projectId: computed(() => props.spotGroup.project_id),
+            projectName: computed(() => state.projects[state.projectId]?.label),
+            projectLink: computed(() => {
+                const projectRouter = referenceRouter(state.projectId, { resource_type: 'identity.Project' });
+                return vm.$router.resolve(projectRouter).href;
             }),
             resourceLink: computed(() => {
                 if (!isEmpty(props.spotGroup)) {
@@ -327,13 +335,8 @@ export default {
                 padding: 0.25rem 0.5rem;
                 .legend {
                     line-height: 1.5;
-                    cursor: pointer;
                     padding: 0 0.125rem;
                     margin-bottom: 0.25rem;
-                    &:hover {
-                        @apply bg-secondary2;
-                        text-decoration: underline;
-                    }
                     .circle {
                         display: inline-block;
                         width: 0.5rem;

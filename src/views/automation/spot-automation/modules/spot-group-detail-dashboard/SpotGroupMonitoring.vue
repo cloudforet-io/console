@@ -57,6 +57,7 @@
                                   :data="instanceState.data"
                                   :options="instanceState.schema.options"
                                   :fetch-options="fetchOptionState"
+                                  :type-options="{ excelVisible: false }"
                                   @fetch="fetchTableData"
                 />
             </template>
@@ -72,6 +73,9 @@ import {
 } from '@vue/composition-api';
 
 import { PDynamicLayout, PI, PLottie } from '@spaceone/design-system';
+import {
+    DynamicLayoutEventListener,
+} from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import Monitoring from '@/common/modules/monitoring/Monitoring.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
@@ -286,7 +290,7 @@ export default {
                 }
             }
         };
-        const fetchTableData = (options, changed) => {
+        const fetchTableData: DynamicLayoutEventListener['fetch'] = (changed) => {
             if (changed) {
                 if (changed.sortBy !== undefined) {
                     fetchOptionState.sortBy = changed.sortBy;
