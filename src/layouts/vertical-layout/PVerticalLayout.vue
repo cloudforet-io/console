@@ -37,7 +37,7 @@ import {
 } from '@vue/composition-api';
 import PI from '@/foundation/icons/PI.vue';
 
-const SCREEN_WIDTH_SM = 576;
+const SCREEN_WIDTH_SM = 767;
 
 const documentEventMount = (eventName: string, func: any) => {
     onMounted(() => document.addEventListener(eventName, func));
@@ -126,7 +126,7 @@ export default {
             if (!state.hide) {
                 state.hide = true;
                 state.transition = true;
-                state.width = 10;
+                state.width = 0;
                 setTimeout(offTransition, 500);
             } else {
                 state.width = props.initWidth;
@@ -139,12 +139,14 @@ export default {
         documentEventMount('mouseup', endResizing);
 
         const detectWindowResizing = () => {
-            if (window.innerWidth <= SCREEN_WIDTH_SM) {
-                state.hide = false;
-                hideSidebar();
-            } else {
-                state.hide = true;
-                hideSidebar();
+            if (!state.hide) {
+                if (window.innerWidth <= SCREEN_WIDTH_SM) {
+                    state.hide = false;
+                    hideSidebar();
+                } else {
+                    state.hide = true;
+                    hideSidebar();
+                }
             }
         };
 
