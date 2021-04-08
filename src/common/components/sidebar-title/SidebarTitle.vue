@@ -49,25 +49,25 @@ header {
     @apply flex border-b border-gray-200 items-center;
     padding: 2rem 0 0.75rem 1rem;
     margin-bottom: 0.75rem;
-    &.link {
-        padding-top: 0;
-        &:hover {
-             @apply cursor-pointer;
-             text-decoration: underline;
-         }
-    }
     .title {
         @apply text-sm text-gray-900 font-semibold capitalize truncate;
         font-size: 0.875rem;
         line-height: 170%;
-
-        &:active {
-            @apply text-blue-500 cursor-pointer;
-        }
-        &.selected {
-            @apply text-blue-500 cursor-pointer;
+    }
+    &.link {
+        padding-top: 0;
+        .title {
+            &:hover {
+                @apply cursor-pointer;
+                text-decoration: underline;
+            }
+            &:active {
+                @apply text-blue-500 cursor-pointer;
+            }
+            &.selected {
+                @apply text-blue-500 cursor-pointer;
+            }
         }
     }
-
 }
 </style>

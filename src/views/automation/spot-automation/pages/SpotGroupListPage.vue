@@ -22,6 +22,7 @@
                    @change="onChange"
                    @refresh="onChange"
         />
+        <p class="cost-instance-info">비용, 인스턴스 기간:<strong>이번달</strong></p>
         <p-data-loader class="flex-grow" :data="items" :loading="loading"
                        :class="{'short': isShort}"
         >
@@ -35,6 +36,14 @@
                     </router-link>
                 </div>
             </div>
+            <template #no-data>
+                <section class="no-spot-group">
+                    <figure class="no-spot-group-img">
+                        <img src="@/assets/images/illust_no-spot-group.svg">
+                    </figure>
+                    <p class="no-spot-group-text">스팟 자동화를 이용하려면, 스팟그룹을 생성해주세요.</p>
+                </section>
+            </template>
         </p-data-loader>
     </section>
 </template>
@@ -306,7 +315,28 @@ export default {
 
 <style lang="postcss" scoped>
 .spot-group-list-wrapper {
+    display: flex;
+    flex-direction: column;
     padding: 2rem 1.5rem;
+    height: 100%;
+}
+.cost-instance-info {
+    @apply text-gray-900;
+    font-size: 0.75rem;
+    line-height: 150%;
+    margin-bottom: 1rem;
+}
+.no-spot-group {
+    display: flex;
+    flex-direction: column;
+    .no-spot-group-img {
+        margin-bottom: 1rem;
+    }
+    .no-spot-group-text {
+        @apply text-primary2;
+        font-size: 1rem;
+        line-height: 160%;
+    }
 }
 .page-title {
     display: flex;
@@ -324,12 +354,16 @@ export default {
         row-gap: 1rem;
         column-gap: 1.5rem;
 
+        @screen sm {
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        }
+
         @screen md {
             grid-template-columns: repeat(auto-fit, minmax(460px, 1fr));
         }
 
         @screen lg {
-            grid-template-columns: repeat(auto-fit, minmax(700px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
         }
     }
 }

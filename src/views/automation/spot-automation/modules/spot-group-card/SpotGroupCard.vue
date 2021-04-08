@@ -59,11 +59,6 @@ import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
 
-interface CloudServiceType {
-    name: string;
-    provider: string;
-    recommended_title: string;
-}
 
 export default {
     name: 'SpotGroupCard',
@@ -117,39 +112,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-@define-mixin spread-case-card-header {
-    height: 3rem;
-
-    .spot-group-title {
-        visibility: hidden;
-    }
-
-    .spot-group-region-date {
-        display: block;
-        font-size: 0.75rem;
-        line-height: 130%;
-    }
-
-    .spot-group-cost-wrapper {
-        display: none;
-    }
-}
-
-@define-mixin spread-case-card-body {
-    min-height: 19.125rem;
-    .card-mobile-version {
-        display: none;
-    }
-    .card-desktop-version {
-        display: flex;
-        height: 100%;
-    }
-}
-
-@define-mixin spread-case-card-footer {
-    display: none;
-}
-
 .card-wrapper {
     @apply border border-gray-200;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
@@ -163,29 +125,50 @@ export default {
     @apply text-white;
     background: linear-gradient(90.01deg, #315ed1 0.01%, #5da3f5 99.99%);
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     padding: 1rem 1.5rem;
     width: 100%;
     height: 6.75rem;
     border-top-left-radius: 0.25rem;
     border-top-right-radius: 0.25rem;
 
+    @screen sm {
+        height: 4.75rem;
+        flex-direction: row;
+        justify-content: space-between;
+    }
+
+    @screen md {
+        height: 4.75rem;
+    }
+
     .left-wrapper {
         flex-direction: column;
+        flex-grow: 0;
+        max-width: 100%;
+        @screen sm {
+            max-width: 50%;
+        }
+        @screen lg {
+            max-width: 66.6%;
+        }
+
         .spot-group-title {
+            @apply truncate;
             display: block;
+            max-width: 100%;
+            padding-right: 3.71rem;
+            /*todo: star -> absolute*/
             font-size: 0.875rem;
             line-height: 115%;
             font-weight: bold;
             margin-top: 0.25rem;
-
-            @screen md {
+            @screen sm {
                 font-size: 1.25rem;
                 line-height: 120%;
             }
         }
     }
-
     .project-group-nav {
         font-size: 0.75rem;
         line-height: 130%;
@@ -197,11 +180,11 @@ export default {
             }
         }
     }
-
     .spot-group-region-date {
         display: none;
     }
     .spot-group-cost-wrapper {
+
         display: flex;
         justify-content: space-between;
         .spot-group-cost-text {
@@ -211,24 +194,10 @@ export default {
             padding-right: 2rem;
         }
         .spot-group-cost {
+            display: flex;
             font-size: 2.75rem;
             font-weight: bold;
             line-height: 100%;
-        }
-    }
-
-    @screen sm {
-        height: 4.75rem;
-    }
-
-    @screen md {
-        height: 4.75rem;
-    }
-
-    @screen lg {
-
-        &:not(.short) {
-            @mixin spread-case-card-header;
         }
     }
 }
@@ -260,15 +229,6 @@ export default {
             display: flex;
             height: 100%;
         }
-        &:not(.short) {
-            @mixin spread-case-card-body;
-        }
-    }
-    .loader {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding-top: 10%;
     }
 }
 .card-footer {
@@ -293,11 +253,5 @@ export default {
         min-height: 2.125rem;
     }
 
-    @screen lg {
-
-        &:not(.short) {
-            @mixin spread-case-card-footer;
-        }
-    }
 }
 </style>
