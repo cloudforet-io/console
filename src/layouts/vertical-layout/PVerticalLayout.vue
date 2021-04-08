@@ -126,7 +126,7 @@ export default {
             if (!state.hide) {
                 state.hide = true;
                 state.transition = true;
-                state.width = 0;
+                state.width = 10;
                 setTimeout(offTransition, 500);
             } else {
                 state.width = props.initWidth;
