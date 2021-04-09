@@ -64,6 +64,7 @@ export default {
     flex-direction: column;
     justify-content: stretch;
     overflow-y: scroll;
+    max-width: 1920px;
 
     .page-contents {
         width: 100%;
