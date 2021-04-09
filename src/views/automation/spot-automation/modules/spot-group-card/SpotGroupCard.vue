@@ -11,6 +11,10 @@
                 </p>
                 <p class="spot-group-title">
                     {{ cardData.name }}
+                    <favorite-button :item-id="cardData.spot_group_id"
+                                     favorite-type="spotGroup"
+                                     resource-type="spot_automation.SpotGroup"
+                    />
                 </p>
             </div>
             <div class="right-wrapper">
@@ -31,14 +35,21 @@
         </div>
         <div class="card-body" :class="{'short': isShort}">
             <spot-group-card-desktop
+                v-if="!cardDataLoading"
                 class="card-desktop-version"
                 :card-data="cardData"
                 :is-short="isShort"
             />
             <spot-group-card-mobile
+                v-if="!cardDataLoading"
                 :card-data="cardData"
                 class="card-mobile-version"
             />
+            <div v-else class="loading-spinner">
+                <p-lottie name="thin-spinner" :size="2.5"
+                          auto class="h-full"
+                />
+            </div>
         </div>
         <div class="card-footer" :class="{'short': isShort}">
             <span class="footer-region">
@@ -77,6 +88,10 @@ export default {
         isShort: {
             type: Boolean,
             default: false,
+        },
+        cardDataLoading: {
+            type: Boolean,
+            default: true,
         },
     },
     setup(props) {
@@ -146,9 +161,11 @@ export default {
         flex-direction: column;
         flex-grow: 0;
         max-width: 100%;
+
         @screen sm {
             max-width: 50%;
         }
+
         @screen lg {
             max-width: 66.6%;
         }
@@ -158,11 +175,13 @@ export default {
             display: block;
             max-width: 100%;
             padding-right: 3.71rem;
-            /*todo: star -> absolute*/
+
+            /* todo: star -> absolute */
             font-size: 0.875rem;
             line-height: 115%;
             font-weight: bold;
             margin-top: 0.25rem;
+
             @screen sm {
                 font-size: 1.25rem;
                 line-height: 120%;
@@ -201,6 +220,7 @@ export default {
         }
     }
 }
+
 .card-body {
     @apply border-gray-200;
     border-width: 1px;
@@ -230,7 +250,14 @@ export default {
             height: 100%;
         }
     }
+    .loading-spinner {
+        min-height: inherit;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
 }
+
 .card-footer {
     @apply bg-blue-100;
     display: flex;
@@ -252,6 +279,5 @@ export default {
     @screen md {
         min-height: 2.125rem;
     }
-
 }
 </style>

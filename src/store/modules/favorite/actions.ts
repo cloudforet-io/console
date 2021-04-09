@@ -3,5 +3,6 @@ export const loadAll = async ({ dispatch }): Promise<void|Error> => {
         dispatch('project/load'),
         dispatch('projectGroup/load'),
         dispatch('cloudServiceType/load'),
+        dispatch('spotGroup/load'),
     ]);
 };

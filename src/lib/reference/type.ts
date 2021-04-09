@@ -7,7 +7,7 @@
 const referenceTypes = ['inventory.Server', 'identity.Project', 'identity.ProjectGroup',
     'inventory.Collector', 'identity.ServiceAccount', 'identity.Provider',
     'inventory.Region', 'inventory.CloudService', 'inventory.CloudServiceType',
-    'secret.Secret'];
+    'secret.Secret', 'spot_automation.SpotGroup'];
 export type ReferenceType = typeof referenceTypes[number]
 
 export interface Reference {

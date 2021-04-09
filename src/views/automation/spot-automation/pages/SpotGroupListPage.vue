@@ -22,16 +22,19 @@
                    @change="onChange"
                    @refresh="onChange"
         />
-        <p class="cost-instance-info">비용, 인스턴스 기간:<strong>이번달</strong></p>
+        <p class="cost-instance-info">
+            비용, 인스턴스 기간:<strong>이번달</strong>
+        </p>
         <p-data-loader class="flex-grow" :data="items" :loading="loading"
                        :class="{'short': isShort}"
         >
             <div class="card-wrapper" :class="{'short': isShort}">
                 <div v-for="item in items" :key="item.spot_group_id" class="spot-group-card">
                     <router-link :to="{ name: 'spotGroupDetail',params: {id: item.spot_group_id}}">
-                        <spot-group-card v-if="!loading"
-                                         :card-data="item"
-                                         :is-short="isShort"
+                        <spot-group-card
+                            :card-data="item"
+                            :is-short="isShort"
+                            :card-data-loading="cardDataLoading"
                         />
                     </router-link>
                 </div>
@@ -41,7 +44,9 @@
                     <figure class="no-spot-group-img">
                         <img src="@/assets/images/illust_no-spot-group.svg">
                     </figure>
-                    <p class="no-spot-group-text">스팟 자동화를 이용하려면, 스팟그룹을 생성해주세요.</p>
+                    <p class="no-spot-group-text">
+                        스팟 자동화를 이용하려면, 스팟그룹을 생성해주세요.
+                    </p>
                 </section>
             </template>
         </p-data-loader>
@@ -53,7 +58,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import {
-    PBreadcrumbs, PPageTitle, PDivider, PToolbox, PIconTextButton, PDataLoader,
+    PBreadcrumbs, PPageTitle, PDivider, PToolbox, PIconTextButton, PDataLoader, PLottie,
 } from '@spaceone/design-system';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { QueryHelper } from '@/lib/query';
@@ -146,6 +151,7 @@ export default {
         PToolbox,
         PIconTextButton,
         PDataLoader,
+        PLottie,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -155,6 +161,7 @@ export default {
         const state = reactive({
             items: undefined as unknown as CardData[],
             loading: true,
+            cardDataLoading: true,
             keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
             tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
@@ -259,6 +266,7 @@ export default {
 
         const listSpotGroup = async () => {
             state.loading = true;
+            state.cardDataLoading = true;
             try {
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.list({ query: getQuery() });
                 state.items = res.results.map(d => ({
@@ -266,6 +274,7 @@ export default {
                     created_at: timestampFormatter(d.created_at, state.timezone),
                 }));
                 state.totalCount = res.total_count || 0;
+                state.loading = false;
                 const spotGroupIds = res.results.map(item => item.spot_group_id) || [];
                 await Promise.all([getSpotGroupInstanceCount(spotGroupIds),
                     getSpotGroupCpuInfo(spotGroupIds),
@@ -273,6 +282,7 @@ export default {
                     getSpotGroupLoadbalancerInfo(spotGroupIds),
                     getSpotGroupCloudServiceType(spotGroupIds),
                 ]);
+                state.cardDataLoading = false;
             } catch (e) {
                 console.error(e);
             } finally {

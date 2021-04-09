@@ -4,10 +4,16 @@
             <aside class="sidebar-menu">
                 <sidebar-title :title="'즐겨찾기'">
                     <template #extra>
-<!--                        &nbsp;<span class="count">({{ favoriteItems.length }})</span>-->
+                        &nbsp;<span class="count">({{ favoriteItems.length }})</span>
                     </template>
                 </sidebar-title>
-<!--                <favorite-list :items="favoriteItems" class="favorite-list" @delete="onFavoriteDelete" />-->
+                <favorite-list :items="favoriteItems" class="favorite-list" @delete="onFavoriteDelete">
+                    <template #icon="{item}">
+                        <p-i name="ic_tree_project-group" class="project-group-icon"
+                             width="1rem" height="1rem" color="inherit transparent"
+                        />
+                    </template>
+                </favorite-list>
                 <div v-for="(item) in menuList" :key="item.label"
                      @click="showPage(item.routeName)"
                 >
@@ -33,6 +39,7 @@ import VueI18n from 'vue-i18n';
 import { FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteList from '@/common/modules/favorite-list/FavoriteList.vue';
 import SidebarTitle from '@/common/components/sidebar-title/SidebarTitle.vue';
+import { PI } from '@spaceone/design-system';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -47,6 +54,7 @@ export default {
         SidebarTitle,
         VerticalPageLayout,
         FavoriteList,
+        PI,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -82,7 +90,7 @@ export default {
 
         (async () => {
             selectSidebarItem(vm.$route.name);
-            // await vm.$store.dispatch('favorite/spotGroup/load');
+            await Promise.all([vm.$store.dispatch('favorite/spotGroup/load'), vm.$store.dispatch('resource/spotGroup/load')]);
         })();
 
         return {
@@ -101,5 +109,8 @@ export default {
             padding: 0;
         }
     }
+}
+.favorite-list {
+    margin-bottom: 2.125rem;
 }
 </style>
