@@ -134,6 +134,7 @@ export default {
     &:hover {
         @apply bg-blue-100 border-blue-500;
     }
+    max-width: 58rem;
 }
 
 .card-header {
@@ -241,7 +242,7 @@ export default {
     }
 
     @screen lg {
-        min-height: 20rem;
+        min-height: 254px;
         .card-mobile-version {
             display: none;
         }

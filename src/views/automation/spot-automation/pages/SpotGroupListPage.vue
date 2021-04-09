@@ -98,6 +98,7 @@ interface Reference {
     resource_id: string;
 }
 
+
 interface CardData {
     cloud_service_group: string;
     cloud_service_type: string;
@@ -107,6 +108,7 @@ interface CardData {
     instanceCpu: number;
     instanceDisk: number;
     loadbalancerCount: number;
+    instanceState: string;
     name: string;
     options: Options;
     project_id: string;
@@ -264,6 +266,21 @@ export default {
             }
         };
 
+        const getSpotGroupInstanceState = async (spotGroupIds) => {
+            try {
+                const StateResponse = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceState({
+                    // eslint-disable-next-line camelcase
+                    spot_groups: spotGroupIds,
+                });
+                Object.keys(state.items).forEach((i) => {
+                    const instanceState = StateResponse.spot_groups[state.items[i].spot_group_id].state || 'N/A';
+                    state.items[i].instanceState = instanceState;
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
         const listSpotGroup = async () => {
             state.loading = true;
             state.cardDataLoading = true;
@@ -281,6 +298,7 @@ export default {
                     getSpotGroupDiskInfo(spotGroupIds),
                     getSpotGroupLoadbalancerInfo(spotGroupIds),
                     getSpotGroupCloudServiceType(spotGroupIds),
+                    getSpotGroupInstanceState(spotGroupIds),
                 ]);
                 state.cardDataLoading = false;
             } catch (e) {
@@ -373,7 +391,7 @@ export default {
         }
 
         @screen lg {
-            grid-template-columns: repeat(auto-fit, minmax(600px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(540px, auto));
         }
     }
 }

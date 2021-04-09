@@ -1,12 +1,9 @@
 <template>
     <article class="desktop-wrapper">
         <div class="spot-column">
-            <p class="column-header">
-                SPOT
-            </p>
             <p class="column-title">
                 스팟 인터럽트
-                <span class="text-xs text-gray-400">Last hour</span>
+                <span class="text-xs text-gray-400">Last 1 day</span>
             </p>
             <p class="column-number">
                 6
@@ -14,13 +11,10 @@
             </p>
             <spot-interrupt-chart class="spot-interrupt-chart" />
             <span class="spot-interrupt-desc">Activity graph time range:</span><br>
-            <span class="spot-interrupt-desc">last 6 hours</span>
+            <span class="spot-interrupt-desc">last 7 days</span>
         </div>
         <div class="spot-card-divider" />
         <div class="instance-column">
-            <p class="column-header">
-                INSTANCE
-            </p>
             <div class="column-title-wrapper">
                 <div>
                     <p class="column-title">
@@ -41,7 +35,7 @@
                 인스턴스 평균 CPU 사용률
             </p>
             <p class="column-number">
-                {{ cardData.instanceCpu || 0}}
+                {{ cardData.instanceCpu || 0 }}
                 <span class="column-number-unit">%</span>
             </p>
             <p class="column-title">
@@ -54,6 +48,23 @@
         </div>
         <div class="spot-card-divider" />
         <div class="load-balancer-column">
+            <p class="column-title">
+                인스턴스 상태
+            </p>
+            <p class="column-info">
+                <p-i v-if="cardData.instanceState === INSTANCE_STATE.healthy"
+                     width="0.875rem"
+                     height="0.875rem"
+                     name="smile-face"
+                />
+                <p-lottie v-else-if="cardData.instanceState === INSTANCE_STATE.unhealthy"
+                          name="lottie_error" auto :size="1.5"
+                />
+                <span v-else>
+                    N/A
+                </span>
+                <span class="text" :class="cardData.instanceState">{{ cardData.instanceState }}</span>
+            </p>
             <p class="column-title">
                 로드밸런서 (개수)
             </p>
@@ -81,6 +92,7 @@
 import SpotInterruptChart from '@/views/automation/spot-automation/components/SpotInterruptChart.vue';
 import OnDemandAndSpotChart from '@/views/automation/spot-automation/components/OnDemandAndSpotChart.vue';
 import { PI } from '@spaceone/design-system';
+import { INSTANCE_STATE } from '@/views/automation/spot-automation/config';
 
 export default {
     name: 'SpotGroupCardDesktop',
@@ -97,6 +109,7 @@ export default {
     },
     setup(props) {
         return {
+            INSTANCE_STATE,
         };
     },
 };
@@ -108,12 +121,6 @@ export default {
     flex-direction: row;
     justify-content: space-between;
     height: 100%;
-}
-.column-header {
-    @apply font-bold text-gray-300;
-    font-size: 0.875rem;
-    margin-bottom: 1.5rem;
-    line-height: 100%;
 }
 .column-title {
     @apply text-gray-500;
@@ -135,7 +142,6 @@ export default {
     padding-top: 2rem;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
-    //border-right: 0.0625rem dashed rgba(theme('colors.gray.200'), 1);
     .spot-interrupt-desc {
         @apply text-gray-400;
         font-size: 0.75rem;
@@ -150,7 +156,7 @@ export default {
     padding-top: 2rem;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
-    //border-right: 0.0625rem dashed rgba(theme('colors.gray.200'), 1);
+
     .column-title-wrapper {
         display: flex;
     }
@@ -161,9 +167,23 @@ export default {
 }
 .load-balancer-column {
     flex: 1;
-    padding-top: 4.375rem;
+    padding-top: 2rem;
     padding-left: 1.5rem;
     padding-right: 1.5rem;
+    .column-info {
+        margin-bottom: 2.6rem;
+        .text {
+            line-height: 100%;
+            font-size: 0.875rem;
+            margin-left: 0.125rem;
+            &.healthy {
+                @apply text-peacock-400;
+            }
+            &.alert {
+                @apply text-red-500;
+            }
+        }
+    }
     .column-text {
         font-size: 0.875rem;
         line-height: 100%;
