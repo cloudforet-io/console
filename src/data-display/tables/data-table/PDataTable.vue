@@ -561,7 +561,7 @@ export default defineComponent<PDataTableProps>({
 
     .invalid-cover {
         @apply absolute w-full h-full overflow-hidden border border-alert;
-        background-color: rgba(theme('colors.red.100'), 0.3);
+        //background-color: rgba(theme('colors.red.100'), 0.3);
         pointer-events: none;
         top: 0;
         z-index: 1;
