@@ -56,7 +56,7 @@ export default defineComponent({
         },
         color: {
             type: String,
-            default: 'transparent inherit',
+            default: 'inherit',
         },
         disabled: {
             type: Boolean,

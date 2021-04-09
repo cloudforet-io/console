@@ -4,7 +4,7 @@
 <script lang="ts">
 import '@/foundation/icons/p-icons';
 import { defineComponent } from '@vue/composition-api';
-
+/* https://www.npmjs.com/package/vue-svgicon */
 interface Props {
     name: string;
     dir: string|null;
