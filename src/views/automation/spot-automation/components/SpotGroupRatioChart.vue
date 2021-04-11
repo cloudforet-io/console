@@ -2,11 +2,11 @@
     <div class="spot-group-composition-chart grid grid-cols-12" :class="chartType">
         <div class="col-span-5 text-wrapper on-demand">
             <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.ON_DEMAND') }}</p>
-            <p><b>{{ onDemandPercentage }}</b>%</p>
+            <p><b>{{ onDemandCount }}</b> ({{ onDemandPercentage }}%)</p>
             <template v-if="chartType === CHART_TYPE.long">
                 <br>
                 <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.ON_DEMAND_TOTAL_COST') }}</p>
-                <p>$<b>{{ onDemandCount }}</b></p>
+                <p>$<b>{{ onDemandCost }}</b></p>
             </template>
         </div>
         <p-chart-loader class="col-span-2" :loading="loading">
@@ -14,11 +14,11 @@
         </p-chart-loader>
         <div class="col-span-5 text-wrapper spot">
             <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.SPOT') }}</p>
-            <p><b>{{ spotPercentage }}</b>%</p>
+            <p><b>{{ spotCount }}</b> ({{ spotPercentage }}%)</p>
             <template v-if="chartType === CHART_TYPE.long">
                 <br>
                 <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.SPOT_TOTAL_COST') }}</p>
-                <p>$<b>{{ spotCount }}</b></p>
+                <p>$<b>{{ spotCost }}</b></p>
             </template>
         </div>
     </div>
@@ -83,6 +83,8 @@ export default {
             spotPercentage: 0,
             onDemandCount: 0,
             spotCount: 0,
+            onDemandCost: 0,
+            spotCost: 0,
         });
 
         /* util */

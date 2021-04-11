@@ -1,6 +1,6 @@
 <template>
     <general-page-layout class="spot-group-detail-page">
-        <div class="page-content">
+        <div class="page-inner">
             <p-breadcrumbs :routes="routeState.routes" />
             <div class="top-wrapper">
                 <p-page-title :title="spotGroup.name" child @goBack="$router.go(-1)" />
@@ -52,11 +52,11 @@ import {
 } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
+import SpotGroupDetailMember from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupDetailMember.vue';
+import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
+
 import { SpaceConnector } from '@/lib/space-connector';
 
-import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
-import SpotGroupDetailMember
-    from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupDetailMember.vue';
 
 export default {
     name: 'SpotGroupDetailPage',
@@ -79,9 +79,9 @@ export default {
         const tabState = reactive({
             tabs: computed(() => ([
                 { name: 'summary', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.TAB_SUMMARY'), keepAlive: true },
-                { name: 'member', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.TAB_MEMBER') },
-                { name: 'tag', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.TAB_TAG') },
-                { name: 'history', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.TAB_HISTORY') },
+                { name: 'member', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.TAB_MEMBER'), keepAlive: true },
+                { name: 'tag', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.TAB_TAG'), keepAlive: true },
+                // { name: 'history', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.TAB_HISTORY') },
             ] as TabItem[])),
             activeTab: 'summary',
         });

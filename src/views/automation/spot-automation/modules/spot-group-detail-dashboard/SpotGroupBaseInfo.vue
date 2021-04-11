@@ -67,7 +67,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    get, isEmpty, map, range,
+    get, isEmpty, range,
 } from 'lodash';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -124,8 +124,11 @@ export default {
             projectId: computed(() => props.spotGroup.project_id),
             projectName: computed(() => state.projects[state.projectId]?.label),
             projectLink: computed(() => {
-                const projectRouter = referenceRouter(state.projectId, { resource_type: 'identity.Project' });
-                return vm.$router.resolve(projectRouter).href;
+                if (state.projectId) {
+                    const projectRouter = referenceRouter(state.projectId, { resource_type: 'identity.Project' });
+                    return vm.$router.resolve(projectRouter).href;
+                }
+                return '';
             }),
             resourceLink: computed(() => {
                 if (!isEmpty(props.spotGroup)) {
@@ -201,14 +204,11 @@ export default {
 
         /* api */
         const getRecommendedName = async (spotGroup) => {
-            const cloudServiceType = get(spotGroup, 'cloud_service_type');
             try {
-                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSupportedResourceTypes();
-                map(res, (d, k) => {
-                    if (k.includes(cloudServiceType)) {
-                        state.title = d.recommended_title;
-                    }
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupCloudServiceType({
+                    spot_groups: [spotGroup.spot_group_id],
                 });
+                state.title = get(res, `spot_groups.${spotGroup.spot_group_id}.name`);
             } catch (e) {
                 console.error(e);
             }
@@ -247,7 +247,6 @@ export default {
 
         return {
             ...toRefs(state),
-            referenceRouter,
         };
     },
 };
