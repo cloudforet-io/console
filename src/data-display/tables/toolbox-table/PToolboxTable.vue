@@ -64,7 +64,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, getCurrentInstance, reactive,
+    ComponentRenderProxy, getCurrentInstance, reactive, watch,
 } from '@vue/composition-api';
 
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
@@ -267,6 +267,21 @@ export default {
                 sortDesc: proxyState.sortDesc,
             });
         };
+
+        const checkSelectIndex = () => {
+            if (!Array.isArray(props.items)) return;
+            const selectIndex: number[] = [];
+            proxyState.selectIndex.forEach((d) => {
+                if (props.items[d] !== undefined) selectIndex.push(d);
+            });
+            if (proxyState.selectIndex.length !== selectIndex.length) {
+                proxyState.selectIndex = selectIndex;
+            }
+        };
+
+        watch(() => props.items, () => {
+            checkSelectIndex();
+        });
 
         return {
             proxyState,

@@ -6,7 +6,7 @@
         <slot />
         <p-i v-if="deletable" name="ic_delete" width="1rem"
              height="1rem" class="icon"
-             color="transparent inherit"
+             color="inherit"
              @click="$emit('delete')"
         />
     </p-badge>

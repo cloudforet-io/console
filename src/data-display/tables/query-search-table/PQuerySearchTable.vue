@@ -146,16 +146,6 @@ export default {
         });
 
 
-        // check if each option value is 'undefined' to escape auto type casting
-        const getFullOptions = (options: ToolboxOptions): Options => ({
-            sortBy: proxyState.sortBy,
-            sortDesc: proxyState.sortDesc,
-            pageStart: options.pageStart === undefined ? 1 : options.pageStart,
-            pageLimit: options.pageLimit === undefined ? proxyState.pageSize : options.pageLimit,
-            queryTags: options.queryTags === undefined ? proxyState.queryTags : options.queryTags,
-        });
-
-
         /** Event emitter */
         const emitSelect = (selectIndex) => {
             proxyState.selectIndex = selectIndex;

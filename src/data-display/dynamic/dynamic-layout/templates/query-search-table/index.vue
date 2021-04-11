@@ -6,27 +6,30 @@
         >
             {{ layoutName }}
         </p-panel-top>
-        <p-query-search-table :fields="fields"
-                              :items="rootData"
-                              :loading="loading"
-                              :total-count="totalCount"
-                              :sort-by.sync="sortBy"
-                              :sort-desc.sync="sortDesc"
-                              :select-index="selectIndex"
-                              :page-size.sync="pageSize"
-                              :key-item-sets="keyItemSets"
-                              :value-handler-map="valueHandlerMap"
-                              :query-tags.sync="queryTags"
-                              :selectable="selectable"
-                              :multi-select="multiSelect"
-                              :invalid="invalid"
-                              :col-copy="colCopy"
-                              :searchable="searchable"
-                              :excel-visible="excelVisible"
-                              :timezone="timezone"
-                              @change="onChange"
-                              @select="onSelect"
-                              @export="onExport"
+        <p-toolbox-table class="p-query-search-table"
+                         search-type="query"
+                         :fields="fields"
+                         :items="rootData"
+                         :loading="loading"
+                         :total-count="totalCount"
+                         :sort-by.sync="sortBy"
+                         :sort-desc.sync="sortDesc"
+                         :select-index="selectIndex"
+                         :page-size.sync="pageSize"
+                         :key-item-sets="keyItemSets"
+                         :value-handler-map="valueHandlerMap"
+                         :query-tags.sync="queryTags"
+                         :selectable="selectable"
+                         :multi-select="multiSelect"
+                         :invalid="invalid"
+                         :col-copy="colCopy"
+                         :searchable="searchable"
+                         :excel-visible="excelVisible"
+                         :timezone="timezone"
+                         @change="onChange"
+                         @refresh="onChange()"
+                         @select="onSelect"
+                         @export="onExport"
         >
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="{field, index}">
                 <p-dynamic-field :key="slotName"
@@ -38,7 +41,7 @@
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                 <slot v-if="!dynamicFieldSlots[slot] && slot !== 'tag-data-type-datetime'" :name="slot" v-bind="scope" />
             </template>
-        </p-query-search-table>
+        </p-toolbox-table>
     </div>
 </template>
 
@@ -47,28 +50,26 @@ import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import PQuerySearchTable from '@/data-display/tables/query-search-table/PQuerySearchTable.vue';
 import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';
 import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import { KeyItemSet } from '@/inputs/search/query-search/type';
-import { forEach, get } from 'lodash';
+import { get } from 'lodash';
 import {
     QuerySearchTableDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/query-search-table/type';
 import { Options } from '@/data-display/tables/query-search-table/type';
 import { DataTableFieldType } from '@/data-display/tables/data-table/type';
 import { getValueByPath } from '@/data-display/dynamic/dynamic-layout/helper';
-import { DynamicLayoutFetchOptions } from '@/data-display/dynamic/dynamic-layout/type';
+import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
 
-const getThisPage = (pageStart = 1, pageLimit = 15) => Math.floor(pageStart / pageLimit) || 1;
 
 export default {
     name: 'PDynamicLayoutQuerySearchTable',
     components: {
         PDynamicField,
         PPanelTop,
-        PQuerySearchTable,
+        PToolboxTable,
     },
     props: {
         name: {
@@ -145,13 +146,6 @@ export default {
 
             /** others */
             pageStart: 1,
-            fetchOptionsParam: computed(() => ({
-                sortBy: state.sortBy,
-                sortDesc: state.sortDesc,
-                pageStart: state.pageStart,
-                pageLimit: state.pageSize,
-                queryTags: state.queryTags,
-            } as DynamicLayoutFetchOptions)),
             rootData: computed<any[]>(() => {
                 if (Array.isArray(props.data)) return props.data;
                 if (typeof props.data === 'object' && props.options.root_path) {
@@ -194,7 +188,7 @@ export default {
         };
 
 
-        const onChange = (options: Options) => {
+        const onChange = (options: Options = {}) => {
             emit('fetch', options);
         };
 
