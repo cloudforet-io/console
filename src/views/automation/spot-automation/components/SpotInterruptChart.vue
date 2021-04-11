@@ -11,14 +11,28 @@ import { PChartLoader } from '@spaceone/design-system';
 import {
     onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
+import dayjs from 'dayjs';
+import { forEach, range } from 'lodash';
+import { store } from '@/store';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { red } from '@/styles/colors';
+
+interface InterruptChartData {
+    date: string;
+    value: number;
+}
 
 export default {
     name: 'SpotInterruptChart',
     components: {
         PChartLoader,
+    },
+    props: {
+        interruptData: {
+            type: Array,
+            default: () => [],
+        },
     },
     setup(props) {
         const state = reactive({
@@ -27,7 +41,7 @@ export default {
             chartRef: null as HTMLElement | null,
             chart: null as null | any,
             chartRegistry: {},
-            data: [] as unknown,
+            data: [] as InterruptChartData[],
         });
 
         const disposeChart = (ctx) => {
@@ -80,28 +94,29 @@ export default {
         const getData = async () => {
             state.loading = true;
             state.data = [];
+            const interruptData = props.interruptData;
+
             try {
-                const res = [{
-                    date: new Date(2018, 3, 20),
-                    value: 90,
-                }, {
-                    date: new Date(2018, 3, 21),
-                    value: 102,
-                }, {
-                    date: new Date(2018, 3, 22),
-                    value: 65,
-                }, {
-                    date: new Date(2018, 3, 23),
-                    value: 62,
-                }, {
-                    date: new Date(2018, 3, 24),
-                    value: 55,
-                }, {
-                    date: new Date(2018, 3, 25),
-                    value: 81,
-                    disabled: false,
-                }];
-                state.data = res;
+                const res = interruptData.map(d => ({
+                    date: d.date,
+                    value: d.count,
+                }));
+                forEach(range(0, 7), (i) => {
+                    const targetDate = dayjs.utc().subtract(i, 'day');
+                    const existData = res.find(d => d.date === targetDate.format('YYYY-MM-DD'));
+                    if (existData) {
+                        state.data.push({
+                            date: existData.date,
+                            value: existData.value,
+                        });
+                    } else {
+                        const now = dayjs();
+                        state.data.push({
+                            date: now.format('YYYY-MM-DD'),
+                            value: 0,
+                        });
+                    }
+                });
             } catch (e) {
                 console.error(e);
             } finally {

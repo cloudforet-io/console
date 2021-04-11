@@ -6,10 +6,12 @@
                 <span class="text-xs text-gray-400">Last 1 day</span>
             </p>
             <p class="column-number">
-                6
+                {{ cardData.interruptCount }}
                 <span class="column-number-unit">개</span>
             </p>
-            <spot-interrupt-chart class="spot-interrupt-chart" />
+            <spot-interrupt-chart
+                :interrupt-data="cardData.interruptHistoryData"
+                class="spot-interrupt-chart" />
             <span class="spot-interrupt-desc">Activity graph time range:</span><br>
             <span class="spot-interrupt-desc">last 7 days</span>
         </div>

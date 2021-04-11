@@ -30,13 +30,11 @@
         >
             <div class="card-wrapper" :class="{'short': isShort}">
                 <div v-for="item in items" :key="item.spot_group_id" class="spot-group-card">
-                    <router-link :to="{ name: 'spotGroupDetail',params: {id: item.spot_group_id}}">
-                        <spot-group-card
-                            :card-data="item"
-                            :is-short="isShort"
-                            :card-data-loading="cardDataLoading"
-                        />
-                    </router-link>
+                    <spot-group-card
+                        :card-data="item"
+                        :is-short="isShort"
+                        :card-data-loading="cardDataLoading"
+                    />
                 </div>
             </div>
             <template #no-data>
@@ -72,6 +70,7 @@ import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import { store } from '@/store';
 import { Tags, TimeStamp } from '@/models';
+import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 
 dayjs.extend(timezone);
 
@@ -98,7 +97,6 @@ interface Reference {
     resource_id: string;
 }
 
-
 interface CardData {
     cloud_service_group: string;
     cloud_service_type: string;
@@ -109,6 +107,7 @@ interface CardData {
     instanceDisk: number;
     loadbalancerCount: number;
     instanceState: string;
+    interruptHistoryData: string;
     name: string;
     options: Options;
     project_id: string;
@@ -138,6 +137,16 @@ interface CloudServiceType {
     name: string;
     recommended_title: string;
     provider: string;
+}
+interface InstanceStateType {
+    total: number;
+    healthy: number;
+    unhealthy: number;
+    state: string;
+}
+interface InterruptHistoryType {
+    date: string;
+    count: number;
 }
 
 interface InstanceRes<T> {
@@ -253,7 +262,7 @@ export default {
 
         const getSpotGroupCloudServiceType = async (spotGroupIds) => {
             try {
-                const CloudServiceTypeResponse = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupCloudServiceType({
+                const CloudServiceTypeResponse: InstanceRes<CloudServiceType> = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupCloudServiceType({
                     // eslint-disable-next-line camelcase
                     spot_groups: spotGroupIds,
                 });
@@ -268,13 +277,44 @@ export default {
 
         const getSpotGroupInstanceState = async (spotGroupIds) => {
             try {
-                const StateResponse = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceState({
+                const StateResponse: InstanceRes<InstanceStateType> = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceState({
                     // eslint-disable-next-line camelcase
                     spot_groups: spotGroupIds,
                 });
                 Object.keys(state.items).forEach((i) => {
-                    const instanceState = StateResponse.spot_groups[state.items[i].spot_group_id].state || 'N/A';
+                    const instanceState = StateResponse.spot_groups[state.items[i].spot_group_id].state as unknown as InstanceStateType || 'N/A';
                     state.items[i].instanceState = instanceState;
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const getSpotGroupInterruptHistory = async (spotGroupIds) => {
+            try {
+                const HistoryResponse: InstanceRes<InterruptHistoryType> = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInterruptHistory({
+                    // eslint-disable-next-line camelcase
+                    spot_groups: spotGroupIds,
+                    granularity: 'DAILY',
+                    period: 7,
+                });
+                Object.keys(state.items).forEach((i) => {
+                    const interruptHistory = HistoryResponse.spot_groups[state.items[i].spot_group_id] as unknown as InterruptHistoryType || 'N/A';
+                    state.items[i].interruptHistoryData = interruptHistory;
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const getSpotGroupInterruptCount = async (spotGroupIds) => {
+            try {
+                const InterruptResponse = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInterrupt({
+                    spot_groups: spotGroupIds,
+                });
+                Object.keys(state.items).forEach((i) => {
+                    const interruptCount = InterruptResponse.spot_groups[state.items[i].spot_group_id] || 0;
+                    state.items[i].interruptCount = interruptCount;
                 });
             } catch (e) {
                 console.error(e);
@@ -299,6 +339,8 @@ export default {
                     getSpotGroupLoadbalancerInfo(spotGroupIds),
                     getSpotGroupCloudServiceType(spotGroupIds),
                     getSpotGroupInstanceState(spotGroupIds),
+                    getSpotGroupInterruptHistory(spotGroupIds),
+                    getSpotGroupInterruptCount(spotGroupIds),
                 ]);
                 state.cardDataLoading = false;
             } catch (e) {

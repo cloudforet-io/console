@@ -1,64 +1,60 @@
 <template>
     <article class="card-wrapper">
-        <div class="card-header" :class="{'short': isShort}">
-            <div class="left-wrapper">
-                <p class="project-group-nav">
-                    <span class="project-group-info">{{ projectGroupName }}</span>
-                    <p-i name="ic_breadcrumb_arrow" width="0.75rem" height="0.75rem"
-                         class="project-group-info opacity-50" color="inherit white"
-                    />
-                    <span class="project-info">{{ projectName }}</span>
-                </p>
-                <p class="spot-group-title">
-                    {{ cardData.name }}
-                    <favorite-button :item-id="cardData.spot_group_id"
-                                     favorite-type="spotGroup"
-                                     resource-type="spot_automation.SpotGroup"
-                    />
-                </p>
+        <router-link :to="{ name: 'spotGroupDetail',params: {id: cardData.spot_group_id}}">
+            <div class="card-header" :class="{'short': isShort}">
+                <div class="left-wrapper">
+                    <p class="project-group-nav">
+                        <span class="project-group-info">{{ projectGroupName }}</span>
+                        <p-i name="ic_breadcrumb_arrow" width="0.75rem" height="0.75rem"
+                             class="project-group-info opacity-50" color="inherit white"
+                        />
+                        <span class="project-info">{{ projectName }}</span>
+                    </p>
+                    <p class="spot-group-title">
+                        {{ cardData.name }}
+                        <favorite-button :item-id="cardData.spot_group_id"
+                                         favorite-type="spotGroup"
+                                         resource-type="spot_automation.SpotGroup"
+                        />
+                    </p>
+                </div>
+                <div class="right-wrapper">
+                    <div class="spot-group-cost-wrapper">
+                        <div class="spot-group-cost-text">
+                            <p>절감비용</p>
+                            <span class="text-xs">이번달 1일 ~ 어제</span>
+                        </div>
+                        <span class="spot-group-cost"><span class="text-2xl font-normal">$</span>125</span>
+                    </div>
+                </div>
             </div>
-            <div class="right-wrapper">
-                <span class="spot-group-region-date">
+            <div class="card-body" :class="{'short': isShort}">
+                <spot-group-card-desktop
+                    v-if="!cardDataLoading"
+                    class="card-desktop-version"
+                    :card-data="cardData"
+                    :is-short="isShort"
+                />
+                <spot-group-card-mobile
+                    v-if="!cardDataLoading"
+                    :card-data="cardData"
+                    class="card-mobile-version"
+                />
+                <div v-else class="loading-spinner">
+                    <p-lottie name="thin-spinner" :size="2.5"
+                              auto class="h-full"
+                    />
+                </div>
+            </div>
+            <div class="card-footer" :class="{'short': isShort}">
+                <span class="footer-region">
                     <span class="opacity-50 mr-2">리전</span>
                     {{ cardData.region_code }}
                     <span class="opacity-50 mr-2 ml-4">생성</span>
                     {{ cardData.created_at }}
                 </span>
-                <div class="spot-group-cost-wrapper">
-                    <div class="spot-group-cost-text">
-                        <p>절감비용</p>
-                        <span class="text-xs">이번달 1일 ~ 어제</span>
-                    </div>
-                    <span class="spot-group-cost"><span class="text-2xl font-normal">$</span>125</span>
-                </div>
             </div>
-        </div>
-        <div class="card-body" :class="{'short': isShort}">
-            <spot-group-card-desktop
-                v-if="!cardDataLoading"
-                class="card-desktop-version"
-                :card-data="cardData"
-                :is-short="isShort"
-            />
-            <spot-group-card-mobile
-                v-if="!cardDataLoading"
-                :card-data="cardData"
-                class="card-mobile-version"
-            />
-            <div v-else class="loading-spinner">
-                <p-lottie name="thin-spinner" :size="2.5"
-                          auto class="h-full"
-                />
-            </div>
-        </div>
-        <div class="card-footer" :class="{'short': isShort}">
-            <span class="footer-region">
-                <span class="opacity-50 mr-2">리전</span>
-                {{ cardData.region_code }}
-                <span class="opacity-50 mr-2 ml-4">생성</span>
-                {{ cardData.created_at }}
-            </span>
-        </div>
+        </router-link>
     </article>
 </template>
 
