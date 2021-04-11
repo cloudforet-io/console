@@ -173,7 +173,7 @@
 			},
 			"DETAIL": {
 				"BASE_INFO": {
-					"EDIT": "편",
+					"EDIT": "편집",
 					"ON_DEMAND": "온디맨드",
 					"ON_DEMAND_TOTAL_COST": "온디맨드 전체 비용",
 					"PROJECT": "프로젝트",
@@ -199,9 +199,9 @@
 					"TITLE": "비용"
 				},
 				"INTERRUPT": {
-					"AFFECTED_INSTANCE": "영향받은 인스턴스",
 					"AZ": "가용 영역(AZ)",
 					"DAY": "일",
+					"INSTANCE_TYPE": "인스턴스 타입",
 					"INTERRUPT_COUNT": "인터럽트 개수",
 					"INTERRUPT_DETAIL": "인터럽트 내역",
 					"LAST_TWO_WEEKS": "지난 14일",

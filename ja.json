@@ -173,7 +173,7 @@
 			},
 			"DETAIL": {
 				"BASE_INFO": {
-					"EDIT": "",
+					"EDIT": "編集",
 					"ON_DEMAND": "",
 					"ON_DEMAND_TOTAL_COST": "",
 					"PROJECT": "プロジェクト",
@@ -199,9 +199,9 @@
 					"TITLE": ""
 				},
 				"INTERRUPT": {
-					"AFFECTED_INSTANCE": "",
 					"AZ": "",
 					"DAY": "日",
+					"INSTANCE_TYPE": "",
 					"INTERRUPT_COUNT": "",
 					"INTERRUPT_DETAIL": "",
 					"LAST_TWO_WEEKS": "",

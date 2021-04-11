@@ -199,9 +199,9 @@
 					"TITLE": "비용"
 				},
 				"INTERRUPT": {
-					"AFFECTED_INSTANCE": "영향받은 인스턴스",
 					"AZ": "가용 영역(AZ)",
 					"DAY": "Day",
+					"INSTANCE_TYPE": "인스턴스 타입",
 					"INTERRUPT_COUNT": "인터럽트 개수",
 					"INTERRUPT_DETAIL": "인터럽트 내역",
 					"LAST_TWO_WEEKS": "지난 14일",
