@@ -177,8 +177,8 @@ export default {
             state.data = [
                 ...resp.results.map(d => ({
                     title: d.name,
-                    latitude: parseFloat(d.tags.find(tag => tag.key === 'latitude').value),
-                    longitude: parseFloat(d.tags.find(tag => tag.key === 'longitude').value),
+                    latitude: parseFloat(d.tags.latitude),
+                    longitude: parseFloat(d.tags.longitude),
                     color: state.providers[d.provider]?.color as string,
                     ...d,
                 })),

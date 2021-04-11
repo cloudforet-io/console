@@ -236,7 +236,7 @@ export default {
                 const res = await SpaceConnector.client.repository.plugin.list(params);
                 state.plugins = [
                     ...res.results.map(d => ({
-                        icon: d.tags.find(tag => tag.key === 'icon')?.value,
+                        icon: d.tags?.icon,
                         ...d,
                     })),
                 ];
