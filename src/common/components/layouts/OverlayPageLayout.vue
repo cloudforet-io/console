@@ -1,14 +1,21 @@
 <template>
-    <div class="overlay-page-layout">
-        <div class="page-wrapper">
-            <slot />
-        </div>
+    <div>
+        <transition name="slide-up">
+            <general-page-layout class="overlay-page-layout">
+                <div class="page-wrapper">
+                    <slot />
+                </div>
+            </general-page-layout>
+        </transition>
     </div>
 </template>
 
 <script lang="ts">
+import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
+
 export default {
     name: 'OverlayPageLayout',
+    components: { GeneralPageLayout },
     setup() {
         return {
         };
@@ -18,6 +25,7 @@ export default {
 
 <style lang="postcss" scoped>
 .overlay-page-layout {
+    @apply bg-white;
     position: absolute;
     display: flex;
     width: 100%;
@@ -26,6 +34,7 @@ export default {
     left: 0;
     flex-direction: column;
     z-index: 99;
+    overflow: auto;
 
     /* transition: opacity 0.3s ease; */
     max-height: 100%;
@@ -36,5 +45,17 @@ export default {
         border: none;
         flex-grow: 1;
     }
+}
+
+/* transition */
+.slide-up-enter-active {
+    transition: all 0.3s ease;
+}
+.slide-up-leave-active {
+    transition: all 0.3s ease-out;
+}
+.slide-up-enter, .slide-up-leave-to {
+    transform: translateY(100px);
+    opacity: 0;
 }
 </style>

@@ -5,7 +5,7 @@
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.TITLE') }}
             </p>
             <div class="title-right">
-                <p-button class="edit-button gray900 sm" :outline="true">
+                <p-button class="edit-button gray900 sm" :outline="true" @click="isEditVisible = true">
                     <span>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.EDIT') }}</span>
                 </p-button>
             </div>
@@ -61,6 +61,8 @@
                 </div>
             </div>
         </section>
+
+        <update-spot-group-overlay v-if="isEditVisible" :spot-group-id="spotGroup.spot_group_id" @close="isEditVisible = false" />
     </div>
 </template>
 
@@ -87,6 +89,7 @@ import SpotGroupRatioChart from '@/views/automation/spot-automation/components/S
 import { SpaceConnector } from '@/lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
+import UpdateSpotGroupOverlay from '@/views/automation/spot-automation/modules/UpdateSpotGroupOverlay.vue';
 
 am4core.useTheme(am4themes_animated);
 
@@ -101,6 +104,7 @@ interface ChartData {
 export default {
     name: 'SpotGroupBaseInfo',
     components: {
+        UpdateSpotGroupOverlay,
         SpotGroupRatioChart,
         PButton,
         PAnchor,
@@ -145,6 +149,7 @@ export default {
             chart: null as null | any,
             chartRegistry: {},
             data: [] as ChartData[],
+            isEditVisible: false,
         });
 
         const disposeChart = (ctx) => {

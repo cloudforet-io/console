@@ -110,7 +110,7 @@ import {
 import {
     ComponentRenderProxy,
     computed,
-    getCurrentInstance, onMounted,
+    getCurrentInstance,
     onUnmounted,
     reactive,
     toRefs,
@@ -124,6 +124,10 @@ import AddSection from '@/views/automation/spot-automation/components/AddSection
 
 interface Props {
     resourceId: string;
+    originOnDemand: {
+        type: SETTINGS_TYPE;
+        value: number;
+    };
 }
 
 const PADDING = 16;
@@ -143,6 +147,10 @@ export default {
         resourceId: {
             type: String,
             default: '',
+        },
+        originOnDemand: {
+            type: Object,
+            default: () => ({}),
         },
     },
     setup(props: Props, { emit }) {
@@ -168,8 +176,8 @@ export default {
             dragContainer: null as null|HTMLElement,
             dragContainerWidth: 0,
             dragContainerX: 0,
-            pxRatio: computed(() => 100 / state.dragContainerWidth),
-            padding: computed(() => state.pxRatio * PADDING),
+            pxRatio: computed(() => (state.dragContainerWidth === 0 ? 1 : 100 / state.dragContainerWidth)),
+            padding: computed(() => (state.dragContainerWidth === 0 ? PADDING : state.pxRatio * PADDING)),
             leftWidth: computed(() => {
                 let res;
                 if (state.changeDisabled) res = 0;
@@ -269,7 +277,9 @@ export default {
         });
 
         watch(() => state.dragContainer, (dragContainer) => {
-            if (dragContainer && state.dragContainerWidth === 0) onResize();
+            if (dragContainer && state.dragContainerWidth === 0) {
+                onResize();
+            }
         });
 
 
@@ -298,7 +308,9 @@ export default {
         watch(() => props.resourceId, async (resourceId) => {
             state.errored = false;
             if (resourceId) await getDesiredCapacity();
-            changeType(state.selectedType);
+            state.selectedType = props.originOnDemand.type || SETTINGS_TYPE.count;
+            state.onDemand = props.originOnDemand.value || 0;
+            emitChange();
         }, { immediate: true });
 
         return {

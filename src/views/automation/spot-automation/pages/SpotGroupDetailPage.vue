@@ -57,7 +57,6 @@ import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 
-
 export default {
     name: 'SpotGroupDetailPage',
     components: {
@@ -116,7 +115,6 @@ export default {
         };
 
         const openSpotGroupEditModal = () => {
-            console.log('open edit modal');
         };
         const updateSpotGroup = async () => {
             console.log('update spot group');

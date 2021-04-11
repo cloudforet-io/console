@@ -36,15 +36,15 @@
             </p-button>
         </div>
 
-        <spot-group-create-check-modal :visible.sync="visibleCheckModal"
-                                       :category="category ? category.label : ''"
-                                       :selected-resource="selectedResource"
-                                       :name="name"
-                                       :recommend-types="recommendTypes"
-                                       :on-demand="onDemand"
-                                       :spot-instance="spotInstance"
-                                       :on-demand-type="onDemandType"
-                                       @confirm="onCheckConfirm"
+        <spot-group-check-modal :visible.sync="visibleCheckModal"
+                                :category="category ? category.label : ''"
+                                :selected-resource="selectedResource"
+                                :name="name"
+                                :recommend-types="recommendTypes"
+                                :on-demand="onDemand"
+                                :spot-instance="spotInstance"
+                                :on-demand-type="onDemandType"
+                                @confirm="onCheckConfirm"
         />
     </general-page-layout>
 </template>
@@ -63,7 +63,7 @@ import InstanceTypeSelection from '@/views/automation/spot-automation/modules/In
 import { SETTINGS_TYPE } from '@/views/automation/spot-automation/lib/config';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
-import SpotGroupCreateCheckModal from '@/views/automation/spot-automation/modules/SpotGroupCreateCheckModal.vue';
+import SpotGroupCheckModal from '@/views/automation/spot-automation/modules/SpotGroupCheckModal.vue';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import ServiceCategorySelection from '@/views/automation/spot-automation/modules/ServiceCategorySelection.vue';
 import { SpotGroupResourceCategory } from '@/views/automation/spot-automation/type';
@@ -72,7 +72,7 @@ export default {
     name: 'AddSpotGroupPage',
     components: {
         ServiceCategorySelection,
-        SpotGroupCreateCheckModal,
+        SpotGroupCheckModal,
         InstanceTypeSelection,
         SchedulePolicySettings,
         BaseInformationInput,
@@ -99,21 +99,15 @@ export default {
             isSchedulePolicyValid: false,
             recommendTypes: [] as string[],
             isRecommendTypesValid: false,
-            options: computed(() => {
-                const res: any = {};
-                if (state.onDemandType === SETTINGS_TYPE.ratio) {
-                    // eslint-disable-next-line camelcase
-                    res.min_ondemand_ratio = state.onDemand;
-                } else {
-                    // eslint-disable-next-line camelcase
-                    res.min_ondemand_size = state.onDemand;
-                }
-
+            options: computed(() => ({
                 // eslint-disable-next-line camelcase
-                res.recommend_types = state.recommendTypes;
-
-                return res;
-            }),
+                min_ondemand: {
+                    type: state.onDemandType,
+                    value: state.onDemand,
+                },
+                // eslint-disable-next-line camelcase
+                candidate_types: state.recommendTypes,
+            })),
             isAllValid: computed(() => state.isResourceValid && state.isSchedulePolicyValid && state.isRecommendTypesValid && state.isBaseInfoValid),
             loading: false,
             visibleCheckModal: false,

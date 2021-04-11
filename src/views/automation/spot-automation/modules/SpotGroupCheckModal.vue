@@ -10,19 +10,19 @@
         <template #body>
             <table class="check-table">
                 <tbody>
-                    <tr>
+                    <tr v-if="!editMode">
                         <td>{{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CHECK_MODAL.CLOUD_SERVICE_CATEGORY_LABEL') }}</td>
                         <td>
                             {{ category }}
                         </td>
                     </tr>
-                    <tr>
+                    <tr v-if="!editMode">
                         <td>{{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CHECK_MODAL.RESOURCE_NAME_LABEL') }}</td>
                         <td>
                             {{ selectedResource.data.auto_scaling_group_name }}
                         </td>
                     </tr>
-                    <tr>
+                    <tr v-if="!editMode">
                         <td>{{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CHECK_MODAL.SPOT_GROUP_LABEL') }}</td>
                         <td>
                             {{ name }}
@@ -76,10 +76,11 @@ interface Props {
     onDemand: number;
     spotInstance: number;
     onDemandType: SETTINGS_TYPE;
+    editMode: boolean;
 }
 
 export default {
-    name: 'SpotGroupCreateCheckModal',
+    name: 'SpotGroupCheckModal',
     components: {
         PButtonModal,
         PI,
@@ -117,6 +118,10 @@ export default {
         onDemandType: {
             type: String,
             default: SETTINGS_TYPE.count,
+        },
+        editMode: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: Props, { emit }) {

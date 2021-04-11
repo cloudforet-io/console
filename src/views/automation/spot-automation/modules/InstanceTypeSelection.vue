@@ -69,6 +69,7 @@ import AddSection from '@/views/automation/spot-automation/components/AddSection
 interface Props {
     resourceId: string;
     resourceType: string;
+    originCandidates: string[];
 }
 
 type CandidateTuple = [string, {
@@ -96,6 +97,10 @@ export default {
         resourceType: {
             type: String,
             default: '',
+        },
+        originCandidates: {
+            type: Array,
+            default: () => [],
         },
     },
     setup(props: Props, { emit }) {
@@ -126,14 +131,14 @@ export default {
             emitChange();
         };
 
-        const candidates = new Map<string, {[size: string]: number}>();
+        const candidates = new Map<string, {[type: string]: number}>();
         const types = new Set<string>();
         const setVariables = (items) => {
             candidates.clear();
             types.clear();
 
             state.optimizedTypes = {};
-            state.selectedTypes = {};
+            if (props.originCandidates.length === 0) state.selectedTypes = {};
 
             items.forEach(({ type: str, priority }) => {
                 const idx = str.indexOf('.');
@@ -150,6 +155,21 @@ export default {
                 if (priority === 0) {
                     if (state.optimizedTypes[size]) state.optimizedTypes[size].push(type);
                     else state.optimizedTypes[size] = [type];
+                }
+            });
+
+            forEach(state.selectedTypes, (typeArr, size) => {
+                if (!candidates.has(size)) {
+                    typeArr.forEach((t) => {
+                        candidates.set(size, { [t]: 1 });
+                        types.add(t);
+                    });
+                } else {
+                    const exists: any = candidates.get(size);
+                    typeArr.forEach((t) => {
+                        exists[t] = exists[t] === undefined ? 1 : exists[t];
+                        if (!types.has(t)) types.add(t);
+                    });
                 }
             });
 
@@ -226,11 +246,24 @@ export default {
             emitChange();
         };
 
+        const setOriginData = () => {
+            props.originCandidates.forEach((str) => {
+                const idx = str.indexOf('.');
+                const size = str.slice(idx + 1);
+                const type = str.slice(0, idx);
+
+                if (state.selectedTypes[size]) state.selectedTypes[size].push(type);
+                else state.selectedTypes[size] = [type];
+            });
+            state.isOptimized = false;
+        };
 
         watch(() => props.resourceId, async (resourceId) => {
             state.errored = false;
             if (resourceId) {
                 state.selectedTypes = {};
+                if (props.originCandidates.length > 0) setOriginData();
+
                 state.optimizedTypes = {};
                 emitChange();
                 await getCandidates();

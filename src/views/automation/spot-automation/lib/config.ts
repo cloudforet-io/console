@@ -1,6 +1,6 @@
 export enum SETTINGS_TYPE {
-    ratio = 'ratio',
-    count = 'count'
+    ratio = 'RATIO',
+    count = 'COUNT'
 }
 
 export enum INSTANCE_STATE {
