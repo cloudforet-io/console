@@ -71,21 +71,60 @@ import timezone from 'dayjs/plugin/timezone';
 import { store } from '@/store';
 import { Tags, TimeStamp } from '@/models';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
+import { makeDistinctValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 
 dayjs.extend(timezone);
 
 // TODO: change handlers with spot automation spec
-const handlers = makeQuerySearchPropsWithSearchSchema(
-    [{
+const handlers = {
+    keyItemSets: [{
         title: 'Filters',
         items: [
-            { key: 'cloud_service_id', name: 'Cloud Service ID', reference: 'inventory.CloudService' },
-            { key: 'provider', name: 'Provider', reference: 'identity.Provider' },
-            { key: 'project_id', name: 'Project', reference: 'identity.Project' },
+            {
+                name: 'spot_group_id',
+                label: 'Spot Group ID',
+            },
+            {
+                name: 'name',
+                label: 'Name',
+            },
+            {
+                name: 'resource_id',
+                label: 'Resource ID',
+            },
+            {
+                name: 'provider',
+                label: 'Provider',
+            },
+            {
+                name: 'region',
+                label: 'Region',
+            },
+            {
+                name: 'project',
+                label: 'Project',
+            },
+            {
+                name: 'created_at',
+                label: 'Created At',
+            },
+            {
+                name: 'created_by',
+                label: 'Created By',
+            },
         ],
     }],
-    'inventory.CloudService',
-);
+    valueHandlerMap: {
+        spot_group_id: makeDistinctValueHandler('spot_automation.SpotGroup', 'spot_group_id'),
+        name: makeDistinctValueHandler('spot_automation.SpotGroup', 'name'),
+        provider: makeReferenceValueHandler('identity.Provider'),
+        region: makeReferenceValueHandler('inventory.Region'),
+        project: makeReferenceValueHandler('identity.Project'),
+        resource_id: makeDistinctValueHandler('spot_automation.SpotGroup', 'resource_id'),
+        created_at: makeDistinctValueHandler('spot_automation.SpotGroup', 'created_at'),
+        created_by: makeDistinctValueHandler('spot_automation.SpotGroup', 'created_by'),
+    },
+};
 
 interface Options {
     min_ondemand_ratio: number;
