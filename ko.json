@@ -169,7 +169,7 @@
 				},
 				"SELECT_RESOURCE": "리소스를 선택하면 설정이 가능합니다.",
 				"TRY_AGAIN": "다시 시도",
-				"TRY_AGAIN_DESC": "문제가 발생하여 데이터를 가져오지 못했습니다."
+				"TRY_AGAIN_DESC": "리소스 정보를 불러오지 못했습니다. 도메인 어드민에게 문의해주세요."
 			},
 			"DETAIL": {
 				"BASE_INFO": {
