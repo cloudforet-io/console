@@ -200,6 +200,12 @@
 					"SPOT_SAVINGS": "스팟으로 절감한 비용",
 					"TITLE": "비용"
 				},
+				"EDIT": {
+					"ALT_E_EDIT_SPOT_GROUP": "스팟 그룹 편집 실패",
+					"ALT_S_EDIT_SPOT_GROUP": "스팟 그룹 편집 완료",
+					"SAVE": "저장",
+					"TITLE": "스팟그룹"
+				},
 				"INTERRUPT": {
 					"AZ": "가용 영역(AZ)",
 					"DAY": "일",
