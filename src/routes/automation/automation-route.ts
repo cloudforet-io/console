@@ -72,9 +72,8 @@ export default {
                     ],
                 },
                 {
-                    path: 'spot-group/add',
+                    path: 'spot-group/add/:projectId?',
                     name: 'addSpotGroup',
-                    props: true,
                     component: AddSpotGroupPage,
                 },
                 {

@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <add-section :title="$t('AUTOMATION.SPOT_AUTOMATION.ADD.BASE_INFO.LABEL')">
         <p-field-group required
                        :label="$t('AUTOMATION.SPOT_AUTOMATION.ADD.BASE_INFO.NAME_LABEL')"
                        :invalid="!isNameValid"
@@ -49,7 +49,7 @@
                 </tags-input-group>
             </template>
         </p-field-group>
-    </div>
+    </add-section>
 </template>
 
 <script lang="ts">
@@ -61,10 +61,8 @@ import {
 } from '@vue/composition-api';
 import TagsInputGroup from '@/common/components/tags-input-group/TagsInputGroup.vue';
 import { makeProxy } from '@/lib/compostion-util';
+import AddSection from '@/views/automation/spot-automation/components/AddSection.vue';
 
-interface Props {
-    showValidation: boolean;
-}
 
 // eslint-disable-next-line no-useless-escape
 const nameRegex = new RegExp(/^[^\s\d\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"][^\{\}\[\]\/?.,;:|\)*~`!^\_+<>@\#$%&\\\=\(\'\"]{0,56}$/);
@@ -72,24 +70,19 @@ const nameRegex = new RegExp(/^[^\s\d\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'
 export default {
     name: 'BaseInformationInput',
     components: {
+        AddSection,
         PFieldGroup,
         PTextInput,
         PIconTextButton,
         TagsInputGroup,
         PI,
     },
-    props: {
-        showValidation: {
-            type: Boolean,
-            default: false,
-        },
-    },
-    setup(props: Props, { emit }) {
+    setup(props, { emit }) {
         const state = reactive({
             name: '',
             isTagsFolded: true,
             tags: [],
-            showNameValidation: props.showValidation,
+            showNameValidation: false,
             showTagsValidation: true,
             isNameValid: computed(() => (!state.showNameValidation || nameRegex.test(state.name))),
             isTagsValid: true,
@@ -114,13 +107,6 @@ export default {
             }
         };
 
-        watch(() => props.showValidation, (showValidation) => {
-            state.showNameValidation = showValidation;
-            state.showTagsValidation = showValidation;
-            if (!state.isTagsValid) {
-                state.isTagsFolded = false;
-            }
-        });
         return {
             ...toRefs(state),
             emitChange,

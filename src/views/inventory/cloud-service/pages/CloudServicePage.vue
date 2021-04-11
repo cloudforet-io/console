@@ -522,7 +522,7 @@ export default {
                     name: d.name,
                     type: d.resource_type,
                 }));
-                sidebarState.iconUrl = res.results[0].tags.find(tag => tag.key === 'spaceone:icon').value;
+                sidebarState.iconUrl = res.results[0].tags['spaceone:icon'] || '';
                 sidebarState.group = res.results[0].group;
             } catch (e) {
                 console.error(e);

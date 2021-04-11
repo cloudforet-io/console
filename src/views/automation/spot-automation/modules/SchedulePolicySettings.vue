@@ -1,5 +1,9 @@
 <template>
-    <div class="schedule-policy-settings">
+    <add-section :title="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.LABEL')"
+                 :empty-text="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SELECT_RESOURCE')"
+                 :is-empty="!resourceId"
+                 class="schedule-policy-settings"
+    >
         <p-field-group required :label="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_TYPE_LABEL')">
             <div class="mt-2">
                 <p-radio v-for="(item, i) in supportedSettingsTypeItems" :key="i"
@@ -93,7 +97,7 @@
                 </div>
             </div>
         </p-field-group>
-    </div>
+    </add-section>
 </template>
 
 <script lang="ts">
@@ -113,6 +117,7 @@ import { SETTINGS_TYPE } from '@/views/automation/spot-automation/config';
 import { throttle } from 'lodash';
 import TryAgainButton from '@/views/automation/spot-automation/components/TryAgainButton.vue';
 import { SpaceConnector } from '@/lib/space-connector';
+import AddSection from '@/views/automation/spot-automation/components/AddSection.vue';
 
 interface Props {
     resourceId: string;
@@ -123,6 +128,7 @@ const PADDING = 16;
 export default {
     name: 'SchedulePolicySettings',
     components: {
+        AddSection,
         TryAgainButton,
         PFieldGroup,
         PRadio,

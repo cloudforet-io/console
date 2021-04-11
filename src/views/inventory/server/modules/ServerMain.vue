@@ -276,7 +276,7 @@ export default {
         const tableState = reactive({
             schema: null as null|DynamicLayout,
             items: [],
-            selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
+            selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d]).filter(d => d !== undefined)),
             consoleLink: computed(() => get(tableState.selectedItems[0], 'reference.external_link')),
             dropdown: computed<MenuItem[]>(() => [
                 {
@@ -367,10 +367,10 @@ export default {
         });
         const monitoringState: MonitoringProps = reactive({
             resourceType: 'inventory.Server',
-            resources: computed(() => tableState.selectedItems.map(d => ({
+            resources: computed<MonitoringResourceType[]>(() => tableState.selectedItems.map(d => ({
                 id: get(d, 'server_id'),
                 name: d.name,
-            }))) as unknown as MonitoringResourceType[],
+            }))),
         });
 
         /* util */

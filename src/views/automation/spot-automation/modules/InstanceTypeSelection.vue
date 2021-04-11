@@ -1,5 +1,8 @@
 <template>
-    <div>
+    <add-section :title="$t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.LABEL')"
+                 :empty-text="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SELECT_RESOURCE')"
+                 :is-empty="!resourceId"
+    >
         <div class="toggle-wrapper" :class="{optimized: isOptimized}">
             <p-toggle-button :value="isOptimized" sync @change="onToggleChange" />
             <span class="label">{{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.OPTIMIZED_TYPE') }}</span>
@@ -24,8 +27,11 @@
                                 {{ size }}
                             </th>
                             <template v-for="(type, idx) in types">
-                                <td :key="idx" :class="{'has-optimized': optimizedTypes[size] && optimizedTypeList.includes(type)}">
+                                <td :key="idx"
+                                    :class="{'has-optimized': optimizedTypes[size] && optimizedTypeList.includes(type)}"
+                                >
                                     <p-check-box v-if="items[type] !== undefined"
+                                                 v-tooltip.bottom="`${type}.${size}`"
                                                  :selected="checkedTypes[size] && checkedTypes[size].includes(type)"
                                                  @change="onSelect(size, type, ...arguments)"
                                     />
@@ -45,7 +51,7 @@
         <p v-if="!errored && !loading && showSelectValidation && !isValid" class="invalid-text">
             {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.ONE_MORE_REQUIRED') }}
         </p>
-    </div>
+    </add-section>
 </template>
 
 <script lang="ts">
@@ -58,11 +64,11 @@ import {
     cloneDeep, remove, forEach, isEmpty, sortBy, flatMap, uniq,
 } from 'lodash';
 import TryAgainButton from '@/views/automation/spot-automation/components/TryAgainButton.vue';
+import AddSection from '@/views/automation/spot-automation/components/AddSection.vue';
 
 interface Props {
     resourceId: string;
     resourceType: string;
-    showValidation: boolean;
 }
 
 type CandidateTuple = [string, {
@@ -76,7 +82,11 @@ interface SelectedType {
 export default {
     name: 'InstanceTypeSelection',
     components: {
-        TryAgainButton, PToggleButton, PCheckBox, PLottie,
+        AddSection,
+        TryAgainButton,
+        PToggleButton,
+        PCheckBox,
+        PLottie,
     },
     props: {
         resourceId: {
@@ -86,10 +96,6 @@ export default {
         resourceType: {
             type: String,
             default: '',
-        },
-        showValidation: {
-            type: Boolean,
-            default: false,
         },
     },
     setup(props: Props, { emit }) {
@@ -103,7 +109,7 @@ export default {
             optimizedTypes: {} as SelectedType,
             optimizedTypeList: computed(() => uniq(flatMap(state.optimizedTypes))),
             checkedTypes: computed(() => (state.isOptimized ? state.optimizedTypes : state.selectedTypes)),
-            showSelectValidation: props.showValidation,
+            showSelectValidation: false,
             isValid: computed(() => !state.errored && !isEmpty(state.checkedTypes)),
         });
 
@@ -220,9 +226,6 @@ export default {
             emitChange();
         };
 
-        watch(() => props.showValidation, (showValidation) => {
-            state.showSelectValidation = showValidation;
-        });
 
         watch(() => props.resourceId, async (resourceId) => {
             state.errored = false;
@@ -270,14 +273,15 @@ export default {
     min-height: 12rem;
 }
 table {
-    min-width: 100%;
     border-collapse: separate;
     border-spacing: 0;
     table-layout: fixed;
     tr {
         display: flex;
         &:hover {
-            @apply bg-secondary2;
+            th, td {
+                @apply bg-secondary2;
+            }
         }
     }
     th, td {
@@ -313,7 +317,7 @@ table {
 }
 .invalid-cover {
     @apply absolute w-full h-full overflow-hidden border border-alert;
-    background-color: rgba(theme('colors.red.100'), 0.3);
+    //background-color: rgba(theme('colors.red.100'), 0.3);
     pointer-events: none;
     top: 0;
     z-index: 1;

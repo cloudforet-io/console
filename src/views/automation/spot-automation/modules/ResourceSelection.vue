@@ -1,40 +1,18 @@
 <template>
-    <div>
-        <p-field-group required class="field-group">
-            <template #label>
-                <span class="label">{{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CLOUD_SERVICE.SERVICE_CATEGORY_LABEL') }}</span>
-            </template>
-            <section class="resource-type-list">
-                <div v-for="(item, i) in supportedResourceTypeItems" :key="i" class="resource-type-wrapper"
-                     :class="{selected: item.name === selectedResourceTypeItem.name}"
-                     @click="onSelectResourceType(i)"
-                >
-                    <p-radio :selected="item.name === selectedResourceTypeItem.name" :value="true" class="radio"
-                             @click.stop="onSelectResourceType(i)"
-                    >
-                        <template #icon>
-                            <p-i v-if="item.name === selectedResourceTypeItem.name"
-                                 name="ic_checkbox_circle--checked"
-                            />
-                        </template>
-                    </p-radio>
-                    <div class="resource-type">
-                        <p-lazy-img :src="item.data.icon" />
-                        <br>
-                        <span class="name">{{ item.label }}</span>
-                    </div>
-                </div>
-            </section>
-        </p-field-group>
-
+    <add-section>
+        <template #title>
+            {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.RESOURCE.LABEL') }}
+            <span class="title-desc">
+                <p-i name="ic_outlined-info" color="inherit" height="1em"
+                     width="1em"
+                />
+                {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.RESOURCE.RESOURCE_DESC') }}
+            </span>
+        </template>
         <p-field-group required class="field-group" :invalid="typeOptionState.invalid"
-                       :invalid-text="$t('AUTOMATION.SPOT_AUTOMATION.ADD.CLOUD_SERVICE.RESOURCE_REQUIRED')"
+                       :invalid-text="$t('AUTOMATION.SPOT_AUTOMATION.ADD.RESOURCE.RESOURCE_REQUIRED')"
         >
-            <template #label>
-                <span class="label">{{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CLOUD_SERVICE.RESOURCE_LABEL') }}</span>
-            </template>
-
-            <div v-if="schema">
+            <template v-if="schema">
                 <p-dynamic-layout type="query-search-table"
                                   class="resource-table"
                                   :options="schema.options"
@@ -45,18 +23,18 @@
                                   @fetch="onFetchTable"
                                   @select="onSelectTable"
                 />
-            </div>
+            </template>
         </p-field-group>
-    </div>
+    </add-section>
 </template>
 
 <script lang="ts">
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { camelCase, forEach, map } from 'lodash';
+import { camelCase, forEach } from 'lodash';
 import {
-    PDynamicLayout, PFieldGroup, PI, PLazyImg, PRadio,
+    PDynamicLayout, PFieldGroup, PI,
 } from '@spaceone/design-system';
 import { store } from '@/store';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
@@ -71,43 +49,31 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { SpotGroupResourceCategory } from '@/views/automation/spot-automation/type';
+import AddSection from '@/views/automation/spot-automation/components/AddSection.vue';
 
-interface SupportResourceGroupTypes {
-    [resourceType: string]: {
-        name: string;
-        // eslint-disable-next-line camelcase
-        recommended_title: string;
-        icon: string;
-    };
-}
-interface SelectedResourceTypeItem {
-    label: string;
-    name: string;
-    type: 'item';
-    data: {
-        resourceType?: string;
-        options: object;
-        icon?: string;
-    };
-}
 
 interface Props {
-    showValidation: boolean;
+    projectId?: string;
+    category?: SpotGroupResourceCategory|null;
 }
 
 export default {
     name: 'ResourceSelection',
     components: {
+        AddSection,
         PDynamicLayout,
         PFieldGroup,
-        PRadio,
         PI,
-        PLazyImg,
     },
     props: {
-        showValidation: {
-            type: Boolean,
-            default: false,
+        projectId: {
+            type: String,
+            default: '',
+        },
+        category: {
+            type: Object,
+            default: null,
         },
     },
     setup(props: Props, { emit }) {
@@ -136,45 +102,17 @@ export default {
         });
 
         const state = reactive({
-            showSelectValidation: props.showValidation,
-            supportedResourceTypes: {} as SupportResourceGroupTypes,
-            supportedResourceTypeItems: computed<SelectedResourceTypeItem[]>(() => map(state.supportedResourceTypes, (d, k) => {
-                const options: any = {};
-                const queryString = k.split('?')[1] || '';
-                if (queryString) {
-                    const optionsSplit = queryString?.split('&');
-                    optionsSplit.forEach((op) => {
-                        if (op) {
-                            const str = op.split('=');
-                            options[str[0]] = str[1];
-                        }
-                    });
-                }
-
-                const res: SelectedResourceTypeItem = {
-                    label: d.name,
-                    name: k,
-                    type: 'item',
-                    data: {
-                        options,
-                        resourceType: k.split('?')[0],
-                        icon: d.icon,
-                    },
-                };
-
-                return res;
-            })),
-            selectedResourceTypeIndex: 0,
-            selectedResourceTypeItem: computed<SelectedResourceTypeItem|null>(() => state.supportedResourceTypeItems[state.selectedResourceTypeIndex] || null),
+            showSelectValidation: false,
             schema: null as any,
             data: null as any,
             selectedResource: null as any,
-            occupiedResources: {},
+            occupiedResources: [] as any[],
         });
 
         const apiQuery = new ApiQueryHelper();
         const tableQueryHelper = new QueryHelper();
-        const extraQueryHelper = new QueryHelper();
+        const schemaOptionsQueryHelper = new QueryHelper();
+        const excludeResourceQueryHelper = new QueryHelper();
 
         const fieldHandler: DynamicLayoutFieldHandler<Record<'reference', Reference>> = (field) => {
             if (field.extraData?.reference) {
@@ -185,17 +123,18 @@ export default {
 
 
         const listResources = async () => {
-            if (!state.selectedResourceTypeItem.data) return;
+            if (!props.category?.resourceType) return;
 
             typeOptionState.loading = true;
             try {
                 let api = SpaceConnector.client;
-                state.selectedResourceTypeItem.data.resourceType.split('.').forEach((d) => {
+                props.category.resourceType.split('.').forEach((d) => {
                     api = api[camelCase(d)];
                 });
 
                 apiQuery.setFilters(tableQueryHelper.filters)
-                    .addFilter(...extraQueryHelper.filters);
+                    .addFilter(...schemaOptionsQueryHelper.filters)
+                    .addFilter(...excludeResourceQueryHelper.filters);
 
                 const res = await api.list({
                     query: apiQuery.data,
@@ -234,52 +173,40 @@ export default {
             await listResources();
         };
 
-        const onSelectTable = (selectIdx) => {
-            if (!state.showSelectValidation) state.showSelectValidation = true;
+        const changeSelect = (selectIdx) => {
             if (!Array.isArray(state.data)) state.selectedResource = null;
             else state.selectedResource = state.data[selectIdx[0]] || null;
 
             emit('change', {
-                category: state.selectedResourceTypeItem?.label,
                 resource: state.selectedResource,
-                resourceType: state.selectedResourceTypeItem?.data.resourceType,
+                resourceType: props.category?.resourceType,
             },
             !typeOptionState.invalid);
         };
 
-        const onSelectResourceType = (i) => {
-            state.selectedResourceTypeIndex = i;
-            typeOptionState.selectIndex = [];
-            onSelectTable(typeOptionState.selectIndex);
+        const onSelectTable = (selectIdx) => {
+            if (!state.showSelectValidation) state.showSelectValidation = true;
+            typeOptionState.selectIndex = selectIdx;
+            changeSelect(selectIdx);
         };
 
-        const getSupportedResourceTypes = async () => {
-            try {
-                state.supportedResourceTypes = await SpaceConnector.client.spotAutomation.spotGroup.getSupportedResourceTypes();
-            } catch (e) {
-                console.error(e);
-                state.supportedResourceTypes = {};
-                state.schema = null;
-                typeOptionState.selectIndex = [];
-            }
-        };
 
         const getSchemaOptions = () => {
-            extraQueryHelper.setFilters([]);
-            const options = state.selectedResourceTypeItem?.data.options || {};
+            schemaOptionsQueryHelper.setFilters([]);
+            const options = props.category?.options || {};
             forEach(options, (d, k) => {
-                extraQueryHelper.addFilter({ k, v: d, o: '=' });
+                schemaOptionsQueryHelper.addFilter({ k, v: d, o: '=' });
             });
 
             return options;
         };
 
         const getPageSchema = async () => {
-            if (!state.selectedResourceTypeItem) return;
+            if (!props.category?.resourceType) return;
 
             try {
                 state.schema = await SpaceConnector.client.addOns.pageSchema.get({
-                    resource_type: state.selectedResourceTypeItem.data.resourceType,
+                    resource_type: props.category.resourceType,
                     schema: 'table',
                     options: getSchemaOptions(),
                 });
@@ -288,7 +215,7 @@ export default {
 
                 const querySearchProps = makeQuerySearchPropsWithSearchSchema(
                     state.schema.options.search,
-                    state.selectedResourceTypeItem.data.resourceType,
+                    props.category.resourceType,
                 );
                 typeOptionState.keyItemSets = querySearchProps.keyItemSets;
                 typeOptionState.valueHandlerMap = querySearchProps.valueHandlerMap;
@@ -308,29 +235,46 @@ export default {
         };
 
         const getOccupiedResourceList = async () => {
-            state.occupiedResources = {};
             try {
                 const { results } = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupResources();
-                results.forEach((d) => {
-                    state.occupiedResources[d.cloud_service_id] = true;
-                });
+                state.occupiedResources = results.map(d => d.cloud_service_id);
+                if (state.occupiedResources.length > 0) {
+                    excludeResourceQueryHelper.setFilters([{
+                        k: 'cloud_service_id',
+                        v: state.occupiedResources,
+                        o: '!=',
+                    }]);
+                } else { excludeResourceQueryHelper.setFilters([]); }
             } catch (e) {
-
+                state.occupiedResources = [];
             }
         };
 
-        watch(() => props.showValidation, (showValidation) => {
-            state.showSelectValidation = showValidation;
-        });
-
         /* Init */
         (async () => {
-            await Promise.all([getSupportedResourceTypes(), getOccupiedResourceList(), store.dispatch('resource/loadAll', true)]);
+            await Promise.all([getOccupiedResourceList(), store.dispatch('resource/loadAll', true)]);
 
-            watch(() => state.selectedResourceTypeItem, async (item) => {
-                if (item) {
+
+            // set project tag
+            if (props.projectId) {
+                fetchOptionState.queryTags.push({
+                    key: { name: 'project_id', label: 'Project' },
+                    operator: '=',
+                    value: { name: props.projectId, label: store.state.resource.project.items[props.projectId]?.label || props.projectId },
+                } as unknown as QueryTag);
+            }
+
+            watch(() => props.category, async (after, before) => {
+                if (after !== before) {
+                    typeOptionState.selectIndex = [];
+                    changeSelect(typeOptionState.selectIndex);
+                }
+                if (after) {
                     await getPageSchema();
                     await onFetchTable(fetchOptionState);
+                } else {
+                    state.schema = null;
+                    typeOptionState.selectIndex = [];
                 }
             }, { immediate: true });
         })();
@@ -343,13 +287,17 @@ export default {
             fieldHandler,
             onFetchTable,
             onSelectTable,
-            onSelectResourceType,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
+.title-desc {
+    @apply text-gray-700;
+    font-size: 0.75rem;
+    line-height: 1.5;
+}
 .field-group {
     margin-bottom: 0;
     &:first-child {
@@ -367,39 +315,6 @@ export default {
     row-gap: 0.5rem;
     column-gap: 0.5rem;
     grid-template-columns: repeat(auto-fit, 16.5rem);
-}
-.resource-type-wrapper {
-    @apply bg-white border-gray-200 text-gray-900;
-    position: relative;
-    border-width: 1px;
-    border-radius: 4px;
-    min-width: 7.375rem;
-    max-width: 16.5rem;
-    padding: 2rem 0.5rem;
-    cursor: pointer;
-    &.selected {
-        @apply border-secondary text-secondary;
-    }
-    .radio {
-        @apply absolute;
-        left: 0.75rem;
-        top: 0.75rem;
-    }
-    .resource-type {
-        @apply flex flex-col items-center justify-center;
-    }
-    .name {
-        color: inherit;
-        font-size: 0.875rem;
-        font-weight: bold;
-        line-height: 1.2;
-    }
-
-    @media (hover: hover) {
-        &:hover {
-            @apply bg-secondary2;
-        }
-    }
 }
 .resource-table::v-deep .p-toolbox-table .p-toolbox {
     padding-left: 0;
