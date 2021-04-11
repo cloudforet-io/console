@@ -9,6 +9,9 @@
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.RESOURCE.RESOURCE_DESC') }}
             </span>
         </template>
+        <div v-if="selectedResource" class="select-item">
+            <strong>Name</strong>: {{ selectedResource.data.auto_scaling_group_name }}
+        </div>
         <p-field-group required class="field-group" :invalid="typeOptionState.invalid"
                        :invalid-text="$t('AUTOMATION.SPOT_AUTOMATION.ADD.RESOURCE.RESOURCE_REQUIRED')"
         >
@@ -297,6 +300,15 @@ export default {
     @apply text-gray-700;
     font-size: 0.75rem;
     line-height: 1.5;
+}
+.select-item {
+    @apply border border-secondary text-secondary;
+    padding: 0.75rem 1rem;
+    font-size: 0.875rem;
+    line-height: 1.4;
+    width: fit-content;
+    margin: 1.5rem 0;
+    border-radius: 4px;
 }
 .field-group {
     margin-bottom: 0;

@@ -12,18 +12,20 @@
                 </div>
             </p-empty>
         </slot>
-        <slot v-else />
+        <div v-else>
+            <slot name="default" />
+        </div>
     </p-pane-layout>
 </template>
 
 <script lang="ts">
-import {PEmpty, PPaneLayout} from '@spaceone/design-system';
+import { PEmpty, PPaneLayout } from '@spaceone/design-system';
 
 export default {
     name: 'AddSection',
     components: {
         PPaneLayout,
-        PEmpty
+        PEmpty,
     },
     props: {
         title: {

@@ -94,7 +94,7 @@
 import SpotInterruptChart from '@/views/automation/spot-automation/components/SpotInterruptChart.vue';
 import OnDemandAndSpotChart from '@/views/automation/spot-automation/components/OnDemandAndSpotChart.vue';
 import { PI } from '@spaceone/design-system';
-import { INSTANCE_STATE } from '@/views/automation/spot-automation/config';
+import { INSTANCE_STATE } from '@/views/automation/spot-automation/lib/config';
 
 export default {
     name: 'SpotGroupCardDesktop',

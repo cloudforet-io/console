@@ -62,10 +62,8 @@ import {
 import TagsInputGroup from '@/common/components/tags-input-group/TagsInputGroup.vue';
 import { makeProxy } from '@/lib/compostion-util';
 import AddSection from '@/views/automation/spot-automation/components/AddSection.vue';
+import {spotGroupNameRegex} from "@/views/automation/spot-automation/lib/validations";
 
-
-// eslint-disable-next-line no-useless-escape
-const nameRegex = new RegExp(/^[^\s\d\{\}\[\]\/?.,;:|\)*~`!^\-_+<>@\#$%&\\\=\(\'\"][^\{\}\[\]\/?.,;:|\)*~`!^\_+<>@\#$%&\\\=\(\'\"]{0,56}$/);
 
 export default {
     name: 'BaseInformationInput',
@@ -84,7 +82,7 @@ export default {
             tags: [],
             showNameValidation: false,
             showTagsValidation: true,
-            isNameValid: computed(() => (!state.showNameValidation || nameRegex.test(state.name))),
+            isNameValid: computed(() => (!state.showNameValidation || spotGroupNameRegex.test(state.name))),
             isTagsValid: true,
             isAllValid: computed(() => state.isNameValid && state.isTagsValid),
         });

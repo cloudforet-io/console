@@ -60,7 +60,7 @@ import ResourceSelection from '@/views/automation/spot-automation/modules/Resour
 import BaseInformationInput from '@/views/automation/spot-automation/modules/BaseInformationInput.vue';
 import SchedulePolicySettings from '@/views/automation/spot-automation/modules/SchedulePolicySettings.vue';
 import InstanceTypeSelection from '@/views/automation/spot-automation/modules/InstanceTypeSelection.vue';
-import { SETTINGS_TYPE } from '@/views/automation/spot-automation/config';
+import { SETTINGS_TYPE } from '@/views/automation/spot-automation/lib/config';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 import SpotGroupCreateCheckModal from '@/views/automation/spot-automation/modules/SpotGroupCreateCheckModal.vue';

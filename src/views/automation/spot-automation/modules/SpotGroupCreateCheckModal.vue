@@ -65,7 +65,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
-import { SETTINGS_TYPE } from '@/views/automation/spot-automation/config';
+import { SETTINGS_TYPE } from '@/views/automation/spot-automation/lib/config';
 
 interface Props {
     visible: boolean;
