@@ -5,7 +5,7 @@
             <div class="top-wrapper">
                 <p-page-title :title="spotGroup.name" child @goBack="$router.go(-1)" />
                 <div class="button-group">
-                    <p-icon-button name="ic_transhcan"
+                    <p-icon-button name="ic_trashcan"
                                    class="delete-button"
                                    @click="openSpotGroupDeleteModal"
                     />
@@ -111,8 +111,15 @@ export default {
         const openSpotGroupDeleteModal = () => {
             console.log('open delete modal');
         };
+        const deleteSpotGroup = async () => {
+            console.log('delete spot group');
+        };
+
         const openSpotGroupEditModal = () => {
             console.log('open edit modal');
+        };
+        const updateSpotGroup = async () => {
+            console.log('update spot group');
         };
 
         return {

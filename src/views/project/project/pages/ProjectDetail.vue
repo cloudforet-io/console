@@ -11,7 +11,7 @@
                                          resource-type="identity.Project"
                         />
                     </span>
-                    <p-icon-button name="ic_transhcan"
+                    <p-icon-button name="ic_trashcan"
                                    class="delete-btn"
                                    @click="openProjectDeleteForm"
                     />
