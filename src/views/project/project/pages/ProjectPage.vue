@@ -12,7 +12,7 @@
                     <div class="sidebar-item-wrapper">
                         <sidebar-title :title="$t('PROJECT.LANDING.FAVORITES')">
                             <template #extra>
-                                &nbsp;<span class="count">({{ favoriteItems.length }})</span>
+                                <span class="count">({{ favoriteItems.length }})</span>
                             </template>
                         </sidebar-title>
                         <favorite-list :items="favoriteItems" :before-route="beforeFavoriteRoute" @delete="onFavoriteDelete">
@@ -333,7 +333,9 @@ export default {
 }
 .sidebar-item-wrapper {
     .count {
-        font-weight: normal;
+        margin-left: 0.25rem;
+        font-size: 0.875rem;
+        line-height: 170%;
     }
 }
 
