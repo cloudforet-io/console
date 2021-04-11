@@ -75,10 +75,10 @@
                             </p>
                             <div class="cost-chart-wrapper">
                                 <div class="chart-wrapper">
-                                    <span class="instance">인스턴스 <span class="instance-num">10</span></span>
+                                    <span class="instance">인스턴스 <span class="instance-num">{{ item.instanceCount }}</span></span>
                                     <on-demand-and-spot-chart chart-type="long"
-                                                              :spot="10"
-                                                              :ondemand="30"
+                                                              :spot="item.spotCount"
+                                                              :ondemand="item.onDemandCount"
                                                               class="on-demand-chart"
                                     />
                                 </div>
@@ -120,6 +120,7 @@ import { getPageStart, getThisPage } from '@/lib/component-utils/pagination';
 import OnDemandAndSpotChart from '@/views/automation/spot-automation/components/OnDemandAndSpotChart.vue';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { SpaceConnector } from '@/lib/space-connector';
+import { Tags, TimeStamp } from '@/models';
 
 // TODO: change handlers with spot automation spec
 const handlers = makeQuerySearchPropsWithSearchSchema(
@@ -136,6 +137,26 @@ const handlers = makeQuerySearchPropsWithSearchSchema(
     'inventory.CloudService',
 );
 
+interface ProjectGroupData {
+    created_at?: TimeStamp;
+    created_by?: string;
+    name: string;
+    parent_project_group_info?: object;
+    project_group_id: string;
+    tags?: Tags;
+}
+
+interface ProjectListData {
+    created_at: TimeStamp;
+    created_by?: string;
+    name: string;
+    project_group_info?: ProjectGroupData;
+    project_id: string;
+    tags: Tags;
+    spotCount: number;
+    onDemandCount: number;
+    instanceCount: number;
+}
 export default {
     name: 'SpotDashboardPage',
     components: {
@@ -154,7 +175,7 @@ export default {
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
 
         const state = reactive({
-            items: undefined,
+            items: undefined as unknown as ProjectListData[],
             dataLoading: true,
             keyItemSets: handlers.keyItemSets,
             valueHandlerMap: handlers.valueHandlerMap,
@@ -204,6 +225,16 @@ export default {
                 const res = await SpaceConnector.client.identity.project.list(getParams());
                 state.items = res.results;
                 state.totalCount = res.total_count || 0;
+
+
+                Object.keys(state.items).forEach((i) => {
+                    const spotCount = Math.floor(Math.random() * 31) + 1;
+                    const onDemandCount = (Math.floor(Math.random() * 100) + 11) - spotCount;
+                    state.items[i].spotCount = spotCount;
+                    state.items[i].onDemandCount = onDemandCount;
+                    state.items[i].instanceCount = spotCount + onDemandCount;
+                });
+
                 state.dataLoading = false;
             } catch (e) {
                 console.error(e);
