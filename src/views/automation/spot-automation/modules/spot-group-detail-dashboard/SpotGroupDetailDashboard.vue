@@ -1,7 +1,7 @@
 <template>
     <div class="grid grid-cols-12 gap-4 spot-group-detail-dashboard">
         <spot-group-base-info :spot-group="spotGroup" />
-        <spot-group-interrupt />
+        <spot-group-interrupt :spot-group-id="spotGroup.spot_group_id" />
         <spot-group-monitoring class="col-span-12" :spot-group="spotGroup" />
         <spot-group-billing class="col-span-12" :spot-group="spotGroup" />
     </div>

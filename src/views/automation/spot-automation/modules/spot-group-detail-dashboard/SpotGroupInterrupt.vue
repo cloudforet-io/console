@@ -1,21 +1,20 @@
 <template>
     <div class="spot-group-interrupt">
-        <!-- interrupt count-->
-        <section class="title-section">
-            <span class="title">{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.INTERRUPT_COUNT') }}</span>
-            <span class="sub-title">({{ today }}, {{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.LAST_TWO_WEEKS') }})</span>
-            <div class="title-right">
-                <p-button v-for="(d, idx) in dateTypes"
-                          :key="idx"
-                          class="date-button sm"
-                          :class="{'selected': selectedDateType === d.name}"
-                          @click="onClickDateTypeButton(d.name)"
-                >
-                    <span>{{ d.label }}</span>
-                </p-button>
-            </div>
-        </section>
         <section class="chart-section">
+            <div class="title-wrapper">
+                <span class="title">{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.INTERRUPT_COUNT') }}</span>
+                <span class="sub-title">({{ today }}, {{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.LAST_TWO_WEEKS') }})</span>
+                <div class="title-right">
+                    <p-button v-for="(d, idx) in dateTypes"
+                              :key="idx"
+                              class="date-button sm"
+                              :class="{'selected': selectedDateType === d.name}"
+                              @click="onClickDateTypeButton(d.name)"
+                    >
+                        <span>{{ d.label }}</span>
+                    </p-button>
+                </div>
+            </div>
             <div class="legend-wrapper">
                 <div class="left-part">
                     <span v-for="legend in legends" :key="legend.label" class="legend">
@@ -29,7 +28,7 @@
                 </div>
             </div>
             <div class="chart-wrapper">
-                <p-chart-loader :loading="loading">
+                <p-chart-loader :loading="chartState.loading">
                     <template #loader>
                         <p-skeleton height="100%" />
                     </template>
@@ -37,21 +36,20 @@
                 </p-chart-loader>
             </div>
         </section>
-        <!-- interrupt list-->
-        <section class="title-section mt-4">
-            <span class="title">{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.INTERRUPT_DETAIL') }}</span>
-            <span class="sub-title">({{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.LATEST_DATE') }})</span>
-            <div class="title-right">
-                <p-icon-button name="ic_refresh" class="refresh-btn"
-                               @click="onClickRefresh"
-                />
-            </div>
-        </section>
         <section class="table-section">
+            <div class="title-wrapper mt-4">
+                <span class="title">{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.INTERRUPT_DETAIL') }}</span>
+                <span class="sub-title">({{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.LATEST_DATE') }})</span>
+                <div class="title-right">
+                    <p-icon-button name="ic_refresh" class="refresh-btn"
+                                   @click="onClickRefresh"
+                    />
+                </div>
+            </div>
             <p-data-table
-                :loading="tableLoading"
-                :fields="fields"
-                :items="tableData"
+                :loading="tableState.loading"
+                :fields="tableState.fields"
+                :items="tableState.data"
                 :bordered="false"
             />
         </section>
@@ -60,7 +58,9 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { range, random, forEach } from 'lodash';
+import {
+    get, range, forEach, find,
+} from 'lodash';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -79,6 +79,7 @@ import {
     secondary, peacock, gray, alert, blue,
 } from '@/styles/colors';
 import { store } from '@/store';
+import { SpaceConnector } from '@/lib/space-connector';
 
 
 dayjs.extend(utc);
@@ -86,24 +87,31 @@ am4core.useTheme(am4themes_animated);
 
 interface ChartData {
     date: string;
-    onDemand: number;
-    spot: number;
-    interrupt: number;
+    onDemand: number | null;
+    spot: number | null;
+    interrupt: number | null;
     bulletText?: string | number;
 }
 interface TableData {
-    affected_instance: string;
-    available_zone: string;
+    type: string;
+    availability_zone: string;
     count: number;
 }
 
 enum DATE_TYPE {
-    daily = 'DAILY',
-    monthly = 'MONTHLY',
+    DAILY = 'DAILY',
+    MONTHLY = 'MONTHLY',
 }
 
-const DAY_COUNT = 14;
-const MONTH_COUNT = 12;
+const PERIOD = {
+    DAILY: 14,
+    MONTHLY: 12,
+};
+const COLORS = {
+    onDemand: secondary,
+    spot: peacock[400],
+    interrupt: alert,
+};
 
 export default {
     name: 'SpotGroupInterrupt',
@@ -114,10 +122,16 @@ export default {
         PIconButton,
         PDataTable,
     },
-    setup() {
+    props: {
+        spotGroupId: {
+            type: String,
+            default: undefined,
+        },
+    },
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            loading: false,
+            chartRef: null as HTMLElement | null,
             today: dayjs().tz(store.state.user.timezone).format('YYYY-MM-DD'),
             legends: computed(() => ([
                 {
@@ -129,73 +143,49 @@ export default {
                     color: peacock[400],
                 },
             ])),
-            colors: {
-                onDemand: secondary,
-                spot: peacock[400],
-                interrupt: alert,
-            },
             dateTypes: computed(() => ([
-                { name: DATE_TYPE.daily, label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.DAY') },
-                { name: DATE_TYPE.monthly, label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.MONTH') },
+                { name: DATE_TYPE.DAILY, label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.DAY') },
+                { name: DATE_TYPE.MONTHLY, label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.MONTH') },
             ])),
-            selectedDateType: DATE_TYPE.daily,
-            //
-            chartRef: null as HTMLElement | null,
+            selectedDateType: DATE_TYPE.DAILY,
+        });
+        const chartState = reactive({
+            loading: true,
             chart: null as null | any,
-            chartRegistry: {},
-            chartData: [] as ChartData[],
-            //
-            tableLoading: false,
+            registry: {},
+            data: [] as ChartData[],
+        });
+        const tableState = reactive({
+            loading: true,
+            data: [] as TableData[],
             fields: computed(() => [
-                { name: 'affected_instance', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.AFFECTED_INSTANCE') },
-                { name: 'available_zone', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.AZ') },
+                { name: 'type', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.INSTANCE_TYPE') },
+                { name: 'availability_zone', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.AZ') },
                 { name: 'count', label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.INTERRUPT.INTERRUPT_COUNT') },
             ]),
-            tableData: [
-                {
-                    affected_instance: 't3.nano',
-                    available_zone: 'ap-northeast-2c',
-                    count: 10,
-                },
-                {
-                    affected_instance: 't4.micro',
-                    available_zone: 'ap-northeast-3c',
-                    count: 6,
-                },
-                {
-                    affected_instance: 'm2.large',
-                    available_zone: 'ap-northeast-2a',
-                    count: 2,
-                },
-                {
-                    affected_instance: 't3.nano',
-                    available_zone: 'ap-northeast-2c',
-                    count: 10,
-                },
-            ] as TableData[],
         });
 
         /* util */
         const disposeChart = (ctx) => {
-            if (state.chartRegistry[ctx]) {
-                state.chartRegistry[ctx].dispose();
-                delete state.chartRegistry[ctx];
+            if (chartState.registry[ctx]) {
+                chartState.registry[ctx].dispose();
+                delete chartState.registry[ctx];
             }
         };
         const drawChart = (ctx) => {
             const createChart = () => {
                 disposeChart(ctx);
-                state.chartRegistry[ctx] = am4core.create(ctx, am4charts.XYChart);
-                return state.chartRegistry[ctx];
+                chartState.registry[ctx] = am4core.create(ctx, am4charts.XYChart);
+                return chartState.registry[ctx];
             };
             const chart = createChart();
-            state.chart = chart;
+            chartState.chart = chart;
 
             chart.logo.disabled = true;
             chart.paddingLeft = -8;
             chart.paddingBottom = 0;
             chart.paddingTop = 16;
-            chart.data = state.chartData;
+            chart.data = chartState.data;
 
             const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
             dateAxis.dataFields.category = 'date';
@@ -222,14 +212,14 @@ export default {
                 tooltip.strokeWidth = 0;
                 tooltip.dy = -5;
                 tooltip.getFillFromObject = false;
-                tooltip.label.fill = am4core.color(state.colors[field]);
-                tooltip.background.stroke = am4core.color(state.colors[field]);
+                tooltip.label.fill = am4core.color(COLORS[field]);
+                tooltip.background.stroke = am4core.color(COLORS[field]);
             };
             const createBarSeries = (field) => {
                 const series = chart.series.push(new am4charts.ColumnSeries());
                 series.dataFields.categoryX = 'date';
                 series.dataFields.valueY = field;
-                series.fill = am4core.color(state.colors[field]);
+                series.fill = am4core.color(COLORS[field]);
                 series.stacked = true;
                 series.strokeWidth = 0;
                 series.columns.template.width = am4core.percent(15);
@@ -243,8 +233,8 @@ export default {
             const lineSeries = chart.series.push(new am4charts.LineSeries());
             lineSeries.dataFields.categoryX = 'date';
             lineSeries.dataFields.valueY = 'interrupt';
-            lineSeries.stroke = am4core.color(state.colors.interrupt);
-            lineSeries.fill = am4core.color(state.colors.interrupt);
+            lineSeries.stroke = am4core.color(COLORS.interrupt);
+            lineSeries.fill = am4core.color(COLORS.interrupt);
             lineSeries.strokeWidth = 2;
             lineSeries.strokeDasharray = '2, 2';
             lineSeries.fillOpacity = 1;
@@ -262,7 +252,7 @@ export default {
             labelBullet.label.fontSize = 14;
             labelBullet.label.truncate = false;
             labelBullet.label.hideOversized = false;
-            labelBullet.label.fill = am4core.color(state.colors.interrupt);
+            labelBullet.label.fill = am4core.color(COLORS.interrupt);
             labelBullet.label.dy = -12;
 
             const fillModifier = new am4core.LinearGradientModifier();
@@ -271,44 +261,97 @@ export default {
             fillModifier.gradient.rotation = 90;
             lineSeries.segments.template.fillModifier = fillModifier;
         };
+        const convertChartData = (interruptData, instanceData) => {
+            const rawData = interruptData.map((data, i) => Object.assign({}, data, instanceData[i]));
 
-        /* api */
-        const getChartData = async () => {
-            const dateUnit = state.selectedDateType === DATE_TYPE.monthly ? 'month' : 'day';
-            const dateCount = state.selectedDateType === DATE_TYPE.monthly ? MONTH_COUNT : DAY_COUNT;
-            const dateFormat = state.selectedDateType === DATE_TYPE.monthly ? 'MMM' : 'MM/DD';
+            const dateUnit = state.selectedDateType === DATE_TYPE.MONTHLY ? 'month' : 'day';
+            const dateFormat = state.selectedDateType === DATE_TYPE.MONTHLY ? 'MMM' : 'MM/DD';
+            const dateCount = PERIOD[state.selectedDateType];
+
             const data = [] as ChartData[];
             let maxInterrupt = 0;
-            // api 값 가져오고 비어있으면 더미데이터
-            forEach(range(0, dateCount), (i) => {
-                let bulletText;
-                const date = dayjs.utc().subtract(i, dateUnit);
-                let formattedDate = date.format(dateFormat);
-                const onDemand = random(50, 100);
-                const spot = random(10, 100);
-                const interrupt = random(1, 10);
 
-                if (state.selectedDateType === DATE_TYPE.monthly && (date.format('M') === '1' || date.format('M') === '12')) {
+            forEach(range(0, dateCount), (i) => {
+                const date = dayjs.utc().subtract(i, dateUnit);
+                const todayData = find(rawData, { date: date.format(dateUnit === 'month' ? 'YYYY-MM' : 'YYYY-MM-DD') });
+                let formattedDate = date.format(dateFormat);
+                if (state.selectedDateType === DATE_TYPE.MONTHLY && (date.format('M') === '1' || date.format('M') === '12')) {
                     formattedDate = date.format('MMM, YY');
                 }
-                if (i === 0 || i === dateCount - 1) {
-                    bulletText = interrupt;
-                }
-                if (interrupt > maxInterrupt) maxInterrupt = interrupt;
 
-                data.push({
-                    date: formattedDate,
-                    onDemand,
-                    spot,
-                    interrupt,
-                    bulletText,
-                });
+                if (todayData) {
+                    const onDemand = todayData.ondemand;
+                    const spot = todayData.spot;
+                    const interrupt = todayData.count;
+
+                    let bulletText;
+                    if (i === 0 || i === dateCount - 1) bulletText = interrupt;
+                    if (interrupt > maxInterrupt) maxInterrupt = interrupt;
+
+                    data.push({
+                        date: formattedDate,
+                        onDemand,
+                        spot,
+                        interrupt,
+                        bulletText,
+                    });
+                } else {
+                    data.push({
+                        date: formattedDate,
+                        onDemand: null,
+                        spot: null,
+                        interrupt: null,
+                    });
+                }
             });
             data.forEach((d) => {
                 if (d.interrupt === maxInterrupt) d.bulletText = d.interrupt;
             });
 
-            state.chartData = data.reverse();
+            chartState.data = data.reverse();
+        };
+
+        /* api */
+        const getInterruptHistory = async () => {
+            try {
+                let res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInterruptHistory({
+                    spot_groups: [props.spotGroupId],
+                    granularity: state.selectedDateType,
+                    period: PERIOD[state.selectedDateType],
+                });
+                res = get(res, `spot_groups.${props.spotGroupId}`);
+                return res;
+            } catch (e) {
+                console.error(e);
+                return null;
+            }
+        };
+        const getInstanceHistory = async () => {
+            try {
+                let res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceCountHistory({
+                    spot_groups: [props.spotGroupId],
+                    granularity: state.selectedDateType,
+                    period: PERIOD[state.selectedDateType],
+                });
+                res = get(res, `spot_groups.${props.spotGroupId}`);
+                return res;
+            } catch (e) {
+                console.error(e);
+                return null;
+            }
+        };
+        const getInterruptSummary = async () => {
+            try {
+                tableState.loading = true;
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInterruptSummary({
+                    spot_group_id: props.spotGroupId,
+                });
+                tableState.data = res.results;
+            } catch (e) {
+                console.error(e);
+            } finally {
+                tableState.loading = false;
+            }
         };
 
         /* event */
@@ -316,28 +359,34 @@ export default {
             state.selectedDateType = type;
         };
         const onClickRefresh = () => {
-            console.log('refresh!');
+            getInterruptSummary();
         };
 
-        const init = async () => {
-            state.loading = true;
-            await getChartData();
-            state.loading = false;
-        };
-        init();
 
-        watch([() => state.loading, () => state.chartRef], ([loading, chartCtx]) => {
+        watch(() => props.spotGroupId, () => {
+            if (props.spotGroupId) {
+                getInterruptSummary();
+            }
+        });
+        watch(() => [props.spotGroupId, state.selectedDateType], async () => {
+            if (props.spotGroupId) {
+                chartState.loading = true;
+                await Promise.all([getInterruptHistory(), getInstanceHistory()]).then((values) => {
+                    convertChartData(values[0], values[1]);
+                });
+                chartState.loading = false;
+            }
+        }, { immediate: false });
+        watch([() => chartState.loading, () => state.chartRef], ([loading, chartCtx]) => {
             if (!loading && chartCtx) {
                 drawChart(chartCtx);
             }
-        }, { immediate: true });
-        watch(() => state.selectedDateType, async () => {
-            await getChartData();
-            drawChart(state.chartRef);
         }, { immediate: false });
 
         return {
             ...toRefs(state),
+            chartState,
+            tableState,
             onClickDateTypeButton,
             onClickRefresh,
         };
@@ -349,7 +398,7 @@ export default {
 .spot-group-interrupt {
     @apply border border-gray-200;
     padding: 1rem;
-    .title-section {
+    .title-wrapper {
         position: relative;
         display: inline-block;
         width: 100%;
@@ -424,6 +473,9 @@ export default {
             }
         }
         .chart-wrapper {
+            .p-chart-loader {
+                height: 10rem;
+            }
             .chart {
                 height: 10rem;
             }
