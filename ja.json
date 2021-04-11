@@ -143,10 +143,7 @@
 					"TITLE": ""
 				},
 				"CLOUD_SERVICE": {
-					"LABEL": "",
-					"RESOURCE_LABEL": "",
-					"RESOURCE_REQUIRED": "",
-					"SERVICE_CATEGORY_LABEL": ""
+					"LABEL": ""
 				},
 				"CREATE": "",
 				"CREATE_TITLE": "",
@@ -156,6 +153,11 @@
 					"OPTIMIZED_TYPE": ""
 				},
 				"LOAD_FAILED": "",
+				"RESOURCE": {
+					"LABEL": "",
+					"RESOURCE_DESC": "",
+					"RESOURCE_REQUIRED": ""
+				},
 				"SCHEDULE_POLICY": {
 					"DESC": "",
 					"LABEL": "",

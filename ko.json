@@ -143,10 +143,7 @@
 					"TITLE": "세부사항 확인"
 				},
 				"CLOUD_SERVICE": {
-					"LABEL": "클라우드 서비스",
-					"RESOURCE_LABEL": "리소스",
-					"RESOURCE_REQUIRED": "리소스를 선택해주세요.",
-					"SERVICE_CATEGORY_LABEL": "서비스 카테고리"
+					"LABEL": "클라우드 서비스 카테고리"
 				},
 				"CREATE": "생성",
 				"CREATE_TITLE": "새 스팟그룹 만들기",
@@ -156,6 +153,11 @@
 					"OPTIMIZED_TYPE": "최적화된 인스턴스 타입"
 				},
 				"LOAD_FAILED": "문제가 발생하여 데이터를 가져오지 못했습니다.",
+				"RESOURCE": {
+					"LABEL": "리소스",
+					"RESOURCE_DESC": "스팟그룹으로 지정되지 않은 리소스만을 보여줍니다.",
+					"RESOURCE_REQUIRED": "리소스를 선택해주세요."
+				},
 				"SCHEDULE_POLICY": {
 					"DESC": "인스턴스 개수에 변화가 생기면, 온디맨드 설정 개수는 유지되고(고정값) 스팟 인스턴스의 개수가 변화합니다.",
 					"LABEL": "스케줄 정책",
