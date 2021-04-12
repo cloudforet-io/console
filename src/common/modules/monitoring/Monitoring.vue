@@ -205,13 +205,13 @@ export default {
                 label: d.name,
             }))),
             selectedTimeRange: '1h',
-            statItems: computed<StatItem[]>(() => {
+            statisticsTypes: computed(() => {
                 const tool = find(state.dataTools, { id: state.selectedToolId });
-                const statisticsTypes = tool ? tool.statisticsTypes : [STATISTICS_TYPE.average];
-                return statisticsTypes.map(d => ({
-                    type: 'item', label: capitalize(d), name: d,
-                }));
+                return tool ? tool.statisticsTypes : [STATISTICS_TYPE.average];
             }),
+            statItems: computed<StatItem[]>(() => state.statisticsTypes.map(d => ({
+                type: 'item', label: capitalize(d), name: d,
+            }))),
             selectedStat: STATISTICS_TYPE.average,
             metricsLoading: true,
             metrics: [] as Metric[],
@@ -272,7 +272,7 @@ export default {
 
                 const res = await SpaceConnector.client.monitoring.metric.list({
                     resource_type: props.resourceType,
-                    data_source_id: state.selectedToolId || props.dataSourceId,
+                    data_source_id: state.selectedToolId,
                     resources: props.resources.map(d => d.id),
                 });
                 state.metrics = sortBy(res.metrics, m => m.name);
@@ -334,13 +334,9 @@ export default {
         }, 300);
 
         const listAll = debounce(async (): Promise<void> => {
-            await setAvailableResources();
+            state.metricChartDataList = [];
 
-            if (props.dataSourceId) {
-                await getDataSource();
-            } else {
-                await listDataSources();
-            }
+            await setAvailableResources();
 
             if (props.selectedMetrics && props.selectedMetrics.length > 0) {
                 state.metrics = sortBy(props.selectedMetrics, m => m.name);
@@ -362,16 +358,26 @@ export default {
             await listMetricCharts(start);
         };
 
-        watch(() => props.resources, () => {
-            if (props.resources) listAll();
+        watch(() => state.statisticsTypes, (types) => {
+            if (types) state.selectedStat = types[0] || STATISTICS_TYPE.average;
+        }, { immediate: true });
+
+        watch(() => props.resources, async () => {
+            if (props.resources) {
+                if (props.dataSourceId) await getDataSource();
+                else await listDataSources();
+                await listAll();
+            }
         }, { immediate: true });
 
         watch([() => state.selectedTimeRange, () => state.selectedStat], ([timeRange, stat]) => {
             if (timeRange && stat) listMetricCharts();
         }, { immediate: false });
 
-        watch(() => state.selectedToolId, () => {
-            listAll();
+        watch(() => state.selectedToolId, async () => {
+            if (props.resources) {
+                await listAll();
+            }
         }, { immediate: false });
 
         return {
