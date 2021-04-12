@@ -62,7 +62,7 @@ import {
 import TagsInputGroup from '@/common/components/tags-input-group/TagsInputGroup.vue';
 import { makeProxy } from '@/lib/compostion-util';
 import AddSection from '@/views/automation/spot-automation/components/AddSection.vue';
-import {spotGroupNameRegex} from "@/views/automation/spot-automation/lib/validations";
+import { spotGroupNameRegex } from '@/views/automation/spot-automation/lib/validations';
 
 
 export default {

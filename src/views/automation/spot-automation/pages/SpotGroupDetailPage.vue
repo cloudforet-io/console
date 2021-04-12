@@ -11,7 +11,7 @@
                     />
                     <p-icon-button name="ic_edit-text"
                                    class="edit-button"
-                                   @click="openSpotGroupEditModal"
+                                   @click="openSpotGroupEditForm"
                     />
                 </div>
             </div>
@@ -35,20 +35,46 @@
                 </template>
                 <template #history />
             </p-tab>
-            <p-button-modal :header-title="headerTitle"
+            <p-button-modal :header-title="$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MODAL_DELETE_SPOT_GROUP_TITLE')"
                             :centered="true"
                             :scrollable="false"
-                            size="md"
+                            size="sm"
                             :fade="true"
                             :backdrop="true"
                             :visible.sync="spotGroupDeleteModalVisible"
                             :theme-color="themeColor"
-                            @confirm="spotGroupDeleteModalConfirm"
+                            @confirm="deleteSpotGroup"
             >
                 <template #body>
                     <p class="delete-modal-content">
                         {{ modalContent }}
                     </p>
+                </template>
+            </p-button-modal>
+            <p-button-modal :header-title="$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MODAL_UPDATE_SPOT_GROUP_TITLE')"
+                            :centered="true"
+                            size="sm"
+                            :fade="true"
+                            :scrollable="false"
+                            :backdrop="true"
+                            :visible.sync="spotGroupEditFormVisible"
+                            :disabled="showNameValidation && !isNameValid"
+                            @confirm="confirm"
+            >
+                <template #body>
+                    <p-field-group :label="$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MODAL_UPDATE_SPOT_GROUP_LABEL')"
+                                   :invalid="!isNameValid"
+                                   :invalid-text="$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MODAL_UPDATE_SPOT_GROUP_NAME_DESC')"
+                                   required
+                    >
+                        <template #default>
+                            <p-text-input v-model="spotGroupName"
+                                          class="block w-full"
+                                          :invalid="!isNameValid"
+                                          :placeholder="$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MODAL_UPDATE_SPOT_GROUP_PLACEHOLDER')"
+                            />
+                        </template>
+                    </p-field-group>
                 </template>
             </p-button-modal>
         </div>
@@ -64,7 +90,7 @@ import {
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import SpotGroupDetailDashboard from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupDetailDashboard.vue';
 import {
-    PBreadcrumbs, PPageTitle, PIconButton, PTab, PButtonModal,
+    PBreadcrumbs, PPageTitle, PIconButton, PTab, PButtonModal, PTextInput, PFieldGroup,
 } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
@@ -74,6 +100,7 @@ import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { TranslateResult } from 'vue-i18n';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { spotGroupNameRegex } from '@/views/automation/spot-automation/lib/validations';
 
 export default {
     name: 'SpotGroupDetailPage',
@@ -87,12 +114,17 @@ export default {
         PTab,
         TagsPanel,
         PButtonModal,
+        PTextInput,
+        PFieldGroup,
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             spotGroupId: computed(() => root.$route.params.id),
             spotGroup: {},
+            spotGroupName: '' as string,
+            showNameValidation: false,
+            isNameValid: computed(() => (!state.showNameValidation || spotGroupNameRegex.test(state.spotGroupName))),
         });
         const tabState = reactive({
             tabs: computed(() => ([
@@ -115,8 +147,11 @@ export default {
         const getSpotGroup = async () => {
             try {
                 state.spotGroup = await SpaceConnector.client.spotAutomation.spotGroup.get({ spot_group_id: state.spotGroupId });
+                state.spotGroupName = state.spotGroup.name;
             } catch (e) {
                 console.error(e);
+                state.spotGroup = {};
+                state.spotGroupName = '';
             }
         };
 
@@ -128,22 +163,19 @@ export default {
         // Member modal
         const formState = reactive({
             spotGroupDeleteModalVisible: false,
-            spotGroupEditModalVisible: false,
-            headerTitle: '' as TranslateResult,
+            spotGroupEditFormVisible: false,
             themeColor: '',
             modalContent: '' as TranslateResult,
         });
 
         /* event */
-
         const openSpotGroupDeleteModal = () => {
             formState.spotGroupDeleteModalVisible = true;
-            formState.headerTitle = vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MODAL_DELETE_SPOT_GROUP_TITLE');
-            formState.themeColor = 'alert';
             formState.modalContent = vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MODAL_DELETE_SPOT_GROUP_CONTENT');
+            formState.themeColor = 'alert';
         };
 
-        const spotGroupDeleteModalConfirm = async () => {
+        const deleteSpotGroup = async () => {
             try {
                 await SpaceConnector.client.spotAutomation.spotGroup.delete({
                     spot_group_id: state.spotGroupId,
@@ -158,16 +190,40 @@ export default {
             }
         };
 
-        const deleteSpotGroup = async () => {
-            console.log('delete spot group');
+        const openSpotGroupEditForm = () => {
+            formState.spotGroupEditFormVisible = true;
         };
 
-        const openSpotGroupEditModal = () => {
-            console.log('open spot group');
+        const updateSpotGroupName = async (params) => {
+            try {
+                await SpaceConnector.client.spotAutomation.spotGroup.update({
+                    ...params,
+                });
+                state.spotGroup.name = state.spotGroupName;
+                formState.spotGroupEditFormVisible = false;
+                showSuccessMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.EDIT.ALT_S_EDIT_SPOT_GROUP'), '', vm.$root);
+            } catch (e) {
+                showErrorMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.EDIT.ALT_E_EDIT_SPOT_GROUP'), e, vm.$root);
+                throw new Error(e);
+            }
         };
 
-        const updateSpotGroup = async () => {
-            console.log('update spot group');
+        const confirm = () => {
+            if (!state.showNameValidation) state.showNameValidation = true;
+            if (!state.isNameValid) return;
+
+            const params = {
+                spot_group_id: state.spotGroupId,
+                name: state.spotGroupName,
+            };
+
+            try {
+                updateSpotGroupName(params);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.showNameValidation = false;
+            }
         };
 
         return {
@@ -175,9 +231,10 @@ export default {
             ...toRefs(formState),
             tabState,
             routeState,
-            spotGroupDeleteModalConfirm,
+            deleteSpotGroup,
+            confirm,
             openSpotGroupDeleteModal,
-            openSpotGroupEditModal,
+            openSpotGroupEditForm,
         };
     },
 };
