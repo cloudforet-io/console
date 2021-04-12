@@ -237,6 +237,8 @@
 				},
 				"MODAL_DELETE_SPOT_GROUP_CONTENT": "이 스팟그룹을 삭제하시겠습니까?",
 				"MODAL_DELETE_SPOT_GROUP_TITLE": "스팟그룹 삭제",
+				"MODAL_UPDATE_SPOT_GROUP_PLACEHOLDER": "스팟그룹 이름",
+				"MODAL_UPDATE_SPOT_GROUP_TITLE": "스팟그룹 변경",
 				"MONITORING": {
 					"CPU_USAGE_RAGE": "CPU 사용률",
 					"DISK_USAGE_RATE": "디스크 사용률",
