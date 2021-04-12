@@ -237,6 +237,8 @@
 				},
 				"MODAL_DELETE_SPOT_GROUP_CONTENT": "이 스팟그룹을 삭제하시겠습니까?",
 				"MODAL_DELETE_SPOT_GROUP_TITLE": "스팟그룹 삭제",
+				"MODAL_UPDATE_SPOT_GROUP_LABEL": "이름",
+				"MODAL_UPDATE_SPOT_GROUP_NAME_DESC": "공백 없이 최대 56자 / 문자로 시작해야 하고, 문자, 숫자 및 하이픈만 포함할 수 있습니다. ",
 				"MODAL_UPDATE_SPOT_GROUP_PLACEHOLDER": "스팟그룹 이름",
 				"MODAL_UPDATE_SPOT_GROUP_TITLE": "스팟그룹 변경",
 				"MONITORING": {
