@@ -12,7 +12,7 @@ export interface MetricChartProps {
     dataset: {
         [key: string]: number[];
     };
-    labels: Array<Timestamp|string>;
+    labels: string[];
     resources: Array<MonitoringResourceType>;
     unit: { x: string; y: string };
     timezone: string;

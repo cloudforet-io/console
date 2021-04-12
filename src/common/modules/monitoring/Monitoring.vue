@@ -1,6 +1,6 @@
 <template>
     <div class="pt-8 pb-16">
-        <section v-if="showTools">
+        <section v-if="!dataSourceId">
             <p-select-btn-group class="pr-4 mb-8" :buttons="tools" :selected.sync="selectedToolId" />
         </section>
         <section class="mb-8">
@@ -29,7 +29,7 @@
         <section class="toolbox-section">
             <div class="inline-flex items-center">
                 <span class="title mr-4 flex-shrink-0">{{ $t('COMMON.MONITORING.TIME_RANGE') }}</span>
-                <p-select-btn-group class="time-range" :buttons="timeRanges" :selected.sync="selectedTimeRange" />
+                <p-select-btn-group class="time-range" :buttons="Object.keys(TIME_RANGE)" :selected.sync="selectedTimeRange" />
             </div>
             <div class="inline-flex items-center">
                 <span class="title mr-4 flex-shrink-0">{{ $t('COMMON.MONITORING.STATISTICS') }}</span>
@@ -79,11 +79,12 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    some, debounce, find, capitalize, chain, range, sortBy,
+    debounce, find, capitalize, chain, range, sortBy, get,
 } from 'lodash';
+import dayjs from 'dayjs';
 
 import {
-    computed, onMounted, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import MetricChart from '@/common/components/metric-chart/MetricChart.vue';
@@ -94,11 +95,9 @@ import {
 import {
     blue, coral, green, peacock, violet, yellow, indigo,
 } from '@/styles/colors';
-import { MonitoringProps } from '@/common/modules/monitoring/type';
+import { Metric, MonitoringProps } from '@/common/modules/monitoring/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { TimeStamp } from '@/models';
-import dayjs, { Dayjs } from 'dayjs';
 import { store } from '@/store';
 import router from '@/routes';
 
@@ -112,25 +111,6 @@ enum STATISTICS_TYPE {
     average = 'AVERAGE',
     maximum = 'MAXIMUM',
     minimum = 'MINIMUM'
-}
-
-
-interface Metric {
-    key: string;
-    name: string;
-    unit: {
-        x: string;
-        y: string;
-    };
-    chart_type: string;
-    chart_options: any;
-}
-
-interface Metrics {
-    metrics: Metric[];
-    available_resources: {
-        [key: string]: boolean;
-    };
 }
 
 interface MetricChartData {
@@ -148,11 +128,17 @@ interface DataToolType {
     statisticsTypes: STATISTICS_TYPE[];
 }
 
-interface AvailableResources {
+interface AvailableResource {
     id: string;
     name: string;
     color: string;
     link: string;
+}
+
+interface StatItem {
+    type: string;
+    label: string;
+    name: string;
 }
 
 
@@ -160,13 +146,18 @@ const colors = [
     coral[500], blue[500], violet[500], yellow[600], green[400], coral[400], peacock[600], coral[700],
     peacock[400], green[700], green[500], blue[400], indigo[700], violet[400], indigo[400], blue[700],
 ];
-const timeRanges = ['1h', '3h', '6h', '12h', '1d', '3d', '1w', '2w'];
-const LOAD_LIMIT = 12;
+const TIME_RANGE = {
+    '1h': 1,
+    '3h': 3,
+    '6h': 6,
+    '12h': 12,
+    '1d': 24,
+    '3d': 24 * 3,
+    '1w': 24 * 7,
+    '2w': 24 * 14,
+};
 
-const getTimestamp = (dayjsTime: Dayjs) => ({
-    seconds: `${dayjsTime.unix()}`,
-    nanos: 0,
-});
+const LOAD_LIMIT = 12;
 
 export default {
     name: 'Monitoring',
@@ -193,11 +184,11 @@ export default {
         },
         selectedMetrics: {
             type: Array,
-            default: () => [],
+            default: () => ([]),
         },
-        showTools: {
-            type: Boolean,
-            default: true,
+        dataSourceId: {
+            type: String,
+            default: undefined,
         },
         responsive: {
             type: Boolean,
@@ -206,7 +197,7 @@ export default {
     },
     setup(props: MonitoringProps) {
         const state = reactive({
-            timezone: store.state.user.timezone,
+            timezone: computed(() => store.state.user.timezone),
             dataTools: [],
             selectedToolId: '',
             tools: computed<DataToolType[]>(() => state.dataTools.map(d => ({
@@ -214,76 +205,56 @@ export default {
                 label: d.name,
             }))),
             selectedTimeRange: '1h',
-            statisticsTypes: computed(() => {
-                const tool = find(
-                    state.dataTools,
-                    { id: state.selectedToolId },
-                );
-                return tool ? tool.statisticsTypes : [STATISTICS_TYPE.average];
+            statItems: computed<StatItem[]>(() => {
+                const tool = find(state.dataTools, { id: state.selectedToolId });
+                const statisticsTypes = tool ? tool.statisticsTypes : [STATISTICS_TYPE.average];
+                return statisticsTypes.map(d => ({
+                    type: 'item', label: capitalize(d), name: d,
+                }));
             }),
-            statItems: computed(() => state.statisticsTypes.map(d => ({
-                type: 'item', label: capitalize(d), name: d,
-            }))),
             selectedStat: STATISTICS_TYPE.average,
-            metricsLoading: false,
-            metrics: [],
+            metricsLoading: true,
+            metrics: [] as Metric[],
             metricChartDataList: [] as MetricChartData[],
-            availableResources: [],
+            availableResources: [] as AvailableResource[],
             noData: false,
         });
 
-        /* util */
-        const setAvailableResources = (data): void => {
-            let count = 0;
-            state.availableResources = [];
-            some(props.resources, (resource, idx) => {
-                if (data[resource.id]) {
-                    state.availableResources.push({
-                        ...resource,
-                        color: colors[idx],
-                        link: router.resolve(referenceRouter(resource.id, { resource_type: 'inventory.Server' })).href,
-                    });
-                    count++;
-                }
-                return count === 10;
-            });
-        };
-        const getStartTimestamp = (end: Dayjs): TimeStamp => {
-            const units = state.selectedTimeRange.match(/[^0-9]/g) || [];
-            return getTimestamp(end.subtract(
-                parseInt(state.selectedTimeRange),
-                units[0] as 'w'|'d'|'h',
-            ));
-        };
-
-        const reset = (): void => {
-            state.metricsLoading = true;
-            state.metricChartDataList = [];
-            state.metrics = [];
-            state.availableResources = [];
-        };
-
-
         /* api */
+        const setAvailableResources = () => {
+            state.availableResources = props.resources.map((resource, idx) => ({
+                ...resource,
+                color: colors[idx],
+                link: router.resolve(referenceRouter(resource.id, { resource_type: 'inventory.Server' })).href,
+            }));
+        };
+        const getDataSource = async () => {
+            try {
+                const res = await SpaceConnector.client.monitoring.dataSource.get({
+                    data_source_id: props.dataSourceId,
+                });
+                state.selectedToolId = props.dataSourceId;
+                state.dataTools = [{
+                    id: props.dataSourceId,
+                    name: res.name,
+                    statisticsTypes: get(res, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.average]),
+                }];
+            } catch (e) {
+                console.error(e);
+            }
+        };
         const listDataSources = async () => {
             try {
                 const res = await SpaceConnector.client.monitoring.dataSource.list({
                     monitoring_type: MONITORING_TYPE.metric,
                 });
-
-                /* code below is for Spot Group Detail Dashboard */
-                let dataSources = res.results;
-                if (props.showTools === false) {
-                    dataSources = [find(dataSources, { name: 'AWS CloudWatch' })];
-                }
-
-                state.dataTools = chain(dataSources)
+                state.dataTools = chain(res.results)
                     .map((d) => {
                         if (d.plugin_info.metadata.supported_resource_type.some(t => props.resourceType === t)) {
                             return {
                                 id: d.data_source_id,
                                 name: d.name,
-                                statisticsTypes: d.plugin_info.metadata.supported_stat || [STATISTICS_TYPE.average],
+                                statisticsTypes: get(d, 'plugin_info.metadata.supported_stat', [STATISTICS_TYPE.average]),
                             };
                         }
                         return undefined;
@@ -294,27 +265,25 @@ export default {
                 console.error(e);
             }
         };
-        const listMetrics = async (): Promise<Metrics> => {
-            state.metricsLoading = true;
+        const listMetrics = async () => {
             try {
+                state.metricsLoading = true;
+                state.metrics = [];
+
                 const res = await SpaceConnector.client.monitoring.metric.list({
                     resource_type: props.resourceType,
-                    data_source_id: state.selectedToolId,
+                    data_source_id: state.selectedToolId || props.dataSourceId,
                     resources: props.resources.map(d => d.id),
                 });
-                return res;
+                state.metrics = sortBy(res.metrics, m => m.name);
             } catch (e) {
                 console.error(e);
             } finally {
                 state.metricsLoading = false;
             }
-            return {
-                metrics: [],
-                available_resources: {},
-            };
         };
 
-        const initMetricChartDataList = (start = 0): void => {
+        const initMetricChartData = (start = 0): void => {
             let endIdx = start + LOAD_LIMIT;
             if (endIdx > state.metrics.length) endIdx = state.metrics.length;
 
@@ -328,26 +297,18 @@ export default {
             });
             state.metricChartDataList = [...state.metricChartDataList];
         };
-        const getMetricChartParam = (metric) => {
-            const now = dayjs();
-            return {
-                data_source_id: state.selectedToolId,
-                resource_type: props.resourceType,
-                stat: state.selectedStat,
-                end: getTimestamp(now),
-                start: getStartTimestamp(now),
-                resources: state.availableResources.map(d => d.id),
-                metric,
-            };
-        };
         const getMetricChartData = async (data: MetricChartData) => {
-            data.loading = true;
-
-            const metric = data.metric.key;
-            const params = getMetricChartParam(metric);
-
             try {
-                const res = await SpaceConnector.client.monitoring.metric.getData(params);
+                data.loading = true;
+                const res = await SpaceConnector.client.monitoring.metric.getData({
+                    data_source_id: state.selectedToolId,
+                    resource_type: props.resourceType,
+                    stat: state.selectedStat,
+                    end: dayjs.utc().toISOString(),
+                    start: dayjs.utc().subtract(TIME_RANGE[state.selectedTimeRange], 'hour').toISOString(),
+                    resources: state.availableResources.map(d => d.id),
+                    metric: data.metric.key,
+                });
                 data.labels = res.labels;
                 data.dataset = res.resource_values;
                 data.error = false;
@@ -373,26 +334,23 @@ export default {
         }, 300);
 
         const listAll = debounce(async (): Promise<void> => {
-            reset();
+            await setAvailableResources();
 
-            const metricInfo = await listMetrics();
-
-            // below code is for Spot Group Detail Dashboard / Monitoring
-            let metrics = [] as any;
-            if (props.selectedMetrics && props.selectedMetrics.length > 0) {
-                props.selectedMetrics.forEach((d) => {
-                    metrics.push(find(metricInfo.metrics, { key: d }));
-                });
+            if (props.dataSourceId) {
+                await getDataSource();
             } else {
-                metrics = metricInfo.metrics;
+                await listDataSources();
             }
 
-            state.metrics = sortBy(metrics, m => m.name);
-
-            setAvailableResources(metricInfo.available_resources);
+            if (props.selectedMetrics && props.selectedMetrics.length > 0) {
+                state.metrics = sortBy(props.selectedMetrics, m => m.name);
+            } else {
+                await listMetrics();
+            }
 
             if (state.metrics.length === 0) return;
-            initMetricChartDataList();
+
+            await initMetricChartData();
             await listMetricCharts();
         }, 300);
 
@@ -400,38 +358,26 @@ export default {
         /* event */
         const loadMoreMetricCharts = async () => {
             const start = state.metricChartDataList.length;
-            initMetricChartDataList(start);
+            await initMetricChartData(start);
             await listMetricCharts(start);
         };
 
+        watch(() => props.resources, () => {
+            if (props.resources) listAll();
+        }, { immediate: true });
 
-        onMounted(() => {
-            watch(() => state.statisticsTypes, (types) => {
-                if (types) state.selectedStat = types[0] || STATISTICS_TYPE.average;
-            }, { immediate: true });
+        watch([() => state.selectedTimeRange, () => state.selectedStat], ([timeRange, stat]) => {
+            if (timeRange && stat) listMetricCharts();
+        }, { immediate: false });
 
-            watch([() => props.resources, () => props.selectedMetrics], async () => {
-                if (props.resources) {
-                    await listDataSources();
-                    await listAll();
-                }
-            }, { immediate: true });
-
-            watch([() => state.selectedTimeRange, () => state.selectedStat], ([timeRange, stat]) => {
-                if (timeRange && stat) listMetricCharts();
-            }, { immediate: false });
-
-            watch(() => state.selectedToolId, async () => {
-                if (props.resources) {
-                    await listAll();
-                }
-            }, { immediate: false });
-        });
+        watch(() => state.selectedToolId, () => {
+            listAll();
+        }, { immediate: false });
 
         return {
             ...toRefs(state),
             colors,
-            timeRanges,
+            TIME_RANGE,
             legendFormatter(resource): string {
                 return resource.name ? `${resource.id} (${resource.name})` : resource.id;
             },
@@ -476,6 +422,10 @@ section {
 
     &.responsive {
         grid-template-columns: repeat(auto-fill, minmax(49%, 49%));
+
+        //@screen sm {
+        //    grid-template-columns: repeat(auto-fill, minmax(100%, 100%));
+        //}
     }
     &.static {
         grid-template-columns: repeat(auto-fill, minmax(23.125rem, 23.125rem));

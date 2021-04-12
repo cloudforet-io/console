@@ -93,18 +93,9 @@ export default {
             chartRegistry: {},
         });
 
-        const chartTimestampFormatter = (value, timezone) => dayjs.tz(dayjs.unix(value.seconds), timezone).format('MM/DD HH:mm');
-        const getLabels = () => {
-            if (props.unit.x === 'Timestamp') {
-                const labels: string[] = props.labels.map(label => chartTimestampFormatter(label, props.timezone));
-                return labels;
-            }
-            return props.labels as string[];
-        };
-
         const convertChartData = async () => {
-            const labels = getLabels();
             const chartDataList: ChartData[] = [];
+            const labels = props.labels.map(label => dayjs.tz(dayjs(label), props.timezone).format('MM/DD HH:mm'));
             labels.forEach((label, index) => {
                 const chartData: ChartData = { label };
                 Object.entries(props.dataset).forEach(([key, value]) => {

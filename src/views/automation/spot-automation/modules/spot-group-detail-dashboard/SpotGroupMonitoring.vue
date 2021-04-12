@@ -17,7 +17,7 @@
                             <span class="suffix">/ {{ d.count }}{{ d.suffix }}</span>
                         </template>
                         <template v-else>
-                            <span class="count">{{ commaFormatter(d.count) }}</span>
+                            <span class="count">{{ d.count }}</span>
                             <span class="suffix">{{ d.suffix }}</span>
                         </template>
                     </p>
@@ -42,25 +42,36 @@
             </div>
         </div>
         <div class="widget-wrapper">
-            <template v-if="selectedIndex < 2">
-                <monitoring v-if="resources.length > 0"
-                            :show-tools="false"
-                            :resources="resources"
-                            :resource-type="resourceType"
-                            :selected-metrics="metrics"
-                            :responsive="true"
-                />
-            </template>
-            <template v-else>
-                <p-dynamic-layout type="table"
-                                  class="resource-table"
-                                  :data="instanceState.data"
-                                  :options="instanceState.schema.options"
-                                  :fetch-options="fetchOptionState"
-                                  :type-options="{ excelVisible: false }"
-                                  @fetch="fetchTableData"
-                />
-            </template>
+            <keep-alive>
+                <template v-if="selectedIndex === 0">
+                    <monitoring v-if="resources.length > 0"
+                                :resources="resources"
+                                :data-source-id="dataSourceId"
+                                :resource-type="resourceType"
+                                :selected-metrics="metrics"
+                                :responsive="true"
+                    />
+                </template>
+                <template v-else-if="selectedIndex === 1">
+                    <monitoring v-if="resources.length > 0"
+                                :resources="resources"
+                                :data-source-id="dataSourceId"
+                                :resource-type="resourceType"
+                                :selected-metrics="metrics"
+                                :responsive="true"
+                    />
+                </template>
+                <template v-else>
+                    <p-dynamic-layout type="table"
+                                      class="resource-table"
+                                      :data="instanceState.data"
+                                      :options="instanceState.schema.options"
+                                      :fetch-options="fetchOptionState"
+                                      :type-options="{ excelVisible: false }"
+                                      @fetch="fetchTableData"
+                    />
+                </template>
+            </keep-alive>
         </div>
     </div>
 </template>
@@ -100,12 +111,26 @@ export default {
         PDynamicLayout,
     },
     props: {
-        spotGroup: {
-            type: Object,
-            default: () => ({}),
+        spotGroupId: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props) {
+        /* util */
+        const numberFormatter = (num) => {
+            if (Math.abs(num) < 10000) {
+                return Math.round(num * 100) / 100;
+            }
+            const options = { notation: 'compact', signDisplay: 'auto', maximumFractionDigits: 1 };
+            return Intl.NumberFormat('en', options).format(num);
+        };
+        const commaFormatter = (num) => {
+            if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+            return num;
+        };
+
+        /* state */
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const apiQuery = new ApiQueryHelper();
         const instanceState = reactive({
@@ -124,6 +149,7 @@ export default {
             schemaType: '' as keyof typeof SCHEMA_TYPE,
             metricType: METRIC_TYPE.CPU as keyof typeof METRIC_TYPE,
             metrics: [] as string[],
+            dataSourceId: '',
             instanceCpuUsage: 0,
             instanceDiskUsage: 0,
             loadBalancerCount: 0,
@@ -131,13 +157,13 @@ export default {
                 {
                     type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTANCE'),
                     detail: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.CPU_USAGE_RAGE'),
-                    count: state.instanceCpuUsage,
+                    count: commaFormatter(numberFormatter(state.instanceCpuUsage)),
                     suffix: '%',
                 },
                 {
                     type: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.INSTANCE'),
                     detail: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MONITORING.DISK_USAGE_RATE'),
-                    count: state.instanceDiskUsage,
+                    count: Math.floor(state.instanceDiskUsage),
                     suffix: 'IOPS',
                 },
                 {
@@ -162,39 +188,32 @@ export default {
             searchText: '',
         });
 
-        /* util */
-        const commaFormatter = (num) => {
-            if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            return num;
-        };
-
         /* api */
-        const getInstanceCpuUsage = async (spotGroup) => {
+        const getInstanceCpuUsage = async (spotGroupId) => {
             try {
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceCpu({
-                    spot_groups: [spotGroup.spot_group_id],
+                    spot_groups: [spotGroupId],
                 });
-                state.instanceCpuUsage = get(res, `spot_groups.${spotGroup.spot_group_id}.cpu_utilization`);
+                state.instanceCpuUsage = get(res, `spot_groups.${spotGroupId}.cpu_utilization`);
             } catch (e) {
                 console.error(e);
             }
         };
-        const getInstanceDiskUsage = async (spotGroup) => {
+        const getInstanceDiskUsage = async (spotGroupId) => {
             try {
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceDisk({
-                    spot_groups: [spotGroup.spot_group_id],
+                    spot_groups: [spotGroupId],
                 });
-                state.instanceDiskUsage = get(res, `spot_groups.${spotGroup.spot_group_id}.total_iops`);
+                state.instanceDiskUsage = get(res, `spot_groups.${spotGroupId}.total_iops`);
             } catch (e) {
                 console.error(e);
             }
         };
-        const getInstanceState = async (spotGroup) => {
+        const getInstanceState = async (spotGroupId) => {
             try {
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceState({
-                    spot_groups: [spotGroup.spot_group_id],
+                    spot_groups: [spotGroupId],
                 });
-                const spotGroupId = spotGroup.spot_group_id;
                 instanceState.count = get(res, `spot_groups.${spotGroupId}.total`);
                 instanceState.unhealthyCount = get(res, `spot_groups.${spotGroupId}.unhealthy`);
                 instanceState.status = get(res, `spot_groups.${spotGroupId}.state`);
@@ -202,42 +221,43 @@ export default {
                 console.error(e);
             }
         };
-        const getLoadBalancerCount = async (spotGroup) => {
+        const getLoadBalancerCount = async (spotGroupId) => {
             try {
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupLoadbalancerCount({
-                    spot_groups: [spotGroup.spot_group_id],
+                    spot_groups: [spotGroupId],
                 });
-                state.loadBalancerCount = get(res, `spot_groups.${spotGroup.spot_group_id}`);
+                state.loadBalancerCount = get(res, `spot_groups.${spotGroupId}`);
             } catch (e) {
                 console.error(e);
             }
         };
 
-        const getSpotGroupServers = async (spotGroup) => {
+        const getSpotGroupServers = async (spotGroupId) => {
             try {
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupServers({
-                    spot_group_id: spotGroup.spot_group_id,
+                    spot_group_id: spotGroupId,
                 });
                 state.resources = res.results.map(d => ({ id: d.server_id, name: d.name }));
             } catch (e) {
                 console.error(e);
             }
         };
-        const getSpotGroupMetrics = async (spotGroup) => {
+        const getSpotGroupMetrics = async (spotGroupId) => {
             try {
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupMetrics({
-                    spot_group_id: spotGroup.spot_group_id,
+                    spot_group_id: spotGroupId,
                     metric_type: state.metricType,
                 });
                 state.metrics = res.metrics;
+                state.dataSourceId = res.data_source_id;
             } catch (e) {
                 console.error(e);
             }
         };
-        const getInstanceSchema = async (spotGroup) => {
+        const getInstanceSchema = async (spotGroupId) => {
             try {
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupSchema({
-                    spot_group_id: spotGroup.spot_group_id,
+                    spot_group_id: spotGroupId,
                     schema_type: state.schemaType,
                 });
                 state.cloudServiceId = res.cloud_service_id;
@@ -253,8 +273,8 @@ export default {
                 .setFilters([{ v: fetchOptionState.searchText }]);
             return apiQuery.data;
         };
-        const getInstance = async (spotGroup) => {
-            await getInstanceSchema(spotGroup);
+        const getInstance = async (spotGroupId) => {
+            await getInstanceSchema(spotGroupId);
 
             try {
                 const res = await SpaceConnector.client.inventory.cloudService.getData({
@@ -306,25 +326,25 @@ export default {
                     fetchOptionState.searchText = changed.searchText;
                 }
             }
-            getInstance(props.spotGroup);
+            getInstance(props.spotGroupId);
         };
 
-        watch(() => props.spotGroup, (spotGroup) => {
-            getInstanceCpuUsage(spotGroup);
-            getInstanceDiskUsage(spotGroup);
-            getInstanceState(spotGroup);
-            getLoadBalancerCount(spotGroup);
+        watch(() => props.spotGroupId, (spotGroupId) => {
+            getInstanceCpuUsage(spotGroupId);
+            getInstanceDiskUsage(spotGroupId);
+            getInstanceState(spotGroupId);
+            getLoadBalancerCount(spotGroupId);
 
-            getSpotGroupServers(spotGroup);
-            getSpotGroupMetrics(spotGroup);
+            getSpotGroupServers(spotGroupId);
+            getSpotGroupMetrics(spotGroupId);
         }, { immediate: false });
 
         watch(() => state.metricType, () => {
-            getSpotGroupMetrics(props.spotGroup);
+            getSpotGroupMetrics(props.spotGroupId);
         }, { immediate: false });
 
         watch(() => state.schemaType, () => {
-            getInstance(props.spotGroup);
+            getInstance(props.spotGroupId);
         }, { immediate: false });
 
         return {
@@ -332,7 +352,6 @@ export default {
             instanceState,
             fetchOptionState,
             onClickBox,
-            commaFormatter,
             fetchTableData,
         };
     },
