@@ -2,29 +2,29 @@
     <article class="desktop-wrapper">
         <div class="spot-column">
             <p class="column-title">
-                스팟 인터럽트
-                <span class="text-xs text-gray-400">Last 1 day</span>
+                {{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.SPOT_INTERRUPT')}}
+                <span class="text-xs text-gray-400">{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.LAST_1_DAY')}}</span>
             </p>
             <p class="column-number">
                 {{ cardData.interruptCount }}
-                <span class="column-number-unit">개</span>
+                <span class="column-number-unit">{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.NUMBER_UNIT')}}</span>
             </p>
             <spot-interrupt-chart
                 :interrupt-data="cardData.interruptHistoryData"
                 class="spot-interrupt-chart" />
-            <span class="spot-interrupt-desc">Activity graph time range:</span><br>
-            <span class="spot-interrupt-desc">last 7 days</span>
+            <span class="spot-interrupt-desc">{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.ACTIVITY_TIME_RANGE')}}</span><br>
+            <span class="spot-interrupt-desc">{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.LAST_7_DAYS')}}</span>
         </div>
         <div class="spot-card-divider" />
         <div class="instance-column">
             <div class="column-title-wrapper">
                 <div>
                     <p class="column-title">
-                        인스턴스
+                        {{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.INSTANCE')}}
                     </p>
                     <p class="column-number">
                         {{ cardData.instanceCount.total || 0 }}
-                        <span class="column-number-unit">개</span>
+                        <span class="column-number-unit">{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.NUMBER_UNIT')}}</span>
                     </p>
                 </div>
                 <on-demand-and-spot-chart chart-type="short"
@@ -34,24 +34,24 @@
                 />
             </div>
             <p class="column-title">
-                인스턴스 평균 CPU 사용률
+                {{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.CPU_UTILIZATION')}}
             </p>
             <p class="column-number">
                 {{ cardData.instanceCpu || 0 }}
                 <span class="column-number-unit">%</span>
             </p>
             <p class="column-title">
-                평균 디스크 사용률
+                {{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.DISK_USAGE')}}
             </p>
             <p class="column-number">
                 {{ cardData.instanceDisk || 0 }}
-                <span class="column-number-unit">IOPS</span>
+                <span class="column-number-unit">IOPS</span><span>{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.IOPS_DESC')}}</span>
             </p>
         </div>
         <div class="spot-card-divider" />
         <div class="load-balancer-column">
             <p class="column-title">
-                인스턴스 상태
+                {{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.INSTANCE_STATE')}}
             </p>
             <p class="column-info">
                 <p-i v-if="cardData.instanceState === INSTANCE_STATE.healthy"
@@ -68,14 +68,14 @@
                 <span class="text" :class="cardData.instanceState">{{ cardData.instanceState }}</span>
             </p>
             <p class="column-title">
-                로드밸런서 (개수)
+                {{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.LOAD_BALANCER')}}
             </p>
             <p class="column-number">
                 {{ cardData.loadbalancerCount || 0 }}
-                <span class="column-number-unit">개</span>
+                <span class="column-number-unit">{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.NUMBER_UNIT')}}</span>
             </p>
             <p class="column-title">
-                서비스 타입
+                {{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.SERVICE_TYPE')}}
             </p>
             <p class="column-text">
                 <p-i

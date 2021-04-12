@@ -7,7 +7,7 @@
                 <p-icon-text-button style-type="primary-dark" outline name="ic_plus_bold"
                                     class="add-spot-group-btn"
                 >
-                    {{ $t('AUTOMATION.SPOT_AUTOMATION.SPOT_GROUP_LIST.ADD_SPOT_GROUP') }}
+                    {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.ADD_SPOT_GROUP') }}
                 </p-icon-text-button>
             </router-link>
         </section>
@@ -23,7 +23,7 @@
                    @refresh="onChange"
         />
         <p class="cost-instance-info">
-            비용, 인스턴스 기간:<strong>이번달</strong>
+            {{$t('AUTOMATION.SPOT_AUTOMATION.LIST.COST_INSTANCE_DATE_1')}}<strong>{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.COST_INSTANCE_DATE_2')}}</strong>
         </p>
         <p-data-loader class="flex-grow" :data="items" :loading="loading"
                        :class="{'short': isShort}"
@@ -43,7 +43,7 @@
                         <img src="@/assets/images/illust_no-spot-group.svg">
                     </figure>
                     <p class="no-spot-group-text">
-                        스팟 자동화를 이용하려면, 스팟그룹을 생성해주세요.
+                        {{$t('AUTOMATION.SPOT_AUTOMATION.LIST.NO_DATA')}}
                     </p>
                 </section>
             </template>
@@ -75,7 +75,6 @@ import { makeDistinctValueHandler, makeReferenceValueHandler } from '@/lib/compo
 
 dayjs.extend(timezone);
 
-// TODO: change handlers with spot automation spec
 const handlers = {
     keyItemSets: [{
         title: 'Filters',

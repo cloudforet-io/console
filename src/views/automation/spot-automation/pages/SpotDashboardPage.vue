@@ -2,22 +2,22 @@
     <section class="dashboard-page-wrapper">
         <nav class="page-info">
             <p-breadcrumbs :routes="routeState.route" />
-            <p-page-title :title="'대시보드'" />
+            <p-page-title :title="$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.PAGE_TITLE')" />
         </nav>
         <section class="dashboard-wrapper">
             <div class="spot-group-info widget-layout">
                 <div class="summary-wrapper">
                     <div class="summary-row">
-                        <span class="title">사용중인 스팟그룹</span>
+                        <span class="title">{{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.USED_SPOT_GROUP')}}</span>
                         <span class="count">13</span>
                     </div>
                     <div class="summary-row">
-                        <span class="title">전체 인스턴스</span>
-                        <span class="sub-title">(온디맨드+스팟)</span>
+                        <span class="title">{{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.ALL_INSTANCE')}}</span>
+                        <span class="sub-title">{{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.ALL_INSTANCE_DESC')}}</span>
                         <span class="count">159</span>
                     </div>
                     <div class="summary-row">
-                        <span class="title">스팟 인스턴스</span>
+                        <span class="title">{{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SPOT_INSTANCE')}}</span>
                         <span class="count">128</span>
                     </div>
                 </div>
@@ -29,8 +29,8 @@
             <div class="cost-info widget-layout">
                 <div class="cost-wrapper">
                     <p class="title">
-                        <span>지난 달</span>
-                        <strong> 절감 비용</strong>
+                        <span>{{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.LAST_MONTH')}}</span>
+                        <strong> {{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SAVING_COST')}}</strong>
                         <span class="percentage">
                             <p-i name="ic_table_sort_fromA" />
                             52%
@@ -42,7 +42,7 @@
                 </div>
                 <div class="cost-wrapper">
                     <p class="title">
-                        <strong>누적 절감 비용</strong>
+                        <strong>{{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.ACCUMULATE_COST')}}</strong>
                     </p>
                     <p class="cost">
                         ${{ commaFormatter(numberFormatter(cumulativeSavingCost)) }}
@@ -75,7 +75,7 @@
                             </p>
                             <div class="cost-chart-wrapper">
                                 <div class="chart-wrapper">
-                                    <span class="instance">인스턴스 <span class="instance-num">{{ item.instanceCount }}</span></span>
+                                    <span class="instance">{{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.CARD.INSTANCE')}} <span class="instance-num">{{ item.instanceCount }}</span></span>
                                     <on-demand-and-spot-chart chart-type="long"
                                                               :spot="item.spotCount"
                                                               :ondemand="item.onDemandCount"
@@ -84,7 +84,7 @@
                                 </div>
                                 <div class="flex flex-col">
                                     <span class="cost-title">
-                                        절감 비용
+                                        {{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SAVING_COST')}}
                                     </span>
                                     <span class="cost">
                                         N/A
@@ -95,7 +95,7 @@
                     </article>
                 </li>
                 <template #no-data>
-                    test
+                    {{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.NO_PROJECT')}}
                 </template>
             </p-data-loader>
         </section>

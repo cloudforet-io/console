@@ -21,8 +21,8 @@
                 <div class="right-wrapper">
                     <div class="spot-group-cost-wrapper">
                         <div class="spot-group-cost-text">
-                            <p>절감비용</p>
-                            <span class="text-xs">이번달 1일 ~ 어제</span>
+                            <p>{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.SAVING_COST')}}</p>
+                            <span class="text-xs">{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.COST_TIME_RANGE')}}</span>
                         </div>
                         <span class="spot-group-cost"><span class="text-2xl font-normal">$</span>125</span>
                     </div>
@@ -48,9 +48,9 @@
             </div>
             <div class="card-footer" :class="{'short': isShort}">
                 <span class="footer-region">
-                    <span class="opacity-50 mr-2">리전</span>
+                    <span class="opacity-50 mr-2">{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.REGION')}}</span>
                     {{ cardData.region_code }}
-                    <span class="opacity-50 mr-2 ml-4">생성</span>
+                    <span class="opacity-50 mr-2 ml-4">{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.CREATED_AT')}}</span>
                     {{ cardData.created_at }}
                 </span>
             </div>
@@ -174,8 +174,6 @@ export default {
             display: block;
             max-width: 100%;
             padding-right: 3.71rem;
-
-            /* todo: star -> absolute */
             font-size: 0.875rem;
             line-height: 115%;
             font-weight: bold;
@@ -222,7 +220,7 @@ export default {
     @apply border border-gray-200;
     border-width: 1px;
     width: 100%;
-    min-height: 11.6rem;
+    min-height: 10rem;
     .card-desktop-version {
         display: none;
     }
