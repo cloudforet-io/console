@@ -264,6 +264,7 @@
 					"CPU_UTILIZATION": "",
 					"CREATED_AT": "",
 					"DISK_USAGE": "",
+					"HEALTHY": "",
 					"INSTANCE": "",
 					"INSTANCE_STATE": "",
 					"IOPS_DESC": "",
@@ -274,11 +275,13 @@
 					"REGION": "",
 					"SAVING_COST": "",
 					"SERVICE_TYPE": "",
-					"SPOT_INTERRUPT": ""
+					"SPOT_INTERRUPT": "",
+					"UNHEALTHY": ""
 				},
 				"COST_INSTANCE_DATE_1": "",
 				"COST_INSTANCE_DATE_2": "",
-				"NO_DATA": ""
+				"NO_DATA": "",
+				"SHOW_FAVORITES": ""
 			},
 			"MAIN": {
 				"DASHBOARD": "",

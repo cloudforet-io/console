@@ -264,6 +264,7 @@
 					"CPU_UTILIZATION": "일 평균 CPU 사용률",
 					"CREATED_AT": "생성",
 					"DISK_USAGE": "일 평균 디스크 사용률",
+					"HEALTHY": "정상",
 					"INSTANCE": "인스턴스 ",
 					"INSTANCE_STATE": "인스턴스 상태",
 					"IOPS_DESC": "(읽기+쓰기)",
@@ -274,11 +275,13 @@
 					"REGION": "리전",
 					"SAVING_COST": "절감비용 ",
 					"SERVICE_TYPE": "서비스 타입",
-					"SPOT_INTERRUPT": "스팟 인터럽트 "
+					"SPOT_INTERRUPT": "스팟 인터럽트 ",
+					"UNHEALTHY": "문제있음"
 				},
 				"COST_INSTANCE_DATE_1": "비용, 인스턴스 기간:",
-				"COST_INSTANCE_DATE_2": "이번 ",
-				"NO_DATA": "스팟 자동화를 이용하려면, 스팟그룹을 생성해주세요."
+				"COST_INSTANCE_DATE_2": "이번달",
+				"NO_DATA": "스팟 자동화를 이용하려면, 스팟그룹을 생성해주세요.",
+				"SHOW_FAVORITES": "즐겨찾기만 보기"
 			},
 			"MAIN": {
 				"DASHBOARD": "대시보드 ",
