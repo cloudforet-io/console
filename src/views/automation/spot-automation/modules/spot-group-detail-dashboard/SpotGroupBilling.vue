@@ -6,7 +6,6 @@
         <div class="widget-wrapper grid grid-cols-12">
             <p class="sub-title col-span-12">
                 <span>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.INSTANCE_COUNT') }}</span>
-                <span class="help-text">({{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.LAST_SIX_MONTH') }})</span>
             </p>
             <section class="billing-chart-section">
                 <instance-billing-chart />
@@ -17,7 +16,9 @@
                         <span>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.LAST_MONTH') }}</span>
                         <strong> {{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.SAVINGS_COST') }}</strong>
                         <span class="percentage">
-                            <p-i name="ic_table_sort_fromA" />
+                            <p-i name="ic_decrease"
+                                 width="1rem" height="1rem"
+                            />
                             52%
                         </span>
                     </p>
@@ -36,7 +37,6 @@
             </section>
             <p class="sub-title col-span-12">
                 <span>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.BILLING_DETAIL') }}</span>
-                <span class="help-text">({{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.LAST_SIX_MONTH') }})</span>
             </p>
             <section class="col-span-12 billing-table-section">
                 <p-data-table
@@ -46,6 +46,9 @@
                 >
                     <template #th-title-format>
                         <span />
+                    </template>
+                    <template #col-title-format="{value}">
+                        <span class="col-title">{{ value }}</span>
                     </template>
                 </p-data-table>
             </section>
@@ -175,12 +178,6 @@ export default {
             font-size: 1rem;
             font-weight: bold;
             line-height: 1.6;
-            .help-text {
-                @apply text-gray-600;
-                font-size: 0.75rem;
-                font-weight: normal;
-                padding-left: 0.25rem;
-            }
         }
     }
 
@@ -238,6 +235,9 @@ export default {
             }
             td {
                 @apply border-gray-200;
+            }
+            .col-title {
+                @apply text-gray-600;
             }
         }
     }
