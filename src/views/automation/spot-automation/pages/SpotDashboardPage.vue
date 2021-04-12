@@ -22,7 +22,7 @@
                     </div>
                 </div>
                 <div class="chart-section">
-                    <spot-group-ratio-chart />
+                    <spot-group-ratio-chart :spot-groups="spotGroups" />
                 </div>
             </div>
             <instance-billing-chart class="widget-layout" />
@@ -127,6 +127,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import {
     PDivider, PBreadcrumbs, PPageTitle, PToolbox, PDataLoader, PI, PAnchor,
 } from '@spaceone/design-system';
@@ -146,6 +147,7 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { SpaceConnector } from '@/lib/space-connector';
 import { Tags, TimeStamp } from '@/models';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
+import { store } from '@/store';
 
 // TODO: change handlers with spot automation spec
 const handlers = makeQuerySearchPropsWithSearchSchema(
@@ -201,6 +203,7 @@ export default {
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
 
         const state = reactive({
+            spotGroups: computed(() => Object.keys(store.state.resource.spotGroup.items)),
             items: undefined as unknown as ProjectListData[],
             dataLoading: true,
             keyItemSets: handlers.keyItemSets,
@@ -300,7 +303,6 @@ export default {
             }
         };
 
-
         /* event */
         const changeQueryString = async (options) => {
             queryHelper.setFiltersAsQueryTag(options.queryTags);
@@ -321,7 +323,10 @@ export default {
         };
 
         (async () => {
-            await listProjects();
+            await Promise.all([
+                listProjects(),
+                vm.$store.dispatch('resource/spotGroup/load'),
+            ]);
         })();
 
         return {

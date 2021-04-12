@@ -63,10 +63,9 @@ export default {
     display: flex;
     flex-direction: column;
     justify-content: stretch;
-    max-width: 1920px;
 
     .page-contents {
-        width: 100%;
+        max-width: 1920px;
         flex-grow: 1;
         padding: 2rem 1.5rem;
     }

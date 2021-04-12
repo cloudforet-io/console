@@ -1,6 +1,6 @@
 <template>
     <div class="spot-group-composition-chart grid grid-cols-12" :class="chartType">
-        <div class="col-span-5 text-wrapper on-demand">
+        <div class="text-wrapper on-demand">
             <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.ON_DEMAND') }}</p>
             <p><b>{{ onDemandCount }}</b> ({{ onDemandPercentage }}%)</p>
             <template v-if="chartType === CHART_TYPE.long">
@@ -9,10 +9,10 @@
                 <p>$<b>{{ onDemandCost }}</b></p>
             </template>
         </div>
-        <p-chart-loader class="col-span-2" :loading="loading">
+        <p-chart-loader class="chart-wrapper" :loading="loading">
             <div ref="chartRef" class="chart" />
         </p-chart-loader>
-        <div class="col-span-5 text-wrapper spot">
+        <div class="text-wrapper spot">
             <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.SPOT') }}</p>
             <p><b>{{ spotCount }}</b> ({{ spotPercentage }}%)</p>
             <template v-if="chartType === CHART_TYPE.long">
@@ -53,6 +53,11 @@ enum CHART_TYPE {
     short = 'short'
 }
 
+const COLORS = {
+    onDemand: secondary,
+    spot: peacock[400],
+};
+
 export default {
     name: 'SpotGroupRatioChart',
     components: {
@@ -63,22 +68,18 @@ export default {
             type: String,
             default: 'long',
         },
-        spotGroupId: {
-            type: String,
-            default: '',
+        spotGroups: {
+            type: Array,
+            default: () => ([]),
         },
     },
     setup(props) {
         const state = reactive({
-            loading: false,
+            loading: true,
             chartRef: null as HTMLElement | null,
             chart: null as null | any,
             chartRegistry: {},
             data: [] as ChartData[],
-            colors: {
-                onDemand: secondary,
-                spot: peacock[400],
-            },
             onDemandPercentage: 0,
             spotPercentage: 0,
             onDemandCount: 0,
@@ -133,28 +134,35 @@ export default {
         };
 
         /* api */
-        const getData = async (spotGroupId) => {
+        const getData = async (spotGroups) => {
             try {
                 state.loading = true;
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceCount({
-                    spot_groups: [spotGroupId],
+                    spot_groups: spotGroups,
                 });
-                const totalCount = get(res, `spot_groups.${spotGroupId}.total`);
-                state.onDemandCount = get(res, `spot_groups.${spotGroupId}.ondemand`);
-                state.spotCount = get(res, `spot_groups.${spotGroupId}.spot`);
-                state.onDemandPercentage = (state.onDemandCount / totalCount) * 100;
+                let totalCount = 0;
+                let onDemandCount = 0;
+                let spotCount = 0;
+                Object.values(res.spot_groups).forEach((d) => {
+                    totalCount += get(d, 'total');
+                    onDemandCount += get(d, 'ondemand');
+                    spotCount += get(d, 'spot');
+                });
+                state.onDemandCount = onDemandCount;
+                state.spotCount = spotCount;
+                state.onDemandPercentage = (onDemandCount / totalCount) * 100;
                 state.spotPercentage = 100 - state.onDemandPercentage;
 
                 state.data = [
                     {
                         type: 'spot',
                         count: state.spotCount,
-                        color: state.colors.spot,
+                        color: COLORS.spot,
                     },
                     {
                         type: 'onDemand',
                         count: state.onDemandCount,
-                        color: state.colors.onDemand,
+                        color: COLORS.onDemand,
                     },
                 ];
             } catch (e) {
@@ -164,14 +172,16 @@ export default {
             }
         };
 
-        watch(() => props.spotGroupId, (spotGroupId) => {
-            getData(spotGroupId);
-        });
+        watch(() => props.spotGroups, (spotGroups) => {
+            if (spotGroups.length > 0) {
+                getData(spotGroups);
+            }
+        }, { immediate: false });
         watch([() => state.loading, () => state.chartRef], ([loading, chartCtx]) => {
             if (!loading && chartCtx) {
                 drawChart(chartCtx);
             }
-        }, { immediate: true });
+        }, { immediate: false });
 
         return {
             ...toRefs(state),
@@ -189,7 +199,23 @@ export default {
     font-size: 0.875rem;
     border-radius: 0.375rem;
 
+    &.long {
+        height: auto;
+        font-size: 0.75rem;
+        padding: 1rem 0.5rem;
+
+        @media lg {
+            .text-wrapper {
+                @apply col-span-4;
+            }
+            .chart-wrapper {
+                @apply col-span-4;
+            }
+        }
+    }
+
     .text-wrapper {
+        @apply col-span-5;
         padding: 0 0.5rem;
         margin: auto 0;
         &.on-demand {
@@ -200,20 +226,14 @@ export default {
             @apply text-peacock-400;
         }
     }
+    .chart-wrapper {
+        @apply col-span-2;
+    }
     .p-chart-loader {
-        margin: auto 0;
+        margin: auto;
         .chart {
             max-width: 4rem;
             max-height: 4rem;
-        }
-    }
-
-    &.long {
-        height: auto;
-        font-size: 0.75rem;
-        padding: 1rem 0.5rem;
-        .text-wrapper {
-            padding: 0 0.25rem;
         }
     }
 }

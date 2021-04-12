@@ -22,8 +22,9 @@
         </section>
         <section class="composition-chart-section">
             <spot-group-ratio-chart
+                :v-if="spotGroup.spot_group_id"
                 chart-type="short"
-                :spot-group-id="spotGroup.spot_group_id"
+                :spot-groups="[spotGroup.spot_group_id]"
             />
         </section>
         <section class="project-section">
@@ -49,7 +50,7 @@
                 </p-chart-loader>
                 <div class="legend-group">
                     <template v-if="loading">
-                        <div v-for="v in skeletons" :key="v" class="items-center p-2">
+                        <div v-for="v in skeletons" :key="v" class="skeleton-wrapper">
                             <p-skeleton class="flex-grow" />
                         </div>
                     </template>
@@ -301,6 +302,7 @@ export default {
         margin: 1rem 0;
     }
     .project-section {
+        display: flex;
         margin-bottom: 1rem;
         .title {
             @apply text-gray-400;
@@ -309,8 +311,14 @@ export default {
             line-height: 1.5;
         }
         .content {
+            width: 75%;
             font-size: 0.875rem;
             margin-left: 0.5rem;
+        }
+        .p-anchor::v-deep {
+            .text {
+                @apply truncate;
+            }
         }
     }
     .using-instance-type-section {
@@ -335,8 +343,13 @@ export default {
             .legend-group {
                 display: inline-block;
                 width: 65%;
+                height: 7.5rem;
+                overflow-y: auto;
                 font-size: 0.875rem;
                 padding: 0.25rem 0.5rem;
+                .skeleton-wrapper {
+                    padding: 0.25rem;
+                }
                 .legend {
                     line-height: 1.5;
                     padding: 0 0.125rem;
