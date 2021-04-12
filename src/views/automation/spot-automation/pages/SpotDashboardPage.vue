@@ -8,16 +8,16 @@
             <div class="spot-group-info widget-layout">
                 <div class="summary-wrapper">
                     <div class="summary-row">
-                        <span class="title">{{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.USED_SPOT_GROUP')}}</span>
+                        <span class="title">{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.USED_SPOT_GROUP') }}</span>
                         <span class="count">13</span>
                     </div>
                     <div class="summary-row">
-                        <span class="title">{{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.ALL_INSTANCE')}}</span>
-                        <span class="sub-title">{{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.ALL_INSTANCE_DESC')}}</span>
+                        <span class="title">{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.ALL_INSTANCE') }}</span>
+                        <span class="sub-title">{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.ALL_INSTANCE_DESC') }}</span>
                         <span class="count">159</span>
                     </div>
                     <div class="summary-row">
-                        <span class="title">{{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SPOT_INSTANCE')}}</span>
+                        <span class="title">{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SPOT_INSTANCE') }}</span>
                         <span class="count">128</span>
                     </div>
                 </div>
@@ -29,8 +29,8 @@
             <div class="cost-info widget-layout">
                 <div class="cost-wrapper">
                     <p class="title">
-                        <span>{{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.LAST_MONTH')}}</span>
-                        <strong> {{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SAVING_COST')}}</strong>
+                        <span>{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.LAST_MONTH') }}</span>
+                        <strong> {{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SAVING_COST') }}</strong>
                         <span class="percentage">
                             <p-i name="ic_table_sort_fromA" />
                             52%
@@ -42,7 +42,7 @@
                 </div>
                 <div class="cost-wrapper">
                     <p class="title">
-                        <strong>{{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.ACCUMULATE_COST')}}</strong>
+                        <strong>{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.ACCUMULATE_COST') }}</strong>
                     </p>
                     <p class="cost">
                         ${{ commaFormatter(numberFormatter(cumulativeSavingCost)) }}
@@ -70,12 +70,19 @@
                             <p class="project-group-name">
                                 {{ item.project_group_info.name }}
                             </p>
-                            <p class="project-name">
-                                {{ item.name }}
-                            </p>
-                            <div v-if="item.noSpotGroup" class="cost-chart-wrapper">
+                            <div class="project-name-wrapper">
+                                <span class="project-name">
+                                    {{ item.name }}
+                                </span>
+                                <div class="divider" />
+                                <span class="spot-group-text">
+                                    {{ $t('AUTOMATION.SPOT_AUTOMATION.MAIN.SPOT_GROUP') }}
+                                    <strong>{{ item.spotGroupCount }}</strong>
+                                </span>
+                            </div>
+                            <div v-if="item.instanceCount > 0" class="cost-chart-wrapper">
                                 <div class="chart-wrapper">
-                                    <span class="instance">{{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.CARD.INSTANCE')}} <span class="instance-num">{{ item.instanceCount }}</span></span>
+                                    <span class="instance">{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.CARD.INSTANCE') }} <span class="instance-num">{{ item.instanceCount }}</span></span>
                                     <on-demand-and-spot-chart chart-type="long"
                                                               :spot="item.spotCount"
                                                               :ondemand="item.onDemandCount"
@@ -84,7 +91,7 @@
                                 </div>
                                 <div class="flex flex-col">
                                     <span class="cost-title">
-                                        {{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SAVING_COST')}}
+                                        {{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SAVING_COST') }}
                                     </span>
                                     <span class="cost">
                                         N/A
@@ -105,14 +112,14 @@
                                              color="inherit"
                                         />
                                     </template>
-                                    스팟 인스턴스 그룹 만들기
+                                    {{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.CARD.ADD_SPOT_GROUP') }}
                                 </p-anchor>
                             </div>
                         </router-link>
                     </article>
                 </li>
                 <template #no-data>
-                    {{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.NO_PROJECT')}}
+                    {{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.NO_PROJECT') }}
                 </template>
             </p-data-loader>
         </section>
@@ -238,6 +245,34 @@ export default {
             };
         };
 
+        const getSpotGroupByProject = async (projectIds) => {
+            try {
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupByProject({
+                    projects: projectIds,
+                });
+                Object.keys(state.items).forEach((i) => {
+                    state.items[i].spotGroupCount = res.projects[state.items[i].project_id];
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const getInstanceByProject = async (projectIds) => {
+            try {
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.getProjectInstanceCount({
+                    projects: projectIds,
+                });
+                Object.keys(state.items).forEach((i) => {
+                    state.items[i].instanceCount = res.projects[state.items[i].project_id].total;
+                    state.items[i].spotCount = res.projects[state.items[i].project_id].spot;
+                    state.items[i].onDemandCount = res.projects[state.items[i].project_id].ondemand;
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
         const listProjects = async () => {
             state.dataLoading = true;
             try {
@@ -245,17 +280,19 @@ export default {
                 state.items = res.results;
                 state.totalCount = res.total_count || 0;
 
+                const projects = state.items?.map(item => item.project_id);
+                await Promise.all([getSpotGroupByProject(projects), getInstanceByProject(projects)]);
 
-                Object.keys(state.items).forEach((i) => {
-                    const spotCount = Math.floor(Math.random() * 31) + 1;
-                    const onDemandCount = (Math.floor(Math.random() * 100) + 11) - spotCount;
-                    state.items[i].spotCount = spotCount;
-                    state.items[i].onDemandCount = onDemandCount;
-                    state.items[i].instanceCount = spotCount + onDemandCount;
-                    if (Math.random() > 0.5) {
-                        state.items[i].noSpotGroup = true;
-                    }
-                });
+                // Object.keys(state.items).forEach((i) => {
+                //     const spotCount = Math.floor(Math.random() * 31) + 1;
+                //     const onDemandCount = (Math.floor(Math.random() * 100) + 11) - spotCount;
+                //     state.items[i].spotCount = spotCount;
+                //     state.items[i].onDemandCount = onDemandCount;
+                //     state.items[i].instanceCount = spotCount + onDemandCount;
+                //     if (Math.random() > 0.5) {
+                //         state.items[i].noSpotGroup = true;
+                //     }
+                // });
 
                 state.dataLoading = false;
             } catch (e) {
@@ -303,6 +340,10 @@ export default {
 .dashboard-page-wrapper {
     @apply bg-secondary2;
     padding-top: 2rem;
+
+    @screen 2xl {
+        @apply bg-white;
+    }
 }
 .page-info {
     padding-left: 1.5rem;
@@ -421,12 +462,26 @@ export default {
     @apply bg-white;
     padding: 2rem 1.5rem;
 }
+.project-name-wrapper {
+    .project-name {
+        @apply text-gray-900 font-bold;
+        margin-top: 0.25rem;
+        font-size: 1.125rem;
+        line-height: 155%;
+    }
+    .divider {
+        @apply inline-block text-gray-200;
+        height: 1rem;
+        border-left-width: 1px;
+        margin-left: 0.2rem;
+        margin-right: 0.2rem;
+        vertical-align: middle;
+    }
 
-.project-wrapper {
-    @apply bg-white;
-    padding: 2rem 1.5rem;
+    .spot-group-text {
+        font-size: 0.75rem;
+    }
 }
-
 .project-card-list {
     @apply grid w-full;
     grid-template-columns: repeat(auto-fill, minmax(24.4rem, 1fr));
@@ -448,13 +503,6 @@ export default {
     line-height: 130%;
 }
 
-.project-name {
-    @apply text-gray-900 font-bold;
-    margin-top: 0.25rem;
-    font-size: 1.125rem;
-    line-height: 155%;
-}
-
 .cost-chart-wrapper {
     @apply flex;
     padding-top: 1.5rem;
@@ -462,7 +510,7 @@ export default {
     .cost-title {
         @apply text-gray-600;
         font-size: 0.75rem;
-        line-height: 150%;
+        line-height: 170%;
     }
     .cost {
         @apply text-gray-400;
@@ -474,11 +522,12 @@ export default {
 
 .chart-wrapper {
     width: 50%;
+    display: flex;
+    flex-direction: column;
     .instance {
         @apply text-gray-600;
         font-size: 0.75rem;
         line-height: 150%;
-        margin-bottom: 0.5rem;
 
         .instance-num {
             @apply text-gray-900 font-bold;
@@ -486,7 +535,7 @@ export default {
     }
 
     .on-demand-chart {
-        margin-top: 0.5rem;
+        margin-top: 0.625rem;
     }
 }
 .go-add {
