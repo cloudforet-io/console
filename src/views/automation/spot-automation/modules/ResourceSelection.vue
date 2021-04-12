@@ -225,7 +225,6 @@ export default {
 
                 if (state.schema.options?.fields) {
                     apiQuery.setOnly(...state.schema.options.fields.map((d) => {
-                        if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
                         if (d.options?.root_path) return `${d.options.root_path}.${d.key}`;
                         return d.key;
                     }), 'cloud_service_id', 'cloud_service_type', 'reference');

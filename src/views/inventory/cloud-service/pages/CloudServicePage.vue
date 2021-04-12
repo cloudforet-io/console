@@ -429,10 +429,7 @@ export default {
 
             const fields = schema?.options?.fields || tableState.schema?.options?.fields;
             if (fields) {
-                apiQuery.setOnly(...fields.map((d) => {
-                    if ((d.key as string).endsWith('.seconds')) return (d.key as string).replace('.seconds', '');
-                    return d.key;
-                }), 'reference', 'cloud_service_id');
+                apiQuery.setOnly(...fields.map(d => d.key), 'reference', 'cloud_service_id');
             }
 
             return apiQuery.data;

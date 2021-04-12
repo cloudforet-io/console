@@ -107,7 +107,7 @@ interface Props {
 const listMapper = {
     icon: d => SCHEDULE_STATUS[d.desired_state]?.icon || '',
 };
-const getFormattedTime = time => dayjs.unix(time.seconds).tz(store.state.user.timezone).format('YYYY-MM-DD');
+const getFormattedTime = time => dayjs(time).tz(store.state.user.timezone).format('YYYY-MM-DD');
 
 const validateProjectId = async (projectId): Promise<boolean> => {
     await store.dispatch('resource/project/load');

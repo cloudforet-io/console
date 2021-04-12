@@ -131,9 +131,9 @@ export default {
             return items;
         };
         const timeFormatter = (value) => {
-            let time = dayjs(dayjs.unix(value.seconds)).utc();
+            let time = dayjs(dayjs(value)).utc();
             if (state.timezone !== 'UTC') {
-                time = dayjs(dayjs.unix(value.seconds)).tz(state.timezone);
+                time = dayjs(dayjs(value)).tz(state.timezone);
             }
             return time.format('MM-DD HH:mm ~');
         };

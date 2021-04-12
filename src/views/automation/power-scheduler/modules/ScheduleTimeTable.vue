@@ -179,7 +179,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import {get, map, range} from 'lodash';
+import { get, map, range } from 'lodash';
 import dayjs, { Dayjs } from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import utc from 'dayjs/plugin/utc';
@@ -210,7 +210,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { store } from '@/store';
-import {timezoneList} from "@/store/modules/user/config";
+import { timezoneList } from '@/store/modules/user/config';
 
 dayjs.extend(isSameOrBefore);
 dayjs.extend(utc);
