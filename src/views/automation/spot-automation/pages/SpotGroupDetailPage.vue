@@ -35,6 +35,22 @@
                 </template>
                 <template #history />
             </p-tab>
+            <p-button-modal :header-title="headerTitle"
+                            :centered="true"
+                            :scrollable="false"
+                            size="md"
+                            :fade="true"
+                            :backdrop="true"
+                            :visible.sync="spotGroupDeleteModalVisible"
+                            :theme-color="themeColor"
+                            @confirm="spotGroupDeleteModalConfirm"
+            >
+                <template #body>
+                    <p class="delete-modal-content">
+                        {{ modalContent }}
+                    </p>
+                </template>
+            </p-button-modal>
         </div>
     </general-page-layout>
 </template>
@@ -48,7 +64,7 @@ import {
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import SpotGroupDetailDashboard from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupDetailDashboard.vue';
 import {
-    PBreadcrumbs, PPageTitle, PIconButton, PTab,
+    PBreadcrumbs, PPageTitle, PIconButton, PTab, PButtonModal,
 } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
@@ -56,6 +72,8 @@ import SpotGroupDetailMember from '@/views/automation/spot-automation/modules/sp
 import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
+import { TranslateResult } from 'vue-i18n';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 export default {
     name: 'SpotGroupDetailPage',
@@ -68,6 +86,7 @@ export default {
         PIconButton,
         PTab,
         TagsPanel,
+        PButtonModal,
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -106,24 +125,57 @@ export default {
         };
         init();
 
+        // Member modal
+        const formState = reactive({
+            spotGroupDeleteModalVisible: false,
+            spotGroupEditModalVisible: false,
+            headerTitle: '' as TranslateResult,
+            themeColor: '',
+            modalContent: '' as TranslateResult,
+        });
+
         /* event */
+
         const openSpotGroupDeleteModal = () => {
-            console.log('open delete modal');
+            formState.spotGroupDeleteModalVisible = true;
+            formState.headerTitle = vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MODAL_DELETE_SPOT_GROUP_TITLE');
+            formState.themeColor = 'alert';
+            formState.modalContent = vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.MODAL_DELETE_SPOT_GROUP_CONTENT');
         };
+
+        const spotGroupDeleteModalConfirm = async () => {
+            try {
+                await SpaceConnector.client.spotAutomation.spotGroup.delete({
+                    spot_group_id: state.spotGroupId,
+                });
+                await vm.$store.dispatch('favorite/spotGroup/removeItem', { id: state.spotGroupId });
+                showSuccessMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.ALT_S_DELETE_SPOT_GROUP'), '', root);
+                vm.$router.go(-1);
+            } catch (e) {
+                showErrorMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.ALT_E_DELETE_SPOT_GROUP'), e, root);
+            } finally {
+                formState.spotGroupDeleteModalVisible = false;
+            }
+        };
+
         const deleteSpotGroup = async () => {
             console.log('delete spot group');
         };
 
         const openSpotGroupEditModal = () => {
+            console.log('open spot group');
         };
+
         const updateSpotGroup = async () => {
             console.log('update spot group');
         };
 
         return {
             ...toRefs(state),
+            ...toRefs(formState),
             tabState,
             routeState,
+            spotGroupDeleteModalConfirm,
             openSpotGroupDeleteModal,
             openSpotGroupEditModal,
         };
