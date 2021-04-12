@@ -21,9 +21,15 @@
                    :value-handler-map="valueHandlerMap"
                    @change="onChange"
                    @refresh="onChange"
-        />
+        >
+            <template #left-area>
+                <p-check-box v-model="showFavorites">
+                    <span class="show-favorite">즐겨찾기만 보기</span>
+                </p-check-box>
+            </template>
+        </p-toolbox>
         <p class="cost-instance-info">
-            {{$t('AUTOMATION.SPOT_AUTOMATION.LIST.COST_INSTANCE_DATE_1')}}<strong>{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.COST_INSTANCE_DATE_2')}}</strong>
+            {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.COST_INSTANCE_DATE_1') }}<strong>{{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.COST_INSTANCE_DATE_2') }}</strong>
         </p>
         <p-data-loader class="flex-grow" :data="items" :loading="loading"
                        :class="{'short': isShort}"
@@ -43,7 +49,7 @@
                         <img src="@/assets/images/illust_no-spot-group.svg">
                     </figure>
                     <p class="no-spot-group-text">
-                        {{$t('AUTOMATION.SPOT_AUTOMATION.LIST.NO_DATA')}}
+                        {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.NO_DATA') }}
                     </p>
                 </section>
             </template>
@@ -53,12 +59,11 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
-    PBreadcrumbs, PPageTitle, PDivider, PToolbox, PIconTextButton, PDataLoader, PLottie,
+    PBreadcrumbs, PPageTitle, PDivider, PToolbox, PIconTextButton, PDataLoader, PLottie, PCheckBox,
 } from '@spaceone/design-system';
-import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { QueryHelper } from '@/lib/query';
 import { timestampFormatter } from '@/lib/util';
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -70,7 +75,6 @@ import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import { store } from '@/store';
 import { Tags, TimeStamp } from '@/models';
-import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 
 dayjs.extend(timezone);
@@ -96,11 +100,7 @@ const handlers = {
                 label: 'Provider',
             },
             {
-                name: 'region',
-                label: 'Region',
-            },
-            {
-                name: 'project',
+                name: 'project_id',
                 label: 'Project',
             },
             {
@@ -201,6 +201,7 @@ export default {
         PIconTextButton,
         PDataLoader,
         PLottie,
+        PCheckBox,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -221,6 +222,7 @@ export default {
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone),
             isShort: true,
+            showFavorites: false,
         });
         const routeState = reactive({
             route: computed(() => [
@@ -230,10 +232,20 @@ export default {
         });
 
         const getQuery = () => {
-            apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
-                .setPageLimit(state.pageSize)
-                .setFilters(queryHelper.filters);
-
+            if (state.showFavorites) {
+                const favoriteList = store.getters['favorite/spotGroup/sortedItems'];
+                const favorites = favoriteList.map(d => d.id);
+                apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
+                    .setPageLimit(state.pageSize)
+                    .setFilters(queryHelper.filters)
+                    .addFilter(
+                        { k: 'spot_group_id', o: '=', v: favorites },
+                    );
+            } else {
+                apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
+                    .setPageLimit(state.pageSize)
+                    .setFilters(queryHelper.filters);
+            }
             return apiQuery.data;
         };
 
@@ -410,6 +422,10 @@ export default {
             await listSpotGroup();
         })();
 
+        watch(() => state.showFavorites, (before, after) => {
+            if (after !== before) listSpotGroup();
+        }, { immediate: true });
+
 
         return {
             ...toRefs(state),
@@ -427,6 +443,11 @@ export default {
     flex-direction: column;
     padding: 2rem 1.5rem;
     height: 100%;
+}
+.show-favorite {
+    font-size: 0.875rem;
+    line-height: 140%;
+    margin-left: 0.5rem;
 }
 .cost-instance-info {
     @apply text-gray-900;

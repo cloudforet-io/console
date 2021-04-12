@@ -45,7 +45,7 @@
             </p>
             <p class="column-number">
                 {{ cardData.instanceDisk || 0 }}
-                <span class="column-number-unit">IOPS</span><span>{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.IOPS_DESC')}}</span>
+                <span class="column-number-unit">IOPS</span><span class="iops-desc">{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.IOPS_DESC')}}</span>
             </p>
         </div>
         <div class="spot-card-divider" />
@@ -165,6 +165,10 @@ export default {
     .on-demand-chart {
         margin-left: 0.5rem;
         margin-right: 1.5rem;
+    }
+    .iops-desc {
+        @apply text-xs text-gray-400 font-normal;
+        margin-left: 0.25rem;
     }
 }
 .load-balancer-column {
