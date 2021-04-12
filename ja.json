@@ -173,6 +173,21 @@
 				"TRY_AGAIN": "",
 				"TRY_AGAIN_DESC": ""
 			},
+			"DASHBOARD": {
+				"ACCUMULATE_COST": "",
+				"ALL_INSTANCE": "",
+				"ALL_INSTANCE_DESC": "",
+				"CARD": {
+					"INSTANCE": "",
+					"NO_SPOT_GROUP": ""
+				},
+				"LAST_MONTH": "",
+				"NO_PROJECT": "",
+				"PAGE_TITLE": "",
+				"SAVING_COST": "",
+				"SPOT_INSTANCE": "",
+				"USED_SPOT_GROUP": ""
+			},
 			"DETAIL": {
 				"ALT_E_DELETE_SPOT_GROUP": "",
 				"ALT_S_DELETE_SPOT_GROUP": "",
@@ -237,12 +252,34 @@
 				"TAB_SUMMARY": "概要情報",
 				"TAB_TAG": "タグ"
 			},
+			"LIST": {
+				"ADD_SPOT_GROUP": "",
+				"CARD": {
+					"ACTIVITY_TIME_RANGE": "",
+					"COST_TIME_RANGE": "",
+					"CPU_UTILIZATION": "",
+					"CREATED_AT": "",
+					"DISK_USAGE": "",
+					"INSTANCE": "",
+					"INSTANCE_STATE": "",
+					"IOPS_DESC": "",
+					"LAST_1_DAY": "",
+					"LAST_7_DAYS": "",
+					"LOAD_BALANCER": "",
+					"NUMBER_UNIT": "",
+					"REGION": "",
+					"SAVING_COST": "",
+					"SERVICE_TYPE": "",
+					"SPOT_INTERRUPT": ""
+				},
+				"COST_INSTANCE_DATE_1": "",
+				"COST_INSTANCE_DATE_2": "",
+				"NO_DATA": ""
+			},
 			"MAIN": {
 				"DASHBOARD": "",
+				"FAVORITES": "",
 				"SPOT_GROUP": ""
-			},
-			"SPOT_GROUP_LIST": {
-				"ADD_SPOT_GROUP": ""
 			}
 		}
 	},

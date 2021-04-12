@@ -173,6 +173,21 @@
 				"TRY_AGAIN": "다시 시도",
 				"TRY_AGAIN_DESC": "리소스 정보를 불러오지 못했습니다. 도메인 어드민에게 문의해주세요."
 			},
+			"DASHBOARD": {
+				"ACCUMULATE_COST": "누적 절감 비용",
+				"ALL_INSTANCE": "전체 인스턴스",
+				"ALL_INSTANCE_DESC": "(온디맨드+스팟)",
+				"CARD": {
+					"INSTANCE": "인스턴스",
+					"NO_SPOT_GROUP": "스팟 인스턴스 그룹 만들기 "
+				},
+				"LAST_MONTH": "지난 달",
+				"NO_PROJECT": "프로젝트 단위로 스팟그룹을 관리해보세요.",
+				"PAGE_TITLE": "대시보드",
+				"SAVING_COST": "절감 비용",
+				"SPOT_INSTANCE": "스팟 인스턴스",
+				"USED_SPOT_GROUP": "사용중인 스팟그룹"
+			},
 			"DETAIL": {
 				"ALT_E_DELETE_SPOT_GROUP": "스팟그룹 삭제 실패",
 				"ALT_S_DELETE_SPOT_GROUP": "스팟그룹 삭제 완료",
@@ -237,12 +252,34 @@
 				"TAB_SUMMARY": "요약정보",
 				"TAB_TAG": "태그"
 			},
+			"LIST": {
+				"ADD_SPOT_GROUP": "스팟그룹 생성  ",
+				"CARD": {
+					"ACTIVITY_TIME_RANGE": "Activity graph time range: ",
+					"COST_TIME_RANGE": "이번달 1일 ~ 어제",
+					"CPU_UTILIZATION": "일 평균 CPU 사용률",
+					"CREATED_AT": "생성",
+					"DISK_USAGE": "일 평균 디스크 사용률",
+					"INSTANCE": "인스턴스 ",
+					"INSTANCE_STATE": "인스턴스 상태",
+					"IOPS_DESC": "(읽기+쓰기)",
+					"LAST_1_DAY": "Last 1 day",
+					"LAST_7_DAYS": "Last 7 days",
+					"LOAD_BALANCER": "로드밸런서",
+					"NUMBER_UNIT": "",
+					"REGION": "리전",
+					"SAVING_COST": "절감비용 ",
+					"SERVICE_TYPE": "서비스 타입",
+					"SPOT_INTERRUPT": "스팟 인터럽트 "
+				},
+				"COST_INSTANCE_DATE_1": "비용, 인스턴스 기간:",
+				"COST_INSTANCE_DATE_2": "이번 ",
+				"NO_DATA": "스팟 자동화를 이용하려면, 스팟그룹을 생성해주세요."
+			},
 			"MAIN": {
 				"DASHBOARD": "대시보드 ",
-				"SPOT_GROUP": "스팟 그룹"
-			},
-			"SPOT_GROUP_LIST": {
-				"ADD_SPOT_GROUP": "스팟그룹 생성  "
+				"FAVORITES": "즐겨찾기 ",
+				"SPOT_GROUP": "스팟그룹"
 			}
 		}
 	},
