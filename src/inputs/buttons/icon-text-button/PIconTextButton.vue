@@ -35,7 +35,7 @@ import PButton from '@/inputs/buttons/button/PButton.vue';
 import { IconTextButtonProps } from '@/inputs/buttons/icon-text-button/type';
 import { BUTTON_SIZE, BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
-import color from '@/styles/colors';
+import { palette } from '@/styles/colors';
 
 export default {
     name: 'PIconTextButton',
@@ -118,14 +118,9 @@ export default {
         });
         const defaultIconColor = computed(() => {
             if (props.disabled) {
-                return color.gray['400'];
-            } if (state.isHover) {
-                return color.white;
+                return palette.gray[400];
             }
-            if (props.outline && props.styleType) {
-                return color[props.styleType];
-            }
-            return color.white;
+            return 'inherit';
         });
         const onHover = (value) => {
             state.isHover = value;

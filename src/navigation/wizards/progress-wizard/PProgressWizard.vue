@@ -73,6 +73,7 @@
             <div class="bottom">
                 <p-button :outline="true"
                           style-type="gray900"
+                          :disabled="loading"
                           size="lg"
                           class="txt-btn" @click="$emit('cancel', $event)"
                 >
@@ -81,6 +82,7 @@
                 <div class="nav-btn-box">
                     <p-button v-if="!isFirstTab"
                               :outline="true"
+                              :disabled="loading"
                               style-type="secondary"
                               size="lg"
                               @click="onClickPrev"
@@ -89,6 +91,7 @@
                     </p-button>
                     <p-button v-if="!isLastTab"
                               :outline="true"
+                              :disabled="loading"
                               style-type="secondary"
                               size="lg"
                               @click="onClickNext"
