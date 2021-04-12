@@ -15,7 +15,7 @@
                   @mousedown="onMousedown"
             >
                 <slot name="dragger">
-                    <p-i color="transparent inherit"
+                    <p-i color="inherit"
                          width="1.5rem"
                          height="1.5rem"
                          name="btn_height-modifier"

@@ -13,7 +13,7 @@
             <span class="header-title">
                 {{ $t('COMPONENT.QUERY_SEARCH_GUIDE.TITLE') }}
             </span>
-            <p-i name="ic_delete" color="transparent inherit"
+            <p-i name="ic_delete" color="inherit"
                  class="close-btn"
                  @click.stop="onClickClose"
             />

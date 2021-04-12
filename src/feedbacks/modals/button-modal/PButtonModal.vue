@@ -16,7 +16,7 @@
                                 />{{ headerTitle }}
                             </div>
                             <p-icon-button v-if="headerCloseButtonVisible"
-                                           name="ic_delete" color="transparent inherit"
+                                           name="ic_delete" color="inherit"
                                            class="close-btn"
                                            :class="[{disabled: loading},
                                                     {'no-footer': !footerVisible}]"

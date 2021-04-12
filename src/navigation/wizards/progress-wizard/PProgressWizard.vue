@@ -85,7 +85,7 @@
                               size="lg"
                               @click="onClickPrev"
                     >
-                        <p-i name="ic_back" color="transparent inherit" />{{ $t('COMPONENT.PROGRESS_WIZARD.PREV') }}
+                        <p-i name="ic_back" color="inherit" />{{ $t('COMPONENT.PROGRESS_WIZARD.PREV') }}
                     </p-button>
                     <p-button v-if="!isLastTab"
                               :outline="true"
@@ -93,7 +93,7 @@
                               size="lg"
                               @click="onClickNext"
                     >
-                        {{ $t('COMPONENT.PROGRESS_WIZARD.NEXT') }}<p-i name="ic_back" color="transparent inherit" dir="down" />
+                        {{ $t('COMPONENT.PROGRESS_WIZARD.NEXT') }}<p-i name="ic_back" color="inherit" dir="down" />
                     </p-button>
                     <p-button :loading="loading"
                               :disabled="disabled"

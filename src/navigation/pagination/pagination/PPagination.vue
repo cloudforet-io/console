@@ -165,7 +165,6 @@ export default {
             // updatePage,
             prevPage,
             nextPage,
-            iconHoverColor: 'transparent inherit',
         };
     },
 };

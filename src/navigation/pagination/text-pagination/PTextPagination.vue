@@ -54,7 +54,6 @@ export default {
 
         return {
             update,
-            iconHoverColor: 'transparent inherit',
         };
     },
 };
