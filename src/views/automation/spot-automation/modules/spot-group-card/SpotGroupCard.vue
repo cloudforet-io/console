@@ -21,8 +21,8 @@
                 <div class="right-wrapper">
                     <div class="spot-group-cost-wrapper">
                         <div class="spot-group-cost-text">
-                            <p>{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.SAVING_COST')}}</p>
-                            <span class="text-xs">{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.COST_TIME_RANGE')}}</span>
+                            <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.SAVING_COST') }}</p>
+                            <span class="text-xs">{{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.COST_TIME_RANGE') }}</span>
                         </div>
                         <span class="spot-group-cost"><span class="text-2xl font-normal">$</span>125</span>
                     </div>
@@ -48,9 +48,9 @@
             </div>
             <div class="card-footer" :class="{'short': isShort}">
                 <span class="footer-region">
-                    <span class="opacity-50 mr-2">{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.REGION')}}</span>
-                    {{ cardData.region_code }}
-                    <span class="opacity-50 mr-2 ml-4">{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.CREATED_AT')}}</span>
+                    <span class="opacity-50 mr-2">{{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.REGION') }}</span>
+                    {{ regionFormatter(cardData.region_code) }} {{ cardData.region_code }}
+                    <span class="opacity-50 mr-2 ml-4">{{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.CREATED_AT') }}</span>
                     {{ cardData.created_at }}
                 </span>
             </div>
@@ -63,8 +63,9 @@ import { PI, PLottie } from '@spaceone/design-system';
 import SpotGroupCardDesktop from '@/views/automation/spot-automation/modules/spot-group-card/SpotGroupCardDesktop.vue';
 import SpotGroupCardMobile from '@/views/automation/spot-automation/modules/spot-group-card/SpotGroupCardMobile.vue';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
-import { reactive, toRefs } from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
+import { store } from '@/store';
 
 
 export default {
@@ -96,6 +97,7 @@ export default {
             projectGroupName: '',
             loading: true,
             spotGroupId: props.cardData.spot_group_id,
+            regions: computed(() => store.state.resource.region.items),
         });
         const getProjectName = async () => {
             state.loading = true;
@@ -111,12 +113,15 @@ export default {
                 state.loading = false;
             }
         };
+        const regionFormatter = val => state.regions[val]?.name || val;
 
         (async () => {
             await getProjectName();
+            await store.dispatch('resource/region/load');
         })();
         return {
             ...toRefs(state),
+            regionFormatter,
         };
     },
 };

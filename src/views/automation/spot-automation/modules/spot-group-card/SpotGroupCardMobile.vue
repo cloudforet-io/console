@@ -19,7 +19,12 @@
                     <span v-else>
                         N/A
                     </span>
-                    <span class="text" :class="cardData.instanceState">{{ cardData.instanceState }}</span>
+                    <span v-if="cardData.instanceState === INSTANCE_STATE.healthy" class="text" :class="cardData.instanceState">
+                        {{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.HEALTHY')}}
+                    </span>
+                    <span v-if="cardData.instanceState === INSTANCE_STATE.unhealthy" class="text" :class="cardData.instanceState">
+                        {{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.UNHEALTHY')}}
+                    </span>
                 </span>
             </div>
             <p class="card-content-text">

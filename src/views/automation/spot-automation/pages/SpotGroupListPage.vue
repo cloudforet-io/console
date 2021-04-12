@@ -24,12 +24,12 @@
         >
             <template #left-area>
                 <p-check-box v-model="showFavorites">
-                    <span class="show-favorite">즐겨찾기만 보기</span>
+                    <span class="show-favorite">{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.SHOW_FAVORITES')}}</span>
                 </p-check-box>
             </template>
         </p-toolbox>
         <p class="cost-instance-info">
-            {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.COST_INSTANCE_DATE_1') }}<strong>{{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.COST_INSTANCE_DATE_2') }}</strong>
+            {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.COST_INSTANCE_DATE_1') }}<strong> {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.COST_INSTANCE_DATE_2') }}</strong>
         </p>
         <p-data-loader class="flex-grow" :data="items" :loading="loading"
                        :class="{'short': isShort}"
