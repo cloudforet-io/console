@@ -178,6 +178,7 @@
 				"ALL_INSTANCE": "전체 인스턴스",
 				"ALL_INSTANCE_DESC": "(온디맨드+스팟)",
 				"CARD": {
+					"ADD_SPOT_GROUP": "스팟 인스턴스 그룹 만들기",
 					"INSTANCE": "인스턴스",
 					"NO_SPOT_GROUP": "스팟 인스턴스 그룹 만들기 "
 				},
