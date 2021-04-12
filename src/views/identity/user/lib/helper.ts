@@ -1,5 +1,5 @@
 import { pluginStateColor, userStateColor } from '@/views/identity/user/lib/config';
-import { timestampFormatter } from '@/lib/util';
+import {iso8601Formatter} from '@/lib/util';
 import dayjs from 'dayjs';
 
 const colorBindFactory = (colorMapping, textFnc) => value => ({
@@ -7,9 +7,10 @@ const colorBindFactory = (colorMapping, textFnc) => value => ({
     ...colorMapping[value],
 });
 
-export const calculateTime = (lastAccessedDay, today, timezone) => {
-    const lastAccessedTime = timestampFormatter(lastAccessedDay, timezone);
-    const todayTime = timestampFormatter(today, timezone);
+export const calculateTime = (lastAccessedDay, timezone) => {
+    const today = dayjs().toISOString();
+    const lastAccessedTime = iso8601Formatter(lastAccessedDay, timezone);
+    const todayTime = iso8601Formatter(today, timezone);
     let calculatedTime = dayjs(todayTime).diff(lastAccessedTime, 'day');
     // eslint-disable-next-line no-restricted-globals
     if (isNaN(calculatedTime)) calculatedTime = -1;

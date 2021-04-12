@@ -13,7 +13,7 @@
                         @change="onChange"
         >
             <template #col-created_at-format="{value}">
-                {{ timestampFormatter(value, timezone) }}
+                {{ iso8601Formatter(value, timezone) }}
             </template>
         </p-search-table>
     </div>
@@ -25,12 +25,9 @@ import {
 } from '@vue/composition-api';
 
 import { PPanelTop, PSearchTable } from '@spaceone/design-system';
-import { Options, SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
-
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { getPageStart } from '@/lib/component-utils/pagination';
-import { timestampFormatter } from '@/lib/util';
+import { iso8601Formatter } from '@/lib/util';
 import { store } from '@/store';
 
 export default {
@@ -114,7 +111,7 @@ export default {
 
         return {
             ...toRefs(state),
-            timestampFormatter,
+            iso8601Formatter,
             onChange,
         };
     },

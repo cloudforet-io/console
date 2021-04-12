@@ -15,10 +15,10 @@
                 <p-text-list :items="data || []" delimiter="<br>" class="text-list" />
             </template>
             <template #data-created_at="{ data }">
-                {{ data ? timestampFormatter(data, baseState.timezone) : '' }}
+                {{ data ? iso8601Formatter(data, baseState.timezone) : '' }}
             </template>
             <template #data-last_collected_at="{ data }">
-                {{ data ? timestampFormatter(data, baseState.timezone) : '' }}
+                {{ data ? iso8601Formatter(data, baseState.timezone) : '' }}
             </template>
         </p-definition-table>
         <p-panel-top :use-total-count="true" :total-count="filterState.items? filterState.items.length:0">
@@ -39,7 +39,7 @@ import {
     PPanelTop, PDefinitionTable, PLazyImg, PDataTable, PStatus, PTextList,
 } from '@spaceone/design-system';
 
-import { timestampFormatter } from '@/lib/util';
+import {iso8601Formatter} from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 
@@ -63,7 +63,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const baseState = reactive({
             name: computed(() => vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_TITLE')),
-            timezone: computed(() => vm.$store.state.user.timezone),
+            timezone: computed(() => vm.$store.state.user.timezone) as unknown as string,
             loading: true,
             fields: computed(() => [
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.DETAILS_BASE_LABEL_NAME'), name: 'name' },
@@ -117,7 +117,7 @@ export default {
         return {
             baseState,
             filterState,
-            timestampFormatter,
+            iso8601Formatter,
         };
     },
 };

@@ -49,10 +49,10 @@
                 </span>
             </template>
             <template #col-created_at-format="{value}">
-                {{ timestampFormatter(value, timezone) }}
+                {{ iso8601Formatter(value, timezone) }}
             </template>
             <template #col-last_schedule_at-format="{value}">
-                {{ value ? timestampFormatter(value, timezone): '' }}
+                {{ value ? iso8601Formatter(value, timezone): '' }}
             </template>
         </p-toolbox-table>
 
@@ -93,7 +93,9 @@ import { DataTableField } from '@spaceone/design-system/dist/src/data-display/ta
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import EditScheduleModal from '@/views/plugin/collector/modules/EditScheduleModal.vue';
-import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
+import {
+    iso8601Formatter, showErrorMessage, showSuccessMessage,
+} from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
@@ -233,7 +235,7 @@ export default {
             listSchedules,
             onConfirmDelete,
             intervalFormatter,
-            timestampFormatter,
+            iso8601Formatter,
         };
     },
 };

@@ -12,7 +12,10 @@
                 <span v-else>Console, API</span>
             </template>
             <template #data-last_accessed_at="{data}">
-                <span v-if="data === 0">
+                <span v-if="data === -1">
+                    No Activity
+                </span>
+                <span v-else-if="data === 0">
                     {{ $t('IDENTITY.USER.MAIN.TODAY') }}
                 </span>
                 <span v-else-if="data === 1">
@@ -33,11 +36,9 @@ import {
 
 import { PPanelTop, PDefinitionTable, PStatus } from '@spaceone/design-system';
 
-import { timestampFormatter } from '@/lib/util';
 import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/helper';
 import { SpaceConnector } from '@/lib/space-connector';
 
-import dayjs from 'dayjs';
 import { Tags } from '@/models';
 // const arrayFormatter = value => ((value && Array.isArray(value) && value.length > 0) ? value.join(', ') : '');
 
@@ -108,7 +109,7 @@ export default {
                 });
                 baseState.data = res;
                 // eslint-disable-next-line camelcase
-                baseState.data.last_accessed_at = calculateTime(baseState.data.last_accessed_at, { seconds: dayjs().unix() }, props.timezone) || 0;
+                baseState.data.last_accessed_at = calculateTime(baseState.data.last_accessed_at, props.timezone as string) || 0;
                 baseState.loading = false;
             } catch (e) {
                 console.error(e);
@@ -123,7 +124,6 @@ export default {
         return {
             ...toRefs(baseState),
             userStateFormatter,
-            timestampFormatter,
         };
     },
 };

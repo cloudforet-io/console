@@ -61,7 +61,7 @@
                         </router-link>
                     </template>
                     <template #col-last_collected_at-format="{ value }">
-                        {{ value ? timestampFormatter(value,timezone) : '' }}
+                        {{ value ? iso8601Formatter(value,timezone) : '' }}
                     </template>
                 </p-query-search-table>
             </template>
@@ -115,7 +115,7 @@
                         </router-link>
                     </template>
                     <template #col-last_collected_at-format="{ value }">
-                        {{ value ? timestampFormatter(value,timezone) : '' }}
+                        {{ value ? iso8601Formatter(value,timezone) : '' }}
                     </template>
                 </p-data-table>
             </template>
@@ -162,7 +162,7 @@
                 </router-link>
             </template>
             <template #col-last_collected_at-format="{ value }">
-                {{ value ? timestampFormatter(value,timezone) : '' }}
+                {{ value ? iso8601Formatter(value,timezone) : '' }}
             </template>
         </p-table-check-modal>
     </general-page-layout>
@@ -188,12 +188,11 @@ import { CollectorModel } from '@/views/plugin/collector/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import {
-    showErrorMessage, showSuccessMessage, timestampFormatter,
+    iso8601Formatter,
+    showErrorMessage, showSuccessMessage,
 } from '@/lib/util';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
-import { getPageStart } from '@/lib/component-utils/pagination';
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import config from '@/lib/config';
 import { store } from '@/store';
 import { QueryHelper } from '@/lib/query';
 
@@ -511,7 +510,7 @@ export default {
             onClickCollectData,
             checkModalConfirm,
             exportCollectorDataToExcel,
-            timestampFormatter,
+            iso8601Formatter,
         };
     },
 };

@@ -167,7 +167,9 @@ import {
 } from '@/views/automation/power-scheduler/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
-import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
+import {
+    iso8601Formatter, showErrorMessage, showSuccessMessage,
+} from '@/lib/util';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PIconButton, PButton, PPageTitle, PI, PLottie,
@@ -338,7 +340,7 @@ export default {
                         schedule_id: props.scheduleId,
                     });
                     state.schedule = res;
-                    state.created = timestampFormatter(res.created_at, state.timezone);
+                    state.created = iso8601Formatter(res.created_at, state.timezone);
                 } catch (e) {
                     state.schedule = { ...defaultSchedule };
                     state.created = '';

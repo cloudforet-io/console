@@ -24,7 +24,7 @@
         >
             <template #left-area>
                 <p-check-box v-model="showFavorites">
-                    <span class="show-favorite">{{$t('AUTOMATION.SPOT_AUTOMATION.LIST.SHOW_FAVORITES')}}</span>
+                    <span class="show-favorite">{{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.SHOW_FAVORITES') }}</span>
                 </p-check-box>
             </template>
         </p-toolbox>
@@ -65,7 +65,7 @@ import {
     PBreadcrumbs, PPageTitle, PDivider, PToolbox, PIconTextButton, PDataLoader, PLottie, PCheckBox,
 } from '@spaceone/design-system';
 import { QueryHelper } from '@/lib/query';
-import { timestampFormatter } from '@/lib/util';
+import { iso8601Formatter } from '@/lib/util';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { getPageStart, getThisPage } from '@/lib/component-utils/pagination';
 import SpotGroupCard from '@/views/automation/spot-automation/modules/spot-group-card/SpotGroupCard.vue';
@@ -378,7 +378,7 @@ export default {
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.list({ query: getQuery() });
                 state.items = res.results.map(d => ({
                     ...d,
-                    created_at: timestampFormatter(d.created_at, state.timezone),
+                    created_at: iso8601Formatter(d.created_at, state.timezone),
                 }));
                 state.totalCount = res.total_count || 0;
                 state.loading = false;
@@ -431,7 +431,7 @@ export default {
             ...toRefs(state),
             routeState,
             onChange,
-            timestampFormatter,
+            iso8601Formatter,
         };
     },
 };

@@ -192,7 +192,7 @@ import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/hel
 import dayjs from 'dayjs';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { map } from 'lodash';
-import { showErrorMessage, showSuccessMessage, timestampFormatter } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 interface UserModel {
     created_at: Timestamp;
@@ -416,7 +416,7 @@ export default {
                     // eslint-disable-next-line camelcase
                     role_name: (getArrayWithNotDuplicatedItem(d.role_bindings.map(data => data.role_info.name))).join(', '),
                     // eslint-disable-next-line camelcase
-                    last_accessed_at: calculateTime(d.last_accessed_at, { seconds: dayjs().unix() }, state.timezone),
+                    last_accessed_at: calculateTime(d.last_accessed_at, state.timezone),
                 }));
                 state.totalCount = res.total_count;
             } catch (e) {
@@ -608,7 +608,6 @@ export default {
             ...toRefs(routeState),
             userFormState,
             userStateFormatter,
-            timestampFormatter,
             modalState,
             singleItemTabState,
             multiItemTabState,

@@ -45,7 +45,6 @@ import {
     PPanelTop, PDataTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
 
-import { timestampFormatter } from '@/lib/util';
 import { userStateFormatter } from '@/views/identity/user/lib/helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -139,7 +138,6 @@ export default {
         return {
             ...toRefs(baseState),
             userStateFormatter,
-            timestampFormatter,
             referenceRouter,
             getProjectLink,
         };

@@ -113,10 +113,9 @@ import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
-import { getPageStart } from '@/lib/component-utils/pagination';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { timestampFormatter } from '@/lib/util';
+import { iso8601Formatter } from '@/lib/util';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
 
@@ -272,8 +271,8 @@ export default {
         };
         const durationFormatter = (createdAt, finishedAt) => {
             if (createdAt && finishedAt) {
-                const createdAtTime = dayjs(timestampFormatter(createdAt, state.timezone));
-                const finishedAtTime = dayjs(timestampFormatter(finishedAt, state.timezone));
+                const createdAtTime = dayjs(iso8601Formatter(createdAt, state.timezone));
+                const finishedAtTime = dayjs(iso8601Formatter(finishedAt, state.timezone));
                 let duration = finishedAtTime.diff(createdAtTime, 'second');
                 if (duration < 60) return `${duration} sec`;
                 duration = finishedAtTime.diff(createdAtTime, 'minute');
@@ -292,7 +291,7 @@ export default {
                     created_count: task.created_count,
                     updated_count: task.updated_count,
                     'errors.length': task.errors.length,
-                    created_at: timestampFormatter(task.created_at, state.timezone),
+                    created_at: iso8601Formatter(task.created_at, state.timezone),
                     duration: durationFormatter(task.created_at, task.finished_at),
                 };
                 state.items.push(newTask);
@@ -396,7 +395,7 @@ export default {
         return {
             ...toRefs(state),
             querySearchHandlers,
-            timestampFormatter,
+            iso8601Formatter,
             referenceRouter,
             onSelect,
             onChange,

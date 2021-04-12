@@ -82,7 +82,7 @@
                         <span :class="value.toLowerCase()" class="pl-2">{{ statusFormatter(value) }}</span>
                     </template>
                     <template #col-created_at-format="{value}">
-                        {{ timestampFormatter(value, timezone) }}
+                        {{ iso8601Formatter(value, timezone) }}
                     </template>
                 </p-query-search-table>
                 <div v-if="!loading && items.length > 0" class="pagination">
@@ -154,7 +154,7 @@ import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { timestampFormatter } from '@/lib/util';
+import { iso8601Formatter } from '@/lib/util';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
@@ -308,8 +308,8 @@ export default {
         };
         const durationFormatter = (createdAt, finishedAt) => {
             if (createdAt && finishedAt) {
-                const createdAtMoment = dayjs(timestampFormatter(createdAt, state.timezone));
-                const finishedAtMoment = dayjs(timestampFormatter(finishedAt, state.timezone));
+                const createdAtMoment = dayjs(iso8601Formatter(createdAt, state.timezone));
+                const finishedAtMoment = dayjs(iso8601Formatter(finishedAt, state.timezone));
                 let duration = finishedAtMoment.diff(createdAtMoment, 'second');
                 if (duration < 60) return `${duration} sec`;
                 duration = finishedAtMoment.diff(createdAtMoment, 'minute');
@@ -448,7 +448,7 @@ export default {
             onClickStatus,
             onClickDate,
             statusFormatter,
-            timestampFormatter,
+            iso8601Formatter,
             referenceRouter,
         };
     },

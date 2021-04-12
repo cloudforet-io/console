@@ -45,7 +45,7 @@
                 </router-link>
             </template>
             <template #col-created_at-format="{value}">
-                <span>{{ timestampFormatter(value, timezone) }}</span>
+                <span>{{ iso8601Formatter(value, timezone) }}</span>
             </template>
             <template #col-collect-format="{item}">
                 <p-button
@@ -75,10 +75,9 @@ import {
 } from '@spaceone/design-system';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
-import { timestampFormatter } from '@/lib/util';
+import { iso8601Formatter } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { getPageStart } from '@/lib/component-utils/pagination';
 import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { TimeStamp } from '@/models';
@@ -225,7 +224,7 @@ export default {
             ...toRefs(state),
             querySearchHandlers,
             listCredentials,
-            timestampFormatter,
+            iso8601Formatter,
             referenceRouter,
             openCollectDataModal(item: SecretModel) {
                 state.collectDataVisible = true;
