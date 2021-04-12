@@ -16,6 +16,7 @@ export interface MonitoringResourceType {
 }
 
 export interface MonitoringProps {
+    loading?: boolean;
     resourceType: string;
     resources: MonitoringResourceType[];
     selectedMetrics?: Metric[];

@@ -43,7 +43,7 @@
                     <strong>{{ $t('COMMON.MONITORING.LOCAL_TIME') }}</strong>
                 </template>
             </i18n>
-            <div v-if="metricsLoading">
+            <div v-if="showLoader">
                 <p-lottie class="loader" name="thin-spinner" auto
                           :size="2"
                 />
@@ -171,6 +171,10 @@ export default {
         MetricChart,
     },
     props: {
+        loading: {
+            type: Boolean,
+            default: false,
+        },
         resourceType: {
             type: String,
             default: null,
@@ -197,6 +201,7 @@ export default {
     },
     setup(props: MonitoringProps) {
         const state = reactive({
+            showLoader: computed(() => props.loading || state.metricsLoading),
             timezone: computed(() => store.state.user.timezone),
             dataTools: [],
             selectedToolId: '',
@@ -267,7 +272,6 @@ export default {
         };
         const listMetrics = async () => {
             try {
-                state.metricsLoading = true;
                 state.metrics = [];
 
                 const res = await SpaceConnector.client.monitoring.metric.list({
@@ -278,8 +282,6 @@ export default {
                 state.metrics = sortBy(res.metrics, m => m.name);
             } catch (e) {
                 console.error(e);
-            } finally {
-                state.metricsLoading = false;
             }
         };
 
@@ -338,11 +340,13 @@ export default {
 
             await setAvailableResources();
 
+            state.metricsLoading = true;
             if (props.selectedMetrics && props.selectedMetrics.length > 0) {
                 state.metrics = sortBy(props.selectedMetrics, m => m.name);
             } else {
                 await listMetrics();
             }
+            state.metricsLoading = false;
 
             if (state.metrics.length === 0) return;
 
@@ -374,7 +378,7 @@ export default {
             if (timeRange && stat) listMetricCharts();
         }, { immediate: false });
 
-        watch(() => state.selectedToolId, async () => {
+        watch([() => state.selectedToolId, () => props.selectedMetrics], async () => {
             if (props.resources) {
                 await listAll();
             }

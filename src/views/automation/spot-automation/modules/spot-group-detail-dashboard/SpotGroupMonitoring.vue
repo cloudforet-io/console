@@ -43,17 +43,9 @@
         </div>
         <div class="widget-wrapper">
             <keep-alive>
-                <template v-if="selectedIndex === 0">
+                <template v-if="selectedIndex < 2">
                     <monitoring v-if="resources.length > 0"
-                                :resources="resources"
-                                :data-source-id="dataSourceId"
-                                :resource-type="resourceType"
-                                :selected-metrics="metrics"
-                                :responsive="true"
-                    />
-                </template>
-                <template v-else-if="selectedIndex === 1">
-                    <monitoring v-if="resources.length > 0"
+                                :loading="loading"
                                 :resources="resources"
                                 :data-source-id="dataSourceId"
                                 :resource-type="resourceType"
@@ -132,6 +124,7 @@ export default {
 
         /* state */
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const metricsCacheMap = {};
         const apiQuery = new ApiQueryHelper();
         const instanceState = reactive({
             count: 0,
@@ -142,6 +135,7 @@ export default {
             data: [],
         });
         const state = reactive({
+            loading: false,
             cloudServiceId: '',
             resourceType: 'inventory.Server',
             resources: [],
@@ -244,14 +238,25 @@ export default {
         };
         const getSpotGroupMetrics = async (spotGroupId) => {
             try {
-                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupMetrics({
-                    spot_group_id: spotGroupId,
-                    metric_type: state.metricType,
-                });
-                state.metrics = res.metrics;
-                state.dataSourceId = res.data_source_id;
+                state.loading = true;
+                let metrics = metricsCacheMap[state.metricType];
+                let dataSourceId = state.dataSourceId;
+
+                if (!metrics || !dataSourceId) {
+                    const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupMetrics({
+                        spot_group_id: spotGroupId,
+                        metric_type: state.metricType,
+                    });
+                    metrics = res.metrics;
+                    dataSourceId = res.data_source_id;
+                }
+                metricsCacheMap[state.metricType] = metrics;
+                state.metrics = metrics || [];
+                state.dataSourceId = dataSourceId;
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
         const getInstanceSchema = async (spotGroupId) => {
