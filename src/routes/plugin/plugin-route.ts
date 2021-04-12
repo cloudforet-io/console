@@ -5,9 +5,21 @@ const CollectorPage = () => import(/* webpackChunkName: "CollectorPage" */ '@/vi
 const CollectorPluginPage = () => import(/* webpackChunkName: "CollectorPlugin" */ '@/views/plugin/collector/pages/CollectorPluginPage.vue');
 const CreateCollectorPage = () => import(/* webpackChunkName: "CreateCollector" */ '@/views/plugin/collector/pages/CreateCollectorPage.vue');
 
+export const PLUGIN_ROUTE = Object.freeze({
+    MAIN: 'plugin',
+    COLLECTOR: {
+        MAIN: 'collectorMain',
+        CREATE: {
+            MAIN: 'createCollector',
+            PLUGINS: 'collectorPlugins',
+            STEPS: 'collectorCreateSteps',
+        },
+    },
+});
+
 export default {
     path: 'plugin',
-    name: 'plugin',
+    name: PLUGIN_ROUTE.MAIN,
     redirect: '/plugin/collector',
     meta: { label: 'Plugin' },
     component: { template: '<router-view />' },
@@ -23,35 +35,26 @@ export default {
             children: [
                 {
                     path: '/',
-                    name: 'collectorMain',
+                    name: PLUGIN_ROUTE.COLLECTOR.MAIN,
                     props: true,
                     component: CollectorPage,
                 },
                 {
                     path: 'create',
-                    name: 'createCollector',
+                    name: PLUGIN_ROUTE.COLLECTOR.CREATE.MAIN,
                     meta: { label: 'Create Collector' },
                     redirect: './create/plugins',
                     component: { template: '<router-view />' },
                     children: [
                         {
                             path: 'plugins',
-                            name: 'collectorPlugins',
+                            name: PLUGIN_ROUTE.COLLECTOR.CREATE.PLUGINS,
                             component: CollectorPluginPage,
                         },
                         {
-                            path: 'collector-creator',
-                            name: Symbol('collector-creator'),
-                            // redirect: './plugins',
-                            component: { template: '<router-view />' },
-                            children: [
-                                {
-                                    path: ':pluginId',
-                                    name: Symbol(':pluginId'),
-                                    props: true,
-                                    component: CreateCollectorPage,
-                                },
-                            ],
+                            path: 'collector-creator/:pluginId',
+                            name: PLUGIN_ROUTE.COLLECTOR.CREATE.STEPS,
+                            component: CreateCollectorPage,
                         },
                     ],
                 },

@@ -2,7 +2,7 @@
     <div class="sitemap-container" :class="{'disabled': disabled}">
         <div class="sitemap-button" :class="visible ? 'visible' : ''" @click="toggleMenu">
             <p-i class="sitemap-icon" :name="visible ? 'ic_delete' : 'ic_gnb_service_2'"
-                 :color="visible ? 'transparent inherit' : 'inherit transparent'"
+                 color="inherit"
                  width="2rem" height="2rem"
             />
         </div>

@@ -3,7 +3,7 @@
          name="ic_bookmark"
          width="1rem" height="1rem"
          :scale="scale"
-         color="transparent inherit"
+         color="inherit"
          class="favorite-btn"
          :class="{active, 'read-only': readOnly}"
          @click.prevent="onClickProjectFavorite"

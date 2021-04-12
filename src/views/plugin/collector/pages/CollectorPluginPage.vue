@@ -44,7 +44,7 @@
                         >
                             <span>{{ tag }}</span>
                             <p-i name="ic_delete" width="1rem"
-                                 height="1rem" color="transparent inherit"
+                                 height="1rem" color="inherit"
                                  class="cursor-pointer"
                                  @click="onDeleteResourceSearchTag(idx)"
                             />

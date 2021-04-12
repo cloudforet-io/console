@@ -98,7 +98,7 @@ import {
     PI, PPaneLayout, PLottie, PIconButton, PIconTextButton, PRadio, PTree,
 } from '@spaceone/design-system';
 
-import { PROJECT_MAIN_PAGE_NAME } from '@/routes/project/project-route';
+import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { ProjectGroupTreeItem } from '@/views/project/project/type';
@@ -201,7 +201,7 @@ export default {
         };
 
 
-        const projectPath = vm?.$router.resolve({ name: PROJECT_MAIN_PAGE_NAME }).href;
+        const projectPath = vm?.$router.resolve({ name: PROJECT_ROUTE.MAIN }).href;
         const goToProject = () => {
             window.open(projectPath);
         };

@@ -38,7 +38,7 @@
                     <span class="error-msg">{{ $t('COMMON.SIGN_IN.ALT_E_SIGN_IN') }}</span>
                     <p-i name="ic_delete" width="1.5rem" height="1.5rem"
                          class="cursor-pointer"
-                         color="transparent inherit"
+                         color="inherit"
                          @click="hideErrorMessage"
                     />
                 </div>
@@ -49,7 +49,7 @@
                 />
                 <span class="user-sign-in-btn" @click="goToUserSignIn">
                     <p-i name="ic_arrow_left_sm" width="0.5rem" height="0.5rem"
-                         color="inherit transparent"
+                         color="inherit"
                          class="mr-2"
                     />
                     {{ $t('COMMON.SIGN_IN.MEMBER_SIGN_IN') }}

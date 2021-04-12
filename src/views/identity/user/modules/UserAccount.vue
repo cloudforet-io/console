@@ -7,13 +7,13 @@
             <p class="form-title">
                 {{ $t('IDENTITY.USER.MAIN.BASE_INFORMATION') }}
             </p>
-            <p-field-group :label="'ID'" class="input-form">
+            <p-field-group required :label="'ID'" class="input-form">
                 <p-text-input v-model="userId" disabled class="text-input" />
             </p-field-group>
-            <p-field-group :label="'Role'" class="input-form">
+            <p-field-group required :label="'Role'" class="input-form">
                 <p-text-input v-model="userRole" disabled class="text-input" />
             </p-field-group>
-            <p-field-group :label="$t('COMMON.PROFILE.EMAIL')"
+            <p-field-group required :label="$t('COMMON.PROFILE.EMAIL')"
                            :invalid="validationState.isEmailValid === false"
                            :invalid-text="validationState.emailInvalidText"
                            class="input-form"
@@ -25,14 +25,14 @@
                     />
                 </template>
             </p-field-group>
-            <p-field-group :label="$t('COMMON.PROFILE.TIMEZONE')" class="input-form">
+            <p-field-group required :label="$t('COMMON.PROFILE.TIMEZONE')" class="input-form">
                 <p-select-dropdown v-model="timezone"
                                    :items="timezones"
                                    auto-height
                                    class="dropdown"
                 />
             </p-field-group>
-            <p-field-group :label="$t('COMMON.PROFILE.LANGUAGE')" class="input-form">
+            <p-field-group required :label="$t('COMMON.PROFILE.LANGUAGE')" class="input-form">
                 <p-select-dropdown v-model="language"
                                    :items="languages"
                                    auto-height
@@ -53,7 +53,7 @@
                 <form class="form">
                     <p-field-group
                         :label="$t('COMMON.PROFILE.PASSWORD')"
-                        :required="true"
+                        required
                         :invalid="validationState.isPasswordValid === false"
                         :invalid-text="validationState.passwordInvalidText"
                         class="input-form"
@@ -67,7 +67,7 @@
                     </p-field-group>
                     <p-field-group
                         :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
-                        :required="true"
+                        required
                         :invalid="validationState.isPasswordCheckValid === false"
                         :invalid-text="validationState.passwordCheckInvalidText"
                         class="input-form"
@@ -283,7 +283,6 @@ export default {
 .form-wrapper {
     padding: 2rem;
     max-width: 53rem;
-    max-height: 30.75rem;
 }
 .form-title {
     font-size: 1.375rem;

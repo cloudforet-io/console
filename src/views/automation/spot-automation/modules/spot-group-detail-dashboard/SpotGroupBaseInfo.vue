@@ -62,7 +62,7 @@
             </div>
         </section>
 
-        <update-spot-group-overlay v-if="isEditVisible" :spot-group-id="spotGroup.spot_group_id" @close="isEditVisible = false" />
+        <update-spot-group-overlay :spot-group-id="spotGroup.spot_group_id" :visible.sync="isEditVisible" />
     </div>
 </template>
 

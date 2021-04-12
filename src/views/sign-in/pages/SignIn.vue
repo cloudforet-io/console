@@ -42,7 +42,7 @@
                     <span class="error-msg">{{ $t('COMMON.SIGN_IN.ALT_E_SIGN_IN') }}</span>
                     <p-i name="ic_delete" width="1.5rem" height="1.5rem"
                          class="cursor-pointer"
-                         color="transparent inherit"
+                         color="inherit"
                          @click="hideErrorMessage"
                     />
                 </div>

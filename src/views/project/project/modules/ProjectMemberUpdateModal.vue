@@ -51,7 +51,7 @@
                               @click="addMemberLabel"
                     >
                         <p-i name="ic_plus" width="1.5rem" height="1.5rem"
-                             color="transparent inherit"
+                             color="inherit"
                         />
                     </p-button>
                 </div>

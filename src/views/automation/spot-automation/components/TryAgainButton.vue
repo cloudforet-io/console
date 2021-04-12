@@ -4,7 +4,6 @@
             {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.TRY_AGAIN_DESC') }}
         </p>
         <p-icon-text-button name="ic_refresh" style-type="gray900" outline
-                            icon-color="transparent inherit"
                             @click="$emit('refresh')"
         >
             {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.TRY_AGAIN') }}

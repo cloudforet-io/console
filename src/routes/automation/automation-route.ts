@@ -10,9 +10,28 @@ const SpotGroupListPage = () => import(/* webpackChunkName: "SpotGroupPage" */ '
 const SpotGroupDetailPage = () => import(/* webpackChunkName: "SpotGroupDetailPage" */ '@/views/automation/spot-automation/pages/SpotGroupDetailPage.vue');
 const AddSpotGroupPage = () => import(/* webpackChunkName: "AddSpotGroupPage" */ '@/views/automation/spot-automation/pages/AddSpotGroupPage.vue');
 
+export const AUTOMATION_ROUTE = Object.freeze({
+    MAIN: 'automation',
+    POWER_SCHEDULER: {
+        MAIN: 'powerSchedulerLanding',
+        ADD: 'powerScheduler',
+        DETAIL: 'powerSchedulerDetail',
+        RESOURCE_GROUP: 'powerSchedulerResourceGroup',
+    },
+    SPOT_AUTOMATION: {
+        MAIN: 'spotAutomation',
+        DASHBOARD: 'spotDashboard',
+        SPOT_GROUP: {
+            MAIN: 'spotGroup',
+            ADD: 'addSpotGroup',
+            DETAIL: 'spotGroupDetail',
+        },
+    },
+});
+
 export default {
     path: 'automation',
-    name: 'automation',
+    name: AUTOMATION_ROUTE.MAIN,
     redirect: '/automation/power-scheduler',
     meta: { label: 'Automation' },
     component: { template: '<router-view />' },
@@ -24,18 +43,18 @@ export default {
             children: [
                 {
                     path: '/',
-                    name: 'powerSchedulerLanding',
+                    name: AUTOMATION_ROUTE.POWER_SCHEDULER.MAIN,
                     component: PowerSchedulerLandingPage,
                 },
                 {
                     path: ':projectId',
-                    name: 'powerScheduler',
+                    name: AUTOMATION_ROUTE.POWER_SCHEDULER.ADD,
                     props: true,
                     component: PowerSchedulerPage,
                 },
                 {
                     path: ':projectId/:scheduleId',
-                    name: 'powerSchedulerDetail',
+                    name: AUTOMATION_ROUTE.POWER_SCHEDULER.DETAIL,
                     props: true,
                     component: PowerSchedulerPage,
                     children: [
@@ -56,29 +75,29 @@ export default {
             children: [
                 {
                     path: '/',
-                    name: 'spotAutomation',
+                    name: AUTOMATION_ROUTE.SPOT_AUTOMATION.MAIN,
                     component: SpotAutomationMainPage,
                     children: [
                         {
                             path: 'spot-dashboard',
-                            name: 'spotDashboard',
+                            name: AUTOMATION_ROUTE.SPOT_AUTOMATION.DASHBOARD,
                             component: SpotDashboardPage,
                         },
                         {
                             path: 'spot-group',
-                            name: 'spotGroup',
+                            name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP.MAIN,
                             component: SpotGroupListPage,
                         },
                     ],
                 },
                 {
                     path: 'spot-group/add/:projectId?',
-                    name: 'addSpotGroup',
+                    name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP.ADD,
                     component: AddSpotGroupPage,
                 },
                 {
                     path: 'spot-group/:id',
-                    name: 'spotGroupDetail',
+                    name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP.DETAIL,
                     props: true,
                     component: SpotGroupDetailPage,
                 },

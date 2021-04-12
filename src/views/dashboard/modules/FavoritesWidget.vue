@@ -4,7 +4,7 @@
             <span>{{ $t('COMMON.WIDGETS.FAVORITES_WIDGET.TITLE') }}</span>
             <p-i class="icon" name="ic_bookmark" height="1rem"
                  width="1rem"
-                 color="transparent inherit"
+                 color="inherit"
             />
         </p>
         <div class="list-wrapper">

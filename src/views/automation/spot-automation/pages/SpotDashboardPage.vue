@@ -73,7 +73,7 @@
                             <p class="project-name">
                                 {{ item.name }}
                             </p>
-                            <div class="cost-chart-wrapper">
+                            <div v-if="item.noSpotGroup" class="cost-chart-wrapper">
                                 <div class="chart-wrapper">
                                     <span class="instance">{{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.CARD.INSTANCE')}} <span class="instance-num">{{ item.instanceCount }}</span></span>
                                     <on-demand-and-spot-chart chart-type="long"
@@ -91,6 +91,23 @@
                                     </span>
                                 </div>
                             </div>
+                            <div v-else>
+                                <p-anchor class="go-add" :show-icon="false" :href="$router.resolve({
+                                              name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP.ADD,
+                                              params: {
+                                                  projectId: item.project_id
+                                              }
+                                          }).href"
+                                          @click.stop="() => {}"
+                                >
+                                    <template #left-extra>
+                                        <p-i name="ic_plus_thin" height="1em" width="1em"
+                                             color="inherit"
+                                        />
+                                    </template>
+                                    스팟 인스턴스 그룹 만들기
+                                </p-anchor>
+                            </div>
                         </router-link>
                     </article>
                 </li>
@@ -104,7 +121,7 @@
 
 <script lang="ts">
 import {
-    PDivider, PBreadcrumbs, PPageTitle, PToolbox, PDataLoader, PI,
+    PDivider, PBreadcrumbs, PPageTitle, PToolbox, PDataLoader, PI, PAnchor,
 } from '@spaceone/design-system';
 import InstanceBillingChart from '@/views/automation/spot-automation/components/InstanceBillingChart.vue';
 import SpotGroupRatioChart from '@/views/automation/spot-automation/components/SpotGroupRatioChart.vue';
@@ -121,6 +138,7 @@ import OnDemandAndSpotChart from '@/views/automation/spot-automation/components/
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { SpaceConnector } from '@/lib/space-connector';
 import { Tags, TimeStamp } from '@/models';
+import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 
 // TODO: change handlers with spot automation spec
 const handlers = makeQuerySearchPropsWithSearchSchema(
@@ -169,6 +187,7 @@ export default {
         PPageTitle,
         PToolbox,
         PDataLoader,
+        PAnchor,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -233,6 +252,9 @@ export default {
                     state.items[i].spotCount = spotCount;
                     state.items[i].onDemandCount = onDemandCount;
                     state.items[i].instanceCount = spotCount + onDemandCount;
+                    if (Math.random() > 0.5) {
+                        state.items[i].noSpotGroup = true;
+                    }
                 });
 
                 state.dataLoading = false;
@@ -271,6 +293,7 @@ export default {
             onChange,
             numberFormatter,
             commaFormatter,
+            AUTOMATION_ROUTE,
         };
     },
 };
@@ -465,6 +488,11 @@ export default {
     .on-demand-chart {
         margin-top: 0.5rem;
     }
+}
+.go-add {
+    @apply text-secondary;
+    font-size: 0.75rem;
+    margin-top: 2rem;
 }
 
 </style>

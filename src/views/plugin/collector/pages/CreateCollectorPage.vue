@@ -98,7 +98,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             plugin: {},
-            imageUrl: computed(() => state.plugin?.tags?.find(tag => tag.key === 'icon').value),
+            imageUrl: computed(() => state.plugin?.tags?.icon),
             provider: computed(() => get(state.plugin, 'provider', '')),
             pluginId: get(root, '$route.params.pluginId', ''),
             tags: [],

@@ -1,13 +1,11 @@
 <template>
-    <div>
-        <transition name="slide-up">
-            <general-page-layout class="overlay-page-layout">
-                <div class="page-wrapper">
-                    <slot />
-                </div>
-            </general-page-layout>
-        </transition>
-    </div>
+    <transition name="slide-up">
+        <general-page-layout v-if="visible" class="overlay-page-layout">
+            <div class="page-wrapper">
+                <slot />
+            </div>
+        </general-page-layout>
+    </transition>
 </template>
 
 <script lang="ts">
@@ -16,6 +14,12 @@ import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue
 export default {
     name: 'OverlayPageLayout',
     components: { GeneralPageLayout },
+    props: {
+        visible: {
+            type: Boolean,
+            required: true,
+        },
+    },
     setup() {
         return {
         };
@@ -26,20 +30,31 @@ export default {
 <style lang="postcss" scoped>
 .overlay-page-layout {
     @apply bg-white;
-    position: absolute;
+    position: fixed;
     display: flex;
     width: 100%;
-    height: 100%;
-    top: 0;
+//height: 100%;
+//top: 0;
+    height: calc(100vh - $(gnb-height));
+    top: $gnb-height;
     left: 0;
     flex-direction: column;
     z-index: 99;
     overflow: auto;
 
     /* transition: opacity 0.3s ease; */
-    max-height: 100%;
-    min-height: 100%;
     max-width: 100vw;
+    //&::before {
+    //    content: '';
+    //    display: block;
+    //    position: fixed;
+    //    top: 0;
+    //    height: $(gnb-height);
+    //    left: 0;
+    //    width: 100vw;
+    //    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
+    //    pointer-events: none;
+    //}
     .page-wrapper {
         width: 100%;
         border: none;

@@ -5,7 +5,7 @@
                 <span class="title col-span-8 md:col-span-10">{{ $t('COMMON.WIDGETS.TOP_PROJECT_TITLE') }}</span>
                 <router-link :to="'/project'" class="create-project-button">
                     <p-i name="ic_plus" width="1rem" height="1rem"
-                         color="transparent inherit"
+                         color="inherit"
                          class="add-icon"
                     />
                     <span class="hidden sm:block">{{ $t('COMMON.WIDGETS.TOP_PROJECT_CREATE_PROJECT') }}</span>
@@ -32,7 +32,7 @@
                 <router-link to="/project" tag="div" class="">
                     <p-icon-text-button name="ic_back" icon-direction="right"
                                         size="lg" dir="down"
-                                        style-type="primary" icon-color="transparent inherit"
+                                        style-type="primary"
                                         width="1.5rem" height="1.5rem"
                                         class="get-started"
                     >
@@ -237,7 +237,6 @@ export default {
 
         const queryHelper = new QueryHelper();
         const getLocation = (type, projectId) => {
-
             const query: Location['query'] = {};
             const name = 'cloudServiceMain';
 

@@ -35,7 +35,7 @@
                     <!--                        {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.PRIORITY') }}-->
                     <!--                    </span>-->
                     <p-i v-if="column.title > 5 && (isCreateMode || isEditMode)" name="ic_delete" width="1.5rem"
-                         color="transparent inherit"
+                         color="inherit"
                          class="header-button"
                          @click="deleteColumn(column.title, column)"
                     />
@@ -81,7 +81,7 @@
                                     </p><span class="resource-count">({{ item.count }})</span>
                                 </div>
                                 <p-icon-button v-if="(isCreateMode || isEditMode) && !item.recommended" name="ic_delete" width="1rem"
-                                               color="transparent inherit"
+                                               color="inherit"
                                                class="float-right -mr-1"
                                                @click.stop="deleteResourceGroup(column, item, index)"
                                 />

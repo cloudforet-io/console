@@ -18,7 +18,7 @@
                     <p class="auth-type-label">
                         <p-i v-if="item.label === formState.selectedAuthType.label"
                              name="ic_check" width="1.125rem" height="1.125rem"
-                             color="transparent inherit"
+                             color="inherit"
                         />
                         {{ item.label }}
                     </p>

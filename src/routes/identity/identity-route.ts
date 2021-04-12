@@ -8,9 +8,24 @@ const AddServiceAccountPage = () => import(/* webpackChunkName: "AddServiceAccou
 const ServiceAccountSearchPage = () => import(/* webpackChunkName: "ServiceAccountSearchPage" */ '@/views/identity/service-account/pages/ServiceAccountSearchPage.vue');
 const NoResource = () => import(/* webpackChunkName: "NoResource" */ '@/common/pages/NoResource.vue');
 
+export const IDENTITY_ROUTE = Object.freeze({
+    MAIN: 'identity',
+    SERVICE_ACCOUNT: {
+        MAIN: 'serviceAccount',
+        SEARCH: 'serviceAccountSearch',
+        ADD: 'addServiceAccount',
+        NO_RESOURCE: 'noServiceAccount',
+    },
+    USER: {
+        MAIN: 'user',
+        MANAGEMENT: 'userManagement',
+        ACCOUNT: 'userAccount',
+    },
+});
+
 export default {
     path: 'identity',
-    name: 'identity',
+    name: IDENTITY_ROUTE.MAIN,
     redirect: '/identity/service-account',
     meta: { label: 'Identity' },
     component: { template: '<router-view />' },
@@ -60,17 +75,17 @@ export default {
             children: [
                 {
                     path: '/',
-                    name: 'user',
+                    name: IDENTITY_ROUTE.USER.MAIN,
                     component: UserPage,
                     children: [
                         {
                             path: 'user-management',
-                            name: 'userManagement',
+                            name: IDENTITY_ROUTE.USER.MANAGEMENT,
                             component: UserManagement,
                         },
                         {
                             path: 'account',
-                            name: 'userAccount',
+                            name: IDENTITY_ROUTE.USER.ACCOUNT,
                             component: UserAccount,
                         },
                     ],

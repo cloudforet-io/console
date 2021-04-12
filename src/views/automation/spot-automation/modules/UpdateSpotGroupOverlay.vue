@@ -1,7 +1,7 @@
 <template>
-    <overlay-page-layout>
+    <overlay-page-layout :visible="proxyVisible">
         <p-page-title :title="$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.EDIT.TITLE')" child
-                      @goBack="$emit('close')"
+                      @goBack="proxyVisible = false"
         />
         <schedule-policy-settings v-if="spotGroup"
                                   :resource-id="resourceId"
@@ -24,7 +24,7 @@
             </p-button>
             <p-button class="text-button" style-type="outline gray900" size="lg"
                       :disabled="loading"
-                      @click="$emit('close')"
+                      @click="proxyVisible = false"
             >
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CANCEL') }}
             </p-button>
@@ -54,6 +54,7 @@ import SpotGroupCheckModal from '@/views/automation/spot-automation/modules/Spot
 import { SETTINGS_TYPE } from '@/views/automation/spot-automation/lib/config';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { i18n } from '@/translations';
+import { makeProxy } from '@/lib/compostion-util';
 
 interface Props {
     spotGroupId: string;
@@ -73,6 +74,10 @@ export default {
             type: String,
             default: '',
         },
+        visible: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: Props, { emit, root }) {
         const state = reactive({
@@ -85,6 +90,7 @@ export default {
             spotInstance: 0,
             onDemandType: SETTINGS_TYPE.ratio,
             recommendTypes: [] as string[],
+            proxyVisible: makeProxy('visible', props, emit),
         });
 
         const onChangeSchedulePolicy = ({ onDemand, spotInstance, type }) => {
@@ -139,7 +145,7 @@ export default {
                 });
 
                 showSuccessMessage(i18n.t('AUTOMATION.SPOT_AUTOMATION.DETAIL.EDIT.ALT_S_EDIT_SPOT_GROUP'), '', root);
-                emit('close');
+                state.proxyVisible = false;
             } catch (e) {
                 console.error(e);
                 showErrorMessage(i18n.t('AUTOMATION.SPOT_AUTOMATION.DETAIL.EDIT.ALT_E_EDIT_SPOT_GROUP'), e, root);

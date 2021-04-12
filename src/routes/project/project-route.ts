@@ -1,10 +1,13 @@
-import {RouteConfig} from 'vue-router';
+import { RouteConfig } from 'vue-router';
 
 const Project = () => import(/* webpackChunkName: "ProjectPage" */ '@/views/project/project/pages/ProjectPage.vue');
 const ProjectDetail = () => import(/* webpackChunkName: "ProjectDetail" */ '@/views/project/project/pages/ProjectDetail.vue');
 
-export const PROJECT_MAIN_PAGE_NAME = 'projectMain';
-export const PROJECT_DETAIL_PAGE_NAME = 'projectDetail';
+export const PROJECT_ROUTE = Object.freeze({
+    MAIN: 'projectMain',
+    DETAIL: 'projectDetail',
+});
+
 export default {
     path: 'project',
     meta: { label: 'Project' },
@@ -12,13 +15,13 @@ export default {
     children: [
         {
             path: '/',
-            name: PROJECT_MAIN_PAGE_NAME,
+            name: PROJECT_ROUTE.MAIN,
             props: true,
             component: Project,
         },
         {
             path: ':id',
-            name: PROJECT_DETAIL_PAGE_NAME,
+            name: PROJECT_ROUTE.DETAIL,
             props: true,
             component: ProjectDetail,
         },

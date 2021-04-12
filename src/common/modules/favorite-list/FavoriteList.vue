@@ -7,7 +7,7 @@
             <template #icon>
                 <p-i name="ic_bookmark"
                      width="0.875rem" height="0.875rem"
-                     color="transparent inherit"
+                     color="inherit"
                      class="favorite-btn"
                 />
             </template>
