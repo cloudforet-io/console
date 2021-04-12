@@ -1,9 +1,7 @@
 <template>
     <transition name="slide-up">
         <general-page-layout v-if="visible" class="overlay-page-layout">
-            <div class="page-wrapper">
-                <slot />
-            </div>
+            <slot />
         </general-page-layout>
     </transition>
 </template>
@@ -55,11 +53,6 @@ export default {
     //    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
     //    pointer-events: none;
     //}
-    .page-wrapper {
-        width: 100%;
-        border: none;
-        flex-grow: 1;
-    }
 }
 
 /* transition */

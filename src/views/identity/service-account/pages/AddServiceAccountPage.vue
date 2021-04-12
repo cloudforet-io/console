@@ -231,7 +231,7 @@ export default {
                 return false;
             }),
             //
-            tags: [],
+            tags: {},
             isTagsValid: true,
             //
             credentialName: undefined as undefined | string,

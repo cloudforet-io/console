@@ -11,11 +11,10 @@
             </template>
         </p-panel-top>
 
-        <p-data-table
-            :fields="fields"
-            :items="tags"
-            :loading="loading"
-            :col-copy="true"
+        <p-data-table :fields="fields"
+                      :items="items"
+                      :loading="loading"
+                      :col-copy="true"
         />
         <transition name="slide-up">
             <tags-page v-if="tagEditPageVisible"
@@ -43,6 +42,11 @@ import { TagItem } from '@/common/modules/tags-panel/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 
+interface Props {
+    resourceKey: string;
+    resourceId: string;
+    resourceType: string;
+}
 export default {
     name: 'TagsPanel',
     components: {
@@ -68,18 +72,19 @@ export default {
             required: true,
         },
     },
-    setup(props) {
+    setup(props: Props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const apiKeys = computed(() => props.resourceType.split('.').map(d => camelCase(d)));
         const api = computed(() => get(SpaceConnector.client, apiKeys.value));
 
         const state = reactive({
             loading: true,
-            tags: [] as TagItem[],
+            tags: {},
             fields: computed(() => [
                 { name: 'key', label: vm.$t('COMMON.TAGS.KEY'), type: 'item' },
                 { name: 'value', label: vm.$t('COMMON.TAGS.VALUE'), type: 'item' },
             ]),
+            items: computed(() => Object.keys(state.tags).map(k => ({ key: k, value: state.tags[k] }))),
         });
         const tagState = reactive({
             tagEditPageVisible: false,
@@ -88,18 +93,19 @@ export default {
         /* api */
         const getTags = async () => {
             if (!api.value) {
-                state.tags = [];
+                state.tags = {};
                 state.loading = false;
+                return;
             }
 
             try {
-                const res = await api.value.get({
+                const { tags } = await api.value.get({
                     [props.resourceKey]: props.resourceId,
                     query: { only: ['tags'] },
                 });
-                state.tags = res.tags;
+                state.tags = tags;
             } catch (e) {
-                state.tags = [];
+                state.tags = {};
                 console.error(e);
             } finally {
                 state.loading = false;

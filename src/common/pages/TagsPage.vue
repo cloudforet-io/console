@@ -72,6 +72,14 @@ import FNB from '@/common/modules/FNB.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { makeProxy } from '@/lib/compostion-util';
+
+interface Props {
+    tags: object;
+    resourceKey: string;
+    resourceId: string;
+    resourceType: string;
+}
 
 export default {
     name: 'TagsPage',
@@ -85,8 +93,8 @@ export default {
     },
     props: {
         tags: {
-            type: Array,
-            default: () => ([]),
+            type: Object,
+            default: () => ({}),
         },
         resourceKey: {
             type: String,
@@ -104,7 +112,7 @@ export default {
             required: true,
         },
     },
-    setup(props, { emit }) {
+    setup(props: Props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const apiKeys = computed(() => props.resourceType.split('.').map(d => camelCase(d)));
         const api = computed(() => get(SpaceConnector.client, apiKeys.value));
@@ -113,8 +121,8 @@ export default {
             loading: false,
             showHeader: computed(() => state.newTags.length > 0),
             showValidation: false,
-            newTags: props.tags.slice(),
-            isTagsValid: true,
+            newTags: { ...props.tags },
+            isTagsValid: false,
             noItem: computed(() => isEmpty(state.newTags)),
         });
 
@@ -122,6 +130,7 @@ export default {
         const goBack = () => {
             emit('close');
         };
+
 
         /* api */
         const onSave = async () => {
@@ -153,7 +162,6 @@ export default {
             ...toRefs(state),
             goBack,
             onSave,
-
         };
     },
 };

@@ -1,34 +1,36 @@
 <template>
-    <overlay-page-layout :visible="proxyVisible">
-        <p-page-title :title="$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.EDIT.TITLE')" child
-                      @goBack="proxyVisible = false"
-        />
-        <schedule-policy-settings v-if="spotGroup"
-                                  :resource-id="resourceId"
-                                  :origin-on-demand="spotGroup.options.min_ondemand"
-                                  @change="onChangeSchedulePolicy"
-        />
-        <instance-type-selection v-if="spotGroup"
-                                 :resource-id="resourceId"
-                                 :resource-type="resourceType"
-                                 :origin-candidates="spotGroup.options.candidate_types"
-                                 @change="onChangeInstanceType"
-        />
+    <fragment>
+        <overlay-page-layout :visible="proxyVisible">
+            <p-page-title :title="$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.EDIT.TITLE')" child
+                          @goBack="proxyVisible = false"
+            />
+            <schedule-policy-settings v-if="spotGroup"
+                                      :resource-id="resourceId"
+                                      :origin-on-demand="spotGroup.options.min_ondemand"
+                                      @change="onChangeSchedulePolicy"
+            />
+            <instance-type-selection v-if="spotGroup"
+                                     :resource-id="resourceId"
+                                     :resource-type="resourceType"
+                                     :origin-candidates="spotGroup.options.candidate_types"
+                                     @change="onChangeInstanceType"
+            />
 
-        <div v-if="spotGroup || !loading" class="button-group">
-            <p-button class="text-button" style-type="primary-dark" size="lg"
-                      :loading="loading"
-                      @click="onClickSave"
-            >
-                {{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.EDIT.SAVE') }}
-            </p-button>
-            <p-button class="text-button" style-type="outline gray900" size="lg"
-                      :disabled="loading"
-                      @click="proxyVisible = false"
-            >
-                {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CANCEL') }}
-            </p-button>
-        </div>
+            <div v-if="spotGroup || !loading" class="button-group">
+                <p-button class="text-button" style-type="primary-dark" size="lg"
+                          :loading="loading"
+                          @click="onClickSave"
+                >
+                    {{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.EDIT.SAVE') }}
+                </p-button>
+                <p-button class="text-button" style-type="outline gray900" size="lg"
+                          :disabled="loading"
+                          @click="proxyVisible = false"
+                >
+                    {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CANCEL') }}
+                </p-button>
+            </div>
+        </overlay-page-layout>
 
         <spot-group-check-modal :visible.sync="visibleCheckModal"
                                 edit-mode
@@ -38,7 +40,7 @@
                                 :on-demand-type="onDemandType"
                                 @confirm="onCheckConfirm"
         />
-    </overlay-page-layout>
+    </fragment>
 </template>
 
 <script lang="ts">

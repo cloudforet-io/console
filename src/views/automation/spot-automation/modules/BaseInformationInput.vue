@@ -38,7 +38,7 @@
                 >
                     <template #addButton="{disabled, addPair}">
                         <p-icon-text-button
-                            outline style-type="primary" :disabled="disabled"
+                            outline style-type="primary-dark" :disabled="disabled"
                             name="ic_plus_bold"
                             class="mb-2"
                             @click="addPair($event)"
@@ -79,7 +79,7 @@ export default {
         const state = reactive({
             name: '',
             isTagsFolded: true,
-            tags: [],
+            tags: {},
             showNameValidation: false,
             showTagsValidation: true,
             isNameValid: computed(() => (!state.showNameValidation || spotGroupNameRegex.test(state.name))),

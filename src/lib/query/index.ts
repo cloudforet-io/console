@@ -196,8 +196,8 @@ export class QueryHelper {
                 }
             } else if (f.v !== null && f.v !== undefined) {
                 /* keyword case */
-                if (Array.isArray(f.v)) keyword.push(...f.v.map(v => (v !== null ? v.toString() : '')));
-                else keyword.push(f.v.toString());
+                if (Array.isArray(f.v)) keyword.push(...f.v.map(v => (v !== null ? v.toString().trim() : '')));
+                else keyword.push(f.v.toString().trim());
             }
         });
         return {
