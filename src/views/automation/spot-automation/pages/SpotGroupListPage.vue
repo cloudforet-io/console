@@ -371,6 +371,20 @@ export default {
             }
         };
 
+        const getSpotGroupCostSavingResult = async (spotGroupIds) => {
+            try {
+                const SavingResponse = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupSavingCost({
+                    spot_groups: spotGroupIds,
+                });
+                Object.keys(state.items).forEach((i) => {
+                    const savingResult = SavingResponse.spot_groups[state.items[i].spot_group_id].saving_result || 0;
+                    state.items[i].savingResult = savingResult;
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
         const listSpotGroup = async () => {
             state.loading = true;
             state.cardDataLoading = true;
@@ -391,6 +405,7 @@ export default {
                     getSpotGroupInstanceState(spotGroupIds),
                     getSpotGroupInterruptHistory(spotGroupIds),
                     getSpotGroupInterruptCount(spotGroupIds),
+                    getSpotGroupCostSavingResult(spotGroupIds),
                 ]);
                 state.cardDataLoading = false;
             } catch (e) {

@@ -24,7 +24,9 @@
                             <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.SAVING_COST') }}</p>
                             <span class="text-xs">{{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.COST_TIME_RANGE') }}</span>
                         </div>
-                        <span class="spot-group-cost"><span class="text-2xl font-normal">$</span>125</span>
+                        <p class="spot-group-cost">
+                            <span class="text-2xl font-normal pt-1">$</span>{{ cardData.savingResult }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -50,6 +52,8 @@
                 <span class="footer-region">
                     <span class="opacity-50 mr-2">{{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.REGION') }}</span>
                     {{ regionFormatter(cardData.region_code) }} {{ cardData.region_code }}
+                </span>
+                <span class="footer-date">
                     <span class="opacity-50 mr-2 ml-4">{{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.CREATED_AT') }}</span>
                     {{ cardData.created_at }}
                 </span>
@@ -203,7 +207,6 @@ export default {
     }
 
     .spot-group-cost-wrapper {
-
         display: flex;
         justify-content: space-between;
         .spot-group-cost-text {
@@ -257,22 +260,21 @@ export default {
 }
 
 .card-footer {
-    @apply bg-blue-100 border border-gray-200;
+    @apply bg-blue-100 border border-gray-200 text-gray-500;
     border-top: 0;
     display: flex;
+    flex-direction: column;
     justify-content: center;
     min-height: 3.25rem;
     border-bottom-left-radius: 0.25rem;
     border-bottom-right-radius: 0.25rem;
-
-    .footer-region {
-        @apply text-gray-500;
-        font-size: 0.75rem;
-        align-self: center;
-    }
+    font-size: 0.75rem;
+    text-align: center;
+    align-items: center;
 
     @screen sm {
         min-height: 2.125rem;
+        flex-direction: row;
     }
 
     @screen md {

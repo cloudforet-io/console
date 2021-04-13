@@ -1,9 +1,6 @@
 <template>
     <article class="mobile-wrapper">
         <div class="left-desc">
-            <p class="card-content-text">
-                {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.SPOT_INTERRUPT') }} <span class="card-content-number">{{ cardData.interruptCount }}</span>
-            </p>
             <div class="card-content-text">
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.INSTANCE') }}
                 <span class="card-content-number">{{ cardData.instanceCount.total || 0 }} </span>{{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.NUMBER_UNIT') }}
@@ -28,10 +25,13 @@
                 </span>
             </div>
             <p class="card-content-text">
-                {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.CPU_UTILIZATION') }}<span class="card-content-number">{{ cardData.instanceCpu || 0 }} </span>%
+                {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.CPU_UTILIZATION') }}<span class="card-content-number"> {{ cardData.instanceCpu || 0 }} </span>%
             </p>
             <p class="card-content-text">
                 {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.DISK_USAGE') }} <span class="card-content-number">{{ cardData.instanceDisk || 0 }} </span>IOPS
+            </p>
+            <p class="card-content-text">
+                {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.SPOT_INTERRUPT') }} <span class="card-content-number">{{ cardData.interruptCount }}</span>
             </p>
         </div>
         <div class="right-desc">
