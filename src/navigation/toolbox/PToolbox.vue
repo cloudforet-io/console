@@ -255,10 +255,16 @@ export default defineComponent<Props>({
         const onSearch = (val?: string|QueryItem) => {
             if (!val) {
                 proxyState.searchText = '';
-                emitChange({ searchText: '' });
+                proxyState.thisPage = 1;
+                vm.$nextTick(() => {
+                    emitChange({ searchText: '', pageStart: state.pageStart });
+                });
             } else if (typeof val === 'string') {
                 proxyState.searchText = val;
-                emitChange({ searchText: val });
+                proxyState.thisPage = 1;
+                vm.$nextTick(() => {
+                    emitChange({ searchText: val, pageStart: state.pageStart });
+                });
             } else if (state.tagRef) {
                 state.tagRef.addTag(val);
             } else {
@@ -279,7 +285,10 @@ export default defineComponent<Props>({
         const onQueryTagsChange = (tags: QueryTag[]) => {
             if (proxyState.queryTags !== tags) {
                 proxyState.queryTags = tags;
-                emitChange({ queryTags: tags });
+                proxyState.thisPage = 1;
+                vm.$nextTick(() => {
+                    emitChange({ queryTags: tags, pageStart: state.pageStart });
+                });
             }
         };
 
