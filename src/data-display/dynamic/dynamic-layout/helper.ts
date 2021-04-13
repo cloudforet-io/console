@@ -9,7 +9,10 @@ export const getValueByPath = (data: any, path: string) => {
 
         if (Array.isArray(target)) {
             if (Number.isNaN(Number(currentPath))) {
-                target = target.map(d => d[currentPath]);
+                target = target.map((d) => {
+                    if (typeof d !== 'object') return d;
+                    return d[currentPath];
+                });
             } else {
                 target = target[Number(currentPath)];
             }
