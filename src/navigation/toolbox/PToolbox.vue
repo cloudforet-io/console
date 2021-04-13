@@ -234,7 +234,6 @@ export default defineComponent<Props>({
         };
 
         const onChangeThisPage = (thisPage: number) => {
-            console.debug('change this page', thisPage);
             proxyState.thisPage = thisPage;
             vm.$nextTick(() => {
                 emitChange({ pageStart: state.pageStart });
