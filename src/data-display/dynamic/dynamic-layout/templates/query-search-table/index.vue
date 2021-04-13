@@ -24,7 +24,7 @@
                          :invalid="invalid"
                          :col-copy="colCopy"
                          :searchable="searchable"
-                         :excel-visible="excelVisible"
+                         :exportable="excelVisible"
                          :timezone="timezone"
                          @change="onChange"
                          @refresh="onChange()"
