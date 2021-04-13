@@ -31,7 +31,7 @@
                     <tr>
                         <td>{{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.LABEL') }}</td>
                         <td>
-                            <p class="text-secondary">
+                            <p :class="onDemand === 0? 'text-gray-400' : 'text-secondary'">
                                 {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_ONDEMAND') }}&nbsp;
                                 <strong>{{ onDemand }}{{ unit }}</strong>
                             </p>
@@ -49,7 +49,7 @@
                     </tr>
                 </tbody>
             </table>
-            <p class="info">
+            <p v-if="onDemand === 0" class="info">
                 <p-i name="ic_outlined-info" color="inherit" height="1em"
                      width="1em"
                 />
@@ -143,7 +143,7 @@ export default {
     margin-top: 0.5rem;
     width: 100%;
     tr {
-        @apply border-b border-gray-300;
+        @apply border-b border-gray-200;
     }
     td {
         @apply text-gray-900;
@@ -152,6 +152,7 @@ export default {
         padding: 0.53125rem 1rem 0.46875rem;
         &:first-child {
             font-weight: bold;
+            width: 12rem;
         }
     }
 }
