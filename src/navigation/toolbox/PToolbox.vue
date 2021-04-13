@@ -57,8 +57,7 @@
                                      :timezone="timezone"
                                      @init="onQueryTagsInit"
                                      @change="onQueryTagsChange"
-                >
-                </p-query-search-tags>
+                />
             </div>
         </div>
     </div>
@@ -235,8 +234,11 @@ export default defineComponent<Props>({
         };
 
         const onChangeThisPage = (thisPage: number) => {
+            console.debug('change this page', thisPage);
             proxyState.thisPage = thisPage;
-            emitChange({ pageStart: state.pageStart });
+            vm.$nextTick(() => {
+                emitChange({ pageStart: state.pageStart });
+            });
         };
 
         const onChangePageSize = (pageSize) => {
