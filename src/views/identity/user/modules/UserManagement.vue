@@ -310,8 +310,8 @@ export default {
                 { name: 'last_accessed_at', label: 'Last Activity' },
                 { name: 'timezone', label: 'Timezone' },
             ])),
-            sortBy: '',
-            sortDesc: '',
+            sortBy: 'name',
+            sortDesc: true,
             pageStart: 1,
             pageLimit: 15,
             totalCount: 0,
@@ -454,13 +454,12 @@ export default {
         };
 
         const clickAdd = () => {
-            userFormState.visible = true;
             userFormState.updateMode = false;
             userFormState.headerTitle = vm.$t('IDENTITY.USER.FORM.ADD_TITLE') as string;
             userFormState.item = undefined;
+            userFormState.visible = true;
         };
         const clickUpdate = () => {
-            userFormState.visible = true;
             userFormState.updateMode = true;
             userFormState.headerTitle = vm.$t('IDENTITY.USER.FORM.UPDATE_TITLE') as string;
             userFormState.item = state.users[state.selectedIndex[0]];
@@ -490,25 +489,33 @@ export default {
 
         const getUsersParam = items => ({ users: map(items, 'user_id') });
         const bindRole = async (userId, roleId) => {
-            await SpaceConnector.client.identity.roleBinding.create({
-                resource_type: 'identity.User',
-                resource_id: userId,
-                role_id: roleId,
-            });
+            try {
+                await SpaceConnector.client.identity.roleBinding.create({
+                    resource_type: 'identity.User',
+                    resource_id: userId,
+                    role_id: roleId,
+                });
+            } catch (e) {
+                throw e;
+            }
         };
         const unbindRole = async (userId, roleId) => {
-            const res = await SpaceConnector.client.identity.roleBinding.list({
-                resource_type: 'identity.User',
-                resource_id: userId,
-                role_id: roleId,
-                // eslint-disable-next-line camelcase
-                role_type: 'DOMAIN',
-            });
-            const roleBindingId = res.results[0].role_binding_id;
-            if (res.total_count > 0) {
-                await SpaceConnector.client.identity.roleBinding.delete({
-                    role_binding_id: roleBindingId,
+            try {
+                const res = await SpaceConnector.client.identity.roleBinding.list({
+                    resource_type: 'identity.User',
+                    resource_id: userId,
+                    role_id: roleId,
+                    // eslint-disable-next-line camelcase
+                    role_type: 'DOMAIN',
                 });
+                const roleBindingId = res.results[0].role_binding_id;
+                if (res.total_count > 0) {
+                    await SpaceConnector.client.identity.roleBinding.delete({
+                        role_binding_id: roleBindingId,
+                    });
+                }
+            } catch (e) {
+                throw e;
             }
         };
         const addUser = async (item, roleId, role) => {
@@ -523,8 +530,8 @@ export default {
                 showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'), e, root);
             } finally {
                 state.selectedIndex = [];
+                userFormState.visible = false;
             }
-            userFormState.visible = false;
         };
         const updateUser = async (item, roleId, role) => {
             try {
@@ -545,8 +552,8 @@ export default {
             } finally {
                 await getUsers();
                 state.selectedIndex = [];
+                userFormState.visible = false;
             }
-            userFormState.visible = false;
         };
         const userFormConfirm = async (item, roleId, role) => {
             if (userFormState.updateMode) {

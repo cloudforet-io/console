@@ -264,11 +264,12 @@ export default {
                     validationState.userIdInvalidText = '';
                 }
             } catch (e) {
-                console.error(e);
+                validationState.isUserIdValid = false;
+                validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.USER_ID_DUPLICATED');
             }
         };
 
-        const checkEmailFormat = async (userId) => {
+        const checkEmailFormat = (userId) => {
             const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
             if (!regex.test(userId)) {
                 validationState.isUserIdValid = false;
@@ -289,7 +290,7 @@ export default {
                     await checkOauth();
                 }
                 if (formState.selectedAuthType.label === 'Local') {
-                    await checkEmailFormat(formState.user_id);
+                    checkEmailFormat(formState.user_id);
                 }
                 await checkDuplicatedId();
                 if (typeof validationState.isUserIdValid !== 'boolean') validationState.isUserIdValid = true;
@@ -312,7 +313,7 @@ export default {
             } else validationState.isEmailValid = true;
         };
 
-        const checkPassword = async (password) => {
+        const checkPassword = (password) => {
             // password1
             if (password.replace(/ /g, '').length !== password.length) {
                 validationState.isPasswordValid = false;
@@ -351,15 +352,17 @@ export default {
         const confirm = async () => {
             if (!props.updateMode) {
                 await checkUserID();
-                if (!validationState.isUserIdValid) {
-                    return;
+                if (!validationState.isUserIdValid) return;
+
+                if (formState.selectedAuthType.label === 'Local') {
+                    checkPassword(formState.password);
+                    if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
                 }
             }
-            if (formState.selectedAuthType.label === 'Local') {
-                await checkPassword(formState.password);
-                if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
-            }
-            await checkEmail(); if (!validationState.isEmailValid) return;
+
+            await checkEmail();
+            if (!validationState.isEmailValid) return;
+
             const data = {
                 user_id: formState.user_id,
                 name: formState.name,
