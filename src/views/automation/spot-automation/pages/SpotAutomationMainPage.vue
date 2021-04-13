@@ -1,5 +1,5 @@
 <template>
-    <vertical-page-layout :min-width="0" :init-width="260" :max-width="400">
+    <vertical-page-layout>
         <template #sidebar>
             <aside class="sidebar-menu">
                 <sidebar-title :title="$t('AUTOMATION.SPOT_AUTOMATION.MAIN.FAVORITES')">

@@ -6,7 +6,7 @@
                 {{ $t('PROJECT.LANDING.TOP_NOTI_PERMISSION_REQUIRED_2') }}
             </div>
         </top-notification>
-        <p-vertical-page-layout :min-width="260" :init-width="260" :max-width="400">
+        <p-vertical-page-layout>
             <template #sidebar="{width}">
                 <div class="sidebar-container">
                     <div class="sidebar-item-wrapper">

@@ -1,5 +1,5 @@
 <template>
-    <vertical-page-layout :min-width="0" :init-width="260" :max-width="400">
+    <vertical-page-layout>
         <template #sidebar>
             <div class="member-profile">
                 <p-i v-if="userState.isDomainOwner" class="member-icon" name="root-account"

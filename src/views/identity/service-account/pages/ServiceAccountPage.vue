@@ -1,30 +1,32 @@
 <template>
-    <p-vertical-page-layout :min-width="0" :init-width="260" :max-width="400">
+    <p-vertical-page-layout>
         <template #sidebar="{width}">
-            <p class="sidebar-title">
-                {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.PROVIDERS_TITLE') }}
-            </p>
-            <p-divider class="sidebar-divider" />
-            <div v-for="provider in providerState.items" :key="provider.provider" class="provider-list">
-                <p-divider v-if="provider.provider && provider.provider !== 'megazone'" class="provider-divider" />
-                <p-radio v-model="selectedProvider" :value="provider.provider">
-                    <template #radio-left>
-                        <img v-if="provider.icon"
-                             :src="provider.icon"
-                             :alt="provider.provider"
-                             class="provider-icon"
-                        >
-                        <p-i v-else name="ic_provider_other"
-                             class="provider-icon"
-                        />
-                        <span class="provider-name">{{ provider.label }}</span>
-                    </template>
-                    <template #icon="{ iconName }">
-                        <p-i class="radio-icon float-right" width="1.25rem" height="1.25rem"
-                             :name="iconName"
-                        />
-                    </template>
-                </p-radio>
+            <div class="relative h-full">
+                <p class="sidebar-title">
+                    {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.PROVIDERS_TITLE') }}
+                </p>
+                <p-divider class="sidebar-divider" />
+                <div v-for="provider in providerState.items" :key="provider.provider" class="provider-list">
+                    <p-divider v-if="provider.provider && provider.provider !== 'megazone'" class="provider-divider" />
+                    <p-radio v-model="selectedProvider" :value="provider.provider">
+                        <template #radio-left>
+                            <img v-if="provider.icon"
+                                 :src="provider.icon"
+                                 :alt="provider.provider"
+                                 class="provider-icon"
+                            >
+                            <p-i v-else name="ic_provider_other"
+                                 class="provider-icon"
+                            />
+                            <span class="provider-name">{{ provider.label }}</span>
+                        </template>
+                        <template #icon="{ iconName }">
+                            <p-i class="radio-icon float-right" width="1.25rem" height="1.25rem"
+                                 :name="iconName"
+                            />
+                        </template>
+                    </p-radio>
+                </div>
             </div>
         </template>
         <template #default>

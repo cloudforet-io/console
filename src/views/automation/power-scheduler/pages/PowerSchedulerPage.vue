@@ -1,5 +1,5 @@
 <template>
-    <vertical-page-layout :min-width="270" :init-width="270" :max-width="400">
+    <vertical-page-layout>
         <template #sidebar="{width}">
             <div class="px-3 mt-10 mb-12">
                 <p-icon-text-button name="ic_plus_bold" outline

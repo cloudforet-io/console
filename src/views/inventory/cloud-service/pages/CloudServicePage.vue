@@ -1,5 +1,5 @@
 <template>
-    <vertical-page-layout :min-width="0" :init-width="260" :max-width="400">
+    <vertical-page-layout>
         <template #sidebar>
             <div class="sidebar-title">
                 <p-lazy-img :src="sidebarState.iconUrl"

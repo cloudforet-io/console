@@ -1,5 +1,5 @@
 <template>
-    <p-vertical-page-layout :min-width="200" :init-width="260">
+    <p-vertical-page-layout>
         <template #sidebar="{width}">
             <div :style="{width: width}">
                 <plugin-filter :repositories="repositories"

@@ -1,5 +1,5 @@
 <template>
-    <p-vertical-page-layout :min-width="260" :init-width="260" :max-width="400">
+    <p-vertical-page-layout>
         <template #sidebar="{width}">
             <div :style="{width}">
                 <p class="sidebar-title">

@@ -156,7 +156,7 @@
 /* eslint-disable camelcase */
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import ScheduleTimeTable from '@/views/automation/power-scheduler/modules/ScheduleTimeTable.vue';
@@ -432,9 +432,16 @@ export default {
             await Promise.all(actions);
         }, { immediate: true });
 
-        setInterval(() => {
-            getScheduleStatus();
-        }, 5000);
+        let scheduleStatusInterval;
+        onMounted(() => {
+            if (scheduleStatusInterval) clearInterval(scheduleStatusInterval);
+            scheduleStatusInterval = setInterval(() => {
+                getScheduleStatus();
+            }, 5000);
+        });
+        onUnmounted(() => {
+            if (scheduleStatusInterval) clearInterval(scheduleStatusInterval);
+        });
 
         return {
             ...toRefs(state),

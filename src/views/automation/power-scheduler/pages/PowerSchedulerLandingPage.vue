@@ -76,7 +76,7 @@
                                         <p class="approximate">
                                             {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.ABOUT') }}
                                         </p>
-                                        <span class="costs"><span>$ </span><span class="approx-costs">N/A</span></span>
+                                        <span class="costs"><span>$ </span><span class="approx-costs">{{ item.savingCost }}</span></span>
                                     </div>
                                 </div>
                             </div>
@@ -250,9 +250,7 @@ export default {
 
         const getSavingCost = async () => {
             try {
-                const res = await SpaceConnector.client.statistics.topic.powerSchedulerSavingCost({ projects: state.items.map(d => d.project_id) }, {
-                    MOCK_MODE: true,
-                });
+                const res = await SpaceConnector.client.statistics.topic.powerSchedulerSavingCost({ projects: state.items.map(d => d.project_id) });
                 for (let i = 0; i < Object.keys(state.items).length; i++) {
                     state.items[i].savingCost = (res.projects[state.items[i].project_id].saving_cost).toLocaleString();
                 }

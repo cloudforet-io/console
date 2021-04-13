@@ -36,15 +36,15 @@ export default {
         },
         initWidth: {
             type: Number,
-            default: 450,
+            default: 260,
         },
         minWidth: {
             type: Number,
-            default: 100,
+            default: 260,
         },
         maxWidth: {
             type: Number,
-            default: 500,
+            default: 400,
         },
     },
     setup() {
