@@ -8,6 +8,8 @@
             </div>
         </div>
         <div class="resizer-container line"
+             :class="{transition:transition}"
+             :style="resizerStyle"
              @mousedown="startResizing"
              @mousemove="isResizing"
              @mouseup="endResizing"
@@ -89,6 +91,9 @@ export default {
                 overflowY: 'auto',
                 overflowX: 'hidden',
                 height: '100%',
+            })),
+            resizerStyle: computed(() => ({
+                left: `${state.width}px`,
             })),
             mainStyle: computed(() => ({
                 width: `calc( 100% - ${state.width}px )`,
@@ -175,7 +180,7 @@ export default {
 }
 .sidebar-container {
     &.transition {
-        transition: width 0.5s;
+        transition: width 0.2s;
     }
 }
 .main {
@@ -191,7 +196,13 @@ export default {
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    width: 5px;
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 0;
+    &.transition {
+        transition: left 0.2s;
+    }
     &.line {
         @apply border-l border-gray-200;
         background-color: transparent;
@@ -210,6 +221,7 @@ export default {
     .resizer {
         @apply text-gray-400;
         display: inline-block;
+        position: absolute;
         font-size: 1.5rem;
         font-weight: 600;
         text-align: center;
