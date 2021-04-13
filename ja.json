@@ -48,7 +48,7 @@
 				"EDIT_NAME_MODAL_TITLE": "スケジューラ編集",
 				"FIVE_SECONDS_MESSAGE": "",
 				"HIGH": "優先順位が高い",
-				"KANBAN_HINT_TEXT_1": "優先順位が高い",
+				"KANBAN_HINT_TEXT_1": "",
 				"KANBAN_HINT_TEXT_2": "優先順位を決めてください",
 				"LOW": "優先順位が低い",
 				"NO_DATA": "スケジューラがありません",

@@ -48,7 +48,7 @@
 				"EDIT_NAME_MODAL_TITLE": "Edit scheduler name",
 				"FIVE_SECONDS_MESSAGE": "Status auto refresh every 5 seconds.",
 				"HIGH": "High Priority",
-				"KANBAN_HINT_TEXT_1": "High Priority",
+				"KANBAN_HINT_TEXT_1": "마우스로 리소스 그룹의 위치를 바꾸고",
 				"KANBAN_HINT_TEXT_2": "Please, set group's priority",
 				"LOW": "Low Priority",
 				"NO_DATA": "There is no scheduler.",

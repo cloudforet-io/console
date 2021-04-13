@@ -48,7 +48,7 @@
 				"EDIT_NAME_MODAL_TITLE": "스케줄러 이름 편집",
 				"FIVE_SECONDS_MESSAGE": "상태는 5초마다 자동 업데이트됩니다.",
 				"HIGH": "우선순위 높음",
-				"KANBAN_HINT_TEXT_1": "우선순위 높음",
+				"KANBAN_HINT_TEXT_1": "마우스로 리소스 그룹의 위치를 바꾸고",
 				"KANBAN_HINT_TEXT_2": "우선순위를 정하세요.",
 				"LOW": "우선순위 낮음",
 				"NO_DATA": "스케줄러가 없습니다.",
