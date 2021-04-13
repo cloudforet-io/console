@@ -273,5 +273,9 @@ export default {
     .tab-bg {
         @apply bg-white rounded-sm pb-8;
     }
+
+    .delete-modal-content {
+        line-height: 1.4;
+    }
 }
 </style>

@@ -375,6 +375,7 @@ export default {
             try {
                 const SavingResponse = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupSavingCost({
                     spot_groups: spotGroupIds,
+                    month: dayjs.utc().format('YYYY-MM'),
                 });
                 Object.keys(state.items).forEach((i) => {
                     const savingResult = SavingResponse.spot_groups[state.items[i].spot_group_id].saving_result || 0;
