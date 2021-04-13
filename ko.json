@@ -118,8 +118,8 @@
 		},
 		"SPOT_AUTOMATION": {
 			"ADD": {
-				"ALT_E_CREATE_SPOT_GROUP": "스팟 그룹 생성 실패",
-				"ALT_S_CREATE_SPOT_GROUP": "스팟 그룹 생성이 완료되었습니다.",
+				"ALT_E_CREATE_SPOT_GROUP": "스팟그룹 생성 실패",
+				"ALT_S_CREATE_SPOT_GROUP": "스팟그룹 생성이 완료되었습니다.",
 				"BASE_INFO": {
 					"LABEL": "기본 정보",
 					"NAME_DESC_1": "공백 없이 최대 56자 / 문자로 시작해야 하고, 문자, 숫자 및 하이픈만 포함할 수 있습니다. ",
@@ -219,8 +219,8 @@
 					"TITLE": "비용"
 				},
 				"EDIT": {
-					"ALT_E_EDIT_SPOT_GROUP": "스팟 그룹 편집 실패",
-					"ALT_S_EDIT_SPOT_GROUP": "스팟 그룹 편집 완료",
+					"ALT_E_EDIT_SPOT_GROUP": "스팟그룹 편집 실패",
+					"ALT_S_EDIT_SPOT_GROUP": "스팟그룹 편집 완료",
 					"SAVE": "저장",
 					"TITLE": "스팟그룹"
 				},
