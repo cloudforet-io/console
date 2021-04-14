@@ -186,6 +186,7 @@
 				"NO_PROJECT": "프로젝트 단위로 스팟그룹을 관리해보세요.",
 				"PAGE_TITLE": "대시보드",
 				"SAVING_COST": "절감 비용",
+				"SPOT_GROUP_BY_PROJECT": "프로젝트 별 스팟그룹 관리",
 				"SPOT_INSTANCE": "스팟 인스턴스",
 				"USED_SPOT_GROUP": "사용중인 스팟그룹"
 			},
