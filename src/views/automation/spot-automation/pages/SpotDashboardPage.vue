@@ -18,7 +18,7 @@
                     </div>
                     <div class="summary-row">
                         <span class="title">{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SPOT_INSTANCE') }}</span>
-                        <span class="count">128</span>
+                        <span class="count">{{ spotInstanceCount }}</span>
                     </div>
                 </div>
                 <div class="chart-section">
@@ -44,7 +44,8 @@
                 </div>
                 <div class="cost-wrapper">
                     <p class="title">
-                        <strong>{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.ACCUMULATE_COST') }}</strong>
+                        <span>{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.LAST_SIX_MONTHS') }}</span>
+                        <strong> {{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.ACCUMULATE_COST') }}</strong>
                     </p>
                     <p class="cost">
                         ${{ commaFormatter(numberFormatter(savingResult)) }}
@@ -220,7 +221,8 @@ export default {
         const state = reactive({
             spotGroups: computed(() => Object.keys(store.state.resource.spotGroup.items)),
             spotGroupCount: computed(() => state.spotGroups.length),
-            totalInstanceCount: 0,
+            totalInstanceCount: 128,
+            spotInstanceCount: 112,
             items: undefined as unknown as ProjectListData[],
             dataLoading: true,
             keyItemSets: handlers.keyItemSets,

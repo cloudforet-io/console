@@ -27,7 +27,7 @@
 /* eslint-disable camelcase */
 import {
     find,
-    forEach, random, range, debounce,
+    forEach, range, debounce,
 } from 'lodash';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -57,7 +57,8 @@ interface ChartData {
     normalCost: number | null;
     savingCost: number | null;
     instance: number | null;
-    bulletText?: string | number;
+    lineBulletText?: string | number;
+    barBulletText?: string | number;
 }
 
 const PERIOD = 6;
@@ -73,7 +74,7 @@ export default {
         PChartLoader,
         PSkeleton,
     },
-    setup(props) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,
@@ -124,14 +125,14 @@ export default {
             dateAxis.tooltip.disabled = true;
             dateAxis.fontSize = 11;
 
-            const setTooltipStyle = (tooltip, field) => {
+            const setTooltipStyle = (tooltip, color) => {
                 tooltip.pointerOrientation = 'down';
                 tooltip.fontSize = 14;
                 tooltip.strokeWidth = 0;
                 tooltip.dy = -5;
                 tooltip.getFillFromObject = false;
-                tooltip.label.fill = am4core.color(COLORS[field]);
-                tooltip.background.stroke = am4core.color(COLORS[field]);
+                tooltip.label.fill = am4core.color(color);
+                tooltip.background.stroke = am4core.color(color);
             };
             const createValueAxis = (axisName, opposite = false) => {
                 const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
@@ -159,10 +160,10 @@ export default {
                 series.stacked = true;
                 series.strokeWidth = 0;
                 series.columns.template.width = am4core.percent(10);
-                series.columns.template.tooltipText = `\${${field}}`;
+                series.columns.template.tooltipHTML = '{barBulletText}';
                 series.stroke = am4core.color(COLORS.normalCost);
                 series.strokeWidth = 2;
-                setTooltipStyle(series.tooltip, field);
+                setTooltipStyle(series.tooltip, COLORS.savingCost);
             };
             const costAxisName = vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.COST');
             const instanceAxisName = vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.INSTANCE');
@@ -182,7 +183,7 @@ export default {
             lineSeries.fillOpacity = 1;
             lineSeries.bulletsContainer.parent = chart.seriesContainer;
             lineSeries.yAxis = lineValueAxis;
-            setTooltipStyle(lineSeries.tooltip, 'instance');
+            setTooltipStyle(lineSeries.tooltip, COLORS.instance);
 
             const circleBullet = lineSeries.bullets.push(new am4charts.CircleBullet());
             circleBullet.circle.radius = 3;
@@ -191,7 +192,7 @@ export default {
             circleBullet.tooltipText = '{instance}';
 
             const labelBullet = lineSeries.bullets.push(new am4charts.LabelBullet());
-            labelBullet.label.text = '{bulletText}';
+            labelBullet.label.text = '{lineBulletText}';
             labelBullet.label.fontSize = 14;
             labelBullet.label.truncate = false;
             labelBullet.label.hideOversized = false;
@@ -211,22 +212,37 @@ export default {
             forEach(range(0, PERIOD), (i) => {
                 const currentDate = dayjs.utc().subtract(i, 'month');
                 const currentData = find(rawData, { date: currentDate.format('YYYY-MM') });
+                let formattedDate = currentDate.format('MMM');
+                if (['1', '12'].includes(currentDate.format('M'))) {
+                    formattedDate = currentDate.format('MMM, YY');
+                }
 
                 if (currentData) {
                     const normalCost = currentData.normal_cost;
                     const savingCost = currentData.saving_cost;
                     const instance = currentData.instance_count;
+                    const savingPercentage = Math.round((savingCost / normalCost) * 100);
 
-                    let bulletText;
-                    if (i === 0 || i === PERIOD - 1) bulletText = instance;
+                    let lineBulletText;
+                    if (i === 0 || i === PERIOD - 1) lineBulletText = instance;
                     if (instance > maxInstance) maxInstance = instance;
+                    const barBulletText = `
+<span style="color: ${COLORS.normalCost}; line-height: 1.5">
+${vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.TOOLTIP_ON_DEMAND_ESTIMATED_COST')}: <strong>$${normalCost}</strong>
+</span>
+<br>
+<span style="color: ${peacock[400]}; line-height: 1.5">
+${vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.TOOLTIP_SAVING_COST')}: <strong>$${savingCost} (${savingPercentage}%)</strong>
+</span>
+`;
 
                     data.push({
-                        date: currentDate.format('MMM, YY'),
+                        date: formattedDate,
                         normalCost,
                         savingCost,
                         instance,
-                        bulletText,
+                        lineBulletText,
+                        barBulletText,
                     });
                 } else {
                     data.push({
@@ -238,7 +254,7 @@ export default {
                 }
             });
             data.forEach((d) => {
-                if (d.instance === maxInstance) d.bulletText = d.instance;
+                if (d.instance === maxInstance) d.lineBulletText = d.instance;
             });
 
             state.data = data.reverse();
