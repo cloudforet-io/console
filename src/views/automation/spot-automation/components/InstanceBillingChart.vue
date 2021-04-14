@@ -55,7 +55,7 @@ am4core.options.classNamePrefix = 'InstanceBillingChart';
 interface ChartData {
     date: string;
     normalCost: number | null;
-    savingCost: number | null;
+    savingResult: number | null;
     instance: number | null;
     lineBulletText?: string | number;
     barBulletText?: string | number;
@@ -64,7 +64,7 @@ interface ChartData {
 const PERIOD = 6;
 const COLORS = {
     normalCost: secondary,
-    savingCost: peacock[300],
+    savingResult: peacock[300],
     instance: primary1,
 };
 
@@ -85,7 +85,7 @@ export default {
                 },
                 {
                     label: vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.SPOT_SAVINGS_COST'),
-                    color: COLORS.savingCost,
+                    color: COLORS.savingResult,
                 },
             ])),
             chartRef: null as HTMLElement | null,
@@ -163,13 +163,13 @@ export default {
                 series.columns.template.tooltipHTML = '{barBulletText}';
                 series.stroke = am4core.color(COLORS.normalCost);
                 series.strokeWidth = 2;
-                setTooltipStyle(series.tooltip, COLORS.savingCost);
+                setTooltipStyle(series.tooltip, COLORS.savingResult);
             };
             const costAxisName = vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.COST');
             const instanceAxisName = vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.INSTANCE');
             createValueAxis(costAxisName);
             createBarSeries('normalCost');
-            createBarSeries('savingCost');
+            createBarSeries('savingResult');
 
             // create line series
             const lineValueAxis = createValueAxis(instanceAxisName, true);
@@ -219,9 +219,12 @@ export default {
 
                 if (currentData) {
                     const normalCost = currentData.normal_cost;
-                    const savingCost = currentData.saving_cost;
+                    const savingResult = currentData.saving_result;
                     const instance = currentData.instance_count;
-                    const savingPercentage = Math.round((savingCost / normalCost) * 100);
+                    const savingPercentage = Math.round((savingResult / normalCost) * 100);
+
+                    //
+                    const totalCost = normalCost - savingResult;
 
                     let lineBulletText;
                     if (i === 0 || i === PERIOD - 1) lineBulletText = instance;
@@ -232,14 +235,14 @@ ${vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.TOOLTIP_ON_DEMAND_ESTIMATED_C
 </span>
 <br>
 <span style="color: ${peacock[400]}; line-height: 1.5">
-${vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.TOOLTIP_SAVING_COST')}: <strong>$${savingCost} (${savingPercentage}%)</strong>
+${vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.TOOLTIP_SAVING_COST')}: <strong>$${savingResult} (${savingPercentage}%)</strong>
 </span>
 `;
 
                     data.push({
                         date: formattedDate,
-                        normalCost,
-                        savingCost,
+                        normalCost: totalCost,
+                        savingResult,
                         instance,
                         lineBulletText,
                         barBulletText,
@@ -248,7 +251,7 @@ ${vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.TOOLTIP_SAVING_COST')}: <stro
                     data.push({
                         date: currentDate.format('MMM, YY'),
                         normalCost: null,
-                        savingCost: null,
+                        savingResult: null,
                         instance: null,
                     });
                 }
