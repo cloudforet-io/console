@@ -252,7 +252,7 @@ export default {
             try {
                 const res = await SpaceConnector.client.statistics.topic.powerSchedulerSavingCost({ projects: state.items.map(d => d.project_id) });
                 for (let i = 0; i < Object.keys(state.items).length; i++) {
-                    state.items[i].savingCost = (res.projects[state.items[i].project_id].saving_cost).toLocaleString();
+                    state.items[i].savingCost = (res.projects[state.items[i].project_id].saving_result || 0).toLocaleString();
                 }
             } catch (e) {
                 console.error(e);

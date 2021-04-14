@@ -54,6 +54,9 @@
         </section>
         <p-divider class="dashboard-divider" />
         <section class="project-wrapper">
+            <p class="project-instance-info">
+                {{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SPOT_GROUP_BY_PROJECT')}} <span class="total-count">({{ totalCount }})</span>
+            </p>
             <p-toolbox filters-visible
                        search-type="query"
                        :page-size.sync="pageSize"
@@ -65,6 +68,9 @@
                        @change="onChange"
                        @refresh="onChange"
             />
+            <p class="cost-instance-info">
+                {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.COST_INSTANCE_DATE_1') }}<strong> {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.COST_INSTANCE_DATE_2') }}</strong>
+            </p>
             <p-data-loader class="flex-grow" :data="items" :loading="dataLoading">
                 <li class="project-card-list">
                     <article v-for="(item, i) in items" :key="i" class="project-item">
@@ -96,7 +102,7 @@
                                         {{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SAVING_COST') }}
                                     </span>
                                     <span class="cost">
-                                        N/A
+                                        <span class="text-sm">$</span>{{ item.savingCost }}
                                     </span>
                                 </div>
                             </div>
@@ -262,7 +268,7 @@ export default {
 
         const getSpotGroupByProject = async (projectIds) => {
             try {
-                const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupByProject({
+                const res = await SpaceConnector.client.statistics.topic.spotAutomationSpotGroupCount({
                     projects: projectIds,
                 });
                 Object.keys(state.items).forEach((i) => {
@@ -274,7 +280,7 @@ export default {
         };
         const getInstanceByProject = async (projectIds) => {
             try {
-                const res = await SpaceConnector.client.spotAutomation.spotGroup.getProjectInstanceCount({
+                const res = await SpaceConnector.client.statistics.topic.spotAutomationInstanceCount({
                     projects: projectIds,
                 });
                 Object.keys(state.items).forEach((i) => {
@@ -286,6 +292,20 @@ export default {
                 console.error(e);
             }
         };
+
+        const getSavingCostResultByProject = async (projectIds) => {
+            try {
+                const res = await SpaceConnector.client.statistics.topic.spotAutomationSavingCost({
+                    projects: projectIds,
+                });
+                Object.keys(state.items).forEach((i) => {
+                    state.items[i].savingCost = res.projects[state.items[i].project_id].saving_result;
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
         const listProjects = async () => {
             state.dataLoading = true;
             try {
@@ -294,19 +314,7 @@ export default {
                 state.totalCount = res.total_count || 0;
 
                 const projects = state.items?.map(item => item.project_id);
-                await Promise.all([getSpotGroupByProject(projects), getInstanceByProject(projects)]);
-
-                // Object.keys(state.items).forEach((i) => {
-                //     const spotCount = Math.floor(Math.random() * 31) + 1;
-                //     const onDemandCount = (Math.floor(Math.random() * 100) + 11) - spotCount;
-                //     state.items[i].spotCount = spotCount;
-                //     state.items[i].onDemandCount = onDemandCount;
-                //     state.items[i].instanceCount = spotCount + onDemandCount;
-                //     if (Math.random() > 0.5) {
-                //         state.items[i].noSpotGroup = true;
-                //     }
-                // });
-
+                await Promise.all([getSpotGroupByProject(projects), getInstanceByProject(projects), getSavingCostResultByProject(projects)]);
                 state.dataLoading = false;
             } catch (e) {
                 console.error(e);
@@ -362,6 +370,12 @@ export default {
 }
 .page-info {
     padding-left: 1.5rem;
+}
+.cost-instance-info {
+    @apply text-gray-900;
+    font-size: 0.75rem;
+    line-height: 150%;
+    margin-bottom: 0.5rem;
 }
 .dashboard-wrapper {
     @apply grid grid-cols-12 gap-4;
@@ -476,6 +490,18 @@ export default {
 .project-wrapper {
     @apply bg-white;
     padding: 2rem 1.5rem;
+    .project-instance-info {
+        @apply text-gray-900;
+        font-size: 1.5rem;
+        line-height: 135%;
+        margin-bottom: 1.5rem;
+        .total-count {
+            @apply text-gray-500;
+            font-size: 1.125rem;
+            line-height: 135%;
+        }
+    }
+
 }
 .project-name-wrapper {
     .project-name {
@@ -528,9 +554,9 @@ export default {
         line-height: 170%;
     }
     .cost {
-        @apply text-gray-400;
-        font-size: 1rem;
-        line-height: 160%;
+        @apply text-indigo-400;
+        font-size: 1.125rem;
+        line-height: 100%;
         margin-top: 0.5rem;
     }
 }

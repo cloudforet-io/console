@@ -469,7 +469,7 @@ export default {
     @apply text-gray-900;
     font-size: 0.75rem;
     line-height: 150%;
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 }
 .no-spot-group {
     display: flex;
