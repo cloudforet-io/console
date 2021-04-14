@@ -26,6 +26,8 @@
                          :searchable="searchable"
                          :exportable="excelVisible"
                          :timezone="timezone"
+                         sortable
+                         use-cursor-loading
                          @change="onChange"
                          @refresh="onChange()"
                          @select="onSelect"
