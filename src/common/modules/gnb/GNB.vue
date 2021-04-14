@@ -184,7 +184,7 @@ export default {
                     label: vm.$t('MENU.MANAGEMENT.MANAGEMENT'),
                     to: { name: 'collectorHistory' },
                     subMenuList: [
-                        { label: vm.$t('MENU.MANAGEMENT.PLUGIN'), to: { name: 'supervisorPlugins' }, show: state.isAdmin },
+                        // { label: vm.$t('MENU.MANAGEMENT.PLUGIN'), to: { name: 'supervisorPlugins' }, show: state.isAdmin },
                         {
                             label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), to: { name: 'collectorHistory' }, isNew: true, show: true,
                         },
