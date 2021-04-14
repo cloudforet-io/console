@@ -76,7 +76,10 @@
                                         <p class="approximate">
                                             {{ $t('AUTOMATION.POWER_SCHEDULER.LANDING.ABOUT') }}
                                         </p>
-                                        <span class="costs"><span>$ </span><span class="approx-costs">{{ item.savingCost }}</span></span>
+                                        <span class="costs"><span>$ </span>
+                                            <span v-if="item.scheduler.length > 0" class="approx-costs">{{ item.savingCost }}</span>
+                                            <span v-else class="approx-costs">0</span>
+                                        </span>
                                     </div>
                                 </div>
                             </div>

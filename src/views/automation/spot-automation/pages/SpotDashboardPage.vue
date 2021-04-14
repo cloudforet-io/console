@@ -56,7 +56,7 @@
         <p-divider class="dashboard-divider" />
         <section class="project-wrapper">
             <p class="project-instance-info">
-                {{$t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SPOT_GROUP_BY_PROJECT')}} <span class="total-count">({{ totalCount }})</span>
+                {{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SPOT_GROUP_BY_PROJECT') }} <span class="total-count">({{ totalCount }})</span>
             </p>
             <p-toolbox filters-visible
                        search-type="query"
@@ -89,7 +89,7 @@
                                     <strong>{{ item.spotGroupCount }}</strong>
                                 </span>
                             </div>
-                            <div v-if="item.instanceCount > 0" class="cost-chart-wrapper">
+                            <div v-if="item.spotGroupCount > 0" class="cost-chart-wrapper">
                                 <div class="chart-wrapper">
                                     <span class="instance">{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.CARD.INSTANCE') }} <span class="instance-num">{{ item.instanceCount }}</span></span>
                                     <on-demand-and-spot-chart chart-type="long"
@@ -103,7 +103,7 @@
                                         {{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SAVING_COST') }}
                                     </span>
                                     <span class="cost">
-                                        <span class="text-sm">$</span>{{ item.savingCost }}
+                                        <span class="text-sm">$</span> {{ item.savingCost }}
                                     </span>
                                 </div>
                             </div>
@@ -157,21 +157,27 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { Tags, TimeStamp } from '@/models';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 import { store } from '@/store';
+import { makeDistinctValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 
-// TODO: change handlers with spot automation spec
-const handlers = makeQuerySearchPropsWithSearchSchema(
-    [{
+const handlers = {
+    keyItemSets: [{
         title: 'Filters',
         items: [
-            { key: 'cloud_service_type', name: 'Cloud Service Type' },
-            { key: 'cloud_service_group', name: 'Cloud Service Group' },
-            { key: 'project_id', name: 'Project', reference: 'identity.Project' },
-            { key: 'collection_info.service_accounts', name: 'Service Account', reference: 'identity.ServiceAccount' },
-            { key: 'collection_info.secrets', name: 'Secret', reference: 'secret.Secret' },
+            {
+                name: 'name',
+                label: 'Name',
+            },
+            {
+                name: 'project_id',
+                label: 'Project',
+            },
         ],
     }],
-    'inventory.CloudService',
-);
+    valueHandlerMap: {
+        name: makeDistinctValueHandler('spot_automation.SpotGroup', 'name'),
+        project_id: makeReferenceValueHandler('identity.Project'),
+    },
+};
 
 interface ProjectGroupData {
     created_at?: TimeStamp;

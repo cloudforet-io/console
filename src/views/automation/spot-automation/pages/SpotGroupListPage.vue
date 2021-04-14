@@ -118,7 +118,7 @@ const handlers = {
         name: makeDistinctValueHandler('spot_automation.SpotGroup', 'name'),
         provider: makeReferenceValueHandler('identity.Provider'),
         region: makeReferenceValueHandler('inventory.Region'),
-        project: makeReferenceValueHandler('identity.Project'),
+        project_id: makeReferenceValueHandler('identity.Project'),
         resource_id: makeDistinctValueHandler('spot_automation.SpotGroup', 'resource_id'),
         created_at: makeDistinctValueHandler('spot_automation.SpotGroup', 'created_at'),
         created_by: makeDistinctValueHandler('spot_automation.SpotGroup', 'created_by'),
