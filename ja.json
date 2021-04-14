@@ -183,6 +183,7 @@
 					"NO_SPOT_GROUP": ""
 				},
 				"LAST_MONTH": "",
+				"LAST_SIX_MONTHS": "",
 				"NO_PROJECT": "",
 				"PAGE_TITLE": "",
 				"SAVING_COST": "",
@@ -215,7 +216,9 @@
 					"SAVINGS_COST": "",
 					"SAVING_COST": "",
 					"SPOT_SAVINGS_COST": "",
-					"TITLE": ""
+					"TITLE": "",
+					"TOOLTIP_ON_DEMAND_ESTIMATED_COST": "",
+					"TOOLTIP_SAVING_COST": ""
 				},
 				"EDIT": {
 					"ALT_E_EDIT_SPOT_GROUP": "",

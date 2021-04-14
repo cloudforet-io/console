@@ -183,6 +183,7 @@
 					"NO_SPOT_GROUP": "스팟 인스턴스 그룹 만들기 "
 				},
 				"LAST_MONTH": "지난 달",
+				"LAST_SIX_MONTHS": "지난 6개월간",
 				"NO_PROJECT": "프로젝트 단위로 스팟그룹을 관리해보세요.",
 				"PAGE_TITLE": "대시보드",
 				"SAVING_COST": "절감 비용",
@@ -215,7 +216,9 @@
 					"SAVINGS_COST": "절감 비용",
 					"SAVING_COST": "절감 비용",
 					"SPOT_SAVINGS_COST": "스팟으로 절감한 비용",
-					"TITLE": "비용"
+					"TITLE": "비용",
+					"TOOLTIP_ON_DEMAND_ESTIMATED_COST": "온디맨드 예상비용",
+					"TOOLTIP_SAVING_COST": "절감비용"
 				},
 				"EDIT": {
 					"ALT_E_EDIT_SPOT_GROUP": "스팟그룹 편집 실패",
