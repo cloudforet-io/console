@@ -210,12 +210,10 @@
 					"INSTANCE": "",
 					"INSTANCE_COUNT": "",
 					"LAST_MONTH": "",
-					"LAST_SIX_MONTH": "",
-					"ON_DEMAND_COST": "",
 					"ON_DEMAND_ESTIMATED_COST": "",
 					"SAVINGS_COST": "",
-					"SPOT_COST": "",
-					"SPOT_SAVINGS": "",
+					"SAVING_COST": "",
+					"SPOT_SAVINGS_COST": "",
 					"TITLE": ""
 				},
 				"EDIT": {
