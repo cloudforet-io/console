@@ -148,7 +148,6 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { QueryHelper } from '@/lib/query';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { getPageStart, getThisPage } from '@/lib/component-utils/pagination';
@@ -156,7 +155,6 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { SpaceConnector } from '@/lib/space-connector';
 import { Tags, TimeStamp } from '@/models';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
-import { store } from '@/store';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 
 const handlers = {
@@ -225,7 +223,7 @@ export default {
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
 
         const state = reactive({
-            spotGroups: computed(() => Object.keys(store.state.resource.spotGroup.items)),
+            spotGroups: [] as string[],
             spotGroupCount: computed(() => state.spotGroups.length),
             totalInstanceCount: 128,
             spotInstanceCount: 112,
@@ -263,6 +261,19 @@ export default {
         };
 
         /* api */
+        const listSpotGroups = async () => {
+            try {
+                const res = await SpaceConnector.client.spotAutomation.spotGroup.list({
+                    query: {
+                        only: ['spot_group_id'],
+                    },
+                });
+                state.spotGroups = res.results.map(d => d.spot_group_id);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
         const apiQuery = new ApiQueryHelper();
         const getParams = () => {
             apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
@@ -350,6 +361,7 @@ export default {
 
         (async () => {
             await Promise.all([
+                listSpotGroups(),
                 listProjects(),
                 vm.$store.dispatch('resource/spotGroup/load'),
             ]);

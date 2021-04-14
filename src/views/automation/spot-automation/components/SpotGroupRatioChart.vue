@@ -26,7 +26,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { get, debounce } from 'lodash';
+import { debounce } from 'lodash';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -80,7 +80,7 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            loading: true,
+            loading: false,
             chartRef: null as HTMLElement | null,
             chart: null as null | any,
             chartRegistry: {},
@@ -178,7 +178,7 @@ export default {
             } finally {
                 state.loading = false;
             }
-        }, 500);
+        }, 300);
 
         watch(() => props.spotGroups, (spotGroups) => {
             if (spotGroups.length > 0) {
