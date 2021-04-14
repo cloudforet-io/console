@@ -5,7 +5,7 @@ import router from '@/routes';
 import { GTag } from '@/lib/gtag';
 import { i18n } from '@/translations';
 import * as am4core from '@amcharts/amcharts4/core';
-import { defaultFonts, langFontsMap } from '@/styles/fonts';
+import { loadFonts } from '@/styles/fonts';
 
 const initConfig = async () => {
     await config.init();
@@ -40,40 +40,11 @@ const initGtag = () => {
     }, { immediate: true });
 };
 
-const loadFont = async (fontsInfo) => {
-    const fonts = fontsInfo.map(({ family, source, descriptors }) => {
-        // @ts-ignore
-        const font = new FontFace(family, source, descriptors);
-        font.display = 'fallback';
-        return font;
-    });
 
-    await Promise.all(fonts.map(d => d.load()));
-
-    fonts.forEach((d) => {
-        (document as any).fonts.add(d);
-    });
-};
-const loaded: any = {};
-const loadFonts = async (lang: string) => {
-    let fonts: any = [];
-    if (!loaded.default) {
-        fonts = fonts.concat(defaultFonts);
-        loaded.default = true;
-    }
-
-    if (!loaded[lang]) {
-        fonts = fonts.concat(langFontsMap[lang]);
-        await loadFont(fonts);
-        loaded[lang] = true;
-        document.body.lang = lang;
-    }
-};
-
-const initLanguage = () => {
+const initLanguageAndFonts = async () => {
     store.watch(state => state.user.language, async (lang) => {
-        i18n.locale = lang as string;
         await loadFonts(lang);
+        i18n.locale = lang as string;
     }, { immediate: true });
 };
 
@@ -106,8 +77,8 @@ const init = async () => {
         // await checkAuth();
         await initApiClient();
         await initDomain();
+        await initLanguageAndFonts();
         initGtag();
-        initLanguage();
         initAmchartsLicense();
     } catch (e) {
         console.error(e);
