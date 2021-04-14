@@ -259,13 +259,11 @@ export default {
                 if (res) {
                     validationState.isUserIdValid = false;
                     validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.USER_ID_DUPLICATED');
-                } else {
-                    validationState.isUserIdValid = true;
-                    validationState.userIdInvalidText = '';
                 }
             } catch (e) {
-                validationState.isUserIdValid = false;
-                validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.USER_ID_DUPLICATED');
+                validationState.isUserIdValid = true;
+                validationState.userIdInvalidText = '';
+                console.error(e);
             }
         };
 
@@ -281,6 +279,7 @@ export default {
             validationState.isUserIdValid = undefined;
             validationState.userIdInvalidText = '';
             if (formState.user_id) {
+                await checkDuplicatedId();
                 if (formState.user_id.replace(/ /g, '').length !== formState.user_id.length) {
                     validationState.isUserIdValid = false;
                     validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
@@ -292,7 +291,6 @@ export default {
                 if (formState.selectedAuthType.label === 'Local') {
                     checkEmailFormat(formState.user_id);
                 }
-                await checkDuplicatedId();
                 if (typeof validationState.isUserIdValid !== 'boolean') validationState.isUserIdValid = true;
             } else {
                 validationState.isUserIdValid = false;
