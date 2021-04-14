@@ -71,13 +71,13 @@ import {
     TagItem, TagValidation, TagsInputGroupProps, ValidationData,
 } from '@/common/components/tags-input-group/type';
 
-const dictToArray = (dict): TagItem[] => Object.keys(dict).map(k => ({ key: k, value: dict[k] }));
+const dictToArray = (dict): TagItem[] => Object.keys(dict).sort().map(k => ({ key: k, value: dict[k] }));
 
 const arrayToDict = (arr) => {
     const dict = {};
     if (Array.isArray(arr)) {
         arr.forEach(({ key, value }) => {
-            dict[key] = value;
+            if (key !== '') dict[key] = value;
         });
     }
     return dict;
@@ -130,7 +130,6 @@ export default {
             isAllValid: computed(() => state.validations.every(d => d.key.isValid && d.value.isValid)),
         });
 
-
         /* util */
         const validateKey = () => {
             const keys = state.items.map(d => d.key);
@@ -157,6 +156,7 @@ export default {
                 state.validations[idx].key = validation;
             });
 
+            state.validations = [...state.validations];
             emit('update:tags', arrayToDict(state.items));
         };
         const validateValue = (value, idx) => {
@@ -169,6 +169,8 @@ export default {
                 validation.message = vm.$t('COMMON.COMPONENTS.TAGS.INVALID_NO_VALUE');
             }
             state.validations[idx].value = validation;
+
+            state.validations = [...state.validations];
             emit('update:tags', arrayToDict(state.items));
         };
         const addPair = () => {
@@ -203,16 +205,16 @@ export default {
 
         watch(() => state.isAllValid, (after) => {
             emit('update:is-valid', after);
-        });
-
-        watch(() => props.tags, (tags) => {
-            state.items = dictToArray(tags);
         }, { immediate: true });
 
+
         const init = () => {
+            state.items = dictToArray(props.tags);
+
             if (props.showEmptyInput) {
                 state.items = [...state.items, { key: '', value: '' }];
             }
+
             vm.$nextTick(() => {
                 initValidations();
             });
@@ -226,6 +228,7 @@ export default {
             deletePair,
             validateKey,
             validateValue,
+            init,
         };
     },
 };

@@ -23,9 +23,10 @@
                     <span class="highlight">{{ $t('COMMON.TAGS.ADD_TAG_DESC') }}</span><br>
                     {{ $t('COMMON.TAGS.KEY_VALUE_DESC') }}
                 </div>
-                <tags-input-group :tags.sync="newTags"
+                <tags-input-group ref="tagsRef"
+                                  :tags.sync="newTags"
                                   :disabled="loading"
-                                  :show-validation="showValidation"
+                                  show-validation
                                   :is-valid.sync="isTagsValid"
                                   :show-header="showHeader"
                 >
@@ -44,7 +45,7 @@
                 <p-button style-type="gray900" :outline="true" @click="goBack">
                     {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>
-                <p-button style-type="primary-dark" @click="onSave">
+                <p-button style-type="primary-dark" :disabled="!isTagsValid" @click="onSave">
                     {{ $t('COMMON.TAGS.SAVE') }}
                 </p-button>
             </div>
@@ -60,7 +61,7 @@ import {
 } from 'lodash';
 
 import {
-    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
+    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy, watch,
 } from '@vue/composition-api';
 
 import {
@@ -72,7 +73,6 @@ import FNB from '@/common/modules/FNB.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import { makeProxy } from '@/lib/compostion-util';
 
 interface Props {
     tags: object;
@@ -120,10 +120,10 @@ export default {
         const state = reactive({
             loading: false,
             showHeader: computed(() => state.newTags.length > 0),
-            showValidation: false,
             newTags: { ...props.tags },
             isTagsValid: false,
             noItem: computed(() => isEmpty(state.newTags)),
+            tagsRef: null as any,
         });
 
         /* util */
@@ -134,7 +134,6 @@ export default {
 
         /* api */
         const onSave = async () => {
-            if (!state.showValidation) state.showValidation = true;
             if (!state.isTagsValid) return;
             if (!api.value) {
                 showErrorMessage(vm.$t('COMMON.TAGS.ALT_E_UPDATE'), new Error(), vm.$root);
@@ -157,6 +156,11 @@ export default {
 
             emit('update');
         };
+
+        watch(() => props.tags, (tags) => {
+            state.newTags = { ...props.tags };
+            if (state.tagsRef) state.tagsRef.init();
+        });
 
         return {
             ...toRefs(state),

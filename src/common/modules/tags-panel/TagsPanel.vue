@@ -38,7 +38,6 @@ import {
 import { PDataTable, PPanelTop, PButton } from '@spaceone/design-system';
 
 import TagsPage from '@/common/pages/TagsPage.vue';
-import { TagItem } from '@/common/modules/tags-panel/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 
