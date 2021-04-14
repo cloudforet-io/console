@@ -9,12 +9,12 @@
                 <div class="summary-wrapper">
                     <div class="summary-row">
                         <span class="title">{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.USED_SPOT_GROUP') }}</span>
-                        <span class="count">13</span>
+                        <span class="count">{{ spotGroupCount }}</span>
                     </div>
                     <div class="summary-row">
                         <span class="title">{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.ALL_INSTANCE') }}</span>
                         <span class="sub-title">{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.ALL_INSTANCE_DESC') }}</span>
-                        <span class="count">159</span>
+                        <span class="count">{{ totalInstanceCount }}</span>
                     </div>
                     <div class="summary-row">
                         <span class="title">{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SPOT_INSTANCE') }}</span>
@@ -32,12 +32,14 @@
                         <span>{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.LAST_MONTH') }}</span>
                         <strong> {{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SAVING_COST') }}</strong>
                         <span class="percentage">
-                            <p-i name="ic_table_sort_fromA" />
-                            52%
+                            <p-i name="ic_decrease"
+                                 width="1rem" height="1rem"
+                            />
+                            {{ savingPercentage }}%
                         </span>
                     </p>
                     <p class="cost">
-                        ${{ commaFormatter(numberFormatter(lastMonthSavingCost)) }}
+                        ${{ commaFormatter(numberFormatter(savingCost)) }}
                     </p>
                 </div>
                 <div class="cost-wrapper">
@@ -45,7 +47,7 @@
                         <strong>{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.ACCUMULATE_COST') }}</strong>
                     </p>
                     <p class="cost">
-                        ${{ commaFormatter(numberFormatter(cumulativeSavingCost)) }}
+                        ${{ commaFormatter(numberFormatter(savingResult)) }}
                     </p>
                 </div>
             </div>
@@ -133,6 +135,7 @@ import {
 } from '@spaceone/design-system';
 import InstanceBillingChart from '@/views/automation/spot-automation/components/InstanceBillingChart.vue';
 import SpotGroupRatioChart from '@/views/automation/spot-automation/components/SpotGroupRatioChart.vue';
+import OnDemandAndSpotChart from '@/views/automation/spot-automation/components/OnDemandAndSpotChart.vue';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
@@ -142,7 +145,6 @@ import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dyna
 import { QueryHelper } from '@/lib/query';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { getPageStart, getThisPage } from '@/lib/component-utils/pagination';
-import OnDemandAndSpotChart from '@/views/automation/spot-automation/components/OnDemandAndSpotChart.vue';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { SpaceConnector } from '@/lib/space-connector';
 import { Tags, TimeStamp } from '@/models';
@@ -184,6 +186,13 @@ interface ProjectListData {
     onDemandCount: number;
     instanceCount: number;
 }
+
+interface SavingCostResponse {
+    normal_cost: number;
+    saving_result: number;
+    saving_cost: number;
+}
+
 export default {
     name: 'SpotDashboardPage',
     components: {
@@ -204,6 +213,8 @@ export default {
 
         const state = reactive({
             spotGroups: computed(() => Object.keys(store.state.resource.spotGroup.items)),
+            spotGroupCount: computed(() => state.spotGroups.length),
+            totalInstanceCount: 0,
             items: undefined as unknown as ProjectListData[],
             dataLoading: true,
             keyItemSets: handlers.keyItemSets,
@@ -212,8 +223,9 @@ export default {
             thisPage: 1,
             pageSize: 12,
             totalCount: 0,
-            lastMonthSavingCost: 1207.36234234,
-            cumulativeSavingCost: 5690.23343,
+            savingCost: 4890,
+            savingResult: 9012,
+            savingPercentage: 43,
         });
 
         const routeState = reactive({
@@ -260,7 +272,6 @@ export default {
                 console.error(e);
             }
         };
-
         const getInstanceByProject = async (projectIds) => {
             try {
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.getProjectInstanceCount({
@@ -275,7 +286,6 @@ export default {
                 console.error(e);
             }
         };
-
         const listProjects = async () => {
             state.dataLoading = true;
             try {

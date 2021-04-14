@@ -26,7 +26,7 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { get } from 'lodash';
+import { get, debounce } from 'lodash';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -42,6 +42,11 @@ import { SpaceConnector } from '@/lib/space-connector';
 
 am4core.useTheme(am4themes_animated);
 
+interface InstanceResponse {
+    total: number;
+    ondemand: number;
+    spot: number;
+}
 interface ChartData {
     type: string;
     count: number;
@@ -134,23 +139,26 @@ export default {
         };
 
         /* api */
-        const getData = async (spotGroups) => {
+        const getData = debounce(async (spotGroups) => {
             try {
                 state.loading = true;
                 const res = await SpaceConnector.client.spotAutomation.spotGroup.getSpotGroupInstanceCount({
                     spot_groups: spotGroups,
                 });
-                let totalCount = 0;
-                let onDemandCount = 0;
-                let spotCount = 0;
-                Object.values(res.spot_groups).forEach((d) => {
-                    totalCount += get(d, 'total');
-                    onDemandCount += get(d, 'ondemand');
-                    spotCount += get(d, 'spot');
+                const dataList = Object.values(res.spot_groups) as InstanceResponse[];
+                const formattedRes: InstanceResponse = dataList.reduce((result, d) => {
+                    result.total += d.total;
+                    result.ondemand += d.ondemand;
+                    result.spot += d.spot;
+                    return result;
+                }, {
+                    total: 0,
+                    ondemand: 0,
+                    spot: 0,
                 });
-                state.onDemandCount = onDemandCount;
-                state.spotCount = spotCount;
-                state.onDemandPercentage = (onDemandCount / totalCount) * 100;
+                state.onDemandCount = formattedRes.ondemand;
+                state.spotCount = formattedRes.spot;
+                state.onDemandPercentage = Math.round((formattedRes.ondemand / formattedRes.total) * 100);
                 state.spotPercentage = 100 - state.onDemandPercentage;
 
                 state.data = [
@@ -170,7 +178,7 @@ export default {
             } finally {
                 state.loading = false;
             }
-        };
+        }, 500);
 
         watch(() => props.spotGroups, (spotGroups) => {
             if (spotGroups.length > 0) {
