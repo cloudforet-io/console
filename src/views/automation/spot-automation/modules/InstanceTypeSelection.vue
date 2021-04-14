@@ -312,7 +312,7 @@ table {
     tr {
         display: flex;
         &:hover {
-            th, td {
+            th[scope=row], td {
                 @apply bg-secondary2;
             }
         }

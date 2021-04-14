@@ -4,8 +4,6 @@ import router from '@/routes/index';
 import { store } from '@/store';
 import directive from '@/directives';
 import { i18n } from '@/translations';
-import webFontLoader from 'webfontloader';
-import { webFonts, fontUrls } from '@/styles/web-fonts';
 import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
 import SpaceDesignSystem from '@spaceone/design-system';
@@ -15,7 +13,6 @@ import App from './App.vue';
 
 import '@/styles/style.pcss';
 import '@spaceone/design-system/css/light-style.css';
-
 
 /** ********** SET VUE PLUGINS ************** */
 Vue.use(VueCompositionApi);
@@ -28,13 +25,6 @@ directive(Vue);
 
 Vue.use(SpaceDesignSystem);
 
-
-webFontLoader.load({
-    google: {
-        families: webFonts,
-        urls: fontUrls,
-    },
-});
 
 (async () => {
     await siteInit();
