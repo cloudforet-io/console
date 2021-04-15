@@ -463,6 +463,7 @@ export default {
             max-width: 70%;
             .scheduler-list {
                 @apply flex mb-2 w-full overflow-x-hidden;
+                align-items: center;
 
                 .p-i {
                     flex-shrink: 0;
@@ -472,7 +473,7 @@ export default {
                     @apply ml-1 truncate;
                     flex-grow: 1;
                     font-size: 0.75rem;
-                    line-height: 1.2;
+                    line-height: 1.5;
 
                     &.schedule-on {
                         @apply text-green-500;

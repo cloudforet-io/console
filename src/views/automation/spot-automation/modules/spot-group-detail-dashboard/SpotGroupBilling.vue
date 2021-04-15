@@ -102,9 +102,9 @@ export default {
         const state = reactive({
             loading: true,
             data: [],
-            savingCost: 1788,
-            savingResult: 3407,
-            savingPercentage: 52,
+            savingCost: 0,
+            savingResult: 650,
+            savingPercentage: 0,
         });
         const tableState = reactive({
             loading: true,

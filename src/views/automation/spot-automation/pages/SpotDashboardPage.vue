@@ -108,13 +108,16 @@
                                 </div>
                             </div>
                             <div v-else>
-                                <p-anchor class="go-add" :show-icon="false" :href="$router.resolve({
-                                              name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP.ADD,
-                                              params: {
-                                                  projectId: item.project_id
-                                              }
-                                          }).href"
-                                          @click.stop="() => {}"
+                                <p-anchor class="go-add" :show-icon="false"
+                                          @click.stop="(e) => {
+                                              $router.push({
+                                                  name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP.ADD,
+                                                  params: {
+                                                      projectId: item.project_id
+                                                  }
+                                              })
+                                              e.preventDefault()
+                                          }"
                                 >
                                     <template #left-extra>
                                         <p-i name="ic_plus_thin" height="1em" width="1em"
