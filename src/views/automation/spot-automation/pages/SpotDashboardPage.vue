@@ -235,9 +235,9 @@ export default {
             thisPage: 1,
             pageSize: 12,
             totalCount: 0,
-            savingCost: 4890,
-            savingResult: 9012,
-            savingPercentage: 43,
+            savingCost: 0,
+            savingResult: 650,
+            savingPercentage: 0,
         });
 
         const routeState = reactive({
