@@ -112,7 +112,6 @@ export default {
             loading: false,
             visibleCheckModal: false,
             projectId: computed(() => {
-                console.debug('vm.$route.params.projectId', vm.$route.params.projectId);
                 return vm.$route.params.projectId;
             }),
         });

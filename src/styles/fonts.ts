@@ -147,16 +147,16 @@ export const loadFonts = async (lang) => {
             fontsInfo = fontsInfo.concat(fontInfoMap.default);
         }
 
-        if (!loaded[lang]) {
+        if (!loaded[lang] && fontInfoMap[lang]) {
             fontsInfo = fontsInfo.concat(fontInfoMap[lang]);
         }
 
         await loadFont(fontsInfo);
 
         if (!loaded.default) loaded.default = true;
-        loaded[lang] = true;
+        if (!loaded[lang] && fontInfoMap[lang]) loaded[lang] = true;
     } catch (e) {
-        console.error('Failed to load fonts', e);
+        console.error(`Failed to load fonts for ${lang}.`, e);
     } finally {
         document.body.lang = lang;
     }
