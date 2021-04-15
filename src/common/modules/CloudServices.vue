@@ -75,6 +75,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
+import {assetUrlConverter} from "@/lib/util";
 
 
 interface Value {
@@ -225,7 +226,7 @@ export default {
 
         return {
             ...toRefs(state),
-            iconUrl: (item: Value): string => item.icon || props.providers[item.provider]?.icon || '',
+            iconUrl: (item: Value): string => assetUrlConverter(item.icon) || props.providers[item.provider]?.icon || '',
         };
     },
 };

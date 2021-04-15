@@ -58,9 +58,8 @@
                         </router-link>
                     </template>
                     <template #col-collector_info.plugin_info-format="{ value }">
-                        <p-lazy-img
-                            :src="plugins[value.plugin_id].icon"
-                            width="1rem" height="1rem"
+                        <p-lazy-img :src="plugins[value.plugin_id].icon"
+                                    width="1rem" height="1rem"
                         />
                         <span class="pl-2">{{ plugins[value.plugin_id].name }}</span>
                     </template>

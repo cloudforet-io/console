@@ -38,7 +38,7 @@
                          class="daily-update-card"
                     >
                         <div>
-                            <p-lazy-img :src="item.icon"
+                            <p-lazy-img :src="assetUrlConverter(item.icon)"
                                         width="2rem" height="2rem"
                                         class="rounded flex-shrink-0 service-img"
                             />
@@ -66,7 +66,7 @@
                 </div>
                 <div v-for="(item, index) in data" :key="index" class="daily-update-card">
                     <div>
-                        <p-lazy-img :src="item.icon"
+                        <p-lazy-img :src="assetUrlConverter(item.icon)"
                                     width="2rem" height="2rem"
                                     class="rounded flex-shrink-0 service-img"
                         />
@@ -105,6 +105,7 @@ import WidgetLayout from '@/common/components/WidgetLayout.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { QueryHelper } from '@/lib/query';
 import { store } from '@/store';
+import { assetUrlConverter } from '@/lib/util';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -409,6 +410,7 @@ export default {
             ...toRefs(state),
             getCreatedAtFilters,
             getDeletedAtFilters,
+            assetUrlConverter,
         };
     },
 };

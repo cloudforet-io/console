@@ -16,5 +16,7 @@
   "MOCK": {
     "ALL": false,
     "ENDPOINT": ""
+  },
+  "ASSET_PATH": {
   }
 }

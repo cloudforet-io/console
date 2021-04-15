@@ -6,27 +6,26 @@
                     {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.PROVIDERS_TITLE') }}
                 </p>
                 <p-divider class="sidebar-divider" />
-                <div v-for="provider in providerState.items" :key="provider.provider" class="provider-list">
-                    <p-divider v-if="provider.provider && provider.provider !== 'megazone'" class="provider-divider" />
-                    <p-radio v-model="selectedProvider" :value="provider.provider">
-                        <template #radio-left>
-                            <img v-if="provider.icon"
-                                 :src="provider.icon"
-                                 :alt="provider.provider"
-                                 class="provider-icon"
-                            >
-                            <p-i v-else name="ic_provider_other"
-                                 class="provider-icon"
-                            />
-                            <span class="provider-name">{{ provider.label }}</span>
-                        </template>
-                        <template #icon="{ iconName }">
-                            <p-i class="radio-icon float-right" width="1.25rem" height="1.25rem"
-                                 :name="iconName"
-                            />
-                        </template>
-                    </p-radio>
-                </div>
+                <p-radio v-for="provider in providerState.items"
+                         :key="provider.provider"
+                         v-model="selectedProvider"
+                         :value="provider.provider"
+                         class="provider-wrapper"
+                >
+                    <template #radio-left>
+                        <p-lazy-img :src="provider.icon || ''"
+                                    error-icon="ic_provider_other"
+                                    :alt="provider.provider"
+                                    width="1.5rem" height="1.5rem"
+                        />
+                        <span class="provider-name">{{ provider.label }}</span>
+                    </template>
+                    <template #icon="{ iconName }">
+                        <p-i class="radio-icon float-right" width="1.25rem" height="1.25rem"
+                             :name="iconName"
+                        />
+                    </template>
+                </p-radio>
             </div>
         </template>
         <template #default>
@@ -137,7 +136,7 @@ import { render } from 'ejs';
 /* spaceone design system */
 import {
     PRadio, PI, PDivider, PBreadcrumbs, PPageTitle, PHorizontalLayout, PIconTextButton,
-    PDropdownMenuBtn, PTab, PDynamicLayout, PEmpty, PDoubleCheckModal,
+    PDropdownMenuBtn, PTab, PDynamicLayout, PEmpty, PDoubleCheckModal, PLazyImg,
 } from '@spaceone/design-system';
 import {
     DynamicLayoutEventListener,
@@ -201,6 +200,7 @@ export default {
         PRadio,
         PVerticalPageLayout,
         PTab,
+        PLazyImg,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -574,29 +574,25 @@ export default {
     margin-top: 0.5625rem;
     margin-bottom: 1rem;
 }
-.provider-list {
-    @apply justify-between text-sm;
-    padding-left: 1rem;
-    padding-right: 1.1875rem;
-    line-height: 1.5rem;
-    .provider-divider {
-        @apply bg-gray-100;
-        margin-top: 0.625rem;
-        margin-bottom: 0.5625rem;
+.provider-wrapper {
+    @apply border-b border-gray-100;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.5rem 0.5rem 0.5rem 0.25rem;
+    margin: 0 0.75rem;
+    &:first-of-type {
+        margin-top: -.69rem;
+    }
+    &:last-of-type {
+        @apply border-b-0;
     }
     .provider-name {
         display: inline-block;
-        cursor: pointer;
-    }
-    .provider-icon {
-        @apply inline justify-start;
-        width: 1.5rem;
-        height: 1.5rem;
-        cursor: pointer;
-        margin-right: 0.5625rem;
-    }
-    .provider-radio-btn {
-        @apply float-right;
+        margin-left: 0.5rem;
+        flex-grow: 1;
+        font-size: 0.875rem;
+        line-height: 1.5;
     }
 }
 .selected-data-tab {

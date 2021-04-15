@@ -20,27 +20,26 @@
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_PROVIDER') }}
                 </p>
                 <p-divider class="sidebar-divider" />
-                <div v-for="provider in providerState.items" :key="provider.provider" class="provider-list">
-                    <p-divider v-if="provider.provider && provider.provider !== 'all'" class="provider-divider" />
-                    <p-radio v-model="selectedProvider" :value="provider.provider">
-                        <template #radio-left>
-                            <img v-if="provider.icon"
-                                 :src="provider.icon"
-                                 :alt="provider.provider"
-                                 class="provider-icon"
-                            >
-                            <p-i v-else name="ic_provider_other"
-                                 class="provider-icon"
-                            />
-                            <span class="provider-name">{{ provider.label }}</span>
-                        </template>
-                        <template #icon="{ iconName }">
-                            <p-i class="radio-icon float-right" width="1.25rem" height="1.25rem"
-                                 :name="iconName"
-                            />
-                        </template>
-                    </p-radio>
-                </div>
+                <p-radio v-for="provider in providerState.items"
+                         :key="provider.provider"
+                         v-model="selectedProvider"
+                         :value="provider.provider"
+                         class="provider-wrapper"
+                >
+                    <template #radio-left>
+                        <p-lazy-img :src="provider.icon || ''"
+                                    error-icon="ic_provider_other"
+                                    :alt="provider.provider"
+                                    width="1.5rem" height="1.5rem"
+                        />
+                        <span class="provider-name">{{ provider.label }}</span>
+                    </template>
+                    <template #icon="{ iconName }">
+                        <p-i class="radio-icon float-right" width="1.25rem" height="1.25rem"
+                             :name="iconName"
+                        />
+                    </template>
+                </p-radio>
                 <p class="sidebar-title">
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_CATEGORY') }}
                 </p>
@@ -116,7 +115,7 @@
                                          class="item-wrapper"
                             >
                                 <p-lazy-img width="3rem" height="3rem"
-                                            :src="item.icon || (providers[item.provider] ? providers[item.provider].icon : '')"
+                                            :src="assetUrlConverter(item.icon) || (providers[item.provider] ? providers[item.provider].icon : '')"
                                             error-icon="ic_provider_other"
                                             :alt="item.name"
                                             class="icon"
@@ -174,7 +173,7 @@
 /* eslint-disable camelcase */
 import { Location } from 'vue-router';
 import {
-    zipObject, debounce, range, sortBy, forEach,
+    zipObject, debounce, range,
 } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
 
@@ -206,6 +205,7 @@ import { FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
+import { assetUrlConverter } from '@/lib/util';
 
 
 interface RegionModel extends Tags {
@@ -238,7 +238,7 @@ export default {
         PToolbox,
         PDataLoader,
     },
-    setup(props, context) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
 
@@ -553,6 +553,7 @@ export default {
             skeletons: range(5),
             onPaginationChange,
             onChange,
+            assetUrlConverter,
         };
     },
 };
@@ -584,31 +585,28 @@ export default {
     margin-bottom: 1rem;
 }
 
-.provider-list {
-    @apply justify-between text-sm;
-    padding-left: 1rem;
-    padding-right: 1.1875rem;
-    line-height: 1.5rem;
-    .provider-divider {
-        @apply bg-gray-100;
-        margin-top: 0.625rem;
-        margin-bottom: 0.5625rem;
+.provider-wrapper {
+    @apply border-b border-gray-100;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 0.5rem 0.5rem 0.5rem 0.25rem;
+    margin: 0 0.75rem;
+    &:first-of-type {
+        margin-top:-.69rem;
+    }
+    &:last-of-type {
+        @apply border-b-0;
     }
     .provider-name {
         display: inline-block;
-        cursor: pointer;
-    }
-    .provider-icon {
-        @apply inline justify-start;
-        width: 1.5rem;
-        height: 1.5rem;
-        cursor: pointer;
-        margin-right: 0.5625rem;
-    }
-    .provider-radio-btn {
-        @apply float-right;
+        margin-left: 0.5rem;
+        flex-grow: 1;
+        font-size: 0.875rem;
+        line-height: 1.5;
     }
 }
+
 .no-region {
     @apply text-gray-400 text-sm;
     padding-left: 1rem;

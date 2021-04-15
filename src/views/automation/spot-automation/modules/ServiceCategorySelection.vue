@@ -14,7 +14,7 @@
                 </template>
             </p-radio>
             <div class="resource-type">
-                <p-lazy-img :src="item.data.icon" />
+                <p-lazy-img :src="assetUrlConverter(item.data.icon)" />
                 <br>
                 <span class="name">{{ item.label }}</span>
             </div>
@@ -29,6 +29,7 @@ import { map } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';
 import { SpotGroupResourceCategory } from '@/views/automation/spot-automation/type';
 import AddSection from '@/views/automation/spot-automation/components/AddSection.vue';
+import { assetUrlConverter } from '@/lib/util';
 
 interface SupportResourceGroupTypes {
     [resourceType: string]: {
@@ -118,6 +119,7 @@ export default {
         return {
             ...toRefs(state),
             onSelectResourceType,
+            assetUrlConverter,
         };
     },
 };

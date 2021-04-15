@@ -1,5 +1,6 @@
 import { SpaceConnector } from '@/lib/space-connector';
 import { ResourceMap } from '@/store/modules/resource/type';
+import { assetUrlConverter } from '@/lib/util';
 
 export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     if (lazyLoad && Object.keys(state.items).length > 0) return;
@@ -15,7 +16,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             cloudServiceTypes[cloudServiceTypeInfo.cloud_service_type_id] = {
                 label: `${cloudServiceTypeInfo.group} > ${cloudServiceTypeInfo.name}`,
                 name: cloudServiceTypeInfo.name,
-                icon: cloudServiceTypeInfo.tags['spaceone:icon'],
+                icon: assetUrlConverter(cloudServiceTypeInfo.tags['spaceone:icon']),
             };
         });
 

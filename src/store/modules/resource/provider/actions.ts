@@ -1,6 +1,7 @@
 import { SpaceConnector } from '@/lib/space-connector';
 import { ResourceMap } from '@/store/modules/resource/type';
 import { indigo } from '@/styles/colors';
+import { assetUrlConverter } from '@/lib/util';
 
 const SPECIAL_LABEL_MAP = {
     // eslint-disable-next-line camelcase
@@ -24,7 +25,7 @@ export const load = async ({ commit, state }, lazyLoad = false): Promise<void|Er
             providers[providerInfo.provider] = {
                 label: SPECIAL_LABEL_MAP[providerInfo.provider] || providerInfo.name,
                 name: providerInfo.name,
-                icon: providerInfo.tags.icon,
+                icon: assetUrlConverter(providerInfo.tags.icon),
                 color: providerInfo.tags.color || indigo[400],
                 linkTemplate: providerInfo.tags.external_link_template,
             };

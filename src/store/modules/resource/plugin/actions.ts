@@ -1,5 +1,6 @@
 import { SpaceConnector } from '@/lib/space-connector';
 import { ResourceMap } from '@/store/modules/resource/type';
+import { assetUrlConverter } from '@/lib/util';
 
 export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     if (lazyLoad && Object.keys(state.items).length > 0) return;
@@ -25,7 +26,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
                 plugins[pluginInfo.plugin_id] = {
                     label: pluginInfo.tags.description || pluginInfo.name,
                     name: pluginInfo.name,
-                    icon: pluginInfo.tags.icon,
+                    icon: assetUrlConverter(pluginInfo.tags.icon),
                 };
             });
         });

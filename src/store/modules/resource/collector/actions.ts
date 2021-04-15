@@ -1,5 +1,6 @@
 import { SpaceConnector } from '@/lib/space-connector';
 import { ResourceMap } from '@/store/modules/resource/type';
+import { assetUrlConverter } from '@/lib/util';
 
 export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     if (lazyLoad && Object.keys(state.items).length > 0) return;
@@ -15,7 +16,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             collectors[collectorInfo.collector_id] = {
                 label: collectorInfo.name,
                 name: collectorInfo.name,
-                icon: collectorInfo.tags.icon,
+                icon: assetUrlConverter(collectorInfo.tags.icon),
             };
         });
 

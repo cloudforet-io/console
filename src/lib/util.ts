@@ -1,7 +1,8 @@
-import _ from 'lodash';
+import { isEmpty, some } from 'lodash';
 import { DateTime } from 'luxon';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
+import config from '@/lib/config';
 
 dayjs.extend(tz);
 
@@ -25,7 +26,7 @@ export const iso8601Formatter = (time: string, timezone: string) => {
 export const isNotEmpty = (value): boolean => {
     if (['boolean', 'number'].includes(typeof value)) return true;
     if (value instanceof Array) return !!value.length;
-    return !_.isEmpty(value); // String, Object
+    return !isEmpty(value); // String, Object
 };
 
 /** * @function
@@ -89,4 +90,22 @@ export const tagsToObject = (tags: Array<{ key: string; value: string }>): Recor
         tagsObject[tag.key] = tag.value;
     });
     return tagsObject;
+};
+
+/**
+ * @function
+ * @name assetUrlConverter
+ * @param src
+ * @description Replace assets base url by config
+ */
+export const assetUrlConverter = (src: string) => {
+    const endpoints = config.get('ASSET_PATH');
+    if (isEmpty(endpoints) || !src) return src;
+
+    let url = src;
+    some(endpoints, (dest, origin) => {
+        if (src.startsWith(origin)) url = src.replace(origin, dest);
+        return src.startsWith(origin);
+    });
+    return url;
 };

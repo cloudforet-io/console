@@ -2,7 +2,7 @@
     <vertical-page-layout>
         <template #sidebar>
             <div class="sidebar-title">
-                <p-lazy-img :src="sidebarState.iconUrl"
+                <p-lazy-img :src="assetUrlConverter(sidebarState.iconUrl)"
                             :loading="!sidebarState.iconUrl"
                             width="1.5rem" height="1.5rem"
                 />
@@ -184,7 +184,7 @@ import {
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import {assetUrlConverter, showErrorMessage, showSuccessMessage} from '@/lib/util';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import { QueryHelper } from '@/lib/query';
@@ -683,6 +683,9 @@ export default {
 
             /* Monitoring Tab */
             monitoringState,
+
+            /* Helper */
+            assetUrlConverter,
         };
     },
 };

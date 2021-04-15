@@ -135,7 +135,7 @@ import ResourceGroupPage from '@/views/automation/power-scheduler/pages/Resource
 import { KanbanItem, ViewMode, ResourceGroupItem } from '@/views/automation/power-scheduler/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { assetUrlConverter, showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 interface ColumnType {
     title: string;
@@ -364,7 +364,7 @@ export default {
             finishEdit,
             deleteResourceGroup,
             onSave,
-            iconUrl: (item): string => item.icon || store.state.resource.provider.items[item.provider]?.icon || '',
+            iconUrl: (item): string => assetUrlConverter(item.icon) || store.state.resource.provider.items[item.provider]?.icon || '',
             onClickResourceGroup,
             onResourceGroupConfirm,
             hideGuide,
