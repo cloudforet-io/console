@@ -31,6 +31,7 @@
     "color": "^3.1.2",
     "core-js": "^3.6.5",
     "ejs": "^3.1.5",
+    "gapi-script": "^1.1.0",
     "hashids": "^2.2.1",
     "jsonwebtoken": "^8.5.1",
     "keycloak-js": "^10.0.2",

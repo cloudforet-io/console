@@ -6,16 +6,12 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy,
-    defineComponent, getCurrentInstance, onMounted,
+    defineComponent,onMounted,
 } from '@vue/composition-api';
 
 import { PButton } from '@spaceone/design-system';
 
 import { loadAuth } from '@/views/sign-in/lib/authenticator/loader';
-
-// @ts-ignore
-const { gapi } = window;
 
 export default defineComponent({
     name: 'GoogleSignIn',
@@ -23,7 +19,6 @@ export default defineComponent({
         PButton,
     },
     setup(props, context) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const onSignIn = () => {
             context.emit('sign-in');
         };

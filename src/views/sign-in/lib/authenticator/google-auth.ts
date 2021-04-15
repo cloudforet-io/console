@@ -1,15 +1,20 @@
-import { SpaceAuth } from '@/views/sign-in/lib/authenticator/space-auth';
 import { store } from '@/store';
 import { Authenticator } from '@/views/sign-in/lib/authenticator/index';
+import { loadGapiInsideDOM } from 'gapi-script';
 
 // @ts-ignore
-const { gapi } = window;
+let { gapi } = window;
 
 class GoogleAuth extends Authenticator {
     static async signOut() {
-        const auth2 = await GoogleAuth.getAuth2(store.state.domain.authOptions.client_id);
-        await GoogleAuth.disconnectGoogleSession(auth2);
-        await super.signOut();
+        try {
+            await GoogleAuth.loadGapi();
+            const auth2 = await GoogleAuth.getAuth2(store.state.domain.authOptions.client_id);
+            await GoogleAuth.disconnectGoogleSession(auth2);
+            await super.signOut();
+        } catch (e) {
+            console.error(e);
+        }
     }
 
     private static async onSuccess(googleUser) {
@@ -32,6 +37,7 @@ class GoogleAuth extends Authenticator {
     }
 
     static signIn = async (onSignInCallback?, onRenderFail?) => {
+        await GoogleAuth.loadGapi();
         gapi.load('auth', () => {
             gapi.auth2.init({
                 // eslint-disable-next-line camelcase
@@ -55,6 +61,15 @@ class GoogleAuth extends Authenticator {
                 },
             });
         });
+    }
+
+    private static loadGapi = async () => {
+        try {
+            if (!gapi) gapi = await loadGapiInsideDOM();
+        } catch (e) {
+            console.error('Failed to load gapi', e);
+            throw e;
+        }
     }
 
     private static getAuth2 = (clientId: string): Promise<any> => new Promise(((resolve, reject) => {
