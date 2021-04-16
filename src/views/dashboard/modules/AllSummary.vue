@@ -814,6 +814,7 @@ export default {
                     @apply border border-gray-200 text-gray-300;
                     height: 1.25rem;
                     min-width: 2rem;
+                    line-height: 1.25rem;
                     font-size: 0.75rem;
                     font-weight: normal;
                     border-radius: 0.125rem;
