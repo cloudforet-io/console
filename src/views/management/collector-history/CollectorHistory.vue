@@ -47,9 +47,8 @@
                         <span class="th-additional-info-text"> (completed / total)</span>
                     </template>
                     <template #col-collector_info-format="{ value }">
-                        <router-link :to="referenceRouter(
-                            value.collector_id,
-                            { resource_type: 'inventory.Collector' })"
+                        <router-link v-if="value"
+                                     :to="referenceRouter(value.collector_id,{ resource_type: 'inventory.Collector' })"
                         >
                             <span class="reference-link">
                                 <span class="text">{{ value.name }}</span>
@@ -58,7 +57,8 @@
                         </router-link>
                     </template>
                     <template #col-collector_info.plugin_info-format="{ value }">
-                        <p-lazy-img :src="plugins[value.plugin_id].icon"
+                        <p-lazy-img v-if="value"
+                                    :src="plugins[value.plugin_id].icon"
                                     width="1rem" height="1rem"
                         />
                         <span class="pl-2">{{ plugins[value.plugin_id].name }}</span>
