@@ -27,30 +27,12 @@
             </div>
             <instance-billing-chart class="widget-layout" />
             <div class="cost-info widget-layout">
-                <div class="cost-wrapper">
-                    <p class="title">
-                        <span>{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.LAST_MONTH') }}</span>
-                        <strong> {{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SAVING_COST') }}</strong>
-                        <span class="percentage">
-                            <p-i name="ic_decrease"
-                                 width="1rem" height="1rem"
-                            />
-                            {{ savingPercentage }}%
-                        </span>
-                    </p>
-                    <p class="cost">
-                        ${{ commaFormatter(numberFormatter(savingCost)) }}
-                    </p>
-                </div>
-                <div class="cost-wrapper">
-                    <p class="title">
-                        <span>{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.LAST_SIX_MONTHS') }}</span>
-                        <strong> {{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.ACCUMULATE_COST') }}</strong>
-                    </p>
-                    <p class="cost">
-                        ${{ commaFormatter(numberFormatter(savingResult)) }}
-                    </p>
-                </div>
+                <spot-group-billing-summary
+                    :saving-percentage="savingPercentage"
+                    :saving-cost="savingCost"
+                    :saving-result="savingResult"
+                    :six-months-ago="true"
+                />
             </div>
         </section>
         <p-divider class="dashboard-divider" />
@@ -146,6 +128,7 @@ import {
 import InstanceBillingChart from '@/views/automation/spot-automation/components/InstanceBillingChart.vue';
 import SpotGroupRatioChart from '@/views/automation/spot-automation/components/SpotGroupRatioChart.vue';
 import OnDemandAndSpotChart from '@/views/automation/spot-automation/components/OnDemandAndSpotChart.vue';
+import SpotGroupBillingSummary from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupBillingSummary.vue';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
@@ -210,6 +193,7 @@ interface SavingCostResponse {
 export default {
     name: 'SpotDashboardPage',
     components: {
+        SpotGroupBillingSummary,
         SpotGroupRatioChart,
         InstanceBillingChart,
         OnDemandAndSpotChart,
@@ -477,30 +461,6 @@ export default {
         @screen lg {
             @apply row-start-1;
             grid-area: cost;
-        }
-
-        .cost-wrapper {
-            margin-bottom: 1.25rem;
-            .title {
-                @apply text-gray-500;
-                font-size: 0.875rem;
-                line-height: 1.5;
-                margin: 0;
-                strong {
-                    @apply text-gray-dark;
-                }
-                .percentage {
-                    margin-left: 0.375rem;
-                    .p-i-icon {
-                        margin-right: -0.25rem;
-                    }
-                }
-            }
-            .cost {
-                @apply text-indigo-500;
-                font-size: 1.375rem;
-                line-height: 1.45;
-            }
         }
     }
 }

@@ -16,6 +16,17 @@ export const iso8601Formatter = (time: string, timezone: string) => {
     if (time) return dayjs.tz(dayjs(time), timezone).format('YYYY-MM-DD HH:mm:ss');
     return '';
 };
+export const numberFormatter = (num) => {
+    if (Math.abs(num) < 10000) {
+        return Math.round(num * 100) / 100;
+    }
+    const options = { notation: 'compact', signDisplay: 'auto', maximumFractionDigits: 1 };
+    return Intl.NumberFormat('en', options).format(num);
+};
+export const commaFormatter = (num) => {
+    if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+    return num;
+};
 
 
 /** @function

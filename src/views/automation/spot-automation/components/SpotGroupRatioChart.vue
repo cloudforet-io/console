@@ -3,11 +3,10 @@
         <div class="text-wrapper on-demand">
             <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.ON_DEMAND') }}</p>
             <p><b>{{ onDemandCount }}</b> ({{ onDemandPercentage }}%)</p>
-            <template v-if="chartType === CHART_TYPE.long">
-                <br>
+            <div v-if="chartType === CHART_TYPE.long" class="total-cost-wrapper">
                 <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.ON_DEMAND_TOTAL_COST') }}</p>
                 <p>$<b>{{ onDemandCost }}</b></p>
-            </template>
+            </div>
         </div>
         <p-chart-loader class="chart-wrapper" :loading="loading">
             <div ref="chartRef" class="chart" />
@@ -15,11 +14,10 @@
         <div class="text-wrapper spot">
             <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.SPOT') }}</p>
             <p><b>{{ spotCount }}</b> ({{ spotPercentage }}%)</p>
-            <template v-if="chartType === CHART_TYPE.long">
-                <br>
+            <div v-if="chartType === CHART_TYPE.long" class="total-cost-wrapper">
                 <p>{{ $t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BASE_INFO.SPOT_TOTAL_COST') }}</p>
                 <p>$<b>{{ spotCost }}</b></p>
-            </template>
+            </div>
         </div>
     </div>
 </template>
@@ -110,6 +108,7 @@ export default {
             state.chart = chart;
             chart.logo.disabled = true;
             chart.responsive.enabled = true;
+            chart.padding = 12;
 
             if (props.chartType === CHART_TYPE.long) {
                 chart.radius = am4core.percent(70);
@@ -203,28 +202,39 @@ export default {
 .spot-group-composition-chart {
     @apply bg-secondary2;
     width: 100%;
-    height: 5.5rem;
+    height: auto;
     font-size: 0.875rem;
     border-radius: 0.375rem;
+    padding: 1rem;
 
     &.long {
-        height: auto;
         font-size: 0.75rem;
-        padding: 1rem 0.5rem;
+    }
 
-        @media lg {
-            .text-wrapper {
-                @apply col-span-4;
-            }
-            .chart-wrapper {
-                @apply col-span-4;
-            }
+    .text-wrapper {
+        @apply col-span-4;
+
+        @screen sm {
+            @apply col-span-5;
+        }
+
+        @screen md {
+            @apply col-span-4;
+        }
+    }
+    .chart-wrapper {
+        @apply col-span-4;
+
+        @screen sm {
+            @apply col-span-2;
+        }
+
+        @screen md {
+            @apply col-span-4;
         }
     }
 
     .text-wrapper {
-        @apply col-span-5;
-        padding: 0 0.5rem;
         margin: auto 0;
         &.on-demand {
             @apply text-secondary;
@@ -233,9 +243,10 @@ export default {
         &.spot {
             @apply text-peacock-400;
         }
-    }
-    .chart-wrapper {
-        @apply col-span-2;
+
+        .total-cost-wrapper {
+            margin-top: 0.75rem;
+        }
     }
     .p-chart-loader {
         margin: auto;
