@@ -117,12 +117,12 @@ export default {
     @apply px-3;
 }
 .empty {
-    @apply pt-2 text-gray-300;
+    @apply pt-2 text-gray-400;
     font-size: 0.875rem;
     line-height: 1.2;
     white-space: break-spaces;
     .favorite-btn {
-        @apply text-yellow-200;
+        @apply text-yellow-400;
     }
 }
 .item {
