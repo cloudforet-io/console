@@ -123,6 +123,7 @@ export default {
     white-space: break-spaces;
     .favorite-btn {
         @apply text-yellow-400;
+        vertical-align: top;
     }
 }
 .item {
