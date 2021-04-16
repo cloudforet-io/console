@@ -400,17 +400,31 @@ export default {
 
 <style lang="postcss" scoped>
 section {
-    @apply px-4;
+    padding-left: 1rem;
+    padding-right: 1rem;
 }
 .toolbox-section {
-    @apply flex justify-between border-t border-b border-gray-200 py-4;
+    @apply justify-between border-t border-b border-gray-200;
+    display: flex;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
 }
 .title {
-    @apply text-sm font-bold capitalize;
+    font-size: 0.875rem;
+    font-weight: bold;
+    text-transform: capitalize;
 }
 .legend {
-    @apply inline-flex items-center text-sm leading-normal mr-4;
+    @apply items-center;
+    display: inline-flex;
+    font-size: 0.875rem;
+    line-height: 1.5;
+    vertical-align: text-bottom;
     margin-top: 0.625rem;
+    margin-right: 1rem;
+    .p-anchor {
+        @apply text-gray-900;
+    }
 }
 .time-range::v-deep {
     &.p-select-btn-group .select-btn {
@@ -419,7 +433,8 @@ section {
         font-weight: normal;
         font-size: 0.875rem;
         &.active {
-            @apply text-secondary font-bold;
+            @apply text-secondary;
+            font-weight: bold;
         }
     }
 }
@@ -432,19 +447,17 @@ section {
 
     &.responsive {
         grid-template-columns: repeat(auto-fill, minmax(49%, 49%));
-
-        //@screen sm {
-        //    grid-template-columns: repeat(auto-fill, minmax(100%, 100%));
-        //}
     }
     &.static {
         grid-template-columns: repeat(auto-fill, minmax(23.125rem, 23.125rem));
     }
 }
 .more-btn::v-deep {
-    @apply border-gray-300 mt-12 block mx-auto;
+    @apply border-gray-300 mx-auto;
+    display: block;
     max-width: 38rem;
     width: 40%;
+    margin-top: 3rem;
 }
 .loader {
     display: flex;
