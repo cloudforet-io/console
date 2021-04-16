@@ -110,7 +110,6 @@
                 <template #confirm-button>
                     <p-icon-text-button
                         class="create-collector-button"
-                        style-type="primary-dark"
                         name="ic_plus_bold"
                         @click="$router.push({ name: 'createCollector' })"
                     >
