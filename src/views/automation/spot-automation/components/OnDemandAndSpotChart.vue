@@ -14,11 +14,11 @@
         >
             <p class="spot-text">
                 {{ data[0].name }} <b>{{ data[0].count }}</b>
-                <span v-if="chartType === 'long'">({{ Math.round(( data[0].count / totalCount ) * 100) }}%)</span>
+                <span v-if="chartType === 'long'"> ({{ Math.round(( data[0].count / totalCount ) * 100) }}%)</span>
             </p>
             <p class="on-demand-text">
                 {{ data[1].name }} <b>{{ data[1].count }}</b>
-                <span v-if="chartType === 'long'">({{ Math.round(( data[1].count / totalCount ) * 100) }}%)</span>
+                <span v-if="chartType === 'long'"> ({{ Math.round(( data[1].count / totalCount ) * 100) }}%)</span>
             </p>
         </div>
     </section>
@@ -96,7 +96,7 @@ export default defineComponent({
             }
             if (props.chartType === 'short') {
                 chart.radius = am4core.percent(70);
-                chart.innerRadius = am4core.percent(50);
+                chart.innerRadius = am4core.percent(47);
             }
 
             chart.data = state.data;
@@ -182,8 +182,12 @@ export default defineComponent({
         width: 8.125rem;
         height: 2.25rem;
         .chart {
-            margin-top: -0.45rem;
-            margin-left: -1rem;
+            margin-top: -1rem;
+            margin-left: -0.8rem;
+            div {
+                left: 0.125rem;
+                top: -0.5rem;
+            }
         }
     }
     &.short {
@@ -196,7 +200,7 @@ export default defineComponent({
 
 .summary-wrapper {
     &.long {
-        margin-top: 0.375rem;
+        margin-top: 0;
         margin-left: -0.2rem;
 
         .spot-text {

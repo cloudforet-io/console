@@ -214,6 +214,9 @@ export default {
             font-size: 0.875rem;
             line-height: 100%;
             padding-right: 2rem;
+            p {
+                margin-bottom: 0.3rem;
+            }
         }
         .spot-group-cost {
             display: flex;

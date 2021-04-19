@@ -184,6 +184,8 @@ export default {
     padding-right: 1.5rem;
     .column-info {
         margin-bottom: 2.6rem;
+        display: flex;
+        align-items: center;
         .text {
             line-height: 100%;
             font-size: 0.875rem;

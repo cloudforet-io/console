@@ -85,7 +85,7 @@
                                         {{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.SAVING_COST') }}
                                     </span>
                                     <span class="cost">
-                                        <span class="text-sm">$</span> {{ item.savingCost }}
+                                        <span class="text-sm">$</span>{{ item.savingCost }}
                                     </span>
                                 </div>
                             </div>
@@ -305,7 +305,7 @@ export default {
                     projects: projectIds,
                 });
                 Object.keys(state.items).forEach((i) => {
-                    state.items[i].savingCost = res.projects[state.items[i].project_id].saving_result;
+                    state.items[i].savingCost = (res.projects[state.items[i].project_id].saving_result).toLocaleString();
                 });
             } catch (e) {
                 console.error(e);
@@ -538,7 +538,7 @@ export default {
     }
     .cost {
         @apply text-indigo-400;
-        font-size: 1.125rem;
+        font-size: 1.25rem;
         line-height: 100%;
         margin-top: 0.5rem;
     }

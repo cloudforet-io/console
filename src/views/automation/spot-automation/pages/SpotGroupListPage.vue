@@ -379,7 +379,7 @@ export default {
                 });
                 Object.keys(state.items).forEach((i) => {
                     const savingResult = SavingResponse.spot_groups[state.items[i].spot_group_id].saving_result || 0;
-                    state.items[i].savingResult = savingResult;
+                    state.items[i].savingResult = savingResult.toLocaleString();
                 });
             } catch (e) {
                 console.error(e);
@@ -462,8 +462,8 @@ export default {
 }
 .show-favorite {
     font-size: 0.875rem;
-    line-height: 140%;
-    margin-left: 0.5rem;
+    line-height: 200%;
+    margin-left: .125rem;
 }
 .cost-instance-info {
     @apply text-gray-900;
