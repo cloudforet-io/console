@@ -282,6 +282,8 @@ export default {
             padding-right: 0.5rem;
         }
         .p-select-dropdown {
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
             .p-context-menu {
                 max-height: 6rem;
             }
