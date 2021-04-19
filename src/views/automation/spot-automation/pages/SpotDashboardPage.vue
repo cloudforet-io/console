@@ -113,7 +113,19 @@
                     </article>
                 </li>
                 <template #no-data>
-                    {{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.NO_PROJECT') }}
+                    <section class="no-project">
+                        <img src="@/assets/images/illust_star.svg">
+                        <span class="no-project-text">{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.NO_PROJECT') }}</span>
+                        <router-link :to="projectPath">
+                            <p-icon-text-button
+                                style-type="primary1"
+                                name="ic_plus_bold"
+                                class="no-project-btn"
+                            >
+                                {{ $t('PROJECT.LANDING.CREATE_PROJECT') }}
+                            </p-icon-text-button>
+                        </router-link>
+                    </section>
                 </template>
             </p-data-loader>
         </section>
@@ -123,7 +135,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    PDivider, PBreadcrumbs, PPageTitle, PToolbox, PDataLoader, PI, PAnchor,
+    PDivider, PBreadcrumbs, PPageTitle, PToolbox, PDataLoader, PI, PAnchor, PIconTextButton,
 } from '@spaceone/design-system';
 import InstanceBillingChart from '@/views/automation/spot-automation/components/InstanceBillingChart.vue';
 import SpotGroupRatioChart from '@/views/automation/spot-automation/components/SpotGroupRatioChart.vue';
@@ -141,6 +153,7 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { SpaceConnector } from '@/lib/space-connector';
 import { Tags, TimeStamp } from '@/models';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
+import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 
 const handlers = {
@@ -204,6 +217,7 @@ export default {
         PToolbox,
         PDataLoader,
         PAnchor,
+        PIconTextButton,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -233,6 +247,8 @@ export default {
                 { name: vm.$t('MENU.AUTOMATION.SPOT_AUTOMATION') },
             ]),
         });
+
+        const projectPath = vm?.$router.resolve({ name: PROJECT_ROUTE.MAIN }).href;
 
         /* util */
         const numberFormatter = (num) => {
@@ -323,6 +339,8 @@ export default {
                 await Promise.all([getSpotGroupByProject(projects), getInstanceByProject(projects), getSavingCostResultByProject(projects)]);
                 state.dataLoading = false;
             } catch (e) {
+                state.items = [];
+                state.totalCount = 0;
                 console.error(e);
             }
         };
@@ -361,6 +379,7 @@ export default {
             numberFormatter,
             commaFormatter,
             AUTOMATION_ROUTE,
+            projectPath,
         };
     },
 };
@@ -370,8 +389,11 @@ export default {
 .dashboard-page-wrapper {
     @apply bg-secondary2;
     padding-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 
-    @screen 2xl {
+    @screen 3xl {
         @apply bg-white;
     }
 }
@@ -472,6 +494,9 @@ export default {
 
 .project-wrapper {
     @apply bg-white;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     padding: 2rem 1.5rem;
     .project-instance-info {
         @apply text-gray-900;
@@ -566,6 +591,25 @@ export default {
     @apply text-secondary;
     font-size: 0.75rem;
     margin-top: 2rem;
+}
+
+.no-project {
+  display: flex;
+  flex-direction: column;
+  .no-project-text {
+    @apply text-primary2;
+    font-size: 1rem;
+    line-height: 160%;
+    margin-top: 0.5rem;
+    margin-bottom: 1rem;
+  }
+  .no-project-btn {
+    @apply rounded;
+    height: 2rem;
+    width: 8.187rem;
+    align-self: center;
+    padding: 1rem;
+  }
 }
 
 </style>
