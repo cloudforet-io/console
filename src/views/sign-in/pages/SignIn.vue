@@ -3,7 +3,7 @@
         <div class="ci-wrapper">
             <template v-if="images">
                 <img class="logo-character" :src="images.ciLogo">
-                <img class="logo-text" :src="images.ciText">
+                <img class="logo-text" :src="images.ciTextWithType">
             </template>
             <template v-else>
                 <img class="logo-character" src="@/assets/images/brand/brand_logo.png">
@@ -103,7 +103,7 @@ export default {
                 if (!isEmpty(domainImage)) {
                     return {
                         ciLogo: config.get('DOMAIN_IMAGE.CI_LOGO'),
-                        ciText: config.get('DOMAIN_IMAGE.CI_TEXT'),
+                        ciTextWithType: config.get('DOMAIN_IMAGE.CI_TEXT_WITH_TYPE'),
                         signIn: config.get('DOMAIN_IMAGE.SIGN_IN'),
                     };
                 }
