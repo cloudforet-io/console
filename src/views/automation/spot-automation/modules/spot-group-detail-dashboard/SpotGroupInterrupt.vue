@@ -495,6 +495,9 @@ export default {
                 height: 2rem;
             }
             tr {
+                &:hover {
+                    @apply bg-transparent;
+                }
                 &:nth-child(even) {
                     td {
                         @apply bg-gray-100;
