@@ -31,11 +31,11 @@
 </template>
 
 <script lang="ts">
+import { isEmpty } from 'lodash';
+
 import {
     toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
-
-import { PI } from '@spaceone/design-system';
 
 import IDPWSignIn from '@/views/sign-in/templates/ID_PW.vue';
 import SignInLeftContainer from '@/views/sign-in/modules/SignInLeftContainer.vue';
@@ -52,7 +52,6 @@ export default {
         SignInRightContainer,
         SignInLeftContainer,
         IDPWSignIn,
-        PI,
     },
     props: {
         admin: {
@@ -80,7 +79,8 @@ export default {
             userType: computed(() => (props.admin ? 'DOMAIN_OWNER' : 'USER')),
             authType: computed(() => store.state.domain.extendedAuthType),
             images: computed(() => {
-                if (config.get('DOMAIN_IMAGE')) {
+                const domainImage = config.get('DOMAIN_IMAGE');
+                if (!isEmpty(domainImage)) {
                     return {
                         ciLogo: config.get('DOMAIN_IMAGE.CI_LOGO'),
                         ciText: config.get('DOMAIN_IMAGE.CI_TEXT'),

@@ -37,13 +37,11 @@
 </template>
 
 <script lang="ts">
+import { isEmpty } from 'lodash';
+
 import {
     toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
-
-import {
-    PButton, PTextInput, PLottie, PBadge, PI,
-} from '@spaceone/design-system';
 
 import IDPWSignIn from '@/views/sign-in/templates/ID_PW.vue';
 import SignInLeftContainer from '@/views/sign-in/modules/SignInLeftContainer.vue';
@@ -58,11 +56,6 @@ export default {
         SignInRightContainer,
         SignInLeftContainer,
         IDPWSignIn,
-        PI,
-        PBadge,
-        PLottie,
-        PButton,
-        PTextInput,
     },
     props: {
         admin: {
@@ -106,7 +99,8 @@ export default {
                 return component;
             }),
             images: computed(() => {
-                if (config.get('DOMAIN_IMAGE')) {
+                const domainImage = config.get('DOMAIN_IMAGE');
+                if (!isEmpty(domainImage)) {
                     return {
                         ciLogo: config.get('DOMAIN_IMAGE.CI_LOGO'),
                         ciText: config.get('DOMAIN_IMAGE.CI_TEXT'),

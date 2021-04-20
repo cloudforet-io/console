@@ -8,10 +8,14 @@
                        class="inline-block" :to="dashboardLink"
             >
                 <div class="logo-wrapper mr-4 lg:mr-10">
-                    <img class="brand-logo" src="@/assets/images/brand/brand_logo.svg">
-                    <img class="brand-logo-text hidden lg:inline-block"
-                         src="@/assets/images/brand/SpaceONE_logoTypeA.svg"
-                    >
+                    <template v-if="images">
+                        <img class="logo-character" :src="images.ciLogo">
+                        <img class="logo-text" :src="images.ciText">
+                    </template>
+                    <template v-else>
+                        <img class="logo-character" src="@/assets/images/brand/brand_logo.png">
+                        <img class="logo-text" src="@/assets/images/brand/SpaceONE_logoTypeA.svg">
+                    </template>
                 </div>
             </component>
             <div v-for="(menu, idx) in menuList"
@@ -68,7 +72,7 @@
 <script lang="ts">
 import vClickOutside from 'v-click-outside';
 import { TranslateResult } from 'vue-i18n';
-import { includes } from 'lodash';
+import { includes, isEmpty } from 'lodash';
 
 import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
@@ -81,6 +85,7 @@ import RightSideMenu from '@/common/modules/gnb/RightSideMenu.vue';
 
 import { Location } from 'vue-router';
 import { store } from '@/store';
+import config from '@/lib/config';
 
 
 enum PARENT_CATEGORY {
@@ -121,6 +126,17 @@ export default {
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            images: computed(() => {
+                const domainImage = config.get('DOMAIN_IMAGE');
+                if (!isEmpty(domainImage)) {
+                    return {
+                        ciLogo: config.get('DOMAIN_IMAGE.CI_LOGO'),
+                        ciText: config.get('DOMAIN_IMAGE.CI_TEXT'),
+                        signIn: config.get('DOMAIN_IMAGE.SIGN_IN'),
+                    };
+                }
+                return undefined;
+            }),
             openedMenu: null,
             showSiteMap: false,
             showAutomation: store.state.user.powerSchedulerState,
@@ -235,14 +251,19 @@ export default {
         }
         .logo-wrapper {
             display: inline-block;
-            .brand-logo {
+            .logo-character {
                 display: inline-block;
                 width: 1.875rem;
                 height: 1.875rem;
             }
-            .brand-logo-text {
+            .logo-text {
+                display: none;
                 height: 0.875rem;
                 margin-left: 0.5rem;
+
+                @screen lg {
+                    display: inline-block;
+                }
             }
         }
     }
