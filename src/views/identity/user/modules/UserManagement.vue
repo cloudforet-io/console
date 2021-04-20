@@ -157,6 +157,7 @@
                    :update-mode="userFormState.updateMode"
                    :item="userFormState.item"
                    :visible.sync="userFormState.visible"
+                   :is-admin="userFormState.isAdmin"
                    @confirm="userFormConfirm"
         />
     </div>
@@ -175,7 +176,6 @@ import {
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import { Options } from '@spaceone/design-system/dist/src/data-display/tables/query-search-table/type';
 import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
 
 import UserForm from '@/views/identity/user/modules/UserForm.vue';
@@ -186,10 +186,8 @@ import PTagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@/lib/component-utils/query-search';
 import { store } from '@/store';
-import { getPageStart } from '@/lib/component-utils/pagination';
 import { SpaceConnector } from '@/lib/space-connector';
 import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/helper';
-import dayjs from 'dayjs';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { map } from 'lodash';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
@@ -359,6 +357,7 @@ export default {
             headerTitle: '',
             item: undefined,
             roleOfSelectedUser: '',
+            isAdmin: computed(() => store.getters['user/isAdmin']).value,
         });
         const routeState = reactive({
             routes: computed(() => ([

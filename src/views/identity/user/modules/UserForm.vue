@@ -69,7 +69,7 @@
                                    class="dropdown"
                 />
             </p-field-group>
-            <form v-if="formState.selectedAuthType.label === 'Local' && !updateMode"
+            <form v-if="(!updateMode && formState.selectedAuthType.label === 'Local') || (updateMode && isAdmin && item.backend === 'LOCAL')"
                   class="form"
             >
                 <p-field-group
@@ -161,6 +161,10 @@ export default {
             default: undefined,
         },
         updateMode: {
+            type: Boolean,
+            default: false,
+        },
+        isAdmin: {
             type: Boolean,
             default: false,
         },
@@ -360,6 +364,11 @@ export default {
 
             await checkEmail();
             if (!validationState.isEmailValid) return;
+
+            if (props.isAdmin) {
+                checkPassword(formState.password);
+                if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
+            }
 
             const data = {
                 user_id: formState.user_id,
