@@ -18,5 +18,10 @@
     "ENDPOINT": ""
   },
   "ASSET_PATH": {
-  }
+  },
+  "DOCS": [
+    { "label": "User Guide", "link": "https://spaceone-dev.gitbook.io/user-guide" },
+    { "label": "API Guide", "link": "https://spaceone-dev.gitbook.io/spaceone-apis" },
+    { "label": "GitHub", "link": "https://github.com/spaceone-dev" }
+  ]
 }

@@ -97,6 +97,7 @@ import router from '@/routes';
 import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { languages } from '@/store/modules/user/config';
+import config from '@/lib/config';
 
 export default {
     name: 'RightSideMenu',
@@ -118,11 +119,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             showLanguageMenu: false,
-            supportMenu: computed(() => [
-                { label: vm.$t('COMMON.GNB.SUPPORT.LABEL_USER_GUIDE'), link: 'https://spaceone-dev.gitbook.io/user-guide/' },
-                { label: vm.$t('COMMON.GNB.SUPPORT.LABEL_API_GUIDE'), link: 'https://spaceone-dev.gitbook.io/spaceone-apis' },
-                { label: vm.$t('COMMON.GNB.SUPPORT.LABEL_GITHUB'), link: 'https://github.com/spaceone-dev' },
-            ]),
+            supportMenu: config.get('DOCS'),
             languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
                 label: v, name: k,
             }))),
