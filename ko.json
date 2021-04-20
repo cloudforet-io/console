@@ -751,6 +751,10 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "서비스 계정 추가",
+				"ALT_E_CHECK_MODAL": "{action} 실패",
+				"ALT_S_CHECK_MODAL": "{action} 완료",
+				"CHECK_MODAL_DELETE_DESC": "정말 삭제하시겠습니까?",
+				"CHECK_MODAL_DELETE_TITLE": "클라우드 서비스 삭제",
 				"EMPTY_CLOUD_SERVICE": "클라우드 서비스를 이용하려면 서비스 계정을 추가해주세요. ",
 				"FAVORITES": "즐겨찾기",
 				"NO_REGION": "리전이 없습니다.",

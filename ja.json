@@ -751,6 +751,10 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "サービスアカウントの追加",
+				"ALT_E_CHECK_MODAL": "{action}失敗",
+				"ALT_S_CHECK_MODAL": "{action}完了",
+				"CHECK_MODAL_DELETE_DESC": "本当に削除しますか？",
+				"CHECK_MODAL_DELETE_TITLE": "",
 				"EMPTY_CLOUD_SERVICE": "クラウドサービスを利用したい場合、サービスアカウントを追加してください。",
 				"FAVORITES": "お気に入り",
 				"NO_REGION": "リージョンがありません。",

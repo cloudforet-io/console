@@ -751,6 +751,10 @@
 			},
 			"MAIN": {
 				"ADD_SERVICE_ACCOUNT": "Add Service Account",
+				"ALT_E_CHECK_MODAL": "{action} failure",
+				"ALT_S_CHECK_MODAL": "{action} success",
+				"CHECK_MODAL_DELETE_DESC": "Are you sure you want to Delete selected item?",
+				"CHECK_MODAL_DELETE_TITLE": "Delete Cloud Service",
 				"EMPTY_CLOUD_SERVICE": "Please, register Service Account first to collect cloud service resouces. ",
 				"FAVORITES": "Favorites",
 				"NO_REGION": "No Region",
