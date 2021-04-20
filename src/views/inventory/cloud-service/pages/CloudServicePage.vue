@@ -65,6 +65,7 @@
 
                                     <p-dropdown-menu-btn class="left-toolbox-item mr-4"
                                                          :menu="tableState.dropdown"
+                                                         @click-delete="clickDelete"
                                                          @click-project="clickProject"
                                     >
                                         {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.ACTION') }}
@@ -131,6 +132,22 @@
                 <p-empty v-else style="height: auto; margin-top: 4rem;">
                     {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.NO_SELECTED') }}
                 </p-empty>
+                <p-table-check-modal v-if="checkTableModalState.visible"
+                                     :visible.sync="checkTableModalState.visible"
+                                     :header-title="checkTableModalState.title"
+                                     :sub-title="checkTableModalState.subTitle"
+                                     :theme-color="checkTableModalState.themeColor"
+                                     size="lg"
+                                     :selectable="false"
+                                     @confirm="checkModalConfirm"
+                >
+                    <p-dynamic-layout v-if="tableState.multiSchema"
+                                      type="simple-table"
+                                      :options="tableState.multiSchema.options"
+                                      :data="tableState.selectedItems"
+                                      :field-handler="fieldHandler"
+                    />
+                </p-table-check-modal>
                 <project-tree-modal :visible.sync="changeProjectState.visible"
                                     :project-id="changeProjectState.projectId"
                                     :loading="changeProjectState.loading"
@@ -155,7 +172,7 @@ import {
 
 import {
     PHorizontalLayout, PDropdownMenuBtn, PTab, PDynamicLayout,
-    PPageTitle, PLazyImg, PBreadcrumbs, PIconTextButton, PEmpty, PDivider,
+    PPageTitle, PLazyImg, PBreadcrumbs, PIconTextButton, PEmpty, PDivider, PTableCheckModal,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import {
@@ -184,12 +201,13 @@ import {
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import {assetUrlConverter, showErrorMessage, showSuccessMessage} from '@/lib/util';
+import { assetUrlConverter, showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import { QueryHelper } from '@/lib/query';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import {TranslateResult} from "vue-i18n";
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -252,6 +270,7 @@ export default {
         CloudServiceHistory,
         CloudServiceAdmin,
         PDynamicLayout,
+        PTableCheckModal,
         PHorizontalLayout,
         PBreadcrumbs,
         PPageTitle,
@@ -332,7 +351,7 @@ export default {
                     type: 'item',
                     name: 'delete',
                     label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.DELETE'),
-                    disabled: true,
+                    disabled: tableState.selectedItems.length === 0,
                 },
                 { type: 'divider' },
                 {
@@ -367,6 +386,16 @@ export default {
             }),
             selectedCloudServiceIds: computed(() => tableState.selectedItems.map(d => d.cloud_service_id)),
             tableHeight: cloudServiceStore.getItem('tableHeight', 'number'),
+        });
+
+        const checkTableModalState = reactive({
+            visible: false,
+            item: null,
+            title: '' as TranslateResult,
+            subTitle: '' as TranslateResult,
+            themeColor: '',
+            api: null as any,
+            params: null as any,
         });
 
         const onTableHeightChange = (height) => {
@@ -626,6 +655,40 @@ export default {
             tableState.collectModalVisible = true;
         };
 
+        const clickDelete = () => {
+            checkTableModalState.title = vm.$tc('INVENTORY.CLOUD_SERVICE.MAIN.CHECK_MODAL_DELETE_TITLE', tableState.selectedItems.length);
+            checkTableModalState.subTitle = vm.$tc('INVENTORY.CLOUD_SERVICE.MAIN.CHECK_MODAL_DELETE_DESC', tableState.selectedItems.length);
+            checkTableModalState.themeColor = 'alert';
+            checkTableModalState.visible = true;
+            checkTableModalState.api = SpaceConnector.client.inventory.cloudService.delete;
+            checkTableModalState.params = {};
+        };
+
+        const checkModalConfirm = async () => {
+            const resetCheckTableModalState = () => {
+                checkTableModalState.visible = false;
+                checkTableModalState.title = '';
+                checkTableModalState.subTitle = '';
+                checkTableModalState.themeColor = '';
+                checkTableModalState.api = null;
+                checkTableModalState.params = null;
+            };
+            try {
+                await checkTableModalState.api({
+                    ...checkTableModalState.params,
+                    cloud_services: tableState.selectedItems.map(item => item.cloud_service_id),
+                });
+                showSuccessMessage(vm.$t('INVENTORY.CLOUD_SERVICE.MAIN.ALT_S_CHECK_MODAL', { action: checkTableModalState.title }), '', root);
+            } catch (e) {
+                showErrorMessage(vm.$t('INVENTORY.CLOUD_SERVICE.MAIN.ALT_E_CHECK_MODAL', { action: checkTableModalState.title }), e, root);
+            } finally {
+                typeOptionState.selectIndex = [];
+                resetCheckTableModalState();
+                await fetchTableData();
+                // await getCloudServiceTableData();
+            }
+        };
+
 
         /** Monitoring Tab */
         const monitoringState: MonitoringProps = reactive({
@@ -661,6 +724,7 @@ export default {
             tableState,
             fetchOptionState,
             typeOptionState,
+            checkTableModalState,
             onTableHeightChange,
             onSelect,
             exportCloudServiceData,
@@ -680,6 +744,9 @@ export default {
             /* Actions */
             onClickSidebarItem,
             clickCollectData,
+
+            clickDelete,
+            checkModalConfirm,
 
             /* Monitoring Tab */
             monitoringState,

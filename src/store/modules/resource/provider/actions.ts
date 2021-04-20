@@ -17,6 +17,9 @@ export const load = async ({ commit, state }, lazyLoad = false): Promise<void|Er
         const response = await SpaceConnector.client.identity.provider.list({
             query: {
                 only: ['provider', 'name', 'tags'],
+                sort: {
+                    key: 'provider',
+                },
             },
         });
         const providers: ResourceMap = {};
