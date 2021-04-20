@@ -65,6 +65,7 @@ import {
 import Color from 'color';
 import { store } from '@/store';
 import { Location } from 'vue-router';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 
 am4core.useTheme(am4themes_animated);
 
@@ -74,6 +75,12 @@ interface Data {
     total: number;
 }
 const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
+
+interface RegionData {
+    provider: string;
+    region_code: string;
+    region_id: string;
+}
 
 export default {
     name: 'ProjectRegionService',
@@ -107,6 +114,7 @@ export default {
             data: [] as Data[],
             chart: null as null | any,
             chartRegistry: {},
+            regionList: [] as RegionData[],
         });
 
         /* util */
@@ -170,14 +178,36 @@ export default {
                 }
             } else {
                 label.text = '{values.value.sum}';
-            };
+            }
 
             state.chart = chart;
         };
+
+        const regionApiQuery = new ApiQueryHelper().setOnly('region_id', 'region_code', 'provider');
+
+        const getRegionList = async () => {
+            try {
+                const res = await SpaceConnector.client.inventory.region.list({
+                    query: regionApiQuery.data,
+                });
+                state.regionList = res.results;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const regionCodeToIdFormatter = (provider, regionCode) => {
+            if (state.regionList) {
+                const regionId = (state.regionList.find(item => item.region_code === regionCode && item.provider === provider))?.region_id;
+                return regionId;
+            } return '';
+        };
+
         const getLocation = (provider, region) => {
+            const regionId = regionCodeToIdFormatter(provider, region);
             const query: Location['query'] = {
                 provider,
-                region,
+                region: regionId || '',
             };
             if (props.label !== 'All') query.service = props.label;
 
@@ -237,6 +267,10 @@ export default {
         watch(() => props.label, async () => {
             await getData();
         }, { immediate: false });
+
+        (async () => {
+            await getRegionList();
+        })();
 
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();
