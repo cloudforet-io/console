@@ -151,7 +151,7 @@
 					"DESC": "성능과 비용에 가장 최적화된 추천 인스턴스 입니다.",
 					"LABEL": "인스턴스 타입",
 					"ONE_MORE_REQUIRED": "하나 이상의 인스턴스 타입이 필요합니다.",
-					"OPTIMIZED_TYPE": "최적화 추천 받기"
+					"OPTIMIZED_TYPE": "최적화 추천받기"
 				},
 				"LOAD_FAILED": "문제가 발생하여 데이터를 가져오지 못했습니다.",
 				"RESOURCE": {
