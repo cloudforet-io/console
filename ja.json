@@ -148,6 +148,7 @@
 				"CREATE": "",
 				"CREATE_TITLE": "",
 				"INSTANCE_TYPE": {
+					"DESC": "",
 					"LABEL": "",
 					"ONE_MORE_REQUIRED": "",
 					"OPTIMIZED_TYPE": ""
