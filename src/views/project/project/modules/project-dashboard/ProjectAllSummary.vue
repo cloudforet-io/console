@@ -349,7 +349,7 @@ export default {
                     project_id: props.projectId,
                     labels: [CLOUD_SERVICE_LABEL[type]],
                 });
-                const count = res.results[0].total;
+                const count = res.results[0]?.total || 0;
                 if (type === DATA_TYPE.storage) {
                     state.storageSuffix = byteFormatter(count).split(' ')[1];
                 }
