@@ -119,7 +119,7 @@
 		"SPOT_AUTOMATION": {
 			"ADD": {
 				"ALT_E_CREATE_SPOT_GROUP": "스팟그룹 생성 실패",
-				"ALT_S_CREATE_SPOT_GROUP": "스팟그룹 생성이 완료되었습니다.",
+				"ALT_S_CREATE_SPOT_GROUP": "스팟그룹 생성 성공",
 				"BASE_INFO": {
 					"LABEL": "기본 정보",
 					"NAME_DESC_1": "공백 없이 최대 56자 / 문자로 시작해야 하고, 문자, 숫자 및 하이픈만 포함할 수 있습니다. ",
@@ -151,7 +151,7 @@
 					"DESC": "성능과 비용에 가장 최적화된 추천 인스턴스 입니다.",
 					"LABEL": "인스턴스 타입",
 					"ONE_MORE_REQUIRED": "하나 이상의 인스턴스 타입이 필요합니다.",
-					"OPTIMIZED_TYPE": "최적화된 인스턴스 타입"
+					"OPTIMIZED_TYPE": "최적화 추천 받기"
 				},
 				"LOAD_FAILED": "문제가 발생하여 데이터를 가져오지 못했습니다.",
 				"RESOURCE": {
@@ -160,7 +160,7 @@
 					"RESOURCE_REQUIRED": "리소스를 선택해주세요."
 				},
 				"SCHEDULE_POLICY": {
-					"DESC": "인스턴스 개수에 변화가 생기면, 온디맨드 설정 개수는 유지되고(고정값) 스팟 인스턴스의 개수가 변화합니다.",
+					"DESC": "인스턴스 개수에 변화가 생기면, 스팟 인스턴스의 개수가 변화합니다. (온디맨드 설정 개수는 고정값) ",
 					"LABEL": "스케줄 정책",
 					"SETTING_LABEL": "설정",
 					"SETTING_ONDEMAND": "온디맨드",
@@ -263,7 +263,7 @@
 			"LIST": {
 				"ADD_SPOT_GROUP": "스팟그룹 생성  ",
 				"CARD": {
-					"ACTIVITY_TIME_RANGE": "Activity graph time range: ",
+					"ACTIVITY_TIME_RANGE": "그래프 기간: ",
 					"COST_TIME_RANGE": "이번달 1일 ~ 어제",
 					"CPU_UTILIZATION": "일 평균 CPU 사용률",
 					"CREATED_AT": "생성",
@@ -275,8 +275,8 @@
 					"LAST_1_DAY": "Last 1 day",
 					"LAST_7_DAYS": "Last 7 days",
 					"LOAD_BALANCER": "로드밸런서",
-					"NUMBER_UNIT": "",
-					"REGION": "리전",
+					"NUMBER_UNIT": "개",
+					"REGION": "지역",
 					"SAVING_COST": "절감비용 ",
 					"SERVICE_TYPE": "서비스 타입",
 					"SPOT_INTERRUPT": "스팟 인터럽트 ",
