@@ -2,6 +2,7 @@
     <div class="p-dropdown-btn" :class="{block, 'button-only': buttonOnly}">
         <p-button v-if="!buttonOnly"
                   :disabled="disabled"
+                  :tabindex="-1"
                   class="menu-btn"
                   :class="{active: popup, hovered: mouseover}"
                   :style-type="buttonStyleType"
