@@ -57,11 +57,12 @@
                         </router-link>
                     </template>
                     <template #col-collector_info.plugin_info-format="{ value }">
-                        <p-lazy-img v-if="value"
-                                    :src="plugins[value.plugin_id].icon"
-                                    width="1rem" height="1rem"
-                        />
-                        <span class="pl-2">{{ plugins[value.plugin_id].name }}</span>
+                        <template v-if="value">
+                            <p-lazy-img :src="plugins[value.plugin_id].icon"
+                                        width="1rem" height="1rem"
+                            />
+                            <span class="pl-2">{{ plugins[value.plugin_id].name }}</span>
+                        </template>
                     </template>
                     <template #col-sequence-format="{ value }">
                         <span class="float-right">{{ value }}</span>
