@@ -65,6 +65,7 @@ export default {
             colors: computed(() => {
                 if (props.theme === 'secondary') return { checked: color.blue[500], unchecked: color.gray[200] };
                 if (props.theme === 'white') return { checked: '#00FF00', unchecked: '#FF0000' };
+                if (props.theme === 'peacock500') return { checked: color.peacock[400], unchecked: color.gray[200] };
                 return { checked: color.blue[500], unchecked: color.gray[200] };
             }),
             buttonBind: computed(() => ({
