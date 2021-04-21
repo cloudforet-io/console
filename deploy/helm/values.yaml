@@ -13,7 +13,15 @@ imagePullPolicy: IfNotPresent
 # For production.json (nodejs)
 # console_api: https://console-api.console.spaceone.dev
 # Domain name of console-api (usually ALB of console-api)
-console_api: https://console-api
+production_json:
+    CONSOLE_API:
+        ENDPOINT: https://console-api
+    VUE_APP_API:
+        ENDPOINT: https://console-api
+    GTAG_ID: DISABLED
+    NO_SERVER_MODE: false
+
+#console_api: https://console-api
 
 #domainName:
 #    ref: config
