@@ -46,7 +46,9 @@
                                                  @change="onSelect(size, type, ...arguments)"
                                     >
                                         <template #icon>
-                                            <p-i name="ic_checkbox_peacock400--checked" width="1.25rem" />
+                                            <p-i v-if="checkedTypes[size] && checkedTypes[size].includes(type)"
+                                                 class="cursor-pointer"
+                                                 name="ic_checkbox_peacock400--checked" width="1.25rem" />
                                         </template>
                                     </p-check-box>
                                 </td>
