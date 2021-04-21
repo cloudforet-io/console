@@ -6,5 +6,5 @@ metadata:
   namespace: {{ .Values.global.namespace | default .Release.Namespace }}
 data:
   production.json: |-
-		{{ toJson .Values.production_json| indent 4 }}
+    {{ toJson .Values.production_json| indent 4 }}
 {{- end }}

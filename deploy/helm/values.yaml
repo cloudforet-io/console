@@ -15,11 +15,29 @@ imagePullPolicy: IfNotPresent
 # Domain name of console-api (usually ALB of console-api)
 production_json:
     CONSOLE_API:
-        ENDPOINT: https://console-api
-    VUE_APP_API:
-        ENDPOINT: https://console-api
-    GTAG_ID: DISABLED
-    NO_SERVER_MODE: false
+        ENDPOINT: "<console-api endpoint>"
+    GTAG_ID: "<google analytics - tag id>"
+    DOMAIN_NAME:
+    DOMAIN_NAME_REF: hostname
+    REPORT:
+        DEFAULT_TEMPLATE_ID: template_2
+    AMCHARTS_LICENSE:
+        CHARTS: ''
+        MAPS: ''
+        TIMELINE: ''
+    MOCK:
+        ALL: false
+        ENDPOINT: ''
+    ASSET_PATH: {}
+    DOMAIN_IMAGE: {}
+    DOCS:
+    - label: User Guide
+      link: https://spaceone-dev.gitbook.io/user-guide
+    - label: API Guide
+      link: https://spaceone-dev.gitbook.io/spaceone-apis
+    - label: GitHub
+      link: https://github.com/spaceone-dev
+
 
 #console_api: https://console-api
 
