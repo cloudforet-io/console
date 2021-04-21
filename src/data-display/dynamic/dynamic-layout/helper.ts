@@ -13,7 +13,9 @@ const getObjectValue = (target: Record<string, any>|Array<any>, currentPath: str
     return target[currentPath];
 };
 
-export const getValueByPath = (data: any, path: string) => {
+export const getValueByPath = (data: any, path: string|null) => {
+    if (typeof path !== 'string') return data;
+
     let target = data;
     const pathArr = path.split('.');
 
