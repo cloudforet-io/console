@@ -25,10 +25,6 @@
                 <div class="desc">
                     {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.BASE_INFO.TAG_DESC_1') }}
                     <br><br>
-                    <p class="text-gray-500">
-                        {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.BASE_INFO.TAG_DESC_2') }}
-                    </p>
-                    <br>
                 </div>
                 <tags-input-group :tags.sync="tags"
                                   :show-validation="showTagsValidation"

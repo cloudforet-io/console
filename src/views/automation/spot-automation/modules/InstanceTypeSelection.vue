@@ -3,11 +3,21 @@
                  :empty-text="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SELECT_RESOURCE')"
                  :is-empty="!resourceId"
     >
-        <div class="toggle-wrapper" :class="{optimized: isOptimized}">
-            <p-toggle-button :value="isOptimized" sync @change="onToggleChange" />
-            <span class="label">{{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.OPTIMIZED_TYPE') }}</span>
-        </div>
         <div class="table-container">
+            <div class="optimized-wrapper">
+                <div class="optimized-checkbox">
+                    <p-i name="ic_checkbox_peacock400--checked" width="1.25rem" height="1.25rem" /> :
+                    <span class="desc"> {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.DESC') }}</span>
+                </div>
+                <div class="toggle-wrapper" :class="{optimized: isOptimized}">
+                    <p-toggle-button :value="isOptimized"
+                                     :theme="'peacock500'"
+                                     sync
+                                     @change="onToggleChange"
+                    />
+                    <span class="label">{{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.OPTIMIZED_TYPE') }}</span>
+                </div>
+            </div>
             <try-again-button v-if="errored" class="mt-4" @refresh="refresh" />
             <div v-else class="table-wrapper">
                 <table v-if="types.length > 0" :class="{optimized: isOptimized}">
@@ -34,7 +44,11 @@
                                                  v-tooltip.bottom="`${type}.${size}`"
                                                  :selected="checkedTypes[size] && checkedTypes[size].includes(type)"
                                                  @change="onSelect(size, type, ...arguments)"
-                                    />
+                                    >
+                                        <template #icon>
+                                            <p-i name="ic_checkbox_peacock400--checked" width="1.25rem" />
+                                        </template>
+                                    </p-check-box>
                                 </td>
                             </template>
                         </tr>
@@ -59,7 +73,9 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
-import { PCheckBox, PLottie, PToggleButton } from '@spaceone/design-system';
+import {
+    PCheckBox, PLottie, PToggleButton, PI,
+} from '@spaceone/design-system';
 import {
     cloneDeep, remove, forEach, isEmpty, sortBy, flatMap, uniq,
 } from 'lodash';
@@ -88,6 +104,7 @@ export default {
         PToggleButton,
         PCheckBox,
         PLottie,
+        PI,
     },
     props: {
         resourceId: {
@@ -246,6 +263,7 @@ export default {
             emitChange();
         };
 
+
         const setOriginData = () => {
             props.originCandidates.forEach((str) => {
                 const idx = str.indexOf('.');
@@ -282,6 +300,17 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.optimized-wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+.optimized-checkbox {
+    @apply text-gray-700;
+    font-size: 0.75rem;
+    .p-i-icon {
+        margin-bottom: .2rem;
+    }
+}
 .toggle-wrapper {
     display: flex;
     align-items: center;
@@ -292,15 +321,18 @@ export default {
     }
     &.optimized {
         .label {
-            @apply text-secondary;
+            @apply text-peacock-500;
         }
     }
 }
 .table-container {
     position: relative;
+    display:inline-block;
+    max-width: 100%;
 }
 .table-wrapper {
-    width: 100%;
+    display:inline-block;
+    max-width: 100%;
     overflow: auto;
     margin-top: 1.5rem;
     min-height: 12rem;
@@ -324,7 +356,12 @@ table {
         justify-content: center;
         text-align: center;
         min-width: 4.5rem;
-        min-height: 2rem;
+        min-height: 2.5rem;
+    }
+    thead {
+        th {
+            min-height: 2rem;
+        }
     }
     th {
         font-size: 0.75rem;
@@ -333,6 +370,11 @@ table {
         position: sticky;
         &[scope=col] {
             top: 0;
+            &:first-child {
+                @apply bg-white;
+                left: 0;
+                z-index: 1;
+            }
         }
         &[scope=row] {
             left: 0;
@@ -363,6 +405,24 @@ table {
 }
 
 @screen mobile {
+    .optimized-wrapper {
+        flex-direction: column;
+    }
+    .toggle-wrapper {
+        margin-top: 1rem;
+    }
+    table {
+        th {
+            &[scope=col] {
+                &:first-child {
+                    box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.08);
+                }
+            }
+            &[scope=row] {
+                box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.08);
+            }
+        }
+    }
     table.optimized {
         th, td {
             &:not(.has-optimized) {

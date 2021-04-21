@@ -6,14 +6,12 @@
         <template #default>
             <div class="schedule-policy-settings">
                 <p-field-group required :label="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_TYPE_LABEL')">
-                    <div class="mt-2">
-                        <p-radio v-for="(item, i) in supportedSettingsTypeItems" :key="i"
-                                 :selected="item.name" :value="selectedType" class="mr-4"
-                                 @click="changeType(item.name)"
-                        >
-                            <span @click="changeType(item.name)">{{ item.label }}</span>
-                        </p-radio>
-                    </div>
+                    <p-radio v-for="(item, i) in supportedSettingsTypeItems" :key="i"
+                             :selected="item.name" :value="selectedType" class="mr-4"
+                             @click="changeType(item.name)"
+                    >
+                        <span @click="changeType(item.name)">{{ item.label }}</span>
+                    </p-radio>
                 </p-field-group>
 
                 <p v-if="selectedType === SETTINGS_TYPE.count" class="count-info">
@@ -346,7 +344,6 @@ export default {
 .input-wrapper {
     display: flex;
     justify-content: space-between;
-    margin-top: 0.625rem;
     .input-group {
         .label {
             margin-bottom: 0.75rem;
@@ -366,7 +363,7 @@ export default {
 .dragger-wrapper {
     display: flex;
     align-items: center;
-    margin-top: 8px;
+    margin-top: 0.75rem;
     height: 32px;
     .dragger-point {
         position: relative;
@@ -375,7 +372,7 @@ export default {
         overflow: visible;
     }
     .dragger {
-        @apply text-peacock-400 border border-peacock-400 bg-white;
+        @apply text-peacock-400 border-2 border-peacock-400 bg-white;
         position: absolute;
         display: inline-flex;
         align-items: center;
@@ -386,8 +383,11 @@ export default {
         left: -16px;
         top: -16px;
         box-shadow: 0 2px 4px rgba(theme('colors.black'), 0.2);
+        transition: all .2s .2s;
         &.dragging, &:hover {
             @apply bg-blue-100;
+            transform: scale(1.1);
+            transition: all .2s .2s;
         }
     }
     .line {

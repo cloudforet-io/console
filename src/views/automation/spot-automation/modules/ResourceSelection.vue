@@ -299,6 +299,9 @@ export default {
     @apply text-gray-700;
     font-size: 0.75rem;
     line-height: 1.5;
+    .p-i-icon {
+        margin-bottom: .2rem;
+    }
 }
 .select-item {
     @apply border border-secondary text-secondary;
@@ -306,7 +309,7 @@ export default {
     font-size: 0.875rem;
     line-height: 1.4;
     width: fit-content;
-    margin: 1.5rem 0;
+    margin: 1.125rem 0 1.5rem;
     border-radius: 4px;
 }
 .field-group {
