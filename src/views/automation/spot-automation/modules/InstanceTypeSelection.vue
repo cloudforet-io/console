@@ -413,6 +413,9 @@ table {
     .toggle-wrapper {
         margin-top: 1rem;
     }
+    .table-wrapper {
+        max-height: 19rem;
+    }
     table {
         th {
             &[scope=col] {
