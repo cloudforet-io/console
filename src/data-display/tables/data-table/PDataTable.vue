@@ -95,9 +95,10 @@
                                              :value="index"
                                 />
                                 <p-radio v-else
-                                         v-model="proxyState.selectIndex[0]"
+                                         :selected="proxyState.selectIndex[0]"
                                          :disabled="getRowSelectable ? getRowSelectable(item, index): false"
                                          :value="index"
+                                         @change="onChangeRadioSelect"
                                 />
                             </td>
                             <td v-for="(field, i) in fieldsData"
@@ -378,6 +379,10 @@ export default defineComponent<PDataTableProps>({
             copyAnyData(result);
         };
 
+        const onChangeRadioSelect = (e) => {
+            proxyState.selectIndex = [e];
+        };
+
 
         watch(() => proxyState.selectIndex, () => {
             if (props.items && props.items.length && props.items.length === (proxyState.selectIndex as any[]).length) {
@@ -430,6 +435,7 @@ export default defineComponent<PDataTableProps>({
             onSelectClick,
             onSelectAllToggle,
             onClickColCopy,
+            onChangeRadioSelect,
         };
     },
 });
