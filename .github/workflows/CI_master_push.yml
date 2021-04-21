@@ -66,25 +66,7 @@ jobs:
           tags: pyengine/${{ env.SERVICE }}:latest, pyengine/${{ env.SERVICE }}:${{ env.VERSION }}
           cache-from: pyengine/${{ env.SERVICE }}:latest
           cache-to: type=inline
-      - 
-        name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-      - 
-        name: Login to Amazon ECR
-        run: aws ecr-public get-login-password --region us-east-1 | docker login --username AWS --password-stdin ${{ secrets.ECR_REPO }}
-      -
-        name: Build and push (ECR)
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          push: true
-          tags: ${{ secrets.ECR_REPO }}/${{ env.SERVICE }}:latest, ${{ secrets.ECR_REPO }}/${{ env.SERVICE }}:${{ env.VERSION }}
-          cache-from: pyengine/${{ env.SERVICE }}:latest
-         
+        
 
       - name: Slack
         if: always()
