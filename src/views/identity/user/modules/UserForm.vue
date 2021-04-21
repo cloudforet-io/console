@@ -69,7 +69,7 @@
                                    class="dropdown"
                 />
             </p-field-group>
-            <form v-if="(!updateMode && formState.selectedAuthType.label === 'Local') || (updateMode && isAdmin && item.backend === 'LOCAL')"
+            <form v-if="(!updateMode && formState.selectedAuthType.label === 'Local') || (updateMode && isAdmin && item.backend === 'LOCAL' && item.user_type !== 'API Only')"
                   class="form"
             >
                 <p-field-group
