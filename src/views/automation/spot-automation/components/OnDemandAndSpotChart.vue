@@ -38,6 +38,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 // eslint-disable-next-line camelcase
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
+import config from '@/lib/config';
 
 
 am4core.useTheme(am4themes_animated);
@@ -89,7 +90,7 @@ export default defineComponent({
             const chart = createChart();
             state.chart = chart;
             chart.responsive.enabled = true;
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             if (props.chartType === 'long') {
                 chart.radius = am4core.percent(50);
                 chart.innerRadius = am4core.percent(27);

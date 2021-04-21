@@ -36,6 +36,7 @@ import {
     gray, peacock, secondary, white,
 } from '@/styles/colors';
 import { SpaceConnector } from '@/lib/space-connector';
+import config from '@/lib/config';
 
 
 am4core.useTheme(am4themes_animated);
@@ -106,7 +107,7 @@ export default {
             };
             const chart = createChart();
             state.chart = chart;
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.responsive.enabled = true;
             chart.padding = 12;
 

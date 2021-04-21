@@ -35,6 +35,7 @@ import { reactive, toRefs, watch } from '@vue/composition-api';
 
 import { MetricChartProps } from '@/common/components/metric-chart/type';
 import { gray } from '@/styles/colors';
+import config from '@/lib/config';
 
 dayjs.extend(utc);
 am4core.useTheme(am4themes_animated);
@@ -119,7 +120,7 @@ export default {
                 return state.chartRegistry[ctx];
             };
             const chart = createChart();
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
             chart.paddingTop = 10;

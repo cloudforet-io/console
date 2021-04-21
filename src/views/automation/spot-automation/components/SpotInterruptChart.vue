@@ -17,6 +17,7 @@ import { store } from '@/store';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { red } from '@/styles/colors';
+import config from '@/lib/config';
 
 interface InterruptChartData {
     date: string;
@@ -60,7 +61,7 @@ export default {
             const chart = createChart();
             state.chart = chart;
             chart.responsive.enabled = true;
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.data = state.data;
 
             // Create axes

@@ -46,6 +46,7 @@ import {
     gray, peacock, secondary, primary1,
 } from '@/styles/colors';
 import { SpaceConnector } from '@/lib/space-connector';
+import config from '@/lib/config';
 
 am4core.useTheme(am4themes_animated);
 am4core.options.autoSetClassName = true;
@@ -110,7 +111,7 @@ export default {
             const chart = createChart();
             state.chart = chart;
 
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingLeft = -8;
             chart.paddingRight = 0;
             chart.paddingBottom = 0;

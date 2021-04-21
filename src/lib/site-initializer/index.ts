@@ -49,13 +49,9 @@ const initLanguageAndFonts = async () => {
 };
 
 const initAmchartsLicense = () => {
-    if (config.get('AMCHARTS_LICENSE.CHARTS')) {
+    if (config.get('AMCHARTS_LICENSE.ENABLED')) {
         am4core.addLicense(config.get('AMCHARTS_LICENSE.CHARTS'));
-    }
-    if (config.get('AMCHARTS_LICENSE.MAPS')) {
         am4core.addLicense(config.get('AMCHARTS_LICENSE.MAPS'));
-    }
-    if (config.get('AMCHARTS_LICENSE.TIMELINE')) {
         am4core.addLicense(config.get('AMCHARTS_LICENSE.TIMELINE'));
     }
 };

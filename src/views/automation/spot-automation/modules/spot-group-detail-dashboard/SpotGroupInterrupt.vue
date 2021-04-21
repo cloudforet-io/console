@@ -80,6 +80,7 @@ import {
 } from '@/styles/colors';
 import { store } from '@/store';
 import { SpaceConnector } from '@/lib/space-connector';
+import config from '@/lib/config';
 
 
 dayjs.extend(utc);
@@ -181,7 +182,7 @@ export default {
             const chart = createChart();
             chartState.chart = chart;
 
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingLeft = -8;
             chart.paddingBottom = 0;
             chart.paddingTop = 16;

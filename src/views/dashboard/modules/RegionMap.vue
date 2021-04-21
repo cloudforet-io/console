@@ -83,6 +83,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import WidgetLayout from '@/common/components/WidgetLayout.vue';
 import { Location } from 'vue-router';
 import { QueryHelper } from '@/lib/query';
+import config from "@/lib/config";
 
 am4core.useTheme(am4themesAnimated);
 
@@ -293,7 +294,7 @@ export default {
             chart.geodata = am4geodataWorldLow;
             chart.projection = new am4maps.projections.Miller();
             chart.responsive.enabled = true;
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.chartContainer.wheelable = true;
             chart.zoomControl = new am4maps.ZoomControl();
             const polygonSeries = chart.series.push(new am4maps.MapPolygonSeries());

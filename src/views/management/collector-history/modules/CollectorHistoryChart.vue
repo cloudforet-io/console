@@ -30,6 +30,7 @@ import { PChartLoader, PDatePagination, PSkeleton } from '@spaceone/design-syste
 import { SpaceConnector } from '@/lib/space-connector';
 import { alert, primary } from '@/styles/colors';
 import { store } from '@/store';
+import config from '@/lib/config';
 
 dayjs.extend(isSameOrBefore);
 
@@ -122,7 +123,7 @@ export default {
             };
             const chart = createChart();
             state.chart = chart;
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
             chart.data = state.chartData;

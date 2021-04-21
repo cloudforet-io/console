@@ -137,6 +137,7 @@ export default {
     .item-link {
         @apply flex flex-grow items-center;
         line-height: 1.5;
+        max-width: calc(100% - 1.75rem);
     }
     .icon {
         @apply flex-shrink-0 flex overflow-hidden;

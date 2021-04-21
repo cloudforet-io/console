@@ -9,6 +9,7 @@
     "DEFAULT_TEMPLATE_ID": "template_2"
   },
   "AMCHARTS_LICENSE": {
+    "ENABLED": false,
     "CHARTS": "",
     "MAPS": "",
     "TIMELINE": ""

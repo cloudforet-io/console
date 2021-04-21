@@ -121,6 +121,7 @@ import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
 import { gray, primary, primary1 } from '@/styles/colors';
 import { store } from '@/store';
+import config from '@/lib/config';
 
 am4core.useTheme(am4themes_animated);
 
@@ -255,7 +256,7 @@ export default {
             const chart = createChart();
             state.chart = chart;
 
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingLeft = -5;
             chart.paddingBottom = 0;
             chart.paddingTop = 10;

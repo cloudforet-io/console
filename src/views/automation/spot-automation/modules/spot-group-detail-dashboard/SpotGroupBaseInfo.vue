@@ -91,6 +91,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 import UpdateSpotGroupOverlay from '@/views/automation/spot-automation/modules/UpdateSpotGroupOverlay.vue';
+import config from '@/lib/config';
 
 am4core.useTheme(am4themes_animated);
 
@@ -167,7 +168,7 @@ export default {
             };
             const chart = createChart();
             state.chart = chart;
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.responsive.enabled = true;
             chart.innerRadius = am4core.percent(60);
 

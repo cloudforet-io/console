@@ -106,6 +106,7 @@ import {
     gray, peacock, secondary,
 } from '@/styles/colors';
 import { QueryHelper } from '@/lib/query';
+import config from '@/lib/config';
 
 am4core.useTheme(am4themes_animated);
 
@@ -170,7 +171,7 @@ export default {
         /* util */
         const drawChart = (chartContext) => {
             const chart = am4core.create(chartContext, am4charts.XYChart);
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingRight = 10;
             chart.paddingLeft = -5;
             chart.paddingTop = 5;

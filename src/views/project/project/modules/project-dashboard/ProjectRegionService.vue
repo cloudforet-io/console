@@ -66,6 +66,7 @@ import Color from 'color';
 import { store } from '@/store';
 import { Location } from 'vue-router';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import config from '@/lib/config';
 
 am4core.useTheme(am4themes_animated);
 
@@ -133,7 +134,7 @@ export default {
             };
             const chart = createChart();
             state.chart = chart;
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.responsive.enabled = true;
             chart.innerRadius = am4core.percent(63);
 

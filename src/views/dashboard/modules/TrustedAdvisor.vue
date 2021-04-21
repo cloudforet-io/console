@@ -113,6 +113,7 @@ import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
 import { green, red, yellow } from '@/styles/colors';
 import { store } from '@/store';
+import config from '@/lib/config';
 
 am4core.useTheme(am4themes_animated);
 
@@ -230,7 +231,7 @@ export default {
         /* util */
         const drawChart = (chartContext) => {
             const chart = am4core.create(chartContext, am4charts.PieChart);
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingTop = 12;
             chart.data = chartState.data;
 

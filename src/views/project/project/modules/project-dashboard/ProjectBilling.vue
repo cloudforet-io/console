@@ -131,6 +131,7 @@ import {
     gray, safe, secondary, secondary1, green, blue,
 } from '@/styles/colors';
 import Color from 'color';
+import config from '@/lib/config';
 
 am4core.useTheme(am4themes_animated);
 
@@ -257,7 +258,7 @@ export default {
                 return chartState.registry[state.chartRef];
             };
             const chart = createChart();
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
             chart.paddingTop = 10;

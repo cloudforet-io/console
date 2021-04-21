@@ -70,6 +70,7 @@ import {
     gray, violet, white,
 } from '@/styles/colors';
 import { SpaceConnector } from '@/lib/space-connector';
+import config from '@/lib/config';
 
 am4core.useTheme(am4themes_animated);
 
@@ -130,7 +131,7 @@ export default {
             };
             const chart = createChart();
             chart.responsive.enabled = true;
-            chart.logo.disabled = true;
+            if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.innerRadius = am4core.percent(63);
 
             if (isLoading) {

@@ -44,6 +44,7 @@ module.exports = {
         disableHostCheck: true,
         port: 8080,
     },
+    publicPath: '/',
     css: {
         loaderOptions: {
             postcss: postcssConfig,
@@ -93,7 +94,6 @@ module.exports = {
         //
         // Discussed here https://github.com/vuejs/vue-cli/issues/1081
         config.output.chunkFilename('[id].[chunkhash:8].js');
-        config.plugins.delete('prefetch');
     },
     parallel: false,
 };
