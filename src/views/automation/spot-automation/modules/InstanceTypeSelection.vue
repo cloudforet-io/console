@@ -5,7 +5,7 @@
     >
         <div class="table-container">
             <div class="optimized-wrapper">
-                <div class="optimized-checkbox">
+                <div class="optimized-checkbox" v-if="!errored">
                     <p-i name="ic_checkbox_peacock400--checked" width="1.25rem" height="1.25rem" /> :
                     <span class="desc"> {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.DESC') }}</span>
                 </div>
