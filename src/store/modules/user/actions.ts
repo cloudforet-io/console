@@ -52,6 +52,15 @@ const getPowerSchedulerState = async (): Promise<boolean> => {
     }
 };
 
+const getSpotAutomationState = async (): Promise<boolean> => {
+    try {
+        await SpaceConnector.client.spotAutomation.domain.get();
+        return true;
+    } catch (e) {
+        return false;
+    }
+};
+
 const updateUser = async (userId: string, userType: string, userRequest: UpdateUserRequest): Promise<void> => {
     const request: any = {};
 
@@ -136,6 +145,9 @@ export const signIn = async ({ commit, state }, signInRequest: SignInRequest): P
 
     const powerSchedulerState = await getPowerSchedulerState();
     commit('setPowerSchedulerState', powerSchedulerState);
+
+    const spotAutomationState = await getSpotAutomationState();
+    commit('setSpotAutomationState', spotAutomationState);
 
     commit('setIsSessionExpired', false);
 };

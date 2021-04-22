@@ -85,7 +85,6 @@ export default {
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            showAutomation: store.state.user.powerSchedulerState,
             siteMapMenuList: computed(() => ([
                 {
                     name: 'dashboard',

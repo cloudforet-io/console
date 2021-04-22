@@ -25,6 +25,7 @@ const state: UserState = {
     roles: storedUserState.roles,
     reportState: storedUserState.reportState,
     powerSchedulerState: storedUserState.powerSchedulerState,
+    spotAutomationState: storedUserState.spotAutomationState,
 };
 
 export default {
