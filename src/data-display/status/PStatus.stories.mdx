@@ -1,0 +1,262 @@
+import icon from 'vue-svgicon';
+import PStatus from '@/data-display/status/PStatus.vue';
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { themes } from '@/data-display/status/config';
+import { names } from '@/foundation/lottie/p-lotties/names';
+
+<Meta title='Data Display/Status' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124044',
+    }
+}} component={ PStatus } argTypes={{
+    theme: {
+        name: 'theme',
+        type: {name: 'string'},
+        description: 'Status theme',
+        defaultValue: 'green',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'null'
+            }
+        },
+        control: {
+            type: 'select',
+            options: [null, ...themes],
+        },
+    },
+    icon: {
+        name: 'icon',
+        type: {name: 'string'},
+        description: 'Icon name',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'null',
+            }
+        },
+        control: {
+            type: 'select',
+            options: [null, ...Object.keys(icon.icons)],
+        },
+    },
+    lottie: {
+        name: 'lottie',
+        type: {name: 'string'},
+        description: 'Lottie name',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'null',
+            }
+        },
+        control: {
+            type: 'select',
+            options: [null, ...names],
+        },
+    },
+    text: {
+        name: 'text',
+        type: {name:' string'},
+        description: 'Text',
+        defaultValue: 'Enabled',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'Enabled',
+            }
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    textColor: {
+        name: 'textColor',
+        type: {name:' string'},
+        description: 'Text color',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'null',
+            }
+        },
+        control: {
+            type: 'color',
+        }
+    },
+    iconColor: {
+        name: 'iconColor',
+        type: {name:' string'},
+        description: 'Icon color',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'null',
+            }
+        },
+        control: {
+            type: 'color',
+        }
+    },
+    disableIcon: {
+        name: 'disableIcon',
+        type: {name: 'boolean'},
+        description: 'Disable icon when true',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            }
+        },
+        control: {
+            type: 'boolean',
+        }
+    },
+    iconSize: {
+        name: 'iconSize',
+        type: {name: 'number'},
+        description: 'Icon size',
+        defaultValue: 1,
+        table: {
+            type: {
+                summary: 'number'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 1,
+            }
+        },
+        control: {
+            type: 'number'
+        }
+    }
+}}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PStatus },
+    template: `
+<div style="display:flex; align-items:center; justify-content:center;">
+    <p-status
+        :icon="icon"
+        :text="text"
+        :text-color="textColor"
+        :icon-color="iconColor"
+        :theme="theme"
+        :disable-icon="disableIcon"
+        :lottie="lottie"
+        :icon-size="iconSize"
+    />
+</div>`,
+    setup() {
+        return {
+        }
+    }
+});
+
+# Status
+
+<br/>
+<br/>
+<br/>
+
+## Theme
+<Canvas>
+    <Story name="Theme Status">
+        {{
+            components:{ PStatus },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center;">
+                    <p-status theme="green" text="Enabled" style="margin: 1rem" />
+                    <p-status theme="yellow" text="Pending" style="margin: 1rem" />
+                    <p-status theme="red" text="Error" style="margin: 1rem" />
+                    <p-status theme="gray" text="Deleted" style="margin: 1rem" />
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Theme Without Icon
+<Canvas>
+    <Story name="Theme Status Without Icon">
+        {{
+            components:{ PStatus },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center;">
+                    <p-status theme="green" :disable-icon="true" text="Enabled" style="margin: 1rem" />
+                    <p-status theme="yellow" :disable-icon="true" text="Pending" style="margin: 1rem" />
+                    <p-status theme="red" :disable-icon="true" text="Error" style="margin: 1rem" />
+                    <p-status theme="gray" :disable-icon="true" text="Deleted" style="margin: 1rem" />
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Icon
+<Canvas>
+    <Story name="Icon Status">
+        {{
+            components:{ PStatus },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center;">
+                    <p-status icon="ic_state_active" text="Enabled" style="margin: 1rem" />
+                    <p-status icon="ic_state_disconnected" text="Disconnected" style="margin: 1rem" />
+                    <p-status icon="ic_state_duplicated" text="Duplicated" style="margin: 1rem" />
+                    <p-status icon="ic_state_manual" text="Manual" style="margin: 1rem" />
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Lottie
+<Canvas>
+    <Story name="Lottie Status">
+        {{
+            components:{ PStatus },
+            template: `
+                <div style="display:flex; align-items:center; justify-content:center;">
+                    <p-status lottie="lottie_booting" text="Booting" style="margin: 1rem" />
+                    <p-status lottie="lottie_stopping" text="Stopping" style="margin: 1rem" />
+                    <p-status lottie="lottie_error" text="Error" style="margin: 1rem" />
+                    <p-status lottie="lottie_working" text="In-Progress" style="margin: 1rem" />
+                </div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Playground
+<Canvas>
+    <Story name="playground" >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground" />
