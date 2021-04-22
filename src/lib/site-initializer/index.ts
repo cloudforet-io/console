@@ -74,7 +74,7 @@ const init = async () => {
         await initApiClient();
         await initDomain();
         await initLanguageAndFonts();
-        initGtag();
+        if (config.get('GTAG_ID') !== 'DISABLED') initGtag();
         initAmchartsLicense();
     } catch (e) {
         console.error(e);
