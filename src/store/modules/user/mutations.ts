@@ -33,3 +33,7 @@ export const setReportState = (state: UserState, reportState: boolean): void => 
 export const setPowerSchedulerState = (state: UserState, powerSchedulerState: boolean): void => {
     state.powerSchedulerState = powerSchedulerState;
 };
+
+export const setSpotAutomationState = (state: UserState, spotAutomationState: boolean): void => {
+    state.spotAutomationState = spotAutomationState;
+};

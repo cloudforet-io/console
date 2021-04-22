@@ -22,6 +22,7 @@ export interface UserState {
     roles?: Array<UserRole>;
     reportState?: boolean;
     powerSchedulerState?: boolean;
+    spotAutomationState?: boolean;
 }
 
 export interface SignInRequest {
