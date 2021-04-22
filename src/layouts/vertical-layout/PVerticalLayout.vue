@@ -196,7 +196,7 @@ export default {
     display: flex;
     align-items: flex-start;
     justify-content: center;
-    position: absolute;
+    position: sticky;
     top: 0;
     height: 100%;
     width: 0;
