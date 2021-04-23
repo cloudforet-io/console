@@ -1,50 +1,21 @@
 <template>
-    <p-button-modal class="user-form-modal"
+    <p-button-modal class="user-update-form-modal"
                     :header-title="headerTitle"
                     :scrollable="true"
-                    size="md"
+                    size="sm"
                     :fade="true"
                     :backdrop="true"
                     :visible.sync="proxyVisible"
                     @confirm="confirm"
     >
         <template #body>
-            <div class="auth-type-list">
-                <div v-for="(item) in formState.authTypeList" :key="item.label"
-                     class="auth-type-item"
-                     :class="{'selected': item.label === formState.selectedAuthType.label}"
-                     @click="selectAuthType(item)"
-                >
-                    <p class="auth-type-label">
-                        <p-i v-if="item.label === formState.selectedAuthType.label"
-                             name="ic_check" width="1.125rem" height="1.125rem"
-                             color="inherit"
-                        />
-                        {{ item.label }}
-                    </p>
-                </div>
-            </div>
-            <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
-                           :required="true"
-                           :invalid="validationState.isUserIdValid === false"
-                           :invalid-text="validationState.userIdInvalidText"
-                           :valid="validationState.isUserIdValid"
-                           :valid-text="validationState.userIdValidText"
-            >
-                <template #default="{invalid}">
+            <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')">
+                <template #default>
                     <div class="id-input-form">
                         <p-text-input v-model="formState.user_id"
-                                      v-focus
-                                      :placeholder="$t('IDENTITY.USER.FORM.NAME_PLACEHOLDER')"
-                                      :invalid="invalid"
+                                      disabled
                                       class="text-input"
                         />
-                        <p-button style-type="outline primary-dark"
-                                  class="user-id-check-button"
-                                  @click="checkUserID"
-                        >
-                            {{ $t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
-                        </p-button>
                     </div>
                 </template>
             </p-field-group>
@@ -68,7 +39,7 @@
                                    class="dropdown"
                 />
             </p-field-group>
-            <form v-if="formState.selectedAuthType.label === 'Local'"
+            <form v-if="isAdmin && item.backend === 'LOCAL' && item.user_type !== 'API Only'"
                   class="form"
             >
                 <p-field-group
@@ -130,14 +101,12 @@ interface AuthType {
 type AuthTypeList = AuthType[];
 
 export default {
-    name: 'UserForm',
+    name: 'UserUpdateForm',
     components: {
-        PI,
         PButtonModal,
         PFieldGroup,
         PTextInput,
         PSelectDropdown,
-        PButton,
     },
     directives: {
         focus: {
@@ -158,6 +127,10 @@ export default {
         item: {
             type: Object,
             default: undefined,
+        },
+        updateMode: {
+            type: Boolean,
+            default: false,
         },
         isAdmin: {
             type: Boolean,
@@ -197,10 +170,6 @@ export default {
             passwordCheck: '',
         });
         const validationState = reactive({
-            isUserIdValid: undefined as undefined | boolean,
-            userIdInvalidText: '' as TranslateResult | string,
-            userIdValidText: computed(() => vm.$t('IDENTITY.USER.FORM.NAME_VALID')),
-            //
             isEmailValid: undefined as undefined | boolean,
             emailInvalidText: '' as TranslateResult | string,
             //
@@ -209,98 +178,6 @@ export default {
             isPasswordCheckValid: undefined as undefined | boolean,
             passwordCheckInvalidText: '' as TranslateResult | string,
         });
-
-        const selectAuthType = (item) => {
-            formState.selectedAuthType = item;
-        };
-
-        const setFormState = () => {
-            formState.user_id = '';
-            formState.name = '';
-            formState.email = '';
-            formState.domainRole = '';
-            formState.password = '';
-            formState.passwordCheck = '';
-        };
-        const setValidationState = () => {
-            validationState.isUserIdValid = undefined;
-            validationState.userIdInvalidText = '';
-            validationState.isEmailValid = undefined;
-            validationState.emailInvalidText = '';
-            validationState.isPasswordValid = undefined;
-            validationState.passwordInvalidText = '';
-            validationState.isPasswordCheckValid = undefined;
-            validationState.passwordCheckInvalidText = '';
-        };
-
-        watch(() => formState.selectedAuthType, (after) => {
-            if (after) {
-                setFormState();
-                setValidationState();
-            }
-        }, { immediate: true });
-
-        const checkOauth = async () => {
-            try {
-                await SpaceConnector.client.identity.user.find({
-                    search: { user_id: formState.user_id },
-                    domain_id: store.state.domain.domainId,
-                });
-            } catch (e) {
-                validationState.isUserIdValid = false;
-                validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.USER_ID_NOT_EXIST');
-            }
-        };
-
-        const checkDuplicatedId = async () => {
-            try {
-                const res = await SpaceConnector.client.identity.user.get({ user_id: formState.user_id });
-                if (res) {
-                    validationState.isUserIdValid = false;
-                    validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.USER_ID_DUPLICATED');
-                } else {
-                    validationState.isUserIdValid = true;
-                    validationState.userIdInvalidText = '';
-                }
-            } catch (e) {
-                validationState.isUserIdValid = true;
-                validationState.userIdInvalidText = '';
-                console.error(e);
-            }
-        };
-
-        const checkEmailFormat = (userId) => {
-            const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-            if (!regex.test(userId)) {
-                validationState.isUserIdValid = false;
-                validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.EMAIL_INVALID');
-            }
-        };
-
-        const checkUserID = async () => {
-            validationState.isUserIdValid = undefined;
-            validationState.userIdInvalidText = '';
-            if (formState.user_id) {
-                await checkDuplicatedId();
-                if (formState.user_id.replace(/ /g, '').length !== formState.user_id.length) {
-                    validationState.isUserIdValid = false;
-                    validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
-                    return;
-                }
-                if (formState.selectedAuthType.backend === 'EXTERNAL') {
-                    await checkOauth();
-                }
-                if (formState.selectedAuthType.label === 'Local') {
-                    checkEmailFormat(formState.user_id);
-                }
-                if (typeof validationState.isUserIdValid !== 'boolean') validationState.isUserIdValid = true;
-
-                console.log('hello', validationState.isUserIdValid)
-            } else {
-                validationState.isUserIdValid = false;
-                validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
-            }
-        };
 
         const checkEmail = async () => {
             const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
@@ -352,10 +229,9 @@ export default {
         };
 
         const confirm = async () => {
-            await checkUserID();
-            if (!validationState.isUserIdValid) return;
-
-            if (formState.selectedAuthType.label === 'Local') {
+            await checkEmail();
+            if (!validationState.isEmailValid) return;
+            if (props.isAdmin && props.item.backend === 'LOCAL' && props.item.user_type !== 'API Only') {
                 checkPassword(formState.password);
                 if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
             }
@@ -363,8 +239,8 @@ export default {
                 user_id: formState.user_id,
                 name: formState.name,
                 email: formState.email,
-                backend: formState.selectedAuthType.backend,
-                user_type: formState.selectedAuthType.user_type,
+                backend: props.item.backend,
+                user_type: props.item.user_type,
                 password: formState.password || '',
             };
             if (formState.domainRoleList.length > 0) {
@@ -372,17 +248,6 @@ export default {
             } else {
                 emit('confirm', data, null, null);
             }
-        };
-
-        const initAuthTypeList = async () => {
-            if (store.state.domain.extendedAuthType !== undefined) {
-                formState.authTypeList.splice(0, 0, {
-                    label: computed(() => store.getters['domain/extendedAuthTypeLabel']).value,
-                    user_type: 'USER',
-                    backend: 'EXTERNAL',
-                });
-            }
-            formState.selectedAuthType = formState.authTypeList[0];
         };
 
         const getRoleList = async () => {
@@ -396,50 +261,47 @@ export default {
             }));
         };
 
+        const setCurrentDomainId = async () => {
+            if (props.updateMode && formState.domainRoleList[0]) {
+                const res = await SpaceConnector.client.identity.roleBinding.list({
+                    resource_type: 'identity.User',
+                    resource_id: formState.user_id,
+                    role_type: 'DOMAIN',
+                });
+                if (res.total_count > 0) formState.domainRole = formState.domainRoleList[0].name;
+                else formState.domainRole = '';
+            } else {
+                formState.domainRole = '';
+            }
+        };
+
+        const checkIsSameId = () => {
+            const userAccountId = store.state.user.userId;
+            if (formState.user_id === userAccountId) state.isSameId = true;
+            else state.isSameId = false;
+        };
+
         (async () => {
-            await Promise.all([initAuthTypeList(), getRoleList()]);
+            formState.user_id = props.item.user_id;
+            formState.name = props.item.name;
+            formState.email = props.item.email;
+            await checkIsSameId();
+            await Promise.all([getRoleList()]);
+            await setCurrentDomainId();
         })();
 
         return {
             ...toRefs(state),
             formState,
             validationState,
-            selectAuthType,
             confirm,
-            checkUserID,
         };
     },
 };
 </script>
 
 <style lang="postcss">
-.user-form-modal {
-    .auth-type-list {
-        display: flex;
-        justify-content: flex-start;
-        margin-bottom: 1.5rem;
-        .auth-type-item {
-            @apply bg-gray-100 cursor-pointer text-gray-500;
-            display: flex;
-            place-content: center;
-            width: 33%;
-            height: 3.25rem;
-            border-radius: 0.125rem;
-            margin-right: 0.25rem;
-            .auth-type-label {
-                @apply font-bold text-center;
-                align-self: center;
-                font-size: 0.875rem;
-                line-height: 140%;
-            }
-            &:hover {
-                @apply bg-blue-100 text-indigo-400;
-            }
-            &.selected {
-                @apply bg-primary1 text-white;
-            }
-        }
-    }
+.user-update-form-modal {
     .id-input-form {
         max-width: 32rem;
         display: flex;
@@ -455,10 +317,6 @@ export default {
         .p-select-dropdown {
             max-width: 14rem;
         }
-    }
-    .user-id-check-button {
-        margin-left: 0.5rem;
-        min-height: 2rem;
     }
 }
 </style>
