@@ -152,13 +152,20 @@
                 </span>
             </template>
         </p-table-check-modal>
-        <user-form v-if="userFormState.visible"
+        <user-form v-if="userFormState.visible && !userFormState.updateMode"
                    :header-title="userFormState.headerTitle"
-                   :update-mode="userFormState.updateMode"
                    :item="userFormState.item"
                    :visible.sync="userFormState.visible"
                    :is-admin="userFormState.isAdmin"
                    @confirm="userFormConfirm"
+        />
+        <user-update-form v-if="userFormState.visible && userFormState.updateMode"
+                          :header-title="userFormState.headerTitle"
+                          :update-mode="userFormState.updateMode"
+                          :item="userFormState.item"
+                          :visible.sync="userFormState.visible"
+                          :is-admin="userFormState.isAdmin"
+                          @confirm="userFormConfirm"
         />
     </div>
 </template>
@@ -182,6 +189,7 @@ import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/ty
 import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
 
 import UserForm from '@/views/identity/user/modules/UserForm.vue';
+import UserUpdateForm from '@/views/identity/user/modules/UserUpdateForm.vue';
 import UserDetail from '@/views/identity/user/modules/UserDetail.vue';
 import UserAssignedRole from '@/views/identity/user/modules/UserAssignedRole.vue';
 import PTagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
@@ -227,6 +235,7 @@ export default {
         PBreadcrumbs,
         PIconTextButton,
         UserForm,
+        UserUpdateForm,
         PStatus,
         PHorizontalLayout,
         PDropdownMenuBtn,
