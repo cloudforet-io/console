@@ -28,6 +28,7 @@
                        @click.stop="showMenu(true)"
                        @focus="focus"
                        @blur="blur"
+                       @paste="onPaste"
                 >
             </template>
             <template #right="scope">
@@ -401,6 +402,51 @@ export default defineComponent({
             }
         };
 
+
+        const getKeyItemsFromKeyText = (keyStr: string): KeyItem[] => {
+            const allKeyItems = props.keyItemSets.map(d => d.items).flat();
+            const dotIdx = keyStr.indexOf('.');
+            let keyItems: KeyItem[] = [];
+
+            if (dotIdx === -1) {
+                const item = findKey(keyStr, allKeyItems);
+                if (item) keyItems.push(item);
+            } else {
+                const item = findKey(keyStr.slice(0, dotIdx), allKeyItems);
+                if (item?.dataType === 'object') {
+                    keyItems = keyStr.split('.').map((d, i) => (i === 0 ? item : { label: d, name: d }));
+                } else if (item) keyItems.push(item);
+            }
+
+            return keyItems;
+        };
+
+        const onPaste = (e: ClipboardEvent) => {
+            if (state.selectedKeys.length > 0) return;
+
+            const paste: string = (e.clipboardData || (window as any).clipboardData).getData('text');
+            const text = (state.searchText + paste).trim().replace(/(\r\n|\n|\r)/gm, '');
+
+            const separatorIdx = text.indexOf(':');
+            if (separatorIdx === -1) {
+                state.searchText = text;
+            } else {
+                const keyStr = text.slice(0, separatorIdx);
+                const keyItems = getKeyItemsFromKeyText(keyStr);
+
+                const value = text.slice(separatorIdx + 1);
+                if (keyItems.length > 0) {
+                    state.selectedKeys = keyItems;
+                    state.searchText = value;
+                    hideMenu();
+                } else {
+                    state.searchText = text;
+                }
+            }
+
+            e.preventDefault();
+        };
+
         const onDeleteAll = () => {
             updateSelectedKey(null, true);
             clearAll();
@@ -475,6 +521,7 @@ export default defineComponent({
             onInput,
             onEnter,
             onKeydownCheck,
+            onPaste,
             onDeleteAll,
             onMenuSelect,
 
