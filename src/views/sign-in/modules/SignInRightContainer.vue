@@ -124,7 +124,8 @@ export default {
         }
 
         .logo-character {
-            width: 33%;
+            width: 5rem;
+            height: 5rem;
             margin-bottom: calc((15rem / 3) / 2 - 0.5rem);
             margin-left: auto;
             margin-right: auto;
