@@ -25,6 +25,7 @@
                          :col-copy="colCopy"
                          :searchable="searchable"
                          :exportable="excelVisible"
+                         :settings-visible="settingsVisible"
                          :timezone="timezone"
                          sortable
                          use-cursor-loading
@@ -139,6 +140,7 @@ export default {
             colCopy: computed(() => (props.typeOptions?.colCopy || false)),
             searchable: computed(() => (props.typeOptions?.searchable === undefined ? true : props.typeOptions.searchable)),
             excelVisible: computed(() => (props.typeOptions?.excelVisible === undefined ? true : props.typeOptions.excelVisible)),
+            settingsVisible: computed(() => props.typeOptions?.settingsVisible || false),
 
             /** get data from fetch options */
             sortBy: props.fetchOptions?.sortBy || '',

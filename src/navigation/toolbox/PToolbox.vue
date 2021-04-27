@@ -44,6 +44,11 @@
                                    @click="$emit('export',$event)"
                     />
                 </div>
+                <div v-if="settingsVisible" class="tool">
+                    <p-icon-button name="ic_setting"
+                                   @click="$emit('setting',$event)"
+                    />
+                </div>
                 <div v-if="refreshable" class="tool">
                     <p-icon-button name="ic_refresh"
                                    @click="$emit('refresh', $event)"
@@ -87,6 +92,7 @@ interface Props {
     refreshable: boolean;
     searchable: boolean;
     filtersVisible: boolean;
+    settingsVisible: boolean;
     searchType: string;
     proxyState?: number;
     pageSize?: number;

@@ -28,6 +28,7 @@ export interface DynamicLayoutTypeOptions {
     multiSelect?: boolean;
     invalid?: boolean;
     excelVisible?: boolean;
+    settingsVisible?: boolean;
     keyItemSets?: KeyItemSet[];
     valueHandlerMap?: ValueHandlerMap;
     language?: string;
