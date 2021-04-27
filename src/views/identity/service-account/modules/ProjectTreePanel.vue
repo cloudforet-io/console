@@ -18,17 +18,17 @@
                     <template v-else-if="!hasProject">
                         {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_NO_DATA') }}
                     </template>
-                    <i18n v-else-if="targetName && selectProjectName"
-                          path="IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_EXIST_DESC"
-                          class="align-baseline"
-                    >
-                        <template #item>
-                            <span class="font-bold">[{{ targetName }}]</span>
-                        </template>
-                        <template #project>
-                            <span class="font-bold text-blue">[{{ selectProjectName }}]</span>
-                        </template>
-                    </i18n>
+<!--                    <i18n v-else-if="targetName && selectProjectName"-->
+<!--                          path="IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_EXIST_DESC"-->
+<!--                          class="align-baseline"-->
+<!--                    >-->
+<!--                        <template #item>-->
+<!--                            <span class="font-bold">[{{ targetName }}]</span>-->
+<!--                        </template>-->
+<!--                        <template #project>-->
+<!--                            <span class="font-bold text-blue">[{{ selectProjectName }}]</span>-->
+<!--                        </template>-->
+<!--                    </i18n>-->
                     <template v-else>
                         {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_SELECT_DESC') }}
                     </template>

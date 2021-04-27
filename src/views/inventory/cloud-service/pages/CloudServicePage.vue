@@ -509,6 +509,7 @@ export default {
 
         const exportCloudServiceData = async () => {
             try {
+                // console.log(tableState.schema.options, 'detail');
                 await store.dispatch('file/downloadExcel', {
                     url: '/inventory/cloud-service/list',
                     param: { query: getQuery() },

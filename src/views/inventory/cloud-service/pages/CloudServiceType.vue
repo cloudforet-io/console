@@ -93,6 +93,7 @@
                 />
                 <p-divider class="cloud-service-divider" />
                 <p-toolbox filters-visible
+                           exportable
                            search-type="query"
                            :page-size.sync="pageSize"
                            :total-count="totalCount"
@@ -101,6 +102,7 @@
                            :value-handler-map="valueHandlerMap"
                            @change="onChange"
                            @refresh="onChange"
+                           @export="exportDataToExcel"
                 >
                     <template #left-area>
                         <p-check-box v-model="filterState.isPrimary">
@@ -190,7 +192,10 @@ import {
 
 import PVerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.vue';
 
-import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
+import {
+    dynamicFieldsToExcelDataFields,
+    makeQuerySearchPropsWithSearchSchema,
+} from '@/lib/component-utils/dynamic-layout';
 import { getPageStart, getThisPage } from '@/lib/component-utils/pagination';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
@@ -280,8 +285,16 @@ export default {
             'inventory.CloudService',
         );
 
+        const excelFields = [
+            { key: 'cloud_service_type', name: 'Cloud Service Type' },
+            { key: 'cloud_service_group', name: 'Cloud Service Group' },
+            { key: 'count', name: 'Count' },
+            { key: 'server_count', name: 'Server Count' },
+        ];
+
         const state = reactive({
             items: undefined as any,
+            itemsForExport: undefined as any,
             providerName: 'All',
             loading: true,
             keyItemSets: handlers.keyItemSets,
@@ -398,16 +411,23 @@ export default {
         });
 
         const apiQuery = new ApiQueryHelper();
-        const getParams = (isTriggeredBySideFilter = false) => {
+        const getParams = (isTriggeredBySideFilter = false, exportable = false) => {
             const { filters, labels } = sidebarFilters.value;
 
-            apiQuery.setPageLimit(state.pageSize)
-                .setFilters(filters)
-                .addFilter(...queryHelper.filters)
-                .setSort('count', true);
+            if (!exportable) {
+                apiQuery.setPageLimit(state.pageSize)
+                    .setFilters(filters)
+                    .addFilter(...queryHelper.filters)
+                    .setSort('count', true);
 
-            if (isTriggeredBySideFilter) state.thisPage = 1;
-            else apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize));
+                if (isTriggeredBySideFilter) state.thisPage = 1;
+                else apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize));
+            } else {
+                apiQuery.setPageLimit(0)
+                    .setFilters(filters)
+                    .addFilter(...queryHelper.filters)
+                    .setSort('count', true);
+            }
 
             return {
                 is_primary: filterState.isPrimary,
@@ -418,7 +438,7 @@ export default {
 
         // ajax request
         let listCloudServiceRequest: CancelTokenSource | undefined;
-        const listCloudServiceType = async (isTriggeredBySideFilter = false) => {
+        const listCloudServiceType = async (isTriggeredBySideFilter = false, exportable = false) => {
             // if request is already exist, cancel the request
             if (listCloudServiceRequest) {
                 listCloudServiceRequest.cancel('Next request has been called.');
@@ -429,10 +449,10 @@ export default {
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(
-                    getParams(isTriggeredBySideFilter),
+                    getParams(isTriggeredBySideFilter, exportable),
                     { cancelToken: listCloudServiceRequest.token },
                 );
-
+                if (exportable) state.itemsForExport = res.results;
                 state.items = res.results;
                 state.totalCount = res.total_count || 0;
                 state.loading = false;
@@ -487,6 +507,71 @@ export default {
             }
             await listCloudServiceType();
         };
+
+        const schemaQueryHelper = new QueryHelper();
+        const getSchema = async (data) => {
+            const schema = await SpaceConnector.client.addOns.pageSchema.get({
+                resource_type: 'inventory.CloudService',
+                schema: 'table',
+                options: {
+                    provider: data.provider,
+                    cloud_service_group: data.cloud_service_group,
+                    cloud_service_type: data.cloud_service_type,
+                },
+            });
+
+            schemaQueryHelper.setFilters([
+                { k: 'provider', o: '=', v: data.provider },
+                { k: 'cloud_service_group', o: '=', v: data.cloud_service_group },
+                { k: 'cloud_service_type', o: '=', v: data.cloud_service_type },
+            ]);
+            // console.log(schema.options, 'main')
+            return dynamicFieldsToExcelDataFields(schema.options.fields);
+        };
+
+        const excelApiQuery = new ApiQueryHelper();
+        const getQuery = (data) => {
+            excelApiQuery
+                .setFilters([
+                    { k: 'provider', o: '=', v: data.provider },
+                    { k: 'cloud_service_group', o: '=', v: data.cloud_service_group },
+                    { k: 'cloud_service_type', o: '=', v: data.cloud_service_type },
+                ]);
+
+            return excelApiQuery.data;
+        };
+
+
+        const getItemsForExport = async () => {
+            await listCloudServiceType(false, true);
+
+            const schemaList = await Promise.all(state.itemsForExport.map(d => getSchema(d)));
+            return schemaList.map((d, i) => ({
+                url: '/inventory/cloud-service/list',
+                param: {
+                    query: getQuery(state.itemsForExport[i]),
+                },
+                fields: d,
+            }));
+        };
+
+        const exportDataToExcel = async () => {
+            try {
+                const excelList = await getItemsForExport();
+                await store.dispatch('file/downloadExcel', [{
+                    url: '/statistics/topic/cloud-service-resources',
+                    param: {
+                        query: getParams(false, true).query,
+                        is_primary: getParams(false, true).is_primary,
+                        labels: getParams(false, true).labels,
+                    },
+                    fields: excelFields,
+                }, ...excelList]);
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
 
         const routeState = reactive({
             route: computed(() => ([
@@ -568,6 +653,7 @@ export default {
             onPaginationChange,
             onChange,
             assetUrlConverter,
+            exportDataToExcel,
         };
     },
 };

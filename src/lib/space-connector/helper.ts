@@ -15,7 +15,7 @@ class ApiQueryHelper extends QueryHelper {
         if (keyword) this._data.keyword = keyword;
         else delete this._data.keyword;
 
-        return this._data;
+        return { ...this._data };
     }
 
     setPage(start: number, limit: number): ApiQueryHelper {
