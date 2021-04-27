@@ -78,7 +78,7 @@ export { default as PTextEditor } from './inputs/text-editor/PTextEditor.vue';
 export { default as PTooltip } from './data-display/tooltips/PTooltip.vue';
 export { default as PTreeNode } from './data-display/tree/tree-node/PTreeNode.vue';
 
-export { default as PSelectBtnGroup } from './inputs/buttons/select-btn-group/PSelectBtnGroup.vue';
+export { default as PSelectButtonGroup } from './inputs/buttons/select-button-group/PSelectButtonGroup.vue';
 export { default as PTooltipButton } from './others/deprecated/tooltip-button/PTooltipButton.vue';
 export { default as PChartLoader } from './others/console/charts/chart-loader/PChartLoader.vue';
 export { default as PContextMenu } from './inputs/context-menu/PContextMenu.vue';

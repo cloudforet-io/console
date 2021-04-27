@@ -1,0 +1,104 @@
+import { action } from '@storybook/addon-actions';
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PSelectButtonGroup from '@/inputs/buttons/select-button-group/PSelectButtonGroup.vue';
+
+<Meta
+    title='Inputs/Buttons/Select Button Group'
+    parameters={{
+        design: {
+            type: 'figma',
+            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5131%3A126230',
+        },
+    }}
+    component={ PSelectButtonGroup }
+    argTypes={{
+        buttons: {
+            name: 'buttons',
+            type: { name: 'array' },
+            description: 'Object Array of buttons.',
+            defaultValue: [
+                {
+                    name: 'one',
+                    label: '첫번째',
+                },
+                {
+                    name: 'two',
+                    label: '두번째',
+                },
+                {
+                    name: 'three',
+                    label: '세번째',
+                },
+                {
+                    name: 'four',
+                    label: '네번째',
+                },
+            ],
+            table: {
+                type: {
+                    summary: 'array'
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: '[]'
+                }
+            },
+        },
+        selected: {
+            name: 'selected',
+            type: {name: 'string'},
+            description: 'Selected button name.',
+            defaultValue: 'one',
+            table: {
+                type: {
+                    summary: 'string'
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: ''
+                }
+            },
+            control: {
+                type: 'select',
+                options: ['one', 'two', 'three', 'four'],
+            },
+        }
+    }}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PSelectButtonGroup },
+    template: `
+<div style="align-items:center; justify-content:center;">
+    <p-select-button-group
+        :buttons="buttons"
+        :selected.sync="selected"
+        @clickButton="clickButton"
+        @click-one="clickOne"
+        @click-two="clickTwo"
+        @click-three="clickThree"
+        @click-four="clickFour"
+    />
+    <br>
+    <p>selected button : {{ selected }}</p>
+</div>`,
+    setup() {
+        return {
+            clickButton: action('clickButton'),
+            clickOne: action('click-one'),
+            clickTwo: action('click-two'),
+            clickThree: action('click-three'),
+            clickFour: action('click-four'),
+        };
+    }
+});
+
+## Playground
+<Canvas>
+    <Story name="playground" >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground" />

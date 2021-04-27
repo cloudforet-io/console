@@ -1,8 +1,8 @@
 <template>
     <div class="p-button-tab">
         <transition name="fade" mode="out-in">
-            <p-select-btn-group class="px-4" :buttons="buttons" :selected.sync="proxyActiveTab"
-                                @clickButton="onChange"
+            <p-select-button-group class="px-4" :buttons="buttons" :selected.sync="proxyActiveTab"
+                                   @clickButton="onChange"
             />
         </transition>
         <div class="tab-pane">
@@ -22,7 +22,7 @@
 <script lang="ts">
 import { computed } from '@vue/composition-api';
 
-import PSelectBtnGroup from '@/inputs/buttons/select-btn-group/PSelectBtnGroup.vue';
+import PSelectButtonGroup from '@/inputs/buttons/select-button-group/PSelectButtonGroup.vue';
 import { TabItem } from '@/navigation/tabs/tab/type';
 import { ButtonTabProps } from '@/others/console/button-tab/type';
 
@@ -30,7 +30,7 @@ import { makeProxy } from '@/util/composition-helpers';
 
 export default {
     name: 'PButtonTab',
-    components: { PSelectBtnGroup },
+    components: { PSelectButtonGroup },
     props: {
         tabs: {
             type: Array,

@@ -1,15 +1,14 @@
 <template>
-    <div ref="btnGroup" class="p-select-btn-group">
+    <div class="p-select-button-group">
         <div class="button-group">
-            <p-button v-for="(button, idx) in formattedButtons"
-                      :key="`${button.name}-${idx}`"
-                      :class="{ active:selected === button.name }"
-                      :outline="selected !== button.name"
-                      :style-type="styleType"
-                      @click="onClickButton(button.name, idx)"
+            <button v-for="(button, idx) in formattedButtons"
+                    :key="`${button.name}-${idx}`"
+                    class="select-button"
+                    :class="{ active:selected === button.name }"
+                    @click="onClickButton(button.name, idx)"
             >
                 {{ button.label }}
-            </p-button>
+            </button>
         </div>
     </div>
 </template>
@@ -18,31 +17,26 @@
 import {
     reactive, computed, toRefs,
 } from '@vue/composition-api';
-import PButton from '@/inputs/buttons/button/PButton.vue';
-import { SelectBtnGroupProps, SelectBtnType } from '@/inputs/buttons/select-btn-group/type';
+
+import { SelectButtonGroupProps, SelectButtonType } from '@/inputs/buttons/select-button-group/type';
 
 export default {
-    name: 'PSelectBtnGroup',
-    components: { PButton },
+    name: 'PSelectButtonGroup',
     props: {
         buttons: {
             type: Array,
-            default: () => [],
+            default: () => ([]),
         },
         selected: {
-            type: [String, Number],
+            type: String,
             default: '',
         },
-        styleType: {
-            type: String,
-            default: 'gray900',
-        },
     },
-    setup(props: SelectBtnGroupProps, context) {
+    setup(props: SelectButtonGroupProps, context) {
         const state = reactive({
             formattedButtons: computed(() => {
-                const buttons: SelectBtnType[] = [];
-                props.buttons.forEach((value: string|SelectBtnType) => {
+                const buttons: SelectButtonType[] = [];
+                props.buttons.forEach((value: string|SelectButtonType) => {
                     if (typeof value === 'string') {
                         buttons.push({ name: value, label: value });
                     } else {
@@ -70,19 +64,28 @@ export default {
 </script>
 
 <style lang="postcss">
-.p-select-btn-group {
+.p-select-button-group {
     @apply flex flex-wrap;
     .button-group {
         margin-right: -0.5rem;
         margin-bottom: -0.5rem;
     }
-    .p-button {
-        @apply mr-2 mb-2;
-        min-width: auto;
-        &.outline {
-            &:not(.disabled):hover {
-                @apply border-secondary bg-blue-200 text-secondary;
-            }
+    .select-button {
+        @apply border text-gray-900;
+        height: 2rem;
+        border-color: rgba(theme('colors.gray.400'), 0.7);
+        border-radius: 0.75rem;
+        font-size: 0.875rem;
+        line-height: 1.6;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        &:hover {
+            @apply bg-gray-200;
+        }
+        &.active {
+            @apply border-none bg-gray-700 text-white;
         }
     }
 }
