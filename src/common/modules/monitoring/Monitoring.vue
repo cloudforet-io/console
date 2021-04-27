@@ -1,7 +1,7 @@
 <template>
     <div class="pt-8 pb-16">
         <section v-if="!dataSourceId">
-            <p-select-btn-group class="pr-4 mb-8" :buttons="tools" :selected.sync="selectedToolId" />
+            <p-select-button-group class="pr-4 mb-8" :buttons="tools" :selected.sync="selectedToolId" />
         </section>
         <section class="mb-8">
             <span class="title">
@@ -29,7 +29,7 @@
         <section class="toolbox-section">
             <div class="inline-flex items-center">
                 <span class="title mr-4 flex-shrink-0">{{ $t('COMMON.MONITORING.TIME_RANGE') }}</span>
-                <p-select-btn-group class="time-range" :buttons="Object.keys(TIME_RANGE)" :selected.sync="selectedTimeRange" />
+                <p-select-button-group class="time-range" :buttons="Object.keys(TIME_RANGE)" :selected.sync="selectedTimeRange" />
             </div>
             <div class="inline-flex items-center">
                 <span class="title mr-4 flex-shrink-0">{{ $t('COMMON.MONITORING.STATISTICS') }}</span>
@@ -89,7 +89,7 @@ import {
 
 import MetricChart from '@/common/components/metric-chart/MetricChart.vue';
 import {
-    PSelectBtnGroup, PSelectDropdown, PIconButton, PLottie, PButton, PAnchor,
+    PSelectButtonGroup, PSelectDropdown, PIconButton, PLottie, PButton, PAnchor,
 } from '@spaceone/design-system';
 
 import {
@@ -165,7 +165,7 @@ export default {
         PButton,
         PLottie,
         PSelectDropdown,
-        PSelectBtnGroup,
+        PSelectButtonGroup,
         PIconButton,
         PAnchor,
         MetricChart,
