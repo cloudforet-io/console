@@ -33,6 +33,7 @@
                          @refresh="onChange()"
                          @select="onSelect"
                          @export="onExport"
+                         @click-settings="$emit('click-settings')"
         >
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="{field, index}">
                 <p-dynamic-field :key="slotName"

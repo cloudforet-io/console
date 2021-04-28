@@ -403,6 +403,20 @@ import { reactive, watch, toRefs } from '@vue/composition-api';
             }
         }
     },
+    onClickSettings: {
+        name: 'click-settings',
+        description: 'Event emitted when settings button clicked',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            category: 'events',
+            defaultValue: {
+                summary: null
+            }
+        }
+    },
     leftArea: {
         name: 'left-area',
         description: 'Slot for left area of toolbox',
@@ -432,6 +446,7 @@ export const Template = (args, { argTypes }) => ({
                         @change="onChange"
                         @export="onExport"
                         @refresh="onRefresh"
+                        @click-settings="onClickSettings"
             >
                 <template v-if="leftArea" #left-area>
                     <span v-html="leftArea"/>

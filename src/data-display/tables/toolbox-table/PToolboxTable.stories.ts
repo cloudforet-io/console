@@ -20,6 +20,7 @@ const actions = {
     clickSetting: action('clickSetting'),
     clickExcel: action('clickExcel'),
     clickRefresh: action('clickRefresh'),
+    clickSettings: action('clickSettings'),
 };
 const data = {
     fields: ['name', 'phone', 'email'],
@@ -77,6 +78,7 @@ export const toolboxTable = () => ({
                 @clickSetting="clickSetting"
                 @clickRefresh="clickRefresh"
                 @clickExcel="clickExcel"
+                @clickSettings="clickSettings"
             >
                 <template #toolbox-top><div class="w-full h-8 border-green" style="border-width:1px" ></div></template>
                 <template #toolbox-left><div style="border: 1px solid green; min-width: 300px "></div></template>
@@ -121,6 +123,7 @@ export const rowSlot = () => ({
                 @clickSetting="clickSetting"
                 @clickRefresh="clickRefresh"
                 @clickExcel="clickExcel"
+                @clickSettings="clickSettings"
             >
                 <template #row="scope">
                     <div>custom row </div>
@@ -165,6 +168,7 @@ export const colSlot = () => ({
                 @clickSetting="clickSetting"
                 @clickRefresh="clickRefresh"
                 @clickExcel="clickExcel"
+                @clickSettings="clickSettings"
             >
                 <template #col-name-format="scope">
                     <td>hi {{scope.value}} </td>

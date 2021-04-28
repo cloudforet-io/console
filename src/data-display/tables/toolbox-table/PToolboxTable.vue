@@ -23,6 +23,7 @@
                    @change="emitChange"
                    @export="$emit('export')"
                    @refresh="$emit('refresh')"
+                   @click-settings="$emit('click-settings')"
         >
             <template v-if="$scopedSlots['toolbox-left']" #left-area>
                 <div class="toolbox-left">

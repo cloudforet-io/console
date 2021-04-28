@@ -61,4 +61,5 @@ export interface DynamicLayoutEventListener {
     fetch: (options: DynamicLayoutFetchOptions, layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     select: (selectIndex: number[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     export: (layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    'click-settings': (layoutName?: string, layoutIndex?: number) => void|Promise<void>;
 }
