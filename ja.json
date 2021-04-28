@@ -336,6 +336,10 @@
 			"NO_RESOURCE_MSG": "リソースが見つけられません。",
 			"NO_RESOURCE_TITLE": "リソースがありません。"
 		},
+		"EXCEL": {
+			"ALT_L_READY_FOR_FILE_DOWNLOAD": "",
+			"ALT_S_DOWNLOAD_SUCCESS": ""
+		},
 		"FNB": {
 			"PRIVACY": "個人情報処理方針",
 			"PRIVACY_MSG": "準備中です"
