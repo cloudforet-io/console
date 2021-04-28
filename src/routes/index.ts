@@ -3,6 +3,7 @@ import VueRouter from 'vue-router';
 import { SpaceConnector } from '@/lib/space-connector';
 import { routerOptions } from '@/routes/config';
 import { GTag } from '@/lib/gtag';
+import config from '@/lib/config';
 
 
 Vue.use(VueRouter);
@@ -37,7 +38,7 @@ router.beforeEach(async (to, from, next) => {
 });
 
 router.afterEach((to, from) => {
-    GTag.setPageView(to);
+    if (config.get('GTAG_ID') !== 'DISABLED') GTag.setPageView(to);
 });
 
 router.onError((error) => {
