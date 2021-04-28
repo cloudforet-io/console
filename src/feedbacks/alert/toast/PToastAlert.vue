@@ -26,6 +26,10 @@
                          width="1.5rem"
                          height="1.5rem"
                     />
+                    <p-lottie v-if="item.type === 'loading'" name="thin-spinner"
+                              class="item-type-icon"
+                              :size="1.5"
+                    />
                 </div>
                 <div class="content-wrapper" :class="[item.type === 'info' ? 'ml-2' : '']">
                     <a class="title">{{ item.title }}</a>
@@ -36,8 +40,8 @@
                 <div v-if="isClosedWithButton" class="button-wrapper">
                     <p-i name="ic_delete"
                          class="delete-icon"
-                         width="1.2rem" height="1.2rem"
-                         color="transparent white"
+                         width="1.5rem" height="1.5rem"
+                         color="inherit"
                     />
                 </div>
             </div>
@@ -47,6 +51,7 @@
 
 <script lang="ts">
 import PI from '@/foundation/icons/PI.vue';
+import PLottie from '@/foundation/lottie/PLottie.vue';
 
 /**
  * Used library: vue-notification
@@ -57,6 +62,7 @@ export default {
     name: 'PToastAlert',
     components: {
         PI,
+        PLottie,
     },
     props: {
         group: {
@@ -96,8 +102,10 @@ export default {
         @apply bg-gray-900;
         position: relative;
         display: flex;
-        border-radius: 0.125rem;
-        opacity: 0.88;
+        border-radius: 0.375rem;
+        min-width: 17rem;
+        max-width: 30rem;
+        opacity: 0.9;
         padding: 0.55rem;
     }
 
@@ -124,6 +132,7 @@ export default {
     }
 
     .button-wrapper {
+        @apply text-gray-400;
         margin: auto 0 auto 0.5rem;
         flex-shrink: 0;
         .delete-icon {
