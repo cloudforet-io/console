@@ -506,24 +506,33 @@ export default {
             await listCloudServiceType();
         };
 
-        const schemaQueryHelper = new QueryHelper();
         const getSchema = async (data) => {
-            const schema = await SpaceConnector.client.addOns.pageSchema.get({
-                resource_type: 'inventory.CloudService',
-                schema: 'table',
-                options: {
-                    provider: data.provider,
-                    cloud_service_group: data.cloud_service_group,
-                    cloud_service_type: data.cloud_service_type,
-                },
-            });
+            let schema;
+            if (data.resource_type === 'inventory.Server') {
+                try {
+                    schema = await SpaceConnector.client.addOns.pageSchema.get({
+                        resource_type: 'inventory.Server',
+                        schema: 'table',
+                    });
+                } catch (e) {
+                    console.error(e);
+                }
+            } else {
+                try {
+                    schema = await SpaceConnector.client.addOns.pageSchema.get({
+                        resource_type: 'inventory.CloudService',
+                        schema: 'table',
+                        options: {
+                            provider: data.provider,
+                            cloud_service_group: data.cloud_service_group,
+                            cloud_service_type: data.cloud_service_type,
+                        },
+                    });
+                } catch (e) {
+                    console.error(e);
+                }
+            }
 
-            schemaQueryHelper.setFilters([
-                { k: 'provider', o: '=', v: data.provider },
-                { k: 'cloud_service_group', o: '=', v: data.cloud_service_group },
-                { k: 'cloud_service_type', o: '=', v: data.cloud_service_type },
-            ]);
-            // console.log(schema.options, 'main')
             return dynamicFieldsToExcelDataFields(schema.options.fields);
         };
 
@@ -541,21 +550,41 @@ export default {
 
 
         const getItemsForExport = async () => {
-            const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(
-                getParams(false, true),
-            );
-            state.itemsForExport = res.results;
+            try {
+                const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(
+                    getParams(false, true),
+                );
+                state.itemsForExport = res.results;
+            } catch (e) {
+                console.error(e);
+            }
 
             const schemaList = await Promise.all(state.itemsForExport.map(d => getSchema(d)));
-            return schemaList.map((d, i) => ({
-                url: '/inventory/cloud-service/list',
-                param: {
-                    query: getQuery(state.itemsForExport[i]),
-                },
-                fields: d,
-                sheet_name: state.itemsForExport[i].cloud_service_type,
-            }));
+            let excelList;
+            // eslint-disable-next-line prefer-const
+            excelList = schemaList.map((d, i) => {
+                if (state.itemsForExport[i].resource_type === 'inventory.Server') {
+                    return {
+                        url: '/inventory/server/list',
+                        param: {
+                            query: getQuery(state.itemsForExport[i]),
+                        },
+                        fields: d,
+                        sheet_name: `${i}${state.itemsForExport[i].cloud_service_type}`,
+                    };
+                }
+                return {
+                    url: '/inventory/cloud-service/list',
+                    param: {
+                        query: getQuery(state.itemsForExport[i]),
+                    },
+                    fields: d,
+                    sheet_name: `${i}${state.itemsForExport[i].cloud_service_type}`,
+                };
+            });
+            return excelList;
         };
+
 
         const exportDataToExcel = async () => {
             try {

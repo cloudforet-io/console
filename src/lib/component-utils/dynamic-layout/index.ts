@@ -61,7 +61,7 @@ export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): E
     const res: ExcelDataField = { key: d.key, name: d.name };
 
     // lis type case will be deprecated
-    if (d.type === 'list' && (d.options as any).sub_key) {
+    if (d.type === 'list' && (d.options as any)?.sub_key) {
         res.key = `${d.key}.${(d.options as any).sub_key}`;
     }
 
