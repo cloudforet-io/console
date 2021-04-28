@@ -323,6 +323,11 @@
 				"VALUE": "値"
 			}
 		},
+		"CUSTOM_FIELD_MODAL": {
+			"ATTRIBUTE_COL": "",
+			"TAG_COL": "",
+			"TITLE": ""
+		},
 		"ERROR": {
 			"404_GO_BACK_1": "前のページに戻る",
 			"404_MSG": "内容が見つかりません",

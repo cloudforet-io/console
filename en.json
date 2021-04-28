@@ -323,6 +323,11 @@
 				"VALUE": "Value"
 			}
 		},
+		"CUSTOM_FIELD_MODAL": {
+			"ATTRIBUTE_COL": "Attribute columns",
+			"TAG_COL": "Tag columns",
+			"TITLE": "Set columns"
+		},
 		"ERROR": {
 			"404_GO_BACK_1": "Try going",
 			"404_MSG": "Oops, nothing is here.",
