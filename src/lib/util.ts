@@ -56,7 +56,7 @@ export const showErrorMessage = (errorTitle, error, root) => {
             type: 'alert',
             title: errorTitle,
             text: errorMsg,
-            duration: 2000,
+            duration: 5000,
             speed: 1000,
         });
     }
@@ -75,7 +75,20 @@ export const showSuccessMessage = (successTitle, successMessage, root) => {
             type: 'success',
             title: successTitle,
             text: successMessage,
-            duration: 2000,
+            duration: 5000,
+            speed: 500,
+        });
+    }
+};
+
+export const showLoadingMessage = (loadingTitle, loadingMessage, root) => {
+    if (root) {
+        root.$notify({
+            group: 'toastTopCenter',
+            type: 'loading',
+            title: loadingTitle,
+            text: loadingMessage,
+            duration: 5000,
             speed: 500,
         });
     }

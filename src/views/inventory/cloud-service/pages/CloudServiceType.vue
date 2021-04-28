@@ -210,7 +210,7 @@ import { FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
-import { assetUrlConverter } from '@/lib/util';
+import {assetUrlConverter, showErrorMessage, showLoadingMessage, showSuccessMessage} from '@/lib/util';
 
 
 interface RegionModel extends Tags {
@@ -563,6 +563,8 @@ export default {
             let excelList;
             // eslint-disable-next-line prefer-const
             excelList = schemaList.map((d, i) => {
+                let sheetName = `${state.itemsForExport[i].provider}.${state.itemsForExport[i].cloud_service_group}.${state.itemsForExport[i].cloud_service_type}`;
+                if (sheetName.length > 30) sheetName = sheetName.substr(0, 29);
                 if (state.itemsForExport[i].resource_type === 'inventory.Server') {
                     return {
                         url: '/inventory/server/list',
@@ -570,7 +572,7 @@ export default {
                             query: getQuery(state.itemsForExport[i]),
                         },
                         fields: d,
-                        sheet_name: `${i}${state.itemsForExport[i].cloud_service_type}`,
+                        sheet_name: sheetName,
                     };
                 }
                 return {
@@ -579,15 +581,15 @@ export default {
                         query: getQuery(state.itemsForExport[i]),
                     },
                     fields: d,
-                    sheet_name: `${i}${state.itemsForExport[i].cloud_service_type}`,
+                    sheet_name: sheetName,
                 };
             });
             return excelList;
         };
 
-
         const exportDataToExcel = async () => {
             try {
+                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
                 const excelList = await getItemsForExport();
                 await store.dispatch('file/downloadExcel', [{
                     url: '/statistics/topic/cloud-service-resources',
