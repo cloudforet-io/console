@@ -85,7 +85,7 @@ export default {
             @apply bg-gray-200;
         }
         &.active {
-            @apply border-none bg-gray-700 text-white;
+            @apply border-transparent bg-gray-700 text-white;
         }
     }
 }
