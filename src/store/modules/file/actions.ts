@@ -7,13 +7,18 @@ interface ExcelPayload {
     url: string;
     param: any;
     fields: ExcelDataField[];
+    // eslint-disable-next-line camelcase
+    sheet_name?: string;
 }
 
 export const downloadExcel: Action<FileState, any> = async ({ commit, rootState }, payload: ExcelPayload[] | ExcelPayload): Promise<void> => {
     try {
         let params;
         if (Array.isArray(payload)) {
-            params = payload.map(({ url, param, fields }) => ({
+            params = payload.map(({
+                // eslint-disable-next-line camelcase
+                url, param, fields, sheet_name,
+            }) => ({
                 source: {
                     url,
                     param,
@@ -22,6 +27,8 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState 
                     options: {
                         fileType: 'xlsx', // will be deprecated
                         timezone: rootState.user.timezone,
+                        // eslint-disable-next-line camelcase
+                        sheet_name,
                     },
                     data_source: fields, // will be deprecated
                     fields,
@@ -37,6 +44,8 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState 
                     options: {
                         fileType: 'xlsx', // will be deprecated
                         timezone: rootState.user.timezone,
+                        // eslint-disable-next-line camelcase
+                        sheet_name: payload.sheet_name,
                     },
                     data_source: payload.fields, // will be deprecated
                     fields: payload.fields,

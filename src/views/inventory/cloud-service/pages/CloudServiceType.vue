@@ -286,10 +286,10 @@ export default {
         );
 
         const excelFields = [
+            { key: 'provider', name: 'Provider' },
             { key: 'cloud_service_type', name: 'Cloud Service Type' },
             { key: 'cloud_service_group', name: 'Cloud Service Group' },
             { key: 'count', name: 'Count' },
-            { key: 'server_count', name: 'Server Count' },
         ];
 
         const state = reactive({
@@ -438,7 +438,7 @@ export default {
 
         // ajax request
         let listCloudServiceRequest: CancelTokenSource | undefined;
-        const listCloudServiceType = async (isTriggeredBySideFilter = false, exportable = false) => {
+        const listCloudServiceType = async (isTriggeredBySideFilter = false) => {
             // if request is already exist, cancel the request
             if (listCloudServiceRequest) {
                 listCloudServiceRequest.cancel('Next request has been called.');
@@ -449,10 +449,9 @@ export default {
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(
-                    getParams(isTriggeredBySideFilter, exportable),
+                    getParams(isTriggeredBySideFilter),
                     { cancelToken: listCloudServiceRequest.token },
                 );
-                if (exportable) state.itemsForExport = res.results;
                 state.items = res.results;
                 state.totalCount = res.total_count || 0;
                 state.loading = false;
@@ -470,7 +469,6 @@ export default {
 
         watch(() => sidebarFilters.value, async (after, before) => {
             if (after !== before) {
-                // await listCloudServiceType(after);
                 await listCloudServiceType(true);
                 await replaceUrlQuery('provider', selectedProvider.value);
                 await replaceUrlQuery('region', filterState.regionFilter);
@@ -543,7 +541,10 @@ export default {
 
 
         const getItemsForExport = async () => {
-            await listCloudServiceType(false, true);
+            const res = await SpaceConnector.client.statistics.topic.cloudServiceResources(
+                getParams(false, true),
+            );
+            state.itemsForExport = res.results;
 
             const schemaList = await Promise.all(state.itemsForExport.map(d => getSchema(d)));
             return schemaList.map((d, i) => ({
@@ -552,6 +553,7 @@ export default {
                     query: getQuery(state.itemsForExport[i]),
                 },
                 fields: d,
+                sheet_name: state.itemsForExport[i].cloud_service_type,
             }));
         };
 
@@ -566,6 +568,7 @@ export default {
                         labels: getParams(false, true).labels,
                     },
                     fields: excelFields,
+                    sheet_name: 'Summary',
                 }, ...excelList]);
             } catch (e) {
                 console.error(e);
