@@ -193,7 +193,7 @@ export default {
             dataMap[state.fetchOptionKey] = state.data;
         };
 
-        const dynamicLayoutListeners: DynamicLayoutEventListener = {
+        const dynamicLayoutListeners: Partial<DynamicLayoutEventListener> = {
             fetch(options) {
                 fetchOptionsMap[state.fetchOptionKey] = options;
                 getData();

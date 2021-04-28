@@ -20,6 +20,7 @@
                                   @fetch="fetchTableData"
                                   @select="onSelect"
                                   @export="exportServerData"
+                                  @click-settings="onClickSettings"
                 >
                     <template #toolbox-left>
                         <div class="flex">
@@ -121,6 +122,7 @@
                        :resources="tableState.selectedItems"
                        id-key="server_id"
         />
+        <custom-field-modal v-model="tableState.visibleCustomFieldModal" />
     </div>
 </template>
 
@@ -169,6 +171,7 @@ import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
+import CustomFieldModal from '@/common/modules/custom-field-modal/CustomFieldModal.vue';
 
 
 interface ProjectItemResp {
@@ -223,6 +226,7 @@ const serverStore = {
 export default {
     name: 'ServerMain',
     components: {
+        CustomFieldModal,
         PPageTitle,
         CollectModal,
         ServerDetails,
@@ -272,6 +276,7 @@ export default {
             keyItemSets: [] as KeyItemSet[],
             valueHandlerMap: {} as ValueHandlerMap,
             colCopy: false,
+            settingsVisible: true,
         });
         const tableState = reactive({
             schema: null as null|DynamicLayout,
@@ -311,6 +316,7 @@ export default {
                 return res;
             }),
             selectedServerIds: computed(() => tableState.selectedItems.map(d => d.server_id)),
+            visibleCustomFieldModal: false,
         });
         const fetchOptionState = reactive({
             pageStart: 1,
@@ -507,6 +513,9 @@ export default {
         const onSelect: DynamicLayoutEventListener['select'] = (selectIndex) => {
             typeOptionState.selectIndex = selectIndex;
         };
+        const onClickSettings = () => {
+            tableState.visibleCustomFieldModal = true;
+        };
         const onClickChangeProject = () => { changeProjectState.visible = true; };
         const onClickDelete = () => {
             checkTableModalState.title = vm.$tc('INVENTORY.SERVER.MAIN.CHECK_MODAL_DELETE_TITLE', tableState.selectedItems.length);
@@ -558,6 +567,7 @@ export default {
             typeOptionState,
             onSelect,
             exportServerData,
+            onClickSettings,
             listServerData,
             fetchTableData,
             fieldHandler,
