@@ -324,8 +324,18 @@
 			}
 		},
 		"CUSTOM_FIELD_MODAL": {
+			"ALT_E_UPDATE_COL": "",
+			"ALT_S_UPDATE_COL": "",
 			"ATTRIBUTE_COL": "",
+			"ATTRIBUTE_COL_DESC": "",
+			"CLEAR_ALL": "",
+			"COL_NAME": "",
+			"COL_REQUIRED": "",
+			"DEFAULT": "",
+			"SEARCH_ATTRIBUTE_COL": "",
+			"SELECT_TAG": "",
 			"TAG_COL": "",
+			"TAG_COL_DESC": "",
 			"TITLE": ""
 		},
 		"ERROR": {
