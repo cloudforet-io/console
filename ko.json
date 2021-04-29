@@ -334,6 +334,7 @@
 			"DEFAULT": "기본 설정으로",
 			"SEARCH_ATTRIBUTE_COL": "속성 필드 검색",
 			"SELECT_TAG": "태그 선택",
+			"TAG": "(태그)",
 			"TAG_COL": "태그 필드",
 			"TAG_COL_DESC": "테이블 필드에 추가할 태그를 선택하세요.",
 			"TITLE": "필드 변경하기"

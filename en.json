@@ -334,6 +334,7 @@
 			"DEFAULT": "Default",
 			"SEARCH_ATTRIBUTE_COL": "Search attribute columns",
 			"SELECT_TAG": "Select tags",
+			"TAG": "(Tag)",
 			"TAG_COL": "Tag columns",
 			"TAG_COL_DESC": "Select visible tag columns",
 			"TITLE": "Set columns"
