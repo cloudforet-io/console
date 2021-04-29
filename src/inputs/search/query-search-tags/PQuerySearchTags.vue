@@ -1,17 +1,15 @@
 <template>
     <div v-if="_tags.length > 0" class="p-query-search-tags">
         <div class="tags-container">
-            <div>
-                <div class="left-wrapper">
-                    <span class="filter">{{ $t('COMPONENT.QUERY_SEARCH_TAGS.FILTER') }}: </span>
-                    <p-badge v-if="!readOnly" class="delete-btn" outline
-                             style-type="gray900"
-                             @click="deleteAllTags"
-                    >
-                        {{ $t('COMPONENT.QUERY_SEARCH_TAGS.CLEAR_ALL') }}
-                    </p-badge>
-                    <div v-if="!readOnly" class="divider" />
-                </div>
+            <div class="left-wrapper">
+                <span class="filter">{{ $t('COMPONENT.QUERY_SEARCH_TAGS.FILTER') }}: </span>
+                <p-badge v-if="!readOnly" class="delete-btn" outline
+                         style-type="gray900"
+                         @click="deleteAllTags"
+                >
+                    {{ $t('COMPONENT.QUERY_SEARCH_TAGS.CLEAR_ALL') }}
+                </p-badge>
+                <div v-if="!readOnly" class="divider" />
             </div>
             <div class="tags-wrapper">
                 <p-tag v-for="(tag, idx) in _tags" :key="`${idx}-${tag.key ? tag.key.name : tag.value}`"
@@ -20,29 +18,25 @@
                        :deletable="!readOnly"
                        @delete="deleteTag(idx)"
                 >
-                    <span class="tag-inner">
-                        <p-i v-if="tag.invalid"
-                             v-tooltip.bottom="{content: tag.description, delay: {show: 200}, classes: ['p-tooltip']}"
-                             class="alert-icon"
-                             name="ic_alert" height="1em" width="1em"
-                        />
-                        <template v-if="tag.key">
-                            <span class="key-label">
-                                {{ tag.key.label || tag.key.name }}
-                            </span>
-                            :{{ tag.operator }}
-                            <slot :name="`data-type-${tag.key.dataType || 'string'}`" v-bind="{ ...$props, tag }">
-                                <span class="value-label">
-                                    {{ tag.value.label || tag.value.name }}
-                                </span>
-                            </slot>
-                        </template>
-                        <template v-else>
+                    <p-i v-if="tag.invalid"
+                         v-tooltip.bottom="{content: tag.description, delay: {show: 200}, classes: ['p-tooltip']}"
+                         class="alert-icon"
+                         name="ic_alert" height="1em" width="1em"
+                    />
+                    <template v-if="tag.key">
+                        <span class="key-label">
+                            {{ tag.key.label || tag.key.name }}
+                        </span>
+                        <span class="operator">:{{ tag.operator }}</span>
+                        <slot :name="`data-type-${tag.key.dataType || 'string'}`" v-bind="{ ...$props, tag }">
                             <span class="value-label">
                                 {{ tag.value.label || tag.value.name }}
                             </span>
-                        </template>
-                    </span>
+                        </slot>
+                    </template>
+                    <template v-else>
+                        {{ tag.value.label || tag.value.name }}
+                    </template>
                 </p-tag>
             </div>
         </div>
@@ -152,6 +146,7 @@ export default defineComponent({
     .tags-container {
         @apply flex flex-row w-full;
         max-width: 100%;
+        align-items: flex-start;
     }
     .left-wrapper {
         @apply flex-shrink-0 inline-flex;
@@ -177,35 +172,29 @@ export default defineComponent({
         flex-grow: 1;
         overflow-x: hidden;
         .tag {
-            @apply inline-flex justify-start;
-            $margin-right: 0.75rem;
-            margin-right: $margin-right;
-            max-width: calc(100% - $(margin-right));
-            margin-bottom: 0.75rem;
-            overflow-x: hidden;
-            border-radius: 0.125rem;
-            padding: 0.125rem 0.5rem;
-            height: auto;
+            margin-bottom: 0.5rem;
             &.invalid {
                 @apply border-alert border bg-white;
             }
-            .icon {
-                @apply flex-shrink-0;
-            }
-        }
-        .tag-inner {
-            @apply inline-flex;
-            flex: 1;
-            .alert-icon {
-                @apply mr-1;
-                cursor: help;
-            }
-            .key-label {
-                @apply font-bold;
-            }
-            .value-label {
-                white-space: normal;
-                word-break: break-all;
+            .text {
+                @apply inline-flex;
+                .alert-icon {
+                    cursor: help;
+                    margin-right: 0.25rem;
+                    flex-shrink: 0;
+                }
+                .key-label {
+                    white-space: nowrap;
+                    font-weight: bold;
+                }
+                .operator {
+                    white-space: nowrap;
+                    margin-right: 0.125rem;
+                }
+                .value-label {
+                    white-space: normal;
+                    word-break: break-all;
+                }
             }
         }
     }

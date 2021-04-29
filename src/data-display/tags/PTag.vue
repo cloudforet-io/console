@@ -1,45 +1,47 @@
 <template>
-    <p-badge v-tooltip.bottom="isError ? errorMessage : ''"
-             class="p-tag"
-             :class="{deletable: deletable, activated: activated, outline: outline, error: isError}"
-             :style-type="styleType" shape="square" :outline="outline"
-             v-on="$listeners"
+    <span v-tooltip.bottom="isError ? errorMessage : ''"
+          class="p-tag"
+          :class="{deletable: deletable, activated: activated, outline: outline, error: isError}"
+          v-on="$listeners"
     >
         <p-i v-if="isError" class="error-icon"
              name="ic_alert"
              width="0.8rem"
              height="0.8rem"
         />
-        <slot />
+        <span class="text"><slot /></span>
         <p-i v-if="deletable"
              name="ic_delete"
              width="1rem"
              height="1rem"
-             class="icon"
+             class="delete-icon"
              color="inherit"
              @click="$emit('delete')"
         />
-    </p-badge>
+    </span>
 </template>
 
 <script lang="ts">
-import PBadge from '@/data-display/badges/PBadge.vue';
 import PI from '@/foundation/icons/PI.vue';
+import { defineComponent } from '@vue/composition-api';
 
-export default {
+interface Props {
+    deletable?: boolean;
+    outline?: boolean;
+    activated?: boolean;
+    isError?: boolean;
+    errorMessage?: string;
+}
+
+export default defineComponent<Props>({
     name: 'PTag',
     components: {
-        PBadge,
         PI,
     },
     props: {
         deletable: {
             type: Boolean,
             default: true,
-        },
-        styleType: {
-            type: String,
-            default: 'gray200',
         },
         outline: {
             type: Boolean,
@@ -61,21 +63,28 @@ export default {
     setup() {
         return { };
     },
-};
+});
 </script>
 
 <style lang="postcss">
 .p-tag {
-    color: inherit;
-    vertical-align: middle;
-    white-space: nowrap;
+    @apply bg-gray-200 text-gray-dark;
+    display: inline-flex;
+    align-items: flex-start;
+    overflow: hidden;
+    padding: 0.125rem 0.25rem 0.125rem 0.5rem;
+    height: auto;
+    max-width: 100%;
+    width: fit-content;
     margin-right: 0.5rem;
+    border-radius: 4px;
     &.deletable {
-        padding-right: 0.15rem;
-        .icon {
+        .delete-icon {
             @apply text-gray-400;
             cursor: pointer;
-            margin-left: 0.5rem;
+            margin-left: 0.25rem;
+            margin-top: 1px;
+            flex-shrink: 0;
         }
         &:hover {
             @apply bg-gray-100;
@@ -84,7 +93,7 @@ export default {
                 @apply border-gray-100;
             }
 
-            .icon {
+            .delete-icon {
                 @apply text-alert;
             }
         }
@@ -93,7 +102,7 @@ export default {
         @apply bg-blue-300;
     }
     &.outline {
-        @apply text-gray-dark;
+        @apply text-gray-dark bg-transparent border border-gray-200;
     }
     &.error {
         @apply bg-white border border-alert;
@@ -101,6 +110,13 @@ export default {
         .error-icon {
             margin-right: 0.3rem;
         }
+    }
+    .text {
+        font-size: 0.75rem;
+        line-height: 1.3;
+        white-space: normal;
+        word-break: break-word;
+        max-width: 100%;
     }
 }
 </style>

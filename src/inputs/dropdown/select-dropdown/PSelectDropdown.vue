@@ -9,7 +9,12 @@
         @select="changSelectItem"
         @openMenu="$emit('openMenu')"
     >
-        {{ selectItemLabel }}
+        <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
+            <slot :name="slot" v-bind="scope" />
+        </template>
+        <template v-if="!$scopedSlots.default" #default>
+            {{ selectItemLabel }}
+        </template>
     </p-dropdown-menu-btn>
 </template>
 
