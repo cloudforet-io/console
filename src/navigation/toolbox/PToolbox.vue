@@ -39,20 +39,22 @@
                         {{ proxyState.sortBy }}
                     </p-dropdown-menu-btn>
                 </div>
-                <div v-if="exportable" class="tool">
-                    <p-icon-button name="ic_excel"
-                                   @click="$emit('export',$event)"
-                    />
-                </div>
-                <div v-if="settingsVisible" class="tool">
-                    <p-icon-button name="ic_setting"
-                                   @click="$emit('click-settings',$event)"
-                    />
-                </div>
-                <div v-if="refreshable" class="tool">
-                    <p-icon-button name="ic_refresh"
-                                   @click="$emit('refresh', $event)"
-                    />
+                <div>
+                    <div v-if="exportable" class="tool">
+                        <p-icon-button name="ic_excel"
+                                       @click="$emit('export',$event)"
+                        />
+                    </div>
+                    <div v-if="settingsVisible" class="tool">
+                        <p-icon-button name="ic_setting"
+                                       @click="$emit('click-settings',$event)"
+                        />
+                    </div>
+                    <div v-if="refreshable" class="tool">
+                        <p-icon-button name="ic_refresh"
+                                       @click="$emit('refresh', $event)"
+                        />
+                    </div>
                 </div>
             </div>
             <div class="filters-wrapper">
@@ -329,16 +331,19 @@ export default defineComponent<Props>({
         order: 3;
     }
     .tools-wrapper {
-        @apply flex-shrink-0 inline-flex justify-end mb-4;
+        @apply flex-shrink-0 inline-flex justify-end;
+        max-width: 100%;
         flex-grow: 1;
         order: 2;
+        flex-wrap: wrap;
         .dropdown-list {
             .p-dropdown-btn {
                 min-width: 6rem;
             }
         }
         .tool {
-            @apply ml-4;
+            @apply ml-4 mb-4;
+            display: inline-block;
         }
     }
     .filters-wrapper {

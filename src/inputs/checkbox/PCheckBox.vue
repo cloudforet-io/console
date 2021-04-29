@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import { indexOf, pull } from 'lodash';
+import { pull } from 'lodash';
 import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
@@ -61,7 +61,8 @@ export default defineComponent<CheckboxProps>({
                 if (typeof props.selected === 'boolean') {
                     return props.selected;
                 }
-                return indexOf(props.selected, props.value) !== -1;
+                if (Array.isArray(props.selected)) return props.selected.includes(props.value);
+                return false;
             }),
         });
         const onClick = () => {

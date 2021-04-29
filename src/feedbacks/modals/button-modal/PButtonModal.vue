@@ -45,21 +45,21 @@
                                 :disabled="loading"
                                 @click="onCancelClick"
                             >
-                                <slot :slot-scope="$props" name="close-button">
+                                <slot name="close-button" v-bind="$props">
                                     {{ $t('COMPONENT.BUTTON_MODAL.CANCEL') }}
                                 </slot>
                             </p-button>
-                            <p-loading-button
+                            <p-button
                                 class="modal-btn"
                                 :style-type="themeColor"
                                 :loading="loading"
                                 :disabled="disabled"
                                 @click="onConfirmClick"
                             >
-                                <slot :slot-scope="$props" name="confirm-button">
+                                <slot name="confirm-button" v-bind="$props">
                                     {{ $t('COMPONENT.BUTTON_MODAL.CONFIRM') }}
                                 </slot>
-                            </p-loading-button>
+                            </p-button>
                         </div>
                     </article>
                 </div>
@@ -69,7 +69,6 @@
 </template>
 
 <script lang="ts">
-import PLoadingButton from '@/others/deprecated/loading-button/PLoadingButton.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { sizeMapping } from '@/feedbacks/modals/type';
 import { computed, reactive, toRefs } from '@vue/composition-api';
@@ -86,7 +85,6 @@ export default {
         PIconButton,
         PLottie,
         PButton,
-        PLoadingButton,
     },
     props: {
         visible: { // sync
