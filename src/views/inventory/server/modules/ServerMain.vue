@@ -48,6 +48,7 @@
         <p-tab v-if="tableState.selectedItems.length === 1"
                :tabs="singleItemTabState.tabs"
                :active-tab.sync="singleItemTabState.activeTab"
+               :class="singleItemTabState.activeTab"
         >
             <template #details>
                 <server-details :server-id="tableState.selectedServerIds[0]" />
@@ -73,6 +74,7 @@
         <p-tab v-else-if="typeOptionState.selectIndex.length > 1"
                :tabs="multiItemTabState.tabs"
                :active-tab.sync="multiItemTabState.activeTab"
+               :class="multiItemTabState.activeTab"
         >
             <template #data>
                 <p-dynamic-layout v-if="tableState.multiSchema"
@@ -376,6 +378,7 @@ export default {
             resources: computed<MonitoringResourceType[]>(() => tableState.selectedItems.map(d => ({
                 id: get(d, 'server_id'),
                 name: d.name,
+                provider: d.provider,
             }))),
         });
 
@@ -613,5 +616,13 @@ export default {
 
 >>> .p-dynamic-layout-query-search-table .p-query-search-table {
     border-width: 1px;
+}
+
+.p-tab::v-deep {
+    &.monitoring {
+        .tab-pane {
+            @apply bg-secondary2;
+        }
+    }
 }
 </style>

@@ -13,17 +13,46 @@
             <transition name="fade-in">
                 <div v-if="error || (loading && chart)" class="shade">
                     <p v-if="error">
-                        Unavailable
+                        {{ $t('COMMON.COMPONENTS.METRIC_CHART.UNAVAILABLE') }}
                     </p>
+                </div>
+                <div v-if="data.length === 0" class="no-data-text">
+                    {{ $t('COMMON.COMPONENTS.METRIC_CHART.NO_DATA') }}
                 </div>
             </transition>
         </p-chart-loader>
+        <transition name="fade">
+            <div class="tooltip-wrapper" :class="{ 'tooltip-visible': visibleTooltip }">
+                <p class="date">
+                    {{ tooltip.date }}
+                </p>
+                <table class="legend-table">
+                    <tr v-for="legend in tooltip.legends"
+                        :key="legend.serverId"
+                        class="legend"
+                    >
+                        <td>
+                            <span class="circle" :style="{ 'background-color': legend.color }" />
+                            <span class="count">{{ legend.count ? commaFormatter(numberFormatter(legend.count)) : 0 }}</span>
+                        </td>
+                        <td>
+                            <p v-if="legend.serverName">
+                                {{ legend.serverName }}
+                            </p>
+                            <p class="server-id-text">
+                                {{ legend.serverId }}
+                            </p>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </transition>
     </div>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { find } from 'lodash';
+import { find, get } from 'lodash';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -34,16 +63,31 @@ import { PChartLoader, PLottie, PSkeleton } from '@spaceone/design-system';
 import { reactive, toRefs, watch } from '@vue/composition-api';
 
 import { MetricChartProps } from '@/common/components/metric-chart/type';
+import { commaFormatter, numberFormatter } from '@/lib/util';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
 
 dayjs.extend(utc);
 am4core.useTheme(am4themes_animated);
+am4core.options.autoSetClassName = true;
+am4core.options.classNamePrefix = 'MetricChart';
 
 
 interface ChartData {
     label: string;
     [key: string]: number | string;
+}
+
+interface Legend {
+    serverId: string;
+    serverName?: string;
+    color?: string;
+    count: number;
+}
+
+interface Tooltip {
+    date: string;
+    legends: Legend[];
 }
 
 export default {
@@ -92,6 +136,12 @@ export default {
             chart: null as null | any,
             data: [] as ChartData[],
             chartRegistry: {},
+            //
+            visibleTooltip: false,
+            tooltip: {
+                date: '',
+                legends: [],
+            } as Tooltip,
         });
 
         const convertChartData = async () => {
@@ -125,10 +175,22 @@ export default {
             chart.paddingBottom = -10;
             chart.paddingTop = 10;
             chart.data = state.data;
+            if (state.data.length > 0) {
+                chart.events.on('over', () => {
+                    state.visibleTooltip = true;
+                });
+                chart.events.on('out', () => {
+                    state.visibleTooltip = false;
+                });
+            }
 
             const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
             dateAxis.dataFields.category = 'label';
-            dateAxis.tooltip.disabled = true;
+            dateAxis.tooltip.label.fontSize = 12;
+            dateAxis.tooltip.label.adapter.add('text', (text) => {
+                if (text) return text.split(' ').join('\n');
+                return text;
+            });
             dateAxis.renderer.minGridDistance = 60;
             dateAxis.fontSize = 12;
             dateAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
@@ -141,7 +203,7 @@ export default {
             });
 
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-            valueAxis.tooltip.disabled = true;
+            valueAxis.tooltip.label.fontSize = 12;
             valueAxis.fontSize = 12;
             valueAxis.extraMax = 0.1;
             valueAxis.min = 0;
@@ -149,30 +211,39 @@ export default {
             valueAxis.renderer.grid.template.strokeOpacity = 1;
 
             let series;
-            let tooltipText = '<strong>{label}</strong>';
-            Object.keys(props.dataset).forEach((key) => {
+            props.resources.forEach((d) => {
                 series = chart.series.push(new am4charts.LineSeries());
                 series.dataFields.categoryX = 'label';
-                series.dataFields.valueY = key;
-
-                const resource = find(props.resources, { id: key });
-                tooltipText += `<br><span style="color: ${resource?.color};" /> ${key}</span> (${resource?.name}): {${key}}
-`;
-                series.stroke = am4core.color(resource?.color);
+                series.dataFields.valueY = d.id;
+                series.stroke = am4core.color(d.color);
             });
 
-            series.tooltipHTML = tooltipText;
-            series.tooltip.fontSize = 12;
-            series.tooltip.getFillFromObject = false;
-            series.tooltip.label.fill = am4core.color(gray.dark);
-            series.tooltip.background.fill = am4core.color('white');
-            series.tooltip.background.stroke = am4core.color(gray[400]);
-            series.tooltip.pointerOrientation = 'vertical';
+            series.adapter.add('tooltipText', (text, target) => {
+                if (target.tooltipDataItem && target.tooltipDataItem.dataContext) {
+                    const tooltipData = target.tooltipDataItem.dataContext;
+                    const date = tooltipData.label;
+                    const legends = [] as Legend[];
+                    props.resources.forEach((d) => {
+                        legends.push({
+                            serverId: d.id,
+                            serverName: d.name,
+                            color: d.color,
+                            count: get(tooltipData, d.id),
+                        });
+                    });
+                    state.tooltip = { date, legends };
+                }
+                return text;
+            });
 
-            chart.cursor = new am4charts.XYCursor();
-            chart.cursor.lineX.strokeOpacity = 0;
-            chart.cursor.lineY.strokeOpacity = 0;
-            chart.cursor.behavior = 'none';
+            if (state.data.length > 0) {
+                chart.cursor = new am4charts.XYCursor();
+                chart.cursor.maxTooltipDistance = 20;
+                chart.cursor.fontSize = 12;
+                chart.cursor.lineX.stroke = am4core.color(gray[900]);
+                chart.cursor.lineX.strokeDasharray = '';
+                chart.cursor.lineX.strokeOpacity = 1;
+            }
         };
 
         watch([() => state.chartRef, () => props.loading], async ([ctx, loading]) => {
@@ -180,10 +251,12 @@ export default {
                 await convertChartData();
                 drawChart(ctx);
             }
-        }, { immediate: false });
+        });
 
         return {
             ...toRefs(state),
+            numberFormatter,
+            commaFormatter,
         };
     },
 };
@@ -191,12 +264,89 @@ export default {
 
 <style lang="postcss">
 .p-metric-chart {
+    @apply bg-white;
+    position: relative;
+    box-shadow: 0 2px 4px rgba(theme('colors.black'), 0.06);
+    border-radius: 0.375rem;
+    padding: 1.25rem;
+
     .chart {
         position: relative;
         height: 12.5rem;
-        padding-left: 0.5rem;
-        padding-right: 0.5rem;
         margin-top: 1.25rem;
+
+        .no-data-text {
+            @apply text-gray-400;
+            position: absolute;
+            top: 40%;
+            left: 30%;
+        }
+    }
+
+    .tooltip-wrapper {
+        @apply bg-white border border-gray-300;
+        position: absolute;
+        visibility: hidden;
+        width: calc(100% - 1rem);
+        top: 17rem;
+        left: 0.5rem;
+        transition: visibility 0s, opacity 0.3s linear;
+        font-size: 0.75rem;
+        line-height: 1.2;
+        opacity: 0;
+        z-index: 1;
+        border-radius: 0.375rem;
+        padding: 0.75rem 0;
+
+        &.tooltip-visible {
+            opacity: 0.95;
+            visibility: visible;
+        }
+
+        .date {
+            font-weight: bold;
+            padding: 0 1rem 0.375rem 1rem;
+        }
+        .legend-table {
+            width: 100%;
+
+            .legend {
+                @apply bg-white;
+                &:nth-child(odd) {
+                    @apply bg-gray-100;
+                }
+
+                td {
+                    vertical-align: sub;
+                    padding-top: 0.25rem;
+                    padding-bottom: 0.25rem;
+                    padding-left: 1rem;
+
+                    &:first-child {
+                        min-width: 4rem;
+                        white-space: nowrap;
+                    }
+                    &:last-child {
+                        padding-right: 1rem;
+                    }
+                }
+
+                .circle {
+                    display: inline-block;
+                    width: 0.5rem;
+                    height: 0.5rem;
+                    border-radius: 50%;
+                }
+
+                .count {
+                    font-weight: bold;
+                    margin: 0 0.25rem;
+                }
+                .server-id-text {
+                    @apply text-gray-600;
+                }
+            }
+        }
     }
 }
 </style>

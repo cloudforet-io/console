@@ -1,23 +1,24 @@
 <template>
-    <div class="pt-8 pb-16">
-        <section v-if="!dataSourceId">
-            <p-select-button-group class="pr-4 mb-8" :buttons="tools" :selected.sync="selectedToolId" />
+    <div class="monitoring">
+        <section v-if="!dataSourceId && dataTools.length > 1" class="data-source-section">
+            <p-select-button-group class="data-source-wrapper" :buttons="tools" :selected.sync="selectedToolId" />
         </section>
-        <section class="mb-8">
+        <section class="resource-section">
             <span class="title">
                 {{ $t('COMMON.MONITORING.RESOURCE') }}
             </span>
             <span class="ml-4 text-gray text-sm">
                 * {{ $t('COMMON.MONITORING.LIMIT_OF_RESOURCE', {
-                    limitCount: 10,
+                    limitCount: 16,
                 }) }}
             </span>
             <div>
                 <div v-for="resource in availableResources" :key="resource.id" class="legend">
-                    <span class="flex-shrink-0 rounded-sm h-3 w-3 mr-2"
+                    <span class="circle"
                           :style="{ backgroundColor: resource.color }"
                     />
-                    <p-anchor :href="resource.link"
+                    <p-anchor class="text"
+                              :href="resource.link"
                               :show-icon="true"
                               highlight
                     >
@@ -37,7 +38,7 @@
                 <p-icon-button class="ml-4 flex-shrink-0" name="ic_refresh" @click="listMetricCharts" />
             </div>
         </section>
-        <section class="py-4">
+        <section class="chart-section">
             <i18n path="COMMON.MONITORING.DISPLAY_TIMEZONE" tag="p" class="text-sm text-gray mb-12">
                 <template #timezone>
                     <strong>{{ $t('COMMON.MONITORING.LOCAL_TIME') }}</strong>
@@ -52,7 +53,7 @@
                 {{ $t('COMMON.MONITORING.NO_METRICS') }}
             </div>
             <template v-else>
-                <div class="metric-chart-wrapper" :class="responsive ? 'responsive' : 'static'">
+                <div class="metric-chart-wrapper grid grid-cols-12">
                     <metric-chart v-for="(item, index) in metricChartDataList" :key="index"
                                   :loading="item.loading"
                                   :labels="item.labels"
@@ -98,6 +99,7 @@ import {
 import { Metric, MonitoringProps } from '@/common/modules/monitoring/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { store } from '@/store';
 import router from '@/routes';
 
@@ -194,10 +196,6 @@ export default {
             type: String,
             default: undefined,
         },
-        responsive: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props: MonitoringProps) {
         const state = reactive({
@@ -227,11 +225,13 @@ export default {
 
         /* api */
         const setAvailableResources = () => {
-            state.availableResources = props.resources.map((resource, idx) => ({
+            let resources = props.resources.slice(0, 16);
+            resources = resources.map((resource, idx) => ({
                 ...resource,
                 color: colors[idx],
                 link: router.resolve(referenceRouter(resource.id, { resource_type: 'inventory.Server' })).href,
             }));
+            state.availableResources = sortBy(resources, m => m.name);
         };
         const getDataSource = async () => {
             try {
@@ -248,10 +248,14 @@ export default {
                 console.error(e);
             }
         };
+
+        const apiQuery = new ApiQueryHelper();
         const listDataSources = async () => {
             try {
+                apiQuery.setFilters([{ k: 'provider', o: '=', v: props.resources.map(d => d.provider) }]);
                 const res = await SpaceConnector.client.monitoring.dataSource.list({
                     monitoring_type: MONITORING_TYPE.metric,
+                    query: apiQuery.data,
                 });
                 state.dataTools = chain(res.results)
                     .map((d) => {
@@ -389,7 +393,7 @@ export default {
             colors,
             TIME_RANGE,
             legendFormatter(resource): string {
-                return resource.name ? `${resource.id} (${resource.name})` : resource.id;
+                return resource.name ? `${resource.name} (${resource.id})` : `(${resource.id})`;
             },
             listMetricCharts,
             loadMoreMetricCharts,
@@ -403,65 +407,109 @@ section {
     padding-left: 1rem;
     padding-right: 1rem;
 }
-.toolbox-section {
-    @apply justify-between border-t border-b border-gray-200;
-    display: flex;
-    padding-top: 1rem;
-    padding-bottom: 1rem;
+
+.monitoring {
+    padding-bottom: 4rem;
 }
+
 .title {
     font-size: 0.875rem;
     font-weight: bold;
     text-transform: capitalize;
 }
-.legend {
-    @apply items-center;
-    display: inline-flex;
-    font-size: 0.875rem;
-    line-height: 1.5;
-    vertical-align: text-bottom;
-    margin-top: 0.625rem;
-    margin-right: 1rem;
-    .p-anchor {
-        @apply text-gray-900;
+
+.data-source-section {
+    @apply bg-white;
+    .data-source-wrapper {
+        padding-right: 1rem;
+        padding-top: 2rem;
     }
 }
-.time-range::v-deep {
-    &.p-select-btn-group .select-btn {
-        margin-right: 0;
-        padding: 0 0.75rem;
-        font-weight: normal;
+
+.resource-section {
+    @apply bg-white;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+
+    .legend {
+        @apply items-center;
+        display: inline-flex;
         font-size: 0.875rem;
-        &.active {
-            @apply text-secondary;
-            font-weight: bold;
+        line-height: 1.5;
+        vertical-align: text-bottom;
+        margin-top: 0.625rem;
+        margin-right: 1rem;
+        .circle {
+            height: 0.625rem;
+            width: 0.625rem;
+            border-radius: 50%;
+            margin-right: 0.25rem;
+        }
+        .text {
+            @apply text-gray-900;
         }
     }
 }
 
-.metric-chart-wrapper {
-    display: grid;
-    grid-auto-rows: auto;
-    row-gap: 3rem;
-    column-gap: 1rem;
-
-    &.responsive {
-        grid-template-columns: repeat(auto-fill, minmax(49%, 49%));
-    }
-    &.static {
-        grid-template-columns: repeat(auto-fill, minmax(23.125rem, 23.125rem));
-    }
-}
-.more-btn::v-deep {
-    @apply border-gray-300 mx-auto;
-    display: block;
-    max-width: 38rem;
-    width: 40%;
-    margin-top: 3rem;
-}
-.loader {
+.toolbox-section {
+    @apply bg-white border-t border-b border-gray-200;
     display: flex;
-    align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+
+    .time-range::v-deep {
+        &.p-select-btn-group .select-btn {
+            margin-right: 0;
+            padding: 0 0.75rem;
+            font-weight: normal;
+            font-size: 0.875rem;
+            &.active {
+                @apply text-secondary;
+                font-weight: bold;
+            }
+        }
+    }
+}
+
+.chart-section {
+    padding-top: 1rem;
+    padding-bottom: 1rem;
+
+    .metric-chart-wrapper {
+        display: grid;
+        grid-auto-rows: auto;
+        row-gap: 3rem;
+        column-gap: 1rem;
+
+        .p-metric-chart {
+            @apply col-span-3;
+
+            @screen laptop {
+                @apply col-span-4;
+            }
+
+            @screen tablet {
+                @apply col-span-12;
+            }
+        }
+    }
+
+    .more-btn::v-deep {
+        @apply border-gray-900;
+        display: block;
+        width: 40%;
+        max-width: 38rem;
+        text-transform: uppercase;
+        margin-top: 3rem;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .loader {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 }
 </style>

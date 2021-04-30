@@ -50,7 +50,6 @@
                                 :data-source-id="dataSourceId"
                                 :resource-type="resourceType"
                                 :selected-metrics="metrics"
-                                :responsive="true"
                     />
                 </template>
                 <template v-else>

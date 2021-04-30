@@ -13,6 +13,7 @@ export interface Metric {
 export interface MonitoringResourceType {
     id: string;
     name?: string;
+    provider: string;
 }
 
 export interface MonitoringProps {
