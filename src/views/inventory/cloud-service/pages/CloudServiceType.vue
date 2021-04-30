@@ -210,7 +210,10 @@ import { FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
-import {assetUrlConverter, showErrorMessage, showLoadingMessage, showSuccessMessage} from '@/lib/util';
+import {
+    assetUrlConverter, showErrorMessage, showLoadingMessage, showSuccessMessage,
+} from '@/lib/util';
+import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 
 
 interface RegionModel extends Tags {
@@ -507,13 +510,17 @@ export default {
         };
 
         const getSchema = async (data) => {
-            let schema;
+            let schema: DynamicLayout;
+            let excelField;
             if (data.resource_type === 'inventory.Server') {
                 try {
                     schema = await SpaceConnector.client.addOns.pageSchema.get({
                         resource_type: 'inventory.Server',
                         schema: 'table',
                     });
+                    if (schema.options) {
+                        excelField = dynamicFieldsToExcelDataFields(schema.options.fields);
+                    }
                 } catch (e) {
                     console.error(e);
                 }
@@ -528,23 +535,28 @@ export default {
                             cloud_service_type: data.cloud_service_type,
                         },
                     });
+                    if (schema.options) {
+                        excelField = dynamicFieldsToExcelDataFields(schema.options.fields);
+                    }
                 } catch (e) {
                     console.error(e);
                 }
             }
-
-            return dynamicFieldsToExcelDataFields(schema.options.fields);
+            return excelField;
         };
 
         const excelApiQuery = new ApiQueryHelper();
-        const getQuery = (data) => {
+        const getQuery = (data, field) => {
             excelApiQuery
                 .setFilters([
                     { k: 'provider', o: '=', v: data.provider },
                     { k: 'cloud_service_group', o: '=', v: data.cloud_service_group },
                     { k: 'cloud_service_type', o: '=', v: data.cloud_service_type },
                 ]);
-
+            const fields = field;
+            if (fields) {
+                excelApiQuery.setOnly(...fields.map(d => d.key), 'reference');
+            }
             return excelApiQuery.data;
         };
 
@@ -562,25 +574,25 @@ export default {
             const schemaList = await Promise.all(state.itemsForExport.map(d => getSchema(d)));
             let excelList;
             // eslint-disable-next-line prefer-const
-            excelList = schemaList.map((d, i) => {
-                let sheetName = `${state.itemsForExport[i].provider}.${state.itemsForExport[i].cloud_service_group}.${state.itemsForExport[i].cloud_service_type}`;
-                if (sheetName.length > 30) sheetName = sheetName.substr(0, 29);
+            excelList = schemaList.map((field, i) => {
+                let sheetName = `${i}.${state.itemsForExport[i].provider}.${state.itemsForExport[i].cloud_service_group}.${state.itemsForExport[i].cloud_service_type}`;
+                if (sheetName.length > 30) sheetName = sheetName.substr(0, 30);
                 if (state.itemsForExport[i].resource_type === 'inventory.Server') {
                     return {
                         url: '/inventory/server/list',
                         param: {
-                            query: getQuery(state.itemsForExport[i]),
+                            query: getQuery(state.itemsForExport[i], field),
                         },
-                        fields: d,
+                        fields: field,
                         sheet_name: sheetName,
                     };
                 }
                 return {
                     url: '/inventory/cloud-service/list',
                     param: {
-                        query: getQuery(state.itemsForExport[i]),
+                        query: getQuery(state.itemsForExport[i], field),
                     },
-                    fields: d,
+                    fields: field,
                     sheet_name: sheetName,
                 };
             });
