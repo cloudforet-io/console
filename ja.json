@@ -314,6 +314,10 @@
 					"TOGGLE_MORE": "もっと見る"
 				}
 			},
+			"METRIC_CHART": {
+				"NO_DATA": "",
+				"UNAVAILABLE": ""
+			},
 			"TAGS": {
 				"ADD": "追加",
 				"INVALID_DUPLICATED_KEY": "重複したキーです",

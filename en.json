@@ -314,6 +314,10 @@
 					"TOGGLE_MORE": "show more"
 				}
 			},
+			"METRIC_CHART": {
+				"NO_DATA": "No data available",
+				"UNAVAILABLE": "Unavailable"
+			},
 			"TAGS": {
 				"ADD": "Add",
 				"INVALID_DUPLICATED_KEY": "duplicated key",

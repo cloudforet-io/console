@@ -314,6 +314,10 @@
 					"TOGGLE_MORE": "더보기"
 				}
 			},
+			"METRIC_CHART": {
+				"NO_DATA": "",
+				"UNAVAILABLE": ""
+			},
 			"TAGS": {
 				"ADD": "추가 ",
 				"INVALID_DUPLICATED_KEY": "중복된 키입니다.",
