@@ -129,7 +129,7 @@ export default {
                 if (!props.options.fields) return [];
 
                 return [{
-                    title: 'Filters',
+                    title: 'Properties',
                     items: props.options.fields.map(d => ({ label: d.name, name: d.key })),
                 }];
             }),
@@ -192,11 +192,9 @@ export default {
             emit('export');
         };
 
-
         const onChange = (options: Options = {}) => {
             emit('fetch', options);
         };
-
 
         return {
             ...toRefs(state),

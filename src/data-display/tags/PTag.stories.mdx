@@ -1,6 +1,5 @@
 import PTag from '@/data-display/tags/PTag.vue';
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import { BADGE_STYLE } from '@/data-display/badges/type';
 
 <Meta title='Data Display/Tag' parameters={{
     design: {
@@ -25,25 +24,6 @@ import { BADGE_STYLE } from '@/data-display/badges/type';
         control: {
             type: 'boolean',
         }
-    },
-    styleType: {
-        name: 'styleType',
-        type: {name: 'string'},
-        description: 'Badge style',
-        defaultValue: BADGE_STYLE.gray200,
-        table: {
-            type: {
-                summary: 'string'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'primary'
-            }
-        },
-        control: {
-            type: 'select',
-            options: Object.values(BADGE_STYLE)
-        },
     },
     outline: {
         name: 'outline',
@@ -144,7 +124,6 @@ export const Template = (args,{argTypes})=>({
     template: `
 <div style="display:flex; align-items:center; justify-content:center; height:100px;">
     <p-tag
-        :styleType="styleType"
         :deletable="deletable"
         :outline="outline"
         :activated="activated"
