@@ -575,7 +575,8 @@ export default {
             let excelList;
             // eslint-disable-next-line prefer-const
             excelList = schemaList.map((field, i) => {
-                let sheetName = `${i}.${state.itemsForExport[i].provider}.${state.itemsForExport[i].cloud_service_group}.${state.itemsForExport[i].cloud_service_type}`;
+                const providerShortName = store.state.resource.provider.items[state.itemsForExport[i].provider]?.label;
+                let sheetName = `${i}.${providerShortName}.${state.itemsForExport[i].cloud_service_group}.${state.itemsForExport[i].cloud_service_type}`;
                 if (sheetName.length > 30) sheetName = sheetName.substr(0, 30);
                 if (state.itemsForExport[i].resource_type === 'inventory.Server') {
                     return {
