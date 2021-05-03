@@ -81,7 +81,7 @@ dayjs.extend(timezone);
 
 const handlers = {
     keyItemSets: [{
-        title: 'Filters',
+        title: 'Properties',
         items: [
             {
                 name: 'spot_group_id',

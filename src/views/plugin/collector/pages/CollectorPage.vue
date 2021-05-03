@@ -264,7 +264,7 @@ export default {
             selectedDataFields: computed(() => [{ name: 'collector_id', label: 'Collector Id' }, ...state.fields]),
             // query
             querySearchHandlers: makeQuerySearchPropsWithSearchSchema([{
-                title: 'Filters',
+                title: 'Properties',
                 items: [
                     { key: 'collector_id', name: 'Collector Id' },
                     { key: 'name', name: 'Name' },

@@ -145,7 +145,7 @@ export default {
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const handlers = {
             keyItemSets: [{
-                title: 'Filters',
+                title: 'Properties',
                 items: [
                     { name: 'plugin_id', label: 'Plugin ID' },
                     // { name: 'name', label: 'Name' },

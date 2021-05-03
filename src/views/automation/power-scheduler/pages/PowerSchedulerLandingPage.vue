@@ -194,7 +194,7 @@ export default {
         const handlers = {
             keyItemSets: [
                 {
-                    title: 'Filters',
+                    title: 'Properties',
                     items: [{
                         name: 'project_id',
                         label: 'Project',

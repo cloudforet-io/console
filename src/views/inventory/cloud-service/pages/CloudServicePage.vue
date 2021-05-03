@@ -53,6 +53,7 @@
                                               @fetch="fetchTableData"
                                               @select="onSelect"
                                               @export="exportCloudServiceData"
+                                              @click-settings="onClickSettings"
                             >
                                 <template #toolbox-left>
                                     <p-icon-text-button style-type="primary-dark"
@@ -159,6 +160,11 @@
                                  :resources="tableState.selectedItems"
                                  id-key="cloud_service_id"
                 />
+                <custom-field-modal v-model="tableState.visibleCustomFieldModal"
+                                    resource-type="inventory.CloudService"
+                                    :options="{provider, cloudServiceGroup: group, cloudServiceType: name}"
+                                    @complete="reloadTable"
+                />
             </template>
         </template>
     </vertical-page-layout>
@@ -209,7 +215,8 @@ import { store } from '@/store';
 import { QueryHelper } from '@/lib/query';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
-import {TranslateResult} from "vue-i18n";
+import { TranslateResult } from 'vue-i18n';
+import CustomFieldModal from '@/common/modules/custom-field-modal/CustomFieldModal.vue';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -264,6 +271,7 @@ interface SidebarItemType {
 export default {
     name: 'CloudServicePage',
     components: {
+        CustomFieldModal,
         ServerMain,
         PLazyImg,
         PDivider,
@@ -341,6 +349,7 @@ export default {
             keyItemSets: [] as KeyItemSet[],
             valueHandlerMap: {} as ValueHandlerMap,
             colCopy: false,
+            settingsVisible: true,
         });
 
         const tableState = reactive({
@@ -388,6 +397,7 @@ export default {
             }),
             selectedCloudServiceIds: computed(() => tableState.selectedItems.map(d => d.cloud_service_id)),
             tableHeight: cloudServiceStore.getItem('tableHeight', 'number'),
+            visibleCustomFieldModal: false,
         });
 
         const checkTableModalState = reactive({
@@ -460,7 +470,7 @@ export default {
 
             const fields = schema?.options?.fields || tableState.schema?.options?.fields;
             if (fields) {
-                apiQuery.setOnly(...fields.map(d => d.key), 'reference', 'cloud_service_id');
+                apiQuery.setOnly(...fields.map(d => d.key).filter(d => !d.startsWith('tags.')), 'reference', 'cloud_service_id', 'tags');
             }
 
             return apiQuery.data;
@@ -581,6 +591,15 @@ export default {
                     typeOptionState.totalCount = totalCount;
                 }
             }
+        };
+
+        const reloadTable = async () => {
+            tableState.schema = await getTableSchema();
+            await fetchTableData();
+        };
+
+        const onClickSettings = () => {
+            tableState.visibleCustomFieldModal = true;
         };
 
         /** Change Project */
@@ -734,6 +753,8 @@ export default {
             exportCloudServiceData,
             fetchTableData,
             fieldHandler,
+            reloadTable,
+            onClickSettings,
 
 
             /* Change Project */

@@ -48,6 +48,7 @@
                                       @fetch="fetchTableData"
                                       @select="onSelect"
                                       @export="exportServiceAccountData"
+                                      @click-settings="onClickSettings"
                     >
                         <template #toolbox-left>
                             <p-icon-text-button style-type="primary-dark"
@@ -122,6 +123,11 @@
                                 :loading="changeProjectState.loading"
                                 @confirm="changeProject"
             />
+            <custom-field-modal v-model="tableState.visibleCustomFieldModal"
+                                resource-type="identity.ServiceAccount"
+                                :options="{provider: selectedProvider}"
+                                @complete="reloadTable"
+            />
         </template>
     </p-vertical-page-layout>
 </template>
@@ -169,6 +175,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 /* types */
 import { Reference } from '@/lib/reference/type';
 import { TranslateResult } from 'vue-i18n';
+import CustomFieldModal from '@/common/modules/custom-field-modal/CustomFieldModal.vue';
 
 
 interface ProjectItemResp {
@@ -182,6 +189,7 @@ interface ProjectItemResp {
 export default {
     name: 'ServiceAccountPage',
     components: {
+        CustomFieldModal,
         ProjectTreeModal,
         PDoubleCheckModal,
         PDropdownMenuBtn,
@@ -240,6 +248,7 @@ export default {
             selectIndex: [] as number[],
             selectable: true,
             colCopy: false,
+            settingsVisible: true,
         });
 
         const tableState = reactive({
@@ -278,6 +287,7 @@ export default {
 
                 return res;
             }),
+            visibleCustomFieldModal: false,
         });
 
         const getLinkTemplate = (data) => {
@@ -312,6 +322,11 @@ export default {
                 .setPage(fetchOptionState.pageStart, fetchOptionState.pageLimit)
                 .setFilters([{ k: 'provider', v: selectedProvider.value, o: '=' }])
                 .addFilter(...queryHelper.filters);
+
+            const fields = tableState.schema?.options?.fields;
+            if (fields) {
+                apiQuery.setOnly(...fields.map(d => d.key).filter(d => !d.startsWith('tags.')), 'service_account_id', 'tags');
+            }
             return apiQuery.data;
         };
 
@@ -425,6 +440,10 @@ export default {
             }
         };
 
+        const onClickSettings = () => {
+            tableState.visibleCustomFieldModal = true;
+        };
+
         /** Change Project & Release Project Action */
         const changeProjectState = reactive({
             visible: false,
@@ -499,15 +518,24 @@ export default {
 
         /** ******* Page Init ******* */
         const getTableSchema = async () => {
-            const schema = await SpaceConnector.client.addOns.pageSchema.get({
-                // eslint-disable-next-line camelcase
-                resource_type: 'identity.ServiceAccount',
-                schema: 'table',
-                options: {
-                    provider: selectedProvider.value,
-                },
-            });
-            tableState.schema = schema;
+            try {
+                const schema = await SpaceConnector.client.addOns.pageSchema.get({
+                    // eslint-disable-next-line camelcase
+                    resource_type: 'identity.ServiceAccount',
+                    schema: 'table',
+                    options: {
+                        provider: selectedProvider.value,
+                    },
+                });
+                tableState.schema = schema;
+            } catch (e) {
+                tableState.schema = null;
+            }
+        };
+
+        const reloadTable = async () => {
+            await getTableSchema();
+            await listServiceAccountData();
         };
 
         const init = async () => {
@@ -546,6 +574,8 @@ export default {
             listServiceAccountData,
             fetchTableData,
             fieldHandler,
+            reloadTable,
+            onClickSettings,
 
             changeProjectState,
             clickProject,

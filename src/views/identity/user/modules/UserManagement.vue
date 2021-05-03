@@ -252,7 +252,7 @@ export default {
         const queryHelper = new ApiQueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const handlers = {
             keyItemSets: [{
-                title: 'Filters',
+                title: 'Properties',
                 items: [
                     {
                         name: 'user_id',

@@ -124,7 +124,10 @@
                        :resources="tableState.selectedItems"
                        id-key="server_id"
         />
-        <custom-field-modal v-model="tableState.visibleCustomFieldModal" />
+        <custom-field-modal v-model="tableState.visibleCustomFieldModal"
+                            resource-type="inventory.Server"
+                            @complete="reloadTable"
+        />
     </div>
 </template>
 
@@ -443,7 +446,8 @@ export default {
                 }
                 // set api query to get only a few specified data
                 if (res?.options?.fields) {
-                    apiQuery.setOnly(...res.options.fields.map(d => d.key), 'server_id', 'reference', 'primary_ip_address', 'collection_info.collectors');
+                    apiQuery.setOnly(...res.options.fields.map(d => d.key).filter(d => !d.startsWith('tags.')),
+                        'server_id', 'reference', 'primary_ip_address', 'collection_info.collectors', 'tags');
                 }
 
                 // initiate queryTags with keyItemSets
@@ -555,6 +559,11 @@ export default {
             }
         };
 
+        const reloadTable = async () => {
+            await getTableSchema();
+            await listServerData();
+        };
+
         /* init */
         const init = async () => {
             await getTableSchema();
@@ -574,6 +583,7 @@ export default {
             listServerData,
             fetchTableData,
             fieldHandler,
+            reloadTable,
 
             /* Change Project */
             changeProjectState,

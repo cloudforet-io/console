@@ -91,15 +91,13 @@
                             </div>
                             <div v-else>
                                 <p-anchor class="go-add" :show-icon="false"
-                                          @click.stop="(e) => {
-                                              $router.push({
-                                                  name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP.ADD,
-                                                  params: {
-                                                      projectId: item.project_id
-                                                  }
-                                              })
-                                              e.preventDefault()
-                                          }"
+                                          :href="$router.resolve({
+                                              name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP.ADD,
+                                              params: {
+                                                  projectId: item.project_id
+                                              }
+                                          }).route.path"
+                                          target="_self"
                                 >
                                     <template #left-extra>
                                         <p-i name="ic_plus_thin" height="1em" width="1em"
@@ -158,7 +156,7 @@ import { makeDistinctValueHandler, makeReferenceValueHandler } from '@/lib/compo
 
 const handlers = {
     keyItemSets: [{
-        title: 'Filters',
+        title: 'Properties',
         items: [
             {
                 name: 'name',
@@ -509,7 +507,6 @@ export default {
             line-height: 135%;
         }
     }
-
 }
 .project-name-wrapper {
     .project-name {

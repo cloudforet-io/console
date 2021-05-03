@@ -123,7 +123,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const querySearchHandlers = {
             keyItemSets: [{
-                title: 'Filters',
+                title: 'Properties',
                 items: [
                     {
                         name: 'service_account_id',

@@ -276,7 +276,7 @@ export default {
         });
         const handlers = makeQuerySearchPropsWithSearchSchema(
             [{
-                title: 'Filters',
+                title: 'Properties',
                 items: [
                     { key: 'cloud_service_type', name: 'Cloud Service Type' },
                     { key: 'cloud_service_group', name: 'Cloud Service Group' },

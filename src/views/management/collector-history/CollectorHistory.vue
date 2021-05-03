@@ -214,7 +214,7 @@ export default {
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const handlers = {
             keyItemSets: [{
-                title: 'Filters',
+                title: 'Properties',
                 items: [
                     {
                         name: 'job_id',
