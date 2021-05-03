@@ -31,41 +31,19 @@
 
                     <div class="column-items-wrapper">
                         <draggable v-model="selectedColumns" draggable=".draggable-item">
-                            <p-check-box v-for="column in selectedColumns"
-                                         v-show="regex.test(column.name)"
-                                         :key="column.key"
+                            <column-item v-for="column in selectedColumns" :key="column.key"
                                          v-model="selectedAllColumnKeys"
-                                         :value="column.key"
-                                         class="column-item draggable-item"
-                            >
-                                <span class="name">
-                                    <template v-for="(text, i) in column.name.split(regex)">
-                                        <strong v-if="i !== 0" :key="`${i}-match`">{{ getMatchText(column.name) }}</strong>
-                                        <span :key="i">{{ text }}</span>
-                                    </template>
-                                    <span v-if="column.key.startsWith(TAGS_PREFIX)" class="ml-1 text-gray-400">{{ $t('COMMON.CUSTOM_FIELD_MODAL.TAG') }}</span>
-                                </span>
-                                <p-i name="ic_drag-handle" width="1rem" height="1rem"
-                                     class="drag-icon"
-                                />
-                            </p-check-box>
+                                         :item="column"
+                                         :search-text="search"
+                                         draggable
+                            />
                         </draggable>
 
-                        <p-check-box v-for="column in unselectedColumns"
-                                     v-show="regex.test(column.name)"
-                                     :key="column.key"
+                        <column-item v-for="column in unselectedColumns" :key="column.key"
                                      v-model="selectedAllColumnKeys"
-                                     :value="column.key"
-                                     class="column-item"
-                        >
-                            <span class="name">
-                                <template v-for="(text, i) in column.name.split(regex)">
-                                    <strong v-if="i !== 0" :key="`${i}-match`">{{ getMatchText(column.name) }}</strong>
-                                    <span :key="i">{{ text }}</span>
-                                </template>
-                                <span v-if="column.key.startsWith(TAGS_PREFIX)" class="ml-1 text-gray-400">{{ $t('COMMON.CUSTOM_FIELD_MODAL.TAG') }}</span>
-                            </span>
-                        </p-check-box>
+                                     :item="column"
+                                     :search-text="search"
+                        />
                     </div>
                 </section>
 
@@ -106,7 +84,7 @@
 <script lang="ts">
 import {
     PButton,
-    PButtonModal, PCheckBox, PI, PSearch, PSelectDropdown, PTag,
+    PButtonModal, PCheckBox, PSearch, PSelectDropdown, PTag,
 } from '@spaceone/design-system';
 import { camelCase, uniq, uniqBy } from 'lodash';
 import {
@@ -119,6 +97,8 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { i18n } from '@/translations';
 import draggable from 'vuedraggable';
+import ColumnItem from '@/common/modules/custom-field-modal/ColumnItem.vue';
+import { TAGS_PREFIX } from '@/common/modules/custom-field-modal/config';
 
 interface Props {
     visible: boolean;
@@ -126,11 +106,10 @@ interface Props {
     options: any;
 }
 
-const TAGS_PREFIX = 'tags.';
-
 export default {
     name: 'CustomFieldModal',
     components: {
+        ColumnItem,
         PButtonModal,
         PSearch,
         PSelectDropdown,
@@ -138,7 +117,6 @@ export default {
         PCheckBox,
         PTag,
         draggable,
-        PI,
     },
     model: {
         prop: 'visible',
@@ -166,7 +144,6 @@ export default {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             search: '',
-            regex: computed(() => new RegExp(state.search || '', 'i')),
             isAllSelected: computed(() => state.selectedColumns.length === state.allColumns.length),
             loading: true,
             currentColumns: [] as DynamicField[],
@@ -200,12 +177,6 @@ export default {
             }))),
             isValid: computed(() => state.selectedColumns.length > 0),
         });
-
-        const getMatchText = (text: string): string => {
-            const res = state.regex.exec(text);
-            if (res) return res[0];
-            return '';
-        };
 
         const onChangeAllSelect = (val) => {
             if (val) {
@@ -341,7 +312,6 @@ export default {
 
         return {
             ...toRefs(state),
-            getMatchText,
             onChangeAllSelect,
             onDeleteTag,
             clearSelectedTags,
@@ -433,38 +403,6 @@ section {
     .column-items-wrapper {
         flex-grow: 1;
         overflow: auto;
-    }
-    .column-item.p-checkbox::v-deep {
-        display: flex;
-        align-items: center;
-        cursor: pointer;
-        padding: 0.375rem 0.5rem;
-        &:hover {
-            @apply bg-blue-200;
-        }
-        .text {
-            flex-grow: 1;
-            display: inline-flex;
-            align-items: center;
-        }
-
-        .check-icon {
-            margin-right: 0.25rem;
-            flex-shrink: 0;
-        }
-        .name {
-            flex-grow: 1;
-        }
-        .drag-icon {
-            flex-shrink: 0;
-            display: none;
-        }
-        &.draggable-item {
-            .drag-icon {
-                display: inline-block;
-            }
-        }
-
     }
 }
 
