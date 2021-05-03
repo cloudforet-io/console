@@ -300,7 +300,7 @@ export default {
     @apply flex flex-col bg-white border border-gray-200 rounded-sm;
 
     .p-data-table {
-        @apply overflow-auto;
+        overflow: auto;
     }
 
     .p-toolbox {

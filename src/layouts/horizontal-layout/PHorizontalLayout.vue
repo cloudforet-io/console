@@ -1,6 +1,6 @@
 <template>
     <div class="p-horizontal-layout">
-        <div :style="{height: `${containerHeight}px`}">
+        <div class="horizontal-contents" :style="{height: `${containerHeight}px`}">
             <slot name="container" :height="containerHeight" />
         </div>
 
@@ -123,7 +123,9 @@ export default {
 
 <style lang="postcss">
 .p-horizontal-layout {
-
+    .horizontal-contents {
+        overflow: hidden;
+    }
     .dragger-container {
         @apply relative mt-4 pb-7;
         .line {
@@ -144,6 +146,12 @@ export default {
                 @apply text-gray-900;
                 cursor: row-resize;
             }
+        }
+    }
+
+    @screen mobile {
+        .dragger-container {
+            visibility: hidden;
         }
     }
 }
