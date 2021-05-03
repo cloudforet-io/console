@@ -40,6 +40,7 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import config from '@/lib/config';
 import { iso8601Formatter } from '@/lib/util';
 import { store } from '@/store';
+import { FILE_NAME_PREFIX } from '@/lib/type';
 
 export default {
     name: 'ServerHistory',
@@ -119,6 +120,7 @@ export default {
                         { name: 'Updated By', key: 'updated_by' },
                         { name: 'Updated', key: 'updated_at', type: 'datetime' },
                     ],
+                    file_name_prefix: FILE_NAME_PREFIX.server,
                 });
             } catch (e) {
                 console.error(e);

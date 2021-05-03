@@ -40,6 +40,7 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import config from '@/lib/config';
 import { store } from '@/store';
+import { FILE_NAME_PREFIX } from '@/lib/type';
 
 export default {
     name: 'ServerMember',
@@ -122,6 +123,7 @@ export default {
                         { name: 'Email', key: 'user_info.email' },
                         { name: 'Labels', key: 'labels' },
                     ],
+                    file_name_prefix: FILE_NAME_PREFIX.server,
                 });
             } catch (e) {
                 console.error(e);

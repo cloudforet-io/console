@@ -195,6 +195,7 @@ import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dyna
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { store } from '@/store';
 import { QueryHelper } from '@/lib/query';
+import { FILE_NAME_PREFIX } from '@/lib/type';
 
 const GeneralPageLayout = (): Component => import('@/common/components/layouts/GeneralPageLayout.vue') as Component;
 const TagsPanel = (): Component => import('@/common/modules/tags-panel/TagsPanel.vue') as Component;
@@ -468,6 +469,7 @@ export default {
                     url: '/inventory/collector/list',
                     param: { query: getQuery() },
                     fields: state.excelFields,
+                    file_name_prefix: FILE_NAME_PREFIX.collector,
                 });
             } catch (e) {
                 console.error(e);

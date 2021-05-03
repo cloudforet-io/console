@@ -123,3 +123,11 @@ export class JsonSchemaObjectType implements JsonSchema<'object'> {
 
 
 export type QueryFilters = Record<string|'keywords', Array<string|number|boolean>>
+
+export enum FILE_NAME_PREFIX {
+    cloudService = 'cloud_service',
+    server = 'server',
+    serviceAccount = 'service_account',
+    user = 'user',
+    collector = 'collector'
+}

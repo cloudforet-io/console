@@ -176,6 +176,7 @@ import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter
 import { Reference } from '@/lib/reference/type';
 import { TranslateResult } from 'vue-i18n';
 import CustomFieldModal from '@/common/modules/custom-field-modal/CustomFieldModal.vue';
+import { FILE_NAME_PREFIX } from '@/lib/type';
 
 
 interface ProjectItemResp {
@@ -378,6 +379,7 @@ export default {
                     url: '/identity/service-account/list',
                     param: { query: getQuery() },
                     fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
+                    file_name_prefix: FILE_NAME_PREFIX.serviceAccount,
                 });
             } catch (e) {
                 console.error(e);

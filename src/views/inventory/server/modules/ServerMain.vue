@@ -177,6 +177,7 @@ import { store } from '@/store';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import CustomFieldModal from '@/common/modules/custom-field-modal/CustomFieldModal.vue';
+import { FILE_NAME_PREFIX } from '@/lib/type';
 
 
 interface ProjectItemResp {
@@ -426,6 +427,7 @@ export default {
                     url: '/inventory/server/list',
                     param: { query: getQuery() },
                     fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
+                    file_name_prefix: FILE_NAME_PREFIX.server,
                 });
             } catch (e) {
                 console.error(e);

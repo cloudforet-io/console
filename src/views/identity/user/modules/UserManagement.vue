@@ -201,6 +201,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { FILE_NAME_PREFIX } from '@/lib/type';
 
 interface UserModel {
     created_at: Timestamp;
@@ -474,6 +475,7 @@ export default {
                         include_role_binding: true,
                     },
                     fields: state.excelFields,
+                    file_name_prefix: FILE_NAME_PREFIX.user,
                 });
             } catch (e) {
                 console.error(e);

@@ -53,6 +53,7 @@ import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { find } from 'lodash';
+import { FILE_NAME_PREFIX } from '@/lib/type';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
     sortBy: '',
@@ -220,6 +221,7 @@ export default {
                         url: '/inventory/cloud-service/get-data',
                         param: getParams(),
                         fields: dynamicFieldsToExcelDataFields(fields),
+                        file_name_prefix: FILE_NAME_PREFIX.cloudService,
                     });
                 } catch (e) {
                     console.error(e);

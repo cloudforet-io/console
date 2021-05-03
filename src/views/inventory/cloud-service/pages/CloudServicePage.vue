@@ -217,6 +217,7 @@ import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-s
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { TranslateResult } from 'vue-i18n';
 import CustomFieldModal from '@/common/modules/custom-field-modal/CustomFieldModal.vue';
+import { FILE_NAME_PREFIX } from '@/lib/type';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -526,6 +527,7 @@ export default {
                     url: '/inventory/cloud-service/list',
                     param: { query: getQuery() },
                     fields: dynamicFieldsToExcelDataFields(tableState.schema.options.fields),
+                    file_name_prefix: FILE_NAME_PREFIX.cloudService,
                 });
             } catch (e) {
                 console.error(e);

@@ -214,6 +214,7 @@ import {
     assetUrlConverter, showErrorMessage, showLoadingMessage, showSuccessMessage,
 } from '@/lib/util';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
+import { FILE_NAME_PREFIX } from '@/lib/type';
 
 
 interface RegionModel extends Tags {
@@ -613,7 +614,7 @@ export default {
                     },
                     fields: excelFields,
                     sheet_name: 'Summary',
-                    file_name_prefix: 'cloud_service',
+                    file_name_prefix: FILE_NAME_PREFIX.cloudService,
                 }, ...excelList]);
             } catch (e) {
                 console.error(e);

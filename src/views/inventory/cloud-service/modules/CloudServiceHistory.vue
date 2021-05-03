@@ -42,6 +42,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { iso8601Formatter } from '@/lib/util';
 import { store } from '@/store';
+import { FILE_NAME_PREFIX } from '@/lib/type';
 
 export default {
     name: 'CloudServiceHistory',
@@ -122,6 +123,7 @@ export default {
                         { name: 'Updated By', key: 'updated_by' },
                         { name: 'Updated', key: 'updated_at', type: 'datetime' },
                     ],
+                    file_name_prefix: FILE_NAME_PREFIX.cloudService,
                 });
             } catch (e) {
                 console.error(e);
