@@ -7,3 +7,7 @@ export const setVisibleInfo = (state: DisplayState, visible: boolean): void => {
 export const setIsInitialized = (state: DisplayState, isInitialized: boolean): void => {
     state.isInitialized = isInitialized;
 };
+
+export const setIsDownloaded = (state: DisplayState, isDownloaded: boolean): void => {
+    state.isDownloaded = isDownloaded;
+};

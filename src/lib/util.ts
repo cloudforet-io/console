@@ -94,6 +94,15 @@ export const showLoadingMessage = (loadingTitle, loadingMessage, root) => {
     }
 };
 
+export const hideLoadingMessage = (root) => {
+    if (root) {
+        root.$notify({
+            group: 'toastTopCenter',
+            clean: true,
+        });
+    }
+};
+
 
 export const downloadURI = (uri: string, name?: string): void => {
     const link = document.createElement('a');

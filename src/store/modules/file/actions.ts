@@ -2,6 +2,8 @@ import { ExcelDataField, FileState } from '@/store/modules/file/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { Action } from 'vuex';
 import config from '@/lib/config';
+import axios from 'axios';
+import { store } from '@/store';
 
 interface ExcelPayload {
     url: string;
@@ -9,6 +11,7 @@ interface ExcelPayload {
     fields: ExcelDataField[];
     // eslint-disable-next-line camelcase
     sheet_name?: string;
+    file_name_prefix?: string;
 }
 
 export const downloadExcel: Action<FileState, any> = async ({ commit, rootState }, payload: ExcelPayload[] | ExcelPayload): Promise<void> => {
@@ -17,7 +20,7 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState 
         if (Array.isArray(payload)) {
             params = payload.map(({
                 // eslint-disable-next-line camelcase
-                url, param, fields, sheet_name,
+                url, param, fields, sheet_name, file_name_prefix,
             }) => ({
                 source: {
                     url,
@@ -29,6 +32,8 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState 
                         timezone: rootState.user.timezone,
                         // eslint-disable-next-line camelcase
                         sheet_name,
+                        // eslint-disable-next-line camelcase
+                        file_name_prefix,
                     },
                     data_source: fields, // will be deprecated
                     fields,
@@ -46,6 +51,8 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState 
                         timezone: rootState.user.timezone,
                         // eslint-disable-next-line camelcase
                         sheet_name: payload.sheet_name,
+                        // eslint-disable-next-line camelcase
+                        file_name_prefix: payload.file_name_prefix,
                     },
                     data_source: payload.fields, // will be deprecated
                     fields: payload.fields,
@@ -55,10 +62,32 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState 
 
         const res = await SpaceConnector.client.addOns.excel.export(params);
 
+        const getFileName = (contentDisposition) => {
+            const fileName = contentDisposition
+                .split(';')
+                .filter(el => el.indexOf('filename') > -1)
+                .map(ele => ele.replace(/"/g, '').split('=')[1]);
+            return fileName[0];
+        };
+
         if (typeof res === 'string') { // defensive code for case of unexpected response from the server. will be removed
             commit('setDownloadSource', config.get('CONSOLE_API.ENDPOINT') + res);
         } else {
-            commit('setDownloadSource', config.get('CONSOLE_API.ENDPOINT') + res.file_link);
+            store.dispatch('display/startDownloading');
+            const { headers, data } = await axios.get(config.get('CONSOLE_API.ENDPOINT') + res.file_link, { responseType: 'blob' });
+            store.dispatch('display/finishDownloading');
+            const blob = new Blob([data], {
+                type: headers['content-type'],
+            });
+            const name = decodeURIComponent(headers['content-disposition']);
+            const fileName = getFileName(name);
+            const link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.target = '_self';
+            link.download = fileName;
+            link.click();
+
+            // commit('setDownloadSource', link);
         }
     } catch (e) {
         console.error(e);

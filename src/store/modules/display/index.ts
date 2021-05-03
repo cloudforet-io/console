@@ -6,6 +6,7 @@ import * as mutations from './mutations';
 const state: DisplayState = {
     visibleInfo: false,
     isInitialized: false,
+    isDownloaded: false,
 };
 
 export default {

@@ -13,3 +13,11 @@ export const startInitializing = ({ commit }): void => {
 export const finishInitializing = ({ commit }): void => {
     commit('setIsInitialized', true);
 };
+
+export const startDownloading = ({ commit }): void => {
+    commit('setIsDownloaded', false);
+};
+
+export const finishDownloading = ({ commit }): void => {
+    commit('setIsDownloaded', true);
+};

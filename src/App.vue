@@ -67,6 +67,7 @@ import GNB from '@/common/modules/gnb/GNB.vue';
 import { Location } from 'vue-router';
 import router from '@/routes';
 import TopNotification from '@/common/components/TopNotification.vue';
+import { hideLoadingMessage, showLoadingMessage, showSuccessMessage } from './lib/util';
 
 export default defineComponent({
     name: 'App',
@@ -99,6 +100,13 @@ export default defineComponent({
                 await vm.$router.replace({ name: 'userAccount' });
             }
         }, { immediate: true });
+
+        watch(() => vm.$store.state.display.isDownloaded, async (after) => {
+            if (after) {
+                hideLoadingMessage(vm.$root);
+                showSuccessMessage(vm.$t('COMMON.EXCEL.ALT_S_DOWNLOAD_SUCCESS'), '', vm.$root);
+            }
+        });
 
         return {
             ...toRefs(state),
