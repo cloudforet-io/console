@@ -136,9 +136,11 @@ export default defineComponent({
         height: $gnb-height;
         z-index: 100;
         flex-shrink: 0;
+        top: 0;
     }
     .app-body {
         display: flex;
+        flex-wrap: wrap;
         flex-direction: column;
         overflow-y: hidden;
         width: 100%;

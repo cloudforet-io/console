@@ -628,6 +628,9 @@ export default {
 
 >>> .p-dynamic-layout-query-search-table .p-query-search-table {
     border-width: 1px;
+    .p-data-table {
+        min-height: unset;
+    }
 }
 
 .p-tab::v-deep {
