@@ -168,7 +168,7 @@ interface SummaryData {
 
 const DAY_COUNT = 14;
 const MONTH_COUNT = 12;
-const BOX_SWITCH_INTERVAL = 5000;
+const BOX_SWITCH_INTERVAL = 10000;
 
 export default {
     name: 'AllSummary',
