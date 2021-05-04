@@ -556,7 +556,7 @@ export default {
                 ]);
             const fields = field;
             if (fields) {
-                excelApiQuery.setOnly(...fields.map(d => d.key), 'reference');
+                excelApiQuery.setOnly(...fields.map(d => d.key));
             }
             return excelApiQuery.data;
         };
@@ -578,6 +578,9 @@ export default {
             excelList = schemaList.map((field, i) => {
                 const providerShortName = store.state.resource.provider.items[state.itemsForExport[i].provider]?.label;
                 let sheetName = `${i}.${providerShortName}.${state.itemsForExport[i].cloud_service_group}.${state.itemsForExport[i].cloud_service_type}`;
+                const headerMessage = {
+                    title: `[${providerShortName}] ${state.itemsForExport[i].cloud_service_group} ${state.itemsForExport[i].cloud_service_type}`,
+                };
                 if (sheetName.length > 30) sheetName = sheetName.substr(0, 30);
                 if (state.itemsForExport[i].resource_type === 'inventory.Server') {
                     return {
@@ -587,6 +590,7 @@ export default {
                         },
                         fields: field,
                         sheet_name: sheetName,
+                        header_message: headerMessage,
                     };
                 }
                 return {
@@ -596,6 +600,7 @@ export default {
                     },
                     fields: field,
                     sheet_name: sheetName,
+                    header_message: headerMessage,
                 };
             });
             return excelList;
@@ -614,6 +619,9 @@ export default {
                     },
                     fields: excelFields,
                     sheet_name: 'Summary',
+                    header_message: {
+                        title: 'Summary',
+                    },
                     file_name_prefix: FILE_NAME_PREFIX.cloudService,
                 }, ...excelList]);
             } catch (e) {

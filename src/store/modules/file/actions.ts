@@ -5,12 +5,19 @@ import config from '@/lib/config';
 import axios from 'axios';
 import { store } from '@/store';
 
+interface HeaderMessage {
+    title: string;
+}
+
 interface ExcelPayload {
     url: string;
     param: any;
     fields: ExcelDataField[];
     // eslint-disable-next-line camelcase
     sheet_name?: string;
+    // eslint-disable-next-line camelcase
+    header_message?: HeaderMessage;
+    // eslint-disable-next-line camelcase
     file_name_prefix?: string;
 }
 
@@ -20,7 +27,7 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState 
         if (Array.isArray(payload)) {
             params = payload.map(({
                 // eslint-disable-next-line camelcase
-                url, param, fields, sheet_name, file_name_prefix,
+                url, param, fields, sheet_name, file_name_prefix, header_message,
             }) => ({
                 source: {
                     url,
@@ -34,6 +41,8 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState 
                         sheet_name,
                         // eslint-disable-next-line camelcase
                         file_name_prefix,
+                        // eslint-disable-next-line camelcase
+                        header_message,
                     },
                     data_source: fields, // will be deprecated
                     fields,
@@ -53,6 +62,7 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState 
                         sheet_name: payload.sheet_name,
                         // eslint-disable-next-line camelcase
                         file_name_prefix: payload.file_name_prefix,
+                        header_message: payload.header_message,
                     },
                     data_source: payload.fields, // will be deprecated
                     fields: payload.fields,
