@@ -5,13 +5,12 @@
                      :delimiter="options.delimiter"
         >
             <template #default="{value}">
-                <component :is="component"
-                           :options="options"
-                           :data="value"
-                           :type-options="typeOptions"
-                           :extra-data="extraData"
-                           :handler="handler"
-                           v-on="$listeners"
+                <p-dynamic-field :options="options"
+                                 :data="value"
+                                 :type-options="typeOptions"
+                                 :extra-data="extraData"
+                                 :handler="handler"
+                                 v-on="$listeners"
                 />
             </template>
             <template v-if="!options.delimiter" #delimiter>
@@ -45,9 +44,11 @@ interface State {
 }
 const RECURSIVE_TYPE = ['list', 'enum'];
 
+const PDynamicField = import('@/data-display/dynamic/dynamic-field/PDynamicField.vue');
+
 export default {
     name: 'PDynamicField',
-    components: { PTextList },
+    components: { PTextList, PDynamicField },
     props: {
         type: {
             type: String,
