@@ -932,6 +932,9 @@
 		"CPU_SOCKET": "CPU Socket",
 		"CREATED_AT": "Created",
 		"DELETED_AT": "Deleted",
+		"FIELD_DESC": {
+			"TAGS": "(Tags)"
+		},
 		"HARDWARE": "Hardware",
 		"HYPER_THREADING": "Hyper-threading",
 		"ID": "ID",

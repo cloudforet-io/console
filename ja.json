@@ -932,6 +932,9 @@
 		"CPU_SOCKET": "CPUソケット",
 		"CREATED_AT": "作成日",
 		"DELETED_AT": "削除日",
+		"FIELD_DESC": {
+			"TAGS": "(タグ)"
+		},
 		"HARDWARE": "ハードウェア",
 		"HYPER_THREADING": "ハイパースレッディング",
 		"ID": "ユーザ名",
