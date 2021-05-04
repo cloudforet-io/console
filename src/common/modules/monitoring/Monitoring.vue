@@ -30,7 +30,17 @@
         <section class="toolbox-section">
             <div class="inline-flex items-center">
                 <span class="title mr-4 flex-shrink-0">{{ $t('COMMON.MONITORING.TIME_RANGE') }}</span>
-                <p-select-button-group class="time-range" :buttons="Object.keys(TIME_RANGE)" :selected.sync="selectedTimeRange" />
+                <div class="time-range-wrapper">
+                    <span v-for="timeRange in Object.keys(TIME_RANGE)"
+                          :key="timeRange"
+                          :title="timeRange"
+                          class="button"
+                          :class="{selected: timeRange === selectedTimeRange}"
+                          @click="selectedTimeRange = timeRange"
+                    >
+                        {{ timeRange }}
+                    </span>
+                </div>
             </div>
             <div class="inline-flex items-center">
                 <span class="title mr-4 flex-shrink-0">{{ $t('COMMON.MONITORING.STATISTICS') }}</span>
@@ -458,13 +468,20 @@ section {
     padding-top: 1rem;
     padding-bottom: 1rem;
 
-    .time-range::v-deep {
-        &.p-select-btn-group .select-btn {
-            margin-right: 0;
-            padding: 0 0.75rem;
-            font-weight: normal;
+    .time-range-wrapper {
+        .button {
+            @apply text-gray-900;
+            display: inline-block;
             font-size: 0.875rem;
-            &.active {
+            line-height: 1.5;
+            cursor: pointer;
+            margin-right: 1.5rem;
+
+            &:last-child {
+                margin-right: 0;
+            }
+
+            &.selected {
                 @apply text-secondary;
                 font-weight: bold;
             }

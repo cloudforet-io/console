@@ -16,7 +16,7 @@
                         {{ $t('COMMON.COMPONENTS.METRIC_CHART.UNAVAILABLE') }}
                     </p>
                 </div>
-                <div v-if="data.length === 0" class="no-data-text">
+                <div v-if="!loading && data.length === 0" class="no-data-text">
                     {{ $t('COMMON.COMPONENTS.METRIC_CHART.NO_DATA') }}
                 </div>
             </transition>
