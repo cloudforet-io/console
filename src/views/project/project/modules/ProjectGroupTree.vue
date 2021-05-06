@@ -41,6 +41,7 @@
             <p-tree :edit-options="editOptions"
                     :drag-options="dragOptions"
                     :toggle-options="toggleOptions"
+                    :select-options="selectOptions"
                     :data-setter="dataSetter"
                     :data-getter="dataGetter"
                     :data-fetcher="dataFetcher"
@@ -69,18 +70,22 @@
                                      read-only
                     />
                 </template>
-                <template #icon>
-                    <p-i name="ic_tree_project-group" class="project-group-icon"
+                <template #icon="{node}">
+                    <p-i v-if="node.data.item_type === 'PROJECT'"
+                         name="ic_tree_project"
+                         width="1rem" height="1rem"
+                    />
+                    <p-i v-else name="ic_tree_project-group" class="project-group-icon"
                          width="1rem" height="1rem" color="inherit transparent"
                     />
                 </template>
                 <template #right-extra="{node, path}">
-                    <p-icon-button v-if="treeEditMode && (permissionInfo[node.data.id] || node.data.has_permission)"
+                    <p-icon-button v-if="treeEditMode && node.data.item_type !== 'PROJECT' && (permissionInfo[node.data.id] || node.data.has_permission)"
                                    name="ic_delete" class="group-delete-btn"
                                    size="sm"
                                    @click.stop="openProjectGroupDeleteCheckModal({node, path})"
                     />
-                    <p-icon-button v-if="!treeEditMode" name="ic_plus" class="group-add-btn"
+                    <p-icon-button v-if="!treeEditMode && node.data.item_type !== 'PROJECT'" name="ic_plus" class="group-add-btn"
                                    size="sm"
                                    @click.stop="openProjectGroupCreateForm({node, path})"
                     />
@@ -91,6 +96,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
@@ -135,7 +141,7 @@ export default {
             treeEditMode: computed(() => store.state.projectPage.treeEditMode),
             editOptions: computed(() => ({
                 disabled: !state.treeEditMode,
-                editStartValidator: item => !!(state.permissionInfo[item.data.id] || item.data.has_permission),
+                editStartValidator: item => !!(state.permissionInfo[item.data.id] || item.data.has_permission) || (item.data.item_type !== 'PROJECT'),
                 validator: text => (text && text.length > 2 && text.length < 40),
                 dataSetter(text, originData) {
                     return {
@@ -156,7 +162,11 @@ export default {
                 dropValidator(node, parent) {
                     if (state.dragParent?.data.id === parent?.data.id) return true;
 
-                    if (!parent) return store.getters['user/isAdmin'];
+                    if (!parent) {
+                        if (node.data.item_type === 'PROJECT') return false;
+                        return store.getters['user/isAdmin'];
+                    }
+                    if (parent.data.item_type === 'PROJECT') return false;
                     return !!(state.permissionInfo[parent.data.id] || parent.data.has_permission);
                 },
             })),
@@ -167,6 +177,12 @@ export default {
 
         const toggleOptions = {
             validator: node => node.data.has_child || node.children.length > 0,
+        };
+
+        const selectOptions = {
+            validator({ data }) {
+                return data.item_type === 'PROJECT_GROUP';
+            },
         };
 
         const dataSetter = (text, node) => {
@@ -237,7 +253,7 @@ export default {
         const dataFetcher = async (node): Promise<ProjectItemResp[]> => {
             try {
                 const params: any = {
-                    exclude_type: 'PROJECT',
+                    exclude_type: state.treeEditMode ? '' : 'PROJECT',
                     sort: { key: 'name', desc: false },
                     item_type: 'ROOT',
                     check_child: true,
@@ -289,21 +305,36 @@ export default {
         };
 
         const onUpdateDrag = async (node, parent) => {
-            try {
+            if (node.data.item_type === 'PROJECT_GROUP') {
                 const params: any = {
                     project_group_id: node.data.id,
                 };
                 if (parent) {
                     params.parent_project_group_id = parent.data.id;
                 } else {
-                    // eslint-disable-next-line camelcase
                     params.release_parent_project_group = true;
                 }
-
-                await SpaceConnector.client.identity.projectGroup.update(params);
-                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', vm.$root);
-            } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e, vm.$root);
+                try {
+                    await SpaceConnector.client.identity.projectGroup.update(params);
+                    showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', vm.$root);
+                } catch (e) {
+                    showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e, vm.$root);
+                }
+            } else {
+                const params: any = {
+                    project_id: node.data.id,
+                };
+                if (parent) {
+                    params.project_group_id = parent.data.id;
+                } else {
+                    params.release_parent_project_group = true;
+                }
+                try {
+                    await SpaceConnector.client.identity.project.update(params);
+                    showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT'), '', vm.$root);
+                } catch (e) {
+                    showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT'), e, vm.$root);
+                }
             }
         };
 
@@ -358,6 +389,7 @@ export default {
         return {
             ...toRefs(state),
             toggleOptions,
+            selectOptions,
             dataSetter,
             dataGetter,
             getClassNames,
