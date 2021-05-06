@@ -8,6 +8,7 @@
           :ondragstart="onDragStart"
           :ondragend="onDragEnd"
           :unfold-when-dragover="true"
+          @node-folded-changed="onNodeFoldedChange"
     >
         <template #default="{node, path, tree, index}">
             <div class="node" :class="{
@@ -270,7 +271,6 @@ export default defineComponent({
         };
         const onToggle = async (node, path, tree) => {
             if (node.$folded) {
-                await fetchData(node);
                 tree.unfold(node, path);
             } else {
                 if (props.dataFetcher) {
@@ -280,6 +280,11 @@ export default defineComponent({
                     }
                 }
                 tree.fold(node, path);
+            }
+        };
+        const onNodeFoldedChange = async (node) => {
+            if (!node.$folded) {
+                await fetchData(node);
             }
         };
         const addNode = (data) => {
@@ -427,6 +432,7 @@ export default defineComponent({
             onDragEnd,
             finishEdit,
             onToggle,
+            onNodeFoldedChange,
         };
     },
 });
