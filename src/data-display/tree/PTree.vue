@@ -388,7 +388,7 @@ export default defineComponent({
         const deleteNodeByPath = (path) => {
             if (path.length === 0) return;
 
-            resetSelect();
+            if (state.selectedPath.toString() === path.toString()) resetSelect();
             state.treeRef.removeNodeByPath(path);
         };
 
