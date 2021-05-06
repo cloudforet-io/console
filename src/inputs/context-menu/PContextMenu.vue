@@ -1,6 +1,7 @@
 <template>
-    <div ref="contextMenu" class="p-context-menu" :class="theme"
-         :style="autoHeightStyle"
+    <div ref="contextMenu" class="p-context-menu"
+         :class="theme"
+         :style="{...autoHeightStyle,...contextMenuStyle}"
          @keyup.esc="onEsc"
     >
         <slot v-if="menu.length === 0" name="no-data" v-bind="{...$props, uuid}">
@@ -76,37 +77,14 @@
 
 <script lang="ts">
 import {
-    computed, ref, onMounted, Ref, watch, defineComponent,
+    computed, ref, onMounted, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PI from '@/foundation/icons/PI.vue';
 
 import { ContextMenuProps, CONTEXT_MENU_THEME } from '@/inputs/context-menu/type';
-import {i18n} from "@/translations";
-
-const setAutoHeight = (props) => {
-    const contextMenu = ref(null) as Ref<HTMLElement|null>;
-    const contextMenuHeight = ref(0);
-    const autoHeightStyle = computed(() => {
-        if (props.autoHeight && contextMenuHeight.value) {
-            return {
-                height: `${contextMenuHeight.value}px`,
-                overflowY: 'auto',
-            };
-        } return null;
-    });
-    onMounted(() => {
-        if (!props.autoHeight) return;
-        const winHeight = window.innerHeight;
-        const rects: any = contextMenu.value?.getBoundingClientRect();
-        if (rects.bottom > winHeight) contextMenuHeight.value = winHeight - rects.top;
-    });
-
-    return {
-        contextMenu, contextMenuHeight, autoHeightStyle,
-    };
-};
+import { i18n } from '@/translations';
 
 export default defineComponent({
     name: 'PContextMenu',
@@ -132,8 +110,58 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
+        useCustomStyle: {
+            type: Boolean,
+            default: false,
+        },
+        position: {
+            type: String,
+            default: null,
+        },
+        offsetTop: {
+            type: Number,
+            default: null,
+        },
+        width: {
+            type: Number,
+            default: null,
+        },
+        height: {
+            type: Number,
+            default: null,
+        },
     },
     setup(props: ContextMenuProps, { emit }) {
+        const state = reactive({
+            contextMenu: null as HTMLElement|null,
+            contextMenuStyle: computed(() => {
+                if (!state.contextMenu || !props.useCustomStyle) return {};
+                const contextMenuStyle: any = {
+                    position: 'fixed',
+                    minWidth: 'auto',
+                    width: `${props.width}px`,
+                };
+                if (props.position === 'top') contextMenuStyle.top = `calc(${props.offsetTop}px + ${props.height}px)`;
+                if (props.position === 'bottom') contextMenuStyle.bottom = `calc(100vh - ${props.offsetTop}px)`;
+                return contextMenuStyle;
+            }),
+            contextMenuHeight: 0,
+            autoHeightStyle: computed(() => {
+                if (props.autoHeight && state.contextMenuHeight) {
+                    return {
+                        maxHeight: `${state.contextMenuHeight}px`,
+                        overflowY: 'auto',
+                    };
+                } return {};
+            }),
+        });
+        onMounted(() => {
+            if (!props.autoHeight || !props.useCustomStyle) return;
+            const winHeight = window.innerHeight;
+            if (props.position === 'top') state.contextMenuHeight = winHeight - props.offsetTop - props.height - 12;
+            if (props.position === 'bottom') state.contextMenuHeight = props.offsetTop - 12;
+        });
+
         let focusedEl: HTMLElement|null = null;
         const uuid = `${Math.random()}`.slice(2);
         const menuClick = (itemName, index, event) => {
@@ -188,14 +216,13 @@ export default defineComponent({
             blur();
         };
 
-
         return {
+            ...toRefs(state),
             menuClick,
             onDownKey,
             onUpKey,
             focus,
             uuid,
-            ...setAutoHeight(props),
             onEsc,
         };
     },

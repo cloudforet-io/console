@@ -1,5 +1,5 @@
 <template>
-    <div class="p-dropdown-btn" :class="{block, 'button-only': buttonOnly}">
+    <div ref="dropdownBtn" class="p-dropdown-btn" :class="{block, 'button-only': buttonOnly}">
         <p-button v-if="!buttonOnly"
                   :disabled="disabled"
                   :tabindex="-1"
@@ -29,7 +29,9 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api';
+import {
+    defineComponent, reactive, toRefs,
+} from '@vue/composition-api';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import { DropdownBtnProps } from '@/inputs/dropdown/dropdown-btn/type';
@@ -68,23 +70,67 @@ export default defineComponent({
                 return Object.keys(ICON_BUTTON_STYLE_TYPE).includes(value as any);
             },
         },
+        useCustomStyle: {
+            type: Boolean,
+            default: false,
+        },
+        offsetTop: {
+            type: Number,
+            default: null,
+        },
+        width: {
+            type: Number,
+            default: null,
+        },
+        height: {
+            type: Number,
+            default: null,
+        },
+        showPopup: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: DropdownBtnProps, { emit }) {
         const state = reactive({
             mouseover: false,
+            dropdownBtn: null as HTMLElement|null,
         });
+
+        const setCustomStyle = () => {
+            if (state.dropdownBtn) {
+                const winHeight = window.innerHeight;
+                const rects: any = state.dropdownBtn?.getBoundingClientRect();
+                let position = 'bottom';
+                if (winHeight * 0.9 > rects.top) position = 'top';
+                emit('update:position', position);
+
+                emit('update:offsetTop', rects.top);
+                emit('update:width', rects.width);
+                emit('update:height', rects.height);
+            }
+        };
+
+        const onClick = () => {
+            emit('update:popup', !props.popup);
+            emit('update:showPopup', false);
+            if (props.useCustomStyle) setCustomStyle();
+        };
+
+        const onMouseOver = () => {
+            if (!props.disabled) state.mouseover = true;
+        };
+
+        const onMouseOut = () => {
+            if (!props.disabled) state.mouseover = false;
+        };
+
         return {
             ...toRefs(state),
-            onClick(event): void {
-                emit('click', event);
-                emit('update:popup', !props.popup);
-            },
-            onMouseOver(): void {
-                if (!props.disabled) state.mouseover = true;
-            },
-            onMouseOut(): void {
-                if (!props.disabled) state.mouseover = false;
-            },
+            onClick,
+            onMouseOver,
+            onMouseOut,
+            setCustomStyle,
         };
     },
 });

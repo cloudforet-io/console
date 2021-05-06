@@ -9,4 +9,9 @@ export interface DropdownBtnProps {
     buttonOnly: boolean;
     buttonIcon?: string;
     buttonStyleType?: keyof BUTTON_STYLE_TYPE;
+    useCustomStyle: boolean;
+    width: string;
+    height: string;
+    offsetTop: number;
+    showPopup: boolean;
 }

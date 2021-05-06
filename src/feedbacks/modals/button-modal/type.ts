@@ -41,4 +41,6 @@ export interface ButtonModalProps {
 
     loading: boolean;
     disabled: boolean;
+
+    showPopup: boolean;
 }
