@@ -276,7 +276,7 @@ export default defineComponent({
                 if (props.dataFetcher) {
                     node.children = [];
                     if (state.selectedNode && path.every((d, i) => state.selectedPath[i] === d)) {
-                        resetSelect();
+                        if (state.selectedPath.toString() !== path.toString()) resetSelect();
                     }
                 }
                 tree.fold(node, path);
@@ -288,7 +288,8 @@ export default defineComponent({
             }
         };
         const addNode = (data) => {
-            state.treeData.push(getDefaultNode(data));
+            if (Array.isArray(data)) state.treeData = state.treeData.concat(data.map(d => getDefaultNode(d)));
+            else state.treeData.push(getDefaultNode(data));
         };
         const findNodePath = (predicate: any, paths: number[] = [], _children?: any[]) => {
             let children: any[] = _children as unknown as any[];
@@ -365,6 +366,25 @@ export default defineComponent({
             return nodes;
         };
 
+        const getAllItems = (node, _path: number[] = []) => {
+            const children: any[] = node?.children || state.treeData;
+            let items: any[] = [];
+
+            children.forEach((d, i) => {
+                const path = [..._path];
+                path.push(i);
+
+                const data: any = {};
+                data.path = path;
+                data.node = d;
+                items.push(data);
+                if (d.children && d.children.length) {
+                    items = items.concat(getAllItems(d, path));
+                }
+            });
+            return items;
+        };
+
         const deleteNodeByPath = (path) => {
             if (path.length === 0) return;
 
@@ -372,13 +392,22 @@ export default defineComponent({
             state.treeRef.removeNodeByPath(path);
         };
 
-        const addChildNodeByPath = (path, data) => {
+        const deleteNode = (predicate) => {
+            const path = findNodePath(predicate);
+            deleteNodeByPath(path);
+        };
+
+        const addChildNodeByPath = (path, data, unfold = true) => {
             if (path.length === 0) addNode(data);
             else {
                 const parent = state.treeRef.getNodeByPath(path);
                 if (parent) {
-                    parent.children.push(getDefaultNode(data));
-                    parent.$folded = false;
+                    if (Array.isArray(data)) {
+                        parent.children = parent.children.concat(data.map(d => getDefaultNode(d)));
+                    } else {
+                        parent.children.push(getDefaultNode(data));
+                    }
+                    if (unfold) parent.$folded = false;
                 } else {
                     addNode(data);
                 }
@@ -401,7 +430,9 @@ export default defineComponent({
             fetchAndFindNode,
             resetSelect,
             getAllNodes,
+            getAllItems,
             deleteNodeByPath,
+            deleteNode,
             addChildNodeByPath,
             updateNodeByPath,
             changeSelectState,
