@@ -343,7 +343,7 @@ export default {
                     margin: 0 0.25rem;
                 }
                 .server-id-text {
-                    @apply text-gray-600;
+                    @apply text-gray-500;
                 }
             }
         }
