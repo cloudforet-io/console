@@ -294,8 +294,6 @@ export default {
                     checkEmailFormat(formState.user_id);
                 }
                 if (typeof validationState.isUserIdValid !== 'boolean') validationState.isUserIdValid = true;
-
-                console.log('hello', validationState.isUserIdValid)
             } else {
                 validationState.isUserIdValid = false;
                 validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
