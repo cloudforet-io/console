@@ -76,7 +76,7 @@ export default defineComponent({
         },
         offsetTop: {
             type: Number,
-            default: 'initial',
+            default: null,
         },
         width: {
             type: Number,
@@ -95,16 +95,16 @@ export default defineComponent({
         const state = reactive({
             mouseover: false,
             dropdownBtn: null as HTMLElement|null,
-            position: 'top',
         });
 
-        const useStyle = () => {
+        const setCustomStyle = () => {
             if (state.dropdownBtn) {
                 const winHeight = window.innerHeight;
                 const rects: any = state.dropdownBtn?.getBoundingClientRect();
-                if (winHeight / 2 > rects.top) state.position = 'top';
-                else state.position = 'bottom';
-                emit('update:position', state.position);
+                let position = 'bottom';
+                if (winHeight / 2 > rects.top) position = 'top';
+                emit('update:position', position);
+
                 emit('update:offsetTop', rects.top);
                 emit('update:width', rects.width);
                 emit('update:height', rects.height);
@@ -114,7 +114,7 @@ export default defineComponent({
         const onClick = () => {
             emit('update:popup', !props.popup);
             emit('update:showPopup', false);
-            if (props.useCustomStyle) useStyle();
+            if (props.useCustomStyle) setCustomStyle();
         };
 
         const onMouseOver = () => {
@@ -130,7 +130,7 @@ export default defineComponent({
             onClick,
             onMouseOver,
             onMouseOut,
-            useStyle,
+            setCustomStyle,
         };
     },
 });

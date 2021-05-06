@@ -7,7 +7,7 @@
         :disabled="disabled"
         :loading="loading"
         :use-custom-style="useCustomStyle"
-        :show-popup.sync="_proxyshowPopup"
+        :show-popup.sync="proxyShowPopup"
         @select="changSelectItem"
         @openMenu="$emit('openMenu')"
     >
@@ -79,7 +79,7 @@ export default {
     },
     setup(props: SelectDropdownProps, { emit }) {
         const state = reactive({
-            _proxyshowPopup: makeProxy('showPopup', props, emit),
+            proxyShowPopup: makeProxy('showPopup', props, emit),
         });
         const selectItemLabel = computed(() => {
             if (props.indexMode) {
@@ -103,7 +103,7 @@ export default {
         };
         const invalidClass = computed(() => ({ 'is-invalid-btn': props.invalid }));
         watch(() => props.showPopup, (after, before) => {
-            if (!after) state._proxyshowPopup = false;
+            if (!after) state.proxyShowPopup = false;
         });
         return {
             ...toRefs(state),

@@ -13,7 +13,7 @@
                         :offset-top.sync="offsetTop"
                         :width.sync="width"
                         :height.sync="height"
-                        :show-popup.sync="proxyshowPopup"
+                        :show-popup.sync="proxyShowPopup"
                         @click="$emit('openMenu')"
         >
             <template v-for="(_, slot) of buttonSlots" v-slot:[slot]="scope">
@@ -124,7 +124,7 @@ export default defineComponent({
                 }
                 return res;
             }, {})),
-            proxyshowPopup: makeProxy('showPopup', props, emit),
+            proxyShowPopup: makeProxy('showPopup', props, emit),
         });
 
         const outsideClick = (): void => {
@@ -140,7 +140,7 @@ export default defineComponent({
 
         watch(() => props.showPopup, (after, before) => {
             if (after) state.popup = false;
-            else state.proxyshowPopup = false;
+            else state.proxyShowPopup = false;
         });
 
         return {
