@@ -8,6 +8,8 @@ export interface SelectDropdownStateType {
     loading: boolean;
     indexMode: boolean;
     placeholder: string;
+    useCustomStyle: boolean;
+    showPopup: boolean;
 }
 
 export interface SelectDropdownSyncStateType {

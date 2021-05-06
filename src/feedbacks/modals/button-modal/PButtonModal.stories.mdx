@@ -1,7 +1,9 @@
 import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
 import PButtonModal from "@/feedbacks/modals/button-modal/PButtonModal";
+import PDropdownMenuBtn from "@/inputs/dropdown/dropdown-menu-btn/PDropdownMenuBtn";
+import PSelectDropdown from "@/inputs/dropdown/select-dropdown/PSelectDropdown";
 import { THEME_COLORS, ModalSizeType } from '@/feedbacks/modals/button-modal/type';
-import {computed, reactive, toRefs} from "@vue/composition-api";
+import {computed, reactive, toRefs, onMounted, onUnmounted, ref} from "@vue/composition-api";
 import PButton from "@/inputs/buttons/button/PButton";
 import faker from 'faker';
 
@@ -348,23 +350,111 @@ import faker from 'faker';
 
 export const Template = (args, {argTypes} ) => ({
     props: Object.keys(argTypes),
-    components: { PButtonModal, PButton },
+    components: { PButtonModal, PButton, PDropdownMenuBtn, PSelectDropdown },
     template: `<div>
                 <p-button :styleType="themeColor" @click="launchModal">Launch a modal</p-button>
-                <p-button-modal v-bind="$props"
+                <p-button-modal
                                 :visible.sync="_visible"
-                               @close="closeModal"
+                                :show-popup.sync="isScrolling"
+                                @close="closeModal"
                 >
                     <template #body>
+                        <p-dropdown-menu-btn
+                            :menu="menu"
+                            :use-custom-style="useCustomStyle"
+                            :auto-height="autoHeight"
+                            :show-popup.sync="isScrolling"
+                        >
+                            dropdown menu btn
+                        </p-dropdown-menu-btn>
+                        <p>{{contents}}</p>
+                        <p-select-dropdown
+                            :items="items"
+                            v-model="selectItem"
+                            :use-custom-style="useCustomStyle"
+                            :auto-height="autoHeight"
+                            :show-popup.sync="isScrolling"
+                        >
+                           select dropdown (default)
+                        </p-select-dropdown>
+                        <p>{{contents}}</p>
+                        <p-dropdown-menu-btn
+                            :menu="menu"
+                            :use-custom-style="useCustomStyle"
+                            :auto-height="autoHeight"
+                            :show-popup.sync="isScrolling"
+                        >
+                            dropdown menu btn
+                        </p-dropdown-menu-btn>
                         <p>{{contents}}</p>
                     </template>
                 </p-button-modal>
             </div>`,
     setup(props) {
+        const selectItem = ref('init');
         const state = reactive({
             _visible: props.visible,
             contents: computed(() => faker.lorem.lines(props.contentsHeight)),
-        })
+            menu: [
+                {
+                    type: 'item', label: 'Add', name: 'add', disabled: false,
+                },
+                {
+                    type: 'item', label: 'Hello', name: 'hello', disabled: false,
+                },
+                { type: 'divider' },
+                { type: 'header', label: 'this is header' },
+                {
+                    type: 'item', label: 'Update', name: 'update', disabled: false,
+                },
+                {
+                    type: 'item', label: 'Delete', name: 'delete', disabled: false,
+                },
+                { type: 'divider' },
+                {
+                    type: 'item', label: 'Collect', name: 'collect', disabled: false,
+                },
+                { type: 'divider' },
+                {
+                    type: 'item', label: 'Remove', name: 'remove', disabled: true,
+                },
+            ],
+            autoHeight: true,
+            useCustomStyle: true,
+            isScrolling: false,
+            items: [
+                { type: 'item', label: 'one', name: 'one' },
+                { type: 'item', label: 'two', name: 'two' },
+                { type: 'item', label: 'three', name: 'three' },
+                { type: 'item', label: 'four', name: 'four' },
+                { type: 'item', label: 'five', name: 'five' },
+                { type: 'item', label: 'six', name: 'six' },
+                { type: 'item', label: 'one', name: 'one' },
+                { type: 'item', label: 'two', name: 'two' },
+                { type: 'item', label: 'three', name: 'three' },
+                { type: 'item', label: 'four', name: 'four' },
+                { type: 'item', label: 'five', name: 'five' },
+                { type: 'item', label: 'six', name: 'six' },
+                { type: 'item', label: 'one', name: 'one' },
+                { type: 'item', label: 'two', name: 'two' },
+                { type: 'item', label: 'three', name: 'three' },
+                { type: 'item', label: 'four', name: 'four' },
+                { type: 'item', label: 'five', name: 'five' },
+                { type: 'item', label: 'six', name: 'six' },
+                { type: 'item', label: 'one', name: 'one' },
+                { type: 'item', label: 'two', name: 'two' },
+                { type: 'item', label: 'three', name: 'three' },
+                { type: 'item', label: 'four', name: 'four' },
+                { type: 'item', label: 'five', name: 'five' },
+                { type: 'item', label: 'six', name: 'six' },
+                { type: 'item', label: 'one', name: 'one' },
+                { type: 'item', label: 'two', name: 'two' },
+                { type: 'item', label: 'three', name: 'three' },
+                { type: 'item', label: 'four', name: 'four' },
+                { type: 'item', label: 'five', name: 'five' },
+                { type: 'item', label: 'six', name: 'six' },
+            ]
+        });
         const launchModal = () => {
             state._visible = true;
         };
@@ -372,6 +462,7 @@ export const Template = (args, {argTypes} ) => ({
             state._visible = false;
         };
         return {
+            selectItem,
             ...toRefs(state),
             launchModal,
             closeModal,

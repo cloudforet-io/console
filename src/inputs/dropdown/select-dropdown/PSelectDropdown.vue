@@ -6,6 +6,8 @@
         :auto-height="autoHeight"
         :disabled="disabled"
         :loading="loading"
+        :use-custom-style="useCustomStyle"
+        :show-popup.sync="_proxyshowPopup"
         @select="changSelectItem"
         @openMenu="$emit('openMenu')"
     >
@@ -20,9 +22,12 @@
 
 <script lang="ts">
 import { groupBy } from 'lodash';
-import { computed } from '@vue/composition-api';
+import {
+    computed, toRefs, watch, reactive,
+} from '@vue/composition-api';
 import PDropdownMenuBtn from '@/inputs/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import { SelectDropdownProps } from '@/inputs/dropdown/select-dropdown/type';
+import { makeProxy } from '@/util/composition-helpers';
 
 export default {
     name: 'PSelectDropdown',
@@ -63,8 +68,19 @@ export default {
             type: String,
             default: '',
         },
+        useCustomStyle: {
+            type: Boolean,
+            default: false,
+        },
+        showPopup: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: SelectDropdownProps, { emit }) {
+        const state = reactive({
+            _proxyshowPopup: makeProxy('showPopup', props, emit),
+        });
         const selectItemLabel = computed(() => {
             if (props.indexMode) {
                 if (props.items[props.selectItem]) return props.items[props.selectItem].label || props.items[props.selectItem].name || '';
@@ -86,7 +102,11 @@ export default {
             }
         };
         const invalidClass = computed(() => ({ 'is-invalid-btn': props.invalid }));
+        watch(() => props.showPopup, (after, before) => {
+            if (!after) state._proxyshowPopup = false;
+        });
         return {
+            ...toRefs(state),
             selectItemLabel,
             changSelectItem,
             invalidClass,

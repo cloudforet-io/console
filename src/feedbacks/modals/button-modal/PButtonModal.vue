@@ -23,7 +23,9 @@
                                            @click.stop="onCloseClick"
                             />
                         </h3>
-                        <div v-if="bodyVisible" class="modal-body" :class="allBodyClass">
+                        <div v-if="bodyVisible" class="modal-body" :class="allBodyClass"
+                             @scroll="onScroll"
+                        >
                             <slot name="body" />
                         </div>
                         <div v-if="footerVisible" class="modal-footer">
@@ -71,13 +73,19 @@
 <script lang="ts">
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { sizeMapping } from '@/feedbacks/modals/type';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, onMounted, onUnmounted, reactive, toRefs,
+} from '@vue/composition-api';
 import { makeProxy } from '@/util/composition-helpers';
 import { ButtonModalProps } from '@/feedbacks/modals/button-modal/type';
 import '../modal.pcss';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 
+const documentEventMount = (eventName: string, func: any) => {
+    onMounted(() => document.addEventListener(eventName, func));
+    onUnmounted(() => document.removeEventListener(eventName, func));
+};
 
 export default {
     name: 'PButtonModal',
@@ -144,6 +152,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        showPopup: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: ButtonModalProps, { emit }) {
         const state = reactive({
@@ -186,6 +198,11 @@ export default {
         const onConfirmClick = () => {
             emit('confirm');
         };
+        const onScroll = (event) => {
+            emit('update:showPopup', true);
+        };
+        documentEventMount('scroll', onScroll);
+
         return {
             ...toRefs(state),
             dialogClassObject,
@@ -196,6 +213,7 @@ export default {
             onCloseClick,
             onCancelClick,
             onConfirmClick,
+            onScroll,
         };
     },
 };

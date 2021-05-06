@@ -8,6 +8,12 @@
                         :button-only="buttonOnly"
                         :button-icon="buttonIcon"
                         :button-style-type="buttonStyleType"
+                        :position.sync="position"
+                        :use-custom-style="useCustomStyle"
+                        :offset-top.sync="offsetTop"
+                        :width.sync="width"
+                        :height.sync="height"
+                        :show-popup.sync="proxyshowPopup"
                         @click="$emit('openMenu')"
         >
             <template v-for="(_, slot) of buttonSlots" v-slot:[slot]="scope">
@@ -23,6 +29,11 @@
                         :menu="menu"
                         :loading="loading"
                         :auto-height="autoHeight"
+                        :use-custom-style="useCustomStyle"
+                        :position="position"
+                        :offset-top="offsetTop"
+                        :width="width"
+                        :height="height"
                         @select="clickMenuEvent"
         >
             <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
@@ -34,11 +45,15 @@
 
 <script lang="ts">
 import vClickOutside from 'v-click-outside';
-import { computed, defineComponent, ref } from '@vue/composition-api';
+import {
+    computed, defineComponent, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import PDropdownBtn from '@/inputs/dropdown/dropdown-btn/PDropdownBtn.vue';
 import { reduce } from 'lodash';
 import { ICON_BUTTON_STYLE_TYPE } from '@/inputs/buttons/icon-button/type';
+import addonOptions from '@storybook/addon-console';
+import { makeProxy } from '@/util/composition-helpers';
 
 export default defineComponent({
     name: 'PDropdownMenuBtn',
@@ -83,33 +98,55 @@ export default defineComponent({
                 return Object.keys(ICON_BUTTON_STYLE_TYPE).includes(value as any);
             },
         },
+        useCustomStyle: {
+            type: Boolean,
+            default: false,
+        },
+        showPopup: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit, slots }) {
-        const popup = ref(false);
-        const outsideClick = (): void => { popup.value = false; };
+        const state = reactive({
+            popup: false,
+            width: 0,
+            height: 0,
+            offsetTop: 0,
+            position: null as any,
+            menuSlots: computed(() => reduce(slots, (res, d, name) => {
+                if (name.startsWith('menu-')) res[`${name.substring(5)}`] = d;
+                return res;
+            }, {})),
+            buttonSlots: computed(() => reduce(slots, (res, d, name) => {
+                if (name.startsWith('button-') || name === 'button-default') {
+                    res[`${name.substring(7)}`] = d;
+                }
+                return res;
+            }, {})),
+            proxyshowPopup: makeProxy('showPopup', props, emit),
+        });
+
+        const outsideClick = (): void => {
+            state.popup = false;
+        };
+
         const clickMenuEvent = (menuName: string, idx: number) => {
             emit('select', menuName, idx);
             emit(`${menuName}:select`, menuName, idx);
             emit(`click-${menuName}`, idx);
-            popup.value = false;
+            state.popup = false;
         };
 
-        const buttonSlots = computed(() => reduce(slots, (res, d, name) => {
-            if (name.startsWith('button-') || name === 'button-default') { res[`${name.substring(7)}`] = d; }
-            return res;
-        }, {}));
-
-        const menuSlots = computed(() => reduce(slots, (res, d, name) => {
-            if (name.startsWith('menu-')) res[`${name.substring(5)}`] = d;
-            return res;
-        }, {}));
+        watch(() => props.showPopup, (after, before) => {
+            if (after) state.popup = false;
+            else state.proxyshowPopup = false;
+        });
 
         return {
-            popup,
+            ...toRefs(state),
             outsideClick,
             clickMenuEvent,
-            buttonSlots,
-            menuSlots,
         };
     },
 });
@@ -118,6 +155,7 @@ export default defineComponent({
 <style lang="postcss">
 .p-dropdown-menu-btn {
     position: relative;
+
     .menu-ctx.block {
         width: 100%;
     }
