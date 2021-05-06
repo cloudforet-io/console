@@ -18,7 +18,7 @@
   "dependencies": {
     "@amcharts/amcharts4": "^4.10.10",
     "@amcharts/amcharts4-geodata": "^4.1.18",
-    "@spaceone/design-system": "^0.1.1-dev.124",
+    "@spaceone/design-system": "^0.1.1-dev.125",
     "@vue/composition-api": "^0.6.7",
     "@vvo/tzdb": "^6.4.1",
     "animated-number-vue": "^1.0.0",

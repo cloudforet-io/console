@@ -203,10 +203,12 @@ export default {
         };
 
         const startTreeEdit = () => {
+            state.rootNode.fetchData();
             store.commit('projectPage/setTreeEditMode', true);
         };
 
         const finishTreeEdit = () => {
+            state.rootNode.fetchData();
             store.commit('projectPage/setTreeEditMode', false);
         };
 
@@ -359,7 +361,6 @@ export default {
 
 
         /* Init */
-
         const onTreeInit = async (root) => {
             await store.dispatch('projectPage/initRoot', root);
         };
