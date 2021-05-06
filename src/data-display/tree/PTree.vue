@@ -7,7 +7,7 @@
           :each-droppable="eachDroppable"
           :ondragstart="onDragStart"
           :ondragend="onDragEnd"
-          :unfold-when-dragover="false"
+          :unfold-when-dragover="true"
     >
         <template #default="{node, path, tree, index}">
             <div class="node" :class="{
