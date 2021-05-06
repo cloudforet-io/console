@@ -9,6 +9,11 @@
                       :col-copy="colCopy"
                       v-on="$listeners"
         >
+            <template v-for="({text, description}, headerSlot) of dynamicFieldHeaderSlots" v-slot:[headerSlot]>
+                {{ text }}
+                <span :key="`${headerSlot}-description`" class="field-description">{{ $t(description) || description }}</span>
+            </template>
+
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
                 <slot :name="slotName" v-bind="data">
                     <p-dynamic-field :key="slotName"
@@ -102,6 +107,20 @@ export default {
             loading: computed(() => (props.typeOptions?.loading || false)),
             colCopy: computed(() => (props.typeOptions?.colCopy || false)),
             /** others */
+            dynamicFieldHeaderSlots: computed(() => {
+                const headerSlots: any = {};
+                if (!Array.isArray(props.options?.fields)) return headerSlots;
+                props.options.fields.forEach((d) => {
+                    // eslint-disable-next-line camelcase
+                    if (d.options?.field_description) {
+                        headerSlots[`th-${d.key}-format`] = {
+                            text: d.name,
+                            description: d.options.field_description,
+                        };
+                    }
+                });
+                return headerSlots;
+            }),
             dynamicFieldSlots: computed((): Record<string, DynamicFieldProps> => {
                 const res = {};
                 if (!props.options.fields) return res;

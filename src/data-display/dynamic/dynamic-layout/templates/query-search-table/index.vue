@@ -36,14 +36,27 @@
                          @click-settings="$emit('click-settings')"
         >
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="{field, index}">
-                <p-dynamic-field :key="slotName"
+                <p-dynamic-field v-if="slotName.startsWith('col')" :key="slotName"
                                  v-bind="item"
                                  :data="getValueByPath(rootData[index], field.name)"
                                  :handler="fieldHandler"
                 />
+                <span v-else :key="slotName">
+                    test
+                </span>
             </template>
+
+            <template v-for="({text, description}, headerSlot) of dynamicFieldHeaderSlots" v-slot:[headerSlot]>
+                {{ text }}
+                <span :key="`${headerSlot}-description`" class="field-description">{{ $t(description) || description }}</span>
+            </template>
+
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
-                <slot v-if="!dynamicFieldSlots[slot] && slot !== 'tag-data-type-datetime'" :name="slot" v-bind="scope" />
+                <slot v-if="!dynamicFieldHeaderSlots[slot] &&
+                          !dynamicFieldSlots[slot] &&
+                          slot !== 'tag-data-type-datetime'"
+                      :name="slot" v-bind="scope"
+                />
             </template>
         </p-toolbox-table>
     </div>
@@ -158,6 +171,20 @@ export default {
                 }
                 return [];
             }),
+            dynamicFieldHeaderSlots: computed(() => {
+                const headerSlots: any = {};
+                if (!Array.isArray(props.options?.fields)) return headerSlots;
+                props.options.fields.forEach((d) => {
+                    // eslint-disable-next-line camelcase
+                    if (d.options?.field_description) {
+                        headerSlots[`th-${d.key}-format`] = {
+                            text: d.name,
+                            description: d.options.field_description,
+                        };
+                    }
+                });
+                return headerSlots;
+            }),
             dynamicFieldSlots: computed((): Record<string, DynamicFieldProps> => {
                 const res = {};
                 if (!state.fields) return res;
@@ -215,6 +242,9 @@ export default {
     .p-query-search-table {
         height: 100%;
         border-width: 0;
+    }
+    .field-description {
+        @apply text-gray-400;
     }
 }
 </style>

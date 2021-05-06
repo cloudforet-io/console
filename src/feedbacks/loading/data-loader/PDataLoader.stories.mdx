@@ -65,6 +65,57 @@ import { LOADER_TYPES } from './config';
             options: Object.values(LOADER_TYPES)
         }
     },
+    disableEmptyCase: {
+        name: 'disableEmptyCase',
+        type: {name: 'boolean'},
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    minLoadingTime: {
+        name: 'minLoadingTime',
+        type: {name: 'number'},
+        defaultValue: 0,
+        table: {
+            type: {
+                summary: 'number'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 0
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    lazyLoadingTime: {
+        name: 'lazyLoadingTime',
+        type: {name: 'number'},
+        defaultValue: 0,
+        table: {
+            type: {
+                summary: 'number'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 0
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
     loader: {
         name: 'loader',
         description: 'Slot to replace loader.',

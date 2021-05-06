@@ -33,6 +33,11 @@
                          @export="onExport"
                          @click-settings="$emit('click-settings')"
         >
+            <template v-for="({text, description}, headerSlot) of dynamicFieldHeaderSlots" v-slot:[headerSlot]>
+                {{ text }}
+                <span :key="`${headerSlot}-description`" class="field-description">{{ $t(description) || description }}</span>
+            </template>
+
             <template v-for="(item, slotName) of dynamicFieldSlots" v-slot:[slotName]="data">
                 <slot :name="slotName" v-bind="data">
                     <p-dynamic-field :key="slotName"
@@ -42,6 +47,7 @@
                     />
                 </slot>
             </template>
+
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                 <slot v-if="!slot.startsWith('col-')" :name="slot" v-bind="scope" />
             </template>
@@ -148,11 +154,25 @@ export default {
                 }
                 return [];
             }),
+            dynamicFieldHeaderSlots: computed(() => {
+                const headerSlots: any = {};
+                if (!Array.isArray(props.options?.fields)) return headerSlots;
+                props.options.fields.forEach((d) => {
+                    // eslint-disable-next-line camelcase
+                    if (d.options?.field_description) {
+                        headerSlots[`th-${d.key}-format`] = {
+                            text: d.name,
+                            description: d.options.field_description,
+                        };
+                    }
+                });
+                return headerSlots;
+            }),
             dynamicFieldSlots: computed((): Record<string, DynamicFieldProps> => {
                 const res = {};
                 if (!state.fields) return res;
 
-                state.fields.forEach((field: DynamicField, i) => {
+                props.options.fields.forEach((field: DynamicField, i) => {
                     const item: Omit<DynamicFieldProps, 'data'> = {
                         type: field.type || 'text',
                         options: { ...field.options },
@@ -203,6 +223,10 @@ export default {
     .p-search-table {
         height: 100%;
         border-width: 0;
+    }
+    .field-description {
+        @apply text-gray-400;
+        margin-left: 0.25rem;
     }
 }
 </style>
