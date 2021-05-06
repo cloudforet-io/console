@@ -158,8 +158,8 @@ export default defineComponent({
         onMounted(() => {
             if (!props.autoHeight || !props.useCustomStyle) return;
             const winHeight = window.innerHeight;
-            if (props.position === 'top') state.contextMenuHeight = winHeight - props.offsetTop - props.height - 10;
-            if (props.position === 'bottom') state.contextMenuHeight = props.offsetTop - 10;
+            if (props.position === 'top') state.contextMenuHeight = winHeight - props.offsetTop - props.height - 12;
+            if (props.position === 'bottom') state.contextMenuHeight = props.offsetTop - 12;
         });
 
         let focusedEl: HTMLElement|null = null;
