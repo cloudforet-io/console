@@ -18,6 +18,7 @@
                 <p-select-dropdown v-model="formState.timezone" :items="timezones"
                                    class="timezone"
                                    @input="changeTimezone"
+                                   :use-custom-style="true"
                 />
             </p-field-group>
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_LABEL')"
@@ -73,6 +74,7 @@
                                     />
                                     <p-select-dropdown v-model="formState.intervalTimeType" class="w-1/2" :items="intervalTimeTypes"
                                                        auto-height
+                                                       :use-custom-style="true"
                                     />
                                 </div>
                             </p-field-group>

@@ -64,6 +64,7 @@
                                            :items="allTagsMenuItems"
                                            auto-height
                                            :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SELECT_TAG')"
+                                           :use-custom-style="true"
                         >
                             <template #menu-item="{item}">
                                 <p-check-box v-model="selectedTagColumnKeys" class="tag-menu-item" :value="item.name">

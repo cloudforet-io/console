@@ -36,6 +36,7 @@
                                    :items="formState.domainRoleItem"
                                    auto-height
                                    :disabled="formState.domainRoleItem.length < 2 || isSameId"
+                                   :use-custom-style="true"
                                    class="dropdown"
                 />
             </p-field-group>

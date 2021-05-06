@@ -47,7 +47,7 @@
                     <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_VERSION_LABEL')"
                                    :required="true"
                     >
-                        <p-select-dropdown v-model="inputModel.version" :items="versions" />
+                        <p-select-dropdown v-model="inputModel.version" :items="versions" :use-custom-style="true" />
                     </p-field-group>
                 </div>
             </div>
