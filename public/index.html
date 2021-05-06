@@ -9,77 +9,24 @@
 <link rel='manifest' type='image/x-icon' href="<%= BASE_URL %>manifest.json">
 <link rel="apple-touch-icon" href="<%= BASE_URL %>images/icons/icon-192x192.png">
 <link rel="stylesheet" type="text/css"  href="/reset.css">
-<link rel="preload" href="<%= BASE_URL %>fonts/roboto/roboto-v27-latin-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<link rel="stylesheet" type="text/css"  href="/site-loader.css">
 <script src="lottie.js"></script>
-<title>SpaceONE</title>
-<style>
-@keyframes fadeInOpacity {
-    0% {
-        opacity: 0;
-    }
-    100% {
-        opacity: 1;
-    }
-}
-#site-loader-wrapper {
-    position: fixed;
-    display: flex;
-    flex-direction: column;
-    height: 100vh;
-    width: 100vw;
-    justify-content: center;
-    align-items: center;
-}
-#site-loader {
-    width: 15rem;
-    height: 15rem;
-    opacity: 1;
-    animation-name: fadeInOpacity;
-    animation-iteration-count: 1;
-    animation-timing-function: ease-in;
-    animation-duration: 1s;
-}
-#site-loader-text {
-    /* color: gray500 */
-    color: #858895;
-    font-size: 0.938rem;
-    letter-spacing: -0.01em;
-    font-weight: 500;
-    margin-top: -1.5rem;
-    font-family: Roboto, sans-serif;
-}
-</style>
+<link rel="preload" href="<%= BASE_URL %>fonts/roboto/roboto-v27-latin-regular.woff2" as="font" type="font/woff2" crossorigin="anonymous">
+<title></title>
 </head>
 
 <body>
 <noscript>
   <strong>We're sorry but this app doesn't work properly without JavaScript enabled. Please enable it to continue.</strong>
 </noscript>
+<script src="page-initializer.js"></script>
 
-<div id="site-loader-wrapper" >
+<div id="site-loader-wrapper">
     <div id="site-loader"></div>
     <div id="site-loader-text">Loading SpaceONE</div>
 </div>
-<div id="app"/>
+<script src="site-loader.js"></script>
 
-<script>
-    lottie.loadAnimation({
-        container: document.getElementById('site-loader'), // the dom element that will contain the animation
-        renderer: 'svg',
-        loop: true,
-        autoplay: true,
-        path: 'loading.json' // the path to the animation json
-    });
-</script>
-<script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register("/service-worker.js")
-      .then((reg) => {
-        // console.log('Service worker registered.', reg);
-      });
-    });
-  }
-</script>
+<div id="app" />
 </body>
 </html>

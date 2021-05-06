@@ -1,0 +1,35 @@
+@keyframes fadeInOpacity {
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
+}
+#site-loader-wrapper {
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    width: 100vw;
+    justify-content: center;
+    align-items: center;
+}
+#site-loader {
+    width: 15rem;
+    height: 15rem;
+    opacity: 1;
+    animation-name: fadeInOpacity;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-in;
+    animation-duration: 1s;
+}
+#site-loader-text {
+    /* color: gray500 */
+    color: #858895;
+    font-size: 0.938rem;
+    letter-spacing: -0.01em;
+    font-weight: 500;
+    margin-top: -1.5rem;
+    font-family: Roboto, sans-serif;
+}
