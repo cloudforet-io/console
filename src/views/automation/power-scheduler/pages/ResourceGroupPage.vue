@@ -340,7 +340,7 @@ export default {
                 extraQueryHelper.addFilter({ k, v: d, o: '=' });
             });
 
-            return { ...options, include_id: true };
+            return options;
         };
 
         const getPageSchema = async () => {

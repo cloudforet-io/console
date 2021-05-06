@@ -6,77 +6,79 @@
                     @confirm="updatePageSchema"
     >
         <template #body>
-            <div class="contents-wrapper">
-                <section class="attribute-column-section">
-                    <h3 class="section-title">
-                        {{ $t('COMMON.CUSTOM_FIELD_MODAL.ATTRIBUTE_COL') }}
-                    </h3>
-                    <h4 class="section-desc">
-                        <span v-if="isValid" class="text">{{ $t('COMMON.CUSTOM_FIELD_MODAL.ATTRIBUTE_COL_DESC') }}</span>
-                        <span v-else class="invalid-text">{{ $t('COMMON.CUSTOM_FIELD_MODAL.COL_REQUIRED') }}</span>
-                        <p-button :outline="true" size="sm" style-type="gray900"
-                                  @click="setColumnsDefault"
-                        >
-                            {{ $t('COMMON.CUSTOM_FIELD_MODAL.DEFAULT') }}
-                        </p-button>
-                    </h4>
-                    <p-search v-model="search" :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_ATTRIBUTE_COL')" />
+            <p-data-loader :loading="loading" :min-loading-time="500">
+                <div class="contents-wrapper">
+                    <section class="attribute-column-section">
+                        <h3 class="section-title">
+                            {{ $t('COMMON.CUSTOM_FIELD_MODAL.ATTRIBUTE_COL') }}
+                        </h3>
+                        <h4 class="section-desc">
+                            <span v-if="loading || isValid" class="text">{{ $t('COMMON.CUSTOM_FIELD_MODAL.ATTRIBUTE_COL_DESC') }}</span>
+                            <span v-else class="invalid-text">{{ $t('COMMON.CUSTOM_FIELD_MODAL.COL_REQUIRED') }}</span>
+                            <p-button :outline="true" size="sm" style-type="gray900"
+                                      @click="setColumnsDefault"
+                            >
+                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.DEFAULT') }}
+                            </p-button>
+                        </h4>
+                        <p-search v-model="search" :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_ATTRIBUTE_COL')" />
 
-                    <header>
-                        <p-check-box :selected="isAllSelected" :value="true"
-                                     @change="onChangeAllSelect"
-                        />
-                        <span class="text">{{ $t('COMMON.CUSTOM_FIELD_MODAL.COL_NAME') }}</span>
-                    </header>
+                        <header>
+                            <p-check-box :selected="isAllSelected" :value="true"
+                                         @change="onChangeAllSelect"
+                            />
+                            <span class="text">{{ $t('COMMON.CUSTOM_FIELD_MODAL.COL_NAME') }}</span>
+                        </header>
 
-                    <div class="column-items-wrapper">
-                        <draggable v-model="selectedColumns" draggable=".draggable-item">
-                            <column-item v-for="column in selectedColumns" :key="column.key"
+                        <div class="column-items-wrapper">
+                            <draggable v-model="selectedColumns" draggable=".draggable-item">
+                                <column-item v-for="column in selectedColumns" :key="column.key"
+                                             v-model="selectedAllColumnKeys"
+                                             :item="column"
+                                             :search-text="search"
+                                             draggable
+                                />
+                            </draggable>
+
+                            <column-item v-for="column in unselectedColumns" :key="column.key"
                                          v-model="selectedAllColumnKeys"
                                          :item="column"
                                          :search-text="search"
-                                         draggable
                             />
-                        </draggable>
+                        </div>
+                    </section>
 
-                        <column-item v-for="column in unselectedColumns" :key="column.key"
-                                     v-model="selectedAllColumnKeys"
-                                     :item="column"
-                                     :search-text="search"
-                        />
-                    </div>
-                </section>
-
-                <section>
-                    <h3 class="section-title">
-                        {{ $t('COMMON.CUSTOM_FIELD_MODAL.TAG_COL') }}
-                    </h3>
-                    <h4 class="section-desc">
-                        <span>{{ $t('COMMON.CUSTOM_FIELD_MODAL.TAG_COL_DESC') }}</span>
-                        <p-button :outline="true" size="sm" style-type="gray900"
-                                  @click="clearSelectedTags"
+                    <section>
+                        <h3 class="section-title">
+                            {{ $t('COMMON.CUSTOM_FIELD_MODAL.TAG_COL') }}
+                        </h3>
+                        <h4 class="section-desc">
+                            <span>{{ $t('COMMON.CUSTOM_FIELD_MODAL.TAG_COL_DESC') }}</span>
+                            <p-button :outline="true" size="sm" style-type="gray900"
+                                      @click="clearSelectedTags"
+                            >
+                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.CLEAR_ALL') }}
+                            </p-button>
+                        </h4>
+                        <p-select-dropdown select-item=""
+                                           :items="allTagsMenuItems"
+                                           auto-height
+                                           :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SELECT_TAG')"
                         >
-                            {{ $t('COMMON.CUSTOM_FIELD_MODAL.CLEAR_ALL') }}
-                        </p-button>
-                    </h4>
-                    <p-select-dropdown select-item=""
-                                       :items="allTagsMenuItems"
-                                       auto-height
-                                       :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SELECT_TAG')"
-                    >
-                        <template #menu-item="{item}">
-                            <p-check-box v-model="selectedTagColumnKeys" class="tag-menu-item" :value="item.name">
-                                {{ item.label }}
-                            </p-check-box>
-                        </template>
-                    </p-select-dropdown>
-                    <div class="tag-box">
-                        <p-tag v-for="(tag, i) in selectedTagColumnKeys" :key="tag" @delete="onDeleteTag(i)">
-                            {{ tag ? tag.slice(TAGS_PREFIX.length) : '' }}
-                        </p-tag>
-                    </div>
-                </section>
-            </div>
+                            <template #menu-item="{item}">
+                                <p-check-box v-model="selectedTagColumnKeys" class="tag-menu-item" :value="item.name">
+                                    {{ item.label }}
+                                </p-check-box>
+                            </template>
+                        </p-select-dropdown>
+                        <div class="tag-box">
+                            <p-tag v-for="(tag, i) in selectedTagColumnKeys" :key="tag" @delete="onDeleteTag(i)">
+                                {{ tag ? tag.slice(TAGS_PREFIX.length) : '' }}
+                            </p-tag>
+                        </div>
+                    </section>
+                </div>
+            </p-data-loader>
         </template>
     </p-button-modal>
 </template>
@@ -84,7 +86,7 @@
 <script lang="ts">
 import {
     PButton,
-    PButtonModal, PCheckBox, PSearch, PSelectDropdown, PTag,
+    PButtonModal, PCheckBox, PDataLoader, PSearch, PSelectDropdown, PTag,
 } from '@spaceone/design-system';
 import { camelCase, uniq, uniqBy } from 'lodash';
 import {
@@ -98,7 +100,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { i18n } from '@/translations';
 import draggable from 'vuedraggable';
 import ColumnItem from '@/common/modules/custom-field-modal/ColumnItem.vue';
-import { TAGS_PREFIX } from '@/common/modules/custom-field-modal/config';
+import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-field-modal/config';
 
 interface Props {
     visible: boolean;
@@ -116,6 +118,7 @@ export default {
         PButton,
         PCheckBox,
         PTag,
+        PDataLoader,
         draggable,
     },
     model: {
@@ -157,7 +160,7 @@ export default {
                 get: () => state.selectedColumns.map(d => d.key),
                 set: (val: string[]) => {
                     state.selectedColumns = val.map((d) => {
-                        if (d.startsWith(TAGS_PREFIX)) return { key: d, name: d.slice(TAGS_PREFIX.length), options: { sortable: false } };
+                        if (d.startsWith(TAGS_PREFIX)) return { key: d, name: d, options: TAGS_OPTIONS };
                         return state.availableColumns.find(col => col.key === d) || { key: d, name: d };
                     });
                 },
@@ -165,8 +168,14 @@ export default {
             selectedTagColumnKeys: computed<string[]>({
                 get: () => state.selectedColumns.filter(d => d.key.startsWith(TAGS_PREFIX)).map(d => d.key),
                 set: (val: string[]) => {
-                    state.selectedColumns = state.selectedColumns.filter(d => !d.key.startsWith(TAGS_PREFIX))
-                        .concat(val.map(d => ({ key: d, name: d.slice(TAGS_PREFIX.length), options: { sortable: false } })));
+                    const compare = [...val];
+                    state.selectedColumns.forEach((d) => {
+                        if (d.key.startsWith(TAGS_PREFIX)) {
+                            const idx = compare.findIndex(tagKey => tagKey === d.key);
+                            if (idx !== -1) compare.splice(idx, 1);
+                        }
+                    });
+                    state.selectedColumns = state.selectedColumns.concat(compare.map(d => ({ key: d, name: d, options: TAGS_OPTIONS })));
                 },
             }),
             allTags: [] as string[],
@@ -216,6 +225,7 @@ export default {
                 });
 
                 schema = res;
+                delete schema.options?.search;
 
                 if (includeOptionalFields) {
                     state.availableColumns = res.options?.fields || [];

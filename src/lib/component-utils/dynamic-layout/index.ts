@@ -76,7 +76,7 @@ export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): E
             // @ts-ignore
             forEach(options, (item, k) => {
                 if (typeof item === 'string') items[k] = item;
-                else items[k] = item.name;
+                else items[k] = item.name || k;
             });
             // eslint-disable-next-line camelcase
             res.enum_items = items;

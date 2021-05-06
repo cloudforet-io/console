@@ -44,7 +44,6 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState 
                         // eslint-disable-next-line camelcase
                         header_message,
                     },
-                    data_source: fields, // will be deprecated
                     fields,
                 },
             }));
@@ -64,7 +63,6 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState 
                         file_name_prefix: payload.file_name_prefix,
                         header_message: payload.header_message,
                     },
-                    data_source: payload.fields, // will be deprecated
                     fields: payload.fields,
                 },
             };
