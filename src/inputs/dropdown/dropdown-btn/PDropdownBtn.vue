@@ -102,7 +102,7 @@ export default defineComponent({
                 const winHeight = window.innerHeight;
                 const rects: any = state.dropdownBtn?.getBoundingClientRect();
                 let position = 'bottom';
-                if (winHeight / 2 > rects.top) position = 'top';
+                if (winHeight * 0.9 > rects.top) position = 'top';
                 emit('update:position', position);
 
                 emit('update:offsetTop', rects.top);
