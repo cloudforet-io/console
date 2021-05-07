@@ -3,7 +3,7 @@
         <template #title>
             <div class="top">
                 <p class="title">
-                    {{ $t('COMMON.WIDGETS.COLLECTING_PROGRESS') }}
+                    {{ $t('COMMON.WIDGETS.COLLECTING_JOBS') }}
                 </p>
                 <router-link
                     :to="{ name: 'collectorHistory' }"
@@ -46,7 +46,7 @@
         <div v-else class="no-data-wrapper">
             <img src="@/assets/images/illust_star.svg" class="no-data-img">
             <p class="no-data-text">
-                {{ $t('COMMON.WIDGETS.COLLECTING_PROGRESS_NO_RUNNING') }}
+                {{ $t('COMMON.WIDGETS.COLLECTING_JOBS_NO_RUNNING') }}
             </p>
         </div>
     </widget-layout>
@@ -113,8 +113,8 @@ export default {
             providers: computed(() => store.state.resource.provider.items),
             items: [] as JobModel[],
             fields: computed(() => [
-                { label: vm.$t('COMMON.WIDGETS.COLLECTING_PROGRESS_TITLE_TIME'), name: 'collector_info' },
-                { label: vm.$t('COMMON.WIDGETS.COLLECTING_PROGRESS_STATUS'), name: 'progress' },
+                { label: vm.$t('COMMON.WIDGETS.COLLECTING_JOBS_TITLE_TIME'), name: 'collector_info' },
+                { label: vm.$t('COMMON.WIDGETS.COLLECTING_JOBS_STATUS'), name: 'progress' },
             ]),
         });
 
