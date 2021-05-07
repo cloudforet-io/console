@@ -71,7 +71,7 @@ export default {
         margin-bottom: -0.5rem;
     }
     .select-button {
-        @apply border text-gray-900;
+        @apply bg-gray-100 border text-gray-900;
         height: 2rem;
         border-color: rgba(theme('colors.gray.400'), 0.7);
         border-radius: 0.75rem;
