@@ -37,7 +37,7 @@
                         </p-icon-text-button>
                         <p-dropdown-menu-btn
                             id="dropdown-btn"
-                            class="left-toolbox-item mr-4"
+                            class="left-toolbox-item"
                             :menu="dropdownMenu"
                             @click-enable="clickEnable"
                             @click-disable="clickDisable"

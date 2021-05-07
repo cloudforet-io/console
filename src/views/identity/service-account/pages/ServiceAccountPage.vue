@@ -59,7 +59,7 @@
                                 {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
                             </p-icon-text-button>
                             <p-dropdown-menu-btn
-                                class="left-toolbox-item mr-4"
+                                class="left-toolbox-item"
                                 :menu="tableState.dropdown"
                                 @click-delete="clickDeleteServiceAccount"
                                 @click-project="clickProject"
