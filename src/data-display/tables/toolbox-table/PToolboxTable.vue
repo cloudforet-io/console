@@ -284,6 +284,10 @@ export default {
             checkSelectIndex();
         });
 
+        watch(() => proxyState.thisPage, () => {
+            proxyState.selectIndex = [];
+        }, { immediate: false });
+
         return {
             proxyState,
             changeSort,
