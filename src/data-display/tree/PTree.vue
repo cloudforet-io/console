@@ -201,11 +201,6 @@ export default defineComponent({
         const onDragEnd = (tree, e) => {
             const parent = tree.getNodeParentByPath(e.targetPath);
 
-            if (e.startPath.toString() === e.targetPath.toString()) {
-                emit('end-drag', e.dragNode, parent);
-                return true;
-            }
-
             const validator = props.dragOptions.endValidator;
 
             if (validator && !validator(e.dragNode, parent)) {
@@ -273,17 +268,18 @@ export default defineComponent({
             if (node.$folded) {
                 tree.unfold(node, path);
             } else {
+                tree.fold(node, path);
+            }
+        };
+        const onNodeFoldedChange = async (node, path) => {
+            if (node.$folded) {
                 if (props.dataFetcher) {
                     node.children = [];
                     if (state.selectedNode && path.every((d, i) => state.selectedPath[i] === d)) {
                         if (state.selectedPath.toString() !== path.toString()) resetSelect();
                     }
                 }
-                tree.fold(node, path);
-            }
-        };
-        const onNodeFoldedChange = async (node) => {
-            if (!node.$folded) {
+            } else {
                 await fetchData(node);
             }
         };
@@ -423,6 +419,11 @@ export default defineComponent({
             target.data = data;
         };
 
+        const updateNode = (predicate, data) => {
+            const path = findNodePath(predicate);
+            updateNodeByPath(path, data);
+        };
+
         const root = {
             fetchData,
             addNode,
@@ -435,6 +436,7 @@ export default defineComponent({
             deleteNode,
             addChildNodeByPath,
             updateNodeByPath,
+            updateNode,
             changeSelectState,
         };
 
