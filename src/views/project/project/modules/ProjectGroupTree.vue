@@ -171,6 +171,7 @@ export default {
                         return store.getters['user/isAdmin'];
                     }
                     if (parent.data.item_type === 'PROJECT') return false;
+                    if (parent.children.some(child => child.data.name === node.data.name)) return false;
                     return !!(state.permissionInfo[parent.data.id] || parent.data.has_permission);
                 },
             })),
