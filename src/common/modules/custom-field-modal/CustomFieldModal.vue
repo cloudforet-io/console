@@ -91,7 +91,8 @@ import {
 } from '@spaceone/design-system';
 import { camelCase, uniq, uniqBy } from 'lodash';
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -143,6 +144,8 @@ export default {
         },
     },
     setup(props: Props, { emit, root }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
         let schema: any = {};
 
         const state = reactive({
@@ -170,13 +173,17 @@ export default {
                 get: () => state.selectedColumns.filter(d => d.key.startsWith(TAGS_PREFIX)).map(d => d.key),
                 set: (val: string[]) => {
                     const compare = [...val];
-                    state.selectedColumns.forEach((d) => {
+                    const selectedColumns = state.selectedColumns.filter((d) => {
                         if (d.key.startsWith(TAGS_PREFIX)) {
                             const idx = compare.findIndex(tagKey => tagKey === d.key);
-                            if (idx !== -1) compare.splice(idx, 1);
+                            if (idx !== -1) {
+                                compare.splice(idx, 1);
+                                return true;
+                            }
                         }
+                        return false;
                     });
-                    state.selectedColumns = state.selectedColumns.concat(compare.map(d => ({ key: d, name: d, options: TAGS_OPTIONS })));
+                    state.selectedColumns = selectedColumns.concat(compare.map(d => ({ key: d, name: d, options: TAGS_OPTIONS })));
                 },
             }),
             allTags: [] as string[],
@@ -199,7 +206,9 @@ export default {
 
         const onDeleteTag = (idx) => {
             state.selectedTagColumnKeys.splice(idx, 1);
-            state.selectedTagColumnKeys = [...state.selectedTagColumnKeys];
+            vm.$nextTick(() => {
+                state.selectedTagColumnKeys = [...state.selectedTagColumnKeys];
+            });
         };
 
         const clearSelectedTags = () => {
