@@ -50,7 +50,6 @@
                     @init="onTreeInit"
                     @finish-edit="onFinishEdit"
                     @start-drag="onStartDrag"
-                    @end-drag="onEndDrag"
                     @update-drag="onUpdateDrag"
                     @change-select="onChangeSelect"
             >
@@ -63,7 +62,8 @@
                     />
                 </template>
                 <template #toggle-right="{node}">
-                    <favorite-button :item-id="node.data.id"
+                    <favorite-button v-if="node.data.item_type === 'PROJECT_GROUP'"
+                                     :item-id="node.data.id"
                                      favorite-type="projectGroup"
                                      resource-type="identity.ProjectGroup"
                                      scale="0.75"
@@ -107,8 +107,7 @@ import {
 } from '@spaceone/design-system';
 import { SpaceConnector } from '@/lib/space-connector';
 import {
-    ProjectGroupTreeItem,
-    ProjectItemResp, ProjectTreeItem, ProjectTreeRootItem,
+    ProjectItemResp, ProjectTreeItem,
 } from '@/views/project/project/type';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { store } from '@/store';
@@ -176,7 +175,8 @@ export default {
         });
 
         const toggleOptions = {
-            validator: node => node.data.has_child || node.children.length > 0,
+            validator: node => node.data.has_child || node.children.length > 0
+            ,
         };
 
         const selectOptions = {
@@ -203,24 +203,20 @@ export default {
         };
 
         const startTreeEdit = () => {
-            state.rootNode.fetchData();
             store.commit('projectPage/setTreeEditMode', true);
         };
 
         const finishTreeEdit = () => {
-            state.rootNode.fetchData();
             store.commit('projectPage/setTreeEditMode', false);
         };
 
-        const getAllCurrentGroupIds = (): string[] => {
+        const getAllCurrentItems = (): {path: number[]; node: any}[] => {
             if (!state.rootNode) return [];
-
-            const children = state.rootNode.getAllNodes();
-            return children.map(d => d.data.id);
+            return state.rootNode.getAllItems();
         };
 
         const permissionApiQueryHelper = new ApiQueryHelper();
-        const getPermissionInfo = async (ids: string[]): Promise<object> => {
+        const setPermissionInfo = async (ids: string[]) => {
             const res = {};
 
             try {
@@ -238,24 +234,12 @@ export default {
                 console.error(e);
             }
 
-            return res;
+            state.permissionInfo = res;
         };
 
-        const getCurrentNodesPermissionInfo = async () => {
-            const ids = getAllCurrentGroupIds();
-            state.permissionInfo = await getPermissionInfo(ids);
-        };
-
-        watch(() => state.treeEditMode, async (treeEditMode) => {
-            if (treeEditMode) {
-                await getCurrentNodesPermissionInfo();
-            }
-        });
-
-        const dataFetcher = async (node): Promise<ProjectItemResp[]> => {
+        const dataFetcher = async (node: any = {}, projectOnly = false): Promise<ProjectItemResp[]> => {
             try {
                 const params: any = {
-                    exclude_type: state.treeEditMode ? '' : 'PROJECT',
                     sort: { key: 'name', desc: false },
                     item_type: 'ROOT',
                     check_child: true,
@@ -268,6 +252,9 @@ export default {
 
                 if (state.treeEditMode) {
                     params.include_permission = true;
+                    if (projectOnly) params.exclude_type = 'PROJECT_GROUP';
+                } else {
+                    params.exclude_type = 'PROJECT';
                 }
 
                 const { items } = await SpaceConnector.client.identity.project.tree(params);
@@ -283,7 +270,40 @@ export default {
             }
         };
 
-        const onFinishEdit = async (item: ProjectTreeItem) => {
+        const addProjectNodes = async (items) => {
+            if (!state.rootNode) return;
+
+            const permittedItems = items.filter(({ node }) => state.permissionInfo[node.data.id]);
+
+            const newChildren: ProjectTreeItem[][] = await Promise.all(permittedItems.map(({ node }) => dataFetcher(node, true)));
+
+            permittedItems.forEach(({ node, path }, i) => {
+                state.rootNode.updateNodeByPath(path, { ...node.data, has_child: node.data.has_child || newChildren[i].length > 0 });
+                if (!node.$folded) state.rootNode.addChildNodeByPath(path, newChildren[i], false);
+            });
+        };
+
+        const removeProjectNodes = (items) => {
+            if (!state.rootNode) return;
+
+            const projectItems = items.filter(({ node }) => node.data.item_type === 'PROJECT');
+
+            projectItems.forEach(({ node }) => {
+                state.rootNode.deleteNode(d => d.id === node.data.id);
+            });
+        };
+
+        watch(() => state.treeEditMode, async (treeEditMode) => {
+            const items = getAllCurrentItems();
+            if (treeEditMode) {
+                await setPermissionInfo(items.map(d => d.node.data.id));
+                await addProjectNodes(items);
+            } else {
+                removeProjectNodes(items);
+            }
+        });
+
+        const onFinishEdit = async (item) => {
             try {
                 const params = {
                     project_group_id: item.data.id,
@@ -302,11 +322,9 @@ export default {
             state.dragParent = parent;
         };
 
-        const onEndDrag = () => {
-            state.dragParent = null;
-        };
-
         const onUpdateDrag = async (node, parent) => {
+            if (state.dragParent?.data.id === parent?.data.id) return;
+
             if (node.data.item_type === 'PROJECT_GROUP') {
                 const params: any = {
                     project_group_id: node.data.id,
@@ -333,6 +351,12 @@ export default {
                 }
                 try {
                     await SpaceConnector.client.identity.project.update(params);
+
+                    // this is for refresh project list cards
+                    if (store.getters['projectPage/groupId'] === state.dragParent?.data.id || store.getters['projectPage/groupId'] === parent.data.id) {
+                        store.commit('projectPage/setSelectedItem', { ...store.state.projectPage.selectedItem });
+                    }
+
                     showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT'), '', vm.$root);
                 } catch (e) {
                     showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT'), e, vm.$root);
@@ -401,7 +425,6 @@ export default {
             dataFetcher,
             onFinishEdit,
             onStartDrag,
-            onEndDrag,
             onUpdateDrag,
             onChangeSelect,
             onTreeInit,
