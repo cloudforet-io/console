@@ -124,6 +124,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { TimeStamp } from '@/models';
+import { assetUrlConverter } from '@/lib/util';
 
 
 enum PLUGIN_STATE {
@@ -236,7 +237,7 @@ export default {
                 const res = await SpaceConnector.client.repository.plugin.list(params);
                 state.plugins = [
                     ...res.results.map(d => ({
-                        icon: d.tags?.icon,
+                        icon: assetUrlConverter(d.tags?.icon),
                         ...d,
                     })),
                 ];
