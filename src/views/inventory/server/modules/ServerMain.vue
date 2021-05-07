@@ -608,6 +608,10 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+>>> .p-horizontal-layout .horizontal-contents {
+    overflow: unset;
+}
+
 .left-toolbox-item {
     margin-left: 1rem;
     &:last-child {
