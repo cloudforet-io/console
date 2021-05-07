@@ -3,7 +3,7 @@ import { ProjectPageState } from '@/views/project/project/store/type';
 import { ProjectGroupTreeItem, ProjectItemResp } from '@/views/project/project/type';
 import { SpaceConnector } from '@/lib/space-connector';
 
-export const initRoot: Action<ProjectPageState, any> = async ({ dispatch, commit }, root) => {
+export const initRoot: Action<ProjectPageState, any> = ({ dispatch, commit }, root) => {
     commit('setRootNode', root);
 };
 
