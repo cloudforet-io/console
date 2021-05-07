@@ -513,7 +513,7 @@ export default {
 
 <style lang="postcss" scoped>
 .left-toolbox-item {
-    @apply mx-4;
+    @apply ml-4;
     &:last-child {
         flex-grow: 1;
     }
