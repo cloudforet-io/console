@@ -51,7 +51,7 @@ export default {
         const deleteProjectGroup = async () => {
             try {
                 await store.dispatch('projectPage/deleteProjectGroup');
-                await store.dispatch('favorite/projectGroup/removeItem', { id: state.groupId });
+                // await store.dispatch('favorite/projectGroup/removeItem', { id: state.groupId });
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '', vm.$root);
             } catch (e) {
                 showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: vm.$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }), e, vm.$root);
