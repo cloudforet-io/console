@@ -104,7 +104,9 @@ export default defineComponent({
         watch(() => vm.$store.state.display.isDownloaded, async (after) => {
             if (after) {
                 hideLoadingMessage(vm.$root);
-                showSuccessMessage(vm.$t('COMMON.EXCEL.ALT_S_DOWNLOAD_SUCCESS'), '', vm.$root);
+                setTimeout(() => {
+                    showSuccessMessage(vm.$t('COMMON.EXCEL.ALT_S_DOWNLOAD_SUCCESS'), '', vm.$root);
+                }, 500);
             }
         });
 
