@@ -23,75 +23,78 @@
                 </div>
             </template>
         </sidebar-title>
-        <div class="mx-3">
-            <p-tree :data-fetcher="() => allProjectNode"
-                    :toggle-options="{disabled: true}"
-                    :edit-options="{disabled: true}"
-                    :drag-options="{disabled: true}"
-                    @init="onAllProjectTreeInit"
-                    @change-select="onAllProjectChangeSelect"
-            >
-                <template #left-extra>
-                    <p-i name="ic_tree_all-projects" width="1rem" height="1rem"
-                         class="all-project-button" color="inherit"
-                    />
-                </template>
-            </p-tree>
 
-            <p-tree :edit-options="editOptions"
-                    :drag-options="dragOptions"
-                    :toggle-options="toggleOptions"
-                    :select-options="selectOptions"
-                    :data-setter="dataSetter"
-                    :data-getter="dataGetter"
-                    :data-fetcher="dataFetcher"
-                    :get-class-names="getClassNames"
-                    :fetch-on-init="false"
-                    @init="onTreeInit"
-                    @finish-edit="onFinishEdit"
-                    @start-drag="onStartDrag"
-                    @update-drag="onUpdateDrag"
-                    @change-select="onChangeSelect"
-            >
-                <template #data="{node}">
-                    {{ node.data.name }}
-                </template>
-                <template #toggle="{node}">
-                    <p-i v-if="node.loading" name="ic_working"
-                         width="1rem" height="1rem"
-                    />
-                </template>
-                <template #toggle-right="{node}">
-                    <favorite-button v-if="node.data.item_type === 'PROJECT_GROUP'"
-                                     :item-id="node.data.id"
-                                     favorite-type="projectGroup"
-                                     resource-type="identity.ProjectGroup"
-                                     scale="0.75"
-                                     read-only
-                    />
-                </template>
-                <template #icon="{node}">
-                    <p-i v-if="node.data.item_type === 'PROJECT'"
-                         name="ic_tree_project"
-                         width="1rem" height="1rem"
-                    />
-                    <p-i v-else name="ic_tree_project-group" class="project-group-icon"
-                         width="1rem" height="1rem" color="inherit transparent"
-                    />
-                </template>
-                <template #right-extra="{node, path}">
-                    <p-icon-button v-if="treeEditMode && node.data.item_type !== 'PROJECT' && (permissionInfo[node.data.id] || node.data.has_permission)"
-                                   name="ic_delete" class="group-delete-btn"
-                                   size="sm"
-                                   @click.stop="openProjectGroupDeleteCheckModal({node, path})"
-                    />
-                    <p-icon-button v-if="!treeEditMode && node.data.item_type !== 'PROJECT'" name="ic_plus" class="group-add-btn"
-                                   size="sm"
-                                   @click.stop="openProjectGroupCreateForm({node, path})"
-                    />
-                </template>
-            </p-tree>
-        </div>
+        <p-data-loader :loading="loading">
+            <div class="mx-3">
+                <p-tree :data-fetcher="() => allProjectNode"
+                        :toggle-options="{disabled: true}"
+                        :edit-options="{disabled: true}"
+                        :drag-options="{disabled: true}"
+                        @init="onAllProjectTreeInit"
+                        @change-select="onAllProjectChangeSelect"
+                >
+                    <template #left-extra>
+                        <p-i name="ic_tree_all-projects" width="1rem" height="1rem"
+                             class="all-project-button" color="inherit"
+                        />
+                    </template>
+                </p-tree>
+
+                <p-tree :edit-options="editOptions"
+                        :drag-options="dragOptions"
+                        :toggle-options="toggleOptions"
+                        :select-options="selectOptions"
+                        :data-setter="dataSetter"
+                        :data-getter="dataGetter"
+                        :data-fetcher="dataFetcher"
+                        :get-class-names="getClassNames"
+                        :fetch-on-init="false"
+                        @init="onTreeInit"
+                        @finish-edit="onFinishEdit"
+                        @start-drag="onStartDrag"
+                        @update-drag="onUpdateDrag"
+                        @change-select="onChangeSelect"
+                >
+                    <template #data="{node}">
+                        {{ node.data.name }}
+                    </template>
+                    <template #toggle="{node}">
+                        <p-i v-if="node.loading" name="ic_working"
+                             width="1rem" height="1rem"
+                        />
+                    </template>
+                    <template #toggle-right="{node}">
+                        <favorite-button v-if="node.data.item_type === 'PROJECT_GROUP'"
+                                         :item-id="node.data.id"
+                                         favorite-type="projectGroup"
+                                         resource-type="identity.ProjectGroup"
+                                         scale="0.75"
+                                         read-only
+                        />
+                    </template>
+                    <template #icon="{node}">
+                        <p-i v-if="node.data.item_type === 'PROJECT'"
+                             name="ic_tree_project"
+                             width="1rem" height="1rem"
+                        />
+                        <p-i v-else name="ic_tree_project-group" class="project-group-icon"
+                             width="1rem" height="1rem" color="inherit transparent"
+                        />
+                    </template>
+                    <template #right-extra="{node, path}">
+                        <p-icon-button v-if="treeEditMode && node.data.item_type !== 'PROJECT' && (permissionInfo[node.data.id] || node.data.has_permission)"
+                                       name="ic_delete" class="group-delete-btn"
+                                       size="sm"
+                                       @click.stop="openProjectGroupDeleteCheckModal({node, path})"
+                        />
+                        <p-icon-button v-if="!treeEditMode && node.data.item_type !== 'PROJECT'" name="ic_plus" class="group-add-btn"
+                                       size="sm"
+                                       @click.stop="openProjectGroupCreateForm({node, path})"
+                        />
+                    </template>
+                </p-tree>
+            </div>
+        </p-data-loader>
     </fragment>
 </template>
 
@@ -103,11 +106,11 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PI, PIconButton, PTree, PButton,
+    PI, PIconButton, PTree, PButton, PDataLoader,
 } from '@spaceone/design-system';
 import { SpaceConnector } from '@/lib/space-connector';
 import {
-    ProjectItemResp, ProjectTreeItem,
+    ProjectItemResp,
 } from '@/views/project/project/type';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { store } from '@/store';
@@ -124,6 +127,7 @@ export default {
         PIconButton,
         PI,
         PButton,
+        PDataLoader,
     },
     props: {
         initGroupId: {
@@ -135,6 +139,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
+            loading: false,
             rootNode: computed(() => store.state.projectPage.rootNode),
             permissionInfo: {},
             treeEditMode: computed(() => store.state.projectPage.treeEditMode),
@@ -175,8 +180,7 @@ export default {
         });
 
         const toggleOptions = {
-            validator: node => node.data.has_child || node.children.length > 0
-            ,
+            validator: node => node.data.has_child || node.children.length > 0,
         };
 
         const selectOptions = {
@@ -275,7 +279,7 @@ export default {
 
             const permittedItems = items.filter(({ node }) => state.permissionInfo[node.data.id]);
 
-            const newChildren: ProjectTreeItem[][] = await Promise.all(permittedItems.map(({ node }) => dataFetcher(node, true)));
+            const newChildren: ProjectItemResp[][] = await Promise.all(permittedItems.map(({ node }) => dataFetcher(node, true)));
 
             permittedItems.forEach(({ node, path }, i) => {
                 state.rootNode.updateNodeByPath(path, { ...node.data, has_child: node.data.has_child || newChildren[i].length > 0 });
@@ -283,7 +287,7 @@ export default {
             });
         };
 
-        const removeProjectNodes = (items) => {
+        const removeProjectNodes = async (items) => {
             if (!state.rootNode) return;
 
             const projectItems = items.filter(({ node }) => node.data.item_type === 'PROJECT');
@@ -291,16 +295,26 @@ export default {
             projectItems.forEach(({ node }) => {
                 state.rootNode.deleteNode(d => d.id === node.data.id);
             });
+
+            const projectGroupItems = items.filter(({ node }) => node.data.item_type === 'PROJECT_GROUP' && node.data.has_child);
+
+            const newChildren: ProjectItemResp[][] = await Promise.all(projectGroupItems.map(({ node }) => dataFetcher(node)));
+
+            projectGroupItems.forEach(({ node, path }, i) => {
+                state.rootNode.updateNodeByPath(path, { ...node.data, has_child: newChildren[i].length > 0 });
+            });
         };
 
         watch(() => state.treeEditMode, async (treeEditMode) => {
             const items = getAllCurrentItems();
+            state.loading = true;
             if (treeEditMode) {
                 await setPermissionInfo(items.map(d => d.node.data.id));
                 await addProjectNodes(items);
             } else {
-                removeProjectNodes(items);
+                await removeProjectNodes(items);
             }
+            state.loading = false;
         });
 
         const onFinishEdit = async (item) => {
@@ -322,45 +336,61 @@ export default {
             state.dragParent = parent;
         };
 
+        const updateProjectGroup = async (node, parent) => {
+            const params: any = {
+                project_group_id: node.data.id,
+            };
+            if (parent) {
+                params.parent_project_group_id = parent.data.id;
+            } else {
+                params.release_parent_project_group = true;
+            }
+            try {
+                await SpaceConnector.client.identity.projectGroup.update(params);
+                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', vm.$root);
+            } catch (e) {
+                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e, vm.$root);
+            }
+        };
+
+        const updateProject = async (node, parent) => {
+            const params: any = {
+                project_id: node.data.id,
+            };
+            if (parent) {
+                params.project_group_id = parent.data.id;
+            } else {
+                params.release_parent_project_group = true;
+            }
+            try {
+                await SpaceConnector.client.identity.project.update(params);
+
+                // this is for refresh project list cards
+                if (store.getters['projectPage/groupId'] === state.dragParent?.data.id || store.getters['projectPage/groupId'] === parent.data.id) {
+                    store.commit('projectPage/setSelectedItem', { ...store.state.projectPage.selectedItem });
+                }
+
+                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT'), '', vm.$root);
+            } catch (e) {
+                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT'), e, vm.$root);
+            }
+        };
+
         const onUpdateDrag = async (node, parent) => {
+            if (!state.rootNode) return;
             if (state.dragParent?.data.id === parent?.data.id) return;
 
+            if (state.dragParent?.data.has_child && state.dragParent?.children.length === 1) {
+                state.rootNode.updateNode(d => d.id === state.dragParent.data.id, {
+                    ...state.dragParent.data,
+                    has_child: false,
+                });
+            }
+
             if (node.data.item_type === 'PROJECT_GROUP') {
-                const params: any = {
-                    project_group_id: node.data.id,
-                };
-                if (parent) {
-                    params.parent_project_group_id = parent.data.id;
-                } else {
-                    params.release_parent_project_group = true;
-                }
-                try {
-                    await SpaceConnector.client.identity.projectGroup.update(params);
-                    showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', vm.$root);
-                } catch (e) {
-                    showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e, vm.$root);
-                }
+                await updateProjectGroup(node, parent);
             } else {
-                const params: any = {
-                    project_id: node.data.id,
-                };
-                if (parent) {
-                    params.project_group_id = parent.data.id;
-                } else {
-                    params.release_parent_project_group = true;
-                }
-                try {
-                    await SpaceConnector.client.identity.project.update(params);
-
-                    // this is for refresh project list cards
-                    if (store.getters['projectPage/groupId'] === state.dragParent?.data.id || store.getters['projectPage/groupId'] === parent.data.id) {
-                        store.commit('projectPage/setSelectedItem', { ...store.state.projectPage.selectedItem });
-                    }
-
-                    showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT'), '', vm.$root);
-                } catch (e) {
-                    showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT'), e, vm.$root);
-                }
+                await updateProject(node, parent);
             }
         };
 
@@ -385,11 +415,11 @@ export default {
 
 
         /* Init */
-        const onTreeInit = async (root) => {
-            await store.dispatch('projectPage/initRoot', root);
+        const onTreeInit = (root) => {
+            store.dispatch('projectPage/initRoot', root);
         };
 
-        const onAllProjectTreeInit = async (root) => {
+        const onAllProjectTreeInit = (root) => {
             state.allProjectRoot = root;
         };
 
@@ -397,6 +427,7 @@ export default {
             if (rootNode && allProjectRoot) {
                 if (store.state.projectPage.isInitiated) return;
 
+                state.loading = true;
                 if (props.initGroupId) {
                     const res = await store.dispatch('projectPage/selectNode', props.initGroupId);
                     if (!res) {
@@ -408,6 +439,7 @@ export default {
                     await rootNode.fetchData();
                 }
                 store.commit('projectPage/setIsInitiated', true);
+                state.loading = false;
             }
         }, { immediate: true });
 
