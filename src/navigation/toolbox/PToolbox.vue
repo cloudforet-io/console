@@ -342,7 +342,7 @@ export default defineComponent<Props>({
             }
         }
         .tool {
-            @apply ml-4 mb-4;
+            @apply ml-2 mb-4;
             display: inline-block;
         }
     }
