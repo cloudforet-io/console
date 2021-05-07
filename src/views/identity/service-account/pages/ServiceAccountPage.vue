@@ -166,7 +166,7 @@ import ServiceAccountMember from '@/views/identity/service-account/modules/Servi
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import {assetUrlConverter, showErrorMessage, showSuccessMessage} from '@/lib/util';
 import { QueryHelper } from '@/lib/query';
 import { dynamicFieldsToExcelDataFields } from '@/lib/component-utils/dynamic-layout';
 import { store } from '@/store';
@@ -219,8 +219,9 @@ export default {
         const selectedProvider: Ref<string> = ref('aws');
         const providerState = reactive({
             items: computed(() => Object.keys(store.state.resource.provider.items).map(k => ({
-                provider: k,
                 ...store.state.resource.provider.items[k],
+                provider: k,
+                icon: assetUrlConverter(store.state.resource.provider.items[k].icon),
             }))),
         });
         const selectedProviderName = computed(() => store.state.resource.provider.items[selectedProvider.value]?.label || selectedProvider.value);
