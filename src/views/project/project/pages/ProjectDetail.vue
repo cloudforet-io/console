@@ -203,7 +203,7 @@ export default {
                 await SpaceConnector.client.identity.project.delete({
                     project_id: projectId.value,
                 });
-                await vm.$store.dispatch('favorite/project/removeItem', { id: projectId.value });
+                // await vm.$store.dispatch('favorite/project/removeItem', { id: projectId.value });
                 showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '', root);
                 vm.$router.go(-1);
             } catch (e) {

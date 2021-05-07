@@ -180,7 +180,7 @@ export default {
                 await SpaceConnector.client.spotAutomation.spotGroup.delete({
                     spot_group_id: state.spotGroupId,
                 });
-                await vm.$store.dispatch('favorite/spotGroup/removeItem', { id: state.spotGroupId });
+                // await vm.$store.dispatch('favorite/spotGroup/removeItem', { id: state.spotGroupId });
                 showSuccessMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.ALT_S_DELETE_SPOT_GROUP'), '', root);
                 vm.$router.go(-1);
             } catch (e) {
