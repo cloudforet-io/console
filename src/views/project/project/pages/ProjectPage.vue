@@ -1,6 +1,6 @@
 <template>
     <fragment>
-        <top-notification v-if="isPermissionDenied">
+        <top-notification v-if="storeState.groupId && isPermissionDenied">
             <div>
                 {{ $t('PROJECT.LANDING.TOP_NOTI_PERMISSION_REQUIRED_1') }} <br>
                 {{ $t('PROJECT.LANDING.TOP_NOTI_PERMISSION_REQUIRED_2') }}
