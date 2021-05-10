@@ -16,14 +16,6 @@
                     </template>
                 </i18n>
             </top-notification>
-            <p-icon-modal :visible="isExpired"
-                          emoji
-                          :header-title="$t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
-                          :button-text="$t('COMMON.SESSION_MODAL.SIGNIN')"
-                          button-type="primary-dark"
-                          :outline="false"
-                          @clickButton="goToSignIn"
-            />
             <template v-if="showGNB">
                 <GNB class="gnb" />
                 <div class="app-body">
@@ -44,6 +36,14 @@
                 </div>
             </template>
             <router-view v-else />
+            <p-icon-modal :visible="isExpired"
+                          emoji
+                          :header-title="$t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
+                          :button-text="$t('COMMON.SESSION_MODAL.SIGNIN')"
+                          button-type="primary-dark"
+                          :outline="false"
+                          @clickButton="goToSignIn"
+            />
         </template>
 
         <!-- Iframe for file download -->
