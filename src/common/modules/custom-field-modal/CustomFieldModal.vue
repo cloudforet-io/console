@@ -173,15 +173,13 @@ export default {
                 get: () => state.selectedColumns.filter(d => d.key.startsWith(TAGS_PREFIX)).map(d => d.key),
                 set: (val: string[]) => {
                     const compare = [...val];
-                    const selectedColumns = state.selectedColumns.filter((d) => {
+                    const selectedColumns: any[] = state.selectedColumns.filter((d) => {
                         if (d.key.startsWith(TAGS_PREFIX)) {
                             const idx = compare.findIndex(tagKey => tagKey === d.key);
-                            if (idx !== -1) {
-                                compare.splice(idx, 1);
-                                return true;
-                            }
+                            if (idx === -1) return false;
+                            compare.splice(idx, 1);
                         }
-                        return false;
+                        return true;
                     });
                     state.selectedColumns = selectedColumns.concat(compare.map(d => ({ key: d, name: d, options: TAGS_OPTIONS })));
                 },
