@@ -38,6 +38,7 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { makeProxy } from '@/lib/compostion-util';
 import VueI18n from 'vue-i18n';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { store } from '@/store';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -115,6 +116,7 @@ export default {
         const crateProject = async (params) => {
             try {
                 await SpaceConnector.client.identity.project.create(params);
+                await store.dispatch('resource/project/load');
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '', vm.$root);
             } catch (e) {
                 showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'), e, vm.$root);
