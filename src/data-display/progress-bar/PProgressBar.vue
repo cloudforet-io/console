@@ -5,7 +5,7 @@
         </div>
         <div class="background-bar" />
         <transition appear @before-appear="beforeEnter" @after-appear="enter">
-            <div ref="progressBar" class="tracker-bar" />
+            <div ref="progressBar" class="tracker-bar" :style="{'background-color': color}" />
         </transition>
     </div>
 </template>
@@ -24,6 +24,10 @@ export default {
         label: {
             type: String,
             default: '',
+        },
+        color: {
+            type: String,
+            default: 'rgba(theme(\'colors.primary1\')',
         },
     },
     setup(props) {
