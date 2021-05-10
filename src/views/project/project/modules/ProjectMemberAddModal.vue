@@ -19,6 +19,7 @@
                             :excel-visible="false"
                             :sort-by.sync="options.sortBy"
                             :sort-desc.sync="options.sortDesc"
+                            class="search-table"
                             @change="onChange"
                             @rowLeftClick="onSelect"
             />
@@ -106,7 +107,7 @@ import {
 import {
     ComponentRenderProxy, computed,
     getCurrentInstance,
-    reactive, ref, Ref, toRefs,
+    reactive, ref, Ref, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -358,6 +359,10 @@ export default {
             }
         };
 
+        watch(() => state.projectRole, async (before, after) => {
+            if (before !== after) await checkProjectRole();
+        });
+
         (async () => {
             await Promise.all([listUser(), getRoleList()]);
         })();
@@ -378,7 +383,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-
+.search-table {
+    @apply text-gray-900;
+}
 .field-group-wrapper {
     @apply bg-primary4 border border-gray-200;
     margin-top: 1.5rem;
@@ -437,6 +444,10 @@ export default {
 
 .tag-wrapper {
     min-height: 3.625rem;
+    overflow-y: auto;
+    >>> .p-tag.deletable {
+        margin-bottom: 0.25rem;
+    }
 }
 >>> .modal-content .modal-body-container {
     overflow: auto;
