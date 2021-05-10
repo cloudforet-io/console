@@ -61,14 +61,12 @@ export default {
     top: 0;
     left: 0;
     flex-direction: column;
-    z-index: 101;
 
     .page-wrapper {
         width: 100%;
         border: none;
         flex-grow: 1;
         padding: 2rem 1.5rem;
-        box-shadow: inset 0 2px 4px rgba(theme('colors.black'), 0.12);
         .page-navigation {
             .title-wrapper {
                 display: flex;
