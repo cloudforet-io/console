@@ -512,6 +512,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+>>> .p-horizontal-layout .horizontal-contents {
+    overflow: unset;
+}
 .left-toolbox-item {
     @apply ml-4;
     &:last-child {
