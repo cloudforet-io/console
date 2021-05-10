@@ -13,6 +13,7 @@
         <template #default="{node, path, tree, index}">
             <div class="node" :class="{
                      selected: getSelectState(path),
+                     'drag-target-parent': dragTargetParentPath ? dragTargetParentPath.toString() === path.toString() : false,
                      ...getClassNames(node)
                  }"
                  @click.stop="changeSelectState(node, path)"
@@ -151,6 +152,7 @@ export default defineComponent({
             selectedPath: computed(() => state.selectedItem.path || []),
             selectedNode: computed(() => state.selectedItem.node || null),
             isFetchAndFinding: false,
+            dragTargetParentPath: null as any,
         });
 
         const getSelectState = path => state.selectedPath.toString() === path.toString();
@@ -199,6 +201,7 @@ export default defineComponent({
         };
 
         const onDragEnd = (tree, e) => {
+            state.dragTargetParentPath = null;
             const parent = tree.getNodeParentByPath(e.targetPath);
 
             const validator = props.dragOptions.endValidator;
@@ -229,6 +232,8 @@ export default defineComponent({
             if (parentPath.length > 0) {
                 parent = tree.getNodeByPath(parentPath);
             }
+
+            state.dragTargetParentPath = parentPath;
 
             if (dropValidator && !dropValidator(e.dragNode, parent)) return false;
             return true;
@@ -479,7 +484,7 @@ export default defineComponent({
     .tree-branch {
         &.tree-placeholder {
             .tree-node-back .tree-node {
-                @apply border border-gray-900;
+                @apply border border-secondary;
             }
         }
     }
@@ -492,9 +497,14 @@ export default defineComponent({
         }
     }
     .tree-node {
-        @apply h-8 rounded-sm text-sm text-black cursor-pointer;
+        @apply h-8 text-sm text-black cursor-pointer;
+        border-radius: 4px;
         .node {
             @apply h-full w-full inline-flex items-center;
+            &.drag-target-parent {
+                @apply bg-secondary text-white;
+                border-radius: 4px;
+            }
         }
         .toggle {
             @apply cursor-pointer;
