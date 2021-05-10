@@ -115,5 +115,9 @@ export default {
             display: inline-block;
         }
     }
+    &.ghost {
+        @apply border border-gray-900;
+        opacity: 0.5;
+    }
 }
 </style>

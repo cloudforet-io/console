@@ -31,7 +31,7 @@
                         </header>
 
                         <div class="column-items-wrapper">
-                            <draggable v-model="selectedColumns" draggable=".draggable-item">
+                            <draggable v-model="selectedColumns" draggable=".draggable-item" ghost-class="ghost">
                                 <column-item v-for="column in selectedColumns" :key="column.key"
                                              v-model="selectedAllColumnKeys"
                                              :item="column"
