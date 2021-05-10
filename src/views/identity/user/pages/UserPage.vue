@@ -151,7 +151,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-
+>>> .p-horizontal-layout .horizontal-contents {
+    overflow: unset;
+}
 .member-profile {
     text-align: center;
     vertical-align: middle;
