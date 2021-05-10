@@ -42,6 +42,7 @@
                         </div>
                         <p-progress-bar :percentage="(item.count / maxValue) * 100"
                                         class="progress-bar" :class="selectedProvider"
+                                        :color="providers[selectedProvider] ? providers[selectedProvider].color : undefined"
                         />
                     </router-link>
                 </div>
@@ -83,7 +84,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import WidgetLayout from '@/common/components/WidgetLayout.vue';
 import { Location } from 'vue-router';
 import { QueryHelper } from '@/lib/query';
-import config from "@/lib/config";
+import config from '@/lib/config';
 
 am4core.useTheme(am4themesAnimated);
 
