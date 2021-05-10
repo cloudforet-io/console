@@ -115,6 +115,7 @@ export default {
         const createProjectGroup = async (item) => {
             try {
                 await store.dispatch('projectPage/createProjectGroup', item);
+                await store.dispatch('resource/projectGroup/load');
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '', root);
             } catch (e) {
                 showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'), e, root);
