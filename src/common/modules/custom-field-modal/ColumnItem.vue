@@ -116,7 +116,7 @@ export default {
         }
     }
     &.ghost {
-        @apply border border-gray-900;
+        @apply border border-secondary;
         opacity: 0.5;
     }
 }
