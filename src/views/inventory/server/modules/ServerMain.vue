@@ -449,7 +449,7 @@ export default {
                 // set api query to get only a few specified data
                 if (res?.options?.fields) {
                     apiQuery.setOnly(...res.options.fields.map(d => d.key).filter(d => !d.startsWith('tags.')),
-                        'server_id', 'reference.external_link', 'primary_ip_address', 'collection_info.collectors', 'tags');
+                        'server_id', 'reference.external_link', 'primary_ip_address', 'collection_info.collectors', 'tags', 'provider');
                 }
 
                 // initiate queryTags with keyItemSets

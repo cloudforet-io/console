@@ -471,7 +471,7 @@ export default {
 
             const fields = schema?.options?.fields || tableState.schema?.options?.fields;
             if (fields) {
-                apiQuery.setOnly(...fields.map(d => d.key).filter(d => !d.startsWith('tags.')), 'reference.external_link', 'cloud_service_id', 'tags');
+                apiQuery.setOnly(...fields.map(d => d.key).filter(d => !d.startsWith('tags.')), 'reference.external_link', 'cloud_service_id', 'tags', 'provider');
             }
 
             return apiQuery.data;

@@ -279,7 +279,9 @@ export default {
                         return undefined;
                     }).compact().uniqBy('id')
                     .value();
-                state.selectedToolId = state.dataTools[0].id;
+                if (state.dataTools.length > 0) {
+                    state.selectedToolId = state.dataTools[0].id;
+                }
             } catch (e) {
                 console.error(e);
             }
