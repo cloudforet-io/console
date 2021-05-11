@@ -17,7 +17,15 @@ export const getValueByPath = (data: any, path: string|null) => {
     if (typeof path !== 'string') return data;
 
     let target = data;
-    const pathArr = path.split('.');
+
+    // TODO: remove temporary codes for tags
+    let pathArr;
+    if (path.startsWith('tags.')) {
+        pathArr = ['tags', path.slice(5)];
+    } else {
+        pathArr = path.split('.');
+    }
+
 
     for (let i = 0; i < pathArr.length; i++) {
         if (target === undefined || target === null || typeof target !== 'object') return target;
