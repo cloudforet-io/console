@@ -10,7 +10,7 @@
                 <strong v-if="i !== 0" :key="`${i}-match`">{{ getMatchText(item.name) }}</strong>
                 <span :key="i">{{ text }}</span>
             </template>
-            <span v-if="item.key.startsWith(TAGS_PREFIX)" class="ml-1 text-gray-400">{{ $t('COMMON.CUSTOM_FIELD_MODAL.TAG') }}</span>
+            <span v-if="item.options && item.options.field_description" class="ml-1 text-gray-400">{{ $t(item.options.field_description) || item.options.field_description }}</span>
         </span>
         <p-i name="ic_drag-handle" width="1rem" height="1rem"
              class="drag-icon"
