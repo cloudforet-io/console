@@ -352,7 +352,7 @@ export default {
         .menu-container {
             @apply pr-4;
             .p-context-menu {
-                width: 100%;
+                min-width: 100%;
             }
             .context-item {
                 padding-top: .41rem;
