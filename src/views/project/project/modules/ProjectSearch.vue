@@ -36,15 +36,17 @@
                     <p-i :name="item.icon" height="1rem" width="1rem"
                          class="mr-1"
                     />
-                    <template v-if="trimmedValue">
-                        <span v-for="(text, i) in item.label.split(regex)" :key="i">
-                            <strong v-if="i !== 0">{{ getMatchText(item.label) }}</strong>
-                            <span class="font-normal">{{ text }}</span>
-                        </span>
-                    </template>
-                    <template v-else>
-                        <span>{{ item.label }}</span>
-                    </template>
+                    <div class="ellipsis">
+                        <template v-if="trimmedValue">
+                            <span v-for="(text, i) in item.label.split(regex)" :key="i">
+                                <strong v-if="i !== 0">{{ getMatchText(item.label) }}</strong>
+                                <span class="font-normal">{{ text }}</span>
+                            </span>
+                        </template>
+                        <template v-else>
+                            <span>{{ item.label }}</span>
+                        </template>
+                    </div>
                     <!--                    <template v-if="item.dataType === 'PROJECT'">-->
                     <!--                        <span class="link-icon"><p-i name="ic_external-link" height="0.875rem" width="0.875rem" /></span>-->
                     <!--                    </template>-->
@@ -350,7 +352,11 @@ export default {
         .menu-container {
             @apply pr-4;
             .p-context-menu {
-                /*min-height: 2rem;*/
+                width: 100%;
+            }
+            .context-item {
+                padding-top: .41rem;
+                padding-bottom: .41rem;
             }
         }
     }
@@ -367,10 +373,16 @@ export default {
         }
     }
     .menu-item {
-        @apply text-gray-900 cursor-pointer truncate;
+        @apply text-gray-900 cursor-pointer;
         display: flex;
         align-items: center;
-        line-height: 1.2;
+        .p-i-icon {
+            flex-shrink: 0;
+        }
+        .ellipsis {
+            @apply truncate;
+            line-height: 1.4;
+        }
         .link-icon {
             @apply self-start ml-1 text-gray-500;
             line-height: 0.8;
