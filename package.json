@@ -42,7 +42,9 @@
     "css": "node build/css.js",
     "analyze": "NODE_ENV=production VUE_APP_ANALYZE_MOD=true vue-cli-service build",
     "lint": "eslint --ext .js,.vue src",
-    "test": "jest"
+    "test": "jest",
+    "cm": "cz",
+    "prepare": "husky install"
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
@@ -90,6 +92,8 @@
     "@babel/preset-env": "^7.12.11",
     "@babel/preset-typescript": "^7.12.7",
     "@babel/runtime-corejs2": "^7.10.3",
+    "@commitlint/cli": "^12.1.1",
+    "@commitlint/config-conventional": "^12.1.1",
     "@storybook/addon-a11y": "^6.1.18",
     "@storybook/addon-actions": "^6.1.18",
     "@storybook/addon-console": "^1.2.3",
@@ -125,12 +129,15 @@
     "babel-eslint": "^10.0.3",
     "babel-jest": "^23.6.0",
     "babel-preset-vue": "^2.0.2",
+    "commitizen": "^4.2.4",
+    "copy-webpack-plugin": "^4.6.0",
     "css-loader": "^3.2.0",
     "eslint": "^5.16.0",
     "eslint-import-resolver-typescript": "^2.0.0",
     "eslint-plugin-vue": "^5.0.0",
     "fork-ts-checker-webpack-plugin": "^6.0.3",
     "https-proxy-agent": "^2.2.4",
+    "husky": "^6.0.0",
     "jest": "^26.6.3",
     "jest-serializer-vue": "^2.0.2",
     "jest-transform-stub": "^2.0.0",
@@ -163,8 +170,7 @@
     "vue-loader": "^15.8.3",
     "vue-template-compiler": "^2.6.10",
     "webpack": "^4.28.4",
-    "webpack-bundle-analyzer": "^3.8.0",
-    "copy-webpack-plugin": "^4.6.0"
+    "webpack-bundle-analyzer": "^3.8.0"
   },
   "browserslist": [
     "> 1%",
