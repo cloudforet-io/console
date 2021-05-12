@@ -27,7 +27,8 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -41,6 +42,7 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import config from '@/lib/config';
 import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/type';
+import {showLoadingMessage} from "@/lib/util";
 
 export default {
     name: 'ServerMember',
@@ -54,6 +56,7 @@ export default {
         },
     },
     setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             users: computed(() => store.state.resource.user.items),
             fields: [
@@ -111,6 +114,7 @@ export default {
 
         const onExport = async () => {
             try {
+                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
                 await store.dispatch('file/downloadExcel', {
                     url: '/inventory/server/member/list',
                     param: {

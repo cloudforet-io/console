@@ -27,7 +27,8 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
     PTextList, PBadge, PPanelTop, PSearchTable,
@@ -38,7 +39,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import config from '@/lib/config';
-import { iso8601Formatter } from '@/lib/util';
+import {iso8601Formatter, showLoadingMessage} from '@/lib/util';
 import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/type';
 
@@ -55,6 +56,7 @@ export default {
         },
     },
     setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             fields: [
@@ -111,6 +113,7 @@ export default {
 
         const onExport = async () => {
             try {
+                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
                 await store.dispatch('file/downloadExcel', {
                     url: '/inventory/server/get-data',
                     param: getParams(),

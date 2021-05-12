@@ -209,7 +209,7 @@ import {
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { assetUrlConverter, showErrorMessage, showSuccessMessage } from '@/lib/util';
+import {assetUrlConverter, showErrorMessage, showLoadingMessage, showSuccessMessage} from '@/lib/util';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import { QueryHelper } from '@/lib/query';
@@ -522,7 +522,7 @@ export default {
 
         const exportCloudServiceData = async () => {
             try {
-                // console.log(tableState.schema.options, 'detail');
+                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
                 await store.dispatch('file/downloadExcel', {
                     url: '/inventory/cloud-service/list',
                     param: { query: getQuery() },
