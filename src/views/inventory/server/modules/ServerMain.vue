@@ -170,7 +170,7 @@ import {
     makeQuerySearchPropsWithSearchSchema,
 } from '@/lib/component-utils/dynamic-layout';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import {showErrorMessage, showLoadingMessage, showSuccessMessage} from '@/lib/util';
 import { QueryHelper } from '@/lib/query';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
@@ -423,6 +423,7 @@ export default {
         };
         const exportServerData = async () => {
             try {
+                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
                 await store.dispatch('file/downloadExcel', {
                     url: '/inventory/server/list',
                     param: { query: getQuery() },

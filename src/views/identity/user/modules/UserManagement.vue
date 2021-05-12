@@ -200,7 +200,7 @@ import { store } from '@/store';
 import { SpaceConnector } from '@/lib/space-connector';
 import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import {showErrorMessage, showLoadingMessage, showSuccessMessage} from '@/lib/util';
 import { FILE_NAME_PREFIX } from '@/lib/type';
 
 interface UserModel {
@@ -468,6 +468,7 @@ export default {
         };
         const exportUserDataToExcel = async () => {
             try {
+                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
                 await store.dispatch('file/downloadExcel', {
                     url: '/identity/user/list',
                     param: {

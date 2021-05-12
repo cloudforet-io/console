@@ -54,6 +54,7 @@ import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { find } from 'lodash';
 import { FILE_NAME_PREFIX } from '@/lib/type';
+import {showLoadingMessage} from "@/lib/util";
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
     sortBy: '',
@@ -217,6 +218,7 @@ export default {
                 const fields = state.currentLayout?.options?.fields;
                 if (!fields) return;
                 try {
+                    showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
                     await store.dispatch('file/downloadExcel', {
                         url: '/inventory/cloud-service/get-data',
                         param: getParams(),

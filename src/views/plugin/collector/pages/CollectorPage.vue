@@ -189,7 +189,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import {
     iso8601Formatter,
-    showErrorMessage, showSuccessMessage,
+    showErrorMessage, showLoadingMessage, showSuccessMessage,
 } from '@/lib/util';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
 import { replaceUrlQuery } from '@/lib/router-query-string';
@@ -465,6 +465,7 @@ export default {
 
         const exportCollectorDataToExcel = async () => {
             try {
+                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
                 await store.dispatch('file/downloadExcel', {
                     url: '/inventory/collector/list',
                     param: { query: getQuery() },

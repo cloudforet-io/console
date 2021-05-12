@@ -88,7 +88,7 @@ export const showLoadingMessage = (loadingTitle, loadingMessage, root) => {
             type: 'loading',
             title: loadingTitle,
             text: loadingMessage,
-            duration: 5000,
+            duration: -1,
             speed: 500,
         });
     }
