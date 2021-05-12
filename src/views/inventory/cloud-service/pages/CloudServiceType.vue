@@ -548,12 +548,13 @@ export default {
 
         const excelApiQuery = new ApiQueryHelper();
         const getQuery = (data, field) => {
+            const { filters } = sidebarFilters.value;
             excelApiQuery
-                .setFilters([
-                    { k: 'provider', o: '=', v: data.provider },
-                    { k: 'cloud_service_group', o: '=', v: data.cloud_service_group },
-                    { k: 'cloud_service_type', o: '=', v: data.cloud_service_type },
-                ]);
+                .setFilters(filters)
+                .addFilter({ k: 'provider', o: '=', v: data.provider })
+                .addFilter({ k: 'cloud_service_group', o: '=', v: data.cloud_service_group })
+                .addFilter({ k: 'cloud_service_type', o: '=', v: data.cloud_service_type })
+                .addFilter(...queryHelper.filters);
             const fields = field;
             if (fields) {
                 excelApiQuery.setOnly(...fields.map(d => d.key));
