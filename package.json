@@ -45,8 +45,7 @@
     "test": "jest",
     "cm": "cz",
     "prepare": "husky install",
-    "semantic-release": "semantic-release",
-    "local-semantic-release": "NPM_TOKEN=f0099c51-166b-444e-a469-1ca2cff3cde3 GH_TOKEN=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 semantic-release --no-ci"
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
