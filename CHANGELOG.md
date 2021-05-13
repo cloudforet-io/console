@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.0.2...v1.0.3) (2021-05-13)
+
+
+### Bug Fixes
+
+* this is for semantic release test ([05174da](https://github.com/spaceone-dev/spaceone-design-system/commit/05174da050314a4e329fc049ca157e0745a1cbb4))
+
 ## [1.0.2](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.0.1...v1.0.2) (2021-05-13)
 
 
