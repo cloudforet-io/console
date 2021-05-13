@@ -27,21 +27,21 @@
             <p-divider class="menu-divider" />
             <div v-for="(item) in sidebarState.userMenuList" :key="item.label"
                  class="menu-item"
-                 :class="{'selected': item.label === sidebarState.selectedItem}"
-                 @click="showAccountPage(item)"
+                 :class="{'selected': item.label === sidebarState.selectedItem.label}"
+                 @click="showPage(item)"
             >
                 {{ item.label }}
             </div>
             <div v-if="userState.isAdmin" class="admin-menu-wrapper">
                 <div class="menu-title">
-                    {{$t('IDENTITY.USER.MAIN.ADMINISTRATION')}}
+                    {{ $t('IDENTITY.USER.MAIN.ADMINISTRATION') }}
                 </div>
                 <p-divider class="menu-divider" />
                 <div v-for="(item) in sidebarState.adminMenuList"
                      :key="item.label"
                      class="menu-item"
-                     :class="{'selected': item.label === sidebarState.selectedItem}"
-                     @click="showManagementPage(item)"
+                     :class="{'selected': item.label === sidebarState.selectedItem.label}"
+                     @click="showPage(item)"
                 >
                     {{ $t('IDENTITY.USER.MAIN.USER_MANAGEMENT') }}
                 </div>
@@ -66,11 +66,13 @@ import VerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.v
 import { store } from '@/store';
 import router from '@/routes';
 import VueI18n from 'vue-i18n';
+import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 
 import TranslateResult = VueI18n.TranslateResult;
 
 interface SidebarItemType {
-    label: TranslateResult;
+    label?: TranslateResult;
+    routeName?: string;
 }
 
 export default {
@@ -105,30 +107,35 @@ export default {
             userMenuList: [
                 {
                     label: vm.$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE'),
+                    routeName: IDENTITY_ROUTE.USER.ACCOUNT,
+                },
+                {
+                    label: vm.$t('IDENTITY.USER.MAIN.API_KEY'),
+                    routeName: IDENTITY_ROUTE.USER.API_KEY,
                 },
             ],
             adminMenuList: [
                 {
                     label: vm.$t('IDENTITY.USER.MAIN.USER_MANAGEMENT'),
+                    routeName: IDENTITY_ROUTE.USER.MANAGEMENT,
                 },
             ],
-            selectedItem: '' as TranslateResult,
+            selectedItem: {} as SidebarItemType,
         });
-        const showAccountPage = (item) => {
-            sidebarState.selectedItem = item.label;
-            vm.$router.replace({ name: 'userAccount', query: { ...router.currentRoute.query } }).catch(() => {});
-        };
-        const showManagementPage = (item) => {
-            sidebarState.selectedItem = item.label;
-            vm.$router.replace({ name: 'userManagement', query: { ...router.currentRoute.query } }).catch(() => {});
+        const showPage = (item) => {
+            sidebarState.selectedItem = item;
+            vm.$router.replace({ name: item.routeName, query: { ...router.currentRoute.query } }).catch(() => {});
         };
 
         const selectSidebarItem = (routeName) => {
-            if (routeName === 'userAccount') {
-                sidebarState.selectedItem = sidebarState.userMenuList[0].label as TranslateResult;
+            if (routeName === IDENTITY_ROUTE.USER.ACCOUNT) {
+                sidebarState.selectedItem = sidebarState.userMenuList[0];
             }
-            if (routeName === 'userManagement') {
-                sidebarState.selectedItem = sidebarState.adminMenuList[0].label as TranslateResult;
+            if (routeName === IDENTITY_ROUTE.USER.API_KEY) {
+                sidebarState.selectedItem = sidebarState.userMenuList[1];
+            }
+            if (routeName === IDENTITY_ROUTE.USER.MANAGEMENT) {
+                sidebarState.selectedItem = sidebarState.adminMenuList[0];
             }
         };
 
@@ -142,8 +149,7 @@ export default {
         return {
             userState,
             sidebarState,
-            showAccountPage,
-            showManagementPage,
+            showPage,
         };
     },
 

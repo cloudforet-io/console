@@ -1,6 +1,7 @@
 import { RouteConfig } from 'vue-router';
 
 const UserAccount = () => import(/* webpackChunkName: "UserAccount" */ '@/views/identity/user/modules/UserAccount.vue');
+const UserAPIKey = () => import(/* webpackChunkName: "UserAPIKey" */ '@/views/identity/user/modules/UserAPIKey.vue');
 const UserManagement = () => import(/* webpackChunkName: "UserManagement" */ '@/views/identity/user/modules/UserManagement.vue');
 const UserPage = () => import(/* webpackChunkName: "User" */ '@/views/identity/user/pages/UserPage.vue');
 const ServiceAccount = () => import(/* webpackChunkName: "ServiceAccount" */ '@/views/identity/service-account/pages/ServiceAccountPage.vue');
@@ -20,6 +21,7 @@ export const IDENTITY_ROUTE = Object.freeze({
         MAIN: 'user',
         MANAGEMENT: 'userManagement',
         ACCOUNT: 'userAccount',
+        API_KEY: 'userAPIKey',
     },
 });
 
@@ -87,6 +89,11 @@ export default {
                             path: 'account',
                             name: IDENTITY_ROUTE.USER.ACCOUNT,
                             component: UserAccount,
+                        },
+                        {
+                            path: 'api-key',
+                            name: IDENTITY_ROUTE.USER.API_KEY,
+                            component: UserAPIKey,
                         },
                     ],
                 },
