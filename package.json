@@ -45,7 +45,8 @@
     "test": "jest",
     "cm": "cz",
     "prepare": "husky install",
-    "semantic-release": "semantic-release"
+    "semantic-release": "semantic-release",
+    "local-semantic-release": "NPM_TOKEN=f0099c51-166b-444e-a469-1ca2cff3cde3 GH_TOKEN=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 semantic-release --no-ci"
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
@@ -95,6 +96,8 @@
     "@babel/runtime-corejs2": "^7.10.3",
     "@commitlint/cli": "^12.1.1",
     "@commitlint/config-conventional": "^12.1.1",
+    "@semantic-release/changelog": "^5.0.1",
+    "@semantic-release/git": "^9.0.0",
     "@storybook/addon-a11y": "^6.1.18",
     "@storybook/addon-actions": "^6.1.18",
     "@storybook/addon-console": "^1.2.3",
