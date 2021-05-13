@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.0.1...v1.0.2) (2021-05-13)
+
+
+### Bug Fixes
+
+*  add fix commit due to npm version conflict ([91804b1](https://github.com/spaceone-dev/spaceone-design-system/commit/91804b1f0fc6c36371c737b30646c52187da4769))
+
 ## [1.0.1](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.0.0...v1.0.1) (2021-05-13)
 
 
