@@ -1,17 +1,24 @@
-name: CI
+name: Release
 on:
   workflow_dispatch:
   push:
     branches:
       - master
 jobs:
-  test:
-    runs-on: ubuntu-16.04
+  release:
+    name: Release
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
+      - name: Checkout
+        uses: actions/checkout@v2
         with:
-          node-version: '12'
+          fetch-depth: 0
+          submodules: true
+      - name: Setup Node.js
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12
+      - name: Install dependencies
       - run: npm install
       - run: npm run build
       - run: npm run css
