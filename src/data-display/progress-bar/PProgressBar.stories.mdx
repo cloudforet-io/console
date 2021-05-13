@@ -1,0 +1,114 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PProgressBar from '@/data-display/progress-bar/PProgressBar.vue';
+import { primary1 } from '@/styles/colors';
+
+<Meta title='Data Display/Progress Bar' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124064',
+    }
+}} component={ PProgressBar } argTypes={{
+    percentage: {
+        name: 'percentage',
+        type: {name: 'number'},
+        description: 'Progress percentage.',
+        defaultValue: 50,
+        table: {
+            type: {
+                summary: 'number'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 0
+            }
+        },
+        control: {
+            type: 'number'
+        }
+    },
+    label: {
+        name: 'label',
+        type: {name:' string'},
+        description: 'Label text.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'null',
+            }
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    color: {
+        name: 'color',
+        type: {name:' string'},
+        description: 'Color of tracker bar.',
+        defaultValue: primary1,
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: primary1
+            }
+        },
+        control: {
+            type: 'color'
+        }
+    },
+}}
+/>
+
+export const Template = (args,{argTypes})=>({
+    props: Object.keys(argTypes),
+    components: { PProgressBar },
+    template: `
+<div style="display:flex; align-items:center; justify-content:center; height:100px;">
+    <p-progress-bar
+        :percentage="percentage"
+        :label="label"
+        :color="color"
+        :style="'width: 10rem;'"
+    />
+</div>`,
+})
+
+# Progress Bar
+
+<br/>
+<br/>
+<br/>
+
+## Label
+<Canvas>
+    <Story name="Progress bar with label">
+        {{
+            components:{ PProgressBar },
+            template: `
+<div style="display:flex; align-items:center; justify-content:center;">
+    <p-progress-bar
+        percentage="40"
+        label="label"
+        :color="primary1"
+        :style="{ width: '10rem' }"
+    />
+</div>`,
+        }}
+    </Story>
+</Canvas>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" height="100px">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground" />

@@ -1,9 +1,7 @@
 <template>
     <div class="progress-bar">
-        <div class="info">
-            <label class="percentage"> {{ label }}  </label>
-        </div>
-        <div class="background-bar" />
+        <label v-if="label" class="label">{{ label }}</label>
+        <div ref="backgroundBar" class="background-bar" />
         <transition appear @before-appear="beforeEnter" @after-appear="enter">
             <div ref="progressBar" class="tracker-bar" :style="{'background-color': color}" />
         </transition>
@@ -11,8 +9,8 @@
 </template>
 
 <script lang="ts">
-
-import { computed, ref, watch } from '@vue/composition-api';
+import { reactive, toRefs, watch } from '@vue/composition-api';
+import { ProgressBarProps } from '@/data-display/progress-bar/type';
 
 export default {
     name: 'PProgressBar',
@@ -23,15 +21,18 @@ export default {
         },
         label: {
             type: String,
-            default: '',
+            default: undefined,
         },
         color: {
             type: String,
             default: 'rgba(theme(\'colors.primary1\')',
         },
     },
-    setup(props) {
-        const progressBar = ref(null);
+    setup(props: ProgressBarProps) {
+        const state = reactive({
+            progressBar: null as HTMLElement | null,
+        });
+
         const beforeEnter = (element) => {
             element.style.width = 0;
         };
@@ -43,14 +44,14 @@ export default {
 
         watch(() => props.percentage, (after, before) => {
             if (after !== before) {
-                enter(progressBar.value);
+                enter(state.progressBar);
             }
         });
 
         return {
+            ...toRefs(state),
             beforeEnter,
             enter,
-            progressBar,
         };
     },
 };
@@ -59,42 +60,32 @@ export default {
 <style lang="postcss">
 .progress-bar {
     width: 100%;
-    .active {
-        label {
-            @apply text-blue-500;
-        }
-        .tracker-bar {
-            @apply bg-blue-500;
-        }
+
+    .label {
+        @apply text-gray-900;
+        display: block;
+        font-size: 0.875rem;
+        font-weight: bolder;
+        line-height: 1.4;
+        padding-bottom: 0.125rem;
     }
 
-    label {
-        color: grey;
-    }
-    .info {
-        font-size: 17px;
-        justify-content: space-between;
-        display: flex;
-        color: grey;
-        text-transform: uppercase;
-        .percentage {
-            font-weight: bolder;
-        }
-    }
     .background-bar {
         @apply bg-gray-100;
         width: 100%;
-        height: 6px;
-        border-radius: 2px;
+        height: 0.375rem;
+        overflow: hidden;
+        border-radius: 0.125rem;
     }
 
     .tracker-bar {
         @apply bg-primary;
-        height: 5px;
-        border-radius: 2px;
+        height: 0.375rem;
         width: 0;
+        overflow: hidden;
         transition: width 0.5s linear;
-        margin-top: -5px;
+        border-radius: 0.125rem;
+        margin-top: -0.375rem;
     }
 }
 </style>
