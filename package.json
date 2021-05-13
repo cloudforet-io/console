@@ -1,6 +1,6 @@
 {
   "name": "@spaceone/design-system",
-  "version": "0.1.1-dev.134",
+  "version": "0.0.0-development",
   "description": "SpaceONE Design System",
   "keywords": [
     "spaceone",
@@ -44,7 +44,8 @@
     "lint": "eslint --ext .js,.vue src",
     "test": "jest",
     "cm": "cz",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "semantic-release": "semantic-release"
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
@@ -171,7 +172,8 @@
     "vue-loader": "^15.8.3",
     "vue-template-compiler": "^2.6.10",
     "webpack": "^4.28.4",
-    "webpack-bundle-analyzer": "^3.8.0"
+    "webpack-bundle-analyzer": "^3.8.0",
+    "semantic-release": "^17.4.3"
   },
   "browserslist": [
     "> 1%",
