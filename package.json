@@ -45,7 +45,7 @@
     "test": "jest",
     "cm": "cz",
     "prepare": "husky install",
-    "semantic-release": "SKIP_PREPARE_COMMIT_MSG=1 COMMIT_MSG=1 semantic-release"
+    "semantic-release": "SKIP_PREPARE_COMMIT_MSG=1 SKIP_COMMIT_MSG=1 semantic-release"
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",
