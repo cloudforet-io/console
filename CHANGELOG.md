@@ -1,3 +1,10 @@
+# [1.1.0-beta.2](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.1...v1.1.0-beta.2) (2021-05-14)
+
+
+### Features
+
+* add font weight props, secondary dark color type to button ([#526](https://github.com/spaceone-dev/spaceone-design-system/issues/526)) ([979e2ff](https://github.com/spaceone-dev/spaceone-design-system/commit/979e2ff0a73e0ab16bb2251c593f646400627352))
+
 # [1.1.0-beta.1](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.0.1...v1.1.0-beta.1) (2021-05-14)
 
 
