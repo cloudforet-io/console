@@ -4,9 +4,9 @@
 import icon from 'vue-svgicon'
 icon.register({
   'ic_checkbox--checked': {
-    width: 16,
-    height: 16,
-    viewBox: '0 0 24 24',
-    data: '<path pid="0" d="M18 3.5H6C4.6 3.5 3.5 4.6 3.5 6v12c0 1.4 1.1 2.5 2.5 2.5h12c1.4 0 2.5-1.1 2.5-2.5V6c0-1.4-1.1-2.5-2.5-2.5z" _fill="#0080fb"/><path pid="1" d="M10 13.3L7.6 11 6 12.6l4 4L18.6 8l-1.4-1.7-7.2 7z" fill-rule="evenodd" clip-rule="evenodd" _fill="#fff"/>'
+    width: 20,
+    height: 20,
+    viewBox: '0 0 20 20',
+    data: '<path pid="0" d="M5.333 2.833a2.5 2.5 0 00-2.5 2.5v9.334a2.5 2.5 0 002.5 2.5h9.333a2.5 2.5 0 002.5-2.5V5.333a2.5 2.5 0 00-2.5-2.5H5.333z" _fill="#007EE5"/><path pid="1" fill-rule="evenodd" clip-rule="evenodd" d="M8.297 11.066L6.312 9.142 5 10.487l3.34 3.34 7.16-7.16-1.19-1.398-6.013 5.797z" _fill="#fff"/>'
   }
 })
