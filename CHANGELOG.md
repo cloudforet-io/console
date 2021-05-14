@@ -1,3 +1,10 @@
+# [1.1.0-beta.4](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.3...v1.1.0-beta.4) (2021-05-14)
+
+
+### Features
+
+* add lottie_in_progress ([#530](https://github.com/spaceone-dev/spaceone-design-system/issues/530)) ([91b1ea0](https://github.com/spaceone-dev/spaceone-design-system/commit/91b1ea076119bf7ffc9f68646e0926830b25014b))
+
 # [1.1.0-beta.3](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.2...v1.1.0-beta.3) (2021-05-14)
 
 
