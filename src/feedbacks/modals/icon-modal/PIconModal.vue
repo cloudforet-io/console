@@ -7,8 +7,8 @@
                      aria-labelledby="headerTitle"
                      tabindex="1"
             >
-                <div class="modal-wrapper">
-                    <div class="content-wrapper">
+                <div class="modal-wrapper" :class="size">
+                    <div class="content-wrapper" :class="size">
                         <p-lottie v-if="lottieName"
                                   :name="lottieName"
                                   :size="5"
@@ -18,13 +18,16 @@
                              width="5rem" height="5rem"
                         />
                         <span v-if="emoji" class="wave">👋</span>
-                        <div class="text-wrapper">
+                        <div class="header-wrapper" :class="size">
                             <p v-if="headerTitle" class="header-title">
                                 {{ headerTitle }}
                             </p>
-                            <span v-if="bodyText">
-                                {{ bodyText }}
+                            <span v-if="headerDesc" class="header-desc">
+                                {{ headerDesc }}
                             </span>
+                        </div>
+                        <div v-if="size === 'md'" class="body-wrapper">
+                            <slot name="body" />
                         </div>
                         <p-button
                             :style-type="buttonType" :outline="outline"
@@ -58,6 +61,10 @@ export default {
         PButton,
     },
     props: {
+        size: {
+            type: String,
+            default: 'sm',
+        },
         visible: {
             type: Boolean,
             default: false,
@@ -78,7 +85,7 @@ export default {
             type: String,
             default: undefined,
         },
-        bodyText: {
+        headerDesc: {
             type: String,
             default: undefined,
         },
@@ -120,16 +127,29 @@ export default {
 
 <style lang="postcss">
 .p-icon-modal {
-    .content-wrapper {
-        @apply bg-white mx-auto;
-        text-align: center;
-        opacity: 0.9;
-        border-radius: 1rem;
-        padding: 3.75rem;
-        width: 100%;
+    .modal-wrapper {
+        width: calc(100vw - 1.5rem);
         min-width: 17rem;
         max-width: 32rem;
         min-height: 12.875rem;
+        max-height: calc(100vh - 4rem);
+        &.md {
+            min-width: 25rem;
+            max-width: 37.5rem;
+            min-height: 12.875rem;
+        }
+    }
+    .content-wrapper {
+        @apply bg-white mx-auto;
+        text-align: center;
+        border-radius: 1rem;
+        padding: 2.875rem 2rem 3.5rem;
+        width: 100%;
+        min-height: 10.5rem;
+
+        &.md {
+            padding: 3.5rem 2rem;
+        }
 
         .p-lottie {
             display: inline-flex;
@@ -175,16 +195,24 @@ export default {
             }
         }
 
-        .text-wrapper {
-            padding-top: 1.5rem;
-            padding-bottom: 1.5rem;
+        .header-wrapper {
+            margin-top: 1.5rem;
+            margin-bottom: 1.5rem;
+            &.md {
+                margin-top: 0.625rem;
+                margin-bottom: 2.5rem;
+            }
 
             .header-title {
                 @apply text-primary-dark;
-                font-size: 1.375rem;
+                font-size: 1.5rem;
                 font-weight: bold;
-                padding-bottom: 0.5rem;
+                line-height: 160%;
+                margin-bottom: 0.25rem;
             }
+        }
+        .body-wrapper {
+            margin-bottom: 1.5rem;
         }
     }
 }

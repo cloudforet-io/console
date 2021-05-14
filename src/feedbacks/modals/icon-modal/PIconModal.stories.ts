@@ -25,7 +25,7 @@ export const iconModal = () => ({
                 :visible.sync="loading"
                 :icon-name="iconName"
                 :header-title="headerTitle"
-                :body-text="bodyText"
+                :header-desc="headerDesc"
                 :button-text="buttonText"
                 @clickButton="onClickCancel"
             />
@@ -37,11 +37,60 @@ export const iconModal = () => ({
         headerTitle: {
             default: 'Loading...',
         },
-        bodyText: {
+        headerDesc: {
             default: 'Please wait around 10 seconds!',
         },
         buttonText: {
-            default: 'cancel',
+            default: 'Cancel',
+        },
+    },
+    setup() {
+        const state = reactive({
+            loading: false,
+        });
+
+        const onClickOpen = () => {
+            state.loading = true;
+        };
+        const onClickCancel = () => {
+            state.loading = false;
+        };
+
+        return {
+            ...toRefs(state),
+            onClickOpen,
+            onClickCancel,
+        };
+    },
+});
+
+export const iconModalMdType = () => ({
+    components: { PIconModal, PButton },
+    template: `
+        <div>
+            <p-button styleType="primary" @click="onClickOpen">Open Modal</p-button>
+            <p-icon-modal
+                :visible.sync="loading"
+                :icon-name="iconName"
+                :header-title="headerTitle"
+                :button-text="buttonText"
+                size="md"
+                @clickButton="onClickCancel"
+            >
+                <template #body>
+                    Content
+                </template>
+            </p-icon-modal>
+        </div>`,
+    props: {
+        iconName: {
+            default: 'ic_dashboard',
+        },
+        headerTitle: {
+            default: 'Loading...',
+        },
+        buttonText: {
+            default: 'Cancel',
         },
     },
     setup() {
