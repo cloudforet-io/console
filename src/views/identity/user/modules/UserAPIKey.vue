@@ -1,12 +1,16 @@
 <template>
     <section class="right-contents-container">
         <p-breadcrumbs :routes="routeState.routes" />
-        <p-page-title :title="$t('IDENTITY.USER.MAIN.API_KEY')" />
+        <p-page-title :title="$t('IDENTITY.USER.MAIN.API_KEY')"
+                      :title-info="'API Key는 스페이스원 사용과 spaceonectl(CLI) 설정에 관련된 요청을 인증하는 고유 식별자입니다.'"
+        />
         <p-pane-layout class="main-table-wrapper">
             <article class="table-header">
                 <div class="left-section">
-                    <p-icon-text-button style-type="primary-dark"
+                    <p-icon-text-button style-type="secondary-dark"
                                         name="ic_plus_bold"
+                                        @click="openAPIKeyConfirmModal"
+                                        @confirm="confirm"
                     >
                         {{ $t('IDENTITY.USER.MAIN.CREATE_API_KEY') }}
                     </p-icon-text-button>
@@ -26,6 +30,7 @@
                 :loading="loading"
                 :fields="fields"
                 :striped="false"
+                :selectable="true"
             />
         </p-pane-layout>
         <p-pane-layout class="sub-table-wrapper">
@@ -39,23 +44,33 @@
                 :striped="false"
             />
         </p-pane-layout>
+        <user-a-p-i-key-modal v-if="visible"
+                              :visible.sync="visible"
+                              @clickButton="confirm"
+        />
     </section>
 </template>
 
 <script lang="ts">
 import {
-    PEmpty, PBreadcrumbs, PIconTextButton,
+    PEmpty, PI, PBreadcrumbs, PIconTextButton,
     PDropdownMenuBtn, PDataTable, PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import UserAPIKeyModal from '@/views/identity/user/modules/UserAPIKeyModal.vue';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { store } from '@/store';
 
 export default {
     name: 'UserAPIKey',
     components: {
+        UserAPIKeyModal,
         PEmpty,
+        PI,
         PPaneLayout,
         PBreadcrumbs,
         PIconTextButton,
@@ -78,11 +93,14 @@ export default {
                     type: 'item', name: 'enable', label: vm.$t('IDENTITY.USER.MAIN.ENABLE'), disabled: !state.isSelected,
                 },
             ] as MenuItem[])),
+            visible: false,
+            userId: computed(() => store.state.user.userId),
         });
         const subState = reactive({
             loading: false,
             fields: [
                 { name: 'service', label: 'Service' },
+                { name: 'name', label: 'Name' },
                 { name: 'version', label: 'Version' },
                 { name: 'endpoint', label: 'Endpoint' },
                 { name: 'status', label: 'Status' },
@@ -97,10 +115,41 @@ export default {
             ])),
         });
 
+        const apiQueryHelper = new ApiQueryHelper();
+        const listAPIKey = async () => {
+            apiQueryHelper.setSort('created_at')
+                .setFilters([{ k: 'user_id', v: state.userId, o: '=' }]);
+
+            const res = await SpaceConnector.client.identity.apiKey.list({
+                query: apiQueryHelper.data,
+            });
+            state.items = res.results;
+        };
+
+        const listEndpoints = async () => {
+            const res = await SpaceConnector.client.identity.endpoint.list();
+            subState.items = res.results;
+        };
+
+        const openAPIKeyConfirmModal = () => {
+            state.visible = true;
+        };
+
+        const confirm = () => {
+            state.visible = false;
+        };
+
+        (async () => {
+            await listAPIKey();
+            await listEndpoints();
+        })();
+
         return {
             ...toRefs(state),
             subState,
             routeState,
+            openAPIKeyConfirmModal,
+            confirm,
         };
     },
 
@@ -108,6 +157,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.title-extra {
+
+}
 .main-table-wrapper {
     width: 100%;
     height: 100%;

@@ -65,7 +65,7 @@
         <p-icon-modal :visible.sync="loading"
                       lottie-name="lottie_interval"
                       :header-title="$t('PROJECT.DETAIL.REPORT_LOADING_TITLE')"
-                      :body-text="$t('PROJECT.DETAIL.REPORT_LOADING_DESC')"
+                      :header-desc="$t('PROJECT.DETAIL.REPORT_LOADING_DESC')"
                       :button-text="$t('PROJECT.DETAIL.REPORT_CANCEL')"
                       @clickButton="onClickCancel"
         />
