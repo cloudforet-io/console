@@ -1,3 +1,11 @@
+# [1.1.0-beta.1](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.0.1...v1.1.0-beta.1) (2021-05-14)
+
+
+### Features
+
+* add md style type to icon modal ([#522](https://github.com/spaceone-dev/spaceone-design-system/issues/522)) ([621ba46](https://github.com/spaceone-dev/spaceone-design-system/commit/621ba46ba512cc63cd1332c550d6ae5d7a84a711))
+* add title info props to page title ([#524](https://github.com/spaceone-dev/spaceone-design-system/issues/524)) ([bd144c2](https://github.com/spaceone-dev/spaceone-design-system/commit/bd144c2d909c368858751d5597888b07994caa34))
+
 ## [1.0.1](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.0.0...v1.0.1) (2021-05-14)
 
 
