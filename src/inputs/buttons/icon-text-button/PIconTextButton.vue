@@ -6,6 +6,7 @@
               :outline="outline"
               :href="href"
               :block="block"
+              :font-weight="fontWeight"
               v-on="$listeners"
               @mouseenter="onHover(true)"
               @mouseleave="onHover(false)"
@@ -33,7 +34,7 @@ import { reactive, computed, toRefs } from '@vue/composition-api';
 import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { IconTextButtonProps } from '@/inputs/buttons/icon-text-button/type';
-import { BUTTON_SIZE, BUTTON_STYLE } from '@/inputs/buttons/button/type';
+import { BUTTON_FONT_WEIGHT, BUTTON_SIZE, BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
 import { palette } from '@/styles/colors';
 
@@ -110,6 +111,14 @@ export default {
         block: {
             type: Boolean,
             default: false,
+        },
+        fontWeight: {
+            type: String,
+            default: 'bold',
+            validator(value) {
+                if (value === undefined) return true;
+                return Object.keys(BUTTON_FONT_WEIGHT).indexOf(value) !== -1;
+            },
         },
     },
     setup(props: IconTextButtonProps) {

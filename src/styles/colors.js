@@ -160,6 +160,7 @@ const semanticColors = {
     primary3: palette.violet[200],
     primary4: palette.violet[100],
     secondary: palette.blue[500],
+    secondaryDark: palette.blue[800],
     secondary1: palette.blue[400],
     secondary2: palette.blue[100],
     alert: palette.red[500],

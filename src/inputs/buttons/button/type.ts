@@ -4,6 +4,7 @@ export enum BUTTON_STYLE {
     primary1 = 'primary1',
     primary2 = 'primary2',
     secondary = 'secondary',
+    'secondary-dark' = 'secondary-dark',
     secondary1 = 'secondary1',
     gray = 'gray',
     gray900 = 'gray900',
@@ -20,8 +21,14 @@ export enum BUTTON_SIZE {
     lg = 'lg'
 }
 
+export enum BUTTON_FONT_WEIGHT {
+    normal = 'normal',
+    bold = 'bold'
+}
+
 export type ButtonStyle = keyof BUTTON_STYLE;
 export type ButtonSize = keyof BUTTON_SIZE;
+export type ButtonFontWeight = keyof BUTTON_FONT_WEIGHT;
 
 export interface Button {
     href?: string;
@@ -31,4 +38,5 @@ export interface Button {
     styleType?: ButtonStyle;
     size?: ButtonSize;
     block?: boolean;
+    fontWeight?: ButtonFontWeight;
 }

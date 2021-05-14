@@ -18,6 +18,9 @@ const getClass = (attrs: Button) => {
     if (attrs.styleType) {
         cls[attrs.styleType] = true;
     }
+    if (attrs.fontWeight) {
+        cls[attrs.fontWeight] = true;
+    }
     return cls;
 };
 
@@ -145,11 +148,20 @@ export default {
         line-height: 0.875rem;
     }
 
+    &.bold {
+        @apply font-bold;
+    }
+
+    &.normal {
+        @apply font-normal;
+    }
+
     @mixin btn-color primary-dark, theme('colors.primary-dark'), theme('colors.white');
     @mixin btn-color primary, theme('colors.primary'), theme('colors.white');
     @mixin btn-color primary1, theme('colors.primary1'), theme('colors.white');
     @mixin btn-color primary2, theme('colors.primary2'), theme('colors.white');
     @mixin btn-color secondary, theme('colors.secondary'), theme('colors.white');
+    @mixin btn-color secondary-dark, theme('colors.secondary-dark'), theme('colors.white');
     @mixin btn-color secondary1, theme('colors.secondary1'), theme('colors.white');
     @mixin btn-color gray, theme('colors.gray.default'), theme('colors.white');
     @mixin btn-color gray900, theme('colors.gray.900'), theme('colors.white');

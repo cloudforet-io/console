@@ -152,6 +152,25 @@ import {BUTTON_STYLE} from "@/inputs/buttons/button/type";
             type: 'boolean',
         }
     },
+    fontWeight: {
+        name: 'fontWeight',
+        type: { name: 'string' },
+        description: 'Font Weight',
+        defaultValue: 'bold',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'bold',
+            }
+        },
+        control: {
+            type: 'select',
+            options: ['light', 'normal', 'bold']
+        }
+    },
     onClick: {
         name:'click',
         type: {name: 'function'},
@@ -183,6 +202,7 @@ export const Template = (args, {argTypes})=>({
                 :loading="loading"
                 :outline="outline"
                 :block="block"
+                :fontWeight="fontWeight"
             >
                 <div v-if="loading" class="loading-btn">
                     <p-lottie v-if="loading" class="spinner"
