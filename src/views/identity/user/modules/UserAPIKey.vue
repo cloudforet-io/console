@@ -2,13 +2,14 @@
     <section class="right-contents-container">
         <p-breadcrumbs :routes="routeState.routes" />
         <p-page-title :title="$t('IDENTITY.USER.MAIN.API_KEY')"
-                      :title-info="'API Key는 스페이스원 사용과 spaceonectl(CLI) 설정에 관련된 요청을 인증하는 고유 식별자입니다.'"
+                      :title-info="$t('IDENTITY.USER.MAIN.API_KEY_TITLE_INFO')"
         />
         <p-pane-layout class="main-table-wrapper">
             <article class="table-header">
                 <div class="left-section">
                     <p-icon-text-button style-type="secondary-dark"
                                         name="ic_plus_bold"
+                                        :disabled="disableCreateBtn"
                                         @click="openAPIKeyConfirmModal"
                                         @confirm="confirm"
                     >
@@ -17,6 +18,9 @@
                     <p-dropdown-menu-btn
                         class="dropdown-btn"
                         :menu="dropdownMenu"
+                        @click-enable="onClickEnable"
+                        @click-disable="onClickDisable"
+                        @click-delete="onClickDelete"
                     >
                         {{ $t('IDENTITY.USER.MAIN.ACTION') }}
                     </p-dropdown-menu-btn>
@@ -29,6 +33,7 @@
                 :items="items"
                 :loading="loading"
                 :fields="fields"
+                :select-index.sync="selectedIndex"
                 :striped="false"
                 :selectable="true"
             />
@@ -48,13 +53,24 @@
                               :visible.sync="visible"
                               @clickButton="confirm"
         />
+        <p-table-check-modal
+            :fields="modalState.fields"
+            :mode="modalState.mode"
+            :items="selectedItems"
+            :header-title="modalState.title"
+            :sub-title="modalState.subTitle"
+            :theme-color="modalState.themeColor"
+            size="md"
+            :visible.sync="modalState.visible"
+            @confirm="checkModalConfirm"
+        />
     </section>
 </template>
 
 <script lang="ts">
 import {
     PEmpty, PI, PBreadcrumbs, PIconTextButton,
-    PDropdownMenuBtn, PDataTable, PPageTitle, PPaneLayout,
+    PDropdownMenuBtn, PDataTable, PPageTitle, PPaneLayout, PTableCheckModal,
 } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
@@ -64,6 +80,10 @@ import UserAPIKeyModal from '@/views/identity/user/modules/UserAPIKeyModal.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { store } from '@/store';
+import { TranslateResult } from 'vue-i18n';
+import {
+    hideLoadingMessage, showErrorMessage, showLoadingMessage, showSuccessMessage,
+} from '@/lib/util';
 
 export default {
     name: 'UserAPIKey',
@@ -77,6 +97,7 @@ export default {
         PDropdownMenuBtn,
         PDataTable,
         PPageTitle,
+        PTableCheckModal,
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -88,13 +109,24 @@ export default {
                 { name: 'created_at', label: 'Created' },
             ],
             items: [] as any,
+            selectedIndex: [],
+            selectedItems: computed(() => state.selectedIndex.map(i => state.items[i])),
             dropdownMenu: computed(() => ([
                 {
-                    type: 'item', name: 'enable', label: vm.$t('IDENTITY.USER.MAIN.ENABLE'), disabled: !state.isSelected,
+                    type: 'item', name: 'enable', label: vm.$t('IDENTITY.USER.MAIN.ENABLE'), disabled: state.selectedIndex.length !== 1,
+                },
+                { type: 'divider' },
+                {
+                    type: 'item', name: 'disable', label: vm.$t('IDENTITY.USER.MAIN.DISABLE'), disabled: state.selectedIndex.length !== 1,
+                },
+                { type: 'divider' },
+                {
+                    type: 'item', name: 'delete', label: vm.$t('IDENTITY.USER.MAIN.DELETE'), disabled: state.selectedIndex.length !== 1,
                 },
             ] as MenuItem[])),
             visible: false,
             userId: computed(() => store.state.user.userId),
+            disableCreateBtn: computed(() => state.items.length >= 2),
         });
         const subState = reactive({
             loading: false,
@@ -115,6 +147,24 @@ export default {
             ])),
         });
 
+        const modalState = reactive({
+            fields: computed(() => [
+                { name: 'api_key_id', label: 'API Key ID' },
+                { name: 'state', label: 'State' },
+                { name: 'created_at', label: 'Created' },
+            ]),
+            mode: '',
+            items: [] as any,
+            title: '' as TranslateResult,
+            subTitle: '' as TranslateResult,
+            themeColor: '',
+            visible: false,
+        });
+
+        const onSelect = async (index) => {
+            state.selectedIndex = index;
+        };
+
         const apiQueryHelper = new ApiQueryHelper();
         const listAPIKey = async () => {
             apiQueryHelper.setSort('created_at')
@@ -131,13 +181,101 @@ export default {
             subState.items = res.results;
         };
 
-        const openAPIKeyConfirmModal = () => {
-            state.visible = true;
+        const openAPIKeyConfirmModal = async () => {
+            try {
+                // showLoadingMessage('Create API Key', '', vm.$root);
+                await SpaceConnector.client.identity.apiKey.create({
+                    user_id: state.userId,
+                });
+                // hideLoadingMessage(vm.$root);
+                state.visible = true;
+            } catch (e) {
+                console.error(e);
+            } finally {
+                await listAPIKey();
+            }
         };
 
         const confirm = () => {
             state.visible = false;
         };
+
+        const enableAPIKey = async (item) => {
+            try {
+                await SpaceConnector.client.identity.apiKey.enable({
+                    api_key_id: item[0].api_key_id,
+                });
+                showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ENABLE_API_KEY'), '', vm.$root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ENABLE_API_KEY'), '', vm.$root);
+            } finally {
+                await listAPIKey();
+                modalState.visible = false;
+            }
+        };
+
+        const disableAPIKey = async (item) => {
+            try {
+                await SpaceConnector.client.identity.apiKey.disable({
+                    api_key_id: item[0].api_key_id,
+                });
+                showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_DISABLE_API_KEY'), '', vm.$root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_DISABLE_API_KEY'), '', vm.$root);
+            } finally {
+                await listAPIKey();
+                modalState.visible = false;
+            }
+        };
+
+        const deleteAPIKey = async (item) => {
+            try {
+                await SpaceConnector.client.identity.apiKey.delete({
+                    api_key_id: item[0].api_key_id,
+                });
+                showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_DELETE_API_KEY'), '', vm.$root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_DELETE_API_KEY'), '', vm.$root);
+            } finally {
+                state.selectedIndex = [];
+                await listAPIKey();
+                modalState.visible = false;
+            }
+        };
+
+        const onClickEnable = async () => {
+            modalState.mode = 'enable';
+            modalState.title = vm.$t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
+            modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', state.selectedIndex.length);
+            modalState.themeColor = 'safe';
+            modalState.visible = true;
+        };
+
+        const onClickDisable = async () => {
+            modalState.mode = 'disable';
+            modalState.title = vm.$t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
+            modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', state.selectedIndex.length);
+            modalState.themeColor = 'alert';
+            modalState.visible = true;
+        };
+
+        const onClickDelete = async () => {
+            modalState.mode = 'delete';
+            modalState.title = vm.$t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
+            modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', state.selectedIndex.length);
+            modalState.themeColor = 'alert';
+            modalState.visible = true;
+        };
+
+        const checkModalConfirm = async (item) => {
+            if (modalState.mode === 'delete') await deleteAPIKey(item);
+            if (modalState.mode === 'enable') await enableAPIKey(item);
+            if (modalState.mode === 'disable') await disableAPIKey(item);
+        };
+
 
         (async () => {
             await listAPIKey();
@@ -148,6 +286,12 @@ export default {
             ...toRefs(state),
             subState,
             routeState,
+            modalState,
+            onSelect,
+            onClickEnable,
+            onClickDisable,
+            onClickDelete,
+            checkModalConfirm,
             openAPIKeyConfirmModal,
             confirm,
         };

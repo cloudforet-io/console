@@ -7,7 +7,6 @@
                   @clickButton="onClickConfirm"
     >
         <template #body>
-            test
         </template>
     </p-icon-modal>
 </template>
