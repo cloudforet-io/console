@@ -25,7 +25,7 @@
                 <p-select-button-group :buttons="statusList" :selected.sync="selectedStatus" />
             </div>
         </template>
-        <template #col-service_account-format="{ value }">
+        <template #col-service_account_id-format="{ value }">
             <p-anchor :to="referenceRouter(
                 value,
                 { resource_type: 'identity.ServiceAccount' })"
@@ -33,7 +33,7 @@
                 {{ serviceAccounts[value] ? serviceAccounts[value].label : value }}
             </p-anchor>
         </template>
-        <template #col-project-format="{ value }">
+        <template #col-project_id-format="{ value }">
             <p-anchor :to="referenceRouter(
                 value,
                 { resource_type: 'identity.Project' })"
@@ -42,43 +42,53 @@
             </p-anchor>
         </template>
         <template #col-status-format="{ value }">
-            <span :class="value.toLowerCase()">{{ value }}</span>
+            <p-status
+                :icon="value === JOB_TASK_STATUS.success ? 'ic_state_active' : undefined"
+                :lottie="statusLottieFormatter(value)"
+                :text="statusFormatter(value)"
+                :icon-color="COMPLETED_ICON_COLOR"
+                :theme="[JOB_TASK_STATUS.canceled, JOB_TASK_STATUS.timeout, JOB_TASK_STATUS.failure].includes(value) ? 'red' : undefined"
+            />
+        </template>
+        <template #col-errors-format="{ value }">
+            {{ value.length }}
         </template>
     </p-toolbox-table>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import {capitalize} from 'lodash';
-import dayjs from 'dayjs';
-import {ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,} from '@vue/composition-api';
+import { capitalize } from 'lodash';
+import {
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
-import {PAnchor, PSelectButtonGroup, PToolboxTable} from '@spaceone/design-system';
+import {
+    PAnchor, PSelectButtonGroup, PStatus, PToolboxTable,
+} from '@spaceone/design-system';
 
-import {referenceRouter} from '@/lib/reference/referenceRouter';
-import {ApiQueryHelper} from '@/lib/space-connector/helper';
-import {SpaceConnector} from '@/lib/space-connector';
-import {makeEnumValueHandler, makeReferenceValueHandler} from '@/lib/component-utils/query-search';
-import {JOB_TASK_STATUS} from '@/views/management/collector-history/pages/config';
-import {iso8601Formatter} from '@/lib/util';
-import {store} from '@/store';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { SpaceConnector } from '@/lib/space-connector';
+import { makeEnumValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
+import { JOB_TASK_STATUS } from '@/views/management/collector-history/pages/config';
+import { iso8601Formatter, durationFormatter } from '@/lib/util';
+import { store } from '@/store';
+import { green } from '@/styles/colors';
 
 
+const COMPLETED_ICON_COLOR = green[400];
+
+const statusLottieFormatter = (status) => {
+    if (status === JOB_TASK_STATUS.success) return undefined;
+    if (status === JOB_TASK_STATUS.pending) return 'lottie_interval';
+    if (status === JOB_TASK_STATUS.progress) return 'lottie_in_progress';
+    return 'lottie_error';
+};
 const statusFormatter = (status) => {
     if (status === JOB_TASK_STATUS.progress) return 'In-Progress';
     if (status === JOB_TASK_STATUS.success) return 'Succeeded';
     return capitalize(status);
-};
-const durationFormatter = (createdAt, finishedAt, timezone) => {
-    if (createdAt && finishedAt) {
-        const createdAtTime = dayjs(iso8601Formatter(createdAt, timezone));
-        const finishedAtTime = dayjs(iso8601Formatter(finishedAt, timezone));
-        let duration = finishedAtTime.diff(createdAtTime, 'second');
-        if (duration < 60) return `${duration} sec`;
-        duration = finishedAtTime.diff(createdAtTime, 'minute');
-        return `${duration} min`;
-    }
-    return null;
 };
 
 export default {
@@ -87,6 +97,7 @@ export default {
         PToolboxTable,
         PAnchor,
         PSelectButtonGroup,
+        PStatus,
     },
     props: {
         jobId: {
@@ -99,26 +110,16 @@ export default {
         const state = reactive({
             loading: false,
             timezone: computed(() => store.state.user.timezone),
-            jobTasks: [],
-            items: computed(() => state.jobTasks.map(task => ({
-                service_account: task.service_account_id,
-                project: task.project_id,
-                status: statusFormatter(task.status),
-                created_count: task.created_count,
-                updated_count: task.updated_count,
-                'errors.length': task.errors.length,
-                created_at: iso8601Formatter(task.created_at, state.timezone),
-                duration: durationFormatter(task.created_at, task.finished_at, state.timezone),
-            }))),
+            items: [],
             fields: [
-                { label: 'Service Account', name: 'service_account', sortable: false },
-                { label: 'Project', name: 'project', sortable: false },
+                { label: 'Service Account', name: 'service_account_id', sortable: false },
+                { label: 'Project', name: 'project_id', sortable: false },
                 { label: 'Status', name: 'status' },
                 { label: 'Created', name: 'created_count' },
                 { label: 'Updated', name: 'updated_count' },
-                { label: 'Error', name: 'errors.length' },
-                { label: 'Disconnected', name: '' },
-                { label: 'Deleted', name: '' },
+                { label: 'Error', name: 'errors' },
+                { label: 'Disconnected', name: 'disconnected_count' },
+                { label: 'Deleted', name: 'deleted_count' },
                 { label: 'Started Time', name: 'created_at' },
                 { label: 'Duration', name: 'duration', sortable: false },
             ],
@@ -174,7 +175,6 @@ export default {
             },
         };
 
-
         /* api */
         const apiQuery = new ApiQueryHelper().setKeyItemSets(querySearchHandlers.keyItemSets);
         const getQuery = () => {
@@ -189,7 +189,7 @@ export default {
             } else if (state.selectedStatus === 'succeeded') {
                 statusValues = [JOB_TASK_STATUS.success];
             } else if (state.selectedStatus === 'failed') {
-                statusValues = [JOB_TASK_STATUS.failure, JOB_TASK_STATUS.error, JOB_TASK_STATUS.timeout, JOB_TASK_STATUS.canceled];
+                statusValues = [JOB_TASK_STATUS.failure, JOB_TASK_STATUS.timeout, JOB_TASK_STATUS.canceled];
             }
             if (statusValues.length > 0) {
                 apiQuery.addFilter({ k: 'status', v: statusValues, o: '=' });
@@ -197,7 +197,6 @@ export default {
 
             return apiQuery.data;
         };
-
         const getJobTasks = async () => {
             state.loading = true;
             try {
@@ -205,11 +204,14 @@ export default {
                     query: getQuery(),
                     job_id: props.jobId,
                 });
-
-                state.jobTasks = res.results;
                 state.totalCount = res.total_count;
+                state.items = res.results.map(jobTask => ({
+                    ...jobTask,
+                    created_at: iso8601Formatter(jobTask.created_at, state.timezone),
+                    duration: durationFormatter(jobTask.created_at, jobTask.finished_at, state.timezone),
+                }));
             } catch (e) {
-                state.jobTasks = [];
+                state.items = [];
                 state.totalCount = 0;
                 console.error(e);
             }
@@ -218,9 +220,8 @@ export default {
 
         /* event */
         const onSelect = (selectedIndexes) => {
-            emit('select', state.jobTasks[selectedIndexes[0]]);
+            emit('select', state.items[selectedIndexes[0]]);
         };
-
         const onChange = async (options: any = {}) => {
             if (options.sortBy !== undefined) {
                 state.sortBy = options.sortBy;
@@ -250,7 +251,11 @@ export default {
             querySearchHandlers,
             onSelect,
             onChange,
+            statusFormatter,
+            statusLottieFormatter,
             referenceRouter,
+            JOB_TASK_STATUS,
+            COMPLETED_ICON_COLOR,
         };
     },
 };

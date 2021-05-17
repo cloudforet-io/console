@@ -41,25 +41,14 @@
                         <span class="pl-2">{{ plugins[value.plugin_id].name }}</span>
                     </template>
                 </template>
-                <template #col-sequence-format="{ value }">
-                    <span class="float-right">{{ value }}</span>
-                </template>
                 <template #col-status-format="{ value }">
-                    <div class="col-status-format">
-                        <p-lottie v-if="value === 'IN_PROGRESS'"
-                                  :size="1" :auto="true" name="lottie_in_progress"
-                        />
-                        <p-lottie v-else-if="['CANCELED', 'ERROR', 'TIMEOUT'].includes(value)"
-                                  :size="1" :auto="true" name="lottie_error"
-                        />
-                        <span v-else class="text-green-400">
-                            <p-i name="ic_state_active"
-                                 width="1rem" height="1rem"
-                                 color="inherit transparent"
-                            />
-                        </span>
-                        <span :class="value.toLowerCase()" class="pl-2">{{ statusFormatter(value) }}</span>
-                    </div>
+                    <p-status
+                        :icon="value === JOB_STATUS.success ? 'ic_state_active' : undefined"
+                        :lottie="statusLottieFormatter(value)"
+                        :text="statusFormatter(value)"
+                        :icon-color="COMPLETED_ICON_COLOR"
+                        :theme="[JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout].includes(value) ? 'red' : undefined"
+                    />
                 </template>
                 <template #col-job_progress-format="{value}">
                     <div class="col-job_progress-format">
@@ -69,9 +58,6 @@
                         />
                         <span class="text">{{ value }}%</span>
                     </div>
-                </template>
-                <template #col-created_at-format="{value}">
-                    {{ iso8601Formatter(value, timezone) }}
                 </template>
             </p-query-search-table>
             <div v-if="!loading && items.length > 0" class="pagination">
@@ -114,7 +100,6 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import { capitalize } from 'lodash';
-import dayjs from 'dayjs';
 
 import {
     computed, getCurrentInstance, reactive, toRefs, ComponentRenderProxy, watch,
@@ -122,7 +107,7 @@ import {
 
 import {
     PPageTitle, PQuerySearchTable, PPagination, PButtonModal, PLazyImg,
-    PBreadcrumbs, PIconTextButton, PLottie, PI, PSelectButtonGroup, PProgressBar,
+    PBreadcrumbs, PIconTextButton, PSelectButtonGroup, PProgressBar, PStatus,
 } from '@spaceone/design-system';
 import { QuerySearchTableFunctions } from '@spaceone/design-system/dist/src/data-display/tables/query-search-table/type';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
@@ -133,7 +118,7 @@ import PCollectorHistoryChart from '@/views/management/collector-history/modules
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { iso8601Formatter } from '@/lib/util';
+import { iso8601Formatter, durationFormatter } from '@/lib/util';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
@@ -142,34 +127,27 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { store } from '@/store';
 import { QueryHelper } from '@/lib/query';
 import { MANAGEMENT_ROUTE } from '@/routes/management/management-route';
-import { peacock } from '@/styles/colors';
+import { peacock, green } from '@/styles/colors';
 import { JOB_STATUS } from '@/views/management/collector-history/pages/config';
 
 
 const PROGRESS_BAR_COLOR = peacock[400];
+const COMPLETED_ICON_COLOR = green[400];
 
+const statusLottieFormatter = (status) => {
+    if (status === JOB_STATUS.success || status === JOB_STATUS.created) return undefined;
+    if (status === JOB_STATUS.progress) return 'lottie_in_progress';
+    return 'lottie_error';
+};
 const statusFormatter = (status) => {
     if (status === JOB_STATUS.progress) return 'In-Progress';
     if (status === JOB_STATUS.success) return 'Completed';
     return capitalize(status);
 };
-const durationFormatter = (createdAt, finishedAt, timezone) => {
-    if (createdAt && finishedAt) {
-        const createdAtTime = dayjs(iso8601Formatter(createdAt, timezone));
-        const finishedAtTime = dayjs(iso8601Formatter(finishedAt, timezone));
-        let duration = finishedAtTime.diff(createdAtTime, 'second');
-        if (duration < 60) return `${duration} sec`;
-        duration = finishedAtTime.diff(createdAtTime, 'minute');
-        return `${duration} min`;
-    }
-    return null;
-};
 
 export default {
     name: 'CollectorHistoryPage',
     components: {
-        PI,
-        PLottie,
         PLazyImg,
         PIconTextButton,
         PButtonModal,
@@ -179,6 +157,7 @@ export default {
         PPageTitle,
         PSelectButtonGroup,
         PProgressBar,
+        PStatus,
         PCollectorHistoryChart,
         GeneralPageLayout,
     },
@@ -291,11 +270,11 @@ export default {
             try {
                 const res = await SpaceConnector.client.inventory.job.list({ query: getQuery() });
                 state.totalCount = res.total_count;
-                state.items = res.results.map((job, index) => ({
-                    sequence: state.pageStart + index,
-                    job_progress: ((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100,
-                    duration: durationFormatter(job.created_at, job.finished_at, state.timezone),
+                state.items = res.results.map(job => ({
                     ...job,
+                    job_progress: ((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100,
+                    created_at: iso8601Formatter(job.created_at, state.timezone),
+                    duration: durationFormatter(job.created_at, job.finished_at, state.timezone),
                 }));
             } catch (e) {
                 console.error(e);
@@ -366,12 +345,14 @@ export default {
             ...toRefs(routeState),
             handlers,
             PROGRESS_BAR_COLOR,
+            COMPLETED_ICON_COLOR,
+            JOB_STATUS,
             onSelect,
             onChange,
             onPaginationChange,
             onClickDate,
             statusFormatter,
-            iso8601Formatter,
+            statusLottieFormatter,
             referenceRouter,
         };
     },
@@ -406,22 +387,6 @@ export default {
                 }
             }
             .p-data-table {
-                .col-status-format {
-                    .error, .timeout, .canceled {
-                        @apply text-red-500;
-                    }
-                    .p-lottie {
-                        display: inline-flex;
-                    }
-                }
-                .reference-link {
-                    &:hover {
-                        text-decoration: underline;
-                    }
-                    .text {
-                        margin-right: 0.125rem;
-                    }
-                }
                 .col-job_progress-format {
                     display: flex;
                     align-items: center;

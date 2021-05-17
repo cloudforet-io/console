@@ -16,6 +16,17 @@ export const iso8601Formatter = (time: string, timezone: string) => {
     if (time) return dayjs.tz(dayjs(time), timezone).format('YYYY-MM-DD HH:mm:ss');
     return '';
 };
+export const durationFormatter = (createdAt: string, finishedAt: string, timezone: string) => {
+    if (createdAt && finishedAt) {
+        const createdAtTime = dayjs(iso8601Formatter(createdAt, timezone));
+        const finishedAtTime = dayjs(iso8601Formatter(finishedAt, timezone));
+        let duration = finishedAtTime.diff(createdAtTime, 'second');
+        if (duration < 60) return `${duration} sec`;
+        duration = finishedAtTime.diff(createdAtTime, 'minute');
+        return `${duration} min`;
+    }
+    return null;
+};
 export const numberFormatter = (num) => {
     if (Math.abs(num) < 10000) {
         return Math.round(num * 100) / 100;
