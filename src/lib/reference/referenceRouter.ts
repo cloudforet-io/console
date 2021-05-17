@@ -92,10 +92,10 @@ const spotGroupLinkFormatter: LinkFormatter = (name, data, reference, query) => 
     const location = {
         name,
         query,
-        params: { id: data},
-    }
+        params: { id: data },
+    };
     return location;
-}
+};
 
 type RouterMap = Record<ReferenceType, { name: string; formatter: LinkFormatter}>
 
@@ -139,7 +139,7 @@ const routerMap: RouterMap = {
         {
             name: 'spotGroupDetail',
             formatter: spotGroupLinkFormatter,
-        }
+        },
 };
 
 export const referenceRouter = (data: string, reference: Reference, query?: Location['query']): Location => {

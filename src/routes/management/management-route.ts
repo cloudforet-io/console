@@ -2,7 +2,7 @@ import { RouteConfig } from 'vue-router';
 
 const SupervisorPluginPage = () => import(/* webpackChunkName: "SupervisorPlugin" */ '@/views/management/supervisor/pages/SupervisorPluginPage.vue');
 const CollectorHistoryPage = () => import(/* webpackChunkName: "CollectorHistory" */ '@/views/management/collector-history/pages/CollectorHistoryPage.vue');
-const CollectorJobHistoryPage = () => import(/* webpackChunkName: "CollectorHistory" */ '@/views/management/collector-history/pages/CollectorJobHistoryPage.vue');
+const JobInformationPage = () => import(/* webpackChunkName: "CollectorHistory" */ '@/views/management/collector-history/pages/JobInformationPage.vue');
 
 export const MANAGEMENT_ROUTE = Object.freeze({
     MAIN: 'management',
@@ -58,7 +58,7 @@ export default {
                     path: ':jobId',
                     name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR.JOB,
                     props: true,
-                    component: CollectorJobHistoryPage,
+                    component: JobInformationPage,
                 },
             ],
         },
