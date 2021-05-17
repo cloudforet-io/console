@@ -94,6 +94,7 @@ export default defineComponent<Props>({
         font-size: inherit;
         color: inherit;
         font-weight: 400;
+        white-space: nowrap;
     }
     &.disabled {
         @apply text-gray-400;
