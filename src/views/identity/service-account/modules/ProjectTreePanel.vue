@@ -3,7 +3,6 @@
         <div class="panel-container">
             <div class="tree-panel-header">
                 <span class="title">{{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_TITLE') }}</span>
-                <span class="title-optional">&nbsp;({{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_OPTIONAL') }})</span>
                 <p-icon-text-button style-type="primary" name="ic_plus_bold" outline
                                     @click="goToProject"
                 >
@@ -18,17 +17,17 @@
                     <template v-else-if="!hasProject">
                         {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_NO_DATA') }}
                     </template>
-<!--                    <i18n v-else-if="targetName && selectProjectName"-->
-<!--                          path="IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_EXIST_DESC"-->
-<!--                          class="align-baseline"-->
-<!--                    >-->
-<!--                        <template #item>-->
-<!--                            <span class="font-bold">[{{ targetName }}]</span>-->
-<!--                        </template>-->
-<!--                        <template #project>-->
-<!--                            <span class="font-bold text-blue">[{{ selectProjectName }}]</span>-->
-<!--                        </template>-->
-<!--                    </i18n>-->
+                    <!--                    <i18n v-else-if="targetName && selectProjectName"-->
+                    <!--                          path="IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_EXIST_DESC"-->
+                    <!--                          class="align-baseline"-->
+                    <!--                    >-->
+                    <!--                        <template #item>-->
+                    <!--                            <span class="font-bold">[{{ targetName }}]</span>-->
+                    <!--                        </template>-->
+                    <!--                        <template #project>-->
+                    <!--                            <span class="font-bold text-blue">[{{ selectProjectName }}]</span>-->
+                    <!--                        </template>-->
+                    <!--                    </i18n>-->
                     <template v-else>
                         {{ $t('IDENTITY.SERVICE_ACCOUNT.ADD.PROJECT_SELECT_DESC') }}
                     </template>
@@ -273,9 +272,6 @@ export default {
     line-height: 120%;
     .title {
         @apply text-2xl;
-    }
-    .title-optional {
-        @apply text-lg text-gray-400;
         margin-right: 1rem;
     }
 }
