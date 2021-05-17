@@ -24,12 +24,10 @@
 
 <script lang="ts">
 import PI from '@/foundation/icons/PI.vue';
-import Vue from 'vue';
-import VueRouter, { Location } from 'vue-router';
+import { Location } from 'vue-router';
 import { makeByPassListeners } from '@/util/composition-helpers';
 import { defineComponent } from '@vue/composition-api';
 
-Vue.use(VueRouter);
 
 interface Props {
   text?: string;
