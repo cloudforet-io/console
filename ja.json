@@ -849,10 +849,14 @@
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
 			"JOB": {
+				"ALL": "すべてを表示",
 				"COLLECTOR_NAME": "コレクタ名",
 				"ERROR_LIST": "エラーリスト",
+				"FAILED": "失敗",
+				"IN_PROGRESS": "進行中",
 				"NO_DATA": "作業がありません",
-				"PROVIDER": "プロバイダー"
+				"PROVIDER": "プロバイダー",
+				"SUCCEEDED": "成功"
 			},
 			"MAIN": {
 				"ALL": "すべてを表示",

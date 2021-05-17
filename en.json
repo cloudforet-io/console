@@ -849,10 +849,14 @@
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
 			"JOB": {
+				"ALL": "All",
 				"COLLECTOR_NAME": "Collector Name",
 				"ERROR_LIST": "Error List",
+				"FAILED": "Failed",
+				"IN_PROGRESS": "In-Progress",
 				"NO_DATA": "No Data",
-				"PROVIDER": "Provider"
+				"PROVIDER": "Provider",
+				"SUCCEEDED": "Succeeded"
 			},
 			"MAIN": {
 				"ALL": "All",

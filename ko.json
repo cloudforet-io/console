@@ -849,10 +849,14 @@
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
 			"JOB": {
+				"ALL": "모두 보기",
 				"COLLECTOR_NAME": "컬렉터 이름",
 				"ERROR_LIST": "에러 목록",
+				"FAILED": "실패",
+				"IN_PROGRESS": "진행중",
 				"NO_DATA": "작업이 없습니다.",
-				"PROVIDER": "제공자"
+				"PROVIDER": "제공자",
+				"SUCCEEDED": "성공"
 			},
 			"MAIN": {
 				"ALL": "모두 보기",
