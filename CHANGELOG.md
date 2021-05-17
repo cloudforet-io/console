@@ -1,3 +1,10 @@
+# [1.1.0-beta.6](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.5...v1.1.0-beta.6) (2021-05-17)
+
+
+### Features
+
+* add styletype props to sidebar ([#532](https://github.com/spaceone-dev/spaceone-design-system/issues/532)) ([21c8611](https://github.com/spaceone-dev/spaceone-design-system/commit/21c86118176c27f58488b4327a88b4cb8daa8a91))
+
 # [1.1.0-beta.5](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.4...v1.1.0-beta.5) (2021-05-17)
 
 
