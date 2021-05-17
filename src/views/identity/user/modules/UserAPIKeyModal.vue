@@ -7,12 +7,64 @@
                   @clickButton="onClickConfirm"
     >
         <template #body>
+            <article class="alert-wrapper">
+                <p-i name="ic_state_duplicated" width="0.75rem" height="0.75rem"
+                     class="alert-icon"
+                />
+                <span class="alert-message">You have to download the JSON or Config file before you continue.
+                    You <br>will <span class="text-red-500 font-bold">not be able to download the file again</span> after close this.
+                </span>
+            </article>
+            <p-pane-layout class="box-wrapper">
+                <span class="box-header">
+                    API Key ID
+                </span>
+                <p class="box-contents">
+                    {{ items.api_key_id }}
+                    <p-collapsible-toggle :is-collapsed.sync="isAPICollapsed" class="collapsible-toggle">
+                        {{ isAPICollapsed ? 'Show' : 'Hide' }}
+                    </p-collapsible-toggle>
+                    <p-raw-data v-if="!isAPICollapsed" class="m-4" :item="items"
+                                folded
+                    />
+                </p>
+                <p-divider class="divider" />
+                <p-icon-text-button style-type="primary-dark" outline
+                                    name="ic_download" class="download-btn"
+                                    @click="onClickDownloadJson"
+                >
+                    Download JSON
+                </p-icon-text-button>
+            </p-pane-layout>
+            <p-pane-layout class="box-wrapper">
+                <span class="box-header">
+                    Spacectl (CLI)
+                </span>
+                <p class="box-contents">
+                    {{ items.api_key_id }}
+                    <p-collapsible-toggle :is-collapsed.sync="isSpacectlCollapsed" class="collapsible-toggle">
+                        {{ isSpacectlCollapsed ? 'Show' : 'Hide' }}
+                    </p-collapsible-toggle>
+                    <p-raw-data v-if="!isSpacectlCollapsed" class="m-4" :item="items"
+                                folded
+                    />
+                </p>
+                <p-divider class="divider" />
+                <p-icon-text-button style-type="primary-dark" outline
+                                    name="ic_download" class="download-btn"
+                                    @click="onClickDownloadJson"
+                >
+                    Download YAML
+                </p-icon-text-button>
+            </p-pane-layout>
         </template>
     </p-icon-modal>
 </template>
 
 <script lang="ts">
-import { PIconModal } from '@spaceone/design-system';
+import {
+    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PRawData, PIconTextButton,
+} from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 
@@ -20,23 +72,45 @@ export default {
     name: 'UserAPIKeyModal',
     components: {
         PIconModal,
+        PI,
+        PPaneLayout,
+        PDivider,
+        PCollapsibleToggle,
+        PRawData,
+        PIconTextButton,
     },
     props: {
         visible: {
             type: Boolean,
             default: false,
         },
+        items: {
+            type: Object,
+            default: null,
+        },
     },
     setup(props, context) {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, context.emit),
+            isAPICollapsed: true,
+            isSpacectlCollapsed: true,
         });
+
+        const onClickDownloadJson = () => {
+
+        };
+
+        const onClickDownloadYaml = () => {
+
+        };
 
         const onClickConfirm = () => {
             context.emit('clickButton');
         };
         return {
             ...toRefs(state),
+            onClickDownloadJson,
+            onClickDownloadYaml,
             onClickConfirm,
         };
     },
@@ -44,5 +118,51 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-
+.alert-wrapper {
+    @apply bg-blue-200;
+    max-width: 33.5rem;
+    min-height: 3.625rem;
+    border-radius: 0.125rem;
+    padding: 0.5rem 1rem 0.5rem 2rem;
+    text-align: left;
+    margin-bottom: 1rem;
+}
+.alert-icon {
+    margin-left: -1rem;
+    margin-right: 0.125rem;
+}
+.alert-message {
+    @apply text-gray-900;
+    font-size: 0.875rem;
+    line-height: 150%;
+}
+.box-wrapper {
+    max-width: 33.5rem;
+    min-height: 12rem;
+    margin-bottom: 1rem;
+    text-align: left;
+    padding: 2rem 1rem;
+}
+.box-header {
+    font-size: 1.125rem;
+    line-height: 155%;
+}
+.box-contents {
+    @apply font-bold;
+    padding-left: 1rem;
+    margin-top: 2.5rem;
+    .collapsible-toggle {
+        @apply font-normal;
+        display: inline-flex;
+        margin-left: 1rem;
+    }
+}
+.divider {
+    margin-top: 0.468rem;
+    margin-bottom: 0.781rem;
+}
+.download-btn {
+    display: flex;
+    margin-left: auto;
+}
 </style>

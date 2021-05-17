@@ -1,9 +1,5 @@
 <template>
     <section class="right-contents-container">
-        <p-breadcrumbs :routes="routeState.routes" />
-        <p-page-title :title="$t('IDENTITY.USER.MAIN.API_KEY')"
-                      :title-info="$t('IDENTITY.USER.MAIN.API_KEY_TITLE_INFO')"
-        />
         <p-pane-layout class="main-table-wrapper">
             <article class="table-header">
                 <div class="left-section">
@@ -38,30 +34,20 @@
                 :selectable="true"
             />
         </p-pane-layout>
-        <p-pane-layout class="sub-table-wrapper">
-            <div class="sub-table-header">
-                {{ $t('IDENTITY.USER.MAIN.ENDPOINTS') }}
-            </div>
-            <p-data-table
-                :items="subState.items"
-                :loading="subState.loading"
-                :fields="subState.fields"
-                :striped="false"
-            />
-        </p-pane-layout>
-        <user-a-p-i-key-modal v-if="visible"
+        <user-a-p-i-key-modal v-if="visible && !modalState.loading"
                               :visible.sync="visible"
+                              :items="modalState.items"
                               @clickButton="confirm"
         />
         <p-table-check-modal
-            :fields="modalState.fields"
-            :mode="modalState.mode"
+            :fields="checkModalState.fields"
+            :mode="checkModalState.mode"
             :items="selectedItems"
-            :header-title="modalState.title"
-            :sub-title="modalState.subTitle"
-            :theme-color="modalState.themeColor"
+            :header-title="checkModalState.title"
+            :sub-title="checkModalState.subTitle"
+            :theme-color="checkModalState.themeColor"
             size="md"
-            :visible.sync="modalState.visible"
+            :visible.sync="checkModalState.visible"
             @confirm="checkModalConfirm"
         />
     </section>
@@ -73,7 +59,7 @@ import {
     PDropdownMenuBtn, PDataTable, PPageTitle, PPaneLayout, PTableCheckModal,
 } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import UserAPIKeyModal from '@/views/identity/user/modules/UserAPIKeyModal.vue';
@@ -90,14 +76,17 @@ export default {
     components: {
         UserAPIKeyModal,
         PEmpty,
-        PI,
         PPaneLayout,
-        PBreadcrumbs,
         PIconTextButton,
         PDropdownMenuBtn,
         PDataTable,
-        PPageTitle,
         PTableCheckModal,
+    },
+    props: {
+        userId: {
+            type: String,
+            default: '',
+        },
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -125,29 +114,16 @@ export default {
                 },
             ] as MenuItem[])),
             visible: false,
-            userId: computed(() => store.state.user.userId),
+            user: props.userId || '',
             disableCreateBtn: computed(() => state.items.length >= 2),
-        });
-        const subState = reactive({
-            loading: false,
-            fields: [
-                { name: 'service', label: 'Service' },
-                { name: 'name', label: 'Name' },
-                { name: 'version', label: 'Version' },
-                { name: 'endpoint', label: 'Endpoint' },
-                { name: 'status', label: 'Status' },
-            ],
-            items: [] as any,
-        });
-        const routeState = reactive({
-            routes: computed(() => ([
-                { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/account' },
-                { name: vm.$t('IDENTITY.USER.MAIN.API_KEY') },
-            ])),
         });
 
         const modalState = reactive({
+            loading: false,
+            items: [] as any,
+        });
+
+        const checkModalState = reactive({
             fields: computed(() => [
                 { name: 'api_key_id', label: 'API Key ID' },
                 { name: 'state', label: 'State' },
@@ -166,33 +142,39 @@ export default {
         };
 
         const apiQueryHelper = new ApiQueryHelper();
-        const listAPIKey = async () => {
-            apiQueryHelper.setSort('created_at')
-                .setFilters([{ k: 'user_id', v: state.userId, o: '=' }]);
+        const listAPIKey = async (userId) => {
+            state.loading = true;
+            try {
+                apiQueryHelper.setSort('created_at')
+                    .setFilters([{ k: 'user_id', v: userId, o: '=' }]);
 
-            const res = await SpaceConnector.client.identity.apiKey.list({
-                query: apiQueryHelper.data,
-            });
-            state.items = res.results;
-        };
-
-        const listEndpoints = async () => {
-            const res = await SpaceConnector.client.identity.endpoint.list();
-            subState.items = res.results;
+                const res = await SpaceConnector.client.identity.apiKey.list({
+                    query: apiQueryHelper.data,
+                });
+                state.items = res.results;
+            } catch (e) {
+                state.items = [];
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
         };
 
         const openAPIKeyConfirmModal = async () => {
             try {
-                // showLoadingMessage('Create API Key', '', vm.$root);
-                await SpaceConnector.client.identity.apiKey.create({
-                    user_id: state.userId,
+                modalState.loading = true;
+                showLoadingMessage('Create API Key', '', vm.$root);
+                const resp = await SpaceConnector.client.identity.apiKey.create({
+                    user_id: state.user,
                 });
-                // hideLoadingMessage(vm.$root);
+                modalState.items = resp;
+                modalState.loading = false;
+                hideLoadingMessage(vm.$root);
                 state.visible = true;
             } catch (e) {
                 console.error(e);
             } finally {
-                await listAPIKey();
+                await listAPIKey(state.user);
             }
         };
 
@@ -210,8 +192,8 @@ export default {
                 console.error(e);
                 showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ENABLE_API_KEY'), '', vm.$root);
             } finally {
-                await listAPIKey();
-                modalState.visible = false;
+                await listAPIKey(state.user);
+                checkModalState.visible = false;
             }
         };
 
@@ -225,8 +207,8 @@ export default {
                 console.error(e);
                 showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_DISABLE_API_KEY'), '', vm.$root);
             } finally {
-                await listAPIKey();
-                modalState.visible = false;
+                await listAPIKey(state.user);
+                checkModalState.visible = false;
             }
         };
 
@@ -241,52 +223,56 @@ export default {
                 showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_DELETE_API_KEY'), '', vm.$root);
             } finally {
                 state.selectedIndex = [];
-                await listAPIKey();
-                modalState.visible = false;
+                await listAPIKey(state.user);
+                checkModalState.visible = false;
             }
         };
 
         const onClickEnable = async () => {
-            modalState.mode = 'enable';
-            modalState.title = vm.$t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
-            modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', state.selectedIndex.length);
-            modalState.themeColor = 'safe';
-            modalState.visible = true;
+            checkModalState.mode = 'enable';
+            checkModalState.title = vm.$t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
+            checkModalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', state.selectedIndex.length);
+            checkModalState.themeColor = 'safe';
+            checkModalState.visible = true;
         };
 
         const onClickDisable = async () => {
-            modalState.mode = 'disable';
-            modalState.title = vm.$t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
-            modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', state.selectedIndex.length);
-            modalState.themeColor = 'alert';
-            modalState.visible = true;
+            checkModalState.mode = 'disable';
+            checkModalState.title = vm.$t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
+            checkModalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', state.selectedIndex.length);
+            checkModalState.themeColor = 'alert';
+            checkModalState.visible = true;
         };
 
         const onClickDelete = async () => {
-            modalState.mode = 'delete';
-            modalState.title = vm.$t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
-            modalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', state.selectedIndex.length);
-            modalState.themeColor = 'alert';
-            modalState.visible = true;
+            checkModalState.mode = 'delete';
+            checkModalState.title = vm.$t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
+            checkModalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', state.selectedIndex.length);
+            checkModalState.themeColor = 'alert';
+            checkModalState.visible = true;
         };
 
         const checkModalConfirm = async (item) => {
-            if (modalState.mode === 'delete') await deleteAPIKey(item);
-            if (modalState.mode === 'enable') await enableAPIKey(item);
-            if (modalState.mode === 'disable') await disableAPIKey(item);
+            if (checkModalState.mode === 'delete') await deleteAPIKey(item);
+            if (checkModalState.mode === 'enable') await enableAPIKey(item);
+            if (checkModalState.mode === 'disable') await disableAPIKey(item);
         };
 
+        watch(() => props.userId, async (after) => {
+            if (after) {
+                state.user = after;
+                await listAPIKey(state.user);
+            }
+        }, { immediate: true });
 
         (async () => {
-            await listAPIKey();
-            await listEndpoints();
+            await listAPIKey(state.user);
         })();
 
         return {
             ...toRefs(state),
-            subState,
-            routeState,
             modalState,
+            checkModalState,
             onSelect,
             onClickEnable,
             onClickDisable,
@@ -301,9 +287,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.title-extra {
-
-}
 .main-table-wrapper {
     width: 100%;
     height: 100%;
@@ -328,13 +311,5 @@ export default {
         font-size: 0.875rem;
         line-height: 150%;
     }
-}
-
-.sub-table-header {
-    padding-left: 1rem;
-    padding-top: 2rem;
-    margin-bottom: 1rem;
-    font-size: 1.375rem;
-    line-height: 145%;
 }
 </style>
