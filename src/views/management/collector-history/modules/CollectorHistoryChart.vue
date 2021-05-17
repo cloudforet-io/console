@@ -1,34 +1,43 @@
 <template>
-    <p-chart-loader :loading="loading" class="collection-history-chart">
-        <template #loader>
-            <p-skeleton width="100%" height="16rem" />
-        </template>
+    <div class="collector-history-chart">
         <div class="top-part">
+            <div class="legend-wrapper">
+                <div v-for="legend in legends" :key="legend.color"
+                     class="legend"
+                >
+                    <span class="circle" :style="{ 'background-color': legend.color }" />
+                    <span class="text">{{ legend.label }}</span>
+                </div>
+            </div>
             <p-date-pagination :date.sync="currentDate" :timezone="timezone" />
         </div>
-        <span class="y-label-text">
-            {{ $t('MANAGEMENT.COLLECTOR_HISTORY.CHART.JOB_COUNT') }}
-        </span>
-        <div ref="chartRef" class="chart" />
-    </p-chart-loader>
+        <p-chart-loader :loading="loading">
+            <template #loader>
+                <p-skeleton width="100%" />
+            </template>
+            <div ref="chartRef" class="chart" />
+        </p-chart-loader>
+    </div>
 </template>
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
 import {
-    reactive, watch, toRefs, computed, onUnmounted,
+    reactive, watch, toRefs, computed, onUnmounted, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import { PChartLoader, PDatePagination, PSkeleton } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@/lib/space-connector';
-import { alert, primary } from '@/styles/colors';
+import {
+    gray, green, coral,
+} from '@/styles/colors';
 import { store } from '@/store';
 import config from '@/lib/config';
 
@@ -38,14 +47,20 @@ am4core.useTheme(am4themes_animated);
 
 
 interface ChartData {
-    date: Dayjs;
-    success: number | null;
-    failure: number | null;
+    date: string;
+    tooltipDate: string;
+    completed: number | null;
+    failed: number | null;
 }
 
+const VALUE_TYPE = {
+    completed: 'completed',
+    failed: 'failed',
+};
+
 const LEGEND_COLORS = {
-    success: primary,
-    failure: alert,
+    completed: green[400],
+    failed: coral[500],
 };
 
 export default {
@@ -62,14 +77,25 @@ export default {
         },
     },
     setup(props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,
             chartRef: null as HTMLElement | null,
             chart: null,
             chartRegistry: {},
             chartData: [] as ChartData[],
-            successData: [] as number[],
-            failureData: [] as number[],
+            completedData: [] as number[],
+            failedData: [] as number[],
+            legends: computed(() => ([
+                {
+                    label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.COMPLETED'),
+                    color: green[400],
+                },
+                {
+                    label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.FAILED'),
+                    color: coral[500],
+                },
+            ])),
             //
             timezone: computed(() => store.state.user.timezone),
             currentDate: dayjs.utc().tz(store.state.user.timezone),
@@ -81,8 +107,8 @@ export default {
         const initChartData = (data) => {
             const dataWithTimezone = data.map(d => ({
                 date: dayjs.utc(d.date).tz(state.timezone).format('YYYY-MM-DD'),
-                success: d.success,
-                failure: d.failure,
+                completed: d.success,
+                failed: d.failure,
             }));
             const chartData = [] as ChartData[];
             let now = state.currentMonthStart.clone();
@@ -94,14 +120,16 @@ export default {
                 if (existData) {
                     chartData.push({
                         date: now.format('YYYY-MM-DD'),
-                        success: existData.success,
-                        failure: existData.failure,
+                        tooltipDate: now.format('MM/DD/YYYY'),
+                        completed: existData.completed,
+                        failed: existData.failed,
                     });
                 } else {
                     chartData.push({
                         date: now.format('YYYY-MM-DD'),
-                        success: null,
-                        failure: null,
+                        tooltipDate: now.format('MM/DD/YYYY'),
+                        completed: null,
+                        failed: null,
                     });
                 }
 
@@ -131,58 +159,64 @@ export default {
             const dateAxis = chart.xAxes.push(new am4charts.CategoryAxis());
             dateAxis.dataFields.category = 'date';
             dateAxis.tooltip.disabled = true;
-            dateAxis.renderer.minGridDistance = 20;
+            dateAxis.renderer.minGridDistance = 30;
             dateAxis.fontSize = 12;
+            dateAxis.renderer.labels.template.fill = am4core.color(gray[600]);
+            dateAxis.renderer.cellStartLocation = 0.3;
+            dateAxis.renderer.cellEndLocation = 0.7;
+            dateAxis.renderer.grid.template.stroke = am4core.color(gray[300]);
             dateAxis.renderer.labels.template.adapter.add('text', (text, target) => dayjs.utc(target.dataItem.category).format('M/D'));
+            dateAxis.renderer.grid.template.adapter.add('strokeOpacity', (strokeOpacity, target) => {
+                const today = dayjs.utc().format('YYYY-MM-DD');
+                if (target.dataItem.category === today) return 1;
+                return 0;
+            });
 
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
             valueAxis.tooltip.disabled = true;
+            valueAxis.renderer.minGridDistance = 20;
             valueAxis.fontSize = 12;
             valueAxis.extraMax = 0.1;
+            valueAxis.renderer.grid.template.strokeOpacity = 1;
+            valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
+            valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
+            valueAxis.renderer.labels.template.adapter.add('text', (label, target) => {
+                if (target.dataItem && (target.dataItem.value === 0)) return 'job';
+                return label;
+            });
 
             const createSeries = (type, color) => {
-                const series = chart.series.push(new am4charts.LineSeries());
+                const series = chart.series.push(new am4charts.ColumnSeries());
                 series.dataFields.categoryX = 'date';
                 series.dataFields.valueY = type;
-                series.stroke = am4core.color(color);
-                series.tooltipText = `{date}\n${type}: {${type}}`;
-                series.tooltip.fontSize = 12;
-                series.tooltip.getFillFromObject = false;
-                series.tooltip.label.fill = color;
-                series.tooltip.background.strokeWidth = 0;
-                series.tooltip.pointerOrientation = 'vertical';
-                series.connect = false;
-                series.tensionX = 0.8;
-                series.bulletsContainer.parent = chart.seriesContainer;
-                return series;
-            };
-            const successSeries = createSeries('success', LEGEND_COLORS.success);
-            const failureSeries = createSeries('failure', LEGEND_COLORS.failure);
+                series.strokeWidth = 0;
+                series.fill = am4core.color(color);
+                series.columns.template.width = am4core.percent(65);
 
-            const createCircleBullet = (series, color) => {
-                const bullet = series.bullets.push(new am4charts.Bullet());
-                const circle = bullet.createChild(am4core.Circle);
-                circle.strokeWidth = 0;
-                circle.width = 5;
-                circle.height = 5;
-                circle.fill = am4core.color(color);
-
-                const circleState = circle.states.create('hover');
-                circleState.properties.width = 10;
-                circleState.properties.height = 10;
-
-                circle.events.on('hit', (event) => {
+                series.columns.template.events.on('hit', (event) => {
                     const clickedData = event.target.dataItem.dataContext;
                     emit('click-date', clickedData.date);
                 });
-            };
-            createCircleBullet(successSeries, LEGEND_COLORS.success);
-            createCircleBullet(failureSeries, LEGEND_COLORS.failure);
 
-            chart.cursor = new am4charts.XYCursor();
-            chart.cursor.lineX.strokeOpacity = 0;
-            chart.cursor.lineY.strokeOpacity = 0;
-            chart.cursor.behavior = 'none';
+                // tooltip
+                const tooltipTextColor = type === VALUE_TYPE.completed ? green[500] : coral[600];
+                if (type === VALUE_TYPE.completed) {
+                    series.columns.template.tooltipText = `[font-size: 1rem; ${tooltipTextColor}; bold]{completed} [font-size: 1rem; ${tooltipTextColor};](Total Completed)
+[font-size: 0.75rem; ${gray[700]}]{tooltipDate}`;
+                } else {
+                    series.columns.template.tooltipText = `[font-size: 1rem; ${tooltipTextColor}; bold]{failed} [font-size: 1rem; ${tooltipTextColor};](Total Completed)
+[font-size: 0.75rem; ${gray[700]}]{tooltipDate}`;
+                }
+                series.tooltip.pointerOrientation = 'down';
+                series.tooltip.fontSize = 12;
+                series.tooltip.getFillFromObject = false;
+                series.tooltip.label.fill = am4core.color(gray[900]);
+                series.tooltip.autoTextColor = false;
+                series.tooltip.background.fillOpacity = 1;
+                series.tooltip.background.stroke = am4core.color(color);
+            };
+            createSeries('completed', LEGEND_COLORS.completed);
+            createSeries('failed', LEGEND_COLORS.failed);
         };
 
         /* api */
@@ -227,27 +261,61 @@ export default {
 </script>
 
 <style lang="postcss">
-.collection-history-chart {
-    height: 20rem;
-    padding-top: 1rem;
-    padding-bottom: 3rem;
-
-    .chart {
-        height: 16rem;
-    }
+.collector-history-chart {
+    @apply bg-white border border-gray-200;
+    height: 14rem;
+    border-radius: 0.375rem;
+    padding: 1rem;
 
     .top-part {
         position: relative;
         height: 2rem;
+
+        .legend-wrapper {
+            position: absolute;
+            left: 0;
+            .legend {
+                display: inline-block;
+
+                &:first-child {
+                    padding-right: 1rem;
+                }
+
+                .circle {
+                    display: inline-block;
+                    width: 0.5rem;
+                    height: 0.5rem;
+                    border-radius: 50%;
+                    margin-right: 0.25rem;
+                }
+                .text {
+                    @apply text-gray-600;
+                    font-size: 0.75rem;
+                    line-height: 1.5;
+                }
+            }
+        }
+
         .p-date-pagination {
             position: absolute;
             right: 0;
+
+            .date-text-wrapper .date-text {
+                @apply text-gray-800;
+            }
         }
     }
 
-    .y-label-text {
-        @apply text-gray-500;
-        font-size: 0.75rem;
+    .p-chart-loader {
+        height: 10rem;
+
+        .p-skeleton {
+            height: 10rem;
+        }
+
+        .chart {
+            height: 10rem;
+        }
     }
 }
 </style>

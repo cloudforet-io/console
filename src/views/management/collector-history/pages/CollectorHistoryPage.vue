@@ -2,10 +2,12 @@
     <general-page-layout class="collector-history-container">
         <p-breadcrumbs :routes="route" />
         <p-page-title :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')" />
-        <p-pane-layout class="collector-history-wrapper">
-            <p-collector-history-chart class="history-chart"
-                                       @click-date="onClickDate"
-            />
+        <p-collector-history-chart @click-date="onClickDate" />
+        <div class="collector-history-table">
+            <div class="status-wrapper">
+                <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
+                <p-select-button-group class="data-source-wrapper" :buttons="statusList" :selected.sync="selectedStatus" />
+            </div>
             <p-query-search-table
                 ref="querySearchRef"
                 :class="items.length === 0 ? 'no-data' : ''"
@@ -27,33 +29,9 @@
                 @change="onChange"
                 @rowLeftClick="onSelect"
             >
-                <template #toolbox-top>
-                    <div class="flex ml-4">
-                        <div v-for="(status, idx) in statusList"
-                             :key="idx"
-                             class="filter-button-wrapper"
-                        >
-                            <span v-if="status.icon" class="legend-icon" :class="status.class" />
-                            <span class="filter-button"
-                                  :class="[activatedStatus === status.key ? 'active' : '', status.class]"
-                                  @click="onClickStatus(status.key)"
-                            >{{ status.label }}</span>
-                        </div>
-                    </div>
-                </template>
                 <template #th-task-format="{  field }">
                     <span>{{ field.label }}</span>
                     <span class="th-additional-info-text"> (completed / total)</span>
-                </template>
-                <template #col-collector_info-format="{ value }">
-                    <router-link v-if="value"
-                                 :to="referenceRouter(value.collector_id,{ resource_type: 'inventory.Collector' })"
-                    >
-                        <span class="reference-link">
-                            <span class="text">{{ value.name }}</span>
-                            <p-i name="ic_external-link" height="1em" width="1em" />
-                        </span>
-                    </router-link>
                 </template>
                 <template #col-collector_info.plugin_info-format="{ value }">
                     <template v-if="value">
@@ -67,18 +45,30 @@
                     <span class="float-right">{{ value }}</span>
                 </template>
                 <template #col-status-format="{ value }">
-                    <p-lottie v-if="value === 'IN_PROGRESS'"
-                              class="status-icon"
-                              :size="1" :auto="true" name="lottie_working"
-                    />
-                    <p-lottie v-else-if="['CANCELED', 'ERROR', 'TIMEOUT'].includes(value)"
-                              class="status-icon"
-                              :size="1" :auto="true" name="lottie_error"
-                    />
-                    <p-i v-else name="ic_done"
-                         width="1rem" height="1rem"
-                    />
-                    <span :class="value.toLowerCase()" class="pl-2">{{ statusFormatter(value) }}</span>
+                    <div class="col-status-format">
+                        <p-lottie v-if="value === 'IN_PROGRESS'"
+                                  :size="1" :auto="true" name="lottie_in_progress"
+                        />
+                        <p-lottie v-else-if="['CANCELED', 'ERROR', 'TIMEOUT'].includes(value)"
+                                  :size="1" :auto="true" name="lottie_error"
+                        />
+                        <span v-else class="text-green-400">
+                            <p-i name="ic_state_active"
+                                 width="1rem" height="1rem"
+                                 color="inherit transparent"
+                            />
+                        </span>
+                        <span :class="value.toLowerCase()" class="pl-2">{{ statusFormatter(value) }}</span>
+                    </div>
+                </template>
+                <template #col-job_progress-format="{value}">
+                    <div class="col-job_progress-format">
+                        <p-progress-bar
+                            :percentage="value"
+                            :color="PROGRESS_BAR_COLOR"
+                        />
+                        <span class="text">{{ value }}%</span>
+                    </div>
                 </template>
                 <template #col-created_at-format="{value}">
                     {{ iso8601Formatter(value, timezone) }}
@@ -91,7 +81,8 @@
                               @change="onPaginationChange"
                 />
             </div>
-        </p-pane-layout>
+        </div>
+        <!-- no item -->
         <p-button-modal
             class="button-modal"
             :header-title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_TITLE')"
@@ -133,14 +124,13 @@ import {
 
 import {
     PPageTitle, PQuerySearchTable, PPagination, PButtonModal, PLazyImg,
-    PBreadcrumbs, PPaneLayout, PIconTextButton, PLottie, PI,
+    PBreadcrumbs, PIconTextButton, PLottie, PI, PSelectButtonGroup, PProgressBar,
 } from '@spaceone/design-system';
 import { QuerySearchTableFunctions } from '@spaceone/design-system/dist/src/data-display/tables/query-search-table/type';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectorHistoryChart.vue';
-import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -151,11 +141,10 @@ import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
 } from '@/lib/component-utils/query-search';
 import { getPageStart } from '@/lib/component-utils/pagination';
-import { TimeStamp } from '@/models';
 import { store } from '@/store';
-import router from '@/routes';
 import { QueryHelper } from '@/lib/query';
 import { MANAGEMENT_ROUTE } from '@/routes/management/management-route';
+import { peacock } from '@/styles/colors';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -169,21 +158,7 @@ enum JOB_STATUS {
     timeout = 'TIMEOUT',
 }
 
-interface JobModel {
-    job_id: string;
-    state: JOB_STATUS;
-    collect_mode: COLLECT_MODE;
-    collector_info: CollectorModel;
-    secret_id: string;
-    filter: any;
-    errors: {
-        code: string;
-        message: string;
-        secret_id?: string;
-    }[];
-    created_at: TimeStamp;
-    finished_at: TimeStamp;
-}
+const PROGRESS_BAR_COLOR = peacock[400];
 
 export default {
     name: 'CollectorHistoryPage',
@@ -193,12 +168,13 @@ export default {
         PLazyImg,
         PIconTextButton,
         PButtonModal,
-        PPaneLayout,
         PBreadcrumbs,
-        PCollectorHistoryChart,
         PPagination,
         PQuerySearchTable,
         PPageTitle,
+        PSelectButtonGroup,
+        PProgressBar,
+        PCollectorHistoryChart,
         GeneralPageLayout,
     },
     setup() {
@@ -240,28 +216,28 @@ export default {
             isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
             fields: computed(() => [
                 { label: 'Job ID', name: 'job_id' },
-                { label: 'Collector', name: 'collector_info', sortable: false },
+                { label: 'Collector', name: 'collector_info.name', sortable: false },
                 { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
                 { label: 'Status', name: 'status' },
-                { label: 'Task', name: 'task' },
-                { label: 'Start Time', name: 'created_at' },
+                { label: 'Job Progress', name: 'job_progress' },
+                { label: 'Created Time', name: 'created_at' },
                 { label: 'Duration', name: 'duration', sortable: false },
             ]),
             statusList: computed(() => ([
                 {
-                    key: 'all', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.ALL'), class: 'all',
+                    name: 'all', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.ALL'),
                 },
                 {
-                    key: 'inProgress', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS'), class: 'in-progress',
+                    name: 'inProgress', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS'),
                 },
                 {
-                    key: 'success', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.SUCCESS'), class: 'success', icon: true,
+                    name: 'completed', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.COMPLETED'),
                 },
                 {
-                    key: 'failure', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.FAILURE'), class: 'failure', icon: true,
+                    name: 'failed', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.FAILED'),
                 },
             ])),
-            activatedStatus: 'all',
+            selectedStatus: 'all',
             items: [] as any[],
             //
             pageStart: 1,
@@ -285,6 +261,7 @@ export default {
 
         const statusFormatter = (status) => {
             if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In-Progress';
+            if (status === 'SUCCESS') return 'Completed';
             return capitalize(status);
         };
         const durationFormatter = (createdAt, finishedAt) => {
@@ -298,14 +275,6 @@ export default {
             }
             return null;
         };
-        const convertJobsToFieldItem = (jobs) => {
-            state.items = jobs.map((job, index) => ({
-                sequence: state.pageStart + index,
-                task: `${job.total_tasks - job.remained_tasks} / ${job.total_tasks}`,
-                duration: durationFormatter(job.created_at, job.finished_at),
-                ...job,
-            }));
-        };
 
         /* api */
         const apiQuery = new ApiQueryHelper();
@@ -315,11 +284,11 @@ export default {
                 .setFilters(queryHelper.filters);
 
             let statusValues: JOB_STATUS[] = [];
-            if (state.activatedStatus === 'inProgress') {
+            if (state.selectedStatus === 'inProgress') {
                 statusValues = [JOB_STATUS.progress];
-            } else if (state.activatedStatus === 'success') {
+            } else if (state.selectedStatus === 'completed') {
                 statusValues = [JOB_STATUS.created, JOB_STATUS.success];
-            } else if (state.activatedStatus === 'failure') {
+            } else if (state.selectedStatus === 'failed') {
                 statusValues = [JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout];
             }
 
@@ -334,7 +303,12 @@ export default {
             try {
                 const res = await SpaceConnector.client.inventory.job.list({ query: getQuery() });
                 state.totalCount = res.total_count;
-                convertJobsToFieldItem(res.results);
+                state.items = res.results.map((job, index) => ({
+                    sequence: state.pageStart + index,
+                    job_progress: ((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100,
+                    duration: durationFormatter(job.created_at, job.finished_at),
+                    ...job,
+                }));
             } catch (e) {
                 console.error(e);
             } finally {
@@ -373,26 +347,18 @@ export default {
                 getJobs();
             });
         };
-        const onClickStatus = (status) => {
-            state.activatedStatus = status;
-            state.thisPage = 1;
-            state.pageStart = 1;
-            getJobs();
-        };
         const onClickDate = (date) => {
-            const selectedDate = dayjs(date).format('YYYY-MM-DD');
             // eslint-disable-next-line no-unused-expressions
             state.querySearchRef?.addTag(
                 {
-                    key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },
-                    value: { label: selectedDate, name: selectedDate },
+                    key: { label: 'Created Time', name: 'created_at', dataType: 'datetime' },
+                    value: { label: date, name: date },
                     operator: '=',
                 },
             );
         };
 
         const init = async () => {
-            // get plugins
             await store.dispatch('resource/plugin/load');
 
             await getJobs();
@@ -400,15 +366,21 @@ export default {
         };
         init();
 
+        watch(() => state.selectedStatus, (selectedStatus) => {
+            state.selectedStatus = selectedStatus;
+            state.thisPage = 1;
+            state.pageStart = 1;
+            getJobs();
+        });
 
         return {
             ...toRefs(state),
             ...toRefs(routeState),
             handlers,
+            PROGRESS_BAR_COLOR,
             onSelect,
             onChange,
             onPaginationChange,
-            onClickStatus,
             onClickDate,
             statusFormatter,
             iso8601Formatter,
@@ -420,87 +392,68 @@ export default {
 
 <style lang="postcss" scoped>
 .collector-history-container {
-    .filter-button-wrapper {
-        @apply border-r border-gray-200;
-        display: inline-block;
-        padding: 0 1rem;
-        &:first-child {
-            padding-left: 0;
-        }
-        &:last-child {
-            @apply border-none;
-        }
-        .legend-icon {
-            display: inline-block;
-            width: 0.75rem;
-            height: 0.75rem;
-            border-radius: 2px;
-            margin-right: 7px;
-            &.success {
-                @apply bg-primary;
-            }
-            &.failure {
-                @apply bg-red-500;
-            }
-        }
-        .filter-button {
-            @apply text-gray-400;
-            font-size: 0.875rem;
-            cursor: pointer;
-            &:hover, &:focus {
-                @apply text-gray-900;
-            }
-            &.active {
-                @apply text-gray-900;
+    .collector-history-table {
+        @apply bg-white border border-gray-200;
+        border-radius: 0.375rem;
+        margin-top: 1rem;
+
+        .status-wrapper {
+            display: flex;
+            align-items: center;
+            margin-left: 1rem;
+            margin-top: 1.5rem;
+
+            .label {
+                font-size: 0.875rem;
                 font-weight: bold;
-            }
-            &.failure:hover, &.failure:focus, &.failure.active {
-                @apply text-red-500;
+                line-height: 1.5;
+                padding-right: 1rem;
             }
         }
-    }
 
-    .history-chart {
-        margin-left: 3rem;
-        margin-right: 3rem;
-        margin-top: 2.5rem;
-    }
-
-    .p-query-search-table {
-        margin-top: 2rem;
-        &.no-data {
+        .p-query-search-table {
+            &.no-data {
+                .p-data-table {
+                    min-height: 18.75rem;
+                }
+            }
             .p-data-table {
-                min-height: 18.75rem;
+                .col-status-format {
+                    .error, .timeout, .canceled {
+                        @apply text-red-500;
+                    }
+                    .p-lottie {
+                        display: inline-flex;
+                    }
+                }
+                .reference-link {
+                    &:hover {
+                        text-decoration: underline;
+                    }
+                    .text {
+                        margin-right: 0.125rem;
+                    }
+                }
+                .col-job_progress-format {
+                    display: flex;
+                    align-items: center;
+                    .progress-bar {
+                        width: 6.25rem;
+                        margin-right: 0.125rem;
+                    }
+                    .text {
+                        @apply text-gray-700;
+                    }
+                }
             }
         }
-        .p-data-table {
-            .error, .timeout, .canceled {
-                @apply text-red-500;
-            }
-            .th-additional-info-text {
-                font-weight: normal;
-                font-size: 0.75rem;
-                vertical-align: initial;
-            }
-            .status-icon {
-                display: inline-flex;
-            }
-            .reference-link {
-                &:hover {
-                    text-decoration: underline;
-                }
-                .text {
-                    margin-right: 0.125rem;
-                }
-            }
-        }
-    }
 
-    .pagination {
-        text-align: center;
-        padding-top: 1.5rem;
-        bottom: 0;
-        margin-bottom: 1.5rem;
+        .pagination {
+            text-align: center;
+            padding-top: 1.5rem;
+            bottom: 0;
+            margin-bottom: 1.5rem;
+        }
     }
 
     .button-modal {
