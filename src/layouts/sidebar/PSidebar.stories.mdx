@@ -1,6 +1,7 @@
 import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
 import PSidebar from '@/layouts/sidebar/PSidebar.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
+import {SIDEBAR_STYLE_TYPE} from '@/layouts/sidebar/type'
 import { reactive, toRefs, watch, computed } from '@vue/composition-api';
 import faker from 'faker'
 
@@ -45,6 +46,25 @@ import faker from 'faker'
         },
         control: {
             type: 'text'
+        }
+    },
+    styleType: {
+        name: 'styleType',
+        type: {name: 'string'},
+        description: 'sidebar style',
+        defaultValue: SIDEBAR_STYLE_TYPE.primary,
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: SIDEBAR_STYLE_TYPE.primary,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(SIDEBAR_STYLE_TYPE),
         }
     },
     'v-model': {
@@ -133,6 +153,7 @@ export const Template = (args, {argTypes}) => {
                     {{visible ? 'close' : 'open' }}
                 </p-button>
                 <p-sidebar :title="title"
+                            :style-type="styleType"
                             v-model="visible"
                             class="mt-4 flex-grow"
                             @close="onClose"
@@ -163,6 +184,7 @@ export const Playground = (args, {argTypes}) => {
             <div class="flex flex-col" style="height: 500px;">
                 <p-sidebar :title="title"
                             :visible="visible"
+                            :style-type="styleType"
                             class="mt-4 flex-grow"
                 >
                     <div class="bg-primary3 h-full flex justify-center items-center">
@@ -309,12 +331,3 @@ export const Playground = (args, {argTypes}) => {
 </Canvas>
 
 <ArgsTable story="playground" />
-
-
-
-
-
-
-
-
-

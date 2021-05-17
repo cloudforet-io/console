@@ -1,10 +1,14 @@
 <template>
-    <div class="p-sidebar">
+    <div class="p-sidebar"
+         :class="styleType"
+    >
         <div class="non-sidebar-wrapper">
             <slot name="default" />
         </div>
         <transition name="slide-fade">
-            <div v-if="proxyVisible" class="sidebar-wrapper">
+            <div v-if="proxyVisible"
+                 class="sidebar-wrapper"
+            >
                 <div class="inner">
                     <p class="title" :class="{'mb-4': !!title || !!$scopedSlots.title}">
                         <slot name="title">
@@ -30,6 +34,7 @@ import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import { SIDEBAR_STYLE_TYPE } from '@/layouts/sidebar/type';
 
 export default defineComponent({
     name: 'PSidebar',
@@ -47,6 +52,11 @@ export default defineComponent({
         title: {
             type: String,
             default: '',
+        },
+        styleType: {
+            type: String,
+            default: SIDEBAR_STYLE_TYPE.primary,
+            validator: value => Object.keys(SIDEBAR_STYLE_TYPE).includes(value as string),
         },
     },
     setup(props, { emit, listeners }) {
@@ -92,7 +102,7 @@ export default defineComponent({
     }
     $max-height: 20rem;
     .sidebar-wrapper {
-        @apply bg-white border-gray-200;
+        @apply border-gray-200;
         position: fixed;
         height: 32vh;
         max-height: $(max-height);
@@ -106,7 +116,6 @@ export default defineComponent({
         padding: 1.5rem 0;
         box-shadow: 0 0 0.5rem rgba(theme('colors.black'), 0.08);
         overflow: hidden;
-
         .inner {
             padding: 0 1.5rem;
             overflow-y: auto;
@@ -129,10 +138,21 @@ export default defineComponent({
         }
     }
 
+    &.primary {
+        .sidebar-wrapper {
+            @apply bg-white;
+        }
+    }
+
+    &.secondary {
+        .sidebar-wrapper {
+            @apply bg-secondary-2;
+        }
+    }
+
     .slide-fade-enter-active, .slide-fade-leave-active {
         transition: all 0.2s linear;
     }
-
     .slide-fade-enter, .slide-fade-leave-to {
         transform: translateY($(max-height));
         opacity: 0;
@@ -146,12 +166,23 @@ export default defineComponent({
             position: static;
             height: 100%;
             max-height: 100%;
-            width: 25%;
             min-width: $(min-width);
             z-index: unset;
             flex-shrink: 0;
             border-top-width: 0;
             border-left-width: 1px;
+        }
+
+        &.primary {
+            .sidebar-wrapper {
+                width: 25%;
+            }
+        }
+
+        &.secondary {
+            .sidebar-wrapper {
+                width: 45.97%;
+            }
         }
         .slide-fade-enter, .slide-fade-leave-to {
             margin-left: -25%;
