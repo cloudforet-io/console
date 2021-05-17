@@ -1,3 +1,10 @@
+# [1.1.0-beta.5](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.4...v1.1.0-beta.5) (2021-05-17)
+
+
+### Features
+
+* update anchor to use vue router ([#531](https://github.com/spaceone-dev/spaceone-design-system/issues/531)) ([b926b51](https://github.com/spaceone-dev/spaceone-design-system/commit/b926b5126f44ea32312e5a72936372861d0692e5))
+
 # [1.1.0-beta.4](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.3...v1.1.0-beta.4) (2021-05-14)
 
 
