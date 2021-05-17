@@ -1,3 +1,10 @@
+# [1.1.0-beta.7](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.6...v1.1.0-beta.7) (2021-05-17)
+
+
+### Bug Fixes
+
+* remove vue router installation in anchor ([#533](https://github.com/spaceone-dev/spaceone-design-system/issues/533)) ([f8aebe6](https://github.com/spaceone-dev/spaceone-design-system/commit/f8aebe63190efb94f32a22229cb04057fe996253))
+
 # [1.1.0-beta.6](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.5...v1.1.0-beta.6) (2021-05-17)
 
 
