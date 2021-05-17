@@ -1,3 +1,10 @@
+# [1.1.0-beta.8](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.7...v1.1.0-beta.8) (2021-05-17)
+
+
+### Bug Fixes
+
+* update css of anchor text ([#534](https://github.com/spaceone-dev/spaceone-design-system/issues/534)) ([4d5534f](https://github.com/spaceone-dev/spaceone-design-system/commit/4d5534f400a02e6ca43fd3e33d4b8360916f1961))
+
 # [1.1.0-beta.7](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.6...v1.1.0-beta.7) (2021-05-17)
 
 
