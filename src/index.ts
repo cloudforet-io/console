@@ -6,8 +6,10 @@ import VueCompositionApi from '@vue/composition-api';
 import Notifications from 'vue-notification';
 import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
+import VueRouter from 'vue-router';
 
 interface SpaceoneDSOptions {
+    installVueRouter?: boolean;
     installVueI18n?: boolean;
     installVueCompositionApi?: boolean;
     installFragment?: boolean;
@@ -16,6 +18,7 @@ interface SpaceoneDSOptions {
 
 const SpaceoneDS: PluginObject<SpaceoneDSOptions> = {
     install(_Vue: VueConstructor, options) {
+        if (options?.installVueRouter) _Vue.use(VueRouter);
         if (options?.installVueI18n) _Vue.use(VueI18n);
         if (options?.installVueCompositionApi) _Vue.use(VueCompositionApi);
         if (options?.installFragment) _Vue.use(Fragment.Plugin);

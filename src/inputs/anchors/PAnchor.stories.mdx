@@ -1,0 +1,298 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PAnchor from './PAnchor.vue';
+
+
+<Meta title='Inputs / Anchor' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=7050%3A551812'
+    }
+}} component={PAnchor} argTypes={{
+    text: {
+        name: 'text',
+        type: {name: 'string'},
+        description: 'Anchor text. It will be replaced by default slot if exists.',
+        defaultValue: 'Hello World',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: ''
+            },
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    showIcon: {
+        name: 'showIcon',
+        type: {name: 'boolean'},
+        description: 'Indicator of visibility of icon which is visible only when target is blank.',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: true
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    href: {
+        name: 'href',
+        type: {name: 'string'},
+        description: 'href',
+        defaultValue: '/',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: `undefined`
+            },
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    to: {
+        name: 'to',
+        type: {name: 'object'},
+        description: 'Vue Router `Location`.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'object'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: `undefined`
+            },
+        },
+        control: {
+            type: 'object'
+        }
+    },
+    target: {
+        name: 'target',
+        type: {name: 'string'},
+        description: 'a tag target attribute',
+        defaultValue: '_blank',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: `"_blank"`
+            },
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    disabled: {
+        name: 'disabled',
+        type: {name: 'boolean'},
+        description: 'Disable anchor or not',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    highlight: {
+        name: 'highlight',
+        type: {name: 'boolean'},
+        description: 'Fix anchor color for highlighting, not inherit parent\'s color.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    'left-extra': {
+        name: 'left-extra',
+        description: 'Slot for left side of text',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+    },
+    default: {
+        name: 'default',
+        description: 'Slot for text',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+    },
+    icon: {
+        name: 'icon',
+        description: 'Slot for icon',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+    },
+}}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PAnchor },
+    template: `
+      <div class="grid grid-cols-1 gap-6">
+            <p-anchor v-bind="$props">{{text}}</p-anchor>
+        </div>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Anchor
+<br/>
+
+This component prevents the propagation of the click event by default.
+
+<br/>
+
+
+## Basic Anchor
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { PAnchor },
+            template: `
+            <div class="grid gap-6">
+            <p-anchor href="https://www.google.com">This is <strong>default</strong> anchor with default slot.</p-anchor>
+            <p-anchor text="This is a default anchor with text props." href="https://www.google.com" />
+</div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## No Icon
+
+<Canvas>
+    <Story name="No Icon">
+        {{
+            components: { PAnchor },
+            template: `
+            <p-anchor :show-icon="false" href="https://www.google.com">This is <strong>no-icon</strong> anchor.</p-anchor>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Disabled
+
+<Canvas>
+    <Story name="Disabled">
+        {{
+            components: { PAnchor },
+            template: `
+            <p-anchor disabled href="https://www.google.com">This is <strong>disabled</strong> anchor</p-anchor>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Highlight
+
+<Canvas>
+    <Story name="Highlight">
+        {{
+            components: { PAnchor },
+            template: `
+            <p-anchor highlight href="https://www.google.com">This is <strong>highlighted</strong> anchor</p-anchor>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Using Vue Router Location
+
+<Canvas>
+    <Story name="Using Vue Router Location">
+        {{
+            components: { PAnchor },
+            template: `
+            <p-anchor :to="{path: ''}" href="https://www.google.com">This is an anchor <strong>with vue router location</strong></p-anchor>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+
