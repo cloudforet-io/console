@@ -848,11 +848,6 @@
 	},
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
-			"CHART": {
-				"FAILURE": "Failure",
-				"JOB_COUNT": "Job Count",
-				"SUCCESS": "Success"
-			},
 			"JOB": {
 				"COLLECTOR_NAME": "Collector Name",
 				"ERROR_LIST": "Error List",
@@ -861,12 +856,15 @@
 			},
 			"MAIN": {
 				"ALL": "All",
+				"COMPLETED": "Completed",
+				"FAILED": "Failed",
 				"FAILURE": "Failure",
 				"IN_PROGRESS": "In-Progress",
 				"MODAL_CREATE_COLLECTOR": "Create Collector",
 				"MODAL_DESC_1": "Looks like you don't have any collector.",
 				"MODAL_DESC_2": "Set a collector first and then use Collector History.",
 				"MODAL_TITLE": "Set a Collector",
+				"STATUS": "Status",
 				"SUCCESS": "Success",
 				"TITLE": "Collector History"
 			}

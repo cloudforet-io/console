@@ -848,11 +848,6 @@
 	},
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
-			"CHART": {
-				"FAILURE": "失敗",
-				"JOB_COUNT": "タスク数",
-				"SUCCESS": "成功"
-			},
 			"JOB": {
 				"COLLECTOR_NAME": "コレクタ名",
 				"ERROR_LIST": "エラーリスト",
@@ -861,12 +856,15 @@
 			},
 			"MAIN": {
 				"ALL": "すべてを表示",
+				"COMPLETED": "完了",
+				"FAILED": "失敗",
 				"FAILURE": "失敗",
 				"IN_PROGRESS": "進行中",
 				"MODAL_CREATE_COLLECTOR": "コレクタ作成",
 				"MODAL_DESC_1": "コレクタがありません",
 				"MODAL_DESC_2": "コレクタを作成した後、コレクタ履歴を利用してください",
 				"MODAL_TITLE": "コレクタ作成が必要",
+				"STATUS": "",
 				"SUCCESS": "成功",
 				"TITLE": "コレクタ履歴"
 			}

@@ -848,11 +848,6 @@
 	},
 	"MANAGEMENT": {
 		"COLLECTOR_HISTORY": {
-			"CHART": {
-				"FAILURE": "실패",
-				"JOB_COUNT": "작업 개수",
-				"SUCCESS": "성공"
-			},
 			"JOB": {
 				"COLLECTOR_NAME": "컬렉터 이름",
 				"ERROR_LIST": "에러 목록",
@@ -861,12 +856,15 @@
 			},
 			"MAIN": {
 				"ALL": "모두 보기",
+				"COMPLETED": "완료",
+				"FAILED": "실패",
 				"FAILURE": "실패",
 				"IN_PROGRESS": "진행중",
 				"MODAL_CREATE_COLLECTOR": "컬렉터 생성",
 				"MODAL_DESC_1": "컬렉터가 없습니다.",
 				"MODAL_DESC_2": "컬렉터를 생성한 뒤 컬렉터 히스토리를 이용해주세요.",
 				"MODAL_TITLE": "컬렉터 생성 필요",
+				"STATUS": "상태",
 				"SUCCESS": "성공",
 				"TITLE": "컬렉터 히스토리"
 			}
