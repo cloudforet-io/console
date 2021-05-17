@@ -1,7 +1,8 @@
 import { RouteConfig } from 'vue-router';
 
 const SupervisorPluginPage = () => import(/* webpackChunkName: "SupervisorPlugin" */ '@/views/management/supervisor/pages/SupervisorPluginPage.vue');
-const CollectorHistory = () => import(/* webpackChunkName: "CollectorHistory" */ '@/views/management/collector-history/CollectorHistory.vue');
+const CollectorHistoryPage = () => import(/* webpackChunkName: "CollectorHistory" */ '@/views/management/collector-history/pages/CollectorHistoryPage.vue');
+const CollectorJobHistoryPage = () => import(/* webpackChunkName: "CollectorHistory" */ '@/views/management/collector-history/pages/CollectorJobHistoryPage.vue');
 
 export const MANAGEMENT_ROUTE = Object.freeze({
     MAIN: 'management',
@@ -10,7 +11,10 @@ export const MANAGEMENT_ROUTE = Object.freeze({
         PLUGIN: 'supervisorPlugins',
     },
     HISTORY: {
-        COLLECTOR: 'collectorHistory',
+        COLLECTOR: {
+            MAIN: 'collectorHistory',
+            JOB: 'collectorJobHistory',
+        },
     },
 });
 
@@ -41,9 +45,22 @@ export default {
         },
         {
             path: 'collector-history',
-            name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR,
+            name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR.MAIN,
             meta: { label: 'Collector History' },
-            component: CollectorHistory,
+            component: { template: '<router-view />' },
+            children: [
+                {
+                    path: '/',
+                    name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR.MAIN,
+                    component: CollectorHistoryPage,
+                },
+                {
+                    path: ':jobId',
+                    name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR.JOB,
+                    props: true,
+                    component: CollectorJobHistoryPage,
+                },
+            ],
         },
     ],
 } as RouteConfig;

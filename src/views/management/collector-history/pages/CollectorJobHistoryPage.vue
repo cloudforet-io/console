@@ -1,98 +1,102 @@
 <template>
-    <div class="collector-history-job-container">
-        <p-collapsible-panel>
-            <template #content>
-                <div class="more-information-wrapper">
-                    <div>
-                        <span class="info-title">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COLLECTOR_NAME') }}: </span>
-                        <span class="info-text">{{ collectorName }}</span>
-                    </div>
-                    <div>
-                        <span class="info-title">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PROVIDER') }}: </span>
-                        <span class="info-text">{{ provider }}</span>
-                    </div>
-                </div>
-            </template>
-        </p-collapsible-panel>
-        <p-horizontal-layout class="job-tasks-wrapper">
-            <template #container="{ height }">
-                <p-query-search-table
-                    :loading="loading"
-                    :fields="fields"
-                    :items="items"
-                    :query-tags="searchTags"
-                    :key-item-sets="querySearchHandlers.keyItemSets"
-                    :value-handler-map="querySearchHandlers.valueHandlerMap"
-                    :sort-by.sync="sortBy"
-                    :sort-desc.sync="sortDesc"
-                    :page-size.sync="pageLimit"
-                    :total-count="totalCount"
-                    :style="{height: `${height}px`}"
-                    :multi-select="false"
-                    :select-index.sync="selectedIndexes"
-                    :disabled-index="disabledIndex"
-                    :excel-visible="false"
-                    @change="onChange"
-                    @rowLeftClick="onSelect"
-                >
-                    <template #toolbox-top>
-                        <div class="flex ml-4 mt-6">
-                            <div v-for="(status, idx) in statusList"
-                                 :key="idx"
-                                 class="filter-button-wrapper"
-                            >
-                                <span v-if="status.icon" class="legend-icon" :class="status.class" />
-                                <span class="filter-button"
-                                      :class="[activatedStatus === status.key ? 'active' : '', status.class]"
-                                      @click="onClickStatus(status.key)"
-                                >{{ status.label }}</span>
-                            </div>
+    <general-page-layout>
+        <p-breadcrumbs :routes="routeState.routes" />
+        <p-page-title :title="jobId" child @goBack="$router.go(-1)" />
+        <div class="collector-history-job-container">
+            <p-collapsible-panel>
+                <template #content>
+                    <div class="more-information-wrapper">
+                        <div>
+                            <span class="info-title">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COLLECTOR_NAME') }}: </span>
+                            <span class="info-text">{{ collectorName }}</span>
                         </div>
-                    </template>
-                    <template #col-service_account-format="{ value }">
-                        <router-link v-if="value.name" :to="referenceRouter(
-                            value.service_account_id,
-                            { resource_type: 'identity.ServiceAccount' })"
-                        >
-                            <span class="reference-link">
-                                <span class="text">{{ value.name }}</span>
-                                <p-i name="ic_external-link" height="1em" width="1em" />
-                            </span>
-                        </router-link>
-                        <span v-else>{{ value.service_account_id }}</span>
-                    </template>
-                    <template #col-status-format="{ value }">
-                        <span :class="value.toLowerCase()">{{ value }}</span>
-                    </template>
-                </p-query-search-table>
-            </template>
-        </p-horizontal-layout>
-        <div v-if="selectedItem" class="error-list-wrapper">
-            <p-panel-top :use-total-count="true" :total-count="selectedItem.errors.length">
-                {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST') }}
-            </p-panel-top>
-            <div v-if="selectedItem.errors.length === 0">
-                <p-empty class="w-full h-full">
-                    {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.NO_DATA') }}
-                </p-empty>
-            </div>
-            <p-data-table v-else
-                          :fields="errorFields"
-                          :items="errorItems"
-                          :sortable="false"
-                          :selectable="false"
-                          :row-height-fixed="false"
-                          table-style-type="light"
-                          bordered
-            >
-                <template #col-message-format="{ value }" style="width: 20rem;">
-                    <div class="error-message">
-                        {{ value.replace(/\'/g, '') }}
+                        <div>
+                            <span class="info-title">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PROVIDER') }}: </span>
+                            <span class="info-text">{{ provider }}</span>
+                        </div>
                     </div>
                 </template>
-            </p-data-table>
+            </p-collapsible-panel>
+            <p-horizontal-layout class="job-tasks-wrapper">
+                <template #container="{ height }">
+                    <p-query-search-table
+                        :loading="loading"
+                        :fields="fields"
+                        :items="items"
+                        :query-tags="searchTags"
+                        :key-item-sets="querySearchHandlers.keyItemSets"
+                        :value-handler-map="querySearchHandlers.valueHandlerMap"
+                        :sort-by.sync="sortBy"
+                        :sort-desc.sync="sortDesc"
+                        :page-size.sync="pageLimit"
+                        :total-count="totalCount"
+                        :style="{height: `${height}px`}"
+                        :multi-select="false"
+                        :select-index.sync="selectedIndexes"
+                        :disabled-index="disabledIndex"
+                        :excel-visible="false"
+                        @change="onChange"
+                        @rowLeftClick="onSelect"
+                    >
+                        <template #toolbox-top>
+                            <div class="flex ml-4 mt-6">
+                                <div v-for="(status, idx) in statusList"
+                                     :key="idx"
+                                     class="filter-button-wrapper"
+                                >
+                                    <span v-if="status.icon" class="legend-icon" :class="status.class" />
+                                    <span class="filter-button"
+                                          :class="[activatedStatus === status.key ? 'active' : '', status.class]"
+                                          @click="onClickStatus(status.key)"
+                                    >{{ status.label }}</span>
+                                </div>
+                            </div>
+                        </template>
+                        <template #col-service_account-format="{ value }">
+                            <router-link v-if="value.name" :to="referenceRouter(
+                                value.service_account_id,
+                                { resource_type: 'identity.ServiceAccount' })"
+                            >
+                                <span class="reference-link">
+                                    <span class="text">{{ value.name }}</span>
+                                    <p-i name="ic_external-link" height="1em" width="1em" />
+                                </span>
+                            </router-link>
+                            <span v-else>{{ value.service_account_id }}</span>
+                        </template>
+                        <template #col-status-format="{ value }">
+                            <span :class="value.toLowerCase()">{{ value }}</span>
+                        </template>
+                    </p-query-search-table>
+                </template>
+            </p-horizontal-layout>
+            <div v-if="selectedItem" class="error-list-wrapper">
+                <p-panel-top :use-total-count="true" :total-count="selectedItem.errors.length">
+                    {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST') }}
+                </p-panel-top>
+                <div v-if="selectedItem.errors.length === 0">
+                    <p-empty class="w-full h-full">
+                        {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.NO_DATA') }}
+                    </p-empty>
+                </div>
+                <p-data-table v-else
+                              :fields="errorFields"
+                              :items="errorItems"
+                              :sortable="false"
+                              :selectable="false"
+                              :row-height-fixed="false"
+                              table-style-type="light"
+                              bordered
+                >
+                    <template #col-message-format="{ value }" style="width: 20rem;">
+                        <div class="error-message">
+                            {{ value.replace(/\'/g, '') }}
+                        </div>
+                    </template>
+                </p-data-table>
+            </div>
         </div>
-    </div>
+    </general-page-layout>
 </template>
 
 <script lang="ts">
@@ -106,7 +110,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PHorizontalLayout, PQuerySearchTable, PDataTable, PPanelTop, PCollapsiblePanel, PEmpty, PI,
+    PHorizontalLayout, PQuerySearchTable, PDataTable, PPanelTop, PCollapsiblePanel, PEmpty, PI, PPageTitle, PBreadcrumbs,
 } from '@spaceone/design-system';
 
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
@@ -118,6 +122,7 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { iso8601Formatter } from '@/lib/util';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
+import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 
 enum JOB_TASK_STATUS {
     pending = 'PENDING',
@@ -153,6 +158,9 @@ interface JobModel {
 export default {
     name: 'CollectorHistoryJob',
     components: {
+        GeneralPageLayout,
+        PPageTitle,
+        PBreadcrumbs,
         PI,
         PCollapsiblePanel,
         PEmpty,
@@ -252,6 +260,14 @@ export default {
             totalCount: 0,
             //
             searchTags: [],
+        });
+
+        const routeState = reactive({
+            routes: computed(() => [
+                { name: vm.$t('MENU.MANAGEMENT.MANAGEMENT'), path: '/management/collector-history' },
+                { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), path: '/management/collector-history' },
+                { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY_JOB_MANAGEMENT') },
+            ]),
         });
 
         /* util */
@@ -394,6 +410,7 @@ export default {
 
         return {
             ...toRefs(state),
+            routeState,
             querySearchHandlers,
             iso8601Formatter,
             referenceRouter,

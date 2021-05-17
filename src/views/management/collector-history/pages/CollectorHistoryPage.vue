@@ -1,129 +1,122 @@
 <template>
     <general-page-layout class="collector-history-container">
-        <div v-if="!selectedJobId">
-            <p-breadcrumbs :routes="route" />
-            <p-page-title :title="pageTitle" />
-            <p-pane-layout class="collector-history-wrapper">
-                <p-collector-history-chart class="history-chart"
-                                           @click-date="onClickDate"
-                />
-                <p-query-search-table
-                    ref="querySearchRef"
-                    :class="items.length === 0 ? 'no-data' : ''"
-                    :fields="fields"
-                    :items="items"
-                    :query-tags="tags"
-                    :key-item-sets="handlers.keyItemSets"
-                    :value-handler-map="handlers.valueHandlerMap"
-                    :loading="loading"
-                    :total-count="totalCount"
-                    :sort-by.sync="sortBy"
-                    :sort-desc.sync="sortDesc"
-                    :this-page.sync="thisPage"
-                    :page-size.sync="pageSize"
-                    :style="{height: '100%', border: 'none'}"
-                    :selectable="false"
-                    :row-cursor-pointer="rowCursorPointer"
-                    :excel-visible="false"
-                    @change="onChange"
-                    @rowLeftClick="onSelect"
-                >
-                    <template #toolbox-top>
-                        <div class="flex ml-4">
-                            <div v-for="(status, idx) in statusList"
-                                 :key="idx"
-                                 class="filter-button-wrapper"
-                            >
-                                <span v-if="status.icon" class="legend-icon" :class="status.class" />
-                                <span class="filter-button"
-                                      :class="[activatedStatus === status.key ? 'active' : '', status.class]"
-                                      @click="onClickStatus(status.key)"
-                                >{{ status.label }}</span>
-                            </div>
-                        </div>
-                    </template>
-                    <template #th-task-format="{  field }">
-                        <span>{{ field.label }}</span>
-                        <span class="th-additional-info-text"> (completed / total)</span>
-                    </template>
-                    <template #col-collector_info-format="{ value }">
-                        <router-link v-if="value"
-                                     :to="referenceRouter(value.collector_id,{ resource_type: 'inventory.Collector' })"
-                        >
-                            <span class="reference-link">
-                                <span class="text">{{ value.name }}</span>
-                                <p-i name="ic_external-link" height="1em" width="1em" />
-                            </span>
-                        </router-link>
-                    </template>
-                    <template #col-collector_info.plugin_info-format="{ value }">
-                        <template v-if="value">
-                            <p-lazy-img :src="plugins[value.plugin_id].icon"
-                                        width="1rem" height="1rem"
-                            />
-                            <span class="pl-2">{{ plugins[value.plugin_id].name }}</span>
-                        </template>
-                    </template>
-                    <template #col-sequence-format="{ value }">
-                        <span class="float-right">{{ value }}</span>
-                    </template>
-                    <template #col-status-format="{ value }">
-                        <p-lottie v-if="value === 'IN_PROGRESS'"
-                                  class="status-icon"
-                                  :size="1" :auto="true" name="lottie_working"
-                        />
-                        <p-lottie v-else-if="['CANCELED', 'ERROR', 'TIMEOUT'].includes(value)"
-                                  class="status-icon"
-                                  :size="1" :auto="true" name="lottie_error"
-                        />
-                        <p-i v-else name="ic_done"
-                             width="1rem" height="1rem"
-                        />
-                        <span :class="value.toLowerCase()" class="pl-2">{{ statusFormatter(value) }}</span>
-                    </template>
-                    <template #col-created_at-format="{value}">
-                        {{ iso8601Formatter(value, timezone) }}
-                    </template>
-                </p-query-search-table>
-                <div v-if="!loading && items.length > 0" class="pagination">
-                    <p-pagination :total-count="totalCount"
-                                  :this-page.sync="thisPage"
-                                  :page-size.sync="pageSize"
-                                  @change="onPaginationChange"
-                    />
-                </div>
-            </p-pane-layout>
-            <p-button-modal
-                class="button-modal"
-                :header-title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_TITLE')"
-                :scrollable="false"
-                size="md"
-                :fade="true"
-                :backdrop="true"
-                :visible.sync="modalVisible"
+        <p-breadcrumbs :routes="route" />
+        <p-page-title :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')" />
+        <p-pane-layout class="collector-history-wrapper">
+            <p-collector-history-chart class="history-chart"
+                                       @click-date="onClickDate"
+            />
+            <p-query-search-table
+                ref="querySearchRef"
+                :class="items.length === 0 ? 'no-data' : ''"
+                :fields="fields"
+                :items="items"
+                :query-tags="tags"
+                :key-item-sets="handlers.keyItemSets"
+                :value-handler-map="handlers.valueHandlerMap"
+                :loading="loading"
+                :total-count="totalCount"
+                :sort-by.sync="sortBy"
+                :sort-desc.sync="sortDesc"
+                :this-page.sync="thisPage"
+                :page-size.sync="pageSize"
+                :style="{height: '100%', border: 'none'}"
+                :selectable="false"
+                :row-cursor-pointer="rowCursorPointer"
+                :excel-visible="false"
+                @change="onChange"
+                @rowLeftClick="onSelect"
             >
-                <template #body>
-                    <p class="modal-content">
-                        <b>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_DESC_1') }}</b><br>
-                        {{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_DESC_2') }}
-                    </p>
+                <template #toolbox-top>
+                    <div class="flex ml-4">
+                        <div v-for="(status, idx) in statusList"
+                             :key="idx"
+                             class="filter-button-wrapper"
+                        >
+                            <span v-if="status.icon" class="legend-icon" :class="status.class" />
+                            <span class="filter-button"
+                                  :class="[activatedStatus === status.key ? 'active' : '', status.class]"
+                                  @click="onClickStatus(status.key)"
+                            >{{ status.label }}</span>
+                        </div>
+                    </div>
                 </template>
-                <template #confirm-button>
-                    <p-icon-text-button
-                        class="create-collector-button"
-                        name="ic_plus_bold"
-                        @click="$router.push({ name: 'createCollector' })"
+                <template #th-task-format="{  field }">
+                    <span>{{ field.label }}</span>
+                    <span class="th-additional-info-text"> (completed / total)</span>
+                </template>
+                <template #col-collector_info-format="{ value }">
+                    <router-link v-if="value"
+                                 :to="referenceRouter(value.collector_id,{ resource_type: 'inventory.Collector' })"
                     >
-                        {{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_CREATE_COLLECTOR') }}
-                    </p-icon-text-button>
+                        <span class="reference-link">
+                            <span class="text">{{ value.name }}</span>
+                            <p-i name="ic_external-link" height="1em" width="1em" />
+                        </span>
+                    </router-link>
                 </template>
-            </p-button-modal>
-        </div>
-        <div v-else>
-            <p-breadcrumbs v-if="selectedJobId" :routes="subRoute" />
-            <p-page-title :title="pageTitle" child @goBack="onClickGoBack" />
-            <collector-history-job :job-id="selectedJobId" />
-        </div>
+                <template #col-collector_info.plugin_info-format="{ value }">
+                    <template v-if="value">
+                        <p-lazy-img :src="plugins[value.plugin_id].icon"
+                                    width="1rem" height="1rem"
+                        />
+                        <span class="pl-2">{{ plugins[value.plugin_id].name }}</span>
+                    </template>
+                </template>
+                <template #col-sequence-format="{ value }">
+                    <span class="float-right">{{ value }}</span>
+                </template>
+                <template #col-status-format="{ value }">
+                    <p-lottie v-if="value === 'IN_PROGRESS'"
+                              class="status-icon"
+                              :size="1" :auto="true" name="lottie_working"
+                    />
+                    <p-lottie v-else-if="['CANCELED', 'ERROR', 'TIMEOUT'].includes(value)"
+                              class="status-icon"
+                              :size="1" :auto="true" name="lottie_error"
+                    />
+                    <p-i v-else name="ic_done"
+                         width="1rem" height="1rem"
+                    />
+                    <span :class="value.toLowerCase()" class="pl-2">{{ statusFormatter(value) }}</span>
+                </template>
+                <template #col-created_at-format="{value}">
+                    {{ iso8601Formatter(value, timezone) }}
+                </template>
+            </p-query-search-table>
+            <div v-if="!loading && items.length > 0" class="pagination">
+                <p-pagination :total-count="totalCount"
+                              :this-page.sync="thisPage"
+                              :page-size.sync="pageSize"
+                              @change="onPaginationChange"
+                />
+            </div>
+        </p-pane-layout>
+        <p-button-modal
+            class="button-modal"
+            :header-title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_TITLE')"
+            :scrollable="false"
+            size="md"
+            :fade="true"
+            :backdrop="true"
+            :visible.sync="modalVisible"
+        >
+            <template #body>
+                <p class="modal-content">
+                    <b>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_DESC_1') }}</b><br>
+                    {{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_DESC_2') }}
+                </p>
+            </template>
+            <template #confirm-button>
+                <p-icon-text-button
+                    class="create-collector-button"
+                    name="ic_plus_bold"
+                    @click="$router.push({ name: 'createCollector' })"
+                >
+                    {{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_CREATE_COLLECTOR') }}
+                </p-icon-text-button>
+            </template>
+        </p-button-modal>
     </general-page-layout>
 </template>
 
@@ -146,7 +139,6 @@ import { QuerySearchTableFunctions } from '@spaceone/design-system/dist/src/data
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
-import CollectorHistoryJob from '@/views/management/collector-history/modules/CollectorHistoryJob.vue';
 import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectorHistoryChart.vue';
 import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 
@@ -163,6 +155,7 @@ import { TimeStamp } from '@/models';
 import { store } from '@/store';
 import router from '@/routes';
 import { QueryHelper } from '@/lib/query';
+import { MANAGEMENT_ROUTE } from '@/routes/management/management-route';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -193,7 +186,7 @@ interface JobModel {
 }
 
 export default {
-    name: 'PCollectorHistory',
+    name: 'CollectorHistoryPage',
     components: {
         PI,
         PLottie,
@@ -204,7 +197,6 @@ export default {
         PBreadcrumbs,
         PCollectorHistoryChart,
         PPagination,
-        CollectorHistoryJob,
         PQuerySearchTable,
         PPageTitle,
         GeneralPageLayout,
@@ -243,10 +235,9 @@ export default {
         };
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            loading: false,
+            loading: true,
             plugins: computed(() => store.state.resource.plugin.items),
             isDomainOwner: computed(() => store.state.user.userType === 'DOMAIN_OWNER'),
-            pageTitle: computed(() => (state.selectedJobId ? state.selectedJobId : vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE'))),
             fields: computed(() => [
                 { label: 'Job ID', name: 'job_id' },
                 { label: 'Collector', name: 'collector_info', sortable: false },
@@ -271,8 +262,7 @@ export default {
                 },
             ])),
             activatedStatus: 'all',
-            jobs: [] as JobModel[],
-            items: [],
+            items: [] as any[],
             //
             pageStart: 1,
             pageSize: 15,
@@ -282,7 +272,6 @@ export default {
             totalCount: 0,
             rowCursorPointer: true,
             //
-            selectedJobId: '',
             tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
             querySearchRef: null as null|QuerySearchTableFunctions,
             modalVisible: false,
@@ -292,13 +281,6 @@ export default {
                 { name: vm.$t('MENU.MANAGEMENT.MANAGEMENT'), path: '/management/collector-history' },
                 { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY') },
             ])),
-        });
-        const subRouteState = reactive({
-            subRoute: computed(() => [
-                { name: vm.$t('MENU.MANAGEMENT.MANAGEMENT'), path: '/management/collector-history' },
-                { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), path: '/management/collector-history' },
-                { name: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY_JOB_MANAGEMENT') },
-            ]),
         });
 
         const statusFormatter = (status) => {
@@ -317,16 +299,12 @@ export default {
             return null;
         };
         const convertJobsToFieldItem = (jobs) => {
-            state.items = [];
-            jobs.forEach((job, index) => {
-                const newJob = {
-                    sequence: state.pageStart + index,
-                    task: `${job.total_tasks - job.remained_tasks} / ${job.total_tasks}`,
-                    duration: durationFormatter(job.created_at, job.finished_at),
-                    ...job,
-                };
-                state.items.push(newJob);
-            });
+            state.items = jobs.map((job, index) => ({
+                sequence: state.pageStart + index,
+                task: `${job.total_tasks - job.remained_tasks} / ${job.total_tasks}`,
+                duration: durationFormatter(job.created_at, job.finished_at),
+                ...job,
+            }));
         };
 
         /* api */
@@ -355,7 +333,6 @@ export default {
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.inventory.job.list({ query: getQuery() });
-                state.jobs = res.results;
                 state.totalCount = res.total_count;
                 convertJobsToFieldItem(res.results);
             } catch (e) {
@@ -367,9 +344,10 @@ export default {
 
         /* event */
         const onSelect = (item) => {
-            state.selectedJobId = item.job_id;
-            // eslint-disable-next-line no-empty-function
-            vm.$router.push({ path: router.currentRoute.fullPath, query: { ...router.currentRoute.query }, hash: item.job_id }).catch(() => {});
+            vm.$router.push({
+                name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR.JOB,
+                params: { jobId: item.job_id },
+            }).catch(() => {});
         };
         const onChange = async (item) => {
             if (item.sortBy !== undefined) {
@@ -395,11 +373,6 @@ export default {
                 getJobs();
             });
         };
-        const onClickGoBack = () => {
-            state.selectedJobId = '';
-            // eslint-disable-next-line no-empty-function
-            vm.$router.replace({ query: { ...router.currentRoute.query }, hash: '' }).catch(() => {});
-        };
         const onClickStatus = (status) => {
             state.activatedStatus = status;
             state.thisPage = 1;
@@ -408,7 +381,8 @@ export default {
         };
         const onClickDate = (date) => {
             const selectedDate = dayjs(date).format('YYYY-MM-DD');
-            state.querySearchRef.addTag(
+            // eslint-disable-next-line no-unused-expressions
+            state.querySearchRef?.addTag(
                 {
                     key: { label: 'Start Time', name: 'created_at', dataType: 'datetime' },
                     value: { label: selectedDate, name: selectedDate },
@@ -421,29 +395,19 @@ export default {
             // get plugins
             await store.dispatch('resource/plugin/load');
 
-            const hash = router.currentRoute.hash;
-            if (hash) {
-                state.selectedJobId = hash.replace('#', '');
-            }
-
             await getJobs();
             if (state.totalCount === 0) state.modalVisible = true;
         };
         init();
 
-        watch(() => vm.$route.hash, (after) => {
-            if (after === '') onClickGoBack();
-        });
 
         return {
             ...toRefs(state),
             ...toRefs(routeState),
-            ...toRefs(subRouteState),
             handlers,
             onSelect,
             onChange,
             onPaginationChange,
-            onClickGoBack,
             onClickStatus,
             onClickDate,
             statusFormatter,
