@@ -850,12 +850,15 @@
 		"COLLECTOR_HISTORY": {
 			"JOB": {
 				"ALL": "すべてを表示",
-				"COLLECTOR_NAME": "コレクタ名",
+				"COLLECTOR": "",
 				"ERROR_LIST": "エラーリスト",
 				"FAILED": "失敗",
+				"FINISH_TIME": "",
 				"IN_PROGRESS": "進行中",
 				"NO_DATA": "作業がありません",
+				"PLUGIN": "",
 				"PROVIDER": "プロバイダー",
+				"START_TIME": "",
 				"SUCCEEDED": "成功"
 			},
 			"MAIN": {

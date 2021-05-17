@@ -850,12 +850,15 @@
 		"COLLECTOR_HISTORY": {
 			"JOB": {
 				"ALL": "All",
-				"COLLECTOR_NAME": "Collector Name",
+				"COLLECTOR": "Collector",
 				"ERROR_LIST": "Error List",
 				"FAILED": "Failed",
+				"FINISH_TIME": "Finish Time",
 				"IN_PROGRESS": "In-Progress",
 				"NO_DATA": "No Data",
+				"PLUGIN": "Plugin",
 				"PROVIDER": "Provider",
+				"START_TIME": "Start Time",
 				"SUCCEEDED": "Succeeded"
 			},
 			"MAIN": {

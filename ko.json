@@ -850,12 +850,15 @@
 		"COLLECTOR_HISTORY": {
 			"JOB": {
 				"ALL": "모두 보기",
-				"COLLECTOR_NAME": "컬렉터 이름",
+				"COLLECTOR": "컬렉터",
 				"ERROR_LIST": "에러 목록",
 				"FAILED": "실패",
+				"FINISH_TIME": "종료 시간",
 				"IN_PROGRESS": "진행중",
 				"NO_DATA": "작업이 없습니다.",
+				"PLUGIN": "플러그인",
 				"PROVIDER": "제공자",
+				"START_TIME": "시작 시간",
 				"SUCCEEDED": "성공"
 			},
 			"MAIN": {
