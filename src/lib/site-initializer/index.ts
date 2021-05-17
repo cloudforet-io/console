@@ -19,18 +19,14 @@ const initApiClient = async () => {
 };
 
 const initDomain = async () => {
-    try {
-        let domainName;
-        if (config.get('DOMAIN_NAME_REF') === 'hostname') {
-            const { hostname } = window.location;
-            domainName = hostname.split('.')[0];
-        } else {
-            domainName = config.get('DOMAIN_NAME');
-        }
-        await store.dispatch('domain/load', domainName);
-    } catch (e) {
-        await router.push('/error-page');
+    let domainName;
+    if (config.get('DOMAIN_NAME_REF') === 'hostname') {
+        const { hostname } = window.location;
+        domainName = hostname.split('.')[0];
+    } else {
+        domainName = config.get('DOMAIN_NAME');
     }
+    await store.dispatch('domain/load', domainName);
 };
 
 const initGtag = () => {
@@ -77,7 +73,7 @@ const init = async () => {
         if (config.get('GTAG_ID') !== 'DISABLED') initGtag();
         initAmchartsLicense();
     } catch (e) {
-        console.error(e);
+        throw e;
     }
 };
 
@@ -103,10 +99,17 @@ export const siteInit = async () => {
         }
     }, MIN_LOADING_TIME);
 
-    await init();
-    isFinishedInitializing = true;
-    if (isMinTimePassed) {
+    try {
+        await init();
+    } catch (e) {
+        console.error(e);
         store.dispatch('display/finishInitializing');
-        removeInitializer();
+        await router.push('/error-page');
+    } finally {
+        isFinishedInitializing = true;
+        if (isMinTimePassed) {
+            store.dispatch('display/finishInitializing');
+            removeInitializer();
+        }
     }
 };
