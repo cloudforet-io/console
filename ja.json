@@ -850,6 +850,7 @@
 		"COLLECTOR_HISTORY": {
 			"JOB": {
 				"ALL": "すべてを表示",
+				"BASIC_INFO": "",
 				"COLLECTOR": "",
 				"ERROR_LIST": "エラーリスト",
 				"FAILED": "失敗",

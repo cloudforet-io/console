@@ -850,6 +850,7 @@
 		"COLLECTOR_HISTORY": {
 			"JOB": {
 				"ALL": "모두 보기",
+				"BASIC_INFO": "기본 정보",
 				"COLLECTOR": "컬렉터",
 				"ERROR_LIST": "에러 목록",
 				"FAILED": "실패",

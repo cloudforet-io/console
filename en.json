@@ -850,6 +850,7 @@
 		"COLLECTOR_HISTORY": {
 			"JOB": {
 				"ALL": "All",
+				"BASIC_INFO": "Basic Information",
 				"COLLECTOR": "Collector",
 				"ERROR_LIST": "Error List",
 				"FAILED": "Failed",
