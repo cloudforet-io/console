@@ -20,17 +20,9 @@
                      @select="onSelect"
     >
         <template #toolbox-top>
-            <div class="flex ml-4 mt-6">
-                <div v-for="(status, idx) in statusList"
-                     :key="idx"
-                     class="filter-button-wrapper"
-                >
-                    <span v-if="status.icon" class="legend-icon" :class="status.class" />
-                    <span class="filter-button"
-                          :class="[activatedStatus === status.key ? 'active' : '', status.class]"
-                          @click="onClickStatus(status.key)"
-                    >{{ status.label }}</span>
-                </div>
+            <div class="status-wrapper">
+                <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
+                <p-select-button-group :buttons="statusList" :selected.sync="selectedStatus" />
             </div>
         </template>
         <template #col-service_account-format="{ value }">
@@ -56,25 +48,27 @@
 </template>
 
 <script lang="ts">
-import { PAnchor, PToolboxTable } from '@spaceone/design-system';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
-import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
-import { store } from '@/store';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { SpaceConnector } from '@/lib/space-connector';
-import { makeEnumValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
-import { JOB_TASK_STATUS } from '@/views/management/collector-history/pages/config';
-import { iso8601Formatter } from '@/lib/util';
-import { capitalize } from 'lodash';
+/* eslint-disable camelcase */
+import {capitalize} from 'lodash';
 import dayjs from 'dayjs';
+import {ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,} from '@vue/composition-api';
+
+import {PAnchor, PSelectButtonGroup, PToolboxTable} from '@spaceone/design-system';
+
+import {referenceRouter} from '@/lib/reference/referenceRouter';
+import {ApiQueryHelper} from '@/lib/space-connector/helper';
+import {SpaceConnector} from '@/lib/space-connector';
+import {makeEnumValueHandler, makeReferenceValueHandler} from '@/lib/component-utils/query-search';
+import {JOB_TASK_STATUS} from '@/views/management/collector-history/pages/config';
+import {iso8601Formatter} from '@/lib/util';
+import {store} from '@/store';
+
 
 const statusFormatter = (status) => {
-    if (status === JOB_TASK_STATUS.pending || status === JOB_TASK_STATUS.progress) return 'In-Progress';
+    if (status === JOB_TASK_STATUS.progress) return 'In-Progress';
+    if (status === JOB_TASK_STATUS.success) return 'Succeeded';
     return capitalize(status);
 };
-
 const durationFormatter = (createdAt, finishedAt, timezone) => {
     if (createdAt && finishedAt) {
         const createdAtTime = dayjs(iso8601Formatter(createdAt, timezone));
@@ -92,6 +86,7 @@ export default {
     components: {
         PToolboxTable,
         PAnchor,
+        PSelectButtonGroup,
     },
     props: {
         jobId: {
@@ -105,46 +100,43 @@ export default {
             loading: false,
             timezone: computed(() => store.state.user.timezone),
             jobTasks: [],
-            items: computed(() => state.jobTasks.map((task, index) => ({
-                sequence: state.pageStart + index,
-                // eslint-disable-next-line camelcase
+            items: computed(() => state.jobTasks.map(task => ({
                 service_account: task.service_account_id,
                 project: task.project_id,
                 status: statusFormatter(task.status),
-                // eslint-disable-next-line camelcase
                 created_count: task.created_count,
-                // eslint-disable-next-line camelcase
                 updated_count: task.updated_count,
                 'errors.length': task.errors.length,
                 created_at: iso8601Formatter(task.created_at, state.timezone),
                 duration: durationFormatter(task.created_at, task.finished_at, state.timezone),
             }))),
             fields: [
-                { label: 'No.', name: 'sequence', sortable: false },
                 { label: 'Service Account', name: 'service_account', sortable: false },
                 { label: 'Project', name: 'project', sortable: false },
                 { label: 'Status', name: 'status' },
                 { label: 'Created', name: 'created_count' },
                 { label: 'Updated', name: 'updated_count' },
                 { label: 'Error', name: 'errors.length' },
-                { label: 'Start Time', name: 'created_at' },
+                { label: 'Disconnected', name: '' },
+                { label: 'Deleted', name: '' },
+                { label: 'Started Time', name: 'created_at' },
                 { label: 'Duration', name: 'duration', sortable: false },
             ],
             statusList: computed(() => ([
                 {
-                    key: 'all', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.ALL'), class: 'all',
+                    name: 'all', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ALL'),
                 },
                 {
-                    key: 'inProgress', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.IN_PROGRESS'), class: 'in-progress',
+                    name: 'inProgress', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.IN_PROGRESS'),
                 },
                 {
-                    key: 'success', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.SUCCESS'), class: 'success', icon: true,
+                    name: 'succeeded', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.SUCCEEDED'),
                 },
                 {
-                    key: 'failure', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.FAILURE'), class: 'failure', icon: true,
+                    name: 'failed', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED'),
                 },
             ])),
-            activatedStatus: 'all',
+            selectedStatus: 'all',
             //
             pageLimit: 15,
             pageStart: 1,
@@ -192,12 +184,12 @@ export default {
                 .setFiltersAsQueryTag(state.searchTags);
 
             let statusValues: JOB_TASK_STATUS[] = [];
-            if (state.activatedStatus === 'inProgress') {
+            if (state.selectedStatus === 'inProgress') {
                 statusValues = [JOB_TASK_STATUS.progress, JOB_TASK_STATUS.pending];
-            } else if (state.activatedStatus === 'success') {
+            } else if (state.selectedStatus === 'succeeded') {
                 statusValues = [JOB_TASK_STATUS.success];
-            } else if (state.activatedStatus === 'failure') {
-                statusValues = [JOB_TASK_STATUS.failure];
+            } else if (state.selectedStatus === 'failed') {
+                statusValues = [JOB_TASK_STATUS.failure, JOB_TASK_STATUS.error, JOB_TASK_STATUS.timeout, JOB_TASK_STATUS.canceled];
             }
             if (statusValues.length > 0) {
                 apiQuery.addFilter({ k: 'status', v: statusValues, o: '=' });
@@ -211,7 +203,6 @@ export default {
             try {
                 const res = await SpaceConnector.client.inventory.jobTask.list({
                     query: getQuery(),
-                    // eslint-disable-next-line camelcase
                     job_id: props.jobId,
                 });
 
@@ -224,12 +215,6 @@ export default {
             }
             state.loading = false;
         };
-
-        const onClickStatus = (status) => {
-            state.activatedStatus = status;
-            getJobTasks();
-        };
-
 
         /* event */
         const onSelect = (selectedIndexes) => {
@@ -254,73 +239,37 @@ export default {
         };
         init();
 
+        watch(() => state.selectedStatus, (selectedStatus) => {
+            state.selectedStatus = selectedStatus;
+            state.pageStart = 1;
+            getJobTasks();
+        });
+
         return {
             ...toRefs(state),
             querySearchHandlers,
-            onClickStatus,
             onSelect,
             onChange,
             referenceRouter,
-            JOB_TASK_STATUS,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-.p-query-search-table {
-  .p-data-table {
-    .failure {
-      @apply text-red-500;
-    }
-    .reference-link {
-      &:hover {
-        text-decoration: underline;
-      }
-      .text {
-        margin-right: 0.125rem;
-      }
-    }
-  }
-}
+.p-toolbox-table {
+    .status-wrapper {
+        display: flex;
+        align-items: center;
+        margin-left: 1rem;
+        margin-top: 1.5rem;
 
-.filter-button-wrapper {
-  @apply border-r border-gray-200;
-  display: inline-block;
-  padding: 0 1rem;
-  &:first-child {
-    padding-left: 0;
-  }
-  &:last-child {
-    @apply border-none;
-  }
-  .legend-icon {
-    display: inline-block;
-    width: 0.75rem;
-    height: 0.75rem;
-    border-radius: 2px;
-    margin-right: 7px;
-    &.success {
-      @apply bg-primary;
+        .label {
+            font-size: 0.875rem;
+            font-weight: bold;
+            line-height: 1.5;
+            padding-right: 1rem;
+        }
     }
-    &.failure {
-      @apply bg-red-500;
-    }
-  }
-  .filter-button {
-    @apply text-gray-400;
-    font-size: 0.875rem;
-    cursor: pointer;
-    &:hover, &:focus {
-      @apply text-gray-900;
-    }
-    &.active {
-      @apply text-gray-900;
-      font-weight: bold;
-    }
-    &.failure:hover, &.failure:focus, &.failure.active {
-      @apply text-red-500;
-    }
-  }
 }
 </style>

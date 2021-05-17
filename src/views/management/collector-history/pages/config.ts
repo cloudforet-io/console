@@ -3,6 +3,9 @@ export enum JOB_TASK_STATUS {
     progress = 'IN_PROGRESS',
     success = 'SUCCESS',
     failure = 'FAILURE',
+    error = 'ERROR',
+    timeout = 'TIMEOUT',
+    canceled = 'CANCELED',
 }
 
 export enum JOB_STATUS {

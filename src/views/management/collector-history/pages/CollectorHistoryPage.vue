@@ -6,7 +6,7 @@
         <div class="collector-history-table">
             <div class="status-wrapper">
                 <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
-                <p-select-button-group class="data-source-wrapper" :buttons="statusList" :selected.sync="selectedStatus" />
+                <p-select-button-group :buttons="statusList" :selected.sync="selectedStatus" />
             </div>
             <p-query-search-table
                 ref="querySearchRef"
@@ -115,8 +115,6 @@
 /* eslint-disable camelcase */
 import { capitalize } from 'lodash';
 import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
-import utc from 'dayjs/plugin/utc';
 
 import {
     computed, getCurrentInstance, reactive, toRefs, ComponentRenderProxy, watch,
@@ -145,20 +143,27 @@ import { store } from '@/store';
 import { QueryHelper } from '@/lib/query';
 import { MANAGEMENT_ROUTE } from '@/routes/management/management-route';
 import { peacock } from '@/styles/colors';
+import { JOB_STATUS } from '@/views/management/collector-history/pages/config';
 
-dayjs.extend(utc);
-dayjs.extend(timezone);
-
-enum JOB_STATUS {
-    created = 'CREATED',
-    canceled = 'CANCELED',
-    progress = 'IN_PROGRESS',
-    success = 'SUCCESS',
-    error = 'ERROR',
-    timeout = 'TIMEOUT',
-}
 
 const PROGRESS_BAR_COLOR = peacock[400];
+
+const statusFormatter = (status) => {
+    if (status === JOB_STATUS.progress) return 'In-Progress';
+    if (status === JOB_STATUS.success) return 'Completed';
+    return capitalize(status);
+};
+const durationFormatter = (createdAt, finishedAt, timezone) => {
+    if (createdAt && finishedAt) {
+        const createdAtTime = dayjs(iso8601Formatter(createdAt, timezone));
+        const finishedAtTime = dayjs(iso8601Formatter(finishedAt, timezone));
+        let duration = finishedAtTime.diff(createdAtTime, 'second');
+        if (duration < 60) return `${duration} sec`;
+        duration = finishedAtTime.diff(createdAtTime, 'minute');
+        return `${duration} min`;
+    }
+    return null;
+};
 
 export default {
     name: 'CollectorHistoryPage',
@@ -259,23 +264,6 @@ export default {
             ])),
         });
 
-        const statusFormatter = (status) => {
-            if (status === 'PENDING' || status === 'IN_PROGRESS') return 'In-Progress';
-            if (status === 'SUCCESS') return 'Completed';
-            return capitalize(status);
-        };
-        const durationFormatter = (createdAt, finishedAt) => {
-            if (createdAt && finishedAt) {
-                const createdAtMoment = dayjs(iso8601Formatter(createdAt, state.timezone));
-                const finishedAtMoment = dayjs(iso8601Formatter(finishedAt, state.timezone));
-                let duration = finishedAtMoment.diff(createdAtMoment, 'second');
-                if (duration < 60) return `${duration} sec`;
-                duration = finishedAtMoment.diff(createdAtMoment, 'minute');
-                return `${duration} min`;
-            }
-            return null;
-        };
-
         /* api */
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
@@ -306,7 +294,7 @@ export default {
                 state.items = res.results.map((job, index) => ({
                     sequence: state.pageStart + index,
                     job_progress: ((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100,
-                    duration: durationFormatter(job.created_at, job.finished_at),
+                    duration: durationFormatter(job.created_at, job.finished_at, state.timezone),
                     ...job,
                 }));
             } catch (e) {
