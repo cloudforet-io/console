@@ -331,7 +331,6 @@
 			"ALT_E_UPDATE_COL": "",
 			"ALT_S_UPDATE_COL": "",
 			"ATTRIBUTE_COL": "",
-			"ATTRIBUTE_COL_DESC": "",
 			"CLEAR_ALL": "",
 			"COL_NAME": "",
 			"COL_REQUIRED": "",
@@ -340,7 +339,6 @@
 			"SELECT_TAG": "",
 			"TAG": "",
 			"TAG_COL": "",
-			"TAG_COL_DESC": "",
 			"TITLE": ""
 		},
 		"ERROR": {

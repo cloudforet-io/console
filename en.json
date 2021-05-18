@@ -331,7 +331,6 @@
 			"ALT_E_UPDATE_COL": "Failed to Update Columns",
 			"ALT_S_UPDATE_COL": "Success to Update Columns",
 			"ATTRIBUTE_COL": "Attribute columns",
-			"ATTRIBUTE_COL_DESC": "Select visible attribute columns",
 			"CLEAR_ALL": "Clear all",
 			"COL_NAME": "Column Name",
 			"COL_REQUIRED": "Select at least one column",
@@ -340,7 +339,6 @@
 			"SELECT_TAG": "Select tags",
 			"TAG": "(Tag)",
 			"TAG_COL": "Tag columns",
-			"TAG_COL_DESC": "Select visible tag columns",
 			"TITLE": "Set columns"
 		},
 		"ERROR": {

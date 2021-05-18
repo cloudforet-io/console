@@ -331,7 +331,6 @@
 			"ALT_E_UPDATE_COL": "필드 변경 실패",
 			"ALT_S_UPDATE_COL": "필드 변경 성공",
 			"ATTRIBUTE_COL": "필드 속성",
-			"ATTRIBUTE_COL_DESC": "테이블에 표시할 필드를 선택하세요.",
 			"CLEAR_ALL": "모두 지우기",
 			"COL_NAME": "필드 이름",
 			"COL_REQUIRED": "한 개 이상의 필드를 선택해주세요.",
@@ -340,7 +339,6 @@
 			"SELECT_TAG": "태그 선택",
 			"TAG": "(태그)",
 			"TAG_COL": "태그 필드",
-			"TAG_COL_DESC": "테이블 필드에 추가할 태그를 선택하세요.",
 			"TITLE": "필드 변경하기"
 		},
 		"ERROR": {
