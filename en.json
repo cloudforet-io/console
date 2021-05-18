@@ -328,6 +328,7 @@
 			}
 		},
 		"CUSTOM_FIELD_MODAL": {
+			"ALPHABETICAL_SORT": "Alphabetical",
 			"ALT_E_UPDATE_COL": "Failed to Update Columns",
 			"ALT_S_UPDATE_COL": "Success to Update Columns",
 			"ATTRIBUTE_COL": "Attribute columns",
@@ -335,8 +336,10 @@
 			"COL_NAME": "Column Name",
 			"COL_REQUIRED": "Select at least one column",
 			"DEFAULT": "Default",
+			"RECOMMEND_SORT": "Recommendation",
 			"SEARCH_ATTRIBUTE_COL": "Search attribute columns",
 			"SELECT_TAG": "Select tags",
+			"SORT_BY": "Sort by",
 			"TAG": "(Tag)",
 			"TAG_COL": "Tag columns",
 			"TITLE": "Set columns"

@@ -328,6 +328,7 @@
 			}
 		},
 		"CUSTOM_FIELD_MODAL": {
+			"ALPHABETICAL_SORT": "알파벳순",
 			"ALT_E_UPDATE_COL": "필드 변경 실패",
 			"ALT_S_UPDATE_COL": "필드 변경 성공",
 			"ATTRIBUTE_COL": "필드 속성",
@@ -335,8 +336,10 @@
 			"COL_NAME": "필드 이름",
 			"COL_REQUIRED": "한 개 이상의 필드를 선택해주세요.",
 			"DEFAULT": "기본 설정으로",
+			"RECOMMEND_SORT": "추천순",
 			"SEARCH_ATTRIBUTE_COL": "속성 필드 검색",
 			"SELECT_TAG": "태그 선택",
+			"SORT_BY": "정렬",
 			"TAG": "(태그)",
 			"TAG_COL": "태그 필드",
 			"TITLE": "필드 변경하기"

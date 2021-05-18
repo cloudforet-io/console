@@ -328,6 +328,7 @@
 			}
 		},
 		"CUSTOM_FIELD_MODAL": {
+			"ALPHABETICAL_SORT": "",
 			"ALT_E_UPDATE_COL": "",
 			"ALT_S_UPDATE_COL": "",
 			"ATTRIBUTE_COL": "",
@@ -335,8 +336,10 @@
 			"COL_NAME": "",
 			"COL_REQUIRED": "",
 			"DEFAULT": "",
+			"RECOMMEND_SORT": "",
 			"SEARCH_ATTRIBUTE_COL": "",
 			"SELECT_TAG": "",
+			"SORT_BY": "",
 			"TAG": "",
 			"TAG_COL": "",
 			"TITLE": ""
