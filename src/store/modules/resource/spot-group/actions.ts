@@ -8,7 +8,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             query: {
                 only: ['spot_group_id', 'name'],
             },
-        });
+        }, { timeout: 2000 });
         const spotGroups: ResourceMap = {};
 
         response.results.forEach((spotGroupInfo: any): void => {

@@ -21,7 +21,7 @@ export const load = async ({ commit, state }, lazyLoad = false): Promise<void|Er
                     key: 'provider',
                 },
             },
-        });
+        }, { timeout: 2000 });
         const providers: ResourceMap = {};
 
         response.results.forEach((providerInfo: any): void => {

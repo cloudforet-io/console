@@ -8,7 +8,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             query: {
                 only: ['service_account_id', 'name'],
             },
-        });
+        }, { timeout: 2000 });
         const serviceAccounts: ResourceMap = {};
 
         response.results.forEach((serviceAccountInfo: any): void => {

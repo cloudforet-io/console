@@ -8,7 +8,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             query: {
                 only: ['name', 'region_code'],
             },
-        });
+        }, { timeout: 2000 });
         const regions: ResourceMap = {};
 
         response.results.forEach((regionInfo: any): void => {

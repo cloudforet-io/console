@@ -8,7 +8,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
             query: {
                 only: ['project_group_id', 'name', 'parent_project_group_info'],
             },
-        });
+        }, { timeout: 2000 });
         const projectGroups: ResourceMap = {};
 
         response.results.forEach((projectGroupInfo: any): void => {

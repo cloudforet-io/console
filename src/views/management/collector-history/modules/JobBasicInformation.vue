@@ -156,6 +156,7 @@ export default {
         }
     }
 }
+
 @screen mobile {
     .job-basic-information {
         .items-container {

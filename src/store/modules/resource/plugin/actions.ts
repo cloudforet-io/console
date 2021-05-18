@@ -19,7 +19,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
                     only: ['plugin_id', 'name', 'tags'],
                 },
                 repository_id: repoInfo.repository_id,
-            });
+            }, { timeout: 2000 });
 
 
             pluginResponse.results.forEach((pluginInfo: any): void => {
