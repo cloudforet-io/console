@@ -853,6 +853,7 @@
 				"ALL": "All",
 				"BASIC_INFO": "Basic Information",
 				"COLLECTOR": "Collector",
+				"COMPLETED": "Completed",
 				"ERROR_LIST": "Error List",
 				"FAILED": "Failed",
 				"FINISH_TIME": "Finish Time",
@@ -861,7 +862,10 @@
 				"PLUGIN": "Plugin",
 				"PROVIDER": "Provider",
 				"START_TIME": "Start Time",
-				"SUCCEEDED": "Succeeded"
+				"STATUS": "Status",
+				"SUCCEEDED": "Succeeded",
+				"TASK": "Task",
+				"TOTAL": "Total"
 			},
 			"MAIN": {
 				"ALL": "All",

@@ -853,6 +853,7 @@
 				"ALL": "すべてを表示",
 				"BASIC_INFO": "",
 				"COLLECTOR": "",
+				"COMPLETED": "完了",
 				"ERROR_LIST": "エラーリスト",
 				"FAILED": "失敗",
 				"FINISH_TIME": "",
@@ -861,7 +862,10 @@
 				"PLUGIN": "",
 				"PROVIDER": "プロバイダー",
 				"START_TIME": "",
-				"SUCCEEDED": "成功"
+				"STATUS": "",
+				"SUCCEEDED": "成功",
+				"TASK": "",
+				"TOTAL": ""
 			},
 			"MAIN": {
 				"ALL": "すべてを表示",

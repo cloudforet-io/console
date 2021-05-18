@@ -853,6 +853,7 @@
 				"ALL": "모두 보기",
 				"BASIC_INFO": "기본 정보",
 				"COLLECTOR": "컬렉터",
+				"COMPLETED": "완료",
 				"ERROR_LIST": "에러 목록",
 				"FAILED": "실패",
 				"FINISH_TIME": "종료 시간",
@@ -861,7 +862,10 @@
 				"PLUGIN": "플러그인",
 				"PROVIDER": "제공자",
 				"START_TIME": "시작 시간",
-				"SUCCEEDED": "성공"
+				"STATUS": "상태",
+				"SUCCEEDED": "성공",
+				"TASK": "Task",
+				"TOTAL": "Total"
 			},
 			"MAIN": {
 				"ALL": "모두 보기",
