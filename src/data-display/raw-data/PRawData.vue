@@ -17,7 +17,7 @@ export default {
     },
     props: {
         item: {
-            type: [Object, Array],
+            type: [Object, Array, String],
             default: () => ({}),
         },
         raw: {

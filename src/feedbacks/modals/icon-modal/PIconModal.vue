@@ -133,6 +133,7 @@ export default {
         max-width: 32rem;
         min-height: 12.875rem;
         max-height: calc(100vh - 4rem);
+        overflow: auto;
         &.md {
             min-width: 25rem;
             max-width: 37.5rem;
