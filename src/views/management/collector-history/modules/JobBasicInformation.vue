@@ -1,21 +1,166 @@
 <template>
-    <p-pane-layout>
-        JobBasicInformation
+    <p-pane-layout class="job-basic-information">
+        <header>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.BASIC_INFO') }}</header>
+        <section class="items-container">
+            <div class="item">
+                <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COLLECTOR') }}</label>
+                <p-anchor :to="collector.linkLocation" class="contents">
+                    <strong>{{ collector.label }}</strong>
+                </p-anchor>
+            </div>
+            <div class="item">
+                <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PROVIDER') }}</label>
+                <span class="contents">
+                    {{ provider.label }}
+                </span>
+            </div>
+            <div class="item">
+                <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PLUGIN') }}</label>
+                <span class="contents align-middle">
+                    <p-lazy-img :src="plugin.icon" error-icon="ic_provider_other"
+                                :alt="plugin.label" width="1rem" height="1rem"
+                                class="mr-1"
+                    />
+                    {{ plugin.label }}
+                </span>
+            </div>
+            <div class="item">
+                <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.START_TIME') }}</label>
+                <span class="contents">
+                    {{ iso8601Formatter(job.created_at, timezone) }}
+                </span>
+            </div>
+            <div class="item">
+                <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FINISH_TIME') }}</label>
+                <span class="contents">
+                    {{ iso8601Formatter(job.finished_at, timezone) }}
+                </span>
+            </div>
+        </section>
     </p-pane-layout>
 </template>
 
 <script lang="ts">
-import { PPaneLayout } from '@spaceone/design-system';
+import { PAnchor, PLazyImg, PPaneLayout } from '@spaceone/design-system';
+import { SpaceConnector } from '@/lib/space-connector';
+import { computed, reactive, toRefs } from '@vue/composition-api';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { store } from '@/store';
+import { ResourceMap } from '@/store/modules/resource/type';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { iso8601Formatter } from '@/lib/util';
+
+interface Props {
+    jobId: string;
+}
 
 export default {
     name: 'JobBasicInformation',
-    components: { PPaneLayout },
-    setup() {
-        return {};
+    components: { PPaneLayout, PAnchor, PLazyImg },
+    props: {
+        jobId: {
+            type: String,
+            required: true,
+        },
+    },
+    setup(props: Props) {
+        const state = reactive({
+            loading: true,
+            job: {} as any,
+            collectors: computed<ResourceMap>(() => store.state.resource.collector.items || {}),
+            providers: computed<ResourceMap>(() => store.state.resource.provider.items || {}),
+            plugins: computed<ResourceMap>(() => store.state.resource.plugin.items || {}),
+            timezone: computed(() => store.state.user.timezone),
+            collector: computed(() => {
+                const id = state.job.collector_info?.collector_id || '';
+                return {
+                    id,
+                    label: state.collectors[id]?.label || id,
+                    linkLocation: referenceRouter(id, { resource_type: 'inventory.Collector' }),
+                };
+            }),
+            provider: computed(() => {
+                const id = state.job.collector_info?.provider || '';
+                return {
+                    id,
+                    label: state.providers[id]?.label || id,
+                };
+            }),
+            plugin: computed(() => {
+                const id = state.job.collector_info?.plugin_info?.plugin_id || '';
+                return {
+                    id,
+                    label: state.plugins[id]?.label || id,
+                    icon: state.plugins[id]?.icon,
+                };
+            }),
+
+        });
+
+        const apiQuery = new ApiQueryHelper();
+        const getJob = async () => {
+            state.loading = true;
+            try {
+                apiQuery.setFilters([{ k: 'job_id', v: props.jobId, o: '=' }]);
+                const { results } = await SpaceConnector.client.inventory.job.list({
+                    query: apiQuery.data,
+                });
+                state.job = results[0] || {};
+            } catch (e) {
+                state.job = {};
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        getJob();
+
+        return {
+            ...toRefs(state),
+            iso8601Formatter,
+        };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-
+.job-basic-information {
+    padding: 1rem;
+    header {
+        font-size: 1rem;
+        line-height: 1.6;
+        margin-bottom: 1rem;
+    }
+    .items-container {
+        display: grid;
+        grid-column-gap: 1rem;
+        grid-row-gap: 0.5rem;
+        grid-template-columns: repeat(2, 1fr);
+    }
+    .item {
+        display: inline-flex;
+        align-items: flex-start;
+        align-content: flex-start;
+        label {
+            @apply text-gray-600;
+            font-size: 0.75rem;
+            line-height: 1.5;
+            margin-right: 0.25rem;
+            white-space: nowrap;
+        }
+        .contents {
+            font-size: 0.75rem;
+            font-weight: bold;
+            line-height: 1.5;
+        }
+    }
+}
+@screen mobile {
+    .job-basic-information {
+        .items-container {
+            grid-template-columns: repeat(1, 1fr);
+        }
+    }
+}
 </style>

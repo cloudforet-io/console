@@ -4,7 +4,7 @@
         <p-page-title :title="jobId" child @goBack="$router.go(-1)" />
         <div class="top-wrapper">
             <job-status-chart />
-            <job-basic-information />
+            <job-basic-information :job-id="jobId" />
         </div>
         <p-horizontal-layout class="job-tasks-wrapper">
             <template #container="{ height }">
@@ -19,8 +19,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-
 import {
     computed, reactive, toRefs,
     getCurrentInstance, ComponentRenderProxy,
@@ -30,33 +28,13 @@ import {
     PHorizontalLayout, PPageTitle, PBreadcrumbs,
 } from '@spaceone/design-system';
 
-import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
-
-import { TimeStamp } from '@/models';
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import JobStatusChart from '@/views/management/collector-history/modules/JobStatusChart.vue';
 import JobBasicInformation from '@/views/management/collector-history/modules/JobBasicInformation.vue';
 import JobTable from '@/views/management/collector-history/modules/JobTaskTable.vue';
-import { JOB_STATUS } from '@/views/management/collector-history/pages/config';
 import JobTaskDetails from '@/views/management/collector-history/modules/JobTaskDetails.vue';
-import router from '@/routes';
+import { store } from '@/store';
 
-
-interface JobModel {
-    job_id: string;
-    state: JOB_STATUS;
-    collect_mode: COLLECT_MODE;
-    collector_info: CollectorModel;
-    secret_id: string;
-    filter: any;
-    errors: {
-        code: string;
-        message: string;
-        secret_id?: string;
-    }[];
-    created_at: TimeStamp;
-    finished_at: TimeStamp;
-}
 
 export default {
     name: 'CollectorHistoryJob',
@@ -91,6 +69,14 @@ export default {
             ]),
         });
 
+        /* Init */
+        (() => {
+            Promise.all([store.dispatch('resource/project/load'),
+                store.dispatch('resource/serviceAccount/load'),
+                store.dispatch('resource/plugin/load'),
+                store.dispatch('resource/collector/load')]);
+        })();
+
 
         return {
             ...toRefs(state),
@@ -102,9 +88,9 @@ export default {
 
 <style lang="postcss" scoped>
 .top-wrapper {
-  display: grid;
-  grid-gap: 1rem;
-  grid-template-columns: repeat(2, 1fr);
-  margin-bottom: 1rem;
+    display: grid;
+    grid-gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(352px, 1fr));
+    margin-bottom: 1rem;
 }
 </style>

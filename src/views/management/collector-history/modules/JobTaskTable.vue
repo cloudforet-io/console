@@ -57,7 +57,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { capitalize } from 'lodash';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
