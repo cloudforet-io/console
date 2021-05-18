@@ -1,3 +1,10 @@
+# [1.1.0-beta.9](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.8...v1.1.0-beta.9) (2021-05-18)
+
+
+### Bug Fixes
+
+* update type in raw data component and modal overflow property ([#535](https://github.com/spaceone-dev/spaceone-design-system/issues/535)) ([680e658](https://github.com/spaceone-dev/spaceone-design-system/commit/680e6589fed0451756affb047f00fbb66b79e0a6))
+
 # [1.1.0-beta.8](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.7...v1.1.0-beta.8) (2021-05-17)
 
 
