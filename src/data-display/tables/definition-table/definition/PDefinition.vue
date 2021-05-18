@@ -20,8 +20,7 @@
 
 <script lang="ts">
 import {
-    computed,
-    ref,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
 import { copyAnyData, copyTextToClipboard, isNotEmpty } from '@/util/helpers';
@@ -54,29 +53,28 @@ export default {
         },
     },
     setup(props: DefinitionProps, { emit, slots }) {
-        const field = ref<HTMLFormElement|null>(null);
-        const displayData = computed(() => (props.formatter ? props.formatter(props.data, props) : props.data));
         const searchElemInnerText = (elem: HTMLElement): string => elem.innerText;
-
-        const showCopy = computed(() => {
-            if (props.disableCopy) return false;
-            if (slots.default) return isNotEmpty(displayData.value);
-            if (field.value) return !!searchElemInnerText(field.value);
-            return true;
+        const state = reactive({
+            field: null as HTMLFormElement|null,
+            displayData: computed(() => (props.formatter ? props.formatter(props.data, props) : props.data)),
+            showCopy: computed(() => {
+                if (props.disableCopy) return false;
+                if (slots.default) return isNotEmpty(state.displayData);
+                if (state.field) return !!searchElemInnerText(state.field);
+                return true;
+            }),
         });
 
         const copy = (): void => {
             if (props.formatter) copyAnyData(props.formatter(props.data, props));
-            else if (field.value) copyTextToClipboard(searchElemInnerText(field.value));
+            else if (state.field) copyTextToClipboard(searchElemInnerText(state.field));
             emit('copy', props);
         };
 
         return {
-            field,
-            displayData,
-            showCopy,
-            copy,
+            ...toRefs(state),
             ...mouseOverState(),
+            copy,
         };
     },
 };

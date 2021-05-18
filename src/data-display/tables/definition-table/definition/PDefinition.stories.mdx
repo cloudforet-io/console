@@ -1,0 +1,251 @@
+import {
+    toRefs, reactive,
+} from '@vue/composition-api';
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PDefinition from '@/data-display/tables/definition-table/definition/PDefinition.vue';
+
+<Meta title='Data Display/Tables/Definition Table/Definition Item' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5373%3A6989',
+    }
+}} component={ PDefinition } argTypes={{
+    name: {
+        name: 'name',
+        type: {name: 'string'},
+        description: 'Name of key.',
+        defaultValue: 'name',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '""'
+            }
+        },
+        control: {
+            type: 'text'
+        },
+    },
+    label: {
+        name: 'label',
+        type: {name: 'string'},
+        description: 'Label of key.',
+        defaultValue: 'label',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '""'
+            }
+        },
+        control: {
+            type: 'text'
+        },
+    },
+    data: {
+        name: 'data',
+        type: {name: 'string'},
+        description: 'Data of value.',
+        defaultValue: 'data',
+        table: {
+            type: {
+                summary: 'string, object, array, boolean, number'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '""'
+            }
+        },
+        control: {
+            type: 'text'
+        },
+    },
+    disableCopy: {
+        name: 'disableCopy',
+        type: {name: 'boolean'},
+        description: 'Disable copy button when true',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            }
+        },
+        control: {
+            type: 'boolean',
+        }
+    },
+    formatter: {
+        name: 'formatter',
+        type: {name: 'function'},
+        description: `formatter that format the data.`,
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'function'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: `undefined`
+            },
+        },
+        control: {
+            type: 'object',
+        }
+    }
+}}
+/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDefinition },
+    template: `
+<p-definition
+    :name="name"
+    :label="label"
+    :data="data"
+    :disable-copy="disableCopy"
+    :formatter="formatter"
+/>`,
+    setup() {
+        return {
+        }
+    }
+});
+
+
+# Definition
+
+<br/>
+<br/>
+<br/>
+
+## Description
+
+<br/>
+
+### Slots
+| Slot name | Description |
+| ---- | ----------- |
+| default | Slot for replacing definition text. |
+| copy | Slot for replacing copy button. |
+
+<br/>
+
+### SlotScope(Props)
+| Type | Description |
+| ---- | ----------- |
+| all Props | name, label, data, disableCopy, formatter |
+| field | 'td' element that wrapping definition text. |
+| displayData | actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'. |
+| showCopy | boolean value that indicates whether show copy or not. it's related the value of 'displayData', 'disableCopy', and field element's innerText. |
+| copy | function that invoked when copy button is clicked. |
+| isMouseOver | boolean value that indicates whether copy button is mouse over or out. |
+| onMouseOver | function that invoked when copy button is mouse over. |
+| onMouseOut | function that invoked when copy button is mouse out. |
+
+
+<br/>
+
+## Basic
+<Canvas>
+    <Story name="basic definition">
+        {{
+            components:{ PDefinition },
+            template: `
+<table>
+    <tbody>
+        <p-definition
+            name="string data"
+            :data="data.stringData"
+        />
+        <p-definition
+            name="object data"
+            :data="data.objectData"
+        />
+        <p-definition
+            name="array data"
+            :data="data.arrayData"
+        />
+        <p-definition
+            name="boolean data"
+            :data="data.booleanData"
+        />
+        <p-definition
+            name="number data"
+            :data="data.numberData"
+        />
+    </tbody>
+</table>
+`,
+            setup() {
+                const state = reactive({
+                    data: {
+                        stringData: 'string data',
+                        objectData: {name: 'object data'},
+                        arrayData: ['array', 'data'],
+                        booleanData: true,
+                        numberData: 13,
+                    }
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Formatter
+<Canvas>
+    <Story name="formatted definition">
+        {{
+            components:{ PDefinition },
+            template: `
+<table>
+    <tbody>
+        <p-definition
+            name="without formatter"
+            :data="numberData"
+        />
+        <p-definition
+            name="with formatter"
+            :data="numberData"
+            :formatter="commaFormatter"
+        />
+    </tbody>
+</table>
+`,
+            setup() {
+                const state = reactive({
+                    numberData: 1234567890,
+                });
+                const commaFormatter = (num) => {
+                    if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                    return num;
+                };
+                return {
+                    ...toRefs(state),
+                    commaFormatter,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+## Playground
+<Canvas>
+    <Story name="playground" >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground" />
