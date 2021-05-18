@@ -208,6 +208,9 @@ export default {
 [font-size: 0.75rem; ${gray[700]}]{tooltipDate}`;
                 }
                 series.tooltip.pointerOrientation = 'down';
+                series.columns.template.tooltipX = am4core.percent(50);
+                series.columns.template.tooltipY = am4core.percent(0);
+                series.tooltip.dy = -5;
                 series.tooltip.fontSize = 12;
                 series.tooltip.getFillFromObject = false;
                 series.tooltip.label.fill = am4core.color(gray[900]);
