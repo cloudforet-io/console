@@ -32,7 +32,7 @@ import {
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import UserAPIKeyTable from '@/views/identity/user/modules/UserAPIKeyTable.vue';
-import {store} from "@/store";
+import { store } from '@/store';
 
 export default {
     name: 'UserAPIKeyPage',
@@ -67,8 +67,12 @@ export default {
         const apiQueryHelper = new ApiQueryHelper();
         const listEndpoints = async () => {
             state.loading = true;
+            apiQueryHelper.setSort('created_at')
+                .setFilters([{ k: 'service', v: 'inventory', o: '=' }]);
             try {
-                const res = await SpaceConnector.client.identity.endpoint.list();
+                const res = await SpaceConnector.client.identity.endpoint.list({
+                    query: apiQueryHelper.data,
+                });
                 state.items = res.results;
             } catch (e) {
                 console.error(e);

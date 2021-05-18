@@ -36,7 +36,8 @@
         </p-pane-layout>
         <user-a-p-i-key-modal v-if="visible && !modalState.loading"
                               :visible.sync="visible"
-                              :items="modalState.items"
+                              :api-key-item="modalState.items"
+                              :endpoints="modalState.endpoints"
                               @clickButton="confirm"
         />
         <p-table-check-modal
@@ -121,6 +122,7 @@ export default {
         const modalState = reactive({
             loading: false,
             items: [] as any,
+            endpoints: null as any,
         });
 
         const checkModalState = reactive({
@@ -258,6 +260,25 @@ export default {
             if (checkModalState.mode === 'disable') await disableAPIKey(item);
         };
 
+        const endpointQueryHelper = new ApiQueryHelper();
+        const listEndpoints = async () => {
+            state.loading = true;
+            endpointQueryHelper.setSort('created_at')
+                .setFilters([{ k: 'service', v: 'inventory', o: '=' }]);
+            try {
+                const res = await SpaceConnector.client.identity.endpoint.list({
+                    query: endpointQueryHelper.data,
+                });
+                modalState.endpoints = {
+                    endpoints: res.results.map(d => `${d.service}: ${d.endpoint}`).join('\n'),
+                };
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
+        };
+
         watch(() => props.userId, async (after) => {
             if (after) {
                 state.user = after;
@@ -267,6 +288,7 @@ export default {
 
         (async () => {
             await listAPIKey(state.user);
+            await listEndpoints();
         })();
 
         return {
