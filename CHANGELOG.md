@@ -1,3 +1,10 @@
+# [1.1.0-beta.13](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.12...v1.1.0-beta.13) (2021-05-19)
+
+
+### Bug Fixes
+
+* update css of sidebar ([#541](https://github.com/spaceone-dev/spaceone-design-system/issues/541)) ([e6c04df](https://github.com/spaceone-dev/spaceone-design-system/commit/e6c04dfac7bba8a1ba6506c1557a54fe7a9df085))
+
 # [1.1.0-beta.12](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.11...v1.1.0-beta.12) (2021-05-19)
 
 
