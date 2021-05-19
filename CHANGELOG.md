@@ -1,3 +1,10 @@
+# [1.1.0-beta.12](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.11...v1.1.0-beta.12) (2021-05-19)
+
+
+### Features
+
+* update autocomplete for general usage ([#540](https://github.com/spaceone-dev/spaceone-design-system/issues/540)) ([c745b36](https://github.com/spaceone-dev/spaceone-design-system/commit/c745b36788f8f7d5bd6a03c9952251600f2719a4))
+
 # [1.1.0-beta.11](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.10...v1.1.0-beta.11) (2021-05-19)
 
 
