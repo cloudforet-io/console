@@ -1,3 +1,10 @@
+# [1.1.0-beta.11](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.10...v1.1.0-beta.11) (2021-05-19)
+
+
+### Bug Fixes
+
+* fix autocomplete search bugs and handler usage ([#539](https://github.com/spaceone-dev/spaceone-design-system/issues/539)) ([dd24c83](https://github.com/spaceone-dev/spaceone-design-system/commit/dd24c837aae8bd509c3124cc558be0ae0ada0c3f))
+
 # [1.1.0-beta.10](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.9...v1.1.0-beta.10) (2021-05-18)
 
 
