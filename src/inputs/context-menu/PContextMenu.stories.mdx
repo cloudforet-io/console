@@ -1,0 +1,553 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PContextMenu from './PContextMenu.vue';
+import PEmpty from '@/data-display/empty/PEmpty';
+import PI from '@/foundation/icons/PI.vue';
+import PRawData from '@/data-display/raw-data/PRawData';
+import {argTypes} from '@/inputs/context-menu/story-helper';
+import {menuItems} from '@/inputs/context-menu/mock';
+import { reactive, toRefs, watch } from '@vue/composition-api';
+
+<Meta title='Inputs/Context Menu' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A133521'
+    }
+}} argTypes={argTypes}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PContextMenu },
+    template: `
+        <p-context-menu :menu="menu"
+                        :theme="theme"
+                        :loading="loading"
+                        :autoHeight="autoHeight"
+                        :useCustomStyle="useCustomStyle"
+                        :position="position"
+                        :offsetTop="offsetTop"
+                        :width="width"
+                        :height="height"
+                        @select="onSelect"
+                        @focus="onFocus"
+                        @blur="onBlur"
+                        @keyup:up:end="$props['onKeyup:up:end']"
+                        @keyup:down:end="$props['onKeyup:down:end']"
+                        @keyup:esc="$props['onKeyup:esc']"
+        />
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Context Menu
+<br/>
+<br/>
+
+## Menu Item Properties
+
+Context Menu's `menu` props is an `array` of `MenuItem`.
+`MenuItem` is an `object` that includes following properties:
+
+<br/>
+
+|Properties|Description|Type|
+|-|-|-|
+|name|The key of the corresponding item|`string`|
+|label|Value to be displayed|`string`|
+|type|The type of item |`['divider', 'header', 'item', 'info']`|
+|disabled|Whether to disable the selection|`boolean`|
+|link|A value given when it is necessary to move to a specific link when pressed. In this case, the corresponding item is displayed as a tag.|`string`|
+|target|When the link property is assigned to the corresponding item, it is bound to the a tag attribute together. |`string`|
+
+<br/>
+
+### Item Types
+
+Each `MenuItem` has the following type to represent it:
+
+<br/>
+
+|Type|Description|
+|-|-|
+|item|Default type. Selectable and Focusable. If no value is given to the type property of `MenuItem`, it is regarded as this type.|
+|divider| Divider. This type is designated when you want to display a divider line. For this type, you don't need any of the `MenuItem` properties. But if you want to customize divider for specific item with 'divider-{item.name}' slot, you need to give the name property.|
+|header|Use it when you want to group items among related items and display the category of items. Not selectable, Not focusable.|
+|info|Not yet defined, but will be provided later|
+
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(argTypes),
+            components: { PContextMenu },
+            template: `
+        <p-context-menu :menu="menu"/>
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Loading
+
+<Canvas>
+    <Story name="Loading" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(argTypes),
+            components: { PContextMenu },
+            template: `
+        <p-context-menu :menu="menu" loading />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## No Data
+
+<Canvas>
+    <Story name="No Data" args={{menu: menuItems}} height={'4rem'}>
+        {{
+            props: Object.keys(argTypes),
+            components: { PContextMenu },
+            template: `
+        <p-context-menu :menu="[]" />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Custom Style
+
+<Canvas>
+    <Story name="Custom Style" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(argTypes),
+            components: { PContextMenu },
+            template: `
+        <div>TODO</div>
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Slot Cases
+
+Context Menu have 4 types fot slots:
+
+|Slot Type|Description|Slots|
+|-|-|-|
+|Full replacement|A slot that replaces the entire corresponding slot area.|`loading`, `no-data`, `item`, `info`, `divider`|
+|Full replacement with style|A slot that replaces the inner area of the style of the entire corresponding slot area.|`loading-format`, `no-data-format`, `item--format`, `info--format`, `header--format`|
+|Specific replacement|A slot that replaces the specific corresponding slot area.|`item-<item.name>`, `divider-<item.name>`, `header-<item.name>`|
+|Specific replacement with style|A slot that replaces the inner area of the style of the specific corresponding slot area.|`item-<item.name>-format`, `header-<item.name>-format`|
+
+<br/>
+
+### Loading Slots
+
+<Canvas>
+    <Story name="Loading Slots" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(argTypes),
+            components: { PContextMenu, PRawData },
+            template: `
+        <div class="flex h-full w-full flex-col">
+            <div>
+                <h2 class="mb-4">This is <strong>loading</strong> slot</h2>
+                <p-context-menu :menu="menu" loading style="position: relative;">
+                    <template #loading>
+                        <div style="position: absolute; display: flex; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center;">
+                            ...loading
+                        </div>
+                    </template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class=" mb-4">This is <strong>loading-format</strong> slot</h2>
+                <p-context-menu :menu="menu" loading style="position: relative;">
+                    <template #loading-format>
+                        ...loading
+                    </template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class="mb-4">Slot Props:</h2>
+                <p-context-menu :menu="menu" loading v-show="false">
+                    <template #loading-format="slotProps">
+                        <pre ref="slotPropsRef">{{slotProps}}</pre>
+                    </template>
+                </p-context-menu>
+                <p-raw-data :raw="slotPropsText" style="height: 10rem; overflow: scroll;"/>
+            </div>
+        </div>
+    <!--<div>-->
+`,
+            setup() {
+                const state = reactive({
+                    slotPropsRef: null,
+                    slotPropsText: ''
+                })
+                watch(() => state.slotPropsRef, (slotPropsRef) => {
+                    if (slotPropsRef) state.slotPropsText = slotPropsRef.textContent
+                })
+                return {...toRefs((state))}
+            }
+        }}
+    </Story>
+</Canvas>
+
+
+<br/>
+<br/>
+
+### No Data Slots
+
+<Canvas>
+    <Story name="No Data Slots" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(argTypes),
+            components: { PContextMenu, PEmpty, PRawData },
+            template: `
+        <div class="flex h-full w-full flex-col">
+            <div>
+                <h2 class="mb-4">This is <strong>no-data</strong> slot</h2>
+                <p-context-menu :menu="[]" style="position: relative;">
+                    <template #no-data>
+                        <p-empty>No Data</p-empty>
+                    </template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class="mb-4">This is <strong>no-data-format</strong> slot</h2>
+                <p-context-menu :menu="[]" style="position: relative;">
+                    <template #no-data-format>No Data</template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class="mb-4">Slot Props:</h2>
+                <p-context-menu :menu="[]" loading v-show="false">
+                    <template #no-data="slotProps">
+                        <pre ref="slotPropsRef">{{slotProps}}</pre>
+                    </template>
+                </p-context-menu>
+                <p-raw-data :raw="slotPropsText" style="height: 10rem; overflow: scroll;"/>
+            </div>
+        </div>
+<!--<div>-->
+`,
+            setup() {
+                const state = reactive({
+                    slotPropsRef: null,
+                    slotPropsText: ''
+                })
+                watch(() => state.slotPropsRef, (slotPropsRef) => {
+                    if (slotPropsRef) state.slotPropsText = slotPropsRef.textContent
+                })
+                return {...toRefs((state))}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+### Menu Slot
+
+<Canvas>
+    <Story name="Menu Slot" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(argTypes),
+            components: { PContextMenu, PRawData },
+            template: `
+        <div class="flex h-full w-full flex-col">
+            <div class="mt-4">
+                <h2 class="mb-4">This is <strong>menu</strong> slot</h2>
+                <p-context-menu :menu="menu" style="position: relative;">
+                    <template #menu="{menu}">
+                        <template v-for="(m, i) in menu">
+                            <div v-if="m.type === undefined || m.type === 'item'" :key="i"
+                                 class="border-b border-blue-200 py-1 text-center text-xs"
+                            >
+                                {{m.label}}
+                            </div>
+                        </template>
+                    </template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class="mb-4">Slot Props:</h2>
+                <p-context-menu :menu="menu" loading v-show="false">
+                    <template #menu="slotProps">
+                        <pre ref="slotPropsRef">{{slotProps}}</pre>
+                    </template>
+                </p-context-menu>
+                <p-raw-data :raw="slotPropsText" style="height: 10rem; overflow: scroll;"/>
+            </div>
+        </div>
+<!--<div>-->
+`,
+            setup() {
+                const state = reactive({
+                    slotPropsRef: null,
+                    slotPropsText: ''
+                })
+                watch(() => state.slotPropsRef, (slotPropsRef) => {
+                    if (slotPropsRef) state.slotPropsText = slotPropsRef.textContent
+                })
+                return {...toRefs((state))}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+### Item Slots
+
+<Canvas>
+    <Story name="Item Slots" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(argTypes),
+            components: { PContextMenu, PI, PRawData },
+            template: `
+        <div class="flex h-full w-full flex-col">
+            <div>
+                <h2 class="mb-4">This is <strong>item</strong> slot</h2>
+                <p-context-menu :menu="menu" style="position: relative;">
+                    <template #item="{item}">
+                        <div>
+                            <p-i name="btn_gnb_top-logo"/>
+                            {{item.label}}
+                        </div>
+                    </template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class="mb-4">This is <strong>item-{item.name}</strong> slot</h2>
+                <p-context-menu :menu="menu" style="position: relative;">
+                    <template #item-collect="{item}">
+                        <div>
+                            <p-i name="btn_gnb_top-logo"/>
+                            This is custom for <strong>{{item.label}}</strong> item!
+                        </div>
+                    </template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class="mb-4">This is <strong>item--format</strong> slot</h2>
+                <p-context-menu :menu="menu" style="position: relative;">
+                    <template #item--format="{item}">
+                        <div>
+                            <p-i name="btn_gnb_top-logo"/>
+                            {{item.label}}
+                        </div>
+                    </template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class="mb-4">This is <strong>item-{item.name}-format</strong> slot</h2>
+                <p-context-menu :menu="menu" style="position: relative;">
+                    <template #item-collect-format="{item}">
+                        <div>
+                            <p-i name="btn_gnb_top-logo"/>
+                            This is custom for <strong>{{item.label}}</strong> item!
+                        </div>
+                    </template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class="mb-4">Slot Props:</h2>
+                <p-context-menu :menu="menu" loading v-show="false">
+                    <template #item-collect="slotProps">
+                        <pre ref="slotPropsRef">{{slotProps}}</pre>
+                    </template>
+                </p-context-menu>
+                <p-raw-data :raw="slotPropsText" style="height: 10rem; overflow: scroll;"/>
+            </div>
+        </div>
+<!--<div>-->
+`,
+            setup() {
+                const state = reactive({
+                    slotPropsRef: null,
+                    slotPropsText: ''
+                })
+                watch(() => state.slotPropsRef, (slotPropsRef) => {
+                    if (slotPropsRef) state.slotPropsText = slotPropsRef.textContent
+                })
+                return {...toRefs((state))}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+### Divider Slots
+
+<Canvas>
+    <Story name="Divider Slots" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(argTypes),
+            components: { PContextMenu, PRawData },
+            template: `
+        <div class="flex h-full w-full flex-col">
+            <div>
+                <h2 class="mb-4">This is <strong>divider</strong> slot</h2>
+                <p-context-menu :menu="menu" style="position: relative;">
+                    <template #divider>
+                        <div style="width: 100%; border-bottom: 1px solid darkgray; margin-top: 1rem;"></div>
+                    </template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class=" mb-4">This is <strong>divider-{item.name}</strong> slot</h2>
+                <p-context-menu :menu="menu" style="position: relative;">
+                    <template #divider-collect-divider>
+                        <div style="width: calc(100% - 1rem); border-bottom: 2px dotted darkgray; margin: auto;"></div>
+                    </template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class="mb-4">Slot Props:</h2>
+                <p-context-menu :menu="menu" loading v-show="false">
+                    <template #divder-collect-divider="slotProps">
+                        <pre ref="slotPropsRef">{{slotProps}}</pre>
+                    </template>
+                </p-context-menu>
+                <p-raw-data :raw="slotPropsText" style="height: 10rem; overflow: scroll;"/>
+            </div>
+        </div>
+<!--<div>-->
+`,
+            setup() {
+                const state = reactive({
+                    slotPropsRef: null,
+                    slotPropsText: ''
+                })
+                watch(() => state.slotPropsRef, (slotPropsRef) => {
+                    if (slotPropsRef) state.slotPropsText = slotPropsRef.textContent
+                })
+                return {...toRefs((state))}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+### Header Slots
+
+<Canvas>
+    <Story name="Header Slots" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(argTypes),
+            components: { PContextMenu, PI, PRawData },
+            template: `
+        <div class="flex h-full w-full flex-col">
+            <div>
+                <h2 class="mb-4">This is <strong>header</strong> slot</h2>
+                <p-context-menu :menu="menu" style="position: relative;">
+                    <template #header="{item}">
+                        <div>
+                            <p-i name="btn_gnb_top-logo"/>
+                            {{item.label}}
+                        </div>
+                    </template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class="mb-4">This is <strong>header-{item.name}</strong> slot</h2>
+                <p-context-menu :menu="menu" style="position: relative;">
+                    <template #header-others="{item}">
+                        <div>
+                            <p-i name="btn_gnb_top-logo"/>
+                            This is custom header for <strong>{{item.label}}</strong>
+                        </div>
+                    </template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class="mb-4">This is <strong>header--format</strong> slot</h2>
+                <p-context-menu :menu="menu" style="position: relative;">
+                    <template #header--format="{item}">
+                        <div>
+                            <p-i name="btn_gnb_top-logo"/>
+                            {{item.label}}
+                        </div>
+                    </template>
+                </p-context-menu>
+            </div>
+            <div class="mt-4">
+                <h2 class="mb-4">This is <strong>header-{item.name}-format</strong> slot</h2>
+                <p-context-menu :menu="menu" style="position: relative;">
+                    <template #header-others-format="{item}">
+                        <div>
+                            <p-i name="btn_gnb_top-logo"/>
+                            This is custom header for <strong>{{item.label}}</strong>
+                        </div>
+                    </template>
+                </p-context-menu>
+            </div>
+        <div class="mt-4">
+                <h2 class="mb-4">Slot Props:</h2>
+                <p-context-menu :menu="menu" loading v-show="false">
+                    <template #header-others="slotProps">
+                        <pre ref="slotPropsRef">{{slotProps}}</pre>
+                    </template>
+                </p-context-menu>
+                <p-raw-data :raw="slotPropsText" style="height: 10rem; overflow: scroll;"/>
+            </div>
+        </div>
+<!--<div>-->
+`,
+            setup() {
+                const state = reactive({
+                    slotPropsRef: null,
+                    slotPropsText: ''
+                })
+                watch(() => state.slotPropsRef, (slotPropsRef) => {
+                    if (slotPropsRef) state.slotPropsText = slotPropsRef.textContent
+                })
+                return {...toRefs((state))}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground" height={'18rem'} args={{menu: menuItems}}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

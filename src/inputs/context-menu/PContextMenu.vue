@@ -13,7 +13,7 @@
         </slot>
         <slot v-else name="menu" v-bind="{...$props, uuid}">
             <template v-for="(item, index) in menu">
-                <slot v-if="item.type==='item'" name="item" v-bind="{...$props, uuid, item, index}">
+                <slot v-if="item.type === undefined || item.type === 'item'" name="item" v-bind="{...$props, uuid, item, index}">
                     <slot :name="`item-${item.name}`" v-bind="{...$props, uuid, item, index}">
                         <a :id="`context-item-${index}-${uuid}`"
                            :key="`${item.name}-${index}`"
@@ -83,10 +83,10 @@ import {
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PI from '@/foundation/icons/PI.vue';
 
-import { ContextMenuProps, CONTEXT_MENU_THEME } from '@/inputs/context-menu/type';
+import { ContextMenuProps, CONTEXT_MENU_THEME, CONTEXT_MENU_POSITION } from '@/inputs/context-menu/type';
 import { i18n } from '@/translations';
 
-export default defineComponent({
+export default defineComponent<ContextMenuProps>({
     name: 'PContextMenu',
     components: { PLottie, PI },
     i18n,
@@ -99,7 +99,7 @@ export default defineComponent({
             type: String,
             default: 'secondary',
             validator(theme) {
-                return Object.keys(CONTEXT_MENU_THEME).includes(theme as any);
+                return Object.values(CONTEXT_MENU_THEME).includes(theme as any);
             },
         },
         loading: {
@@ -116,19 +116,22 @@ export default defineComponent({
         },
         position: {
             type: String,
-            default: null,
+            default: undefined,
+            validator(position?: any) {
+                return position === undefined || Object.values(CONTEXT_MENU_POSITION).includes(position);
+            },
         },
         offsetTop: {
             type: Number,
-            default: null,
+            default: undefined,
         },
         width: {
             type: Number,
-            default: null,
+            default: undefined,
         },
         height: {
             type: Number,
-            default: null,
+            default: undefined,
         },
     },
     setup(props: ContextMenuProps, { emit }) {
@@ -141,8 +144,8 @@ export default defineComponent({
                     minWidth: 'auto',
                     width: `${props.width}px`,
                 };
-                if (props.position === 'top') contextMenuStyle.top = `calc(${props.offsetTop}px + ${props.height}px)`;
-                if (props.position === 'bottom') contextMenuStyle.bottom = `calc(100vh - ${props.offsetTop}px)`;
+                if (props.position === CONTEXT_MENU_POSITION.top) contextMenuStyle.top = `calc(${props.offsetTop ?? 0}px + ${props.height ?? 0}px)`;
+                if (props.position === CONTEXT_MENU_POSITION.bottom) contextMenuStyle.bottom = `calc(100vh - ${props.offsetTop ?? 0}px)`;
                 return contextMenuStyle;
             }),
             contextMenuHeight: 0,
@@ -158,8 +161,8 @@ export default defineComponent({
         onMounted(() => {
             if (!props.autoHeight || !props.useCustomStyle) return;
             const winHeight = window.innerHeight;
-            if (props.position === 'top') state.contextMenuHeight = winHeight - props.offsetTop - props.height - 12;
-            if (props.position === 'bottom') state.contextMenuHeight = props.offsetTop - 12;
+            if (props.position === 'top') state.contextMenuHeight = winHeight - (props.offsetTop ?? 0) - (props.height ?? 0) - 12;
+            if (props.position === 'bottom') state.contextMenuHeight = (props.offsetTop ?? 0) - 12;
         });
 
         let focusedEl: HTMLElement|null = null;
@@ -173,7 +176,8 @@ export default defineComponent({
         const itemsIndex = computed<number[]>(() => {
             const idxs: number[] = [];
             for (let i = 0; i < Object.keys(props.menu).length; i++) {
-                if (props.menu[i].type === 'item' && !props.menu[i].disabled) idxs.push(i);
+                if ((props.menu[i].type === undefined || props.menu[i].type === 'item')
+                    && !props.menu[i].disabled) idxs.push(i);
             }
             return idxs;
         });
@@ -304,7 +308,7 @@ export default defineComponent({
         font-size: 0.75rem;
 
         &.secondary {
-            @apply text-gray-900;
+            @apply text-secondary;
         }
         &.gray900 {
             @apply text-gray-400;
@@ -332,12 +336,12 @@ export default defineComponent({
         }
 
         &.secondary {
-            @mixin context-item-theme theme('colors.gray.900'), theme('colors.secondary'), theme('colors.white'),
-                theme('colors.secondary2'), theme('colors.secondary'), theme('colors.gray.200');
+            @mixin context-item-theme theme('colors.gray.900'), theme('colors.blue.200'), theme('colors.gray.900'),
+                theme('colors.secondary2'), theme('colors.secondary'), theme('colors.gray.300');
         }
         &.gray900 {
             @mixin context-item-theme theme('colors.gray.900'), theme('colors.gray.100'), theme('colors.gray.900'),
-                theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.200');
+                theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.300');
         }
     }
     .no-drag {

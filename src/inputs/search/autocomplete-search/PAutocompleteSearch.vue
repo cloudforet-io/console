@@ -1,9 +1,9 @@
 <template>
     <div class="p-autocomplete-search">
-        <p-search ref="searchRef"
-                  v-model="proxyValue"
+        <p-search v-model="proxyValue"
                   :placeholder="placeholder"
                   :focused="focused"
+                  :disabled="disabled"
                   :disable-icon="disableIcon"
                   :is-focused.sync="proxyIsFocused"
                   v-on="searchListeners"
@@ -15,7 +15,7 @@
         <div v-if="proxyVisibleMenu" class="menu-container">
             <p-context-menu ref="menuRef"
                             theme="secondary"
-                            :menu="filteredMenu"
+                            :menu="bindingMenu"
                             :loading="loading"
                             @select="onClickMenuItem"
                             @keyup:up:end="focusSearch"
@@ -33,18 +33,42 @@
 <script lang="ts">
 
 import {
-    AutocompleteSearchProps,
+    AutocompleteHandler,
 } from '@/inputs/search/autocomplete-search/type';
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import {
-    computed, onMounted, onUnmounted, reactive, toRefs,
+    ComponentRenderProxy,
+    computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs,
 } from '@vue/composition-api';
-import { makeByPassListeners, makeProxy } from '@/util/composition-helpers';
+import { makeByPassListeners, makeOptionalProxy } from '@/util/composition-helpers';
 import PSearch from '@/inputs/search/search/PSearch.vue';
 import { reduce } from 'lodash';
-import { plainAutocompleteHandler } from '@/inputs/search/autocomplete-search/helper';
+import { MenuItem } from '@/inputs/context-menu/type';
+import Fuse from 'fuse.js';
 
-export default {
+interface AutocompleteSearchProps {
+    value: string;
+    placeholder?: string;
+    focused?: boolean;
+    disabled?: boolean;
+    disableIcon?: boolean;
+    isFocused?: boolean;
+    menu: MenuItem[];
+    loading?: boolean;
+    visibleMenu?: boolean;
+    handler?: AutocompleteHandler;
+    disableHandler?: boolean;
+    exactMode?: boolean;
+}
+
+const fuseOptions = {
+    keys: ['label'],
+    distance: 100,
+    threshold: 0.1,
+    ignoreLocation: true,
+};
+
+export default defineComponent<AutocompleteSearchProps>({
     name: 'PAutocompleteSearch',
     components: { PSearch, PContextMenu },
     model: {
@@ -52,6 +76,7 @@ export default {
         event: 'update:value',
     },
     props: {
+        /* search props */
         value: {
             type: String,
             default: '',
@@ -64,10 +89,19 @@ export default {
             type: Boolean,
             default: false,
         },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
         disableIcon: {
             type: Boolean,
             default: false,
         },
+        isFocused: {
+            type: Boolean,
+            default: undefined,
+        },
+        /* context menu props */
         menu: {
             type: Array,
             default: () => [],
@@ -76,49 +110,74 @@ export default {
             type: Boolean,
             default: false,
         },
+        /* extra props */
         visibleMenu: {
-            type: Boolean,
-            default: undefined,
-        },
-        isFocused: {
             type: Boolean,
             default: undefined,
         },
         handler: {
             type: Function,
-            default: plainAutocompleteHandler,
+            default: undefined,
+        },
+        disableHandler: {
+            type: Boolean,
+            default: false,
+        },
+        exactMode: {
+            type: Boolean,
+            default: true,
         },
     },
     setup(props: AutocompleteSearchProps, { emit, slots, listeners }) {
-        const state: any = reactive({
-            searchRef: null,
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const state = reactive({
             menuRef: null,
-            proxyValue: listeners['update:value'] ? makeProxy('value', props, emit) : '',
+            proxyValue: makeOptionalProxy('value', vm, ''),
             isAutoMode: computed(() => props.visibleMenu === undefined),
-            proxyVisibleMenu: props.visibleMenu === undefined
-                ? false
-                : makeProxy('visibleMenu', props, emit),
-            proxyIsFocused: makeProxy('isFocused', props, emit),
-            filteredMenu: props.handler ? [] : computed(() => props.menu),
+            proxyVisibleMenu: makeOptionalProxy('visibleMenu', vm, false),
+            proxyIsFocused: makeOptionalProxy('isFocused', vm, props.focused),
+            filteredMenu: [] as MenuItem[],
+            bindingMenu: computed<MenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
+            searchableItems: computed<MenuItem[]>(() => props.menu.filter(d => d.type === undefined || d.type === 'item')),
+            fuse: computed(() => new Fuse(state.searchableItems, fuseOptions)),
         });
 
-
-        const filterMenu = async (val = '') => {
-            if (props.handler) {
-                let res = props.handler(val, props.menu);
-                if (res instanceof Promise) res = await res;
-                state.filteredMenu = res.results;
+        const defaultHandler = (inputText: string, list: MenuItem[]) => {
+            let results: MenuItem[] = [...list];
+            const trimmed = inputText.trim();
+            if (trimmed) {
+                results = state.fuse.search(trimmed);
             }
+            return { results };
+        };
+
+
+        const filterMenu = async (val: string) => {
+            if (props.disableHandler) return;
+
+            let results: MenuItem[];
+            if (props.handler) {
+                let res = props.handler(val, state.searchableItems);
+                if (res instanceof Promise) res = await res;
+                results = res.results;
+            } else {
+                results = defaultHandler(val, state.searchableItems).results;
+            }
+
+            const filtered = props.menu.filter((item) => {
+                if (item.type && item.type !== 'item') return true;
+                return !!results.find(d => d.name === item.name);
+            });
+            if (filtered[filtered.length - 1]?.type === 'divider') filtered.pop();
+            state.filteredMenu = filtered;
         };
 
         const focusSearch = () => {
-            if (state.searchRef) {
-                state.searchRef.focus();
-            }
+            state.proxyIsFocused = true;
         };
 
         const blurSearch = () => {
-            if (state.searchRef) state.searchRef.blur();
+            state.proxyIsFocused = false;
         };
 
         const hideMenu = () => {
@@ -128,10 +187,11 @@ export default {
 
         const showMenu = () => {
             if (state.isAutoMode) state.proxyVisibleMenu = true;
+            emit('show-menu');
         };
 
         const focusMenu = () => {
-            if (state.filteredMenu.length === 0) return;
+            if (state.bindingMenu.length === 0) return;
             showMenu();
 
             if (state.menuRef) state.menuRef.focus();
@@ -143,7 +203,7 @@ export default {
         };
 
         const onWindowKeydown = (e: KeyboardEvent) => {
-            if (state.proxyVisibleMenu && ['ArrowDown', 'ArrowUp'].includes(e.code)) {
+            if (state.proxyVisibleMenu && ['ArrowDown', 'ArrowUp'].includes(e.key)) {
                 e.preventDefault();
             }
         };
@@ -163,7 +223,7 @@ export default {
         };
 
         const onSearchFocus = () => {
-            filterMenu();
+            filterMenu(state.proxyValue);
             showMenu();
         };
 
@@ -183,28 +243,41 @@ export default {
             state.proxyValue = val;
             emit('input', val, e);
 
-            await filterMenu(val);
+            filterMenu(val);
         };
 
         const emitSearch = (val?: string) => {
             emit('search', val);
         };
 
-        const onSearch = (val?: string) => {
-            emitSearch(val);
-            hideMenu();
+        const emitSelectMenu = (item: MenuItem) => {
+            emit('select-menu', item);
         };
 
         const onClickMenuItem = (name, idx) => {
-            if (listeners['select-menu']) {
-                state.proxyValue = name;
-                emit('select-menu', name, idx);
-                hideMenu();
-            } else {
-                state.proxyValue = state.filteredMenu[idx].label;
-                emitSearch(name);
-                hideMenu();
+            state.proxyValue = state.bindingMenu[idx]?.label ?? name;
+            emitSelectMenu(state.bindingMenu[idx]);
+            hideMenu();
+        };
+
+        const onSearch = (val?: string) => {
+            const trimmed = val?.trim() ?? '';
+            const menuItem = state.filteredMenu.find(d => trimmed.toLowerCase() === d.label?.toLowerCase());
+            if (menuItem) {
+                emitSelectMenu(menuItem);
+                state.proxyValue = menuItem.label;
             }
+
+            if (!menuItem && props.exactMode) {
+                state.proxyValue = '';
+                emitSearch('');
+            } else {
+                emitSearch(trimmed);
+            }
+
+            vm.$nextTick(() => {
+                allFocusOut();
+            });
         };
 
         const onDelete = () => {
@@ -236,8 +309,6 @@ export default {
             input: onInput,
         };
 
-        filterMenu();
-
         return {
             ...toRefs(state),
             allFocusOut,
@@ -257,7 +328,7 @@ export default {
             searchListeners,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
@@ -271,25 +342,11 @@ export default {
     }
     .p-context-menu {
         @apply font-normal;
-        min-width: unset;
-        .secondary {
-            &.context-header {
-                @apply text-secondary;
-            }
-            &.context-item {
-                &:hover {
-                    @apply bg-blue-200;
-                    color: currentColor !important;
-                }
-                &:focus {
-                    @apply bg-blue-200;
-                    color: currentColor !important;
-                }
-                &:active {
-                    @apply bg-blue-200;
-                    color: currentColor !important;
-                }
-            }
+
+        /* min-width: unset; */
+
+        .context-header.secondary {
+            @apply text-secondary;
         }
     }
 }
