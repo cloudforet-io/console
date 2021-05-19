@@ -42,6 +42,7 @@ import {
 import { makeByPassListeners, makeProxy } from '@/util/composition-helpers';
 import PSearch from '@/inputs/search/search/PSearch.vue';
 import { reduce } from 'lodash';
+import { plainAutocompleteHandler } from '@/inputs/search/autocomplete-search/helper';
 
 export default {
     name: 'PAutocompleteSearch',
@@ -85,7 +86,7 @@ export default {
         },
         handler: {
             type: Function,
-            default: null,
+            default: plainAutocompleteHandler,
         },
     },
     setup(props: AutocompleteSearchProps, { emit, slots, listeners }) {
@@ -101,8 +102,19 @@ export default {
             filteredMenu: props.handler ? [] : computed(() => props.menu),
         });
 
+
+        const filterMenu = async (val = '') => {
+            if (props.handler) {
+                let res = props.handler(val, props.menu);
+                if (res instanceof Promise) res = await res;
+                state.filteredMenu = res.results;
+            }
+        };
+
         const focusSearch = () => {
-            if (state.searchRef) state.searchRef.focus();
+            if (state.searchRef) {
+                state.searchRef.focus();
+            }
         };
 
         const blurSearch = () => {
@@ -121,6 +133,7 @@ export default {
         const focusMenu = () => {
             if (state.filteredMenu.length === 0) return;
             showMenu();
+
             if (state.menuRef) state.menuRef.focus();
         };
 
@@ -150,6 +163,7 @@ export default {
         };
 
         const onSearchFocus = () => {
+            filterMenu();
             showMenu();
         };
 
@@ -169,10 +183,7 @@ export default {
             state.proxyValue = val;
             emit('input', val, e);
 
-            if (props.handler) {
-                const res = await props.handler(val);
-                state.filteredMenu = res.results;
-            }
+            await filterMenu(val);
         };
 
         const emitSearch = (val?: string) => {
@@ -196,13 +207,6 @@ export default {
             }
         };
 
-        const init = async () => {
-            if (props.handler) {
-                const res = await props.handler('');
-                state.filteredMenu = res.results;
-            }
-        };
-
         const onDelete = () => {
             emitSearch('');
             focusSearch();
@@ -211,8 +215,8 @@ export default {
         const searchListeners = {
             ...listeners,
             keyup(e) {
-                if (e.code === 'ArrowDown') focusMenu();
-                else if (e.code === 'Escape') allFocusOut();
+                if (e.key === 'ArrowDown' || e.key === 'Down') focusMenu();
+                else if (e.key === 'Escape' || e.key === 'Esc') allFocusOut();
                 makeByPassListeners(listeners, 'keyup', e);
             },
             focus(e) {
@@ -232,7 +236,7 @@ export default {
             input: onInput,
         };
 
-        init();
+        filterMenu();
 
         return {
             ...toRefs(state),
