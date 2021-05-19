@@ -132,6 +132,7 @@ export default defineComponent({
             @apply absolute text-gray-400;
             top: 1.5rem;
             right: 1.5rem;
+            z-index: 5;
             &:hover {
                 @apply text-secondary;
             }
@@ -181,7 +182,7 @@ export default defineComponent({
 
         &.secondary {
             .sidebar-wrapper {
-                width: 45.97%;
+                width: 30%;
             }
         }
         .slide-fade-enter, .slide-fade-leave-to {
