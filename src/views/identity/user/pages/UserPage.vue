@@ -27,7 +27,7 @@
             <p-divider class="menu-divider" />
             <div v-for="(item) in sidebarState.userMenuList" :key="item.label"
                  class="menu-item"
-                 :class="{'selected': item.label === sidebarState.selectedItem.label}"
+                 :class="{'selected': item.label === sidebarState.selectedItem.label, 'hide': item.userOnly && userState.isDomainOwner}"
                  @click="showPage(item)"
             >
                 {{ item.label }}
@@ -57,7 +57,7 @@
 /* eslint-disable camelcase */
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, watch,
 } from '@vue/composition-api';
 
 import { PDivider, PI } from '@spaceone/design-system';
@@ -73,6 +73,7 @@ import TranslateResult = VueI18n.TranslateResult;
 interface SidebarItemType {
     label?: TranslateResult;
     routeName?: string;
+    userOnly?: boolean;
 }
 
 export default {
@@ -85,10 +86,12 @@ export default {
     beforeRouteEnter(to, from, next) {
         next((vm) => {
             const isAdmin = vm.$store.getters['user/isAdmin'];
-            if (to.name === 'user') {
-                if (isAdmin) next({ name: 'userManagement', query: to.query });
-                else next({ name: 'userAccount', query: to.query });
-            } else if (to.name === 'userManagement' && !isAdmin) next({ name: 'userAccount', query: to.query });
+            const isDomainOwner = vm.$store.getters['user/isDomainOwner'];
+            if (to.name === IDENTITY_ROUTE.USER.MAIN) {
+                if (isAdmin) next({ name: IDENTITY_ROUTE.USER.MANAGEMENT, query: to.query });
+                else next({ name: IDENTITY_ROUTE.USER.ACCOUNT, query: to.query });
+            } else if (to.name === IDENTITY_ROUTE.USER.MANAGEMENT && !isAdmin) next({ name: IDENTITY_ROUTE.USER.ACCOUNT, query: to.query });
+            else if (to.name === IDENTITY_ROUTE.USER.API_KEY && isDomainOwner) next({ name: IDENTITY_ROUTE.USER.ACCOUNT, query: to.query });
             else next(to);
         });
     },
@@ -108,16 +111,19 @@ export default {
                 {
                     label: vm.$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE'),
                     routeName: IDENTITY_ROUTE.USER.ACCOUNT,
+                    userOnly: false,
                 },
                 {
                     label: vm.$t('IDENTITY.USER.MAIN.API_KEY'),
                     routeName: IDENTITY_ROUTE.USER.API_KEY,
+                    userOnly: true,
                 },
             ],
             adminMenuList: [
                 {
                     label: vm.$t('IDENTITY.USER.MAIN.USER_MANAGEMENT'),
                     routeName: IDENTITY_ROUTE.USER.MANAGEMENT,
+                    userOnly: false,
                 },
             ],
             selectedItem: {} as SidebarItemType,
@@ -131,7 +137,7 @@ export default {
             if (routeName === IDENTITY_ROUTE.USER.ACCOUNT) {
                 sidebarState.selectedItem = sidebarState.userMenuList[0];
             }
-            if (routeName === IDENTITY_ROUTE.USER.API_KEY) {
+            if (routeName === IDENTITY_ROUTE.USER.API_KEY && !userState.isDomainOwner) {
                 sidebarState.selectedItem = sidebarState.userMenuList[1];
             }
             if (routeName === IDENTITY_ROUTE.USER.MANAGEMENT) {
@@ -216,6 +222,9 @@ export default {
     }
     &.selected {
         @apply bg-blue-200 text-blue-500 cursor-pointer;
+    }
+    &.hide {
+        display: none;
     }
 }
 .admin-menu-wrapper {

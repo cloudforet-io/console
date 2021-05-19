@@ -56,8 +56,7 @@
 
 <script lang="ts">
 import {
-    PEmpty, PI, PBreadcrumbs, PIconTextButton,
-    PDropdownMenuBtn, PDataTable, PPageTitle, PPaneLayout, PTableCheckModal,
+    PEmpty, PIconTextButton, PDropdownMenuBtn, PDataTable, PPaneLayout, PTableCheckModal,
 } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
@@ -66,11 +65,29 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import UserAPIKeyModal from '@/views/identity/user/modules/UserAPIKeyModal.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { store } from '@/store';
 import { TranslateResult } from 'vue-i18n';
 import {
     hideLoadingMessage, showErrorMessage, showLoadingMessage, showSuccessMessage,
 } from '@/lib/util';
+import { TimeStamp } from '@/models';
+
+export interface APIKeyItem {
+    api_key: string;
+    api_key_id: string;
+    created_at: TimeStamp;
+    domain_id?: string;
+    last_accessed_at?: TimeStamp;
+    state?: string;
+    user_id?: string;
+}
+interface EndpointType {
+    endpoints: string;
+}
+interface ModalItem {
+    loading?: boolean;
+    items: APIKeyItem;
+    endpoints?: EndpointType;
+}
 
 export default {
     name: 'UserAPIKey',
@@ -98,7 +115,7 @@ export default {
                 { name: 'state', label: 'State' },
                 { name: 'created_at', label: 'Created' },
             ],
-            items: [] as any,
+            items: [] as APIKeyItem[],
             selectedIndex: [],
             selectedItems: computed(() => state.selectedIndex.map(i => state.items[i])),
             dropdownMenu: computed(() => ([
@@ -119,10 +136,10 @@ export default {
             disableCreateBtn: computed(() => state.items.length >= 2),
         });
 
-        const modalState = reactive({
+        const modalState: ModalItem = reactive({
             loading: false,
-            items: [] as any,
-            endpoints: null as any,
+            items: [] as unknown as APIKeyItem,
+            endpoints: {} as EndpointType,
         });
 
         const checkModalState = reactive({
@@ -132,7 +149,7 @@ export default {
                 { name: 'created_at', label: 'Created' },
             ]),
             mode: '',
-            items: [] as any,
+            items: {} as APIKeyItem,
             title: '' as TranslateResult,
             subTitle: '' as TranslateResult,
             themeColor: '',

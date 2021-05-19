@@ -23,8 +23,7 @@
 
 <script lang="ts">
 import {
-    PEmpty, PI, PBreadcrumbs, PIconTextButton,
-    PDropdownMenuBtn, PDataTable, PPageTitle, PPaneLayout, PTableCheckModal,
+    PBreadcrumbs, PDataTable, PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
@@ -33,6 +32,14 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import UserAPIKeyTable from '@/views/identity/user/modules/UserAPIKeyTable.vue';
 import { store } from '@/store';
+
+interface EndpointItem {
+    endpoint: string;
+    name: string;
+    service: string;
+    state?: string;
+    version?: string;
+}
 
 export default {
     name: 'UserAPIKeyPage',
@@ -54,7 +61,7 @@ export default {
                 { name: 'endpoint', label: 'Endpoint' },
                 { name: 'status', label: 'Status' },
             ],
-            items: [] as any,
+            items: [] as EndpointItem[],
             userId: computed(() => store.state.user.userId),
         });
         const routeState = reactive({

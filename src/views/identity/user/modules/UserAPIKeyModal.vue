@@ -11,8 +11,8 @@
                 <p-i name="ic_state_duplicated" width="0.75rem" height="0.75rem"
                      class="alert-icon"
                 />
-                <span class="alert-message">{{$t('IDENTITY.USER.MAIN.API_KEY_ALERT_MSG_1')}}
-                    <br> <span class="text-red-500 font-bold">{{$t('IDENTITY.USER.MAIN.API_KEY_ALERT_MSG_2')}}</span> {{$t('IDENTITY.USER.MAIN.API_KEY_ALERT_MSG_3')}}
+                <span class="alert-message">{{ $t('IDENTITY.USER.MAIN.API_KEY_ALERT_MSG_1') }}
+                    <br> <span class="text-red-500 font-bold">{{ $t('IDENTITY.USER.MAIN.API_KEY_ALERT_MSG_2') }}</span> {{ $t('IDENTITY.USER.MAIN.API_KEY_ALERT_MSG_3') }}
                 </span>
             </article>
             <p-pane-layout class="box-wrapper">
@@ -22,7 +22,7 @@
                 <p class="box-contents">
                     {{ apiKeyItem.api_key_id }}
                     <p-collapsible-toggle :is-collapsed.sync="isAPICollapsed" class="collapsible-toggle">
-                        {{ isAPICollapsed ? 'Show' : 'Hide' }}
+                        {{ isAPICollapsed ? $t('IDENTITY.USER.MAIN.API_KEY_SHOW') : $t('IDENTITY.USER.MAIN.API_KEY_HIDE') }}
                     </p-collapsible-toggle>
                     <p-raw-data v-if="!isAPICollapsed" class="m-4" :item="apiItem"
                                 folded
@@ -33,17 +33,17 @@
                                     name="ic_download" class="download-btn"
                                     @click="onClickDownloadFile(FileType.JSON)"
                 >
-                    {{$t('IDENTITY.USER.MAIN.API_KEY_DOWNLOAD_JSON')}}
+                    {{ $t('IDENTITY.USER.MAIN.API_KEY_DOWNLOAD_JSON') }}
                 </p-icon-text-button>
             </p-pane-layout>
             <p-pane-layout class="box-wrapper">
                 <span class="box-header">
-                    {{$t('IDENTITY.USER.MAIN.API_KEY_SPACECTL')}}
+                    {{ $t('IDENTITY.USER.MAIN.API_KEY_SPACECTL') }}
                 </span>
                 <p class="box-contents">
                     {{ apiKeyItem.api_key_id }}
                     <p-collapsible-toggle :is-collapsed.sync="isSpacectlCollapsed" class="collapsible-toggle">
-                        {{ isSpacectlCollapsed ? 'Show' : 'Hide' }}
+                        {{ isSpacectlCollapsed ? $t('IDENTITY.USER.MAIN.API_KEY_SHOW') : $t('IDENTITY.USER.MAIN.API_KEY_HIDE') }}
                     </p-collapsible-toggle>
                     <p-raw-data v-if="!isSpacectlCollapsed" class="m-4" :raw="yamlItem"
                                 folded
@@ -54,7 +54,7 @@
                                     name="ic_download" class="download-btn"
                                     @click="onClickDownloadFile(FileType.YAML)"
                 >
-                    {{$t('IDENTITY.USER.MAIN.API_KEY_DOWNLOAD_YAML')}}
+                    {{ $t('IDENTITY.USER.MAIN.API_KEY_DOWNLOAD_YAML') }}
                 </p-icon-text-button>
             </p-pane-layout>
         </template>
@@ -68,6 +68,7 @@ import {
 import { reactive, toRefs } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 import yaml from 'js-yaml';
+import { APIKeyItem } from '@/views/identity/user/modules/UserAPIKeyTable.vue';
 
 enum FileType {
     JSON = 'json',
@@ -104,8 +105,8 @@ export default {
             proxyVisible: makeProxy('visible', props, context.emit),
             isAPICollapsed: true,
             isSpacectlCollapsed: true,
-            apiItem: null as any,
-            yamlItem: null as any,
+            apiItem: {} as APIKeyItem,
+            yamlItem: '',
         });
 
         const onClickDownloadFile = (fileType: FileType) => {
