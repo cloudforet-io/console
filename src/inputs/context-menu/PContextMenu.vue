@@ -13,8 +13,8 @@
         </slot>
         <slot v-else name="menu" v-bind="{...$props, uuid}">
             <template v-for="(item, index) in menu">
-                <slot v-if="item.type === undefined || item.type === 'item'" name="item" v-bind="{...$props, uuid, item, index}">
-                    <slot :name="`item-${item.name}`" v-bind="{...$props, uuid, item, index}">
+                <slot v-if="item.type === undefined || item.type === 'item'" name="item" v-bind="{...$props, uuid, id: `context-item-${index}-${uuid}`, item, index}">
+                    <slot :name="`item-${item.name}`" v-bind="{...$props, uuid, id: `context-item-${index}-${uuid}`, item, index}">
                         <a :id="`context-item-${index}-${uuid}`"
                            :key="`${item.name}-${index}`"
                            :tabindex="index"
