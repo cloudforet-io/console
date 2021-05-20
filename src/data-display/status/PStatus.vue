@@ -14,7 +14,7 @@
         <p-lottie v-if="lottie" :name="lottie" :size="iconSize" />
         <span v-else-if="isFortAwesome" :style="{color:realIconColor||null}"><i :class="icon.split(' ')" /></span>
         <p-i v-else-if="icon" :name="icon"
-             :color="realIconColor ? `${realIconColor}` : undefined"
+             :color="realIconColor ? `${realIconColor} white` : undefined"
              :height="`${iconSize}rem`" :width="`${iconSize}rem`"
         />
         <span v-else-if="!disableIcon" class="circle" :style="{
