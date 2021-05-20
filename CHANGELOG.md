@@ -1,3 +1,10 @@
+# [1.1.0-beta.14](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.13...v1.1.0-beta.14) (2021-05-20)
+
+
+### Bug Fixes
+
+* color of icon in PStatus ([#543](https://github.com/spaceone-dev/spaceone-design-system/issues/543)) ([918ab5d](https://github.com/spaceone-dev/spaceone-design-system/commit/918ab5d5064fbf123e4955a97c96908052f26670))
+
 # [1.1.0-beta.13](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.12...v1.1.0-beta.13) (2021-05-19)
 
 
