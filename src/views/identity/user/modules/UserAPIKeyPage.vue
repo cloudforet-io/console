@@ -2,8 +2,23 @@
     <section class="right-contents-container">
         <p-breadcrumbs :routes="routeState.routes" />
         <p-page-title :title="$t('IDENTITY.USER.MAIN.API_KEY')"
-                      :title-info="$t('IDENTITY.USER.MAIN.API_KEY_TITLE_INFO')"
-        />
+                      :title-info="$t('IDENTITY.USER.MAIN.API_KEY_TITLE_INFO')" class="page-title">
+            <template #extra>
+                <handbook-button :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab">
+                    <template #tab1>
+                        <keep-alive>
+                            <p>test</p>
+                        </keep-alive>
+                    </template>
+                    <template #tab2>
+                        <p> this tab is</p>
+                    </template>
+                    <template #tab3>
+                        <p> this tab is</p>
+                    </template>
+                </handbook-button>
+            </template>
+        </p-page-title>
         <user-a-p-i-key-table
             :user-id="userId"
         />
@@ -25,13 +40,14 @@
 import {
     PBreadcrumbs, PDataTable, PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
+import HandbookButton from '@/common/components/HandbookButton.vue';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import UserAPIKeyTable from '@/views/identity/user/modules/UserAPIKeyTable.vue';
 import { store } from '@/store';
+import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
 interface EndpointItem {
     endpoint: string;
@@ -44,6 +60,7 @@ interface EndpointItem {
 export default {
     name: 'UserAPIKeyPage',
     components: {
+        HandbookButton,
         UserAPIKeyTable,
         PPaneLayout,
         PBreadcrumbs,
@@ -71,16 +88,18 @@ export default {
                 { name: vm.$t('IDENTITY.USER.MAIN.API_KEY') },
             ])),
         });
-        const apiQueryHelper = new ApiQueryHelper();
+        const tabState = reactive({
+            tabs: computed(() => ([
+                { name: 'tab1', label: 'Spacectl', keepAlive: true },
+                { name: 'tab2', label: vm.$t('IDENTITY.USER.MAIN.API_KEY'), keepAlive: true },
+            ] as TabItem[])),
+            activeTab: 'tab1',
+        });
         const listEndpoints = async () => {
             state.loading = true;
-            apiQueryHelper.setSort('created_at')
-                .setFilters([{ k: 'service', v: 'inventory', o: '=' }]);
             try {
-                const res = await SpaceConnector.client.identity.endpoint.list({
-                    query: apiQueryHelper.data,
-                });
-                state.items = res.results;
+                const res = await SpaceConnector.client.identity.endpoint.list();
+                state.items = [res.results.find(d => d.service === 'inventory')];
             } catch (e) {
                 console.error(e);
             } finally {
@@ -95,6 +114,7 @@ export default {
         return {
             ...toRefs(state),
             routeState,
+            tabState,
         };
     },
 
@@ -102,6 +122,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.page-title {
+    align-items: center;
+}
 .sub-table-header {
     padding-left: 1rem;
     padding-top: 2rem;

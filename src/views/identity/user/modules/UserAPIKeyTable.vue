@@ -32,7 +32,11 @@
                 :select-index.sync="selectedIndex"
                 :striped="false"
                 :selectable="true"
-            />
+            >
+                <template #col-created_at-format="{value}">
+                    {{ iso8601Formatter(value, timezone) }}
+                </template>
+            </p-data-table>
         </p-pane-layout>
         <user-a-p-i-key-modal v-if="visible && !modalState.loading"
                               :visible.sync="visible"
@@ -50,7 +54,11 @@
             size="md"
             :visible.sync="checkModalState.visible"
             @confirm="checkModalConfirm"
-        />
+        >
+            <template #col-created_at-format="{value}">
+                {{ iso8601Formatter(value, timezone) }}
+            </template>
+        </p-table-check-modal>
     </section>
 </template>
 
@@ -67,9 +75,10 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { TranslateResult } from 'vue-i18n';
 import {
-    hideLoadingMessage, showErrorMessage, showLoadingMessage, showSuccessMessage,
+    hideLoadingMessage, showErrorMessage, showLoadingMessage, showSuccessMessage, iso8601Formatter,
 } from '@/lib/util';
 import { TimeStamp } from '@/models';
+import { store } from '@/store';
 
 export interface APIKeyItem {
     api_key: string;
@@ -133,6 +142,7 @@ export default {
             ] as MenuItem[])),
             visible: false,
             user: props.userId || '',
+            timezone: computed(() => store.state.user.timezone),
             disableCreateBtn: computed(() => state.items.length >= 2),
         });
 
@@ -277,17 +287,13 @@ export default {
             if (checkModalState.mode === 'disable') await disableAPIKey(item);
         };
 
-        const endpointQueryHelper = new ApiQueryHelper();
         const listEndpoints = async () => {
             state.loading = true;
-            endpointQueryHelper.setSort('created_at')
-                .setFilters([{ k: 'service', v: 'inventory', o: '=' }]);
             try {
-                const res = await SpaceConnector.client.identity.endpoint.list({
-                    query: endpointQueryHelper.data,
-                });
+                const res = await SpaceConnector.client.identity.endpoint.list();
+                const endpointItem = [res.results.find(d => d.service === 'inventory')];
                 modalState.endpoints = {
-                    endpoints: res.results.map(d => `${d.service}: ${d.endpoint}`).join('\n'),
+                    endpoints: endpointItem.map(d => (`${d.service}: ${d.endpoint}`)).join('\n').replace(/'/g, ''),
                 };
             } catch (e) {
                 console.error(e);
@@ -312,6 +318,7 @@ export default {
             ...toRefs(state),
             modalState,
             checkModalState,
+            iso8601Formatter,
             onSelect,
             onClickEnable,
             onClickDisable,

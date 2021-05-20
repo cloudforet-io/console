@@ -313,7 +313,7 @@ export default {
             },
         };
         const state = reactive({
-            loading: false,
+            loading: true,
             users: [] as UserModel[],
             timezone: computed(() => store.state.user.timezone || 'UTC'),
             fields: computed(() => ([

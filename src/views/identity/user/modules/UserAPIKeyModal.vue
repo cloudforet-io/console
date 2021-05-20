@@ -3,7 +3,7 @@
                   icon-name="ic_done"
                   size="md"
                   :header-title="$t('IDENTITY.USER.MAIN.API_KEY_MODAL_TITLE')"
-                  :button-text="$t('COMPONENT.BUTTON_MODAL.CONFIRM') "
+                  :button-text="$t('COMPONENT.BUTTON_MODAL.CONFIRM')"
                   @clickButton="onClickConfirm"
     >
         <template #body>
@@ -130,9 +130,10 @@ export default {
             const endpoint = props.endpoints;
             const yamlItem = { ...state.apiItem, ...endpoint };
             state.yamlItem = yaml.dump(yamlItem, {
+                noArrayIndent: true,
+                flowLevel: 1,
                 noRefs: true,
-                sortKeys: true,
-            }).trim();
+            });
         };
 
         (async () => {
