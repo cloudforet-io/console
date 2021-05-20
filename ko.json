@@ -338,6 +338,7 @@
 			"DEFAULT": "기본 설정으로",
 			"RECOMMEND_SORT": "추천순",
 			"SEARCH_ATTRIBUTE_COL": "속성 필드 검색",
+			"SEARCH_TAG": "태그 검색",
 			"SELECT_TAG": "태그 선택",
 			"SORT_BY": "정렬",
 			"TAG": "(태그)",

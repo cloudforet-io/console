@@ -338,6 +338,7 @@
 			"DEFAULT": "Default",
 			"RECOMMEND_SORT": "Recommendation",
 			"SEARCH_ATTRIBUTE_COL": "Search attribute columns",
+			"SEARCH_TAG": "Search Tags",
 			"SELECT_TAG": "Select tags",
 			"SORT_BY": "Sort by",
 			"TAG": "(Tag)",
