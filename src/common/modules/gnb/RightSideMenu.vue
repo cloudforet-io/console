@@ -1,6 +1,16 @@
 <template>
     <div class="right-side-menu">
         <div class="menu-wrapper">
+            <div v-if="!userState.isDomainOwner" class="menu-button code">
+                <router-link :to="{ name: 'userAPIKey' }">
+                    <p-i class="menu-icon"
+                         name="ic_code"
+                    />
+                </router-link>
+                <g-n-b-new-icon />
+            </div>
+        </div>
+        <div class="menu-wrapper">
             <div class="menu-button opacity"
                  :class="{opened: openedMenu === 'support'}"
                  @click.stop="toggleMenu('support')"
@@ -98,6 +108,7 @@ import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { languages } from '@/store/modules/user/config';
 import config from '@/lib/config';
+import GNBNewIcon from '@/common/components/GNBNewIcon.vue';
 
 export default {
     name: 'RightSideMenu',
@@ -105,6 +116,7 @@ export default {
         PDivider,
         PAnchor,
         PI,
+        GNBNewIcon,
     },
     directives: {
         clickOutside: vClickOutside.directive,
@@ -206,6 +218,10 @@ export default {
             &:hover {
                 @apply text-primary;
                 opacity: 1;
+            }
+
+            &.code {
+                margin-right: 1rem;
             }
             &.account {
                 margin-left: 1.5rem;
