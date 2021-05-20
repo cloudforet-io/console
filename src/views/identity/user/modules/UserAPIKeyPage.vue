@@ -2,9 +2,12 @@
     <section class="right-contents-container">
         <p-breadcrumbs :routes="routeState.routes" />
         <p-page-title :title="$t('IDENTITY.USER.MAIN.API_KEY')"
-                      :title-info="$t('IDENTITY.USER.MAIN.API_KEY_TITLE_INFO')" class="page-title">
+                      :title-info="$t('IDENTITY.USER.MAIN.API_KEY_TITLE_INFO')" class="page-title"
+        >
             <template #extra>
-                <handbook-button :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab">
+                <handbook-button :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab"
+                                 type="identity/user/api-key"
+                >
                     <template #tab1>
                         <keep-alive>
                             <p>test</p>

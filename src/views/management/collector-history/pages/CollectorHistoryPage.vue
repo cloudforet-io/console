@@ -1,6 +1,10 @@
 <template>
     <general-page-layout class="collector-history-container">
-        <p-breadcrumbs :routes="route" />
+        <div class="top-wrapper">
+            <p-breadcrumbs :routes="route" class="flex-grow" />
+            <!--            <handbook-button class="flex-shrink-0">-->p
+            <!--            </handbook-button>-->
+        </div>
         <p-page-title :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')" />
         <p-collector-history-chart @click-date="onClickDate" />
         <div class="collector-history-table">
@@ -129,6 +133,7 @@ import { QueryHelper } from '@/lib/query';
 import { MANAGEMENT_ROUTE } from '@/routes/management/management-route';
 import { peacock, green } from '@/styles/colors';
 import { JOB_STATUS } from '@/views/management/collector-history/pages/config';
+import HandbookButton from '@/common/components/HandbookButton.vue';
 
 
 const PROGRESS_BAR_COLOR = peacock[400];
@@ -148,6 +153,7 @@ const statusFormatter = (status) => {
 export default {
     name: 'CollectorHistoryPage',
     components: {
+        HandbookButton,
         PLazyImg,
         PIconTextButton,
         PButtonModal,
@@ -361,6 +367,10 @@ export default {
 
 <style lang="postcss" scoped>
 .collector-history-container {
+    .top-wrapper {
+        display: flex;
+        justify-content: space-between;
+    }
     .collector-history-table {
         @apply bg-white border border-gray-200;
         border-radius: 0.375rem;
