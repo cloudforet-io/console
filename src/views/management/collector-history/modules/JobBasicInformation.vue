@@ -9,9 +9,9 @@
                 </p-anchor>
             </div>
             <div class="item">
-                <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PROVIDER') }}</label>
+                <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.START_TIME') }}</label>
                 <span class="contents">
-                    {{ provider.label }}
+                    {{ iso8601Formatter(job.created_at, timezone) }}
                 </span>
             </div>
             <div class="item">
@@ -25,15 +25,15 @@
                 </span>
             </div>
             <div class="item">
-                <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.START_TIME') }}</label>
-                <span class="contents">
-                    {{ iso8601Formatter(job.created_at, timezone) }}
-                </span>
-            </div>
-            <div class="item">
                 <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FINISH_TIME') }}</label>
                 <span class="contents">
                     {{ iso8601Formatter(job.finished_at, timezone) }}
+                </span>
+            </div>
+            <div class="item">
+                <label>{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.PROVIDER') }}</label>
+                <span class="contents">
+                    {{ provider.label }}
                 </span>
             </div>
         </section>
