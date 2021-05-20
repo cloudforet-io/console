@@ -378,6 +378,10 @@
 				"LABEL_USER_GUIDE": "유저 가이드"
 			}
 		},
+		"HANDBOOK_BUTTON": {
+			"DONT_DISPLAY": "",
+			"HANDBOOK": "Handbook"
+		},
 		"INFO_BUTTON": {
 			"INFO": "Info"
 		},

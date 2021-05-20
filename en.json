@@ -378,6 +378,10 @@
 				"LABEL_USER_GUIDE": "User Guide"
 			}
 		},
+		"HANDBOOK_BUTTON": {
+			"DONT_DISPLAY": "Don't display when open",
+			"HANDBOOK": "Handbook"
+		},
 		"INFO_BUTTON": {
 			"INFO": "Info"
 		},
