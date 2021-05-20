@@ -10,18 +10,30 @@
                 <div class="contents-wrapper">
                     <section class="attribute-column-section">
                         <h3 class="section-title">
-                            {{ $t('COMMON.CUSTOM_FIELD_MODAL.ATTRIBUTE_COL') }}
-                        </h3>
-                        <h4 class="section-desc">
-                            <span v-if="loading || isValid" class="text">{{ $t('COMMON.CUSTOM_FIELD_MODAL.ATTRIBUTE_COL_DESC') }}</span>
+                            <template v-if="isValid">
+                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.ATTRIBUTE_COL') }}
+                            </template>
                             <span v-else class="invalid-text">{{ $t('COMMON.CUSTOM_FIELD_MODAL.COL_REQUIRED') }}</span>
                             <p-button :outline="true" size="sm" style-type="gray900"
                                       @click="setColumnsDefault"
                             >
                                 {{ $t('COMMON.CUSTOM_FIELD_MODAL.DEFAULT') }}
                             </p-button>
-                        </h4>
+                        </h3>
                         <p-search v-model="search" :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_ATTRIBUTE_COL')" />
+                        <div class="sort-wrapper">
+                            <label>{{ $t('COMMON.CUSTOM_FIELD_MODAL.SORT_BY') }}</label>
+                            <p-button size="sm" style-type="gray-border" font-weight="normal"
+                                      @click="sortByRecommendation"
+                            >
+                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.RECOMMEND_SORT') }}
+                            </p-button>
+                            <p-button size="sm" style-type="gray-border" font-weight="normal"
+                                      @click="sortByAlphabet"
+                            >
+                                {{ $t('COMMON.CUSTOM_FIELD_MODAL.ALPHABETICAL_SORT') }}
+                            </p-button>
+                        </div>
 
                         <header>
                             <p-check-box :selected="isAllSelected" :value="true"
@@ -31,52 +43,28 @@
                         </header>
 
                         <div class="column-items-wrapper">
-                            <draggable v-model="selectedColumns" draggable=".draggable-item" ghost-class="ghost">
-                                <column-item v-for="column in selectedColumns" :key="column.key"
+                            <draggable v-model="allColumns" draggable=".draggable-item" ghost-class="ghost">
+                                <column-item v-for="column in allColumns" :key="column.key"
                                              v-model="selectedAllColumnKeys"
                                              :item="column"
                                              :search-text="search"
-                                             draggable
                                 />
                             </draggable>
-
-                            <column-item v-for="column in unselectedColumns" :key="column.key"
-                                         v-model="selectedAllColumnKeys"
-                                         :item="column"
-                                         :search-text="search"
-                            />
                         </div>
                     </section>
 
                     <section>
                         <h3 class="section-title">
                             {{ $t('COMMON.CUSTOM_FIELD_MODAL.TAG_COL') }}
-                        </h3>
-                        <h4 class="section-desc">
-                            <span>{{ $t('COMMON.CUSTOM_FIELD_MODAL.TAG_COL_DESC') }}</span>
                             <p-button :outline="true" size="sm" style-type="gray900"
                                       @click="clearSelectedTags"
                             >
                                 {{ $t('COMMON.CUSTOM_FIELD_MODAL.CLEAR_ALL') }}
                             </p-button>
-                        </h4>
-                        <p-select-dropdown select-item=""
-                                           :items="allTagsMenuItems"
-                                           auto-height
-                                           :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SELECT_TAG')"
-                                           :use-custom-style="true"
-                        >
-                            <template #menu-item="{item}">
-                                <p-check-box v-model="selectedTagColumnKeys" class="tag-menu-item" :value="item.name">
-                                    {{ item.label }}
-                                </p-check-box>
-                            </template>
-                        </p-select-dropdown>
-                        <div class="tag-box">
-                            <p-tag v-for="(tag, i) in selectedTagColumnKeys" :key="tag" @delete="onDeleteTag(i)">
-                                {{ tag ? tag.slice(TAGS_PREFIX.length) : '' }}
-                            </p-tag>
-                        </div>
+                        </h3>
+                        <select-tag-columns :resource-type="resourceType" :options="options"
+                                            :selected-keys.sync="selectedAllColumnKeys"
+                        />
                     </section>
                 </div>
             </p-data-loader>
@@ -87,9 +75,9 @@
 <script lang="ts">
 import {
     PButton,
-    PButtonModal, PCheckBox, PDataLoader, PSearch, PSelectDropdown, PTag,
+    PButtonModal, PCheckBox, PDataLoader, PSearch,
 } from '@spaceone/design-system';
-import { camelCase, uniq, uniqBy } from 'lodash';
+import { unionBy } from 'lodash';
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
@@ -97,12 +85,12 @@ import {
 import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { i18n } from '@/translations';
 import draggable from 'vuedraggable';
 import ColumnItem from '@/common/modules/custom-field-modal/ColumnItem.vue';
 import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-field-modal/config';
+import SelectTagColumns from '@/common/modules/custom-field-modal/SelectTagColumns.vue';
 
 interface Props {
     visible: boolean;
@@ -110,16 +98,17 @@ interface Props {
     options: any;
 }
 
+type SelectedColumnMap = Record<string, DynamicField>
+
 export default {
     name: 'CustomFieldModal',
     components: {
         ColumnItem,
+        SelectTagColumns,
         PButtonModal,
         PSearch,
-        PSelectDropdown,
         PButton,
         PCheckBox,
-        PTag,
         PDataLoader,
         draggable,
     },
@@ -144,8 +133,6 @@ export default {
         },
     },
     setup(props: Props, { emit, root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         let schema: any = {};
 
         const state = reactive({
@@ -153,45 +140,67 @@ export default {
             search: '',
             isAllSelected: computed(() => state.selectedColumns.length === state.allColumns.length),
             loading: true,
-            currentColumns: [] as DynamicField[],
             availableColumns: [] as DynamicField[],
-            selectedColumns: [] as DynamicField[],
+            currentColumns: [] as DynamicField[],
+            allColumns: [] as DynamicField[],
             // eslint-disable-next-line camelcase
             defaultColumns: computed<DynamicField[]>(() => state.availableColumns.filter(d => !d.options?.is_optional)),
-            allColumns: computed<DynamicField[]>(() => uniqBy(state.selectedColumns.concat(state.availableColumns), d => d.key)),
-            unselectedColumns: computed<DynamicField[]>(() => state.allColumns.filter(d => !state.selectedAllColumnKeys.includes(d.key))),
+            selectedColumnMap: {} as SelectedColumnMap,
+            selectedColumns: computed<DynamicField[]>({
+                get: () => state.allColumns.filter(d => !!state.selectedColumnMap[d.key]),
+                set: (val: DynamicField[]) => {
+                    const selectedMap: SelectedColumnMap = {};
+                    const tagColumns: DynamicField[] = [];
+                    val.forEach((d) => {
+                        selectedMap[d.key] = d;
+                        if (d.key.startsWith(TAGS_PREFIX)) tagColumns.push(d);
+                    });
+
+                    state.allColumns = unionBy(state.allColumns, tagColumns, d => d.key)
+                        .filter(d => (d.key.startsWith(TAGS_PREFIX) ? !!selectedMap[d.key] : true));
+                    state.selectedColumnMap = selectedMap;
+                },
+            }),
             selectedAllColumnKeys: computed<string[]>({
                 get: () => state.selectedColumns.map(d => d.key),
                 set: (val: string[]) => {
-                    state.selectedColumns = val.map((d) => {
-                        if (d.startsWith(TAGS_PREFIX)) return { key: d, name: d, options: TAGS_OPTIONS };
-                        return state.availableColumns.find(col => col.key === d) || { key: d, name: d };
+                    state.selectedColumns = val.map((key) => {
+                        if (key.startsWith(TAGS_PREFIX)) return { key, name: key, options: TAGS_OPTIONS } as DynamicField;
+                        return state.availableColumns.find(col => col.key === key) ?? { key, name: key } as DynamicField;
                     });
                 },
             }),
-            selectedTagColumnKeys: computed<string[]>({
-                get: () => state.selectedColumns.filter(d => d.key.startsWith(TAGS_PREFIX)).map(d => d.key),
-                set: (val: string[]) => {
-                    const compare = [...val];
-                    const selectedColumns: any[] = state.selectedColumns.filter((d) => {
-                        if (d.key.startsWith(TAGS_PREFIX)) {
-                            const idx = compare.findIndex(tagKey => tagKey === d.key);
-                            if (idx === -1) return false;
-                            compare.splice(idx, 1);
-                        }
-                        return true;
-                    });
-                    state.selectedColumns = selectedColumns.concat(compare.map(d => ({ key: d, name: d, options: TAGS_OPTIONS })));
-                },
+            recommendedSequenceMap: computed<Record<string, number>>(() => {
+                const orderMap: Record<string, number> = {};
+                state.availableColumns.forEach((d, i) => {
+                    orderMap[d.key] = i;
+                });
+                return orderMap;
             }),
-            allTags: [] as string[],
-            allTagsMenuItems: computed(() => state.allTags.map(d => ({
-                name: `${TAGS_PREFIX}${d}`,
-                label: d,
-                type: 'item',
-            }))),
-            isValid: computed(() => state.selectedColumns.length > 0),
+            isValid: computed(() => state.loading || state.selectedColumns.length > 0),
         });
+
+        const sortByRecommendation = () => {
+            state.allColumns = state.allColumns.sort((a, b) => {
+                if (!state.selectedColumnMap[a.key]) return 1;
+                if (!state.selectedColumnMap[b.key]) return -1;
+                if (state.recommendedSequenceMap[a.key] === undefined) return 1;
+                if (state.recommendedSequenceMap[b.key] === undefined) return -1;
+                return state.recommendedSequenceMap[a.key] - (state.recommendedSequenceMap[b.key]);
+            });
+        };
+
+        const sortByAlphabet = () => {
+            state.allColumns = state.allColumns.sort((a, b) => {
+                const nameA = a.name.toUpperCase();
+                const nameB = b.name.toUpperCase();
+                if (!state.selectedColumnMap[a.key]) return 1;
+                if (!state.selectedColumnMap[b.key]) return -1;
+                if (nameA < nameB) return -1;
+                if (nameA > nameB) return 1;
+                return 0;
+            });
+        };
 
         const onChangeAllSelect = (val) => {
             if (val) {
@@ -200,19 +209,6 @@ export default {
                 state.selectedColumns = [];
             }
         };
-
-
-        const onDeleteTag = (idx) => {
-            state.selectedTagColumnKeys.splice(idx, 1);
-            vm.$nextTick(() => {
-                state.selectedTagColumnKeys = [...state.selectedTagColumnKeys];
-            });
-        };
-
-        const clearSelectedTags = () => {
-            state.selectedColumns = state.selectedColumns.filter(d => !d.key.startsWith(TAGS_PREFIX));
-        };
-
 
         const getColumns = async (includeOptionalFields = false) => {
             try {
@@ -253,37 +249,17 @@ export default {
 
         const setColumnsDefault = async () => {
             state.selectedColumns = [...state.defaultColumns];
-        };
-
-        const tagsApiQueryHelper = new ApiQueryHelper().setOnly('tags.key');
-        const getTags = async () => {
-            try {
-                let api = SpaceConnector.client;
-                props.resourceType.split('.').forEach((d) => {
-                    api = api?.[camelCase(d)];
-                });
-
-                tagsApiQueryHelper.setFilters([]);
-                const { provider, cloudServiceGroup, cloudServiceType } = props.options;
-                if (provider) tagsApiQueryHelper.addFilter({ k: 'provider', v: provider, o: '=' });
-                if (cloudServiceGroup) tagsApiQueryHelper.addFilter({ k: 'cloud_service_group', v: cloudServiceGroup, o: '=' });
-                if (cloudServiceType) tagsApiQueryHelper.addFilter({ k: 'cloud_service_type', v: cloudServiceType, o: '=' });
-
-                const { results } = await api.list({
-                    query: tagsApiQueryHelper.data,
-                });
-
-                state.allTags = uniq(results.map(d => Object.keys(d.tags)).flat());
-            } catch (e) {
-                console.error(e);
-                state.allTags = [];
-            }
+            sortByRecommendation();
         };
 
         const resetSelectedStates = () => {
-            clearSelectedTags();
             state.selectedColumns = [...state.currentColumns];
         };
+
+        const clearSelectedTags = () => {
+            state.selectedAllColumnKeys.filter(d => !d.startsWith(TAGS_PREFIX));
+        };
+
 
         const updatePageSchema = async () => {
             state.loading = true;
@@ -318,22 +294,32 @@ export default {
             }
         };
 
+        const initColumns = async () => {
+            state.loading = true;
+            await Promise.all([getColumns(true), getColumns(false)]);
+            resetSelectedStates();
+            state.loading = false;
+        };
 
-        watch([() => props.visible, () => props.resourceType], async ([visible, resourceType]) => {
+        watch([() => state.availableColumns, () => state.currentColumns], ([availableColumns, currentColumns]) => {
+            if (Array.isArray(availableColumns) && Array.isArray(currentColumns)) {
+                state.allColumns = unionBy<DynamicField>(currentColumns, availableColumns, d => d.key);
+            }
+        });
+
+        watch([() => props.visible, () => props.resourceType], ([visible, resourceType]) => {
             if (visible && resourceType) {
-                state.loading = true;
-                await Promise.all([getColumns(true), getColumns(false), getTags()]);
-                resetSelectedStates();
-                state.loading = false;
+                initColumns();
             }
         }, { immediate: true });
 
         return {
             ...toRefs(state),
+            sortByRecommendation,
+            sortByAlphabet,
             onChangeAllSelect,
-            onDeleteTag,
-            clearSelectedTags,
             setColumnsDefault,
+            clearSelectedTags,
             updatePageSchema,
             TAGS_PREFIX,
         };
@@ -361,24 +347,36 @@ section {
     }
     .section-title {
         @apply text-gray-900;
+        display: flex;
+        justify-content: space-between;
         font-size: 1.125rem;
         line-height: 155%;
-        margin-bottom: 0.25rem;
+        margin-bottom: 0.875rem;
+        .invalid-text {
+            @apply text-alert;
+        }
+        .p-button {
+            flex-shrink: 0;
+        }
     }
-    .section-desc {
-        @apply text-gray-500;
+    .sort-wrapper {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        font-size: 0.875rem;
-        line-height: 120%;
-        margin-bottom: 1.25rem;
-        .invalid-text {
-            @apply text-alert;
+        margin-top: 0.5rem;
+        margin-bottom: 0.5rem;
+        label {
+            @apply text-gray-500;
+            flex-grow: 1;
+            font-size: 0.75rem;
+            line-height: 1.5;
             font-weight: bold;
         }
         .p-button {
             flex-shrink: 0;
+            &:first-of-type {
+                margin-right: 0.5rem;
+            }
         }
     }
 }
@@ -424,24 +422,4 @@ section {
     }
 }
 
-.tag-menu-item.p-checkbox::v-deep {
-    @apply bg-transparent;
-    display: flex;
-    padding: 0.375rem 0.5rem;
-    cursor: pointer;
-    .check-icon {
-        flex-shrink: 0;
-        margin-right: 0.5rem;
-    }
-    &:hover {
-        @apply bg-blue-200;
-    }
-}
-.tag-box {
-    @apply text-gray-900;
-    margin-top: 0.625rem;
-    .p-tag {
-        margin-bottom: 0.5rem;
-    }
-}
 </style>

@@ -5,8 +5,11 @@
                                :placeholder="groupId ? $t('PROJECT.LANDING.PLACE_HOLDER_PROJECT') : $t('PROJECT.LANDING.PLACE_HOLDER_EXAMPLE')"
                                :disable-icon="!!groupId"
                                :menu="menu"
+                               :loading="loading"
                                :visible-menu.sync="visibleMenu"
                                :is-focused.sync="isFocused"
+                               disable-handler
+                               :exact-mode="false"
                                @delete="onDeleteAll"
                                @input="onInput"
                                @search="onSearch"
@@ -20,15 +23,6 @@
                      :class="{active: isFocused || visibleMenu}"
                 >
                     <span class="text">{{ groupName }}</span>
-                </div>
-            </template>
-            <template #menu-no-data>
-                <div class="text-center">
-                    <!--                    <p class="no-data-text">-->
-                    <!--                        No results match your search.<br>-->
-                    <!--                        Try again with a different term.-->
-                    <!--                    </p>-->
-                    <!--                    <img src="@/assets/images/illust_satellite.svg" class="no-data-img">-->
                 </div>
             </template>
             <template #menu-item--format="{item}">
@@ -47,9 +41,6 @@
                             <span>{{ item.label }}</span>
                         </template>
                     </div>
-                    <!--                    <template v-if="item.dataType === 'PROJECT'">-->
-                    <!--                        <span class="link-icon"><p-i name="ic_external-link" height="0.875rem" width="0.875rem" /></span>-->
-                    <!--                    </template>-->
                 </div>
             </template>
             <template #menu-header-more="{item}">
@@ -160,6 +151,7 @@ export default {
             projectTotalCount: 0,
             projectGroupStart: 1,
             projectStart: 1,
+            loading: true,
             menu: computed<MenuItem[]>(() => {
                 const menuOptions: MenuOption[] = [];
                 if (!state.groupId) {
@@ -241,12 +233,15 @@ export default {
         const listItems = async () => {
             state.projectStart = 1;
             state.projectGroupStart = 1;
+            state.loading = true;
             try {
                 await Promise.all([listProjectGroups(), listProjects()]);
             } catch (e) {
                 console.error(e);
                 state.projectItems = [];
                 state.projectGroupItems = [];
+            } finally {
+                state.loading = false;
             }
         };
 
@@ -260,7 +255,7 @@ export default {
 
         watch(() => state.groupId, async () => {
             if (state.visibleMenu) await listItems();
-        }, { immediate: true });
+        });
 
 
         const commitSearchContext = (groupId?: string, searchText?: string, hide = true) => {
@@ -284,8 +279,7 @@ export default {
             commitSearchContext(state.groupId, text);
         };
 
-        const onMenuSelect = (value: string, idx: number) => {
-            const item = state.menu[idx];
+        const onMenuSelect = (item: MenuItem) => {
             if (item.dataType === 'PROJECT_GROUP') {
                 state.searchText = '';
                 commitSearchContext(item.name, '', false);
@@ -348,6 +342,9 @@ export default {
         .p-search {
             overflow-x: hidden;
             overflow-y: hidden;
+            input {
+                min-width: 0;
+            }
         }
         .menu-container {
             @apply pr-4;
@@ -355,8 +352,8 @@ export default {
                 min-width: 100%;
             }
             .context-item {
-                padding-top: .41rem;
-                padding-bottom: .41rem;
+                padding-top: 0.41rem;
+                padding-bottom: 0.41rem;
             }
         }
     }

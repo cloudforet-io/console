@@ -3,7 +3,7 @@
                  :key="item.key"
                  v-model="proxySelectedKeys"
                  :value="item.key"
-                 :class="{'draggable-item' :draggable}"
+                 :class="{'draggable-item' :proxySelectedKeys.includes(item.key)}"
     >
         <span class="name">
             <template v-for="(text, i) in item.name.split(regex)">
@@ -30,7 +30,6 @@ interface Props {
     item: DynamicField[];
     selectedKeys: string[];
     searchText: string;
-    draggable: boolean;
 }
 export default {
     name: 'ColumnItem',
@@ -57,10 +56,6 @@ export default {
         searchText: {
             type: String,
             default: '',
-        },
-        draggable: {
-            type: Boolean,
-            default: false,
         },
     },
     setup(props: Props, { emit }) {

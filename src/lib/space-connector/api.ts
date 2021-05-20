@@ -115,7 +115,7 @@ class API {
                 const decodedToken = jwt.decode(token);
                 return decodedToken.exp;
             } catch (e) {
-                console.log(`Decode token error: ${e}`);
+                console.error(`Decode token error: ${e}`);
                 return -1;
             }
         } else {

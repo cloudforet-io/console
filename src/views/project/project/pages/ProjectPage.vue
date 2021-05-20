@@ -100,7 +100,7 @@
 
                     <project-group-delete-check-modal v-if="storeState.projectGroupDeleteCheckModalVisible" />
 
-                    <project-group-member-page v-if="groupMemberPageVisible"
+                    <project-group-member-page v-if="groupMemberPageVisible && storeState.groupId"
                                                :group-id="storeState.groupId"
                                                @close="groupMemberPageVisible = false"
                     />
@@ -283,11 +283,11 @@ export default {
 
 
         /* Member Count */
-        watch([() => storeState.groupId, () => state.groupMemberPageVisible], async (groupId, visible) => {
-            if (groupId && visible) {
+        watch(() => storeState.groupId, async (groupId) => {
+            if (groupId) {
                 try {
                     const res = await SpaceConnector.client.identity.projectGroup.member.list({
-                        project_group_id: storeState.groupId,
+                        project_group_id: groupId,
                     });
                     state.groupMemberCount = res.total_count;
                 } catch (e) {
