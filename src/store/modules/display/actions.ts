@@ -1,9 +1,17 @@
-export const showInfo = ({ commit }): void => {
-    commit('setVisibleInfo', true);
+import { SIDEBAR_TYPE } from '@/store/modules/display/config';
+
+export const showHandbook = ({ commit }): void => {
+    commit('setVisibleSidebar', true);
+    commit('setSidebarType', SIDEBAR_TYPE.handbook);
 };
 
-export const hideInfo = ({ commit }): void => {
-    commit('setVisibleInfo', false);
+export const showInfo = ({ commit }): void => {
+    commit('setSidebarType', SIDEBAR_TYPE.info);
+    commit('setVisibleSidebar', true);
+};
+
+export const hideSidebar = ({ commit }): void => {
+    commit('setVisibleSidebar', false);
 };
 
 export const startInitializing = ({ commit }): void => {

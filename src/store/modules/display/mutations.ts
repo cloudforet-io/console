@@ -1,7 +1,12 @@
+import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { DisplayState } from './type';
 
-export const setVisibleInfo = (state: DisplayState, visible: boolean): void => {
-    state.visibleInfo = visible;
+export const setVisibleSidebar = (state: DisplayState, visible: boolean): void => {
+    state.visibleSidebar = visible;
+};
+
+export const setSidebarType = (state: DisplayState, type: SIDEBAR_TYPE): void => {
+    state.sidebarType = type;
 };
 
 export const setIsInitialized = (state: DisplayState, isInitialized: boolean): void => {

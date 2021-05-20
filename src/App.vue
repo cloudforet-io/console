@@ -19,18 +19,21 @@
             <template v-if="showGNB">
                 <GNB class="gnb" />
                 <div class="app-body">
-                    <p-sidebar :visible="$store.state.display.visibleInfo"
-                               @close="$store.dispatch('display/hideInfo')"
+                    <p-sidebar :visible="$store.state.display.visibleSidebar"
+                               :style-type="$store.state.display.sidebarType"
+                               @close="$store.dispatch('display/hideSidebar')"
                     >
                         <main class="main">
                             <portal-target name="top-notification" />
                             <router-view />
                         </main>
                         <template #title>
-                            <portal-target name="info-title" />
+                            <portal-target v-if="$store.state.display.sidebarType === SIDEBAR_TYPE.info" name="info-title" />
+                            <portal-target v-else name="handbook-title" />
                         </template>
                         <template #sidebar>
-                            <portal-target name="info-contents" />
+                            <portal-target v-if="$store.state.display.sidebarType === SIDEBAR_TYPE.info" name="info-contents" />
+                            <portal-target v-else name="handbook-contents" />
                         </template>
                     </p-sidebar>
                 </div>
@@ -67,6 +70,7 @@ import GNB from '@/common/modules/gnb/GNB.vue';
 import { Location } from 'vue-router';
 import router from '@/routes';
 import TopNotification from '@/common/components/TopNotification.vue';
+import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { hideLoadingMessage, showLoadingMessage, showSuccessMessage } from './lib/util';
 
 export default defineComponent({
@@ -113,6 +117,7 @@ export default defineComponent({
         return {
             ...toRefs(state),
             goToSignIn,
+            SIDEBAR_TYPE,
             // flush() {
             //     SpaceConnector.flushToken();
             //     vm.$store.dispatch('user/setIsSessionExpired', true);

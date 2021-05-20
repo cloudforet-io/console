@@ -1,10 +1,12 @@
+import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { DisplayState } from './type';
 import * as getters from './getters';
 import * as actions from './actions';
 import * as mutations from './mutations';
 
 const state: DisplayState = {
-    visibleInfo: false,
+    visibleSidebar: false,
+    sidebarType: SIDEBAR_TYPE.info,
     isInitialized: false,
     isDownloaded: false,
 };

@@ -71,12 +71,12 @@ export default {
             if (after) {
                 vm.$store.dispatch('display/showInfo');
             } else {
-                vm.$store.dispatch('display/hideInfo');
+                vm.$store.dispatch('display/hideSidebar');
             }
         }, { immediate: true });
 
         onBeforeUnmount(() => {
-            vm.$store.dispatch('display/hideInfo');
+            vm.$store.dispatch('display/hideSidebar');
         });
         return {
             ...toRefs(state),
