@@ -83,14 +83,14 @@ export default {
                 const id = state.job.collector_info?.provider || '';
                 return {
                     id,
-                    label: state.providers[id]?.label || id,
+                    label: state.providers[id]?.name || id,
                 };
             }),
             plugin: computed(() => {
                 const id = state.job.collector_info?.plugin_info?.plugin_id || '';
                 return {
                     id,
-                    label: state.plugins[id]?.label || id,
+                    label: state.plugins[id]?.name || id,
                     icon: state.plugins[id]?.icon,
                 };
             }),

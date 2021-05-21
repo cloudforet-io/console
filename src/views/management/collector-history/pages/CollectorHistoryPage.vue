@@ -2,7 +2,7 @@
     <general-page-layout class="collector-history-container">
         <div class="top-wrapper">
             <p-breadcrumbs :routes="route" class="flex-grow" />
-            <!--            <handbook-button class="flex-shrink-0">-->p
+            <!--            <handbook-button class="flex-shrink-0">-->
             <!--            </handbook-button>-->
         </div>
         <p-page-title :title="$t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.TITLE')" />
@@ -12,26 +12,27 @@
                 <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.STATUS') }}:</span>
                 <p-select-button-group :buttons="statusList" :selected.sync="selectedStatus" />
             </div>
-            <p-query-search-table
-                ref="querySearchRef"
-                :class="items.length === 0 ? 'no-data' : ''"
-                :fields="fields"
-                :items="items"
-                :query-tags="tags"
-                :key-item-sets="handlers.keyItemSets"
-                :value-handler-map="handlers.valueHandlerMap"
-                :loading="loading"
-                :total-count="totalCount"
-                :sort-by.sync="sortBy"
-                :sort-desc.sync="sortDesc"
-                :this-page.sync="thisPage"
-                :page-size.sync="pageSize"
-                :style="{height: '100%', border: 'none'}"
-                :selectable="false"
-                :row-cursor-pointer="rowCursorPointer"
-                :excel-visible="false"
-                @change="onChange"
-                @rowLeftClick="onSelect"
+            <p-toolbox-table search-type="query"
+                             :fields="fields"
+                             :items="items"
+                             :query-tags.sync="tags"
+                             :key-item-sets="handlers.keyItemSets"
+                             :value-handler-map="handlers.valueHandlerMap"
+                             :loading="loading"
+                             :total-count="totalCount"
+                             :sort-by.sync="sortBy"
+                             :sort-desc.sync="sortDesc"
+                             :this-page.sync="thisPage"
+                             :page-size.sync="pageSize"
+                             :row-cursor-pointer="rowCursorPointer"
+                             sortable
+                             :selectable="false"
+                             :exportable="false"
+                             :class="items.length === 0 ? 'no-data' : ''"
+                             :style="{height: '100%', border: 'none'}"
+                             @change="onChange"
+                             @refresh="onChange()"
+                             @rowLeftClick="onSelect"
             >
                 <template #th-task-format="{  field }">
                     <span>{{ field.label }}</span>
@@ -62,7 +63,7 @@
                         <span class="text">{{ value }}%</span>
                     </div>
                 </template>
-            </p-query-search-table>
+            </p-toolbox-table>
             <div v-if="!loading && items.length > 0" class="pagination">
                 <p-pagination :total-count="totalCount"
                               :this-page.sync="thisPage"
@@ -109,10 +110,9 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PPageTitle, PQuerySearchTable, PPagination, PButtonModal, PLazyImg,
-    PBreadcrumbs, PIconTextButton, PSelectButtonGroup, PProgressBar, PStatus,
+    PPageTitle, PPagination, PButtonModal, PLazyImg,
+    PBreadcrumbs, PIconTextButton, PSelectButtonGroup, PProgressBar, PStatus, PToolboxTable,
 } from '@spaceone/design-system';
-import { QuerySearchTableFunctions } from '@spaceone/design-system/dist/src/data-display/tables/query-search-table/type';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
@@ -162,13 +162,13 @@ const statusIconColorFormatter = (status) => {
 export default {
     name: 'CollectorHistoryPage',
     components: {
-        HandbookButton,
+        // HandbookButton,
         PLazyImg,
         PIconTextButton,
         PButtonModal,
         PBreadcrumbs,
         PPagination,
-        PQuerySearchTable,
+        PToolboxTable,
         PPageTitle,
         PSelectButtonGroup,
         PProgressBar,
@@ -248,7 +248,6 @@ export default {
             rowCursorPointer: true,
             //
             tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
-            querySearchRef: null as null|QuerySearchTableFunctions,
             modalVisible: false,
         });
         const routeState = reactive({
@@ -305,7 +304,7 @@ export default {
                 params: { jobId: item.job_id },
             }).catch(() => {});
         };
-        const onChange = async (item) => {
+        const onChange = async (item: any = {}) => {
             if (item.sortBy !== undefined) {
                 state.sortBy = item.sortBy;
                 state.sortDesc = item.sortDesc;
@@ -330,14 +329,11 @@ export default {
             });
         };
         const onClickDate = (date) => {
-            // eslint-disable-next-line no-unused-expressions
-            state.querySearchRef?.addTag(
-                {
-                    key: { label: 'Created Time', name: 'created_at', dataType: 'datetime' },
-                    value: { label: date, name: date },
-                    operator: '=',
-                },
-            );
+            state.tags.push({
+                key: { label: 'Created Time', name: 'created_at', dataType: 'datetime' },
+                value: { label: date, name: date },
+                operator: '=',
+            });
         };
 
         const init = async () => {
@@ -400,7 +396,7 @@ export default {
             }
         }
 
-        .p-query-search-table {
+        .p-toolbox-table {
             &.no-data {
                 .p-data-table {
                     min-height: 18.75rem;

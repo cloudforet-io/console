@@ -71,10 +71,13 @@ export default {
 
         /* Init */
         (() => {
-            Promise.all([store.dispatch('resource/project/load'),
+            Promise.all([
+                store.dispatch('resource/project/load'),
                 store.dispatch('resource/serviceAccount/load'),
                 store.dispatch('resource/plugin/load'),
-                store.dispatch('resource/collector/load')]);
+                store.dispatch('resource/collector/load'),
+                store.dispatch('resource/provider/load'),
+            ]);
         })();
 
 
