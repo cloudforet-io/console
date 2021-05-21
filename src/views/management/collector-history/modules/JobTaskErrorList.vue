@@ -13,11 +13,11 @@
         >
             <template #col-message-format="{ value }" style="width: 20rem;">
                 <div class="error-message">
-                    {{ value.replace(/\'/g, '') }}
+                    <pre>{{ value }}</pre>
                 </div>
             </template>
             <template #no-data-format>
-                {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.NO_DATA') }}
+                {{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.NO_ERROR') }}
             </template>
         </p-data-table>
     </div>
@@ -32,6 +32,15 @@ import {
 interface Props {
     selectedItem: any;
 }
+
+const errorMessageFormatter = (message) => {
+    let result = message
+        .replace(/'/g, '')
+        .replace(/(\\r\\n|\\n|\\r)/gm, '\n')
+        .replace(/(\\t)/gm, '');
+    if (result.startsWith('\n')) result = result.replace('\n', '');
+    return result;
+};
 
 export default {
     name: 'JobTaskErrorList',
@@ -51,8 +60,9 @@ export default {
             errorItems: computed(() => {
                 if (Array.isArray(props?.selectedItem?.errors)) {
                     return props.selectedItem.errors.map((d, idx) => ({
-                        sequence: idx + 1,
                         ...d,
+                        sequence: idx + 1,
+                        message: errorMessageFormatter(d.message),
                     }));
                 }
                 return [];
@@ -88,11 +98,11 @@ export default {
         @apply text-gray-500;
     }
     .error-message {
-        /* white-space: nowrap; */
-
-        /* overflow: hidden; */
-
-        /* text-overflow: ellipsis; */
+        @apply bg-gray-100;
+        white-space: pre-wrap;
+        border-radius: 0.375rem;
+        padding: 0.5rem 0.75rem;
+        margin: 0.75rem 0;
     }
 }
 </style>
