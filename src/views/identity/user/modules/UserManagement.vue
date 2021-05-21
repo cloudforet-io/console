@@ -206,23 +206,24 @@ import { store } from '@/store';
 import { SpaceConnector } from '@/lib/space-connector';
 import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import {showErrorMessage, showLoadingMessage, showSuccessMessage} from '@/lib/util';
+import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/lib/util';
 import { FILE_NAME_PREFIX } from '@/lib/type';
 
 interface UserModel {
     created_at: Timestamp;
-    domain_id: string;
-    email: string;
-    group: string;
+    domain_id?: string;
+    email?: string;
+    group?: string;
     language: string;
     last_accessed_at: Timestamp;
-    mobile: string;
+    mobile?: string;
     name: string;
-    roles: string[];
+    roles?: string[];
     state: string;
-    tags: {};
+    tags?: {};
     timezone: string;
     user_id: string;
+    api_key_count?: number;
 }
 
 const UserType = {
@@ -321,6 +322,7 @@ export default {
                 { name: 'name', label: 'Name' },
                 { name: 'state', label: 'State' },
                 { name: 'user_type', label: 'Access Control' },
+                { name: 'api_key_count', label: 'API Key' },
                 { name: 'role_name', label: 'Role' },
                 { name: 'backend', label: 'Auth Type' },
                 { name: 'last_accessed_at', label: 'Last Activity' },
@@ -433,11 +435,12 @@ export default {
             try {
                 const res = await SpaceConnector.client.identity.user.list({
                     query: getQuery(),
-                    only: ['user_id', 'name', 'email', 'state', 'timezone', 'user_type', 'backend', 'last_accessed_at'],
+                    only: ['user_id', 'name', 'email', 'state', 'timezone', 'user_type', 'backend', 'last_accessed_at', 'api_key_count'],
                     include_role_binding: true,
                 });
                 state.users = res.results.map(d => ({
                     ...d,
+                    api_key_count: d.api_key_count || 0,
                     user_type: getUserType(d.user_type),
                     role_name: (getArrayWithNotDuplicatedItem(d.role_bindings.map(data => data.role_info.name))).join(', '),
                     last_accessed_at: calculateTime(d.last_accessed_at, state.timezone),

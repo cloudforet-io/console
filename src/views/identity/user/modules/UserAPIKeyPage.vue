@@ -94,7 +94,6 @@ export default {
         const tabState = reactive({
             tabs: computed(() => ([
                 { name: 'tab1', label: 'Spacectl', keepAlive: true },
-                { name: 'tab2', label: vm.$t('IDENTITY.USER.MAIN.API_KEY'), keepAlive: true },
             ] as TabItem[])),
             activeTab: 'tab1',
         });
