@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from '@vue/composition-api';
 import { PTab } from '@spaceone/design-system';
 import JobTaskErrorList from '@/views/management/collector-history/modules/JobTaskErrorList.vue';
@@ -39,6 +39,10 @@ export default {
                 { name: 'error-list', label: vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.ERROR_LIST'), keepAlive: true },
             ]),
             activeTab: 'error-list',
+        });
+
+        onActivated(() => {
+            state.activeTab = 'error-list';
         });
 
         return {

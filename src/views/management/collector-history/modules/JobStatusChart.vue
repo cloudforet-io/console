@@ -31,7 +31,13 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs,
+    ComponentRenderProxy,
+    computed,
+    getCurrentInstance,
+    onActivated,
+    onDeactivated,
+    reactive,
+    toRefs,
 } from '@vue/composition-api';
 
 import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
@@ -51,21 +57,26 @@ export default {
         PStatus,
         PI,
     },
+    props: {
+        jobId: {
+            type: String,
+            required: true,
+        },
+    },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,
-            jobId: computed<string>(() => root.$route.params.jobId as string),
             job: {},
-            status: undefined,
+            status: computed(() => state.job.job_status),
             statusText: computed(() => {
                 if (state.status === JOB_STATUS.progress) return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.IN_PROGRESS');
                 if ([JOB_STATUS.success, JOB_STATUS.created].includes(state.status)) return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COMPLETED');
                 return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED');
             }),
-            succeededCount: 0,
-            failedCount: 0,
-            totalCount: 0,
+            succeededCount: computed(() => state.job.job_task_status?.succeeded || 0),
+            failedCount: computed(() => state.job.job_task_status?.failed || 0),
+            totalCount: computed(() => state.job.job_task_status?.total),
             succeededPercentage: computed(() => {
                 if (state.totalCount > 0) {
                     return (state.succeededCount / state.totalCount) * 100;
@@ -93,14 +104,11 @@ export default {
         /* api */
         const getJob = async () => {
             state.loading = true;
+            state.job = {};
             try {
-                const res = await SpaceConnector.client.inventory.job.getJobProgress({
-                    job_id: state.jobId,
+                state.job = await SpaceConnector.client.inventory.job.getJobProgress({
+                    job_id: props.jobId,
                 });
-                state.status = res.job_status;
-                state.succeededCount = res.job_task_status?.succeeded;
-                state.failedCount = res.job_task_status?.failed;
-                state.totalCount = res.job_task_status?.total;
             } catch (e) {
                 console.error(e);
             } finally {
@@ -108,12 +116,13 @@ export default {
             }
         };
 
-        (() => {
-            getJob();
-        })();
-
+        /* Init */
         let interval;
-        onMounted(() => {
+
+
+        onActivated(async () => {
+            await getJob();
+
             if (interval) clearInterval(interval);
             if (state.status === JOB_STATUS.progress) {
                 interval = setInterval(() => {
@@ -121,7 +130,8 @@ export default {
                 }, 5000);
             }
         });
-        onUnmounted(() => {
+
+        onDeactivated(() => {
             if (interval) clearInterval(interval);
         });
 

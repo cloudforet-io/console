@@ -47,7 +47,7 @@ export default {
             path: 'collector-history',
             name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR.MAIN,
             meta: { label: 'Collector History' },
-            component: { template: '<router-view />' },
+            component: { template: '<keep-alive><router-view /></keep-alive>' },
             children: [
                 {
                     path: '/',

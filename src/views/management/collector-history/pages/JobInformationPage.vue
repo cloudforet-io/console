@@ -3,7 +3,7 @@
         <p-breadcrumbs :routes="routeState.routes" />
         <p-page-title :title="jobId" child @goBack="$router.go(-1)" />
         <div class="top-wrapper">
-            <job-status-chart />
+            <job-status-chart :job-id="jobId" />
             <job-basic-information :job-id="jobId" />
         </div>
         <p-horizontal-layout class="job-tasks-wrapper">
@@ -21,7 +21,7 @@
 <script lang="ts">
 import {
     computed, reactive, toRefs,
-    getCurrentInstance, ComponentRenderProxy,
+    getCurrentInstance, ComponentRenderProxy, onMounted, onUnmounted, onActivated,
 } from '@vue/composition-api';
 
 import {
@@ -80,6 +80,9 @@ export default {
             ]);
         })();
 
+        onActivated(() => {
+            state.selectedItem = null;
+        });
 
         return {
             ...toRefs(state),

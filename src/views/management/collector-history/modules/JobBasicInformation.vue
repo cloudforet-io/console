@@ -43,7 +43,9 @@
 <script lang="ts">
 import { PAnchor, PLazyImg, PPaneLayout } from '@spaceone/design-system';
 import { SpaceConnector } from '@/lib/space-connector';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, onActivated, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { store } from '@/store';
 import { ResourceMap } from '@/store/modules/resource/type';
@@ -100,6 +102,7 @@ export default {
         const apiQuery = new ApiQueryHelper();
         const getJob = async () => {
             state.loading = true;
+            state.job = {};
             try {
                 apiQuery.setFilters([{ k: 'job_id', v: props.jobId, o: '=' }]);
                 const { results } = await SpaceConnector.client.inventory.job.list({
@@ -107,14 +110,16 @@ export default {
                 });
                 state.job = results[0] || {};
             } catch (e) {
-                state.job = {};
                 console.error(e);
             } finally {
                 state.loading = false;
             }
         };
 
-        getJob();
+        /* Init */
+        onActivated(() => {
+            getJob();
+        });
 
         return {
             ...toRefs(state),

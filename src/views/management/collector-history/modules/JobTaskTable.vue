@@ -5,6 +5,7 @@
                      :loading="loading"
                      :fields="fields"
                      :items="items"
+                     :select-index.sync="selectIndex"
                      :sort-by="sortBy"
                      :sort-desc="sortDesc"
                      :page-size="pageLimit"
@@ -61,7 +62,7 @@
 /* eslint-disable camelcase */
 import { capitalize } from 'lodash';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    ComponentRenderProxy, computed, getCurrentInstance, onActivated, onDeactivated, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -153,6 +154,7 @@ export default {
             ])),
             selectedStatus: 'all',
             //
+            selectIndex: [],
             pageLimit: 15,
             pageStart: 1,
             sortBy: '',
@@ -248,16 +250,34 @@ export default {
             await getJobTasks();
         };
 
-        const init = async () => {
-            await Promise.all([store.dispatch('resource/project/load'), store.dispatch('resource/serviceAccount/load')]);
-            await getJobTasks();
-        };
-        init();
-
-        watch(() => state.selectedStatus, (selectedStatus) => {
-            state.selectedStatus = selectedStatus;
+        /* Init */
+        const initStates = () => {
+            state.totalCount = 0;
+            state.items = [];
+            state.pageLimit = 15;
             state.pageStart = 1;
-            getJobTasks();
+            state.sortBy = '';
+            state.sortDesc = true;
+            state.totalCount = 0;
+            state.searchTags = [];
+            state.selectIndex = [];
+            state.selectedStatus = 'all';
+        };
+
+        let stopSelectStatusWatch;
+
+        onActivated(async () => {
+            initStates();
+            await getJobTasks();
+
+            stopSelectStatusWatch = watch(() => state.selectedStatus, () => {
+                state.pageStart = 1;
+                getJobTasks();
+            });
+        });
+
+        onDeactivated(() => {
+            if (stopSelectStatusWatch) stopSelectStatusWatch();
         });
 
         return {
