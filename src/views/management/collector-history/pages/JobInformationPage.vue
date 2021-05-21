@@ -3,7 +3,7 @@
         <p-breadcrumbs :routes="routeState.routes" />
         <p-page-title :title="jobId" child @goBack="$router.go(-1)" />
         <div class="top-wrapper">
-            <job-status-chart :job-id="jobId" />
+            <job-status-chart />
             <job-basic-information :job-id="jobId" />
         </div>
         <p-horizontal-layout class="job-tasks-wrapper">

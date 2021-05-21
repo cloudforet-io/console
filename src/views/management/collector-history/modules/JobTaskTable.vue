@@ -34,20 +34,21 @@
             </p-anchor>
         </template>
         <template #col-project_id-format="{ value }">
-            <p-anchor :to="referenceRouter(
-                value,
-                { resource_type: 'identity.Project' })"
-            >
-                {{ projects[value] ? projects[value].label : value }}
-            </p-anchor>
+            <template v-if="value">
+                <p-anchor :to="referenceRouter(
+                    value,
+                    { resource_type: 'identity.Project' })"
+                >
+                    {{ projects[value] ? projects[value].label : value }}
+                </p-anchor>
+            </template>
         </template>
         <template #col-status-format="{ value }">
             <p-status
-                :icon="value === JOB_TASK_STATUS.success ? 'ic_state_active' : undefined"
-                :lottie="statusLottieFormatter(value)"
-                :text="statusFormatter(value)"
-                :icon-color="COMPLETED_ICON_COLOR"
-                :theme="[JOB_TASK_STATUS.canceled, JOB_TASK_STATUS.timeout, JOB_TASK_STATUS.failure].includes(value) ? 'red' : undefined"
+                :text="statusTextFormatter(value)"
+                :text-color="statusTextColorFormatter(value)"
+                :icon="statusIconFormatter(value)"
+                :icon-color="statusIconColorFormatter(value)"
             />
         </template>
         <template #col-errors-format="{ value }">
@@ -57,6 +58,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import { capitalize } from 'lodash';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
@@ -72,22 +74,35 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { makeEnumValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { JOB_TASK_STATUS } from '@/views/management/collector-history/pages/config';
 import { iso8601Formatter, durationFormatter } from '@/lib/util';
+import { green, primaryDark, red } from '@/styles/colors';
 import { store } from '@/store';
-import { green } from '@/styles/colors';
 
 
 const COMPLETED_ICON_COLOR = green[400];
+const FAILED_ICON_COLOR = red[400];
+const PENDING_ICON_COLOR = primaryDark;
 
-const statusLottieFormatter = (status) => {
-    if (status === JOB_TASK_STATUS.success) return undefined;
-    if (status === JOB_TASK_STATUS.pending) return 'lottie_interval';
-    if (status === JOB_TASK_STATUS.progress) return 'lottie_in_progress';
-    return 'lottie_error';
-};
-const statusFormatter = (status) => {
+const statusTextFormatter = (status) => {
     if (status === JOB_TASK_STATUS.progress) return 'In-Progress';
     if (status === JOB_TASK_STATUS.success) return 'Succeeded';
     return capitalize(status);
+};
+const statusTextColorFormatter = (status) => {
+    if ([JOB_TASK_STATUS.failure, JOB_TASK_STATUS.timeout, JOB_TASK_STATUS.canceled].includes(status)) return FAILED_ICON_COLOR;
+    return undefined;
+};
+const statusIconFormatter = (status) => {
+    if (status === JOB_TASK_STATUS.success) return 'ic_state_active';
+    if (status === JOB_TASK_STATUS.pending) return 'ic_clock-history';
+    if (status === JOB_TASK_STATUS.progress) return 'ic_in-progress';
+    return 'ic_alert';
+};
+const statusIconColorFormatter = (status) => {
+    if (status === JOB_TASK_STATUS.success) return COMPLETED_ICON_COLOR;
+    if (status === JOB_TASK_STATUS.pending) return PENDING_ICON_COLOR;
+    // if (status === JOB_TASK_STATUS.progress) return undefined;
+    // return FAILED_ICON_COLOR;
+    return undefined;
 };
 
 export default {
@@ -250,8 +265,10 @@ export default {
             querySearchHandlers,
             onSelect,
             onChange,
-            statusFormatter,
-            statusLottieFormatter,
+            statusTextFormatter,
+            statusTextColorFormatter,
+            statusIconFormatter,
+            statusIconColorFormatter,
             referenceRouter,
             JOB_TASK_STATUS,
             COMPLETED_ICON_COLOR,

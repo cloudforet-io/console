@@ -47,11 +47,10 @@
                 </template>
                 <template #col-status-format="{ value }">
                     <p-status
-                        :icon="value === JOB_STATUS.success ? 'ic_state_active' : undefined"
-                        :lottie="statusLottieFormatter(value)"
-                        :text="statusFormatter(value)"
-                        :icon-color="COMPLETED_ICON_COLOR"
-                        :theme="[JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout].includes(value) ? 'red' : undefined"
+                        :text="statusTextFormatter(value)"
+                        :text-color="statusTextColorFormatter(value)"
+                        :icon="statusIconFormatter(value)"
+                        :icon-color="statusIconColorFormatter(value)"
                     />
                 </template>
                 <template #col-job_progress-format="{value}">
@@ -119,7 +118,6 @@ import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectorHistoryChart.vue';
 
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { iso8601Formatter, durationFormatter } from '@/lib/util';
@@ -131,23 +129,34 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { store } from '@/store';
 import { QueryHelper } from '@/lib/query';
 import { MANAGEMENT_ROUTE } from '@/routes/management/management-route';
-import { peacock, green } from '@/styles/colors';
+import { peacock, green, red } from '@/styles/colors';
 import { JOB_STATUS } from '@/views/management/collector-history/pages/config';
 import HandbookButton from '@/common/components/HandbookButton.vue';
 
 
 const PROGRESS_BAR_COLOR = peacock[400];
 const COMPLETED_ICON_COLOR = green[400];
+const FAILED_ICON_COLOR = red[400];
 
-const statusLottieFormatter = (status) => {
-    if (status === JOB_STATUS.success || status === JOB_STATUS.created) return undefined;
-    if (status === JOB_STATUS.progress) return 'lottie_in_progress';
-    return 'lottie_error';
-};
-const statusFormatter = (status) => {
+const statusTextFormatter = (status) => {
+    if (status === JOB_STATUS.success || status === JOB_STATUS.created) return 'Completed';
     if (status === JOB_STATUS.progress) return 'In-Progress';
-    if (status === JOB_STATUS.success) return 'Completed';
     return capitalize(status);
+};
+const statusTextColorFormatter = (status) => {
+    if ([JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout].includes(status)) return FAILED_ICON_COLOR;
+    return undefined;
+};
+const statusIconFormatter = (status) => {
+    if (status === JOB_STATUS.success || status === JOB_STATUS.created) return 'ic_state_active';
+    if (status === JOB_STATUS.progress) return 'ic_in-progress';
+    return 'ic_alert';
+};
+const statusIconColorFormatter = (status) => {
+    if (status === JOB_STATUS.success || status === JOB_STATUS.created) return COMPLETED_ICON_COLOR;
+    // if (status === JOB_STATUS.progress) return undefined;
+    // return FAILED_ICON_COLOR;
+    return undefined;
 };
 
 export default {
@@ -278,9 +287,9 @@ export default {
                 state.totalCount = res.total_count;
                 state.items = res.results.map(job => ({
                     ...job,
-                    job_progress: ((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100,
+                    job_progress: job.total_tasks > 0 ? ((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100 : 0,
                     created_at: iso8601Formatter(job.created_at, state.timezone),
-                    duration: durationFormatter(job.created_at, job.finished_at, state.timezone),
+                    duration: durationFormatter(job.created_at, job.finished_at, state.timezone) || '--',
                 }));
             } catch (e) {
                 console.error(e);
@@ -357,9 +366,10 @@ export default {
             onChange,
             onPaginationChange,
             onClickDate,
-            statusFormatter,
-            statusLottieFormatter,
-            referenceRouter,
+            statusTextFormatter,
+            statusTextColorFormatter,
+            statusIconFormatter,
+            statusIconColorFormatter,
         };
     },
 };

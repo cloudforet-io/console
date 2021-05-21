@@ -3,14 +3,8 @@
         <div class="status-wrapper">
             <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.STATUS') }}</span>
             <span class="value">
-                <p-status
-                    v-if="!loading"
-                    :icon="status === JOB_STATUS.success ? 'ic_state_active' : undefined"
-                    :lottie="statusLottieFormatter(status)"
-                    :text="statusText"
-                    :icon-color="SUCCEEDED_COLOR"
-                    :theme="[JOB_STATUS.canceled, JOB_STATUS.error, JOB_STATUS.timeout].includes(status) ? 'red' : undefined"
-                />
+                <p-i :name="statusIconFormatter(status)" width="1rem" height="1rem" />
+                {{ statusText }}
             </span>
         </div>
         <div class="chart-wrapper">
@@ -37,10 +31,10 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    computed, reactive, toRefs, ComponentRenderProxy, getCurrentInstance,
+    ComponentRenderProxy, computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { PPaneLayout, PStatus } from '@spaceone/design-system';
+import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
 
 import { JOB_STATUS } from '@/views/management/collector-history/pages/config';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -55,27 +49,23 @@ export default {
     components: {
         PPaneLayout,
         PStatus,
+        PI,
     },
-    props: {
-        jobId: {
-            type: String,
-            default: undefined,
-        },
-    },
-    setup(props) {
+    setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,
+            jobId: computed<string>(() => root.$route.params.jobId as string),
             job: {},
-            status: computed(() => state.job?.status),
+            status: undefined,
             statusText: computed(() => {
                 if (state.status === JOB_STATUS.progress) return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.IN_PROGRESS');
                 if ([JOB_STATUS.success, JOB_STATUS.created].includes(state.status)) return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.COMPLETED');
                 return vm.$t('MANAGEMENT.COLLECTOR_HISTORY.JOB.FAILED');
             }),
-            succeededCount: 22,
-            failedCount: 10,
-            totalCount: 32,
+            succeededCount: 0,
+            failedCount: 0,
+            totalCount: 0,
             succeededPercentage: computed(() => {
                 if (state.totalCount > 0) {
                     return (state.succeededCount / state.totalCount) * 100;
@@ -94,35 +84,50 @@ export default {
         });
 
         /* util */
-        const statusLottieFormatter = (status) => {
-            if ([JOB_STATUS.success, JOB_STATUS.created].includes(status)) return undefined;
-            if (status === JOB_STATUS.progress) return 'lottie_in_progress';
-            return 'lottie_error';
+        const statusIconFormatter = (status) => {
+            if (status === JOB_STATUS.success || status === JOB_STATUS.created) return 'ic_state_active';
+            if (status === JOB_STATUS.progress) return 'ic_in-progress';
+            return 'ic_alert';
         };
 
         /* api */
         const getJob = async () => {
             state.loading = true;
             try {
-                const res = await SpaceConnector.client.inventory.job.list({
-                    job_id: props.jobId,
+                const res = await SpaceConnector.client.inventory.job.getJobProgress({
+                    job_id: state.jobId,
                 });
-                state.job = res.results[0] || {};
+                state.status = res.job_status;
+                state.succeededCount = res.job_task_status?.succeeded;
+                state.failedCount = res.job_task_status?.failed;
+                state.totalCount = res.job_task_status?.total;
             } catch (e) {
-                state.job = {};
                 console.error(e);
             } finally {
                 state.loading = false;
             }
         };
 
-        (async () => {
-            await getJob();
+        (() => {
+            getJob();
         })();
+
+        let interval;
+        onMounted(() => {
+            if (interval) clearInterval(interval);
+            if (state.status === JOB_STATUS.progress) {
+                interval = setInterval(() => {
+                    getJob();
+                }, 5000);
+            }
+        });
+        onUnmounted(() => {
+            if (interval) clearInterval(interval);
+        });
 
         return {
             ...toRefs(state),
-            statusLottieFormatter,
+            statusIconFormatter,
             JOB_STATUS,
             SUCCEEDED_COLOR,
             FAILED_COLOR,
@@ -144,6 +149,14 @@ export default {
         .label {
             @apply text-gray-600;
             margin-right: 0.5rem;
+        }
+        .value {
+            display: flex;
+            font-weight: bold;
+
+            .p-i-icon {
+                margin-right: 0.25rem;
+            }
         }
     }
 
