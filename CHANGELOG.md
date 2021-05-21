@@ -1,3 +1,10 @@
+# [1.1.0-beta.16](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.15...v1.1.0-beta.16) (2021-05-21)
+
+
+### Bug Fixes
+
+* update icons and fix bug in anchor ([#545](https://github.com/spaceone-dev/spaceone-design-system/issues/545)) ([8b3e892](https://github.com/spaceone-dev/spaceone-design-system/commit/8b3e892b3a73932b052f2a16853f8f2b6a8496fd))
+
 # [1.1.0-beta.15](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.14...v1.1.0-beta.15) (2021-05-20)
 
 
