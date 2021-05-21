@@ -873,7 +873,7 @@
 				"FAILED": "Failed",
 				"FINISH_TIME": "Finish Time",
 				"IN_PROGRESS": "In-Progress",
-				"NO_DATA": "No Data",
+				"NO_ERROR": "No Error",
 				"PLUGIN": "Plugin",
 				"PROVIDER": "Provider",
 				"START_TIME": "Start Time",

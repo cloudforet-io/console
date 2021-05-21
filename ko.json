@@ -873,7 +873,7 @@
 				"FAILED": "실패",
 				"FINISH_TIME": "종료 시간",
 				"IN_PROGRESS": "진행중",
-				"NO_DATA": "작업이 없습니다.",
+				"NO_ERROR": "에러가 없습니다.",
 				"PLUGIN": "플러그인",
 				"PROVIDER": "제공자",
 				"START_TIME": "시작 시간",

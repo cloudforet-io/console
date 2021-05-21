@@ -873,7 +873,7 @@
 				"FAILED": "失敗",
 				"FINISH_TIME": "",
 				"IN_PROGRESS": "進行中",
-				"NO_DATA": "作業がありません",
+				"NO_ERROR": "エラーがありません",
 				"PLUGIN": "",
 				"PROVIDER": "プロバイダー",
 				"START_TIME": "",
