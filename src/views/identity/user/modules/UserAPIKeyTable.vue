@@ -33,6 +33,9 @@
                 :striped="false"
                 :selectable="true"
             >
+                <template #col-state-format="{value}">
+                    <p-status v-bind="userStateFormatter(value)" class="capitalize" />
+                </template>
                 <template #col-created_at-format="{value}">
                     {{ iso8601Formatter(value, timezone) }}
                 </template>
@@ -55,6 +58,9 @@
             :visible.sync="checkModalState.visible"
             @confirm="checkModalConfirm"
         >
+            <template #col-state-format="{value}">
+                <p-status v-bind="userStateFormatter(value)" class="capitalize" />
+            </template>
             <template #col-created_at-format="{value}">
                 {{ iso8601Formatter(value, timezone) }}
             </template>
@@ -64,15 +70,16 @@
 
 <script lang="ts">
 import {
-    PEmpty, PIconTextButton, PDropdownMenuBtn, PDataTable, PPaneLayout, PTableCheckModal,
+    PEmpty, PIconTextButton, PDropdownMenuBtn, PDataTable, PPaneLayout, PTableCheckModal, PStatus,
 } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import UserAPIKeyModal from '@/views/identity/user/modules/UserAPIKeyModal.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { userStateFormatter } from '@/views/identity/user/lib/helper';
 import { TranslateResult } from 'vue-i18n';
 import {
     hideLoadingMessage, showErrorMessage, showLoadingMessage, showSuccessMessage, iso8601Formatter,
@@ -89,13 +96,19 @@ export interface APIKeyItem {
     state?: string;
     user_id?: string;
 }
-interface EndpointType {
-    endpoints: string;
-}
+
 interface ModalItem {
     loading?: boolean;
     items: APIKeyItem;
-    endpoints?: EndpointType;
+    endpoints: object;
+}
+
+interface EndpointItem {
+    endpoint: string;
+    name: string;
+    service: string;
+    state?: string;
+    version?: string;
 }
 
 export default {
@@ -103,6 +116,7 @@ export default {
     components: {
         UserAPIKeyModal,
         PEmpty,
+        PStatus,
         PPaneLayout,
         PIconTextButton,
         PDropdownMenuBtn,
@@ -146,10 +160,10 @@ export default {
             disableCreateBtn: computed(() => state.items.length >= 2),
         });
 
-        const modalState: ModalItem = reactive({
+        const modalState: UnwrapRef<ModalItem> = reactive({
             loading: false,
             items: [] as unknown as APIKeyItem,
-            endpoints: {} as EndpointType,
+            endpoints: {},
         });
 
         const checkModalState = reactive({
@@ -291,9 +305,18 @@ export default {
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.identity.endpoint.list();
-                const endpointItem = [res.results.find(d => d.service === 'inventory')];
+                const endpointItem: EndpointItem[] = [];
+                const filteredEndpointItem: EndpointItem = res.results.find(d => d.service === 'inventory');
+                if (filteredEndpointItem) endpointItem.push(filteredEndpointItem);
+
+                const endpoints = {};
+                endpointItem.forEach((data) => {
+                    const service = data.service;
+                    const link = data.endpoint;
+                    endpoints[service] = link;
+                });
                 modalState.endpoints = {
-                    endpoints: endpointItem.map(d => (`${d.service}: ${d.endpoint}`)).join('\n').replace(/'/g, ''),
+                    endpoints,
                 };
             } catch (e) {
                 console.error(e);
@@ -319,6 +342,7 @@ export default {
             modalState,
             checkModalState,
             iso8601Formatter,
+            userStateFormatter,
             onSelect,
             onClickEnable,
             onClickDisable,

@@ -41,7 +41,7 @@
                     {{ $t('IDENTITY.USER.MAIN.API_KEY_SPACECTL') }}
                 </span>
                 <p class="box-contents">
-                    {{ apiKeyItem.api_key_id }}
+                    Spacectl configuration
                     <p-collapsible-toggle :is-collapsed.sync="isSpacectlCollapsed" class="collapsible-toggle">
                         {{ isSpacectlCollapsed ? $t('IDENTITY.USER.MAIN.API_KEY_SHOW') : $t('IDENTITY.USER.MAIN.API_KEY_HIDE') }}
                     </p-collapsible-toggle>
@@ -75,6 +75,10 @@ enum FileType {
     YAML = 'yaml'
 }
 
+interface APIItem {
+    api_key: string;
+}
+
 export default {
     name: 'UserAPIKeyModal',
     components: {
@@ -105,7 +109,7 @@ export default {
             proxyVisible: makeProxy('visible', props, context.emit),
             isAPICollapsed: true,
             isSpacectlCollapsed: true,
-            apiItem: {} as APIKeyItem,
+            apiItem: {} as APIItem,
             yamlItem: '',
         });
 
@@ -116,7 +120,8 @@ export default {
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = 'download';
+            if (fileType === FileType.JSON) a.download = 'api_key';
+            if (fileType === FileType.YAML) a.download = 'spacectl';
             a.click();
             a.remove();
         };
@@ -126,17 +131,20 @@ export default {
         };
 
         const makeYamlItem = () => {
-            state.apiItem = props.apiKeyItem;
+            const apiItem = {
+                api_key: props.apiKeyItem.api_key,
+            };
             const endpoint = props.endpoints;
-            const yamlItem = { ...state.apiItem, ...endpoint };
+            const yamlItem = { ...apiItem, ...endpoint };
+
             state.yamlItem = yaml.dump(yamlItem, {
-                noArrayIndent: true,
-                flowLevel: 1,
-                noRefs: true,
+                noArrayIndent: false,
+                lineWidth: -1,
             });
         };
 
         (async () => {
+            if (props.apiKeyItem) state.apiItem = props.apiKeyItem;
             makeYamlItem();
         })();
 
