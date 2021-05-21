@@ -2,7 +2,7 @@
     <router-link :to="to || {}" custom>
         <template #default="{href: toHref, route, navigate, isActive, isExactActive }">
             <a class="p-anchor" :class="{disabled, highlight}" :target="target"
-               :href="!disabled && toHref || href"
+               :href="!disabled && to ? toHref : href"
                v-on="anchorListeners"
             >
                 <slot name="left-extra" v-bind="$props" />
