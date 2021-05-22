@@ -1,15 +1,11 @@
 name: Release
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
-      - beta
-      - "[0-9]+.[0-9]+.[0-9]+*"
+
 
 jobs:
-  job_install_dependencies:
-    name: Install Dependencies
+  build:
+    name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
@@ -33,24 +29,6 @@ jobs:
       - name: Install dependencies
         if: steps.cache_dependencies.outputs.cache-hit == ''
         run: npm install
-    outputs:
-      dependency_cache_key: ${{ steps.compute_lockfile_hash.outputs.hash }}
-
-  job_build:
-    name: Build
-    needs: job_install_dependencies
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Check out current commit
-        uses: actions/checkout@v2
-      - name: Set up Node
-        uses: actions/setup-node@v1
-      - name: Check dependency cache
-        uses: actions/cache@v2
-        with:
-          path: ${{ github.workspace }}/node_modules
-          key: ${{ needs.job_install_dependencies.outputs.dependency_cache_key }}
       - name: Check build cache
         uses: actions/cache@v2
         id: cache_built_packages
@@ -61,11 +39,12 @@ jobs:
         if: steps.cache_built_packages.outputs.cache-hit != 'true'
         run: npm run build
     outputs:
-      dependency_cache_key: ${{ needs.job_install_dependencies.outputs.dependency_cache_key }}
+      dependency_cache_key: ${{ steps.compute_lockfile_hash.outputs.hash }}
+      dependency_build_cache_key: ${{ needs.job_install_dependencies.outputs.dependency_cache_key }}
 
   release:
     name: Release
-    needs: job_build
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - name: Check out current commit (${{ github.sha }})
