@@ -1,3 +1,10 @@
+# [1.1.0-beta.17](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.16...v1.1.0-beta.17) (2021-05-22)
+
+
+### Features
+
+* add caching job to github action workflow ([#546](https://github.com/spaceone-dev/spaceone-design-system/issues/546)) ([78f6bc0](https://github.com/spaceone-dev/spaceone-design-system/commit/78f6bc09494d56ea6a22179d6003d7bb7375d54c))
+
 # [1.1.0-beta.16](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.15...v1.1.0-beta.16) (2021-05-21)
 
 
