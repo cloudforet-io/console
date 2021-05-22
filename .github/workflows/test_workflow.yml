@@ -6,10 +6,6 @@ on:
       - master
       - beta
       - "[0-9]+.[0-9]+.[0-9]+*"
-env:
-  CACHED_DEPENDENCY_PATHS:
-  CACHED_BUILD_PATHS:
-  BUILD_CACHE_KEY:
 
 jobs:
   job_install_dependencies:
@@ -19,22 +15,26 @@ jobs:
     steps:
       - name: Check out current commit (${{ github.sha }})
         uses: actions/checkout@v2
+
       - name: Set up Node
         uses: actions/setup-node@v1
-      - name: Cache node modules
-        id: node-cache
-        uses: actions/cache@v1
+
+      - name: Compute dependency cache key
+        id: compute_lockfile_hash
+        run: echo "::set-output name=hash::${{ hashFiles('package-lock.json') }}"
+
+      - name: Check dependency cache
+        uses: actions/cache@v2
+        id: cache_dependencies
         with:
-          path: node_modules
-          key: $ {{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            $ {{ runner.OS }}-build-
-            $ {{ runner.OS }}-
+          path: ${{ github.workspace }}/node_modules
+          key: ${{ steps.compute_lockfile_hash.outputs.hash }}
+
       - name: Install dependencies
-        if: steps.node-cache.outputs.cache-hit != 'true'
+        if: steps.cache_dependencies.outputs.cache-hit == ''
         run: npm install
     outputs:
-      dependency_cache_key: ${{ steps.node-cache.outputs.hash }}
+      dependency_cache_key: ${{ steps.compute_lockfile_hash.outputs.hash }}
 
   job_build:
     name: Build
