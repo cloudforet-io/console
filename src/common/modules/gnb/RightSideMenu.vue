@@ -1,7 +1,7 @@
 <template>
     <div class="right-side-menu">
         <div class="menu-wrapper">
-            <div v-if="!userState.isDomainOwner" class="menu-button code" :class="{'new-icon':isNewIconVisible}"
+            <div v-if="!userState.isDomainOwner" class="menu-button code" :class="{'new-icon':!isNewIconHidden}"
                  @click="hideNewIcon"
             >
                 <router-link :to="{ name: 'userAPIKey' }">
@@ -9,7 +9,7 @@
                          name="ic_code"
                     />
                 </router-link>
-                <g-n-b-new-icon v-if="isNewIconVisible" />
+                <g-n-b-new-icon v-if="!isNewIconHidden" />
             </div>
         </div>
         <div class="menu-wrapper">
@@ -137,7 +137,7 @@ export default {
             languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
                 label: v, name: k,
             }))),
-            isNewIconVisible: computed(() => store.getters['settings/getItem']('new_menu_icon', '/gnb')),
+            isNewIconHidden: store.getters['settings/getItem']('hide_new_icon', '/gnb'),
         });
         const userState = reactive({
             name: computed(() => store.state.user.name),
@@ -168,16 +168,15 @@ export default {
         const toggleLanguageMenu = () => {
             state.showLanguageMenu = !state.showLanguageMenu;
         };
-        const hideNewIcon = () => {
-            store.dispatch('settings/setItem', {
-                key: 'new_menu_icon',
-                value: false,
+        const hideNewIcon = async () => {
+            state.isNewIconHidden = true;
+            await store.dispatch('settings/setItem', {
+                key: 'hide_new_icon',
+                value: true,
                 path: '/gnb',
             });
         };
-        watch(() => store.getters['settings/getItem']('new_menu_icon', '/gnb'), (after) => {
-            if (after) state.isNewIconVisible = after;
-        });
+
 
         /* action */
         const signOut = async () => {
