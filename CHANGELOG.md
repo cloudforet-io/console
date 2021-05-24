@@ -1,3 +1,10 @@
+# [1.1.0-beta.22](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.21...v1.1.0-beta.22) (2021-05-24)
+
+
+### Features
+
+* add animation to status and icon button ([#555](https://github.com/spaceone-dev/spaceone-design-system/issues/555)) ([cd79918](https://github.com/spaceone-dev/spaceone-design-system/commit/cd799182048bbe89d081459da79946eac1e2c6f9))
+
 # [1.1.0-beta.21](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.20...v1.1.0-beta.21) (2021-05-24)
 
 
