@@ -333,6 +333,7 @@ export default {
                 { key: 'name', name: 'Name' },
                 { key: 'state', name: 'State' },
                 { key: 'user_type', name: 'Access Control' },
+                { key: 'api_key_count', name: 'API Key' },
                 { key: 'role_bindings.role_info.name', name: 'Role' },
                 { key: 'backend', name: 'Auth Type' },
                 { key: 'last_accessed_at', name: 'Last Activity', type: 'datetime' },

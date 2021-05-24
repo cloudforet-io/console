@@ -54,6 +54,15 @@
                 {{ $t('IDENTITY.USER.MAIN.HANDBOOK_DESC_3-2') }}
             </p>
             <p-raw-data :raw="codeBlock.helpCode" class="code-block" />
+            <p class="desc">
+                <i18n path="IDENTITY.USER.MAIN.HANDBOOK_DESC_3-3">
+                    <template #document>
+                        <p-anchor :href="githubLink" target="_blank" class="link">
+                            {{ $t('IDENTITY.USER.MAIN.HANDBOOK_DESC_1_DOC') }}
+                        </p-anchor>
+                    </template>
+                </i18n>
+            </p>
         </article>
     </section>
 </template>
@@ -106,6 +115,7 @@ export default {
     line-height: 150%;
 }
 .sub-title {
+    @apply font-bold;
     margin-top: 0.5rem;
     line-height: 150%;
 }
