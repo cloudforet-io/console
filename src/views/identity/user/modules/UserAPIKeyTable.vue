@@ -273,24 +273,24 @@ export default {
 
         const onClickEnable = async () => {
             checkModalState.mode = 'enable';
-            checkModalState.title = vm.$t('IDENTITY.USER.MAIN.ENABLE_MODAL_TITLE') as string;
-            checkModalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.ENABLE_MODAL_DESC', state.selectedIndex.length);
+            checkModalState.title = vm.$t('IDENTITY.USER.MAIN.API_KEY_ENABLE_MODAL_TITLE') as string;
+            checkModalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.API_KEY_ENABLE_MODAL_DESC', state.selectedIndex.length);
             checkModalState.themeColor = 'safe';
             checkModalState.visible = true;
         };
 
         const onClickDisable = async () => {
             checkModalState.mode = 'disable';
-            checkModalState.title = vm.$t('IDENTITY.USER.MAIN.DISABLE_MODAL_TITLE') as string;
-            checkModalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DISABLE_MODAL_DESC', state.selectedIndex.length);
+            checkModalState.title = vm.$t('IDENTITY.USER.MAIN.API_KEY_DISABLE_MODAL_TITLE') as string;
+            checkModalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.API_KEY_DISABLE_MODAL_DESC', state.selectedIndex.length);
             checkModalState.themeColor = 'alert';
             checkModalState.visible = true;
         };
 
         const onClickDelete = async () => {
             checkModalState.mode = 'delete';
-            checkModalState.title = vm.$t('IDENTITY.USER.MAIN.DELETE_MODAL_TITLE') as string;
-            checkModalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.DELETE_MODAL_DESC', state.selectedIndex.length);
+            checkModalState.title = vm.$t('IDENTITY.USER.MAIN.API_KEY_DELETE_MODAL_TITLE') as string;
+            checkModalState.subTitle = vm.$tc('IDENTITY.USER.MAIN.API_KEY_DELETE_MODAL_DESC', state.selectedIndex.length);
             checkModalState.themeColor = 'alert';
             checkModalState.visible = true;
         };

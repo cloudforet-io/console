@@ -1,13 +1,15 @@
 <template>
     <div class="right-side-menu">
         <div class="menu-wrapper">
-            <div v-if="!userState.isDomainOwner" class="menu-button code">
+            <div v-if="!userState.isDomainOwner" class="menu-button code" :class="{'new-icon':isNewIconVisible}"
+                 @click="hideNewIcon"
+            >
                 <router-link :to="{ name: 'userAPIKey' }">
-                    <p-i class="menu-icon"
+                    <p-i class="menu-icon code"
                          name="ic_code"
                     />
                 </router-link>
-                <g-n-b-new-icon />
+                <g-n-b-new-icon v-if="isNewIconVisible" />
             </div>
         </div>
         <div class="menu-wrapper">
@@ -98,7 +100,7 @@
 import vClickOutside from 'v-click-outside';
 
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PAnchor, PI, PDivider } from '@spaceone/design-system';
@@ -135,6 +137,7 @@ export default {
             languageMenu: computed(() => Object.entries(languages).map(([k, v]) => ({
                 label: v, name: k,
             }))),
+            isNewIconVisible: computed(() => store.getters['settings/getItem']('new_menu_icon', '/gnb')),
         });
         const userState = reactive({
             name: computed(() => store.state.user.name),
@@ -165,6 +168,16 @@ export default {
         const toggleLanguageMenu = () => {
             state.showLanguageMenu = !state.showLanguageMenu;
         };
+        const hideNewIcon = () => {
+            store.dispatch('settings/setItem', {
+                key: 'new_menu_icon',
+                value: false,
+                path: '/gnb',
+            });
+        };
+        watch(() => store.getters['settings/getItem']('new_menu_icon', '/gnb'), (after) => {
+            if (after) state.isNewIconVisible = after;
+        });
 
         /* action */
         const signOut = async () => {
@@ -195,6 +208,7 @@ export default {
             toggleMenu,
             openProfile,
             toggleLanguageMenu,
+            hideNewIcon,
         };
     },
 };
@@ -219,9 +233,12 @@ export default {
                 @apply text-primary;
                 opacity: 1;
             }
-
             &.code {
-                margin-right: 1rem;
+              margin-right: 1.5rem;
+            }
+
+            &.new-icon {
+                margin-right: 0.5rem;
             }
             &.account {
                 margin-left: 1.5rem;
