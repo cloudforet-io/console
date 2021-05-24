@@ -164,8 +164,13 @@ export default {
             dateAxis.renderer.labels.template.fill = am4core.color(gray[600]);
             dateAxis.renderer.cellStartLocation = 0.3;
             dateAxis.renderer.cellEndLocation = 0.7;
-            dateAxis.renderer.grid.template.stroke = am4core.color(gray[300]);
+            dateAxis.renderer.grid.template.stroke = am4core.color(gray[500]);
             dateAxis.renderer.labels.template.adapter.add('text', (text, target) => dayjs.utc(target.dataItem.category).format('M/D'));
+            dateAxis.renderer.labels.template.adapter.add('fill', (fill, target) => {
+                const today = dayjs.utc().format('YYYY-MM-DD');
+                if (target.dataItem.category === today) return am4core.color(gray[900]);
+                return am4core.color(gray[600]);
+            });
             dateAxis.renderer.grid.template.adapter.add('strokeOpacity', (strokeOpacity, target) => {
                 const today = dayjs.utc().format('YYYY-MM-DD');
                 if (target.dataItem.category === today) return 1;
