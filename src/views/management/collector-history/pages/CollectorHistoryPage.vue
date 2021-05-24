@@ -64,7 +64,7 @@
                     </div>
                 </template>
             </p-toolbox-table>
-            <div v-if="!loading && items.length > 0" class="pagination">
+            <div v-if="items.length > 0" class="pagination">
                 <p-pagination :total-count="totalCount"
                               :this-page.sync="thisPage"
                               :page-size.sync="pageSize"
