@@ -8,11 +8,11 @@
     >
         <template #body>
             <article class="alert-wrapper">
-                <p-i name="ic_state_duplicated" width="0.75rem" height="0.75rem"
-                     class="alert-icon"
-                />
-                <span class="alert-message">{{ $t('IDENTITY.USER.MAIN.API_KEY_ALERT_MSG_1') }}
-                    <br> <span class="text-red-500 font-bold">{{ $t('IDENTITY.USER.MAIN.API_KEY_ALERT_MSG_2') }}</span> {{ $t('IDENTITY.USER.MAIN.API_KEY_ALERT_MSG_3') }}
+                <span class="alert-message">
+                    <p-i name="ic_state_duplicated" width="0.75rem" height="0.75rem"
+                         class="alert-icon"
+                    />
+                    {{ $t('IDENTITY.USER.MAIN.API_KEY_ALERT_MSG') }}
                 </span>
             </article>
             <p-pane-layout class="box-wrapper">
@@ -39,9 +39,23 @@
             <p-pane-layout class="box-wrapper">
                 <span class="box-header">
                     {{ $t('IDENTITY.USER.MAIN.API_KEY_SPACECTL') }}
+                    <div class="box-header-desc">
+                        <p-i name="ic_outlined-info"
+                             width="1rem" height="1rem"
+                             color="inherit"
+                             class="info-icon"
+                        />
+                        <p>{{ $t('IDENTITY.USER.MAIN.API_KEY_SPACECTL_DESC') }}
+                            <span class="text">
+                                <p-anchor :href="githubLink" target="_blank">
+                                    {{ $t('IDENTITY.USER.MAIN.API_KEY_GIT') }}
+                                </p-anchor>
+                            </span>
+                        </p>
+                    </div>
                 </span>
                 <p class="box-contents">
-                    Spacectl configuration
+                    {{ $t('IDENTITY.USER.MAIN.API_KEY_SPACECTL_CONFIG') }}
                     <p-collapsible-toggle :is-collapsed.sync="isSpacectlCollapsed" class="collapsible-toggle">
                         {{ isSpacectlCollapsed ? $t('IDENTITY.USER.MAIN.API_KEY_SHOW') : $t('IDENTITY.USER.MAIN.API_KEY_HIDE') }}
                     </p-collapsible-toggle>
@@ -63,7 +77,7 @@
 
 <script lang="ts">
 import {
-    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PRawData, PIconTextButton,
+    PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PRawData, PIconTextButton, PAnchor,
 } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
@@ -89,6 +103,7 @@ export default {
         PCollapsibleToggle,
         PRawData,
         PIconTextButton,
+        PAnchor,
     },
     props: {
         visible: {
@@ -111,6 +126,7 @@ export default {
             isSpacectlCollapsed: true,
             apiItem: {} as APIItem,
             yamlItem: '',
+            githubLink: 'https://github.com/spaceone-dev/spacectl',
         });
 
         const onClickDownloadFile = (fileType: FileType) => {
@@ -161,10 +177,10 @@ export default {
 <style lang="postcss" scoped>
 .alert-wrapper {
     @apply bg-blue-200;
-    max-width: 33.5rem;
+    max-width: 46rem;
     min-height: 3.625rem;
     border-radius: 0.125rem;
-    padding: 0.5rem 1rem 0.5rem 2rem;
+    padding: 0.5rem 1rem;
     text-align: left;
     margin-bottom: 1rem;
 }
@@ -174,11 +190,16 @@ export default {
 }
 .alert-message {
     @apply text-gray-900;
+    display: flex;
     font-size: 0.875rem;
     line-height: 150%;
+    .alert-icon {
+        flex-shrink: 0;
+        margin: 0.3125rem 0.125rem auto 0;
+    }
 }
 .box-wrapper {
-    max-width: 33.5rem;
+    max-width: 46rem;
     min-height: 12rem;
     margin-bottom: 1rem;
     text-align: left;
@@ -187,6 +208,23 @@ export default {
 .box-header {
     font-size: 1.125rem;
     line-height: 155%;
+}
+.box-header-desc {
+    @apply text-gray-700;
+    display: flex;
+    font-size: 0.875rem;
+    line-height: 150%;
+    align-items: center;
+    margin-top: 0.5rem;
+    .info-icon {
+        flex-shrink: 0;
+        align-self: flex-start;
+        margin: 3px 0.25rem auto 0;
+    }
+    .text {
+        @apply text-blue-500;
+        display: inline-flex;
+    }
 }
 .box-contents {
     @apply font-bold;
