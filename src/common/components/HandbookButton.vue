@@ -19,19 +19,14 @@
         </portal>
         <portal to="handbook-contents">
             <div class="handbook-contents">
-                <p-tab v-if="tabs.length > 0" :tabs="tabs" :active-tab.sync="proxyActiveTab">
+                <p-tab :tabs="tabs" :active-tab.sync="proxyActiveTab">
                     <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                         <div :key="slot">
                             <slot :name="slot" v-bind="scope" />
                         </div>
                     </template>
                 </p-tab>
-                <div v-else class="single-content">
-                    <div>
-                        <slot name="default" />
-                    </div>
-                </div>
-                <div class="anymore">
+                <div class="no-more">
                     <p-check-box v-model="noMore" :value="true" @change="onChangeNoMore">
                         {{ $t('COMMON.HANDBOOK_BUTTON.DONT_DISPLAY') }}
                     </p-check-box>
@@ -113,19 +108,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-@define-mixin handbook-layout {
-    position: relative;
-    z-index: 1;
-    flex-grow: 1;
-    margin-bottom: 1rem;
-    border-radius: 0 0 1.25rem 0;
-    background-color: theme('colors.white');
-
-    @screen lg {
-        margin-bottom: 2rem;
-    }
-}
-
 .handbook-button {
     @apply inline-flex items-center text-gray-700;
     margin-right: 20px;
@@ -143,66 +125,65 @@ export default {
     }
 }
 
-.handbook-title {
-    @apply text-center ml-8;
-}
-
 .handbook-contents {
     @apply relative flex h-full flex-col;
-
     &::before {
-        content: '';
-
         @apply absolute block bg-blue-300;
         width: 93.63%;
         height: 8.75rem;
-        bottom: 5.225rem;
+        bottom: 1.75rem;
         left: 0.589375rem;
         opacity: 0.5;
         border-radius: 0 0 1.25rem 0;
         transform: matrix(1, 0.05, -0.02, 1, 0, 0);
-    }
-    .single-content {
-        @mixin handbook-layout;
-        padding: 1.5625rem 0.875rem 2.5rem;
+        content: '';
     }
     .p-tab::v-deep {
-        @apply border-0;
+        @apply relative flex-grow border-0;
+        z-index: 1;
+        margin-bottom: 1rem;
+        border-radius: 0 0 1.25rem 0;
+        background-color: theme('colors.white');
 
-        @mixin handbook-layout;
         .p-tab-bar {
             @apply bg-secondary-2;
         }
+        .is-single {
+            display: none;
+        }
         .tab-pane {
-            padding: 1.5625rem 1.25rem 2.5rem;
+            padding: 0 1.25rem;
+            margin-top: 1.5rem;
+            margin-bottom: 2.5rem;
         }
     }
-    .anymore {
+    .no-more {
         margin-top: auto;
     }
 }
 
 @screen lg {
+    .handbook-title {
+        @apply text-center ml-8;
+    }
     .handbook-contents {
-        height: calc(100vh - 3rem - 3rem - 2.25rem - 1rem);
-        .single-content::v-deep {
-            height: calc(100% - 3.75rem - 2rem);
-            > div {
-                overflow: auto;
-                height: 100%;
-            }
+        @apply overflow-auto;
+        height: calc(100vh - 9.25rem);
+        &::before {
+            bottom: 5.225rem;
         }
         .p-tab::v-deep {
+            margin-bottom: 2rem;
+            .is-single + .tab-pane {
+                height: calc(100% - 4rem);
+            }
             .tab-pane {
-                height: calc(100% - 2.75rem);
-                > div {
-                    overflow: auto;
-                    height: 100%;
-                }
+                @apply overflow-auto;
+                height: calc(100% - 6.8125rem);
             }
         }
     }
-    .anymore {
+    .no-more {
         margin-bottom: 2.5rem;
     }
 }
