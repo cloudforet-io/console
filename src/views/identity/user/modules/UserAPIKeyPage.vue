@@ -8,16 +8,10 @@
                 <handbook-button :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab"
                                  type="identity/user/api-key"
                 >
-                    <template #tab1>
+                    <template #spacectl>
                         <keep-alive>
-                            <p>test</p>
+                            <user-a-p-i-key-handbook />
                         </keep-alive>
-                    </template>
-                    <template #tab2>
-                        <p> this tab is</p>
-                    </template>
-                    <template #tab3>
-                        <p> this tab is</p>
                     </template>
                 </handbook-button>
             </template>
@@ -51,6 +45,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import UserAPIKeyTable from '@/views/identity/user/modules/UserAPIKeyTable.vue';
 import { store } from '@/store';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import UserAPIKeyHandbook from '@/views/identity/user/modules/UserAPIKeyHandbook.vue';
 
 interface EndpointItem {
     endpoint: string;
@@ -65,6 +60,7 @@ export default {
     components: {
         HandbookButton,
         UserAPIKeyTable,
+        UserAPIKeyHandbook,
         PPaneLayout,
         PBreadcrumbs,
         PDataTable,
@@ -93,9 +89,9 @@ export default {
         });
         const tabState = reactive({
             tabs: computed(() => ([
-                { name: 'tab1', label: 'Spacectl', keepAlive: true },
+                { name: 'spacectl', label: 'Spacectl', keepAlive: true },
             ] as TabItem[])),
-            activeTab: 'tab1',
+            activeTab: 'spacectl',
         });
         const listEndpoints = async () => {
             state.loading = true;
