@@ -133,10 +133,9 @@ export default {
         max-width: 32rem;
         min-height: 12.875rem;
         max-height: calc(100vh - 4rem);
-        overflow: auto;
         &.md {
             min-width: 25rem;
-            max-width: 37.5rem;
+            max-width: 50rem;
             min-height: 12.875rem;
         }
     }
@@ -212,8 +211,16 @@ export default {
                 margin-bottom: 0.25rem;
             }
         }
+
+        $header-height: 14rem;
+        $footer-height: 6.9rem;
+        $wrapper-margin: 4rem;
+        $body-max-height: calc(100vh - $(header-height) - $(footer-height) - $(wrapper-margin));
+
         .body-wrapper {
             margin-bottom: 1.5rem;
+            overflow: auto;
+            max-height: $body-max-height;
         }
     }
 }
