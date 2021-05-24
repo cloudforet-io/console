@@ -48,7 +48,7 @@
                         <p>{{ $t('IDENTITY.USER.MAIN.API_KEY_SPACECTL_DESC') }}
                             <span class="text">
                                 <p-anchor :href="githubLink" target="_blank">
-                                    {{ $t('IDENTITY.USER.MAIN.API_KEY_GIT') }}
+                                    {{ $t('IDENTITY.USER.MAIN.API_KEY_VIEW_MORE') }}
                                 </p-anchor>
                             </span>
                         </p>
@@ -137,7 +137,7 @@ export default {
             const a = document.createElement('a');
             a.href = url;
             if (fileType === FileType.JSON) a.download = 'api_key';
-            if (fileType === FileType.YAML) a.download = 'spacectl';
+            if (fileType === FileType.YAML) a.download = 'spacectl_config';
             a.click();
             a.remove();
         };
