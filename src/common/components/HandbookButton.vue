@@ -1,8 +1,8 @@
 <template>
     <fragment>
-        <button style-type="primary"
-                class="handbook-button"
-                @click="$store.dispatch('display/showHandbook')"
+        <span style-type="primary"
+              class="handbook-button"
+              @click="$store.dispatch('display/showHandbook')"
         >
             <p-i name="ic_help"
                  width="0.875rem" height="0.875rem"
@@ -11,7 +11,7 @@
             <span class="text">
                 <slot name="button">{{ $t('COMMON.HANDBOOK_BUTTON.HANDBOOK') }}</slot>
             </span>
-        </button>
+        </span>
         <portal to="handbook-title">
             <p class="handbook-title">
                 {{ $t('COMMON.HANDBOOK_BUTTON.HANDBOOK') }}
@@ -126,14 +126,6 @@ export default {
     }
 }
 
-@define-mixin handbook-height {
-    height: calc(100% - 2.75rem - 1.5625rem - 2.5rem);
-    > div {
-        overflow: auto;
-        height: 100%;
-    }
-}
-
 .handbook-button {
     @apply inline-flex items-center text-gray-700;
     margin-right: 20px;
@@ -152,7 +144,7 @@ export default {
 }
 
 .handbook-title {
-    @apply text-center ml-4;
+    @apply text-center ml-8;
 }
 
 .handbook-contents {
@@ -182,9 +174,7 @@ export default {
             @apply bg-secondary-2;
         }
         .tab-pane {
-            padding: 0 1.25rem;
-            margin-top: 1.5625rem;
-            margin-bottom: 2.5rem;
+            padding: 1.5625rem 1.25rem 2.5rem;
         }
     }
     .anymore {
@@ -195,13 +185,21 @@ export default {
 @screen lg {
     .handbook-contents {
         height: calc(100vh - 3rem - 3rem - 2.25rem - 1rem);
-    }
-    .p-tab::v-deep {
-        .tab-pane {
-            @mixin handbook-height;
+        .single-content::v-deep {
+            height: calc(100% - 3.75rem - 2rem);
+            > div {
+                overflow: auto;
+                height: 100%;
+            }
         }
-        .single-content {
-            @mixin handbook-height;
+        .p-tab::v-deep {
+            .tab-pane {
+                height: calc(100% - 2.75rem);
+                > div {
+                    overflow: auto;
+                    height: 100%;
+                }
+            }
         }
     }
     .anymore {
