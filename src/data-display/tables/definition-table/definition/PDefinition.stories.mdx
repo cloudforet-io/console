@@ -128,32 +128,6 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-## Description
-
-<br/>
-
-### Slots
-| Slot name | Description |
-| ---- | ----------- |
-| default | Slot for replacing definition text. |
-| copy | Slot for replacing copy button. |
-
-<br/>
-
-### SlotScope(Props)
-| Type | Description |
-| ---- | ----------- |
-| all Props | name, label, data, disableCopy, formatter |
-| field | 'td' element that wrapping definition text. |
-| displayData | actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'. |
-| showCopy | boolean value that indicates whether show copy or not. it's related the value of 'displayData', 'disableCopy', and field element's innerText. |
-| copy | function that invoked when copy button is clicked. |
-| isMouseOver | boolean value that indicates whether copy button is mouse over or out. |
-| onMouseOver | function that invoked when copy button is mouse over. |
-| onMouseOut | function that invoked when copy button is mouse out. |
-
-
-<br/>
 
 ## Basic
 <Canvas>
@@ -249,3 +223,29 @@ export const Template = (args, { argTypes }) => ({
 </Canvas>
 
 <ArgsTable story="playground" />
+
+<br/>
+
+## Description
+
+<br/>
+
+### Slots
+| Slot name | Description |
+| ---- | ----------- |
+| default | Slot for replacing definition text. |
+| copy | Slot for replacing copy button. |
+
+<br/>
+
+### SlotScope(Props)
+| Type | Description |
+| ---- | ----------- |
+| all Props | name, label, data, disableCopy, formatter |
+| field | 'td' element that wrapping definition text. |
+| displayData | actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'. |
+| showCopy | boolean value that indicates whether show copy or not. it's related the value of 'displayData', 'disableCopy', and field element's innerText. |
+| copy | function that invoked when copy button is clicked. |
+| isMouseOver | boolean value that indicates whether copy button is mouse over or out. |
+| onMouseOver | function that invoked when copy button is mouse over. |
+| onMouseOut | function that invoked when copy button is mouse out. |

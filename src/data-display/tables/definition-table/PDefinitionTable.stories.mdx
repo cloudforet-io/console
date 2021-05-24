@@ -1,0 +1,202 @@
+import { reactive, toRefs } from '@vue/composition-api';
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PDefinitionTable from '@/data-display/tables/definition-table/PDefinitionTable';
+
+<Meta title='Data Display/Tables/Definition Table' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5373%3A6989',
+    }
+}} component={ PDefinitionTable } argTypes={{
+    fields: {
+        name: 'fields',
+        type: { name: 'array' },
+        description: 'Fields of definition table.',
+        defaultValue: [
+            { label: 'Id', name: 'collector_id' },
+            { label: 'Name', name: 'name' },
+            { label: 'Provider', name: 'provider' },
+        ],
+        table: {
+            type: {
+                summary: 'array'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '[]'
+            }
+        },
+        control: {
+            type: 'object',
+        },
+    },
+    data: {
+        name: 'data',
+        type: { name: 'object' },
+        description: 'Data object of definition table.',
+        defaultValue: {
+            collector_id: 'collector-6746d641c98b',
+            name: 'collector name',
+            provider: 'aws',
+        },
+        table: {
+            type: {
+                summary: 'object',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: 'object',
+        },
+    },
+    loading: {
+        name: 'loading',
+        type: {name: 'boolean'},
+        description: 'Loading.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    skeletonRows: {
+        name: 'skeletonRows',
+        type: { name: 'number' },
+        description: 'Rows of skeletons',
+        defaultValue: 5,
+        table: {
+            type: {
+                summary: 'number',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 5,
+            }
+        },
+        control: {
+            type: 'number'
+        }
+    },
+}}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDefinitionTable },
+    template: `
+<p-definition-table
+    :fields="fields"
+    :data="data"
+    :loading="loading"
+    :skeleton-rows="skeletonRows"
+/>`,
+    setup() {
+        return {
+        }
+    }
+});
+
+
+# Definition
+
+<br/>
+<br/>
+<br/>
+
+
+## Basic
+<Canvas>
+    <Story name="basic definition table">
+        {{
+            components: { PDefinitionTable },
+            template: `
+<p-definition-table
+    :fields="fields"
+    :data="data"
+/>
+`,
+            setup() {
+                const state = reactive({
+                    fields: [
+                        { label: 'Id', name: 'collector_id' },
+                        { label: 'Name', name: 'name' },
+                        { label: 'Provider', name: 'provider' },
+                    ],
+                    data: {
+                        collector_id: 'collector-6746d641c98b',
+                        name: 'collector name',
+                        provider: 'aws',
+                    }
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+
+## No Data
+<Canvas>
+    <Story name="no data definition table">
+        {{
+            components: { PDefinitionTable },
+            template: `
+<p-definition-table />
+`,
+        }}
+    </Story>
+</Canvas>
+
+## Playground
+<Canvas>
+    <Story name="playground" >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground" />
+
+<br/>
+
+## Description
+
+<br/>
+
+### Slots
+| Slot name | Description |
+| ---- | ----------- |
+| data-{field index} | Slot for definition field. |
+| data-{field.name} | Slot for definition field. Use it only when all field names are distinct. Otherwise, it can cause unexpected error. It's useful when field names are duplicated. * Don't use 'data-{field.name}' slot together. It can cause multiple definition field. |
+| no-data | Slot for no data case. |
+| copy | Slot for all copy button. It replaces all copy button. |
+| copy-{field index} | Slot for field's copy button. |
+| copy-{field.name} | Slot for field's copy button. Use it only when all field names are distinct. Otherwise, it can cause unexpected error. |
+
+<br/>
+
+### SlotScope(Props)
+* Except for 'no-data' slot, all slots provide slot props.
+
+| Type | Description |
+| ---- | ----------- |
+| all Props | name, label, data, disableCopy, formatter |
+| field | 'td' element that wrapping definition text. |
+| displayData | actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'. |
+| showCopy | boolean value that indicates whether show copy or not. it's related the value of 'displayData', 'disableCopy', and field element's innerText. |
+| copy | function that invoked when copy button is clicked. |
+| isMouseOver | boolean value that indicates whether copy button is mouse over or out. |
+| onMouseOver | function that invoked when copy button is mouse over. |
+| onMouseOut | function that invoked when copy button is mouse out. |
