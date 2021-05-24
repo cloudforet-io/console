@@ -2,25 +2,17 @@
     <p-button
         class="p-icon-button"
         :class="[activated ? 'activated' : '', shape, size]"
-        :loading="loading"
         :style-type="styleType"
         :outline="outline"
         :disabled="disabled"
         v-on="$listeners"
     >
         <slot>
-            <p-lottie v-if="loading"
-                      class="spinner"
-                      name="thin-spinner"
-                      :width="width"
-                      :height="height"
-                      auto
-            />
-            <p-i v-else
-                 :name="name"
+            <p-i :name="name"
                  :width="width"
                  :height="height"
                  :color="color"
+                 :animation="animation"
             />
         </slot>
     </p-button>
@@ -35,6 +27,7 @@ import PLottie from '@/foundation/lottie/PLottie.vue';
 import {
     ICON_BUTTON_SHAPE, ICON_BUTTON_SIZE, ICON_BUTTON_STYLE_TYPE, IconButtonProps,
 } from '@/inputs/buttons/icon-button/type';
+import { ANIMATION_TYPE } from '@/foundation/icons/config';
 
 
 export default defineComponent({
@@ -44,10 +37,6 @@ export default defineComponent({
         name: {
             type: String,
             default: '',
-        },
-        loading: {
-            type: Boolean,
-            default: false,
         },
         styleType: {
             type: String,
@@ -79,6 +68,13 @@ export default defineComponent({
             type: String,
             default: 'circle',
             validator: value => Object.keys(ICON_BUTTON_SHAPE).includes(value as string),
+        },
+        animation: {
+            type: String,
+            default: undefined,
+            validator(animation: any) {
+                return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
+            },
         },
     },
     setup(props: IconButtonProps) {

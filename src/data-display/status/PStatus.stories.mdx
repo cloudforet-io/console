@@ -3,13 +3,14 @@ import PStatus from '@/data-display/status/PStatus.vue';
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import { themes } from '@/data-display/status/config';
 import { names } from '@/foundation/lottie/p-lotties/names';
+import {ANIMATION_TYPE } from '@/foundation/icons/config';
 
 <Meta title='Data Display/Status' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124044',
     }
-}} component={ PStatus } argTypes={{
+}} argTypes={{
     theme: {
         name: 'theme',
         type: {name: 'string'},
@@ -156,7 +157,26 @@ import { names } from '@/foundation/lottie/p-lotties/names';
         control: {
             type: 'number'
         }
-    }
+    },
+    iconAnimation: {
+        name: 'iconAnimation',
+        type: { name: 'string' },
+        description: `Animation type. ${Object.values(ANIMATION_TYPE).map(d => `'${d}'`)} are available.`,
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(ANIMATION_TYPE)
+        },
+    },
 }}
 />
 
@@ -174,6 +194,7 @@ export const Template = (args, { argTypes }) => ({
         :disable-icon="disableIcon"
         :lottie="lottie"
         :icon-size="iconSize"
+        :icon-animation="iconAnimation"
     />
 </div>`,
     setup() {
@@ -230,7 +251,7 @@ export const Template = (args, { argTypes }) => ({
                     <p-status icon="ic_state_active" text="Enabled" style="margin: 1rem" />
                     <p-status icon="ic_state_disconnected" text="Disconnected" style="margin: 1rem" />
                     <p-status icon="ic_state_duplicated" text="Duplicated" style="margin: 1rem" />
-                    <p-status icon="ic_state_manual" text="Manual" style="margin: 1rem" />
+                    <p-status icon="ic_state_manual" text="Manual" style="margin: 1rem" icon-animation="spin" />
                 </div>`,
         }}
     </Story>

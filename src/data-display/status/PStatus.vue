@@ -4,6 +4,7 @@
         <span v-else-if="isFortAwesome" class="fort-awesome"><i :class="icon.split(' ')" /></span>
         <p-i v-else-if="icon" :name="icon"
              :height="`${iconSize}rem`" :width="`${iconSize}rem`"
+             :animation="iconAnimation"
         />
         <span v-else-if="!disableIcon" class="circle" />
         <p-label class="label">
@@ -15,6 +16,7 @@
         <span v-else-if="isFortAwesome" :style="{color:realIconColor||null}"><i :class="icon.split(' ')" /></span>
         <p-i v-else-if="icon" :name="icon"
              :color="realIconColor ? realIconColor : undefined"
+             :animation="iconAnimation"
              :height="`${iconSize}rem`" :width="`${iconSize}rem`"
         />
         <span v-else-if="!disableIcon" class="circle" :style="{
@@ -39,6 +41,7 @@ import { getColor } from '@/util/helpers';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import '@/styles/fontawesome.scss';
 import { themes } from '@/data-display/status/config';
+import { ANIMATION_TYPE } from '@/foundation/icons/config';
 
 const fontAwesomePrefix = RegExp('fa-');
 
@@ -80,6 +83,13 @@ export default {
         iconSize: {
             type: Number,
             default: 1,
+        },
+        iconAnimation: {
+            type: String,
+            default: undefined,
+            validator(animation: any) {
+                return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
+            },
         },
     },
     setup(props: StatusProps) {

@@ -2,13 +2,14 @@ import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PIconButton from "@/inputs/buttons/icon-button/PIconButton";
 import { ICON_BUTTON_SHAPE, ICON_BUTTON_STYLE_TYPE } from "@/inputs/buttons/icon-button/type";
 import icon from 'vue-svgicon';
+import {ANIMATION_TYPE } from '@/foundation/icons/config';
 
 <Meta title='Inputs/Buttons/IconButton' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5110%3A120777',
     }
-}} component={ PIconButton } argTypes={{
+}} argTypes={{
     name: {
         name: 'name',
         type: {name: 'string'},
@@ -27,24 +28,6 @@ import icon from 'vue-svgicon';
             type: 'select',
             options: Object.keys(icon.icons),
         },
-    },
-    loading: {
-        name: 'loading',
-        type: {name: 'boolean'},
-        description: 'Loading when true',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: false,
-            }
-        },
-        control: {
-            type: 'boolean',
-        }
     },
     styleType: {
         name: 'styleType',
@@ -175,6 +158,25 @@ import icon from 'vue-svgicon';
             type: 'text'
         }
     },
+    animation: {
+        name: 'animation',
+        type: { name: 'string' },
+        description: `Animation type. ${Object.values(ANIMATION_TYPE).map(d => `'${d}'`)} are available.`,
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(ANIMATION_TYPE)
+        },
+    },
     //
     default: {
         name: 'default',
@@ -202,7 +204,6 @@ export const Template = (args, { argTypes }) => ({
         <div style="display:flex; align-items:center; justify-content:center; height:150px;">
             <p-icon-button
                 :name="name"
-                :loading="loading"
                 :style-type="styleType"
                 :color="color"
                 :disabled="disabled"
@@ -210,6 +211,7 @@ export const Template = (args, { argTypes }) => ({
                 :outline="outline"
                 :size="size"
                 :shape="shape"
+                :animation="animation"
             />
         </div>
     `,
@@ -227,6 +229,7 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 
 ## Size
+
 <Canvas>
     <Story name="size">
         {{
@@ -240,6 +243,9 @@ export const Template = (args, { argTypes }) => ({
         }}
     </Story>
 </Canvas>
+
+<br/>
+<br/>
 
 ## Style Type
 <Canvas>
@@ -284,6 +290,8 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
+<br/>
+<br/>
 
 ## Disabled
 
@@ -303,27 +311,29 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
+<br/>
+<br/>
 
-## Loading
+## Animation
 
 <Canvas>
-    <Story name="loading">
+    <Story name="Animation">
         {{
             components:{ PIconButton },
             template: `
                 <div style="text-align:center">
-                    <p-icon-button style-type="primary" style="margin: 1rem" name="ic_refresh" />
-                    <p-icon-button style-type="primary" :loading="true" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="primary" animation="spin" style="margin: 1rem" name="ic_refresh" />
                     <br>
-                    <p-icon-button style-type="transparent" style="margin: 1rem" name="ic_refresh" />
-                    <p-icon-button style-type="transparent" :loading="true" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="transparent" animation="spin" style="margin: 1rem" name="ic_refresh" />
                     <br>
-                    <p-icon-button style-type="gray-border" style="margin: 1rem" name="ic_refresh" />
-                    <p-icon-button style-type="gray-border" :loading="true" style="margin: 1rem" name="ic_refresh" />
+                    <p-icon-button style-type="gray-border" animation="spin" style="margin: 1rem" name="ic_refresh" />
                 </div>`,
         }}
     </Story>
 </Canvas>
+
+<br/>
+<br/>
 
 
 ## Activated
@@ -340,6 +350,9 @@ export const Template = (args, { argTypes }) => ({
         }}
     </Story>
 </Canvas>
+
+<br/>
+<br/>
 
 
 ## Playground
