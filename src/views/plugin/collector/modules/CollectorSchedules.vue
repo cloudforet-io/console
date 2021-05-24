@@ -1,16 +1,16 @@
 <template>
     <div>
         <p-toolbox-table :items="items"
-                         :fields="fields"
+                         :fields="tableState.fields"
                          sortable
                          hover
-                         :sort-by.sync="sortBy"
-                         :sort-desc.sync="sortDesc"
-                         :all-page="allPage"
-                         :this-page.sync="thisPage"
-                         :page-size.sync="pageSize"
+                         :sort-by.sync="tableState.sortBy"
+                         :sort-desc.sync="tableState.sortDesc"
+                         :all-page="tableState.allPage"
+                         :this-page.sync="tableState.thisPage"
+                         :page-size.sync="tableState.pageSize"
                          :setting-visible="false"
-                         :loading="loading"
+                         :loading="tableState.loading"
                          :selectable="true"
                          :multi-select="false"
                          :select-index.sync="selectIndex"
@@ -58,9 +58,10 @@
 
         <edit-schedule-modal v-if="editVisible"
                              :visible.sync="editVisible"
-                             :collector-id="collectorId"
+                             :collector-id="collector.collector_id"
                              :schedule-id="items[selectIndex[0]] ? items[selectIndex[0]].schedule_id : null"
                              :edit-mode="isEditMode"
+                             :supported-schedules="supportedSchedules"
                              @success="listSchedules"
         />
 
@@ -79,7 +80,7 @@
 </template>
 
 <script lang="ts">
-import { debounce } from 'lodash';
+import { debounce, get } from 'lodash';
 import dayjs from 'dayjs';
 
 import {
@@ -108,32 +109,24 @@ export default {
         PTableCheckModal,
         PDropdownMenuBtn,
         PToolboxTable,
-        EditScheduleModal,
         PIconTextButton,
+        EditScheduleModal,
     },
     props: {
-        collectorId: {
-            type: String,
-            default: '',
+        collector: {
+            type: Object,
+            default: () => ({}),
         },
     },
     setup(props) {
         const vm: any = getCurrentInstance();
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            loading: true,
             items: [],
             selectIndex: [],
             editVisible: false,
             deleteVisible: false,
-            fields: [
-                { name: 'schedule_id', label: 'ID' },
-                { name: 'name', label: 'Name' },
-                {
-                    name: 'schedule', label: 'Schedule', sortable: false, width: '25rem',
-                },
-                { name: 'created_at', label: 'Created' },
-            ] as DataTableField[],
+            supportedSchedules: computed(() => get(props.collector, 'plugin_info.metadata.supported_schedules')),
             dropdown: computed<MenuItem[]>(() => [
                 {
                     name: 'update', label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_UPDATE'), type: 'item', disabled: state.selectIndex.length !== 1,
@@ -142,18 +135,29 @@ export default {
                     name: 'delete', label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_DELETE'), type: 'item', disabled: state.selectIndex.length === 0,
                 },
             ]),
-            sortBy: '',
-            sortDesc: '',
-            totalCount: 0,
-            pageSize: 10,
-            thisPage: 1,
-            allPage: computed(() => Math.ceil(state.totalCount / state.pageSize) || 1),
             multiItems: computed(() => state.selectIndex.map(idx => state.items[idx])),
             multiFields: [
                 { name: 'schedule_id', label: 'ID' },
                 { name: 'name', label: 'Name' },
             ] as DataTableField[],
             isEditMode: false,
+        });
+        const tableState = reactive({
+            loading: true,
+            fields: [
+                { name: 'schedule_id', label: 'ID' },
+                { name: 'name', label: 'Name' },
+                {
+                    name: 'schedule', label: 'Schedule', sortable: false, width: '25rem',
+                },
+                { name: 'created_at', label: 'Created' },
+            ] as DataTableField[],
+            sortBy: '',
+            sortDesc: '',
+            totalCount: 0,
+            pageSize: 10,
+            thisPage: 1,
+            allPage: computed(() => Math.ceil(tableState.totalCount / tableState.pageSize) || 1),
         });
 
         const timezone = store.state.user.timezone || 'UTC';
@@ -186,31 +190,31 @@ export default {
 
         const apiQuery = new ApiQueryHelper();
         const listSchedules = debounce(async (): Promise<void> => {
-            state.loading = true;
+            tableState.loading = true;
             state.selectIndex = [];
-            state.totalCount = 0;
+            tableState.totalCount = 0;
             try {
-                apiQuery.setSort(state.sortBy, state.sortDesc)
-                    .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+                apiQuery.setSort(tableState.sortBy, tableState.sortDesc)
+                    .setPage(getPageStart(tableState.thisPage, tableState.pageSize), tableState.pageSize);
 
                 const res = await SpaceConnector.client.inventory.collector.schedule.list({
-                    collector_id: props.collectorId,
+                    collector_id: props.collector.collector_id,
                     query: apiQuery.data,
                 });
                 state.items = res.results;
-                state.totalCount = res.total_count;
+                tableState.totalCount = res.total_count;
             } catch (e) {
                 state.items = [];
                 console.error(e);
             } finally {
-                state.loading = false;
+                tableState.loading = false;
             }
         }, 200);
 
         const onConfirmDelete = async () => {
             try {
                 await SpaceConnector.client.inventory.collector.schedule.delete({
-                    collector_id: props.collectorId,
+                    collector_id: props.collector.collector_id,
                     schedule_id: state.items[state.selectIndex[0]].schedule_id,
                 });
                 showSuccessMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DELETE_SCHEDULE_TITLE', 1), '', vm.$root);
@@ -223,13 +227,14 @@ export default {
             }
         };
 
-        watch(() => props.collectorId, () => {
+        watch(() => props.collector, () => {
             listSchedules();
         }, { immediate: true });
 
 
         return {
             ...toRefs(state),
+            tableState,
             getTimezoneHours,
             openEditModal,
             listSchedules,

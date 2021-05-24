@@ -101,6 +101,7 @@ import {
 } from '@spaceone/design-system';
 
 import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/views/plugin/collector/type';
+import { TranslateResult } from 'vue-i18n';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { makeProxy } from '@/lib/compostion-util';
@@ -110,6 +111,11 @@ import { timezoneList } from '@/store/modules/user/config';
 
 interface ScheduleHours {
     [time: string]: Dayjs;
+}
+
+interface ScheduleType {
+    hourly: string | TranslateResult;
+    interval?: string | TranslateResult;
 }
 
 const INTERVAL_MAX_SECONDS = 3600;
@@ -140,6 +146,10 @@ export default {
         editMode: {
             type: Boolean,
             default: true,
+        },
+        supportedSchedules: {
+            type: Array,
+            default: undefined,
         },
     },
     setup(props, { emit }) {
@@ -176,10 +186,15 @@ export default {
             timezones: map(timezoneList, d => ({
                 type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
             })),
-            scheduleTypes: computed(() => ({
-                hourly: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_HOURLY_LABEL'),
-                interval: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_LABEL'),
-            })),
+            scheduleTypes: computed(() => {
+                const result: ScheduleType = {
+                    hourly: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_HOURLY_LABEL'),
+                };
+                if (props.supportedSchedules && props.supportedSchedules.includes('interval')) {
+                    result.interval = vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_LABEL');
+                }
+                return result;
+            }),
             intervalTimeTypes: computed(() => [
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_SECOND'), name: 'seconds', type: 'item' },
                 { label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_MINUTE'), name: 'minutes', type: 'item' },

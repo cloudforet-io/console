@@ -84,7 +84,7 @@
                 <collector-credentials :collector-id="selectedItems[0].collector_id" :provider="selectedItems[0].plugin_info.provider" />
             </template>
             <template #schedules>
-                <collector-schedules :collector-id="selectedItems[0].collector_id" />
+                <collector-schedules :collector="selectedItems[0]" />
             </template>
         </p-tab>
         <p-tab v-else-if="selectedItems.length > 1"
