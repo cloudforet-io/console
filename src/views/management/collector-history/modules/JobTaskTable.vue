@@ -50,6 +50,7 @@
                 :text-color="statusTextColorFormatter(value)"
                 :icon="statusIconFormatter(value)"
                 :icon-color="statusIconColorFormatter(value)"
+                :icon-animation="value === JOB_TASK_STATUS.progress ? 'spin' : undefined"
             />
         </template>
         <template #col-errors-format="{ value }">

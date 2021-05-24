@@ -278,7 +278,7 @@ export default {
                     { key: 'last_collected_at', name: 'Last Collected' },
                 ],
             }], 'inventory.Collector'),
-            loading: false,
+            loading: true,
             searchTags: [],
             pageLimit: 15,
             pageStart: 1,

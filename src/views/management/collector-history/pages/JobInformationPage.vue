@@ -21,7 +21,7 @@
 <script lang="ts">
 import {
     computed, reactive, toRefs,
-    getCurrentInstance, ComponentRenderProxy, onMounted, onUnmounted, onActivated,
+    getCurrentInstance, ComponentRenderProxy, onActivated,
 } from '@vue/composition-api';
 
 import {

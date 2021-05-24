@@ -14,7 +14,7 @@
             <div class="collector-input-wrapper">
                 <p-lazy-img class="flex-shrink-0 mr-8"
                             :src="imageUrl"
-                            :loading="!imageUrl"
+                            :loading="collector === null"
                             width="5.5rem" height="5.5rem"
                 />
                 <div class="flex-grow">
@@ -117,8 +117,8 @@ export default {
             loading: true,
             collector: null,
             proxyVisible: makeProxy<boolean>('visible', props, emit),
-            pluginInfo: computed<CollectorPluginModel>(() => get(state.collector, 'plugin_info')),
-            imageUrl: computed<string>(() => get(store.state.resource.plugin.items[state.collector?.plugin_info.plugin_id], 'icon', '')),
+            pluginInfo: computed<CollectorPluginModel>(() => get(state.collector, 'plugin_info', {})),
+            imageUrl: computed<string>(() => get(store.state.resource.plugin.items[state.pluginInfo.plugin_id], 'icon', '')),
             confirmBtnBind: computed(() => {
                 const defaultStyle: any = { style: { padding: 0 } };
                 defaultStyle.styleType = state.loading ? 'gray200' : 'primary-dark';
@@ -158,6 +158,7 @@ export default {
         });
 
         const getCollector = async (): Promise<void> => {
+            state.collector = null;
             try {
                 const res = await SpaceConnector.client.inventory.collector.get({
                     collector_id: props.collectorId,
@@ -252,6 +253,8 @@ export default {
         watch([() => props.collectorId, () => props.visible], ([id, visible]) => {
             if (id && visible) {
                 init();
+            } else {
+                state.collector = null;
             }
         }, { immediate: true });
 

@@ -15,8 +15,8 @@
             <template #contents-conf="{tab}">
                 <div class="collector-input-wrapper">
                     <p-lazy-img class="flex-shrink-0 mr-8"
-                                :loading="!imageUrl"
                                 :src="imageUrl"
+                                :loading="loading"
                                 width="5.5rem" height="5.5rem"
                     />
                     <div class="flex-grow">
@@ -97,6 +97,7 @@ export default {
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            loading: true,
             plugin: {},
             imageUrl: computed(() => state.plugin?.tags?.icon),
             provider: computed(() => get(state.plugin, 'provider', '')),
@@ -176,6 +177,7 @@ export default {
 
         /* api */
         const getPlugin = async () => {
+            state.loading = true;
             try {
                 const res = await SpaceConnector.client.repository.plugin.get({
                     plugin_id: state.pluginId,
@@ -185,6 +187,8 @@ export default {
             } catch (e) {
                 console.error(e);
                 showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_GET_PLUGIN_TITLE'), e, vm.$root);
+            } finally {
+                state.loading = false;
             }
         };
         const getNames = async () => {

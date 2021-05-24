@@ -3,7 +3,7 @@
         <template #sidebar>
             <div class="sidebar-title">
                 <p-lazy-img :src="assetUrlConverter(sidebarState.iconUrl)"
-                            :loading="!sidebarState.iconUrl"
+                            :loading="!sidebarState.items[0]"
                             width="1.5rem" height="1.5rem"
                 />
                 <p class="sidebar-title-text">
@@ -209,7 +209,9 @@ import {
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import {assetUrlConverter, showErrorMessage, showLoadingMessage, showSuccessMessage} from '@/lib/util';
+import {
+    assetUrlConverter, showErrorMessage, showLoadingMessage, showSuccessMessage,
+} from '@/lib/util';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import { QueryHelper } from '@/lib/query';
@@ -563,8 +565,8 @@ export default {
                     name: d.name,
                     type: d.resource_type,
                 }));
-                sidebarState.iconUrl = res.results[0].tags['spaceone:icon'] || '';
-                sidebarState.group = res.results[0].group;
+                sidebarState.iconUrl = get(res.results[0], ['tags', 'spaceone:icon'], '');
+                sidebarState.group = res.results[0]?.group;
             } catch (e) {
                 console.error(e);
             }

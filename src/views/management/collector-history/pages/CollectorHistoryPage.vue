@@ -40,10 +40,10 @@
                 </template>
                 <template #col-collector_info.plugin_info-format="{ value }">
                     <template v-if="value">
-                        <p-lazy-img :src="plugins[value.plugin_id].icon"
+                        <p-lazy-img :src="plugins[value.plugin_id] ? plugins[value.plugin_id].icon : ''"
                                     width="1rem" height="1rem"
                         />
-                        <span class="pl-2">{{ plugins[value.plugin_id].name }}</span>
+                        <span class="pl-2">{{ plugins[value.plugin_id] ? plugins[value.plugin_id].name : value.plugin_id }}</span>
                     </template>
                 </template>
                 <template #col-status-format="{ value }">
@@ -52,6 +52,7 @@
                         :text-color="statusTextColorFormatter(value)"
                         :icon="statusIconFormatter(value)"
                         :icon-color="statusIconColorFormatter(value)"
+                        :icon-animation="value === JOB_STATUS.progress ? 'spin' : undefined"
                     />
                 </template>
                 <template #col-job_progress-format="{value}">

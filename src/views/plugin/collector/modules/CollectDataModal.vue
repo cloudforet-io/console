@@ -12,7 +12,8 @@
         <template #body>
             <div class="w-full">
                 <div class="flex w-full">
-                    <p-lazy-img :src="imageUrl" :loading="!imageUrl"
+                    <p-lazy-img :src="imageUrl"
+                                :loading="collector === null"
                                 width="5.5rem" height="5.5rem"
                                 class="mr-10 flex-grow-0"
                     />
@@ -224,6 +225,7 @@ export default {
                 state.collector = res;
             } catch (e) {
                 console.error(e);
+                state.collector = null;
             } finally {
                 state.loading = false;
             }
