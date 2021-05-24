@@ -155,9 +155,8 @@ const statusIconFormatter = (status) => {
 };
 const statusIconColorFormatter = (status) => {
     if (status === JOB_STATUS.success || status === JOB_STATUS.created) return COMPLETED_ICON_COLOR;
-    // if (status === JOB_STATUS.progress) return undefined;
-    // return FAILED_ICON_COLOR;
-    return undefined;
+    if (status === JOB_STATUS.progress) return undefined;
+    return FAILED_ICON_COLOR;
 };
 
 export default {

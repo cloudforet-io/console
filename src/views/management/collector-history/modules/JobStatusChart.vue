@@ -2,8 +2,12 @@
     <p-pane-layout class="job-status-chart">
         <div class="status-wrapper">
             <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.STATUS') }}</span>
-            <span class="value">
-                <p-i :name="statusIconFormatter(status)" width="1rem" height="1rem" />
+            <span v-if="!loading" class="value">
+                <p-i
+                    :name="statusIconFormatter(status)"
+                    width="1rem" height="1rem"
+                    :animation="status === JOB_STATUS.progress ? 'spin' : undefined"
+                />
                 {{ statusText }}
             </span>
         </div>
@@ -63,7 +67,7 @@ export default {
             required: true,
         },
     },
-    setup(props, { root }) {
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,
