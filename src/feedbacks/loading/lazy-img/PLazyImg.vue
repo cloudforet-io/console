@@ -2,61 +2,58 @@
     <transition-group name="fade-in" tag="span" class="p-lazy-img"
                       :style="{height, width}"
     >
-        <span v-if="loading || (imgLoading && !isError)" key="loader"
-              class="img-container" v-on="$listeners"
-        >
-            <slot name="preloader" :height="height" :width="width"
-                  :imgLoading="imgLoading"
+        <span v-if="!loading" key="img" class="img-container">
+            <img v-show="status === LOAD_STATUS.succeed"
+                 :style="{height, width}"
+                 :src="src || ''"
+                 :alt="alt"
+                 @load="onLoad"
+                 @error="onError"
             >
+        </span>
+        <span v-show="!loading && status === LOAD_STATUS.errored" key="error-img" class="img-container error">
+            <slot name="error" v-bind="{...$props, ...$data}">
+                <p-i :name="errorIcon || 'ic_collector_tags'" :style="{height, width}"
+                     :height="height"
+                     :width="width"
+                />
+            </slot>
+        </span>
+        <span v-show="loading || status === LOAD_STATUS.loading" key="loader" class="img-container">
+            <slot name="preloader" v-bind="{...$props, ...$data}">
                 <p-skeleton :height="height" :width="width" />
             </slot>
         </span>
-        <transition-group v-if="!loading" key="images" tag="span"
-                          name="fade-in" class="img-container"
-        >
-            <img v-show="!imgLoading && !isError"
-                 key="img"
-                 :style="{height, width}"
-                 :src="src"
-                 :alt="alt"
-                 class="absolute"
-                 @load="onLoad"
-                 @error="onError"
-                 v-on="$listeners"
-            >
-            <span v-if="isError" key="error-img" class="img-container error"
-                  v-on="$listeners"
-            >
-                <slot name="error" :height="height" :width="width"
-                      :imgLoading="imgLoading"
-                >
-                    <p-i :name="errorIcon || 'ic_collector_tags'" :style="{height, width}"
-                         height="height"
-                         width="width"
-                    />
-                </slot>
-            </span>
-        </transition-group>
     </transition-group>
 </template>
 
 <script lang="ts">
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance,
+    defineComponent,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
-import PLottie from '@/foundation/lottie/PLottie.vue';
-import { LazyImgPropsType } from '@/feedbacks/loading/lazy-img/type';
 import PI from '@/foundation/icons/PI.vue';
-import { makeOptionalProxy } from '@/util/composition-helpers';
 import PSkeleton from '@/feedbacks/loading/skeleton/PSkeleton.vue';
 
-export default {
+interface Props {
+    height?: string;
+    width?: string;
+    src: string;
+    errorIcon?: string;
+    loading?: boolean;
+    alt?: string;
+}
+
+enum LOAD_STATUS {
+    loading = 'loading',
+    succeed = 'succeed',
+    errored = 'errored'
+}
+
+export default defineComponent<Props>({
     name: 'PLazyImg',
     components: {
         PSkeleton,
-        PLottie,
         PI,
     },
     props: {
@@ -78,58 +75,64 @@ export default {
         },
         loading: {
             type: Boolean,
-            default: false,
+            default: undefined,
         },
         alt: {
             type: String,
             default: undefined,
         },
-        strictMode: {
-            type: Boolean,
-            default: false,
-        },
     },
-    setup(props: LazyImgPropsType, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+    setup(props: Props) {
         const state = reactive({
-            imgLoading: true,
-            isError: false,
+            status: LOAD_STATUS.loading,
         });
 
-        watch(() => props.src, (val) => {
-            state.imgLoading = true;
-            state.isError = false;
-        });
+
+        watch(() => props.src, (src, before) => {
+            if (!src && src === before) {
+                state.status = LOAD_STATUS.errored;
+            } else {
+                state.status = LOAD_STATUS.loading;
+            }
+        }, { immediate: true });
+
         return {
             ...toRefs(state),
             onLoad() {
-                state.imgLoading = false;
+                if (!props.loading) {
+                    state.status = LOAD_STATUS.succeed;
+                }
             },
             onError() {
-                state.isError = true;
+                if (!props.loading) {
+                    state.status = LOAD_STATUS.errored;
+                }
             },
+            LOAD_STATUS,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
 .p-lazy-img {
     @apply inline-block relative;
+    z-index: 0;
     .img-container {
         @apply inline-block w-full h-full absolute rounded-sm overflow-hidden;
+        z-index: 1;
         &.error {
             @apply inline-flex;
         }
     }
     .fade-in-leave-active, .fade-in-enter-active {
-        transition: opacity 0.25s;
+        transition: visibility 0.25s;
     }
     .fade-in-leave-to, .fade-in-enter {
-        opacity: 0;
+        visibility: hidden;
     }
     .fade-in-enter-to, .fade-in-leave {
-        opacity: 1;
+        visibility: visible;
     }
 }
 </style>

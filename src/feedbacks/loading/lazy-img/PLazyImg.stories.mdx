@@ -1,0 +1,295 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PLazyImg from './PLazyImg.vue';
+import PButton from '@/inputs/buttons/button/PButton';
+import PLottie from '@/foundation/lottie/PLottie';
+import { reactive, toRefs } from '@vue/composition-api';
+import faker from 'faker';
+
+<Meta title='Feedbacks/Loading/Lazy Image' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A133538',
+    }
+}} argTypes={{
+    height: {
+        name: 'height',
+        type: { name: 'string' },
+        description: `Height of image`,
+        defaultValue: '2rem',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            defaultValue: {
+                summary: '"2rem"'
+            },
+            category: 'props'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    width: {
+        name: 'width',
+        type: { name: 'string' },
+        description: `Height of image`,
+        defaultValue: '2rem',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            defaultValue: {
+                summary: '"2rem"'
+            },
+            category: 'props'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    src: {
+        name: 'src',
+        type: { name: 'string' },
+        description: `Source of image`,
+        defaultValue: '',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            defaultValue: {
+                summary: 'undefined'
+            },
+            category: 'props'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    errorIcon: {
+        name: 'errorIcon',
+        type: { name: 'string' },
+        description: `Alternative icon name when failed to load image. Refer to Icon component.`,
+        defaultValue: 'ic_collector_tags',
+        table: {
+            type: {
+                summary: 'string'
+            },
+            defaultValue: {
+                summary: '"ic_collector_tags"'
+            },
+            category: 'props'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    loading: {
+        name: 'loading',
+        type: { name: 'boolean' },
+        description: `Manual loading controller. If it's not given, it works automatically.`,
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            defaultValue: {
+                summary: 'undefined'
+            },
+            category: 'props'
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    alt: {
+        name: 'alt',
+        type: { name: 'string' },
+        description: `alt attribute of image tag.`,
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string'
+            },
+            defaultValue: {
+                summary: 'undefined'
+            },
+            category: 'props'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    preloaderSlot: {
+        name: 'preloader',
+        description: 'Slot for image loader',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+        control: null
+    },
+    errorSlot: {
+        name: 'error',
+        description: 'Slot for error icon',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+        control: null
+    }
+}}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PLazyImg },
+    template: `
+          <p-lazy-img v-bind="$props"></p-lazy-img>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Lazy Image
+
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic" args={{
+        src: faker.image.image(100, 100, true)
+    }} >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Failed to Load Image
+
+<Canvas>
+    <Story name="Failed to Load Image">
+        {{
+            components: { PLazyImg },
+            template: `
+    <div>
+        <div class="flex items-center mb-4">
+            <h2 class=" mr-4">Default: </h2>
+            <p-lazy-img src="" />
+        </div>
+        <div class="flex items-center mb-4">
+            <h2 class=" mr-4">Custom Error Icon: </h2>
+            <p-lazy-img src="" error-icon="admin" />
+        </div>
+        <div class="flex items-center">
+            <h2 class=" mr-4">Using Error Slot: </h2>
+            <p-lazy-img src="">
+                <template #error>
+                    <img :src="errorImage"/>
+                </template>
+            </p-lazy-img>
+        </div>
+    </div>
+`,
+            setup() {
+                return {
+                    errorImage: faker.image.image(100, 100, true)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Custom Loader
+
+<Canvas>
+    <Story name="Custom Loader">
+        {{
+            components: { PLazyImg, PLottie },
+            template: `
+    <p-lazy-img loading>
+        <template #preloader>
+            <p-lottie name="lottie_working" :size="2"></p-lottie>
+        </template>
+    </p-lazy-img>
+`
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Manual Control
+
+<Canvas>
+    <Story name="Manual Control">
+        {{
+            components: {
+                PLazyImg,
+                PButton
+            },
+            template: `
+    <div class="flex items-center">
+        <p-button class="mr-4" style-type="primary" @click="getData">Load Image</p-button>
+        <p-lazy-img :src="src"
+            :loading="loading"
+        />
+    </div>
+`,
+            setup() {
+                const state = reactive({
+                    src: '',
+                    loading: false
+                })
+                const getData = () => {
+                    state.src = '';
+                    state.loading = true
+                    setTimeout(() => {
+                        state.src = faker.image.image(100, 100, true)
+                        state.loading = false;
+                    }, 2000)
+                }
+                return {
+                    ...toRefs(state),
+                    getData
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

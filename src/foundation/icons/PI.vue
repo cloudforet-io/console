@@ -1,20 +1,32 @@
 <template>
-    <svgicon v-bind="$props" v-on="$listeners" />
+    <svgicon :name="name"
+             :dir="dir"
+             :fill="fill"
+             :width="width"
+             :height="height"
+             :scale="scale"
+             :color="color"
+             :original="original"
+             :class="animation"
+             v-on="$listeners"
+    />
 </template>
 <script lang="ts">
 import '@/foundation/icons/p-icons';
 import { defineComponent } from '@vue/composition-api';
+import { ANIMATION_TYPE } from '@/foundation/icons/config';
 /* https://www.npmjs.com/package/vue-svgicon */
 interface Props {
     name: string;
-    dir: string|null;
-    fill: boolean;
+    dir?: string;
+    fill?: boolean;
     width: string;
     height: string;
     scale?: string;
     color?: string;
-    original: boolean;
+    original?: boolean;
     title?: string;
+    animation?: boolean;
 }
 export default defineComponent<Props>({
     name: 'PI',
@@ -25,7 +37,7 @@ export default defineComponent<Props>({
         },
         dir: {
             type: String,
-            default: null,
+            default: undefined,
         },
         fill: {
             type: Boolean,
@@ -54,6 +66,13 @@ export default defineComponent<Props>({
         title: {
             type: String,
             default: undefined,
+        },
+        animation: {
+            type: String,
+            default: undefined,
+            validator(animation: any) {
+                return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
+            },
         },
     },
 });
@@ -90,6 +109,19 @@ export default defineComponent<Props>({
 
     &.p-i-left {
         transform: rotate(-90deg);
+    }
+
+    &.spin {
+        animation: spin-animation 2s linear infinite;
+    }
+
+    @keyframes spin-animation {
+        0% {
+            transform: rotate(0deg);
+        }
+        100% {
+            transform: rotate(359deg);
+        }
     }
 }
 </style>
