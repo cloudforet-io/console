@@ -102,9 +102,8 @@ const statusIconFormatter = (status) => {
 const statusIconColorFormatter = (status) => {
     if (status === JOB_TASK_STATUS.success) return COMPLETED_ICON_COLOR;
     if (status === JOB_TASK_STATUS.pending) return PENDING_ICON_COLOR;
-    // if (status === JOB_TASK_STATUS.progress) return undefined;
-    // return FAILED_ICON_COLOR;
-    return undefined;
+    if (status === JOB_TASK_STATUS.progress) return undefined;
+    return FAILED_ICON_COLOR;
 };
 
 export default {
