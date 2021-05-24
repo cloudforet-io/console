@@ -1,3 +1,10 @@
+# [1.1.0-beta.20](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.19...v1.1.0-beta.20) (2021-05-24)
+
+
+### Bug Fixes
+
+* update css of icon modal ([#553](https://github.com/spaceone-dev/spaceone-design-system/issues/553)) ([53fb7e7](https://github.com/spaceone-dev/spaceone-design-system/commit/53fb7e7b69e24ea49de7c9adf2b73fd5d901f2f8))
+
 # [1.1.0-beta.19](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.18...v1.1.0-beta.19) (2021-05-22)
 
 
