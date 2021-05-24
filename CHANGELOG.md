@@ -1,3 +1,10 @@
+# [1.1.0-beta.21](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.20...v1.1.0-beta.21) (2021-05-24)
+
+
+### Features
+
+* add animation to icon and fix lazy image bug ([#554](https://github.com/spaceone-dev/spaceone-design-system/issues/554)) ([ef15c31](https://github.com/spaceone-dev/spaceone-design-system/commit/ef15c3170dc3b9e51cb5bf7966ed57d95f99f5f9))
+
 # [1.1.0-beta.20](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.19...v1.1.0-beta.20) (2021-05-24)
 
 
