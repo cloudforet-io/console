@@ -1,3 +1,10 @@
+# [1.1.0-beta.24](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.23...v1.1.0-beta.24) (2021-05-25)
+
+
+### Features
+
+* add theme to PSelectButtonGroup ([#558](https://github.com/spaceone-dev/spaceone-design-system/issues/558)) ([4218f8f](https://github.com/spaceone-dev/spaceone-design-system/commit/4218f8f2c669d8b89005ae04dbdc393d24f19764))
+
 # [1.1.0-beta.23](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.22...v1.1.0-beta.23) (2021-05-24)
 
 
