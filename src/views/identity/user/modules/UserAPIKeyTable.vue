@@ -211,12 +211,13 @@ export default {
                     user_id: state.user,
                 });
                 modalState.items = resp;
-                modalState.loading = false;
-                hideLoadingMessage(vm.$root);
                 state.visible = true;
             } catch (e) {
                 console.error(e);
+                showErrorMessage(vm.$t('IDENTITY.USER.API_KEY.ALT_E_CREATE_SCHEDULER'), e, vm.$root);
             } finally {
+                modalState.loading = false;
+                hideLoadingMessage(vm.$root);
                 await listAPIKey(state.user);
             }
         };
