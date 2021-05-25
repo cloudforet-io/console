@@ -788,7 +788,7 @@
 				"HANDBOOK_DESC_2-3": "Set up spacectl configuration with Spacectl config file that you downloaded in previous step.",
 				"HANDBOOK_DESC_3-1": "• The following commands list all available spacectl APIs. Run it like this:",
 				"HANDBOOK_DESC_3-2": "• You can find all supported commands with [--help]:",
-				"HANDBOOK_DESC_3-3": "• Please, find more details about each command, including all the supported flags and subcommands, see the {document}.",
+				"HANDBOOK_DESC_3-3": "Please, find more details about each command, including all the supported flags and subcommands, see the {document}.",
 				"HANDBOOK_TITLE_1": "1. About Spacectl",
 				"HANDBOOK_TITLE_2": "2. Spacectl installation & Set Up",
 				"HANDBOOK_TITLE_2-1": "2.1 Generate API-Key",
