@@ -113,7 +113,7 @@ export default defineComponent({
         z-index: 99;
         border-top-width: 1px;
 
-        padding: 1.5rem 0;
+        padding: 1.75rem 0;
         box-shadow: 0 0 0.5rem rgba(theme('colors.black'), 0.08);
         overflow: hidden;
         .inner {
@@ -124,9 +124,9 @@ export default defineComponent({
         }
         .title {
             width: calc(100% - 2rem);
-            min-height: 2rem;
+            min-height: 1.575rem;
             font-size: 1.125rem;
-            line-height: 2;
+            line-height: 1.4;
         }
         .close-btn {
             @apply absolute text-gray-400;
@@ -148,6 +148,7 @@ export default defineComponent({
     &.secondary {
         .sidebar-wrapper {
             @apply bg-secondary-2;
+            padding: 1.75rem 0 1.5rem;
         }
     }
 

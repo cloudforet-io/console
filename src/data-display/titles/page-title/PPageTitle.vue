@@ -7,15 +7,17 @@
         />
         <div class="title-wrapper" :class="{child}">
             <slot name="title">
-                {{ title }}
+                <h2>{{ title }}</h2>
             </slot>
             <slot name="title-info">
                 <template v-if="titleInfo">
-                    <p-i name="ic_outlined-info" color="inherit" width="0.875rem"
-                         height="0.875rem"
-                         class="icon"
-                    />
-                    <span class="title-info">{{ titleInfo }}</span>
+                    <div class="title-info-wrapper">
+                        <p-i name="ic_outlined-info" color="inherit" width="0.875rem"
+                             height="0.875rem"
+                             class="icon"
+                        />
+                        <span class="title-info">{{ titleInfo }}</span>
+                    </div>
                 </template>
             </slot>
         </div>
@@ -83,20 +85,31 @@ export default {
         @apply flex-shrink-0 mr-1;
     }
     .title-wrapper {
-        @apply flex-shrink;
-        font-weight: bold;
-        font-size: 1.5rem;
-        line-height: 2rem;
+        @apply flex flex-shrink items-start;
         overflow: hidden;
-        vertical-align: middle;
+        h2 {
+            @apply flex-shrink-0;
+            font-weight: bold;
+            font-size: 1.5rem;
+            line-height: 2rem;
+        }
         .icon {
             margin-left: 0.625rem;
         }
-        .title-info {
-            @apply font-normal text-gray-700;
-            font-size: 0.75rem;
-            line-height: 150%;
-            margin-left: 0.25rem;
+        .title-info-wrapper {
+            @apply flex;
+            margin-top: 0.55rem;
+            .icon {
+                @apply flex-shrink-0;
+                margin-top: 0.1rem;
+            }
+            .title-info {
+                @apply font-normal text-gray-700;
+                display: inline-block;
+                font-size: 0.75rem;
+                line-height: 150%;
+                margin-left: 0.25rem;
+            }
         }
     }
     .total-count {
