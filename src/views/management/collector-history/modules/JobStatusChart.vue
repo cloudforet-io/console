@@ -2,7 +2,7 @@
     <p-pane-layout class="job-status-chart">
         <div class="status-wrapper">
             <span class="label">{{ $t('MANAGEMENT.COLLECTOR_HISTORY.JOB.STATUS') }}</span>
-            <span v-if="!loading" class="value">
+            <span v-if="status" class="value">
                 <p-i
                     :name="statusIconFormatter(status)"
                     width="1rem" height="1rem"
@@ -70,7 +70,6 @@ export default {
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            loading: true,
             job: {},
             status: computed(() => state.job.job_status),
             statusText: computed(() => {
@@ -106,28 +105,25 @@ export default {
         };
 
         /* api */
+        let interval;
         const getJob = async () => {
-            state.loading = true;
-            state.job = {};
             try {
                 state.job = await SpaceConnector.client.inventory.job.getJobProgress({
                     job_id: props.jobId,
                 });
+                if (state.status !== JOB_STATUS.progress && interval) {
+                    clearInterval(interval);
+                }
             } catch (e) {
+                state.job = {};
                 console.error(e);
-            } finally {
-                state.loading = false;
             }
         };
 
         /* Init */
-        let interval;
-
-
         onActivated(async () => {
             await getJob();
 
-            if (interval) clearInterval(interval);
             if (state.status === JOB_STATUS.progress) {
                 interval = setInterval(() => {
                     getJob();

@@ -6,6 +6,7 @@
                                :selected-repo-id.sync="selectedRepositoryId"
                                :resource-type-search-tags.sync="resourceTypeSearchTags"
                                @search="onSearch"
+                               @delete="onSearch('')"
                 />
             </div>
         </template>
