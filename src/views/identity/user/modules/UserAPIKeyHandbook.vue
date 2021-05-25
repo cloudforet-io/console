@@ -54,7 +54,7 @@
                 {{ $t('IDENTITY.USER.MAIN.HANDBOOK_DESC_3-2') }}
             </p>
             <p-raw-data :raw="codeBlock.helpCode" class="code-block" />
-            <p class="desc">
+            <p class="desc last">
                 <i18n path="IDENTITY.USER.MAIN.HANDBOOK_DESC_3-3">
                     <template #document>
                         <p-anchor :href="githubLink" target="_blank" class="link">
@@ -113,13 +113,16 @@ export default {
     margin-top: 0.5rem;
     font-size: 0.875rem;
     line-height: 150%;
+    &.last {
+        margin-top: 1.5rem;
+    }
 }
 .sub-title {
-    @apply font-bold;
-    margin-top: 0.5rem;
+    margin-top: 1rem;
     line-height: 150%;
 }
 .code-block {
+    min-height: auto;
     margin-top: 0.5rem;
 }
 .link {

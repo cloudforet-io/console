@@ -110,7 +110,6 @@ export default {
 <style lang="postcss" scoped>
 .handbook-button {
     @apply inline-flex items-center text-gray-700;
-    margin-right: 20px;
     cursor: pointer;
     font-size: 0.75rem;
     line-height: 1.2;
@@ -152,9 +151,9 @@ export default {
             display: none;
         }
         .tab-pane {
-            padding: 0 1.25rem;
-            margin-top: 1.5rem;
-            margin-bottom: 2.5rem;
+            padding: 0 1rem;
+            margin-top: 1.75rem;
+            margin-bottom: 1.75rem;
         }
     }
     .no-more {
@@ -168,14 +167,14 @@ export default {
     }
     .handbook-contents {
         @apply overflow-auto;
-        height: calc(100vh - 9.25rem);
+        height: calc(100vh - 8.825rem);
         &::before {
             bottom: 5.225rem;
         }
         .p-tab::v-deep {
             margin-bottom: 2rem;
             .is-single + .tab-pane {
-                height: calc(100% - 4rem);
+                height: calc(100% - 3.5rem);
             }
             .tab-pane {
                 @apply overflow-auto;
