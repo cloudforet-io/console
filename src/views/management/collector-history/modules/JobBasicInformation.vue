@@ -163,7 +163,7 @@ export default {
     }
 }
 
-@screen mobile {
+@screen tablet {
     .job-basic-information {
         .items-container {
             grid-template-columns: repeat(1, 1fr);

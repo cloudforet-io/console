@@ -5,6 +5,7 @@
             <p-divider class="sidebar-divider" />
             <p-search v-model="search" class="p-search" :placeholder="$t('PLUGIN.COLLECTOR.PLUGINS.SEARCH_PLACEHOLDER')"
                       @search="$emit('search', $event)"
+                      @delete="$emit('delete')"
             />
         </div>
         <div class="rows">
@@ -33,7 +34,9 @@
 </template>
 
 <script lang="ts">
-import { toRefs, reactive, computed } from '@vue/composition-api';
+import {
+    toRefs, reactive, computed,
+} from '@vue/composition-api';
 
 import {
     PSearch, PRadio, PCheckBox, PDivider,
@@ -53,10 +56,6 @@ export default {
         repositories: {
             type: Array,
             default: () => [],
-        },
-        searchKeyword: {
-            type: String,
-            default: '',
         },
         /** sync */
         selectedRepoId: {
