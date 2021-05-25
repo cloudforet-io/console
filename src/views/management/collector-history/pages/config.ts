@@ -1,7 +1,7 @@
 export enum JOB_STATUS {
-    created = 'CREATED',
     success = 'SUCCESS',
     //
+    created = 'CREATED',
     progress = 'IN_PROGRESS',
     //
     error = 'ERROR',
