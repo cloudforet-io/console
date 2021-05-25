@@ -15,7 +15,7 @@
             <p-toolbox-table search-type="query"
                              :fields="fields"
                              :items="items"
-                             :query-tags.sync="tags"
+                             :query-tags="tags"
                              :key-item-sets="handlers.keyItemSets"
                              :value-handler-map="handlers.valueHandlerMap"
                              :loading="loading"
@@ -31,7 +31,7 @@
                              :class="items.length === 0 ? 'no-data' : ''"
                              :style="{height: '100%', border: 'none'}"
                              @change="onChange"
-                             @refresh="onChange()"
+                             @refresh="onChange"
                              @rowLeftClick="onSelect"
             >
                 <template #th-task-format="{  field }">
@@ -52,11 +52,11 @@
                         :text-color="statusTextColorFormatter(value)"
                         :icon="statusIconFormatter(value)"
                         :icon-color="statusIconColorFormatter(value)"
-                        :icon-animation="value === JOB_STATUS.progress ? 'spin' : undefined"
+                        :icon-animation="[JOB_STATUS.progress, JOB_STATUS.created].includes(value) ? 'spin' : undefined"
                     />
                 </template>
-                <template #col-job_progress-format="{value}">
-                    <div class="col-job_progress-format">
+                <template #col-remained_tasks-format="{value}">
+                    <div class="col-remained_tasks-format">
                         <p-progress-bar
                             :percentage="value"
                             :color="PROGRESS_BAR_COLOR"
@@ -140,8 +140,8 @@ const COMPLETED_ICON_COLOR = green[400];
 const FAILED_ICON_COLOR = red[400];
 
 const statusTextFormatter = (status) => {
-    if (status === JOB_STATUS.success || status === JOB_STATUS.created) return 'Completed';
-    if (status === JOB_STATUS.progress) return 'In-Progress';
+    if (status === JOB_STATUS.success) return 'Completed';
+    if (status === JOB_STATUS.progress || status === JOB_STATUS.created) return 'In-Progress';
     return capitalize(status);
 };
 const statusTextColorFormatter = (status) => {
@@ -149,13 +149,13 @@ const statusTextColorFormatter = (status) => {
     return undefined;
 };
 const statusIconFormatter = (status) => {
-    if (status === JOB_STATUS.success || status === JOB_STATUS.created) return 'ic_state_active';
-    if (status === JOB_STATUS.progress) return 'ic_in-progress';
+    if (status === JOB_STATUS.success) return 'ic_state_active';
+    if (status === JOB_STATUS.progress || status === JOB_STATUS.created) return 'ic_in-progress';
     return 'ic_alert';
 };
 const statusIconColorFormatter = (status) => {
-    if (status === JOB_STATUS.success || status === JOB_STATUS.created) return COMPLETED_ICON_COLOR;
-    if (status === JOB_STATUS.progress) return undefined;
+    if (status === JOB_STATUS.success) return COMPLETED_ICON_COLOR;
+    if (status === JOB_STATUS.progress || status === JOB_STATUS.created) return undefined;
     return FAILED_ICON_COLOR;
 };
 
@@ -198,7 +198,7 @@ export default {
                     {
                         dataType: 'datetime',
                         name: 'created_at',
-                        label: 'Start Time',
+                        label: 'Created Time',
                     },
                 ],
             }] as KeyItemSet[],
@@ -217,9 +217,9 @@ export default {
                 { label: 'Job ID', name: 'job_id' },
                 { label: 'Collector', name: 'collector_info.name', sortable: false },
                 { label: 'Plugin', name: 'collector_info.plugin_info', sortable: false },
-                { label: 'Status', name: 'status' },
-                { label: 'Job Progress', name: 'job_progress' },
-                { label: 'Created Time', name: 'created_at' },
+                { label: 'Status', name: 'status', sortable: false },
+                { label: 'Job Progress', name: 'remained_tasks' },
+                { label: 'Created', name: 'created_at' },
                 { label: 'Duration', name: 'duration', sortable: false },
             ]),
             statusList: computed(() => ([
@@ -286,7 +286,7 @@ export default {
                 state.totalCount = res.total_count;
                 state.items = res.results.map(job => ({
                     ...job,
-                    job_progress: job.total_tasks > 0 ? ((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100 : 0,
+                    remained_tasks: job.total_tasks > 0 ? ((job.total_tasks - job.remained_tasks) / job.total_tasks) * 100 : 0,
                     created_at: iso8601Formatter(job.created_at, state.timezone),
                     duration: durationFormatter(job.created_at, job.finished_at, state.timezone) || '--',
                 }));
@@ -328,12 +328,13 @@ export default {
                 getJobs();
             });
         };
-        const onClickDate = (date) => {
+        const onClickDate = async (date) => {
             state.tags.push({
                 key: { label: 'Created Time', name: 'created_at', dataType: 'datetime' },
                 value: { label: date, name: date },
                 operator: '=',
             });
+            await onChange({ queryTags: state.tags });
         };
 
         const init = async () => {
@@ -403,7 +404,7 @@ export default {
                 }
             }
             .p-data-table {
-                .col-job_progress-format {
+                .col-remained_tasks-format {
                     display: flex;
                     align-items: center;
                     .progress-bar {

@@ -206,10 +206,10 @@ export default {
                 // tooltip
                 const tooltipTextColor = type === VALUE_TYPE.completed ? green[500] : coral[600];
                 if (type === VALUE_TYPE.completed) {
-                    series.columns.template.tooltipText = `[font-size: 1rem; ${tooltipTextColor}; bold]{completed} [font-size: 1rem; ${tooltipTextColor};](Total Completed)
+                    series.columns.template.tooltipText = `[font-size: 1rem; ${tooltipTextColor}; bold]{completed} [font-size: 0.875rem; ${tooltipTextColor};](Total Completed)
 [font-size: 0.75rem; ${gray[700]}]{tooltipDate}`;
                 } else {
-                    series.columns.template.tooltipText = `[font-size: 1rem; ${tooltipTextColor}; bold]{failed} [font-size: 1rem; ${tooltipTextColor};](Total Completed)
+                    series.columns.template.tooltipText = `[font-size: 1rem; ${tooltipTextColor}; bold]{failed} [font-size: 0.875rem; ${tooltipTextColor};](Total Failed)
 [font-size: 0.75rem; ${gray[700]}]{tooltipDate}`;
                 }
                 series.tooltip.pointerOrientation = 'down';
