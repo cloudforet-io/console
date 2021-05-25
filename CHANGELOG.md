@@ -1,3 +1,10 @@
+# [1.1.0-beta.25](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.24...v1.1.0-beta.25) (2021-05-25)
+
+
+### Bug Fixes
+
+* update css of page title and sidebar ([#560](https://github.com/spaceone-dev/spaceone-design-system/issues/560)) ([7e60c63](https://github.com/spaceone-dev/spaceone-design-system/commit/7e60c63fcfea2015d0bf98c29d431a2ebb2085a5))
+
 # [1.1.0-beta.24](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.23...v1.1.0-beta.24) (2021-05-25)
 
 
