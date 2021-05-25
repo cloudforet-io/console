@@ -678,6 +678,9 @@
 			}
 		},
 		"USER": {
+			"API_KEY": {
+				"ALT_E_CREATE_SCHEDULER": ""
+			},
 			"FORM": {
 				"ADD_TITLE": "ユーザー追加",
 				"ASSIGN_DOMAIN_ROLE": "ドメイン·ロールの割り当てる",

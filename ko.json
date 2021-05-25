@@ -678,6 +678,9 @@
 			}
 		},
 		"USER": {
+			"API_KEY": {
+				"ALT_E_CREATE_SCHEDULER": "스케줄러 생성 실패"
+			},
 			"FORM": {
 				"ADD_TITLE": "사용자 추가",
 				"ASSIGN_DOMAIN_ROLE": "도메인 권한 할당 ",

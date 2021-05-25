@@ -678,6 +678,9 @@
 			}
 		},
 		"USER": {
+			"API_KEY": {
+				"ALT_E_CREATE_SCHEDULER": "Create scheduler failure"
+			},
 			"FORM": {
 				"ADD_TITLE": "Add User",
 				"ASSIGN_DOMAIN_ROLE": "Assign Domain Role",
