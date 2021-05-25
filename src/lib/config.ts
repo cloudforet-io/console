@@ -1,5 +1,5 @@
 import axios, { AxiosInstance } from 'axios';
-import _ from 'lodash';
+import { get } from 'lodash';
 
 
 class Config {
@@ -40,7 +40,7 @@ class Config {
 
     get(key) {
         if (key) {
-            return _.get(this.config, key);
+            return get(this.config, key);
         }
         return this.config;
     }
