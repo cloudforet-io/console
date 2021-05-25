@@ -4,10 +4,15 @@
             <button v-for="(button, idx) in formattedButtons"
                     :key="`${button.name}-${idx}`"
                     class="select-button"
-                    :class="{ active:selected === button.name }"
+                    :class="[{ active:selected === button.name }, theme]"
                     @click="onClickButton(button.name, idx)"
             >
-                {{ button.label }}
+                <p-i v-if="selected === button.name && theme === 'text'"
+                     name="ic_check"
+                     width="1rem" height="1rem"
+                     :color="secondary"
+                />
+                <span>{{ button.label }}</span>
             </button>
         </div>
     </div>
@@ -18,10 +23,16 @@ import {
     reactive, computed, toRefs,
 } from '@vue/composition-api';
 
+import PI from '@/foundation/icons/PI.vue';
 import { SelectButtonGroupProps, SelectButtonType } from '@/inputs/buttons/select-button-group/type';
+import { SELECT_BUTTON_GROUP_THEME } from '@/inputs/buttons/select-button-group/config';
+import { secondary } from '@/styles/colors';
 
 export default {
     name: 'PSelectButtonGroup',
+    components: {
+        PI,
+    },
     props: {
         buttons: {
             type: Array,
@@ -30,6 +41,13 @@ export default {
         selected: {
             type: String,
             default: '',
+        },
+        theme: {
+            type: String,
+            default: SELECT_BUTTON_GROUP_THEME.default,
+            validator(theme) {
+                return Object.keys(SELECT_BUTTON_GROUP_THEME).includes(theme);
+            },
         },
     },
     setup(props: SelectButtonGroupProps, context) {
@@ -57,6 +75,7 @@ export default {
         };
         return {
             ...toRefs(state),
+            secondary,
             onClickButton,
         };
     },
@@ -67,6 +86,7 @@ export default {
 .p-select-button-group {
     @apply flex flex-wrap;
     .button-group {
+        display: flex;
         margin-right: -0.5rem;
         margin-bottom: -0.5rem;
     }
@@ -86,6 +106,19 @@ export default {
         }
         &.active {
             @apply border-transparent bg-gray-700 text-white;
+        }
+        &.text {
+            @apply bg-transparent text-gray-500 border-transparent;
+            display: inline-flex;
+            align-items: center;
+            padding-left: 0.5rem;
+            padding-right: 0.5rem;
+            &:hover {
+                @apply bg-transparent;
+            }
+            &.active {
+                @apply text-secondary;
+            }
         }
     }
 }

@@ -43,6 +43,9 @@ import PSelectButtonGroup from '@/inputs/buttons/select-button-group/PSelectButt
                     summary: '[]'
                 }
             },
+            control: {
+                type: 'object',
+            },
         },
         selected: {
             name: 'selected',
@@ -62,6 +65,25 @@ import PSelectButtonGroup from '@/inputs/buttons/select-button-group/PSelectButt
                 type: 'select',
                 options: ['one', 'two', 'three', 'four'],
             },
+        },
+        theme: {
+            name: 'theme',
+            type: {name: 'string'},
+            description: 'Style theme of buttons.',
+            defaultValue: 'default',
+            table: {
+                type: {
+                    summary: 'string'
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'default'
+                }
+            },
+            control: {
+                type: 'select',
+                options: ['default', 'text'],
+            },
         }
     }}
 />
@@ -74,6 +96,7 @@ export const Template = (args, { argTypes }) => ({
     <p-select-button-group
         :buttons="buttons"
         :selected.sync="selected"
+        :theme="theme"
         @clickButton="clickButton"
         @click-one="clickOne"
         @click-two="clickTwo"
