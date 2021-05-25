@@ -39,6 +39,9 @@ production_json:
       link: https://github.com/spaceone-dev
 
 
+volumeMounts:
+    application: []
+
 #console_api: https://console-api
 
 #domainName:
