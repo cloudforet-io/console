@@ -4,9 +4,9 @@
 import icon from 'vue-svgicon'
 icon.register({
   'ic_bookmark': {
-    width: 16,
-    height: 16,
-    viewBox: '0 0 12 12',
-    data: '<defs><path pid="0" id="svgicon_ic_bookmark_a" d="M0 0h12v12H0z"/></defs><clipPath id="svgicon_ic_bookmark_b"><use xlink:href="#svgicon_ic_bookmark_a" overflow="visible"/></clipPath><g clip-path="url(#svgicon_ic_bookmark_b)"><path pid="1" d="M9.1 11.5c-.1 0-.3 0-.4-.1L6 9.5l-2.7 1.9c-.1.1-.2.1-.4.1-.1 0-.3 0-.4-.1-.1-.1-.2-.2-.2-.3v-.4l1-3.3L.6 5.5c-.1-.1-.2-.2-.2-.3v-.4c0-.1.1-.2.2-.3.1-.1.2-.2.4-.2h3.3l1.1-3.2c0-.1.1-.2.2-.3.1-.1.3-.1.4-.1.1 0 .3 0 .4.1.1.1.2.2.2.4l1 3.2h3.3c.1 0 .3 0 .4.1.1.1.2.2.2.3v.4c0 .1-.1.2-.2.3L8.7 7.4l1 3.3v.4c0 .1-.1.2-.2.3-.1.1-.3.1-.4.1z" _fill="#ffce02"/></g>'
+    width: 20,
+    height: 20,
+    viewBox: '0 0 20 20',
+    data: '<g clip-path="url(#clip0-659240)"><path pid="0" d="M13.514 5.867l5.462.832c.98.148 1.372 1.41.661 2.132l-3.951 4.023.935 5.683c.168 1.027-.868 1.793-1.735 1.317L10 17.17l-4.886 2.683c-.867.48-1.903-.289-1.735-1.316l.935-5.683L.363 8.831c-.71-.722-.318-1.984.661-2.132l5.462-.832L8.927.696a1.175 1.175 0 012.146 0l2.441 5.171z" _fill="#FFCE02"/></g><defs><clipPath id="clip0-659240"><path pid="1" _fill="#fff" d="M0 0h20v20H0z"/></clipPath></defs>'
   }
 })

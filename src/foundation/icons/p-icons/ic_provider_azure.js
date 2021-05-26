@@ -4,9 +4,9 @@
 import icon from 'vue-svgicon'
 icon.register({
   'ic_provider_azure': {
-    width: 16,
-    height: 16,
+    width: 32,
+    height: 32,
     viewBox: '0 0 32 32',
-    data: '<defs><path pid="0" id="svgicon_ic_provider_azure_a" d="M0 0h32v32H0z"/></defs><clipPath id="svgicon_ic_provider_azure_b"><use xlink:href="#svgicon_ic_provider_azure_a" overflow="visible"/></clipPath><g clip-path="url(#svgicon_ic_provider_azure_b)"><path pid="1" d="M14.8 27.1c4.1-.7 7.5-1.3 7.5-1.3h.1l-3.9-4.6c-2.1-2.5-3.9-4.6-3.9-4.6l4-11.1s2.7 4.7 6.6 11.4c3.6 6.3 6.6 11.5 6.6 11.5l.1.1H7.3l7.5-1.4zM0 25.7s1.8-3.2 4.1-7.1l4.1-7 4.7-4c2.6-2.2 4.7-4 4.8-4 0 0 0 .1-.1.2s-2.4 5.1-5.1 11L7.3 25.7H0z" _fill="#0089d6"/></g>'
+    data: '<g clip-path="url(#clip0-885254)"><path pid="0" d="M14.804 27.078c4.111-.727 7.507-1.328 7.546-1.336l.07-.015-3.88-4.62a655.87 655.87 0 01-3.882-4.642c0-.023 4.008-11.067 4.03-11.107.008-.013 2.735 4.7 6.612 11.423l6.65 11.533.05.089-12.335-.002L7.329 28.4l7.475-1.322zM0 25.67c0-.006 1.829-3.183 4.064-7.06l4.065-7.048 4.736-3.977c2.605-2.188 4.743-3.98 4.752-3.984a.833.833 0 01-.076.192l-5.143 11.039-5.052 10.84-3.673.006C1.653 25.678 0 25.675 0 25.669z" _fill="#0089D6"/></g><defs><clipPath id="clip0-885254"><path pid="1" _fill="#fff" d="M0 0h32v32H0z"/></clipPath></defs>'
   }
 })

@@ -4,9 +4,9 @@
 import icon from 'vue-svgicon'
 icon.register({
   'ic_edit': {
-    width: 16,
-    height: 16,
+    width: 24,
+    height: 24,
     viewBox: '0 0 24 24',
-    data: '<defs><path pid="0" id="svgicon_ic_edit_a" d="M0 0h24v24H0z"/></defs><clipPath id="svgicon_ic_edit_b"><use xlink:href="#svgicon_ic_edit_a" overflow="visible"/></clipPath><g clip-path="url(#svgicon_ic_edit_b)"><path pid="1" d="M19.4 7.3l-2.7-2.7c-.4-.3-.8-.5-1.3-.5s-1 .2-1.3.5l-9 9c-.3.3-.5.8-.6 1.2L4 18.9c0 .1 0 .3.1.4.1.1.1.3.2.4.1.1.2.2.3.2.1.1.3.1.4.1h.1l4.2-.4c.5 0 .9-.2 1.2-.6l9-9c.3-.3.5-.8.5-1.3s-.2-1-.6-1.4zM9.3 18.1l-3.7.4.4-3.8L11.8 9l3.2 3.3-5.7 5.8zm6.8-6.9L12.9 8l2.3-2.2L18.4 9l-2.3 2.2z" _fill="#222532"/></g>'
+    data: '<path pid="0" fill-rule="evenodd" clip-rule="evenodd" d="M16.052 3.75c-.338 0-.663.134-.903.373L4.742 14.534l-.962 4.158v.003a1.279 1.279 0 001.226 1.55c.084.007.168.007.252-.002l.016-.001 4.21-.967L19.879 8.874a1.283 1.283 0 000-1.808l-2.922-2.942a1.28 1.28 0 00-.904-.374zm1.222 5.594l-2.63-2.635 1.376-1.37 2.589 2.636-1.335 1.369zM5.326 18.637l.776-3.347 7.521-7.505 2.633 2.637-7.519 7.499-3.41.716z" _fill="#222532"/>'
   }
 })
