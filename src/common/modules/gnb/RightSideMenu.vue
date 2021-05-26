@@ -1,16 +1,17 @@
 <template>
     <div class="right-side-menu">
         <div class="menu-wrapper">
-            <div v-if="!userState.isDomainOwner" class="menu-button code" :class="{'new-icon':!isNewIconHidden}"
-                 @click="hideNewIcon"
-            >
-                <router-link :to="{ name: 'userAPIKey' }">
+            <router-link :to="{ name: 'userAPIKey' }">
+                <div v-if="!userState.isDomainOwner" class="menu-button code" :class="{'new-icon':!isNewIconHidden}"
+                     @click="hideNewIcon"
+                >
                     <p-i class="menu-icon code"
                          name="ic_code"
+                         color="inherit transparent"
                     />
-                </router-link>
-                <g-n-b-new-icon v-if="!isNewIconHidden" />
-            </div>
+                    <g-n-b-new-icon v-if="!isNewIconHidden" />
+                </div>
+            </router-link>
         </div>
         <div class="menu-wrapper">
             <div class="menu-button opacity"
@@ -233,7 +234,11 @@ export default {
                 opacity: 1;
             }
             &.code {
-              margin-right: 1.5rem;
+                @apply text-gray-500;
+                margin-right: 1.5rem;
+                &:hover {
+                    @apply text-primary;
+                }
             }
 
             &.new-icon {
