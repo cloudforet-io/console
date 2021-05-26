@@ -1,0 +1,109 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
+import { TOGGLE_BUTTON_THEME } from "@/inputs/buttons/toggle-button/config";
+
+<Meta
+    title='Inputs/Buttons/Toggle Button'
+    parameters={{
+        design: {
+            type: 'figma',
+            url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5131%3A127311',
+        },
+    }}
+    component={ PToggleButton }
+    argTypes={{
+        value: {
+            name: 'value',
+            type: { name: 'boolean' },
+            description: 'Initial State of the toggle button.',
+            defaultValue: true,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
+        theme: {
+            name: 'theme',
+            type: {name: 'string'},
+            description: 'Style theme of toggle button.',
+            defaultValue: TOGGLE_BUTTON_THEME.secondary,
+            table: {
+                type: {
+                    summary: 'string'
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: TOGGLE_BUTTON_THEME.secondary,
+                }
+            },
+            control: {
+                type: 'select',
+                options: Object.keys(TOGGLE_BUTTON_THEME),
+            },
+        }
+    }}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PToggleButton },
+    template: `
+<div style="display:flex; align-items:center; justify-content:center;">
+    <p-toggle-button
+        :value="value"
+        :theme="theme"
+        @change="onToggleChange"
+    />
+</div>`,
+    setup() {
+        const onToggleChange = () => {
+            console.log('toggle changed!');
+        }
+        return {
+            onToggleChange,
+        };
+    }
+});
+
+# Toggle Button
+
+<br/>
+<br/>
+<br/>
+
+## Basic
+<Canvas>
+    <Story name="toggle button basic">
+    {{
+        components: { PToggleButton },
+        template: `
+<div style="display:flex; align-items:center; justify-content:center;">
+    <p-toggle-button
+        :value="true"
+        class="mr-8"
+    />
+    <p-toggle-button
+        :value="true"
+        theme="peacock500"
+    />
+</div>`
+    }}
+    </Story>
+</Canvas>
+
+## Playground
+<Canvas>
+    <Story name="playground" >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground" />
