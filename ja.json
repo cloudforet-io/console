@@ -806,6 +806,7 @@
 				"MOBILE": "連絡先",
 				"MY_ACCOUNT": "マイアカウント",
 				"NAME": "お名前",
+				"NOTIFICATION": "",
 				"NO_SELECTED": "ユーザーを選択すると、詳細な情報が表示されます。",
 				"ROOT_ACCOUNT": "",
 				"SELECTED_DATA": "選択したデータ",
@@ -821,6 +822,33 @@
 				"USER_ID": "ID",
 				"USER_MANAGEMENT": "ユーザー管理",
 				"YESTERDAY": "昨日"
+			},
+			"NOTIFICATION": {
+				"ADD_SLACK": "",
+				"ADD_SMS": "",
+				"ADD_VOICE": "",
+				"EDIT": "",
+				"FORM": {
+					"ALL_TIME": "",
+					"BASE_INFO": "",
+					"CUSTOM": "",
+					"ESCALATION_LEVEL": "",
+					"PHONE_NUMBER": "",
+					"RECEIVE_ALL": "",
+					"RECEIVE_ON_TOPIC": "",
+					"SCEHDULE": "",
+					"SCHEDULE_INFO_MSG": "",
+					"SETTING": "",
+					"SETTING_MODE": "",
+					"SLACK_TOKEN": "",
+					"TOPIC": ""
+				},
+				"MESSENGER": "",
+				"NOTIFICATION_CHANNEL": "",
+				"NOTI_CHANNEL_DESC": "",
+				"NO_NOTI_CHANNEL": "",
+				"TOKEN": "",
+				"TOKEN_INFO": ""
 			}
 		}
 	},

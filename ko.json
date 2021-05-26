@@ -806,6 +806,7 @@
 				"MOBILE": "연락처",
 				"MY_ACCOUNT": "내 계정 ",
 				"NAME": "이름",
+				"NOTIFICATION": "알림",
 				"NO_SELECTED": "사용자를 선택하면 자세한 정보를 볼 수 있습니다.",
 				"ROOT_ACCOUNT": "루트 어카운트 ",
 				"SELECTED_DATA": "선택한 데이터",
@@ -821,6 +822,33 @@
 				"USER_ID": "아이디",
 				"USER_MANAGEMENT": "사용자 관리 ",
 				"YESTERDAY": "어제 "
+			},
+			"NOTIFICATION": {
+				"ADD_SLACK": "슬랙 채널 추가",
+				"ADD_SMS": "SMS 채널 추가",
+				"ADD_VOICE": "보이스 콜 채널 추가",
+				"EDIT": "편집",
+				"FORM": {
+					"ALL_TIME": "모든 시간",
+					"BASE_INFO": "기본 정보",
+					"CUSTOM": "시간 설정",
+					"ESCALATION_LEVEL": "에스컬레이션 레벨",
+					"PHONE_NUMBER": "전화번호",
+					"RECEIVE_ALL": "모든 알림 받기",
+					"RECEIVE_ON_TOPIC": "선택한 토픽 알림 받기",
+					"SCEHDULE": "스케쥴",
+					"SCHEDULE_INFO_MSG": "선택한 일정의 알림만 수신됩니다.",
+					"SETTING": "설정",
+					"SETTING_MODE": "설정 방식",
+					"SLACK_TOKEN": "슬랙 토큰",
+					"TOPIC": "토픽"
+				},
+				"MESSENGER": "메신저",
+				"NOTIFICATION_CHANNEL": "알림 채널",
+				"NOTI_CHANNEL_DESC": "SMS 및 음성 통화 지원 환경은 국가에 따라 다를 수 있습니다.",
+				"NO_NOTI_CHANNEL": "알림 채널이 없습니다.",
+				"TOKEN": "토큰",
+				"TOKEN_INFO": "Token은 수정이 불가합니다."
 			}
 		}
 	},

@@ -806,6 +806,7 @@
 				"MOBILE": "Mobile",
 				"MY_ACCOUNT": "My Account",
 				"NAME": "Name",
+				"NOTIFICATION": "Notification",
 				"NO_SELECTED": "Select a user for more details.",
 				"ROOT_ACCOUNT": "Root Account",
 				"SELECTED_DATA": "Selected Data",
@@ -821,6 +822,33 @@
 				"USER_ID": "ID",
 				"USER_MANAGEMENT": "User Management",
 				"YESTERDAY": "Yesterday"
+			},
+			"NOTIFICATION": {
+				"ADD_SLACK": "Add Slack channel",
+				"ADD_SMS": "Add SMS channel",
+				"ADD_VOICE": "Add Voice Call channel",
+				"EDIT": "Edit",
+				"FORM": {
+					"ALL_TIME": "All Time",
+					"BASE_INFO": "Base Information",
+					"CUSTOM": "Custom",
+					"ESCALATION_LEVEL": "Escalation Level ",
+					"PHONE_NUMBER": "Phone number",
+					"RECEIVE_ALL": "Receive all notifications",
+					"RECEIVE_ON_TOPIC": "Receive notifications based on selected topics",
+					"SCEHDULE": "Schedule ",
+					"SCHEDULE_INFO_MSG": "You will only receive notifications in the schedule you choose.",
+					"SETTING": "Setting",
+					"SETTING_MODE": "Setting Mode",
+					"SLACK_TOKEN": "Slack Token",
+					"TOPIC": "Topic"
+				},
+				"MESSENGER": "Messenger",
+				"NOTIFICATION_CHANNEL": "Notification Channels",
+				"NOTI_CHANNEL_DESC": "Supporting environments for SMS and voice call may vary depends on the country.  ",
+				"NO_NOTI_CHANNEL": "No Notification Channel",
+				"TOKEN": "Token",
+				"TOKEN_INFO": "Token cannot be modified."
 			}
 		}
 	},
