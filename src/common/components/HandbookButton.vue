@@ -169,21 +169,18 @@ export default {
         @apply overflow-auto;
         height: calc(100vh - 8.825rem);
         &::before {
-            bottom: 5.225rem;
+            bottom: 2.225rem;
         }
         .p-tab::v-deep {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             .is-single + .tab-pane {
                 height: calc(100% - 3.5rem);
             }
             .tab-pane {
                 @apply overflow-auto;
-                height: calc(100% - 6.8125rem);
+                height: calc(100% - 6.25rem);
             }
         }
-    }
-    .no-more {
-        margin-bottom: 2.5rem;
     }
 }
 </style>
