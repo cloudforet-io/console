@@ -1004,6 +1004,10 @@
 			"MANAGEMENT": "Management",
 			"PLUGIN": "Plugin Management"
 		},
+		"MONITORING": {
+			"ALERT_SYSTEM": "Alert System",
+			"MONITORING": "Monitoring"
+		},
 		"PLUGIN": {
 			"COLLECTOR": "Collector",
 			"CREATE_COLLECTOR": "Create Collector",
@@ -1011,6 +1015,15 @@
 		},
 		"PROJECT": {
 			"PROJECT": "Project"
+		}
+	},
+	"MONITORING": {
+		"ALERT": {
+			"MAIN": {
+				"ALERT": "Alert",
+				"DASHBOARD": "Dashboard",
+				"ESCALATION_POLICY": "Escalation Policy"
+			}
 		}
 	},
 	"PAGE_SCHEMA": {

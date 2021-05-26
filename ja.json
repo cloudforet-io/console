@@ -1004,6 +1004,10 @@
 			"MANAGEMENT": "管理",
 			"PLUGIN": "プラグイン管理"
 		},
+		"MONITORING": {
+			"ALERT_SYSTEM": "",
+			"MONITORING": "モニタリング"
+		},
 		"PLUGIN": {
 			"COLLECTOR": "コレクタ",
 			"CREATE_COLLECTOR": "コレクタ作成",
@@ -1011,6 +1015,15 @@
 		},
 		"PROJECT": {
 			"PROJECT": "プロジェクト"
+		}
+	},
+	"MONITORING": {
+		"ALERT": {
+			"MAIN": {
+				"ALERT": "",
+				"DASHBOARD": "ダッシュボード",
+				"ESCALATION_POLICY": ""
+			}
 		}
 	},
 	"PAGE_SCHEMA": {

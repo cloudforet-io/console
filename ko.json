@@ -1004,6 +1004,10 @@
 			"MANAGEMENT": "관리 ",
 			"PLUGIN": "플러그인 관리"
 		},
+		"MONITORING": {
+			"ALERT_SYSTEM": "Alert System",
+			"MONITORING": "모니터링"
+		},
 		"PLUGIN": {
 			"COLLECTOR": "컬렉터 ",
 			"CREATE_COLLECTOR": "컬렉터 생성 ",
@@ -1011,6 +1015,15 @@
 		},
 		"PROJECT": {
 			"PROJECT": "프로젝트 "
+		}
+	},
+	"MONITORING": {
+		"ALERT": {
+			"MAIN": {
+				"ALERT": "Alert",
+				"DASHBOARD": "대시보드",
+				"ESCALATION_POLICY": "Escalation Policy"
+			}
 		}
 	},
 	"PAGE_SCHEMA": {
