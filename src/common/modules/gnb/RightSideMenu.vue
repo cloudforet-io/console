@@ -170,12 +170,14 @@ export default {
             state.showLanguageMenu = !state.showLanguageMenu;
         };
         const hideNewIcon = async () => {
-            state.isNewIconHidden = true;
-            await store.dispatch('settings/setItem', {
-                key: 'hide_new_icon',
-                value: true,
-                path: '/gnb',
-            });
+            if (!state.isNewIconHidden) {
+                state.isNewIconHidden = true;
+                await store.dispatch('settings/setItem', {
+                    key: 'hide_new_icon',
+                    value: true,
+                    path: '/gnb',
+                });
+            }
         };
 
 

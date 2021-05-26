@@ -54,6 +54,7 @@
             :header-title="checkModalState.title"
             :sub-title="checkModalState.subTitle"
             :theme-color="checkModalState.themeColor"
+            :loading="checkModalState.loading"
             size="md"
             :visible.sync="checkModalState.visible"
             @confirm="checkModalConfirm"
@@ -178,6 +179,7 @@ export default {
             subTitle: '' as TranslateResult,
             themeColor: '',
             visible: false,
+            loading: false,
         });
 
         const onSelect = async (index) => {
@@ -297,9 +299,11 @@ export default {
         };
 
         const checkModalConfirm = async (item) => {
+            checkModalState.loading = true;
             if (checkModalState.mode === 'delete') await deleteAPIKey(item);
-            if (checkModalState.mode === 'enable') await enableAPIKey(item);
-            if (checkModalState.mode === 'disable') await disableAPIKey(item);
+            else if (checkModalState.mode === 'enable') await enableAPIKey(item);
+            else if (checkModalState.mode === 'disable') await disableAPIKey(item);
+            checkModalState.loading = false;
         };
 
         const listEndpoints = async () => {
