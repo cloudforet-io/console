@@ -1,3 +1,10 @@
+# [1.1.0-beta.27](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.26...v1.1.0-beta.27) (2021-05-26)
+
+
+### Bug Fixes
+
+* add loading props to table check modal ([#562](https://github.com/spaceone-dev/spaceone-design-system/issues/562)) ([bb8ebdc](https://github.com/spaceone-dev/spaceone-design-system/commit/bb8ebdc48cc52a9b0e26daff87ce8fed4f759518))
+
 # [1.1.0-beta.26](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.25...v1.1.0-beta.26) (2021-05-26)
 
 
