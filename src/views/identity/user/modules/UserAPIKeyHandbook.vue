@@ -2,63 +2,63 @@
     <section>
         <article class="desc-wrapper">
             <h2 class="title first">
-                {{ $t('IDENTITY.USER.MAIN.HANDBOOK_TITLE_1') }}
+                {{ $t('IDENTITY.USER.HANDBOOK.TITLE_1') }}
             </h2>
             <p class="desc">
-                <i18n path="IDENTITY.USER.MAIN.HANDBOOK_DESC_1">
+                <i18n path="IDENTITY.USER.HANDBOOK.DESC_1">
                     <template #document>
                         <p-anchor :href="githubLink" target="_blank" class="link">
-                            {{ $t('IDENTITY.USER.MAIN.HANDBOOK_DESC_1_DOC') }}
+                            {{ $t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
                         </p-anchor>
                     </template>
                 </i18n>
                 <br>
-                <strong>{{ $t('IDENTITY.USER.MAIN.HANDBOOK_DESC_1_REQUIREMENTS') }}</strong>
-                {{ $t('IDENTITY.USER.MAIN.HANDBOOK_DESC_1_PYTHON_VERSION') }}
+                <strong>{{ $t('IDENTITY.USER.HANDBOOK.DESC_1_REQUIREMENTS') }}</strong>
+                {{ $t('IDENTITY.USER.HANDBOOK.DESC_1_PYTHON_VERSION') }}
             </p>
         </article>
         <article class="desc-wrapper">
             <h2 class="title">
-                {{ $t('IDENTITY.USER.MAIN.HANDBOOK_TITLE_2') }}
+                {{ $t('IDENTITY.USER.HANDBOOK.TITLE_2') }}
             </h2>
             <h3 class="sub-title">
-                {{ $t('IDENTITY.USER.MAIN.HANDBOOK_TITLE_2-1') }}
+                {{ $t('IDENTITY.USER.HANDBOOK.TITLE_2-1') }}
             </h3>
             <p class="desc">
-                {{ $t('IDENTITY.USER.MAIN.HANDBOOK_DESC_2-1') }}
+                {{ $t('IDENTITY.USER.HANDBOOK.DESC_2-1') }}
             </p>
             <h3 class="sub-title">
-                {{ $t('IDENTITY.USER.MAIN.HANDBOOK_TITLE_2-2') }}
+                {{ $t('IDENTITY.USER.HANDBOOK.TITLE_2-2') }}
             </h3>
             <p class="desc">
-                {{ $t('IDENTITY.USER.MAIN.HANDBOOK_DESC_2-2') }}
+                {{ $t('IDENTITY.USER.HANDBOOK.DESC_2-2') }}
             </p>
             <p-raw-data :raw="codeBlock.installCode" class="code-block" />
             <h3 class="sub-title">
-                {{ $t('IDENTITY.USER.MAIN.HANDBOOK_TITLE_2-3') }}
+                {{ $t('IDENTITY.USER.HANDBOOK.TITLE_2-3') }}
             </h3>
             <p class="desc">
-                {{ $t('IDENTITY.USER.MAIN.HANDBOOK_DESC_2-3') }}
+                {{ $t('IDENTITY.USER.HANDBOOK.DESC_2-3') }}
             </p>
             <p-raw-data :raw="codeBlock.configCode" class="code-block" />
         </article>
         <article class="desc-wrapper">
             <h2 class="title">
-                {{ $t('IDENTITY.USER.MAIN.HANDBOOK_TITLE_3') }}
+                {{ $t('IDENTITY.USER.HANDBOOK.TITLE_3') }}
             </h2>
             <p class="desc">
-                {{ $t('IDENTITY.USER.MAIN.HANDBOOK_DESC_3-1') }}
+                {{ $t('IDENTITY.USER.HANDBOOK.DESC_3-1') }}
             </p>
             <p-raw-data :raw="codeBlock.startCode" class="code-block" />
             <p class="desc">
-                {{ $t('IDENTITY.USER.MAIN.HANDBOOK_DESC_3-2') }}
+                {{ $t('IDENTITY.USER.HANDBOOK.DESC_3-2') }}
             </p>
             <p-raw-data :raw="codeBlock.helpCode" class="code-block" />
             <p class="desc last">
-                <i18n path="IDENTITY.USER.MAIN.HANDBOOK_DESC_3-3">
+                <i18n path="IDENTITY.USER.HANDBOOK.DESC_3-3">
                     <template #document>
                         <p-anchor :href="githubLink" target="_blank" class="link">
-                            {{ $t('IDENTITY.USER.MAIN.HANDBOOK_DESC_1_DOC') }}
+                            {{ $t('IDENTITY.USER.HANDBOOK.DESC_1_DOC') }}
                         </p-anchor>
                     </template>
                 </i18n>

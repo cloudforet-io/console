@@ -1,8 +1,8 @@
 import { RouteConfig } from 'vue-router';
 
-const UserAccount = () => import(/* webpackChunkName: "UserAccount" */ '@/views/identity/user/modules/UserAccount.vue');
-const UserAPIKeyPage = () => import(/* webpackChunkName: "UserAPIKey" */ '@/views/identity/user/modules/UserAPIKeyPage.vue');
-const UserManagement = () => import(/* webpackChunkName: "UserManagement" */ '@/views/identity/user/modules/UserManagement.vue');
+const UserAccount = () => import(/* webpackChunkName: "UserAccount" */ '@/views/identity/user/pages/UserAccountPage.vue');
+const UserAPIKeyPage = () => import(/* webpackChunkName: "UserAPIKey" */ '@/views/identity/user/pages/UserAPIKeyPage.vue');
+const UserManagement = () => import(/* webpackChunkName: "UserManagement" */ '@/views/identity/user/pages/UserManagementPage.vue');
 const UserPage = () => import(/* webpackChunkName: "User" */ '@/views/identity/user/pages/UserPage.vue');
 const ServiceAccount = () => import(/* webpackChunkName: "ServiceAccount" */ '@/views/identity/service-account/pages/ServiceAccountPage.vue');
 const AddServiceAccountPage = () => import(/* webpackChunkName: "AddServiceAccount" */ '@/views/identity/service-account/pages/AddServiceAccountPage.vue');

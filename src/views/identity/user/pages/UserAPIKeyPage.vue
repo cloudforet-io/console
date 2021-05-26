@@ -14,7 +14,7 @@
             </handbook-button>
         </div>
         <p-page-title :title="$t('IDENTITY.USER.MAIN.API_KEY')"
-                      :title-info="$t('IDENTITY.USER.MAIN.API_KEY_TITLE_INFO')" class="page-title"
+                      :title-info="$t('IDENTITY.USER.API_KEY.TITLE_INFO')" class="page-title"
         />
         <user-a-p-i-key-table
             :user-id="userId"

@@ -2,7 +2,7 @@
     <p-icon-modal :visible.sync="proxyVisible"
                   icon-name="ic_done"
                   size="md"
-                  :header-title="$t('IDENTITY.USER.MAIN.API_KEY_MODAL_TITLE')"
+                  :header-title="$t('IDENTITY.USER.API_KEY.MODAL_TITLE')"
                   :button-text="$t('COMPONENT.BUTTON_MODAL.CONFIRM')"
                   @clickButton="onClickConfirm"
     >
@@ -12,17 +12,17 @@
                     <p-i name="ic_state_duplicated" width="0.75rem" height="0.75rem"
                          class="alert-icon"
                     />
-                    {{ $t('IDENTITY.USER.MAIN.API_KEY_ALERT_MSG') }}
+                    {{ $t('IDENTITY.USER.API_KEY.ALERT_MSG') }}
                 </span>
             </article>
             <p-pane-layout class="box-wrapper">
                 <span class="box-header">
-                    {{ $t('IDENTITY.USER.MAIN.API_KEY_ID') }}
+                    {{ $t('IDENTITY.USER.API_KEY.ID') }}
                 </span>
                 <p class="box-contents">
                     {{ apiKeyItem.api_key_id }}
                     <p-collapsible-toggle :is-collapsed.sync="isAPICollapsed" class="collapsible-toggle">
-                        {{ isAPICollapsed ? $t('IDENTITY.USER.MAIN.API_KEY_SHOW') : $t('IDENTITY.USER.MAIN.API_KEY_HIDE') }}
+                        {{ isAPICollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
                     </p-collapsible-toggle>
                     <p-raw-data v-if="!isAPICollapsed" class="m-4" :item="apiItem"
                                 folded
@@ -33,31 +33,31 @@
                                     name="ic_download" class="download-btn"
                                     @click="onClickDownloadFile(FileType.JSON)"
                 >
-                    {{ $t('IDENTITY.USER.MAIN.API_KEY_DOWNLOAD_JSON') }}
+                    {{ $t('IDENTITY.USER.API_KEY.DOWNLOAD_JSON') }}
                 </p-icon-text-button>
             </p-pane-layout>
             <p-pane-layout class="box-wrapper">
                 <span class="box-header">
-                    {{ $t('IDENTITY.USER.MAIN.API_KEY_SPACECTL') }}
+                    {{ $t('IDENTITY.USER.API_KEY.SPACECTL') }}
                     <div class="box-header-desc">
                         <p-i name="ic_outlined-info"
                              width="1rem" height="1rem"
                              color="inherit"
                              class="info-icon"
                         />
-                        <p>{{ $t('IDENTITY.USER.MAIN.API_KEY_SPACECTL_DESC') }}
+                        <p>{{ $t('IDENTITY.USER.API_KEY.SPACECTL_DESC') }}
                             <span class="text">
                                 <p-anchor :href="githubLink" target="_blank">
-                                    {{ $t('IDENTITY.USER.MAIN.API_KEY_VIEW_MORE') }}
+                                    {{ $t('IDENTITY.USER.API_KEY.VIEW_MORE') }}
                                 </p-anchor>
                             </span>
                         </p>
                     </div>
                 </span>
                 <p class="box-contents">
-                    {{ $t('IDENTITY.USER.MAIN.API_KEY_SPACECTL_CONFIG') }}
+                    {{ $t('IDENTITY.USER.API_KEY.SPACECTL_CONFIG') }}
                     <p-collapsible-toggle :is-collapsed.sync="isSpacectlCollapsed" class="collapsible-toggle">
-                        {{ isSpacectlCollapsed ? $t('IDENTITY.USER.MAIN.API_KEY_SHOW') : $t('IDENTITY.USER.MAIN.API_KEY_HIDE') }}
+                        {{ isSpacectlCollapsed ? $t('IDENTITY.USER.API_KEY.SHOW') : $t('IDENTITY.USER.API_KEY.HIDE') }}
                     </p-collapsible-toggle>
                     <p-raw-data v-if="!isSpacectlCollapsed" class="m-4" :raw="yamlItem"
                                 folded
@@ -68,7 +68,7 @@
                                     name="ic_download" class="download-btn"
                                     @click="onClickDownloadFile(FileType.YAML)"
                 >
-                    {{ $t('IDENTITY.USER.MAIN.API_KEY_DOWNLOAD_YAML') }}
+                    {{ $t('IDENTITY.USER.API_KEY.DOWNLOAD_YAML') }}
                 </p-icon-text-button>
             </p-pane-layout>
         </template>

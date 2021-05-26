@@ -109,7 +109,7 @@ export default {
             showManagementPage: true,
             userMenuList: [
                 {
-                    label: vm.$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE'),
+                    label: vm.$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE'),
                     routeName: IDENTITY_ROUTE.USER.ACCOUNT,
                     userOnly: false,
                 },

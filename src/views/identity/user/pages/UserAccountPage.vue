@@ -2,15 +2,15 @@
     <div class="user-account-page">
         <p-breadcrumbs v-if="isAdmin" :routes="routeState.adminRoutes" />
         <p-breadcrumbs v-else :routes="routeState.userRoutes" />
-        <p-page-title :title="$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE')" />
+        <p-page-title :title="$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE')" />
         <p-pane-layout class="form-wrapper">
             <p class="form-title">
-                {{ $t('IDENTITY.USER.MAIN.BASE_INFORMATION') }}
+                {{ $t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION') }}
             </p>
-            <p-field-group required :label="'ID'" class="input-form">
+            <p-field-group required :label="$t('COMMON.PROFILE.ID')" class="input-form">
                 <p-text-input v-model="userId" disabled class="text-input" />
             </p-field-group>
-            <p-field-group required :label="'Role'" class="input-form">
+            <p-field-group required :label="$t('COMMON.PROFILE.ROLE')" class="input-form">
                 <p-text-input v-model="userRole" disabled class="text-input" />
             </p-field-group>
             <p-field-group required :label="$t('COMMON.PROFILE.EMAIL')"
@@ -41,14 +41,14 @@
             </p-field-group>
             <div class="save-btn">
                 <p-button style-type="primary-dark" @click="onClickProfileConfirm">
-                    {{ $t('IDENTITY.USER.MAIN.SAVE_CHANGES') }}
+                    {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
                 </p-button>
             </div>
         </p-pane-layout>
         <div v-if="userType == 'LOCAL'">
             <p-pane-layout class="mt-6 form-wrapper">
                 <p class="form-title">
-                    {{ $t('IDENTITY.USER.MAIN.CHANGE_PASSWORD') }}
+                    {{ $t('IDENTITY.USER.ACCOUNT.CHANGE_PASSWORD') }}
                 </p>
                 <form class="form">
                     <p-field-group
@@ -82,7 +82,7 @@
                 </form>
                 <div class="save-btn">
                     <p-button style-type="primary-dark" @click="onClickPasswordConfirm">
-                        {{ $t('IDENTITY.USER.MAIN.SAVE_CHANGES') }}
+                        {{ $t('IDENTITY.USER.ACCOUNT.SAVE_CHANGES') }}
                     </p-button>
                 </div>
             </p-pane-layout>
@@ -165,7 +165,7 @@ export default {
                 { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
                 { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/user-management' },
                 { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
-                { name: vm.$t('IDENTITY.USER.MAIN.ACCOUNT_N_PROFILE') },
+                { name: vm.$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE') },
             ])),
         });
 
