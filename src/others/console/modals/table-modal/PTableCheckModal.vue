@@ -6,6 +6,7 @@
                     :backdrop="backdrop"
                     :visible.sync="proxyVisible"
                     :theme-color="themeColor"
+                    :loading="loading"
                     @cancel="cancel"
                     @close="close"
                     @confirm="confirm"
@@ -75,6 +76,10 @@ export default {
         subTitle: String,
         fields: Array,
         items: Array,
+        loading: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, context) {
         const state = reactive({
