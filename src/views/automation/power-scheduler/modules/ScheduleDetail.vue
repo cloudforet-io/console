@@ -84,21 +84,11 @@
             </div>
         </section>
 
-        <p-button-modal :header-title="checkDeleteState.headerTitle"
-                        :scrollable="false"
-                        size="md"
-                        :fade="true"
-                        :backdrop="true"
-                        :visible.sync="checkDeleteState.visible"
-                        theme-color="alert"
-                        @confirm="scheduleDeleteConfirm"
-        >
-            <template #body>
-                <p class="delete-modal-content">
-                    {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.CHECK_DELETE_MODAL_DESC') }}
-                </p>
-            </template>
-        </p-button-modal>
+        <delete-modal :header-title="checkDeleteState.headerTitle"
+                      :visible.sync="checkDeleteState.visible"
+                      :contents="$t('AUTOMATION.POWER_SCHEDULER.DETAILS.CHECK_DELETE_MODAL_DESC')"
+                      @confirm="scheduleDeleteConfirm"
+        />
 
         <p-button-modal :header-title="$t('AUTOMATION.POWER_SCHEDULER.DETAILS.CHECK_TIME_SET_MODAL_TITLE')"
                         size="md"
@@ -109,7 +99,7 @@
                         @confirm="onClickCheckModalConfirm"
         >
             <template #body>
-                <p class="delete-modal-content">
+                <p class="check-modal-contents">
                     {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.CHECK_TIME_SET_MODAL_DESC_1') }}
                     <br>
                     {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.CHECK_TIME_SET_MODAL_DESC_2') }}
@@ -176,6 +166,7 @@ import {
 } from '@spaceone/design-system';
 
 import { store } from '@/store';
+import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 
 
 interface Props {
@@ -191,6 +182,7 @@ type sectionType = 'kanban'|'time-table'
 export default {
     name: 'ScheduleDetail',
     components: {
+        DeleteModal,
         PButton,
         PIconButton,
         PPageTitle,
@@ -527,7 +519,7 @@ header {
     @apply block mt-4 w-full;
 }
 
-.delete-modal-content {
+.check-modal-contents {
     line-height: 160%;
 }
 

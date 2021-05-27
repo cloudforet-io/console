@@ -1,26 +1,17 @@
 <template>
-    <p-button-modal :header-title="$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE')"
-                    centered
-                    :scrollable="false"
-                    size="sm"
-                    fade
-                    :visible.sync="proxyVisible"
-                    theme-color="alert"
-                    @confirm="deleteProjectGroup"
+    <delete-modal :header-title="$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE')"
+                  :visible.sync="proxyVisible"
+                  @confirm="deleteProjectGroup"
     >
-        <template #body>
-            <div class="delete-modal-contents">
-                <p>
-                    {{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.CONTENT') }}
-                </p>
-                <i18n path="PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DESC" tag="p" class="desc">
-                    <template #deleteAllSubProjects>
-                        <strong>{{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DELETE_ALL_SUB_PROJECT') }}</strong>
-                    </template>
-                </i18n>
-            </div>
-        </template>
-    </p-button-modal>
+        <p>
+            {{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.CONTENT') }}
+        </p>
+        <i18n path="PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DESC" tag="p" class="desc">
+            <template #deleteAllSubProjects>
+                <strong>{{ $t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.DELETE_ALL_SUB_PROJECT') }}</strong>
+            </template>
+        </i18n>
+    </delete-modal>
 </template>
 
 <script lang="ts">
@@ -29,14 +20,12 @@ import {
 } from '@vue/composition-api';
 import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import {
-    PButtonModal,
-} from '@spaceone/design-system';
+import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 
 export default {
     name: 'ProjectGroupDeleteCheckModal',
     components: {
-        PButtonModal,
+        DeleteModal,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
