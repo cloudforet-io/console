@@ -218,6 +218,8 @@ export default {
 
         let getCardToken: CancelTokenSource | undefined;
         const getCardSummary = async (items) => {
+            if (items.length === 0) return;
+
             if (getCardToken) {
                 getCardToken.cancel('Next request has been called.');
                 getCardToken = undefined;
@@ -225,6 +227,7 @@ export default {
 
             getCardToken = axios.CancelToken.source();
             const cardSummary = {};
+            state.cardSummaryLoading = true;
             try {
                 const ids = items?.map(item => item.project_id);
                 const res = await SpaceConnector.client.statistics.topic.projectPage({
@@ -238,9 +241,16 @@ export default {
                         serverCount: d.server_count || 0,
                     };
                 });
-            } catch (e) { console.error(e); }
-
-            return cardSummary;
+                getCardToken = undefined;
+                state.cardSummary = cardSummary;
+                state.cardSummaryLoading = false;
+            } catch (e) {
+                if (!axios.isCancel(e.axiosError)) {
+                    state.cardSummary = cardSummary;
+                    state.cardSummaryLoading = false;
+                    console.error(e);
+                }
+            }
         };
 
         let listProjectToken: CancelTokenSource | undefined;
@@ -256,28 +266,22 @@ export default {
             // create a new token for upcoming request (overwrite the previous one)
             listProjectToken = axios.CancelToken.source();
             state.loading = true;
-            state.cardSummaryLoading = true;
             try {
                 let res;
                 if (state.isAll) res = await listAllProjectApi(getParams(undefined, text), { cancelToken: listProjectToken.token });
                 else res = await listProjectApi(getParams(id, text), { cancelToken: listProjectToken.token });
                 state.items = res.results;
                 state.totalCount = res.total_count;
+                store.commit('projectPage/setProjectCount', state.totalCount);
                 state.loading = false;
                 listProjectToken = undefined;
-
-                state.cardSummary = await getCardSummary(res.results);
-                state.cardSummaryLoading = false;
-
-                store.commit('projectPage/setProjectCount', state.totalCount);
+                await getCardSummary(res.results);
             } catch (e) {
                 if (!axios.isCancel(e.axiosError)) {
                     state.items = [];
                     state.totalCount = 0;
                     state.loading = false;
-                    state.cardSummaryLoading = false;
                     store.commit('projectPage/setProjectCount', 0);
-                } else {
                     console.error(e);
                 }
             }

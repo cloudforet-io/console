@@ -2,6 +2,7 @@
     <fragment>
         <p-autocomplete-search v-model="search" :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_TAG')"
                                :menu="allTagsMenuItems"
+                               :loading="loading"
                                @select-menu="onSelectTag"
         >
             <template #menu-item--format="{item, id}">
@@ -10,6 +11,9 @@
                 >
                     {{ item.label }}
                 </p-check-box>
+            </template>
+            <template #menu-no-data-format>
+                <div v-if="loading" class="fake-no-data" />
             </template>
         </p-autocomplete-search>
         <div class="tag-box">
@@ -167,6 +171,9 @@ export default {
     &:hover {
         @apply bg-blue-200;
     }
+    .text {
+        word-break: break-word;
+    }
 }
 .tag-box {
     @apply text-gray-900;
@@ -181,6 +188,9 @@ export default {
         .context-item:not(.empty) {
             padding: 0;
             white-space: unset;
+        }
+        .fake-no-data {
+            height: 1rem;
         }
     }
 }
