@@ -13,8 +13,8 @@ import pluginRoute from '@/routes/plugin/plugin-route';
 import projectRoute from '@/routes/project/project-route';
 import managementRoute from '@/routes/management/management-route';
 import automationRoute from '@/routes/automation/automation-route';
+import monitoringRoute from '@/routes/monitoring/monitoring-route';
 import { RouterOptions } from 'vue-router';
-
 
 
 export const routerOptions = {
@@ -95,6 +95,7 @@ export const routerOptions = {
                 projectRoute,
                 managementRoute,
                 automationRoute,
+                monitoringRoute,
             ],
         },
         { path: '*', component: ErrorPage },

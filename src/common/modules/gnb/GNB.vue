@@ -92,6 +92,7 @@ enum PARENT_CATEGORY {
     project = 'project',
     inventory = 'inventory',
     identity = 'identity',
+    monitoring = 'monitoring',
     automation = 'automation',
     plugin = 'plugin',
     management = 'management',
@@ -172,6 +173,19 @@ export default {
                             show: true,
                         },
                         { label: vm.$t('MENU.IDENTITY.USER'), to: { name: 'userManagement' }, show: state.isAdmin },
+                    ],
+                },
+                {
+                    name: PARENT_CATEGORY.monitoring,
+                    label: vm.$t('MENU.MONITORING.MONITORING'),
+                    to: { name: 'monitoring' },
+                    subMenuList: [
+                        {
+                            label: vm.$t('MENU.MONITORING.ALERT_SYSTEM'),
+                            to: { name: 'alertDashboard' },
+                            isNew: true,
+                            show: true,
+                        },
                     ],
                 },
                 {
