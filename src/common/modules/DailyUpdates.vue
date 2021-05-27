@@ -174,10 +174,6 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        projectFilter: {
-            type: String,
-            default: '',
-        },
         projectId: {
             type: String,
             default: undefined,
@@ -393,7 +389,7 @@ export default {
         const getData = async (): Promise<void> => {
             state.loading = true;
             await Promise.all([getServerData(), getCloudServiceData()]);
-            if (props.projectFilter) {
+            if (props.projectId) {
                 const dataForFilter = await setProjectDashboardData() as any[];
                 await getAlertData(dataForFilter);
             } else {

@@ -101,10 +101,6 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        projectFilter: {
-            type: String,
-            default: '',
-        },
         moreInfo: {
             type: Boolean,
             default: false,
@@ -197,7 +193,7 @@ export default {
             apiQuery.setSort('count', true)
                 .setPage(1, 9);
             try {
-                if (props.projectFilter) {
+                if (props.projectId) {
                     await getDataInProject();
                 } else {
                     const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({

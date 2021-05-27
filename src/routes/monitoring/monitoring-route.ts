@@ -10,7 +10,7 @@ const AlertDetailPage = () => import(/* webpackChunkName: "AlertDetailPage" */ '
 export const MONITORING_ROUTE = Object.freeze({
     MAIN: 'monitoring',
     ALERT_SYSTEM: {
-        MAIN: 'alertDashboard',
+        MAIN: 'alertSystem',
         DASHBOARD: 'alertDashboard',
         ALERT: {
             LIST: 'alertList',

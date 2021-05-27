@@ -1,24 +1,22 @@
 <template>
-    <div class="grid grid-cols-12 project-dashboard">
-        <project-all-summary class="col-span-12" :project-id="projectId" />
+    <div class="grid grid-cols-12 project-dashboard-page">
+        <project-all-summary class="col-span-12" :project-id="id" />
         <div class="col-span-12 lg:col-span-9 grid grid-cols-12 left-part">
-            <project-billing class="col-span-12" :project-id="projectId" />
-            <project-personal-health-dashboard class="col-span-12" :providers="providers" :project-id="projectId" />
-            <project-service-accounts class="col-span-12 service-accounts-table" :project-id="projectId" />
+            <project-billing class="col-span-12" :project-id="id" />
+            <project-personal-health-dashboard class="col-span-12" :providers="providers" :project-id="id" />
+            <project-service-accounts class="col-span-12 service-accounts-table" :project-id="id" />
         </div>
         <div class="col-span-12 lg:col-span-3 grid grid-cols-12 right-part">
             <daily-updates class="col-span-12 daily-updates"
-                           :project-id="projectId"
-                           :project-filter="projectFilter"
+                           :project-id="id"
             />
             <cloud-services class="col-span-12 cloud-services"
                             :more-info="true"
-                            :project-filter="projectFilter"
-                            :project-id="projectId"
+                            :project-id="id"
             />
             <project-trusted-advisor class="col-span-12 trusted-advisor"
                                      :providers="providers"
-                                     :project-id="projectId"
+                                     :project-id="id"
             />
         </div>
     </div>
@@ -41,7 +39,7 @@ import { store } from '@/store';
 
 
 export default {
-    name: 'ProjectDashboard',
+    name: 'ProjectDashboardPage',
     components: {
         ProjectBilling,
         ProjectPersonalHealthDashboard,
@@ -52,18 +50,17 @@ export default {
         ProjectServiceAccounts,
     },
     props: {
-        projectId: {
+        id: {
             type: String,
             default: undefined,
         },
     },
-    setup(props) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
             providers: computed(() => vm.$store.state.resource.provider.items),
         });
-        const projectFilter = `&filters=project_id%3A%3D${props.projectId}`;
 
         const init = () => {
             store.dispatch('resource/cloudServiceType/load');
@@ -73,7 +70,6 @@ export default {
 
         return {
             ...toRefs(state),
-            projectFilter,
         };
     },
 };
@@ -88,8 +84,11 @@ export default {
     }
 }
 
-.project-dashboard {
+.project-dashboard-page {
     grid-gap: 1rem;
+    border-width: 1px;
+    border-color: #e5e5e8;
+    padding: 2rem 1rem 1.5rem;
 
     .left-part, .right-part {
         display: grid;

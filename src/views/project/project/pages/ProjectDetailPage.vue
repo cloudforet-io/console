@@ -30,25 +30,10 @@
             </div>
 
             <p-tab :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab"
-                   class="tab-content"
                    :class="[singleItemTabState.activeTab]"
+                   @update:activeTab="onUpdateActiveTab"
             >
-                <template #summary>
-                    <project-dashboard ref="ProjectDashboard" :project-id="projectId" />
-                </template>
-                <template #member>
-                    <project-member-tab :project-id="projectId" />
-                </template>
-                <template #tag>
-                    <tags-panel :resource-id="projectId"
-                                resource-key="project_id"
-                                resource-type="identity.Project"
-                                class="tab-bg"
-                    />
-                </template>
-                <template #report>
-                    <project-report-tab :project-id="projectId" :project-name="projectName" />
-                </template>
+                <keep-alive><router-view /></keep-alive>
             </p-tab>
             <p-button-modal :header-title="headerTitle"
                             :centered="true"
@@ -91,45 +76,37 @@ import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/ty
 
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
-import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
 import ProjectFormModal from '@/views/project/project/modules/ProjectFormModal.vue';
 
-import ProjectDashboard from '@/views/project/project/modules/project-dashboard/ProjectDashboard.vue';
-import ProjectMemberTab from '@/views/project/project/modules/ProjectMemberTab.vue';
-import ProjectReportTab from '@/views/project/project/modules/ProjectReportTab.vue';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 
+import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { ProjectModel } from '@/views/project/project/type';
 import { TranslateResult } from 'vue-i18n';
 
 
 export default {
-    name: 'ProjectDetail',
+    name: 'ProjectDetailPage',
     components: {
-        FavoriteButton,
-        ProjectMemberTab,
-        ProjectReportTab,
-        ProjectDashboard,
-        PButtonModal,
         GeneralPageLayout,
-        TagsPanel,
+        ProjectFormModal,
+        FavoriteButton,
+        PButtonModal,
         PPageTitle,
         PTab,
         PIconButton,
         PCopyButton,
-        ProjectFormModal,
         PBreadcrumbs,
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const projectId = computed<string>(() => root.$route.params.id as string);
         const item = ref({} as ProjectModel);
         const state = reactive({
+            projectId: computed(() => root.$route.params.id),
             projectName: computed(() => item.value?.name || ''),
             projectGroupId: computed(() => item.value?.project_group_info?.project_group_id || ''),
             projectGroupName: computed(() => item.value?.project_group_info?.name || ''),
-            projectId,
             projectGroupNames: [],
             pageNavigation: computed(() => [
                 { name: vm.$t('MENU.PROJECT.PROJECT'), path: '/project' },
@@ -140,10 +117,10 @@ export default {
                 // })),
                 { name: state.projectName },
             ]),
-            reportState: computed(() => vm.$store.state.user.reportState),
             users: computed(() => vm.$store.state.resource.user.items),
         });
 
+        /* api */
         const getProject = async (id) => {
             const resp = await SpaceConnector.client.identity.project.get({
                 project_id: id,
@@ -153,34 +130,44 @@ export default {
             }
         };
 
-        onMounted(async () => {
-            await getProject(projectId.value);
-        });
-
-        watch(projectId, (after, before) => {
-            if (after && after !== before) {
-                getProject(after);
-            }
-        }, { immediate: true });
-
-
         /** Tabs */
         const singleItemTabState = reactive({
             tabs: computed(() => {
                 const items: TabItem[] = [
-                    { name: 'summary', label: vm.$t('PROJECT.DETAIL.TAB_SUMMARY'), keepAlive: true },
-                    { name: 'member', label: vm.$t('PROJECT.DETAIL.TAB_MEMBER') },
-                    { name: 'tag', label: vm.$t('PROJECT.DETAIL.TAB_TAG') },
+                    {
+                        name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY,
+                        label: vm.$t('PROJECT.DETAIL.TAB_SUMMARY'),
+                        keepAlive: true,
+                    },
+                    {
+                        name: PROJECT_ROUTE.DETAIL.TAB.MEMBER,
+                        label: vm.$t('PROJECT.DETAIL.TAB_MEMBER'),
+                    },
+                    {
+                        name: PROJECT_ROUTE.DETAIL.TAB.ALERT,
+                        label: vm.$t('PROJECT.DETAIL.TAB_ALERT'),
+                    },
+                    {
+                        name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS,
+                        label: vm.$t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
+                    },
+                    {
+                        name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW,
+                        label: vm.$t('PROJECT.DETAIL.TAB_MAINTENANCE_WINDOW'),
+                    },
+                    {
+                        name: PROJECT_ROUTE.DETAIL.TAB.TAG,
+                        label: vm.$t('PROJECT.DETAIL.TAB_TAG'),
+                    },
                 ];
-
-                if (state.reportState) {
-                    items.push({ name: 'report', label: vm.$t('PROJECT.DETAIL.TAB_REPORT'), beta: true } as TabItem);
-                }
                 return items;
             }),
-            activeTab: 'summary',
+            activeTab: PROJECT_ROUTE.DETAIL.TAB.SUMMARY,
         });
 
+        const onUpdateActiveTab = (activeTab) => {
+            vm.$router.replace({ name: activeTab }).catch(() => {});
+        };
 
         // Member modal
         const formState = reactive({
@@ -201,7 +188,7 @@ export default {
         const projectDeleteFormConfirm = async () => {
             try {
                 await SpaceConnector.client.identity.project.delete({
-                    project_id: projectId.value,
+                    project_id: state.projectId,
                 });
                 // await vm.$store.dispatch('favorite/project/removeItem', { id: projectId.value });
                 showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '', root);
@@ -231,10 +218,26 @@ export default {
                 vm.$store.dispatch('resource/provider/load'),
             ]);
         })();
+
+        onMounted(async () => {
+            await getProject(state.projectId);
+        });
+
+        watch(() => state.projectId, (projectId) => {
+            if (projectId) {
+                getProject(projectId);
+            }
+        }, { immediate: true });
+
+        (async () => {
+            singleItemTabState.activeTab = vm.$route?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY;
+        })();
+
         return {
             ...toRefs(state),
             ...toRefs(formState),
             singleItemTabState,
+            onUpdateActiveTab,
 
             item,
             openProjectDeleteForm,
@@ -282,16 +285,9 @@ export default {
         @apply text-2xl;
     }
 }
-.tab-content::v-deep {
+.p-tab::v-deep {
     border: none;
     margin: auto;
-
-    &.summary {
-        .tab-pane {
-            @apply border border-gray-200;
-            padding: 2rem 1rem 1.5rem;
-        }
-    }
 }
 
 .delete-btn {
