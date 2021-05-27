@@ -1,13 +1,7 @@
 <template>
     <add-section>
         <template #title>
-            {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.RESOURCE.LABEL') }}
-            <span class="title-desc">
-                <p-i name="ic_outlined-info" color="inherit" height="1em"
-                     width="1em"
-                />
-                {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.RESOURCE.RESOURCE_DESC') }}
-            </span>
+            <info-message :message="$t('AUTOMATION.SPOT_AUTOMATION.ADD.RESOURCE.RESOURCE_DESC') " />
         </template>
         <div v-if="selectedResource" class="select-item">
             <strong>Name</strong>: {{ selectedResource.data.auto_scaling_group_name }}
@@ -37,7 +31,7 @@ import {
 } from '@vue/composition-api';
 import { camelCase, forEach } from 'lodash';
 import {
-    PDynamicLayout, PFieldGroup, PI,
+    PDynamicLayout, PFieldGroup,
 } from '@spaceone/design-system';
 import { store } from '@/store';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
@@ -54,6 +48,7 @@ import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-s
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { SpotGroupResourceCategory } from '@/views/automation/spot-automation/type';
 import AddSection from '@/views/automation/spot-automation/components/AddSection.vue';
+import InfoMessage from '@/common/components/InfoMessage.vue';
 
 
 interface Props {
@@ -64,10 +59,10 @@ interface Props {
 export default {
     name: 'ResourceSelection',
     components: {
+        InfoMessage,
         AddSection,
         PDynamicLayout,
         PFieldGroup,
-        PI,
     },
     props: {
         projectId: {
@@ -295,14 +290,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.title-desc {
-    @apply text-gray-700;
-    font-size: 0.75rem;
-    line-height: 1.5;
-    .p-i-icon {
-        margin-bottom: .2rem;
-    }
-}
 .select-item {
     @apply border border-secondary text-secondary;
     padding: 0.75rem 1rem;

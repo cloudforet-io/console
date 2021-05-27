@@ -14,12 +14,11 @@
                     </p-radio>
                 </p-field-group>
 
-                <p v-if="selectedType === SETTINGS_TYPE.count" class="count-info">
-                    <p-i name="ic_outlined-info" color="inherit" height="1em"
-                         width="1em"
-                    />
-                    <span class="desc"> {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.DESC') }}</span>
-                </p>
+                <info-message v-if="selectedType === SETTINGS_TYPE.count"
+                              style-type="secondary"
+                              :message="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.DESC')"
+                              block
+                />
 
                 <p-field-group required :label="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.SETTING_LABEL')" class="mb-0">
                     <div class="settings-wrapper">
@@ -119,6 +118,7 @@ import { throttle } from 'lodash';
 import TryAgainButton from '@/views/automation/spot-automation/components/TryAgainButton.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import AddSection from '@/views/automation/spot-automation/components/AddSection.vue';
+import InfoMessage from '@/common/components/InfoMessage.vue';
 
 interface Props {
     resourceId: string;
@@ -133,6 +133,7 @@ const PADDING = 16;
 export default {
     name: 'SchedulePolicySettings',
     components: {
+        InfoMessage,
         AddSection,
         TryAgainButton,
         PFieldGroup,
@@ -451,16 +452,6 @@ export default {
 }
 .error-box {
     margin-top: 0.375rem;
-}
-.count-info {
-    @apply text-secondary;
-    font-size: 0.75rem;
-    vertical-align: middle;
-    margin-top: 1.5rem;
-    margin-bottom: 1.5rem;
-    .desc {
-        line-height: 1.5;
-    }
 }
 
 </style>

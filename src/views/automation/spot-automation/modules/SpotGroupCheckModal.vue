@@ -49,23 +49,23 @@
                     </tr>
                 </tbody>
             </table>
-            <p v-if="onDemand === 0" class="info">
-                <p-i name="ic_outlined-info" color="inherit" height="1em"
-                     width="1em"
-                />
-                <span class="desc">{{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.CHECK_MODAL.DESC') }}</span>
-            </p>
+            <info-message v-if="onDemand === 0" class="info"
+                          style-type="peacock"
+                          block
+                          :message="$t('AUTOMATION.SPOT_AUTOMATION.ADD.CHECK_MODAL.DESC')"
+            />
         </template>
     </p-button-modal>
 </template>
 
 <script lang="ts">
-import { PButtonModal, PI, PTextList } from '@spaceone/design-system';
+import { PButtonModal, PTextList } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 import { SETTINGS_TYPE } from '@/views/automation/spot-automation/lib/config';
+import InfoMessage from '@/common/components/InfoMessage.vue';
 
 interface Props {
     visible: boolean;
@@ -82,8 +82,8 @@ interface Props {
 export default {
     name: 'SpotGroupCheckModal',
     components: {
+        InfoMessage,
         PButtonModal,
-        PI,
         PTextList,
     },
     props: {
@@ -157,13 +157,6 @@ export default {
     }
 }
 .info {
-    @apply text-peacock-500;
     margin-top: 1rem;
-    font-size: 0.875rem;
-    vertical-align: middle;
-    .desc {
-        margin-left: 0.375rem;
-        line-height: 1.5;
-    }
 }
 </style>

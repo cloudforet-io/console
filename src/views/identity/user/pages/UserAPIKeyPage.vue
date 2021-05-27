@@ -14,8 +14,12 @@
             </handbook-button>
         </div>
         <p-page-title :title="$t('IDENTITY.USER.MAIN.API_KEY')"
-                      :title-info="$t('IDENTITY.USER.API_KEY.TITLE_INFO')" class="page-title"
-        />
+                      class="page-title"
+        >
+            <template #extra>
+                <info-message :message="$t('IDENTITY.USER.API_KEY.TITLE_INFO')" block class="w-full ml-1" />
+            </template>
+        </p-page-title>
         <user-a-p-i-key-table
             :user-id="userId"
         />
@@ -46,6 +50,7 @@ import UserAPIKeyTable from '@/views/identity/user/modules/UserAPIKeyTable.vue';
 import { store } from '@/store';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import UserAPIKeyHandbook from '@/views/identity/user/modules/UserAPIKeyHandbook.vue';
+import InfoMessage from '@/common/components/InfoMessage.vue';
 
 interface EndpointItem {
     endpoint: string;
@@ -58,6 +63,7 @@ interface EndpointItem {
 export default {
     name: 'UserAPIKeyPage',
     components: {
+        InfoMessage,
         HandbookButton,
         UserAPIKeyTable,
         UserAPIKeyHandbook,
