@@ -1,3 +1,10 @@
+# [1.1.0-beta.28](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.27...v1.1.0-beta.28) (2021-05-27)
+
+
+### Features
+
+* add default slot to tab ([614905a](https://github.com/spaceone-dev/spaceone-design-system/commit/614905a500df903ddbbb173873275a9e344158da))
+
 # [1.1.0-beta.27](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.26...v1.1.0-beta.27) (2021-05-26)
 
 
