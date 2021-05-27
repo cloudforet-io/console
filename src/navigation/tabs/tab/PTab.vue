@@ -6,6 +6,7 @@
                    :tabs="tabs"
         />
         <div class="tab-pane">
+            <slot />
             <keep-alive>
                 <slot v-for="tab in keepTabs"
                       :name="proxyActiveTab === tab.name ? proxyActiveTab : undefined"
