@@ -4,13 +4,14 @@ enum BUTTON_STYLE_TYPE {
     'primary-dark' = 'primary-dark'
 }
 
-export interface DropdownMenuBtnProps {
+export interface DropdownMenuButtonProps {
     menu: MenuItem[];
     loading: boolean;
     autoHeight: boolean;
-    block: boolean;
     disabled: boolean;
     buttonOnly: boolean;
     buttonIcon?: string;
     buttonStyleType?: keyof BUTTON_STYLE_TYPE;
+    useCustomStyle: boolean;
+    showPopup: boolean;
 }

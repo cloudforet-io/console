@@ -87,7 +87,6 @@ export { default as PChartLoader } from './others/console/charts/chart-loader/PC
 export { default as PContextMenu } from './inputs/context-menu/PContextMenu.vue';
 export { default as PDatePagination } from './navigation/pagination/date-pagination/PDatePagination.vue';
 export { default as PDefinition } from './data-display/tables/definition-table/definition/PDefinition.vue';
-export { default as PDropdownBtn } from './inputs/dropdown/dropdown-btn/PDropdownBtn.vue';
 export { default as PSelectDropdown } from './inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 export { default as PDropdownMenuBtn } from './inputs/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 export { default as PDynamicField } from './data-display/dynamic/dynamic-field/PDynamicField.vue';
