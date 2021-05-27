@@ -25,26 +25,29 @@
                 {{ $t('IDENTITY.USER.MAIN.MY_ACCOUNT') }}
             </div>
             <p-divider class="menu-divider" />
-            <div v-for="(item) in sidebarState.userMenuList" :key="item.label"
-                 class="menu-item"
-                 :class="{'selected': item.label === sidebarState.selectedItem.label, 'hide': item.userOnly && userState.isDomainOwner}"
-                 @click="showPage(item)"
+            <ul v-for="(item) in sidebarState.MenuList" :key="item.label"
+                class="menu-item"
+                :class="{'selected': item.label === sidebarState.selectedItem.label, 'hide': (item.userOnly && userState.isDomainOwner) || item.isAdminMenu}"
+
+                @click="showPage(item)"
             >
-                {{ item.label }}
-            </div>
+                <li v-if="!item.isAdminMenu">{{ item.label }}</li>
+            </ul>
             <div v-if="userState.isAdmin" class="admin-menu-wrapper">
                 <div class="menu-title">
                     {{ $t('IDENTITY.USER.MAIN.ADMINISTRATION') }}
                 </div>
                 <p-divider class="menu-divider" />
-                <div v-for="(item) in sidebarState.adminMenuList"
-                     :key="item.label"
-                     class="menu-item"
-                     :class="{'selected': item.label === sidebarState.selectedItem.label}"
-                     @click="showPage(item)"
+                <ul v-for="(item) in sidebarState.MenuList"
+                    :key="item.label"
+                    class="menu-item"
+                    :class="[{'selected': item.label === sidebarState.selectedItem.label}, {'hide': !item.isAdminMenu}]"
+                    @click="showPage(item)"
                 >
-                    {{ $t('IDENTITY.USER.MAIN.USER_MANAGEMENT') }}
-                </div>
+                    <li v-if="item.isAdminMenu">
+                        {{ item.label }}
+                    </li>
+                </ul>
             </div>
         </template>
         <template #default>
@@ -74,6 +77,7 @@ interface SidebarItemType {
     label?: TranslateResult;
     routeName?: string;
     userOnly?: boolean;
+    isAdminMenu?: boolean;
 }
 
 export default {
@@ -107,7 +111,7 @@ export default {
         });
         const sidebarState = reactive({
             showManagementPage: true,
-            userMenuList: [
+            MenuList: [
                 {
                     label: vm.$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE'),
                     routeName: IDENTITY_ROUTE.USER.ACCOUNT,
@@ -118,12 +122,16 @@ export default {
                     routeName: IDENTITY_ROUTE.USER.API_KEY,
                     userOnly: true,
                 },
-            ],
-            adminMenuList: [
+                {
+                    label: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION'),
+                    routeName: IDENTITY_ROUTE.USER.NOTIFICATION,
+                    userOnly: false,
+                },
                 {
                     label: vm.$t('IDENTITY.USER.MAIN.USER_MANAGEMENT'),
                     routeName: IDENTITY_ROUTE.USER.MANAGEMENT,
                     userOnly: false,
+                    isAdminMenu: true,
                 },
             ],
             selectedItem: {} as SidebarItemType,
@@ -132,17 +140,10 @@ export default {
             sidebarState.selectedItem = item;
             vm.$router.replace({ name: item.routeName, query: { ...router.currentRoute.query } }).catch(() => {});
         };
-
         const selectSidebarItem = (routeName) => {
-            if (routeName === IDENTITY_ROUTE.USER.ACCOUNT) {
-                sidebarState.selectedItem = sidebarState.userMenuList[0];
-            }
             if (routeName === IDENTITY_ROUTE.USER.API_KEY && !userState.isDomainOwner) {
-                sidebarState.selectedItem = sidebarState.userMenuList[1];
-            }
-            if (routeName === IDENTITY_ROUTE.USER.MANAGEMENT) {
-                sidebarState.selectedItem = sidebarState.adminMenuList[0];
-            }
+                sidebarState.selectedItem = sidebarState.MenuList[1];
+            } else if (routeName) sidebarState.selectedItem = sidebarState.MenuList.find(d => d.routeName === routeName) as SidebarItemType;
         };
 
         watch(() => vm.$route.name, (after) => {

@@ -1,5 +1,5 @@
 <template>
-    <div class="user-account-page">
+    <section class="account-wrapper">
         <p-breadcrumbs v-if="isAdmin" :routes="routeState.adminRoutes" />
         <p-breadcrumbs v-else :routes="routeState.userRoutes" />
         <p-page-title :title="$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE')" />
@@ -87,7 +87,7 @@
                 </div>
             </p-pane-layout>
         </div>
-    </div>
+    </section>
 </template>
 
 <script lang="ts">

@@ -1,5 +1,5 @@
 <template>
-    <section class="right-contents-container">
+    <section class="api-key-wrapper">
         <div class="flex">
             <p-breadcrumbs class="flex-grow" :routes="routeState.routes" />
             <handbook-button :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab"

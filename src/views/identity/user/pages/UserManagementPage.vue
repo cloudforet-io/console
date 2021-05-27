@@ -1,5 +1,5 @@
 <template>
-    <div class="right-contents-container">
+    <section class="management-wrapper">
         <p-breadcrumbs :routes="routes" />
         <p-page-title :title="$t('IDENTITY.USER.MAIN.USER_MANAGEMENT')"
                       use-total-count use-selected-count
@@ -172,7 +172,7 @@
                           :is-admin="userFormState.isAdmin"
                           @confirm="userFormConfirm"
         />
-    </div>
+    </section>
 </template>
 
 <script lang="ts">

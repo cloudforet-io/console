@@ -2,6 +2,8 @@ import { RouteConfig } from 'vue-router';
 
 const UserAccount = () => import(/* webpackChunkName: "UserAccount" */ '@/views/identity/user/pages/UserAccountPage.vue');
 const UserAPIKeyPage = () => import(/* webpackChunkName: "UserAPIKey" */ '@/views/identity/user/pages/UserAPIKeyPage.vue');
+const UserNotificationPage = () => import(/* webpackChunkName: "UserNotificationPage" */ '@/views/identity/user/pages/UserNotificationPage.vue');
+const AddNotiChannelPage = () => import(/* webpackChunkName: "AddNotiChannelPage" */ '@/views/identity/user/pages/AddNotiChannelPage.vue');
 const UserManagement = () => import(/* webpackChunkName: "UserManagement" */ '@/views/identity/user/pages/UserManagementPage.vue');
 const UserPage = () => import(/* webpackChunkName: "User" */ '@/views/identity/user/pages/UserPage.vue');
 const ServiceAccount = () => import(/* webpackChunkName: "ServiceAccount" */ '@/views/identity/service-account/pages/ServiceAccountPage.vue');
@@ -22,6 +24,8 @@ export const IDENTITY_ROUTE = Object.freeze({
         MANAGEMENT: 'userManagement',
         ACCOUNT: 'userAccount',
         API_KEY: 'userAPIKey',
+        NOTIFICATION: 'userNotification',
+        ADD_NOTIFICATION: 'addNotification',
     },
 });
 
@@ -95,7 +99,17 @@ export default {
                             name: IDENTITY_ROUTE.USER.API_KEY,
                             component: UserAPIKeyPage,
                         },
+                        {
+                            path: 'notification',
+                            name: IDENTITY_ROUTE.USER.NOTIFICATION,
+                            component: UserNotificationPage,
+                        },
                     ],
+                },
+                {
+                    path: 'notification/:channel',
+                    name: IDENTITY_ROUTE.USER.ADD_NOTIFICATION,
+                    component: AddNotiChannelPage,
                 },
             ],
         },
