@@ -15,6 +15,7 @@
                         />
                         <p-i v-if="iconName"
                              class="block" :name="iconName"
+                             :color="primaryDark"
                              width="5rem" height="5rem"
                         />
                         <span v-if="emoji" class="wave">👋</span>
@@ -52,6 +53,8 @@ import { IconModalProps } from '@/feedbacks/modals/icon-modal/type';
 import '../modal.pcss';
 
 import { makeProxy } from '@/util/composition-helpers';
+
+import { primaryDark } from '@/styles/colors';
 
 export default {
     name: 'PIconModal',
@@ -119,6 +122,7 @@ export default {
         return {
             ...toRefs(state),
             onClickButton,
+            primaryDark,
         };
     },
 };
