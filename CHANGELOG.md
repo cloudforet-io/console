@@ -1,3 +1,11 @@
+# [1.1.0-beta.30](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.29...v1.1.0-beta.30) (2021-05-27)
+
+
+### Bug Fixes
+
+* add ic_done icon and fix icon modal icon color ([73292ea](https://github.com/spaceone-dev/spaceone-design-system/commit/73292ea6cb41c50f70b171e8ac91c0423a95517d))
+* update assets head ([9bca8b3](https://github.com/spaceone-dev/spaceone-design-system/commit/9bca8b3e8911dd766d9bf3bbda3805db0153f363))
+
 # [1.1.0-beta.29](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.28...v1.1.0-beta.29) (2021-05-27)
 
 
