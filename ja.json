@@ -1245,7 +1245,10 @@
 			"REPORT_LOADING_DESC": "少々お待ちください。",
 			"REPORT_LOADING_TITLE": "ロード中···",
 			"REPORT_PERIOD": "期間（過去1ヶ月）",
+			"TAB_ALERT": "",
+			"TAB_MAINTENANCE_WINDOW": "",
 			"TAB_MEMBER": "メンバー",
+			"TAB_NOTIFICATIONS": "",
 			"TAB_REPORT": "レポート",
 			"TAB_SUMMARY": "概要情報",
 			"TAB_TAG": "タグ"

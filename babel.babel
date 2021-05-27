@@ -22373,6 +22373,48 @@
                                 </translations>
                             </concept_node>
                             <concept_node>
+                                <name>TAB_ALERT</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description/>
+                                <comment/>
+                                <default_text/>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
+                                <name>TAB_MAINTENANCE_WINDOW</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description/>
+                                <comment/>
+                                <default_text/>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
                                 <name>TAB_MEMBER</name>
                                 <definition_loaded>false</definition_loaded>
                                 <description/>
@@ -22390,6 +22432,27 @@
                                     <translation>
                                         <language>ko-KR</language>
                                         <approved>true</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
+                                <name>TAB_NOTIFICATIONS</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description/>
+                                <comment/>
+                                <default_text/>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>false</approved>
                                     </translation>
                                 </translations>
                             </concept_node>

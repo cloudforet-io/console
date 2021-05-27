@@ -1245,7 +1245,10 @@
 			"REPORT_LOADING_DESC": "잠시만 기다려주세요.",
 			"REPORT_LOADING_TITLE": "로딩중...",
 			"REPORT_PERIOD": "기간(지난 1개월)",
+			"TAB_ALERT": "Alert",
+			"TAB_MAINTENANCE_WINDOW": "Maintenance Window",
 			"TAB_MEMBER": "구성원 ",
+			"TAB_NOTIFICATIONS": "알림",
 			"TAB_REPORT": "보고서",
 			"TAB_SUMMARY": "요약 정보 ",
 			"TAB_TAG": "태그 "

@@ -258,7 +258,7 @@
 				"TAB_HISTORY": "History",
 				"TAB_MEMBER": "Member",
 				"TAB_SUMMARY": "Summary",
-				"TAB_TAG": "Tags"
+				"TAB_TAG": "Tag"
 			},
 			"LIST": {
 				"ADD_SPOT_GROUP": "Add Spot Group",
@@ -674,7 +674,7 @@
 				"TAB_DETAILS": "Details",
 				"TAB_MEMBER": "Member",
 				"TAB_SELECTED_DATA": "Selected Data",
-				"TAB_TAG": "Tags",
+				"TAB_TAG": "Tag",
 				"TITLE": "{provider} Accounts"
 			}
 		},
@@ -892,7 +892,7 @@
 				"TAB_MEMBER": "Member",
 				"TAB_MONITORING": "Monitoring",
 				"TAB_SELECTED_DATA": "Selected Data",
-				"TAB_TAG": "Tags"
+				"TAB_TAG": "Tag"
 			}
 		},
 		"SERVER": {
@@ -916,7 +916,7 @@
 				"TAB_MEMBER": "Member",
 				"TAB_MONITORING": "Monitoring",
 				"TAB_SELECTED_DATA": "Selected Data",
-				"TAB_TAG": "Tags",
+				"TAB_TAG": "Tag",
 				"TITLE": "Server"
 			}
 		}
@@ -1177,7 +1177,7 @@
 				"TAB_DETAILS": "Details",
 				"TAB_SCHEDULE": "Schedule",
 				"TAB_SELECTED_DATA": "Selected Data",
-				"TAB_TAG": "Tags",
+				"TAB_TAG": "Tag",
 				"TITLE": "Collector",
 				"UPDATE": "Edit",
 				"UPDATE_MODAL_NAME_DUPLICATED": "Name is duplicated.",
@@ -1245,10 +1245,13 @@
 			"REPORT_LOADING_DESC": "Please, wait for a moment.",
 			"REPORT_LOADING_TITLE": "Loading...",
 			"REPORT_PERIOD": "Period (Last one month)",
+			"TAB_ALERT": "Alert",
+			"TAB_MAINTENANCE_WINDOW": "Maintenance Window",
 			"TAB_MEMBER": "Member",
+			"TAB_NOTIFICATIONS": "Notifications",
 			"TAB_REPORT": "Report",
 			"TAB_SUMMARY": "Summary",
-			"TAB_TAG": "Tags"
+			"TAB_TAG": "Tag"
 		},
 		"LANDING": {
 			"ACTION_DELETE_THIS_GROUP": "Delete selected group",
