@@ -3,7 +3,7 @@ import { RouteConfig } from 'vue-router';
 const UserAccount = () => import(/* webpackChunkName: "UserAccount" */ '@/views/identity/user/pages/UserAccountPage.vue');
 const UserAPIKeyPage = () => import(/* webpackChunkName: "UserAPIKey" */ '@/views/identity/user/pages/APIKeyPage.vue');
 const UserNotificationPage = () => import(/* webpackChunkName: "UserNotificationPage" */ '@/views/identity/user/pages/NotificationPage.vue');
-const AddNotiChannelPage = () => import(/* webpackChunkName: "AddNotiChannelPage" */ '@/views/identity/user/pages/AddNotiChannelPage.vue');
+const AddNotificationChannelPage = () => import(/* webpackChunkName: "AddNotificationChannelPage" */ '@/views/identity/user/pages/AddNotificationChannelPage.vue');
 const UserManagement = () => import(/* webpackChunkName: "UserManagement" */ '@/views/identity/user/pages/UserManagementPage.vue');
 const UserPage = () => import(/* webpackChunkName: "User" */ '@/views/identity/user/pages/UserPage.vue');
 const ServiceAccount = () => import(/* webpackChunkName: "ServiceAccount" */ '@/views/identity/service-account/pages/ServiceAccountPage.vue');
@@ -109,7 +109,7 @@ export default {
                 {
                     path: 'notification/:channel',
                     name: IDENTITY_ROUTE.USER.ADD_NOTIFICATION,
-                    component: AddNotiChannelPage,
+                    component: AddNotificationChannelPage,
                 },
             ],
         },

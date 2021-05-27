@@ -37,22 +37,8 @@
                     </template>
                 </p-field-group>
             </p-pane-layout>
-            <p-pane-layout class="content-wrapper">
-                <h3 class="content-title">
-                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE') }}
-                </h3>
-                <h4 class="sub-title">
-                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING_MODE') }}
-                </h4>
-            </p-pane-layout>
-            <p-pane-layout class="content-wrapper">
-                <h3 class="content-title">
-                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC') }}
-                </h3>
-                <h4 class="sub-title">
-                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING_MODE') }}
-                </h4>
-            </p-pane-layout>
+            <add-notification-schedule />
+            <add-notification-topic />
         </section>
         <div class="button-group">
             <p-button style-type="gray900" :outline="true" class="text-button"
@@ -81,6 +67,8 @@ import {
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 // eslint-disable-next-line import/named
 import { notiChannelPhoneNumRegex } from '@/views/identity/user/lib/validations';
+import AddNotificationTopic from '@/views/identity/user/modules/AddNotificationTopic.vue';
+import AddNotificationSchedule from '@/views/identity/user/modules/AddNotificationSchedule.vue';
 
 enum CHANNEL_TYPE {
     SMS = 'sms',
@@ -93,8 +81,10 @@ const LEVEL_LIST = [
     { label: 'Level 3', name: 3, type: 'item' },
 ];
 export default {
-    name: 'AddNotiChannelPage',
+    name: 'AddNotificationChannelPage',
     components: {
+        AddNotificationSchedule,
+        AddNotificationTopic,
         GeneralPageLayout,
         PBreadcrumbs,
         PPageTitle,
@@ -175,13 +165,6 @@ export default {
     margin-top: 1.5rem;
     max-width: 15rem;
 }
-.sub-title {
-    @apply font-bold;
-    font-size: 0.875rem;
-    line-height: 140%;
-    margin-top: 1.25rem;
-    margin-bottom: 0.375rem;
-}
 .button-group {
     display: flex;
     justify-content: flex-end;
@@ -189,4 +172,5 @@ export default {
         margin-left: 1rem;
     }
 }
+
 </style>
