@@ -276,7 +276,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.user-account-page {
+.account-wrapper {
     @apply mx-auto;
     max-width: 53rem;
 }

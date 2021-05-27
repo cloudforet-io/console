@@ -82,7 +82,7 @@ import {
 import { reactive, toRefs } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 import yaml from 'js-yaml';
-import { APIKeyItem } from '@/views/identity/user/modules/UserAPIKeyTable.vue';
+import { APIKeyItem } from '@/views/identity/user/modules/APIKeyTable.vue';
 
 enum FileType {
     JSON = 'json',

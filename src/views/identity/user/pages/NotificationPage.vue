@@ -20,10 +20,11 @@
                     </li>
                 </router-link>
             </ul>
-            <p-divider />
-            <p-empty class="empty-msg">
-                {{ $t('IDENTITY.USER.NOTIFICATION.NO_NOTI_CHANNEL') }}
-            </p-empty>
+            <p-divider class="divider" />
+            <notification-channel-card />
+            <!--            <p-empty class="empty-msg">-->
+            <!--                {{ $t('IDENTITY.USER.NOTIFICATION.NO_NOTI_CHANNEL') }}-->
+            <!--            </p-empty>-->
         </p-pane-layout>
     </section>
 </template>
@@ -36,10 +37,12 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
+import NotificationChannelCard from '@/views/identity/user/modules/NotificationChannelCard.vue';
 
 export default {
     name: 'UserNotificationPage',
     components: {
+        NotificationChannelCard,
         PBreadcrumbs,
         PPageTitle,
         PPaneLayout,
@@ -106,7 +109,7 @@ export default {
     display: grid;
     row-gap: 0.5rem;
     column-gap: 0.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(22.625rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(216px, 1fr));
     margin-top: 1.125rem;
     margin-bottom: 1.5rem;
     gap: 0.5rem;
@@ -123,6 +126,9 @@ export default {
     .text {
         @apply text-primaryDark font-bold;
     }
+}
+.divider {
+    margin-bottom: 1.5rem;
 }
 .empty-msg {
     margin-top: 2.5rem;

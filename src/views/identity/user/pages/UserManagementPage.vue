@@ -198,7 +198,7 @@ import UserUpdateForm from '@/views/identity/user/modules/UserUpdateForm.vue';
 import UserDetail from '@/views/identity/user/modules/UserDetail.vue';
 import UserAssignedRole from '@/views/identity/user/modules/UserAssignedRole.vue';
 import PTagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
-import UserAPIKeyTable from '@/views/identity/user/modules/UserAPIKeyTable.vue';
+import UserAPIKeyTable from '@/views/identity/user/modules/APIKeyTable.vue';
 
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@/lib/component-utils/query-search';
@@ -677,7 +677,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.right-contents-container {
+.management-wrapper {
     @apply mx-0;
     max-width: 100%;
 
