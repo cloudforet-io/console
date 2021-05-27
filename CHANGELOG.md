@@ -1,3 +1,10 @@
+# [1.1.0-beta.29](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.28...v1.1.0-beta.29) (2021-05-27)
+
+
+### Bug Fixes
+
+* remove title info from page title ([9fe5b84](https://github.com/spaceone-dev/spaceone-design-system/commit/9fe5b84542998203dd7acb353c0e23d14109251d))
+
 # [1.1.0-beta.28](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.27...v1.1.0-beta.28) (2021-05-27)
 
 
