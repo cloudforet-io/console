@@ -41,9 +41,9 @@
                 <template #col-collector_info.plugin_info-format="{ value }">
                     <template v-if="value">
                         <p-lazy-img :src="plugins[value.plugin_id] ? plugins[value.plugin_id].icon : ''"
-                                    width="1rem" height="1rem"
+                                    width="1rem" height="1rem" class="mr-2"
                         />
-                        <span class="pl-2">{{ plugins[value.plugin_id] ? plugins[value.plugin_id].name : value.plugin_id }}</span>
+                        {{ plugins[value.plugin_id] ? plugins[value.plugin_id].label : value.plugin_id }}
                     </template>
                 </template>
                 <template #col-status-format="{ value }">

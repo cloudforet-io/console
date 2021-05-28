@@ -46,7 +46,7 @@
                     </template>
                     <template #col-plugin_info.plugin_id-format="{index, field, item}">
                         <p-lazy-img :src="item.plugin_icon"
-                                    width="1.5rem" height="1.5rem" class="mr-2"
+                                    width="1rem" height="1rem" class="mr-2"
                         />
                         {{ item.plugin_name }}
                     </template>
@@ -367,8 +367,8 @@ export default {
             try {
                 const res = await SpaceConnector.client.inventory.collector.list({ query: getQuery() });
                 state.items = res.results.map(d => ({
-                    plugin_name: computed(() => store.state.resource.plugin.items[d.plugin_info.plugin_id]?.label).value,
-                    plugin_icon: store.state.resource.plugin.items[d.plugin_info.plugin_id]?.icon,
+                    plugin_name: state.plugins[d.plugin_info.plugin_id]?.label,
+                    plugin_icon: state.plugins[d.plugin_info.plugin_id]?.icon,
                     detailLink: {
                         name: 'collectorHistory',
                         query: { filters: detailLinkQueryHelper.setFilters([{ k: 'collector_id', v: d.collector_id, o: '=' }]).rawQueryStrings },
