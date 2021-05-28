@@ -127,3 +127,4 @@ export { default as PDataLoader } from './feedbacks/loading/data-loader/PDataLoa
 export { default as PToolbox } from './navigation/toolbox/PToolbox.vue';
 
 export { default as PSelectCard } from './inputs/select-card/PSelectCard.vue';
+export { default as PSelectButton } from './inputs/select-button/PSelectButton.vue';

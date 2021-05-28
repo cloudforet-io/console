@@ -10,77 +10,7 @@ import {argTypes} from '@/inputs/checkbox/story-helper';
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A162064'
     }
-}} argTypes={{
-    ...argTypes,
-    'v-model': {
-        name: 'v-model',
-        type: {name: 'any'},
-        description: 'Two way binding for `selected` props with `change` event.',
-        defaultValue: [],
-        table: {
-            type: {
-                summary: 'any'
-            },
-            category: 'model',
-            defaultValue: {
-                summary: '[]'
-            },
-        },
-        control: null
-    },
-    invalid: {
-        name: 'invalid',
-        type: {name: 'boolean'},
-        description: 'Apply invalid style',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: false
-            },
-        },
-        control: {
-            type: 'boolean'
-        }
-    },
-    defaultSlot: {
-        name: 'default',
-        description: 'Slot for the additional selectable area that explains checkbox.',
-        defaultValue: 'click me!',
-        table: {
-            type: {
-                summary: null
-            },
-            defaultValue: {
-                summary: null
-            },
-            category: 'slots'
-        },
-        control: {
-            type: 'text'
-        }
-    },
-    iconSlot: {
-        name: 'icon',
-        description: 'Slot for custom checkbox icon.',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null
-            },
-            defaultValue: {
-                summary: null
-            },
-            category: 'slots'
-        },
-        control: {
-            type: 'text'
-        }
-    },
-}}/>
+}} argTypes={argTypes}/>
 
 
 export const Template = (args, { argTypes }) => ({
