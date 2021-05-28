@@ -66,11 +66,11 @@ export default defineComponent<Props>({
             type: Function,
             default: undefined,
         },
-        /* select card props */
         multiSelectable: {
             type: Boolean,
             default: false,
         },
+        /* select card props */
         block: {
             type: Boolean,
             default: false,
@@ -89,14 +89,7 @@ export default defineComponent<Props>({
         },
     },
     setup(props: Props, context) {
-        const { state } = selectState(props, context);
-        const { onClick: onSingleClick } = singleSelectState(props, context, state);
-        const { onClick: onMultiClick } = multiSelectState(props, context, state);
-
-        const onClick = (...args) => {
-            if (props.multiSelectable) onMultiClick(...args);
-            else onSingleClick(...args);
-        };
+        const { state, onClick } = selectState(props, context);
 
         const iconName = computed(() => {
             if (props.multiSelectable) {
