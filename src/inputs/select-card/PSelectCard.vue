@@ -25,11 +25,9 @@ import {
 import PI from '@/foundation/icons/PI.vue';
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import {
-    multiSelectState, SelectProps, selectState, singleSelectState,
+    SelectProps, selectState,
 } from '@/states/select-state';
 
-const PRadio = () => import(/* webpackMode: "eager" */ '@/inputs/radio/PRadio.vue');
-const PCheckBox = () => import(/* webpackMode: "eager" */ '@/inputs/checkbox/PCheckBox.vue');
 
 interface Props extends SelectProps {
     multiSelectable: boolean;
@@ -39,8 +37,6 @@ interface Props extends SelectProps {
 export default defineComponent<Props>({
     name: 'PSelectCard',
     components: {
-        PCheckBox,
-        PRadio,
         PI,
         PLazyImg,
     },
