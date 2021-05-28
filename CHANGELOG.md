@@ -1,3 +1,10 @@
+# [1.1.0-beta.34](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.33...v1.1.0-beta.34) (2021-05-28)
+
+
+### Features
+
+* add style type and size to select button ([#567](https://github.com/spaceone-dev/spaceone-design-system/issues/567)) ([b3c4bff](https://github.com/spaceone-dev/spaceone-design-system/commit/b3c4bff39b37d1d8e51970378d70839550f17810))
+
 # [1.1.0-beta.33](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.32...v1.1.0-beta.33) (2021-05-28)
 
 
