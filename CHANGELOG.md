@@ -1,3 +1,10 @@
+# [1.1.0-beta.33](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.32...v1.1.0-beta.33) (2021-05-28)
+
+
+### Features
+
+* add select button component ([#566](https://github.com/spaceone-dev/spaceone-design-system/issues/566)) ([41f768b](https://github.com/spaceone-dev/spaceone-design-system/commit/41f768b16fb457d49b586e50367e9d419c5ddbcb))
+
 # [1.1.0-beta.32](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.31...v1.1.0-beta.32) (2021-05-28)
 
 
