@@ -24,8 +24,8 @@ import {
 } from '@vue/composition-api';
 import { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
 import { copyAnyData, copyTextToClipboard, isNotEmpty } from '@/util/helpers';
-import { mouseOverState } from '@/util/composition-helpers';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
+import { mouseOverState } from '@/states/mouse-over-state';
 
 export default {
     name: 'PDefinition',

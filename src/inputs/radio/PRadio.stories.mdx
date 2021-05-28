@@ -1,0 +1,332 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PRadio from './PRadio.vue';
+import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api'; import { makeOptionalProxy } from '@/util/composition-helpers'; import { argTypes } from '@/states/select-state/story-helper';
+
+
+<Meta title='Inputs/Radio' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A162064'
+    }
+}} argTypes={{
+    ...argTypes,
+    selected: {
+        ...argTypes.selected,
+        defaultValue: undefined,
+        table: {
+            ...argTypes.selected.table,
+            defaultValue: {
+                summary: 'undefined'
+            }
+        }
+    },
+    'v-model': {
+        name: 'v-model',
+        type: {name: 'any'},
+        description: 'Two way binding for `selected` props with `change` event.',
+        defaultValue: [],
+        table: {
+            type: {
+                summary: 'any'
+            },
+            category: 'model',
+            defaultValue: {
+                summary: '[]'
+            },
+        },
+        control: null
+    },
+    invalid: {
+        name: 'invalid',
+        type: {name: 'boolean'},
+        description: 'Apply invalid style',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false
+            },
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    defaultSlot: {
+        name: 'default',
+        description: 'Slot for the additional selectable area that explains checkbox.',
+        defaultValue: 'click me!',
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    radioIconSlot: {
+        name: 'radio-icon',
+        description: 'Slot for custom radio icon.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+    radioLeftSlot: {
+        name: 'radio-left',
+        description: 'Slot for left area of radio.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null
+            },
+            defaultValue: {
+                summary: null
+            },
+            category: 'slots'
+        },
+        control: {
+            type: 'text'
+        }
+    },
+}}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PRadio },
+    template: `
+        <div class="h-full w-full overflow p-8">
+            <p-radio :value="value"
+                        v-model="proxySelected"
+                        :disabled="disabled"
+                        :predicate="predicate"
+                        :invalid="invalid"
+                        @change="onChange"
+            >
+                <span v-html="defaultSlot" />
+                <template #radio-left>
+                    <span v-if="radioLeftSlot" v-html="radioLeftSlot"/>
+                </template>
+                <template #radio-icon>
+                    <span v-if="radioIconSlot" v-html="radioIconSlot"/>
+                </template>
+            </p-radio>
+        </div>
+    `,
+    setup(props) {
+        const vm = getCurrentInstance()
+        const state = reactive({
+            proxySelected: makeOptionalProxy('selected', vm, props.selected)
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+
+# Radio
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { PRadio },
+            template: `
+        <div>
+            <div class="flex flex-col mb-8">
+                <p-radio v-for="value in values" v-model="selected" :value="value" :key="value">
+                    This is radio for {{value}}
+                </p-radio>
+            </div>
+            selected : {{selected}}
+        </div>
+    `,
+            setup() {
+                const state = reactive({
+                    selected: undefined,
+                    values: [0, 1, 2, 3]
+                })
+                return {
+                    ...toRefs(state)
+                };
+            },
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Simple Boolean
+
+<Canvas>
+    <Story name="Simple Boolean">
+        {{
+            components: { PRadio },
+            template: `
+        <div>
+            <div class="flex flex-col mb-8">
+                <p-radio v-model="selected">
+                    simple boolean radio
+                </p-radio>
+            </div>
+            selected : {{selected}}
+        </div>
+    `,
+            setup() {
+                const state = reactive({
+                    selected: false,
+                })
+                return {
+                    ...toRefs(state)
+                };
+            },
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Disabled
+
+<Canvas>
+    <Story name="Disabled">
+        {{
+            components: { PRadio },
+            template: `
+        <div>
+            <div class="flex flex-col mb-8">
+                <p-radio v-model="selected" disabled>
+                    you can't select disabled radio.
+                </p-radio>
+            </div>
+        </div>
+    `,
+            setup() {
+                const state = reactive({
+                    selected: false,
+                })
+                return {
+                    ...toRefs(state)
+                };
+            },
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Invalid
+
+<Canvas>
+    <Story name="Invalid">
+        {{
+            components: { PRadio },
+            template: `
+         <div>
+            <div class="flex flex-col mb-8">
+                <p class="mb-4">One item must be selected.</p>
+                <p-radio v-for="value in values" :key="value"
+                            v-model="selected"
+                            :value="value"
+                            :invalid="selected.length === 0"
+>
+                    {{value}}
+                </p-radio>
+            </div>
+            selected : {{selected}}
+        </div>
+    `,
+            setup() {
+                const state = reactive({
+                    selected: [],
+                    values: [0, 1, 2, 3]
+                })
+                return {
+                    ...toRefs(state)
+                };
+            },
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Advanced
+
+<Canvas>
+    <Story name="Advanced">
+        {{
+            components: { PRadio },
+            template: `
+         <div>
+            <div class="flex flex-col mb-8">
+                <p-radio v-for="value in values" :key="value.key"
+                            v-model="selected"
+                            :value="value"
+                            :predicate="predicate"
+>
+                    {{value.name}}
+                </p-radio>
+            </div>
+            selected : <pre>{{selected}}</pre>
+        </div>
+    `,
+            setup() {
+                const state = reactive({
+                    selected: undefined,
+                    values: [
+                        {key: 'hello', name: 'Hello'},
+                        {key: 'world', name: 'World!'},
+                        {key: 'spaceone', name: 'SpaceONE'},
+                    ]
+                })
+                const predicate = (value, current) => {
+                    return current && value.key === current.key
+                }
+                return {
+                    ...toRefs(state),
+                    predicate
+                };
+            },
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+
