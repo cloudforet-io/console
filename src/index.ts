@@ -125,3 +125,5 @@ export { default as PNotificationBar } from './feedbacks/notification/PNotificat
 export { default as PDataLoader } from './feedbacks/loading/data-loader/PDataLoader.vue';
 
 export { default as PToolbox } from './navigation/toolbox/PToolbox.vue';
+
+export { default as PSelectCard } from './inputs/select-card/PSelectCard.vue';

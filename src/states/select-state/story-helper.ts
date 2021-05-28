@@ -74,7 +74,9 @@ export const argTypes: ArgTypes = {
     },
     onChange: {
         name: 'change',
-        description: 'Event emitted when selected state changed.',
+        description: `Event emitted when selected state changed. 
+        The first argument is the changed \`selected\` props.
+        And the second argument is passed as a boolean value whether or not it is selected.`,
         defaultValue: null,
         table: {
             type: {

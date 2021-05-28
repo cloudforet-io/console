@@ -1,4 +1,6 @@
-import { computed, reactive, SetupContext } from '@vue/composition-api';
+import {
+    computed, reactive, SetupContext, UnwrapRef,
+} from '@vue/composition-api';
 import { pull, remove } from 'lodash';
 
 export interface SelectProps {
@@ -8,9 +10,13 @@ export interface SelectProps {
     predicate?: (value: any, current: any) => boolean;
 }
 
+type SelectState = UnwrapRef<{
+    isSelected: boolean;
+}>
+
 export const selectState = (props: SelectProps, context: SetupContext) => {
-    const state = reactive({
-        isSelected: computed(() => {
+    const state: SelectState = reactive({
+        isSelected: computed<boolean>(() => {
             if (Array.isArray(props.selected)) {
                 if (props.predicate) {
                     const predicate = props.predicate;
@@ -31,9 +37,8 @@ export const selectState = (props: SelectProps, context: SetupContext) => {
 };
 
 
-export const multiSelectState = (props: SelectProps, context: SetupContext) => {
-    const { state } = selectState(props, context);
-
+export const multiSelectState = (props: SelectProps, context: SetupContext,
+    state: SelectState = selectState(props, context).state) => {
     const onClick = () => {
         if (props.disabled) return;
 
@@ -61,9 +66,8 @@ export const multiSelectState = (props: SelectProps, context: SetupContext) => {
 };
 
 
-export const singleSelectState = (props: SelectProps, context: SetupContext) => {
-    const { state } = selectState(props, context);
-
+export const singleSelectState = (props: SelectProps, context: SetupContext,
+    state: SelectState = selectState(props, context).state) => {
     const onClick = () => {
         if (props.disabled) return;
         if (state.isSelected) return;
