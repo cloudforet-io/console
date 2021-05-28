@@ -1,6 +1,8 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PCheckBox from './PCheckBox.vue';
-import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api'; import { makeOptionalProxy } from '@/util/composition-helpers'; import { argTypes } from '@/states/select-state/story-helper';
+import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
+import { makeOptionalProxy } from '@/util/composition-helpers';
+import {argTypes} from '@/inputs/checkbox/story-helper';
 
 
 <Meta title='Inputs/Checkbox' parameters={{

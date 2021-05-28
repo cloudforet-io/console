@@ -1,5 +1,8 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const _ = require('lodash');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const plugin = require('tailwindcss/plugin');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const defaultTheme = require('tailwindcss/defaultTheme');
 const colors = require('./src/styles/colors').tailwindColors;
 
@@ -16,6 +19,16 @@ const rawPercent = [
 const percent = _.fromPairs(rawPercent.map(value => [value, `${eval(value) * 100}%`]));
 module.exports = {
     theme: {
+        borderRadius: {
+            none: '0',
+            sm: '0.125rem',
+            md: '0.25rem',
+            default: '0.25rem',
+            lg: '0.375rem',
+            xl: '0.5rem',
+            '2xl': '0.75rem',
+            full: '50%',
+        },
         colors,
         spacing: {
             ...defaultTheme.spacing,

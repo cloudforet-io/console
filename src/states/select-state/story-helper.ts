@@ -72,6 +72,24 @@ export const argTypes: ArgTypes = {
         },
         control: null,
     },
+    multiSelectable: {
+        name: 'multiSelectable',
+        type: { name: 'boolean' },
+        description: 'Whether to allow multi select or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     onChange: {
         name: 'change',
         description: `Event emitted when selected state changed. 

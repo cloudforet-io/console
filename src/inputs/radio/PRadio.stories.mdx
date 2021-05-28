@@ -1,6 +1,8 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PRadio from './PRadio.vue';
-import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api'; import { makeOptionalProxy } from '@/util/composition-helpers'; import { argTypes } from '@/states/select-state/story-helper';
+import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
+import { makeOptionalProxy } from '@/util/composition-helpers';
+import { argTypes } from '@/inputs/radio/story-helper';
 
 
 <Meta title='Inputs/Radio' parameters={{
@@ -10,16 +12,6 @@ import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api'; imp
     }
 }} argTypes={{
     ...argTypes,
-    selected: {
-        ...argTypes.selected,
-        defaultValue: undefined,
-        table: {
-            ...argTypes.selected.table,
-            defaultValue: {
-                summary: 'undefined'
-            }
-        }
-    },
     'v-model': {
         name: 'v-model',
         type: {name: 'any'},

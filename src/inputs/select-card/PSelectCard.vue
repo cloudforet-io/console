@@ -1,6 +1,7 @@
 <template>
     <div class="p-select-card" :class="{selected: isSelected, block, disabled}"
          @click="onClick"
+         v-on="$listeners"
     >
         <p-i :name="iconName"
              class="marker" width="1.25rem" height="1.25rem"
@@ -8,7 +9,7 @@
         <div class="contents">
             <slot v-bind="{isSelected}">
                 <p-lazy-img v-if="imageUrl || icon" :src="imageUrl" :error-icon="icon"
-                            :width="block ? '1rem' : '2rem'" :height="block ? '1rem' : '2rem'"
+                            :width="block ? '1rem' : '3rem'" :height="block ? '1rem' : '3rem'"
                 />
                 <span v-if="label" class="label">{{ label }}</span>
             </slot>
@@ -153,6 +154,7 @@ export default defineComponent<Props>({
         .p-lazy-img {
             margin-right: 0;
             margin-bottom: 1rem;
+            flex-shrink: 0;
         }
 
         .label {

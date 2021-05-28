@@ -6,7 +6,7 @@ import {
 import { range } from 'lodash'
 import { makeOptionalProxy } from '@/util/composition-helpers';
 import {getAllAvailableIcons } from '@/foundation/icons/helper';
-import { argTypes } from '@/states/select-state/story-helper';
+import { argTypes } from '@/inputs/select-card/story-helper';
 import PSelectCard from './PSelectCard.vue';
 import { peacock } from '@/styles/colors'
 
@@ -17,16 +17,6 @@ import { peacock } from '@/styles/colors'
     }
 }} argTypes={{
     ...argTypes,
-    selected: {
-        ...argTypes.selected,
-        defaultValue: undefined,
-        table: {
-            ...argTypes.selected.table,
-            defaultValue: {
-                summary: 'undefined'
-            }
-        }
-    },
     block: {
         name: 'block',
         type: {name: 'boolean'},
