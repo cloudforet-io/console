@@ -8,8 +8,7 @@ export interface SelectProps {
     predicate?: (value: any, current: any) => boolean;
 }
 
-
-export const multiSelectState = (props: SelectProps, context: SetupContext) => {
+export const selectState = (props: SelectProps, context: SetupContext) => {
     const state = reactive({
         isSelected: computed(() => {
             if (Array.isArray(props.selected)) {
@@ -25,6 +24,16 @@ export const multiSelectState = (props: SelectProps, context: SetupContext) => {
             return props.selected === props.value;
         }),
     });
+
+    return {
+        state,
+    };
+};
+
+
+export const multiSelectState = (props: SelectProps, context: SetupContext) => {
+    const { state } = selectState(props, context);
+
     const onClick = () => {
         if (props.disabled) return;
 
@@ -43,6 +52,32 @@ export const multiSelectState = (props: SelectProps, context: SetupContext) => {
         }
 
         context.emit('change', newResult, !state.isSelected);
+    };
+
+    return {
+        state,
+        onClick,
+    };
+};
+
+
+export const singleSelectState = (props: SelectProps, context: SetupContext) => {
+    const { state } = selectState(props, context);
+
+    const onClick = () => {
+        if (props.disabled) return;
+        if (state.isSelected) return;
+
+        let newResult: any;
+        if (Array.isArray(props.selected)) {
+            newResult = [props.value];
+        } else if (typeof props.selected === 'boolean') {
+            newResult = !props.selected;
+        } else {
+            newResult = props.value;
+        }
+
+        context.emit('change', newResult, true);
     };
 
     return {

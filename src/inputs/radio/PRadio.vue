@@ -3,9 +3,11 @@
           @click.stop.prevent="onClick"
           v-on="$listeners"
     >
-        <slot name="radio-left" />
+        <slot name="radio-left" v-bind="{isSelected}" />
         <input type="radio">
-        <slot :slot-scope="$props" name="icon" :icon-name="iconName">
+        <slot :slot-scope="$props" name="icon"
+              v-bind="{isSelected, iconName}"
+        >
             <p-i class="radio-icon"
                  :class="{disabled,invalid}"
                  width="1.25rem" height="1.25rem"
@@ -18,23 +20,20 @@
               :class="{disabled,invalid}"
               @click.stop="onClick"
         >
-            <slot name="default" />
+            <slot name="default" v-bind="{isSelected}" />
         </span>
     </span>
 </template>
 
 <script lang="ts">
 import {
-    reactive, computed, toRefs, defineComponent,
+    computed, toRefs, defineComponent,
 } from '@vue/composition-api';
 import PI from '@/foundation/icons/PI.vue';
-import * as events from 'events';
+import { SelectProps, singleSelectState } from '@/states/select-state';
 
-interface Props {
-    selected: any;
-    value: any;
-    disabled: boolean;
-    invalid: boolean;
+interface Props extends SelectProps {
+    invalid?: boolean;
 }
 export default defineComponent<Props>({
     name: 'PRadio',
@@ -44,41 +43,41 @@ export default defineComponent<Props>({
         event: 'change',
     },
     props: {
-        selected: [Boolean, String, Number, Object, Array],
+        /* select props */
         value: {
             type: [Boolean, String, Number, Object, Array],
             default: true,
+        },
+        selected: {
+            type: [Boolean, String, Number, Object, Array],
+            default: undefined,
         },
         disabled: {
             type: Boolean,
             default: false,
         },
+        predicate: {
+            type: Function,
+            default: undefined,
+        },
+        /* radio props */
         invalid: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props: Props, { emit }) {
-        const isSelected = computed(() => props.selected === props.value);
-        const onClick = () => {
-            if (!props.disabled) {
-                if (!isSelected.value) {
-                    if (typeof props.selected === 'object') {
-                        if (props.selected instanceof Array) emit('change', [...props.value], isSelected.value);
-                        else emit('change', { ...props.value }, isSelected.value);
-                    } else emit('change', props.value, isSelected.value);
-                }
-            }
-        };
+    setup(props: Props, context) {
+        const { state, onClick } = singleSelectState(props, context);
+
         const iconName = computed(() => {
             if (props.disabled) return 'ic_radio--disabled';
-            if (isSelected.value) return 'ic_radio--checked';
+            if (state.isSelected) return 'ic_radio--checked';
             return 'ic_radio';
         });
         return {
-            isSelected,
-            iconName,
+            ...toRefs(state),
             onClick,
+            iconName,
         };
     },
 });

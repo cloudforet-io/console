@@ -72,4 +72,18 @@ export const argTypes: ArgTypes = {
         },
         control: null,
     },
+    onChange: {
+        name: 'change',
+        description: 'Event emitted when selected state changed.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
 };
