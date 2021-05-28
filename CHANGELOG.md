@@ -1,3 +1,10 @@
+# [1.1.0-beta.32](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.31...v1.1.0-beta.32) (2021-05-28)
+
+
+### Bug Fixes
+
+* update select state to use get select state ([5856087](https://github.com/spaceone-dev/spaceone-design-system/commit/58560872f78b30c7d3db0e2aacffcf288645864e))
+
 # [1.1.0-beta.31](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.30...v1.1.0-beta.31) (2021-05-28)
 
 
