@@ -90,7 +90,7 @@ export const singleSelectState = (props: SelectProps, context: SetupContext,
 
 
 export const selectState = (props: SelectProps, context: SetupContext) => {
-    const { state } = selectState(props, context);
+    const state = getSelectState(props);
     const { onClick: onSingleClick } = singleSelectState(props, context, state);
     const { onClick: onMultiClick } = multiSelectState(props, context, state);
 
