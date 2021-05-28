@@ -13,51 +13,97 @@
             <p-icon-button name="ic_trashcan" width="1.5rem" height="1.5rem" />
         </div>
         <ul class="card-body">
-            <li class="content-wrapper">
+            <!-- dynamic field part -->
+            <li class="content-wrapper" :class="{'edit-mode': isDataEditMode}">
                 <span class="content-title">
-                    {{$t('IDENTITY.USER.NOTIFICATION.FORM.PHONE_NUMBER')}}
+                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.PHONE_NUMBER') }}
                 </span>
-                <div class="content">
+                <div v-if="isDataEditMode" class="content">
                     <p>010-2222-3333</p>
-                    <p class="edit-btn">
+                    <div class="button-group">
+                        <p-button :outline="true" class="text-button" @click="cancelEdit(EDIT_TYPE.DATA)">
+                            {{ $t('COMMON.TAGS.CANCEL') }}
+                        </p-button>
+                        <p-button
+                            style-type="primary"
+                            class="text-button"
+                        >
+                            {{ $t('COMMON.TAGS.SAVE') }}
+                        </p-button>
+                    </div>
+                </div>
+                <div v-else class="content">
+                    <p>010-2222-3333</p>
+                    <button class="edit-btn" @click="startEdit(EDIT_TYPE.DATA)">
                         <p-i name="ic_edit" width="1rem" height="1rem"
                              color="inherit" class="edit-icon"
                         />
-                        {{$t('IDENTITY.USER.NOTIFICATION.EDIT')}}
-                    </p>
+                        {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
+                    </button>
                 </div>
             </li>
             <p-divider />
-            <li class="content-wrapper">
+            <!-- static field part(schedule, topic) -->
+            <li class="content-wrapper" :class="{'edit-mode': isScheduleEditMode}">
                 <span class="content-title">
-                    {{$t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE')}}
+                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE') }}
                 </span>
-                <div class="content">
+                <div v-if="isScheduleEditMode" class="content">
+                    <add-notification-schedule />
+                    <div class="button-group">
+                        <p-button :outline="true" class="text-button" @click="cancelEdit(EDIT_TYPE.SCHEDULE)">
+                            {{ $t('COMMON.TAGS.CANCEL') }}
+                        </p-button>
+                        <p-button
+                            style-type="primary"
+                            class="text-button"
+                        >
+                            {{ $t('COMMON.TAGS.SAVE') }}
+                        </p-button>
+                    </div>
+                </div>
+                <div v-else class="content">
                     <p>
                         Custom : Monday 10:00 AM to 10:00 PM, Tuesday 10:00 AM
                         to 10:00 PM, Thursday  10:00 AM to 10:00 PM
                     </p>
-                    <p class="edit-btn">
+                    <button class="edit-btn" @click="startEdit(EDIT_TYPE.SCHEDULE)">
                         <p-i name="ic_edit" width="1rem" height="1rem"
                              color="inherit" class="edit-icon"
                         />
-                        {{$t('IDENTITY.USER.NOTIFICATION.EDIT')}}
-                    </p>
+                        {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
+                    </button>
                 </div>
             </li>
             <p-divider />
-            <li class="content-wrapper">
+            <li class="content-wrapper" :class="{'edit-mode': isTopicEditMode}">
                 <span class="content-title">
-                    {{$t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC')}}
+                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC') }}
                 </span>
-                <div class="content">
-                    <p-tag :deletable="false">Topic1</p-tag>
-                    <p class="edit-btn">
+                <div v-if="isTopicEditMode" class="content">
+                    <add-notification-topic />
+                    <div class="button-group">
+                        <p-button :outline="true" class="text-button" @click="cancelEdit(EDIT_TYPE.TOPIC)">
+                            {{ $t('COMMON.TAGS.CANCEL') }}
+                        </p-button>
+                        <p-button
+                            style-type="primary"
+                            class="text-button"
+                        >
+                            {{ $t('COMMON.TAGS.SAVE') }}
+                        </p-button>
+                    </div>
+                </div>
+                <div v-else class="content">
+                    <p-tag :deletable="false">
+                        Topic1
+                    </p-tag>
+                    <button class="edit-btn" @click="startEdit(EDIT_TYPE.TOPIC)">
                         <p-i name="ic_edit" width="1rem" height="1rem"
                              color="inherit" class="edit-icon"
                         />
-                        {{$t('IDENTITY.USER.NOTIFICATION.EDIT')}}
-                    </p>
+                        {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
+                    </button>
                 </div>
             </li>
             <p-divider />
@@ -67,17 +113,28 @@
 
 <script lang="ts">
 import {
-    PBadge, PDivider, PI, PIconButton, PPaneLayout, PTag, PToggleButton,
+    PBadge, PDivider, PI, PIconButton, PPaneLayout, PTag, PToggleButton, PButton,
 } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
+import AddNotificationSchedule from '@/views/identity/user/modules/AddNotificationSchedule.vue';
+import AddNotificationTopic from '@/views/identity/user/modules/AddNotificationTopic.vue';
+
+enum EDIT_TYPE {
+    DATA = 'data',
+    SCHEDULE = 'schedule',
+    TOPIC = 'topic',
+}
 
 export default {
     name: 'NotificationChannelCard',
     components: {
+        AddNotificationTopic,
+        AddNotificationSchedule,
         PPaneLayout,
         PToggleButton,
         PI,
         PIconButton,
+        PButton,
         PBadge,
         PDivider,
         PTag,
@@ -85,13 +142,33 @@ export default {
     setup() {
         const state = reactive({
             isActivated: true,
+            isDataEditMode: false,
+            isScheduleEditMode: false,
+            isTopicEditMode: false,
         });
         const onToggleChange = () => {
             console.log('toggle changed!');
         };
+        const startEdit = (type: EDIT_TYPE) => {
+            if (type === EDIT_TYPE.DATA) state.isDataEditMode = true;
+            if (type === EDIT_TYPE.SCHEDULE) state.isScheduleEditMode = true;
+            if (type === EDIT_TYPE.TOPIC) state.isTopicEditMode = true;
+        };
+        const cancelEdit = (type: EDIT_TYPE) => {
+            if (type === EDIT_TYPE.DATA) state.isDataEditMode = false;
+            if (type === EDIT_TYPE.SCHEDULE) state.isScheduleEditMode = false;
+            if (type === EDIT_TYPE.TOPIC) state.isTopicEditMode = false;
+        };
+        const saveChange = () => {
+
+        };
         return {
+            EDIT_TYPE,
             ...toRefs(state),
             onToggleChange,
+            startEdit,
+            cancelEdit,
+            saveChange,
         };
     },
 };
@@ -123,6 +200,9 @@ export default {
     flex-direction: row;
     min-height: 2.5rem;
     align-items: center;
+    &.edit-mode {
+        @apply bg-blue-100;
+    }
     .content-title {
         @apply text-gray-600;
         min-width: 10.5rem;
@@ -136,6 +216,7 @@ export default {
         justify-content: space-between;
         font-size: 0.875rem;
         line-height: 170%;
+        padding: 0.75rem 1rem;
     }
     .edit-btn {
         @apply text-blue-600;
@@ -144,7 +225,16 @@ export default {
         .edit-icon {
             margin-right: 0.25rem;
         }
+        &:hover, &:active {
+            @apply cursor-pointer;
+        }
     }
-
+    .button-group {
+        justify-content: flex-end;
+        .text-button {
+            height: 1.5rem;
+        }
+    }
 }
+
 </style>

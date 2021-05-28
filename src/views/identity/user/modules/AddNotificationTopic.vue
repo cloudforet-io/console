@@ -1,39 +1,47 @@
 <template>
-    <p-pane-layout class="content-wrapper">
-        <h3 class="content-title">
-            {{ $t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC') }}
-        </h3>
-        <h4 class="sub-title">
-            {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING_MODE') }}
-        </h4>
+    <div>
         <p-radio v-for="(item, i) in topicMode" :key="i"
                  :selected="item.value" :value="selectedTopicMode" class="mr-4"
                  @click="changeTopicMode(item.value)"
         >
             <span class="radio-label" @click="changeTopicMode(item.value)">{{ item.label }}</span>
         </p-radio>
-        <article v-if="selectedTopicMode === TOPIC_MODE.TOPIC">
-            Topic
+        <article v-if="selectedTopicMode === TOPIC_MODE.TOPIC" class="topic-wrapper">
+            <h5 class="setting">
+                {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
+            </h5>
+            <p-check-box v-for="item in TOPIC_LIST" :key="item.value"
+                         v-model="selectedTopic"
+                         :value="item.value"
+            >
+                <span class="topic-label">{{ item.label }}</span>
+            </p-check-box>
         </article>
-    </p-pane-layout>
+    </div>
 </template>
 
 <script lang="ts">
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { PPaneLayout, PRadio } from '@spaceone/design-system';
+import { PRadio, PCheckBox } from '@spaceone/design-system';
 
 enum TOPIC_MODE {
     ALL = 'all',
     TOPIC = 'topic',
 }
 
+const TOPIC_LIST = [
+    { label: 'Topic 1', value: 'topic1' },
+    { label: 'Topic 2', value: 'topic2' },
+    { label: 'Topic 3', value: 'topic3' },
+];
+
 export default {
     name: 'AddNotificationTopic',
     components: {
-        PPaneLayout,
         PRadio,
+        PCheckBox,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -44,12 +52,14 @@ export default {
                 label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ON_TOPIC'), value: 'topic',
             }]),
             selectedTopicMode: 'all',
+            selectedTopic: [] as string[],
         });
         const changeTopicMode = (value) => {
             state.selectedTopicMode = value;
         };
         return {
             TOPIC_MODE,
+            TOPIC_LIST,
             ...toRefs(state),
             changeTopicMode,
         };
@@ -58,24 +68,21 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.content-wrapper {
-    padding-left: 1rem;
-    padding-top: 2rem;
-    padding-bottom: 3.5rem;
-}
-.content-title {
-    font-size: 1.5rem;
-    line-height: 135%;
-}
-.sub-title {
-    @apply font-bold;
-    font-size: 0.875rem;
-    line-height: 140%;
-    margin-top: 1.25rem;
-    margin-bottom: 0.375rem;
-}
 .radio-label {
     font-size: 0.875rem;
     line-height: 150%;
+}
+.topic-wrapper {
+    margin-top: 2.625rem;
+    .setting {
+        @apply font-bold;
+        font-size: 0.875rem;
+        line-height: 140%;
+        margin-bottom: 1.125rem;
+    }
+}
+.topic-label {
+    min-width: 6.25rem;
+    margin-right: 0.5rem;
 }
 </style>

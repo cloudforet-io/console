@@ -1,21 +1,21 @@
 <template>
-    <p-pane-layout class="content-wrapper">
-        <h3 class="content-title">
-            {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE') }}
-        </h3>
-        <h4 class="sub-title">
-            {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING_MODE') }}
-        </h4>
+    <div>
         <p-radio v-for="(item, i) in scheduleMode" :key="i"
                  :selected="item.value" :value="selectedScheduleMode" class="mr-4"
                  @click="changeScheduleMode(item.value)"
         >
             <span class="radio-label" @click="changeScheduleMode(item.value)">{{ item.label }}</span>
         </p-radio>
-        <article v-if="selectedScheduleMode === SCHEDULE_MODE.CUSTOM">
-            Custom
+        <article v-if="selectedScheduleMode === SCHEDULE_MODE.CUSTOM" class="schedule-wrapper">
+            <info-message style-type="secondary"
+                          :message="$t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE_INFO_MSG')"
+                          block
+            />
+            <h5 class="setting">
+                {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
+            </h5>
         </article>
-    </p-pane-layout>
+    </div>
 </template>
 
 <script lang="ts">
@@ -23,6 +23,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { PPaneLayout, PRadio } from '@spaceone/design-system';
+import InfoMessage from '@/common/components/InfoMessage.vue';
 
 enum SCHEDULE_MODE {
     ALL = 'all',
@@ -34,6 +35,7 @@ export default {
     components: {
         PPaneLayout,
         PRadio,
+        InfoMessage,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -58,24 +60,17 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.content-wrapper {
-    padding-left: 1rem;
-    padding-top: 2rem;
-    padding-bottom: 3.5rem;
-}
-.content-title {
-    font-size: 1.5rem;
-    line-height: 135%;
-}
-.sub-title {
-    @apply font-bold;
-    font-size: 0.875rem;
-    line-height: 140%;
-    margin-top: 1.25rem;
-    margin-bottom: 0.375rem;
-}
 .radio-label {
     font-size: 0.875rem;
     line-height: 150%;
+}
+.schedule-wrapper {
+    margin-top: 1.25rem;
+    .setting {
+        @apply font-bold;
+        font-size: 0.875rem;
+        line-height: 140%;
+        margin-bottom: 1.125rem;
+    }
 }
 </style>
