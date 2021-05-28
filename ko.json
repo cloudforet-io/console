@@ -824,6 +824,7 @@
 				"YESTERDAY": "어제 "
 			},
 			"NOTIFICATION": {
+				"ADD_MEMBER_GROUP": "멤버 추가",
 				"ADD_SLACK": "슬랙 채널 추가",
 				"ADD_SMS": "SMS 채널 추가",
 				"ADD_VOICE": "보이스 콜 채널 추가",

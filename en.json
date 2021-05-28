@@ -824,6 +824,7 @@
 				"YESTERDAY": "Yesterday"
 			},
 			"NOTIFICATION": {
+				"ADD_MEMBER_GROUP": "Add Member Group ",
 				"ADD_SLACK": "Add Slack channel",
 				"ADD_SMS": "Add SMS channel",
 				"ADD_VOICE": "Add Voice Call channel",

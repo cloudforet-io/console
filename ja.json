@@ -824,6 +824,7 @@
 				"YESTERDAY": "昨日"
 			},
 			"NOTIFICATION": {
+				"ADD_MEMBER_GROUP": "",
 				"ADD_SLACK": "",
 				"ADD_SMS": "",
 				"ADD_VOICE": "",
