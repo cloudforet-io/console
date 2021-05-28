@@ -1019,6 +1019,9 @@
 	},
 	"MONITORING": {
 		"ALERT": {
+			"ESCALATION_POLICY": {
+				"ESCALATION_POLICY": "Escalation Policy"
+			},
 			"MAIN": {
 				"ALERT": "Alert",
 				"DASHBOARD": "대시보드",
@@ -1137,7 +1140,7 @@
 				"DETAILS_BASE_LABEL_ID": "아이디",
 				"DETAILS_BASE_LABEL_LAST_COLLECTED": "최근 수집 시간",
 				"DETAILS_BASE_LABEL_NAME": "이름",
-				"DETAILS_BASE_LABEL_PLUGIN_NAME": "플러그인 이름 ",
+				"DETAILS_BASE_LABEL_PLUGIN": "플러그인",
 				"DETAILS_BASE_LABEL_PRIORITY": "우선 순위",
 				"DETAILS_BASE_LABEL_PROVIDER": "서비스 제공자",
 				"DETAILS_BASE_LABEL_RESOURCE_TYPE": "리소스 타입",

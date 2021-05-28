@@ -1019,6 +1019,9 @@
 	},
 	"MONITORING": {
 		"ALERT": {
+			"ESCALATION_POLICY": {
+				"ESCALATION_POLICY": ""
+			},
 			"MAIN": {
 				"ALERT": "",
 				"DASHBOARD": "ダッシュボード",
@@ -1137,7 +1140,7 @@
 				"DETAILS_BASE_LABEL_ID": "ID",
 				"DETAILS_BASE_LABEL_LAST_COLLECTED": "最後に収集した時間",
 				"DETAILS_BASE_LABEL_NAME": "名前",
-				"DETAILS_BASE_LABEL_PLUGIN_NAME": "プラグイン名",
+				"DETAILS_BASE_LABEL_PLUGIN": "プラグイン",
 				"DETAILS_BASE_LABEL_PRIORITY": "優先順位",
 				"DETAILS_BASE_LABEL_PROVIDER": "サービスプロバイダー",
 				"DETAILS_BASE_LABEL_RESOURCE_TYPE": "リソースタイプ",
