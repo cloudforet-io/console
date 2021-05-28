@@ -1,3 +1,16 @@
+# [1.1.0-beta.31](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.30...v1.1.0-beta.31) (2021-05-28)
+
+
+### Bug Fixes
+
+* remove loading spinner opacity in context menu ([2e9b890](https://github.com/spaceone-dev/spaceone-design-system/commit/2e9b89062022bb78bb4b28032514367b10044ecc))
+* update select state and usage of it ([666182f](https://github.com/spaceone-dev/spaceone-design-system/commit/666182f054fedab142bf5e1e185a917d65a8d443))
+
+
+### Features
+
+* add select card component ([3fffbfe](https://github.com/spaceone-dev/spaceone-design-system/commit/3fffbfe5379730b6004bca583a63510140c1433a))
+
 # [1.1.0-beta.30](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.29...v1.1.0-beta.30) (2021-05-27)
 
 
