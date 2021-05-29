@@ -1,7 +1,9 @@
 <template>
     <general-page-layout class="add-noti-wrapper">
         <p-breadcrumbs class="flex-grow" :routes="routeState.routes" />
-        <p-page-title child @goBack="$router.go(-1)" />
+        <p-page-title child :title="pageTitle" class="page-title"
+                      @goBack="$router.go(-1)"
+        />
         <section class="content-list-wrapper">
             <add-notification-data />
             <p-pane-layout class="content-wrapper">
@@ -59,7 +61,7 @@ const LEVEL_LIST = [
 ];
 
 export default {
-    name: 'AddNotificationChannelPage',
+    name: 'AddNotificationPage',
     components: {
         AddNotificationData,
         AddNotificationSchedule,
@@ -75,6 +77,8 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             escalationLevel: 1,
+            type: '',
+            pageTitle: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: '' }),
         });
         const routeState = reactive({
             routes: computed(() => ([
@@ -87,6 +91,10 @@ export default {
         const onClickSave = () => {
             console.log('save!!');
         };
+
+        (async () => {
+            state.pageTitle = vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: vm.$route.params.channel });
+        })();
 
         return {
             LEVEL_LIST,
@@ -104,6 +112,9 @@ export default {
     flex-direction: column;
     gap: 1rem;
     margin-bottom: 1rem;
+}
+.page-title {
+    text-transform: capitalize;
 }
 .button-group {
     display: flex;
