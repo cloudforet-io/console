@@ -830,6 +830,7 @@
 				"ADD_VOICE": "Add Voice Call channel",
 				"EDIT": "Edit",
 				"FORM": {
+					"ADD_CHANNEL": "Add {type} Channel",
 					"ALL_TIME": "All Time",
 					"BASE_INFO": "Base Information",
 					"CUSTOM": "Custom",

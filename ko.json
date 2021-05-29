@@ -830,6 +830,7 @@
 				"ADD_VOICE": "보이스 콜 채널 추가",
 				"EDIT": "편집",
 				"FORM": {
+					"ADD_CHANNEL": "{type} 채널 추가하기 ",
 					"ALL_TIME": "모든 시간",
 					"BASE_INFO": "기본 정보",
 					"CUSTOM": "시간 설정",
