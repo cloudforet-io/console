@@ -24,8 +24,10 @@ export const IDENTITY_ROUTE = Object.freeze({
         MANAGEMENT: 'userManagement',
         ACCOUNT: 'userAccount',
         API_KEY: 'userAPIKey',
-        NOTIFICATION: 'userNotification',
-        ADD_NOTIFICATION: 'addNotification',
+        NOTIFICATION: {
+            MAIN: 'userNotification',
+            ADD: 'addNotification',
+        }
     },
 });
 
@@ -101,14 +103,14 @@ export default {
                         },
                         {
                             path: 'notification',
-                            name: IDENTITY_ROUTE.USER.NOTIFICATION,
+                            name: IDENTITY_ROUTE.USER.NOTIFICATION.MAIN,
                             component: UserNotificationPage,
                         },
                     ],
                 },
                 {
                     path: 'notification/:channel',
-                    name: IDENTITY_ROUTE.USER.ADD_NOTIFICATION,
+                    name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
                     component: AddNotificationChannelPage,
                 },
             ],

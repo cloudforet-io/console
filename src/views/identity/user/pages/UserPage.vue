@@ -124,7 +124,7 @@ export default {
                 },
                 {
                     label: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION'),
-                    routeName: IDENTITY_ROUTE.USER.NOTIFICATION,
+                    routeName: IDENTITY_ROUTE.USER.NOTIFICATION.MAIN,
                     userOnly: false,
                 },
                 {

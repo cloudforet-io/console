@@ -14,6 +14,26 @@
             <h5 class="setting">
                 {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
             </h5>
+            <p-select-button v-for="day in weekDay" :key="day"
+                             v-model="selectedDay"
+                             multi-selectable
+                             :value="day"
+                             class="select-button-wrapper"
+            >
+                {{ day }}
+            </p-select-button>
+            <div class="dropdown-wrapper">
+                <p-select-dropdown v-model="startTime"
+                                   :items="timeList"
+                                   class="dropdown"
+                />
+                <span class="text">to</span>
+                <p-select-dropdown v-model="endTime"
+                                   :items="timeList"
+                                   class="dropdown"
+                />
+                <span class="timezone-text">{{$t('COMMON.PROFILE.TIMEZONE')}}: {{ timezone }}</span>
+            </div>
         </article>
     </div>
 </template>
@@ -22,20 +42,26 @@
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { PPaneLayout, PRadio } from '@spaceone/design-system';
+import { PRadio, PSelectButton, PSelectDropdown } from '@spaceone/design-system';
 import InfoMessage from '@/common/components/InfoMessage.vue';
+import { range } from 'lodash';
+import { store } from '@/store';
 
 enum SCHEDULE_MODE {
     ALL = 'all',
     CUSTOM = 'custom',
 }
 
+const TIME_LIST = range(24);
+
+
 export default {
     name: 'AddNotificationSchedule',
     components: {
-        PPaneLayout,
         PRadio,
+        PSelectButton,
         InfoMessage,
+        PSelectDropdown,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -46,10 +72,19 @@ export default {
                 label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.CUSTOM'), value: 'custom',
             }]),
             selectedScheduleMode: 'all',
+            weekDay: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
+            selectedDay: [],
+            timeList: TIME_LIST.map(d => ({
+                type: 'item', label: d > 13 ? `${d}:00 PM` : `${d}:00 AM`, name: d,
+            })),
+            startTime: 0,
+            endTime: 0,
+            timezone: computed(() => store.state.user.timezone),
         });
         const changeScheduleMode = (value) => {
             state.selectedScheduleMode = value;
         };
+
         return {
             SCHEDULE_MODE,
             ...toRefs(state),
@@ -71,6 +106,25 @@ export default {
         font-size: 0.875rem;
         line-height: 140%;
         margin-bottom: 1.125rem;
+    }
+}
+.select-button-wrapper {
+    margin-right: 0.5rem;
+    margin-bottom: 1rem;
+}
+.dropdown-wrapper {
+    display: flex;
+    align-items: center;
+    .text {
+        @apply mx-2;
+        font-size: 0.875rem;
+        line-height: 160%;
+    }
+    .timezone-text {
+        @apply text-gray-600;
+        margin-left: 1rem;
+        font-size: 0.75rem;
+        line-height: 150%;
     }
 }
 </style>

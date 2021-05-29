@@ -63,7 +63,7 @@ export default {
                 {
                     label: vm.$t('IDENTITY.USER.NOTIFICATION.ADD_MEMBER_GROUP'),
                     link: {
-                        name: IDENTITY_ROUTE.USER.ADD_NOTIFICATION,
+                        name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
                         params: { channel: 'member' },
                     },
                     isProjectOnlyChannel: true,
@@ -71,21 +71,21 @@ export default {
                 {
                     label: vm.$t('IDENTITY.USER.NOTIFICATION.ADD_SMS'),
                     link: {
-                        name: IDENTITY_ROUTE.USER.ADD_NOTIFICATION,
+                        name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
                         params: { channel: 'sms' },
                     },
                 },
                 {
                     label: vm.$t('IDENTITY.USER.NOTIFICATION.ADD_VOICE'),
                     link: {
-                        name: IDENTITY_ROUTE.USER.ADD_NOTIFICATION,
+                        name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
                         params: { channel: 'voice' },
                     },
                 },
                 {
                     label: vm.$t('IDENTITY.USER.NOTIFICATION.ADD_SLACK'),
                     link: {
-                        name: IDENTITY_ROUTE.USER.ADD_NOTIFICATION,
+                        name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
                         params: { channel: 'slack' },
                     },
                 },
