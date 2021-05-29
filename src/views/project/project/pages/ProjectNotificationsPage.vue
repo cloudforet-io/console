@@ -1,6 +1,6 @@
 <template>
     <section>
-        <notification-list :hide-project-only-channel="hideProjectOnlyChannel" />
+        <notification-list :hide-project-only-channel="hideProjectOnlyChannel" :project-id="projectId" />
     </section>
 </template>
 
@@ -22,10 +22,11 @@ export default {
             default: undefined,
         },
     },
-    setup() {
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             hideProjectOnlyChannel: true,
+            projectId: vm.$route.params.id,
         });
 
         (async () => {

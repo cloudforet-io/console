@@ -9,7 +9,7 @@
             </template>
         </p-field-group>
         <p-field-group
-            v-if="channel !== CHANNEL_TYPE.SLACK"
+            v-if="channel === CHANNEL_TYPE.SMS || channel === CHANNEL_TYPE.VOICE"
             :label="$t('IDENTITY.USER.NOTIFICATION.FORM.PHONE_NUMBER')"
             :invalid="!isPhoneNumValid"
             :invalid-text="'Invalid Phone number format!'"
@@ -23,7 +23,7 @@
             </template>
         </p-field-group>
         <p-field-group
-            v-else
+            v-else-if="channel === CHANNEL_TYPE.SLACK"
             :label="$t('IDENTITY.USER.NOTIFICATION.FORM.SLACK_TOKEN')"
             required
             class="base-info-input"
@@ -32,6 +32,9 @@
                 <p-text-input v-model="slackToken" />
             </template>
         </p-field-group>
+        <div v-else>
+            <add-notification-member-group :project-id="projectId" />
+        </div>
     </p-pane-layout>
 </template>
 
@@ -44,11 +47,13 @@ import {
 } from '@vue/composition-api';
 // eslint-disable-next-line import/named
 import { notiChannelPhoneNumRegex } from '@/views/identity/user/lib/validations';
+import AddNotificationMemberGroup from '@/views/identity/user/modules/AddNotificationMemberGroup.vue';
 
 enum CHANNEL_TYPE {
     SMS = 'sms',
     VOICE = 'voice',
     SLACK = 'slack',
+    MEMBER = 'member',
 }
 const LEVEL_LIST = [
     { label: 'Level 1', name: 1, type: 'item' },
@@ -59,6 +64,7 @@ const LEVEL_LIST = [
 export default {
     name: 'AddNotificationData',
     components: {
+        AddNotificationMemberGroup,
         PPaneLayout,
         PFieldGroup,
         PTextInput,
@@ -67,6 +73,7 @@ export default {
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const channel = vm.$route.params.channel;
+        const projectId = vm.$route.query.projectId;
         const state = reactive({
             phoneNum: '',
             slackToken: '',
@@ -90,6 +97,7 @@ export default {
             channel,
             CHANNEL_TYPE,
             LEVEL_LIST,
+            projectId,
             ...toRefs(state),
             onChangePhoneNum,
         };

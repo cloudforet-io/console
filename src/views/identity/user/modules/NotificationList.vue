@@ -55,8 +55,12 @@ export default {
             type: Boolean,
             default: true,
         },
+        projectId: {
+            type: String,
+            default: '',
+        },
     },
-    setup() {
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             channelList: computed(() => [
@@ -65,6 +69,9 @@ export default {
                     link: {
                         name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
                         params: { channel: 'member' },
+                        query: {
+                            projectId: props.projectId,
+                        },
                     },
                     isProjectOnlyChannel: true,
                 },
