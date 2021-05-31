@@ -48,7 +48,7 @@
 
             <template v-for="({text, description}, headerSlot) of dynamicFieldHeaderSlots" v-slot:[headerSlot]>
                 {{ text }}
-                <span :key="`${headerSlot}-description`" class="field-description">{{ $t(description) || description }}</span>
+                <span :key="`${headerSlot}-description`" class="field-description">{{ description }}</span>
             </template>
 
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
