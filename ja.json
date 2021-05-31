@@ -1234,6 +1234,8 @@
 			"MODAL_DELETE_MEMBER_TITLE": "メンバー削除",
 			"MODAL_DELETE_PROJECT_CONTENT": "このプロジェクトを削除しますか？",
 			"MODAL_DELETE_PROJECT_TITLE": "プロジェクト削除",
+			"MODAL_DELETE_WEBHOOK_CONTENT": "",
+			"MODAL_DELETE_WEBHOOK_TITLE": "",
 			"MODAL_UPDATE_MEMBER_TITLE": "メンバー情報の更新",
 			"MODAL_UPDATE_PROJECT_TITLE": "プロジェクト変更",
 			"MODAL_UPDATE_WEBHOOK": "",
@@ -1266,6 +1268,7 @@
 			"TAB_REPORT": "レポート",
 			"TAB_SUMMARY": "概要情報",
 			"TAB_TAG": "タグ",
+			"WEBHOOK_ACTION": "",
 			"WEBHOOK_ADD": "",
 			"WEBHOOK_DELETE": "",
 			"WEBHOOK_UPDATE": ""

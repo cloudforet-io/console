@@ -1234,6 +1234,8 @@
 			"MODAL_DELETE_MEMBER_TITLE": "Delete Member",
 			"MODAL_DELETE_PROJECT_CONTENT": "Are you sure you want to delete the project?",
 			"MODAL_DELETE_PROJECT_TITLE": "Delete Project",
+			"MODAL_DELETE_WEBHOOK_CONTENT": "Are you sure you want to delete webhook?",
+			"MODAL_DELETE_WEBHOOK_TITLE": "Delete Webhook",
 			"MODAL_UPDATE_MEMBER_TITLE": "Update Member Information",
 			"MODAL_UPDATE_PROJECT_TITLE": "Update Project",
 			"MODAL_UPDATE_WEBHOOK": "Update",
@@ -1266,6 +1268,7 @@
 			"TAB_REPORT": "Report",
 			"TAB_SUMMARY": "Summary",
 			"TAB_TAG": "Tag",
+			"WEBHOOK_ACTION": "Action",
 			"WEBHOOK_ADD": "Add",
 			"WEBHOOK_DELETE": "Delete",
 			"WEBHOOK_UPDATE": "Update"
