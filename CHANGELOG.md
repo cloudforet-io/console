@@ -1,3 +1,12 @@
+# [1.1.0-beta.35](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.34...v1.1.0-beta.35) (2021-05-31)
+
+
+### Bug Fixes
+
+* autocomplete search menu to watch menu ([b0e24c7](https://github.com/spaceone-dev/spaceone-design-system/commit/b0e24c77d92a2915d713e230f27943f35bc935c9))
+* remove translation of field descriptions in dynamic layouts ([3aceb26](https://github.com/spaceone-dev/spaceone-design-system/commit/3aceb2617915c810fbdc585383a6c151b8fd9db4))
+* update dynamic layout panel top margin ([41de0df](https://github.com/spaceone-dev/spaceone-design-system/commit/41de0df0a9096783b15f5014a66bd843967709f2))
+
 # [1.1.0-beta.34](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.33...v1.1.0-beta.34) (2021-05-28)
 
 
