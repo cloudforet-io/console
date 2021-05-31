@@ -841,10 +841,14 @@ export default {
     @apply mt-8;
 }
 
->>> .p-dynamic-layout-query-search-table .p-query-search-table {
-    border-width: 1px;
+>>> .p-dynamic-layout-query-search-table .p-toolbox-table {
+    @apply border border-gray-200 rounded-lg;
+    .p-data-table {
+        min-height: unset;
+    }
 }
 .p-tab::v-deep {
+    @apply rounded-lg;
     &.monitoring {
         .tab-pane {
             @apply bg-secondary2;

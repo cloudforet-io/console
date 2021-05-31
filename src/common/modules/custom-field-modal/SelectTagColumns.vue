@@ -30,19 +30,16 @@ import {
 } from '@spaceone/design-system';
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { TAGS_PREFIX } from '@/common/modules/custom-field-modal/config';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { SpaceConnector } from '@/lib/space-connector';
-import { camelCase, uniq } from 'lodash';
 import { makeProxy } from '@/lib/compostion-util';
 
 interface Props {
     selectedKeys: string[];
-    resourceType: string;
-    options: any;
+    allTags: string[];
+    loading: boolean;
 }
 
 export default {
@@ -57,14 +54,13 @@ export default {
             type: Array,
             default: () => [],
         },
-        resourceType: {
-            type: String,
-            default: '',
-            required: true,
+        allTags: {
+            type: Array,
+            default: () => [],
         },
-        options: {
-            type: Object,
-            default: () => ({}),
+        loading: {
+            type: Boolean,
+            default: true,
         },
     },
     setup(props: Props, { emit }) {
@@ -72,7 +68,6 @@ export default {
 
         const state = reactive({
             search: '',
-            loading: true,
             proxySelectedKeys: makeProxy('selectedKeys', props, emit),
             selectedTagKeys: computed<string[]>({
                 get: () => props.selectedKeys.filter(key => key.startsWith(TAGS_PREFIX)),
@@ -82,8 +77,7 @@ export default {
                         .concat(val);
                 },
             }),
-            allTags: [] as string[],
-            allTagsMenuItems: computed(() => state.allTags.map(d => ({
+            allTagsMenuItems: computed(() => props.allTags.map(d => ({
                 name: `${TAGS_PREFIX}${d}`,
                 label: d,
                 type: 'item',
@@ -97,7 +91,7 @@ export default {
             });
         };
 
-        const onSelectTag = (item: MenuItem) => {
+        const onSelectTag = (item: Required<MenuItem>) => {
             state.search = '';
             const idx = state.selectedTagKeys.findIndex(k => k === item.name);
             if (idx !== -1) {
@@ -111,40 +105,6 @@ export default {
             state.selectedTagKeys = [];
             state.search = '';
         };
-
-        const tagsApiQueryHelper = new ApiQueryHelper().setOnly('tags.key');
-        const getTags = async () => {
-            state.loading = true;
-            try {
-                let api = SpaceConnector.client;
-                props.resourceType.split('.').forEach((d) => {
-                    api = api?.[camelCase(d)];
-                });
-
-                tagsApiQueryHelper.setFilters([]);
-                const { provider, cloudServiceGroup, cloudServiceType } = props.options;
-                if (provider) tagsApiQueryHelper.addFilter({ k: 'provider', v: provider, o: '=' });
-                if (cloudServiceGroup) tagsApiQueryHelper.addFilter({ k: 'cloud_service_group', v: cloudServiceGroup, o: '=' });
-                if (cloudServiceType) tagsApiQueryHelper.addFilter({ k: 'cloud_service_type', v: cloudServiceType, o: '=' });
-
-                const { results } = await api.list({
-                    query: tagsApiQueryHelper.data,
-                });
-
-                state.allTags = uniq(results.map(d => Object.keys(d.tags)).flat());
-            } catch (e) {
-                console.error(e);
-                state.allTags = [];
-            } finally {
-                state.loading = false;
-            }
-        };
-
-        watch(() => props.resourceType, (after, before) => {
-            if (state.allTags.length === 0 && after && after !== before) {
-                getTags();
-            }
-        }, { immediate: true });
 
         return {
             ...toRefs(state),
