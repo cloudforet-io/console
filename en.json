@@ -1241,6 +1241,7 @@
 			"MODAL_UPDATE_WEBHOOK": "Update",
 			"MODAL_UPDATE_WEBHOOK_LABEL_1": "Name",
 			"MODAL_UPDATE_WEBHOOK_LABEL_2": "State",
+			"MODAL_UPDATE_WEBHOOK_PLACEHOLDER": "Webhook Name",
 			"MODAL_UPDATE_WEBHOOK_TITLE": "Update Webhook",
 			"MODAL_VALIDATION_DUPLICATED": "Project name is duplicated.",
 			"MODAL_VALIDATION_LENGTH": "Must be longer than 40 characters.",
