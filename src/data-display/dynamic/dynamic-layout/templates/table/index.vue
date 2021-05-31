@@ -6,8 +6,7 @@
         >
             {{ layoutName }}
         </p-panel-top>
-        <p-toolbox-table class="p-search-table"
-                         search-type="plain"
+        <p-toolbox-table search-type="plain"
                          :fields="fields"
                          :items="rootData"
                          :loading="loading"
@@ -217,16 +216,12 @@ export default {
 </script>
 <style lang="postcss">
 .p-dynamic-layout-table {
-    .panel-top {
-        margin: 0.5rem 0 0;
-    }
-    .p-search-table {
+    .p-toolbox-table {
         height: 100%;
         border-width: 0;
     }
     .field-description {
         @apply text-gray-400;
-        margin-left: 0.25rem;
     }
 }
 </style>
