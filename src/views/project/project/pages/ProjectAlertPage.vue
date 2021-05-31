@@ -1,12 +1,15 @@
 <template>
     <div>
-        Project Alert Page
+        <project-alert-tab :project-id="id" />
     </div>
 </template>
 
 <script lang="ts">
+import ProjectAlertTab from '@/views/project/project/modules/ProjectAlertTab.vue';
+
 export default {
     name: 'ProjectAlertPage',
+    components: { ProjectAlertTab },
     props: {
         id: {
             type: String,

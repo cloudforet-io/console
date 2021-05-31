@@ -286,7 +286,7 @@ export default {
     }
 }
 .p-tab::v-deep {
-    border: none;
+    border-radius: 0.375rem;
     margin: auto;
 }
 
