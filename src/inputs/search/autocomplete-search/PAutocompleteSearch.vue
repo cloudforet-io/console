@@ -38,7 +38,7 @@ import {
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import {
     ComponentRenderProxy,
-    computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs,
+    computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { makeByPassListeners, makeOptionalProxy } from '@/util/composition-helpers';
 import PSearch from '@/inputs/search/search/PSearch.vue';
@@ -171,6 +171,11 @@ export default defineComponent<AutocompleteSearchProps>({
             if (filtered[filtered.length - 1]?.type === 'divider') filtered.pop();
             state.filteredMenu = filtered;
         };
+
+        watch(() => props.menu, (menu) => {
+            state.filteredMenu = menu;
+            filterMenu(state.proxyValue);
+        });
 
         const focusSearch = () => {
             state.proxyIsFocused = true;
