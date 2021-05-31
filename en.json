@@ -824,15 +824,12 @@
 				"YESTERDAY": "Yesterday"
 			},
 			"NOTIFICATION": {
-				"ADD_MEMBER_GROUP": "Add Member Group ",
-				"ADD_SLACK": "Add Slack channel",
-				"ADD_SMS": "Add SMS channel",
-				"ADD_VOICE": "Add Voice Call channel",
 				"EDIT": "Edit",
 				"FORM": {
 					"ADD_CHANNEL": "Add {type} Channel",
 					"ALL_TIME": "All Time",
 					"BASE_INFO": "Base Information",
+					"CHANNEL_NAME": "Channel Name",
 					"CUSTOM": "Custom",
 					"ESCALATION_LEVEL": "Escalation Level ",
 					"PHONE_NUMBER": "Phone number",
@@ -849,8 +846,12 @@
 				"NOTIFICATION_CHANNEL": "Notification Channels",
 				"NOTI_CHANNEL_DESC": "Supporting environments for SMS and voice call may vary depends on the country.  ",
 				"NO_NOTI_CHANNEL": "No Notification Channel",
+				"SLACK": "Slack",
+				"SMS": "SMS",
+				"SPACEONE_USER": "SpaceOne User",
 				"TOKEN": "Token",
-				"TOKEN_INFO": "Token cannot be modified."
+				"TOKEN_INFO": "Token cannot be modified.",
+				"VOICE": "Voice Call"
 			}
 		}
 	},

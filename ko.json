@@ -824,15 +824,12 @@
 				"YESTERDAY": "어제 "
 			},
 			"NOTIFICATION": {
-				"ADD_MEMBER_GROUP": "멤버 추가",
-				"ADD_SLACK": "슬랙 채널 추가",
-				"ADD_SMS": "SMS 채널 추가",
-				"ADD_VOICE": "보이스 콜 채널 추가",
 				"EDIT": "편집",
 				"FORM": {
-					"ADD_CHANNEL": "{type} 채널 추가하기 ",
+					"ADD_CHANNEL": "{type} 채널 추가",
 					"ALL_TIME": "모든 시간",
 					"BASE_INFO": "기본 정보",
+					"CHANNEL_NAME": "채널 이름",
 					"CUSTOM": "시간 설정",
 					"ESCALATION_LEVEL": "에스컬레이션 레벨",
 					"PHONE_NUMBER": "전화번호",
@@ -849,8 +846,12 @@
 				"NOTIFICATION_CHANNEL": "알림 채널",
 				"NOTI_CHANNEL_DESC": "SMS 및 음성 통화 지원 환경은 국가에 따라 다를 수 있습니다.",
 				"NO_NOTI_CHANNEL": "알림 채널이 없습니다.",
+				"SLACK": "슬랙",
+				"SMS": "SMS",
+				"SPACEONE_USER": "스페이스원 사용자",
 				"TOKEN": "토큰",
-				"TOKEN_INFO": "Token은 수정이 불가합니다."
+				"TOKEN_INFO": "Token은 수정이 불가합니다.",
+				"VOICE": "보이스 콜"
 			}
 		}
 	},

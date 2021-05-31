@@ -824,15 +824,12 @@
 				"YESTERDAY": "昨日"
 			},
 			"NOTIFICATION": {
-				"ADD_MEMBER_GROUP": "",
-				"ADD_SLACK": "",
-				"ADD_SMS": "",
-				"ADD_VOICE": "",
 				"EDIT": "",
 				"FORM": {
 					"ADD_CHANNEL": "",
 					"ALL_TIME": "",
 					"BASE_INFO": "",
+					"CHANNEL_NAME": "",
 					"CUSTOM": "",
 					"ESCALATION_LEVEL": "",
 					"PHONE_NUMBER": "",
@@ -849,8 +846,12 @@
 				"NOTIFICATION_CHANNEL": "",
 				"NOTI_CHANNEL_DESC": "",
 				"NO_NOTI_CHANNEL": "",
+				"SLACK": "",
+				"SMS": "",
+				"SPACEONE_USER": "",
 				"TOKEN": "",
-				"TOKEN_INFO": ""
+				"TOKEN_INFO": "",
+				"VOICE": ""
 			}
 		}
 	},
