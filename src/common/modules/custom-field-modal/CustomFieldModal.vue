@@ -328,10 +328,21 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.p-button-modal::v-deep {
+    .modal-content {
+        .modal-body {
+            @apply flex;
+            .p-data-loader {
+                @apply flex-grow;
+                max-height: inherit;
+            }
+        }
+    }
+}
 .contents-wrapper {
     display: flex;
     width: 100%;
-    height: 608px;
+    height: 100%;
     max-height: inherit;
     overflow: hidden;
 }

@@ -185,6 +185,7 @@ export default {
 .p-autocomplete-search::v-deep {
     .p-context-menu {
         min-width: 100%;
+        max-height: 50vh;
         .context-item:not(.empty) {
             padding: 0;
             white-space: unset;
