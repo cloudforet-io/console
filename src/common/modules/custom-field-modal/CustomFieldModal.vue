@@ -62,9 +62,12 @@
                                 {{ $t('COMMON.CUSTOM_FIELD_MODAL.CLEAR_ALL') }}
                             </p-button>
                         </h3>
-                        <select-tag-columns :resource-type="resourceType" :options="options"
-                                            :selected-keys.sync="selectedAllColumnKeys"
-                        />
+                        <keep-alive>
+                            <select-tag-columns :all-tags="tagState.allTags"
+                                                :loading="tagState.loading"
+                                                :selected-keys.sync="selectedAllColumnKeys"
+                            />
+                        </keep-alive>
                     </section>
                 </div>
             </p-data-loader>
@@ -77,10 +80,9 @@ import {
     PButton,
     PButtonModal, PCheckBox, PDataLoader, PSearch,
 } from '@spaceone/design-system';
-import { unionBy } from 'lodash';
+import { camelCase, unionBy, uniq } from 'lodash';
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -91,6 +93,7 @@ import draggable from 'vuedraggable';
 import ColumnItem from '@/common/modules/custom-field-modal/ColumnItem.vue';
 import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-field-modal/config';
 import SelectTagColumns from '@/common/modules/custom-field-modal/SelectTagColumns.vue';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 
 interface Props {
     visible: boolean;
@@ -256,11 +259,6 @@ export default {
             state.selectedColumns = [...state.currentColumns];
         };
 
-        const clearSelectedTags = () => {
-            state.selectedAllColumnKeys.filter(d => !d.startsWith(TAGS_PREFIX));
-        };
-
-
         const updatePageSchema = async () => {
             state.loading = true;
 
@@ -301,6 +299,44 @@ export default {
             state.loading = false;
         };
 
+        /* Tags */
+        const clearSelectedTags = () => {
+            state.selectedAllColumnKeys.filter(d => !d.startsWith(TAGS_PREFIX));
+        };
+
+        const tagState = reactive({
+            loading: true,
+            allTags: [] as string[],
+        });
+
+        const tagsApiQueryHelper = new ApiQueryHelper().setOnly('tags.key');
+        const getTags = async () => {
+            tagState.loading = true;
+            try {
+                let api = SpaceConnector.client;
+                props.resourceType.split('.').forEach((d) => {
+                    api = api?.[camelCase(d)];
+                });
+
+                tagsApiQueryHelper.setFilters([]);
+                const { provider, cloudServiceGroup, cloudServiceType } = props.options;
+                if (provider) tagsApiQueryHelper.addFilter({ k: 'provider', v: provider, o: '=' });
+                if (cloudServiceGroup) tagsApiQueryHelper.addFilter({ k: 'cloud_service_group', v: cloudServiceGroup, o: '=' });
+                if (cloudServiceType) tagsApiQueryHelper.addFilter({ k: 'cloud_service_type', v: cloudServiceType, o: '=' });
+
+                const { results } = await api.list({
+                    query: tagsApiQueryHelper.data,
+                });
+
+                tagState.allTags = uniq(results.map(d => Object.keys(d.tags)).flat());
+            } catch (e) {
+                console.error(e);
+                tagState.allTags = [];
+            } finally {
+                tagState.loading = false;
+            }
+        };
+
         watch([() => state.availableColumns, () => state.currentColumns], ([availableColumns, currentColumns]) => {
             if (Array.isArray(availableColumns) && Array.isArray(currentColumns)) {
                 state.allColumns = unionBy<DynamicField>(currentColumns, availableColumns, d => d.key);
@@ -309,12 +345,14 @@ export default {
 
         watch([() => props.visible, () => props.resourceType], ([visible, resourceType]) => {
             if (visible && resourceType) {
-                initColumns();
+                if (state.allColumns.length === 0) initColumns();
+                if (tagState.allTags.length === 0) getTags();
             }
         }, { immediate: true });
 
         return {
             ...toRefs(state),
+            tagState,
             sortByRecommendation,
             sortByAlphabet,
             onChangeAllSelect,
