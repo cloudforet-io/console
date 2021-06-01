@@ -7,7 +7,7 @@ import { BADGE_SHAPE, BADGE_STYLE, BADGE_STYLE_OUTLINE } from '@/data-display/ba
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A124077',
     }
-}} component={PBadge} argTypes={{
+}} argTypes={{
     styleType: {
         name: 'styleType',
         type: {name: 'string'},
@@ -19,7 +19,7 @@ import { BADGE_SHAPE, BADGE_STYLE, BADGE_STYLE_OUTLINE } from '@/data-display/ba
             },
             category: 'props',
             defaultValue: {
-                summary: 'primary'
+                summary: BADGE_STYLE.primary,
             }
         },
         control: {
@@ -63,21 +63,6 @@ import { BADGE_SHAPE, BADGE_STYLE, BADGE_STYLE_OUTLINE } from '@/data-display/ba
             type: 'color',
         }
     },
-    default: {
-        name: 'default',
-        type: {name: 'string'},
-        description: 'Slot for contents of badge',
-        defaultValue: 'badge',
-        table: {
-            type: {
-                summary: null
-            },
-            category: 'slots',
-        },
-        control: {
-            type: 'text'
-        }
-    },
     shape: {
         name: 'shape',
         type: {name: 'string'},
@@ -89,7 +74,7 @@ import { BADGE_SHAPE, BADGE_STYLE, BADGE_STYLE_OUTLINE } from '@/data-display/ba
             },
             category: 'props',
             defaultValue: {
-                summary: 'round',
+                summary: BADGE_SHAPE.ROUND,
             }
         },
         control: {
@@ -115,6 +100,21 @@ import { BADGE_SHAPE, BADGE_STYLE, BADGE_STYLE_OUTLINE } from '@/data-display/ba
             type: 'boolean',
         }
     },
+    defaultSlot: {
+        name: 'default',
+        type: {name: 'string'},
+        description: 'Slot for contents of badge',
+        defaultValue: 'badge',
+        table: {
+            type: {
+                summary: null
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text'
+        }
+    },
 }}/>
 
 export const Template = (args,{argTypes})=>({
@@ -122,12 +122,12 @@ export const Template = (args,{argTypes})=>({
     components: {PBadge},
     template: `
         <div style="display:flex; align-items:center; justify-content:center; height:100px;">
-            <PBadge :styleType="styleType"
+            <p-badge :styleType="styleType"
                     :text-color="textColor"
                     :backgroundColor="backgroundColor"
                     :outline="outline"
                     :shape="shape"
-            >{{$props.default}}</PBadge>
+            >{{$props.defaultSlot}}</p-badge>
         </div>`,
 })
 
@@ -206,4 +206,4 @@ export const Template = (args,{argTypes})=>({
     </Story>
 </Canvas>
 
-<ArgsTable story="playground" />
+<ArgsTable story="Playground" />
