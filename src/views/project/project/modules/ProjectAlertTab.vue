@@ -65,3 +65,10 @@ export default {
 
 };
 </script>
+<style lang="postcss" scoped>
+.alert-tab {
+    .p-button-tab::v-deep .tab-pane {
+        @apply pb-0;
+    }
+}
+</style>

@@ -299,6 +299,7 @@ export default {
 <style lang="postcss" scoped>
 .webhook-tab {
     .p-pane-layout {
+        @apply mb-0;
         border-width: 0;
         padding-left: 0;
         padding-right: 0;

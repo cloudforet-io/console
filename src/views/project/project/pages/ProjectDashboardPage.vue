@@ -86,9 +86,7 @@ export default {
 
 .project-dashboard-page {
     grid-gap: 1rem;
-    border-width: 1px;
-    border-color: #e5e5e8;
-    padding: 2rem 1rem 1.5rem;
+    padding: 2rem 1rem 0;
 
     .left-part, .right-part {
         display: grid;

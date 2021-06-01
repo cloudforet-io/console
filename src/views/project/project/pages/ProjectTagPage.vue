@@ -22,3 +22,8 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.tab-bg {
+    @apply pb-0 border-none;
+}
+</style>

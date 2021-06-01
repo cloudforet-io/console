@@ -116,12 +116,13 @@ export default {
 
 <style lang="postcss" scoped>
 .noti-channel-wrapper {
+    @apply border-none;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
     width: 100%;
     height: 100%;
-    padding: 2rem 1rem 2.5rem;
+    padding: 2rem 1rem 0;
 }
 .sub-title {
     font-size: 1.375rem;

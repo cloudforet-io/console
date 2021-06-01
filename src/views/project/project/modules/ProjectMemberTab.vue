@@ -8,7 +8,7 @@
                          :select-index.sync="memberTableState.selectIndex"
                          :loading="memberTableState.loading"
                          :total-count="memberTableState.totalCount"
-                         class="mb-2 px-4"
+                         class="px-4"
                          @change="onChangeMemberTable"
                          @refresh="onChangeMemberTable()"
         >
@@ -331,9 +331,12 @@ export default {
         margin-left: 0;
         margin-bottom: 0.5rem;
     }
-    .p-toolbox-table::v-deep .p-toolbox {
-        padding-left: 0;
-        padding-right: 0;
+    .p-toolbox-table::v-deep {
+        @apply border-none;
+        .p-toolbox {
+            padding-left: 0;
+            padding-right: 0;
+        }
     }
 }
 </style>
