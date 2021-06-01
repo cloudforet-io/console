@@ -828,6 +828,8 @@
 				"FORM": {
 					"ADD_CHANNEL": "",
 					"ALL_TIME": "",
+					"ALT_E_CREATE_USER_CHANNEL": "",
+					"ALT_S_CREATE_USER_CHANNEL": "",
 					"BASE_INFO": "",
 					"CHANNEL_NAME": "",
 					"CUSTOM": "",

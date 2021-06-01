@@ -828,6 +828,8 @@
 				"FORM": {
 					"ADD_CHANNEL": "Add {type} Channel",
 					"ALL_TIME": "All Time",
+					"ALT_E_CREATE_USER_CHANNEL": "Create user channel failure",
+					"ALT_S_CREATE_USER_CHANNEL": "Create User Channel success",
 					"BASE_INFO": "Base Information",
 					"CHANNEL_NAME": "Channel Name",
 					"CUSTOM": "Custom",
