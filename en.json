@@ -1022,8 +1022,51 @@
 	},
 	"MONITORING": {
 		"ALERT": {
+			"DASHBOARD": {
+				"ALERT_HISTORY": "Alert History",
+				"ALERT_STATE": "Alert State",
+				"CURRENT_PROJECT_STATUS": "Current Project Status",
+				"DASHBOARD": "Dashboard",
+				"PROJECT_HEALTH_BOARD": "Project Health Board",
+				"TOP_5_PROJECT_ACTIVITY": "Top 5 Project Activity"
+			},
 			"ESCALATION_POLICY": {
-				"ESCALATION_POLICY": "Escalation Policy"
+				"ACTION": "Action",
+				"ALT_E_DELETE_POLICY": "Delete Escalation Policy failure",
+				"ALT_E_SET_AS_DEFAULT": "Change default escalation policy failure",
+				"ALT_S_DELETE_POLICY": "Delete Escalation Policy success",
+				"ALT_S_SET_AS_DEFAULT": "Change default escalation policy success",
+				"CREATE": "Create",
+				"CREATE_MODAL_TITLE": "Create Escalation Policy",
+				"DELETE": "Delete",
+				"DELETE_MODAL_TITLE": "Are you sure you want to delete selected Escalation Policy?",
+				"ESCALATION_POLICY": "Escalation Policy",
+				"FORM": {
+					"ACKNOWLEDGED": "Acknowledged",
+					"ADD_STEP": "Add Step",
+					"ESCALATES_AFTER": "Escalates after",
+					"ESCALATION_RULES_HELP_TEXT": "Must be at least 1 minute for a single target. (Up to 5)",
+					"ESCALATION_RULES_LABEL": "Escalation Rules",
+					"FINISH_CONDITION_LABEL": "Finish Condition",
+					"GLOBAL": "Global",
+					"MIN": "min.",
+					"NAME_INVALID_TEXT": "The maximum length of a name is 40 characters.",
+					"NAME_LABEL": "Name",
+					"NAME_REQUIRED": "Please enter name.",
+					"NOTIFICATION_LEVEL": "Notification Level",
+					"NOTIFICATION_SETTINGS": "Notification Settings",
+					"PROJECT": "Project",
+					"REPEAT": "repeat",
+					"REPEAT_LABEL_HELP_TEXT": "Apply to all steps above",
+					"RESOLVED": "Resolved",
+					"RULE": "Rule",
+					"SCOPE_LABEL": "Scope",
+					"STEP": "Step",
+					"TIME": "Time(s)"
+				},
+				"SET_AS_DEFAULT": "Set as default",
+				"UPDATE": "Update",
+				"UPDATE_MODAL_TITLE": "Update Escalation Policy"
 			},
 			"MAIN": {
 				"ALERT": "Alert",

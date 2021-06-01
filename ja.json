@@ -1022,8 +1022,51 @@
 	},
 	"MONITORING": {
 		"ALERT": {
+			"DASHBOARD": {
+				"ALERT_HISTORY": "",
+				"ALERT_STATE": "",
+				"CURRENT_PROJECT_STATUS": "",
+				"DASHBOARD": "ダッシュボード",
+				"PROJECT_HEALTH_BOARD": "",
+				"TOP_5_PROJECT_ACTIVITY": ""
+			},
 			"ESCALATION_POLICY": {
-				"ESCALATION_POLICY": ""
+				"ACTION": "作業",
+				"ALT_E_DELETE_POLICY": "",
+				"ALT_E_SET_AS_DEFAULT": "",
+				"ALT_S_DELETE_POLICY": "",
+				"ALT_S_SET_AS_DEFAULT": "",
+				"CREATE": "作成",
+				"CREATE_MODAL_TITLE": "",
+				"DELETE": "削除",
+				"DELETE_MODAL_TITLE": "",
+				"ESCALATION_POLICY": "",
+				"FORM": {
+					"ACKNOWLEDGED": "",
+					"ADD_STEP": "",
+					"ESCALATES_AFTER": "",
+					"ESCALATION_RULES_HELP_TEXT": "",
+					"ESCALATION_RULES_LABEL": "",
+					"FINISH_CONDITION_LABEL": "",
+					"GLOBAL": "",
+					"MIN": "",
+					"NAME_INVALID_TEXT": "",
+					"NAME_LABEL": "名前",
+					"NAME_REQUIRED": "お名前を入力してください。",
+					"NOTIFICATION_LEVEL": "",
+					"NOTIFICATION_SETTINGS": "",
+					"PROJECT": "プロジェクト",
+					"REPEAT": "",
+					"REPEAT_LABEL_HELP_TEXT": "",
+					"RESOLVED": "",
+					"RULE": "",
+					"SCOPE_LABEL": "",
+					"STEP": "",
+					"TIME": ""
+				},
+				"SET_AS_DEFAULT": "",
+				"UPDATE": "編集",
+				"UPDATE_MODAL_TITLE": ""
 			},
 			"MAIN": {
 				"ALERT": "",
