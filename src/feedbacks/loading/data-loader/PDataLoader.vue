@@ -5,7 +5,7 @@
                 <slot name="loader">
                     <div class="loader-backdrop" />
                     <template v-if="loaderType === LOADER_TYPES.spinner">
-                        <p-lottie name="thin-spinner" :size="2.5"
+                        <p-lottie name="thin-spinner" :size="spinnerSize"
                                   auto class="loader spinner"
                         />
                     </template>
@@ -66,6 +66,10 @@ export default defineComponent({
             validator(loaderType) {
                 return Object.values(LOADER_TYPES).includes(loaderType as any);
             },
+        },
+        spinnerSize: {
+            type: Number,
+            default: 2.5,
         },
         disableEmptyCase: {
             type: Boolean,
@@ -159,12 +163,11 @@ export default defineComponent({
     }
 
     .no-data-wrapper {
-        @apply absolute justify-center items-center flex w-full text-gray-300 text-center;
+        @apply justify-center items-center flex w-full text-gray-300 text-center;
         line-height: 120%;
         font-size: 1rem;
         height: calc(100% - 2rem);
         max-height: 16.875rem;
-        top: 2rem;
     }
 
     .data-wrapper {
