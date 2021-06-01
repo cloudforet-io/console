@@ -14,11 +14,10 @@
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
 import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
+import { CardProps } from '@/data-display/cards/card/type';
 
-interface Props {
-    header?: string;
-}
-export default defineComponent<Props>({
+
+export default defineComponent<CardProps>({
     name: 'PCard',
     props: {
         header: {
