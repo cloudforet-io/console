@@ -1,6 +1,6 @@
 <template>
     <div class="p-card" :class="styleType">
-        <header>
+        <header v-if="header !== false || $scopedSlots.header">
             <slot name="header">
                 {{ header }}
             </slot>
@@ -21,7 +21,7 @@ export default defineComponent<CardProps>({
     name: 'PCard',
     props: {
         header: {
-            type: String,
+            type: [String, Boolean],
             default: '',
         },
         styleType: {
@@ -46,6 +46,7 @@ export default defineComponent<CardProps>({
         padding: 0.5rem 1rem;
         font-size: 0.75rem;
         line-height: 1.5;
+        min-height: 2rem;
     }
     .body {
         padding: 0.75rem 0.875rem;

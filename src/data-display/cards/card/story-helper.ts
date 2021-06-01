@@ -4,12 +4,12 @@ import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
 export const argTypes: ArgTypes = {
     header: {
         name: 'header',
-        type: { name: 'string' },
+        type: { name: 'string, boolean' },
         description: 'Card header',
         defaultValue: 'This is header!',
         table: {
             type: {
-                summary: 'string',
+                summary: 'string, boolean',
             },
             category: 'props',
             defaultValue: {
@@ -17,7 +17,7 @@ export const argTypes: ArgTypes = {
             },
         },
         control: {
-            type: 'text',
+            type: 'object',
         },
     },
     styleType: {

@@ -100,6 +100,37 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+## Without Header
+
+<br/>
+
+If you give ```false``` to ```header``` props and don't give ```header``` slot, the header will be not displayed.<br/>
+
+<Canvas>
+    <Story name="Without Header">
+        {{
+            components: { PListCard },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-list-card
+            :header="false"
+            :items="items"
+        >
+        </p-list-card>
+    </div>
+    `,
+            setup() {
+                return {
+                    items: range(10).map(() => faker.lorem.sentence(8))
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Slots
 
 <Canvas>

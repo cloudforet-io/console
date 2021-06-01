@@ -2,7 +2,7 @@
     <p-card class="p-list-card" :header="header" :style-type="styleType"
             :class="{'no-data': items.length === 0}"
     >
-        <template #header>
+        <template v-if="$scopedSlots.header" #header>
             <slot name="header" />
         </template>
         <p-data-loader :data="items" :loading="loading" :spinner-size="1.5">
@@ -39,7 +39,7 @@ export default defineComponent<Props>({
     props: {
         /* card props */
         header: {
-            type: String,
+            type: [String, Boolean],
             default: '',
         },
         styleType: {
@@ -84,6 +84,7 @@ export default defineComponent<Props>({
         font-size: 0.875rem;
         line-height: 1.25;
         padding: 0.5rem 1rem;
+        min-height: 2.25rem;
         &:last-of-type {
             @apply border-b-0 rounded-b-lg;
         }

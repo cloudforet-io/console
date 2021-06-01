@@ -22,7 +22,7 @@ export const Template = (args, { argTypes }) => ({
             :style-type="styleType"
             style="width: 12rem;"
         >
-            <div v-if="headerSlot" v-html="headerSlot" />
+            <template #header><div v-if="headerSlot" v-html="headerSlot" /></template>
             <div v-if="defaultSlot" v-html="defaultSlot" />
         </p-card>
      </div>
@@ -41,7 +41,45 @@ export const Template = (args, { argTypes }) => ({
 
 <Canvas>
     <Story name="Basic">
-        {Template.bind({})}
+        {{
+            components: { PCard },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-card
+            header="Basic Case Card"
+            style="width: 12rem;"
+        >
+            Hello World!
+        </p-card>
+     </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Without Header
+
+<br/>
+
+If you give ```false``` to ```header``` props and don't give ```header``` slot, the header will be not displayed.<br/>
+
+<Canvas>
+    <Story name="Without Header">
+        {{
+            components: { PCard },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-card :header="false"
+            style="width: 30rem;"
+        >
+            It has no header.
+        </p-card>
+     </div>
+    `,
+        }}
     </Story>
 </Canvas>
 
@@ -53,7 +91,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Style Types">
         {{
-            components: { PCard, PI },
+            components: { PCard },
             template: `
     <div class="h-full w-full overflow p-8 flex flex-wrap">
         <p-card v-for="styleType in styleTypes" :key="styleType" :header="styleType" :style-type="styleType"
