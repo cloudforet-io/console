@@ -32,9 +32,7 @@ enum TOPIC_MODE {
 }
 
 const TOPIC_LIST = [
-    { label: 'Topic 1', value: 'topic1' },
-    { label: 'Topic 2', value: 'topic2' },
-    { label: 'Topic 3', value: 'topic3' },
+    { label: 'Alert', value: 'monitoring.Alert' },
 ];
 
 export default {

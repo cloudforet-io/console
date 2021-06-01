@@ -1,6 +1,6 @@
 <template>
     <section>
-        <notification-list :hide-project-only-channel="hideProjectOnlyChannel" :project-id="projectId" />
+        <notification-list :project-id="projectId" />
     </section>
 </template>
 
@@ -25,13 +25,9 @@ export default {
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            hideProjectOnlyChannel: true,
             projectId: vm.$route.params.id,
         });
 
-        (async () => {
-            if (vm.$route.name === PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS) state.hideProjectOnlyChannel = false;
-        })();
         return {
             ...toRefs(state),
         };

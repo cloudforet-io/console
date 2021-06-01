@@ -7,7 +7,7 @@
             <ul class="channel-list-wrapper">
                 <div v-for="item in channelList"
                      :key="item.label"
-                     class="channel-item-wrapper" :class="{'hide': hideProjectOnlyChannel && item.isProjectOnlyChannel}"
+                     class="channel-item-wrapper"
                 >
                     <router-link :to="item.link">
                         <li class="channel-item">
@@ -40,6 +40,8 @@ import {
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import NotificationChannelCard from '@/views/identity/user/modules/NotificationChannelCard.vue';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 
 export default {
     name: 'NotificationList',
@@ -51,52 +53,16 @@ export default {
         PEmpty,
     },
     props: {
-        hideProjectOnlyChannel: {
-            type: Boolean,
-            default: true,
-        },
         projectId: {
             type: String,
-            default: '',
+            default: null,
         },
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            channelList: computed(() => [
-                {
-                    label: vm.$t('IDENTITY.USER.NOTIFICATION.ADD_MEMBER_GROUP'),
-                    link: {
-                        name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
-                        params: { channel: 'member' },
-                        query: {
-                            projectId: props.projectId,
-                        },
-                    },
-                    isProjectOnlyChannel: true,
-                },
-                {
-                    label: vm.$t('IDENTITY.USER.NOTIFICATION.ADD_SMS'),
-                    link: {
-                        name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
-                        params: { channel: 'sms' },
-                    },
-                },
-                {
-                    label: vm.$t('IDENTITY.USER.NOTIFICATION.ADD_VOICE'),
-                    link: {
-                        name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
-                        params: { channel: 'voice' },
-                    },
-                },
-                {
-                    label: vm.$t('IDENTITY.USER.NOTIFICATION.ADD_SLACK'),
-                    link: {
-                        name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
-                        params: { channel: 'slack' },
-                    },
-                },
-            ]),
+            channelList: [] as any,
+            loading: true,
         });
         const routeState = reactive({
             routes: computed(() => ([
@@ -105,6 +71,44 @@ export default {
                 { name: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION') },
             ])),
         });
+
+        const apiQuery = new ApiQueryHelper();
+        const listProtocol = async () => {
+            try {
+                state.loading = true;
+                let res;
+                if (props.projectId) res = await SpaceConnector.client.notification.protocol.list();
+                else {
+                    apiQuery.setFilters([{ k: 'protocol_type', o: '=', v: 'EXTERNAL' }]);
+                    res = await SpaceConnector.client.notification.protocol.list({
+                        query: apiQuery.data,
+                    });
+                }
+                state.channelList = res.results.map(d => ({
+                    label: computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: vm.$t(`IDENTITY.USER.NOTIFICATION.${d.name.toUpperCase()}`) })).value,
+                    link: {
+                        name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
+                        params: {
+                            channel: d.name.toLowerCase(),
+                            protocolId: d.protocol_id,
+                        },
+                        query: {
+                            projectId: props.projectId ? props.projectId : null,
+                            supported_schema: d.capability.supported_schema,
+                        },
+                    },
+                }));
+            } catch (e) {
+                state.channelList = [];
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        (async () => {
+            await listProtocol();
+        })();
 
         return {
             ...toRefs(state),

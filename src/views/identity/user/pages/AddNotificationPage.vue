@@ -5,7 +5,7 @@
                       @goBack="$router.go(-1)"
         />
         <section class="content-list-wrapper">
-            <add-notification-data />
+            <add-notification-data :project-id="projectId" :supported-schema="supportedSchema" />
             <p-pane-layout class="content-wrapper">
                 <h3 class="content-title">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE') }}
@@ -53,6 +53,9 @@ import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue
 import AddNotificationData from '@/views/identity/user/modules/AddNotificationData.vue';
 import AddNotificationTopic from '@/views/identity/user/modules/AddNotificationTopic.vue';
 import AddNotificationSchedule from '@/views/identity/user/modules/AddNotificationSchedule.vue';
+import VueI18n from 'vue-i18n';
+
+import TranslateResult = VueI18n.TranslateResult;
 
 const LEVEL_LIST = [
     { label: 'Level 1', name: 1, type: 'item' },
@@ -78,7 +81,10 @@ export default {
         const state = reactive({
             escalationLevel: 1,
             type: '',
-            pageTitle: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: '' }),
+            pageTitle: '' as TranslateResult,
+            projectId: vm.$route.query.projectId,
+            protocolId: vm.$route.params.protocolId,
+            supportedSchema: vm.$route.query.supported_schema,
         });
         const routeState = reactive({
             routes: computed(() => ([
@@ -93,7 +99,8 @@ export default {
         };
 
         (async () => {
-            state.pageTitle = vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: vm.$route.params.channel });
+            const channel = vm.$route.params.channel.toUpperCase();
+            state.pageTitle = computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: vm.$t(`IDENTITY.USER.NOTIFICATION.${channel}`) })) as unknown as TranslateResult;
         })();
 
         return {

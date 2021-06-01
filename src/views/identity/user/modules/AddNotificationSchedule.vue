@@ -14,13 +14,13 @@
             <h5 class="setting">
                 {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
             </h5>
-            <p-select-button v-for="day in weekDay" :key="day"
+            <p-select-button v-for="day in weekDay" :key="day.value"
                              v-model="selectedDay"
                              multi-selectable
-                             :value="day"
+                             :value="day.value"
                              class="select-button-wrapper"
             >
-                {{ day }}
+                {{ day.label }}
             </p-select-button>
             <div class="dropdown-wrapper">
                 <p-select-dropdown v-model="startTime"
@@ -32,7 +32,7 @@
                                    :items="timeList"
                                    class="dropdown"
                 />
-                <span class="timezone-text">{{$t('COMMON.PROFILE.TIMEZONE')}}: {{ timezone }}</span>
+                <span class="timezone-text">{{ $t('COMMON.PROFILE.TIMEZONE') }}: {{ timezone }}</span>
             </div>
         </article>
     </div>
@@ -72,13 +72,16 @@ export default {
                 label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.CUSTOM'), value: 'custom',
             }]),
             selectedScheduleMode: 'all',
-            weekDay: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'],
-            selectedDay: [],
+            weekDay: [{ label: 'Monday', value: 'MON' }, { label: 'Tuesday', value: 'TUE' }, { label: 'Wednesday', value: 'WED' },
+                { label: 'Thursday', value: 'THU' }, { label: 'Friday', value: 'FRI' },
+                { label: 'Saturday', value: 'SAT' },
+                { label: 'Sunday', value: 'SUN' }],
+            selectedDay: ['MON', 'TUE', 'WED', 'THU', 'FRI'],
             timeList: TIME_LIST.map(d => ({
-                type: 'item', label: d > 13 ? `${d}:00 PM` : `${d}:00 AM`, name: d,
+                type: 'item', label: `${d}:00`, name: d,
             })),
-            startTime: 0,
-            endTime: 0,
+            startTime: 9,
+            endTime: 18,
             timezone: computed(() => store.state.user.timezone),
         });
         const changeScheduleMode = (value) => {
