@@ -431,7 +431,7 @@ export default {
         .modal-content {
             line-height: 1.5rem;
         }
-        .modal-btn {
+        .modal-button {
             .create-collector-button {
                 padding: 0;
             }
