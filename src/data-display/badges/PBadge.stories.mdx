@@ -1,6 +1,6 @@
 import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
 import PBadge from "@/data-display/badges/PBadge";
-import {BADGE_SHAPE, BADGE_STYLE} from "@/data-display/badges/type";
+import { BADGE_SHAPE, BADGE_STYLE, BADGE_STYLE_OUTLINE } from '@/data-display/badges/type';
 
 <Meta title='Data Display/Badges' parameters={{
     design: {
@@ -140,60 +140,20 @@ export const Template = (args,{argTypes})=>({
 ## Style Types
 
 <Canvas>
-    <Story name='Style Types' height='250px'>
+    <Story name='Style Types'>
         {{
             components:{ PBadge },
             template: `
-                <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height:250px;">
-                    <div style="display:flex">
-                        <p-badge styleType="primary" style="margin-right: 20px">
-                            <div>primary</div>
-                        </p-badge>
-                        <p-badge styleType="primary-dark" style="margin-right: 20px">
-                            <div>primary-dark</div>
-                        </p-badge>
-                        <p-badge styleType="primary1" style="margin-right: 20px">
-                            <div>primary1</div>
-                        </p-badge>
-                        <p-badge styleType="primary2" style="margin-right: 20px">
-                            <div>primary2</div>
-                        </p-badge>
-                        <p-badge styleType="secondary" style="margin-right: 20px">
-                            <div>secondary</div>
-                        </p-badge>
-                        <p-badge styleType="secondary1">
-                            <div>secondary1</div>
-                        </p-badge>
-                    </div>
-                    <div style="display:flex; margin-top: 20px">
-                        <p-badge styleType="alert" style="margin-right: 20px">
-                            <div>alert</div>
-                        </p-badge>
-                        <p-badge styleType="safe" style="margin-right: 20px">
-                            <div>safe</div>
-                        </p-badge>
-                        <p-badge styleType="gray900" style="margin-right: 20px">
-                            <div>gray900</div>
-                        </p-badge>
-                        <p-badge styleType="gray">
-                            <div>gray</div>
-                        </p-badge>
-                    </div>
-                    <div style="display:flex; margin-top: 20px">
-                        <p-badge styleType="coral600" style="margin-right: 20px">
-                            <div>coral600</div>
-                        </p-badge>
-                        <p-badge styleType="coral500" style="margin-right: 20px">
-                            <div>coral500</div>
-                        </p-badge>
-                        <p-badge styleType="peacock" style="margin-right: 20px">
-                            <div>peacock</div>
-                        </p-badge>
-                        <p-badge styleType="indigo">
-                            <div>indigo</div>
-                        </p-badge>
-                    </div>
+                <div class="w-full h-full flex flex-wrap items-center justify-center">
+                    <p-badge v-for="styleType in styleTypes" :styleType="styleType" class="m-2">
+                        {{styleType}}
+                    </p-badge>
                 </div>`,
+            setup() {
+                return {
+                    styleTypes: Object.values(BADGE_STYLE)
+                }
+            }
         }}
     </Story>
 </Canvas>
@@ -201,60 +161,20 @@ export const Template = (args,{argTypes})=>({
 ## Outlined
 
 <Canvas>
-    <Story name='Outlined' height='250px'>
+    <Story name='Outlined'>
         {{
             components:{ PBadge },
             template: `
-                <div style="display: flex; flex-direction: column; justify-content: center; align-items: center; height:250px;">
-                    <div style="display:flex">
-                        <p-badge styleType="primary" outline style="margin-right: 20px">
-                            <div>primary</div>
-                        </p-badge>
-                        <p-badge styleType="primary-dark" outline style="margin-right: 20px">
-                            <div>primary-dark</div>
-                        </p-badge>
-                        <p-badge styleType="primary1" outline style="margin-right: 20px">
-                            <div>primary1</div>
-                        </p-badge>
-                        <p-badge styleType="primary2" outline style="margin-right: 20px">
-                            <div>primary2</div>
-                        </p-badge>
-                        <p-badge styleType="secondary" outline style="margin-right: 20px">
-                            <div>secondary</div>
-                        </p-badge>
-                        <p-badge styleType="secondary1" outline>
-                            <div>secondary1</div>
-                        </p-badge>
-                    </div>
-                    <div style="display:flex; margin-top: 20px">
-                        <p-badge styleType="alert" outline style="margin-right: 20px">
-                            <div>alert</div>
-                        </p-badge>
-                        <p-badge styleType="safe" outline style="margin-right: 20px">
-                            <div>safe</div>
-                        </p-badge>
-                        <p-badge styleType="gray900" outline style="margin-right: 20px">
-                            <div>gray900</div>
-                        </p-badge>
-                        <p-badge styleType="gray" outline>
-                            <div>gray</div>
-                        </p-badge>
-                    </div>
-                    <div style="display:flex; margin-top: 20px">
-                        <p-badge styleType="coral600" outline style="margin-right: 20px">
-                            <div>coral600</div>
-                        </p-badge>
-                        <p-badge styleType="coral500" outline style="margin-right: 20px">
-                            <div>coral500</div>
-                        </p-badge>
-                        <p-badge styleType="peacock" outline style="margin-right: 20px">
-                            <div>peacock</div>
-                        </p-badge>
-                        <p-badge styleType="indigo" outline>
-                            <div>indigo</div>
-                        </p-badge>
-                    </div>
+                <div class="w-full h-full flex flex-wrap items-center justify-center">
+                    <p-badge v-for="styleType in styleTypes" :styleType="styleType" outline class="m-2">
+                        {{styleType}}
+                    </p-badge>
                 </div>`,
+            setup() {
+                return {
+                    styleTypes: Object.values(BADGE_STYLE_OUTLINE)
+                }
+            }
         }}
     </Story>
 </Canvas>

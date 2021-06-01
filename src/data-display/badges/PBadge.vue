@@ -87,7 +87,7 @@ export default {
     }
 }
 
-@define-mixin badge-color $theme, $color, $opposite-color, $hover-color {
+@define-mixin badge-color $theme, $color, $opposite-color {
     .badge-$(theme) {
         background-color: $color;
         color: $opposite-color;
@@ -99,20 +99,38 @@ export default {
     }
 }
 
-@mixin badge-color primary, theme('colors.primary'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color primary-dark, theme('colors.primary-dark'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color primary1, theme('colors.primary1'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color primary2, theme('colors.primary2'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color secondary, theme('colors.secondary'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color secondary1, theme('colors.secondary1'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color alert, theme('colors.alert'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color safe, theme('colors.safe'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color gray900, theme('colors.gray.900'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color gray, theme('colors.gray.default'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color gray200, theme('colors.gray.200'), theme('colors.gray.900'), theme('colors.secondary');
-@mixin badge-color coral600, theme('colors.coral.600'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color coral500, theme('colors.coral.500'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color peacock, theme('colors.peacock.default'), theme('colors.white'), theme('colors.secondary');
-@mixin badge-color indigo, theme('colors.indigo.default'), theme('colors.white'), theme('colors.secondary');
+@define-mixin badge-without-outline $theme, $bg-color, $text-color {
+    .badge-$(theme) {
+        background-color: $bg-color;
+        color: $text-color;
+    }
+}
+
+@mixin badge-color primary, theme('colors.primary'), theme('colors.white');
+@mixin badge-color primary-dark, theme('colors.primary-dark'), theme('colors.white');
+@mixin badge-color primary1, theme('colors.primary1'), theme('colors.white');
+@mixin badge-color primary2, theme('colors.primary2'), theme('colors.white');
+@mixin badge-color secondary, theme('colors.secondary'), theme('colors.white');
+@mixin badge-color secondary1, theme('colors.secondary1'), theme('colors.white');
+@mixin badge-color alert, theme('colors.alert'), theme('colors.white');
+@mixin badge-color safe, theme('colors.safe'), theme('colors.white');
+@mixin badge-color gray900, theme('colors.gray.900'), theme('colors.white');
+@mixin badge-color gray, theme('colors.gray.default'), theme('colors.white');
+@mixin badge-color coral600, theme('colors.coral.600'), theme('colors.white');
+@mixin badge-color coral500, theme('colors.coral.500'), theme('colors.white');
+@mixin badge-color peacock, theme('colors.peacock.500'), theme('colors.white');
+@mixin badge-color indigo, theme('colors.indigo.500'), theme('colors.white');
+
+/* Styles without outline case */
+@mixin badge-without-outline primary3, theme('colors.primary3'), theme('colors.violet.600');
+@mixin badge-without-outline blue200, theme('colors.blue.200'), theme('colors.blue.600');
+@mixin badge-without-outline blue300, theme('colors.blue.300'), theme('colors.blue.600');
+@mixin badge-without-outline green200, theme('colors.green.200'), theme('colors.green.600');
+@mixin badge-without-outline gray200, theme('colors.gray.200'), theme('colors.gray.900');
+@mixin badge-without-outline coral100, theme('colors.coral.100'), theme('colors.coral.600');
+@mixin badge-without-outline peacock200, theme('colors.peacock.200'), theme('colors.peacock.800');
+@mixin badge-without-outline yellow200, theme('colors.yellow.200'), theme('colors.gray.900');
+@mixin badge-without-outline red100, theme('colors.red.100'), theme('colors.red.500');
+
 
 </style>
