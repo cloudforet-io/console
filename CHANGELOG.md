@@ -1,3 +1,18 @@
+# [1.1.0-beta.37](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.36...v1.1.0-beta.37) (2021-06-01)
+
+
+### Bug Fixes
+
+* remove data loader no data absolute ([62ecd69](https://github.com/spaceone-dev/spaceone-design-system/commit/62ecd693de443e06715e2b701d404f82ff0513f2))
+
+
+### Features
+
+* add badge style types ([592652f](https://github.com/spaceone-dev/spaceone-design-system/commit/592652f36abbab5f6b3765a9766f57522b319c44))
+* add list card component ([9f0c38a](https://github.com/spaceone-dev/spaceone-design-system/commit/9f0c38a9259e2ebeecd0c0ed05c295d68490f53c))
+* add no header case to card and list card ([ddc85d5](https://github.com/spaceone-dev/spaceone-design-system/commit/ddc85d56f0aebae9c7e311bde7d00794480f43b8))
+* add style types to card ([16f15e4](https://github.com/spaceone-dev/spaceone-design-system/commit/16f15e40baa21f8f262313f5bacfd3df4bd335ad))
+
 # [1.1.0-beta.36](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.35...v1.1.0-beta.36) (2021-06-01)
 
 
