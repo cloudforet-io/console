@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
 
 export const argTypes: ArgTypes = {
     header: {
@@ -17,6 +18,25 @@ export const argTypes: ArgTypes = {
         },
         control: {
             type: 'text',
+        },
+    },
+    styleType: {
+        name: 'styleType',
+        type: { name: 'string' },
+        description: `Card style types. ${Object.values(CARD_STYLE_TYPE)} are available.`,
+        defaultValue: CARD_STYLE_TYPE.gray,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: `"${CARD_STYLE_TYPE.gray}"`,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(CARD_STYLE_TYPE),
         },
     },
     defaultSlot: {
