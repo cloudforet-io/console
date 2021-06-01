@@ -1,7 +1,10 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { reactive, toRefs } from '@vue/composition-api';
+
 import PCard from './PCard.vue';
 import PI from '@/foundation/icons/PI.vue'
-import { argTypes } from '@/data-display/cards/card/story-helper'; import { reactive, toRefs } from '@vue/composition-api'; import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
+import { argTypes } from '@/data-display/cards/card/story-helper';
+import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
 
 
 <Meta title='Data Display/Cards/Card' parameters={{
