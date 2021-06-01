@@ -1,3 +1,10 @@
+# [1.1.0-beta.36](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.35...v1.1.0-beta.36) (2021-06-01)
+
+
+### Features
+
+* add card component & rename states to hooks ([#569](https://github.com/spaceone-dev/spaceone-design-system/issues/569)) ([dce7242](https://github.com/spaceone-dev/spaceone-design-system/commit/dce724242b3bb725b36f2d027b4923eb867bc544))
+
 # [1.1.0-beta.35](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.34...v1.1.0-beta.35) (2021-05-31)
 
 
