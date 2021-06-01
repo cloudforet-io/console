@@ -27,7 +27,7 @@ import {
     computed, defineComponent, toRefs,
 } from '@vue/composition-api';
 import PI from '@/foundation/icons/PI.vue';
-import { multiSelectState, SelectProps } from '@/states/select-state';
+import { useMultiSelect, SelectProps } from '@/hooks/select';
 
 interface CheckboxProps extends SelectProps {
     invalid?: boolean;
@@ -65,7 +65,7 @@ export default defineComponent<CheckboxProps>({
         },
     },
     setup(props: CheckboxProps, context) {
-        const { state, onClick } = multiSelectState(props, context);
+        const { state, onClick } = useMultiSelect(props, context);
         const iconName = computed(() => {
             if (props.disabled) return 'ic_checkbox--disabled';
             if (state.isSelected) return 'ic_checkbox--checked';

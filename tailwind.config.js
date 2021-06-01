@@ -21,12 +21,12 @@ module.exports = {
     theme: {
         borderRadius: {
             none: '0',
-            sm: '0.125rem',
-            md: '0.25rem',
-            default: '0.25rem',
-            lg: '0.375rem',
-            xl: '0.5rem',
-            '2xl': '0.75rem',
+            sm: '0.125rem', // 2px
+            md: '0.25rem', // 4px
+            default: '0.25rem', // 4px
+            lg: '0.375rem', // 6px
+            xl: '0.5rem', // 8px
+            '2xl': '0.75rem', // 12px
             full: '50%',
         },
         colors,

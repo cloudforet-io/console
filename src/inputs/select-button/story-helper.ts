@@ -1,4 +1,4 @@
-import { argTypes as selectArgTypes } from '@/states/select-state/story-helper';
+import { argTypes as selectArgTypes } from '@/hooks/select/story-helper';
 import { SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
 import { ArgTypes } from '@storybook/addons';
 

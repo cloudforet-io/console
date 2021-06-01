@@ -30,7 +30,7 @@ import {
     computed, toRefs, defineComponent,
 } from '@vue/composition-api';
 import PI from '@/foundation/icons/PI.vue';
-import { SelectProps, singleSelectState } from '@/states/select-state';
+import { SelectProps, useSingleSelect } from '@/hooks/select';
 
 interface Props extends SelectProps {
     invalid?: boolean;
@@ -67,7 +67,7 @@ export default defineComponent<Props>({
         },
     },
     setup(props: Props, context) {
-        const { state, onClick } = singleSelectState(props, context);
+        const { state, onClick } = useSingleSelect(props, context);
 
         const iconName = computed(() => {
             if (props.disabled) return 'ic_radio--disabled';

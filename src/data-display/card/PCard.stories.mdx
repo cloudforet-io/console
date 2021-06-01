@@ -1,0 +1,89 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import PCard from './PCard.vue';
+import PI from '@/foundation/icons/PI.vue'
+import { argTypes } from '@/data-display/card/story-helper';
+
+
+<Meta title='Data Display/Card' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
+    }
+}} argTypes={argTypes}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PCard },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-card :header="header"
+            style="width: 12rem;"
+        >
+            <div v-if="headerSlot" v-html="headerSlot" />
+            <div v-if="defaultSlot" v-html="defaultSlot" />
+        </p-card>
+     </div>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Card
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Slots
+
+<Canvas>
+    <Story name="Slots">
+        {{
+            components: { PCard, PI },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-card style="width: 209px;">
+            <template #header>
+                <div class="flex justify-between items-center">
+                    <span class="text-gray-900">Created</span>
+                    <span class="text-alert">1 <p-i name="ic_decrease" height="12px" width="12px"/></span>
+                </div>
+            </template>
+            <div class="flex justify-between items-center">
+                <span>8.5</span><span>145</span>
+            </div>
+            <div class="flex justify-between items-center text-gray text-xs mt-1">
+                <span>Dail Average</span><span class="text-right">Monthly Total</span>
+            </div>
+        </p-card>
+     </div>
+    `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
+

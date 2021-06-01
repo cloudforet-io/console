@@ -26,8 +26,8 @@ import {
 import PI from '@/foundation/icons/PI.vue';
 import PLazyImg from '@/feedbacks/loading/lazy-img/PLazyImg.vue';
 import {
-    SelectProps, selectState,
-} from '@/states/select-state';
+    SelectProps, useSelect,
+} from '@/hooks/select';
 
 
 interface Props extends SelectProps {
@@ -86,7 +86,7 @@ export default defineComponent<Props>({
         },
     },
     setup(props: Props, context) {
-        const { state, onClick } = selectState(props, context);
+        const { state, onClick } = useSelect(props, context);
 
         const iconName = computed(() => {
             if (props.multiSelectable) {

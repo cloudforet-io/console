@@ -8,7 +8,7 @@
 </template>
 
 <script lang="ts">
-import { selectState } from '@/states/select-state';
+import { useSelect } from '@/hooks/select';
 import { toRefs } from '@vue/composition-api';
 import { SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
 
@@ -53,7 +53,7 @@ export default {
         },
     },
     setup(props, context) {
-        const { state, onClick } = selectState(props, context);
+        const { state, onClick } = useSelect(props, context);
         return {
             ...toRefs(state),
             onClick,

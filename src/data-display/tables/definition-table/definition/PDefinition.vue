@@ -25,7 +25,7 @@ import {
 import { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
 import { copyAnyData, copyTextToClipboard, isNotEmpty } from '@/util/helpers';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
-import { mouseOverState } from '@/states/mouse-over-state';
+import { mouseOverState } from '@/hooks/mouse-over-state';
 
 export default {
     name: 'PDefinition',

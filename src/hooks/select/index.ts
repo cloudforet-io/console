@@ -35,7 +35,7 @@ const getSelectState = (props: SelectProps) => {
     return state;
 };
 
-export const multiSelectState = (props: SelectProps, context: SetupContext,
+export const useMultiSelect = (props: SelectProps, context: SetupContext,
     state: SelectState = getSelectState(props)) => {
     const onClick = () => {
         if (props.disabled) return;
@@ -64,7 +64,7 @@ export const multiSelectState = (props: SelectProps, context: SetupContext,
 };
 
 
-export const singleSelectState = (props: SelectProps, context: SetupContext,
+export const useSingleSelect = (props: SelectProps, context: SetupContext,
     state: SelectState = getSelectState(props)) => {
     const onClick = () => {
         if (props.disabled) return;
@@ -89,10 +89,10 @@ export const singleSelectState = (props: SelectProps, context: SetupContext,
 };
 
 
-export const selectState = (props: SelectProps, context: SetupContext) => {
+export const useSelect = (props: SelectProps, context: SetupContext) => {
     const state = getSelectState(props);
-    const { onClick: onSingleClick } = singleSelectState(props, context, state);
-    const { onClick: onMultiClick } = multiSelectState(props, context, state);
+    const { onClick: onSingleClick } = useSingleSelect(props, context, state);
+    const { onClick: onMultiClick } = useMultiSelect(props, context, state);
 
     const onClick = () => {
         if (props.multiSelectable) onMultiClick();

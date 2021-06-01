@@ -1,4 +1,4 @@
-import { argTypes as selectArgTypes } from '@/states/select-state/story-helper';
+import { argTypes as selectArgTypes } from '@/hooks/select/story-helper';
 import { ArgTypes } from '@storybook/addons';
 
 const getArgTypes = () => {
