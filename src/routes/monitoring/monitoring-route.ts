@@ -23,7 +23,7 @@ export const MONITORING_ROUTE = Object.freeze({
 export default {
     path: 'monitoring',
     name: MONITORING_ROUTE.MAIN,
-    redirect: '/monitoring/alert-system',
+    redirect: '/monitoring/alert-system/dashboard',
     meta: { label: 'Monitoring' },
     component: { template: '<router-view />' },
     children: [
