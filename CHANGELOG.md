@@ -1,3 +1,10 @@
+# [1.1.0-beta.39](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.38...v1.1.0-beta.39) (2021-06-02)
+
+
+### Bug Fixes
+
+* add PCard to index.ts ([#573](https://github.com/spaceone-dev/spaceone-design-system/issues/573)) ([a27ddae](https://github.com/spaceone-dev/spaceone-design-system/commit/a27ddae8c024ccc598897fa1dbd06a606b6cda13))
+
 # [1.1.0-beta.38](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.37...v1.1.0-beta.38) (2021-06-02)
 
 
