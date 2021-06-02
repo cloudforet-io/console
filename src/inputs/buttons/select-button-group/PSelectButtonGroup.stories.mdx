@@ -1,4 +1,5 @@
 import { action } from '@storybook/addon-actions';
+import { reactive, toRefs } from "@vue/composition-api";
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PSelectButtonGroup from '@/inputs/buttons/select-button-group/PSelectButtonGroup.vue';
 
@@ -116,6 +117,53 @@ export const Template = (args, { argTypes }) => ({
         };
     }
 });
+
+# Select Button Group
+
+<br/>
+<br/>
+<br/>
+
+## Long Case
+<Canvas>
+    <Story name="long case select button group">
+        {{
+            components:{ PSelectButtonGroup },
+            template: `
+<div style="align-items:center; justify-content:center;">
+    <p-select-button-group
+        :buttons="buttons"
+        :selected.sync="selected"
+    />
+    <br>
+    <p>selected button : {{ selected }}</p>
+</div>`,
+            setup() {
+                const state = reactive({
+                    buttons: [
+                        { name: 'baseInformation', label: 'Base Information' },
+                        { name: 'buckets', label: 'Buckets' },
+                        { name: 'objects', label: 'Objects' },
+                        { name: 'versioning', label: 'Versioning' },
+                        { name: 'websiteHosting', label: 'Website Hosting' },
+                        { name: 'serverAccessLogging', label: 'Server Access Logging' },
+                        { name: 'encryption', label: 'Encryption' },
+                        { name: 'objectLock', label: 'Object Lock' },
+                        { name: 'transferAcceleration', label: 'Transfer Acceleration' },
+                        { name: 'requesterPays', label: 'Requester Pays' },
+                        { name: 'events', label: 'Events' },
+                        { name: 'tags', label: 'Tags' },
+                        { name: 'rawData', label: 'Raw Data' },
+                    ],
+                    selected: 'baseInformation',
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
 
 ## Playground
 <Canvas>

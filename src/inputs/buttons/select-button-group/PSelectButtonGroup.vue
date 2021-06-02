@@ -86,7 +86,6 @@ export default {
 .p-select-button-group {
     @apply flex flex-wrap;
     .button-group {
-        display: flex;
         margin-right: -0.5rem;
         margin-bottom: -0.5rem;
     }
