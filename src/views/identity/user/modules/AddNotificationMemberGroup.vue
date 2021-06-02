@@ -34,7 +34,7 @@ export default {
             default: '',
         },
     },
-    setup(props) {
+    setup(props, { emit }) {
         const state = reactive({
             search: '',
             loading: true,
@@ -47,10 +47,17 @@ export default {
             selectedMemberItems: [],
         });
 
+        const emitChange = () => {
+            emit('change', {
+                member: state.selectedMemberItems,
+            });
+        };
+
         const onSelectMember = (item: MenuItem) => {
             state.search = '';
             // const idx = state.selectedMemberItems.findIndex(k => k === item.name);
             state.selectedMemberItems = [...state.selectedMemberItems, item.name];
+            emitChange();
         };
 
         (async () => {

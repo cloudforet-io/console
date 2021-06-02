@@ -2,7 +2,7 @@
     <section class="notification-wrapper">
         <p-breadcrumbs class="flex-grow" :routes="routeState.routes" />
         <p-page-title :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')" />
-        <notification-list />
+        <notification-channel-list />
     </section>
 </template>
 
@@ -13,12 +13,12 @@ import {
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive,
 } from '@vue/composition-api';
-import NotificationList from '@/views/identity/user/modules/NotificationList.vue';
+import NotificationChannelList from '@/views/identity/user/modules/NotificationChannelList.vue';
 
 export default {
     name: 'NotificationPage',
     components: {
-        NotificationList,
+        NotificationChannelList,
         PBreadcrumbs,
         PPageTitle,
     },

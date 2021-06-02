@@ -1,29 +1,30 @@
 <template>
-    <p-pane-layout class="content-wrapper">
-        <h3 class="content-title">
-            {{ $t('IDENTITY.USER.NOTIFICATION.FORM.BASE_INFO') }}
-        </h3>
+    <div>
         <p-field-group
             :label="$t('IDENTITY.USER.NOTIFICATION.FORM.CHANNEL_NAME')"
             required
             class="base-info-input"
         >
             <template #default="{invalid}">
-                <p-text-input v-model="channelName" />
+                <p-text-input v-model="channelName" @input="onChangeChannelName" />
             </template>
         </p-field-group>
         <p-field-group v-if="projectId" :label="$t('IDENTITY.USER.NOTIFICATION.FORM.ESCALATION_LEVEL')" required
                        class="level-dropdown"
         >
             <template #default>
-                <p-select-dropdown v-model="escalationLevel" :items="LEVEL_LIST" :use-custom-style="true" />
+                <p-select-dropdown v-model="escalationLevel" :items="LEVEL_LIST" :use-custom-style="true"
+                                   @input="onChangeLevel"
+                />
             </template>
         </p-field-group>
-        <p-json-schema-form :model.sync="schemaModel" :schema="schema" :is-valid.sync="isSchemaModelValid" />
+        <p-json-schema-form :model.sync="schemaModel" :schema="schema" :is-valid.sync="isSchemaModelValid"
+                            @update:model="onChangeModel"
+        />
         <div v-if="projectId">
-            <add-notification-member-group :project-id="projectId" />
+            <add-notification-member-group :project-id="projectId" @change="onChangeMember" />
         </div>
-    </p-pane-layout>
+    </div>
 </template>
 
 <script lang="ts">
@@ -80,6 +81,7 @@ export default {
             schemaModel: {},
             schema: {},
             isSchemaModelValid: false,
+            selectedMember: [],
         });
 
         const getSchema = async () => {
@@ -87,6 +89,35 @@ export default {
                 name: props.supportedSchema,
             });
             state.schema = res.schema;
+        };
+
+        const emitChange = () => {
+            emit('change', {
+                channelName: state.channelName,
+                data: state.schemaModel,
+                member: state.selectedMember,
+                level: state.escalationLevel,
+            });
+        };
+
+        const onChangeChannelName = (value) => {
+            state.channelName = value;
+            emitChange();
+        };
+
+        const onChangeModel = (value) => {
+            state.schemaModel = value;
+            emitChange();
+        };
+
+        const onChangeMember = (value) => {
+            state.selectedMember = value.member;
+            emitChange();
+        };
+
+        const onChangeLevel = (value) => {
+            state.escalationLevel = value;
+            emitChange();
         };
 
         (async () => {
@@ -98,6 +129,10 @@ export default {
             CHANNEL_TYPE,
             LEVEL_LIST,
             ...toRefs(state),
+            onChangeChannelName,
+            onChangeModel,
+            onChangeMember,
+            onChangeLevel,
         };
     },
 
@@ -105,15 +140,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.content-wrapper {
-    padding-left: 1rem;
-    padding-top: 2rem;
-    padding-bottom: 3.5rem;
-}
-.content-title {
-    font-size: 1.5rem;
-    line-height: 135%;
-}
 .base-info-input {
     max-width: 30rem;
     margin-top: 1.25rem;

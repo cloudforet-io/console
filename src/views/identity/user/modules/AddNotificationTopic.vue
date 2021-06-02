@@ -1,18 +1,19 @@
 <template>
     <div>
-        <p-radio v-for="(item, i) in topicMode" :key="i"
-                 :selected="item.value" :value="selectedTopicMode" class="mr-4"
-                 @click="changeTopicMode(item.value)"
+        <p-radio v-for="(item, i) in topicModeList" :key="i"
+                 :selected="item.value" :value="isTopicModeSelected" class="mr-4"
+                 @click="onChangeTopicMode(item.value)"
         >
-            <span class="radio-label" @click="changeTopicMode(item.value)">{{ item.label }}</span>
+            <span class="radio-label" @click="onChangeTopicMode(item.value)">{{ item.label }}</span>
         </p-radio>
-        <article v-if="selectedTopicMode === TOPIC_MODE.TOPIC" class="topic-wrapper">
+        <article v-if="isTopicModeSelected" class="topic-wrapper">
             <h5 class="setting">
                 {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
             </h5>
             <p-check-box v-for="item in TOPIC_LIST" :key="item.value"
                          v-model="selectedTopic"
                          :value="item.value"
+                         @change="onChangeTopic"
             >
                 <span class="topic-label">{{ item.label }}</span>
             </p-check-box>
@@ -26,11 +27,6 @@ import {
 } from '@vue/composition-api';
 import { PRadio, PCheckBox } from '@spaceone/design-system';
 
-enum TOPIC_MODE {
-    ALL = 'all',
-    TOPIC = 'topic',
-}
-
 const TOPIC_LIST = [
     { label: 'Alert', value: 'monitoring.Alert' },
 ];
@@ -41,25 +37,49 @@ export default {
         PRadio,
         PCheckBox,
     },
-    setup() {
+    props: {
+        topic: {
+            type: [Array, String],
+            default: () => [],
+        },
+        topicMode: {
+            type: Boolean,
+            default: null,
+        },
+    },
+    setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            topicMode: computed(() => [{
-                label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL'), value: 'all',
+            topicModeList: computed(() => [{
+                label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL'), value: false,
             }, {
-                label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ON_TOPIC'), value: 'topic',
+                label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ON_TOPIC'), value: true,
             }]),
-            selectedTopicMode: 'all',
-            selectedTopic: [] as string[],
+            isTopicModeSelected: props.topicMode ? props.topicMode : false,
+            selectedTopic: props.topic.length > 0 ? props.topic : [] as string[],
         });
-        const changeTopicMode = (value) => {
-            state.selectedTopicMode = value;
+
+        const emitChange = () => {
+            emit('change', {
+                topicMode: state.isTopicModeSelected,
+                selectedTopic: state.selectedTopic,
+            });
         };
+        const onChangeTopicMode = (value) => {
+            state.isTopicModeSelected = value;
+            emitChange();
+        };
+
+        const onChangeTopic = (value) => {
+            state.selectedTopic = value;
+            emitChange();
+        };
+
         return {
-            TOPIC_MODE,
             TOPIC_LIST,
             ...toRefs(state),
-            changeTopicMode,
+            onChangeTopicMode,
+            onChangeTopic,
         };
     },
 };

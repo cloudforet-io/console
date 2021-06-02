@@ -5,7 +5,14 @@
                       @goBack="$router.go(-1)"
         />
         <section class="content-list-wrapper">
-            <add-notification-data :project-id="projectId" :supported-schema="supportedSchema" />
+            <p-pane-layout class="content-wrapper">
+                <h3 class="content-title">
+                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.BASE_INFO') }}
+                </h3>
+                <add-notification-data :project-id="projectId" :supported-schema="supportedSchema"
+                                       @change="onChangeData"
+                />
+            </p-pane-layout>
             <p-pane-layout class="content-wrapper">
                 <h3 class="content-title">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE') }}
@@ -13,7 +20,7 @@
                 <h4 class="sub-title">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING_MODE') }}
                 </h4>
-                <add-notification-schedule />
+                <add-notification-schedule @change="onChangeSchedule" />
             </p-pane-layout>
             <p-pane-layout class="content-wrapper">
                 <h3 class="content-title">
@@ -22,7 +29,7 @@
                 <h4 class="sub-title">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING_MODE') }}
                 </h4>
-                <add-notification-topic />
+                <add-notification-topic @change="onChangeTopic" />
             </p-pane-layout>
         </section>
         <div class="button-group">
@@ -54,8 +61,11 @@ import AddNotificationData from '@/views/identity/user/modules/AddNotificationDa
 import AddNotificationTopic from '@/views/identity/user/modules/AddNotificationTopic.vue';
 import AddNotificationSchedule from '@/views/identity/user/modules/AddNotificationSchedule.vue';
 import VueI18n from 'vue-i18n';
+import store from '@/store';
+import { SpaceConnector } from '@/lib/space-connector';
 
 import TranslateResult = VueI18n.TranslateResult;
+import {showErrorMessage, showSuccessMessage} from "@/lib/util";
 
 const LEVEL_LIST = [
     { label: 'Level 1', name: 1, type: 'item' },
@@ -76,7 +86,7 @@ export default {
         PButton,
     },
 
-    setup(props, { emit }) {
+    setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             escalationLevel: 1,
@@ -85,6 +95,13 @@ export default {
             projectId: vm.$route.query.projectId,
             protocolId: vm.$route.params.protocolId,
             supportedSchema: vm.$route.query.supported_schema,
+            //
+            channelName: '',
+            data: {},
+            topicMode: false,
+            topicList: [],
+            schedule: null,
+            userId: store.state.user.userId,
         });
         const routeState = reactive({
             routes: computed(() => ([
@@ -94,8 +111,47 @@ export default {
             ])),
         });
 
-        const onClickSave = () => {
-            console.log('save!!');
+        const createUserChannel = async () => {
+            await SpaceConnector.client.notification.userChannel.create({
+                protocol_id: state.protocolId,
+                name: state.channelName,
+                data: state.data,
+                schema: state.supportedSchema,
+                is_subscribe: state.topicMode,
+                subscriptions: state.topicList,
+                schedule: state.schedule,
+                user_id: state.userId,
+            });
+        };
+
+        const createProjectChannel = async () => {
+            await SpaceConnector.client.notification.ProjectChannel.create({
+
+            });
+        };
+
+        const onClickSave = async () => {
+            try {
+                if (state.projectId) await createProjectChannel();
+                else await createUserChannel();
+                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_USER_CHANNEL'), '', context.root);
+            } catch (e) {
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_USER_CHANNEL'), e, context.root);
+            }
+        };
+
+        const onChangeData = (value) => {
+            state.channelName = value.channelName;
+            state.data = value.data;
+        };
+
+        const onChangeSchedule = (value) => {
+            state.schedule = value;
+        };
+
+        const onChangeTopic = (value) => {
+            state.topicMode = value.topicMode;
+            state.topicList = value.selectedTopic;
         };
 
         (async () => {
@@ -108,6 +164,9 @@ export default {
             ...toRefs(state),
             routeState,
             onClickSave,
+            onChangeData,
+            onChangeSchedule,
+            onChangeTopic,
         };
     },
 };

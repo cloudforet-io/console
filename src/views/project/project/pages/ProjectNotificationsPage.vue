@@ -1,11 +1,11 @@
 <template>
     <section>
-        <notification-list :project-id="projectId" />
+        <notification-channel-list :project-id="projectId" />
     </section>
 </template>
 
 <script lang="ts">
-import NotificationList from '@/views/identity/user/modules/NotificationList.vue';
+import NotificationChannelList from '@/views/identity/user/modules/NotificationChannelList.vue';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import {
     ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
@@ -14,7 +14,7 @@ import {
 export default {
     name: 'ProjectNotificationsPage',
     components: {
-        NotificationList,
+        NotificationChannelList,
     },
     props: {
         id: {
