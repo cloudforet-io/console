@@ -1,3 +1,10 @@
+# [1.1.0-beta.38](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.37...v1.1.0-beta.38) (2021-06-02)
+
+
+### Bug Fixes
+
+* delete display:flex from PSelectButtonGroup ([#572](https://github.com/spaceone-dev/spaceone-design-system/issues/572)) ([6976953](https://github.com/spaceone-dev/spaceone-design-system/commit/6976953eb32cc35416990012ef0912c6ef7a7a17))
+
 # [1.1.0-beta.37](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.36...v1.1.0-beta.37) (2021-06-01)
 
 
