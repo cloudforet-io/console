@@ -824,11 +824,14 @@
 				"YESTERDAY": "昨日"
 			},
 			"NOTIFICATION": {
+				"AWS_SNS": "",
 				"EDIT": "",
 				"FORM": {
 					"ADD_CHANNEL": "",
 					"ALL_TIME": "",
+					"ALT_E_CREATE_PROJECT_CHANNEL": "",
 					"ALT_E_CREATE_USER_CHANNEL": "",
+					"ALT_S_CREATE_PROJECT_CHANNEL": "",
 					"ALT_S_CREATE_USER_CHANNEL": "",
 					"BASE_INFO": "",
 					"CHANNEL_NAME": "",

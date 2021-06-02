@@ -824,11 +824,14 @@
 				"YESTERDAY": "어제 "
 			},
 			"NOTIFICATION": {
+				"AWS_SNS": "AWS SNS",
 				"EDIT": "편집",
 				"FORM": {
 					"ADD_CHANNEL": "{type} 채널 추가",
 					"ALL_TIME": "모든 시간",
+					"ALT_E_CREATE_PROJECT_CHANNEL": "프로젝트 채널 생성 실패",
 					"ALT_E_CREATE_USER_CHANNEL": "유저 채널 생성 실패",
+					"ALT_S_CREATE_PROJECT_CHANNEL": "프로젝트 채널 생성 성공",
 					"ALT_S_CREATE_USER_CHANNEL": "유저 채널 생성 성공",
 					"BASE_INFO": "기본 정보",
 					"CHANNEL_NAME": "채널 이름",
