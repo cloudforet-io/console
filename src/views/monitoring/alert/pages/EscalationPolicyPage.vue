@@ -4,31 +4,34 @@
         <p-page-title :title="pageTitle"
                       use-total-count
                       use-selected-count
-                      :total-count="totalCount"
-                      :selected-count="selectedItems.length"
+                      :total-count="tableState.totalCount"
+                      :selected-count="selectedItem ? 1 : 0"
         />
         <p-toolbox-table
             selectable
             sortable
-            exportable
-            settings-visible
+            :multi-select="false"
             search-type="query"
             :items="items"
             :loading="tableState.loading"
             :fields="tableState.fields"
             :select-index.sync="tableState.selectIndex"
-            :sort-by="tableState.sortBy"
-            :sort-desc="tableState.sortDesc"
-            :page-size="tableState.pageLimit"
+            :sort-by.sync="tableState.sortBy"
+            :sort-desc.sync="tableState.sortDesc"
+            :page-size.sync="tableState.pageLimit"
             :total-count="tableState.totalCount"
             :query-tags="tableState.searchTags"
+            :key-item-sets="searchHandlers.keyItemSets"
+            :value-handler-map="searchHandlers.valueHandlerMap"
+            @change="onChange"
+            @refresh="listEscalationPolicies"
         >
             <template #toolbox-left>
                 <p-icon-text-button
                     class="create-button"
                     style-type="primary-dark"
                     name="ic_plus_bold"
-                    @click="openFormModal('create')"
+                    @click="onSelectAction(ACTION.create)"
                 >
                     {{ $t('MONITORING.ALERT.ESCALATION_POLICY.CREATE') }}
                 </p-icon-text-button>
@@ -36,50 +39,80 @@
                     :select-item="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
                     :items="tableState.actionItems"
                     :placeholder="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
-                    :disabled="false"
+                    :disabled="!selectedItem"
                     @onSelected="onSelectAction"
                 />
+            </template>
+            <template #col-name-format="{ value }">
+                <span>{{ value.label }}</span>
+                <p-badge v-if="value.isDefault" outline class="ml-2">
+                    {{ $t('MONITORING.ALERT.ESCALATION_POLICY.DEFAULT') }}
+                </p-badge>
+            </template>
+            <template #col-rules-format="{ value }">
+                {{ ruleFormatter(value) }}
+            </template>
+            <template #col-finish_condition-format="{ value }">
+                {{ capitalize(value) }}
+            </template>
+            <template #col-scope-format="{ value }">
+                {{ capitalize(value) }}
+            </template>
+            <template #col-project_id-format="{ value }">
+                <template v-if="value">
+                    <p-anchor :to="referenceRouter(
+                        value,
+                        { resource_type: 'identity.Project' })"
+                    >
+                        {{ projects[value] ? projects[value].label : value }}
+                    </p-anchor>
+                </template>
             </template>
         </p-toolbox-table>
 
         <escalation-policy-form-modal
-            :header-title="formState.headerTitle"
-            :visible.sync="formState.visible"
-            :confirm-button-text="formState.confirmButtonText"
+            :visible.sync="formModalVisible"
+            :mode="formMode"
+            :escalation-policy="selectedItem"
+            @confirm="listEscalationPolicies"
         />
         <delete-modal
             class="delete-modal"
             :header-title="$t('MONITORING.ALERT.ESCALATION_POLICY.DELETE_MODAL_TITLE')"
             :visible.sync="deleteModalVisible"
-            @confirm="escalationPolicyDeleteConfirm"
+            @confirm="deleteEscalationPolicy"
         />
     </div>
 </template>
 
 <script lang="ts">
-import { TranslateResult } from 'vue-i18n';
+/* eslint-disable camelcase */
+import { capitalize } from 'lodash';
 
 import {
     reactive, toRefs, ComponentRenderProxy, getCurrentInstance, computed,
 } from '@vue/composition-api';
 
 import {
-    PBreadcrumbs, PPageTitle, PToolboxTable, PIconTextButton, PSelectDropdown,
+    PBreadcrumbs, PPageTitle, PToolboxTable, PIconTextButton, PSelectDropdown, PAnchor, PBadge,
 } from '@spaceone/design-system';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+import EscalationPolicyFormModal from '@/views/monitoring/alert/modules/EscalationPolicyFormModal.vue';
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 
+import { ACTION, FINISH_CONDITION, SCOPE } from '@/views/monitoring/alert/type';
 import { SpaceConnector } from '@/lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import EscalationPolicyFormModal from '@/views/monitoring/alert/modules/EscalationPolicyFormModal.vue';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+import {
+    iso8601Formatter, showErrorMessage, showSuccessMessage,
+} from '@/lib/util';
+import {
+    makeEnumValueHandler, makeReferenceValueHandler,
+} from '@/lib/component-utils/query-search';
+import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { store } from '@/store';
 
-
-enum ACTION {
-    create = 'create',
-    delete = 'delete',
-    update = 'update',
-    default = 'default',
-}
 
 export default {
     name: 'EscalationPolicyPage',
@@ -91,18 +124,13 @@ export default {
         PToolboxTable,
         PIconTextButton,
         PSelectDropdown,
+        PAnchor,
+        PBadge,
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const state = reactive({
-            pageTitle: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY'),
-            totalCount: 0,
-            items: [],
-            selectedItems: [],
-            deleteModalVisible: false,
-        });
         const tableState = reactive({
-            loading: false, // todo true
+            loading: true,
             actionItems: computed(() => ([
                 {
                     type: 'item',
@@ -121,27 +149,33 @@ export default {
                 },
             ])),
             selectedActionItem: '',
+            selectIndex: [],
             fields: [
                 { name: 'name', label: 'Name' },
-                { name: 'escalationRules', label: 'Escalation Rules' },
-                { name: 'repeatTime', label: 'Repeat Time' },
-                { name: 'finishCondition', label: 'Finish Condition' },
+                { name: 'rules', label: 'Escalation Rules' },
+                { name: 'repeat_count', label: 'Repeat Time' },
+                { name: 'finish_condition', label: 'Finish Condition' },
                 { name: 'scope', label: 'Scope' },
-                { name: 'project', label: 'Project' },
+                { name: 'project_id', label: 'Project' },
                 { name: 'created_at', label: 'Created' },
             ] as DataTableField[],
             sortBy: '',
-            sortDesc: '',
+            sortDesc: true,
             totalCount: 0,
-            pageSize: 10,
-            thisPage: 1,
-            allPage: computed(() => Math.ceil(tableState.totalCount / tableState.pageSize) || 1),
+            pageLimit: 15,
+            pageStart: 1,
             searchTags: [],
         });
-        const formState = reactive({
-            headerTitle: '' as TranslateResult,
-            visible: false,
-            confirmButtonText: '' as TranslateResult,
+        const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
+            projects: computed(() => store.state.resource.project.items),
+            pageTitle: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY'),
+            escalationPolicies: [],
+            items: [],
+            selectedItem: computed(() => state.escalationPolicies[tableState.selectIndex[0]]),
+            deleteModalVisible: false,
+            formModalVisible: false,
+            formMode: undefined,
         });
         const routeState = reactive({
             route: computed(() => [
@@ -150,22 +184,90 @@ export default {
                 { name: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY') },
             ]),
         });
+        const searchHandlers = {
+            keyItemSets: [{
+                title: 'Properties',
+                items: [
+                    { name: 'name', label: 'Name' },
+                    { name: 'rules', label: 'Escalation Rules' },
+                    { name: 'repeat_count', label: 'Repeat Time' },
+                    { name: 'finish_condition', label: 'Finish Condition' },
+                    { name: 'scope', label: 'Scope' },
+                    { name: 'project_id', label: 'Project' },
+                    { name: 'created_at', label: 'Created', dataType: 'datetime' },
+                ],
+            }] as KeyItemSet[],
+            valueHandlerMap: {
+                finish_condition: makeEnumValueHandler(FINISH_CONDITION),
+                scope: makeEnumValueHandler(SCOPE),
+                project_id: makeReferenceValueHandler('identity.Project'),
+            },
+        };
+
+        /* util */
+        const ruleFormatter = (rules) => {
+            const result = [] as string[];
+            rules.forEach((rule, idx) => {
+                let formattedRule = rule.notification_level;
+                if (idx + 1 < rules.length) {
+                    formattedRule += ` (${rule.escalate_minutes}min)`;
+                    formattedRule += ' > ';
+                }
+                result.push(formattedRule);
+            });
+            return result.join('');
+        };
 
         /* api */
-        const onClickSetAsDefault = () => {
+        const apiQuery = new ApiQueryHelper();
+        const getQuery = () => {
+            apiQuery.setSort(tableState.sortBy, tableState.sortDesc)
+                .setPage(tableState.pageStart, tableState.pageLimit)
+                .setFiltersAsQueryTag(tableState.searchTags);
+            return apiQuery.data;
+        };
+        const listEscalationPolicies = async () => {
             try {
+                tableState.loading = true;
+                const res = await SpaceConnector.client.monitoring.escalationPolicy.list({
+                    query: getQuery(),
+                });
+                state.escalationPolicies = res.results;
+                state.items = res.results.map(d => ({
+                    ...d,
+                    name: {
+                        label: d.name,
+                        isDefault: d.is_default,
+                    },
+                    created_at: iso8601Formatter(d.created_at, state.timezone),
+                }));
+                tableState.totalCount = res.total_count;
+            } catch (e) {
+                state.items = [];
+                console.error(e);
+            } finally {
+                tableState.loading = false;
+            }
+        };
+        const setDefaultEscalationPolicy = async () => {
+            try {
+                await SpaceConnector.client.monitoring.escalationPolicy.setDefault({
+                    escalation_policy_id: state.selectedItem.escalation_policy_id,
+                });
                 showSuccessMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_S_SET_AS_DEFAULT'), '', root);
+                await listEscalationPolicies();
             } catch (e) {
                 console.error(e);
                 showErrorMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_E_SET_AS_DEFAULT'), e, root);
             }
         };
-        const escalationPolicyDeleteConfirm = () => {
+        const deleteEscalationPolicy = async () => {
             try {
-                // await SpaceConnector.client.powerScheduler.schedule.delete({
-                //     schedule_id: props.scheduleId,
-                // });
+                await SpaceConnector.client.monitoring.escalationPolicy.delete({
+                    escalation_policy_id: state.selectedItem.escalation_policy_id,
+                });
                 showSuccessMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_S_DELETE_POLICY'), '', root);
+                await listEscalationPolicies();
             } catch (e) {
                 console.error(e);
                 showErrorMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_E_DELETE_POLICY'), e, root);
@@ -175,35 +277,43 @@ export default {
         };
 
         /* event */
-        const openFormModal = (action) => {
-            if (action === ACTION.create) {
-                formState.headerTitle = vm.$t('MONITORING.ALERT.ESCALATION_POLICY.CREATE_MODAL_TITLE');
-                formState.confirmButtonText = vm.$t('MONITORING.ALERT.ESCALATION_POLICY.CREATE');
-            } else if (action === ACTION.update) {
-                formState.headerTitle = vm.$t('MONITORING.ALERT.ESCALATION_POLICY.UPDATE_MODAL_TITLE');
-                formState.confirmButtonText = vm.$t('MONITORING.ALERT.ESCALATION_POLICY.UPDATE');
-            }
-            formState.visible = true;
-        };
         const onSelectAction = (action) => {
-            console.log(action);
-            if (action === ACTION.delete) {
-                state.deleteModalVisible = true;
+            state.formMode = action;
+            if (action === ACTION.create) {
+                state.formModalVisible = true;
             } else if (action === ACTION.update) {
-                openFormModal(action);
+                state.formModalVisible = true;
+            } else if (action === ACTION.delete) {
+                state.deleteModalVisible = true;
             } else if (action === ACTION.default) {
-                onClickSetAsDefault();
+                setDefaultEscalationPolicy();
             }
         };
+        const onChange = async (options: any = {}) => {
+            if (options.pageStart !== undefined) tableState.pageStart = options.pageStart;
+            if (options.queryTags !== undefined) tableState.searchTags = options.queryTags;
+
+            await listEscalationPolicies();
+        };
+
+        /* init */
+        (async () => {
+            await Promise.all([store.dispatch('resource/project/load'), listEscalationPolicies()]);
+        })();
 
         return {
             ...toRefs(state),
+            ACTION,
             routeState,
             tableState,
-            formState,
-            openFormModal,
+            searchHandlers,
             onSelectAction,
-            escalationPolicyDeleteConfirm,
+            onChange,
+            listEscalationPolicies,
+            deleteEscalationPolicy,
+            ruleFormatter,
+            capitalize,
+            referenceRouter,
         };
     },
 };

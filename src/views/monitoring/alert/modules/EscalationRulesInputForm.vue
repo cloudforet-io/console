@@ -10,13 +10,14 @@
             <span class="col-span-4">
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RULE') }}
             </span>
-            <p-anchor class="link-text"
+            <p-anchor v-if="scope === 'PROJECT'"
+                      class="link-text"
                       :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATION_SETTINGS')"
                       :to="{ name: IDENTITY_ROUTE.USER.NOTIFICATION.MAIN }"
                       highlight
             />
         </div>
-        <div v-for="(rule, idx) in escalationRules"
+        <div v-for="(rule, idx) in rules"
              :key="`rule-${idx}`"
              class="content-wrapper"
         >
@@ -25,17 +26,17 @@
             </span>
             <span class="col-span-2 notification-wrapper">
                 <p-select-dropdown
-                    v-model="rule.notificationLevel"
-                    :items="notificationLevels"
+                    v-model="rule.notification_level"
+                    :items="NOTIFICATION_LEVEL"
                 />
             </span>
-            <span v-if="rule.escalatesAfter"
+            <span v-if="rule.escalate_minutes"
                   class="col-span-4 rule-wrapper"
             >
                 <span class="label">
                     {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATES_AFTER') }}
                 </span>
-                <p-text-input v-model="rule.escalatesAfter"
+                <p-text-input v-model="rule.escalate_minutes"
                               class="rule-input"
                 >
                     <template #right-extra>
@@ -54,7 +55,11 @@
                 <p-i name="ic_repeat" />
             </span>
             <span class="col-span-2">
-                <p-text-input v-model="repeatTime" class="repeat-input">
+                <p-text-input v-model.number="proxyRepeatCount"
+                              type="number"
+                              :min="0"
+                              class="repeat-input"
+                >
                     <template #right-extra>
                         {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.TIME') }}
                     </template>
@@ -72,7 +77,7 @@
                 class="add-button"
                 name="ic_plus_bold" outline
                 style-type="gray900"
-                :disabled="escalationRules.length >= 5"
+                :disabled="rules.length >= 5"
                 @click="onClickAddStep"
             >
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ADD_STEP') }}
@@ -82,6 +87,7 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import { reactive, toRefs } from '@vue/composition-api';
 
 import {
@@ -89,6 +95,16 @@ import {
 } from '@spaceone/design-system';
 
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
+import { makeProxy } from '@/lib/compostion-util';
+
+const NOTIFICATION_LEVEL = [
+    { name: 'ALL', label: 'All' },
+    { name: 'LV1', label: 'Level 1' },
+    { name: 'LV2', label: 'Level 2' },
+    { name: 'LV3', label: 'Level 3' },
+    { name: 'LV4', label: 'Level 4' },
+    { name: 'LV5', label: 'Level 5' },
+];
 
 export default {
     name: 'EscalationRulesInputForm',
@@ -101,55 +117,46 @@ export default {
         PIconTextButton,
         PTextInput,
     },
-    setup() {
+    props: {
+        scope: {
+            type: String,
+            default: '',
+        },
+        rules: {
+            type: Array,
+            default: () => ([]),
+        },
+        repeatCount: {
+            type: Number,
+            default: 0,
+        },
+    },
+    setup(props, { emit }) {
         const state = reactive({
-            repeatTime: undefined,
-            escalationRules: [
-                {
-                    notificationLevel: 'all',
-                    escalatesAfter: 10,
-                },
-                {
-                    notificationLevel: 'all',
-                    escalatesAfter: 15,
-                },
-                {
-                    notificationLevel: 'all',
-                    escalatesAfter: undefined,
-                },
-            ],
-            notificationLevels: [
-                {
-                    label: 'All',
-                    name: 'all',
-                },
-                {
-                    label: 'Level 1',
-                    name: 'level1',
-                },
-                {
-                    label: 'Level 2',
-                    name: 'level1',
-                },
-            ],
+            proxyRepeatCount: makeProxy('repeatCount', props, emit),
         });
 
-        const onClickDeleteRule = async (idx) => {
-            await state.escalationRules.splice(idx, 1);
-            const lastItem = state.escalationRules[state.escalationRules.length - 1];
-            lastItem.escalatesAfter = undefined;
+        /* event */
+        const onClickDeleteRule = (idx) => {
+            const rules = props.rules;
+            rules.splice(idx, 1);
+            if (rules.length > 0) rules[rules.length - 1].escalate_minutes = undefined;
+            emit('update:rules', rules);
         };
         const onClickAddStep = () => {
-            state.escalationRules[state.escalationRules.length - 1].escalatesAfter = 10;
-            state.escalationRules.push({
-                notificationLevel: 'all',
-                escalatesAfter: undefined,
+            const rules = props.rules;
+            if (rules.length > 0) rules[rules.length - 1].escalate_minutes = 30;
+            rules.push({
+                notification_level: NOTIFICATION_LEVEL[rules.length + 1].name,
+                escalate_minutes: undefined,
             });
+            emit('update:rules', rules);
         };
 
         return {
             ...toRefs(state),
             IDENTITY_ROUTE,
+            NOTIFICATION_LEVEL,
             onClickDeleteRule,
             onClickAddStep,
         };
@@ -160,6 +167,7 @@ export default {
 <style lang="postcss" scoped>
 .escalation-rules-input-form {
     @apply bg-gray-100 border border-gray-200;
+    min-height: 21.75rem;
     border-radius: 0.375rem;
     padding: 0.5rem;
 
