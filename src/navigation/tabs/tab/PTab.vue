@@ -1,43 +1,48 @@
 <template>
     <div class="p-tab">
-        <p-tab-bar class="p-tab-bar"
-                   :class="{'is-single':isSingle,'is-double':isDouble}"
-                   :active-tab.sync="proxyActiveTab"
-                   :tabs="tabs"
-        />
+        <ul class="tab-item-wrapper" :class="{stretch}">
+            <li v-for="tab in tabItems" :key="tab.name"
+                :class="{active: activeTab === tab.name, single: isSingle}"
+                @click="onClickTab(tab)"
+            >
+                <span class="label">
+                    {{ tab.label }}
+                    <slot name="extra" />
+                </span>
+            </li>
+        </ul>
         <div class="tab-pane">
             <slot />
             <keep-alive>
-                <slot v-for="tab in keepTabs"
-                      :name="proxyActiveTab === tab.name ? proxyActiveTab : undefined"
-                      :tabName="tab.name" :label="tab.label"
-                />
+                <slot v-if="keepTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
             </keep-alive>
-            <template v-for="tab in nonKeepTabs">
-                <div v-if="proxyActiveTab === tab.name" :key="tab.name">
-                    <slot :name="tab.name" :tabName="tab.name"
-                          :label="tab.label"
-                    />
-                </div>
-            </template>
+            <slot v-if="nonKeepTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, defineComponent,
+    toRefs,
 } from '@vue/composition-api';
 
-import PTabBar from '@/navigation/tabs/tab/tab-bar/PTabBar.vue';
-import { TabProps, TabItem } from '@/navigation/tabs/tab/type';
+import { TabProps } from '@/navigation/tabs/tab/type';
 
-import { makeProxy } from '@/util/composition-helpers';
+import { useTab } from '@/hooks/tab';
 
-export default {
+interface Props extends TabProps {
+    stretch?: boolean;
+}
+
+export default defineComponent<Props>({
     name: 'PTab',
-    components: { PTabBar },
+    model: {
+        prop: 'activeTab',
+        event: 'update:activeTab',
+    },
     props: {
+        /* tab item props */
         tabs: {
             type: Array,
             default: () => [],
@@ -46,46 +51,76 @@ export default {
             type: String,
             default: '',
         },
+        /* tab props */
+        stretch: {
+            type: Boolean,
+            default: false,
+        },
     },
-    setup(props: TabProps, { emit }) {
-        const state = reactive({
-            proxyActiveTab: makeProxy('activeTab', props, emit),
-            isSingle: computed(() => props.tabs.length === 1),
-            isDouble: computed(() => props.tabs.length === 2),
-            nonKeepTabs: computed(() => props.tabs.reduce<TabItem[]>((results, current, idx) => {
-                if (typeof current === 'string') results.push({ name: current, label: current, keepAlive: false });
-                else if (!current.keepAlive) results.push(current);
-                return results;
-            }, [])),
-            keepTabs: computed(() => props.tabs.filter(tab => (typeof tab === 'string' ? false : tab.keepAlive))),
-        });
+    setup(props: Props, context) {
+        const { state, onClickTab } = useTab(props, context);
+        const isSingle = computed(() => props.tabs.length === 1);
         return {
             ...toRefs(state),
+            onClickTab,
+            isSingle,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
 .p-tab {
-    @apply rounded-sm border  border-gray-200 bg-white;
+    @apply rounded-sm border border-gray-200 bg-white;
     min-height: 19rem;
-    .p-tab-bar {
-        @apply border-b-4 border-gray-100;
-        &.is-double {
-            &.p-nav-tabs {
-                .nav-item {
-                    flex: 0.5;
+    ul.tab-item-wrapper {
+        @apply border-gray-100;
+        display: flex;
+        flex-wrap: wrap;
+        border-bottom-width: 4px;
+        li {
+            @apply text-gray-400;
+            display: flex;
+            min-height: 2.25rem;
+            font-weight: bold;
+            font-size: 0.875rem;
+            text-decoration: none;
+            text-align: center;
+            cursor: pointer;
+            margin-bottom: -4px;
+            border-bottom-width: 4px;
+            border-color: transparent;
+            &:hover {
+                @apply text-gray-900;
+            }
+            &.active {
+                @apply text-primary;
+
+                &:not(.single) {
+                    @apply border-primary;
                 }
-                .p-nav-link {
-                    .label {
-                        @apply inline-flex;
-                        justify-content: center;
-                    }
-                }
+            }
+            .label {
+                @apply w-full;
+                display: flex;
+                padding: 0.6rem 1rem;
+                line-height: 150%;
+            }
+        }
+        &.stretch {
+            flex-wrap: nowrap;
+            justify-content: space-around;
+            li {
+                flex-grow: 1;
+                flex-shrink: 0;
+            }
+            .label {
+                display: inline-flex;
+                justify-content: center;
             }
         }
     }
+
     .tab-pane {
         @apply w-full pb-8;
     }

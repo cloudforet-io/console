@@ -6,13 +6,8 @@ export interface TabItem {
     keepAlive?: boolean;
 }
 
-type TabsType = Array<string|TabItem>;
 
-interface TabStateType {
-    tabs: TabsType;
-}
-interface TabSyncType {
+export interface TabProps {
     activeTab: string;
+    tabs: Array<string|TabItem>;
 }
-
-export interface TabProps extends TabStateType, TabSyncType {}
