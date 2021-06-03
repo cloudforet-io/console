@@ -193,6 +193,14 @@ enum PARAM_KEY_TYPE {
     SCHEDULE = 'schedule',
 }
 
+interface ParamType {
+    user_channel_id?: string;
+    project_channel_id?: string;
+    name?: string;
+    data?: object;
+    schedule?: object;
+}
+
 export default {
     name: 'NotificationChannelItem',
     components: {
@@ -254,7 +262,7 @@ export default {
 
         const updateUserChannel = async (paramKey, paramValue) => {
             try {
-                const param = {
+                const param: ParamType = {
                     user_channel_id: state.userChannelId,
                 };
                 if (paramKey === PARAM_KEY_TYPE.NAME) param.name = paramValue;
@@ -270,7 +278,7 @@ export default {
 
         const updateProjectChannel = async (paramKey, paramValue) => {
             try {
-                const param = {
+                const param: ParamType = {
                     // eslint-disable-next-line camelcase
                     project_channel_id: state.projectChannelId,
                 };
