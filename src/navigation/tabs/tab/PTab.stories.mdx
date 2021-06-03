@@ -53,9 +53,9 @@ export const Template = (args, { argTypes }) => ({
 
 <Canvas>
     <Story name="Basic">
-        {{
-            components: { PTab },
-            template: `
+{{
+    components: { PTab },
+    template: `
       <div class="h-full w-full overflow p-8">
           <p-tab
             :tabs="tabs"
@@ -63,20 +63,20 @@ export const Template = (args, { argTypes }) => ({
             ></p-tab>
       </div>
     `,
-            setup(props) {
-                const state = reactive({
-                    tabs: [
-                        { name: 'detail', label: 'Detail' },
-                        { name: 'info', label: 'Info' },
-                        { name: 'tags', label: 'Tags' },
-                    ],
-                    activeTab: 'detail'
-                })
-                return {
-                    ...toRefs(state)
-                }
-            }
-        }}
+    setup(props) {
+        const state = reactive({
+            tabs: [
+                { name: 'detail', label: 'Detail' },
+                { name: 'info', label: 'Info' },
+                { name: 'tags', label: 'Tags' },
+            ],
+            activeTab: 'detail'
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+}}
     </Story>
 </Canvas>
 
