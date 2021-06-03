@@ -5,10 +5,7 @@
                 <p-toggle-button :value="isActivated"
                                  @change="onToggleChange"
                 />
-                <span class="card-title">SMS</span>
-                <p-badge v-if="channelData.notification_level" outline style-type="gray">
-                    Lv1
-                </p-badge>
+                <span class="card-title">{{ channelData.protocol_name }}</span>
             </div>
             <p-icon-button name="ic_trashcan" width="1.5rem" height="1.5rem" />
         </div>
@@ -28,6 +25,7 @@
                         <p-button
                             style-type="primary"
                             class="text-button"
+                            @click="onClickSave(EDIT_TYPE.NAME)"
                         >
                             {{ $t('COMMON.TAGS.SAVE') }}
                         </p-button>
@@ -47,12 +45,12 @@
             <li class="content-wrapper" :class="{'edit-mode': isDataEditMode}">
                 <div class="content-title">
                     <p v-for="(item, index) in Object.keys(channelData.data)" :key="`channel-data-key-${index}`">
-                        {{ item }}
+                        {{ item.replace(/\_/g, ' ') }}
                     </p>
                 </div>
                 <div v-if="isDataEditMode" class="content">
                     <div class="left-section">
-                        <p v-for="(item, index) in Object.values(channelData.data)" :key="`channel-editable-data-value-${index}`">
+                        <p v-for="(item, index) in dataListForEdit" :key="`channel-editable-data-value-${index}`">
                             <p-text-input v-model="dataListForEdit[index]"
                                           class="block"
                             />
@@ -65,6 +63,7 @@
                         <p-button
                             style-type="primary"
                             class="text-button"
+                            @click="onClickSave(EDIT_TYPE.DATA)"
                         >
                             {{ $t('COMMON.TAGS.SAVE') }}
                         </p-button>
@@ -73,10 +72,14 @@
                 <div v-else class="content">
                     <div class="left-section">
                         <p v-for="(item, index) in Object.values(channelData.data)" :key="`channel-data-value-${index}`">
-                            {{ item }}
+                            <span v-if="channelData.protocol_name === PROTOCOL_TYPE.SLACK">{{ item.replace(/(?<=.{0})./gi, "*") }}</span>
+                            <span v-else>{{ item }}</span>
                         </p>
                     </div>
-                    <button class="edit-btn" @click="startEdit(EDIT_TYPE.DATA)">
+                    <p v-if="channelData.protocol_name === PROTOCOL_TYPE.SLACK">
+                        cannot edit
+                    </p>
+                    <button v-else class="edit-btn" @click="startEdit(EDIT_TYPE.DATA)">
                         <p-i name="ic_edit" width="1rem" height="1rem"
                              color="inherit" class="edit-icon"
                         />
@@ -98,18 +101,18 @@
                         <p-button
                             style-type="primary"
                             class="text-button"
+                            @click="onClickSave(EDIT_TYPE.SCHEDULE)"
                         >
                             {{ $t('COMMON.TAGS.SAVE') }}
                         </p-button>
                     </div>
                 </div>
                 <div v-else class="content">
-                    <p>
-                        <template v-if="channelData.schedule">
-                            {{ channelData.schedule.day_of_week }} <br>
-                            {{ channelData.schedule.start_hour }} ~ {{ channelData.schedule.end_hour }}
-                        </template>
+                    <p v-if="channelData.schedule">
+                        <span v-for="day in channelData.schedule.day_of_week" :key="day"> {{ day }}</span><br>
+                        {{ channelData.schedule.start_hour }}:00 ~ {{ channelData.schedule.end_hour }}:00
                     </p>
+                    <span v-else>All</span>
                     <button class="edit-btn" @click="startEdit(EDIT_TYPE.SCHEDULE)">
                         <p-i name="ic_edit" width="1rem" height="1rem"
                              color="inherit" class="edit-icon"
@@ -132,19 +135,21 @@
                         <p-button
                             style-type="primary"
                             class="text-button"
+                            @click="onClickSave(EDIT_TYPE.TOPIC)"
                         >
                             {{ $t('COMMON.TAGS.SAVE') }}
                         </p-button>
                     </div>
                 </div>
                 <div v-else class="content">
-                    <ul>
+                    <ul v-if="channelData.subscriptions.length > 0">
                         <li v-for="(item, index) in channelData.subscriptions" :key="`topic-${index}`">
                             <p-tag :deletable="false">
                                 {{ item }}
                             </p-tag>
                         </li>
                     </ul>
+                    <span v-else>All</span>
                     <button class="edit-btn" @click="startEdit(EDIT_TYPE.TOPIC)">
                         <p-i name="ic_edit" width="1rem" height="1rem"
                              color="inherit" class="edit-icon"
@@ -162,11 +167,13 @@
 import {
     PBadge, PDivider, PI, PIconButton, PPaneLayout, PTag, PToggleButton, PButton, PTextInput,
 } from '@spaceone/design-system';
-import { reactive, toRefs } from '@vue/composition-api';
+import {
+    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
 import AddNotificationSchedule from '@/views/identity/user/modules/AddNotificationSchedule.vue';
 import AddNotificationTopic from '@/views/identity/user/modules/AddNotificationTopic.vue';
-import AddNotificationData from '@/views/identity/user/modules/AddNotificationData.vue';
 import { SpaceConnector } from '@/lib/space-connector';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 enum EDIT_TYPE {
     NAME = 'name',
@@ -175,8 +182,19 @@ enum EDIT_TYPE {
     TOPIC = 'topic',
 }
 
+enum PROTOCOL_TYPE {
+    AWS_SNS = 'AWS SNS',
+    SLACK = 'Slack',
+}
+
+enum PARAM_KEY_TYPE {
+    NAME = 'name',
+    DATA = 'data',
+    SCHEDULE = 'schedule',
+}
+
 export default {
-    name: 'NotificationChannelCard',
+    name: 'NotificationChannelItem',
     components: {
         AddNotificationTopic,
         AddNotificationSchedule,
@@ -195,8 +213,13 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        projectId: {
+            type: String,
+            default: null,
+        },
     },
-    setup(props, { emit }) {
+    setup(props, context) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             isActivated: true,
             isNameEditMode: false,
@@ -204,9 +227,11 @@ export default {
             isScheduleEditMode: false,
             isTopicEditMode: false,
             //
+            userChannelId: props.channelData.user_channel_id || null,
+            projectChannelId: props.channelData.project_channel_id || null,
             channelNameForEdit: props.channelData.name,
-            dataListForEdit: [],
-            scheduleForEdit: props.channelData.schedule || [],
+            dataListForEdit: props.channelData.data,
+            scheduleForEdit: props.channelData.schedule || null,
             topicModeForEdit: undefined,
             topicForEdit: props.channelData.subscriptions,
         });
@@ -227,29 +252,118 @@ export default {
             else if (type === EDIT_TYPE.TOPIC) state.isTopicEditMode = false;
         };
 
+        const updateUserChannel = async (paramKey, paramValue) => {
+            try {
+                const param = {
+                    user_channel_id: state.userChannelId,
+                };
+                if (paramKey === PARAM_KEY_TYPE.NAME) param.name = paramValue;
+                else if (paramKey === PARAM_KEY_TYPE.DATA) param.data = paramValue;
+                else if (paramKey === PARAM_KEY_TYPE.SCHEDULE) param.schedule = paramValue;
+                await SpaceConnector.client.notification.userChannel.update(param);
+                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '', context.root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_USER_CHANNEL'), e, context.root);
+            }
+        };
+
+        const updateProjectChannel = async (paramKey, paramValue) => {
+            try {
+                const param = {
+                    // eslint-disable-next-line camelcase
+                    project_channel_id: state.projectChannelId,
+                };
+                if (paramKey === PARAM_KEY_TYPE.NAME) param.name = paramValue;
+                else if (paramKey === PARAM_KEY_TYPE.DATA) param.data = paramValue;
+                else if (paramKey === PARAM_KEY_TYPE.SCHEDULE) param.schedule = paramValue;
+                await SpaceConnector.client.notification.projectChannel.update(param);
+                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_PROJECT_CHANNEL'), '', context.root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'), e, context.root);
+            }
+        };
+
+        const saveChangedName = async () => {
+            if (props.projectId) await updateProjectChannel(PARAM_KEY_TYPE.NAME, state.channelNameForEdit);
+            else await updateUserChannel(PARAM_KEY_TYPE.NAME, state.channelNameForEdit);
+        };
+
+        const saveChangedData = async () => {
+            if (props.projectId) await updateProjectChannel(PARAM_KEY_TYPE.DATA, state.dataListForEdit);
+            else await updateUserChannel(PARAM_KEY_TYPE.DATA, state.dataListForEdit);
+        };
+
         const onChangeSchedule = async (value) => {
-            console.log('schedule test', value);
-            console.log(props.channelData.user_channel_id);
-            const res = await SpaceConnector.client.notification.update({
-
-            });
+            state.scheduleForEdit = value.schedule;
+        };
+        const saveChangedSchedule = async () => {
+            if (props.projectId) await updateProjectChannel(PARAM_KEY_TYPE.SCHEDULE, state.scheduleForEdit);
+            else await updateUserChannel(PARAM_KEY_TYPE.SCHEDULE, state.scheduleForEdit);
         };
 
+        const setUserChannelSubscription = async () => {
+            try {
+                await SpaceConnector.client.notification.userChannel.setSubscription({
+                    user_channel_id: state.userChannelId,
+                    is_subscribe: state.topicModeForEdit,
+                    subscriptions: state.topicForEdit,
+                });
+                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', context.root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, context.root);
+            }
+        };
+        const setProjectChannelSubscription = async () => {
+            try {
+                await SpaceConnector.client.notification.projectChannel.setSubscription({
+                    project_channel_id: state.projectChannelId,
+                    is_subscribe: state.topicModeForEdit,
+                    subscriptions: state.topicForEdit,
+                });
+                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', context.root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, context.root);
+            }
+        };
         const onChangeTopic = (value) => {
-            console.log('topic test', value);
+            state.topicModeForEdit = value.topicMode;
+            state.topicForEdit = value.selectedTopic;
         };
-        const saveChange = () => {
+        const saveChangedTopic = async () => {
+            if (props.projectId) await setProjectChannelSubscription();
+            else await setUserChannelSubscription();
+        };
 
+        const onClickSave = async (type: EDIT_TYPE) => {
+            if (type === EDIT_TYPE.NAME) {
+                await saveChangedName();
+                state.isNameEditMode = false;
+            } else if (type === EDIT_TYPE.DATA) {
+                await saveChangedData();
+                state.isDataEditMode = false;
+            } else if (type === EDIT_TYPE.SCHEDULE) {
+                await saveChangedSchedule();
+                state.isScheduleEditMode = false;
+            } else if (type === EDIT_TYPE.TOPIC) {
+                await saveChangedTopic();
+                state.isTopicEditMode = false;
+            }
+            context.emit('change');
         };
         return {
             EDIT_TYPE,
+            PROTOCOL_TYPE,
             ...toRefs(state),
             onToggleChange,
             startEdit,
             cancelEdit,
             onChangeSchedule,
             onChangeTopic,
-            saveChange,
+            onClickSave,
         };
     },
 };
@@ -290,6 +404,7 @@ export default {
         padding-left: 1rem;
         font-size: 0.875rem;
         line-height: 170%;
+        text-transform: capitalize;
     }
     .content {
         display: inherit;
@@ -302,6 +417,7 @@ export default {
         .left-section {
             display: inherit;
             flex-direction: column;
+            gap: 0.125rem;
         }
     }
     .edit-btn {

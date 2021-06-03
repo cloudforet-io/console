@@ -166,8 +166,8 @@ export default {
         };
 
         (async () => {
-            const channel = vm.$route.params.channel;
-            state.pageTitle = computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: channel })) as unknown as TranslateResult;
+            const protocol = vm.$route.query.protocolLabel;
+            state.pageTitle = computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: protocol })) as unknown as TranslateResult;
         })();
 
         return {

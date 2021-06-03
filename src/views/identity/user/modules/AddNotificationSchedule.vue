@@ -4,7 +4,7 @@
                  :selected="item.value" :value="selectedScheduleMode" class="mr-4"
                  @click="changeScheduleMode(item.value)"
         >
-            <span class="radio-label" @click="changeScheduleMode(item.value)" @change="changeScheduleMode(item.value)">{{ item.label }}</span>
+            <span class="radio-label" @click="changeScheduleMode(item.value)">{{ item.label }}</span>
         </p-radio>
         <article v-if="selectedScheduleMode === SCHEDULE_MODE.CUSTOM" class="schedule-wrapper">
             <info-message style-type="secondary"
@@ -15,7 +15,7 @@
                 {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
             </h5>
             <p-select-button v-for="day in weekDay" :key="day.value"
-                             v-model="selectedDay"
+                             v-model="proxySchedule.day_of_week"
                              multi-selectable
                              :value="day.value"
                              class="select-button-wrapper"
@@ -24,16 +24,18 @@
                 {{ day.label }}
             </p-select-button>
             <div class="dropdown-wrapper">
-                <p-select-dropdown v-model="startTime"
+                <p-select-dropdown :value="proxySchedule.start_hour"
                                    :items="timeList"
+                                   :select-item="proxySchedule.start_hour"
                                    class="dropdown"
-                                   @input="onSelectStartTime"
+                                   @input="onSelectStartHour"
                 />
                 <span class="text">to</span>
-                <p-select-dropdown v-model="endTime"
+                <p-select-dropdown v-model="proxySchedule.end_hour"
+                                   :select-item="proxySchedule.end_hour"
                                    :items="timeList"
                                    class="dropdown"
-                                   @input="onSelectEndTime"
+                                   @input="onSelectEndHour"
                 />
                 <span class="timezone-text">{{ $t('COMMON.PROFILE.TIMEZONE') }}: {{ timezone }}</span>
             </div>
@@ -80,26 +82,29 @@ export default {
             }, {
                 label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.CUSTOM'), value: 'custom',
             }]),
-            selectedScheduleMode: 'all',
+            selectedScheduleMode: props.schedule ? 'custom' : 'all',
             weekDay: [{ label: 'Monday', value: 'MON' }, { label: 'Tuesday', value: 'TUE' }, { label: 'Wednesday', value: 'WED' },
                 { label: 'Thursday', value: 'THU' }, { label: 'Friday', value: 'FRI' },
                 { label: 'Saturday', value: 'SAT' },
                 { label: 'Sunday', value: 'SUN' }],
-            selectedDay: props.schedule ? props.schedule.day_of_week : ['MON', 'TUE', 'WED', 'THU', 'FRI'],
             timeList: TIME_LIST.map(d => ({
                 type: 'item', label: `${d}:00`, name: d,
             })),
-            startTime: props.schedule ? props.schedule.start_hour : 9,
-            endTime: props.schedule ? props.schedule.end_hour : 18,
+            proxySchedule: props.schedule ? props.schedule : {
+                day_of_week: ['MON', 'TUE', 'WED', 'THU', 'FRI'],
+                start_hour: 9,
+                end_hour: 18,
+            },
             timezone: computed(() => store.state.user.timezone),
         });
 
         const emitChange = () => {
-            emit('change', {
-                day_of_week: state.selectedDay,
-                start_hour: state.startTime,
-                end_hour: state.endTime,
-            });
+            if (state.selectedScheduleMode === 'all') {
+                console.log('here');
+                emit('change', null);
+            } else {
+                emit('change', state.proxySchedule);
+            }
         };
 
         const changeScheduleMode = (value) => {
@@ -111,11 +116,13 @@ export default {
             emitChange();
         };
 
-        const onSelectStartTime = () => {
+        const onSelectStartHour = (value) => {
+            state.proxySchedule.start_hour = value;
             emitChange();
         };
 
-        const onSelectEndTime = () => {
+        const onSelectEndHour = (value) => {
+            state.proxySchedule.end_hour = value;
             emitChange();
         };
 
@@ -124,8 +131,8 @@ export default {
             ...toRefs(state),
             changeScheduleMode,
             onSelectDay,
-            onSelectStartTime,
-            onSelectEndTime,
+            onSelectStartHour,
+            onSelectEndHour,
         };
     },
 };

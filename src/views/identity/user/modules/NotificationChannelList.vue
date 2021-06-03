@@ -24,12 +24,14 @@
             <p-divider class="divider" />
             <ul v-for="item in channelList" :key="item.user_channel_id">
                 <li class="mb-4">
-                    <notification-channel-card :channel-data="item" />
+                    <notification-channel-item :channel-data="item" :project-id="projectId"
+                                               @change="onChangeChannelItem"
+                    />
                 </li>
             </ul>
-            <!--            <p-empty class="empty-msg">-->
-            <!--                {{ $t('IDENTITY.USER.NOTIFICATION.NO_NOTI_CHANNEL') }}-->
-            <!--            </p-empty>-->
+            <p-empty v-if="channelList.length === 0" class="empty-msg">
+                {{ $t('IDENTITY.USER.NOTIFICATION.NO_NOTI_CHANNEL') }}
+            </p-empty>
         </p-pane-layout>
     </section>
 </template>
@@ -42,8 +44,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
-import NotificationChannelCard from '@/views/identity/user/modules/NotificationChannelCard.vue';
-import { PROJECT_ROUTE } from '@/routes/project/project-route';
+import NotificationChannelItem from '@/views/identity/user/modules/NotificationChannelItem.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { store } from '@/store';
@@ -91,12 +92,25 @@ interface ChannelItem {
     tags: Tags;
     created_at: TimeStamp;
     notification_level?: string;
+    protocol_name: string;
+}
+
+interface ProtocolResp {
+    capability: object;
+    created_at: TimeStamp;
+    name: string;
+    plugin_info: object;
+    protocol_id: string;
+    protocol_type: string;
+    resource_type: string;
+    state: string;
+    tags: Tags;
 }
 
 export default {
     name: 'NotificationChannelList',
     components: {
-        NotificationChannelCard,
+        NotificationChannelItem,
         PPaneLayout,
         PI,
         PDivider,
@@ -115,6 +129,7 @@ export default {
             loading: true,
             userId: store.state.user.userId,
             channelList: [] as ChannelItem[],
+            protocolResp: [] as ProtocolResp[],
         });
         const routeState = reactive({
             routes: computed(() => ([
@@ -136,15 +151,17 @@ export default {
                         query: apiQuery.data,
                     });
                 }
+                state.protocolResp = res.results;
                 state.protocolList = res.results.map(d => ({
                     label: computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name })).value,
                     link: {
                         name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
                         params: {
-                            channel: d.name,
+                            protocol: d.name.replace(/(\s*)/g, ''),
                             protocolId: d.protocol_id,
                         },
                         query: {
+                            protocolLabel: d.name,
                             projectId: props.projectId ? props.projectId : null,
                             // eslint-disable-next-line camelcase
                             supported_schema: d.capability.supported_schema,
@@ -152,12 +169,15 @@ export default {
                     },
                 }));
             } catch (e) {
-                state.channelList = [];
+                state.protocolList = [];
+                state.protocolResp = [];
                 console.error(e);
             } finally {
                 state.loading = false;
             }
         };
+
+        const injectProtocolName = (channel: ChannelItem) => (state.protocolResp as any).find(i => i.protocol_id === channel.protocol_id).name;
 
         const channelApiQuery = new ApiQueryHelper();
         const listUserChannel = async () => {
@@ -166,7 +186,11 @@ export default {
                 const res = await SpaceConnector.client.notification.userChannel.list({
                     query: channelApiQuery.data,
                 });
-                state.channelList = res.results;
+                state.channelList = res.results.map(d => ({
+                    ...d,
+                    // eslint-disable-next-line camelcase
+                    protocol_name: injectProtocolName(d),
+                }));
             } catch (e) {
                 state.channelList = [];
                 console.error(e);
@@ -179,17 +203,24 @@ export default {
                 const res = await SpaceConnector.client.notification.projectChannel.list({
                     query: channelApiQuery.data,
                 });
-                state.channelList = res.results;
+                state.channelList = res.results.map(d => ({
+                    ...d,
+                    // eslint-disable-next-line camelcase
+                    protocol_name: injectProtocolName(d),
+                }));
             } catch (e) {
                 state.channelList = [];
                 console.error(e);
             }
         };
 
-
         const listChannel = async () => {
             if (props.projectId) await listProjectChannel();
             else await listUserChannel();
+        };
+
+        const onChangeChannelItem = async () => {
+            await listChannel();
         };
 
         (async () => {
@@ -200,6 +231,7 @@ export default {
         return {
             ...toRefs(state),
             routeState,
+            onChangeChannelItem,
         };
     },
 };

@@ -109,7 +109,7 @@ export default {
                     ],
                 },
                 {
-                    path: 'notification/:channel/:protocolId',
+                    path: 'notification/:protocol/:protocolId',
                     name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
                     component: AddNotificationPage,
                     props: true,

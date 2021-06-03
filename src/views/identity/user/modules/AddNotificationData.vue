@@ -21,15 +21,20 @@
         <p-json-schema-form :model="schemaModel" :schema="schema" :is-valid.sync="isSchemaModelValid"
                             @update:model="onChangeModel"
         />
-        <div v-if="projectId && channel === CHANNEL_TYPE.SPACEONE_USER">
+        <div v-if="projectId && protocol === CHANNEL_TYPE.SPACEONE_USER">
             <add-notification-member-group :project-id="projectId" @change="onChangeMember" />
+            <div class="tag-box">
+                <p-tag v-for="(tag, i) in selectedMember" :key="tag" @delete="onDeleteTag(i)">
+                    {{ tag ? tag : '' }}
+                </p-tag>
+            </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import {
-    PFieldGroup, PPaneLayout, PSelectDropdown, PTextInput, PJsonSchemaForm,
+    PFieldGroup, PPaneLayout, PSelectDropdown, PTextInput, PJsonSchemaForm, PTag,
 } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
@@ -40,11 +45,9 @@ import AddNotificationMemberGroup from '@/views/identity/user/modules/AddNotific
 import { SpaceConnector } from '@/lib/space-connector';
 
 enum CHANNEL_TYPE {
-    SMS = 'sms',
-    VOICE = 'voice',
-    SLACK = 'slack',
-    MEMBER = 'member',
-    SPACEONE_USER = 'SpaceONE User',
+    AWS_SNS = 'AWSSNS',
+    SLACK = 'Slack',
+    SPACEONE_USER = 'SpaceONEUser',
 }
 const LEVEL_LIST = [
     { label: 'All', name: 'All', type: 'item' },
@@ -64,6 +67,7 @@ export default {
         PTextInput,
         PSelectDropdown,
         PJsonSchemaForm,
+        PTag,
     },
     props: {
         projectId: {
@@ -77,7 +81,7 @@ export default {
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const channel = vm.$route.params.channel;
+        const protocol = vm.$route.params.protocol;
 
         const state = reactive({
             channelName: '',
@@ -101,6 +105,13 @@ export default {
                 data: state.schemaModel,
                 member: state.selectedMember,
                 level: state.notificationLevel,
+            });
+        };
+
+        const onDeleteTag = (idx) => {
+            state.selectedMember.splice(idx, 1);
+            vm.$nextTick(() => {
+                state.selectedMember = [...state.selectedMember];
             });
         };
 
@@ -129,7 +140,7 @@ export default {
         })();
 
         return {
-            channel,
+            protocol,
             CHANNEL_TYPE,
             LEVEL_LIST,
             ...toRefs(state),
@@ -137,6 +148,7 @@ export default {
             onChangeModel,
             onChangeMember,
             onChangeLevel,
+            onDeleteTag,
         };
     },
 
@@ -151,5 +163,12 @@ export default {
 .level-dropdown {
     margin-top: 1.5rem;
     max-width: 15rem;
+}
+.tag-box {
+    @apply text-gray-900;
+    margin-top: 0.625rem;
+    .p-tag {
+        margin-bottom: 0.5rem;
+    }
 }
 </style>
