@@ -137,11 +137,11 @@ export default {
                     });
                 }
                 state.protocolList = res.results.map(d => ({
-                    label: computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: vm.$t(`IDENTITY.USER.NOTIFICATION.${d.name.toUpperCase()}`) })).value,
+                    label: computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name })).value,
                     link: {
                         name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
                         params: {
-                            channel: d.name.toLowerCase(),
+                            channel: d.name,
                             protocolId: d.protocol_id,
                         },
                         query: {

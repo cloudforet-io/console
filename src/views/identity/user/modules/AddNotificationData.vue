@@ -13,15 +13,15 @@
                        class="level-dropdown"
         >
             <template #default>
-                <p-select-dropdown v-model="escalationLevel" :items="LEVEL_LIST" :use-custom-style="true"
+                <p-select-dropdown v-model="notificationLevel" :items="LEVEL_LIST" :use-custom-style="true"
                                    @input="onChangeLevel"
                 />
             </template>
         </p-field-group>
-        <p-json-schema-form :model.sync="schemaModel" :schema="schema" :is-valid.sync="isSchemaModelValid"
+        <p-json-schema-form :model="schemaModel" :schema="schema" :is-valid.sync="isSchemaModelValid"
                             @update:model="onChangeModel"
         />
-        <div v-if="projectId">
+        <div v-if="projectId && channel === CHANNEL_TYPE.SPACEONE_USER">
             <add-notification-member-group :project-id="projectId" @change="onChangeMember" />
         </div>
     </div>
@@ -44,11 +44,15 @@ enum CHANNEL_TYPE {
     VOICE = 'voice',
     SLACK = 'slack',
     MEMBER = 'member',
+    SPACEONE_USER = 'SpaceONE User',
 }
 const LEVEL_LIST = [
-    { label: 'Level 1', name: 1, type: 'item' },
-    { label: 'Level 2', name: 2, type: 'item' },
-    { label: 'Level 3', name: 3, type: 'item' },
+    { label: 'All', name: 'All', type: 'item' },
+    { label: 'Level 1', name: 'LV1', type: 'item' },
+    { label: 'Level 2', name: 'LV2', type: 'item' },
+    { label: 'Level 3', name: 'LV3', type: 'item' },
+    { label: 'Level 4', name: 'LV4', type: 'item' },
+    { label: 'Level 5', name: 'LV5', type: 'item' },
 ];
 
 export default {
@@ -77,7 +81,7 @@ export default {
 
         const state = reactive({
             channelName: '',
-            escalationLevel: 1,
+            notificationLevel: 'All',
             schemaModel: {},
             schema: {},
             isSchemaModelValid: false,
@@ -96,7 +100,7 @@ export default {
                 channelName: state.channelName,
                 data: state.schemaModel,
                 member: state.selectedMember,
-                level: state.escalationLevel,
+                level: state.notificationLevel,
             });
         };
 
@@ -116,7 +120,7 @@ export default {
         };
 
         const onChangeLevel = (value) => {
-            state.escalationLevel = value;
+            state.notificationLevel = value;
             emitChange();
         };
 

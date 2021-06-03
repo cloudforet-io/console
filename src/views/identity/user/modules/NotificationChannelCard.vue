@@ -45,15 +45,19 @@
             </li>
             <p-divider />
             <li class="content-wrapper" :class="{'edit-mode': isDataEditMode}">
-                <p v-for="(item, index) in Object.keys(channelData.data)" :key="`channel-data-key-${index}`" class="content-title">
-                    {{ item }}
-                </p>
-                <div v-if="isDataEditMode" class="content">
-                    <p v-for="(item, index) in Object.values(channelData.data)" :key="`channel-editable-data-value-${index}`">
-                        <p-text-input v-model="dataListForEdit[index]"
-                                      class="block"
-                        />
+                <div class="content-title">
+                    <p v-for="(item, index) in Object.keys(channelData.data)" :key="`channel-data-key-${index}`">
+                        {{ item }}
                     </p>
+                </div>
+                <div v-if="isDataEditMode" class="content">
+                    <div class="left-section">
+                        <p v-for="(item, index) in Object.values(channelData.data)" :key="`channel-editable-data-value-${index}`">
+                            <p-text-input v-model="dataListForEdit[index]"
+                                          class="block"
+                            />
+                        </p>
+                    </div>
                     <div class="button-group">
                         <p-button :outline="true" class="text-button" @click="cancelEdit(EDIT_TYPE.DATA)">
                             {{ $t('COMMON.TAGS.CANCEL') }}
@@ -67,9 +71,11 @@
                     </div>
                 </div>
                 <div v-else class="content">
-                    <p v-for="(item, index) in Object.values(channelData.data)" :key="`channel-data-value-${index}`">
-                        {{ item }}
-                    </p>
+                    <div class="left-section">
+                        <p v-for="(item, index) in Object.values(channelData.data)" :key="`channel-data-value-${index}`">
+                            {{ item }}
+                        </p>
+                    </div>
                     <button class="edit-btn" @click="startEdit(EDIT_TYPE.DATA)">
                         <p-i name="ic_edit" width="1rem" height="1rem"
                              color="inherit" class="edit-icon"
@@ -98,9 +104,11 @@
                     </div>
                 </div>
                 <div v-else class="content">
-                    <p v-if="channelData.schedule">
-                        {{ channelData.schedule.day_of_week }} <br>
-                        {{ channelData.schedule.start_hour }} ~ {{ channelData.schedule.end_hour }}
+                    <p>
+                        <template v-if="channelData.schedule">
+                            {{ channelData.schedule.day_of_week }} <br>
+                            {{ channelData.schedule.start_hour }} ~ {{ channelData.schedule.end_hour }}
+                        </template>
                     </p>
                     <button class="edit-btn" @click="startEdit(EDIT_TYPE.SCHEDULE)">
                         <p-i name="ic_edit" width="1rem" height="1rem"
@@ -158,6 +166,7 @@ import { reactive, toRefs } from '@vue/composition-api';
 import AddNotificationSchedule from '@/views/identity/user/modules/AddNotificationSchedule.vue';
 import AddNotificationTopic from '@/views/identity/user/modules/AddNotificationTopic.vue';
 import AddNotificationData from '@/views/identity/user/modules/AddNotificationData.vue';
+import { SpaceConnector } from '@/lib/space-connector';
 
 enum EDIT_TYPE {
     NAME = 'name',
@@ -207,19 +216,23 @@ export default {
 
         const startEdit = (type: EDIT_TYPE) => {
             if (type === EDIT_TYPE.NAME) state.isNameEditMode = true;
-            if (type === EDIT_TYPE.DATA) state.isDataEditMode = true;
-            if (type === EDIT_TYPE.SCHEDULE) state.isScheduleEditMode = true;
-            if (type === EDIT_TYPE.TOPIC) state.isTopicEditMode = true;
+            else if (type === EDIT_TYPE.DATA) state.isDataEditMode = true;
+            else if (type === EDIT_TYPE.SCHEDULE) state.isScheduleEditMode = true;
+            else if (type === EDIT_TYPE.TOPIC) state.isTopicEditMode = true;
         };
         const cancelEdit = (type: EDIT_TYPE) => {
             if (type === EDIT_TYPE.NAME) state.isNameEditMode = false;
-            if (type === EDIT_TYPE.DATA) state.isDataEditMode = false;
-            if (type === EDIT_TYPE.SCHEDULE) state.isScheduleEditMode = false;
-            if (type === EDIT_TYPE.TOPIC) state.isTopicEditMode = false;
+            else if (type === EDIT_TYPE.DATA) state.isDataEditMode = false;
+            else if (type === EDIT_TYPE.SCHEDULE) state.isScheduleEditMode = false;
+            else if (type === EDIT_TYPE.TOPIC) state.isTopicEditMode = false;
         };
 
-        const onChangeSchedule = (value) => {
+        const onChangeSchedule = async (value) => {
             console.log('schedule test', value);
+            console.log(props.channelData.user_channel_id);
+            const res = await SpaceConnector.client.notification.update({
+
+            });
         };
 
         const onChangeTopic = (value) => {
@@ -280,11 +293,16 @@ export default {
     }
     .content {
         display: inherit;
+        flex-direction: row;
         width: 100%;
         justify-content: space-between;
         font-size: 0.875rem;
         line-height: 170%;
         padding: 0.75rem 1rem;
+        .left-section {
+            display: inherit;
+            flex-direction: column;
+        }
     }
     .edit-btn {
         @apply text-blue-600;

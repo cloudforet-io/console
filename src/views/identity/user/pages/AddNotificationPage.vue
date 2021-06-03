@@ -61,17 +61,11 @@ import AddNotificationData from '@/views/identity/user/modules/AddNotificationDa
 import AddNotificationTopic from '@/views/identity/user/modules/AddNotificationTopic.vue';
 import AddNotificationSchedule from '@/views/identity/user/modules/AddNotificationSchedule.vue';
 import VueI18n from 'vue-i18n';
-import store from '@/store';
+import { store } from '@/store';
 import { SpaceConnector } from '@/lib/space-connector';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 import TranslateResult = VueI18n.TranslateResult;
-import {showErrorMessage, showSuccessMessage} from "@/lib/util";
-
-const LEVEL_LIST = [
-    { label: 'Level 1', name: 1, type: 'item' },
-    { label: 'Level 2', name: 2, type: 'item' },
-    { label: 'Level 3', name: 3, type: 'item' },
-];
 
 export default {
     name: 'AddNotificationPage',
@@ -101,6 +95,7 @@ export default {
             topicMode: false,
             topicList: [],
             schedule: null,
+            notificationLevel: null,
             userId: store.state.user.userId,
         });
         const routeState = reactive({
@@ -112,37 +107,53 @@ export default {
         });
 
         const createUserChannel = async () => {
-            await SpaceConnector.client.notification.userChannel.create({
-                protocol_id: state.protocolId,
-                name: state.channelName,
-                data: state.data,
-                schema: state.supportedSchema,
-                is_subscribe: state.topicMode,
-                subscriptions: state.topicList,
-                schedule: state.schedule,
-                user_id: state.userId,
-            });
+            try {
+                await SpaceConnector.client.notification.userChannel.create({
+                    protocol_id: state.protocolId,
+                    name: state.channelName,
+                    data: state.data,
+                    schema: state.supportedSchema,
+                    is_subscribe: state.topicMode,
+                    subscriptions: state.topicList,
+                    schedule: state.schedule,
+                    user_id: state.userId,
+                });
+                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_USER_CHANNEL'), '', context.root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_USER_CHANNEL'), e, context.root);
+            }
         };
 
         const createProjectChannel = async () => {
-            await SpaceConnector.client.notification.ProjectChannel.create({
-
-            });
+            try {
+                await SpaceConnector.client.notification.projectChannel.create({
+                    protocol_id: state.protocolId,
+                    name: state.channelName,
+                    data: state.data,
+                    schema: state.supportedSchema,
+                    is_subscribe: state.topicMode,
+                    subscriptions: state.topicList,
+                    schedule: state.schedule,
+                    user_id: state.userId,
+                    notification_level: state.notificationLevel,
+                    project_id: state.projectId,
+                });
+                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_PROJECT_CHANNEL'), '', context.root);
+            } catch (e) {
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_PROJECT_CHANNEL'), e, context.root);
+            }
         };
 
         const onClickSave = async () => {
-            try {
-                if (state.projectId) await createProjectChannel();
-                else await createUserChannel();
-                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_USER_CHANNEL'), '', context.root);
-            } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_USER_CHANNEL'), e, context.root);
-            }
+            if (state.projectId) await createProjectChannel();
+            else await createUserChannel();
         };
 
         const onChangeData = (value) => {
             state.channelName = value.channelName;
             state.data = value.data;
+            state.notificationLevel = value.level;
         };
 
         const onChangeSchedule = (value) => {
@@ -155,12 +166,11 @@ export default {
         };
 
         (async () => {
-            const channel = vm.$route.params.channel.toUpperCase();
-            state.pageTitle = computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: vm.$t(`IDENTITY.USER.NOTIFICATION.${channel}`) })) as unknown as TranslateResult;
+            const channel = vm.$route.params.channel;
+            state.pageTitle = computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: channel })) as unknown as TranslateResult;
         })();
 
         return {
-            LEVEL_LIST,
             ...toRefs(state),
             routeState,
             onClickSave,
