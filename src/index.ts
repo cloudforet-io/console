@@ -128,3 +128,5 @@ export { default as PToolbox } from './navigation/toolbox/PToolbox.vue';
 
 export { default as PSelectCard } from './inputs/select-card/PSelectCard.vue';
 export { default as PSelectButton } from './inputs/select-button/PSelectButton.vue';
+
+export { default as PBalloonTab } from './navigation/tabs/ballon-tab/PBalloonTab.vue';
