@@ -1,3 +1,10 @@
+# [1.1.0-beta.40](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.39...v1.1.0-beta.40) (2021-06-03)
+
+
+### Features
+
+* add balloon tab component ([#575](https://github.com/spaceone-dev/spaceone-design-system/issues/575)) ([2a40cc2](https://github.com/spaceone-dev/spaceone-design-system/commit/2a40cc2818b685859a59e25cc5974e2a76bb502a))
+
 # [1.1.0-beta.39](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.38...v1.1.0-beta.39) (2021-06-02)
 
 
