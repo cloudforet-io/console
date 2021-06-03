@@ -115,7 +115,7 @@ export { default as PDefinitionTable } from './data-display/tables/definition-ta
 export { default as PQuerySearchTable } from './data-display/tables/query-search-table/PQuerySearchTable.vue';
 export { default as PSearchTable } from './data-display/tables/search-table/PSearchTable.vue';
 export { default as PToolboxTable } from './data-display/tables/toolbox-table/PToolboxTable.vue';
-export { default as PButtonTab } from './others/console/button-tab/PButtonTab.vue';
+export { default as PButtonTab } from './navigation/tabs/button-tab/PButtonTab.vue';
 export { default as PTab } from './navigation/tabs/tab/PTab.vue';
 export { default as PPageTitle } from './data-display/titles/page-title/PPageTitle.vue';
 export { default as PTree } from './data-display/tree/PTree.vue';

@@ -1,9 +1,9 @@
 <template>
     <div class="p-tab">
         <ul class="tab-item-wrapper" :class="{stretch}">
-            <li v-for="tab in tabItems" :key="tab.name"
+            <li v-for="(tab, idx) in tabItems" :key="tab.name"
                 :class="{active: activeTab === tab.name, single: isSingle}"
-                @click="onClickTab(tab)"
+                @click="onClickTab(tab, idx)"
             >
                 <span class="label">
                     {{ tab.label }}
@@ -27,9 +27,7 @@ import {
     toRefs,
 } from '@vue/composition-api';
 
-import { TabProps } from '@/navigation/tabs/tab/type';
-
-import { useTab } from '@/hooks/tab';
+import { TabProps, useTab } from '@/hooks/tab';
 
 interface Props extends TabProps {
     stretch?: boolean;
@@ -49,7 +47,7 @@ export default defineComponent<Props>({
         },
         activeTab: {
             type: String,
-            default: '',
+            required: true,
         },
         /* tab props */
         stretch: {

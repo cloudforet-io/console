@@ -5,9 +5,3 @@ export interface TabItem {
     label?: string | TranslateResult;
     keepAlive?: boolean;
 }
-
-
-export interface TabProps {
-    activeTab: string;
-    tabs: Array<string|TabItem>;
-}

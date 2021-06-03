@@ -11,7 +11,7 @@ import { argTypes, Inner } from '@/navigation/tabs/tab/story-helper';
 <Meta title='navigation/Tabs/Tab' parameters={{
     design: {
         type: 'figma',
-        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6013%3A121728'
     }
 }} argTypes={argTypes}/>
 
@@ -20,13 +20,18 @@ export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PTab },
     template: `
-      <div class="h-full w-full overflow p-8">
-          <p-tab
+    <div class="h-full w-full overflow p-8">
+        <p-tab
             :tabs="tabs"
             v-model="proxyActiveTab"
+            :keep-alive-all="keepAliveAll"
             :stretch="stretch"
-            ></p-tab>
-      </div>
+            @update:activeTab="onUpdateActiveTab"
+            @change="onChange"
+        >
+            <div v-if="defaultSlot" v-html="defaultSlot"/>
+        </p-tab>
+    </div>
     `,
     setup(props) {
         const vm = getCurrentInstance()
@@ -174,9 +179,9 @@ export const Template = (args, { argTypes }) => ({
 
 <Canvas>
     <Story name="Keep Alive">
-        {{
-            components: { PTab, Inner },
-            template: `
+{{
+    components: { PTab, Inner },
+    template: `
     <div class="h-full w-full overflow p-8">
         <p-tab
             :tabs="tabs"
@@ -195,20 +200,20 @@ export const Template = (args, { argTypes }) => ({
     </div>
 <!--<div>-->
 `,
-            setup(props) {
-                const state = reactive({
-                    tabs: [
-                        { name: 'detail', label: 'Detail', keepAlive: true },
-                        { name: 'info', label: 'Info', keepAlive: false },
-                        { name: 'tags', label: 'Tags', keepAlive: true },
-                    ],
-                    activeTab: 'detail'
-                })
-                return {
-                    ...toRefs(state)
-                }
-            }
-        }}
+    setup(props) {
+        const state = reactive({
+            tabs: [
+                { name: 'detail', label: 'Detail', keepAlive: true },
+                { name: 'info', label: 'Info', keepAlive: false },
+                { name: 'tags', label: 'Tags', keepAlive: true },
+            ],
+            activeTab: 'detail'
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+}}
     </Story>
 </Canvas>
 
