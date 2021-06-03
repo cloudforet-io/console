@@ -842,7 +842,7 @@
 					"BASE_INFO": "Base Information",
 					"CHANNEL_NAME": "Channel Name",
 					"CUSTOM": "Custom",
-					"ESCALATION_LEVEL": "Escalation Level ",
+					"NOTIFICATION_LEVEL": "Notification Level ",
 					"PHONE_NUMBER": "Phone number",
 					"RECEIVE_ALL": "Receive all notifications",
 					"RECEIVE_ON_TOPIC": "Receive notifications based on selected topics",

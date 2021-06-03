@@ -842,7 +842,7 @@
 					"BASE_INFO": "",
 					"CHANNEL_NAME": "",
 					"CUSTOM": "",
-					"ESCALATION_LEVEL": "",
+					"NOTIFICATION_LEVEL": "",
 					"PHONE_NUMBER": "",
 					"RECEIVE_ALL": "",
 					"RECEIVE_ON_TOPIC": "",

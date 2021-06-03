@@ -842,7 +842,7 @@
 					"BASE_INFO": "기본 정보",
 					"CHANNEL_NAME": "채널 이름",
 					"CUSTOM": "시간 설정",
-					"ESCALATION_LEVEL": "에스컬레이션 레벨",
+					"NOTIFICATION_LEVEL": "알림 레벨",
 					"PHONE_NUMBER": "전화번호",
 					"RECEIVE_ALL": "모든 알림 받기",
 					"RECEIVE_ON_TOPIC": "선택한 토픽 알림 받기",
