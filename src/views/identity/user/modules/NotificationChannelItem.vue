@@ -87,6 +87,36 @@
                     </button>
                 </div>
             </li>
+            <p-divider v-if="projectId" />
+            <li v-if="projectId" class="content-wrapper" :class="{'edit-mode': isLevelEditMode}">
+                <p class="content-title">
+                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.NOTIFICATION_LEVEL') }}
+                </p>
+                <div v-if="isLevelEditMode" class="content">
+                    <add-notification-level :notification-level="channelData.notification_level" @change="onChangeLevel" />
+                    <div class="button-group">
+                        <p-button :outline="true" class="text-button" @click="cancelEdit(EDIT_TYPE.LEVEL)">
+                            {{ $t('COMMON.TAGS.CANCEL') }}
+                        </p-button>
+                        <p-button
+                            style-type="primary"
+                            class="text-button"
+                            @click="onClickSave(EDIT_TYPE.LEVEL)"
+                        >
+                            {{ $t('COMMON.TAGS.SAVE') }}
+                        </p-button>
+                    </div>
+                </div>
+                <div v-else class="content">
+                    <p>{{ channelData.notification_level }}</p>
+                    <button class="edit-btn" @click="startEdit(EDIT_TYPE.LEVEL)">
+                        <p-i name="ic_edit" width="1rem" height="1rem"
+                             color="inherit" class="edit-icon"
+                        />
+                        {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
+                    </button>
+                </div>
+            </li>
             <p-divider />
             <li class="content-wrapper" :class="{'edit-mode': isScheduleEditMode}">
                 <span class="content-title">
@@ -172,6 +202,7 @@ import {
 } from '@vue/composition-api';
 import AddNotificationSchedule from '@/views/identity/user/modules/AddNotificationSchedule.vue';
 import AddNotificationTopic from '@/views/identity/user/modules/AddNotificationTopic.vue';
+import AddNotificationLevel from '@/views/identity/user/modules/AddNotificationLevel.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
@@ -180,6 +211,7 @@ enum EDIT_TYPE {
     DATA = 'data',
     SCHEDULE = 'schedule',
     TOPIC = 'topic',
+    LEVEL = 'notification_level',
 }
 
 enum PROTOCOL_TYPE {
@@ -191,6 +223,7 @@ enum PARAM_KEY_TYPE {
     NAME = 'name',
     DATA = 'data',
     SCHEDULE = 'schedule',
+    LEVEL = 'notification_level',
 }
 
 interface ParamType {
@@ -199,11 +232,13 @@ interface ParamType {
     name?: string;
     data?: object;
     schedule?: object;
+    notification_level?: string;
 }
 
 export default {
     name: 'NotificationChannelItem',
     components: {
+        AddNotificationLevel,
         AddNotificationTopic,
         AddNotificationSchedule,
         PPaneLayout,
@@ -234,6 +269,7 @@ export default {
             isDataEditMode: false,
             isScheduleEditMode: false,
             isTopicEditMode: false,
+            isLevelEditMode: false,
             //
             userChannelId: props.channelData.user_channel_id || null,
             projectChannelId: props.channelData.project_channel_id || null,
@@ -242,6 +278,7 @@ export default {
             scheduleForEdit: props.channelData.schedule || null,
             topicModeForEdit: undefined,
             topicForEdit: props.channelData.subscriptions,
+            notificationLevelForEdit: props.channelData.notification_level,
         });
         const onToggleChange = () => {
             console.log('toggle changed!');
@@ -252,12 +289,14 @@ export default {
             else if (type === EDIT_TYPE.DATA) state.isDataEditMode = true;
             else if (type === EDIT_TYPE.SCHEDULE) state.isScheduleEditMode = true;
             else if (type === EDIT_TYPE.TOPIC) state.isTopicEditMode = true;
+            else if (type === EDIT_TYPE.LEVEL) state.isLevelEditMode = true;
         };
         const cancelEdit = (type: EDIT_TYPE) => {
             if (type === EDIT_TYPE.NAME) state.isNameEditMode = false;
             else if (type === EDIT_TYPE.DATA) state.isDataEditMode = false;
             else if (type === EDIT_TYPE.SCHEDULE) state.isScheduleEditMode = false;
             else if (type === EDIT_TYPE.TOPIC) state.isTopicEditMode = false;
+            else if (type === EDIT_TYPE.LEVEL) state.isLevelEditMode = false;
         };
 
         const updateUserChannel = async (paramKey, paramValue) => {
@@ -285,6 +324,7 @@ export default {
                 if (paramKey === PARAM_KEY_TYPE.NAME) param.name = paramValue;
                 else if (paramKey === PARAM_KEY_TYPE.DATA) param.data = paramValue;
                 else if (paramKey === PARAM_KEY_TYPE.SCHEDULE) param.schedule = paramValue;
+                else if (paramKey === PARAM_KEY_TYPE.LEVEL) param.notification_level = paramValue;
                 await SpaceConnector.client.notification.projectChannel.update(param);
                 showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_PROJECT_CHANNEL'), '', context.root);
             } catch (e) {
@@ -346,6 +386,14 @@ export default {
             else await setUserChannelSubscription();
         };
 
+        const onChangeLevel = (value) => {
+            state.notificationLevelForEdit = value.level;
+        };
+
+        const saveChangedLevel = async () => {
+            await updateProjectChannel(PARAM_KEY_TYPE.LEVEL, state.notificationLevelForEdit);
+        };
+
         const onClickSave = async (type: EDIT_TYPE) => {
             if (type === EDIT_TYPE.NAME) {
                 await saveChangedName();
@@ -359,6 +407,9 @@ export default {
             } else if (type === EDIT_TYPE.TOPIC) {
                 await saveChangedTopic();
                 state.isTopicEditMode = false;
+            } else if (type === EDIT_TYPE.LEVEL) {
+                await saveChangedLevel();
+                state.isLevelEditMode = false;
             }
             context.emit('change');
         };
@@ -371,6 +422,7 @@ export default {
             cancelEdit,
             onChangeSchedule,
             onChangeTopic,
+            onChangeLevel,
             onClickSave,
         };
     },

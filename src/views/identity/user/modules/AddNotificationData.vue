@@ -9,15 +9,7 @@
                 <p-text-input v-model="channelName" @input="onChangeChannelName" />
             </template>
         </p-field-group>
-        <p-field-group v-if="projectId" :label="$t('IDENTITY.USER.NOTIFICATION.FORM.ESCALATION_LEVEL')" required
-                       class="level-dropdown"
-        >
-            <template #default>
-                <p-select-dropdown v-model="notificationLevel" :items="LEVEL_LIST" :use-custom-style="true"
-                                   @input="onChangeLevel"
-                />
-            </template>
-        </p-field-group>
+        <add-notification-level v-if="projectId" @change="onChangeLevel" />
         <p-json-schema-form :model="schemaModel" :schema="schema" :is-valid.sync="isSchemaModelValid"
                             @update:model="onChangeModel"
         />
@@ -41,6 +33,7 @@ import {
 } from '@vue/composition-api';
 // eslint-disable-next-line import/named
 import { notiChannelPhoneNumRegex } from '@/views/identity/user/lib/validations';
+import AddNotificationLevel from '@/views/identity/user/modules/AddNotificationLevel.vue';
 import AddNotificationMemberGroup from '@/views/identity/user/modules/AddNotificationMemberGroup.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 
@@ -49,18 +42,10 @@ enum CHANNEL_TYPE {
     SLACK = 'Slack',
     SPACEONE_USER = 'SpaceONEUser',
 }
-const LEVEL_LIST = [
-    { label: 'All', name: 'All', type: 'item' },
-    { label: 'Level 1', name: 'LV1', type: 'item' },
-    { label: 'Level 2', name: 'LV2', type: 'item' },
-    { label: 'Level 3', name: 'LV3', type: 'item' },
-    { label: 'Level 4', name: 'LV4', type: 'item' },
-    { label: 'Level 5', name: 'LV5', type: 'item' },
-];
-
 export default {
     name: 'AddNotificationData',
     components: {
+        AddNotificationLevel,
         AddNotificationMemberGroup,
         PPaneLayout,
         PFieldGroup,
@@ -85,7 +70,7 @@ export default {
 
         const state = reactive({
             channelName: '',
-            notificationLevel: 'All',
+            notificationLevel: '',
             schemaModel: {},
             schema: {},
             isSchemaModelValid: false,
@@ -131,7 +116,7 @@ export default {
         };
 
         const onChangeLevel = (value) => {
-            state.notificationLevel = value;
+            state.notificationLevel = value.level;
             emitChange();
         };
 
@@ -142,7 +127,6 @@ export default {
         return {
             protocol,
             CHANNEL_TYPE,
-            LEVEL_LIST,
             ...toRefs(state),
             onChangeChannelName,
             onChangeModel,
@@ -159,10 +143,6 @@ export default {
 .base-info-input {
     max-width: 30rem;
     margin-top: 1.25rem;
-}
-.level-dropdown {
-    margin-top: 1.5rem;
-    max-width: 15rem;
 }
 .tag-box {
     @apply text-gray-900;
