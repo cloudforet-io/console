@@ -1,3 +1,10 @@
+# [1.1.0-beta.41](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.40...v1.1.0-beta.41) (2021-06-03)
+
+
+### Bug Fixes
+
+* add Balloon Tab to index ([#576](https://github.com/spaceone-dev/spaceone-design-system/issues/576)) ([cb85767](https://github.com/spaceone-dev/spaceone-design-system/commit/cb857673c839f81c6b5ff12bbf8873cfc2856263))
+
 # [1.1.0-beta.40](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.39...v1.1.0-beta.40) (2021-06-03)
 
 
