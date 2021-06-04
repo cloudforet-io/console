@@ -1,6 +1,9 @@
 <template>
     <div>
-        <project-alert-tab :project-id="id" />
+        <project-alert-tab
+            :project-id="id"
+            :is-activated="true"
+        />
     </div>
 </template>
 
