@@ -87,7 +87,7 @@ export const argTypes: ArgTypes = {
     defaultSlot: {
         name: 'default',
         description: 'Use it to insert something to every tab body.',
-        defaultValue: 'This is card body!',
+        defaultValue: 'This is tab body!',
         table: {
             type: {
                 summary: null,

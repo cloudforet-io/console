@@ -28,5 +28,5 @@ export default create({
 
     brandTitle: 'SpaceONE Design System',
     brandUrl: 'https://github.com/spaceone-dev/spaceone-design-system',
-    brandImage: 'https://console-asset.doodle.spaceone.dev/assets/images/brand/SpaceONE_logoTypeA.png',
+    brandImage: './images/SpaceONE_logoTypeA.svg',
 });

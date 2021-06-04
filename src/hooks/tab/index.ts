@@ -1,8 +1,7 @@
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, SetupContext,
+    computed, reactive, SetupContext,
 } from '@vue/composition-api';
 import { TranslateResult } from 'vue-i18n';
-import { makeOptionalProxy } from '@/util/composition-helpers';
 
 export interface TabItem {
     name: string;
