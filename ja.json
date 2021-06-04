@@ -825,6 +825,7 @@
 			},
 			"NOTIFICATION": {
 				"AWS_SNS": "",
+				"CANNOT_EDIT_SLACK": "",
 				"EDIT": "",
 				"FORM": {
 					"ADD_CHANNEL": "",

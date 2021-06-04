@@ -825,6 +825,7 @@
 			},
 			"NOTIFICATION": {
 				"AWS_SNS": "AWS SNS",
+				"CANNOT_EDIT_SLACK": "Slack Token is unable to edit.",
 				"EDIT": "Edit",
 				"FORM": {
 					"ADD_CHANNEL": "Add {type} Channel",
