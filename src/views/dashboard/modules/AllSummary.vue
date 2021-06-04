@@ -1,97 +1,95 @@
 <template>
     <div class="all-summary">
-        <div class="top-part grid grid-cols-12 gap-3">
-            <div v-for="(data, idx) of dataList" :key="idx"
-                 class="box col-span-6 sm:col-span-3 md:col-span-3 lg:col-span-3"
-                 :class="[{'selected': idx === selectedIndex}, data.type]"
-                 @click="onClickBox(idx)"
-            >
-                <div class="content">
+        <p-balloon-tab v-model="activeTab" :tabs="tabs"
+                       tail stretch @change="onChangeTab"
+        >
+            <template #tab="{name}">
+                <div class="content" :class="{selected: name === activeTab}">
                     <div class="count">
-                        <router-link :to="data.type !== 'billing' ? getLocation(data.type) : ''" class="anchor" :class="data.type">
+                        <router-link :to="name !== 'billing' ? getLocation(name) : ''" class="anchor">
                             <span class="number">
-                                <span v-if="data.type === 'billing'" class="dollar-sign">$</span>
-                                <span>{{ count[data.type] }}</span>
+                                <span v-if="name === 'billing'" class="dollar-sign">$</span>
+                                <span>{{ count[name] }}</span>
                             </span>
                         </router-link>
-                        <span v-if="data.type === 'storage'" class="suffix">{{ storageBoxSuffix }}</span>
+                        <span v-if="name === 'storage'" class="suffix">{{ storageBoxSuffix }}</span>
                     </div>
                     <div class="title">
-                        {{ data.label }}
+                        {{ dataMap[name].label }}
                     </div>
                 </div>
-            </div>
-        </div>
-        <div class="bottom-part">
-            <div class="content-wrapper grid grid-cols-12 gap-2">
-                <div class="chart-wrapper col-span-12 lg:col-span-9">
-                    <div class="title">
-                        <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
-                        <span v-if="selectedType === 'storage'" class="suffix">({{ storageTrendSuffix }})</span>
-                        <span v-if="selectedType === 'billing'" class="suffix">(USD)</span>
-                    </div>
-                    <div class="toggle-button-group">
-                        <p-button v-for="(d, idx) in dateTypes"
-                                  :key="idx"
-                                  :class="{'selected': selectedDateType === d.name}"
-                                  @click="onClickDateTypeButton(d.name)"
-                        >
-                            {{ d.label }}
-                        </p-button>
-                    </div>
-                    <p-chart-loader :loading="chartState.loading">
-                        <template #loader>
-                            <p-skeleton width="100%" height="100%" />
-                        </template>
-                        <div ref="chartRef" class="chart" />
-                    </p-chart-loader>
-                </div>
-                <div class="summary-wrapper col-span-12 lg:col-span-3">
-                    <div class="title col-span-3">
-                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: dataList[selectedIndex].summaryTitle || dataList[selectedIndex].label }) }}
-                    </div>
-                    <template v-if="!loading && summaryData.length > 0">
-                        <div class="summary-content-wrapper block md:grid md:grid-cols-3 lg:block">
-                            <router-link :to="selectedType !== 'billing' ? getLocation(selectedType) : ''"
-                                         class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
-                                         :class="{'link-text': selectedType !== 'billing'}"
-                            >
-                                <div class="text-group">
-                                    <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
-                                </div>
-                                <span class="count">{{ count[selectedType] }} {{ selectedType === 'storage' ? storageBoxSuffix : '' }}</span>
-                            </router-link>
-                            <router-link v-for="(data, idx) of summaryData" :key="idx"
-                                         :to="data.to"
-                                         class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
-                                         :class="{'link-text': !!data.to.name}"
-                            >
-                                <div class="text-group">
-                                    <span class="provider" :style="{ color: providers[data.provider] ? providers[data.provider].color : ''}">{{ data.label }}</span>
-                                    <span class="type">{{ data.type }}</span>
-                                </div>
-                                <span class="count">{{ data.count }}</span>
-                            </router-link>
+            </template>
+            <div class="bottom-part">
+                <div class="content-wrapper grid grid-cols-12 gap-2">
+                    <div class="chart-wrapper col-span-12 lg:col-span-9">
+                        <div class="title">
+                            <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
+                            <span v-if="activeTab === 'storage'" class="suffix">({{ storageTrendSuffix }})</span>
+                            <span v-if="activeTab === 'billing'" class="suffix">(USD)</span>
                         </div>
-                    </template>
-                    <template v-else-if="!loading">
-                        <div class="summary-content-wrapper no-data-wrapper grid">
-                            <div class="m-auto">
-                                <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
-                                <p class="text">
-                                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: dataList[selectedIndex].label }) }}
-                                </p>
+                        <div class="toggle-button-group">
+                            <p-button v-for="(d, idx) in dateTypes"
+                                      :key="idx"
+                                      :class="{'selected': selectedDateType === d.name}"
+                                      @click="onClickDateTypeButton(d.name)"
+                            >
+                                {{ d.label }}
+                            </p-button>
+                        </div>
+                        <p-chart-loader :loading="chartState.loading">
+                            <template #loader>
+                                <p-skeleton width="100%" height="100%" />
+                            </template>
+                            <div ref="chartRef" class="chart" />
+                        </p-chart-loader>
+                    </div>
+                    <div class="summary-wrapper col-span-12 lg:col-span-3">
+                        <div class="title col-span-3">
+                            {{ $t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: dataMap[activeTab].summaryTitle || dataMap[activeTab].label }) }}
+                        </div>
+                        <template v-if="!loading && summaryData.length > 0">
+                            <div class="summary-content-wrapper block md:grid md:grid-cols-3 lg:block">
+                                <router-link :to="activeTab !== 'billing' ? getLocation(activeTab) : ''"
+                                             class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
+                                             :class="{'link-text': activeTab !== 'billing'}"
+                                >
+                                    <div class="text-group">
+                                        <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
+                                    </div>
+                                    <span class="count">{{ count[activeTab] }} {{ activeTab === 'storage' ? storageBoxSuffix : '' }}</span>
+                                </router-link>
+                                <router-link v-for="(data, idx) of summaryData" :key="idx"
+                                             :to="data.to"
+                                             class="summary-row col-span-3 md:col-span-1 lg:col-span-3"
+                                             :class="{'link-text': !!data.to.name}"
+                                >
+                                    <div class="text-group">
+                                        <span class="provider" :style="{ color: providers[data.provider] ? providers[data.provider].color : ''}">{{ data.label }}</span>
+                                        <span class="type">{{ data.type }}</span>
+                                    </div>
+                                    <span class="count">{{ data.count }}</span>
+                                </router-link>
                             </div>
-                        </div>
-                    </template>
-                    <template v-else>
-                        <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
-                            <p-skeleton class="flex-grow" />
-                        </div>
-                    </template>
+                        </template>
+                        <template v-else-if="!loading">
+                            <div class="summary-content-wrapper no-data-wrapper grid">
+                                <div class="m-auto">
+                                    <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
+                                    <p class="text">
+                                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: dataMap[activeTab].label }) }}
+                                    </p>
+                                </div>
+                            </div>
+                        </template>
+                        <template v-else>
+                            <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
+                                <p-skeleton class="flex-grow" />
+                            </div>
+                        </template>
+                    </div>
                 </div>
             </div>
-        </div>
+        </p-balloon-tab>
     </div>
 </template>
 
@@ -113,7 +111,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PChartLoader, PSkeleton, PButton,
+    PChartLoader, PSkeleton, PButton, PBalloonTab,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@/lib/space-connector';
@@ -176,6 +174,7 @@ export default {
         PButton,
         PSkeleton,
         PChartLoader,
+        PBalloonTab,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -200,14 +199,11 @@ export default {
 
         const state = reactive({
             loading: false,
-            chart: null,
+            chart: null as any,
             chartRef: null as HTMLElement | null,
             skeletons: range(4),
             providers: computed(() => store.state.resource.provider.items),
             //
-            selectedIndexInterval: undefined,
-            selectedIndex: 0,
-            selectedType: computed(() => state.dataList[state.selectedIndex].type),
             selectedDateType: DATE_TYPE.daily,
             dateTypes: computed(() => ([
                 { name: DATE_TYPE.daily, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DAY') },
@@ -222,16 +218,15 @@ export default {
             },
             storageBoxSuffix: 'TB' as Unit,
             storageTrendSuffix: 'TB' as Unit,
-            dataList: computed(() => ([
-                { type: DATA_TYPE.compute, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.COMPUTE') },
-                { type: DATA_TYPE.database, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE') },
-                { type: DATA_TYPE.storage, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE') },
-                {
-                    type: DATA_TYPE.billing,
-                    label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.OVERALL_SPENDINGS'),
-                    summaryTitle: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.RESOURCE'),
-                },
-            ] as Data[])),
+            tabs: computed(() => Object.values(DATA_TYPE)),
+            selectedIndex: 0,
+            activeTab: DATA_TYPE.compute,
+            dataMap: computed(() => ({
+                [DATA_TYPE.compute]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.COMPUTE') },
+                [DATA_TYPE.database]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE') },
+                [DATA_TYPE.storage]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE') },
+                [DATA_TYPE.billing]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.OVERALL_SPENDINGS'), summaryTitle: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.RESOURCE') },
+            })),
             summaryData: [] as SummaryData[],
         });
         const chartState = reactive({
@@ -242,15 +237,20 @@ export default {
 
         /* util */
         const disposeChart = () => {
+            // @ts-ignore
             if (chartState.registry[state.chartRef]) {
+                // @ts-ignore
                 chartState.registry[state.chartRef].dispose();
+                // @ts-ignore
                 delete chartState.registry[state.chartRef];
             }
         };
         const drawChart = () => {
             const createChart = () => {
                 disposeChart();
+                // @ts-ignore
                 chartState.registry[state.chartRef] = am4core.create(state.chartRef, am4charts.XYChart);
+                // @ts-ignore
                 return chartState.registry[state.chartRef];
             };
             const chart = createChart();
@@ -278,7 +278,7 @@ export default {
             valueAxis.tooltip.disabled = true;
             valueAxis.fontSize = 11;
             valueAxis.extraMax = 0.15;
-            if (state.selectedType === DATA_TYPE.billing) {
+            if (state.activeTab === DATA_TYPE.billing) {
                 valueAxis.renderer.labels.template.adapter.add('text', (text, target) => numberFormatter(target.dataItem.value));
             } else {
                 valueAxis.min = 0;
@@ -310,7 +310,7 @@ export default {
             bullet.label.hideOversized = false;
             bullet.label.propertyFields.fill = 'bulletColor';
             bullet.label.dy = -10;
-            if (state.selectedType === DATA_TYPE.billing) {
+            if (state.activeTab === DATA_TYPE.billing) {
                 bullet.label.adapter.add('dy', (dy, target) => {
                     if (target.dataItem.valueY < 0) return 10;
                     return dy;
@@ -322,8 +322,10 @@ export default {
             chart.cursor.lineY.strokeOpacity = 0;
             chart.cursor.behavior = 'none';
         };
+
+        let selectedIndexInterval;
         const setBoxInterval = () => {
-            state.selectedIndexInterval = setInterval(() => {
+            selectedIndexInterval = setInterval(() => {
                 disposeChart();
                 if (state.selectedIndex < 3) {
                     state.selectedIndex += 1;
@@ -355,14 +357,14 @@ export default {
             const dateUnit = dateType === DATE_TYPE.monthly ? 'month' : 'day';
             const dateFormat = dateType === DATE_TYPE.monthly ? 'YYYY-MM' : 'YYYY-MM-DD';
 
-            if (state.selectedType === DATA_TYPE.storage) {
+            if (state.activeTab === DATA_TYPE.storage) {
                 const smallestCount = Math.min(...data.map(d => d.total));
                 const formattedSize = byteFormatter(smallestCount);
                 if (formattedSize) state.storageTrendSuffix = formattedSize.split(' ')[1] as Unit;
             }
             const formattedData = data.map((d) => {
                 let count = d.total;
-                if (state.selectedType === DATA_TYPE.storage) {
+                if (state.activeTab === DATA_TYPE.storage) {
                     const formattedSize = byteFormatter(d.total, { unit: state.storageTrendSuffix });
                     if (formattedSize) count = formattedSize.split(' ')[0];
                 }
@@ -375,7 +377,7 @@ export default {
             // fill default value
             forEach(range(0, dateRange), (i) => {
                 let date = dayjs.utc().subtract(i, dateUnit);
-                if (state.selectedType === DATA_TYPE.billing && state.selectedDateType === DATE_TYPE.daily) {
+                if (state.activeTab === DATA_TYPE.billing && state.selectedDateType === DATE_TYPE.daily) {
                     date = date.subtract(1, 'day');
                 }
                 if (formattedData.find(d => date.format(dateFormat) === d.date)) {
@@ -387,7 +389,7 @@ export default {
 
             const orderedData = orderBy(chartData, ['date'], ['asc']);
             chartState.data = orderedData.map((d, idx) => {
-                const tooltipText = state.selectedType === DATA_TYPE.billing ? numberFormatter(d.count) : d.count || '';
+                const tooltipText = state.activeTab === DATA_TYPE.billing ? numberFormatter(d.count) : d.count || '';
                 let bulletText;
                 if ((dateType === DATE_TYPE.daily && idx % 3 === 1) || (dateType === DATE_TYPE.monthly && idx % 3 === 2)) {
                     bulletText = tooltipText;
@@ -395,7 +397,7 @@ export default {
 
                 let fillOpacity = 1;
                 let bulletColor = primary;
-                if (state.selectedType === DATA_TYPE.billing && idx === orderedData.length - 1) {
+                if (state.activeTab === DATA_TYPE.billing && idx === orderedData.length - 1) {
                     fillOpacity = 0.5;
                     bulletColor = primary1;
                 }
@@ -444,7 +446,7 @@ export default {
                 let count = 0 as number | string;
                 res.results.forEach((d) => {
                     if (type === DATA_TYPE.storage) {
-                        state.storageBoxSuffix = byteFormatter(d.total).split(' ')[1];
+                        state.storageBoxSuffix = byteFormatter(d.total).split(' ')[1] as Unit;
                         count = parseFloat(byteFormatter(d.total).split(' ')[0]);
                         count = commaFormatter(count);
                     } else {
@@ -621,14 +623,14 @@ export default {
         };
 
         /* event */
-        const onClickBox = (idx) => {
+        const onChangeTab = (name, idx) => {
             if (idx !== state.selectedIndex) disposeChart();
             state.selectedIndex = idx;
-            clearInterval(state.selectedIndexInterval);
+            if (selectedIndexInterval) clearInterval(selectedIndexInterval);
         };
         const onClickDateTypeButton = (type) => {
             state.selectedDateType = type;
-            clearInterval(state.selectedIndexInterval);
+            if (selectedIndexInterval) clearInterval(selectedIndexInterval);
         };
 
         const init = async () => {
@@ -649,7 +651,7 @@ export default {
                 drawChart();
             }
         }, { immediate: false });
-        watch(() => state.selectedType, async (type) => {
+        watch(() => state.activeTab, async (type) => {
             if (type === DATA_TYPE.billing) {
                 await Promise.all([getBillingSummaryInfo(), getTrend(type)]);
                 drawChart();
@@ -659,7 +661,7 @@ export default {
             }
         }, { immediate: false });
         watch(() => state.selectedDateType, async () => {
-            await getTrend(state.selectedType);
+            await getTrend(state.activeTab);
             drawChart();
         }, { immediate: false });
 
@@ -670,7 +672,7 @@ export default {
         return {
             ...toRefs(state),
             chartState,
-            onClickBox,
+            onChangeTab,
             onClickDateTypeButton,
             commaFormatter,
             numberFormatter,
@@ -681,98 +683,78 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.top-part {
-    .box {
-        @apply bg-white;
-        position: relative;
-        display: flex;
-        height: 7.25rem;
-        cursor: pointer;
-        border-radius: 0.375rem;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        padding-left: 1rem;
-
-        @screen lg {
-            padding-left: 1.25rem;
+.p-balloon-tab::v-deep {
+    .balloon-group {
+        flex-wrap: wrap;
+        button {
+            width: 40%;
         }
+    }
 
+    @screen sm {
+        .balloon-group {
+            flex-wrap: nowrap;
+            justify-content: space-evenly;
+            button {
+                width: 100%;
+            }
+        }
+    }
+}
+.content {
+    text-align: left;
+    padding: 0.5rem 0;
+    .count {
+        @apply text-indigo-400;
+        display: inline-block;
+        line-height: 2.5rem;
         &:hover {
-            background-color: rgba(theme('colors.indigo.400'), 0.1);
-        }
-        &.selected {
-            @apply bg-primary1 text-white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            .count {
-                @apply text-white;
-                .dollar-sign {
-                    @apply text-white;
-                }
-                .suffix {
-                    @apply text-white;
-                    opacity: 1;
-                }
-            }
-            .title {
-                @apply text-white;
-                font-weight: bold;
-            }
-            &::after {
-                position: absolute;
-                display: none;
-                content: '';
-                width: 0;
-                border-style: solid;
-                border-color: theme('colors.primary1') transparent;
-                border-width: 0.5rem 0.5rem 0;
-                bottom: -0.45rem;
-                left: 50%;
-                margin-left: -0.5rem;
-
-                @screen sm {
-                    display: block;
+            .anchor {
+                border-bottom: 2px solid;
+                &.billing {
+                    border: none;
                 }
             }
         }
-
-        .content {
-            position: relative;
-            top: -0.25rem;
-            margin: auto 0;
+        .dollar-sign {
+            @apply text-gray-500;
+            font-size: 1.5rem;
+            font-weight: normal;
+            padding-right: 0.25rem;
         }
+        .number {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .suffix {
+            @apply text-gray-500;
+            font-size: 0.875rem;
+            font-weight: normal;
+            padding-left: 0.5rem;
+        }
+    }
+    .title {
+        @apply text-gray-900;
+        font-size: 1rem;
+        text-transform: capitalize;
+    }
+    &.selected {
         .count {
-            @apply text-indigo-400;
-            position: relative;
-            display: inline-block;
-            line-height: 2.5rem;
-            &:hover {
-                .anchor {
-                    border-bottom: 2px solid;
-                    &.billing {
-                        border: none;
-                    }
-                }
-            }
+            @apply text-white;
+
             .dollar-sign {
-                @apply text-gray-500;
-                font-size: 1.5rem;
-                font-weight: normal;
-                padding-right: 0.25rem;
+                @apply text-white;
             }
-            .number {
-                font-size: 2rem;
-                font-weight: bold;
-            }
+
             .suffix {
-                @apply text-gray-500;
-                font-size: 0.875rem;
-                font-weight: normal;
-                padding-left: 0.5rem;
+                @apply text-white;
+                opacity: 1;
             }
         }
+
         .title {
-            @apply text-gray-900;
-            font-size: 1rem;
-            text-transform: capitalize;
+            @apply text-white;
+            font-weight: bold;
         }
     }
 }

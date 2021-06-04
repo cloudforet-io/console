@@ -103,7 +103,7 @@
                     </span>
                 </div>
             </p-field-group>
-            <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab">
+            <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab" stretch>
                 <template #input>
                     <p-json-schema-form :model.sync="credentialModel" :schema="credentialSchema" :is-valid.sync="isCredentialModelValid"
                                         class="custom-schema-box"

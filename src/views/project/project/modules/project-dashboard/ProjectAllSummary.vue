@@ -3,90 +3,90 @@
         <div class="title">
             <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TITLE') }}</span>
         </div>
-        <div class="top-part">
-            <div v-for="(data, idx) of dataList" :key="idx"
-                 class="box"
-                 :class="[{'selected': idx === selectedIndex}, data.type]"
-                 @click="onClickBox(idx)"
-            >
-                <span>{{ data.label }}</span>
-                <span v-if="data.type === 'storage'" class="suffix">({{ storageSuffix }})</span>
-                <span class="count"> {{ data.type === 'storage' ? byteFormatter(count[data.type]).split(' ')[0] : commaFormatter(count[data.type]) }}</span>
-            </div>
-        </div>
-        <div class="bottom-part">
-            <div class="content-wrapper grid grid-cols-12 gap-2">
-                <div class="chart-wrapper col-span-12 lg:col-span-7">
-                    <div class="sub-title">
-                        <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
-                        <span v-if="selectedType === 'storage'" class="suffix">({{ storageTrendSuffix }})</span>
-                    </div>
-                    <div class="toggle-button-group">
-                        <p-button v-for="(d, idx) in dateTypes"
-                                  :key="idx"
-                                  :class="{'selected': selectedDateType === d.name}"
-                                  @click="onClickDateTypeButton(d.name)"
-                        >
-                            {{ d.label }}
-                        </p-button>
-                    </div>
-                    <p-chart-loader :loading="chartState.loading">
-                        <template #loader>
-                            <p-skeleton width="100%" height="100%" />
-                        </template>
-                        <div ref="chartRef" class="chart" />
-                    </p-chart-loader>
+        <p-balloon-tab v-model="activeTab" size="sm" style-type="peacock"
+                       :tabs="tabs" tail
+        >
+            <template #tab="{name}">
+                <div class="box" :class="{selected: name === activeTab}">
+                    <span>{{ dataMap[name].label }}</span>
+                    <span v-if="name === 'storage'" class="suffix">({{ storageSuffix }})</span>
+                    <span class="count"> {{ name === 'storage' ? byteFormatter(count[name]).split(' ')[0] : commaFormatter(count[name]) }}</span>
                 </div>
-                <div class="col-span-12 md:col-span-4 lg:col-span-2 summary-wrapper">
-                    <div class="sub-title">
-                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: dataList[selectedIndex].label }) }}
-                    </div>
-                    <template v-if="!loading && summaryData.length > 0">
-                        <div class="summary-content-wrapper">
-                            <router-link :to="getLocation(selectedType)"
-                                         class="summary-row"
-                            >
-                                <div class="text-group">
-                                    <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
-                                </div>
-                                <span class="count">{{ selectedType === 'storage' ? byteFormatter(count[selectedType]) : commaFormatter(count[selectedType]) }}</span>
-                            </router-link>
-                            <router-link v-for="(data, idx) of summaryData" :key="idx"
-                                         :to="data.to"
-                                         class="summary-row"
-                            >
-                                <div class="text-group">
-                                    <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
-                                    <span class="type">{{ data.type }}</span>
-                                </div>
-                                <span class="count">{{ data.count }}</span>
-                            </router-link>
+            </template>
+            <div class="bottom-part">
+                <div class="content-wrapper grid grid-cols-12 gap-2">
+                    <div class="chart-wrapper col-span-12 lg:col-span-7">
+                        <div class="sub-title">
+                            <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TREND_TITLE') }}</span>
+                            <span v-if="activeTab === 'storage'" class="suffix">({{ storageTrendSuffix }})</span>
                         </div>
-                    </template>
-                    <template v-else-if="!loading">
-                        <div class="summary-content-wrapper no-data-wrapper grid">
-                            <div class="m-auto">
-                                <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
-                                <p class="text">
-                                    {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: dataList[selectedIndex].label }) }}
-                                </p>
+                        <div class="toggle-button-group">
+                            <p-button v-for="(d, idx) in dateTypes"
+                                      :key="idx"
+                                      :class="{'selected': selectedDateType === d.name}"
+                                      @click="onClickDateTypeButton(d.name)"
+                            >
+                                {{ d.label }}
+                            </p-button>
+                        </div>
+                        <p-chart-loader :loading="chartState.loading">
+                            <template #loader>
+                                <p-skeleton width="100%" height="100%" />
+                            </template>
+                            <div ref="chartRef" class="chart" />
+                        </p-chart-loader>
+                    </div>
+                    <div class="col-span-12 md:col-span-4 lg:col-span-2 summary-wrapper">
+                        <div class="sub-title">
+                            {{ $t('COMMON.WIDGETS.ALL_SUMMARY.TYPE_TITLE', { service: dataMap[activeTab].label }) }}
+                        </div>
+                        <template v-if="!loading && summaryData.length > 0">
+                            <div class="summary-content-wrapper">
+                                <router-link :to="getLocation(activeTab)"
+                                             class="summary-row"
+                                >
+                                    <div class="text-group">
+                                        <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.ALL') }}</span>
+                                    </div>
+                                    <span class="count">{{ activeTab === 'storage' ? byteFormatter(count[activeTab]) : commaFormatter(count[activeTab]) }}</span>
+                                </router-link>
+                                <router-link v-for="(data, idx) of summaryData" :key="idx"
+                                             :to="data.to"
+                                             class="summary-row"
+                                >
+                                    <div class="text-group">
+                                        <span class="provider" :style="{ color: colorState[data.label.toLowerCase()] }">{{ data.label }}</span>
+                                        <span class="type">{{ data.type }}</span>
+                                    </div>
+                                    <span class="count">{{ data.count }}</span>
+                                </router-link>
                             </div>
-                        </div>
-                    </template>
-                    <template v-else>
-                        <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
-                            <p-skeleton class="flex-grow" />
-                        </div>
-                    </template>
-                </div>
-                <div class="col-span-12 md:col-span-5 lg:col-span-3 region-service-wrapper">
-                    <div class="sub-title">
-                        <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.REGION_SERVICE_TITLE') }}</span>
+                        </template>
+                        <template v-else-if="!loading">
+                            <div class="summary-content-wrapper no-data-wrapper grid">
+                                <div class="m-auto">
+                                    <img src="@/assets/images/illust_cloud.svg" class="empty-image hidden lg:block">
+                                    <p class="text">
+                                        {{ $t('COMMON.WIDGETS.ALL_SUMMARY.NO_SERVICE', { service: dataMap[activeTab].label }) }}
+                                    </p>
+                                </div>
+                            </div>
+                        </template>
+                        <template v-else>
+                            <div v-for="v in skeletons" :key="v" class="flex items-center p-2 col-span-3">
+                                <p-skeleton class="flex-grow" />
+                            </div>
+                        </template>
                     </div>
-                    <project-region-service :project-id="projectId" :label="selectedLabel" :count="count[selectedType]" />
+                    <div class="col-span-12 md:col-span-5 lg:col-span-3 region-service-wrapper">
+                        <div class="sub-title">
+                            <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.REGION_SERVICE_TITLE') }}</span>
+                        </div>
+                        <project-region-service :project-id="projectId" :label="selectedLabel" :count="count[activeTab]" />
+                    </div>
                 </div>
             </div>
-        </div>
+        </p-balloon-tab>
     </div>
 </template>
 
@@ -110,7 +110,7 @@ import {
 
 import ProjectRegionService from '@/views/project/project/modules/project-dashboard/ProjectRegionService.vue';
 import {
-    PChartLoader, PSkeleton, PButton,
+    PChartLoader, PSkeleton, PButton, PBalloonTab,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@/lib/space-connector';
@@ -176,6 +176,7 @@ export default {
         PButton,
         PSkeleton,
         PChartLoader,
+        PBalloonTab,
     },
     props: {
         projectId: {
@@ -212,8 +213,7 @@ export default {
             providers: computed(() => store.state.resource.provider.items),
             //
             selectedIndex: 0,
-            selectedType: computed(() => state.dataList[state.selectedIndex].type),
-            selectedLabel: computed(() => CLOUD_SERVICE_LABEL[state.selectedType]),
+            selectedLabel: computed(() => CLOUD_SERVICE_LABEL[state.activeTab]),
             selectedDateType: DATE_TYPE.daily,
             dateTypes: computed(() => ([
                 { name: DATE_TYPE.daily, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DAY') },
@@ -232,16 +232,18 @@ export default {
             },
             storageSuffix: 'TB' as Unit,
             storageTrendSuffix: 'TB' as Unit,
-            dataList: computed(() => ([
-                { type: DATA_TYPE.compute, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.COMPUTE') },
-                { type: DATA_TYPE.container, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.CONTAINER') },
-                { type: DATA_TYPE.database, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE') },
-                { type: DATA_TYPE.networking, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.NETWORKING') },
-                { type: DATA_TYPE.storage, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE') },
-                { type: DATA_TYPE.security, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.SECURITY') },
-                { type: DATA_TYPE.analytics, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.ANALYTICS') },
-                { type: DATA_TYPE.all, label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.CLOUD_SERVICE') },
-            ] as Data[])),
+            tabs: Object.values(DATA_TYPE),
+            activeTab: DATA_TYPE.compute,
+            dataMap: computed(() => ({
+                [DATA_TYPE.compute]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.COMPUTE') },
+                [DATA_TYPE.container]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.CONTAINER') },
+                [DATA_TYPE.database]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.DATABASE') },
+                [DATA_TYPE.networking]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.NETWORKING') },
+                [DATA_TYPE.storage]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.STORAGE') },
+                [DATA_TYPE.security]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.SECURITY') },
+                [DATA_TYPE.analytics]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.ANALYTICS') },
+                [DATA_TYPE.all]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.CLOUD_SERVICE') },
+            })),
             summaryData: [] as SummaryData[],
         });
         const chartState = reactive({
@@ -546,12 +548,12 @@ export default {
                 drawChart();
             }
         }, { immediate: false });
-        watch(() => state.selectedType, async (type) => {
+        watch(() => state.activeTab, async (type) => {
             await Promise.all([getSummaryInfo(type), getTrend(type)]);
             drawChart();
         }, { immediate: false });
         watch(() => state.selectedDateType, async () => {
-            await getTrend(state.selectedType);
+            await getTrend(state.activeTab);
             drawChart();
         }, { immediate: false });
 
@@ -591,78 +593,20 @@ export default {
         padding-left: 0.5rem;
     }
 }
-.top-part {
-    .box {
-        @apply bg-white border border-gray-200;
-        position: relative;
-        display: inline-block;
-        width: auto;
-        line-height: 1.6;
-        font-size: 1rem;
-        cursor: pointer;
-        border-radius: 0.375rem;
-        padding: 0.375rem 1rem;
-        margin-right: 0.375rem;
-        margin-bottom: 0.375rem;
-        .suffix {
-            @apply text-gray-500;
-            font-size: 0.75rem;
-            padding-left: 0.125rem;
-        }
-        .count {
-            @apply text-peacock-600;
-            font-weight: bold;
-        }
+.box {
+    .suffix {
+        @apply text-gray-500;
+        font-size: 0.75rem;
+        padding-left: 0.125rem;
+    }
+    .count {
+        @apply text-peacock-600;
+        font-weight: bold;
+    }
 
-        &:hover {
-            @apply bg-secondary2;
-        }
-        &.selected {
-            @apply bg-peacock-600 text-white border-peacock-600;
-            .suffix, .count {
-                @apply text-white;
-            }
-            &::after {
-                position: absolute;
-                display: none;
-                content: '';
-                width: 0;
-                border-style: solid;
-                border-color: theme('colors.peacock.600') transparent;
-                border-width: 0.5rem 0.5rem 0;
-                border-radius: 0.125rem;
-                bottom: -0.45rem;
-                left: 50%;
-                margin-left: -0.5rem;
-
-                @screen lg {
-                    display: block;
-                }
-            }
-        }
-        &.compute {
-            min-width: 8.5rem;
-        }
-        &.container {
-            min-width: 8.875rem;
-        }
-        &.database {
-            min-width: 8.625rem;
-        }
-        &.networking {
-            min-width: 9.75rem;
-        }
-        &.storage {
-            min-width: 9.625rem;
-        }
-        &.security {
-            min-width: 8rem;
-        }
-        &.analytics {
-            min-width: 8.375rem;
-        }
-        &.all {
-            min-width: 10.5rem;
+    &.selected {
+        .suffix, .count {
+            @apply text-white;
         }
     }
 }

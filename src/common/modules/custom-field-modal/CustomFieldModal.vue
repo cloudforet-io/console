@@ -324,12 +324,8 @@ export default {
                 if (cloudServiceGroup) tagsApiQueryHelper.addFilter({ k: 'cloud_service_group', v: cloudServiceGroup, o: '=' });
                 if (cloudServiceType) tagsApiQueryHelper.addFilter({ k: 'cloud_service_type', v: cloudServiceType, o: '=' });
 
-                const { results } = await new Promise((resolve) => {
-                    setTimeout(() => {
-                        api.list({
-                            query: tagsApiQueryHelper.data,
-                        }).then(res => resolve(res));
-                    }, 3000);
+                const { results } = await api.list({
+                    query: tagsApiQueryHelper.data,
                 });
 
                 tagState.allTags = uniq(results.map(d => Object.keys(d.tags)).flat());
