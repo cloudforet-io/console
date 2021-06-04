@@ -1,5 +1,5 @@
 <template>
-    <div class="project-alert-page">
+    <div v-if="!loading" class="project-alert-page">
         <div v-if="!isActivated" class="activation-wrapper">
             <strong>{{ $t('PROJECT.DETAIL.PROJECT_ALERT_ACTIVATION_DESC_1') }}</strong>
             <p>{{ $t('PROJECT.DETAIL.PROJECT_ALERT_ACTIVATION_DESC_2') }}</p>
@@ -45,6 +45,7 @@ import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/ty
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
+
 export default {
     name: 'ProjectAlertPage',
     components: {
@@ -63,6 +64,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
+            loading: true,
             isActivated: false,
         });
         const tabState = reactive({
@@ -77,6 +79,7 @@ export default {
         /* api */
         const getProjectAlertConfig = async () => {
             try {
+                state.loading = true;
                 const res = await SpaceConnector.client.monitoring.projectAlertConfig.get({
                     project_id: props.id,
                 });
@@ -84,6 +87,8 @@ export default {
             } catch (e) {
                 state.isActivated = false;
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
         const onActivateAlert = async () => {

@@ -1,0 +1,230 @@
+<template>
+    <div class="escalation-policy-form">
+        <p-field-group
+            :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_LABEL')"
+            required
+            :invalid="!isNameValid"
+            :invalid-text="nameInvalidText"
+        >
+            <p-text-input v-model="inputModel.name"
+                          :invalid="!isNameValid"
+                          class="w-1/2"
+            />
+        </p-field-group>
+        <p-field-group
+            v-if="showScope"
+            :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.SCOPE_LABEL')"
+            required
+        >
+            <template #default>
+                <div v-if="mode === ACTION.create">
+                    <p-radio v-for="(item, idx) in scopes" :key="idx"
+                             :selected="item.value"
+                             :value="inputModel.scope"
+                    >
+                        <span class="radio-label" @click="onChangeScope(item.value)">{{ item.label }}</span>
+                    </p-radio>
+                    <escalation-policy-project-tree v-if="inputModel.scope === SCOPE.project"
+                                                    :selected-project-id.sync="inputModel.project_id"
+                    />
+                </div>
+            </template>
+            <template #label-extra>
+                <span v-if="mode === 'update'" class="scope-text">
+                    {{ inputModel.scope }}
+                </span>
+            </template>
+        </p-field-group>
+        <p-field-group
+            :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.FINISH_CONDITION_LABEL')"
+            required
+        >
+            <p-radio v-for="(item, idx) in finishConditions" :key="idx"
+                     :selected="item.value"
+                     :value="inputModel.finish_condition"
+            >
+                <span class="radio-label" @click="onChangeFinishCondition(item.value)">{{ item.label }}</span>
+            </p-radio>
+        </p-field-group>
+        <p-field-group
+            :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATION_RULES_LABEL')"
+            required
+        >
+            <template #help>
+                <span class="help-text">
+                    {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATION_RULES_HELP_TEXT') }}
+                </span>
+            </template>
+            <escalation-rules-input-form
+                :scope="inputModel.scope"
+                :rules.sync="inputModel.rules"
+                :repeat-count.sync="inputModel.repeat_count"
+            />
+        </p-field-group>
+    </div>
+</template>
+
+<script lang="ts">
+/* eslint-disable camelcase */
+import {
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
+} from '@vue/composition-api';
+
+import { PFieldGroup, PRadio, PTextInput } from '@spaceone/design-system';
+
+import EscalationRulesInputForm from '@/views/monitoring/alert/modules/EscalationRulesInputForm.vue';
+import EscalationPolicyProjectTree from '@/views/monitoring/alert/modules/EscalationPolicyProjectTree.vue';
+
+import {
+    EscalationPolicyFormModel, FINISH_CONDITION, SCOPE, ACTION,
+} from '@/views/monitoring/alert/type';
+
+
+const DEFAULT_REPEAT_COUNT = 0;
+const DEFAULT_NOTIFICATION_LEVEL = 'LV1';
+
+export default {
+    name: 'EscalationPolicyForm',
+    components: {
+        EscalationRulesInputForm,
+        EscalationPolicyProjectTree,
+        PFieldGroup,
+        PTextInput,
+        PRadio,
+    },
+    props: {
+        mode: {
+            type: String,
+            default: undefined,
+        },
+        showScope: {
+            type: Boolean,
+            default: true,
+        },
+        showValidation: {
+            type: Boolean,
+            default: false,
+        },
+        escalationPolicy: {
+            type: Object,
+            default: undefined,
+        },
+        /* sync */
+        isAllValid: {
+            type: Boolean,
+            default: false,
+        },
+    },
+    setup(props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const state = reactive({
+            inputModel: {
+                name: '',
+                scope: SCOPE.global,
+                rules: [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }],
+                finish_condition: FINISH_CONDITION.acknowledged,
+                repeat_count: DEFAULT_REPEAT_COUNT,
+                project_id: undefined,
+            } as EscalationPolicyFormModel,
+            isNameValid: computed(() => {
+                if (!props.showValidation) return true;
+                return state.inputModel.name.length <= 40 && state.inputModel.name.length > 0;
+            }),
+            nameInvalidText: computed(() => {
+                if (!state.inputModel.name) {
+                    return vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
+                }
+                if (state.inputModel.name.length > 40) {
+                    return vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
+                }
+                return undefined;
+            }),
+            scopes: computed(() => [
+                {
+                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'), value: SCOPE.global,
+                }, {
+                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: SCOPE.project,
+                },
+            ]),
+            finishConditions: computed(() => [
+                {
+                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ACKNOWLEDGED'), value: FINISH_CONDITION.acknowledged,
+                }, {
+                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RESOLVED'), value: FINISH_CONDITION.resolved,
+                },
+            ]),
+        });
+
+        /* util */
+        const initInputModel = () => {
+            if (props.mode === ACTION.create) {
+                state.inputModel.name = '';
+                state.inputModel.scope = SCOPE.global;
+                state.inputModel.rules = [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }];
+                state.inputModel.finish_condition = FINISH_CONDITION.acknowledged;
+                state.inputModel.project_id = undefined;
+                state.inputModel.repeat_count = DEFAULT_REPEAT_COUNT;
+            } else if (props.mode === ACTION.update && props.escalationPolicy) {
+                state.inputModel = props.escalationPolicy;
+            }
+        };
+
+        /* event */
+        const onChangeInputModel = () => {
+            emit('update:is-all-valid', state.isNameValid);
+            emit('change', state.inputModel);
+        };
+        const onChangeScope = (value) => {
+            state.inputModel.scope = value;
+            if (value === SCOPE.global) state.inputModel.project_id = undefined;
+        };
+        const onChangeFinishCondition = (value) => {
+            state.inputModel.finish_condition = value;
+        };
+
+        watch([() => props.mode, () => props.escalationPolicy], () => {
+            initInputModel();
+        }, { immediate: true });
+
+        watch(() => state.inputModel, () => {
+            onChangeInputModel();
+        }, { deep: true });
+
+        return {
+            ...toRefs(state),
+            SCOPE,
+            ACTION,
+            onChangeScope,
+            onChangeFinishCondition,
+        };
+    },
+};
+</script>
+
+<style lang="postcss" scoped>
+.escalation-policy-form {
+    .p-text-input {
+        .input-container {
+            border-radius: 0.25rem;
+        }
+    }
+    .radio-label {
+        font-size: 0.875rem;
+        line-height: 1.2;
+
+        &:first-child {
+            margin-right: 1.125rem;
+        }
+    }
+    .scope-text {
+        text-transform: capitalize;
+        font-weight: normal;
+        padding-left: 0.5rem;
+    }
+    .help-text {
+        @apply text-gray-900;
+        font-size: 0.875rem;
+    }
+}
+</style>
