@@ -1272,10 +1272,12 @@
 	"PROJECT": {
 		"DETAIL": {
 			"ADD": "추가 ",
+			"ALT_E_ACTIVATE_ALERT": "",
 			"ALT_E_ADD_MEMBER": "구성원 추가 실패",
 			"ALT_E_DELETE_MEMBER": "구성원 삭제 실패",
 			"ALT_E_DELETE_PROJECT": "프로젝트 삭제 실패",
 			"ALT_E_UPDATE_PROJECT": "프로젝트 편집 실패",
+			"ALT_S_ACTIVATE_ALERT": "",
 			"ALT_S_ADD_MEMBER": "구성원 추가 완료",
 			"ALT_S_DELETE_MEMBER": "구성원 삭제 완료",
 			"ALT_S_DELETE_PROJECT": "프로젝트 삭제 완료",
@@ -1308,6 +1310,9 @@
 			"MODAL_VALIDATION_REQUIRED": "이름을 입력해 주세요.",
 			"MODAL_VALIDATION_SELECT_MEMBER": "구성원을 선택하세요",
 			"MODAL_VALIDATION_SELECT_ROLE": "권한을 선택하세요",
+			"PROJECT_ALERT_ACTIVATE": "",
+			"PROJECT_ALERT_ACTIVATION_DESC_1": "",
+			"PROJECT_ALERT_ACTIVATION_DESC_2": "",
 			"PROJECT_ID": "프로젝트 아이디: ",
 			"PROJECT_MEMBER_LABEL": "라벨 ",
 			"PROJECT_ROLE": "프로젝트 권한 ",

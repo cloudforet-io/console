@@ -1272,10 +1272,12 @@
 	"PROJECT": {
 		"DETAIL": {
 			"ADD": "Add",
+			"ALT_E_ACTIVATE_ALERT": "Activate alert failure",
 			"ALT_E_ADD_MEMBER": "Add member failure",
 			"ALT_E_DELETE_MEMBER": "Delete member failure",
 			"ALT_E_DELETE_PROJECT": "Delete project failure",
 			"ALT_E_UPDATE_PROJECT": "Update project failure",
+			"ALT_S_ACTIVATE_ALERT": "Activate alert success",
 			"ALT_S_ADD_MEMBER": "Add member success",
 			"ALT_S_DELETE_MEMBER": "Delete member success",
 			"ALT_S_DELETE_PROJECT": "Delete project success",
@@ -1308,6 +1310,9 @@
 			"MODAL_VALIDATION_REQUIRED": "Required field",
 			"MODAL_VALIDATION_SELECT_MEMBER": "Select a member ",
 			"MODAL_VALIDATION_SELECT_ROLE": "Select a Role",
+			"PROJECT_ALERT_ACTIVATE": "Active Alert",
+			"PROJECT_ALERT_ACTIVATION_DESC_1": "Set an Alert of this Project",
+			"PROJECT_ALERT_ACTIVATION_DESC_2": "Click ‘Active Alert’ to recieve integrated external events or manage of this project.",
 			"PROJECT_ID": "Project ID:",
 			"PROJECT_MEMBER_LABEL": "Labels",
 			"PROJECT_ROLE": "Project Role",

@@ -1272,10 +1272,12 @@
 	"PROJECT": {
 		"DETAIL": {
 			"ADD": "追加",
+			"ALT_E_ACTIVATE_ALERT": "",
 			"ALT_E_ADD_MEMBER": "メンバー追加に失敗",
 			"ALT_E_DELETE_MEMBER": "メンバー削除に失敗",
 			"ALT_E_DELETE_PROJECT": "プロジェクト削除に失敗",
 			"ALT_E_UPDATE_PROJECT": "プロジェクト編集に失敗",
+			"ALT_S_ACTIVATE_ALERT": "",
 			"ALT_S_ADD_MEMBER": "メンバー追加完了",
 			"ALT_S_DELETE_MEMBER": "メンバー削除完了",
 			"ALT_S_DELETE_PROJECT": "プロジェクト削除完了",
@@ -1308,6 +1310,9 @@
 			"MODAL_VALIDATION_REQUIRED": "名前を入力してください",
 			"MODAL_VALIDATION_SELECT_MEMBER": "メンバーを選択してください。",
 			"MODAL_VALIDATION_SELECT_ROLE": "権限を選択してください。",
+			"PROJECT_ALERT_ACTIVATE": "",
+			"PROJECT_ALERT_ACTIVATION_DESC_1": "",
+			"PROJECT_ALERT_ACTIVATION_DESC_2": "",
 			"PROJECT_ID": "プロジェクトID：",
 			"PROJECT_MEMBER_LABEL": "ラベル",
 			"PROJECT_ROLE": "プロジェクト権限",
