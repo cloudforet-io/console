@@ -1,12 +1,12 @@
 <template>
     <div>
         <p-radio v-for="(item, i) in scheduleMode" :key="i"
-                 :selected="item.value" :value="selectedScheduleMode" class="mr-4"
+                 :selected="item.value" :value="proxyIsScheduled" class="mr-4"
                  @click="changeScheduleMode(item.value)"
         >
             <span class="radio-label" @click="changeScheduleMode(item.value)">{{ item.label }}</span>
         </p-radio>
-        <article v-if="selectedScheduleMode === SCHEDULE_MODE.CUSTOM" class="schedule-wrapper">
+        <article v-if="isScheduled" class="schedule-wrapper">
             <info-message style-type="secondary"
                           :message="$t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE_INFO_MSG')"
                           block
@@ -52,11 +52,6 @@ import InfoMessage from '@/common/components/InfoMessage.vue';
 import { range } from 'lodash';
 import { store } from '@/store';
 
-enum SCHEDULE_MODE {
-    ALL = 'all',
-    CUSTOM = 'custom',
-}
-
 const TIME_LIST = range(24);
 
 
@@ -69,6 +64,10 @@ export default {
         PSelectDropdown,
     },
     props: {
+        is_scheduled: {
+            type: Boolean,
+            default: false,
+        },
         schedule: {
             type: Object,
             default: null,
@@ -78,11 +77,11 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             scheduleMode: computed(() => [{
-                label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME'), value: 'all',
+                label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME'), value: false,
             }, {
-                label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.CUSTOM'), value: 'custom',
+                label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.CUSTOM'), value: true,
             }]),
-            selectedScheduleMode: props.schedule ? 'custom' : 'all',
+            proxyIsScheduled: props.is_scheduled ? props.is_scheduled : false,
             weekDay: [{ label: 'Monday', value: 'MON' }, { label: 'Tuesday', value: 'TUE' }, { label: 'Wednesday', value: 'WED' },
                 { label: 'Thursday', value: 'THU' }, { label: 'Friday', value: 'FRI' },
                 { label: 'Saturday', value: 'SAT' },
@@ -99,16 +98,21 @@ export default {
         });
 
         const emitChange = () => {
-            if (state.selectedScheduleMode === 'all') {
-                console.log('here');
-                emit('change', null);
+            if (state.proxyIsScheduled) {
+                emit('change', {
+                    schedule: state.proxySchedule,
+                    isScheduled: state.proxyIsScheduled,
+                });
             } else {
-                emit('change', state.proxySchedule);
+                emit('change', {
+                    schedule: null,
+                    isScheduled: state.proxyIsScheduled,
+                });
             }
         };
 
         const changeScheduleMode = (value) => {
-            state.selectedScheduleMode = value;
+            state.proxyIsScheduled = value;
             emitChange();
         };
 
@@ -127,7 +131,6 @@ export default {
         };
 
         return {
-            SCHEDULE_MODE,
             ...toRefs(state),
             changeScheduleMode,
             onSelectDay,

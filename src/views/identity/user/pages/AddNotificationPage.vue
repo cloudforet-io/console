@@ -95,6 +95,7 @@ export default {
             topicMode: false,
             topicList: [],
             schedule: null,
+            isScheduled: false,
             notificationLevel: null,
             userId: store.state.user.userId,
         });
@@ -116,6 +117,7 @@ export default {
                     is_subscribe: state.topicMode,
                     subscriptions: state.topicList,
                     schedule: state.schedule,
+                    is_scheduled: state.isScheduled,
                     user_id: state.userId,
                 });
                 showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_USER_CHANNEL'), '', context.root);
@@ -135,6 +137,7 @@ export default {
                     is_subscribe: state.topicMode,
                     subscriptions: state.topicList,
                     schedule: state.schedule,
+                    is_scheduled: state.isScheduled,
                     user_id: state.userId,
                     notification_level: state.notificationLevel,
                     project_id: state.projectId,
@@ -157,7 +160,8 @@ export default {
         };
 
         const onChangeSchedule = (value) => {
-            state.schedule = value;
+            state.schedule = value.schedule;
+            state.isScheduled = value.isScheduled;
         };
 
         const onChangeTopic = (value) => {

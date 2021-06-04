@@ -77,7 +77,7 @@
                         </p>
                     </div>
                     <p v-if="channelData.protocol_name === PROTOCOL_TYPE.SLACK">
-                        cannot edit
+                        <info-message :message="$t('IDENTITY.USER.NOTIFICATION.CANNOT_EDIT_SLACK')" />
                     </p>
                     <button v-else class="edit-btn" @click="startEdit(EDIT_TYPE.DATA)">
                         <p-i name="ic_edit" width="1rem" height="1rem"
@@ -123,7 +123,7 @@
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE') }}
                 </span>
                 <div v-if="isScheduleEditMode" class="content">
-                    <add-notification-schedule :schedule="channelData.schedule" @change="onChangeSchedule" />
+                    <add-notification-schedule :schedule="channelData.schedule" :is-scheduled="channelData.is_scheduled" @change="onChangeSchedule" />
                     <div class="button-group">
                         <p-button :outline="true" class="text-button" @click="cancelEdit(EDIT_TYPE.SCHEDULE)">
                             {{ $t('COMMON.TAGS.CANCEL') }}
@@ -205,6 +205,7 @@ import AddNotificationTopic from '@/views/identity/user/modules/AddNotificationT
 import AddNotificationLevel from '@/views/identity/user/modules/AddNotificationLevel.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import InfoMessage from '@/common/components/InfoMessage.vue';
 
 enum EDIT_TYPE {
     NAME = 'name',
@@ -250,6 +251,7 @@ export default {
         PBadge,
         PDivider,
         PTag,
+        InfoMessage,
     },
     props: {
         channelData: {
@@ -275,6 +277,7 @@ export default {
             projectChannelId: props.channelData.project_channel_id || null,
             channelNameForEdit: props.channelData.name,
             dataListForEdit: props.channelData.data,
+            scheduleModeForEdit: props.channelData.is_scheduled,
             scheduleForEdit: props.channelData.schedule || null,
             topicModeForEdit: undefined,
             topicForEdit: props.channelData.subscriptions,
@@ -324,6 +327,7 @@ export default {
                 if (paramKey === PARAM_KEY_TYPE.NAME) param.name = paramValue;
                 else if (paramKey === PARAM_KEY_TYPE.DATA) param.data = paramValue;
                 else if (paramKey === PARAM_KEY_TYPE.SCHEDULE) param.schedule = paramValue;
+                // eslint-disable-next-line camelcase
                 else if (paramKey === PARAM_KEY_TYPE.LEVEL) param.notification_level = paramValue;
                 await SpaceConnector.client.notification.projectChannel.update(param);
                 showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_PROJECT_CHANNEL'), '', context.root);
@@ -343,12 +347,38 @@ export default {
             else await updateUserChannel(PARAM_KEY_TYPE.DATA, state.dataListForEdit);
         };
 
+        const setUserChannelSchedule = async () => {
+            try {
+                await SpaceConnector.client.notification.userChannel.setSchedule({
+                    user_channel_id: state.userChannelId,
+                    is_scheduled: state.scheduleModeForEdit,
+                    schedule: state.scheduleForEdit,
+                });
+                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', context.root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, context.root);
+            }
+        };
+        const setProjectChannelSchedule = async () => {
+            try {
+                await SpaceConnector.client.notification.projectChannel.setSchedule({
+                    project_channel_id: state.projectChannelId,
+                    is_scheduled: state.scheduleModeForEdit,
+                    schedule: state.scheduleForEdit,
+                });
+                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '', context.root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'), e, context.root);
+            }
+        };
         const onChangeSchedule = async (value) => {
-            state.scheduleForEdit = value.schedule;
+            state.scheduleForEdit = value;
         };
         const saveChangedSchedule = async () => {
-            if (props.projectId) await updateProjectChannel(PARAM_KEY_TYPE.SCHEDULE, state.scheduleForEdit);
-            else await updateUserChannel(PARAM_KEY_TYPE.SCHEDULE, state.scheduleForEdit);
+            if (props.projectId) await setUserChannelSchedule();
+            else await setProjectChannelSchedule();
         };
 
         const setUserChannelSubscription = async () => {
