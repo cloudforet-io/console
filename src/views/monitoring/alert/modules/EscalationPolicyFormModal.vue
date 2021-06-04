@@ -39,7 +39,7 @@
                 </template>
                 <template #label-extra>
                     <span v-if="mode === 'update'" class="scope-text">
-                        {{ capitalize(inputModel.scope) }}
+                        {{ inputModel.scope }}
                     </span>
                 </template>
             </p-field-group>
@@ -78,8 +78,6 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { capitalize } from 'lodash';
-
 import {
     computed, reactive, toRefs, watch, ComponentRenderProxy, getCurrentInstance,
 } from '@vue/composition-api';
@@ -247,7 +245,6 @@ export default {
             onChangeScope,
             onChangeFinishCondition,
             createEscalationPolicy,
-            capitalize,
         };
     },
 };
@@ -269,6 +266,7 @@ export default {
         }
     }
     .scope-text {
+        text-transform: capitalize;
         font-weight: normal;
         padding-left: 0.5rem;
     }

@@ -21,10 +21,10 @@
             {{ ruleFormatter(value) }}
         </template>
         <template #col-finish_condition-format="{ value }">
-            {{ capitalize(value) }}
+            <span class="capitalize">{{ value }}</span>
         </template>
         <template #col-scope-format="{ value }">
-            {{ capitalize(value) }}
+            <span class="capitalize">{{ value }}</span>
         </template>
         <template #col-project_id-format="{ value }">
             <template v-if="value">
@@ -40,17 +40,15 @@
 </template>
 
 <script lang="ts">
-import { capitalize } from 'lodash';
-
 import {
     PDataTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
 
-import {computed, reactive, toRefs} from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import {store} from "@/store";
+import { store } from '@/store';
 
 export default {
     name: 'EscalationPolicyDataTable',
@@ -116,7 +114,6 @@ export default {
             ...toRefs(state),
             referenceRouter,
             ruleFormatter,
-            capitalize,
         };
     },
 };
