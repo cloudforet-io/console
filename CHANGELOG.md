@@ -1,3 +1,10 @@
+# [1.1.0-beta.42](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.41...v1.1.0-beta.42) (2021-06-04)
+
+
+### Features
+
+* add box tab component ([#577](https://github.com/spaceone-dev/spaceone-design-system/issues/577)) ([9acd9d7](https://github.com/spaceone-dev/spaceone-design-system/commit/9acd9d724e896b77b68017c885a89067b6ce24e1))
+
 # [1.1.0-beta.41](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.40...v1.1.0-beta.41) (2021-06-03)
 
 
