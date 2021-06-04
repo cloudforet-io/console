@@ -7,26 +7,17 @@
                       :total-count="tableState.totalCount"
                       :selected-count="selectedItem ? 1 : 0"
         />
-        <p-toolbox-table
-            selectable
-            sortable
-            :multi-select="false"
+        <p-toolbox
             search-type="query"
-            :items="items"
-            :loading="tableState.loading"
-            :fields="tableState.fields"
-            :select-index.sync="tableState.selectIndex"
-            :sort-by.sync="tableState.sortBy"
-            :sort-desc.sync="tableState.sortDesc"
             :page-size.sync="tableState.pageLimit"
             :total-count="tableState.totalCount"
             :query-tags="tableState.searchTags"
             :key-item-sets="searchHandlers.keyItemSets"
             :value-handler-map="searchHandlers.valueHandlerMap"
             @change="onChange"
-            @refresh="listEscalationPolicies"
+            @refresh="onChange"
         >
-            <template #toolbox-left>
+            <template #left-area>
                 <p-icon-text-button
                     class="create-button"
                     style-type="primary-dark"
@@ -43,33 +34,15 @@
                     @onSelected="onSelectAction"
                 />
             </template>
-            <template #col-name-format="{ value }">
-                <span>{{ value.label }}</span>
-                <p-badge v-if="value.isDefault" outline class="ml-2">
-                    {{ $t('MONITORING.ALERT.ESCALATION_POLICY.DEFAULT') }}
-                </p-badge>
-            </template>
-            <template #col-rules-format="{ value }">
-                {{ ruleFormatter(value) }}
-            </template>
-            <template #col-finish_condition-format="{ value }">
-                {{ capitalize(value) }}
-            </template>
-            <template #col-scope-format="{ value }">
-                {{ capitalize(value) }}
-            </template>
-            <template #col-project_id-format="{ value }">
-                <template v-if="value">
-                    <p-anchor :to="referenceRouter(
-                        value,
-                        { resource_type: 'identity.Project' })"
-                    >
-                        {{ projects[value] ? projects[value].label : value }}
-                    </p-anchor>
-                </template>
-            </template>
-        </p-toolbox-table>
-
+        </p-toolbox>
+        <escalation-policy-data-table
+            :loading="tableState.loading"
+            :items="items"
+            :select-index.sync="tableState.selectIndex"
+            :sort-by.sync="tableState.sortBy"
+            :sort-desc.sync="tableState.sortDesc"
+        />
+        <!--modal-->
         <escalation-policy-form-modal
             :visible.sync="formModalVisible"
             :mode="formMode"
@@ -87,23 +60,20 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { capitalize } from 'lodash';
-
 import {
     reactive, toRefs, ComponentRenderProxy, getCurrentInstance, computed,
 } from '@vue/composition-api';
 
 import {
-    PBreadcrumbs, PPageTitle, PToolboxTable, PIconTextButton, PSelectDropdown, PAnchor, PBadge,
+    PBreadcrumbs, PPageTitle, PIconTextButton, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import EscalationPolicyFormModal from '@/views/monitoring/alert/modules/EscalationPolicyFormModal.vue';
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
+import EscalationPolicyDataTable from '@/views/monitoring/alert/modules/EscalationPolicyDataTable.vue';
 
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/views/monitoring/alert/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { referenceRouter } from '@/lib/reference/referenceRouter';
 import {
     iso8601Formatter, showErrorMessage, showSuccessMessage,
 } from '@/lib/util';
@@ -119,13 +89,12 @@ export default {
     components: {
         EscalationPolicyFormModal,
         DeleteModal,
+        EscalationPolicyDataTable,
         PBreadcrumbs,
         PPageTitle,
-        PToolboxTable,
         PIconTextButton,
         PSelectDropdown,
-        PAnchor,
-        PBadge,
+        PToolbox,
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -150,15 +119,6 @@ export default {
             ])),
             selectedActionItem: '',
             selectIndex: [],
-            fields: [
-                { name: 'name', label: 'Name' },
-                { name: 'rules', label: 'Escalation Rules' },
-                { name: 'repeat_count', label: 'Repeat Time' },
-                { name: 'finish_condition', label: 'Finish Condition' },
-                { name: 'scope', label: 'Scope' },
-                { name: 'project_id', label: 'Project' },
-                { name: 'created_at', label: 'Created' },
-            ] as DataTableField[],
             sortBy: '',
             sortDesc: true,
             totalCount: 0,
@@ -168,7 +128,6 @@ export default {
         });
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            projects: computed(() => store.state.resource.project.items),
             pageTitle: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY'),
             escalationPolicies: [],
             items: [],
@@ -202,20 +161,6 @@ export default {
                 scope: makeEnumValueHandler(SCOPE),
                 project_id: makeReferenceValueHandler('identity.Project'),
             },
-        };
-
-        /* util */
-        const ruleFormatter = (rules) => {
-            const result = [] as string[];
-            rules.forEach((rule, idx) => {
-                let formattedRule = rule.notification_level;
-                if (idx + 1 < rules.length) {
-                    formattedRule += ` (${rule.escalate_minutes}min)`;
-                    formattedRule += ' > ';
-                }
-                result.push(formattedRule);
-            });
-            return result.join('');
         };
 
         /* api */
@@ -311,9 +256,6 @@ export default {
             onChange,
             listEscalationPolicies,
             deleteEscalationPolicy,
-            ruleFormatter,
-            capitalize,
-            referenceRouter,
         };
     },
 };
@@ -321,7 +263,10 @@ export default {
 
 <style lang="postcss" scoped>
 .escalation-policy-page {
-    .p-toolbox-table {
+    .p-toolbox::v-deep {
+        .left-area-wrapper {
+            display: flex;
+        }
         .create-button {
             margin-right: 1rem;
         }

@@ -27,7 +27,7 @@
             <span class="col-span-2 notification-wrapper">
                 <p-select-dropdown
                     v-model="rule.notification_level"
-                    :items="NOTIFICATION_LEVEL"
+                    :items="NOTIFICATION_LEVELS"
                 />
             </span>
             <span v-if="rule.escalate_minutes"
@@ -97,7 +97,7 @@ import {
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import { makeProxy } from '@/lib/compostion-util';
 
-const NOTIFICATION_LEVEL = [
+const NOTIFICATION_LEVELS = [
     { name: 'ALL', label: 'All' },
     { name: 'LV1', label: 'Level 1' },
     { name: 'LV2', label: 'Level 2' },
@@ -147,7 +147,7 @@ export default {
             const rules = props.rules;
             if (rules.length > 0) rules[rules.length - 1].escalate_minutes = 30;
             rules.push({
-                notification_level: NOTIFICATION_LEVEL[rules.length + 1].name,
+                notification_level: NOTIFICATION_LEVELS[rules.length + 1].name,
                 escalate_minutes: undefined,
             });
             emit('update:rules', rules);
@@ -156,7 +156,7 @@ export default {
         return {
             ...toRefs(state),
             IDENTITY_ROUTE,
-            NOTIFICATION_LEVEL,
+            NOTIFICATION_LEVELS,
             onClickDeleteRule,
             onClickAddStep,
         };
