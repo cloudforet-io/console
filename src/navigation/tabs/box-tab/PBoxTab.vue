@@ -70,10 +70,11 @@ export default defineComponent({
 
 <style lang="postcss">
 .p-box-tab {
-    $button-margin: 0.25rem;
+    $button-margin: 0.125rem;
     display: flex;
     flex-direction: column;
     width: 100%;
+    overflow: hidden;
     .box-group {
         display: flex;
         flex: 1;
@@ -82,13 +83,16 @@ export default defineComponent({
         margin: -$button-margin;
         button {
             @apply text-gray-500 border rounded-sm;
+            display: flex;
             line-height: 1.6;
             font-size: 0.875rem;
             font-weight: bold;
             cursor: pointer;
             white-space: nowrap;
             padding: 1rem;
-            min-height: 3.375rem;
+            max-height: 3.375rem;
+            align-items: center;
+            justify-content: center;
             margin: $button-margin;
             width: 100%;
             flex: 1;
@@ -99,7 +103,6 @@ export default defineComponent({
                     @apply bg-blue-100 text-indigo-400;
                 }
             }
-
         }
     }
     .tab-pane {

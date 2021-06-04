@@ -130,3 +130,4 @@ export { default as PSelectCard } from './inputs/select-card/PSelectCard.vue';
 export { default as PSelectButton } from './inputs/select-button/PSelectButton.vue';
 
 export { default as PBalloonTab } from './navigation/tabs/ballon-tab/PBalloonTab.vue';
+export { default as PBoxTab } from './navigation/tabs/box-tab/PBoxTab.vue';
