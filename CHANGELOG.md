@@ -1,3 +1,10 @@
+# [1.1.0-beta.43](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.42...v1.1.0-beta.43) (2021-06-04)
+
+
+### Features
+
+* add box tab to index ([fe2156f](https://github.com/spaceone-dev/spaceone-design-system/commit/fe2156f35092959ec5f49c846f99aed0126162cb))
+
 # [1.1.0-beta.42](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.41...v1.1.0-beta.42) (2021-06-04)
 
 
