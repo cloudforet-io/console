@@ -19,6 +19,22 @@ export const argTypes: ArgTypes = {
             type: 'object',
         },
     },
+    'v-model': {
+        name: 'v-model',
+        type: { name: 'any' },
+        description: 'Two way binding for `value` props with `change` event.',
+        defaultValue: '',
+        table: {
+            type: {
+                summary: 'any',
+            },
+            category: 'model',
+            defaultValue: {
+                summary: '',
+            },
+        },
+        control: null,
+    },
     selected: {
         name: 'selected',
         type: { name: 'any, any[]' },

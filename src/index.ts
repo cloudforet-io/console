@@ -131,3 +131,5 @@ export { default as PSelectButton } from './inputs/select-button/PSelectButton.v
 
 export { default as PBalloonTab } from './navigation/tabs/ballon-tab/PBalloonTab.vue';
 export { default as PBoxTab } from './navigation/tabs/box-tab/PBoxTab.vue';
+
+export { default as PTextarea } from './inputs/textarea/PTextarea.vue';

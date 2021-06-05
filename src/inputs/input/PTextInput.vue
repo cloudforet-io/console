@@ -113,7 +113,7 @@ export default {
             @apply border-alert;
         }
         &.disabled {
-            @apply border-gray-200 bg-gray-100
+            @apply border-gray-200 bg-gray-100;
         }
         &:focus-within:not(.disabled):not(.invalid) {
             @apply border-secondary;
