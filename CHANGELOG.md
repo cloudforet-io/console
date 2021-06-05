@@ -1,3 +1,10 @@
+# [1.1.0-beta.44](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.43...v1.1.0-beta.44) (2021-06-05)
+
+
+### Features
+
+* add select status component ([#578](https://github.com/spaceone-dev/spaceone-design-system/issues/578)) ([5b106e9](https://github.com/spaceone-dev/spaceone-design-system/commit/5b106e95faccc1b70e3cc7696ff5afd6f8104956))
+
 # [1.1.0-beta.43](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.42...v1.1.0-beta.43) (2021-06-04)
 
 
