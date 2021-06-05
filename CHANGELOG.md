@@ -1,3 +1,10 @@
+# [1.1.0-beta.45](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.44...v1.1.0-beta.45) (2021-06-05)
+
+
+### Features
+
+* add textarea component ([#579](https://github.com/spaceone-dev/spaceone-design-system/issues/579)) ([919437b](https://github.com/spaceone-dev/spaceone-design-system/commit/919437b79f0e1e3d8f33891f0a0bfc9eb1029bcf))
+
 # [1.1.0-beta.44](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.43...v1.1.0-beta.44) (2021-06-05)
 
 
