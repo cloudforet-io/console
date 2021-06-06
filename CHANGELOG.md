@@ -1,3 +1,10 @@
+# [1.1.0-beta.46](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.45...v1.1.0-beta.46) (2021-06-06)
+
+
+### Features
+
+* update collapsible panel component ([#580](https://github.com/spaceone-dev/spaceone-design-system/issues/580)) ([bf924c1](https://github.com/spaceone-dev/spaceone-design-system/commit/bf924c1be31f4edb7cf97191ea0a4e96aaaa4a11))
+
 # [1.1.0-beta.45](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.44...v1.1.0-beta.45) (2021-06-05)
 
 
