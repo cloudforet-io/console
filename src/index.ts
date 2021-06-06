@@ -133,3 +133,4 @@ export { default as PBalloonTab } from './navigation/tabs/ballon-tab/PBalloonTab
 export { default as PBoxTab } from './navigation/tabs/box-tab/PBoxTab.vue';
 
 export { default as PTextarea } from './inputs/textarea/PTextarea.vue';
+export { default as PCollapsibleList } from './data-display/collapsibles/collapsible-list/PCollapsibleList.vue';
