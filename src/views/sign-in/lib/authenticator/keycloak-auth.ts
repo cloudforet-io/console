@@ -13,8 +13,10 @@ class KeycloakAuth extends Authenticator {
 
         const authIndex = parsedIssuer.indexOf('auth');
         const baseUrl = parsedIssuer[authIndex - 1];
-        const realmIndex = parsedIssuer.indexOf('realms');
-        const realm = parsedIssuer[realmIndex + 1];
+
+        const realm = authOptions.realm;
+        // const realmIndex = parsedIssuer.indexOf('realms');
+        // const realm = parsedIssuer[realmIndex + 1];
 
         const clientId = authOptions.client_id;
 
@@ -50,7 +52,7 @@ class KeycloakAuth extends Authenticator {
 
     static async signIn(onSignInCallback) {
         KeycloakAuth.init();
-        KeycloakAuth.keycloak.init({ onLoad: 'login-required' })
+        KeycloakAuth.keycloak.init({ onLoad: 'login-required', checkLoginIframe: false })
             .then(async (auth) => {
                 await KeycloakAuth.keycloakSignIn(auth);
                 await onSignInCallback();
