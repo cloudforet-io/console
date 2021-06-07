@@ -6,7 +6,7 @@
         >
             <span class="radio-label" @click="changeScheduleMode(item.value)">{{ item.label }}</span>
         </p-radio>
-        <article v-if="isScheduled" class="schedule-wrapper">
+        <article v-if="proxyIsScheduled" class="schedule-wrapper">
             <info-message style-type="secondary"
                           :message="$t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE_INFO_MSG')"
                           block
