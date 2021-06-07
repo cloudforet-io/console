@@ -14,16 +14,15 @@
                           }"
                     >{{ item.title }}</slot>
                 </span>
-                <p-collapsible-toggle v-if="togglePosition === COLLAPSIBLE_LIST_TOGGLE_POSITION.title || lineClamp === 0"
+                <p-collapsible-toggle v-if="togglePosition === COLLAPSIBLE_LIST_TOGGLE_POSITION.title"
                                       :is-collapsed="!proxyUnfoldedIndices.includes(idx)"
                                       @update:isCollapsed="onUpdateCollapsed(idx, ...arguments)"
                 />
             </p>
-            <div v-if="proxyUnfoldedIndices.includes(idx) ||
-                     (togglePosition === COLLAPSIBLE_LIST_TOGGLE_POSITION.contents && lineClamp > 0)"
-                 class="contents"
-                 :class="{collapsed: !proxyUnfoldedIndices.includes(idx)}"
-                 :style="{'-webkit-line-clamp': lineClamp}"
+            <p-collapsible-panel v-show="togglePosition === COLLAPSIBLE_LIST_TOGGLE_POSITION.contents || proxyUnfoldedIndices.includes(idx)"
+                                 :is-collapsed="!proxyUnfoldedIndices.includes(idx)"
+                                 :line-clamp="togglePosition === COLLAPSIBLE_LIST_TOGGLE_POSITION.contents ? lineClamp : -1"
+                                 @update:isCollapsed="onUpdateCollapsed(idx, ...arguments)"
             >
                 <slot v-bind="{
                     data: item.data,
@@ -34,13 +33,7 @@
                 >
                     {{ item.data }}
                 </slot>
-            </div>
-            <div class="toggle-wrapper">
-                <p-collapsible-toggle v-if="lineClamp > 0 && togglePosition === COLLAPSIBLE_LIST_TOGGLE_POSITION.contents"
-                                      :is-collapsed="!proxyUnfoldedIndices.includes(idx)"
-                                      @update:isCollapsed="onUpdateCollapsed(idx, ...arguments)"
-                />
-            </div>
+            </p-collapsible-panel>
         </div>
     </div>
 </template>
@@ -50,12 +43,14 @@ import {
     ComponentRenderProxy, computed,
     defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import { makeOptionalProxy } from '@/util/composition-helpers';
 import PCollapsibleToggle from '@/inputs/buttons/collapsible-toggle/PCollapsibleToggle.vue';
 import {
     COLLAPSIBLE_LIST_THEME,
     COLLAPSIBLE_LIST_TOGGLE_POSITION,
 } from '@/data-display/collapsibles/collapsible-list/config';
-import { makeOptionalProxy } from '@/util/composition-helpers';
+import PCollapsiblePanel from '@/data-display/collapsibles/collapsible-panel/PCollapsiblePanel.vue';
 
 interface CollapsibleItem {
     title?: string;
@@ -67,12 +62,12 @@ interface Props {
     unfoldedIndices?: number[];
     lineClamp?: number;
     multiUnfoldable?: boolean;
-    togglePosition?: togglePosition;
+    togglePosition?: COLLAPSIBLE_LIST_TOGGLE_POSITION;
     theme?: COLLAPSIBLE_LIST_THEME;
 }
 export default defineComponent<Props>({
     name: 'PCollapsibleList',
-    components: { PCollapsibleToggle },
+    components: { PCollapsiblePanel, PCollapsibleToggle },
     model: {
         prop: 'unfoldedIndices',
         event: 'update:unfoldedIndices',
@@ -174,25 +169,8 @@ export default defineComponent<Props>({
             line-height: 1.25;
         }
     }
-    .contents {
-        font-size: 0.75rem;
-        line-height: 1.5;
-        word-break: break-word;
-        margin-bottom: 0.5rem;
-        &.collapsed {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    }
-    .toggle-wrapper {
-        display: flex;
-        justify-content: flex-end;
-        .p-collapsible-toggle {
-            flex-shrink: 0;
-        }
+    .p-collapsible-panel {
+        padding: 0 0 1rem 0;
     }
 
     &.card {

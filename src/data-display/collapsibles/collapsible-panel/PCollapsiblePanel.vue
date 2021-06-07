@@ -1,23 +1,26 @@
 <template>
     <div class="p-collapsible-panel">
-        <div class="contents"
-             :class="{collapsed: proxyIsCollapsed}"
-             :style="{'-webkit-line-clamp': lineClamp}"
-        >
-            <slot v-if="lineClamp" />
+        <div class="contents">
+            <div ref="fakeTextRef" class="text fake" :style="{'-webkit-line-clamp': lineClamp}">
+                <slot />
+            </div>
+            <div class="text" :class="{collapsed: proxyIsCollapsed}" :style="{'-webkit-line-clamp': lineClamp}">
+                <slot v-if="lineClamp !== 0 || !proxyIsCollapsed" />
+            </div>
         </div>
-        <div class="toggle-wrapper">
-            <p-collapsible-toggle v-model="proxyIsCollapsed" />
-        </div>
+        <p-collapsible-toggle v-if="lineClamp === 0 || isOverflow" v-model="proxyIsCollapsed" />
     </div>
 </template>
 
 <script lang="ts">
 import {
-    defineComponent,
+    defineComponent, onMounted, onUnmounted, onUpdated, reactive,
     toRefs,
 } from '@vue/composition-api';
+import { debounce } from 'lodash';
+
 import { CollapsibleProps, useCollapsible } from '@/hooks/collapsible';
+
 import PCollapsibleToggle from '@/inputs/buttons/collapsible-toggle/PCollapsibleToggle.vue';
 
 interface Props extends CollapsibleProps {
@@ -44,8 +47,32 @@ export default defineComponent({
         },
     },
     setup(props: Props, context) {
-        const { state } = useCollapsible(props, context);
+        const { state: collapsibleState } = useCollapsible(props, context);
+        const state = reactive({
+            fakeTextRef: null as null|HTMLElement,
+            isOverflow: false,
+        });
+
+        const checkTextOverflow = debounce(() => {
+            if (!state.fakeTextRef) return;
+            state.isOverflow = state.fakeTextRef.scrollHeight > state.fakeTextRef.clientHeight;
+        }, 150);
+
+        onUpdated(() => {
+            checkTextOverflow();
+        });
+
+        onMounted(() => {
+            window.addEventListener('resize', checkTextOverflow);
+            checkTextOverflow();
+        });
+
+        onUnmounted(() => {
+            window.removeEventListener('resize', checkTextOverflow);
+        });
+
         return {
+            ...toRefs(collapsibleState),
             ...toRefs(state),
         };
     },
@@ -57,22 +84,24 @@ export default defineComponent({
     width: 100%;
     padding: 0.625rem;
     .contents {
+        position: relative;
         font-size: 0.75rem;
         line-height: 1.5;
         word-break: break-word;
-        &.collapsed {
-            display: -webkit-box;
-            -webkit-line-clamp: 3;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-    }
-    .toggle-wrapper {
-        display: flex;
-        justify-content: flex-end;
-        .p-collapsible-toggle {
-            flex-shrink: 0;
+        z-index: 0;
+        .text {
+            &.collapsed, &.fake {
+                display: -webkit-box;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+            &.fake {
+                position: absolute;
+                visibility: hidden;
+                top: 0;
+                left: 0;
+            }
         }
     }
 }

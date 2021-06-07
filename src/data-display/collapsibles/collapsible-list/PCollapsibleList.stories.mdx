@@ -70,7 +70,7 @@ export const Template = (args, { argTypes }) => ({
     `,
     setup() {
         const state = reactive({
-            items: range(5).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(60) })),
+            items: range(5).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(faker.random.number({min: 30, max: 200})) })),
             unfolded: [0]
         })
         return {
@@ -98,7 +98,7 @@ export const Template = (args, { argTypes }) => ({
     `,
             setup() {
                 const state = reactive({
-                    items: range(5).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(60) })),
+                    items: range(5).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(faker.random.number({min: 30, max: 200})) })),
                     unfolded: [0, 1]
                 })
                 return {
@@ -134,7 +134,7 @@ export const Template = (args, { argTypes }) => ({
     `,
             setup() {
                 const state = reactive({
-                    items: range(3).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(60) }))
+                    items: range(3).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(faker.random.number({min: 30, max: 200})) })),
                 })
                 return {
                     ...toRefs(state)
@@ -156,23 +156,28 @@ export const Template = (args, { argTypes }) => ({
             i18n,
             template: `
     <div class="h-full w-full overflow p-8">
+        <p class="italic mb-4">Line Clamp works only when the toggle position is contents.</p>
         <div class="p-4 mb-4">
-            <p class="text-xl font-bold mb-6">Line Clamp: 5</p>
+            <p class="text-xl font-bold mb-2">Line Clamp: 5</p>
             <p-collapsible-list :items="items" toggle-position="contents" :line-clamp="5" />
         </div>
         <div class="p-4 mb-4">
-            <p class="text-xl font-bold mb-6">Line Clamp: 1 </p>
+            <p class="text-xl font-bold mb-2">Line Clamp: 1 </p>
             <p-collapsible-list :items="items" toggle-position="contents"  :line-clamp="1" />
         </div>
         <div class="p-4 mb-4">
-            <p class="text-xl font-bold mb-6">Line Clamp: 0</p>
+            <p class="text-xl font-bold mb-2">Line Clamp: 0</p>
             <p-collapsible-list :items="items" toggle-position="contents"  :line-clamp="0" />
+        </div>
+        <div class="p-4 mb-4">
+            <p class="text-xl font-bold mb-2">Line Clamp: -1</p>
+            <p-collapsible-list :items="items" toggle-position="contents"  :line-clamp="-1" />
         </div>
     </div>
     `,
             setup() {
                 const state = reactive({
-                    items: range(2).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(30) }))
+                    items: range(3).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(faker.random.number({min: 30, max: 200})) })),
                 })
                 return {
                     ...toRefs(state)
@@ -206,7 +211,7 @@ export const Template = (args, { argTypes }) => ({
     `,
             setup() {
                 const state = reactive({
-                    items: range(4).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(30) }))
+                    items: range(3).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(faker.random.number({min: 30, max: 200})) })),
                 })
                 return {
                     ...toRefs(state)
@@ -262,7 +267,7 @@ export const Template = (args, { argTypes }) => ({
     `,
             setup() {
                 const state = reactive({
-                    items: range(3).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(30) })),
+                    items: range(3).map(() => ({ title: faker.lorem.sentence(3), data: faker.lorem.sentence(faker.random.number({min: 30, max: 200})) })),
                 })
                 return {
                     ...toRefs(state)

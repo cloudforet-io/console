@@ -64,7 +64,7 @@ export const Template = (args, { argTypes }) => ({
     `,
     setup() {
         const state = reactive({
-            contents: faker.lorem.sentence(40)
+            contents: faker.lorem.sentence(80)
         })
         return {
             ...toRefs(state)
@@ -87,20 +87,27 @@ export const Template = (args, { argTypes }) => ({
             template: `
     <div class="h-full w-full overflow p-8">
         <div class="p-4 mb-8">
-            <p class="text-xl font-bold mb-6">Line Clamp: 5</p>
+            <p class="text-xl font-bold mb-2 border-b">Line Clamp: 5</p>
             <p-collapsible-panel :line-clamp="5">
                 {{contents}}
             </p-collapsible-panel>
         </div>
         <div class="p-4 mb-8">
-            <p class="text-xl font-bold mb-6">Line Clamp: 1 </p>
+            <p class="text-xl font-bold mb-2 border-b">Line Clamp: 1 </p>
             <p-collapsible-panel :line-clamp="1">
                 {{contents}}
             </p-collapsible-panel>
         </div>
         <div class="p-4 mb-8">
-            <p class="text-xl font-bold mb-6">Line Clamp: 0</p>
+            <p class="text-xl font-bold mb-2 border-b">Line Clamp: 0</p>
             <p-collapsible-panel :line-clamp="0">
+                {{contents}}
+            </p-collapsible-panel>
+        </div>
+        <div class="p-4 mb-8">
+            <p class="text-xl font-bold mb-2">Line Clamp: -1</p>
+            <p class="border-b mb-2">If the value is negative, the toggle will be not shown.</p>
+            <p-collapsible-panel :line-clamp="-1">
                 {{contents}}
             </p-collapsible-panel>
         </div>
