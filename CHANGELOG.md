@@ -1,3 +1,10 @@
+# [1.1.0-beta.48](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.47...v1.1.0-beta.48) (2021-06-07)
+
+
+### Features
+
+* export list card component ([#583](https://github.com/spaceone-dev/spaceone-design-system/issues/583)) ([f9a0851](https://github.com/spaceone-dev/spaceone-design-system/commit/f9a08512f34a34cd00f90670e85b9c4e565e7deb))
+
 # [1.1.0-beta.47](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.46...v1.1.0-beta.47) (2021-06-07)
 
 
