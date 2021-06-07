@@ -33,16 +33,6 @@ const getUserInfo = async (userId: string): Promise<UserState> => {
     };
 };
 
-const getReportState = async (): Promise<boolean> => {
-    return false;
-    // try {
-    //     await SpaceConnector.client.report.domain.get();
-    //     return true;
-    // } catch (e) {
-    //     return false;
-    // }
-};
-
 const getPowerSchedulerState = async (): Promise<boolean> => {
     try {
         await SpaceConnector.client.powerScheduler.domain.get();
@@ -139,9 +129,6 @@ export const signIn = async ({ commit, state }, signInRequest: SignInRequest): P
         const userRoles = await getUserRoleBindings(userId);
         commit('setRoles', userRoles);
     }
-
-    const reportState = await getReportState();
-    commit('setReportState', reportState);
 
     const powerSchedulerState = await getPowerSchedulerState();
     commit('setPowerSchedulerState', powerSchedulerState);

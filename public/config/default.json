@@ -5,9 +5,6 @@
   "GTAG_ID": "DISABLED",
   "DOMAIN_NAME": null,
   "DOMAIN_NAME_REF": "hostname",
-  "REPORT": {
-    "DEFAULT_TEMPLATE_ID": "template_2"
-  },
   "AMCHARTS_LICENSE": {
     "ENABLED": false,
     "CHARTS": "",

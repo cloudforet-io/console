@@ -1,5 +1,5 @@
 ###############################
-# DEFAULT 
+# DEFAULT
 ###############################
 enabled: true
 developer: false
@@ -19,8 +19,6 @@ production_json:
     GTAG_ID: "<google analytics - tag id>"
     DOMAIN_NAME:
     DOMAIN_NAME_REF: hostname
-    REPORT:
-        DEFAULT_TEMPLATE_ID: template_2
     AMCHARTS_LICENSE:
         CHARTS: ''
         MAPS: ''
@@ -95,7 +93,7 @@ global:
 #          configMap:
 #              name: shared-conf
 
-    
+
 # Service
 service:
     type: NodePort

@@ -26,10 +26,6 @@ export const setRoles = (state: UserState, roles: Array<UserRole>): void => {
     state.roles = roles;
 };
 
-export const setReportState = (state: UserState, reportState: boolean): void => {
-    state.reportState = reportState;
-};
-
 export const setPowerSchedulerState = (state: UserState, powerSchedulerState: boolean): void => {
     state.powerSchedulerState = powerSchedulerState;
 };

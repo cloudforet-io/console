@@ -23,7 +23,6 @@ const state: UserState = {
     language: storedUserState.language,
     timezone: storedUserState.timezone,
     roles: storedUserState.roles,
-    reportState: storedUserState.reportState,
     powerSchedulerState: storedUserState.powerSchedulerState,
     spotAutomationState: storedUserState.spotAutomationState,
 };

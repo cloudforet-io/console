@@ -20,7 +20,6 @@ export interface UserState {
     language?: string;
     timezone?: string;
     roles?: Array<UserRole>;
-    reportState?: boolean;
     powerSchedulerState?: boolean;
     spotAutomationState?: boolean;
 }
