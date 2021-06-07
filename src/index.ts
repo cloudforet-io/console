@@ -59,6 +59,7 @@ export { default as PLoadingButton } from './others/deprecated/loading-button/PL
 export { default as PToggleButton } from './inputs/buttons/toggle-button/PToggleButton.vue';
 export { default as PCard } from './data-display/cards/card/PCard.vue';
 export { default as PCardItem } from './others/deprecated/card-item/PCardItem.vue';
+export { default as PListCard } from './data-display/cards/list-card/PListCard.vue';
 export { default as PCollapsiblePanel } from './data-display/collapsibles/collapsible-panel/PCollapsiblePanel.vue';
 export { default as PCheckBox } from './inputs/checkbox/PCheckBox.vue';
 export { default as PFieldGroup } from './inputs/forms/field-group/PFieldGroup.vue';
