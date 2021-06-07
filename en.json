@@ -1042,6 +1042,41 @@
 				"PROJECT_HEALTH_BOARD": "Project Health Board",
 				"TOP_5_PROJECT_ACTIVITY": "Top 5 Project Activity"
 			},
+			"DETAIL": {
+				"ADD_NOTE": "Add Note",
+				"HEADER": {
+					"ASSIGNED_TO": "Assigned to",
+					"DURATION": "Duration",
+					"REASSIGN": "Reassign",
+					"STATE": "State",
+					"URGENCY": "Urgency"
+				},
+				"INFO": {
+					"ACKNOWLEDGED": "Acknowledged",
+					"ALERT_ID": "Alert ID",
+					"CHANGE": "Change",
+					"CREATED": "Created",
+					"DESC": "Description",
+					"EDIT": "Edit",
+					"ESCALATION_POLICY": "Escalation Policy",
+					"PROJECT": "Project",
+					"RESOLVED": "Resolved",
+					"SEVERITY": "Severity",
+					"STATUS_DETAILS": "Status Details",
+					"TRIGGERED_BY": "Triggered By"
+				},
+				"NOTE": "Note",
+				"RESPONDER": {
+					"ADDITIONAL_RESPONDER": "Additional Responder",
+					"CURRENT": "Current",
+					"HIDE": "hide",
+					"LEVEL": "Level {level}",
+					"RESPONDER": "Responder",
+					"SEARCH_PLACEHOLDER": "Search Member",
+					"SHOW_RESPONDERS": "show responders"
+				},
+				"TIMELINE": "Timeline"
+			},
 			"ESCALATION_POLICY": {
 				"ACTION": "Action",
 				"ALT_E_DELETE_POLICY": "Delete Escalation Policy failure",

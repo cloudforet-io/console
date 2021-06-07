@@ -1042,6 +1042,41 @@
 				"PROJECT_HEALTH_BOARD": "",
 				"TOP_5_PROJECT_ACTIVITY": ""
 			},
+			"DETAIL": {
+				"ADD_NOTE": "",
+				"HEADER": {
+					"ASSIGNED_TO": "",
+					"DURATION": "",
+					"REASSIGN": "",
+					"STATE": "",
+					"URGENCY": ""
+				},
+				"INFO": {
+					"ACKNOWLEDGED": "",
+					"ALERT_ID": "",
+					"CHANGE": "",
+					"CREATED": "",
+					"DESC": "",
+					"EDIT": "",
+					"ESCALATION_POLICY": "",
+					"PROJECT": "",
+					"RESOLVED": "",
+					"SEVERITY": "",
+					"STATUS_DETAILS": "",
+					"TRIGGERED_BY": ""
+				},
+				"NOTE": "",
+				"RESPONDER": {
+					"ADDITIONAL_RESPONDER": "",
+					"CURRENT": "",
+					"HIDE": "",
+					"LEVEL": "",
+					"RESPONDER": "",
+					"SEARCH_PLACEHOLDER": "",
+					"SHOW_RESPONDERS": ""
+				},
+				"TIMELINE": ""
+			},
 			"ESCALATION_POLICY": {
 				"ACTION": "作業",
 				"ALT_E_DELETE_POLICY": "",

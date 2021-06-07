@@ -1042,6 +1042,41 @@
 				"PROJECT_HEALTH_BOARD": "Project Health Board",
 				"TOP_5_PROJECT_ACTIVITY": "Top 5 Project Activity"
 			},
+			"DETAIL": {
+				"ADD_NOTE": "노트 추가",
+				"HEADER": {
+					"ASSIGNED_TO": "담당자",
+					"DURATION": "지속 기간",
+					"REASSIGN": "재할당",
+					"STATE": "상태",
+					"URGENCY": "긴급도"
+				},
+				"INFO": {
+					"ACKNOWLEDGED": "확인 여부",
+					"ALERT_ID": "경보 ID",
+					"CHANGE": "변경",
+					"CREATED": "생성 시간",
+					"DESC": "설명",
+					"EDIT": "편집",
+					"ESCALATION_POLICY": "에스컬레이션 정책",
+					"PROJECT": "프로젝트",
+					"RESOLVED": "해결 여부",
+					"SEVERITY": "심각도",
+					"STATUS_DETAILS": "상태 설명",
+					"TRIGGERED_BY": "트리거"
+				},
+				"NOTE": "노트",
+				"RESPONDER": {
+					"ADDITIONAL_RESPONDER": "추가 수신인 ",
+					"CURRENT": "현재",
+					"HIDE": "숨기기",
+					"LEVEL": "레벨 {level}",
+					"RESPONDER": "수신자",
+					"SEARCH_PLACEHOLDER": "구성원 검색",
+					"SHOW_RESPONDERS": "수신자 보기"
+				},
+				"TIMELINE": "타임라인"
+			},
 			"ESCALATION_POLICY": {
 				"ACTION": "작업",
 				"ALT_E_DELETE_POLICY": "Delete Escalation Policy failure",
