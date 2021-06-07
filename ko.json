@@ -1052,7 +1052,7 @@
 					"URGENCY": "긴급도"
 				},
 				"INFO": {
-					"ACKNOWLEDGED": "확인 여부",
+					"ACKNOWLEDGED": "확인 시간",
 					"ALERT_ID": "경보 ID",
 					"CHANGE": "변경",
 					"CREATED": "생성 시간",
@@ -1060,7 +1060,7 @@
 					"EDIT": "편집",
 					"ESCALATION_POLICY": "에스컬레이션 정책",
 					"PROJECT": "프로젝트",
-					"RESOLVED": "해결 여부",
+					"RESOLVED": "해결 시간",
 					"SEVERITY": "심각도",
 					"STATUS_DETAILS": "상태 설명",
 					"TRIGGERED_BY": "트리거"
@@ -1070,7 +1070,7 @@
 					"ADDITIONAL_RESPONDER": "추가 수신인 ",
 					"CURRENT": "현재",
 					"HIDE": "숨기기",
-					"LEVEL": "레벨 {level}",
+					"LEVEL": "레벨",
 					"RESPONDER": "수신자",
 					"SEARCH_PLACEHOLDER": "구성원 검색",
 					"SHOW_RESPONDERS": "수신자 보기"
