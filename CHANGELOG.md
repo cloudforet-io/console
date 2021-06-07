@@ -1,3 +1,11 @@
+# [1.1.0-beta.47](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.46...v1.1.0-beta.47) (2021-06-07)
+
+
+### Features
+
+* add collapsible list component ([#581](https://github.com/spaceone-dev/spaceone-design-system/issues/581)) ([a5a643b](https://github.com/spaceone-dev/spaceone-design-system/commit/a5a643bad09a47f4bc5a0b5a8d051410fef5f469))
+* add text overflow detection to collapsible panel ([#582](https://github.com/spaceone-dev/spaceone-design-system/issues/582)) ([980f1b3](https://github.com/spaceone-dev/spaceone-design-system/commit/980f1b34af72c4f66c58236b9e59692732c7420a))
+
 # [1.1.0-beta.46](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.45...v1.1.0-beta.46) (2021-06-06)
 
 
