@@ -1,13 +1,13 @@
 <template>
     <div class="escalation-rules-input-form">
-        <div class="label-wrapper">
-            <span class="col-span-1 text-center">
+        <div class="label-row">
+            <span class="col-step">
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.STEP') }}
             </span>
-            <span class="col-span-2">
+            <span class="col-notification">
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATION_LEVEL') }}
             </span>
-            <span class="col-span-4">
+            <span class="col-rule">
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RULE') }}
             </span>
             <p-anchor v-if="scope === 'PROJECT'"
@@ -17,26 +17,18 @@
                       highlight
             />
         </div>
-        <div v-for="(rule, idx) in rules"
-             :key="`rule-${idx}`"
-             class="content-wrapper"
-        >
-            <span class="col-span-1 step-wrapper">
+        <div v-for="(rule, idx) in rules" :key="`rule-${idx}`" class="content-row">
+            <span class="col-step">
                 <p-badge outline style-type="gray">{{ idx + 1 }}</p-badge>
             </span>
-            <span class="col-span-2 notification-wrapper">
-                <p-select-dropdown
-                    v-model="rule.notification_level"
-                    :items="NOTIFICATION_LEVELS"
-                />
+            <span class="col-notification">
+                <p-select-dropdown v-model="rule.notification_level" :items="NOTIFICATION_LEVELS" />
             </span>
-            <span v-if="rule.escalate_minutes"
-                  class="col-span-4 rule-wrapper"
-            >
+            <span v-if="rule.escalate_minutes" class="col-rule">
                 <span class="label">
                     {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATES_AFTER') }}
                 </span>
-                <p-text-input v-model="rule.escalate_minutes"
+                <p-text-input v-model.number="rule.escalate_minutes"
                               class="rule-input"
                 >
                     <template #right-extra>
@@ -44,17 +36,40 @@
                     </template>
                 </p-text-input>
             </span>
+            <div class="col-mobile-input">
+                <span class="label">
+                    {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATION_LV') }}
+                </span>
+                <span class="input">
+                    <p-select-dropdown v-model="rule.notification_level" :items="MINIFIED_NOTIFICATION_LEVELS" />
+                </span>
+                <template v-if="rule.escalate_minutes">
+                    <span class="label">
+                        {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATES_AFTER') }}
+                    </span>
+                    <span class="input">
+                        <p-text-input v-model.number="rule.escalate_minutes" type="number" class="rule-input">
+                            <template #right-extra>
+                                {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.MIN') }}
+                            </template>
+                        </p-text-input>
+                    </span>
+                </template>
+            </div>
             <p-icon-button
                 class="delete-button"
                 name="ic_trashcan"
                 @click="onClickDeleteRule(idx)"
             />
         </div>
-        <div class="add-wrapper">
-            <span class="col-span-1 text-center">
+        <div class="add-row">
+            <span class="col-icon">
                 <p-i name="ic_repeat" />
             </span>
-            <span class="col-span-2">
+            <span class="col-mobile-label">
+                {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.REPEAT_ALL') }}
+            </span>
+            <span class="col-input">
                 <p-text-input v-model.number="proxyRepeatCount"
                               type="number"
                               :min="0"
@@ -65,7 +80,7 @@
                     </template>
                 </p-text-input>
             </span>
-            <span class="col-span-4">
+            <span class="col-label">
                 <span class="label">
                     {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.REPEAT') }}
                     <span class="text-gray-500">
@@ -97,14 +112,22 @@ import {
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import { makeProxy } from '@/lib/compostion-util';
 
-const NOTIFICATION_LEVELS = [
+const NOTIFICATION_LEVELS = Object.freeze([
     { name: 'ALL', label: 'All' },
     { name: 'LV1', label: 'Level 1' },
     { name: 'LV2', label: 'Level 2' },
     { name: 'LV3', label: 'Level 3' },
     { name: 'LV4', label: 'Level 4' },
     { name: 'LV5', label: 'Level 5' },
-];
+]);
+const MINIFIED_NOTIFICATION_LEVELS = Object.freeze([
+    { name: 'ALL', label: 'All' },
+    { name: 'LV1', label: '1' },
+    { name: 'LV2', label: '2' },
+    { name: 'LV3', label: '3' },
+    { name: 'LV4', label: '4' },
+    { name: 'LV5', label: '5' },
+]);
 
 export default {
     name: 'EscalationRulesInputForm',
@@ -157,6 +180,7 @@ export default {
             ...toRefs(state),
             IDENTITY_ROUTE,
             NOTIFICATION_LEVELS,
+            MINIFIED_NOTIFICATION_LEVELS,
             onClickDeleteRule,
             onClickAddStep,
         };
@@ -166,12 +190,15 @@ export default {
 
 <style lang="postcss" scoped>
 .escalation-rules-input-form {
-    @apply bg-gray-100 border border-gray-200;
+    @apply bg-gray-100 border border-gray-200 rounded-lg;
     min-height: 21.75rem;
-    border-radius: 0.375rem;
     padding: 0.5rem;
 
-    .label-wrapper {
+    @screen mobile {
+        min-height: auto;
+    }
+
+    .label-row {
         @apply text-gray-400 grid grid-cols-12;
         position: relative;
         font-size: 0.75rem;
@@ -179,33 +206,77 @@ export default {
         line-height: 1.5;
         margin-bottom: 0.5rem;
 
+        .col-step {
+            @apply col-span-1;
+            text-align: center;
+
+            @screen mobile {
+                @apply col-span-2;
+            }
+        }
+        .col-notification {
+            @apply col-span-2;
+
+            @screen mobile {
+                display: none;
+            }
+        }
+        .col-rule {
+            @apply col-span-4;
+
+            @screen mobile {
+                display: none;
+            }
+        }
         .link-text {
             position: absolute;
             right: 0;
         }
     }
 
-    .content-wrapper {
-        @apply bg-white grid grid-cols-12;
+    .content-row {
+        @apply bg-white grid grid-cols-12 rounded-md;
         position: relative;
         height: 3rem;
         align-items: center;
-        border-radius: 0.25rem;
         vertical-align: middle;
         margin-bottom: 0.25rem;
         padding: 0.5rem 0;
 
-        .step-wrapper {
-            margin: auto;
+        @screen mobile {
+            height: auto;
         }
-        .notification-wrapper {
+
+        .col-step {
+            @apply col-span-1;
+            margin: auto;
+
+            @screen mobile {
+                @apply col-span-2;
+                height: 100%;
+                padding-top: 0.375rem;
+            }
+        }
+        .col-notification {
+            @apply col-span-2;
+
+            @screen mobile {
+                display: none;
+            }
+
             .p-select-dropdown::v-deep {
                 .p-dropdown-button {
                     min-width: 6rem;
                 }
             }
         }
-        .rule-wrapper {
+        .col-rule {
+            @apply col-span-5;
+
+            @screen mobile {
+                display: none;
+            }
+
             .label {
                 @apply text-gray-900;
                 font-size: 0.875rem;
@@ -216,6 +287,33 @@ export default {
                 width: 6rem;
             }
         }
+        .col-mobile-input {
+            @apply col-span-8 grid grid-cols-8 text-gray-900;
+            display: none;
+            row-gap: 0.5rem;
+            font-size: 0.75rem;
+
+            @screen mobile {
+                display: grid;
+            }
+
+            .label {
+                @apply col-span-4;
+                margin: auto 0;
+            }
+            .input {
+                @apply col-span-4;
+                .p-select-dropdown::v-deep {
+                    .p-dropdown-button {
+                        min-width: 100%;
+                    }
+                }
+                .rule-input {
+                    width: 100%;
+                }
+            }
+        }
+
         .delete-button {
             position: absolute;
             right: 0.5rem;
@@ -223,23 +321,63 @@ export default {
         }
     }
 
-    .add-wrapper {
+    .add-row {
         @apply grid grid-cols-12;
         position: relative;
         align-items: center;
+        font-size: 0.875rem;
         padding: 0.5rem 0;
 
-        .repeat-input {
-            width: 6rem;
+        .col-icon {
+            @apply col-span-1;
+            text-align: center;
+
+            @screen mobile {
+                @apply col-span-2;
+            }
         }
-        .label {
-            @apply text-gray-900;
-            font-size: 0.875rem;
+        .col-mobile-label {
+            @apply col-span-4 text-gray-900;
+            display: none;
+            font-size: 0.75rem;
+
+            @screen mobile {
+                display: block;
+            }
         }
+        .col-input {
+            @apply col-span-2;
+
+            @screen mobile {
+                @apply col-span-4;
+            }
+
+            .repeat-input {
+                width: 6rem;
+
+                @screen mobile {
+                    width: 100%;
+                }
+            }
+        }
+        .col-label {
+            @apply col-span-5 text-gray-900;
+
+            @screen mobile {
+                display: none;
+            }
+        }
+
         .add-button {
             position: absolute;
             right: 0;
             border-radius: 0.25rem;
+
+            @screen mobile {
+                @apply col-span-12;
+                position: relative;
+                margin-top: 0.75rem;
+            }
         }
     }
 }

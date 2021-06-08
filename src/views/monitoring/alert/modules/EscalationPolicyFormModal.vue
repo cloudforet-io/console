@@ -61,7 +61,6 @@ export default {
     setup(props, { emit, root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            loading: false,
             proxyVisible: makeProxy('visible', props, emit),
             inputModel: {} as EscalationPolicyFormModel,
             showValidation: false,
@@ -106,7 +105,6 @@ export default {
             state.showValidation = true;
             if (!state.isAllValid) return;
 
-            state.loading = true;
             if (props.mode === ACTION.create) await createEscalationPolicy();
             else if (props.mode === ACTION.update) await updateEscalationPolicy();
             emit('confirm');
@@ -114,6 +112,7 @@ export default {
 
         watch(() => props.visible, () => {
             state.showValidation = false;
+            state.isAllValid = false;
         });
 
         return {
