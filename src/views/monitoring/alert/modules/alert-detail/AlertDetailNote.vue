@@ -1,20 +1,38 @@
 <template>
     <p-pane-layout class="alert-detail-note">
-        Note
+        <p-panel-top>
+            {{ $t('MONITORING.ALERT.DETAIL.NOTE') }}
+        </p-panel-top>
+        <article class="note-wrapper">
+            <p-textarea  :value="value"/>
+            <p-button style-type="gray-border" size="md" class="add-btn">
+                {{$t('MONITORING.ALERT.DETAIL.ADD_NOTE')}}
+            </p-button>
+        </article>
     </p-pane-layout>
 </template>
 
 <script lang="ts">
-import { PPaneLayout } from '@spaceone/design-system';
+import {
+    PButton, PPaneLayout, PPanelTop, PTextarea,
+} from '@spaceone/design-system';
+import { reactive, toRefs } from '@vue/composition-api';
 
 export default {
     name: 'AlertDetailNote',
     components: {
         PPaneLayout,
+        PPanelTop,
+        PTextarea,
+        PButton,
     },
     setup() {
-        return {
+        const state = reactive({
+            value: 'test',
+        });
 
+        return {
+            ...toRefs(state),
         };
     },
 };
@@ -23,9 +41,12 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.alert-detail-note {
-    padding-left: 1rem;
-    padding-top: 1.5rem;
-    padding-bottom: 1.5rem;
+.note-wrapper {
+    @apply px-4 flex flex-col;
+    margin-top: 1.5rem;
+}
+.add-btn {
+    width: 6.125rem;
+    margin-top: 0.5rem;
 }
 </style>

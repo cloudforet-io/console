@@ -5,11 +5,11 @@
                       @goBack="$router.go(-1)"
         />
         <section class="detail-contents-wrapper">
-            <alert-detail-header class="header" />
-            <alert-detail-responder class="responder" />
-            <alert-detail-info class="info" />
-            <alert-detail-note class="note" />
-            <alert-detail-timeline class="timeline" />
+            <alert-detail-header class="header" :id="id" />
+            <alert-detail-responder class="responder" :id="id" />
+            <alert-detail-info class="info" :id="id" />
+            <alert-detail-note class="note" :id="id" />
+            <alert-detail-timeline class="timeline" :id="id" />
         </section>
     </general-page-layout>
 </template>
@@ -70,21 +70,26 @@ export default {
     @apply bg-gray-100;
 }
 .detail-contents-wrapper {
-    @apply grid grid-cols-12 gap-1 w-full;
+    @apply grid grid-cols-12 gap-4 w-full;
+    grid-auto-flow: row;
+    grid-auto-rows: max-content;
 
     .header {
-        @apply col-span-8 row-start-1;
+        @apply col-span-8;
+        max-height: 6.125rem;
 
         @screen mobile {
             @apply col-span-12 row-start-1;
+            max-height: none;
         }
 
         @screen tablet {
             @apply col-span-12 row-start-1;
+            max-height: none;
         }
     }
     .responder {
-        @apply col-span-4 row-start-1;
+        @apply col-span-4;
 
         @screen tablet {
             @apply col-span-6 row-start-4;
@@ -95,7 +100,7 @@ export default {
         }
     }
     .info {
-        @apply col-span-8 row-start-2;
+        @apply col-span-8;
 
         @screen mobile {
             @apply col-span-12 row-start-2;
@@ -106,7 +111,7 @@ export default {
         }
     }
     .note {
-        @apply col-span-4 row-start-2;
+        @apply col-span-4;
 
         @screen tablet {
             @apply col-span-6 row-start-4;
@@ -118,7 +123,7 @@ export default {
 
     }
     .timeline {
-        @apply col-span-8 row-start-3;
+        @apply col-span-8;
 
         @screen mobile {
             @apply col-span-12 row-start-3;
