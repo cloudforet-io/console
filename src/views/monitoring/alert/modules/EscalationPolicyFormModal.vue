@@ -98,7 +98,7 @@ export default {
         };
 
         /* event */
-        const onChangeInputModel = (inputModel) => {
+        const onChangeInputModel = (inputModel: EscalationPolicyFormModel) => {
             state.inputModel = inputModel;
         };
         const onClickPolicyConfirm = async () => {

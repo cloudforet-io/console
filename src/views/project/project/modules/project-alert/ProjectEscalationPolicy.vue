@@ -18,7 +18,7 @@
                         </p-badge>
                         <span class="text">
                             {{ $t('PROJECT.DETAIL.ALERT.NOTIFICATION_LEVEL') }}
-                            <strong>{{ rule.notification_level }}</strong>
+                            <strong>{{ notificationLevelFormatter(rule.notification_level) }}</strong>
                         </span>
                         <template v-if="rule.escalate_minutes">
                             <span class="vertical-divider"> | </span>
@@ -46,11 +46,9 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { find } from 'lodash';
+import { get } from 'lodash';
 
-import {
-    PBadge, PDivider, PI,
-} from '@spaceone/design-system';
+import { PBadge, PDivider, PI } from '@spaceone/design-system';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
@@ -84,26 +82,28 @@ export default {
                     label: vm.$t('PROJECT.DETAIL.ALERT.RESOLVED'),
                 },
             ])),
-            escalationPolicyName: '',
-            finishCondition: '' as any,
-            escalationRules: [],
-            repeatCount: 0,
+            escalationPolicyRule: {},
+            escalationPolicyName: computed(() => get(state.escalationPolicyRule, 'name')),
+            finishCondition: computed(() => {
+                const finishCondition = get(state.escalationPolicyRule, 'finish_condition');
+                if (finishCondition) return finishCondition.label;
+                return '';
+            }),
+            escalationRules: computed(() => get(state.escalationPolicyRule, 'rules')),
+            repeatCount: computed(() => get(state.escalationPolicyRule, 'repeat_count')),
         });
+
+        /* util */
+        const notificationLevelFormatter = str => str.replace('LV', '');
 
         /* api */
         const getEscalationPolicy = async () => {
             try {
-                const res = await SpaceConnector.client.monitoring.escalationPolicy.get({
+                state.escalationPolicyRule = await SpaceConnector.client.monitoring.escalationPolicy.get({
                     escalation_policy_id: props.escalationPolicyId,
                 });
-                state.escalationPolicyName = res.name;
-                state.escalationRules = res.rules.map(rule => ({
-                    notification_level: rule.notification_level.replace('LV', ''),
-                    escalate_minutes: rule.escalate_minutes,
-                }));
-                state.finishCondition = find(state.finishConditions, { name: res.finish_condition })?.label;
-                state.repeatCount = res.repeat_count;
             } catch (e) {
+                state.escalationPolicyRule = {};
                 console.error(e);
             }
         };
@@ -114,6 +114,7 @@ export default {
 
         return {
             ...toRefs(state),
+            notificationLevelFormatter,
         };
     },
 };

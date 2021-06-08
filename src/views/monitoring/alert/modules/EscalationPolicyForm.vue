@@ -3,11 +3,11 @@
         <p-field-group
             :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_LABEL')"
             required
-            :invalid="!isNameValid"
+            :invalid="!!nameInvalidText"
             :invalid-text="nameInvalidText"
         >
             <p-text-input v-model="inputModel.name"
-                          :invalid="!isNameValid"
+                          :invalid="!!nameInvalidText"
                           class="w-1/2"
             />
         </p-field-group>
@@ -21,8 +21,9 @@
                     <p-radio v-for="(item, idx) in scopes" :key="idx"
                              :selected="item.value"
                              :value="inputModel.scope"
+                             @change="onChangeScope(item.value)"
                     >
-                        <span class="radio-label" @click="onChangeScope(item.value)">{{ item.label }}</span>
+                        <span class="radio-label">{{ item.label }}</span>
                     </p-radio>
                     <escalation-policy-project-tree v-if="inputModel.scope === SCOPE.project"
                                                     :selected-project-id.sync="inputModel.project_id"
@@ -42,8 +43,9 @@
             <p-radio v-for="(item, idx) in finishConditions" :key="idx"
                      :selected="item.value"
                      :value="inputModel.finish_condition"
+                     @change="onChangeFinishCondition(item.value)"
             >
-                <span class="radio-label" @click="onChangeFinishCondition(item.value)">{{ item.label }}</span>
+                <span class="radio-label">{{ item.label }}</span>
             </p-radio>
         </p-field-group>
         <p-field-group
@@ -127,11 +129,8 @@ export default {
                 repeat_count: DEFAULT_REPEAT_COUNT,
                 project_id: undefined,
             } as EscalationPolicyFormModel,
-            isNameValid: computed(() => {
-                if (!props.showValidation) return true;
-                return state.inputModel.name.length <= 40 && state.inputModel.name.length > 0;
-            }),
             nameInvalidText: computed(() => {
+                if (!props.showValidation) return undefined;
                 if (!state.inputModel.name) {
                     return vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
                 }
@@ -172,7 +171,7 @@ export default {
 
         /* event */
         const onChangeInputModel = () => {
-            emit('update:is-all-valid', state.isNameValid);
+            emit('update:is-all-valid', !state.nameInvalidText);
             emit('change', state.inputModel);
         };
         const onChangeScope = (value) => {

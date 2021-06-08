@@ -8,28 +8,28 @@
     >
         <template #body>
             <div class="modal-content-wrapper">
-                <button v-for="formMode in formModes"
-                        :class="{'bg-red': selectedFormMode === formMode.name}"
-                        @click="() => selectedFormMode = formMode.name"
-                >
-                    {{ formMode.label }}
-                </button>
-                <escalation-policy-data-table
-                    v-if="selectedFormMode === FORM_MODE.select"
-                    :loading="tableState.loading"
-                    :items="tableState.items"
-                    :select-index.sync="tableState.selectIndex"
-                    :sort-by.sync="tableState.sortBy"
-                    :sort-desc.sync="tableState.sortDesc"
-                />
-                <escalation-policy-form
-                    v-if="selectedFormMode === FORM_MODE.create"
-                    :mode="selectedFormMode"
-                    :show-scope="false"
-                    :show-validation="formState.showValidation"
-                    :is-all-valid.sync="formState.isAllValid"
-                    @change="onChangeInputModel"
-                />
+                <p-box-tab v-model="activeTab" :tabs="tabs">
+                    <template #select>
+                        <escalation-policy-data-table
+                            v-if="activeTab === FORM_MODE.select"
+                            :loading="tableState.loading"
+                            :items="tableState.items"
+                            :select-index.sync="tableState.selectIndex"
+                            :sort-by.sync="tableState.sortBy"
+                            :sort-desc.sync="tableState.sortDesc"
+                        />
+                    </template>
+                    <template #create>
+                        <escalation-policy-form
+                            v-if="activeTab === FORM_MODE.create"
+                            :mode="activeTab"
+                            :show-scope="false"
+                            :show-validation="formState.showValidation"
+                            :is-all-valid.sync="formState.isAllValid"
+                            @change="onChangeInputModel"
+                        />
+                    </template>
+                </p-box-tab>
             </div>
         </template>
         <template #confirm-button>
@@ -45,7 +45,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButtonModal,
+    PButtonModal, PBoxTab,
 } from '@spaceone/design-system';
 
 import EscalationPolicyDataTable from '@/views/monitoring/alert/modules/EscalationPolicyDataTable.vue';
@@ -70,6 +70,7 @@ export default {
         EscalationPolicyForm,
         EscalationPolicyDataTable,
         PButtonModal,
+        PBoxTab,
     },
     props: {
         projectId: {
@@ -90,8 +91,7 @@ export default {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             proxyVisible: makeProxy<boolean>('visible', props, emit),
-            selectedFormMode: FORM_MODE.select,
-            formModes: computed(() => ([
+            tabs: computed(() => ([
                 {
                     name: FORM_MODE.select,
                     label: vm.$t('PROJECT.DETAIL.ALERT.SELECT_POLICY'),
@@ -101,6 +101,7 @@ export default {
                     label: vm.$t('PROJECT.DETAIL.ALERT.CREATE_NEW_POLICY'),
                 },
             ])),
+            activeTab: FORM_MODE.select,
             changedEscalationPolicyId: undefined,
         });
         const tableState = reactive({
@@ -181,7 +182,7 @@ export default {
 
         /* event */
         const onClickConfirm = async () => {
-            if (state.selectedFormMode === FORM_MODE.create) {
+            if (state.activeTab === FORM_MODE.create) {
                 formState.showValidation = true;
                 if (!formState.isAllValid) return;
                 await createEscalationPolicy();

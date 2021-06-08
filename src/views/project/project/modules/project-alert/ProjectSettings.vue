@@ -40,17 +40,19 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import { get } from 'lodash';
+
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import ProjectEscalationPolicy from '@/views/project/project/modules/project-alert/ProjectEscalationPolicy.vue';
-import ProjectNotificationPolicyUpdateModal from '@/views/project/project/modules/project-alert/ProjectNotificationPolicyUpdateModal.vue';
-import ProjectEscalationPolicyUpdateModal from '@/views/project/project/modules/project-alert/ProjectEscalationPolicyUpdateModal.vue';
+import ProjectNotificationPolicyUpdateModal
+    from '@/views/project/project/modules/project-alert/ProjectNotificationPolicyUpdateModal.vue';
+import ProjectEscalationPolicyUpdateModal
+    from '@/views/project/project/modules/project-alert/ProjectEscalationPolicyUpdateModal.vue';
 
-import {
-    PI, PPaneLayout, PIconButton,
-} from '@spaceone/design-system';
+import { PI, PIconButton, PPaneLayout } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@/lib/space-connector';
 
@@ -89,8 +91,9 @@ export default {
                     label: vm.$t('PROJECT.DETAIL.ALERT.HIGH_URGENCY_NOTIFICATIONS'),
                 },
             ])),
-            notificationOption: '' as any,
-            escalationPolicyId: undefined,
+            projectAlertConfig: {},
+            notificationOption: computed(() => get(state.projectAlertConfig, 'notification_options.urgency')),
+            escalationPolicyId: computed(() => get(state.projectAlertConfig, 'escalation_policy_info.escalation_policy_id')),
             //
             updateNotificationPolicyModalVisible: false,
             updateEscalationPolicyModalVisible: false,
@@ -102,12 +105,11 @@ export default {
         /* api */
         const getProjectAlertConfig = async () => {
             try {
-                const res = await SpaceConnector.client.monitoring.projectAlertConfig.get({
+                state.projectAlertConfig = await SpaceConnector.client.monitoring.projectAlertConfig.get({
                     project_id: props.projectId,
                 });
-                state.notificationOption = res.notification_options.urgency;
-                state.escalationPolicyId = res.escalation_policy_info.escalation_policy_id;
             } catch (e) {
+                state.projectAlertConfig = {};
                 console.error(e);
             }
         };
