@@ -7,7 +7,7 @@
               :disable-icon="!withIcon && (!isSelected || disableCheckIcon)"
               @click="onClick"
     >
-        {{ value }}
+        <slot>{{ value }}</slot>
     </p-status>
 </template>
 
@@ -21,9 +21,10 @@ interface Props extends SelectProps {
     icon?: string;
     lottie?: string;
     iconAnimation?: ANIMATION_TYPE;
+    disableCheckIcon?: boolean;
 }
 
-export default defineComponent({
+export default defineComponent<Props>({
     name: 'PSelectStatus',
     components: { PStatus },
     model: {
