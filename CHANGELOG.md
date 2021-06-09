@@ -1,3 +1,10 @@
+# [1.1.0-beta.49](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.48...v1.1.0-beta.49) (2021-06-09)
+
+
+### Features
+
+* add style type to Toolbox Table ([#584](https://github.com/spaceone-dev/spaceone-design-system/issues/584)) ([f57e04b](https://github.com/spaceone-dev/spaceone-design-system/commit/f57e04bd598cf8d57793198fc83938b217b1ac5f))
+
 # [1.1.0-beta.48](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.47...v1.1.0-beta.48) (2021-06-07)
 
 
