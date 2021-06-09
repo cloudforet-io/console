@@ -3,30 +3,67 @@
         <p-definition-table :fields="fields" :data="data"
                             :skeleton-rows="10"
                             :stripe="false"
+                            :disable-copy="true"
+        >
+            <template #data-project_id>
+                <p class="content-wrapper">
+                    <span class="project">{{ data.project_id }}</span>
+                    <p-button style-type="gray-border" size="sm" @click="openChangeProjectModal">
+                        Change
+                    </p-button>
+                </p>
+            </template>
+            <template #data-created_at>
+                {{ iso8601Formatter(data.created_at, timezone) }}
+            </template>
+            <template #data-description>
+                test
+            </template>
+        </p-definition-table>
+        <project-tree-modal :visible.sync="formState.changeProjectModalVisible"
+                            :project-id="formState.projectId"
+                            :loading="formState.loading"
+                            @confirm="changeProject"
         />
     </p-pane-layout>
 </template>
 
 <script lang="ts">
-import { PPaneLayout, PDefinitionTable } from '@spaceone/design-system';
+import { PPaneLayout, PDefinitionTable, PButton } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+import { iso8601Formatter } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
+import { store } from '@/store';
+import { AlertDataModel } from '@/views/monitoring/alert/type';
+import { ProjectItemResp } from '@/views/project/project/type';
+import ProjectTreeModal from '@/common/modules/ProjectTreeModal.vue';
+
+interface PropsType {
+    id: string;
+    alertData: AlertDataModel;
+}
 
 export default {
     name: 'AlertDetailInfo',
     components: {
         PPaneLayout,
         PDefinitionTable,
+        PButton,
+        ProjectTreeModal,
     },
     props: {
         id: {
             type: String,
             default: '',
         },
+        alertData: {
+            type: Object,
+            default: null,
+        },
     },
-    setup(props) {
+    setup(props: PropsType) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
@@ -44,26 +81,40 @@ export default {
             ],
             data: {},
             loading: true,
+            timezone: store.state.user.timezone,
         });
 
-        const getAlertData = async () => {
-            state.loading = true;
-            try {
-                const res = await SpaceConnector.client.monitoring.alert.get({
-                    alert_id: props.id,
-                });
-                state.data = res;
-            } catch (e) {
-                console.error(e);
-            }
+        const formState = reactive({
+            changeProjectModalVisible: false,
+            loading: false,
+            projectId: props.alertData.project_id,
+        });
+
+        const openChangeProjectModal = () => {
+            formState.changeProjectModalVisible = true;
+        };
+
+        const changeProject = async (data?: ProjectItemResp|null) => {
+            // TODO: add API when backend structure fixed
+            // if (data) {
+            //     try {
+            //         await SpaceConnector.client.monitoring.alert.update({
+            //
+            //         })
+            //     }
+            // }
         };
 
         (async () => {
-            await getAlertData();
+            state.data = props.alertData;
         })();
 
         return {
             ...toRefs(state),
+            formState,
+            iso8601Formatter,
+            openChangeProjectModal,
+            changeProject,
         };
     },
 };
@@ -74,5 +125,10 @@ export default {
 <style lang="postcss" scoped>
 .alert-detail-info {
 
+}
+.content-wrapper {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
 }
 </style>

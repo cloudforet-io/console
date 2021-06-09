@@ -4,7 +4,8 @@
                        class="level-dropdown"
         >
             <template #default>
-                <p-select-dropdown v-model="notificationLevel" :items="LEVEL_LIST" :use-custom-style="true"
+                <p-select-dropdown v-model="proxyNotificationLevel" :items="LEVEL_LIST" :use-custom-style="true"
+                                   :select-item="proxyNotificationLevel"
                                    @input="onChangeLevel"
                 />
             </template>
@@ -40,15 +41,15 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            notificationLevel: props.notificationLevel ? props.notificationLevel : 'ALL',
+            proxyNotificationLevel: props.notificationLevel ? props.notificationLevel : 'ALL',
         });
         const emitChange = () => {
             emit('change', {
-                level: state.notificationLevel,
+                level: state.proxyNotificationLevel,
             });
         };
         const onChangeLevel = (value) => {
-            state.notificationLevel = value;
+            state.proxyNotificationLevel = value;
             emitChange();
         };
         return {

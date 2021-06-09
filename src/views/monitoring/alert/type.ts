@@ -1,5 +1,7 @@
 /* eslint-disable camelcase */
 
+import {TimeStamp} from "@/models";
+
 export enum ACTION {
     create = 'create',
     delete = 'delete',
@@ -30,6 +32,37 @@ export interface EscalationPolicyFormModel {
     repeat_count: number;
     project_id?: string;
 }
+
+type responder = {
+    resource_type: string;
+    resource_id: string;
+}
+
+export interface AlertDataModel {
+    responders: responder[];
+    alert_number: number;
+    alert_id: string;
+    title: string;
+    state: ALERT_STATE;
+    status_message: string;
+    description: string;
+    assignee: string;
+    urgency: ALERT_URGENCY;
+    severity: ALERT_SEVERITY;
+    is_snoozed: true;
+    snoozed_end_time: TimeStamp;
+    escalation_level: number;
+    escalation_ttl: number;
+    webhook_id: string;
+    escalation_policy_id: string;
+    project_id: string;
+    created_at: TimeStamp;
+    updated_at: TimeStamp;
+    acknowledged_at: TimeStamp;
+    resolved_at: TimeStamp;
+    escalated_at: TimeStamp;
+}
+
 
 export const ALERT_STATE = {
     TRIGGERED: 'TRIGGERED',

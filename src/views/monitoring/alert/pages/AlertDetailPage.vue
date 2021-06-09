@@ -1,21 +1,51 @@
 <template>
     <general-page-layout class="alert-detail-page">
         <p-breadcrumbs :routes="routeState.route" />
-        <p-page-title :title="id" child class="page-title"
+        <p-page-title :title="alertInfo.title" child class="page-title"
                       @goBack="$router.go(-1)"
-        />
+        >
+            <template #extra>
+                <span class="title-btn">
+                    <p-icon-button name="ic_trashcan"
+                                   class="w-full delete-btn"
+                                   @click="openAlertDeleteForm"
+                    />
+                    <p-icon-button name="ic_edit-text"
+                                   class="edit-btn"
+                                   @click="openAlertEditForm"
+                    />
+                </span>
+            </template>
+        </p-page-title>
         <section class="detail-contents-wrapper">
-            <alert-detail-header class="header" :id="id" />
-            <alert-detail-responder class="responder" :id="id" />
-            <alert-detail-info class="info" :id="id" />
-            <alert-detail-note class="note" :id="id" />
-            <alert-detail-timeline class="timeline" :id="id" />
+            <alert-detail-header v-if="!loading" :id="id" class="header"
+                                 :alert-data="alertInfo"
+            />
+            <alert-detail-responder v-if="!loading" :id="id" class="responder"
+                                    :alert-data="alertInfo"
+            />
+            <alert-detail-info v-if="!loading" :id="id" class="info"
+                               :alert-data="alertInfo"
+            />
+            <alert-detail-note v-if="!loading" :id="id" class="note" />
+            <alert-detail-timeline v-if="!loading" :id="id" class="timeline" />
         </section>
+        <delete-modal :header-title="checkDeleteState.headerTitle"
+                      :visible.sync="checkDeleteState.visible"
+                      :contents="'Alert를 삭제하시겠습니까?'"
+                      @confirm="alertDeleteConfirm"
+        />
+        <alert-title-edit-modal v-if="alertTitleEditFormVisible"
+                                :visible.sync="alertTitleEditFormVisible"
+                                :alert-id="id"
+                                :alert-title="alertInfo.title"
+                                @confirm="alertTitleEditConfirm"
+        />
     </general-page-layout>
 </template>
 
 <script lang="ts">
-import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
+import { PBreadcrumbs, PIconButton, PPageTitle } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
@@ -25,18 +55,26 @@ import AlertDetailInfo from '@/views/monitoring/alert/modules/alert-detail/Alert
 import AlertDetailResponder from '@/views/monitoring/alert/modules/alert-detail/AlertDetailResponder.vue';
 import AlertDetailTimeline from '@/views/monitoring/alert/modules/alert-detail/AlertDetailTimeline.vue';
 import AlertDetailNote from '@/views/monitoring/alert/modules/alert-detail/AlertDetailNote.vue';
+import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
+import { SpaceConnector } from '@/lib/space-connector';
+import { AlertDataModel } from '@/views/monitoring/alert/type';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import AlertTitleEditModal from '@/views/monitoring/alert/modules/alert-detail/AlertTitleEditModal.vue';
 
 export default {
     name: 'AlertDetailPage',
     components: {
+        AlertTitleEditModal,
         AlertDetailNote,
         AlertDetailTimeline,
         AlertDetailResponder,
         AlertDetailInfo,
         AlertDetailHeader,
         GeneralPageLayout,
+        DeleteModal,
         PBreadcrumbs,
         PPageTitle,
+        PIconButton,
     },
     props: {
         id: {
@@ -44,9 +82,13 @@ export default {
             default: null,
         },
     },
-    setup(props) {
+    setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            alertInfo: {} as AlertDataModel,
+            loading: true,
+            //
+            alertTitleEditFormVisible: false,
         });
 
         const routeState = reactive({
@@ -57,9 +99,64 @@ export default {
             ]),
         });
 
+        const checkDeleteState = reactive({
+            visible: false,
+            headerTitle: 'Alert를 삭제하시겠습니까?',
+        });
+
+        const getAlertData = async () => {
+            state.loading = true;
+            try {
+                const res = await SpaceConnector.client.monitoring.alert.get({
+                    // eslint-disable-next-line camelcase
+                    alert_id: props.id,
+                });
+                state.alertInfo = res;
+                state.loading = false;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const openAlertDeleteForm = () => {
+            checkDeleteState.visible = true;
+        };
+
+        const alertDeleteConfirm = async () => {
+            try {
+                await SpaceConnector.client.monitoring.alert.delete({
+                    alert_id: props.id,
+                });
+                showSuccessMessage('Alert Delete confirm', '', root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage('Alert Delete failure', '', root);
+            } finally {
+                checkDeleteState.visible = false;
+            }
+        };
+
+        const openAlertEditForm = () => {
+            state.alertTitleEditFormVisible = true;
+        };
+
+        const alertTitleEditConfirm = async () => {
+            state.alertTitleEditFormVisible = false;
+            await getAlertData();
+        };
+
+        (async () => {
+            await getAlertData();
+        })();
+
         return {
             ...toRefs(state),
             routeState,
+            checkDeleteState,
+            openAlertDeleteForm,
+            alertDeleteConfirm,
+            openAlertEditForm,
+            alertTitleEditConfirm,
         };
     },
 };
@@ -69,68 +166,59 @@ export default {
 .alert-detail-page {
     @apply bg-gray-100;
 }
+.p-page-title::v-deep {
+    .extra {
+        justify-content: flex-start;
+    }
+}
 .detail-contents-wrapper {
     @apply grid grid-cols-12 gap-4 w-full;
     grid-auto-flow: row;
     grid-auto-rows: max-content;
 
     .header {
-        @apply col-span-8;
+        @apply col-span-8 row-start-1 row-end-1;
         max-height: 6.125rem;
 
-        @screen mobile {
-            @apply col-span-12 row-start-1;
-            max-height: none;
-        }
-
         @screen tablet {
-            @apply col-span-12 row-start-1;
+            @apply col-span-12 row-start-1 row-end-1;
             max-height: none;
         }
     }
     .responder {
-        @apply col-span-4;
+        @apply col-span-4 row-start-1 row-end-3;
 
         @screen tablet {
-            @apply col-span-6 row-start-4;
+            @apply col-span-6 row-start-4 row-end-4;
         }
 
         @screen mobile {
-            @apply col-span-12 row-start-4;
+            @apply col-span-12 row-start-4 row-end-5;
         }
     }
     .info {
-        @apply col-span-8;
-
-        @screen mobile {
-            @apply col-span-12 row-start-2;
-        }
+        @apply col-span-8 row-start-2 row-end-2;
 
         @screen tablet {
-            @apply col-span-12 row-start-2;
+            @apply col-span-12 row-start-2 row-end-2;
         }
     }
     .note {
-        @apply col-span-4;
+        @apply col-span-4 row-start-3 row-end-3;
 
         @screen tablet {
-            @apply col-span-6 row-start-4;
+            @apply col-span-6 row-start-4 row-end-4;
         }
 
         @screen mobile {
-            @apply col-span-12 row-start-5;
+            @apply col-span-12 row-start-5 row-end-5 col-start-1;
         }
-
     }
     .timeline {
-        @apply col-span-8;
-
-        @screen mobile {
-            @apply col-span-12 row-start-3;
-        }
+        @apply col-span-8 col-start-1 row-start-3 row-end-3;
 
         @screen tablet {
-            @apply col-span-12 row-start-3;
+            @apply col-span-12 row-start-3 row-end-3;
         }
     }
 }

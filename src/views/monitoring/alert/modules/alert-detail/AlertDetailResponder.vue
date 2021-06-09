@@ -1,7 +1,9 @@
 <template>
     <p-pane-layout class="alert-detail-responder">
         <article class="responder-wrapper">
-            <p-panel-top class="-ml-1">{{ $t('MONITORING.ALERT.DETAIL.RESPONDER.RESPONDER') }}</p-panel-top>
+            <p-panel-top class="-ml-1">
+                {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.RESPONDER') }}
+            </p-panel-top>
             <p-collapsible-list :items="items" theme="card">
                 <template #title="{title, index}">
                     <span class="level" :class="{'current': index + 1 === alertData.escalation_level}">{{ title }}</span>
@@ -13,11 +15,13 @@
                 <template #default="{data}">
                     <p class="data-wrapper">
                         whdalsrnt@gmail.com
-<!--                        {{ alertData.responders[0].resource_id }}-->
+                        <!--                        {{ alertData.responders[0].resource_id }}-->
                     </p>
                 </template>
             </p-collapsible-list>
-            <p class="search-title">{{$t('MONITORING.ALERT.DETAIL.RESPONDER.ADDITIONAL_RESPONDER')}}</p>
+            <p class="search-title">
+                {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.ADDITIONAL_RESPONDER') }}
+            </p>
             <p-autocomplete-search v-model="responderState.search" :menu="responderState.allMemberItems" :loading="responderState.loading"
                                    class="autocomplete-search" @select-menu="onSelectMember"
             >
@@ -32,6 +36,11 @@
                     <div v-if="responderState.loading" class="fake-no-data" />
                 </template>
             </p-autocomplete-search>
+            <div class="tag-box">
+                <p-tag v-for="(tag, i) in responderState.selectedMemberItems" :key="tag" @delete="onDeleteTag(i)">
+                    {{ tag ? tag : '' }}
+                </p-tag>
+            </div>
         </article>
     </p-pane-layout>
 </template>
@@ -39,7 +48,7 @@
 <script lang="ts">
 import {
     PAutocompleteSearch,
-    PBadge, PCheckBox, PCollapsibleList, PPaneLayout, PPanelTop,
+    PBadge, PCheckBox, PCollapsibleList, PPaneLayout, PPanelTop, PTag,
 } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
@@ -48,36 +57,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { TimeStamp } from '@/models';
 import { ALERT_SEVERITY, ALERT_STATE, ALERT_URGENCY } from '@/views/monitoring/alert/type';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-
-type responder = {
-    resource_type: string;
-    resource_id: string;
-}
-
-interface AlertDataModel {
-    responders: responder[];
-    alert_number: number;
-    alert_id: string;
-    title: string;
-    state: ALERT_STATE;
-    status_message: string;
-    description: string;
-    assignee: string;
-    urgency: ALERT_URGENCY;
-    severity: ALERT_SEVERITY;
-    is_snoozed: true;
-    snoozed_end_time: TimeStamp;
-    escalation_level: number;
-    escalation_ttl: number;
-    webhook_id: string;
-    escalation_policy_id: string;
-    project_id: string;
-    created_at: TimeStamp;
-    updated_at: TimeStamp;
-    acknowledged_at: TimeStamp;
-    resolved_at: TimeStamp;
-    escalated_at: TimeStamp;
-}
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 
 export default {
     name: 'AlertDetailResponder',
@@ -88,10 +68,15 @@ export default {
         PBadge,
         PAutocompleteSearch,
         PCheckBox,
+        PTag,
     },
     props: {
         id: {
             type: String,
+            default: null,
+        },
+        alertData: {
+            type: Object,
             default: null,
         },
     },
@@ -103,7 +88,6 @@ export default {
                 { title: vm.$t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'test' },
                 { title: vm.$t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'test' },
             ],
-            alertData: {} as AlertDataModel,
             loading: true,
         });
 
@@ -119,18 +103,6 @@ export default {
             selectedMemberItems: [],
         });
 
-        const getAlertData = async () => {
-            state.loading = true;
-            try {
-                const res = await SpaceConnector.client.monitoring.alert.get({
-                    alert_id: props.id,
-                });
-                state.alertData = res;
-            } catch (e) {
-                console.error(e);
-            }
-        };
-
         const listMember = async () => {
             responderState.loading = true;
             try {
@@ -145,7 +117,6 @@ export default {
         };
 
         (async () => {
-            await getAlertData();
             await listMember();
         })();
 
@@ -155,11 +126,19 @@ export default {
             responderState.selectedMemberItems = [...responderState.selectedMemberItems, item.name];
         };
 
+        const onDeleteTag = (idx) => {
+            responderState.selectedMemberItems.splice(idx, 1);
+            vm.$nextTick(() => {
+                responderState.selectedMemberItems = [...responderState.selectedMemberItems];
+            });
+        };
+
 
         return {
             ...toRefs(state),
             responderState,
             onSelectMember,
+            onDeleteTag,
         };
     },
 };
@@ -188,5 +167,12 @@ export default {
     margin-bottom: 0.5rem;
     font-size: 1rem;
     line-height: 140%;
+}
+.tag-box {
+    @apply text-gray-900;
+    margin-top: 0.625rem;
+    .p-tag {
+        margin-bottom: 0.5rem;
+    }
 }
 </style>
