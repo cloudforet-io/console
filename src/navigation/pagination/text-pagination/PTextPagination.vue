@@ -6,7 +6,7 @@
                        :disabled="thisPage === 1"
                        @click="update(thisPage-1)"
         />
-        <div class="page-number">
+        <div v-if="showPageNumber" class="page-number">
             <div class="page-number-text">
                 <span class="this-page">{{ thisPage }}</span> / <span>{{ allPage }}</span>
             </div>
@@ -33,12 +33,18 @@ export default {
             validator(value) {
                 return value > 0;
             },
+            default: undefined,
         },
         allPage: {
             type: Number,
             validator(value) {
                 return value > 0;
             },
+            default: undefined,
+        },
+        showPageNumber: {
+            type: Boolean,
+            default: true,
         },
     },
     setup(props, { emit }) {
