@@ -19,6 +19,12 @@ export enum FINISH_CONDITION {
     resolved = 'RESOLVED',
 }
 
+export const WEBHOOK_STATE = {
+    ENABLED: 'ENABLED',
+    DISABLED: 'DISABLED',
+} as const;
+export type WEBHOOK_STATE = typeof WEBHOOK_STATE[keyof typeof WEBHOOK_STATE];
+
 export interface Rule {
     notification_level: string;
     escalate_minutes?: number;

@@ -1,329 +1,319 @@
 <template>
     <div class="webhook-tab">
-        <p-toolbox-table selectable
-                         sortable
-                         :exportable="true"
-                         :settings-visible="true"
-                         :loading="loading"
-                         :fields="fields"
-                         :items="items"
-                         :select-index.sync="selectIndex"
-                         :total-count="totalCount"
-                         class="mb-2 px-4"
-                         @refresh="onChangeWebhookTable"
-                         @export="exportDataToExcel"
+        <p-toolbox-table
+            selectable
+            sortable
+            exportable
+            search-type="query"
+            :multi-select="false"
+            :loading="loading"
+            :items="items"
+            :fields="fields"
+            :select-index.sync="selectIndex"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
+            :page-size.sync="pageLimit"
+            :total-count="totalCount"
+            :query-tags="searchTags"
+            :key-item-sets="handlers.keyItemSets"
+            :value-handler-map="handlers.valueHandlerMap"
+            :timezone="timezone"
+            @refresh="listWebhooks"
+            @change="onChange"
+            @export="onExport"
         >
             <template #toolbox-top>
-                <p-panel-top :title="$t('PROJECT.DETAIL.SUBTAB_WEBHOOK')" use-total-count :total-count="totalCount" />
+                <p-panel-top
+                    use-total-count
+                    :total-count="totalCount"
+                    :title="$t('PROJECT.DETAIL.SUBTAB_WEBHOOK')"
+                />
             </template>
             <template #toolbox-left>
-                <p-icon-text-button style-type="primary-dark" class="mr-4 add-btn"
-                                    name="ic_plus_bold"
-                                    @click="onClickAdd()"
+                <p-icon-text-button
+                    class="mr-4 add-btn"
+                    style-type="primary-dark"
+                    name="ic_plus_bold"
+                    @click="onClickAdd"
                 >
-                    {{ $t('PROJECT.DETAIL.SUBTAB_WEBHOOK') }}
+                    {{ $t('PROJECT.DETAIL.ADD') }}
                 </p-icon-text-button>
-                <p-dropdown-menu-btn :menu="dropdownMenu"
-                                     @click-update="onClickUpdate"
-                                     @click-delete="onClickDelete"
+                <p-dropdown-menu-btn
+                    :menu="dropdown"
+                    @click-update="onClickUpdate"
+                    @click-delete="onClickDelete"
                 >
                     {{ $t('PROJECT.DETAIL.WEBHOOK_ACTION') }}
                 </p-dropdown-menu-btn>
             </template>
+            <template #col-plugin_info.plugin_id-format="{index, field, item}">
+                <p-lazy-img :src="item.plugin_icon"
+                            width="1.5rem" height="1.5rem" class="mr-2"
+                />
+                {{ item.plugin_name }}
+            </template>
+            <template #col-state-format="{ value }">
+                <p-status
+                    class="capitalize"
+                    v-bind="userStateFormatter(value)"
+                />
+            </template>
         </p-toolbox-table>
 
-        <p-button-modal :header-title="$t('PROJECT.DETAIL.MODAL_ADD_WEBHOOK_TITLE')"
-                        :visible.sync="webhookAddFormVisible"
-                        size="md"
-                        @confirm="onAddConfirm"
-        >
-            <template #body>
-                <div>add webhook list</div>
-            </template>
-        </p-button-modal>
-
-        <p-button-modal :header-title="$t('PROJECT.DETAIL.MODAL_UPDATE_WEBHOOK_TITLE')"
-                        :visible.sync="webhookUpdateFormVisible"
-                        size="sm"
-                        @confirm="onUpdateConfirm"
-        >
-            <template #body>
-                <p-field-group
-                    :label="$t('PROJECT.DETAIL.MODAL_UPDATE_WEBHOOK_LABEL_1')"
-                    required
-                >
-                    <p-text-input class="block w-full"
-                                  :placeholder="$t('PROJECT.DETAIL.MODAL_UPDATE_WEBHOOK_PLACEHOLDER')"
-                    />
-                </p-field-group>
-                <p-field-group
-                    :label="$t('PROJECT.DETAIL.MODAL_UPDATE_WEBHOOK_LABEL_2')"
-                    required
-                >
-                    <div class="toggle-wrapper" :class="{enabled: enabled}">
-                        <p-toggle-button :value="enabled"
-                                         :theme="'secondary'"
-                                         sync
-                                         @change="onToggleChange"
-                        />
-                        <span class="label">{{ enabled ? 'enabled' : 'disabled' }}</span>
-                    </div>
-                </p-field-group>
-            </template>
-        </p-button-modal>
-
-        <delete-modal :header-title="$t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_TITLE')"
-                      :visible.sync="webhookDeleteFormVisible"
-                      @confirm="onDeleteConfirm"
-        >
-            <p>
-                {{ $t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_CONTENT') }}
-            </p>
-        </delete-modal>
+        <webhook-add-form-modal
+            :visible.sync="webhookAddFormVisible"
+            :project-id="projectId"
+            @confirm="listWebhooks()"
+        />
+        <webhook-update-form-modal
+            v-if="webhookUpdateFormVisible"
+            :visible.sync="webhookUpdateFormVisible"
+            :webhook-info="selectedItems[0]"
+            @confirm="listWebhooks()"
+        />
+        <delete-modal
+            :header-title="$t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_CONTENT')"
+            :visible.sync="webhookDeleteFormVisible"
+            @confirm="onDeleteConfirm"
+        />
     </div>
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs,
+    reactive, toRefs, ComponentRenderProxy, computed, getCurrentInstance,
 } from '@vue/composition-api';
 
 import {
-    PToolboxTable, PPanelTop, PIconTextButton, PDropdownMenuBtn, PButtonModal, PToggleButton, PFieldGroup, PTextInput,
+    PToolboxTable, PPanelTop, PIconTextButton, PDropdownMenuBtn, PStatus, PLazyImg,
 } from '@spaceone/design-system';
+import WebhookAddFormModal from '@/views/project/project/modules/WebhookAddFormModal.vue';
+import WebhookUpdateFormModal from '@/views/project/project/modules/WebhookUpdateFormModal.vue';
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
-import { Options } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
+
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { SpaceConnector } from '@/lib/space-connector';
-import { TranslateResult } from 'vue-i18n';
-import { store } from '@/store';
-import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/lib/util';
-import { Tags, TimeStamp } from '@/models';
-import { FILE_NAME_PREFIX } from '@/lib/type';
-import { getPageStart } from '@/lib/component-utils/pagination';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { QueryHelper } from '@/lib/query';
 
-interface WebhookItem {
-    created_at?: TimeStamp;
-    domain_id?: string;
-    labels: string[];
-    // eslint-disable-next-line camelcase
-    project_group_info?: object;
-    resource_id?: string;
-    resource_type?: string;
-    role_binding_id?: string;
-    // eslint-disable-next-line camelcase
-    role_info?: object;
-    tags?: Tags;
-}
-interface WebhookListApiResponse {
-    results: WebhookItem[];
-    // eslint-disable-next-line camelcase
-    total_count: number;
-}
+import { store } from '@/store';
+import { userStateFormatter } from '@/views/identity/user/lib/helper';
+import { replaceUrlQuery } from '@/lib/router-query-string';
+import {
+    iso8601Formatter, showErrorMessage, showLoadingMessage, showSuccessMessage,
+} from '@/lib/util';
+import {
+    makeDistinctValueHandler, makeEnumValueHandler,
+} from '@/lib/component-utils/query-search';
+import { FILE_NAME_PREFIX } from '@/lib/type';
+import { WEBHOOK_STATE } from '@/views/monitoring/alert/type';
+
 export default {
     name: 'ProjectWebhookTab',
     components: {
+        WebhookAddFormModal,
+        WebhookUpdateFormModal,
+        DeleteModal,
         PToolboxTable,
         PPanelTop,
         PIconTextButton,
         PDropdownMenuBtn,
-        PButtonModal,
-        PToggleButton,
-        PFieldGroup,
-        PTextInput,
-        DeleteModal,
+        PStatus,
+        PLazyImg,
     },
     props: {
         projectId: {
             type: String,
             default: '',
         },
-        isProjectGroup: {
-            type: Boolean,
-            default: false,
-        },
-        projectGroupId: {
-            type: String,
-            default: '',
-        },
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryHelper = new QueryHelper();
 
+        const handlers = {
+            keyItemSets: [{
+                title: 'Properties',
+                items: [
+                    { name: 'name', label: 'Name' },
+                    { name: 'state', label: 'State' },
+                    { name: 'plugin_info.plugin_id', label: 'Plugin' },
+                    { name: 'webhook_url', label: 'Webhook URL' },
+                    { name: 'created_at', label: 'Created', dataType: 'datetime' },
+                ],
+            }],
+            valueHandlerMap: {
+                name: makeDistinctValueHandler('monitoring.Webhook', 'name'),
+                state: makeEnumValueHandler(WEBHOOK_STATE),
+                'plugin_info.plugin_id': makeDistinctValueHandler('monitoring.Webhook', 'plugin_info.plugin_id'),
+                // 'plugin_info.plugin_id': makeReferenceValueHandler('inventory.Collector'),
+                webhook_url: makeDistinctValueHandler('monitoring.Webhook', 'webhook_url'),
+                created_at: makeDistinctValueHandler('monitoring.Webhook', 'created_at'),
+            },
+        };
         const state = reactive({
-            enabled: true,
-            users: computed(() => vm.$store.state.resource.user.items),
-            selectIndex: [] as number[],
-            fields: [
-                { label: 'Type', name: '', type: '' },
-                { label: 'Name', name: '', type: '' },
-                { label: 'Key', name: '', type: '' },
-                { label: 'Webhook URL', name: '', type: '' },
-                { label: 'State', name: '', type: '' },
-            ],
-            items: [] as WebhookItem[],
-            thisPage: 1,
-            pageSize: 24,
             loading: true,
-            totalCount: 0,
-            options: {
-                searchText: '',
-            } as Partial<Options>,
-            selectedItems: computed(() => state.selectIndex.map(i => state.items[i])),
-            isSelected: computed(() => state.selectIndex.length > 0),
-            dropdownMenu: computed(() => ([
+            dropdown: computed(() => ([
                 {
                     type: 'item',
                     name: 'update',
                     label: vm.$t('PROJECT.DETAIL.WEBHOOK_UPDATE'),
-                    disabled: state.selectIndex.length > 1 || !state.isSelected,
+                    disabled: state.selectedItems.length !== 1,
                 },
                 {
                     type: 'item',
                     name: 'delete',
                     label: vm.$t('PROJECT.DETAIL.WEBHOOK_DELETE'),
-                    disabled: !state.isSelected,
+                    disabled: state.selectedItems.length !== 1,
                 },
             ] as MenuItem[])),
+            fields: [
+                { name: 'name', label: 'Name' },
+                { name: 'state', label: 'State' },
+                { name: 'plugin_info.plugin_id', label: 'Type' },
+                { name: 'webhook_url', label: 'Webhook URL' },
+                { name: 'created_at', label: 'Created' },
+            ],
+            items: [],
+            selectIndex: [],
+            selectedItems: computed(() => state.selectIndex.map(i => state.items[i])),
+            sortBy: 'name',
+            sortDesc: true,
+            totalCount: 0,
+            pageLimit: 15,
+            pageStart: 1,
+            searchTags: [],
+            plugins: computed(() => store.state.resource.plugin.items),
+            timezone: computed(() => store.state.user.timezone),
         });
-
-        // List api Handler for query search table
-        const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
-        const apiQuery = new ApiQueryHelper();
-        apiQuery.setPageStart(getPageStart(state.thisPage, state.pageSize))
-            .setPageLimit(state.pageSize)
-            .setFilters(queryHelper.filters);
-
-        const listWebhook = async () => {
-            const res = await SpaceConnector.client.identity.project.member.list({
-                project_id: props.projectId,
-                query: apiQuery.data,
-            });
-            return res;
-        };
-        const listGroupWebhook = async () => {
-            const res = await SpaceConnector.client.identity.projectGroup.member.list({
-                project_group_id: props.projectGroupId,
-                query: apiQuery.data,
-            });
-            return res;
-        };
-        const listWebhooks = async () => {
-            state.loading = true;
-            state.selectIndex = [];
-            let res = [] as unknown as WebhookListApiResponse;
-            try {
-                if (props.isProjectGroup) res = await listGroupWebhook();
-                else res = await listWebhook();
-                state.items = res.results.map(d => ({
-                    ...d,
-                    user_id: d.resource_id,
-                }));
-                state.totalCount = res.total_count;
-            } catch (e) {
-                state.items = [];
-                state.totalCount = 0;
-                console.error(e);
-            }
-            state.loading = false;
-        };
-
-        const onChangeWebhookTable = async (changed: any = {}) => {
-        };
-
-        const exportDataToExcel = async () => {
-        };
-
         const formState = reactive({
-            headerTitle: '' as TranslateResult,
-            themeColor: '',
             webhookAddFormVisible: false,
             webhookUpdateFormVisible: false,
             webhookDeleteFormVisible: false,
+            visibleCustomFieldModal: false,
         });
 
+        /* api */
+        const apiQuery = new ApiQueryHelper();
+        const getQuery = () => {
+            apiQuery.setSort(state.sortBy, state.sortDesc)
+                .setPage(state.pageStart, state.pageLimit)
+                .setFiltersAsQueryTag(state.searchTags);
+            return apiQuery.data;
+        };
+        const listWebhooks = async () => {
+            state.loading = true;
+            try {
+                const res = await SpaceConnector.client.monitoring.webhook.list({
+                    query: getQuery(),
+                });
+                state.items = res.results.map(d => ({
+                    ...d,
+                    plugin_name: state.plugins[d.plugin_info.plugin_id]?.label,
+                    plugin_icon: state.plugins[d.plugin_info.plugin_id]?.icon,
+                    created_at: iso8601Formatter(d.created_at, state.timezone),
+                }));
+                state.totalCount = res.total_count;
+                state.selectIndex = [];
+            } catch (e) {
+                console.error(e);
+                state.items = [];
+                state.totalCount = 0;
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        /* event */
+        const onChange = async (changed: any = {}) => {
+            if (changed.sortBy !== undefined) {
+                state.sortBy = changed.sortBy;
+                state.sortDesc = changed.sortDesc;
+            }
+            if (changed.pageStart !== undefined) state.pageStart = changed.pageStart;
+            if (changed.queryTags !== undefined) state.searchTags = changed.queryTags;
+            if (changed.queryTags !== undefined) {
+                state.tags = changed.queryTags;
+                queryHelper.setFiltersAsQueryTag(changed.queryTags);
+                await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
+            }
+            await listWebhooks();
+        };
         const onClickAdd = () => {
             formState.webhookAddFormVisible = true;
         };
-
-        const onAddConfirm = async () => {
-            formState.webhookAddFormVisible = false;
-        };
-
         const onClickUpdate = () => {
             formState.webhookUpdateFormVisible = true;
         };
-
-        const onUpdateConfirm = async () => {
-            formState.webhookUpdateFormVisible = false;
-        };
-
         const onClickDelete = () => {
             formState.webhookDeleteFormVisible = true;
         };
-
         const onDeleteConfirm = async () => {
-            formState.webhookDeleteFormVisible = false;
+            try {
+                await SpaceConnector.client.monitoring.webhook.delete({
+                    webhook_id: state.selectedItems.map(d => d.webhook_id),
+                });
+                await listWebhooks();
+                showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_DELETE_WEBHOOK'), '', root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_DELETE_WEBHOOK'), e, root);
+            } finally {
+                formState.webhookDeleteFormVisible = false;
+            }
+        };
+        const onExport = async () => {
+            try {
+                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
+                await store.dispatch('file/downloadExcel', {
+                    url: '/monitoring/webhook/list',
+                    param: { query: getQuery() },
+                    fields: [
+                        { name: 'Name', key: 'name' },
+                        { name: 'State', key: 'state' },
+                        { name: 'Plugin', key: 'plugin_info.plugin_id' },
+                        { name: 'WebhookURL', key: 'webhook_url' },
+                        { name: 'Created', key: 'created_at', type: 'datetime' },
+                    ],
+                    file_name_prefix: FILE_NAME_PREFIX.projectWebhook,
+                });
+            } catch (e) {
+                console.error(e);
+            }
         };
 
-        const onToggleChange = ({ value }) => {
-            state.enabled = value;
-        };
-
+        /* init */
         (async () => {
-            await vm.$store.dispatch('resource/user/load');
+            await store.dispatch('resource/plugin/load');
             await listWebhooks();
         })();
 
         return {
             ...toRefs(state),
             ...toRefs(formState),
-            onChangeWebhookTable,
+            handlers,
+            userStateFormatter,
+            listWebhooks,
             onClickAdd,
             onClickUpdate,
             onClickDelete,
-            onAddConfirm,
             onDeleteConfirm,
-            onUpdateConfirm,
-            onToggleChange,
-            exportDataToExcel,
+            onExport,
+            onChange,
         };
     },
-
 };
 </script>
 
 <style lang="postcss" scoped>
 .webhook-tab {
     .p-pane-layout {
-        @apply mb-0;
         border-width: 0;
-        padding-left: 0;
-        padding-right: 0;
     }
     .p-toolbox-table::v-deep {
         .p-toolbox {
             padding-top: 0;
-        }
-    }
-}
-
-.toggle-wrapper {
-    display: flex;
-    align-items: center;
-    .label {
-        @apply text-gray;
-        margin-left: 0.25rem;
-        font-size: 0.875rem;
-        line-height: 1.5;
-        color: theme('colors.gray[400]');
-    }
-    &.enabled {
-        .label {
-            color: theme('colors.secondary');
         }
     }
 }
