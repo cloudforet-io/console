@@ -1,3 +1,10 @@
+# [1.1.0-beta.50](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.49...v1.1.0-beta.50) (2021-06-09)
+
+
+### Features
+
+* add PSelectStatus to index.ts ([#585](https://github.com/spaceone-dev/spaceone-design-system/issues/585)) ([0b632b7](https://github.com/spaceone-dev/spaceone-design-system/commit/0b632b73955bf4b6bb7e7daf04b05bdf4897a2bf))
+
 # [1.1.0-beta.49](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.48...v1.1.0-beta.49) (2021-06-09)
 
 
