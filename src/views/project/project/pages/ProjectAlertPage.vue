@@ -21,7 +21,7 @@
                 <div>Project Alert</div>
             </template>
             <template #webhook>
-                <project-webhook-tab :project-id="id" />
+                <project-webhook :project-id="id" />
             </template>
             <template #settings>
                 <project-settings :project-id="id" />
@@ -38,7 +38,7 @@ import {
 } from '@vue/composition-api';
 
 import { PButtonTab, PButton } from '@spaceone/design-system';
-import ProjectWebhookTab from '@/views/project/project/modules/ProjectWebhookTab.vue';
+import ProjectWebhook from '@/views/project/project/modules/ProjectWebhook.vue';
 import ProjectSettings from '@/views/project/project/modules/project-alert/ProjectSettings.vue';
 
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
@@ -50,7 +50,7 @@ export default {
     name: 'ProjectAlertPage',
     components: {
         ProjectSettings,
-        ProjectWebhookTab,
+        ProjectWebhook,
         PButtonTab,
         PButton,
     },
@@ -140,8 +140,14 @@ export default {
     }
 }
 .project-alert-page {
-    .p-button-tab::v-deep .tab-pane {
-        @apply pb-0;
+    .p-button-tab::v-deep {
+        .button-group {
+            @apply mb-0;
+            margin-top: 2rem;
+        }
+        .tab-pane {
+            @apply pb-0;
+        }
     }
 }
 

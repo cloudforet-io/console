@@ -141,7 +141,7 @@ export default {
 <style lang="postcss" scoped>
 .project-settings {
     @apply border-none grid gap-4;
-    margin: 2.5rem 1rem 0;
+    margin: 2rem 1rem 0;
 
     .sub-title {
         font-size: 1.375rem;

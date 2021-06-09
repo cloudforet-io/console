@@ -1,5 +1,5 @@
 <template>
-    <div class="webhook-tab">
+    <div class="project-webhook">
         <p-toolbox-table
             selectable
             sortable
@@ -110,7 +110,7 @@ import { FILE_NAME_PREFIX } from '@/lib/type';
 import { WEBHOOK_STATE } from '@/views/monitoring/alert/type';
 
 export default {
-    name: 'ProjectWebhookTab',
+    name: 'ProjectWebhook',
     components: {
         WebhookAddFormModal,
         WebhookUpdateFormModal,
@@ -307,7 +307,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.webhook-tab {
+.project-webhook {
     .p-pane-layout {
         border-width: 0;
     }
