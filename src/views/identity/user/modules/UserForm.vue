@@ -9,100 +9,87 @@
                     @confirm="confirm"
     >
         <template #body>
-            <div class="auth-type-list">
-                <div v-for="(item) in formState.authTypeList" :key="item.label"
-                     class="auth-type-item"
-                     :class="{'selected': item.label === formState.selectedAuthType.label}"
-                     @click="selectAuthType(item)"
-                >
-                    <p class="auth-type-label">
-                        <p-i v-if="item.label === formState.selectedAuthType.label"
-                             name="ic_check" width="1.125rem" height="1.125rem"
-                             color="inherit"
-                        />
-                        {{ item.label }}
-                    </p>
-                </div>
-            </div>
-            <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
-                           :required="true"
-                           :invalid="validationState.isUserIdValid === false"
-                           :invalid-text="validationState.userIdInvalidText"
-                           :valid="validationState.isUserIdValid"
-                           :valid-text="validationState.userIdValidText"
-            >
-                <template #default="{invalid}">
-                    <div class="id-input-form">
-                        <p-text-input v-model="formState.user_id"
-                                      v-focus
-                                      :placeholder="$t('IDENTITY.USER.FORM.NAME_PLACEHOLDER')"
-                                      :invalid="invalid"
-                                      class="text-input"
-                        />
-                        <p-button style-type="outline primary-dark"
-                                  class="user-id-check-button"
-                                  @click="checkUserID"
-                        >
-                            {{ $t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
-                        </p-button>
-                    </div>
-                </template>
-            </p-field-group>
-            <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')" class="input-form">
-                <p-text-input v-model="formState.name" class="text-input" autocomplete="username" />
-            </p-field-group>
-            <p-field-group :label="$t('IDENTITY.USER.FORM.EMAIL')"
-                           :invalid="validationState.isEmailValid === false"
-                           :invalid-text="validationState.emailInvalidText"
-                           class="input-form"
-            >
-                <template #default="{invalid}">
-                    <p-text-input v-model="formState.email" :invalid="invalid" class="text-input" />
-                </template>
-            </p-field-group>
-            <p-field-group :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')" class="input-form">
-                <p-select-dropdown v-model="formState.domainRole"
-                                   :items="formState.domainRoleItem"
-                                   auto-height
-                                   :disabled="formState.domainRoleItem.length < 2 || isSameId"
-                                   :use-custom-style="true"
-                                   class="dropdown"
-                />
-            </p-field-group>
-            <form v-if="formState.selectedAuthType.label === 'Local'"
-                  class="form"
-            >
-                <p-field-group
-                    :label="$t('COMMON.PROFILE.PASSWORD')"
-                    :required="true"
-                    :invalid="validationState.isPasswordValid === false"
-                    :invalid-text="validationState.passwordInvalidText"
-                    class="input-form"
+            <p-box-tab v-model="formState.activeTab" :tabs="formState.tabs" style-type="gray" class="auth-type-tab">
+                <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
+                               :required="true"
+                               :invalid="validationState.isUserIdValid === false"
+                               :invalid-text="validationState.userIdInvalidText"
+                               :valid="validationState.isUserIdValid"
+                               :valid-text="validationState.userIdValidText"
                 >
                     <template #default="{invalid}">
-                        <p-text-input v-model="formState.password" type="password"
-                                      autocomplete="current-password"
-                                      class="text-input"
-                                      :invalid="invalid"
-                        />
+                        <div class="id-input-form">
+                            <p-text-input v-model="formState.user_id"
+                                          v-focus
+                                          :placeholder="$t('IDENTITY.USER.FORM.NAME_PLACEHOLDER')"
+                                          :invalid="invalid"
+                                          class="text-input"
+                            />
+                            <p-button style-type="outline primary-dark"
+                                      class="user-id-check-button"
+                                      @click="checkUserID"
+                            >
+                                {{ $t('IDENTITY.USER.FORM.CHECK_USER_ID') }}
+                            </p-button>
+                        </div>
                     </template>
                 </p-field-group>
-                <p-field-group
-                    :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
-                    :required="true"
-                    :invalid="validationState.isPasswordCheckValid === false"
-                    :invalid-text="validationState.passwordCheckInvalidText"
-                    class="input-form"
+                <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')" class="input-form">
+                    <p-text-input v-model="formState.name" class="text-input" autocomplete="username" />
+                </p-field-group>
+                <p-field-group :label="$t('IDENTITY.USER.FORM.EMAIL')"
+                               :invalid="validationState.isEmailValid === false"
+                               :invalid-text="validationState.emailInvalidText"
+                               class="input-form"
                 >
                     <template #default="{invalid}">
-                        <p-text-input v-model="formState.passwordCheck" type="password"
-                                      class="text-input"
-                                      autocomplete="new-password"
-                                      :invalid="invalid"
-                        />
+                        <p-text-input v-model="formState.email" :invalid="invalid" class="text-input" />
                     </template>
                 </p-field-group>
-            </form>
+                <p-field-group :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')" class="input-form">
+                    <p-select-dropdown v-model="formState.domainRole"
+                                       :items="formState.domainRoleItem"
+                                       auto-height
+                                       :disabled="formState.domainRoleItem.length < 2 || isSameId"
+                                       :use-custom-style="true"
+                                       class="dropdown"
+                    />
+                </p-field-group>
+                <form v-if="formState.activeTab === 'local'"
+                      class="form"
+                >
+                    <p-field-group
+                        :label="$t('COMMON.PROFILE.PASSWORD')"
+                        :required="true"
+                        :invalid="validationState.isPasswordValid === false"
+                        :invalid-text="validationState.passwordInvalidText"
+                        class="input-form"
+                    >
+                        <template #default="{invalid}">
+                            <p-text-input v-model="formState.password" type="password"
+                                          autocomplete="current-password"
+                                          class="text-input"
+                                          :invalid="invalid"
+                            />
+                        </template>
+                    </p-field-group>
+                    <p-field-group
+                        :label="$t('COMMON.PROFILE.PASSWORD_CHECK')"
+                        :required="true"
+                        :invalid="validationState.isPasswordCheckValid === false"
+                        :invalid-text="validationState.passwordCheckInvalidText"
+                        class="input-form"
+                    >
+                        <template #default="{invalid}">
+                            <p-text-input v-model="formState.passwordCheck" type="password"
+                                          class="text-input"
+                                          autocomplete="new-password"
+                                          :invalid="invalid"
+                            />
+                        </template>
+                    </p-field-group>
+                </form>
+            </p-box-tab>
         </template>
     </p-button-modal>
 </template>
@@ -116,7 +103,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PSelectDropdown, PFieldGroup, PButton, PTextInput, PI,
+    PButtonModal, PSelectDropdown, PFieldGroup, PButton, PTextInput, PBoxTab,
 } from '@spaceone/design-system';
 
 import { makeProxy } from '@/lib/compostion-util';
@@ -124,21 +111,34 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 
 interface AuthType {
-    label: string | null;
     user_type: string;
     backend: string;
 }
-type AuthTypeList = AuthType[];
+
+const authTypeMap: Record<string, AuthType> = {
+    external: {
+        user_type: 'USER',
+        backend: 'EXTERNAL',
+    },
+    local: {
+        user_type: 'USER',
+        backend: 'LOCAL',
+    },
+    apiOnly: {
+        user_type: 'API_USER',
+        backend: 'LOCAL',
+    },
+};
 
 export default {
     name: 'UserForm',
     components: {
-        PI,
         PButtonModal,
         PFieldGroup,
         PTextInput,
         PSelectDropdown,
         PButton,
+        PBoxTab,
     },
     directives: {
         focus: {
@@ -173,18 +173,11 @@ export default {
             isSameId: false,
         });
         const formState = reactive({
-            authTypeList: [
-                {
-                    label: 'Local',
-                    user_type: 'USER',
-                    backend: 'LOCAL',
-                }, {
-                    label: 'API Only',
-                    user_type: 'API_USER',
-                    backend: 'LOCAL',
-                },
-            ] as AuthTypeList,
-            selectedAuthType: {} as AuthType,
+            tabs: [
+                { name: 'local', label: 'Local' },
+                { name: 'apiOnly', label: 'API Only' },
+            ],
+            activeTab: '',
             user_id: '',
             name: '',
             email: '',
@@ -211,10 +204,6 @@ export default {
             passwordCheckInvalidText: '' as TranslateResult | string,
         });
 
-        const selectAuthType = (item) => {
-            formState.selectedAuthType = item;
-        };
-
         const setFormState = () => {
             formState.user_id = '';
             formState.name = '';
@@ -234,7 +223,7 @@ export default {
             validationState.passwordCheckInvalidText = '';
         };
 
-        watch(() => formState.selectedAuthType, (after) => {
+        watch(() => formState.activeTab, (after) => {
             if (after) {
                 setFormState();
                 setValidationState();
@@ -266,7 +255,7 @@ export default {
             } catch (e) {
                 validationState.isUserIdValid = true;
                 validationState.userIdInvalidText = '';
-                console.error(e);
+                if (e.code !== 'ERROR_NOT_FOUND') console.error(e);
             }
         };
 
@@ -288,10 +277,9 @@ export default {
                     validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
                     return;
                 }
-                if (formState.selectedAuthType.backend === 'EXTERNAL') {
+                if (formState.activeTab === 'external') {
                     await checkOauth();
-                }
-                if (formState.selectedAuthType.label === 'Local') {
+                } else if (formState.activeTab === 'local') {
                     checkEmailFormat(formState.user_id);
                 }
                 if (typeof validationState.isUserIdValid !== 'boolean') validationState.isUserIdValid = true;
@@ -354,7 +342,7 @@ export default {
             await checkUserID();
             if (!validationState.isUserIdValid) return;
 
-            if (formState.selectedAuthType.label === 'Local') {
+            if (formState.activeTab === 'local') {
                 checkPassword(formState.password);
                 if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
             }
@@ -362,8 +350,8 @@ export default {
                 user_id: formState.user_id,
                 name: formState.name,
                 email: formState.email,
-                backend: formState.selectedAuthType.backend,
-                user_type: formState.selectedAuthType.user_type,
+                backend: authTypeMap[formState.activeTab]?.backend,
+                user_type: authTypeMap[formState.activeTab]?.user_type,
                 password: formState.password || '',
             };
             if (formState.domainRoleList.length > 0) {
@@ -375,13 +363,14 @@ export default {
 
         const initAuthTypeList = async () => {
             if (store.state.domain.extendedAuthType !== undefined) {
-                formState.authTypeList.splice(0, 0, {
-                    label: computed(() => store.getters['domain/extendedAuthTypeLabel']).value,
-                    user_type: 'USER',
-                    backend: 'EXTERNAL',
-                });
+                formState.tabs = [
+                    { name: 'external', label: store.getters['domain/extendedAuthTypeLabel'] },
+                    ...formState.tabs,
+                ];
+                formState.activeTab = 'external';
+            } else {
+                formState.activeTab = 'local';
             }
-            formState.selectedAuthType = formState.authTypeList[0];
         };
 
         const getRoleList = async () => {
@@ -403,7 +392,6 @@ export default {
             ...toRefs(state),
             formState,
             validationState,
-            selectAuthType,
             confirm,
             checkUserID,
         };
@@ -413,31 +401,8 @@ export default {
 
 <style lang="postcss">
 .user-form-modal {
-    .auth-type-list {
-        display: flex;
-        justify-content: flex-start;
+    .auth-type-tab {
         margin-bottom: 1.5rem;
-        .auth-type-item {
-            @apply bg-gray-100 cursor-pointer text-gray-500;
-            display: flex;
-            place-content: center;
-            width: 33%;
-            height: 3.25rem;
-            border-radius: 0.125rem;
-            margin-right: 0.25rem;
-            .auth-type-label {
-                @apply font-bold text-center;
-                align-self: center;
-                font-size: 0.875rem;
-                line-height: 140%;
-            }
-            &:hover {
-                @apply bg-blue-100 text-indigo-400;
-            }
-            &.selected {
-                @apply bg-primary1 text-white;
-            }
-        }
     }
     .id-input-form {
         max-width: 32rem;
