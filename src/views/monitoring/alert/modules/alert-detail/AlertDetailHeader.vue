@@ -2,15 +2,22 @@
     <p-pane-layout class="alert-detail-header">
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.STATE') }}</span>
-            <p-select-dropdown v-model="alertState" :items="ALERT_STATE_LIST" :use-custom-style="true" />
+            <p-select-dropdown :value="alertState" :items="ALERT_STATE_LIST" :use-custom-style="true"
+                               :select-item="alertState"
+                               @onSelected="changeAlertState"
+            />
         </p>
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.URGENCY') }}</span>
-            <p-select-dropdown v-model="alertUrgency" :items="ALERT_URGENCY_LIST" :use-custom-style="true" />
+            <p-select-dropdown :value="alertUrgency" :items="ALERT_URGENCY_LIST" :use-custom-style="true"
+                               :select-item="alertUrgency"
+                               @onSelected="changeAlertUrgency"
+            />
         </p>
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.ASSIGNED_TO') }}
-                <p-button style-type="gray-border outline" size="sm" class="ml-2"
+                <p-button style-type="gray-border" :outline="true" size="sm"
+                          class="ml-2"
                           @click="onClickReassign"
                 >
                     {{ $t('MONITORING.ALERT.DETAIL.HEADER.REASSIGN') }}
@@ -22,7 +29,11 @@
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.DURATION') }}</span>
             <span class="time">{{ duration }}</span>
         </p>
-        <alert-reassign-modal :visible.sync="reassignModalVisible" :project-id="alertData.project_id" />
+        <alert-reassign-modal
+            :visible.sync="reassignModalVisible" :project-id="alertData.project_id"
+            :alert-id="id"
+            @confirm="onConfirmReassign"
+        />
     </p-pane-layout>
 </template>
 
@@ -36,6 +47,7 @@ import utc from 'dayjs/plugin/utc';
 import relativeTime from 'dayjs/plugin/relativeTime';
 import { TimeStamp } from '@/models';
 import { iso8601Formatter } from '@/lib/util';
+import { SpaceConnector } from '@/lib/space-connector';
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
@@ -48,14 +60,14 @@ interface HeaderState {
 }
 
 const ALERT_STATE_LIST = Object.freeze([
-    { label: 'Triggered', name: 'TRIGGERED', type: 'item' },
-    { label: 'Acknowledged', name: 'ACKNOWLEDGED', type: 'item' },
-    { label: 'Resolved', name: 'RESOLVED', type: 'item' },
+    { label: 'Triggered', name: 'TRIGGERED' },
+    { label: 'Acknowledged', name: 'ACKNOWLEDGED' },
+    { label: 'Resolved', name: 'RESOLVED' },
 ]);
 
 const ALERT_URGENCY_LIST = Object.freeze([
-    { label: 'High', name: 'HIGH', type: 'item' },
-    { label: 'Low', name: 'LOW', type: 'item' },
+    { label: 'High', name: 'HIGH' },
+    { label: 'Low', name: 'LOW' },
 ]);
 
 interface PropsType {
@@ -65,11 +77,13 @@ interface PropsType {
 
 const calculateTime = (time) => {
     const today = dayjs().toISOString();
-    const targetTime = iso8601Formatter(time, 'UTC');
+    const createdTime = iso8601Formatter(time, 'UTC');
     const todayTime = iso8601Formatter(today, 'UTC');
-    let calculatedTime = dayjs(todayTime).diff(targetTime);
-    if (isNaN(calculatedTime)) calculatedTime = -1;
-    return dayjs(calculatedTime).format('DD/HH:mm');
+    const timeForCalculate = dayjs(todayTime).diff(createdTime, 'minute');
+    const days = Math.floor(timeForCalculate / 1440);
+    const hours = Math.floor((timeForCalculate % 1440) / 60);
+    const minutes = Math.floor((timeForCalculate % 1440) % 60);
+    return `${days}d ${hours}h ${minutes}m`;
 };
 
 export default {
@@ -83,23 +97,51 @@ export default {
     props: {
         id: {
             type: String,
-            default: null,
+            default: undefined,
         },
         alertData: {
             type: Object,
-            default: null,
+            default: () => ({}),
         },
     },
-    setup(props: PropsType) {
+    setup(props: PropsType, { emit }) {
         const state: UnwrapRef<HeaderState> = reactive({
-            alertState: props.alertData.state,
-            alertUrgency: props.alertData.urgency,
+            alertState: props.alertData?.state,
+            alertUrgency: props.alertData?.urgency,
             reassignModalVisible: false,
-            duration: calculateTime(props.alertData.created_at),
+            duration: calculateTime(props.alertData?.created_at),
         });
 
         const onClickReassign = () => {
             state.reassignModalVisible = true;
+        };
+
+        const onConfirmReassign = () => {
+            emit('confirm');
+        };
+
+        const changeAlertState = async (alertState: ALERT_STATE) => {
+            state.alertState = alertState;
+            try {
+                await SpaceConnector.client.monitoring.alert.updateState({
+                    alert_id: props.id,
+                    state: state.alertState,
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const changeAlertUrgency = async (alertUrgency: ALERT_URGENCY) => {
+            state.alertUrgency = alertUrgency;
+            try {
+                await SpaceConnector.client.monitoring.alert.update({
+                    alert_id: props.id,
+                    urgency: state.alertUrgency,
+                });
+            } catch (e) {
+                console.error(e);
+            }
         };
 
         return {
@@ -107,6 +149,9 @@ export default {
             ALERT_STATE_LIST,
             ALERT_URGENCY_LIST,
             onClickReassign,
+            onConfirmReassign,
+            changeAlertState,
+            changeAlertUrgency,
         };
     },
 };

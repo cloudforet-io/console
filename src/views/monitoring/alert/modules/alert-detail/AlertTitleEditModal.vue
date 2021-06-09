@@ -17,7 +17,7 @@
                            required
             >
                 <template #default="{invalid}">
-                    <p-text-input v-model="proxyAlertTitle" class="block w-full" :invalid="isNameInvalid"
+                    <p-text-input v-model="alertTitleInput" class="block w-full" :invalid="isNameInvalid"
                                   :placeholder="'Alert 편집'"
                     />
                 </template>
@@ -67,12 +67,12 @@ export default {
         const state = reactive({
             loading: true,
             proxyVisible: makeProxy('visible', props, emit),
-            proxyAlertTitle: props.alertTitle,
+            alertTitleInput: props.alertTitle,
             nameInvalidText: computed(() => {
-                if (state.proxyAlertTitle.length === 0) {
+                if (state.alertTitleInput.length === 0) {
                     return vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
                 }
-                if (state.proxyAlertTitle.length > 40) {
+                if (state.alertTitleInput.length > 40) {
                     return vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
                 }
                 return undefined;
@@ -85,7 +85,7 @@ export default {
                 state.loading = true;
                 await SpaceConnector.client.monitoring.alert.update({
                     alert_id: props.alertId,
-                    title: state.proxyAlertTitle,
+                    title: state.alertTitleInput,
                 });
             } catch (e) {
                 console.error(e);

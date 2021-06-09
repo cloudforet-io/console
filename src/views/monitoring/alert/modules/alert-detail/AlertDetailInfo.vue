@@ -17,7 +17,62 @@
                 {{ iso8601Formatter(data.created_at, timezone) }}
             </template>
             <template #data-description>
-                test
+                <p v-if="!isDescriptionEditMode" class="content-wrapper">
+                    <span class="description">{{ data.description }}</span>
+                    <button class="edit-btn" @click="startEdit(EDIT_MODE.DESCRIPTION)">
+                        <p-i name="ic_edit" width="1rem" height="1rem"
+                             color="inherit" class="edit-icon"
+                        />
+                        {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
+                    </button>
+                </p>
+                <div v-else class="content-wrapper">
+                    <p-text-input v-model="descriptionInput" />
+                    <div class="button-group">
+                        <p-button :outline="true" class="text-button"
+                                  size="sm" @click="cancelEdit(EDIT_MODE.DESCRIPTION)"
+                        >
+                            {{ $t('COMMON.TAGS.CANCEL') }}
+                        </p-button>
+                        <p-button
+                            style-type="primary"
+                            size="sm"
+                            class="text-button"
+                            @click="onClickSave(EDIT_MODE.DESCRIPTION)"
+                        >
+                            {{ $t('COMMON.TAGS.SAVE') }}
+                        </p-button>
+                    </div>
+                </div>
+            </template>
+            <template #data-status_message>
+                <p v-if="!isStatusMessageEditMode" class="content-wrapper">
+                    <span class="description">{{ data.status_message }}</span>
+                    <button class="edit-btn" @click="startEdit(EDIT_MODE.STATUS_MSG)">
+                        <p-i name="ic_edit" width="1rem" height="1rem"
+                             color="inherit" class="edit-icon"
+                        />
+                        {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
+                    </button>
+                </p>
+                <div v-else class="content-wrapper">
+                    <p-textarea v-model="statusMessageInput" />
+                    <div class="button-group">
+                        <p-button :outline="true" class="text-button" size="sm"
+                                  @click="cancelEdit(EDIT_MODE.STATUS_MSG)"
+                        >
+                            {{ $t('COMMON.TAGS.CANCEL') }}
+                        </p-button>
+                        <p-button
+                            style-type="primary"
+                            size="sm"
+                            class="text-button"
+                            @click="onClickSave(EDIT_MODE.STATUS_MSG)"
+                        >
+                            {{ $t('COMMON.TAGS.SAVE') }}
+                        </p-button>
+                    </div>
+                </div>
             </template>
         </p-definition-table>
         <project-tree-modal :visible.sync="formState.changeProjectModalVisible"
@@ -29,11 +84,13 @@
 </template>
 
 <script lang="ts">
-import { PPaneLayout, PDefinitionTable, PButton } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
+    PPaneLayout, PDefinitionTable, PButton, PI, PTextarea, PTextInput,
+} from '@spaceone/design-system';
+import {
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { iso8601Formatter } from '@/lib/util';
+import { iso8601Formatter, showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
 import { AlertDataModel } from '@/views/monitoring/alert/type';
@@ -45,25 +102,34 @@ interface PropsType {
     alertData: AlertDataModel;
 }
 
+const EDIT_MODE = {
+    DESCRIPTION: 'description',
+    STATUS_MSG: 'status_message',
+} as const;
+type EDIT_MODE = typeof EDIT_MODE[keyof typeof EDIT_MODE];
+
 export default {
     name: 'AlertDetailInfo',
     components: {
         PPaneLayout,
         PDefinitionTable,
         PButton,
+        PI,
+        PTextInput,
+        PTextarea,
         ProjectTreeModal,
     },
     props: {
         id: {
             type: String,
-            default: '',
+            default: undefined,
         },
         alertData: {
             type: Object,
-            default: null,
+            default: () => ({}),
         },
     },
-    setup(props: PropsType) {
+    setup(props: PropsType, { emit, root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
@@ -79,15 +145,19 @@ export default {
                 { name: 'description', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.DESC') },
                 { name: 'status_message', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.STATUS_DETAILS') },
             ],
-            data: {},
+            data: props.alertData || {},
             loading: true,
-            timezone: store.state.user.timezone,
+            timezone: computed(() => store.state.user.timezone),
+            isDescriptionEditMode: false,
+            isStatusMessageEditMode: false,
+            descriptionInput: props.alertData?.description,
+            statusMessageInput: props.alertData?.status_message,
         });
 
         const formState = reactive({
             changeProjectModalVisible: false,
             loading: false,
-            projectId: props.alertData.project_id,
+            projectId: props.alertData?.project_id,
         });
 
         const openChangeProjectModal = () => {
@@ -105,9 +175,50 @@ export default {
             // }
         };
 
-        (async () => {
-            state.data = props.alertData;
-        })();
+        const updateDescription = async () => {
+            try {
+                await SpaceConnector.client.monitoring.alert.update({
+                    alert_id: props.id,
+                    description: state.descriptionInput,
+                });
+                showSuccessMessage('Update Description Success', '', root);
+                state.isDescriptionEditMode = false;
+                emit('update');
+            } catch (e) {
+                console.error(e);
+                showErrorMessage('Update Description Failure', e, root);
+            }
+        };
+
+        const updateStatusMessage = async () => {
+            try {
+                await SpaceConnector.client.monitoring.alert.update({
+                    alert_id: props.id,
+                    status_message: state.statusMessageInput,
+                });
+                showSuccessMessage('Update Status Message Success', '', root);
+                state.isStatusMessageEditMode = false;
+                emit('update');
+            } catch (e) {
+                console.error(e);
+                showErrorMessage('Update Status Message Failure', e, root);
+            }
+        };
+
+        const startEdit = (editMode: EDIT_MODE) => {
+            if (editMode === EDIT_MODE.DESCRIPTION) state.isDescriptionEditMode = true;
+            else if (editMode === EDIT_MODE.STATUS_MSG) state.isStatusMessageEditMode = true;
+        };
+
+        const cancelEdit = (editMode: EDIT_MODE) => {
+            if (editMode === EDIT_MODE.DESCRIPTION) state.isDescriptionEditMode = false;
+            else if (editMode === EDIT_MODE.STATUS_MSG) state.isStatusMessageEditMode = false;
+        };
+
+        const onClickSave = async (editMode: EDIT_MODE) => {
+            if (editMode === EDIT_MODE.DESCRIPTION) await updateDescription();
+            else if (editMode === EDIT_MODE.STATUS_MSG) await updateStatusMessage();
+        };
 
         return {
             ...toRefs(state),
@@ -115,6 +226,10 @@ export default {
             iso8601Formatter,
             openChangeProjectModal,
             changeProject,
+            EDIT_MODE,
+            startEdit,
+            cancelEdit,
+            onClickSave,
         };
     },
 };
@@ -129,6 +244,25 @@ export default {
 .content-wrapper {
     display: flex;
     justify-content: space-between;
+    align-items: center;
     width: 100%;
+}
+.button-group {
+    justify-content: flex-end;
+    flex-shrink: 0;
+    .text-button {
+        height: 1.5rem;
+    }
+}
+.edit-btn {
+    @apply text-blue-600;
+    padding-right: 0.5rem;
+    line-height: 160%;
+    .edit-icon {
+        margin-right: 0.25rem;
+    }
+    &:hover, &:active {
+        @apply cursor-pointer;
+    }
 }
 </style>

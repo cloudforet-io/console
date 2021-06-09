@@ -20,12 +20,14 @@
         <section class="detail-contents-wrapper">
             <alert-detail-header v-if="!loading" :id="id" class="header"
                                  :alert-data="alertInfo"
+                                 @confirm="getAlertData"
             />
             <alert-detail-responder v-if="!loading" :id="id" class="responder"
                                     :alert-data="alertInfo"
             />
             <alert-detail-info v-if="!loading" :id="id" class="info"
                                :alert-data="alertInfo"
+                               @update="getAlertData"
             />
             <alert-detail-note v-if="!loading" :id="id" class="note" />
             <alert-detail-timeline v-if="!loading" :id="id" class="timeline" />
@@ -157,6 +159,7 @@ export default {
             alertDeleteConfirm,
             openAlertEditForm,
             alertTitleEditConfirm,
+            getAlertData,
         };
     },
 };
@@ -216,9 +219,11 @@ export default {
     }
     .timeline {
         @apply col-span-8 col-start-1 row-start-3 row-end-3;
+        max-height: 32.125rem;
 
         @screen tablet {
             @apply col-span-12 row-start-3 row-end-3;
+            max-height: none;
         }
     }
 }

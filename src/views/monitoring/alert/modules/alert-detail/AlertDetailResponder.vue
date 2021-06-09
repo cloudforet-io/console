@@ -4,7 +4,7 @@
             <p-panel-top class="-ml-1">
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.RESPONDER') }}
             </p-panel-top>
-            <p-collapsible-list :items="items" theme="card">
+            <p-collapsible-list :items="items" theme="card" multi-unfoldable>
                 <template #title="{title, index}">
                     <span class="level" :class="{'current': index + 1 === alertData.escalation_level}">{{ title }}</span>
                     <span class="level font-bold" :class="{'current': index + 1 === alertData.escalation_level}"> {{ index+1 }} </span>
@@ -15,7 +15,6 @@
                 <template #default="{data}">
                     <p class="data-wrapper">
                         whdalsrnt@gmail.com
-                        <!--                        {{ alertData.responders[0].resource_id }}-->
                     </p>
                 </template>
             </p-collapsible-list>
@@ -23,7 +22,7 @@
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.ADDITIONAL_RESPONDER') }}
             </p>
             <p-autocomplete-search v-model="responderState.search" :menu="responderState.allMemberItems" :loading="responderState.loading"
-                                   class="autocomplete-search" @select-menu="onSelectMember"
+                                   class="autocomplete-search" @select-menu="onSelectMember" @update:value="addResponder"
             >
                 <template #menu-item--format="{item, id}">
                     <p-check-box :id="id" v-model="responderState.selectedMemberItems" class="tag-menu-item"
@@ -55,9 +54,16 @@ import {
 } from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
 import { TimeStamp } from '@/models';
-import { ALERT_SEVERITY, ALERT_STATE, ALERT_URGENCY } from '@/views/monitoring/alert/type';
+import {
+    ALERT_SEVERITY, ALERT_STATE, ALERT_URGENCY, AlertDataModel,
+} from '@/views/monitoring/alert/type';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
+
+interface PropsType {
+    id?: string;
+    alertData: AlertDataModel;
+}
 
 export default {
     name: 'AlertDetailResponder',
@@ -73,14 +79,14 @@ export default {
     props: {
         id: {
             type: String,
-            default: null,
+            default: undefined,
         },
         alertData: {
             type: Object,
-            default: null,
+            default: () => ({}),
         },
     },
-    setup(props) {
+    setup(props: PropsType) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             items: [
@@ -100,7 +106,7 @@ export default {
                 label: d.name,
                 type: 'item',
             }))),
-            selectedMemberItems: [],
+            selectedMemberItems: props.alertData.responders.map(d => d.resource_id),
         });
 
         const listMember = async () => {
@@ -116,9 +122,17 @@ export default {
             }
         };
 
-        (async () => {
-            await listMember();
-        })();
+        const addResponder = async (userID) => {
+            try {
+                await SpaceConnector.client.monitoring.alert.addResponder({
+                    alert_id: props.id,
+                    resource_type: 'identity.User',
+                    resource_id: userID,
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
 
         const onSelectMember = (item: MenuItem) => {
             responderState.search = '';
@@ -126,18 +140,36 @@ export default {
             responderState.selectedMemberItems = [...responderState.selectedMemberItems, item.name];
         };
 
-        const onDeleteTag = (idx) => {
+        const removeResponder = async (userID) => {
+            try {
+                await SpaceConnector.client.monitoring.alert.removeResponder({
+                    alert_id: props.id,
+                    resource_type: 'identity.User',
+                    resource_id: userID,
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const onDeleteTag = async (idx) => {
+            await removeResponder(responderState.selectedMemberItems[idx]);
             responderState.selectedMemberItems.splice(idx, 1);
             vm.$nextTick(() => {
                 responderState.selectedMemberItems = [...responderState.selectedMemberItems];
             });
         };
 
+        (async () => {
+            await listMember();
+        })();
+
 
         return {
             ...toRefs(state),
             responderState,
             onSelectMember,
+            addResponder,
             onDeleteTag,
         };
     },

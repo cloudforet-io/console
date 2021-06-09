@@ -1,7 +1,7 @@
 <template>
     <p-button-modal
         class="alert-reassign-modal"
-        :header-title="'Reassign to other member'"
+        header-title="Reassign to other member"
         size="md"
         :visible.sync="proxyVisible"
         :loading="modalLoading"
@@ -26,12 +26,13 @@
 <script lang="ts">
 import { PButtonModal, PToolboxTable } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { Options } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 export default {
     name: 'AlertReassignModal',
@@ -46,10 +47,14 @@ export default {
         },
         projectId: {
             type: String,
-            default: null,
+            default: undefined,
+        },
+        alertId: {
+            type: String,
+            default: undefined,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit, root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             //
@@ -58,10 +63,11 @@ export default {
             //
             loading: true,
             selectIndex: [] as number[],
-            fields: [
+            selectedUserID: computed(() => state.items[state.selectIndex]?.resource_id),
+            fields: computed(() => [
                 { label: 'User ID', name: 'resource_id', type: 'item' },
                 { label: 'Name', name: 'resource_id', type: 'item' },
-            ],
+            ]),
             items: [] as any,
             options: {
                 sortBy: 'resource_id',
@@ -73,15 +79,24 @@ export default {
             totalCount: 0,
         });
 
-        // const reassignMember = async () => {
-        //     try {
-        //         await SpaceConnector.client.monitoring.alert.update({
-        //
-        //         })
-        //     }
-        // }
+        const reassignMember = async () => {
+            try {
+                await SpaceConnector.client.monitoring.alert.update({
+                    alert_id: props.alertId,
+                    assignee: state.selectedUserID,
+                });
+                showSuccessMessage('Reassign Member success', '', root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage('Reassign Member failure', e, root);
+            } finally {
+                state.proxyVisible = false;
+            }
+        };
 
         const onClickReassign = async () => {
+            await reassignMember();
+            console.log('confirm test')
             emit('confirm');
         };
 
@@ -103,6 +118,7 @@ export default {
                 state.items = res.results;
             } catch (e) {
                 console.error(e);
+                state.items = [];
             } finally {
                 state.loading = false;
             }
