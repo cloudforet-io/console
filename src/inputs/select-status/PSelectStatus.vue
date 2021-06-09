@@ -1,10 +1,10 @@
 <template>
     <p-status class="p-select-status" :class="{selected: isSelected, 'with-icon': withIcon}"
-              :icon="icon || (isSelected ? 'ic_check' : undefined)"
+              :icon="icon || (isSelected && !disableCheckIcon ? 'ic_check' : undefined)"
               :icon-color="icon ? undefined : 'inherit'"
               :icon-animation="iconAnimation"
               :lottie="lottie"
-              :disable-icon="!withIcon && !isSelected"
+              :disable-icon="!withIcon && (!isSelected || disableCheckIcon)"
               @click="onClick"
     >
         {{ value }}
@@ -63,6 +63,10 @@ export default defineComponent({
             validator(animation: any) {
                 return animation === undefined || Object.values(ANIMATION_TYPE).includes(animation);
             },
+        },
+        disableCheckIcon: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: Props, context) {

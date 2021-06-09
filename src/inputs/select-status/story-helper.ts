@@ -78,6 +78,24 @@ const getArgTypes = (): ArgTypes => {
                 type: 'text',
             },
         },
+        disableCheckIcon: {
+            name: 'disableCheckIcon',
+            type: { name: 'boolean' },
+            description: 'Whether to show check icon or not.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: false,
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
     };
 
     delete argTypes.disabled;

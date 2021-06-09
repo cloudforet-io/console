@@ -32,6 +32,7 @@ export const Template = (args, { argTypes }) => ({
             v-model="proxySelected"
             :predicate="predicate"
             :multi-selectable="multiSelectable"
+            :disable-check-icon="disableCheckIcon"
             @change="onChange"
         >
             <span v-if="defaultSlot" v-html="defaultSlot" />
@@ -183,6 +184,41 @@ export const Template = (args, { argTypes }) => ({
                 const values = range(8).map(() => faker.random.word())
                 const state = reactive({
                     selected: [values[0], values[1]],
+                    values,
+                })
+                return {
+                    ...toRefs(state),
+                };
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Without Check Icon
+
+<Canvas>
+    <Story name="Without Check Icon">
+        {{
+            components: { PSelectStatus },
+            template: `
+    <div class="w-full overflow p-8 flex flex-wrap">
+        <p-select-status v-for="(value, idx) in values" :key="idx"
+            :value="value"
+            v-model="selected"
+            :disable-check-icon="true"
+            class="mr-4"
+        >
+            {{value}}
+        </p-select-status>
+    </div>
+    `,
+            setup(props) {
+                const values = range(8).map(() => faker.random.word())
+                const state = reactive({
+                    selected: [values[0]],
                     values,
                 })
                 return {
