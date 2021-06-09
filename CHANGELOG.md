@@ -1,3 +1,10 @@
+# [1.1.0-beta.51](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.50...v1.1.0-beta.51) (2021-06-09)
+
+
+### Features
+
+* add disableCheckIcon props to PSelectStatus ([#586](https://github.com/spaceone-dev/spaceone-design-system/issues/586)) ([9ae7597](https://github.com/spaceone-dev/spaceone-design-system/commit/9ae7597ae126907b9117635ffb15d5584f45cbc9))
+
 # [1.1.0-beta.50](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.49...v1.1.0-beta.50) (2021-06-09)
 
 
