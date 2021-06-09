@@ -110,6 +110,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const ROOT_KEY_SETTER = ':';
+
 export default defineComponent({
     name: 'PQuerySearch',
     components: {

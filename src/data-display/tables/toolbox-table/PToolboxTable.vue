@@ -1,37 +1,39 @@
 <template>
-    <p-pane-layout class="p-toolbox-table">
-        <slot name="toolbox-top" />
-        <p-toolbox :pagination-visible="paginationVisible"
-                   :page-size-changeable="pageSizeChangeable"
-                   :settings-visible="settingsVisible"
-                   :exportable="exportable"
-                   :refreshable="refreshable"
-                   :searchable="searchable"
-                   :sortable="false"
-                   :filters-visible="filtersVisible"
-                   :search-type="searchType"
-                   :this-page.sync="proxyState.thisPage"
-                   :page-size.sync="proxyState.pageSize"
-                   :total-count="totalCount"
-                   :page-size-options="pageSizeOptions"
-                   :key-item-sets="keyItemSets"
-                   :value-handler-map="valueHandlerMap"
-                   :query-tags.sync="proxyState.queryTags"
-                   :search-text.sync="proxyState.searchText"
-                   :timezone="timezone"
-                   @init-tags="emitInitTags"
-                   @change="emitChange"
-                   @export="$emit('export')"
-                   @refresh="$emit('refresh')"
-                   @click-settings="$emit('click-settings')"
-        >
-            <template v-if="$scopedSlots['toolbox-left']" #left-area>
-                <div class="toolbox-left">
-                    <slot name="toolbox-left" />
-                </div>
-            </template>
-        </p-toolbox>
-        <slot name="toolbox-bottom" />
+    <p-pane-layout class="p-toolbox-table" :class="styleType">
+        <div class="top-wrapper">
+            <slot name="toolbox-top" />
+            <p-toolbox :pagination-visible="paginationVisible"
+                       :page-size-changeable="pageSizeChangeable"
+                       :settings-visible="settingsVisible"
+                       :exportable="exportable"
+                       :refreshable="refreshable"
+                       :searchable="searchable"
+                       :sortable="false"
+                       :filters-visible="filtersVisible"
+                       :search-type="searchType"
+                       :this-page.sync="proxyState.thisPage"
+                       :page-size.sync="proxyState.pageSize"
+                       :total-count="totalCount"
+                       :page-size-options="pageSizeOptions"
+                       :key-item-sets="keyItemSets"
+                       :value-handler-map="valueHandlerMap"
+                       :query-tags.sync="proxyState.queryTags"
+                       :search-text.sync="proxyState.searchText"
+                       :timezone="timezone"
+                       @init-tags="emitInitTags"
+                       @change="emitChange"
+                       @export="$emit('export')"
+                       @refresh="$emit('refresh')"
+                       @click-settings="$emit('click-settings')"
+            >
+                <template v-if="$scopedSlots['toolbox-left']" #left-area>
+                    <div class="toolbox-left">
+                        <slot name="toolbox-left" />
+                    </div>
+                </template>
+            </p-toolbox>
+            <slot name="toolbox-bottom" />
+        </div>
 
         <p-data-table :fields="fields"
                       :items="items"
@@ -45,16 +47,16 @@
                       :table-style-type="tableStyleType"
                       :striped="striped"
                       :bordered="bordered"
-                      :hover="hover"
+                      :disable-hover="disableHover"
                       :loading="loading"
                       :use-cursor-loading="useCursorLoading"
-                      :width="width"
                       :row-height-fixed="rowHeightFixed"
                       :row-cursor-pointer="rowCursorPointer"
                       :invalid="invalid"
+                      :get-row-class-names="getRowClassNames"
+                      :get-row-selectable="getRowSelectable"
                       v-on="$listeners"
                       @changeSort="changeSort"
-                      @rowLeftClick="byPassEvent('rowLeftClick', ...arguments)"
         >
             <template v-for="(_, slot) of $scopedSlots" v-slot:[slot]="scope">
                 <slot v-if="!slot.startsWith('toolbox')" :name="slot" v-bind="scope" />
@@ -65,17 +67,26 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, getCurrentInstance, reactive, watch,
+    ComponentRenderProxy, defineComponent, getCurrentInstance, reactive, watch,
 } from '@vue/composition-api';
 
-import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
-import { PToolboxTableProps, ToolboxTableOptions } from '@/data-display/tables/toolbox-table/type';
+import PDataTable, { DataTableProps } from '@/data-display/tables/data-table/PDataTable.vue';
 import { makeOptionalProxy } from '@/util/composition-helpers';
-import PToolbox from '@/navigation/toolbox/PToolbox.vue';
-import { ToolboxOptions } from '@/navigation/toolbox/type';
+import PToolbox, { ToolboxOptions, ToolboxProps } from '@/navigation/toolbox/PToolbox.vue';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
+import { SEARCH_TYPES } from '@/navigation/toolbox/config';
+import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
+import { TOOLBOX_TABLE_STYLE_TYPE } from '@/data-display/tables/toolbox-table/config';
 
-export default {
+export interface ToolboxTableOptions extends ToolboxOptions {
+    sortDesc?: boolean;
+}
+
+export interface ToolboxTableProps extends DataTableProps, ToolboxProps {
+    styleType?: TOOLBOX_TABLE_STYLE_TYPE;
+}
+
+export default defineComponent<ToolboxTableProps>({
     name: 'PToolboxTable',
     components: {
         PPaneLayout,
@@ -83,7 +94,7 @@ export default {
         PDataTable,
     },
     props: {
-        // PDataTableProps
+        /* data table props */
         loading: {
             type: Boolean,
             default: false,
@@ -91,10 +102,11 @@ export default {
         fields: {
             type: Array,
             required: true,
+            default: () => [],
         },
         items: {
             type: Array,
-            required: true,
+            default: () => [],
         },
         sortable: {
             type: Boolean,
@@ -117,7 +129,7 @@ export default {
             default: false,
         },
         selectIndex: {
-            type: [Array, Number],
+            type: Array,
             default: undefined,
         },
         multiSelect: {
@@ -130,7 +142,7 @@ export default {
         },
         tableStyleType: {
             type: String,
-            default: 'default',
+            default: DATA_TABLE_STYLE_TYPE.default,
         },
         striped: {
             type: Boolean,
@@ -140,13 +152,9 @@ export default {
             type: Boolean,
             default: true,
         },
-        hover: {
+        disableHover: {
             type: Boolean,
             default: false,
-        },
-        width: {
-            type: String,
-            default: undefined,
         },
         rowHeightFixed: {
             type: Boolean,
@@ -160,7 +168,15 @@ export default {
             type: Boolean,
             default: false,
         },
-        /* PToolboxTableProps */
+        getRowClassNames: {
+            type: Function,
+            default: undefined,
+        },
+        getRowSelectable: {
+            type: Function,
+            default: undefined,
+        },
+        /* toolbox props */
         paginationVisible: {
             type: Boolean,
             default: true,
@@ -191,7 +207,7 @@ export default {
         },
         searchType: {
             type: String,
-            default: 'plain',
+            default: SEARCH_TYPES.plain,
         },
         thisPage: {
             type: Number,
@@ -233,8 +249,16 @@ export default {
             type: String,
             default: 'UTC',
         },
+        /* toolbox table props */
+        styleType: {
+            type: String,
+            default: undefined,
+            validator(styleType: any) {
+                return styleType === undefined || Object.values(TOOLBOX_TABLE_STYLE_TYPE).includes(styleType);
+            },
+        },
     },
-    setup(props: PToolboxTableProps, { emit }) {
+    setup(props: ToolboxTableProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const proxyState = reactive({
@@ -255,10 +279,6 @@ export default {
         const changeSort = (sortBy, sortDesc) => {
             proxyState.thisPage = 1;
             emitChange({ sortBy, sortDesc });
-        };
-
-        const byPassEvent = (name, ...args) => {
-            emit(name, ...args);
         };
 
         const emitInitTags = (options: Required<ToolboxOptions>) => {
@@ -291,18 +311,20 @@ export default {
         return {
             proxyState,
             changeSort,
-            byPassEvent,
             emitInitTags,
             emitChange,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
 .p-toolbox-table {
     @apply flex flex-col bg-white border border-gray-200 rounded-sm;
 
+    .top-wrapper {
+        @apply flex flex-col rounded-sm;
+    }
     .p-data-table {
         overflow: auto;
     }
@@ -312,6 +334,21 @@ export default {
     }
     .toolbox-left {
         display: flex;
+    }
+
+    /* style types */
+    @define-mixin style-type $bg-color, $border-color {
+        .top-wrapper {
+            background-color: $bg-color;
+        }
+        .p-toolbox {
+            border-bottom-width: 1px;
+            border-color: $border-color;
+        }
+    }
+
+    &.light-gray {
+        @mixin style-type theme('colors.gray.100'), theme('colors.gray.200');
     }
 }
 </style>
