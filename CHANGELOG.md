@@ -1,3 +1,10 @@
+# [1.1.0-beta.52](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.51...v1.1.0-beta.52) (2021-06-09)
+
+
+### Features
+
+* add default slot to PSelectStatus ([#587](https://github.com/spaceone-dev/spaceone-design-system/issues/587)) ([631c16b](https://github.com/spaceone-dev/spaceone-design-system/commit/631c16b135ecaad6c065653fdbef8edd18e0e39f))
+
 # [1.1.0-beta.51](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.50...v1.1.0-beta.51) (2021-06-09)
 
 
