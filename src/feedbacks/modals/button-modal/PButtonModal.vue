@@ -17,7 +17,7 @@
                             </div>
                             <p-icon-button v-if="headerCloseButtonVisible"
                                            name="ic_delete" color="inherit"
-                                           class="close-btn"
+                                           class="close-button"
                                            :class="[{disabled: loading},
                                                     {'no-footer': !footerVisible}]"
                                            @click.stop="onCloseClick"
@@ -32,7 +32,7 @@
                             <slot :slot-scope="$props" name="footer-extra" />
                             <p-button
                                 v-if="footerResetButtonVisible"
-                                class="modal-btn reset-btn"
+                                class="modal-button reset-button"
                                 style-type="gray-border"
                                 :disabled="loading"
                                 @click="onResetClick"
@@ -42,7 +42,7 @@
                                 </slot>
                             </p-button>
                             <p-button
-                                class="modal-btn cancel-btn"
+                                class="modal-button cancel-button"
                                 style-type="transparent"
                                 :disabled="loading"
                                 @click="onCancelClick"
@@ -52,7 +52,7 @@
                                 </slot>
                             </p-button>
                             <p-button
-                                class="modal-btn"
+                                class="modal-button"
                                 :style-type="themeColor"
                                 :loading="loading"
                                 :disabled="disabled"
@@ -262,7 +262,7 @@ export default {
                 }
             }
 
-            .close-btn {
+            .close-button {
                 @apply text-gray-400;
                 cursor: pointer;
 
@@ -294,17 +294,18 @@ export default {
             padding-top: 1.5rem;
             border: none;
 
-            .modal-btn {
+            .modal-button {
                 height: 2.5rem;
                 font-size: 1rem;
+                border-radius: 0.25rem;
             }
 
-            .cancel-btn {
+            .cancel-button {
                 margin-left: auto;
                 margin-right: 1rem;
             }
 
-            .reset-btn {
+            .reset-button {
                 display: none;
 
                 @screen xs {

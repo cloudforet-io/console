@@ -44,7 +44,6 @@ import {
 } from '@/inputs/search/query-search-tags/type';
 import { Options, QuerySearchTableProps } from '@/data-display/tables/query-search-table/type';
 import { makeOptionalProxy } from '@/util/composition-helpers';
-import { ToolboxOptions } from '@/navigation/toolbox/type';
 
 export default {
     name: 'PQuerySearchTable',

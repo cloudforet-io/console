@@ -1,5 +1,7 @@
 <template>
-    <span v-if="theme" class="p-status" :class="theme">
+    <span v-if="theme" class="p-status" :class="theme"
+          v-on="$listeners"
+    >
         <p-lottie v-if="lottie" :name="lottie" :size="iconSize" />
         <span v-else-if="isFortAwesome" class="fort-awesome"><i :class="icon.split(' ')" /></span>
         <p-i v-else-if="icon" :name="icon"
@@ -7,11 +9,9 @@
              :animation="iconAnimation"
         />
         <span v-else-if="!disableIcon" class="circle" />
-        <p-label class="label">
-            {{ text }}
-        </p-label>
+        <span class="text"><slot>{{ text }}</slot></span>
     </span>
-    <span v-else class="p-status">
+    <span v-else class="p-status" v-on="$listeners">
         <p-lottie v-if="lottie" :name="lottie" :size="iconSize" />
         <span v-else-if="isFortAwesome" :style="{color:realIconColor||null}"><i :class="icon.split(' ')" /></span>
         <p-i v-else-if="icon" :name="icon"
@@ -23,18 +23,17 @@
             backgroundColor: circleColor
         }"
         />
-        <p-label class="label" :style="{
+        <span class="text" :style="{
             color: labelColor
         }"
         >
-            {{ text }}
-        </p-label>
+            <slot>{{ text }}</slot>
+        </span>
     </span>
 </template>
 
 <script lang="ts">
 import PI from '@/foundation/icons/PI.vue';
-import PLabel from '@/inputs/forms/label/PLabel.vue';
 import { computed } from '@vue/composition-api';
 import { StatusProps } from '@/data-display/status/type';
 import { getColor } from '@/util/helpers';
@@ -47,7 +46,7 @@ const fontAwesomePrefix = RegExp('fa-');
 
 export default {
     name: 'PStatus',
-    components: { PLottie, PI, PLabel },
+    components: { PLottie, PI },
     props: {
         icon: {
             type: String,
@@ -113,22 +112,22 @@ export default {
 };
 </script>
 
-<style lang="postcss" scoped>
-@define-mixin status-theme $icon-color, $circle-color {
-    .fort-awesome {
-        color: $icon-color;
-    }
-    .p-i {
-        color: $icon-color;
-    }
-    .circle {
-        background-color: $icon-color;
-    }
-    .label {
-        color: $circle-color;
-    }
-}
+<style lang="postcss">
 .p-status {
+    @define-mixin status-theme $icon-color, $circle-color {
+        .fort-awesome {
+            color: $icon-color;
+        }
+        .p-i {
+            color: $icon-color;
+        }
+        .circle {
+            background-color: $icon-color;
+        }
+        .text {
+            color: $circle-color;
+        }
+    }
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -138,7 +137,7 @@ export default {
         width: 0.5rem;
         margin-right: 0.1rem;
     }
-    .label {
+    .text {
         margin: 0;
         margin-left: 0.3rem;
     }

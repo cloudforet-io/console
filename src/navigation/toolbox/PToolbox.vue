@@ -42,12 +42,12 @@
                 <div>
                     <div v-if="exportable" class="tool">
                         <p-icon-button name="ic_excel"
-                                       @click="$emit('export',$event)"
+                                       @click="$emit('export', $event)"
                         />
                     </div>
                     <div v-if="settingsVisible" class="tool">
                         <p-icon-button name="ic_setting"
-                                       @click="$emit('click-settings',$event)"
+                                       @click="$emit('click-settings', $event)"
                         />
                     </div>
                     <div v-if="refreshable" class="tool">
@@ -84,31 +84,41 @@ import { KeyItemSet, QueryItem, ValueHandlerMap } from '@/inputs/search/query-se
 import PSearch from '@/inputs/search/search/PSearch.vue';
 import PQuerySearchTags from '@/inputs/search/query-search-tags/PQuerySearchTags.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
-import { ToolboxOptions } from '@/navigation/toolbox/type';
+import { TOOLBOX_TABLE_STYLE_TYPE } from '@/data-display/tables/toolbox-table/config';
 
-interface Props {
-    paginationVisible: boolean;
-    pageSizeChangeable: boolean;
-    sortable: boolean;
-    exportable: boolean;
-    refreshable: boolean;
-    searchable: boolean;
-    filtersVisible: boolean;
-    settingsVisible: boolean;
-    searchType: string;
-    proxyState?: number;
-    pageSize?: number;
-    totalCount: number;
-    pageSizeOptions: number[];
-    sortByOptions: string[];
-    keyItemSets: KeyItemSet[];
-    valueHandlerMap: ValueHandlerMap;
+
+export interface ToolboxOptions {
+    pageStart?: number;
+    pageLimit?: number;
+    sortBy?: string;
     queryTags?: QueryTag[];
     searchText?: string;
-    timezone: string;
 }
 
-export default defineComponent<Props>({
+export interface ToolboxProps {
+    paginationVisible?: boolean;
+    pageSizeChangeable?: boolean;
+    settingsVisible?: boolean;
+    sortable?: boolean;
+    exportable?: boolean;
+    refreshable?: boolean;
+    searchable?: boolean;
+    filtersVisible?: boolean;
+    searchType?: string;
+    thisPage?: number;
+    pageSize?: number;
+    totalCount?: number;
+    sortBy?: string;
+    pageSizeOptions?: number[];
+    sortByOptions?: string[];
+    keyItemSets?: KeyItemSet[];
+    valueHandlerMap?: ValueHandlerMap;
+    queryTags?: QueryTag[];
+    searchText?: string;
+    timezone?: string;
+}
+
+export default defineComponent<ToolboxProps>({
     name: 'PToolbox',
     components: {
         PQuerySearchTags,
@@ -153,7 +163,7 @@ export default defineComponent<Props>({
         },
         searchType: {
             type: String,
-            default: 'plain',
+            default: SEARCH_TYPES.plain,
             validator(searchType) {
                 return Object.values(SEARCH_TYPES).includes(searchType as any);
             },
@@ -206,21 +216,21 @@ export default defineComponent<Props>({
             default: 'UTC',
         },
     },
-    setup(props: Props) {
+    setup(props: ToolboxProps) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const initPageSize = props.pageSizeOptions ? props.pageSizeOptions[0] || 24 : 24;
         const proxyState = reactive({
             thisPage: makeOptionalProxy<number>('thisPage', vm, 1),
             pageSize: makeOptionalProxy<number>('pageSize', vm, initPageSize),
-            sortBy: makeOptionalProxy<string>('sortBy', vm, props.sortByOptions[0] || ''),
+            sortBy: makeOptionalProxy<string>('sortBy', vm, props.sortByOptions ? (props.sortByOptions[0] || '') : ''),
             searchText: makeOptionalProxy<string>('searchText', vm, ''),
             queryTags: makeOptionalProxy<QueryTag[]>('queryTags', vm, []),
         });
 
         const state = reactive({
             pageStart: computed(() => ((proxyState.thisPage - 1) * proxyState.pageSize) + 1),
-            allPage: computed(() => Math.ceil(props.totalCount / proxyState.pageSize) || 1),
+            allPage: computed(() => Math.ceil((props.totalCount || 0) / proxyState.pageSize) || 1),
             pageMenu: computed(() => {
                 if (!Array.isArray(props.pageSizeOptions)) return [];
                 return props.pageSizeOptions.map(d => ({
@@ -351,6 +361,7 @@ export default defineComponent<Props>({
         order: 4;
     }
 
+    /* responsive */
     @screen md {
         .search-wrapper {
             &.simple {

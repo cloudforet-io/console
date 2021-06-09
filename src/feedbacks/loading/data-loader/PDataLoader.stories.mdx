@@ -65,6 +65,24 @@ import { LOADER_TYPES } from './config';
             options: Object.values(LOADER_TYPES)
         }
     },
+    spinnerSize: {
+        name: 'spinnerSize',
+        type: {name: 'string'},
+        description: `Spinner loader size. It works only when \`loaderType\` props is ${LOADER_TYPES.spinner}.`,
+        defaultValue: 2.5,
+        table: {
+            type: {
+                summary: `string`
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 2.5
+            },
+        },
+        control: {
+            type: 'number',
+        }
+    },
     disableEmptyCase: {
         name: 'disableEmptyCase',
         type: {name: 'boolean'},

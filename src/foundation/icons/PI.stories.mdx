@@ -1,7 +1,7 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PI from './PI.vue';
-import icon from 'vue-svgicon';
 import {ANIMATION_TYPE } from '@/foundation/icons/config';
+import { getAllAvailableIcons } from '@/foundation/icons/helper';
 
 <Meta title='Foundation/Graphics/Icons' parameters={{
     design: {
@@ -217,7 +217,7 @@ export const Template = (args, { argTypes }) => ({
         {{
             components: {PI},
             template: `
-            <div style="padding: 32px; border: 1px solid #eee; display: grid; row-gap: 1rem; column-gap: 1rem;  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));">
+            <div style="width: 100%; padding: 32px; border: 1px solid #eee; display: grid; row-gap: 1rem; column-gap: 1rem;  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));">
                 <div v-for="icon in icons" :key="icon" class="flex flex-col items-center p-4 rounded hover:bg-secondary-2">
                     <p-i :name="icon" class="flex-shrink-0"/>
                     <label class="mt-4 whitespace-no-wrap break-words text-xs text-gray-600" >{{icon}}</label>
@@ -226,7 +226,7 @@ export const Template = (args, { argTypes }) => ({
 `,
             setup() {
                 return {
-                    icons: Object.keys(icon.icons),
+                    icons: getAllAvailableIcons(),
                 }
             }
         }}

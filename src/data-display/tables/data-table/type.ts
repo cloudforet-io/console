@@ -15,28 +15,3 @@ export interface DataTableFieldType {
     width?: string;
 }
 export type DataTableField = string | DataTableFieldType
-
-export interface PDataTableProps {
-    loading: boolean;
-    fields: DataTableField[];
-    items: any[];
-    sortable?: boolean;
-    sortBy?: string;
-    sortDesc?: boolean;
-    colCopy?: boolean;
-    selectable?: boolean;
-    selectIndex?: number[] | number;
-    multiSelect?: boolean;
-    rowClickMultiSelectMode?: boolean;
-    useCursorLoading?: boolean;
-    tableStyleType?: string;
-    striped?: boolean;
-    bordered?: boolean|null|unknown;
-    hover?: boolean;
-    width?: string;
-    rowHeightFixed?: boolean;
-    rowCursorPointer?: boolean;
-    invalid?: boolean;
-    getRowClassNames?: (item: any, i: number) => Record<string, boolean>;
-    getRowSelectable?: (item: any, i: number) => boolean;
-}

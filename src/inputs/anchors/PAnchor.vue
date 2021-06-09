@@ -1,17 +1,17 @@
 <template>
     <router-link :to="to || {}" custom>
-        <template #default="{href: toHref, route, navigate, isActive, isExactActive }">
+        <template #default="{href: toHref }">
             <a class="p-anchor" :class="{disabled, highlight}" :target="target"
-               :href="!disabled && to ? toHref : href"
+               :href="!disabled && (to ? toHref : href)"
                v-on="anchorListeners"
             >
-                <slot name="left-extra" v-bind="$props" />
+                <slot name="left-extra" v-bind="{...$props, toHref}" />
                 <span class="text" :class="{disabled}">
-                    <slot v-bind="$props">
+                    <slot v-bind="{...$props, toHref}">
                         {{ text }}
                     </slot>
                 </span>
-                <slot v-if="showIcon || (showIcon && target === '_blank')" name="icon" v-bind="$props">
+                <slot v-if="showIcon || (showIcon && target === '_blank')" name="icon" v-bind="{...$props, toHref}">
                     <p-i name="ic_external-link"
                          height="1em" width="1em"
                          color="inherit"

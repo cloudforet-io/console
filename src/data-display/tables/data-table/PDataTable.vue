@@ -5,10 +5,8 @@
                    :class="{
                        striped: striped,
                        bordered: bordered,
-                       'no-hover': !hover,
                        [tableStyleType]: true,
                    }"
-                   :style="{ width }"
             >
                 <thead>
                     <slot name="head" v-bind="getDefaultSlotProps()">
@@ -82,6 +80,7 @@
                                 'tr-selected': getSelectedState(item, index),
                                 'row-height-fixed': rowHeightFixed,
                                 'row-cursor-pointer': rowCursorPointer,
+                                'no-hover': disableHover,
                             } "
                             @click.left="onRowLeftClick( item, index, $event )"
                         >
@@ -118,12 +117,15 @@
                 </tfoot>
             </table>
         </div>
-        <slot v-if="showLoading" name="loading">
-            <div class="loading-backdrop fade-in" />
-            <p-lottie name="thin-spinner" :size="2.5"
-                      :auto="true" class="loading"
-            />
-        </slot>
+
+        <div v-if="showLoading" class="loading-backdrop fade-in" />
+        <div v-if="showLoading" class="loading">
+            <slot name="loading">
+                <p-lottie name="thin-spinner" :size="2.5"
+                          :auto="true"
+                />
+            </slot>
+        </div>
         <div v-if="invalid" class="invalid-cover" />
     </div>
 </template>
@@ -135,17 +137,40 @@ import {
 import { get } from 'lodash';
 import { copyAnyData } from '@/util/helpers';
 import { makeOptionalProxy } from '@/util/composition-helpers';
-import { PDataTableProps, DataTableField, DataTableFieldType } from '@/data-display/tables/data-table/type';
+import { DataTableField, DataTableFieldType } from '@/data-display/tables/data-table/type';
 
 import PCheckBox from '@/inputs/checkbox/PCheckBox.vue';
 import PRadio from '@/inputs/radio/PRadio.vue';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PI from '@/foundation/icons/PI.vue';
+import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
 
-const color = ['default', 'light', 'primary4'];
+export interface DataTableProps {
+    loading: boolean;
+    fields: DataTableField[];
+    items: any[];
+    sortable?: boolean;
+    sortBy?: string;
+    sortDesc?: boolean;
+    colCopy?: boolean;
+    selectable?: boolean;
+    selectIndex?: number[] | number;
+    multiSelect?: boolean;
+    rowClickMultiSelectMode?: boolean;
+    useCursorLoading?: boolean;
+    tableStyleType?: DATA_TABLE_STYLE_TYPE;
+    striped?: boolean;
+    bordered?: boolean|null|unknown;
+    disableHover?: boolean;
+    rowHeightFixed?: boolean;
+    rowCursorPointer?: boolean;
+    invalid?: boolean;
+    getRowClassNames?: (item: any, i: number) => Record<string, boolean>;
+    getRowSelectable?: (item: any, i: number) => boolean;
+}
 
-export default defineComponent<PDataTableProps>({
+export default defineComponent<DataTableProps>({
     name: 'PDataTable',
     components: {
         PI,
@@ -162,6 +187,7 @@ export default defineComponent<PDataTableProps>({
         fields: {
             type: Array,
             required: true,
+            default: () => [],
         },
         items: {
             type: Array,
@@ -188,7 +214,7 @@ export default defineComponent<PDataTableProps>({
             default: false,
         },
         selectIndex: {
-            type: [Array, Number],
+            type: Array,
             default: undefined,
         },
         multiSelect: {
@@ -206,8 +232,8 @@ export default defineComponent<PDataTableProps>({
         tableStyleType: {
             type: String,
             default: 'default',
-            validator(value: string) {
-                return [null, ...color].indexOf(value) !== -1;
+            validator(value: any) {
+                return Object.values(DATA_TABLE_STYLE_TYPE).includes(value);
             },
         },
         striped: {
@@ -218,13 +244,9 @@ export default defineComponent<PDataTableProps>({
             type: Boolean,
             default: true,
         },
-        hover: {
+        disableHover: {
             type: Boolean,
             default: false,
-        },
-        width: {
-            type: String,
-            default: undefined,
         },
         rowHeightFixed: {
             type: Boolean,
@@ -247,7 +269,7 @@ export default defineComponent<PDataTableProps>({
             default: undefined,
         },
     },
-    setup(props: PDataTableProps, context) {
+    setup(props: DataTableProps, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const proxyState = reactive({
@@ -259,7 +281,7 @@ export default defineComponent<PDataTableProps>({
         const state = reactive({
             table: null as any,
             allState: false,
-            fieldsData: computed<DataTableFieldType[]>(() => props.fields.map((value: string | DataTableField) => {
+            fieldsData: computed<DataTableFieldType[]>(() => props.fields.map((value: string | DataTableFieldType) => {
                 if (typeof value === 'string') return { name: value, label: value, sortable: true };
                 return { sortable: true, ...value };
             })),
@@ -399,12 +421,10 @@ export default defineComponent<PDataTableProps>({
                 return;
             }
 
-            if (props.useCursorLoading) {
-                if (value) {
-                    document.body.style.cursor = 'progress';
-                } else {
-                    document.body.style.cursor = 'default';
-                }
+            if (props.useCursorLoading && value) {
+                document.body.style.cursor = 'progress';
+            } else {
+                document.body.style.cursor = 'default';
             }
 
             if (value) {
@@ -529,7 +549,8 @@ export default defineComponent<PDataTableProps>({
     tr {
         &.row-height-fixed {
             td {
-                @apply truncate;
+                overflow-x: hidden;
+                white-space: nowrap;
             }
         }
         &.row-cursor-pointer {
@@ -567,7 +588,6 @@ export default defineComponent<PDataTableProps>({
 
     .invalid-cover {
         @apply absolute w-full h-full overflow-hidden border border-alert;
-        //background-color: rgba(theme('colors.red.100'), 0.3);
         pointer-events: none;
         top: 0;
         z-index: 1;

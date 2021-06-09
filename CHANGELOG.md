@@ -1,3 +1,174 @@
+# [1.1.0-beta.52](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.51...v1.1.0-beta.52) (2021-06-09)
+
+
+### Features
+
+* add default slot to PSelectStatus ([#587](https://github.com/spaceone-dev/spaceone-design-system/issues/587)) ([631c16b](https://github.com/spaceone-dev/spaceone-design-system/commit/631c16b135ecaad6c065653fdbef8edd18e0e39f))
+
+# [1.1.0-beta.51](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.50...v1.1.0-beta.51) (2021-06-09)
+
+
+### Features
+
+* add disableCheckIcon props to PSelectStatus ([#586](https://github.com/spaceone-dev/spaceone-design-system/issues/586)) ([9ae7597](https://github.com/spaceone-dev/spaceone-design-system/commit/9ae7597ae126907b9117635ffb15d5584f45cbc9))
+
+# [1.1.0-beta.50](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.49...v1.1.0-beta.50) (2021-06-09)
+
+
+### Features
+
+* add PSelectStatus to index.ts ([#585](https://github.com/spaceone-dev/spaceone-design-system/issues/585)) ([0b632b7](https://github.com/spaceone-dev/spaceone-design-system/commit/0b632b73955bf4b6bb7e7daf04b05bdf4897a2bf))
+
+# [1.1.0-beta.49](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.48...v1.1.0-beta.49) (2021-06-09)
+
+
+### Features
+
+* add style type to Toolbox Table ([#584](https://github.com/spaceone-dev/spaceone-design-system/issues/584)) ([f57e04b](https://github.com/spaceone-dev/spaceone-design-system/commit/f57e04bd598cf8d57793198fc83938b217b1ac5f))
+
+# [1.1.0-beta.48](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.47...v1.1.0-beta.48) (2021-06-07)
+
+
+### Features
+
+* export list card component ([#583](https://github.com/spaceone-dev/spaceone-design-system/issues/583)) ([f9a0851](https://github.com/spaceone-dev/spaceone-design-system/commit/f9a08512f34a34cd00f90670e85b9c4e565e7deb))
+
+# [1.1.0-beta.47](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.46...v1.1.0-beta.47) (2021-06-07)
+
+
+### Features
+
+* add collapsible list component ([#581](https://github.com/spaceone-dev/spaceone-design-system/issues/581)) ([a5a643b](https://github.com/spaceone-dev/spaceone-design-system/commit/a5a643bad09a47f4bc5a0b5a8d051410fef5f469))
+* add text overflow detection to collapsible panel ([#582](https://github.com/spaceone-dev/spaceone-design-system/issues/582)) ([980f1b3](https://github.com/spaceone-dev/spaceone-design-system/commit/980f1b34af72c4f66c58236b9e59692732c7420a))
+
+# [1.1.0-beta.46](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.45...v1.1.0-beta.46) (2021-06-06)
+
+
+### Features
+
+* update collapsible panel component ([#580](https://github.com/spaceone-dev/spaceone-design-system/issues/580)) ([bf924c1](https://github.com/spaceone-dev/spaceone-design-system/commit/bf924c1be31f4edb7cf97191ea0a4e96aaaa4a11))
+
+# [1.1.0-beta.45](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.44...v1.1.0-beta.45) (2021-06-05)
+
+
+### Features
+
+* add textarea component ([#579](https://github.com/spaceone-dev/spaceone-design-system/issues/579)) ([919437b](https://github.com/spaceone-dev/spaceone-design-system/commit/919437b79f0e1e3d8f33891f0a0bfc9eb1029bcf))
+
+# [1.1.0-beta.44](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.43...v1.1.0-beta.44) (2021-06-05)
+
+
+### Features
+
+* add select status component ([#578](https://github.com/spaceone-dev/spaceone-design-system/issues/578)) ([5b106e9](https://github.com/spaceone-dev/spaceone-design-system/commit/5b106e95faccc1b70e3cc7696ff5afd6f8104956))
+
+# [1.1.0-beta.43](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.42...v1.1.0-beta.43) (2021-06-04)
+
+
+### Features
+
+* add box tab to index ([fe2156f](https://github.com/spaceone-dev/spaceone-design-system/commit/fe2156f35092959ec5f49c846f99aed0126162cb))
+
+# [1.1.0-beta.42](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.41...v1.1.0-beta.42) (2021-06-04)
+
+
+### Features
+
+* add box tab component ([#577](https://github.com/spaceone-dev/spaceone-design-system/issues/577)) ([9acd9d7](https://github.com/spaceone-dev/spaceone-design-system/commit/9acd9d724e896b77b68017c885a89067b6ce24e1))
+
+# [1.1.0-beta.41](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.40...v1.1.0-beta.41) (2021-06-03)
+
+
+### Bug Fixes
+
+* add Balloon Tab to index ([#576](https://github.com/spaceone-dev/spaceone-design-system/issues/576)) ([cb85767](https://github.com/spaceone-dev/spaceone-design-system/commit/cb857673c839f81c6b5ff12bbf8873cfc2856263))
+
+# [1.1.0-beta.40](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.39...v1.1.0-beta.40) (2021-06-03)
+
+
+### Features
+
+* add balloon tab component ([#575](https://github.com/spaceone-dev/spaceone-design-system/issues/575)) ([2a40cc2](https://github.com/spaceone-dev/spaceone-design-system/commit/2a40cc2818b685859a59e25cc5974e2a76bb502a))
+
+# [1.1.0-beta.39](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.38...v1.1.0-beta.39) (2021-06-02)
+
+
+### Bug Fixes
+
+* add PCard to index.ts ([#573](https://github.com/spaceone-dev/spaceone-design-system/issues/573)) ([a27ddae](https://github.com/spaceone-dev/spaceone-design-system/commit/a27ddae8c024ccc598897fa1dbd06a606b6cda13))
+
+# [1.1.0-beta.38](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.37...v1.1.0-beta.38) (2021-06-02)
+
+
+### Bug Fixes
+
+* delete display:flex from PSelectButtonGroup ([#572](https://github.com/spaceone-dev/spaceone-design-system/issues/572)) ([6976953](https://github.com/spaceone-dev/spaceone-design-system/commit/6976953eb32cc35416990012ef0912c6ef7a7a17))
+
+# [1.1.0-beta.37](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.36...v1.1.0-beta.37) (2021-06-01)
+
+
+### Bug Fixes
+
+* remove data loader no data absolute ([62ecd69](https://github.com/spaceone-dev/spaceone-design-system/commit/62ecd693de443e06715e2b701d404f82ff0513f2))
+
+
+### Features
+
+* add badge style types ([592652f](https://github.com/spaceone-dev/spaceone-design-system/commit/592652f36abbab5f6b3765a9766f57522b319c44))
+* add list card component ([9f0c38a](https://github.com/spaceone-dev/spaceone-design-system/commit/9f0c38a9259e2ebeecd0c0ed05c295d68490f53c))
+* add no header case to card and list card ([ddc85d5](https://github.com/spaceone-dev/spaceone-design-system/commit/ddc85d56f0aebae9c7e311bde7d00794480f43b8))
+* add style types to card ([16f15e4](https://github.com/spaceone-dev/spaceone-design-system/commit/16f15e40baa21f8f262313f5bacfd3df4bd335ad))
+
+# [1.1.0-beta.36](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.35...v1.1.0-beta.36) (2021-06-01)
+
+
+### Features
+
+* add card component & rename states to hooks ([#569](https://github.com/spaceone-dev/spaceone-design-system/issues/569)) ([dce7242](https://github.com/spaceone-dev/spaceone-design-system/commit/dce724242b3bb725b36f2d027b4923eb867bc544))
+
+# [1.1.0-beta.35](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.34...v1.1.0-beta.35) (2021-05-31)
+
+
+### Bug Fixes
+
+* autocomplete search menu to watch menu ([b0e24c7](https://github.com/spaceone-dev/spaceone-design-system/commit/b0e24c77d92a2915d713e230f27943f35bc935c9))
+* remove translation of field descriptions in dynamic layouts ([3aceb26](https://github.com/spaceone-dev/spaceone-design-system/commit/3aceb2617915c810fbdc585383a6c151b8fd9db4))
+* update dynamic layout panel top margin ([41de0df](https://github.com/spaceone-dev/spaceone-design-system/commit/41de0df0a9096783b15f5014a66bd843967709f2))
+
+# [1.1.0-beta.34](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.33...v1.1.0-beta.34) (2021-05-28)
+
+
+### Features
+
+* add style type and size to select button ([#567](https://github.com/spaceone-dev/spaceone-design-system/issues/567)) ([b3c4bff](https://github.com/spaceone-dev/spaceone-design-system/commit/b3c4bff39b37d1d8e51970378d70839550f17810))
+
+# [1.1.0-beta.33](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.32...v1.1.0-beta.33) (2021-05-28)
+
+
+### Features
+
+* add select button component ([#566](https://github.com/spaceone-dev/spaceone-design-system/issues/566)) ([41f768b](https://github.com/spaceone-dev/spaceone-design-system/commit/41f768b16fb457d49b586e50367e9d419c5ddbcb))
+
+# [1.1.0-beta.32](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.31...v1.1.0-beta.32) (2021-05-28)
+
+
+### Bug Fixes
+
+* update select state to use get select state ([5856087](https://github.com/spaceone-dev/spaceone-design-system/commit/58560872f78b30c7d3db0e2aacffcf288645864e))
+
+# [1.1.0-beta.31](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.30...v1.1.0-beta.31) (2021-05-28)
+
+
+### Bug Fixes
+
+* remove loading spinner opacity in context menu ([2e9b890](https://github.com/spaceone-dev/spaceone-design-system/commit/2e9b89062022bb78bb4b28032514367b10044ecc))
+* update select state and usage of it ([666182f](https://github.com/spaceone-dev/spaceone-design-system/commit/666182f054fedab142bf5e1e185a917d65a8d443))
+
+
+### Features
+
+* add select card component ([3fffbfe](https://github.com/spaceone-dev/spaceone-design-system/commit/3fffbfe5379730b6004bca583a63510140c1433a))
+
 # [1.1.0-beta.30](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.29...v1.1.0-beta.30) (2021-05-27)
 
 

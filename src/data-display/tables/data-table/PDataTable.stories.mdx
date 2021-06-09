@@ -1,0 +1,456 @@
+import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
+
+import { makeOptionalProxy } from '@/util/composition-helpers';
+
+import PTextarea from '@/inputs/textarea/PTextarea';
+import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
+
+import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
+import {DATA_TABLE_STYLE_TYPE} from './config';
+import { getDataTableArgsType } from '@/data-display/tables/data-table/story-helper';
+import { getUserFields, getUsers, getLongUsers } from '@/data-display/tables/data-table/mock';
+
+
+<Meta title='Data Display/Tables/Data Table' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
+    }
+}} argTypes={getDataTableArgsType()} />
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PDataTable },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-data-table
+            :loading="loading"
+            :fields="fields"
+            :items="items"
+            :sortable="sortable"
+            :sortBy.sync="proxySortBy"
+            :sortDesc.sync="proxySortDesc"
+            :colCopy="colCopy"
+            :selectable="selectable"
+            :selectIndex.sync="proxySelectIndex"
+            :multiSelect="multiSelect"
+            :rowClickMultiSelectMode="rowClickMultiSelectMode"
+            :useCursorLoading="useCursorLoading"
+            :tableStyleType="tableStyleType"
+            :striped="striped"
+            :bordered="bordered"
+            :disableHover="disableHover"
+            :rowHeightFixed="rowHeightFixed"
+            :rowCursorPointer="rowCursorPointer"
+            :invalid="invalid"
+            :getRowClassNames="getRowClassNames"
+            :getRowSelectable="getRowSelectable"
+            @select="onSelect"
+            @rowLeftClick="onRowLeftClick"
+            @changeSort="onChangeSort"
+            @update:selectIndex="onUpdateSelectIndex"
+            @update:sortBy="onUpdateSortBy"
+            @update:sortDesc="onUpdateSortDesc"
+        >
+        </p-data-table>
+    </div>
+    `,
+    setup(props) {
+        const vm = getCurrentInstance();
+        const state = reactive({
+            proxySortBy: makeOptionalProxy('sortBy', vm, props.sortBy),
+            proxySortDesc: makeOptionalProxy('sortDesc', vm, props.sortDesc),
+            proxySelectIndex: makeOptionalProxy('selectIndex', vm, props.selectIndex),
+        });
+        return {
+            ...toRefs(state),
+        };
+    }
+});
+
+
+# Data Table
+
+<br/>
+<br/>
+
+### Fields
+
+`fields` props must be an array of `DataTableFieldType` or `string`. <br/>
+
+
+```typescript
+
+interface DataTableFieldType {
+    name: string;
+    label?: string;
+    sortable?: boolean;
+    sortKey?: string;
+    width?: string;
+}
+
+```
+
+|Property|Description|
+|--|--|
+|name|The path(key) for getting the value from the object(each item in `items` props). Required.|
+|label|Display name for the column(field) head.|
+|sortable|Whether to sortable the table by the column or not. If it's not given, it follows the `sortable` props.|
+|sortKey|If you give the value to this property, the value of `sortBy` passed to the `changeSort` and `update:sortBy` events is replaced with this value when sorting based on the corresponding column. default is the column `name`.|
+|width|If you want to fix the cell width, give the value.|
+
+
+
+
+<br/>
+
+### Events and Handler Arguments
+
+|Event Name|Arguments|
+|--|--|
+|select|`[selectIndex: number[]]`|
+|rowLeftClick|`[item: any, index: number, event: MouseEvent]`|
+|changeSort|`[sortBy: string, sortDesc: boolean]`|
+|update:selectIndex|`[selectIndex: number[]]`|
+|update:sortBy|`[sortBy: string]`|
+|update:sortDesc|`[sortDesc: boolean]`|
+
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+{{
+    components: { PDataTable },
+    template: `
+    <p-data-table :fields="fields" :items="items" />
+    `,
+    setup() {
+        return {
+            fields: getUserFields(),
+            items: getUsers(7, 7)
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Sortable
+
+This only affects the display of arrows based on the value of `sortDesc` and `sortBy`, and raising sort-related events. <br/>
+There is no built-in function to actually sort data. <br/>
+To sort data, receive the changed `sortBy` and `SortDesc` values through the `changeSort` or `update:sortBy` and `udpate:sortDesc` events, and use them in a way to reflect the changes in the `items` props. <br/>
+
+<Canvas>
+    <Story name="Sortable">
+{{
+    components: { PDataTable },
+    template: `
+        <p-data-table :fields="fields" :items="items"
+            sortable :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"
+        />
+    `,
+    setup() {
+        const fields =  getUserFields()
+        const state = reactive({
+            items: getUsers(5, 5),
+            sortBy: fields[0].name,
+            sortDesc: true
+        })
+        return {
+            ...toRefs(state),
+            fields
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Column Copy
+
+<Canvas>
+    <Story name="Column Copy">
+{{
+    components: { PDataTable, PTextarea },
+    template: `
+    <div>
+        <p class="mb-4 text-gray-700">Click copy button and check copied data by paste to textarea below.</p>
+        <p-textarea class="mb-4" />
+        <p-data-table :fields="fields" :items="items" col-copy />
+    </div>
+    `,
+    setup() {
+        return {
+            fields: getUserFields(),
+            items: getUsers(5, 5),
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Selection
+
+Default for row click is single selection.<br/>
+To enable multi selection on row click, give `true` to `rowClickMultiSelectionMode` props.
+
+<Canvas>
+    <Story name="Selection">
+{{
+    components: { PDataTable },
+    template: `
+<div>
+    <div>
+        <p class="mb-4 font-xl font-bold">Default(Multi Selection)</p>
+        <p class="mb-4 text-gray-700">Selected indices: {{selectIndex}}</p>
+        <p class="mb-4 text-gray-700">Selected items: {{selectIndex.map(d => items[d])}}</p>
+        <p-data-table :fields="fields" :items="items" selectable :select-index.sync="selectIndex" />
+    </div>
+    <div class="mt-6">
+        <p class="mb-4 font-xl font-bold">Row Click Multi Selection Mode</p>
+        <p class="mb-4 text-gray-700">Selected indices: {{selectIndex}}</p>
+        <p class="mb-4 text-gray-700">Selected items: {{selectIndex.map(d => items[d])}}</p>
+        <p-data-table :fields="fields" :items="items" selectable :select-index.sync="selectIndex" rowClickMultiSelectMode />
+    </div>
+    <div class="mt-6">
+        <p class="mb-4 font-xl font-bold">Single Selection</p>
+        <p class="mb-4 text-gray-700">Selected index: {{singleSelectIndex}}</p>
+        <p class="mb-4 text-gray-700">Selected items: {{singleSelectIndex.map(d => items[d])}}</p>
+        <p-data-table :fields="fields" :items="items" selectable :select-index.sync="singleSelectIndex" :multi-select="false" />
+    </div>
+</div>
+    `,
+    setup() {
+        const state = reactive({
+            selectIndex: [],
+            singleSelectIndex: []
+        })
+        return {
+            ...toRefs(state),
+            fields: getUserFields(),
+            items: getUsers(5, 5)
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Loading
+
+<Canvas>
+    <Story name="Loading">
+        {{
+            components: { PDataTable, PToggleButton },
+            template: `
+<div>
+    <div>
+        <p class="mb-4 font-xl font-bold">Default</p>
+        <p class="mb-4 text-gray-700">Use Cursor Loading: <p-toggle-button :value="userCursorLoading" @change="onToggleChange"/></p>
+        <p-data-table :fields="fields" :items="items" :loading="loading" :use-cursor-loading="userCursorLoading" />
+    </div>
+    <div class="mt-6">
+        <p class="mb-4 font-xl font-bold">Use Slot: loading</p>
+        <p-data-table :fields="fields" :items="items" loading>
+            <template #loading>
+                <span>Loading...</span>
+            </template>
+        </p-data-table>
+    </div>
+</div>
+    `,
+            setup() {
+                const state = reactive({
+                    userCursorLoading: false,
+                    loading: true
+                })
+                return {
+                    ...toRefs(state),
+                    fields: getUserFields(),
+                    items: getUsers(5, 5),
+                    onToggleChange({value}) {
+                        state.userCursorLoading = value;
+                        state.loading = false;
+                        setTimeout(() => {
+                            state.loading = true;
+                        }, 500)
+                    }
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Stripe & Border
+
+<Canvas>
+    <Story name="Stripe & Border">
+{{
+    components: { PDataTable },
+    template: `
+<div>
+    <div>
+        <p class="mb-4 font-xl font-bold">No Stripe & Border (Default)</p>
+        <p-data-table :fields="fields" :items="items" :striped="false" bordered />
+    </div>
+    <div class="mt-6">
+        <p class="mb-4 font-xl font-bold">No Stripe & No Border</p>
+        <p-data-table :fields="fields" :items="items" :striped="false" :bordered="false" />
+    </div>
+    <div class="mt-6">
+        <p class="mb-4 font-xl font-bold">Stripe & Border</p>
+        <p-data-table :fields="fields" :items="items" striped bordered />
+    </div>
+    <div class="mt-6">
+        <p class="mb-4 font-xl font-bold">Stripe & No Border</p>
+        <p-data-table :fields="fields" :items="items" striped :bordered="false" />
+    </div>
+</div>
+    `,
+    setup() {
+        return {
+            fields: getUserFields(),
+            items: getUsers(5, 5)
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Disable Hover
+
+<Canvas>
+    <Story name="Disable Hover">
+{{
+    components: { PDataTable },
+    template: `
+<p-data-table :fields="fields" :items="items" disable-hover />
+`,
+    setup() {
+        return {
+            fields: getUserFields(),
+            items: getUsers(5, 5)
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Table Style Types
+
+<Canvas>
+    <Story name="Table Style Types">
+{{
+    components: { PDataTable },
+    template: `
+<div>
+    <div>
+        <p class="mb-4 font-xl font-bold">Style Type: {{DATA_TABLE_STYLE_TYPE.default}}</p>
+        <p-data-table :fields="fields" :items="items" selectable :table-style-type="DATA_TABLE_STYLE_TYPE.default"/>
+    </div>
+    <div class="mt-6">
+        <p class="mb-4 font-xl font-bold">Style Type: {{DATA_TABLE_STYLE_TYPE.light}}</p>
+        <p-data-table :fields="fields" :items="items" selectable :table-style-type="DATA_TABLE_STYLE_TYPE.light" />
+    </div>
+    <div class="mt-6">
+        <p class="mb-4 font-xl font-bold">Style Type: {{DATA_TABLE_STYLE_TYPE.primary4}}</p>
+        <p-data-table :fields="fields" :items="items" selectable :table-style-type="DATA_TABLE_STYLE_TYPE.primary4" />
+    </div>
+</div>
+`,
+    setup() {
+        return {
+            fields: getUserFields(),
+            items: getUsers(5, 5),
+            DATA_TABLE_STYLE_TYPE
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+## Fixed Row Height
+
+<Canvas>
+    <Story name="Fixed Row Height">
+        {{
+            components: { PDataTable },
+            template: `
+<div>
+    <div>
+        <p class="mb-4 font-xl font-bold">Row Height Fixed (Default)</p>
+        <p-data-table :fields="fields" :items="items" row-height-fixed />
+    </div>
+    <div class="mt-6">
+        <p class="mb-4 font-xl font-bold">Row Height Not Fixed</p>
+        <p-data-table :fields="fields" :items="items" :row-height-fixed="false" />
+    </div>
+</div>
+`,
+            setup() {
+                return {
+                    fields: getUserFields(),
+                    items: getLongUsers(5, 5),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Invalid
+
+<Canvas>
+    <Story name="Invalid">
+        {{
+            components: { PDataTable },
+            template: `
+<p-data-table :fields="fields" :items="items" invalid />
+`,
+            setup() {
+                return {
+                    fields: getUserFields(),
+                    items: getUsers(5, 5)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>

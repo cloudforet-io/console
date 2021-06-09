@@ -1,7 +1,11 @@
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const _ = require('lodash');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const plugin = require('tailwindcss/plugin');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const defaultTheme = require('tailwindcss/defaultTheme');
 const colors = require('./src/styles/colors').tailwindColors;
+const screens = require('./src/styles/screens');
 
 const rawSize = Array(32)
     .fill('')
@@ -16,6 +20,16 @@ const rawPercent = [
 const percent = _.fromPairs(rawPercent.map(value => [value, `${eval(value) * 100}%`]));
 module.exports = {
     theme: {
+        borderRadius: {
+            none: '0',
+            sm: '0.125rem', // 2px
+            md: '0.25rem', // 4px
+            default: '0.25rem', // 4px
+            lg: '0.375rem', // 6px
+            xl: '0.5rem', // 8px
+            '2xl': '0.75rem', // 12px
+            full: '50%',
+        },
         colors,
         spacing: {
             ...defaultTheme.spacing,
@@ -67,10 +81,10 @@ module.exports = {
             xl: { min: '1440px' },
             '2xl': { min: '1920px' },
             '3xl': { min: '2560px' },
-            mobile: { max: '767px' },
-            tablet: { max: '1023px' },
-            laptop: { max: '1440px' },
-            desktop: { max: '1920px' },
+            mobile: { max: `${screens.mobile.max}px` },
+            tablet: { max: `${screens.tablet.max}px` },
+            laptop: { max: `${screens.laptop.max}px` },
+            desktop: { max: `${screens.desktop.max}px` },
         },
     },
     variants: ['responsive', 'important', 'hover'],

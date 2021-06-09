@@ -1,10 +1,12 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
+import { makeOptionalProxy } from '@/util/composition-helpers';
+
 import PToolbox from './PToolbox.vue';
-import { SEARCH_TYPES } from './config';
-import {getHandler} from './story-helper'
-import faker from 'faker'
-import {range} from 'lodash'
-import { reactive, watch, toRefs } from '@vue/composition-api';
+import { getToolboxArgTypes } from './story-helper';
+import { getKeyItemSets,
+    getValueHandlerMap
+} from '@/navigation/toolbox/mock';
 
 
 <Meta title='Navigation/Toolbox' parameters={{
@@ -12,464 +14,80 @@ import { reactive, watch, toRefs } from '@vue/composition-api';
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5894%3A179180',
     }
-}} argTypes={{
-    paginationVisible: {
-        name: 'paginationVisible',
-        type: {name: 'boolean'},
-        description: 'Show pagination',
-        defaultValue: true,
-        table: {
-            type: {
-                summary: 'boolean'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: true
-            },
-        },
-        control: {
-            type: 'boolean'
-        }
-    },
-    pageSizeChangeable: {
-        name: 'pageSizeChangeable',
-        type: {name: 'boolean'},
-        description: 'Show page size options and allow changing page size',
-        defaultValue: true,
-        table: {
-            type: {
-                summary: 'boolean'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: true
-            },
-        },
-        control: {
-            type: 'boolean'
-        }
-    },
-    sortable: {
-        name: 'sortable',
-        type: {name: 'boolean'},
-        description: 'Show sort options and allow changing sort key',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: false
-            },
-        },
-        control: {
-            type: 'boolean'
-        }
-    },
-    'exportable': {
-        name: 'exportable',
-        type: {name: 'boolean'},
-        description: 'Show excel button and allow export',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: false
-            },
-        },
-        control: {
-            type: 'boolean'
-        }
-    },
-    refreshable: {
-            name: 'refreshable',
-            type: {name: 'boolean'},
-            description: 'Show refresh button and allow refresh',
-            defaultValue: true,
-            table: {
-                type: {
-                    summary: 'boolean'
-                },
-                    category: 'props',
-                    defaultValue: {
-                    summary: true
-                },
-            },
-            control: {
-                type: 'boolean'
-            }
-    },
-    searchable: {
-        name: 'searchable',
-        type: {name: 'boolean'},
-        description: 'Show search input and allow search',
-        defaultValue: true,
-        table: {
-          type: {
-              summary: 'boolean'
-          },
-          category: 'props',
-          defaultValue: {
-              summary: true
-          },
-        },
-        control: {
-          type: 'boolean'
-        }
-    },
-    filtersVisible: {
-        name: 'filtersVisible',
-        type: {name: 'boolean'},
-        description: 'Show search filters. filters exist only when search type is `query`.',
-        defaultValue: true,
-        table: {
-          type: {
-              summary: 'boolean'
-          },
-          category: 'props',
-          defaultValue: {
-              summary: true
-          },
-        },
-        control: {
-          type: 'boolean'
-        }
-    },
-    searchType: {
-        name: 'searchType',
-        type: {name: 'string'},
-        description: `Search type. ${Object.values(SEARCH_TYPES)} are available.`,
-        defaultValue: 'plain',
-        table: {
-            type: {
-                summary: 'string'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'plain'
-            },
-        },
-        control: {
-            type: 'select',
-            options: Object.values(SEARCH_TYPES)
-        }
-    },
-    pageSize: {
-        name: 'pageSize',
-        type: {name: 'number'},
-        description: 'Page size to show data. sync props.',
-        defaultValue: 24,
-        table: {
-            type: {
-                summary: 'number'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 24
-            },
-        },
-        control: {
-            type: 'select',
-            options: [24, 36, 48]
-        }
-    },
-    totalCount: {
-        name: 'totalCount',
-        type: {name: 'number'},
-        description: 'Total count of data for calculating pagination.',
-        defaultValue: 0,
-        table: {
-        type: {
-        summary: 'number'
-    },
-        category: 'props',
-        defaultValue: {
-        summary: 0
-    },
-    },
-        control: {
-        type: 'number',
-        options: {min: 0}
-        }
-    },
-    sortBy: {
-        name: 'sortBy',
-        type: {name: 'string'},
-        description: 'Sort key',
-        defaultValue: '',
-        table: {
-            type: {
-                summary: 'string'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: ''
-            },
-        },
-        control: {
-            type: 'text',
-        }
-    },
-    pageSizeOptions: {
-        name: 'pageSizeOptions',
-        type: {name: 'array'},
-        description: 'Options for dropdown of page sizes.',
-        defaultValue: [24, 36, 48],
-        table: {
-            type: {
-                summary: 'array'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: '[24, 36, 48]'
-            },
-        },
-        control: {
-            type: 'object',
-        }
-    },
-    sortByOptions: {
-        name: 'sortByOptions',
-        type: {name: 'array'},
-        description: 'Options for dropdown of sort keys.',
-        defaultValue: [],
-        table: {
-            type: {
-                summary: 'array'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: '[]'
-            },
-        },
-        control: {
-            type: 'object',
-        }
-    },
-    keyItemSets: {
-        name: 'keyItemSets',
-        type: {name: 'array'},
-        description: 'Query search key item sets. Follow the QuerySearch component spec.',
-        defaultValue: [
-            {
-                title: 'Key',
-                items: [{
-                    name: 'id',
-                    label: 'ID',
-                },
-                    {
-                        name: 'name',
-                        label: 'Name',
-                    },
-                    {
-                        name: 'group',
-                        label: 'Group',
-                    }],
-            },
-        ],
-        table: {
-          type: {
-              summary: 'array'
-          },
-          category: 'props',
-          defaultValue: {
-              summary: '[]'
-          },
-        },
-        control: {
-          type: 'object',
-        }
-    },
-    valueHandlerMap: {
-        name: 'valueHandlerMap',
-        type: {name: 'object'},
-        description: 'Query search value handler map. Follow the QuerySearch component spec.',
-        defaultValue: {
-            id: getHandler(range(10).map((d, i) => faker.random.uuid())),
-            name: getHandler(range(10).map(() => faker.name.findName())),
-            group: getHandler(range(10).map(() => faker.name.jobArea())),
-        },
-        table: {
-            type: {
-                summary: 'object'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: '{}'
-            },
-        },
-        control: {
-            type: 'object',
-        }
-    },
-    queryTags: {
-        name: 'queryTags',
-        type: {name: 'array'},
-        description: 'Query search tags. Follow the QuerySearchTags component spec.',
-        defaultValue: [],
-        table: {
-          type: {
-              summary: 'array'
-          },
-          category: 'props',
-          defaultValue: {
-              summary: null
-          },
-        },
-        control: {
-          type: 'object',
-        }
-    },
-    searchText: {
-        name: 'searchText',
-        type: {name: 'string'},
-        description: 'Search text for plain search. Works only with plain search.',
-        defaultValue: '',
-        table: {
-            type: {
-                summary: 'string'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: null
-            },
-        },
-        control: {
-            type: 'text',
-        }
-    },
-    timezone: {
-      name: 'timezone',
-      type: {name: 'string'},
-      description: 'Timezone that is used for display time value of query search tags.',
-      defaultValue: 'UTC',
-      table: {
-          type: {
-              summary: 'string'
-          },
-          category: 'props',
-          defaultValue: {
-              summary: 'UTC'
-          },
-      },
-      control: {
-          type: 'text',
-      }
-    },
-    onChange: {
-        name: 'change',
-        description: `Event emitted when pagination or sort value is changed.
-         First argument is 'options'.`,
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null
-            },
-            category: 'events',
-            defaultValue: {
-                summary: null
-            }
-        }
-    },
-    onExport: {
-        name: 'export',
-        description: 'Event emitted when export button clicked',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null
-            },
-            category: 'events',
-            defaultValue: {
-                summary: null
-            }
-        }
-    },
-    onRefresh: {
-        name: 'refresh',
-        description: 'Event emitted when refresh button clicked',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null
-            },
-            category: 'events',
-            defaultValue: {
-                summary: null
-            }
-        }
-    },
-    onClickSettings: {
-        name: 'click-settings',
-        description: 'Event emitted when settings button clicked',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null
-            },
-            category: 'events',
-            defaultValue: {
-                summary: null
-            }
-        }
-    },
-    leftArea: {
-        name: 'left-area',
-        description: 'Slot for left area of toolbox',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null
-            },
-            category: 'slots',
-            defaultValue: {
-                summary: null
-            }
-        },
-        control: {
-            type: 'text'
-        }
-    }
-}}/>
+}} argTypes={getToolboxArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PToolbox },
     template: `
-        <div class="w-full min-h-30 border-gray-200 border">
-            <p-toolbox v-bind="$props"
-                        @change="onChange"
-                        @export="onExport"
-                        @refresh="onRefresh"
-                        @click-settings="onClickSettings"
-            >
-                <template v-if="leftArea" #left-area>
-                    <span v-html="leftArea"/>
-                </template>
-            </p-toolbox>
-        </div>
+    <p-toolbox
+        :paginationVisible="paginationVisible"
+        :pageSizeChangeable="pageSizeChangeable"
+        :settingsVisible="settingsVisible"
+        :sortable="sortable"
+        :exportable="exportable"
+        :refreshable="refreshable"
+        :searchable="searchable"
+        :filtersVisible="filtersVisible"
+        :searchType="searchType"
+        :this-page.sync="proxyThisPage"
+        :pageSize.sync="proxyPageSize"
+        :totalCount="totalCount"
+        :sortBy.sync="proxySortBy"
+        :pageSizeOptions="pageSizeOptions"
+        :sortByOptions="sortByOptions"
+        :keyItemSets="keyItemSets"
+        :valueHandlerMap="valueHandlerMap"
+        :queryTags.sync="proxyQueryTags"
+        :searchText.sync="proxySearchText"
+        :timezone="timezone"
+        :styleType="styleType"
+        @change="onChange"
+        @export="onExport"
+        @refresh="onRefresh"
+        @click-settings="onClickSettings"
+        @init-tags="onInitTags"
+    >
+        <template v-if="leftAreaSlot" #left-area>
+            <span v-html="leftAreaSlot"/>
+        </template>
+        <template v-if="bottomSlot" #bottom>
+            <span v-html="bottomSlot"/>
+        </template>
+    </p-toolbox>
     `,
     setup(props) {
+        const vm = getCurrentInstance();
+        const state = reactive({
+            proxyThisPage: makeOptionalProxy('thisPage', vm, props.thisPage),
+            proxyPageSize: makeOptionalProxy('pageSize', vm, props.pageSize),
+            proxySortBy: makeOptionalProxy('sortBy', vm, props.sortBy),
+            proxySearchText: makeOptionalProxy('searchText', vm, props.searchText),
+            proxyQueryTags: makeOptionalProxy('queryTags', vm, props.queryTags),
+        });
         return {
-        }
+            ...toRefs(state),
+        };
     }
 });
 
 
 # Toolbox
-<br/>
-<br/>
+
+<br />
+<br />
 
 ## Basic
 
 <Canvas>
-    <Story name="basic">
-        {Template.bind({})}
+    <Story name="Basic">
+{{
+    components: { PToolbox },
+    template: `
+    <p-toolbox />
+`,
+}}
     </Story>
 </Canvas>
 
@@ -478,37 +96,48 @@ export const Template = (args, { argTypes }) => ({
 
 ### Options
 
-When pagination, page size, and sort value are changed, `change` event will be occurred.<br/>
+<br/>
+
+When pagination, page size, filters like search text and query tags, and sort value are changed, `change` event will be occurred.<br/>
 `change` event has one argument, `options`. <br/>
-`options` contains `sortBy`, `limit`, and `start` optionally.<br/>
-Each property in options exists only when the value is changed.<br/>
+`options` contains `sortBy`, `pageStart`, `pageLimit`, `queryTags`, and `searchText` optionally.<br/>
+Each property in options exists only when the value changed.<br/>
 
 ```typescript
-
 interface Options {
-    start?: number;
-    limit?: number;
+    pageStart?: number;
+    pageLimit?: number;
     sortBy?: string;
+    queryTags?: QueryTag[]; // query search tag type
+    searchText?: string;
 }
-
 ```
 
+<br/>
 
 
 ## Full Case
 
 <Canvas>
-    <Story name="full case" args={{
-        paginationVisible: true,
-        pageSizeChangeable: true,
-        sortable: true,
-        'exportable': true,
-        refreshable: true,
-        searchable: true,
-        sortBy: 'Recent',
-        sortByOptions: ['Recent']
-    }}>
-        {Template.bind({})}
+    <Story name="Full Case" height="150px">
+{{
+    components: { PToolbox },
+    template: `
+    <p-toolbox
+        paginationVisible
+        pageSizeChangeable
+        sortable
+        exportable
+        refreshable
+        searchable
+        filtersVisible
+        settingsVisible
+        :sortBy="'Recent'"
+        :sortByOptions="['Recent']"
+    >
+    </p-toolbox>
+`,
+}}
     </Story>
 </Canvas>
 
@@ -518,15 +147,33 @@ interface Options {
 ## Query Search
 
 <Canvas>
-    <Story name="query search" args={{
-        searchable: true,
-        searchType: 'query',
-        filtersVisible: true,
-        queryTags: [
-            { key: null, value: { label: 'Hello', name: 'hello' }, operator: '' },
-        ]
-    }}>
-        {Template.bind({})}
+    <Story name="Query Search" height="200px">
+{{
+    components: { PToolbox },
+    template: `
+    <p-toolbox
+        searchable
+        searchType="query"
+        filtersVisible
+        :key-item-sets="keyItemSets"
+        :value-handler-map="valueHandlerMap"
+        :queryTags.sync="queryTags"
+    >
+    </p-toolbox>
+`,
+    setup(props) {
+        const state = reactive({
+            keyItemSets: getKeyItemSets(),
+            valueHandlerMap: getValueHandlerMap(),
+            queryTags: [
+                { key: null, value: { label: 'Hello', name: 'hello' }, operator: '' },
+            ]
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+}}
     </Story>
 </Canvas>
 
@@ -536,30 +183,37 @@ interface Options {
 ## Left Area Slot
 
 <Canvas>
-    <Story name="left area slot" args={{
-        searchable: true,
-        searchType: 'query',
-        filtersVisible: true,
-        queryTags: [
+    <Story name="Left Area Slot">
+{{
+    components: { PToolbox },
+    template: `
+    <p-toolbox
+        searchable
+        searchType="query"
+        filtersVisible
+        :queryTags="[
             { key: null, value: { label: 'Hello', name: 'hello' }, operator: '' },
-        ],
-        leftArea: '<button class="py-1 px-3 h-full rounded-sm bg-primary text-white font-bold text-lg">LEFT AREA</button>'
-    }}>
-        {Template.bind({})}
+        ]"
+    >
+        <template #left-area>
+            <button class="py-1 px-3 h-full rounded-sm bg-primary text-white font-bold text-lg">LEFT AREA</button>
+        </template>
+    </p-toolbox>
+`,
+}}
     </Story>
 </Canvas>
 
 <br/>
 <br/>
-
 
 ## Playground
 
 <Canvas>
-    <Story name="playground">
+    <Story name="Playground">
         {Template.bind({})}
     </Story>
 </Canvas>
 
-<ArgsTable story="playground"/>
+<ArgsTable story="Playground"/>
 

@@ -5,14 +5,3 @@ export interface TabItem {
     label?: string | TranslateResult;
     keepAlive?: boolean;
 }
-
-type TabsType = Array<string|TabItem>;
-
-interface TabStateType {
-    tabs: TabsType;
-}
-interface TabSyncType {
-    activeTab: string;
-}
-
-export interface TabProps extends TabStateType, TabSyncType {}

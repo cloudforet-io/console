@@ -57,8 +57,10 @@ export { default as PIconButton } from './inputs/buttons/icon-button/PIconButton
 export { default as PIconTextButton } from './inputs/buttons/icon-text-button/PIconTextButton.vue';
 export { default as PLoadingButton } from './others/deprecated/loading-button/PLoadingButton.vue';
 export { default as PToggleButton } from './inputs/buttons/toggle-button/PToggleButton.vue';
+export { default as PCard } from './data-display/cards/card/PCard.vue';
 export { default as PCardItem } from './others/deprecated/card-item/PCardItem.vue';
-export { default as PCollapsiblePanel } from './data-display/collapsible/collapsible-panel/PCollapsiblePanel.vue';
+export { default as PListCard } from './data-display/cards/list-card/PListCard.vue';
+export { default as PCollapsiblePanel } from './data-display/collapsibles/collapsible-panel/PCollapsiblePanel.vue';
 export { default as PCheckBox } from './inputs/checkbox/PCheckBox.vue';
 export { default as PFieldGroup } from './inputs/forms/field-group/PFieldGroup.vue';
 export { default as PRadio } from './inputs/radio/PRadio.vue';
@@ -75,7 +77,6 @@ export { default as PProgressBar } from './data-display/progress-bar/PProgressBa
 export { default as PSearch } from './inputs/search/search/PSearch.vue';
 export { default as PSelectableItem } from './others/deprecated/selectable-item/PSelectableItem.vue';
 export { default as PStatus } from './data-display/status/PStatus.vue';
-export { default as PTabBar } from './navigation/tabs/tab/tab-bar/PTabBar.vue';
 export { default as PTag } from './data-display/tags/PTag.vue';
 export { default as PTextEditor } from './inputs/text-editor/PTextEditor.vue';
 export { default as PTooltip } from './data-display/tooltips/PTooltip.vue';
@@ -115,13 +116,23 @@ export { default as PDefinitionTable } from './data-display/tables/definition-ta
 export { default as PQuerySearchTable } from './data-display/tables/query-search-table/PQuerySearchTable.vue';
 export { default as PSearchTable } from './data-display/tables/search-table/PSearchTable.vue';
 export { default as PToolboxTable } from './data-display/tables/toolbox-table/PToolboxTable.vue';
-export { default as PButtonTab } from './others/console/button-tab/PButtonTab.vue';
+export { default as PButtonTab } from './navigation/tabs/button-tab/PButtonTab.vue';
 export { default as PTab } from './navigation/tabs/tab/PTab.vue';
 export { default as PPageTitle } from './data-display/titles/page-title/PPageTitle.vue';
 export { default as PTree } from './data-display/tree/PTree.vue';
 export { default as PProgressWizard } from './navigation/wizards/progress-wizard/PProgressWizard.vue';
+export { default as PSelectStatus } from './inputs/select-status/PSelectStatus.vue';
 
 export { default as PNotificationBar } from './feedbacks/notification/PNotificationBar.vue';
 export { default as PDataLoader } from './feedbacks/loading/data-loader/PDataLoader.vue';
 
 export { default as PToolbox } from './navigation/toolbox/PToolbox.vue';
+
+export { default as PSelectCard } from './inputs/select-card/PSelectCard.vue';
+export { default as PSelectButton } from './inputs/select-button/PSelectButton.vue';
+
+export { default as PBalloonTab } from './navigation/tabs/ballon-tab/PBalloonTab.vue';
+export { default as PBoxTab } from './navigation/tabs/box-tab/PBoxTab.vue';
+
+export { default as PTextarea } from './inputs/textarea/PTextarea.vue';
+export { default as PCollapsibleList } from './data-display/collapsibles/collapsible-list/PCollapsibleList.vue';

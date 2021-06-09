@@ -349,10 +349,10 @@ export default defineComponent<ContextMenuProps>({
     }
 
     .loader {
-        @apply absolute w-full h-full flex items-center justify-center bg-white;
+        @apply absolute w-full h-full flex items-center justify-center;
         left: 0;
         top: 0;
-        opacity: 50%;
+        background-color: rgba(theme('colors.white'), 0.5);
     }
 }
 </style>

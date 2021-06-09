@@ -177,6 +177,23 @@ import {ANIMATION_TYPE } from '@/foundation/icons/config';
             options: Object.values(ANIMATION_TYPE)
         },
     },
+    defaultSlot: {
+        name: 'default',
+        description: 'Slot for text.',
+        defaultValue: '',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text',
+        },
+    },
 }}
 />
 
@@ -195,7 +212,9 @@ export const Template = (args, { argTypes }) => ({
         :lottie="lottie"
         :icon-size="iconSize"
         :icon-animation="iconAnimation"
-    />
+    >
+        <div v-if="defaultSlot" v-html="defaultSlot"/>
+    </p-status>
 </div>`,
     setup() {
         return {
