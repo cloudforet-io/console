@@ -1,3 +1,10 @@
+# [1.1.0-beta.54](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.53...v1.1.0-beta.54) (2021-06-09)
+
+
+### Features
+
+* add showPageNumber props to PTextPagination ([#588](https://github.com/spaceone-dev/spaceone-design-system/issues/588)) ([31ea8e8](https://github.com/spaceone-dev/spaceone-design-system/commit/31ea8e84b305d4436fdab3ccfc978b5c052b9122))
+
 # [1.1.0-beta.53](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.52...v1.1.0-beta.53) (2021-06-09)
 
 
