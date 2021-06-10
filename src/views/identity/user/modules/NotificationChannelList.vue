@@ -165,6 +165,7 @@ export default {
                             projectId: props.projectId ? props.projectId : null,
                             // eslint-disable-next-line camelcase
                             supported_schema: d.capability.supported_schema,
+                            protocolType: d.protocol_type,
                         },
                     },
                 }));

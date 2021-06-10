@@ -14,27 +14,39 @@
                 <div v-if="loading" class="fake-no-data" />
             </template>
         </p-autocomplete-search>
+        <div class="tag-box">
+            <p-tag v-for="(tag, i) in selectedMemberItems" :key="tag" @delete="onDeleteTag(i)">
+                {{ tag ? tag : '' }}
+            </p-tag>
+        </div>
     </fragment>
 </template>
 
 <script lang="ts">
-import { PAutocompleteSearch, PCheckBox } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {PAutocompleteSearch, PCheckBox, PTag} from '@spaceone/design-system';
+import {
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 export default {
     name: 'AddNotificationMemberGroup',
     components: {
-        PAutocompleteSearch, PCheckBox,
+        PAutocompleteSearch, PCheckBox, PTag,
     },
     props: {
         projectId: {
             type: String,
             default: '',
         },
+        users: {
+            type: Array,
+            default: () => [],
+        }
     },
     setup(props, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             search: '',
             loading: true,
@@ -44,12 +56,13 @@ export default {
                 label: d.resource_id,
                 type: 'item',
             }))),
-            selectedMemberItems: [],
+            selectedMemberItems: props.users || [],
+
         });
 
         const emitChange = () => {
             emit('change', {
-                member: state.selectedMemberItems,
+                users: state.selectedMemberItems,
             });
         };
 
@@ -58,6 +71,13 @@ export default {
             // const idx = state.selectedMemberItems.findIndex(k => k === item.name);
             state.selectedMemberItems = [...state.selectedMemberItems, item.name];
             emitChange();
+        };
+
+        const onDeleteTag = (idx) => {
+            state.selectedMemberItems.splice(idx, 1);
+            vm.$nextTick(() => {
+                state.selectedMember = [...state.selectedMember];
+            });
         };
 
         (async () => {
@@ -77,6 +97,7 @@ export default {
         return {
             ...toRefs(state),
             onSelectMember,
+            onDeleteTag,
         };
     },
 };
@@ -85,5 +106,12 @@ export default {
 <style lang="postcss" scoped>
 .autocomplete-search {
     max-width: 26.25rem;
+}
+.tag-box {
+    @apply text-gray-900;
+    margin-top: 0.625rem;
+    .p-tag {
+        margin-bottom: 0.5rem;
+    }
 }
 </style>

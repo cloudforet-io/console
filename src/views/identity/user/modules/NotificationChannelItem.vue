@@ -50,11 +50,16 @@
                 </div>
                 <div v-if="isDataEditMode" class="content">
                     <div class="left-section">
-                        <p v-for="(item, index) in dataListForEdit" :key="`channel-editable-data-value-${index}`">
-                            <p-text-input v-model="dataListForEdit[index]"
-                                          class="block"
-                            />
+                        <p v-if="Object.keys(dataListForEdit).includes('users')">
+                            <add-notification-member-group :users="channelData.data.users" :project-id="projectId" @change="onChangeUser" />
                         </p>
+                        <div v-else>
+                            <p v-for="(item, index) in dataListForEdit" :key="`channel-editable-data-value-${index}`">
+                                <p-text-input v-model="dataListForEdit[index]"
+                                              class="block"
+                                />
+                            </p>
+                        </div>
                     </div>
                     <div class="button-group">
                         <p-button :outline="true" class="text-button" @click="cancelEdit(EDIT_TYPE.DATA)">
@@ -71,10 +76,20 @@
                 </div>
                 <div v-else class="content">
                     <div class="left-section">
-                        <p v-for="(item, index) in Object.values(channelData.data)" :key="`channel-data-value-${index}`">
-                            <span v-if="channelData.protocol_name === PROTOCOL_TYPE.SLACK">{{ item.replace(/(?<=.{0})./gi, "*") }}</span>
-                            <span v-else>{{ item }}</span>
-                        </p>
+                        <div v-if="Object.keys(dataListForEdit).includes('users')">
+                            <p-badge v-for="(item, index) in dataListForEdit.users" :key="index" style-type="gray900"
+                                     outline
+                                     class="mr-2"
+                            >
+                                {{ item }}
+                            </p-badge>
+                        </div>
+                        <div v-else>
+                            <p v-for="(item, index) in Object.values(channelData.data)" :key="`channel-data-value-${index}`">
+                                <span v-if="channelData.protocol_name === PROTOCOL_TYPE.SLACK">{{ item.replace(/(?<=.{0})./gi, "*") }}</span>
+                                <span v-else>{{ item }}</span>
+                            </p>
+                        </div>
                     </div>
                     <p v-if="channelData.protocol_name === PROTOCOL_TYPE.SLACK">
                         <info-message :message="$t('IDENTITY.USER.NOTIFICATION.CANNOT_EDIT_SLACK')" />
@@ -206,6 +221,7 @@ import AddNotificationLevel from '@/views/identity/user/modules/AddNotificationL
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import InfoMessage from '@/common/components/InfoMessage.vue';
+import AddNotificationMemberGroup from '@/views/identity/user/modules/AddNotificationMemberGroup.vue';
 
 enum EDIT_TYPE {
     NAME = 'name',
@@ -213,6 +229,7 @@ enum EDIT_TYPE {
     SCHEDULE = 'schedule',
     TOPIC = 'topic',
     LEVEL = 'notification_level',
+    USERS = 'users',
 }
 
 enum PROTOCOL_TYPE {
@@ -225,6 +242,7 @@ enum PARAM_KEY_TYPE {
     DATA = 'data',
     SCHEDULE = 'schedule',
     LEVEL = 'notification_level',
+    USERS = 'users',
 }
 
 interface ParamType {
@@ -239,6 +257,7 @@ interface ParamType {
 export default {
     name: 'NotificationChannelItem',
     components: {
+        AddNotificationMemberGroup,
         AddNotificationLevel,
         AddNotificationTopic,
         AddNotificationSchedule,
@@ -424,6 +443,10 @@ export default {
             await updateProjectChannel(PARAM_KEY_TYPE.LEVEL, state.notificationLevelForEdit);
         };
 
+        const onChangeUser = (value) => {
+            state.dataListForEdit.users = value.users;
+        };
+
         const onClickSave = async (type: EDIT_TYPE) => {
             if (type === EDIT_TYPE.NAME) {
                 await saveChangedName();
@@ -453,6 +476,7 @@ export default {
             onChangeSchedule,
             onChangeTopic,
             onChangeLevel,
+            onChangeUser,
             onClickSave,
         };
     },

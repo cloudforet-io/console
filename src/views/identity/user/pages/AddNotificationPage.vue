@@ -9,7 +9,7 @@
                 <h3 class="content-title">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.BASE_INFO') }}
                 </h3>
-                <add-notification-data :project-id="projectId" :supported-schema="supportedSchema"
+                <add-notification-data :project-id="projectId" :supported-schema="supportedSchema" :protocol-type="protocolType"
                                        @change="onChangeData"
                 />
             </p-pane-layout>
@@ -41,6 +41,7 @@
             <p-button
                 style-type="primary-dark"
                 class="text-button"
+                :disabled="!isDataValid"
                 @click="onClickSave"
             >
                 {{ $t('COMMON.TAGS.SAVE') }}
@@ -88,7 +89,9 @@ export default {
             pageTitle: '' as TranslateResult,
             projectId: vm.$route.query.projectId,
             protocolId: vm.$route.params.protocolId,
+            protocolType: vm.$route.query.protocolType,
             supportedSchema: vm.$route.query.supported_schema,
+            isDataValid: false,
             //
             channelName: '',
             data: {},
@@ -157,6 +160,8 @@ export default {
             state.channelName = value.channelName;
             state.data = value.data;
             state.notificationLevel = value.level;
+            state.isDataValid = value.isValid;
+
         };
 
         const onChangeSchedule = (value) => {
@@ -170,8 +175,8 @@ export default {
         };
 
         (async () => {
-            const protocol = vm.$route.query.protocolLabel;
-            state.pageTitle = computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: protocol })) as unknown as TranslateResult;
+            const protocolLabel = vm.$route.query.protocolLabel;
+            state.pageTitle = computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: protocolLabel })) as unknown as TranslateResult;
         })();
 
         return {
