@@ -1369,7 +1369,27 @@
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
 			"MAINTENANCE_WINDOW": {
-				"TITLE": ""
+				"ACTION": "작업",
+				"ALT_E_CLOSE_MAINTENANCE_WINDOW": "유지 관리 기간 닫기 실패",
+				"ALT_E_CREATE_MAINTENANCE_WINDOW": "유지 관리 기간 생성 실패",
+				"ALT_E_UPDATE_MAINTENANCE_WINDOW": "유지 관리 기간 편집 실패",
+				"ALT_S_CLOSE_MAINTENANCE_WINDOW": "유지 관리 기간 닫기 성공",
+				"ALT_S_CREATE_MAINTENANCE_WINDOW": "유지 관리 기간 생성 성공",
+				"ALT_S_UPDATE_MAINTENANCE_WINDOW": "유지 관리 기간 편집 성공",
+				"CLOSE": "닫기",
+				"CREATE": "유지 관리 기간 생성",
+				"FORM": {
+					"CREATE_TITLE": "유지 관리 기간 생성",
+					"DESC": "유지 관리 기간 동안, 이 프로젝트에 새 알림이 생성되지 않습니다.",
+					"LABEL_TITLE": "제목",
+					"REQUIRED": "필수 입력 항목입니다.",
+					"SCHEDULE": "스케줄",
+					"START_AT_TIME": "예정된 시간에 시작하기",
+					"START_NOW": "지금 시작하고 끝내기",
+					"UPDATE_TITLE": "유지 관리 기간 편집"
+				},
+				"TITLE": "유지 관리 기간",
+				"UPDATE": "편집"
 			},
 			"MEMBER_TITLE": "구성원",
 			"MODAL_ADDED_MEMBERS": "선택된 구성원들 ",
@@ -1418,7 +1438,7 @@
 			"SUBTAB_TITLE_WEBHOOK": "",
 			"SUBTAB_WEBHOOK": "",
 			"TAB_ALERT": "Alert",
-			"TAB_MAINTENANCE_WINDOW": "Maintenance Window",
+			"TAB_MAINTENANCE_WINDOW": "유지 관리 기간",
 			"TAB_MEMBER": "구성원 ",
 			"TAB_NOTIFICATIONS": "알림",
 			"TAB_REPORT": "보고서",

@@ -1369,7 +1369,27 @@
 			"DELETE": "Delete",
 			"DOWNLOAD_FILE": "Download file",
 			"MAINTENANCE_WINDOW": {
-				"TITLE": "Maintenance Window"
+				"ACTION": "Action",
+				"ALT_E_CLOSE_MAINTENANCE_WINDOW": "Failed to Close Maintenance Window",
+				"ALT_E_CREATE_MAINTENANCE_WINDOW": "Failed to Create Maintenance Window",
+				"ALT_E_UPDATE_MAINTENANCE_WINDOW": "Failed to Update Maintenance Window",
+				"ALT_S_CLOSE_MAINTENANCE_WINDOW": "Success to Close Maintenance Window",
+				"ALT_S_CREATE_MAINTENANCE_WINDOW": "Success to Create Maintenance Window",
+				"ALT_S_UPDATE_MAINTENANCE_WINDOW": "Success to Update Maintenance Window",
+				"CLOSE": "Close",
+				"CREATE": "Create Maintenance Window",
+				"FORM": {
+					"CREATE_TITLE": "Create Maintenance Window",
+					"DESC": "During a maintenance window, no new alert will be created on this project.",
+					"LABEL_TITLE": "Title",
+					"REQUIRED": "Required field",
+					"SCHEDULE": "Schedule",
+					"START_AT_TIME": "Start at scheduled time",
+					"START_NOW": "Start now and end in",
+					"UPDATE_TITLE": "Update Maintenance Window"
+				},
+				"TITLE": "Maintenance Window",
+				"UPDATE": "Update"
 			},
 			"MEMBER_TITLE": "Member",
 			"MODAL_ADDED_MEMBERS": "Added Members",

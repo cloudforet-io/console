@@ -1369,7 +1369,27 @@
 			"DELETE": "削除",
 			"DOWNLOAD_FILE": "ファイルをダウンロードする",
 			"MAINTENANCE_WINDOW": {
-				"TITLE": ""
+				"ACTION": "",
+				"ALT_E_CLOSE_MAINTENANCE_WINDOW": "",
+				"ALT_E_CREATE_MAINTENANCE_WINDOW": "",
+				"ALT_E_UPDATE_MAINTENANCE_WINDOW": "",
+				"ALT_S_CLOSE_MAINTENANCE_WINDOW": "",
+				"ALT_S_CREATE_MAINTENANCE_WINDOW": "",
+				"ALT_S_UPDATE_MAINTENANCE_WINDOW": "",
+				"CLOSE": "",
+				"CREATE": "",
+				"FORM": {
+					"CREATE_TITLE": "",
+					"DESC": "",
+					"LABEL_TITLE": "",
+					"REQUIRED": "",
+					"SCHEDULE": "",
+					"START_AT_TIME": "",
+					"START_NOW": "",
+					"UPDATE_TITLE": ""
+				},
+				"TITLE": "",
+				"UPDATE": ""
 			},
 			"MEMBER_TITLE": "メンバー",
 			"MODAL_ADDED_MEMBERS": "選択されたメンバー",
