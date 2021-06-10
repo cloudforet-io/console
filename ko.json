@@ -1368,6 +1368,9 @@
 			"CLICK_ADD_MEMBER": "테이블 정보를 클릭하면 구성원이 추가됩니다.",
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
+			"MAINTENANCE_WINDOW": {
+				"TITLE": ""
+			},
 			"MEMBER_TITLE": "구성원",
 			"MODAL_ADDED_MEMBERS": "선택된 구성원들 ",
 			"MODAL_ADD_MEMBER": "프로젝트 구성원 추가",

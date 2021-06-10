@@ -1368,6 +1368,9 @@
 			"CLICK_ADD_MEMBER": "Click and Add Members",
 			"DELETE": "Delete",
 			"DOWNLOAD_FILE": "Download file",
+			"MAINTENANCE_WINDOW": {
+				"TITLE": "Maintenance Window"
+			},
 			"MEMBER_TITLE": "Member",
 			"MODAL_ADDED_MEMBERS": "Added Members",
 			"MODAL_ADD_MEMBER": "Add Member",

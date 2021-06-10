@@ -1368,6 +1368,9 @@
 			"CLICK_ADD_MEMBER": "テーブル情報をクリックすると、メンバーが追加されます。",
 			"DELETE": "削除",
 			"DOWNLOAD_FILE": "ファイルをダウンロードする",
+			"MAINTENANCE_WINDOW": {
+				"TITLE": ""
+			},
 			"MEMBER_TITLE": "メンバー",
 			"MODAL_ADDED_MEMBERS": "選択されたメンバー",
 			"MODAL_ADD_MEMBER": "プロジェクトメンバーを追加する",
