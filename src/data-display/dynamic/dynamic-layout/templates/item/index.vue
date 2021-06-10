@@ -25,7 +25,7 @@ import PPanelTop from '@/data-display/titles/panel-top/PPanelTop.vue';
 import PDefinitionTable from '@/data-display/tables/definition-table/PDefinitionTable.vue';
 import { DefinitionData, DefinitionField } from '@/data-display/tables/definition-table/type';
 import {
-    ItemDynamicLayoutProps, ItemFetchOptions,
+    ItemDynamicLayoutProps,
 } from '@/data-display/dynamic/dynamic-layout/templates/item/type';
 import { DynamicFieldProps } from '@/data-display/dynamic/dynamic-field/type';
 import PDynamicField from '@/data-display/dynamic/dynamic-field/PDynamicField.vue';

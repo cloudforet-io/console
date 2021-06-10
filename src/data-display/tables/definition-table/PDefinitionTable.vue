@@ -1,34 +1,53 @@
 <template>
-    <div class="p-definition-table">
-        <slot v-if="!loading && isNoData" name="empty">
-            <p-empty class="no-data">
-                <span>{{ $t('COMPONENT.DEFINITION_TABLE.NO_DATA') }}</span>
-            </p-empty>
-        </slot>
+    <div class="p-definition-table" :class="styleType">
+        <p-empty v-if="!loading && isNoData" class="no-data">
+            <slot name="no-data">
+                {{ $t('COMPONENT.DEFINITION_TABLE.NO_DATA') }}
+            </slot>
+        </p-empty>
         <table v-else-if="!isNoData">
             <tbody>
-                <p-definition v-for="(bind, idx) in items" :key="`${contextKey}-${idx}`"
-                              class="def-row" v-bind="bind" @copy="onCopy(bind, idx)"
+                <p-definition v-for="(item, idx) in items" :key="`${contextKey}-${idx}`"
+                              class="def-row"
+                              :label="item.label"
+                              :name="item.name"
+                              :data="item.data"
+                              :disable-copy="disableCopy"
+                              @copy="onCopy(item, idx)"
                 >
                     <template #default="scope">
-                        <slot :name="`data-${bind.name}`" v-bind="{...scope, index: idx, items}" />
-                        <slot :name="`data-${idx}`" v-bind="{...scope, index: idx, items}" />
-                    </template>
-                    <template #copy="scope">
-                        <slot name="copy" v-bind="{...scope, index: idx, items}">
-                            <slot :name="`copy-${bind.name}`" v-bind="{...scope, index: idx, items}" />
-                            <slot :name="`copy-${idx}`" v-bind="{...scope, index: idx, items}" />
+                        <slot name="data" v-bind="{
+                            ...scope, index: idx, items}"
+                        >
+                            <slot :name="`data-${item.name}`"
+                                  v-bind="{...scope, index: idx, items}"
+                            >
+                                <slot :name="`data-${idx}`"
+                                      v-bind="{...scope, index: idx, items}"
+                                >
+                                    {{ scope.value }}
+                                </slot>
+                            </slot>
                         </slot>
+                    </template>
+                    <template v-if="$scopedSlots.key" #key="scope">
+                        <slot name="key" v-bind="{...scope, index: idx, items}" />
+                    </template>
+                    <template #extra="scope">
+                        <slot name="extra" v-bind="scope" />
                     </template>
                 </p-definition>
             </tbody>
         </table>
-        <slot v-if="loading" name="loading">
-            <div class="loading-backdrop fade-in" />
-            <p-lottie name="thin-spinner" :size="2.5"
-                      :auto="true" class="loading"
-            />
-        </slot>
+
+        <div v-if="loading" class="loading-backdrop fade-in" />
+        <div v-if="loading" class="loading">
+            <slot name="loading">
+                <p-lottie name="thin-spinner" :size="2.5"
+                          auto
+                />
+            </slot>
+        </div>
     </div>
 </template>
 
@@ -36,7 +55,7 @@
 import { every, range, get } from 'lodash';
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -46,13 +65,15 @@ import PDefinition from '@/data-display/tables/definition-table/definition/PDefi
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PEmpty from '@/data-display/empty/PEmpty.vue';
 import { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
+import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
 
-const makeDefItems = (fields: DefinitionField[], data?: DefinitionData): DefinitionProps[] => fields.map(item => ({
-    ...item,
-    data: get(data, item.name, ''),
+const makeDefItems = (fields: DefinitionField[], data?: DefinitionData): DefinitionProps[] => fields.map(field => ({
+    ...field,
+    data: get(data, field.name, ''),
 }));
 
-export default {
+
+export default defineComponent<DefinitionTableProps>({
     name: 'PDefinitionTable',
     components: {
         PLottie, PEmpty, PDefinition,
@@ -74,12 +95,23 @@ export default {
             type: Number,
             default: 5,
         },
+        disableCopy: {
+            type: Boolean,
+            default: false,
+        },
+        styleType: {
+            type: String,
+            default: DEFINITION_TABLE_STYLE_TYPE.primary,
+            validator(styleType: any) {
+                return Object.values(DEFINITION_TABLE_STYLE_TYPE).includes(styleType);
+            },
+        },
     },
-    setup(props: DefinitionTableProps, { emit }) {
+    setup(props: DefinitionTableProps, { emit, slots }) {
         const state = reactive({
             contextKey: Math.floor(Math.random() * Date.now()),
             isNoData: computed(() => every(state.items, def => !def.data)),
-            skeletons: computed(() => range(props.skeletonRows)),
+            skeletons: computed(() => range(props.skeletonRows ?? 5)),
             items: computed(() => makeDefItems(props.fields, props.data)),
         });
 
@@ -91,16 +123,16 @@ export default {
             ...toRefs(state),
             onCopy(bind, idx) {
                 emit('copy', bind, idx);
-                emit(`copy:${bind.name}`, bind, idx);
             },
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
 .p-definition-table {
     @apply relative;
+    z-index: 0;
     min-height: 11.25rem;
     .no-data {
         min-height: 11.25rem;
@@ -109,24 +141,18 @@ export default {
         @apply w-full;
         table-layout: fixed;
         td {
-            @apply border-white;
             line-height: 1.8;
             word-break: break-word;
         }
     }
-    .def-row:nth-child(2n+1) {
-        td {
-            &:first-child {
-                @apply border-r-2 border-white;
-            }
-
-            @apply bg-violet-100;
+    .def-row {
+        td:first-child {
+            @apply border-r-2;
         }
     }
     .loading-backdrop {
         @apply absolute w-full h-full overflow-hidden;
-        background-color: white;
-        opacity: 0.5;
+        background-color: rgba(theme('colors.white'), 0.5);
         top: 0;
         z-index: 1;
     }
@@ -134,6 +160,46 @@ export default {
         @apply absolute flex w-full h-full justify-center items-center;
         top: 0;
         max-height: 10rem;
+        z-index: 2;
+    }
+
+    /* style types */
+    @define-mixin style-type $table-border-color, $stripe-bg-color, $row-border-color, $key-border-color {
+        table {
+            td {
+                border-color: $table-border-color;
+            }
+            tr {
+                border-color: $row-border-color;
+            }
+        }
+        .def-row {
+            &:nth-child(2n+1) {
+                background-color: $stripe-bg-color;
+            }
+            td:first-child {
+                border-color: $key-border-color;
+            }
+        }
+    }
+
+    &.primary {
+        @mixin style-type theme('colors.white'), theme('colors.violet.100'), transparent, theme('colors.white');
+    }
+    &.white {
+        @mixin style-type theme('colors.white'), theme('colors.white'), theme('colors.gray.300'), theme('colors.white');
+        @apply rounded-lg border border-gray-200;
+        table {
+            tr {
+                @apply border-b;
+                &:first-of-type {
+                    @apply rounded-t-lg;
+                }
+                &:last-of-type {
+                    @apply rounded-b-lg border-b-0;
+                }
+            }
+        }
     }
 
     /* transitions */
@@ -149,6 +215,16 @@ export default {
     }
     .fade-in-leave, .fade-in-enter-to {
         opacity: 0.5;
+    }
+
+    /* responsive */
+
+    @screen mobile {
+        .def-row {
+            td:first-child {
+                @apply border-r-0;
+            }
+        }
     }
 }
 </style>

@@ -15,6 +15,7 @@
                     <p-i name="ic_external-link"
                          height="1em" width="1em"
                          color="inherit"
+                         class="external-icon"
                     />
                 </slot>
             </a>
@@ -87,14 +88,17 @@ export default defineComponent<Props>({
 
 <style lang="postcss">
 .p-anchor {
-    @apply cursor-pointer inline-flex items-center;
-
+    @apply cursor-pointer inline-block;
+    vertical-align: middle;
+    line-height: inherit;
     .text {
-        margin-right: 2px;
+        font-weight: inherit;
         font-size: inherit;
         color: inherit;
-        font-weight: 400;
-        white-space: nowrap;
+        word-break: break-all;
+    }
+    .external-icon {
+        margin-left: 2px;
     }
     &.disabled {
         @apply text-gray-400;

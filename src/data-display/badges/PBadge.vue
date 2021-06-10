@@ -73,7 +73,7 @@ export default {
     width: fit-content;
     font-size: 0.75rem;
     line-height: 1;
-    height: 1.25rem;
+    min-height: 1.25rem;
     overflow: hidden;
     letter-spacing: 0.02rem;
     padding: 0 0.5rem;

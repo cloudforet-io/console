@@ -1,106 +1,19 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import {
     toRefs, reactive,
 } from '@vue/composition-api';
-import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import PDefinition from '@/data-display/tables/definition-table/definition/PDefinition.vue';
+import faker from 'faker'
 
-<Meta title='Data Display/Tables/Definition Table/Definition Item' parameters={{
+import PButton from '@/inputs/buttons/button/PButton';
+import PDefinition from '@/data-display/tables/definition-table/definition/PDefinition.vue';
+import { getDefinitionArgTypes } from '@/data-display/tables/definition-table/definition/story-helper';
+
+<Meta title='Data Display/Tables/Definition Table/Definition' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5373%3A6989',
     }
-}} component={ PDefinition } argTypes={{
-    name: {
-        name: 'name',
-        type: {name: 'string'},
-        description: 'Name of key.',
-        defaultValue: 'name',
-        table: {
-            type: {
-                summary: 'string'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: '""'
-            }
-        },
-        control: {
-            type: 'text'
-        },
-    },
-    label: {
-        name: 'label',
-        type: {name: 'string'},
-        description: 'Label of key.',
-        defaultValue: 'label',
-        table: {
-            type: {
-                summary: 'string'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: '""'
-            }
-        },
-        control: {
-            type: 'text'
-        },
-    },
-    data: {
-        name: 'data',
-        type: {name: 'string'},
-        description: 'Data of value.',
-        defaultValue: 'data',
-        table: {
-            type: {
-                summary: 'string, object, array, boolean, number'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: '""'
-            }
-        },
-        control: {
-            type: 'text'
-        },
-    },
-    disableCopy: {
-        name: 'disableCopy',
-        type: {name: 'boolean'},
-        description: 'Disable copy button when true',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: false,
-            }
-        },
-        control: {
-            type: 'boolean',
-        }
-    },
-    formatter: {
-        name: 'formatter',
-        type: {name: 'function'},
-        description: `formatter that format the data.`,
-        defaultValue: undefined,
-        table: {
-            type: {
-                summary: 'function'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: `undefined`
-            },
-        },
-        control: {
-            type: 'object',
-        }
-    }
-}}
+}} argTypes={getDefinitionArgTypes()}
 />
 
 
@@ -114,8 +27,9 @@ export const Template = (args, { argTypes }) => ({
     :data="data"
     :disable-copy="disableCopy"
     :formatter="formatter"
-/>`,
-    setup() {
+>
+</p-definition>`,
+    setup(props) {
         return {
         }
     }
@@ -130,8 +44,9 @@ export const Template = (args, { argTypes }) => ({
 
 
 ## Basic
+
 <Canvas>
-    <Story name="basic definition">
+    <Story name="Basic">
         {{
             components:{ PDefinition },
             template: `
@@ -178,9 +93,33 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-## Formatter
+## Disable Copy
+
 <Canvas>
-    <Story name="formatted definition">
+    <Story name="Disable Copy">
+{{
+    components:{ PDefinition },
+    template: `
+        <p-definition
+            :label="label"
+            :data="data"
+            disable-copy
+        />
+`,
+    setup() {
+        return {
+            label: faker.lorem.sentence(5),
+            data: faker.lorem.sentence(20)
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+## With Formatter
+
+<Canvas>
+    <Story name="With Formatter">
         {{
             components:{ PDefinition },
             template: `
@@ -215,37 +154,78 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
-## Playground
-<Canvas>
-    <Story name="playground" >
-        {Template.bind({})}
-    </Story>
-</Canvas>
-
-<ArgsTable story="playground" />
-
+<br/>
 <br/>
 
-## Description
-
-<br/>
-
-### Slots
+## Slots
 | Slot name | Description |
 | ---- | ----------- |
-| default | Slot for replacing definition text. |
-| copy | Slot for replacing copy button. |
+| default | Slot for replacing definition(value) text. |
+| key | Slot for replacing key text. |
+| extra | Slot for right space of value. |
 
 <br/>
 
 ### SlotScope(Props)
 | Type | Description |
 | ---- | ----------- |
-| all Props | name, label, data, disableCopy, formatter |
-| field | 'td' element that wrapping definition text. |
-| displayData | actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'. |
-| showCopy | boolean value that indicates whether show copy or not. it's related the value of 'displayData', 'disableCopy', and field element's innerText. |
+| name | name props. |
+| label | label props. |
+| data | data props. |
+| value | actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'. |
 | copy | function that invoked when copy button is clicked. |
-| isMouseOver | boolean value that indicates whether copy button is mouse over or out. |
-| onMouseOver | function that invoked when copy button is mouse over. |
-| onMouseOut | function that invoked when copy button is mouse out. |
+| hoverCopy | Indication of copy button is hovered. |
+
+<br/>
+
+
+<Canvas>
+    <Story name="Slots">
+{{
+    components:{ PDefinition, PButton },
+    template: `
+<table>
+    <tbody>
+        <p-definition
+            name="Key Slot"
+            data="Slot: key"
+        >
+            <template #key="{value}">
+                <span class="text-peacock">{{value}}</span>
+            </template>
+        </p-definition>
+        <p-definition
+            name="Default Slot"
+            data="Slot: default"
+        >
+            <template #default="{value, hoverCopy}">
+                <span :class="hoverCopy ? 'text-secondary' : 'text-peacock'">{{value}}</span>
+            </template>
+        </p-definition>
+        <p-definition
+            name="Extra Slot"
+            data="Slot: extra"
+        >
+            <template #extra>
+                <div class="text-peacock ml-4 w-full"><p-button style-type="secondary" size="sm">Edit</p-button></div>
+            </template>
+        </p-definition>
+    </tbody>
+</table>
+<!--<div>-->
+`,
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+<Canvas>
+    <Story name="Playground" >
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground" />

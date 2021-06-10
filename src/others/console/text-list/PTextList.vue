@@ -1,5 +1,5 @@
 <template>
-    <div class="p-text-list">
+    <span class="p-text-list">
         <component :is="component" v-for="(item, i) in displayItems"
                    :key="i" class="list-item"
                    :href="getHref(item, i)"
@@ -12,7 +12,7 @@
                 <span class="delimiter" v-html="delimiter" />
             </slot>
         </component>
-    </div>
+    </span>
 </template>
 
 <script lang="ts">
@@ -87,8 +87,10 @@ export default {
 <style lang="postcss">
 .p-text-list {
     line-height: 1.8;
-    .list-item.p-anchor:hover {
-        @apply underline text-secondary cursor-pointer;
+    .list-item {
+        .p-anchor:hover {
+            @apply underline text-secondary cursor-pointer;
+        }
     }
     .delimiter {
         white-space: pre;

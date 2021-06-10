@@ -1,94 +1,17 @@
-import { reactive, toRefs } from '@vue/composition-api';
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { reactive, toRefs } from '@vue/composition-api';
+
 import PDefinitionTable from '@/data-display/tables/definition-table/PDefinitionTable';
+import PButton from '@/inputs/buttons/button/PButton';
+import { DEFINITION_TABLE_STYLE_TYPE } from '@/data-display/tables/definition-table/config';
+import { getDefinitionTableArgTypes } from '@/data-display/tables/definition-table/story-helper';
 
 <Meta title='Data Display/Tables/Definition Table' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5373%3A6989',
     }
-}} component={ PDefinitionTable } argTypes={{
-    fields: {
-        name: 'fields',
-        type: { name: 'array' },
-        description: 'Fields of definition table.',
-        defaultValue: [
-            { label: 'Id', name: 'collector_id' },
-            { label: 'Name', name: 'name' },
-            { label: 'Provider', name: 'provider' },
-        ],
-        table: {
-            type: {
-                summary: 'array'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: '[]'
-            }
-        },
-        control: {
-            type: 'object',
-        },
-    },
-    data: {
-        name: 'data',
-        type: { name: 'object' },
-        description: 'Data object of definition table.',
-        defaultValue: {
-            collector_id: 'collector-6746d641c98b',
-            name: 'collector name',
-            provider: 'aws',
-        },
-        table: {
-            type: {
-                summary: 'object',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'undefined',
-            },
-        },
-        control: {
-            type: 'object',
-        },
-    },
-    loading: {
-        name: 'loading',
-        type: {name: 'boolean'},
-        description: 'Loading.',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: false
-            },
-        },
-        control: {
-            type: 'boolean'
-        }
-    },
-    skeletonRows: {
-        name: 'skeletonRows',
-        type: { name: 'number' },
-        description: 'Rows of skeletons',
-        defaultValue: 5,
-        table: {
-            type: {
-                summary: 'number',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 5,
-            }
-        },
-        control: {
-            type: 'number'
-        }
-    },
-}}
+}} argTypes={getDefinitionTableArgTypes()}
 />
 
 export const Template = (args, { argTypes }) => ({
@@ -108,7 +31,7 @@ export const Template = (args, { argTypes }) => ({
 });
 
 
-# Definition
+# Definition Table
 
 <br/>
 <br/>
@@ -117,13 +40,66 @@ export const Template = (args, { argTypes }) => ({
 
 ## Basic
 <Canvas>
-    <Story name="basic definition table">
+    <Story name="Basic">
+{{
+    components: { PDefinitionTable },
+    template: `
+<p-definition-table
+    :fields="fields"
+    :data="data"
+/>
+`,
+    setup() {
+        const state = reactive({
+            fields: [
+                { label: 'Id', name: 'collector_id' },
+                { label: 'Name', name: 'name' },
+                { label: 'Provider', name: 'provider' },
+            ],
+            data: {
+                collector_id: 'collector-6746d641c98b',
+                name: 'collector name',
+                provider: 'aws',
+            }
+        });
+        return {
+            ...toRefs(state),
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## No Data
+<Canvas>
+    <Story name="No Data">
+        {{
+            components: { PDefinitionTable },
+            template: `
+<p-definition-table />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Loading
+
+<Canvas>
+    <Story name="Loading">
         {{
             components: { PDefinitionTable },
             template: `
 <p-definition-table
     :fields="fields"
     :data="data"
+    loading
 />
 `,
             setup() {
@@ -147,56 +123,238 @@ export const Template = (args, { argTypes }) => ({
     </Story>
 </Canvas>
 
+<br/>
+<br/>
 
-## No Data
+## Slots
+
+| Slot name | Description |
+| ---- | ----------- |
+| data | Slot for all definition field value. It has the highest priority among field value slots. |
+| data-{field index} | Slot for definition field value that matched for the field index. It has the second highest priority among field value slots. |
+| data-{field.name} | Slot for definition field value. Use it only when all field names are distinct. Otherwise, it can cause unexpected error. It's useful when field names are duplicated. * Don't use 'data-{field.name}' slot together. It can cause multiple definition field. It has the lowest priority among field value slots. |
+| key | Slot for replacing field key text. |
+| extra | Slot for right space of field value. |
+| loading | Slot for replacing loader. |
+| no-data | Slot for no data case. |
+
+<br/>
+<br/>
+
+### SlotScope(Props)
+
+<br/>
+
+> Except for `no-data` and `loading` slots, all slots provide slot props below:
+
+| Type | Description |
+| ---- | ----------- |
+| name | The name of the item. |
+| label | The label of the item. |
+| data | The data of the item. |
+| value | The actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'. |
+| copy | The function that invoked when copy button is clicked. |
+| hoverCopy | Indication of copy button is hovered. |
+| items | All field and data items ordered by `fields` props. |
+| index | Current item's index. |
+
+<br/>
+<br/>
+
 <Canvas>
-    <Story name="no data definition table">
+    <Story name="Slots">
+{{
+    components: { PDefinitionTable, PButton },
+    template: `
+<div>
+    <p class="mb-4 text-lg font-bold">Slot: data</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    >
+        <template #data="{value}">
+            <span class="text-secondary-dark">{{value}}</span>
+        </template>
+    </p-definition-table>
+    <p class="mb-4 text-lg font-bold">Slot: data-{field.name}</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    >
+        <template #data-name="{value}">
+            <span class="text-secondary-dark">{{value}}</span>
+        </template>
+    </p-definition-table>
+    <p class="mb-4 text-lg font-bold">Slot: data-{field index}</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    >
+        <template #data-name="{index, value}">
+            <span class="text-secondary-dark">{{index}}. {{value}}</span>
+        </template>
+    </p-definition-table>
+    <p class="my-4 text-lg font-bold">Slot: key</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    >
+        <template #key="{label}">
+            <span class="text-secondary-dark">{{label}}</span>
+        </template>
+    </p-definition-table>
+    <p class="my-4 text-lg font-bold">Slot: extra</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    >
+        <template #extra="{label}">
+            <div class="text-peacock mr-4 w-full text-right"><p-button style-type="secondary" size="sm">Edit</p-button></div>
+        </template>
+    </p-definition-table>
+    <p class="my-4 text-lg font-bold">Slot: loading</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+        loading
+    >
+        <template #loading>
+            <span class="text-secondary-dark">Loading...</span>
+        </template>
+    </p-definition-table>
+    <p class="my-4 text-lg font-bold">Slot: no-data</p>
+    <p-definition-table
+        :fields="fields"
+        :data="{}"
+    >
+        <template #no-data>
+            <span class="text-secondary-dark">No Data</span>
+        </template>
+    </p-definition-table>
+</div>
+<!--<div>-->
+`,
+    setup() {
+        const state = reactive({
+            fields: [
+                { label: 'Id', name: 'collector_id' },
+                { label: 'Name', name: 'name' },
+                { label: 'Provider', name: 'provider' },
+            ],
+            data: {
+                collector_id: 'collector-6746d641c98b',
+                name: 'collector name',
+                provider: 'aws',
+            }
+        });
+        return {
+            ...toRefs(state),
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Disable Copy
+
+<Canvas>
+    <Story name="Disable Copy">
         {{
             components: { PDefinitionTable },
             template: `
-<p-definition-table />
+<p-definition-table
+    :fields="fields"
+    :data="data"
+    disable-copy
+/>
 `,
+            setup() {
+                const state = reactive({
+                    fields: [
+                        { label: 'Id', name: 'collector_id' },
+                        { label: 'Name', name: 'name' },
+                        { label: 'Provider', name: 'provider' },
+                    ],
+                    data: {
+                        collector_id: 'collector-6746d641c98b',
+                        name: 'collector name',
+                        provider: 'aws',
+                    }
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
         }}
     </Story>
 </Canvas>
 
+<br/>
+<br/>
+
+
+## Style Types
+
+<Canvas>
+    <Story name="Style Types">
+        {{
+            components: { PDefinitionTable },
+            template: `
+<div>
+    <p class="mb-4 text-lg font-bold">Style Type: {{DEFINITION_TABLE_STYLE_TYPE.primary}}</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+        :style-type="DEFINITION_TABLE_STYLE_TYPE.primary"
+    />
+    <p class="mb-4 text-lg font-bold">Style Type: {{DEFINITION_TABLE_STYLE_TYPE.white}}</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+        :style-type="DEFINITION_TABLE_STYLE_TYPE.white"
+    />
+</div>
+`,
+            setup() {
+                const state = reactive({
+                    fields: [
+                        { label: 'Id', name: 'collector_id' },
+                        { label: 'Name', name: 'name' },
+                        { label: 'Provider', name: 'provider' },
+                    ],
+                    data: {
+                        collector_id: 'collector-6746d641c98b',
+                        name: 'collector name',
+                        provider: 'aws',
+                    }
+                });
+                return {
+                    ...toRefs(state),
+                    DEFINITION_TABLE_STYLE_TYPE
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
 ## Playground
 <Canvas>
-    <Story name="playground" >
+    <Story name="Playground" >
         {Template.bind({})}
     </Story>
 </Canvas>
 
-<ArgsTable story="playground" />
+<ArgsTable story="Playground" />
 
 <br/>
 
-## Description
 
-<br/>
 
-### Slots
-| Slot name | Description |
-| ---- | ----------- |
-| data-{field index} | Slot for definition field. |
-| data-{field.name} | Slot for definition field. Use it only when all field names are distinct. Otherwise, it can cause unexpected error. It's useful when field names are duplicated. * Don't use 'data-{field.name}' slot together. It can cause multiple definition field. |
-| no-data | Slot for no data case. |
-| copy | Slot for all copy button. It replaces all copy button. |
-| copy-{field index} | Slot for field's copy button. |
-| copy-{field.name} | Slot for field's copy button. Use it only when all field names are distinct. Otherwise, it can cause unexpected error. |
-
-<br/>
-
-### SlotScope(Props)
-* Except for 'no-data' slot, all slots provide slot props.
-
-| Type | Description |
-| ---- | ----------- |
-| all Props | name, label, data, disableCopy, formatter |
-| field | 'td' element that wrapping definition text. |
-| displayData | actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'. |
-| showCopy | boolean value that indicates whether show copy or not. it's related the value of 'displayData', 'disableCopy', and field element's innerText. |
-| copy | function that invoked when copy button is clicked. |
-| isMouseOver | boolean value that indicates whether copy button is mouse over or out. |
-| onMouseOver | function that invoked when copy button is mouse over. |
-| onMouseOut | function that invoked when copy button is mouse out. |
