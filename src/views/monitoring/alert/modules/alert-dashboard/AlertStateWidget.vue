@@ -68,24 +68,13 @@
                             <p-text-pagination
                                 :this-page.sync="thisPage"
                                 :all-page="allPage"
+                                :show-page-number="false"
                                 @pageChange="changePageNumber"
                             />
                         </div>
                     </template>
                     <template #item="{item, index}">
-                        <div class="card-wrapper">
-                            <div class="left-part">
-                                <p-i :name="item.icon" width="1em" height="1em" />
-                                <span class="value">{{ item.value }}</span>
-                                <span class="project">{{ item.project }}</span>
-                            </div>
-                            <div class="right-part">
-                                <p-badge :style-type="item.badge === 'acknowledged' ? 'red100' : 'blue200'">
-                                    {{ item.badge }}
-                                </p-badge>
-                                <span class="date">{{ item.date }}</span>
-                            </div>
-                        </div>
+                        <alert-list-item :item="item" />
                     </template>
                 </p-list-card>
             </div>
@@ -95,11 +84,14 @@
 
 <script lang="ts">
 import {
-    PBalloonTab, PListCard, PI, PBadge, PSelectStatus, PTextPagination, PSelectButton, PCheckBox,
-} from '@spaceone/design-system';
-import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+
+import {
+    PBalloonTab, PListCard, PSelectStatus, PTextPagination, PSelectButton, PCheckBox,
+} from '@spaceone/design-system';
+
+import AlertListItem from '@/views/monitoring/alert/components/AlertListItem.vue';
 
 
 const ALERT_STATE = Object.freeze({
@@ -122,10 +114,9 @@ const ASSIGNED_STATE = Object.freeze({
 export default {
     name: 'AlertStateWidget',
     components: {
+        AlertListItem,
         PBalloonTab,
         PListCard,
-        PI,
-        PBadge,
         PSelectStatus,
         PTextPagination,
         PSelectButton,
@@ -208,6 +199,13 @@ export default {
                     badge: 'triggered',
                     date: '05/17 17:06',
                 },
+                {
+                    value: 'Netsparker Enterprise Test Issue. Netsparker Enterprise Test Issue.',
+                    icon: 'ic_alert',
+                    project: 'Group > Project',
+                    badge: 'acknowledged',
+                    date: '05/17 17:04',
+                },
             ],
             thisPage: 1,
             allPage: 1,
@@ -243,18 +241,10 @@ export default {
         @apply grid grid-cols-12 gap-2;
         vertical-align: middle;
 
-        @screen tablet {
-            display: block;
-        }
-
         .p-balloon-tab::v-deep {
             @apply col-span-3;
             .balloon-group {
                 width: 100%;
-
-                @screen tablet {
-                    margin-bottom: 1.5rem;
-                }
 
                 .tab-button {
                     display: flex;
@@ -277,12 +267,6 @@ export default {
                 width: 100%;
                 top: -2.75rem;
 
-                @screen tablet {
-                    position: relative;
-                    top: 0;
-                    margin-bottom: 1rem;
-                }
-
                 .left-part {
                     display: inline-flex;
                     flex-grow: 1;
@@ -295,13 +279,10 @@ export default {
                         }
                     }
                 }
+
                 .right-part {
                     display: flex;
                     height: 1.5rem;
-
-                    @screen tablet {
-                        display: none;
-                    }
 
                     .p-select-button {
                         margin-right: 0.375rem;
@@ -309,60 +290,47 @@ export default {
                 }
             }
             .p-list-card::v-deep {
-                .card-wrapper {
-                    display: flex;
-
-                    @screen mobile {
-                        display: block;
-                        line-height: 1.5;
-                    }
-
-                    .left-part {
-                        flex-grow: 1;
-                        margin: auto 0;
-
-                        @screen mobile {
-                            display: block;
-                        }
-
-                        .p-i-icon {
-                            margin-right: 0.5rem;
-                        }
-                        .value {
-                            margin-right: 0.5rem;
-                        }
-                        .project {
-                            @apply text-gray-500;
-
-                            @screen mobile {
-                                display: block;
-                            }
-                        }
-                    }
-                    .right-part {
-                        .date {
-                            @apply text-gray-500;
-                            font-size: 0.75rem;
-                            margin-left: 0.5rem;
-                        }
-                    }
-                }
-
                 header {
                     display: none;
+                }
+            }
+        }
+    }
 
-                    @screen tablet {
-                        display: block;
+    @screen tablet {
+        .content-wrapper {
+            display: block;
+
+            .p-balloon-tab::v-deep {
+                .balloon-group {
+                    margin-bottom: 1.5rem;
+                }
+            }
+
+            .tab-content-wrapper {
+                .filter-wrapper {
+                    position: relative;
+                    top: 0;
+                    margin-bottom: 1rem;
+
+                    .right-part {
+                        display: none;
                     }
+                }
+                .p-list-card::v-deep {
+                    header {
+                        display: block;
 
-                    .mobile-header {
-                        display: flex;
-                        height: 1.5rem;
+                        .mobile-header {
+                            display: flex;
+                            height: 1.5rem;
+                            justify-content: space-between;
+                            align-items: center;
 
-                        .p-checkbox {
-                            flex-grow: 1;
-                            .text {
-                                padding-left: 0.375rem;
+                            .p-checkbox {
+                                .text {
+                                    padding-left: 0.375rem;
+                                }
                             }
                         }
                     }
