@@ -1,3 +1,10 @@
+# [1.1.0-beta.55](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.54...v1.1.0-beta.55) (2021-06-10)
+
+
+### Features
+
+* add resposive styles, style type, disable copy to definition table ([#589](https://github.com/spaceone-dev/spaceone-design-system/issues/589)) ([6aab463](https://github.com/spaceone-dev/spaceone-design-system/commit/6aab463bebcaf8bcca54dd6c99578e220e5aa795))
+
 # [1.1.0-beta.54](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.53...v1.1.0-beta.54) (2021-06-09)
 
 
