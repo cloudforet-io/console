@@ -29,13 +29,9 @@
             >
                 <p-anchor v-for="(item, index) in supportMenu" :key="index"
                           :href="item.link" target="_blank"
-                          :show-icon="false"
                           class="sub-menu"
                 >
-                    <span>{{ item.label }}</span>
-                    <p-i class="external-link-icon" name="ic_external-link"
-                         width="0.875rem" height="0.875rem"
-                    />
+                    {{ item.label }}
                 </p-anchor>
             </div>
         </div>
@@ -295,10 +291,12 @@ export default {
             .sub-menu {
                 @apply text-gray-900;
                 position: relative;
+                display: inline-flex;
+                justify-content: space-between;
+                align-items: center;
                 width: 100%;
                 height: 2rem;
                 font-size: 0.875rem;
-                line-height: 1rem;
                 text-decoration: none;
                 white-space: nowrap;
                 cursor: pointer;
@@ -309,11 +307,6 @@ export default {
                 }
                 &:active {
                     @apply bg-white;
-                }
-                .external-link-icon {
-                    position: absolute;
-                    top: 0.5rem;
-                    right: 1rem;
                 }
             }
             .info-wrapper {

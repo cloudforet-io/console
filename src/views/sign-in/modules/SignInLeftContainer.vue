@@ -81,12 +81,16 @@ export default {
     }
 
     .version {
+        display: inline-flex;
+        align-items: center;
         margin-left: 2.5rem;
         margin-bottom: 2.5rem;
+        line-height: 140%;
         .help-msg {
             @apply text-gray-500;
+            display: inline-flex;
+            align-items: center;
             font-size: 0.875rem;
-            line-height: 140%;
             margin-left: 1rem;
         }
     }

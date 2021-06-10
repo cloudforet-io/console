@@ -13,18 +13,17 @@
                 }) }}
             </span>
             <div>
-                <div v-for="resource in availableResources" :key="resource.id" class="legend">
-                    <span class="circle"
-                          :style="{ backgroundColor: resource.color }"
-                    />
-                    <p-anchor class="text"
-                              :href="resource.link"
-                              :show-icon="true"
-                              highlight
-                    >
-                        {{ legendFormatter(resource) }}
-                    </p-anchor>
-                </div>
+                <p-anchor v-for="resource in availableResources" :key="resource.id" class="legend"
+                          :href="resource.link"
+                          :show-icon="true"
+                >
+                    <template #left-extra>
+                        <span class="circle"
+                              :style="{ backgroundColor: resource.color }"
+                        />
+                    </template>
+                    {{ legendFormatter(resource) }}
+                </p-anchor>
             </div>
         </section>
         <section class="toolbox-section">
@@ -443,22 +442,22 @@ section {
     padding-top: 2rem;
     padding-bottom: 2rem;
 
-    .legend {
-        @apply items-center;
+    .legend.p-anchor::v-deep {
+        @apply text-gray-900;
         display: inline-flex;
+        flex-wrap: wrap;
+        align-items: center;
         font-size: 0.875rem;
         line-height: 1.5;
         vertical-align: text-bottom;
         margin-top: 0.625rem;
         margin-right: 1rem;
         .circle {
+            display: inline-block;
             height: 0.625rem;
             width: 0.625rem;
             border-radius: 50%;
             margin-right: 0.25rem;
-        }
-        .text {
-            @apply text-gray-900;
         }
     }
 }

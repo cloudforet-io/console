@@ -305,6 +305,7 @@ export default {
     .project-section {
         display: flex;
         margin-bottom: 1rem;
+        align-items: center;
         .title {
             @apply text-gray-400;
             font-size: 0.875rem;

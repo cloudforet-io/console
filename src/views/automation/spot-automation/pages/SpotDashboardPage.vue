@@ -91,12 +91,12 @@
                             </div>
                             <div v-else>
                                 <p-anchor class="go-add" :show-icon="false"
-                                          :href="$router.resolve({
+                                          :to="{
                                               name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP.ADD,
                                               params: {
                                                   projectId: item.project_id
                                               }
-                                          }).route.path"
+                                          }"
                                           target="_self"
                                 >
                                     <template #left-extra>

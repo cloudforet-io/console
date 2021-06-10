@@ -7,8 +7,8 @@
             <template #data-state="{data}">
                 <p-status v-bind="userStateFormatter(data)" class="capitalize" />
             </template>
-            <template #data-user_type="{value}">
-                <span v-if="value === 'API_USER'">API Only</span>
+            <template #data-user_type="{data}">
+                <span v-if="data === 'API_USER'">API Only</span>
                 <span v-else>Console, API</span>
             </template>
             <template #data-last_accessed_at="{data}">
