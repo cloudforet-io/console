@@ -3,11 +3,11 @@
         <p-field-group
             :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_LABEL')"
             required
-            :invalid="!!nameInvalidText"
+            :invalid="!isNameValid"
             :invalid-text="nameInvalidText"
         >
             <p-text-input v-model="inputModel.name"
-                          :invalid="!!nameInvalidText"
+                          :invalid="!isNameValid"
                           class="w-1/2"
             />
         </p-field-group>
@@ -104,10 +104,6 @@ export default {
             type: Boolean,
             default: true,
         },
-        showValidation: {
-            type: Boolean,
-            default: false,
-        },
         escalationPolicy: {
             type: Object,
             default: undefined,
@@ -129,8 +125,10 @@ export default {
                 repeat_count: DEFAULT_REPEAT_COUNT,
                 project_id: undefined,
             } as EscalationPolicyFormModel,
+            showValidation: false,
+            isNameValid: computed(() => !state.nameInvalidText),
             nameInvalidText: computed(() => {
-                if (!props.showValidation) return undefined;
+                if (!state.showValidation) return undefined;
                 if (!state.inputModel.name) {
                     return vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
                 }
@@ -171,7 +169,8 @@ export default {
 
         /* event */
         const onChangeInputModel = () => {
-            emit('update:is-all-valid', !state.nameInvalidText);
+            state.showValidation = true;
+            emit('update:is-all-valid', state.isNameValid);
             emit('change', state.inputModel);
         };
         const onChangeScope = (value) => {

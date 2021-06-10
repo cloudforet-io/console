@@ -11,7 +11,6 @@
         <template #body>
             <escalation-policy-form
                 :mode="mode"
-                :show-validation="showValidation"
                 :escalation-policy="escalationPolicy"
                 :is-all-valid.sync="isAllValid"
                 @change="onChangeInputModel"
@@ -63,7 +62,6 @@ export default {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             inputModel: {} as EscalationPolicyFormModel,
-            showValidation: false,
             isAllValid: false,
         });
 
@@ -102,7 +100,6 @@ export default {
             state.inputModel = inputModel;
         };
         const onClickPolicyConfirm = async () => {
-            state.showValidation = true;
             if (!state.isAllValid) return;
 
             if (props.mode === ACTION.create) await createEscalationPolicy();
@@ -111,7 +108,6 @@ export default {
         };
 
         watch(() => props.visible, () => {
-            state.showValidation = false;
             state.isAllValid = false;
         });
 
