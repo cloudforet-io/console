@@ -44,7 +44,7 @@ export default defineComponent<Props>({
         },
         styleType: {
             type: String,
-            default: CARD_STYLE_TYPE.gray,
+            default: CARD_STYLE_TYPE.gray100,
             validator(styleType: any) {
                 return Object.values(CARD_STYLE_TYPE).includes(styleType);
             },

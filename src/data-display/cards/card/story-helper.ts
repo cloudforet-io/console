@@ -24,14 +24,14 @@ export const argTypes: ArgTypes = {
         name: 'styleType',
         type: { name: 'string' },
         description: `Card style types. ${Object.values(CARD_STYLE_TYPE)} are available.`,
-        defaultValue: CARD_STYLE_TYPE.gray,
+        defaultValue: CARD_STYLE_TYPE.gray100,
         table: {
             type: {
                 summary: 'string',
             },
             category: 'props',
             defaultValue: {
-                summary: `"${CARD_STYLE_TYPE.gray}"`,
+                summary: `"${CARD_STYLE_TYPE.gray100}"`,
             },
         },
         control: {
