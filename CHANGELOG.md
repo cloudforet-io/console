@@ -1,3 +1,11 @@
+# [1.1.0-beta.56](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.55...v1.1.0-beta.56) (2021-06-10)
+
+
+### Features
+
+* add card styles ([#590](https://github.com/spaceone-dev/spaceone-design-system/issues/590)) ([e075fe7](https://github.com/spaceone-dev/spaceone-design-system/commit/e075fe79e6a28eac98e17afcdb03c2213ce11284))
+* fix card styles ([#591](https://github.com/spaceone-dev/spaceone-design-system/issues/591)) ([bb5b1b9](https://github.com/spaceone-dev/spaceone-design-system/commit/bb5b1b92107d54a3de19c1fac22da539cf3e279f))
+
 # [1.1.0-beta.55](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.54...v1.1.0-beta.55) (2021-06-10)
 
 
