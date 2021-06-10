@@ -1037,9 +1037,17 @@
 			"DASHBOARD": {
 				"ALERT_HISTORY": "Alert History",
 				"ALERT_STATE": "Alert State",
+				"ALL": "All",
+				"ALL_STATE": "All State",
+				"ALL_URGENCY": "All Urgency",
+				"ASSIGNED_TO_ME": "Assigned to me",
 				"CURRENT_PROJECT_STATUS": "Current Project Status",
 				"DASHBOARD": "대시보드",
+				"HIGH": "High",
+				"LOW": "Low",
+				"OPEN": "Open",
 				"PROJECT_HEALTH_BOARD": "Project Health Board",
+				"RESOLVED": "Resolved",
 				"TOP_5_PROJECT_ACTIVITY": "Top 5 Project Activity"
 			},
 			"DETAIL": {

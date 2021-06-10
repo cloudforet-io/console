@@ -1037,9 +1037,17 @@
 			"DASHBOARD": {
 				"ALERT_HISTORY": "",
 				"ALERT_STATE": "",
+				"ALL": "",
+				"ALL_STATE": "",
+				"ALL_URGENCY": "",
+				"ASSIGNED_TO_ME": "",
 				"CURRENT_PROJECT_STATUS": "",
 				"DASHBOARD": "ダッシュボード",
+				"HIGH": "",
+				"LOW": "",
+				"OPEN": "",
 				"PROJECT_HEALTH_BOARD": "",
+				"RESOLVED": "",
 				"TOP_5_PROJECT_ACTIVITY": ""
 			},
 			"DETAIL": {
