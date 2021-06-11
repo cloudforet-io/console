@@ -26,6 +26,7 @@
                 <li class="mb-4">
                     <notification-channel-item :channel-data="item" :project-id="projectId"
                                                @change="onChangeChannelItem"
+                                               @confirm="listChannel"
                     />
                 </li>
             </ul>
@@ -119,7 +120,7 @@ export default {
     props: {
         projectId: {
             type: String,
-            default: null,
+            default: '',
         },
     },
     setup(props) {
@@ -233,6 +234,7 @@ export default {
             ...toRefs(state),
             routeState,
             onChangeChannelItem,
+            listChannel,
         };
     },
 };

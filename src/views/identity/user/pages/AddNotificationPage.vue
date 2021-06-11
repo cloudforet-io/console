@@ -152,8 +152,13 @@ export default {
         };
 
         const onClickSave = async () => {
-            if (state.projectId) await createProjectChannel();
-            else await createUserChannel();
+            try {
+                if (state.projectId) await createProjectChannel();
+                else await createUserChannel();
+                vm.$router.back();
+            } catch (e) {
+                console.error(e);
+            }
         };
 
         const onChangeData = (value) => {

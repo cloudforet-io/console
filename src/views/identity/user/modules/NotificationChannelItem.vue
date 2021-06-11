@@ -7,7 +7,9 @@
                 />
                 <span class="card-title">{{ channelData.protocol_name }}</span>
             </div>
-            <p-icon-button name="ic_trashcan" width="1.5rem" height="1.5rem" />
+            <p-icon-button name="ic_trashcan" width="1.5rem" height="1.5rem"
+                           @click="onClickDelete"
+            />
         </div>
         <ul class="card-body">
             <li class="content-wrapper" :class="{'edit-mode': isNameEditMode}">
@@ -205,6 +207,11 @@
             </li>
             <p-divider />
         </ul>
+        <delete-modal :header-title="checkDeleteState.headerTitle"
+                      :visible.sync="checkDeleteState.visible"
+                      :contents="'Channel 삭제하시겠습니까?'"
+                      @confirm="deleteChannelConfirm"
+        />
     </p-pane-layout>
 </template>
 
@@ -222,6 +229,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import InfoMessage from '@/common/components/InfoMessage.vue';
 import AddNotificationMemberGroup from '@/views/identity/user/modules/AddNotificationMemberGroup.vue';
+import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 
 enum EDIT_TYPE {
     NAME = 'name',
@@ -254,6 +262,12 @@ interface ParamType {
     notification_level?: string;
 }
 
+export const STATE_TYPE = {
+    ENABLED: 'ENABLED',
+    DISABLED: 'DISABLED',
+} as const;
+export type STATE_TYPE = typeof STATE_TYPE[keyof typeof STATE_TYPE];
+
 export default {
     name: 'NotificationChannelItem',
     components: {
@@ -261,6 +275,7 @@ export default {
         AddNotificationLevel,
         AddNotificationTopic,
         AddNotificationSchedule,
+        DeleteModal,
         PPaneLayout,
         PToggleButton,
         PI,
@@ -282,28 +297,96 @@ export default {
             default: null,
         },
     },
-    setup(props, context) {
+    setup(props, { emit, root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            isActivated: true,
+            isActivated: props.channelData?.state === STATE_TYPE.ENABLED,
             isNameEditMode: false,
             isDataEditMode: false,
             isScheduleEditMode: false,
             isTopicEditMode: false,
             isLevelEditMode: false,
             //
-            userChannelId: props.channelData.user_channel_id || null,
-            projectChannelId: props.channelData.project_channel_id || null,
-            channelNameForEdit: props.channelData.name,
-            dataListForEdit: props.channelData.data,
-            scheduleModeForEdit: props.channelData.is_scheduled,
-            scheduleForEdit: props.channelData.schedule || null,
+            userChannelId: props.channelData?.user_channel_id,
+            projectChannelId: props.channelData?.project_channel_id,
+            channelNameForEdit: props.channelData?.name,
+            dataListForEdit: props.channelData?.data,
+            scheduleModeForEdit: props.channelData?.is_scheduled,
+            scheduleForEdit: props.channelData?.schedule,
             topicModeForEdit: undefined,
-            topicForEdit: props.channelData.subscriptions,
-            notificationLevelForEdit: props.channelData.notification_level,
+            topicForEdit: props.channelData?.subscriptions,
+            notificationLevelForEdit: props.channelData?.notification_level,
         });
-        const onToggleChange = () => {
-            console.log('toggle changed!');
+        const checkDeleteState = reactive({
+            visible: false,
+            headerTitle: 'Channel을 삭제하시겠습니까?',
+        });
+
+        const enableProjectChannel = async () => {
+            try {
+                await SpaceConnector.client.notification.projectChannel.enable({
+                    project_channel_id: state.projectChannelId,
+                });
+                state.isActivated = true;
+                showSuccessMessage('Enable project channel success', '', root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage('Enable project channel failure', e, root);
+            }
+        };
+
+        const enableUserChannel = async () => {
+            try {
+                await SpaceConnector.client.notification.userChannel.enable({
+                    user_channel_id: state.userChannelId,
+                });
+                state.isActivated = true;
+                showSuccessMessage('Enable user channel success', '', root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage('Enable user channel failure', e, root);
+            }
+        };
+
+        const enableChannel = async () => {
+            if (props.projectId) await enableProjectChannel();
+            else await enableUserChannel();
+        };
+
+        const disableProjectChannel = async () => {
+            try {
+                await SpaceConnector.client.notification.projectChannel.disable({
+                    project_channel_id: state.projectChannelId,
+                });
+                state.isActivated = false;
+                showSuccessMessage('Disable project channel success', '', root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage('Disable project channel failure', e, root);
+            }
+        };
+
+        const disableUserChannel = async () => {
+            try {
+                await SpaceConnector.client.notification.userChannel.disable({
+                    user_channel_id: state.userChannelId,
+                });
+                state.isActivated = false;
+                showSuccessMessage('Disable user channel success', '', root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage('Disable user channel failure', e, root);
+            }
+        };
+
+        const disableChannel = async () => {
+            if (props.projectId) await disableProjectChannel();
+            else await disableUserChannel();
+        };
+
+        const onToggleChange = async (value) => {
+            if (!value.value) await disableChannel();
+            else await enableChannel();
         };
 
         const startEdit = (type: EDIT_TYPE) => {
@@ -330,10 +413,10 @@ export default {
                 else if (paramKey === PARAM_KEY_TYPE.DATA) param.data = paramValue;
                 else if (paramKey === PARAM_KEY_TYPE.SCHEDULE) param.schedule = paramValue;
                 await SpaceConnector.client.notification.userChannel.update(param);
-                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '', context.root);
+                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_USER_CHANNEL'), e, context.root);
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_USER_CHANNEL'), e, root);
             }
         };
 
@@ -349,10 +432,10 @@ export default {
                 // eslint-disable-next-line camelcase
                 else if (paramKey === PARAM_KEY_TYPE.LEVEL) param.notification_level = paramValue;
                 await SpaceConnector.client.notification.projectChannel.update(param);
-                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_PROJECT_CHANNEL'), '', context.root);
+                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_PROJECT_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'), e, context.root);
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'), e, root);
             }
         };
 
@@ -373,10 +456,10 @@ export default {
                     is_scheduled: state.scheduleModeForEdit,
                     schedule: state.scheduleForEdit,
                 });
-                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', context.root);
+                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, context.root);
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, root);
             }
         };
         const setProjectChannelSchedule = async () => {
@@ -386,10 +469,10 @@ export default {
                     is_scheduled: state.scheduleModeForEdit,
                     schedule: state.scheduleForEdit,
                 });
-                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '', context.root);
+                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'), e, context.root);
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'), e, root);
             }
         };
         const onChangeSchedule = async (value) => {
@@ -407,10 +490,10 @@ export default {
                     is_subscribe: state.topicModeForEdit,
                     subscriptions: state.topicForEdit,
                 });
-                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', context.root);
+                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, context.root);
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, root);
             }
         };
         const setProjectChannelSubscription = async () => {
@@ -420,10 +503,10 @@ export default {
                     is_subscribe: state.topicModeForEdit,
                     subscriptions: state.topicForEdit,
                 });
-                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', context.root);
+                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, context.root);
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, root);
             }
         };
         const onChangeTopic = (value) => {
@@ -464,12 +547,53 @@ export default {
                 await saveChangedLevel();
                 state.isLevelEditMode = false;
             }
-            context.emit('change');
+            emit('change');
         };
+
+        const onClickDelete = () => {
+            checkDeleteState.visible = true;
+        };
+
+        const deleteProjectChannel = async () => {
+            try {
+                await SpaceConnector.client.notification.projectChannel.delete({
+                    project_channel_id: state.projectChannelId,
+                });
+                showSuccessMessage('Delete project channel success', '', root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage('Delete project channel failure', e, root);
+            } finally {
+                checkDeleteState.visible = false;
+                emit('confirm');
+            }
+        };
+
+        const deleteUserChannel = async () => {
+            try {
+                await SpaceConnector.client.notification.userChannel.delete({
+                    user_channel_id: state.userChannelId,
+                });
+                showSuccessMessage('Delete user channel success', '', root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage('Delete user channel failure', e, root);
+            } finally {
+                checkDeleteState.visible = false;
+                emit('confirm');
+            }
+        };
+
+        const deleteChannelConfirm = async () => {
+            if (props.projectId) await deleteProjectChannel();
+            else await deleteUserChannel();
+        };
+
         return {
             EDIT_TYPE,
             PROTOCOL_TYPE,
             ...toRefs(state),
+            checkDeleteState,
             onToggleChange,
             startEdit,
             cancelEdit,
@@ -478,6 +602,8 @@ export default {
             onChangeLevel,
             onChangeUser,
             onClickSave,
+            onClickDelete,
+            deleteChannelConfirm,
         };
     },
 };
