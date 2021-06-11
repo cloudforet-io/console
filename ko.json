@@ -1040,6 +1040,7 @@
 				"ALL": "All",
 				"ASSIGNED_TO_ME": "Assigned to me",
 				"ASSIGNED_TO_YOU_TITLE": "New alert assigned to you",
+				"CREATE": "생성",
 				"DELETE": "Delete",
 				"HIGH": "High",
 				"LOW": "Low",
