@@ -79,7 +79,9 @@ module.exports = {
           "has_permission",
           "include_permission",
           "check_child",
-          "author_within"
+          "author_within",
+          "total_count",
+          "maintenance_window_id"
         ]
       }
     ],
