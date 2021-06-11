@@ -1385,7 +1385,9 @@
 				"FORM": {
 					"CREATE_TITLE": "유지 관리 기간 생성",
 					"DESC": "유지 관리 기간 동안, 이 프로젝트에 새 알림이 생성되지 않습니다.",
+					"HOURS": "시간",
 					"LABEL_TITLE": "제목",
+					"MINUTES": "분",
 					"REQUIRED": "필수 입력 항목입니다.",
 					"SCHEDULE": "스케줄",
 					"START_AT_TIME": "예정된 시간에 시작하기",

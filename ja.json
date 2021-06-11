@@ -1385,7 +1385,9 @@
 				"FORM": {
 					"CREATE_TITLE": "",
 					"DESC": "",
+					"HOURS": "",
 					"LABEL_TITLE": "",
+					"MINUTES": "",
 					"REQUIRED": "",
 					"SCHEDULE": "",
 					"START_AT_TIME": "",

@@ -1385,7 +1385,9 @@
 				"FORM": {
 					"CREATE_TITLE": "Create Maintenance Window",
 					"DESC": "During a maintenance window, no new alert will be created on this project.",
+					"HOURS": "hours",
 					"LABEL_TITLE": "Title",
+					"MINUTES": "minutes",
 					"REQUIRED": "Required field",
 					"SCHEDULE": "Schedule",
 					"START_AT_TIME": "Start at scheduled time",
