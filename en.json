@@ -1376,6 +1376,10 @@
 				"ALT_S_CLOSE_MAINTENANCE_WINDOW": "Success to Close Maintenance Window",
 				"ALT_S_CREATE_MAINTENANCE_WINDOW": "Success to Create Maintenance Window",
 				"ALT_S_UPDATE_MAINTENANCE_WINDOW": "Success to Update Maintenance Window",
+				"CHECK_MODAL": {
+					"DESC_CLOSE": "Are you sure you wan to close the selected maintenance window?",
+					"TITLE_CLOSE": "Close Maintenance Window"
+				},
 				"CLOSE": "Close",
 				"CREATE": "Create Maintenance Window",
 				"FORM": {

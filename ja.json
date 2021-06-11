@@ -1376,6 +1376,10 @@
 				"ALT_S_CLOSE_MAINTENANCE_WINDOW": "",
 				"ALT_S_CREATE_MAINTENANCE_WINDOW": "",
 				"ALT_S_UPDATE_MAINTENANCE_WINDOW": "",
+				"CHECK_MODAL": {
+					"DESC_CLOSE": "",
+					"TITLE_CLOSE": ""
+				},
 				"CLOSE": "",
 				"CREATE": "",
 				"FORM": {

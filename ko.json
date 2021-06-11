@@ -1376,6 +1376,10 @@
 				"ALT_S_CLOSE_MAINTENANCE_WINDOW": "유지 관리 기간 닫기 성공",
 				"ALT_S_CREATE_MAINTENANCE_WINDOW": "유지 관리 기간 생성 성공",
 				"ALT_S_UPDATE_MAINTENANCE_WINDOW": "유지 관리 기간 편집 성공",
+				"CHECK_MODAL": {
+					"DESC_CLOSE": "선택한 유지 관리 기간을 삭제하시겠습니까?",
+					"TITLE_CLOSE": "유지 관리 기간 닫기"
+				},
 				"CLOSE": "닫기",
 				"CREATE": "유지 관리 기간 생성",
 				"FORM": {
