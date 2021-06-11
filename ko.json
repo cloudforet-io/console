@@ -1034,6 +1034,24 @@
 	},
 	"MONITORING": {
 		"ALERT": {
+			"ALERT_LIST": {
+				"ACKNOWLEDGED": "Acknowledged",
+				"ALERT": "Alert",
+				"ALL": "All",
+				"ASSIGNED_TO_ME": "Assigned to me",
+				"ASSIGNED_TO_YOU_TITLE": "New alert assigned to you",
+				"DELETE": "Delete",
+				"HIGH": "High",
+				"LOW": "Low",
+				"MERGE": "Merge",
+				"OPEN": "Open",
+				"OPEN_ALERT": "Your open alert",
+				"RESOLVE": "Resolve",
+				"RESOLVED": "Resolved",
+				"STATE": "State",
+				"TRIGGERED": "Triggered",
+				"URGENCY": "Urgency"
+			},
 			"DASHBOARD": {
 				"ALERT_HISTORY": "Alert History",
 				"ALERT_STATE": "Alert State",

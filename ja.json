@@ -1034,6 +1034,24 @@
 	},
 	"MONITORING": {
 		"ALERT": {
+			"ALERT_LIST": {
+				"ACKNOWLEDGED": "",
+				"ALERT": "",
+				"ALL": "",
+				"ASSIGNED_TO_ME": "",
+				"ASSIGNED_TO_YOU_TITLE": "",
+				"DELETE": "",
+				"HIGH": "",
+				"LOW": "",
+				"MERGE": "",
+				"OPEN": "",
+				"OPEN_ALERT": "",
+				"RESOLVE": "",
+				"RESOLVED": "",
+				"STATE": "",
+				"TRIGGERED": "",
+				"URGENCY": ""
+			},
 			"DASHBOARD": {
 				"ALERT_HISTORY": "",
 				"ALERT_STATE": "",
