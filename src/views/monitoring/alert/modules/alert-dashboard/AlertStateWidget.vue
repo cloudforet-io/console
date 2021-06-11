@@ -5,28 +5,28 @@
         </p>
         <div class="content-wrapper">
             <!--tabs-->
-            <p-balloon-tab v-model="activeTab"
+            <p-balloon-tab v-model="tabState.activeTab"
                            class="tablet:hidden"
-                           :tabs="tabs"
+                           :tabs="tabState.tabs"
                            size="lg"
                            position="left"
-                           :style-type="tabItems[activeTab].styleType"
+                           :style-type="tabState.tabItems[tabState.activeTab].styleType"
                            tail
             >
                 <template #tab="{label, name}">
                     <div class="tab-button">
-                        {{ label }} <span class="count">{{ tabItems[name].count }}</span>
+                        {{ label }} <span class="count">{{ tabState.tabItems[name].count }}</span>
                     </div>
                 </template>
             </p-balloon-tab>
-            <p-balloon-tab v-model="activeTab"
+            <p-balloon-tab v-model="tabState.activeTab"
                            class="hidden tablet:block"
-                           :tabs="tabs"
+                           :tabs="tabState.tabs"
                            size="sm"
-                           :style-type="tabItems[activeTab].styleType"
+                           :style-type="tabState.tabItems[tabState.activeTab].styleType"
             >
                 <template #tab="{label, name}">
-                    <span>{{ label }} <strong>{{ tabItems[name].count }}</strong></span>
+                    <span>{{ label }} <strong>{{ tabState.tabItems[name].count }}</strong></span>
                 </template>
             </p-balloon-tab>
             <!--tab content-->
@@ -34,11 +34,12 @@
                 <!--filter-->
                 <div class="filter-wrapper">
                     <div class="left-part">
-                        <p-select-status v-for="(status, idx) in statusList" :key="idx"
-                                         v-model="selectedStatus"
+                        <p-select-status v-for="(status, idx) in urgencyList" :key="idx"
+                                         v-model="selectedUrgency"
                                          :value="status.name"
                                          :icon="status.icon"
                                          :disable-check-icon="true"
+                                         @change="listAlerts"
                         >
                             {{ status.label }}
                         </p-select-status>
@@ -49,17 +50,18 @@
                                          :value="state.name"
                                          size="sm"
                                          style-type="gray"
+                                         @change="onSelectAssignedState"
                         >
                             {{ state.label }}
                         </p-select-button>
-                        <p-text-pagination :this-page="thisPage"
+                        <p-text-pagination :this-page.sync="thisPage"
                                            :all-page="allPage"
-                                           @pageChange="changePageNumber"
+                                           @pageChange="onPageChange"
                         />
                     </div>
                 </div>
                 <!--list-->
-                <p-list-card :items="listItems">
+                <p-list-card :items="items">
                     <template #header>
                         <div class="mobile-header">
                             <p-check-box v-model="isAssignedToMe">
@@ -69,7 +71,7 @@
                                 :this-page.sync="thisPage"
                                 :all-page="allPage"
                                 :show-page-number="false"
-                                @pageChange="changePageNumber"
+                                @pageChange="onPageChange"
                             />
                         </div>
                     </template>
@@ -83,8 +85,9 @@
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -93,8 +96,14 @@ import {
 
 import AlertListItem from '@/views/monitoring/alert/components/AlertListItem.vue';
 
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
+import { getPageStart } from '@/lib/component-utils/pagination';
+import { store } from '@/store';
 
-const ALERT_STATE = Object.freeze({
+
+const TAB_STATE = Object.freeze({
     OPEN: 'OPEN',
     RESOLVED: 'RESOLVED',
     ALL: 'ALL',
@@ -124,22 +133,39 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const state = reactive({
+        const tabState = reactive({
             tabs: computed(() => ([
                 {
-                    name: ALERT_STATE.OPEN,
+                    name: TAB_STATE.OPEN,
                     label: vm.$t('MONITORING.ALERT.DASHBOARD.OPEN'),
                 },
                 {
-                    name: ALERT_STATE.RESOLVED,
+                    name: TAB_STATE.RESOLVED,
                     label: vm.$t('MONITORING.ALERT.DASHBOARD.RESOLVED'),
                 },
                 {
-                    name: ALERT_STATE.ALL,
+                    name: TAB_STATE.ALL,
                     label: vm.$t('MONITORING.ALERT.DASHBOARD.ALL_STATE'),
                 },
             ])),
-            statusList: computed(() => ([
+            activeTab: TAB_STATE.OPEN,
+            tabItems: {
+                OPEN: {
+                    count: 122,
+                    styleType: 'alert',
+                },
+                RESOLVED: {
+                    count: 23,
+                    styleType: 'gray',
+                },
+                ALL: {
+                    count: 145,
+                    styleType: 'primary',
+                },
+            },
+        });
+        const state = reactive({
+            urgencyList: computed(() => ([
                 {
                     name: ALERT_URGENCY.ALL,
                     label: vm.$t('MONITORING.ALERT.DASHBOARD.ALL_URGENCY'),
@@ -166,59 +192,57 @@ export default {
                 },
             ]),
             //
-            activeTab: ALERT_STATE.OPEN,
-            selectedStatus: ALERT_URGENCY.ALL,
+            selectedUrgency: ALERT_URGENCY.ALL,
             selectedAssignedState: ASSIGNED_STATE.ALL,
             isAssignedToMe: false,
-            tabItems: {
-                OPEN: {
-                    count: 122,
-                    styleType: 'alert',
-                },
-                RESOLVED: {
-                    count: 23,
-                    styleType: 'gray',
-                },
-                ALL: {
-                    count: 145,
-                    styleType: 'primary',
-                },
-            },
-            listItems: [
-                {
-                    value: 'Netsparker Enterprise Test Issue',
-                    icon: 'ic_alert',
-                    project: 'Group > Project',
-                    badge: 'acknowledged',
-                    date: '05/17 17:04',
-                },
-                {
-                    value: 'Vulnerability - Local File Inclusion',
-                    icon: 'ic_state_duplicated',
-                    project: 'Group > Project',
-                    badge: 'triggered',
-                    date: '05/17 17:06',
-                },
-                {
-                    value: 'Netsparker Enterprise Test Issue. Netsparker Enterprise Test Issue.',
-                    icon: 'ic_alert',
-                    project: 'Group > Project',
-                    badge: 'acknowledged',
-                    date: '05/17 17:04',
-                },
-            ],
+            items: [],
             thisPage: 1,
             allPage: 1,
+            pageSize: 10,
         });
 
-        /* util */
-        const changePageNumber = (page) => {
-            state.thisPage = page;
+        /* api */
+        const getQuery = () => {
+            const apiQuery = new ApiQueryHelper();
+            apiQuery
+                .setSort('created_at', true)
+                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+            if (state.selectedUrgency !== ALERT_URGENCY.ALL) {
+                apiQuery.setFilters([{ k: 'urgency', v: state.selectedUrgency, o: '=' }]);
+            }
+            if (state.isAssignedToMe) {
+                apiQuery.setFilters([{ k: 'assignee', v: store.state.user.userId, o: '=' }]);
+            }
+            return apiQuery.data;
         };
+        const listAlerts = async () => {
+            const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({ query: getQuery() });
+            state.allPage = getAllPage(total_count, 10);
+            state.items = results;
+        };
+
+        /* event */
+        const onPageChange = async () => {
+            await listAlerts();
+        };
+        const onSelectAssignedState = (assignedState) => {
+            state.isAssignedToMe = assignedState === ASSIGNED_STATE.ASSIGNED_TO_ME;
+        };
+
+        (async () => {
+            await listAlerts();
+        })();
+
+        watch(() => state.isAssignedToMe, () => {
+            listAlerts();
+        });
 
         return {
             ...toRefs(state),
-            changePageNumber,
+            tabState,
+            onPageChange,
+            onSelectAssignedState,
+            listAlerts,
         };
     },
 };
@@ -290,6 +314,9 @@ export default {
                 }
             }
             .p-list-card::v-deep {
+                max-height: 15rem;
+                overflow-y: auto;
+
                 header {
                     display: none;
                 }

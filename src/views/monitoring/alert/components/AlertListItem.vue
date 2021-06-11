@@ -1,29 +1,54 @@
 <template>
     <div class="alert-list-item">
         <div class="left-part">
-            <p-i :name="item.icon" width="1em" height="1em" />
-            <span class="value">{{ item.value }}</span>
-            <span class="project">{{ item.project }}</span>
+            <p-i :name="item.urgency === ALERT_URGENCY.HIGH ? 'ic_alert' : 'ic_state_duplicated'"
+                 width="1em" height="1em"
+            />
+            <span class="title">{{ item.title }}</span>
+            <p-anchor class="project-link"
+                      :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
+            >
+                {{ projects[item.project_id] ? projects[item.project_id].label : item.project_id }}
+            </p-anchor>
         </div>
         <div class="right-part">
-            <p-badge :style-type="item.badge === 'acknowledged' ? 'red100' : 'blue200'">
-                {{ item.badge }}
+            <p-badge :style-type="badgeStyleTypeFormatter(item.state)">
+                {{ capitalize(item.state) }}
             </p-badge>
-            <span class="date">{{ item.date }}</span>
+            <span class="date">{{ dateFormatter(item.created_at) }}</span>
         </div>
     </div>
 </template>
 
 <script lang="ts">
+import { capitalize } from 'lodash';
+import dayjs from 'dayjs';
+
 import {
-    PI, PBadge,
+    PI, PBadge, PAnchor,
 } from '@spaceone/design-system';
+
+import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { computed, reactive, toRefs } from '@vue/composition-api';
+import { store } from '@/store';
+
+
+const ALERT_URGENCY = Object.freeze({
+    HIGH: 'HIGH',
+    LOW: 'LOW',
+});
+const ALERT_STATE = Object.freeze({
+    TRIGGERED: 'TRIGGERED',
+    ACKNOWLEDGED: 'ACKNOWLEDGED',
+    RESOLVED: 'RESOLVED',
+});
 
 export default {
     name: 'AlertListItem',
     components: {
         PI,
         PBadge,
+        PAnchor,
     },
     props: {
         item: {
@@ -32,7 +57,26 @@ export default {
         },
     },
     setup() {
+        const state = reactive({
+            projects: computed(() => store.state.resource.project.items),
+        });
 
+        /* util */
+        const badgeStyleTypeFormatter = (alertState) => {
+            if (alertState === ALERT_STATE.TRIGGERED) return 'red100';
+            if (alertState === ALERT_STATE.ACKNOWLEDGED) return 'blue200';
+            return 'gray200';
+        };
+        const dateFormatter = date => dayjs.utc(date).format('MM/DD HH:mm');
+
+        return {
+            ...toRefs(state),
+            ALERT_URGENCY,
+            referenceRouter,
+            capitalize,
+            badgeStyleTypeFormatter,
+            dateFormatter,
+        };
     },
 };
 </script>
@@ -44,17 +88,18 @@ export default {
     .left-part {
         display: inherit;
         flex-grow: 1;
+        align-items: center;
         margin: auto 0;
 
         .p-i-icon {
             margin-right: 0.5rem;
         }
-        .value {
+        .title {
             @apply truncate;
             display: block;
             margin-right: 0.5rem;
         }
-        .project {
+        .project-link {
             @apply text-gray-500;
             display: inherit;
         }

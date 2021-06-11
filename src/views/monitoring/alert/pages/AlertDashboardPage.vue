@@ -4,12 +4,12 @@
         <p-page-title :title="$t('MONITORING.ALERT.DASHBOARD.DASHBOARD')" />
         <div class="widget-wrapper">
             <alert-state-widget class="alert-state-widget" />
-            <alert-history-widget class="col-span-12" />
-            <h2 class="widget-title col-span-12">
+            <alert-history-widget class="alert-history-widget" />
+            <h2 class="widget-title">
                 {{ $t('MONITORING.ALERT.DASHBOARD.PROJECT_HEALTH_BOARD') }}
             </h2>
-            <current-project-status-widget class="col-span-3" />
-            <top5-project-activity-widget class="col-span-9" />
+            <current-project-status-widget class="current-project-status-widget" />
+            <top5-project-activity-widget class="top5-project-activity-widget" />
             <project-search-widget class="col-span-12" />
         </div>
     </div>
@@ -29,6 +29,7 @@ import AlertHistoryWidget from '@/views/monitoring/alert/modules/alert-dashboard
 import CurrentProjectStatusWidget from '@/views/monitoring/alert/modules/alert-dashboard/CurrentProjectStatusWidget.vue';
 import Top5ProjectActivityWidget from '@/views/monitoring/alert/modules/alert-dashboard/Top5ProjectActivityWidget.vue';
 import ProjectSearchWidget from '@/views/monitoring/alert/modules/alert-dashboard/ProjectSearchWidget.vue';
+import { store } from '@/store';
 
 export default {
     name: 'AlertDashboardPage',
@@ -53,6 +54,10 @@ export default {
             ]),
         });
 
+        (() => {
+            store.dispatch('resource/project/load');
+        })();
+
         return {
             routeState,
         };
@@ -68,6 +73,7 @@ export default {
         @apply grid grid-cols-12 gap-4;
 
         .widget-title {
+            @apply col-span-12;
             font-size: 1.5rem;
             line-height: 1.35;
             padding-top: 1rem;
@@ -76,8 +82,39 @@ export default {
         .alert-state-widget {
             @apply col-span-12;
         }
+        .alert-history-widget {
+            @apply col-span-12;
+        }
+        .current-project-status-widget {
+            @apply col-span-3;
+        }
+        .top5-project-activity-widget {
+            @apply col-span-9;
+        }
         .project-search-widget {
             padding-top: 0.5rem;
+        }
+    }
+
+    @screen tablet {
+        .widget-wrapper {
+            .current-project-status-widget {
+                @apply col-span-6;
+            }
+            .top5-project-activity-widget {
+                @apply col-span-6;
+            }
+        }
+    }
+
+    @screen mobile {
+        .widget-wrapper {
+            .current-project-status-widget {
+                @apply col-span-12;
+            }
+            .top5-project-activity-widget {
+                @apply col-span-12;
+            }
         }
     }
 }
