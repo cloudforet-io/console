@@ -1,6 +1,6 @@
 <template>
     <p-card class="p-list-card" :header="header" :style-type="styleType"
-            :class="{'no-data': items.length === 0}"
+            :class="{'no-data': items.length === 0, hoverable}"
     >
         <template v-if="$scopedSlots.header" #header>
             <slot name="header" />
@@ -30,6 +30,7 @@ import { CardProps } from '@/data-display/cards/card/type';
 interface Props extends CardProps {
     items: any[];
     loading?: boolean;
+    hoverable?: boolean;
 }
 
 
@@ -58,6 +59,10 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
+        hoverable: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: Props) {
         const state = reactive({
@@ -78,6 +83,12 @@ export default defineComponent<Props>({
 .p-list-card {
     &.p-card:not(.no-data) .body {
         padding: 0;
+    }
+    &.hoverable {
+        li:hover {
+            @apply bg-secondary2;
+            cursor: pointer;
+        }
     }
     li {
         @apply border-b border-gray-200;

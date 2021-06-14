@@ -42,6 +42,24 @@ const getArgTypes = () => {
                 type: 'boolean',
             },
         },
+        hoverable: {
+            name: 'hoverable',
+            type: { name: 'boolean' },
+            description: 'Whether to show hover style or not.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
         itemSlot: {
             name: 'itemSlot',
             description: 'Slot for list item.',

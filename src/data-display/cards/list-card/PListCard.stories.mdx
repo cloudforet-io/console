@@ -28,6 +28,7 @@ export const Template = (args, { argTypes }) => ({
             :style-type="styleType"
             :items="items"
             :loading="loading"
+            :hoverable="hoverable"
         >
             <template v-if="headerSlot" #header><div v-html="headerSlot"/></template>
             <template v-if="itemSlot" #item><div v-html="itemSlot"/></template>
@@ -184,6 +185,35 @@ If you give ```false``` to ```header``` props and don't give ```header``` slot, 
 
 <br/>
 <br/>
+
+## Hoverable
+
+<Canvas>
+    <Story name="Hoverable">
+        {{
+            components: { PListCard },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-list-card
+            header="Hoverable List Card"
+            :items="items"
+            :hoverable="true"
+        >
+        </p-list-card>
+    </div>
+    `,
+            setup() {
+                return {
+                    items: range(10).map(() => faker.lorem.sentence(8))
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 
 ## Playground
 
