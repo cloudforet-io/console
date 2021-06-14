@@ -1,3 +1,10 @@
+# [1.1.0-beta.57](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.56...v1.1.0-beta.57) (2021-06-14)
+
+
+### Bug Fixes
+
+* PSelectButton color ([#592](https://github.com/spaceone-dev/spaceone-design-system/issues/592)) ([85c0146](https://github.com/spaceone-dev/spaceone-design-system/commit/85c014662762410e4c48416071838e5a95958bb1))
+
 # [1.1.0-beta.56](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.55...v1.1.0-beta.56) (2021-06-10)
 
 
