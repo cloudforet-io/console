@@ -33,8 +33,8 @@ import {
 } from '@vue/composition-api';
 // eslint-disable-next-line import/named
 import { notiChannelPhoneNumRegex } from '@/views/identity/user/lib/validations';
-import AddNotificationLevel from '@/views/identity/user/modules/AddNotificationLevel.vue';
-import AddNotificationMemberGroup from '@/views/identity/user/modules/AddNotificationMemberGroup.vue';
+import AddNotificationLevel from '@/views/identity/user/modules/notification/AddNotificationLevel.vue';
+import AddNotificationMemberGroup from '@/views/identity/user/modules/notification/AddNotificationMemberGroup.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 
 const CHANNEL_TYPE = {

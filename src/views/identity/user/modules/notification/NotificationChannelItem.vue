@@ -222,13 +222,13 @@ import {
 import {
     ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import AddNotificationSchedule from '@/views/identity/user/modules/AddNotificationSchedule.vue';
-import AddNotificationTopic from '@/views/identity/user/modules/AddNotificationTopic.vue';
-import AddNotificationLevel from '@/views/identity/user/modules/AddNotificationLevel.vue';
+import AddNotificationSchedule from '@/views/identity/user/modules/notification/AddNotificationSchedule.vue';
+import AddNotificationTopic from '@/views/identity/user/modules/notification/AddNotificationTopic.vue';
+import AddNotificationLevel from '@/views/identity/user/modules/notification/AddNotificationLevel.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import InfoMessage from '@/common/components/InfoMessage.vue';
-import AddNotificationMemberGroup from '@/views/identity/user/modules/AddNotificationMemberGroup.vue';
+import AddNotificationMemberGroup from '@/views/identity/user/modules/notification/AddNotificationMemberGroup.vue';
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 
 enum EDIT_TYPE {
@@ -411,7 +411,6 @@ export default {
                 };
                 if (paramKey === PARAM_KEY_TYPE.NAME) param.name = paramValue;
                 else if (paramKey === PARAM_KEY_TYPE.DATA) param.data = paramValue;
-                else if (paramKey === PARAM_KEY_TYPE.SCHEDULE) param.schedule = paramValue;
                 await SpaceConnector.client.notification.userChannel.update(param);
                 showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '', root);
             } catch (e) {
@@ -428,7 +427,6 @@ export default {
                 };
                 if (paramKey === PARAM_KEY_TYPE.NAME) param.name = paramValue;
                 else if (paramKey === PARAM_KEY_TYPE.DATA) param.data = paramValue;
-                else if (paramKey === PARAM_KEY_TYPE.SCHEDULE) param.schedule = paramValue;
                 // eslint-disable-next-line camelcase
                 else if (paramKey === PARAM_KEY_TYPE.LEVEL) param.notification_level = paramValue;
                 await SpaceConnector.client.notification.projectChannel.update(param);
@@ -476,11 +474,12 @@ export default {
             }
         };
         const onChangeSchedule = async (value) => {
-            state.scheduleForEdit = value;
+            state.scheduleModeForEdit = value.is_scheduled;
+            state.scheduleForEdit = value.schedule;
         };
         const saveChangedSchedule = async () => {
-            if (props.projectId) await setUserChannelSchedule();
-            else await setProjectChannelSchedule();
+            if (props.projectId) await setProjectChannelSchedule();
+            else await setUserChannelSchedule();
         };
 
         const setUserChannelSubscription = async () => {

@@ -92,6 +92,9 @@
                     :user-id="selectedUsers[0].user_id"
                 />
             </template>
+            <template #notifications>
+                <user-notifications :user-id="selectedUsers[0].user_id" />
+            </template>
         </p-tab>
         <p-tab v-else-if="selectedIndex.length > 1" :tabs="multiItemTabState.tabs"
                :active-tab.sync="multiItemTabState.activeTab"
@@ -193,12 +196,13 @@ import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
 
-import UserForm from '@/views/identity/user/modules/UserForm.vue';
-import UserUpdateForm from '@/views/identity/user/modules/UserUpdateForm.vue';
-import UserDetail from '@/views/identity/user/modules/UserDetail.vue';
-import UserAssignedRole from '@/views/identity/user/modules/UserAssignedRole.vue';
+import UserForm from '@/views/identity/user/modules/user-management/UserForm.vue';
+import UserUpdateForm from '@/views/identity/user/modules/user-management/UserUpdateForm.vue';
+import UserDetail from '@/views/identity/user/modules/user-management/UserDetail.vue';
+import UserAssignedRole from '@/views/identity/user/modules/user-management/UserAssignedRole.vue';
 import PTagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
-import UserAPIKeyTable from '@/views/identity/user/modules/APIKeyTable.vue';
+import UserAPIKeyTable from '@/views/identity/user/modules/api-key/APIKeyTable.vue';
+import UserNotifications from '@/views/identity/user/modules/user-management/UserNotifications.vue';
 
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { makeDistinctValueHandler, makeEnumValueHandler } from '@/lib/component-utils/query-search';
@@ -250,6 +254,7 @@ export default {
         UserDetail,
         UserAssignedRole,
         UserAPIKeyTable,
+        UserNotifications,
         PTab,
         PTagsPanel,
         PDataTable,
@@ -405,6 +410,7 @@ export default {
                 { label: vm.$t('IDENTITY.USER.MAIN.TAG'), name: 'tag', keepAlive: true },
                 { label: vm.$t('IDENTITY.USER.MAIN.ASSIGNED_ROLES'), name: 'assigned_role', keepAlive: true },
                 { label: vm.$t('IDENTITY.USER.MAIN.API_KEY'), name: 'api_key', keepAlive: true },
+                { label: 'Notifications', name: 'notifications', keepAlive: true },
             ] as TabItem[])),
             activeTab: 'detail',
         });

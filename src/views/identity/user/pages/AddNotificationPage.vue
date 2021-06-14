@@ -58,9 +58,9 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
-import AddNotificationData from '@/views/identity/user/modules/AddNotificationData.vue';
-import AddNotificationTopic from '@/views/identity/user/modules/AddNotificationTopic.vue';
-import AddNotificationSchedule from '@/views/identity/user/modules/AddNotificationSchedule.vue';
+import AddNotificationData from '@/views/identity/user/modules/notification/AddNotificationData.vue';
+import AddNotificationTopic from '@/views/identity/user/modules/notification/AddNotificationTopic.vue';
+import AddNotificationSchedule from '@/views/identity/user/modules/notification/AddNotificationSchedule.vue';
 import VueI18n from 'vue-i18n';
 import { store } from '@/store';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -87,6 +87,7 @@ export default {
             escalationLevel: 1,
             type: '',
             pageTitle: '' as TranslateResult,
+            userId: decodeURIComponent(vm.$route.query?.userId as string),
             projectId: vm.$route.query.projectId,
             protocolId: vm.$route.params.protocolId,
             protocolType: vm.$route.query.protocolType,
@@ -100,7 +101,6 @@ export default {
             schedule: null,
             isScheduled: false,
             notificationLevel: null,
-            userId: store.state.user.userId,
         });
         const routeState = reactive({
             routes: computed(() => ([
@@ -166,12 +166,11 @@ export default {
             state.data = value.data;
             state.notificationLevel = value.level;
             state.isDataValid = value.isValid;
-
         };
 
         const onChangeSchedule = (value) => {
             state.schedule = value.schedule;
-            state.isScheduled = value.isScheduled;
+            state.isScheduled = value.is_scheduled;
         };
 
         const onChangeTopic = (value) => {
@@ -180,7 +179,7 @@ export default {
         };
 
         (async () => {
-            const protocolLabel = vm.$route.query.protocolLabel;
+            const protocolLabel = decodeURIComponent(vm.$route.query?.protocolLabel as string);
             state.pageTitle = computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: protocolLabel })) as unknown as TranslateResult;
         })();
 

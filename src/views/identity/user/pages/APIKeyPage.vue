@@ -42,10 +42,10 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
-import UserAPIKeyTable from '@/views/identity/user/modules/APIKeyTable.vue';
+import UserAPIKeyTable from '@/views/identity/user/modules/api-key/APIKeyTable.vue';
 import { store } from '@/store';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import UserAPIKeyHandbook from '@/views/identity/user/modules/APIKeyHandbook.vue';
+import UserAPIKeyHandbook from '@/views/identity/user/modules/api-key/APIKeyHandbook.vue';
 
 interface EndpointItem {
     endpoint: string;

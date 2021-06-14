@@ -101,12 +101,12 @@ export default {
             if (state.proxyIsScheduled) {
                 emit('change', {
                     schedule: state.proxySchedule,
-                    isScheduled: state.proxyIsScheduled,
+                    is_scheduled: state.proxyIsScheduled,
                 });
             } else {
                 emit('change', {
-                    schedule: null,
-                    isScheduled: state.proxyIsScheduled,
+                    schedule: {},
+                    is_scheduled: state.proxyIsScheduled,
                 });
             }
         };

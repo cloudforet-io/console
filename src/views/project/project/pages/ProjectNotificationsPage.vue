@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import NotificationChannelList from '@/views/identity/user/modules/NotificationChannelList.vue';
+import NotificationChannelList from '@/views/identity/user/modules/notification/NotificationChannelList.vue';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import {
     ComponentRenderProxy, getCurrentInstance, reactive, toRefs,

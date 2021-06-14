@@ -45,68 +45,12 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
-import NotificationChannelItem from '@/views/identity/user/modules/NotificationChannelItem.vue';
+import NotificationChannelItem from '@/views/identity/user/modules/notification/NotificationChannelItem.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { store } from '@/store';
 import { Tags, TimeStamp } from '@/models';
-
-type ProtocolType = 'INTERNAL' | 'EXTERNAL';
-
-interface Capability {
-    data_type: string;
-    supported_schema: string[];
-}
-
-interface PluginInfo {
-    plugin_id: string;
-    version: string;
-    options: object;
-    metadata: object;
-}
-
-interface ProtocolItem {
-    capability: Capability;
-    name: string;
-    plugin_info: PluginInfo;
-    protocol_id: string;
-    protocol_type: ProtocolType;
-    resource_type: string;
-    state: string;
-    tags: Tags;
-    created_at: TimeStamp;
-}
-
-interface ChannelItem {
-    user_channel_id?: string;
-    project_channel_id?: string;
-    user_id: string;
-    name: string;
-    data: object;
-    is_subscribe: boolean;
-    protocol_id: string;
-    schedule: string[];
-    schema: string;
-    secret_id: string;
-    state: string;
-    subscriptions: string[];
-    tags: Tags;
-    created_at: TimeStamp;
-    notification_level?: string;
-    protocol_name: string;
-}
-
-interface ProtocolResp {
-    capability: object;
-    created_at: TimeStamp;
-    name: string;
-    plugin_info: object;
-    protocol_id: string;
-    protocol_type: string;
-    resource_type: string;
-    state: string;
-    tags: Tags;
-}
+import { ChannelItem, ProtocolItem } from '@/views/identity/user/type';
 
 export default {
     name: 'NotificationChannelList',
@@ -128,9 +72,10 @@ export default {
         const state = reactive({
             protocolList: [] as ProtocolItem[],
             loading: true,
-            userId: store.state.user.userId,
+            // eslint-disable-next-line no-use-before-define
+            userId: computed(() => ((vm.$route.params.user_id) ? decodeURIComponent(vm.$route.params.user_id) : store.state.user.userId)),
             channelList: [] as ChannelItem[],
-            protocolResp: [] as ProtocolResp[],
+            protocolResp: [] as ProtocolItem[],
         });
         const routeState = reactive({
             routes: computed(() => ([
@@ -160,10 +105,11 @@ export default {
                         params: {
                             protocol: d.name.replace(/(\s*)/g, ''),
                             protocolId: d.protocol_id,
+                            userId: state.userId,
                         },
                         query: {
-                            protocolLabel: d.name,
-                            projectId: props.projectId ? props.projectId : null,
+                            protocolLabel: encodeURIComponent(d.name),
+                            projectId: props.projectId ? props.projectId : undefined,
                             // eslint-disable-next-line camelcase
                             supported_schema: d.capability.supported_schema,
                             protocolType: d.protocol_type,

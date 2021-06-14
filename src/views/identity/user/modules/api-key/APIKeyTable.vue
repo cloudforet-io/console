@@ -77,7 +77,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, UnwrapRef, watch,
 } from '@vue/composition-api';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import UserAPIKeyModal from '@/views/identity/user/modules/APIKeyModal.vue';
+import UserAPIKeyModal from '@/views/identity/user/modules/api-key/APIKeyModal.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { userStateFormatter } from '@/views/identity/user/lib/helper';

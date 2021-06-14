@@ -110,6 +110,7 @@ module.exports = {
     "no-new": ["off"],
     "prefer-template": ["error"],
     "no-plusplus": ["off"],
+    "no-tabs": ["off"],
 
     // typescript rules
     "@typescript-eslint/explicit-member-accessibility": [
