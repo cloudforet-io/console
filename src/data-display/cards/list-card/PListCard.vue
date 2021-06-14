@@ -7,7 +7,9 @@
         </template>
         <p-data-loader :data="items" :loading="loading" :spinner-size="1.5">
             <ul>
-                <li v-for="(item, index) in items" :key="`${contextKey}-${index}`">
+                <li v-for="(item, index) in items" :key="`${contextKey}-${index}`"
+                    @click="$emit('click', index)"
+                >
                     <slot name="item" v-bind="{item, index}">
                         {{ item }}
                     </slot>
