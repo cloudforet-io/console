@@ -61,7 +61,7 @@
                     </div>
                 </div>
                 <!--list-->
-                <p-list-card :items="items">
+                <p-list-card :items="items" :hoverable="true" @click="onClickListItem">
                     <template #header>
                         <div class="mobile-header">
                             <p-check-box v-model="isAssignedToMe">
@@ -86,6 +86,8 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import { get, find, sum } from 'lodash';
+
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -100,7 +102,9 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
+import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { store } from '@/store';
+import {ALERT_STATE} from "@/views/monitoring/alert/type";
 
 
 const TAB_STATE = Object.freeze({
@@ -151,15 +155,15 @@ export default {
             activeTab: TAB_STATE.OPEN,
             tabItems: {
                 OPEN: {
-                    count: 122,
+                    count: 0,
                     styleType: 'alert',
                 },
                 RESOLVED: {
-                    count: 23,
+                    count: 0,
                     styleType: 'gray',
                 },
                 ALL: {
-                    count: 145,
+                    count: 0,
                     styleType: 'primary',
                 },
             },
@@ -216,9 +220,26 @@ export default {
             return apiQuery.data;
         };
         const listAlerts = async () => {
-            const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({ query: getQuery() });
-            state.allPage = getAllPage(total_count, 10);
-            state.items = results;
+            try {
+                const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({ query: getQuery() });
+                state.allPage = getAllPage(total_count, 10);
+                state.items = results;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+        const statAlerts = async () => {
+            try {
+                const { results } = await SpaceConnector.client.statistics.topic.alertStateCount();
+                const resolvedCount = find(results, { state: ALERT_STATE.RESOLVED }).total;
+                const acknowledgedCount = find(results, { state: ALERT_STATE.ACKNOWLEDGED }).total;
+                const triggeredCount = find(results, { state: ALERT_STATE.TRIGGERED }).total;
+                tabState.tabItems.OPEN.count = sum([acknowledgedCount, triggeredCount]);
+                tabState.tabItems.RESOLVED.count = resolvedCount;
+                tabState.tabItems.ALL.count = sum([resolvedCount, acknowledgedCount, triggeredCount]);
+            } catch (e) {
+                console.error(e);
+            }
         };
 
         /* event */
@@ -228,9 +249,13 @@ export default {
         const onSelectAssignedState = (assignedState) => {
             state.isAssignedToMe = assignedState === ASSIGNED_STATE.ASSIGNED_TO_ME;
         };
+        const onClickListItem = (idx) => {
+            const alertId = get(state.items[idx], 'alert_id');
+            if (alertId) vm.$router.push({ name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT.DETAIL, params: { id: alertId } });
+        };
 
         (async () => {
-            await listAlerts();
+            await Promise.all([listAlerts(), statAlerts()]);
         })();
 
         watch(() => state.isAssignedToMe, () => {
@@ -242,6 +267,7 @@ export default {
             tabState,
             onPageChange,
             onSelectAssignedState,
+            onClickListItem,
             listAlerts,
         };
     },
@@ -269,6 +295,12 @@ export default {
             @apply col-span-3;
             .balloon-group {
                 width: 100%;
+
+                button {
+                    height: 4.5rem;
+                    padding: 1rem;
+                    margin: 0.375rem 0;
+                }
 
                 .tab-button {
                     display: flex;
@@ -314,11 +346,12 @@ export default {
                 }
             }
             .p-list-card::v-deep {
-                max-height: 15rem;
-                overflow-y: auto;
-
                 header {
                     display: none;
+                }
+                .body {
+                    max-height: 14.5rem;
+                    overflow-y: auto;
                 }
             }
         }
@@ -331,6 +364,12 @@ export default {
             .p-balloon-tab::v-deep {
                 .balloon-group {
                     margin-bottom: 1.5rem;
+
+                    button {
+                        height: auto;
+                        padding: 0.375rem 1rem;
+                        margin: 0.375rem;
+                    }
                 }
             }
 
@@ -360,6 +399,9 @@ export default {
                                 }
                             }
                         }
+                    }
+                    .body {
+                        max-height: 21.875rem;
                     }
                 }
             }

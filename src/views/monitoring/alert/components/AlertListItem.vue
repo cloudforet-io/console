@@ -5,8 +5,10 @@
                  width="1em" height="1em"
             />
             <span class="title">{{ item.title }}</span>
-            <p-anchor class="project-link"
+            <p-anchor v-if="itemType !== ITEM_TYPE.PROJECT"
+                      class="project-link"
                       :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
+                      :show-icon="false"
             >
                 {{ projects[item.project_id] ? projects[item.project_id].label : item.project_id }}
             </p-anchor>
@@ -42,6 +44,10 @@ const ALERT_STATE = Object.freeze({
     ACKNOWLEDGED: 'ACKNOWLEDGED',
     RESOLVED: 'RESOLVED',
 });
+const ITEM_TYPE = Object.freeze({
+    DEFAULT: 'DEFAULT',
+    PROJECT: 'PROJECT',
+});
 
 export default {
     name: 'AlertListItem',
@@ -54,6 +60,13 @@ export default {
         item: {
             type: Object,
             default: () => ({}),
+        },
+        itemType: {
+            type: String,
+            default: ITEM_TYPE.DEFAULT,
+            validator(itemType) {
+                return Object.values(ITEM_TYPE).includes(itemType);
+            },
         },
     },
     setup() {
@@ -72,6 +85,7 @@ export default {
         return {
             ...toRefs(state),
             ALERT_URGENCY,
+            ITEM_TYPE,
             referenceRouter,
             capitalize,
             badgeStyleTypeFormatter,
