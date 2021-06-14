@@ -103,8 +103,8 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
+import { ALERT_STATE } from '@/views/monitoring/alert/type';
 import { store } from '@/store';
-import {ALERT_STATE} from "@/views/monitoring/alert/type";
 
 
 const TAB_STATE = Object.freeze({
@@ -214,6 +214,11 @@ export default {
             if (state.selectedUrgency !== ALERT_URGENCY.ALL) {
                 apiQuery.setFilters([{ k: 'urgency', v: state.selectedUrgency, o: '=' }]);
             }
+            if (tabState.activeTab === TAB_STATE.OPEN) {
+                apiQuery.setFilters([{ k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' }]);
+            } else if (tabState.activeTab === TAB_STATE.RESOLVED) {
+                apiQuery.setFilters([{k: 'state', v: ALERT_STATE.RESOLVED, o: '='}]);
+            }
             if (state.isAssignedToMe) {
                 apiQuery.setFilters([{ k: 'assignee', v: store.state.user.userId, o: '=' }]);
             }
@@ -258,8 +263,9 @@ export default {
             await Promise.all([listAlerts(), statAlerts()]);
         })();
 
-        watch(() => state.isAssignedToMe, () => {
-            listAlerts();
+        watch([() => state.isAssignedToMe, () => tabState.activeTab], async () => {
+            state.thisPage = 1;
+            await listAlerts();
         });
 
         return {
