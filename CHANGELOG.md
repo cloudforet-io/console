@@ -1,3 +1,10 @@
+# [1.1.0-beta.58](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.57...v1.1.0-beta.58) (2021-06-14)
+
+
+### Features
+
+* add hoverable props to PListCard ([#593](https://github.com/spaceone-dev/spaceone-design-system/issues/593)) ([4c7a18c](https://github.com/spaceone-dev/spaceone-design-system/commit/4c7a18c9da292264eaa06446b2f94a8183c16870))
+
 # [1.1.0-beta.57](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.56...v1.1.0-beta.57) (2021-06-14)
 
 
