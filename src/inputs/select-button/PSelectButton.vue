@@ -68,7 +68,8 @@ export default {
     border-width: 1px;
     border-style: solid;
 
-    @define-mixin style-type $bg-color, $border-color, $selected-bg-color, $selected-text-color, $hover-bg-color {
+    @define-mixin style-type $bg-color, $border-color, $text-color, $selected-bg-color, $selected-text-color, $hover-bg-color {
+        color: $text-color;
         background-color: $bg-color;
         border-color: $border-color;
 
@@ -84,8 +85,8 @@ export default {
         }
     }
 
-    &.secondary { @mixin style-type theme('colors.white'), theme('colors.gray.300'), theme('colors.blue.500'), theme('colors.white'), theme('colors.blue.200'); }
-    &.gray { @mixin style-type transparent, theme('colors.gray.500'), theme('colors.gray.500'), theme('colors.white'), transparent; }
+    &.secondary { @mixin style-type theme('colors.white'), theme('colors.gray.300'), theme('colors.gray.900'), theme('colors.blue.500'), theme('colors.white'), theme('colors.blue.200'); }
+    &.gray { @mixin style-type transparent, theme('colors.gray.500'), theme('colors.gray.500'), theme('colors.gray.500'), theme('colors.white'), theme('colors.gray.100'); }
 
     @define-mixin size $font-size, $padding-x, $padding-y, $line-height {
         font-size: $font-size;
