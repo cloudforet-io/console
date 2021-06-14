@@ -130,5 +130,6 @@ export enum FILE_NAME_PREFIX {
     serviceAccount = 'service_account',
     user = 'user',
     collector = 'collector',
-    projectWebhook = 'projectWebhook'
+    projectWebhook = 'projectWebhook',
+    alert = 'alert'
 }

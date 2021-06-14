@@ -1,8 +1,5 @@
 <template>
     <div class="alert-list-page">
-        <router-link :to="{ name: 'alertDetail', params: { id: 'alert-1dc1e7fe3e4b' }}">
-            <a class="temp_elem">Alert Detail 페이지로 가즈아ㅏㅏㅏㅏ</a>
-        </router-link><br>
         <p-breadcrumbs :routes="routeState.route" />
         <p-page-title :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')" />
         <div class="content-wrapper">
@@ -28,6 +25,11 @@ import AlertDataTable from '@/views/monitoring/alert/modules/alert-list/AlertDat
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+import { store } from '@/store';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { SpaceConnector } from '@/lib/space-connector';
+import { durationFormatter, iso8601Formatter } from '@/lib/util';
+
 
 export default {
     name: 'AlertListPage',
@@ -43,8 +45,8 @@ export default {
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            loading: true,
             pageTitle: vm.$t('MONITORING.ALERT.ALERT_LIST.ALERT'),
-            items: {},
             totalCount: 0,
         });
         const routeState = reactive({
@@ -55,11 +57,6 @@ export default {
             ]),
         });
 
-        /* api */
-
-        /* event */
-
-        /* init */
         return {
             ...toRefs(state),
             routeState,
@@ -70,8 +67,6 @@ export default {
 
 <style lang="postcss" scoped>
 .alert-list-page {
-    max-width: 85.5rem;
-
     .content-wrapper {
         @apply grid grid-cols-12 gap-4;
     }

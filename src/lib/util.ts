@@ -20,10 +20,14 @@ export const durationFormatter = (createdAt: string, finishedAt: string, timezon
     if (createdAt && finishedAt) {
         const createdAtTime = dayjs(iso8601Formatter(createdAt, timezone));
         const finishedAtTime = dayjs(iso8601Formatter(finishedAt, timezone));
-        let duration = finishedAtTime.diff(createdAtTime, 'second');
-        if (duration < 60) return `${duration} sec`;
-        duration = finishedAtTime.diff(createdAtTime, 'minute');
-        return `${duration} min`;
+        const durationSec = finishedAtTime.diff(createdAtTime, 'second');
+        const durationMin = finishedAtTime.diff(createdAtTime, 'minute');
+        const durationHour = finishedAtTime.diff(createdAtTime, 'hour');
+        const durationDay = finishedAtTime.diff(createdAtTime, 'day');
+        if (durationSec < 60) return `${durationSec} sec`;
+        if (durationMin < 60) return `${durationSec} min`;
+        if (durationHour < 60) return `${durationHour} hour ${durationSec % 60} min`;
+        return `${durationDay % 24} day ${durationHour % 24} hour`;
     }
     return null;
 };
