@@ -1,3 +1,10 @@
+# [1.1.0-beta.59](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.58...v1.1.0-beta.59) (2021-06-14)
+
+
+### Features
+
+* add click event to PListCard ([#594](https://github.com/spaceone-dev/spaceone-design-system/issues/594)) ([6f4d015](https://github.com/spaceone-dev/spaceone-design-system/commit/6f4d0150c106cf1ebb22ec07838996ec2cabc5ba))
+
 # [1.1.0-beta.58](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.57...v1.1.0-beta.58) (2021-06-14)
 
 
