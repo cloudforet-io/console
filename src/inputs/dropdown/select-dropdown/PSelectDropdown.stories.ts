@@ -18,7 +18,7 @@ export default {
 export const defaultCase = () => ({
     components: { PSelectDropdown },
     template: `
-    <div>
+    <div style="height: 20rem">
       <PSelectDropdown :invalid="invalidState" v-model="selectItem" :items="items"></PSelectDropdown>
       <p>select item : {{selectItem}}</p>
     </div>
@@ -27,7 +27,7 @@ export const defaultCase = () => ({
         invalidState: { default: boolean('invalid', false) },
     },
     setup() {
-        const selectItem = ref('init');
+        const selectItem = ref('one');
         const items = [
             { type: 'item', label: 'one', name: 'one' },
             { type: 'item', label: 'two', name: 'two' },

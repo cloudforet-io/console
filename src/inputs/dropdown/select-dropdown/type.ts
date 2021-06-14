@@ -1,5 +1,9 @@
 import { MenuItem } from '@/inputs/context-menu/type';
 
+enum BUTTON_STYLE_TYPE {
+    'primary-dark' = 'primary-dark'
+}
+
 export interface SelectDropdownStateType {
     items: MenuItem[];
     invalid: boolean;
@@ -10,6 +14,9 @@ export interface SelectDropdownStateType {
     placeholder: string;
     useCustomStyle: boolean;
     showPopup: boolean;
+    buttonOnly: boolean;
+    buttonStyleType?: keyof BUTTON_STYLE_TYPE;
+    buttonIcon: string;
 }
 
 export interface SelectDropdownSyncStateType {
