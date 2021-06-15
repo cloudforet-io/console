@@ -824,8 +824,23 @@
 				"YESTERDAY": "昨日"
 			},
 			"NOTIFICATION": {
+				"ALT_E_DELETE_PROJECT_CHANNEL": "",
+				"ALT_E_DELETE_USER_CHANNEL": "",
+				"ALT_E_DISABLE_PROJECT_CHANNEL": "",
+				"ALT_E_DISABLE_USER_CHANNEL": "",
+				"ALT_E_ENABLE_PROJECT_CHANNEL": "",
+				"ALT_E_ENABLE_USER_CHANNEL": "",
+				"ALT_S_DELETE_PROJECT_CHANNEL": "",
+				"ALT_S_DELETE_USER_CHANNEL": "",
+				"ALT_S_DISABLE_PROJECT_CHANNEL": "",
+				"ALT_S_DISABLE_USER_CHANNEL": "",
+				"ALT_S_ENABLE_PROJECT_CHANNEL": "",
+				"ALT_S_ENABLE_USER_CHANNEL": "",
 				"AWS_SNS": "",
 				"CANNOT_EDIT_SLACK": "",
+				"CHANNEL_DELETE_MODAL_TITLE": "",
+				"CHANNEL_INFO": "",
+				"CHANNEL_NAME": "",
 				"EDIT": "",
 				"FORM": {
 					"ADD_CHANNEL": "",
@@ -843,6 +858,7 @@
 					"BASE_INFO": "",
 					"CHANNEL_NAME": "",
 					"CUSTOM": "",
+					"LEVEL": "",
 					"NOTIFICATION_LEVEL": "",
 					"PHONE_NUMBER": "",
 					"RECEIVE_ALL": "",
@@ -852,17 +868,21 @@
 					"SETTING": "",
 					"SETTING_MODE": "",
 					"SLACK_TOKEN": "",
+					"TO": "",
 					"TOPIC": ""
 				},
+				"MANAGE": "",
 				"MESSENGER": "",
 				"NOTIFICATION_CHANNEL": "",
 				"NOTI_CHANNEL_DESC": "",
 				"NO_NOTI_CHANNEL": "",
+				"SCHEDULE": "",
 				"SLACK": "",
 				"SMS": "",
 				"SPACEONE_USER": "",
 				"TOKEN": "",
 				"TOKEN_INFO": "",
+				"TYPE": "",
 				"VOICE": ""
 			}
 		}

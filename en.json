@@ -824,8 +824,23 @@
 				"YESTERDAY": "Yesterday"
 			},
 			"NOTIFICATION": {
+				"ALT_E_DELETE_PROJECT_CHANNEL": "Delete Project Channel Failure",
+				"ALT_E_DELETE_USER_CHANNEL": "Delete User Channel Failure",
+				"ALT_E_DISABLE_PROJECT_CHANNEL": "Disable Project Channel Failure",
+				"ALT_E_DISABLE_USER_CHANNEL": "Disable User Channel Failure",
+				"ALT_E_ENABLE_PROJECT_CHANNEL": "Enable Project Channel Failure",
+				"ALT_E_ENABLE_USER_CHANNEL": "Enable User Channel Failure",
+				"ALT_S_DELETE_PROJECT_CHANNEL": "Delete Project Channel Success",
+				"ALT_S_DELETE_USER_CHANNEL": "Delete User Channel Success",
+				"ALT_S_DISABLE_PROJECT_CHANNEL": "Disable Project Channel Success",
+				"ALT_S_DISABLE_USER_CHANNEL": "Disable User Channel Success",
+				"ALT_S_ENABLE_PROJECT_CHANNEL": "Enable Project Channel Success",
+				"ALT_S_ENABLE_USER_CHANNEL": "Enable User Channel Success",
 				"AWS_SNS": "AWS SNS",
 				"CANNOT_EDIT_SLACK": "Slack Token is unable to edit.",
+				"CHANNEL_DELETE_MODAL_TITLE": "Are you sure you want to Delete Notifications Channel?",
+				"CHANNEL_INFO": "Channel Info.",
+				"CHANNEL_NAME": "Channel Name",
 				"EDIT": "Edit",
 				"FORM": {
 					"ADD_CHANNEL": "Add {type} Channel",
@@ -843,6 +858,7 @@
 					"BASE_INFO": "Base Information",
 					"CHANNEL_NAME": "Channel Name",
 					"CUSTOM": "Custom",
+					"LEVEL": "LEVEL {level}",
 					"NOTIFICATION_LEVEL": "Notification Level ",
 					"PHONE_NUMBER": "Phone number",
 					"RECEIVE_ALL": "Receive all notifications",
@@ -852,17 +868,21 @@
 					"SETTING": "Setting",
 					"SETTING_MODE": "Setting Mode",
 					"SLACK_TOKEN": "Slack Token",
+					"TO": "to",
 					"TOPIC": "Topic"
 				},
+				"MANAGE": "Manage",
 				"MESSENGER": "Messenger",
 				"NOTIFICATION_CHANNEL": "Notification Channels",
 				"NOTI_CHANNEL_DESC": "Supporting environments for SMS and voice call may vary depends on the country.  ",
 				"NO_NOTI_CHANNEL": "No Notification Channel",
+				"SCHEDULE": "Schedule",
 				"SLACK": "Slack",
 				"SMS": "SMS",
 				"SPACEONE_USER": "SpaceOne User",
 				"TOKEN": "Token",
 				"TOKEN_INFO": "Token cannot be modified.",
+				"TYPE": "Type",
 				"VOICE": "Voice Call"
 			}
 		}

@@ -824,8 +824,23 @@
 				"YESTERDAY": "어제 "
 			},
 			"NOTIFICATION": {
+				"ALT_E_DELETE_PROJECT_CHANNEL": "프로젝트 채널 삭제 실패",
+				"ALT_E_DELETE_USER_CHANNEL": "사용자 채널 삭제 실패",
+				"ALT_E_DISABLE_PROJECT_CHANNEL": "프로젝트 채널 비활성화 실패",
+				"ALT_E_DISABLE_USER_CHANNEL": "사용자 채널 비활성화 성공",
+				"ALT_E_ENABLE_PROJECT_CHANNEL": "프로젝트 채널 활성화 실패",
+				"ALT_E_ENABLE_USER_CHANNEL": "사용자 채널 활성화 실패",
+				"ALT_S_DELETE_PROJECT_CHANNEL": "프로젝트 채널 삭제 성공 ",
+				"ALT_S_DELETE_USER_CHANNEL": "사용자 채널 삭제 성공",
+				"ALT_S_DISABLE_PROJECT_CHANNEL": "프로젝트 채널 비활성화 성공",
+				"ALT_S_DISABLE_USER_CHANNEL": "사용자 채널 비활성화 성공",
+				"ALT_S_ENABLE_PROJECT_CHANNEL": "프로젝트 채널 활성화 성공",
+				"ALT_S_ENABLE_USER_CHANNEL": "사용자 채널 활성화 성공",
 				"AWS_SNS": "AWS SNS",
 				"CANNOT_EDIT_SLACK": "슬랙 토큰은 편집할 수 없습니다.",
+				"CHANNEL_DELETE_MODAL_TITLE": "이 알림 채널을 삭제하시겠습니까?",
+				"CHANNEL_INFO": "채널 정보",
+				"CHANNEL_NAME": "채널 이름",
 				"EDIT": "편집",
 				"FORM": {
 					"ADD_CHANNEL": "{type} 채널 추가",
@@ -843,6 +858,7 @@
 					"BASE_INFO": "기본 정보",
 					"CHANNEL_NAME": "채널 이름",
 					"CUSTOM": "시간 설정",
+					"LEVEL": "레벨 {level}",
 					"NOTIFICATION_LEVEL": "알림 레벨",
 					"PHONE_NUMBER": "전화번호",
 					"RECEIVE_ALL": "모든 알림 받기",
@@ -852,17 +868,21 @@
 					"SETTING": "설정",
 					"SETTING_MODE": "설정 방식",
 					"SLACK_TOKEN": "슬랙 토큰",
+					"TO": "부터",
 					"TOPIC": "토픽"
 				},
+				"MANAGE": "관리",
 				"MESSENGER": "메신저",
 				"NOTIFICATION_CHANNEL": "알림 채널",
 				"NOTI_CHANNEL_DESC": "SMS 및 음성 통화 지원 환경은 국가에 따라 다를 수 있습니다.",
 				"NO_NOTI_CHANNEL": "알림 채널이 없습니다.",
+				"SCHEDULE": "스케쥴 ",
 				"SLACK": "슬랙",
 				"SMS": "SMS",
 				"SPACEONE_USER": "스페이스원 사용자",
 				"TOKEN": "토큰",
 				"TOKEN_INFO": "Token은 수정이 불가합니다.",
+				"TYPE": "유형",
 				"VOICE": "보이스 콜"
 			}
 		}
