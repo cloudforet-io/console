@@ -86,8 +86,8 @@ export default {
             try {
                 await SpaceConnector.client.monitoring.projectAlertConfig.update({
                     project_id: props.projectId,
-                    notification_options: {
-                        urgency: state.selectedOption,
+                    options: {
+                        notification_urgency: state.selectedOption,
                     },
                 });
                 showSuccessMessage(vm.$t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_NOTIFICATION_POLICY'), '', root);

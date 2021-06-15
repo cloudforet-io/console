@@ -18,7 +18,10 @@
                 {{ $t('PROJECT.DETAIL.ALERT.ESCALATION_POLICY') }}
             </div>
             <div class="content-wrapper">
-                <project-escalation-policy :escalation-policy-id="escalationPolicyId" />
+                <project-escalation-policy
+                    :project-id="projectId"
+                    :escalation-policy-id="escalationPolicyId"
+                />
             </div>
             <p-icon-button class="edit-button" name="ic_edit" @click="onClickUpdateEscalationPolicy" />
         </section>
@@ -75,7 +78,7 @@ export default {
     props: {
         projectId: {
             type: String,
-            default: '',
+            default: undefined,
         },
     },
     setup(props) {
@@ -92,7 +95,7 @@ export default {
                 },
             ])),
             projectAlertConfig: {},
-            notificationOption: computed(() => get(state.projectAlertConfig, 'notification_options.urgency')),
+            notificationOption: computed(() => get(state.projectAlertConfig, 'options.notification_urgency')),
             escalationPolicyId: computed(() => get(state.projectAlertConfig, 'escalation_policy_info.escalation_policy_id')),
             //
             updateNotificationPolicyModalVisible: false,

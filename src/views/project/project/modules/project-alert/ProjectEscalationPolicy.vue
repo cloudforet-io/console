@@ -28,6 +28,24 @@
                                 {{ $t('PROJECT.DETAIL.ALERT.MINUTE') }}
                             </span>
                         </template>
+                        <div v-if="channelFormatter(rule.notification_level).length > 0" class="channel-box">
+                            <div v-for="(channel, cIdx) in channelFormatter(rule.notification_level)" :key="`channel-${cIdx}`"
+                                 :class="{ disabled: channel.state === CHANNEL_STATE.DISABLED }"
+                            >
+                                <p class="title">
+                                    [{{ CHANNEL_SCHEMA[channel.schema] }}] {{ channel.name }}
+                                    <p-i name="ic_bell" color="inherit" class="ml-1"
+                                         width="1rem" height="1rem"
+                                    />
+                                    {{ channel.state === CHANNEL_STATE.ENABLED ? 'ON' : 'OFF' }}
+                                </p>
+                                <div v-if="channel.schema === 'spaceone_user'" class="info">
+                                    <p v-for="(user, uIdx) in channel.data.users" :key="`user-${uIdx}`">
+                                        {{ user }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
                         <p-divider class="divider" />
                     </div>
                 </div>
@@ -46,15 +64,27 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { get } from 'lodash';
-
-import { PBadge, PDivider, PI } from '@spaceone/design-system';
+import { get, filter } from 'lodash';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import { PBadge, PDivider, PI } from '@spaceone/design-system';
+
 import { FINISH_CONDITION } from '@/views/monitoring/alert/type';
 import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
+
+
+const CHANNEL_SCHEMA = Object.freeze({
+    spaceone_user: 'Member',
+    slack_webhook: 'Slack',
+});
+const CHANNEL_STATE = Object.freeze({
+    ENABLED: 'ENABLED',
+    DISABLED: 'DISABLED',
+});
 
 export default {
     name: 'ProjectEscalationPolicy',
@@ -64,6 +94,10 @@ export default {
         PI,
     },
     props: {
+        projectId: {
+            type: String,
+            default: undefined,
+        },
         escalationPolicyId: {
             type: String,
             default: undefined,
@@ -86,17 +120,36 @@ export default {
             escalationPolicyName: computed(() => get(state.escalationPolicyRule, 'name')),
             finishCondition: computed(() => {
                 const finishCondition = get(state.escalationPolicyRule, 'finish_condition');
-                if (finishCondition) return finishCondition.label;
+                if (finishCondition) return state.finishConditions.find(d => d.name === finishCondition).label;
                 return '';
             }),
             escalationRules: computed(() => get(state.escalationPolicyRule, 'rules')),
             repeatCount: computed(() => get(state.escalationPolicyRule, 'repeat_count')),
+            //
+            projectChannels: [],
+            projectChannelForLevel: {},
         });
 
         /* util */
         const notificationLevelFormatter = str => str.replace('LV', '');
+        const channelFormatter = level => filter(state.projectChannels, { notification_level: level });
 
         /* api */
+        const apiQuery = new ApiQueryHelper();
+        const getQuery = () => {
+            apiQuery
+                .setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
+            return apiQuery.data;
+        };
+        const listProjectChannel = async () => {
+            try {
+                const { results } = await SpaceConnector.client.notification.projectChannel.list({ query: getQuery() });
+                state.projectChannels = results;
+            } catch (e) {
+                state.projectChannels = [];
+                console.error(e);
+            }
+        };
         const getEscalationPolicy = async () => {
             try {
                 state.escalationPolicyRule = await SpaceConnector.client.monitoring.escalationPolicy.get({
@@ -108,13 +161,18 @@ export default {
             }
         };
 
-        watch(() => props.escalationPolicyId, (escalationPolicyId) => {
-            if (escalationPolicyId) getEscalationPolicy();
+        watch([() => props.escalationPolicyId, () => props.projectId], async (escalationPolicyId, projectId) => {
+            if (escalationPolicyId && projectId) {
+                await Promise.all([getEscalationPolicy(), listProjectChannel()]);
+            }
         }, { immediate: true });
 
         return {
             ...toRefs(state),
+            CHANNEL_SCHEMA,
+            CHANNEL_STATE,
             notificationLevelFormatter,
+            channelFormatter,
         };
     },
 };
@@ -145,6 +203,32 @@ export default {
             }
             .divider {
                 margin: 1rem 0;
+            }
+            .channel-box {
+                @apply bg-white rounded;
+                font-size: 0.75rem;
+                line-height: 1.5;
+                padding: 0.5rem;
+                margin-top: 0.5rem;
+
+                .title {
+                    @apply text-blue-900;
+                    display: flex;
+                    align-items: center;
+                    font-weight: bold;
+                }
+                .info {
+                    @apply text-gray-700;
+                }
+
+                .disabled {
+                    .title {
+                        @apply text-gray-300;
+                    }
+                    .info {
+                        @apply text-gray-300;
+                    }
+                }
             }
 
             @screen mobile {
