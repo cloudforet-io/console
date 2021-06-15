@@ -15,9 +15,10 @@ export interface CommonOptions {
     translation_id?: string;
     default?: any;
     delimiter?: string;
+    is_optional?: boolean;
+    field_description?: string;
     postfix?: string;
     prefix?: string;
-    field_description?: string;
 }
 
 export interface BadgeOptions extends CommonOptions {

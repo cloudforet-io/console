@@ -8,9 +8,9 @@
         <span v-if="useTotalCount" class="total-count">
             &nbsp;({{ totalCount }})
         </span>
-        <div class="extra">
+        <span class="extra">
             <slot name="extra" />
-        </div>
+        </span>
     </div>
 </template>
 <script lang="ts">

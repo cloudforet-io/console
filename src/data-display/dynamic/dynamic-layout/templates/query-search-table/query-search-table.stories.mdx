@@ -22,6 +22,7 @@ import {range} from 'lodash'
     colCopy: argTypes.colCopy,
     searchable: argTypes.searchable,
     excelVisible: argTypes.excelVisible,
+    settingsVisible: argTypes.settingsVisible,
     keyItemSets: argTypes.keyItemSets,
     valueHandlerMap: argTypes.valueHandlerMap,
     sortBy: argTypes.sortBy,
@@ -29,10 +30,10 @@ import {range} from 'lodash'
     pageStart: argTypes.pageStart,
     pageLimit: argTypes.pageLimit,
     queryTags: argTypes.queryTags,
-    onInit: argTypes.onInit,
     onFetch: argTypes.onFetch,
     onSelect: argTypes.onSelect,
     onExport: argTypes.onExport,
+    onClickSettings: argTypes.onClickSettings
 }}/>
 
 
@@ -55,6 +56,7 @@ export const Template = (args, { argTypes }) => ({
                               colCopy,
                               searchable,
                               excelVisible,
+                              settingsVisible,
                               keyItemSets,
                               valueHandlerMap
                           }"
@@ -65,11 +67,11 @@ export const Template = (args, { argTypes }) => ({
                               pageLimit,
                               queryTags
                           }"
-                           class="w-full"
-                            @init="onInit"
+                           style="max-height: inherit; width: 90%;"
                             @fetch="onFetch"
                             @select="onSelect"
                             @export="onExport"
+                            @click-settings="onClickSettings"
             >
         </p-dynamic-layout>
     `,
@@ -86,20 +88,20 @@ export const Template = (args, { argTypes }) => ({
 
 <Canvas>
     <Story name="Basic">
-        {{
+{{
     components: { PDynamicLayout },
     i18n,
     template: `
-      <p-dynamic-layout type="query-search-table"
-                      :options="options"
-                      :data="data"
-                      :type-options="typeOptions"
-                      :fetch-options="{}"
-                       class="w-full"
-                        @init="fetchData"
-                        @fetch="fetchData"
-            >
-        </p-dynamic-layout>
+    <p-dynamic-layout
+        type="query-search-table"
+        :options="options"
+        :data="data"
+        :type-options="typeOptions"
+        :fetch-options="{}"
+        style="max-height: inherit; width: 90%;"
+        @fetch="fetchData"
+        >
+    </p-dynamic-layout>
     `,
     setup() {
         const state = reactive({
@@ -110,12 +112,12 @@ export const Template = (args, { argTypes }) => ({
             options: mock.querySearchTable.options,
             data: null
         })
-        const fetchData = async (options, changed) => {
+        const fetchData = async (options = {}) => {
             state.typeOptions.loading = true;
             state.data = await new Promise((resolve) => {
                 setTimeout(() => {
                     state.typeOptions.totalCount = faker.random.number({ min: 0 });
-                    resolve(range(options.pageLimit)
+                    resolve(range(options.pageLimit || 15)
                         .map(d => ({
                             // eslint-disable-next-line camelcase
                             server_id: faker.random.uuid(),
@@ -134,6 +136,7 @@ export const Template = (args, { argTypes }) => ({
             });
             state.typeOptions.loading = false;
         };
+        fetchData();
         return {
             ...toRefs(state),
             fetchData,

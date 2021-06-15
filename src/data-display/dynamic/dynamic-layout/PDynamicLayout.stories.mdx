@@ -28,6 +28,7 @@ export const Template = (args, { argTypes }) => ({
                                   colCopy,
                                   searchable,
                                   excelVisible,
+                                  settingsVisible,
                                   keyItemSets,
                                   valueHandlerMap,
                                   language,
@@ -105,12 +106,12 @@ export const Template = (args, { argTypes }) => ({
 
 ```typescript
 interface DynamicLayoutFetchOptions {
-    sortBy: string;
-    sortDesc: boolean;
-    pageStart: number;
-    pageLimit: number;
-    queryTags: QueryTag[];
-    searchText: string;
+    sortBy?: string;
+    sortDesc?: boolean;
+    pageStart?: number;
+    pageLimit?: number;
+    queryTags?: QueryTag[];
+    searchText?: string;
 }
 ```
 
@@ -137,9 +138,9 @@ Each type of dynamic layout corresponds to each component as the table below.<br
 | ---- | ----------- |
 | item | ```loading```, ```timezone``` |
 | simple-table | ```loading```, ```timezone```, ```colCopy``` |
-| table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```searchable```, ```excelVisible``` |
-| raw-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```searchable```, ```excelVisible``` |
-| query-search-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```searchable```, ```excelVisible```, ```keyItemSets```, ```valueHandlerMap``` |
+| table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```searchable```, ```excelVisible```, ```settingsVisible``` |
+| raw-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```searchable```, ```excelVisible```, ```settingsVisible```  |
+| query-search-table |```loading```, ```totalCount```, ```timezone```, ```selectIndex```, ```selectable```, ```multiSelect```, ```invalid```, ```colCopy```, ```searchable```, ```excelVisible```, ```settingsVisible``` , ```keyItemSets```, ```valueHandlerMap``` |
 | raw | ```loading``` |
 | markdown | ```language``` |
 | html | - |
@@ -160,6 +161,7 @@ Each type of dynamic layout corresponds to each component as the table below.<br
 | invalid | boolean | ```false``` | Used to display invalid style. |
 | colCopy | boolean | ```false``` | Used to on/off each column copy. |
 | excelVisible | boolean | ```false``` | Used to on/off export button. |
+| settingsVisible | boolean | ```false``` | Used to on/off settings button. |
 | searchable | boolean | ```true``` | Used to on/off search. |
 | keyItemSets | KeyItemSet[] |```options.fields``` or ```[]``` | Only for query-search-table's key items. |
 | valueHandlerMap | ValueHandlerMap |```{}``` | Only for query-search-table's value handler map. |
@@ -177,6 +179,7 @@ interface DynamicLayoutTypeOptions {
     multiSelect?: boolean;
     invalid?: boolean;
     excelVisible?: boolean;
+    settingsVisible?: boolean;
     keyItemSets?: KeyItemSet[];
     valueHandlerMap?: ValueHandlerMap;
     language?: string;
@@ -187,7 +190,6 @@ interface DynamicLayoutTypeOptions {
 ## Event Description
 | Event Name | Description |
 | ---------- | ----------- |
-| init | Emitted when the component has been created. |
 | fetch | Emitted when the new 'data' must be fetched.<br/> ex) when user clicked refresh button. |
 | select | Emitted when row(item) has been selected. |
 | export | Emitted when clicked export button. |
@@ -198,24 +200,20 @@ interface DynamicLayoutTypeOptions {
 ## Event Handlers and Parameters
 
 ```typescript
-interface DynamicLayoutEventListeners<FetchOptions = DynamicLayoutFetchOptions> {
-    init: (options: FetchOptions, layoutName?: string, layoutIndex?: number) => void|Promise<void>;
-    fetch: (options: FetchOptions,
-             changedOptions: Partial<FetchOptions>,
-             layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+interface DynamicLayoutEventListeners {
+    fetch: (options: DynamicLayoutFetchOptions, layoutName?: string, layoutIndex?: number) => void|Promise<void>;
     select: (selectIndex: number[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
-    export: (options: FetchOptions, fields: DynamicField[], layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    export: (layoutName?: string, layoutIndex?: number) => void|Promise<void>;
+    'click-settings': (layoutName?: string, layoutIndex?: number) => void|Promise<void>;
 }
 ```
 
 | Parameter Name | Description |
 | ---------- | ----------- |
 | options | All layout fetch options. Different by layout types. |
-| changedOptions | Changed fetch options. If no fetch options has been changed, empty object will be provided. Different by layout types. |
 | selectIndex | Selected row(item) indexes. |
 | layoutName | Name props. Only provided when layout type is 'list'. |
 | layoutIndex | Layout index. Only provided when layout type is 'list'. |
-| fields (export) | Fields for exported csv/excel columns.  |
 
 <br/>
 <br/>

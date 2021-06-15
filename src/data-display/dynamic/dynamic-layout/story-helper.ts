@@ -227,6 +227,23 @@ export const argTypes = {
             type: 'boolean',
         },
     },
+    settingsVisible: {
+        name: 'settingsVisible',
+        type: { name: 'boolean' },
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'typeOptions',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     searchable: {
         name: 'searchable',
         type: { name: 'boolean' },
@@ -495,8 +512,22 @@ export const argTypes = {
         },
     },
     onExport: {
-        name: 'fetch',
+        name: 'export',
         description: 'An event emitted by an export action.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+            defaultValue: {
+                summary: null,
+            },
+        },
+    },
+    onClickSettings: {
+        name: 'click-settings',
+        description: 'An event emitted by an settings button click action.',
         defaultValue: null,
         table: {
             type: {

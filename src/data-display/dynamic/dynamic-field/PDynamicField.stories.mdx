@@ -2,7 +2,7 @@ import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PDynamicField from './PDynamicField.vue';
 import { dynamicFieldTypes } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 
-<Meta title='Data Display/Dynamic/Dynamic Field' component={PDynamicField} argTypes={{
+<Meta title='Data Display/Dynamic/Dynamic Field' argTypes={{
     type: {
         name: 'type',
         type: {name: 'string'},
@@ -148,8 +148,10 @@ The types that can be displayed as dynamic fields are as follows.
 - badge
 - datetime
 - dict
+- state
 - enum
 - size
+- list (deprecated)
 
 <br/>
 
@@ -171,9 +173,13 @@ Each type is slightly different, but there are also **common options**.
   - Translation key for the label of the field(optional)
 - default
   - Used to display the default value when is undefined
+- delimiter
+  - When data is an array type, it is a delimiter between array values.
 - is_optional
   - false (default) : Fields that are displayed by default even if the user does not select them
   - true : Fields that are not visible to the user by default, but can be changed through the Custom Table feature.
+- field_description
+  - Description of the field
 - postfix
   - the value after value
   - ex) 70 + '%'
@@ -189,6 +195,10 @@ interface CommonOptions {
     width?: string;
     translation_id?: string;
     default?: any;
+    delimiter?: string;
+    postfix?: string;
+    prefix?: string;
+    field_description?: string;
 }
 ````
 

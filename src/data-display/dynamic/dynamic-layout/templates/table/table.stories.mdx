@@ -19,15 +19,16 @@ import mock from '@/data-display/dynamic/dynamic-layout/mock.ts'
     colCopy: argTypes.colCopy,
     searchable: argTypes.searchable,
     excelVisible: argTypes.excelVisible,
+    settingsVisible: argTypes.settingsVisible,
     sortBy: argTypes.sortBy,
     sortDesc: argTypes.sortDesc,
     pageStart: argTypes.pageStart,
     pageLimit: argTypes.pageLimit,
     searchText: argTypes.searchText,
-    onInit: argTypes.onInit,
     onFetch: argTypes.onFetch,
     onSelect: argTypes.onSelect,
     onExport: argTypes.onExport,
+    onClickSettings: argTypes.onClickSettings
 }}/>
 
 
@@ -50,6 +51,7 @@ export const Template = (args, { argTypes }) => ({
                               colCopy,
                               searchable,
                               excelVisible,
+                              settingsVisible,
                           }"
                           :fetch-options="{
                               sortBy,
@@ -59,10 +61,10 @@ export const Template = (args, { argTypes }) => ({
                               searchText
                           }"
                            class="w-full"
-                            @init="onInit"
                             @fetch="onFetch"
                             @select="onSelect"
                             @export="onExport"
+                            @click-settings="onClickSettings"
             >
         </p-dynamic-layout>
     `,

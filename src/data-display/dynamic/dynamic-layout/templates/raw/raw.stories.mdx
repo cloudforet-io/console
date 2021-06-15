@@ -10,7 +10,6 @@ import mock from '@/data-display/dynamic/dynamic-layout/mock.ts'
     options: argTypes.options,
     data: argTypes.data,
     loading: argTypes.loading,
-    onInit: argTypes.onInit,
 }}/>
 
 
@@ -28,7 +27,6 @@ export const Template = (args, { argTypes }) => ({
                           :fetch-options="{
                           }"
                            class="w-full"
-                           @init="onInit"
             >
         </p-dynamic-layout>
     `,

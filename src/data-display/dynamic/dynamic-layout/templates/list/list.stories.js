@@ -371,7 +371,6 @@ export const defaultCase = () => ({
                         :options="options"
                         :typeOptions="{timezone}"
                         type="list"
-                        @init="onInit" 
                         @fetch="onFetch" 
                         @select="onSelect"/>
     </div>`,
@@ -380,7 +379,6 @@ export const defaultCase = () => ({
 
         return {
             ...toRefs(state),
-            onInit: action('init'),
             onFetch: action('fetch'),
             onSelect: action('select'),
         };

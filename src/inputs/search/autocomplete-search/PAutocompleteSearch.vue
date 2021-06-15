@@ -17,6 +17,7 @@
                             theme="secondary"
                             :menu="bindingMenu"
                             :loading="loading"
+                            auto-height
                             @select="onClickMenuItem"
                             @keyup:up:end="focusSearch"
                             @keyup:esc="focusSearch"
