@@ -97,6 +97,9 @@ export default {
         &.disabled {
             @apply bg-gray-200 text-gray-400 border-gray-100;
             cursor: not-allowed;
+            &.outline {
+                @apply bg-transparent text-gray-300 border-gray-300;
+            }
         }
         &.loading {
             @apply bg-gray-200 text-gray-400 border-gray-100;
