@@ -61,6 +61,7 @@
                 :scope="inputModel.scope"
                 :rules.sync="inputModel.rules"
                 :repeat-count.sync="inputModel.repeat_count"
+                :project-id="inputModel.project_id"
             />
         </p-field-group>
     </div>

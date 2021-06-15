@@ -22,7 +22,18 @@
                 <p-badge outline style-type="gray">{{ idx + 1 }}</p-badge>
             </span>
             <span class="col-notification">
-                <p-select-dropdown v-model="rule.notification_level" :items="NOTIFICATION_LEVELS" />
+                <p-select-dropdown v-model="rule.notification_level" :items="NOTIFICATION_LEVELS">
+                    <template #menu-item--format="{item}">
+                        <p-radio v-model="rule.notification_level"
+                                 :value="item.name"
+                        >
+                            <div class="item">
+                                <p>{{ item.label }}</p>
+                                <project-channel-list :project-channels="projectChannels" :notification-level="item.name" />
+                            </div>
+                        </p-radio>
+                    </template>
+                </p-select-dropdown>
             </span>
             <span v-if="rule.escalate_minutes" class="col-rule">
                 <span class="label">
@@ -41,7 +52,18 @@
                     {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATION_LV') }}
                 </span>
                 <span class="input">
-                    <p-select-dropdown v-model="rule.notification_level" :items="MINIFIED_NOTIFICATION_LEVELS" />
+                    <p-select-dropdown v-model="rule.notification_level" :items="MINIFIED_NOTIFICATION_LEVELS">
+                        <template #menu-item--format="{item}">
+                            <p-radio v-model="rule.notification_level"
+                                     :value="item.name"
+                            >
+                                <div class="item">
+                                    <p>{{ item.label }}</p>
+                                    <project-channel-list :project-channels="projectChannels" :notification-level="item.name" />
+                                </div>
+                            </p-radio>
+                        </template>
+                    </p-select-dropdown>
                 </span>
                 <template v-if="rule.escalate_minutes">
                     <span class="label">
@@ -103,14 +125,19 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs, watch } from '@vue/composition-api';
 
 import {
-    PAnchor, PBadge, PIconButton, PSelectDropdown, PI, PIconTextButton, PTextInput,
+    PAnchor, PBadge, PIconButton, PSelectDropdown, PI, PIconTextButton, PTextInput, PRadio,
 } from '@spaceone/design-system';
+
+import ProjectChannelList from '@/views/monitoring/alert/components/ProjectChannelList.vue';
 
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import { makeProxy } from '@/lib/compostion-util';
+import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
+
 
 const NOTIFICATION_LEVELS = Object.freeze([
     { name: 'ALL', label: 'All' },
@@ -132,6 +159,7 @@ const MINIFIED_NOTIFICATION_LEVELS = Object.freeze([
 export default {
     name: 'EscalationRulesInputForm',
     components: {
+        ProjectChannelList,
         PAnchor,
         PBadge,
         PIconButton,
@@ -139,6 +167,7 @@ export default {
         PI,
         PIconTextButton,
         PTextInput,
+        PRadio,
     },
     props: {
         scope: {
@@ -153,11 +182,33 @@ export default {
             type: Number,
             default: 0,
         },
+        projectId: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
             proxyRepeatCount: makeProxy('repeatCount', props, emit),
+            projectChannels: [],
         });
+
+        /* api */
+        const apiQuery = new ApiQueryHelper();
+        const getQuery = () => {
+            apiQuery
+                .setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
+            return apiQuery.data;
+        };
+        const listProjectChannel = async () => {
+            try {
+                const { results } = await SpaceConnector.client.notification.projectChannel.list({ query: getQuery() });
+                state.projectChannels = results;
+            } catch (e) {
+                state.projectChannels = [];
+                console.error(e);
+            }
+        };
 
         /* event */
         const onClickDeleteRule = (idx) => {
@@ -175,6 +226,10 @@ export default {
             });
             emit('update:rules', rules);
         };
+
+        watch(() => props.projectId, (projectId) => {
+            if (projectId) listProjectChannel();
+        }, { immediate: true });
 
         return {
             ...toRefs(state),
@@ -194,10 +249,6 @@ export default {
     min-height: 21.75rem;
     padding: 0.5rem;
 
-    @screen mobile {
-        min-height: auto;
-    }
-
     .label-row {
         @apply text-gray-400 grid grid-cols-12;
         position: relative;
@@ -209,24 +260,12 @@ export default {
         .col-step {
             @apply col-span-1;
             text-align: center;
-
-            @screen mobile {
-                @apply col-span-2;
-            }
         }
         .col-notification {
             @apply col-span-2;
-
-            @screen mobile {
-                display: none;
-            }
         }
         .col-rule {
             @apply col-span-4;
-
-            @screen mobile {
-                display: none;
-            }
         }
         .link-text {
             position: absolute;
@@ -243,39 +282,15 @@ export default {
         margin-bottom: 0.25rem;
         padding: 0.5rem 0;
 
-        @screen mobile {
-            height: auto;
-        }
-
         .col-step {
             @apply col-span-1;
             margin: auto;
-
-            @screen mobile {
-                @apply col-span-2;
-                height: 100%;
-                padding-top: 0.375rem;
-            }
         }
         .col-notification {
             @apply col-span-2;
-
-            @screen mobile {
-                display: none;
-            }
-
-            .p-select-dropdown::v-deep {
-                .p-dropdown-button {
-                    min-width: 6rem;
-                }
-            }
         }
         .col-rule {
             @apply col-span-5;
-
-            @screen mobile {
-                display: none;
-            }
 
             .label {
                 @apply text-gray-900;
@@ -288,32 +303,8 @@ export default {
             }
         }
         .col-mobile-input {
-            @apply col-span-8 grid grid-cols-8 text-gray-900;
             display: none;
-            row-gap: 0.5rem;
-            font-size: 0.75rem;
-
-            @screen mobile {
-                display: grid;
-            }
-
-            .label {
-                @apply col-span-4;
-                margin: auto 0;
-            }
-            .input {
-                @apply col-span-4;
-                .p-select-dropdown::v-deep {
-                    .p-dropdown-button {
-                        min-width: 100%;
-                    }
-                }
-                .rule-input {
-                    width: 100%;
-                }
-            }
         }
-
         .delete-button {
             position: absolute;
             right: 0.5rem;
@@ -331,49 +322,112 @@ export default {
         .col-icon {
             @apply col-span-1;
             text-align: center;
-
-            @screen mobile {
-                @apply col-span-2;
-            }
         }
         .col-mobile-label {
-            @apply col-span-4 text-gray-900;
             display: none;
-            font-size: 0.75rem;
-
-            @screen mobile {
-                display: block;
-            }
         }
         .col-input {
             @apply col-span-2;
-
-            @screen mobile {
-                @apply col-span-4;
-            }
-
             .repeat-input {
                 width: 6rem;
-
-                @screen mobile {
-                    width: 100%;
-                }
             }
         }
         .col-label {
             @apply col-span-5 text-gray-900;
-
-            @screen mobile {
-                display: none;
-            }
         }
 
         .add-button {
             position: absolute;
             right: 0;
             border-radius: 0.25rem;
+        }
+    }
 
-            @screen mobile {
+    .p-select-dropdown::v-deep {
+        .p-dropdown-button {
+            min-width: 6rem;
+        }
+        .context-item {
+            @apply border-b border-secondary;
+            box-sizing: border-box;
+            &:last-child {
+                border: none;
+            }
+        }
+        .p-radio {
+            display: flex;
+            .item {
+                margin-left: 0.25rem;
+                .project-channel-list {
+                    @apply bg-transparent;
+                    padding: 0;
+                }
+            }
+        }
+    }
+
+    @screen mobile {
+        min-height: auto;
+
+        .label-row {
+            .col-step {
+                @apply col-span-2;
+            }
+            .col-notification, .col-rule {
+                display: none;
+            }
+        }
+        .content-row {
+            height: auto;
+            .col-step {
+                @apply col-span-2;
+                height: 100%;
+                padding-top: 0.375rem;
+            }
+            .col-notification, .col-rule {
+                display: none;
+            }
+            .col-mobile-input {
+                @apply col-span-8 grid grid-cols-8 text-gray-900;
+                row-gap: 0.5rem;
+                font-size: 0.75rem;
+
+                .label {
+                    @apply col-span-4;
+                    margin: auto 0;
+                }
+                .input {
+                    @apply col-span-4;
+                    .p-select-dropdown::v-deep {
+                        .p-dropdown-button {
+                            min-width: 100%;
+                        }
+                    }
+                    .rule-input {
+                        width: 100%;
+                    }
+                }
+            }
+        }
+        .add-row {
+            .col-icon {
+                @apply col-span-2;
+            }
+            .col-mobile-label {
+                @apply col-span-4 text-gray-900;
+                display: block;
+                font-size: 0.75rem;
+            }
+            .col-input {
+                @apply col-span-4;
+                .repeat-input {
+                    width: 100%;
+                }
+            }
+            .col-label {
+                display: none;
+            }
+            .add-button {
                 @apply col-span-12;
                 position: relative;
                 margin-top: 0.75rem;

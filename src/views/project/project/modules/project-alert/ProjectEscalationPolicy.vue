@@ -28,24 +28,7 @@
                                 {{ $t('PROJECT.DETAIL.ALERT.MINUTE') }}
                             </span>
                         </template>
-                        <div v-if="channelFormatter(rule.notification_level).length > 0" class="channel-box">
-                            <div v-for="(channel, cIdx) in channelFormatter(rule.notification_level)" :key="`channel-${cIdx}`"
-                                 :class="{ disabled: channel.state === CHANNEL_STATE.DISABLED }"
-                            >
-                                <p class="title">
-                                    [{{ CHANNEL_SCHEMA[channel.schema] }}] {{ channel.name }}
-                                    <p-i name="ic_bell" color="inherit" class="ml-1"
-                                         width="1rem" height="1rem"
-                                    />
-                                    {{ channel.state === CHANNEL_STATE.ENABLED ? 'ON' : 'OFF' }}
-                                </p>
-                                <div v-if="channel.schema === 'spaceone_user'" class="info">
-                                    <p v-for="(user, uIdx) in channel.data.users" :key="`user-${uIdx}`">
-                                        {{ user }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
+                        <project-channel-list :project-channels="projectChannels" :notification-level="rule.notification_level" />
                         <p-divider class="divider" />
                     </div>
                 </div>
@@ -71,6 +54,7 @@ import {
 } from '@vue/composition-api';
 
 import { PBadge, PDivider, PI } from '@spaceone/design-system';
+import ProjectChannelList from '@/views/monitoring/alert/components/ProjectChannelList.vue';
 
 import { FINISH_CONDITION } from '@/views/monitoring/alert/type';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -81,14 +65,11 @@ const CHANNEL_SCHEMA = Object.freeze({
     spaceone_user: 'Member',
     slack_webhook: 'Slack',
 });
-const CHANNEL_STATE = Object.freeze({
-    ENABLED: 'ENABLED',
-    DISABLED: 'DISABLED',
-});
 
 export default {
     name: 'ProjectEscalationPolicy',
     components: {
+        ProjectChannelList,
         PDivider,
         PBadge,
         PI,
@@ -125,9 +106,7 @@ export default {
             }),
             escalationRules: computed(() => get(state.escalationPolicyRule, 'rules')),
             repeatCount: computed(() => get(state.escalationPolicyRule, 'repeat_count')),
-            //
             projectChannels: [],
-            projectChannelForLevel: {},
         });
 
         /* util */
@@ -170,7 +149,6 @@ export default {
         return {
             ...toRefs(state),
             CHANNEL_SCHEMA,
-            CHANNEL_STATE,
             notificationLevelFormatter,
             channelFormatter,
         };
@@ -203,32 +181,6 @@ export default {
             }
             .divider {
                 margin: 1rem 0;
-            }
-            .channel-box {
-                @apply bg-white rounded;
-                font-size: 0.75rem;
-                line-height: 1.5;
-                padding: 0.5rem;
-                margin-top: 0.5rem;
-
-                .title {
-                    @apply text-blue-900;
-                    display: flex;
-                    align-items: center;
-                    font-weight: bold;
-                }
-                .info {
-                    @apply text-gray-700;
-                }
-
-                .disabled {
-                    .title {
-                        @apply text-gray-300;
-                    }
-                    .info {
-                        @apply text-gray-300;
-                    }
-                }
             }
 
             @screen mobile {

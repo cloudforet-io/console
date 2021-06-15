@@ -31,7 +31,7 @@
                     :items="tableState.actionItems"
                     :placeholder="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
                     :disabled="!selectedItem"
-                    @onSelected="onSelectAction"
+                    @input="onSelectAction"
                 />
             </template>
         </p-toolbox>
