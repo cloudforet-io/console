@@ -1,3 +1,10 @@
+# [1.1.0-beta.61](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.60...v1.1.0-beta.61) (2021-06-15)
+
+
+### Bug Fixes
+
+* apply auto height to autocomplete search ([#597](https://github.com/spaceone-dev/spaceone-design-system/issues/597)) ([200458c](https://github.com/spaceone-dev/spaceone-design-system/commit/200458ca7daaf4b643442b0ebedec949df5e09d9))
+
 # [1.1.0-beta.60](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.59...v1.1.0-beta.60) (2021-06-15)
 
 
