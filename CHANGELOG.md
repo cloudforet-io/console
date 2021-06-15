@@ -1,3 +1,10 @@
+# [1.1.0-beta.60](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.59...v1.1.0-beta.60) (2021-06-15)
+
+
+### Features
+
+* add disabled outline button style ([#596](https://github.com/spaceone-dev/spaceone-design-system/issues/596)) ([5a14265](https://github.com/spaceone-dev/spaceone-design-system/commit/5a142651e472afdb6393caff54a326478545ac21))
+
 # [1.1.0-beta.59](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.58...v1.1.0-beta.59) (2021-06-14)
 
 
