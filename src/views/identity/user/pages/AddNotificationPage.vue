@@ -87,7 +87,7 @@ export default {
             escalationLevel: 1,
             type: '',
             pageTitle: '' as TranslateResult,
-            userId: decodeURIComponent(vm.$route.query?.userId as string),
+            userId: decodeURIComponent(vm.$route.params.userId),
             projectId: vm.$route.query.projectId,
             protocolId: vm.$route.params.protocolId,
             protocolType: vm.$route.query.protocolType,
@@ -179,7 +179,7 @@ export default {
         };
 
         (async () => {
-            const protocolLabel = decodeURIComponent(vm.$route.query?.protocolLabel as string);
+            const protocolLabel = decodeURIComponent(vm.$route.query?.protocolLabel as any);
             state.pageTitle = computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: protocolLabel })) as unknown as TranslateResult;
         })();
 

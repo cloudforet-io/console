@@ -79,7 +79,7 @@
                 <div v-else class="content">
                     <div class="left-section">
                         <div v-if="Object.keys(dataListForEdit).includes('users')">
-                            <p-badge v-for="(item, index) in dataListForEdit.users" :key="index" style-type="gray900"
+                            <p-badge v-for="(item, index) in dataListForEdit.users" :key="`users-${index}`" style-type="gray900"
                                      outline
                                      class="mr-2"
                             >
@@ -159,7 +159,7 @@
                         <span v-for="day in channelData.schedule.day_of_week" :key="day"> {{ day }}</span><br>
                         {{ channelData.schedule.start_hour }}:00 ~ {{ channelData.schedule.end_hour }}:00
                     </p>
-                    <span v-else>All</span>
+                    <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME') }}</span>
                     <button class="edit-btn" @click="startEdit(EDIT_TYPE.SCHEDULE)">
                         <p-i name="ic_edit" width="1rem" height="1rem"
                              color="inherit" class="edit-icon"
@@ -174,7 +174,7 @@
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC') }}
                 </span>
                 <div v-if="isTopicEditMode" class="content">
-                    <add-notification-topic :topic="channelData.topic" :topic-mode="channelData.is_subscribe" @change="onChangeTopic" />
+                    <add-notification-topic :topic="channelData.subscriptions" :topic-mode="channelData.is_subscribe" @change="onChangeTopic" />
                     <div class="button-group">
                         <p-button :outline="true" class="text-button" @click="cancelEdit(EDIT_TYPE.TOPIC)">
                             {{ $t('COMMON.TAGS.CANCEL') }}
@@ -196,7 +196,7 @@
                             </p-tag>
                         </li>
                     </ul>
-                    <span v-else>All</span>
+                    <span v-else>{{$t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL')}}</span>
                     <button class="edit-btn" @click="startEdit(EDIT_TYPE.TOPIC)">
                         <p-i name="ic_edit" width="1rem" height="1rem"
                              color="inherit" class="edit-icon"
@@ -209,7 +209,7 @@
         </ul>
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
-                      :contents="'Channel 삭제하시겠습니까?'"
+                      :contents="$t('IDENTITY.USER.NOTIFICATION.CHANNEL_DELETE_MODAL_TITLE')"
                       @confirm="deleteChannelConfirm"
         />
     </p-pane-layout>
@@ -230,6 +230,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import InfoMessage from '@/common/components/InfoMessage.vue';
 import AddNotificationMemberGroup from '@/views/identity/user/modules/notification/AddNotificationMemberGroup.vue';
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
+import { i18n } from '@/translations';
 
 enum EDIT_TYPE {
     NAME = 'name',
@@ -319,7 +320,7 @@ export default {
         });
         const checkDeleteState = reactive({
             visible: false,
-            headerTitle: 'Channel을 삭제하시겠습니까?',
+            headerTitle: i18n.t('IDENTITY.USER.NOTIFICATION.CHANNEL_DELETE_MODAL_TITLE'),
         });
 
         const enableProjectChannel = async () => {
@@ -328,10 +329,10 @@ export default {
                     project_channel_id: state.projectChannelId,
                 });
                 state.isActivated = true;
-                showSuccessMessage('Enable project channel success', '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_ENABLE_PROJECT_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Enable project channel failure', e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_ENABLE_PROJECT_CHANNEL'), e, root);
             }
         };
 
@@ -341,10 +342,10 @@ export default {
                     user_channel_id: state.userChannelId,
                 });
                 state.isActivated = true;
-                showSuccessMessage('Enable user channel success', '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_ENABLE_USER_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Enable user channel failure', e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_ENABLE_USER_CHANNEL'), e, root);
             }
         };
 
@@ -359,10 +360,10 @@ export default {
                     project_channel_id: state.projectChannelId,
                 });
                 state.isActivated = false;
-                showSuccessMessage('Disable project channel success', '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DISABLE_PROJECT_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Disable project channel failure', e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DISABLE_PROJECT_CHANNEL'), e, root);
             }
         };
 
@@ -372,10 +373,10 @@ export default {
                     user_channel_id: state.userChannelId,
                 });
                 state.isActivated = false;
-                showSuccessMessage('Disable user channel success', '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DISABLE_USER_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Disable user channel failure', e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DISABLE_USER_CHANNEL'), e, root);
             }
         };
 
@@ -412,10 +413,10 @@ export default {
                 if (paramKey === PARAM_KEY_TYPE.NAME) param.name = paramValue;
                 else if (paramKey === PARAM_KEY_TYPE.DATA) param.data = paramValue;
                 await SpaceConnector.client.notification.userChannel.update(param);
-                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_USER_CHANNEL'), e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_USER_CHANNEL'), e, root);
             }
         };
 
@@ -430,10 +431,10 @@ export default {
                 // eslint-disable-next-line camelcase
                 else if (paramKey === PARAM_KEY_TYPE.LEVEL) param.notification_level = paramValue;
                 await SpaceConnector.client.notification.projectChannel.update(param);
-                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_PROJECT_CHANNEL'), '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_PROJECT_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'), e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'), e, root);
             }
         };
 
@@ -454,10 +455,10 @@ export default {
                     is_scheduled: state.scheduleModeForEdit,
                     schedule: state.scheduleForEdit,
                 });
-                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, root);
             }
         };
         const setProjectChannelSchedule = async () => {
@@ -467,10 +468,10 @@ export default {
                     is_scheduled: state.scheduleModeForEdit,
                     schedule: state.scheduleForEdit,
                 });
-                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_USER_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'), e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'), e, root);
             }
         };
         const onChangeSchedule = async (value) => {
@@ -489,10 +490,10 @@ export default {
                     is_subscribe: state.topicModeForEdit,
                     subscriptions: state.topicForEdit,
                 });
-                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, root);
             }
         };
         const setProjectChannelSubscription = async () => {
@@ -502,10 +503,10 @@ export default {
                     is_subscribe: state.topicModeForEdit,
                     subscriptions: state.topicForEdit,
                 });
-                showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, root);
             }
         };
         const onChangeTopic = (value) => {
@@ -558,10 +559,10 @@ export default {
                 await SpaceConnector.client.notification.projectChannel.delete({
                     project_channel_id: state.projectChannelId,
                 });
-                showSuccessMessage('Delete project channel success', '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DELETE_PROJECT_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Delete project channel failure', e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DELETE_PROJECT_CHANNEL'), e, root);
             } finally {
                 checkDeleteState.visible = false;
                 emit('confirm');
@@ -573,10 +574,10 @@ export default {
                 await SpaceConnector.client.notification.userChannel.delete({
                     user_channel_id: state.userChannelId,
                 });
-                showSuccessMessage('Delete user channel success', '', root);
+                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DELETE_USER_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Delete user channel failure', e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DELETE_USER_CHANNEL'), e, root);
             } finally {
                 checkDeleteState.visible = false;
                 emit('confirm');

@@ -111,13 +111,13 @@ export default {
                     ],
                 },
                 {
-                    path: 'notification/:user_id',
+                    path: 'notification/:userId',
                     name: IDENTITY_ROUTE.USER.NOTIFICATION.MANAGE,
                     component: ManageNotificationPage,
                     props: true,
                 },
                 {
-                    path: 'notification/:protocol/:protocolId/:user_id',
+                    path: 'notification/:protocol/:protocolId/:userId',
                     name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
                     component: AddNotificationPage,
                     props: true,

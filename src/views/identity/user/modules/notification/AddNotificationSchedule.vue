@@ -30,7 +30,7 @@
                                    class="dropdown"
                                    @input="onSelectStartHour"
                 />
-                <span class="text">to</span>
+                <span class="text">{{$t('IDENTITY.USER.NOTIFICATION.FORM.TO')}}</span>
                 <p-select-dropdown v-model="proxySchedule.end_hour"
                                    :select-item="proxySchedule.end_hour"
                                    :items="timeList"

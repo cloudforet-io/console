@@ -9,7 +9,7 @@
         >
             <template #default>
                 <p-text-input v-model="channelName" class="block w-full" :invalid="isNameInvalid"
-                              :placeholder="'Channel Name'" @input="onChangeChannelName"
+                              :placeholder="$t('IDENTITY.USER.NOTIFICATION.FORM.CHANNEL_NAME')" @input="onChangeChannelName"
                 />
             </template>
         </p-field-group>

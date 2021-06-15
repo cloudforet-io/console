@@ -23,7 +23,7 @@
 </template>
 
 <script lang="ts">
-import {PAutocompleteSearch, PCheckBox, PTag} from '@spaceone/design-system';
+import { PAutocompleteSearch, PCheckBox, PTag } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
@@ -43,7 +43,7 @@ export default {
         users: {
             type: Array,
             default: () => [],
-        }
+        },
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;

@@ -73,7 +73,7 @@ export default {
             protocolList: [] as ProtocolItem[],
             loading: true,
             // eslint-disable-next-line no-use-before-define
-            userId: computed(() => ((vm.$route.params.user_id) ? decodeURIComponent(vm.$route.params.user_id) : store.state.user.userId)),
+            userId: computed(() => ((vm.$route.params.userId) ? decodeURIComponent(vm.$route.params.userId) : store.state.user.userId)),
             channelList: [] as ChannelItem[],
             protocolResp: [] as ProtocolItem[],
         });

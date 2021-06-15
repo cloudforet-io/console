@@ -4,7 +4,7 @@
                        class="level-dropdown"
         >
             <template #default>
-                <p-select-dropdown v-model="proxyNotificationLevel" :items="LEVEL_LIST" :use-custom-style="true"
+                <p-select-dropdown v-model="proxyNotificationLevel" :items="LEVEL_LIST"
                                    :select-item="proxyNotificationLevel"
                                    @input="onChangeLevel"
                 />
@@ -18,14 +18,14 @@
 import { PFieldGroup, PSelectDropdown } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
 
-const LEVEL_LIST = [
+const LEVEL_LIST = Object.freeze([
     { label: 'All', name: 'ALL', type: 'item' },
     { label: 'Level 1', name: 'LV1', type: 'item' },
     { label: 'Level 2', name: 'LV2', type: 'item' },
     { label: 'Level 3', name: 'LV3', type: 'item' },
     { label: 'Level 4', name: 'LV4', type: 'item' },
     { label: 'Level 5', name: 'LV5', type: 'item' },
-];
+]);
 
 export default {
     name: 'AddNotificationLevel',

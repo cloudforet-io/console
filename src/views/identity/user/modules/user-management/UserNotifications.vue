@@ -4,7 +4,7 @@
             <p-panel-top>{{ title }}</p-panel-top>
             <router-link :to="manageLink">
                 <p-button style-type="primary-dark">
-                    Manage
+                    {{ $t('IDENTITY.USER.NOTIFICATION.MANAGE') }}
                 </p-button>
             </router-link>
         </div>
@@ -37,7 +37,7 @@
                     </li>
                 </ul>
                 <span v-else>
-                    Receive all notifications
+                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL') }}
                 </span>
             </template>
         </p-data-table>
@@ -54,6 +54,7 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ChannelItem, ProtocolItem } from '@/views/identity/user/type';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
+import { i18n } from '@/translations';
 
 export default {
     name: 'UserNotifications',
@@ -71,22 +72,21 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            title: 'Notifications Channel',
+            title: i18n.t('IDENTITY.USER.NOTIFICATION.NOTIFICATION_CHANNEL'),
             loading: true,
             fields: computed(() => [
-                { name: 'protocol_type', label: 'Type' },
-                { name: 'name', label: 'Channel Name' },
-                { name: 'data', label: 'Channel Info.' },
-                { name: 'schedule', label: 'Schedule' },
-                { name: 'subscriptions', label: 'Topic' },
+                { name: 'protocol_type', label: i18n.t('IDENTITY.USER.NOTIFICATION.TYPE') },
+                { name: 'name', label: i18n.t('IDENTITY.USER.NOTIFICATION.CHANNEL_NAME') },
+                { name: 'data', label: i18n.t('IDENTITY.USER.NOTIFICATION.CHANNEL_INFO') },
+                { name: 'schedule', label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE') },
+                { name: 'subscriptions', label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.TOPIC') },
             ]),
             items: [] as ChannelItem[],
             protocolList: [] as ProtocolItem[],
             manageLink: {
                 name: IDENTITY_ROUTE.USER.NOTIFICATION.MANAGE,
-                params: { user_id: encodeURIComponent(props.userId) },
+                params: { userId: encodeURIComponent(props.userId) },
             },
         });
 
