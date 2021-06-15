@@ -25,18 +25,23 @@
                     />
                 </template>
             </p-field-group>
-            <p-field-group required :label="$t('COMMON.PROFILE.TIMEZONE')" class="input-form">
-                <p-select-dropdown v-model="timezone"
-                                   :items="timezones"
-                                   auto-height
-                                   class="dropdown"
-                />
+            <p-field-group required :label="$t('COMMON.PROFILE.TIMEZONE')" class="input-form"
+                           :invalid="validationState.showValidation && !!validationState.timezoneInvalidText"
+                           :invalid-text="validationState.timezoneInvalidText"
+            >
+                <template #default="{invalid}">
+                    <p-autocomplete-search v-model="timezone" :menu="timezones"
+                                           disable-icon
+                                           :placeholder="$t('COMMON.PROFILE.TIMEZONE')"
+                                           exact-mode
+                                           :class="{invalid}"
+                    />
+                </template>
             </p-field-group>
             <p-field-group required :label="$t('COMMON.PROFILE.LANGUAGE')" class="input-form">
                 <p-select-dropdown v-model="language"
                                    :items="languages"
                                    auto-height
-                                   class="dropdown"
                 />
             </p-field-group>
             <div class="save-btn">
@@ -96,7 +101,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PPaneLayout, PButton, PBreadcrumbs, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle,
+    PPaneLayout, PButton, PBreadcrumbs, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle, PAutocompleteSearch,
 } from '@spaceone/design-system';
 
 import { map } from 'lodash';
@@ -116,6 +121,7 @@ export default {
         PTextInput,
         PFieldGroup,
         PPaneLayout,
+        PAutocompleteSearch,
     },
     props: {
         role: {
@@ -155,6 +161,11 @@ export default {
             passwordInvalidText: '' as TranslateResult | string,
             isPasswordCheckValid: undefined as undefined | boolean,
             passwordCheckInvalidText: '' as TranslateResult | string,
+            timezoneInvalidText: computed(() => {
+                if (!state.timezone || !timezoneList.includes(state.timezone)) return vm.$t('IDENTITY.USER.FORM.TIMEZONE_INVALID');
+                return '';
+            }),
+            showValidation: false,
         });
         const routeState = reactive({
             userRoutes: computed(() => ([
@@ -214,6 +225,7 @@ export default {
             }
         };
 
+
         const updateUser = async (userParam) => {
             try {
                 await store.dispatch('user/setUser', userParam);
@@ -228,8 +240,9 @@ export default {
         };
 
         const onClickProfileConfirm = async () => {
+            if (!validationState.showValidation) validationState.showValidation = true;
             await checkEmail();
-            if (!validationState.isEmailValid) return;
+            if (!validationState.isEmailValid || validationState.timezoneInvalidText) return;
 
             const userParam: UpdateUserRequest = {
                 email: state.email,
@@ -289,19 +302,34 @@ export default {
     line-height: 120%;
     margin-bottom: 2rem;
 }
-.input-form {
+.input-form.p-field-group::v-deep {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     max-width: 33.5rem;
-    .text-input {
-        width: 25rem;
+    .form-label {
+        margin-right: 1rem;
     }
-    >>> .invalid-feedback {
+    .invalid-feedback {
         margin-left: 8.5rem;
     }
-    .p-select-dropdown::v-deep {
-        width: 25rem;
+}
+.p-text-input::v-deep,
+.p-select-dropdown::v-deep,
+.p-autocomplete-search::v-deep {
+    width: 100%;
+    max-width: 25rem;
+    flex-shrink: 0;
+    flex-grow: 1;
+}
+.p-select-dropdown::v-deep {
+    .p-dropdown-button {
+        width: 100%;
+    }
+}
+.p-autocomplete-search::v-deep {
+    &.invalid .p-search {
+        @apply border-alert;
     }
 }
 
@@ -309,5 +337,13 @@ export default {
     display: flex;
     justify-content: flex-end;
     margin-top: 2rem;
+}
+
+@screen mobile {
+    .p-text-input::v-deep,
+    .p-select-dropdown::v-deep,
+    .p-autocomplete-search::v-deep {
+        max-width: unset;
+    }
 }
 </style>

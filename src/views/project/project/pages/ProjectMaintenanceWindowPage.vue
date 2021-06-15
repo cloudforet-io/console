@@ -4,6 +4,7 @@
 
         <p-toolbox-table :loading="loading" :fields="fields" :items="items"
                          searchable selectable :select-index.sync="selectIndex"
+                         :total-count="totalCount"
                          @change="getMaintenanceWindows"
                          @refresh="getMaintenanceWindows()"
         >
@@ -12,9 +13,20 @@
                     {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ACTION') }}
                 </p-select-dropdown>
             </template>
+            <template #col-start_time-format="{value}">
+                {{ iso8601Formatter(value, timezone) }}
+            </template>
+            <template #col-end_time-format="{value}">
+                {{ iso8601Formatter(value, timezone) }}
+            </template>
+            <template #col-created_at-format="{value}">
+                {{ iso8601Formatter(value, timezone) }}
+            </template>
         </p-toolbox-table>
 
-        <maintenance-window-form-modal visible.sync="visibleUpdateModal" edit-mode />
+        <maintenance-window-form-modal :visible.sync="visibleUpdateModal" edit-mode
+                                       :maintenance-window-id="selectedItems[0] && selectedItems[0].maintenance_window_id"
+        />
 
         <p-table-check-modal :visible.sync="visibleCloseCheckModal"
                              :header-title="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CHECK_MODAL.TITLE_CLOSE')"
@@ -31,17 +43,21 @@
 </template>
 
 <script lang="ts">
+import { computed, reactive, toRefs } from '@vue/composition-api';
+
 import {
     PPanelTop, PSelectDropdown, PTableCheckModal, PToolboxTable,
 } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { iso8601Formatter, showErrorMessage, showSuccessMessage } from '@/lib/util';
+
 import { i18n } from '@/translations';
-import { ToolboxTableOptions } from '@spaceone/design-system/dist/src/data-display/tables/toolbox-table/PToolboxTable.vue';
+import { store } from '@/store';
+
 import MaintenanceWindowFormModal from '@/views/project/project/modules/MaintenanceWindowFormModal.vue';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 const ACTION = Object.freeze({
     update: 'update',
@@ -80,16 +96,18 @@ export default {
                 { name: 'state', label: 'State' },
                 { name: 'start_time', label: 'Start Time' },
                 { name: 'end_time', label: 'End Time' },
+                { name: 'created_by', label: 'Created By' },
                 { name: 'created_at', label: 'Created At' },
             ],
             items: [] as any[],
+            timezone: computed(() => store.state.user.timezone),
             selectIndex: [] as number[],
             selectedItems: computed<any[]>(() => state.selectIndex.map(d => state.items[d])),
             actionMenu: computed<MenuItem[]>(() => [
                 {
                     name: ACTION.update,
                     label: i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.UPDATE'),
-                    disabled: state.selectedItems.length !== 1,
+                    disabled: state.selectedItems.length !== 1 || state.selectedItems[0]?.state === STATE.closed,
                 },
                 {
                     name: ACTION.close,
@@ -102,12 +120,22 @@ export default {
             closeLoading: false,
         });
 
-        const apiQueryHelper = new ApiQueryHelper().setOnly(...state.fields.map(d => d.name), 'maintenance_window_id');
-        const getMaintenanceWindows = async (options: ToolboxTableOptions = {}) => {
+        const apiQueryHelper = new ApiQueryHelper()
+            .setOnly(...state.fields.map(d => d.name), 'maintenance_window_id')
+            .setPageStart(1).setPageLimit(15);
+
+        const getApiQuery = (options) => {
+            apiQueryHelper.setFilters([{ v: options.searchText || '' }]);
+            if (options.pageStart) apiQueryHelper.setPageStart(options.pageStart);
+            if (options.pageLimit) apiQueryHelper.setPageLimit(options.pageLimit);
+            return apiQueryHelper.data;
+        };
+
+        const getMaintenanceWindows = async (options: any = {}) => {
             state.loading = true;
             try {
                 const { total_count, results } = await SpaceConnector.client.monitoring.maintenanceWindow.list({
-                    query: apiQueryHelper.data,
+                    query: getApiQuery(options),
                 });
 
                 state.totalCount = total_count;
@@ -164,6 +192,7 @@ export default {
             getMaintenanceWindows,
             closeMaintenanceWindow,
             onSelectAction,
+            iso8601Formatter,
         };
     },
 };

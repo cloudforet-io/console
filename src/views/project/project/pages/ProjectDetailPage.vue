@@ -20,13 +20,20 @@
                                    @click="openProjectEditForm"
                     />
                 </div>
-                <p class="copy-project-id">
-                    <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
-                    {{ projectId }}
-                    <p-copy-button class="icon"
-                                   :value="projectId"
-                    />
-                </p>
+                <div class="top-right-group">
+                    <p-icon-text-button name="ic_state_manual" style-type="gray900"
+                                        @click="maintenanceWindowFormVisible = true"
+                    >
+                        {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CREATE') }}
+                    </p-icon-text-button>
+                    <p class="copy-project-id">
+                        <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
+                        {{ projectId }}
+                        <p-copy-button class="icon"
+                                       :value="projectId"
+                        />
+                    </p>
+                </div>
             </div>
 
             <p-tab :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab"
@@ -57,6 +64,7 @@
                                 :project="item"
                                 @complete="onProjectFormComplete"
             />
+            <maintenance-window-form-modal :visible.sync="maintenanceWindowFormVisible" :project-id="projectId" />
         </div>
     </general-page-layout>
 </template>
@@ -69,7 +77,7 @@ import {
 
 import {
     PTab, PPageTitle, PButtonModal,
-    PIconButton, PCopyButton, PBreadcrumbs,
+    PIconButton, PCopyButton, PBreadcrumbs, PButton, PIconTextButton,
 } from '@spaceone/design-system';
 
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
@@ -84,11 +92,13 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { ProjectModel } from '@/views/project/project/type';
 import { TranslateResult } from 'vue-i18n';
+import MaintenanceWindowFormModal from '@/views/project/project/modules/MaintenanceWindowFormModal.vue';
 
 
 export default {
     name: 'ProjectDetailPage',
     components: {
+        MaintenanceWindowFormModal,
         GeneralPageLayout,
         ProjectFormModal,
         FavoriteButton,
@@ -98,6 +108,7 @@ export default {
         PIconButton,
         PCopyButton,
         PBreadcrumbs,
+        PIconTextButton,
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -118,6 +129,7 @@ export default {
                 { name: state.projectName },
             ]),
             users: computed(() => vm.$store.state.resource.user.items),
+            maintenanceWindowFormVisible: false,
         });
 
         /* api */
@@ -266,17 +278,22 @@ export default {
             @apply flex-shrink-0 ml-4;
         }
     }
-    .copy-project-id {
-        @apply flex-shrink-0 flex-grow inline-flex items-center justify-end text-gray-500;
-        font-size: 0.875rem;
-        height: 2rem;
-        .label {
-            @apply text-gray-dark;
-        }
-        .icon {
-            @apply ml-2 text-gray-dark;
+    .top-right-group {
+        @apply flex-grow inline-flex items-center justify-end flex-wrap;
+        .copy-project-id {
+            @apply inline-flex items-center text-gray-500;
+            font-size: 0.875rem;
+            height: 2rem;
+            margin-left: 0.875rem;
+            .label {
+                @apply text-gray-dark;
+            }
+            .icon {
+                @apply ml-2 text-gray-dark;
+            }
         }
     }
+
 }
 .p-page-title::v-deep {
     @apply mb-0;
