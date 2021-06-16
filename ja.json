@@ -1058,10 +1058,18 @@
 				"ACKNOWLEDGED": "",
 				"ALERT": "",
 				"ALL": "",
+				"ALT_E_ACKNOWLEDGED": "",
+				"ALT_S_ACKNOWLEDGED": "",
 				"ASSIGNED_TO_ME": "",
 				"ASSIGNED_TO_YOU_TITLE": "",
 				"CREATE": "",
 				"DELETE": "",
+				"FORM": {
+					"DELETE_MODAL_TITLE": "",
+					"UPDATE_RESOLVE_MODAL_LABEL_1": "",
+					"UPDATE_RESOLVE_MODAL_LABEL_2": "",
+					"UPDATE_RESOLVE_MODAL_TITLE": ""
+				},
 				"HIGH": "",
 				"LOW": "",
 				"MERGE": "",

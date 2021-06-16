@@ -1058,10 +1058,18 @@
 				"ACKNOWLEDGED": "Acknowledged",
 				"ALERT": "Alert",
 				"ALL": "All",
+				"ALT_E_ACKNOWLEDGED": "Change alert state ",
+				"ALT_S_ACKNOWLEDGED": "Change alert state failure",
 				"ASSIGNED_TO_ME": "Assigned to me",
 				"ASSIGNED_TO_YOU_TITLE": "New alert assigned to you",
 				"CREATE": "Create",
 				"DELETE": "Delete",
+				"FORM": {
+					"DELETE_MODAL_TITLE": "Are you sure you want to delete selected alert?",
+					"UPDATE_RESOLVE_MODAL_LABEL_1": "Note",
+					"UPDATE_RESOLVE_MODAL_LABEL_2": "optional",
+					"UPDATE_RESOLVE_MODAL_TITLE": "Change to resolved state"
+				},
 				"HIGH": "High",
 				"LOW": "Low",
 				"MERGE": "Merge",
