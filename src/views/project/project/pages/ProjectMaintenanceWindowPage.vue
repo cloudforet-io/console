@@ -3,8 +3,11 @@
         <p-panel-top :title="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.TITLE')" use-total-count :total-count="totalCount" />
 
         <p-toolbox-table :loading="loading" :fields="fields" :items="items"
-                         searchable selectable :select-index.sync="selectIndex"
+                         searchable selectable sortable
+                         :select-index.sync="selectIndex"
                          :total-count="totalCount"
+                         :sort-desc="true"
+                         sort-by="state"
                          @change="getMaintenanceWindows"
                          @refresh="getMaintenanceWindows()"
         >
@@ -12,6 +15,11 @@
                 <p-select-dropdown :select-item="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ACTION')" :items="actionMenu" @input="onSelectAction">
                     {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ACTION') }}
                 </p-select-dropdown>
+            </template>
+            <template #col-state-format="{value}">
+                <p-badge :style-type="STATE[value] === STATE.OPEN ? 'yellow200' : 'gray200'">
+                    {{ STATE[value] }}
+                </p-badge>
             </template>
             <template #col-start_time-format="{value}">
                 {{ iso8601Formatter(value, timezone) }}
@@ -46,6 +54,7 @@
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
+    PBadge,
     PPanelTop, PSelectDropdown, PTableCheckModal, PToolboxTable,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -66,9 +75,9 @@ const ACTION = Object.freeze({
 type ACTION = typeof ACTION[keyof typeof ACTION]
 
 const STATE = Object.freeze({
-    none: 'NONE',
-    open: 'OPEN',
-    closed: 'CLOSED',
+    NONE: 'None',
+    OPEN: 'Open',
+    CLOSED: 'Closed',
 } as const);
 type STATE = typeof STATE[keyof typeof STATE]
 
@@ -79,6 +88,7 @@ export default {
         PToolboxTable,
         PSelectDropdown,
         PTableCheckModal,
+        PBadge,
         MaintenanceWindowFormModal,
     },
     props: {
@@ -107,12 +117,12 @@ export default {
                 {
                     name: ACTION.update,
                     label: i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.UPDATE'),
-                    disabled: state.selectedItems.length !== 1 || state.selectedItems[0]?.state === STATE.closed,
+                    disabled: state.selectedItems.length !== 1 || STATE[state.selectedItems[0]?.state] === STATE.CLOSED,
                 },
                 {
                     name: ACTION.close,
                     label: i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CLOSE'),
-                    disabled: state.selectedItems.length !== 1 || state.selectedItems[0]?.state === STATE.closed,
+                    disabled: state.selectedItems.length !== 1 || STATE[state.selectedItems[0]?.state] === STATE.CLOSED,
                 },
             ]),
             visibleUpdateModal: false,
@@ -122,12 +132,14 @@ export default {
 
         const apiQueryHelper = new ApiQueryHelper()
             .setOnly(...state.fields.map(d => d.name), 'maintenance_window_id')
-            .setPageStart(1).setPageLimit(15);
+            .setPageStart(1).setPageLimit(15)
+            .setSort('state', true);
 
         const getApiQuery = (options) => {
-            apiQueryHelper.setFilters([{ v: options.searchText || '' }]);
-            if (options.pageStart) apiQueryHelper.setPageStart(options.pageStart);
-            if (options.pageLimit) apiQueryHelper.setPageLimit(options.pageLimit);
+            if (options.pageStart !== undefined) apiQueryHelper.setPageStart(options.pageStart);
+            if (options.pageLimit !== undefined) apiQueryHelper.setPageLimit(options.pageLimit);
+            if (options.sortBy !== undefined) apiQueryHelper.setSort(options.sortBy, options.sortDesc);
+            if (options.searchText !== undefined) apiQueryHelper.setFilters([{ v: options.searchText || '' }]);
             return apiQueryHelper.data;
         };
 
@@ -193,6 +205,7 @@ export default {
             closeMaintenanceWindow,
             onSelectAction,
             iso8601Formatter,
+            STATE,
         };
     },
 };
