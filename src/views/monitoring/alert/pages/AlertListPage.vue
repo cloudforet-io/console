@@ -25,11 +25,6 @@ import AlertDataTable from '@/views/monitoring/alert/modules/alert-list/AlertDat
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { store } from '@/store';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { SpaceConnector } from '@/lib/space-connector';
-import { durationFormatter, iso8601Formatter } from '@/lib/util';
-
 
 export default {
     name: 'AlertListPage',

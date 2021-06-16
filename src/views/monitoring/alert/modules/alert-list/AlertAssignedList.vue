@@ -1,6 +1,6 @@
 <template>
     <p-list-card
-        :items="listItems"
+        :items="items"
         class="assigned-alert-list"
         style-type="indigo400"
     >
@@ -16,7 +16,7 @@
             />
         </template>
         <template #item="{item, index}">
-            <!--            <alert-list-item :item="item" />-->
+            <alert-list-item :item="item" />
         </template>
     </p-list-card>
 </template>
@@ -26,6 +26,11 @@ import {
 } from '@spaceone/design-system';
 import AlertListItem from '@/views/monitoring/alert/components/AlertListItem.vue';
 import { reactive, toRefs } from '@vue/composition-api';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { getPageStart } from '@/lib/component-utils/pagination';
+import { SpaceConnector } from '@/lib/space-connector';
+import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
+import { store } from '@/store';
 
 export default {
     name: 'AlertAssignedList',
@@ -36,33 +41,39 @@ export default {
     },
     setup() {
         const state = reactive({
-            // listItems: [
-            //     {
-            //         value: 'Netsparker Enterprise Test Issue',
-            //         icon: 'ic_alert',
-            //         project: 'Group > Project',
-            //         badge: 'acknowledged',
-            //         date: '05/17 17:04',
-            //     },
-            //     {
-            //         value: 'Vulnerability - Local File Inclusion',
-            //         icon: 'ic_state_duplicated',
-            //         project: 'Group > Project',
-            //         badge: 'triggered',
-            //         date: '05/17 17:06',
-            //     },
-            //     {
-            //         value: 'Netsparker Enterprise Test Issue. Netsparker Enterprise Test Issue.',
-            //         icon: 'ic_alert',
-            //         project: 'Group > Project',
-            //         badge: 'acknowledged',
-            //         date: '05/17 17:04',
-            //     },
-            // ],
+            items: [],
+            thisPage: 1,
+            allPage: 1,
+            pageSize: 10,
         });
+
+        /* api */
+        const getQuery = () => {
+            const apiQuery = new ApiQueryHelper();
+            apiQuery
+                .setSort('created_at', true)
+                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
+                .setFilters({ k: 'assignee', v: store.state.user.userId, o: '=' });
+            return apiQuery.data;
+        };
+        const listAlerts = async () => {
+            try {
+                const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({ query: getQuery() });
+                state.allPage = getAllPage(total_count, 10);
+                state.items = results;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        /* init */
+        (async () => {
+            await listAlerts();
+        })();
 
         return {
             ...toRefs(state),
+            listAlerts,
         };
     },
 };
@@ -80,6 +91,10 @@ export default {
         .ic_delete {
             @apply ml-auto;
         }
+    }
+    .body {
+        @apply overflow-y-auto;
+        max-height: 10.5rem;
     }
 }
 </style>

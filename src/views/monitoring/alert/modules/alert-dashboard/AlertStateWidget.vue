@@ -211,17 +211,6 @@ export default {
             apiQuery
                 .setSort('created_at', true)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
-            if (state.selectedUrgency !== ALERT_URGENCY.ALL) {
-                apiQuery.setFilters([{ k: 'urgency', v: state.selectedUrgency, o: '=' }]);
-            }
-            if (tabState.activeTab === TAB_STATE.OPEN) {
-                apiQuery.setFilters([{ k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' }]);
-            } else if (tabState.activeTab === TAB_STATE.RESOLVED) {
-                apiQuery.setFilters([{k: 'state', v: ALERT_STATE.RESOLVED, o: '='}]);
-            }
-            if (state.isAssignedToMe) {
-                apiQuery.setFilters([{ k: 'assignee', v: store.state.user.userId, o: '=' }]);
-            }
             return apiQuery.data;
         };
         const listAlerts = async () => {

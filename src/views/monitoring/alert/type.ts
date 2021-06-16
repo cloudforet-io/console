@@ -9,6 +9,13 @@ export enum ACTION {
     default = 'default',
 }
 
+export enum ALERT_ACTION {
+    acknowledge = 'acknowledge',
+    resolve = 'resolve',
+    merge = 'merge',
+    delete = 'delete',
+}
+
 export enum SCOPE {
     global = 'GLOBAL',
     project = 'PROJECT',

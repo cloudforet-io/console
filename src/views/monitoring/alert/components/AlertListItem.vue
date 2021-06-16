@@ -106,6 +106,7 @@ export default {
         margin: auto 0;
 
         .p-i-icon {
+            @apply flex-shrink-0;
             margin-right: 0.5rem;
         }
         .title {
@@ -114,11 +115,14 @@ export default {
             margin-right: 0.5rem;
         }
         .project-link {
-            @apply text-gray-500;
+            @apply flex-shrink-0 text-gray-500;
             display: inherit;
+            max-width: calc(100% - 2rem);
+            margin-right: 0.5rem;
         }
     }
     .right-part {
+        @apply flex-shrink-0;
         .date {
             @apply text-gray-500;
             font-size: 0.75rem;
