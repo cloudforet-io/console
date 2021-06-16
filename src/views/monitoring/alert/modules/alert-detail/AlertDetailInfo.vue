@@ -5,9 +5,22 @@
                             :stripe="false"
                             :disable-copy="true"
         >
+            <template #data-escalation_policy_id>
+                <p-anchor :to="{ name: MONITORING_ROUTE.ALERT_SYSTEM.ESCALATION_POLICY }" highlight>
+                    {{ escalationPolicyName }}
+                </p-anchor>
+            </template>
             <template #data-project_id>
                 <p class="content-wrapper">
-                    <span class="project">{{ data.project_id }}</span>
+                    <span class="project">
+                        <p-anchor :to="referenceRouter(
+                                      data.project_id,
+                                      { resource_type: 'identity.Project' })"
+                                  highlight
+                        >
+                            {{ projects[data.project_id] ? projects[data.project_id].label : data.project_id }}
+                        </p-anchor>
+                    </span>
                     <p-button style-type="gray-border" size="sm" @click="openChangeProjectModal">
                         Change
                     </p-button>
@@ -74,6 +87,14 @@
                     </div>
                 </div>
             </template>
+            <template #data-additional_info="{value}">
+                <p v-if="Object.keys(value).length === 0">
+                    --
+                </p>
+                <p v-else>
+                    {{ value }}
+                </p>
+            </template>
         </p-definition-table>
         <project-tree-modal :visible.sync="formState.changeProjectModalVisible"
                             :project-id="formState.projectId"
@@ -85,17 +106,19 @@
 
 <script lang="ts">
 import {
-    PPaneLayout, PDefinitionTable, PButton, PI, PTextarea, PTextInput,
+    PPaneLayout, PDefinitionTable, PButton, PI, PTextarea, PTextInput, PAnchor,
 } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { iso8601Formatter, showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 import { AlertDataModel } from '@/views/monitoring/alert/type';
 import { ProjectItemResp } from '@/views/project/project/type';
 import ProjectTreeModal from '@/common/modules/ProjectTreeModal.vue';
+import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 
 interface PropsType {
     id: string;
@@ -117,6 +140,7 @@ export default {
         PI,
         PTextInput,
         PTextarea,
+        PAnchor,
         ProjectTreeModal,
     },
     props: {
@@ -135,7 +159,7 @@ export default {
         const state = reactive({
             fields: [
                 { name: 'triggered_by', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY') },
-                { name: 'escalation_policy', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.ESCALATION_POLICY') },
+                { name: 'escalation_policy_id', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.ESCALATION_POLICY') },
                 { name: 'project_id', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.PROJECT') },
                 { name: 'severity', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.SEVERITY') },
                 { name: 'created_at', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.CREATED') },
@@ -143,15 +167,19 @@ export default {
                 { name: 'resolved_at', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.RESOLVED') },
                 { name: 'alert_id', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.ALERT_ID') },
                 { name: 'description', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.DESC') },
+                { name: 'rule', label: 'Rule' },
                 { name: 'status_message', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.STATUS_DETAILS') },
+                { name: 'additional_info', label: 'Additional Info' },
             ],
             data: props.alertData || {},
+            escalationPolicyName: '',
             loading: true,
             timezone: computed(() => store.state.user.timezone),
             isDescriptionEditMode: false,
             isStatusMessageEditMode: false,
             descriptionInput: props.alertData?.description,
             statusMessageInput: props.alertData?.status_message,
+            projects: computed(() => store.state.resource.project.items),
         });
 
         const formState = reactive({
@@ -165,14 +193,21 @@ export default {
         };
 
         const changeProject = async (data?: ProjectItemResp|null) => {
-            // TODO: add API when backend structure fixed
-            // if (data) {
-            //     try {
-            //         await SpaceConnector.client.monitoring.alert.update({
-            //
-            //         })
-            //     }
-            // }
+            if (data) {
+                formState.loading = true;
+                try {
+                    await SpaceConnector.client.monitoring.alert.update({
+                        alert_id: props.id,
+                        project_id: data.id,
+                    });
+                    emit('update');
+                } catch (e) {
+                    console.error(e);
+                } finally {
+                    formState.loading = false;
+                    formState.changeProjectModalVisible = false;
+                }
+            }
         };
 
         const updateDescription = async () => {
@@ -220,16 +255,35 @@ export default {
             else if (editMode === EDIT_MODE.STATUS_MSG) await updateStatusMessage();
         };
 
+        const getEscalationPolicy = async () => {
+            try {
+                const res = await SpaceConnector.client.monitoring.escalationPolicy.get({
+                    // eslint-disable-next-line camelcase
+                    escalation_policy_id: state.data.escalation_policy_id,
+                });
+                state.escalationPolicyName = res.name;
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        (async () => {
+            await store.dispatch('resource/project/load');
+            await getEscalationPolicy();
+        })();
+
         return {
             ...toRefs(state),
             formState,
             iso8601Formatter,
+            referenceRouter,
             openChangeProjectModal,
             changeProject,
             EDIT_MODE,
             startEdit,
             cancelEdit,
             onClickSave,
+            MONITORING_ROUTE,
         };
     },
 };
@@ -238,8 +292,10 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.alert-detail-info {
-
+.p-definition-table::v-deep {
+    >>>.value-wrapper .value {
+        width: 100%;
+    }
 }
 .content-wrapper {
     display: flex;

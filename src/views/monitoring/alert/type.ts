@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import {TimeStamp} from "@/models";
+import { TimeStamp } from '@/models';
 
 export enum ACTION {
     create = 'create',
@@ -51,6 +51,13 @@ type responder = {
     resource_id: string;
 }
 
+interface ResourceModel {
+    resource_id?: string;
+    resource_type?: string;
+    name?: string;
+    ip_address?: string;
+}
+
 export interface AlertDataModel {
     responders: responder[];
     alert_number: number;
@@ -69,6 +76,9 @@ export interface AlertDataModel {
     webhook_id: string;
     escalation_policy_id: string;
     project_id: string;
+    project_dependencies: string[];
+    rule: string;
+    resource: ResourceModel;
     created_at: TimeStamp;
     updated_at: TimeStamp;
     acknowledged_at: TimeStamp;

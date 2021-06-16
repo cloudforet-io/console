@@ -2,14 +2,14 @@
     <p-pane-layout class="alert-detail-header">
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.STATE') }}</span>
-            <p-select-dropdown :value="alertState" :items="ALERT_STATE_LIST" :use-custom-style="true"
+            <p-select-dropdown :value="alertState" :items="ALERT_STATE_LIST"
                                :select-item="alertState"
                                @onSelected="changeAlertState"
             />
         </p>
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.URGENCY') }}</span>
-            <p-select-dropdown :value="alertUrgency" :items="ALERT_URGENCY_LIST" :use-custom-style="true"
+            <p-select-dropdown :value="alertUrgency" :items="ALERT_URGENCY_LIST"
                                :select-item="alertUrgency"
                                @onSelected="changeAlertUrgency"
             />

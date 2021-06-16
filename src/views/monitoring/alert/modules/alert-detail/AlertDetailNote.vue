@@ -73,7 +73,7 @@ export default {
                     query: apiQuery.data,
                 });
                 state.noteList = res.results.map(d => ({
-                    title: 'user_id@mz.co.kr',
+                    title: d.created_by,
                     data: d.note,
                     ...d,
                 }));

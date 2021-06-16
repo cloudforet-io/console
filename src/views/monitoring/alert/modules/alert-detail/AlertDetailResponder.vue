@@ -14,7 +14,7 @@
                 </template>
                 <template #default="{data}">
                     <p class="data-wrapper">
-                        whdalsrnt@gmail.com
+                        <project-channel-list :project-channels="projectChannels" :notification-level="data" />
                     </p>
                 </template>
             </p-collapsible-list>
@@ -59,6 +59,7 @@ import {
 } from '@/views/monitoring/alert/type';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import ProjectChannelList from '@/views/monitoring/alert/components/ProjectChannelList.vue';
 
 interface PropsType {
     id?: string;
@@ -75,6 +76,7 @@ export default {
         PAutocompleteSearch,
         PCheckBox,
         PTag,
+        ProjectChannelList,
     },
     props: {
         id: {
@@ -90,11 +92,12 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             items: [
-                { title: vm.$t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'test' },
-                { title: vm.$t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'test' },
-                { title: vm.$t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'test' },
+                { title: vm.$t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV1' },
+                { title: vm.$t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV2' },
+                { title: vm.$t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV3' },
             ],
             loading: true,
+            projectChannels: [],
         });
 
         const responderState = reactive({
@@ -108,6 +111,22 @@ export default {
             }))),
             selectedMemberItems: props.alertData.responders.map(d => d.resource_id),
         });
+
+        const apiQuery = new ApiQueryHelper();
+        const getQuery = () => {
+            apiQuery
+                .setFilters([{ k: 'project_id', v: props.alertData.project_id, o: '=' }]);
+            return apiQuery.data;
+        };
+        const listProjectChannel = async () => {
+            try {
+                const { results } = await SpaceConnector.client.notification.projectChannel.list({ query: getQuery() });
+                state.projectChannels = results;
+            } catch (e) {
+                state.projectChannels = [];
+                console.error(e);
+            }
+        };
 
         const listMember = async () => {
             responderState.loading = true;
@@ -161,7 +180,7 @@ export default {
         };
 
         (async () => {
-            await listMember();
+            await Promise.all([listProjectChannel(), listMember()]);
         })();
 
 
@@ -189,11 +208,11 @@ export default {
         @apply text-violet-500;
     }
 }
-.data-wrapper {
+
+.project-channel-list::v-deep {
     @apply bg-gray-100;
-    padding: 0.5rem 0.5rem;
-    min-height: 4.375rem;
 }
+
 .search-title {
     margin-top: 2rem;
     margin-bottom: 0.5rem;

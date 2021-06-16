@@ -29,6 +29,8 @@
                                :alert-data="alertInfo"
                                @update="getAlertData"
             />
+            <alert-detail-resource-info v-if="!loading && alertInfo.resource" :alert-data="alertInfo" :id="id" class="resource-info" />
+            <alert-detail-project-dependency v-if="!loading" :alert-data="alertInfo" :id="id" class="project-dependency" />
             <alert-detail-note v-if="!loading" :id="id" class="note" />
             <alert-detail-timeline v-if="!loading" :id="id" class="timeline" />
         </section>
@@ -62,10 +64,15 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { AlertDataModel } from '@/views/monitoring/alert/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import AlertTitleEditModal from '@/views/monitoring/alert/modules/alert-detail/AlertTitleEditModal.vue';
+import AlertDetailResourceInfo from '@/views/monitoring/alert/modules/alert-detail/AlertDetailResourceInfo.vue';
+import AlertDetailProjectDependency
+    from '@/views/monitoring/alert/modules/alert-detail/AlertDetailProjectDependency.vue';
 
 export default {
     name: 'AlertDetailPage',
     components: {
+        AlertDetailProjectDependency,
+        AlertDetailResourceInfo,
         AlertTitleEditModal,
         AlertDetailNote,
         AlertDetailTimeline,
@@ -182,49 +189,68 @@ export default {
     .header {
         @apply col-span-8 row-start-1 row-end-1;
         max-height: 6.125rem;
-
-        @screen tablet {
-            @apply col-span-12 row-start-1 row-end-1;
-            max-height: none;
-        }
     }
     .responder {
         @apply col-span-4 row-start-1 row-end-3;
-
-        @screen tablet {
-            @apply col-span-6 row-start-4 row-end-4;
-        }
-
-        @screen mobile {
-            @apply col-span-12 row-start-4 row-end-5;
-        }
     }
     .info {
         @apply col-span-8 row-start-2 row-end-2;
-
-        @screen tablet {
-            @apply col-span-12 row-start-2 row-end-2;
-        }
+    }
+    .resource-info {
+        @apply col-span-8 row-start-3 row-end-3;
+    }
+    .project-dependency {
+        @apply col-span-4 row-start-3 row-end-3;
+        min-height: 10rem;
     }
     .note {
-        @apply col-span-4 row-start-3 row-end-3;
-
-        @screen tablet {
-            @apply col-span-6 row-start-4 row-end-4;
-        }
-
-        @screen mobile {
-            @apply col-span-12 row-start-5 row-end-5 col-start-1;
-        }
+        @apply col-span-4 row-start-4 row-end-4;
     }
     .timeline {
-        @apply col-span-8 col-start-1 row-start-3 row-end-3;
+        @apply col-span-8 col-start-1 row-start-4 row-end-4;
         max-height: 32.125rem;
+    }
 
-        @screen tablet {
-            @apply col-span-12 row-start-3 row-end-3;
+    @screen tablet {
+        .header {
+            @apply col-span-12 row-start-1 row-end-1;
             max-height: none;
         }
+        .info {
+            @apply col-span-12 row-start-2 row-end-2;
+        }
+        .resource-info {
+            @apply col-span-12 row-start-3 row-end-3;
+        }
+        .timeline {
+            @apply col-span-12 row-start-4 row-end-4;
+            max-height: none;
+        }
+        .responder {
+            @apply col-span-6 row-start-5 row-end-5;
+        }
+        .note {
+            @apply col-span-6 row-start-5 row-end-5;
+        }
+        .project-dependency {
+            @apply col-span-6 row-start-6 row-end-6;
+            min-height: 10rem;
+        }
+
     }
+
+    @screen mobile {
+        .responder {
+            @apply col-span-12 row-start-5 row-end-5;
+        }
+        .project-dependency {
+            @apply col-span-12 row-start-6 row-end-6 col-start-1;
+            min-height: 10rem;
+        }
+        .note {
+            @apply col-span-12 row-start-7 row-end-7 col-start-1;
+        }
+    }
+
 }
 </style>
