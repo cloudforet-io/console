@@ -53,10 +53,10 @@ export default {
             apiQuery
                 .setSort('created_at', true)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
-                .setFilters({ k: 'assignee', v: store.state.user.userId, o: '=' });
+                .setFilters([{ k: 'assignee', v: store.state.user.userId, o: '=' }]);
             return apiQuery.data;
         };
-        const listAlerts = async () => {
+        const assignedAlerts = async () => {
             try {
                 const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({ query: getQuery() });
                 state.allPage = getAllPage(total_count, 10);
@@ -68,12 +68,12 @@ export default {
 
         /* init */
         (async () => {
-            await listAlerts();
+            await assignedAlerts();
         })();
 
         return {
             ...toRefs(state),
-            listAlerts,
+            assignedAlerts,
         };
     },
 };

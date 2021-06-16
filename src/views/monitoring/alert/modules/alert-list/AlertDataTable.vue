@@ -123,7 +123,7 @@
             </template>
         </p-toolbox-table>
         <delete-modal
-            :header-title="'Are you sure you want to delete selected alert?'"
+            :header-title="$t('MONITORING.ALERT.ALERT_LIST.FORM.DELETE_MODAL_TITLE')"
             :visible.sync="deleteState.visible"
             @confirm="deleteConfirm"
         />
