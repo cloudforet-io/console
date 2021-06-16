@@ -6,7 +6,7 @@ import {range} from 'lodash'
 import {makeOptionalProxy} from '@/util/composition-helpers';
 
 import PBalloonTab from './PBalloonTab.vue';
-import { argTypes } from '@/navigation/tabs/ballon-tab/story-helper';
+import { getBalloonTabArgTypes } from '@/navigation/tabs/ballon-tab/story-helper';
 import {
     BALLOON_TAB_POSITION,
     BALLOON_TAB_SIZE,
@@ -19,7 +19,7 @@ import {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
     }
-}} argTypes={argTypes} />
+}} argTypes={getBalloonTabArgTypes()} />
 
 
 export const Template = (args, { argTypes }) => ({

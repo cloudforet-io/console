@@ -4,7 +4,7 @@ import {getCurrentInstance, reactive, toRefs} from '@vue/composition-api';
 import {makeOptionalProxy} from '@/util/composition-helpers';
 
 import PButtonTab from './PButtonTab.vue';
-import { argTypes, Inner } from '@/navigation/tabs/button-tab/story-helper';
+import { getButtonTabArgTypes, Inner } from '@/navigation/tabs/button-tab/story-helper';
 
 
 
@@ -13,7 +13,7 @@ import { argTypes, Inner } from '@/navigation/tabs/button-tab/story-helper';
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=12164%3A1629'
     }
-}} argTypes={argTypes}/>
+}} argTypes={getButtonTabArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({

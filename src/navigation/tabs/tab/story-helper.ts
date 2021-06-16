@@ -1,8 +1,8 @@
 import { ArgTypes } from '@storybook/addons';
-import { argTypes as tabArgTypes, Inner } from '@/hooks/tab/story-helper';
+import { getTabHookArgTypes, Inner } from '@/hooks/tab/story-helper';
 
-export const argTypes: ArgTypes = {
-    ...tabArgTypes,
+export const getTabArgTypes = (): ArgTypes => ({
+    ...getTabHookArgTypes(),
     stretch: {
         name: 'stretch',
         type: { name: 'boolean' },
@@ -21,7 +21,22 @@ export const argTypes: ArgTypes = {
             type: 'boolean',
         },
     },
-};
+    /* slots */
+    extraSlot: {
+        name: 'extra',
+        description: 'Use it to insert something to right extra space of every tab.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+    },
+});
 
 
 export { Inner };

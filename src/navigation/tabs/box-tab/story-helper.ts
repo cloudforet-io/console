@@ -1,9 +1,9 @@
 import { ArgTypes } from '@storybook/addons';
-import { argTypes as tabArgTypes, Inner } from '@/hooks/tab/story-helper';
+import { getTabHookArgTypes, Inner } from '@/hooks/tab/story-helper';
 import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';
 
-export const argTypes: ArgTypes = {
-    ...tabArgTypes,
+export const getBoxTabArgTypes = (): ArgTypes => ({
+    ...getTabHookArgTypes(),
     styleType: {
         name: 'styleType',
         type: { name: 'string' },
@@ -23,7 +23,7 @@ export const argTypes: ArgTypes = {
             options: Object.values(BOX_TAB_STYLE_TYPE),
         },
     },
-};
+});
 
 
 export { Inner };

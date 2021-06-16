@@ -7,7 +7,9 @@
             >
                 <span class="label">
                     {{ tab.label }}
-                    <slot name="extra" />
+                </span>
+                <span class="extra">
+                    <slot name="extra" v-bind="tab" />
                 </span>
             </li>
         </ul>
@@ -79,8 +81,8 @@ export default defineComponent<Props>({
         li {
             @apply text-gray-400;
             display: flex;
+            align-items: center;
             min-height: 2.25rem;
-            font-weight: bold;
             font-size: 0.875rem;
             text-decoration: none;
             text-align: center;
@@ -88,6 +90,7 @@ export default defineComponent<Props>({
             margin-bottom: -4px;
             border-bottom-width: 4px;
             border-color: transparent;
+            padding: 0 1rem;
             &:hover {
                 @apply text-gray-900;
             }
@@ -101,8 +104,12 @@ export default defineComponent<Props>({
             .label {
                 @apply w-full;
                 display: flex;
-                padding: 0.6rem 1rem;
+                padding: 0.6rem 0;
                 line-height: 150%;
+                font-weight: bold;
+            }
+            .extra {
+                margin-left: 0.25rem;
             }
         }
         &.stretch {

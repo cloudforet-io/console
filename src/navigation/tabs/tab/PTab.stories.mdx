@@ -3,8 +3,9 @@ import { reactive, getCurrentInstance, toRefs } from '@vue/composition-api';
 
 import { makeOptionalProxy } from '@/util/composition-helpers';
 
+import PBadge from '@/data-display/badges/PBadge';
 import PTab from './PTab.vue';
-import { argTypes, Inner } from '@/navigation/tabs/tab/story-helper';
+import { getTabArgTypes, Inner } from '@/navigation/tabs/tab/story-helper';
 
 
 
@@ -13,7 +14,7 @@ import { argTypes, Inner } from '@/navigation/tabs/tab/story-helper';
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6013%3A121728'
     }
-}} argTypes={argTypes}/>
+}} argTypes={getTabArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({
@@ -214,6 +215,45 @@ export const Template = (args, { argTypes }) => ({
         }
     }
 }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Extra Slot
+
+<Canvas>
+    <Story name="Extra Slot">
+        {{
+            components: { PTab, PBadge },
+            template: `
+<div class="h-full w-full overflow p-8">
+    <p class="mb-6 font-bold text-xl">Slot Props: tab item (name, label, keepAlive)</p>
+    <p-tab
+        :tabs="tabs"
+        v-model="activeTab"
+    >
+        <template #extra="tab">
+            <p-badge v-if="tab.name === 'info'" style-type="gray200">18</p-badge>
+        </template>
+    </p-tab>
+</div>
+    `,
+            setup(props) {
+                const state = reactive({
+                    tabs: [
+                        { name: 'detail', label: 'Detail' },
+                        { name: 'info', label: 'Info' },
+                        { name: 'tags', label: 'Tags' },
+                    ],
+                    activeTab: 'detail'
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
     </Story>
 </Canvas>
 

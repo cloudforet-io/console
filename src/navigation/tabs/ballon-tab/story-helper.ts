@@ -1,9 +1,9 @@
 import { ArgTypes } from '@storybook/addons';
-import { argTypes as tabArgTypes, Inner } from '@/hooks/tab/story-helper';
+import { getTabHookArgTypes, Inner } from '@/hooks/tab/story-helper';
 import { BALLOON_TAB_POSITION, BALLOON_TAB_SIZE, BALLOON_TAB_STYLE_TYPE } from '@/navigation/tabs/ballon-tab/config';
 
-export const argTypes: ArgTypes = {
-    ...tabArgTypes,
+export const getBalloonTabArgTypes = (): ArgTypes => ({
+    ...getTabHookArgTypes(),
     tail: {
         name: 'tail',
         type: { name: 'boolean' },
@@ -97,5 +97,5 @@ export const argTypes: ArgTypes = {
             type: 'boolean',
         },
     },
-};
+});
 export { Inner };

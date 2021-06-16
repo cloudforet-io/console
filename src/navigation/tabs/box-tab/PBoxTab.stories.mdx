@@ -4,7 +4,7 @@ import {getCurrentInstance, reactive, toRefs} from '@vue/composition-api';
 import {makeOptionalProxy} from '@/util/composition-helpers';
 
 import PBoxTab from './PBoxTab.vue';
-import { argTypes, Inner } from '@/navigation/tabs/box-tab/story-helper';
+import { getBoxTabArgTypes, Inner } from '@/navigation/tabs/box-tab/story-helper';
 import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';
 
 
@@ -13,7 +13,7 @@ import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=13493%3A294520'
     }
-}} argTypes={argTypes} />
+}} argTypes={getBoxTabArgTypes()} />
 
 
 export const Template = (args, { argTypes }) => ({

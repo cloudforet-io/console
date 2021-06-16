@@ -2,7 +2,7 @@ import { ArgTypes } from '@storybook/addons';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 
-export const argTypes: ArgTypes = {
+export const getTabHookArgTypes = (): ArgTypes => ({
     tabs: {
         name: 'tabs',
         type: { name: 'array' },
@@ -84,6 +84,7 @@ export const argTypes: ArgTypes = {
         },
         control: null,
     },
+    /* slots */
     defaultSlot: {
         name: 'default',
         description: 'Use it to insert something to every tab body.',
@@ -117,6 +118,7 @@ export const argTypes: ArgTypes = {
         },
         control: null,
     },
+    /* events */
     onUpdateActiveTab: {
         name: 'update:activeTab',
         description: 'Event emitted when activated tab changed. Works with `v-model` and `activeTab` props sync.',
@@ -148,7 +150,7 @@ export const argTypes: ArgTypes = {
             category: 'events',
         },
     },
-};
+});
 
 export const Inner = {
     name: 'Inner',
