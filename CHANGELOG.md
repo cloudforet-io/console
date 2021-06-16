@@ -1,3 +1,10 @@
+# [1.1.0-beta.62](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.61...v1.1.0-beta.62) (2021-06-16)
+
+
+### Features
+
+* add extra slot to tab ([#598](https://github.com/spaceone-dev/spaceone-design-system/issues/598)) ([86fe036](https://github.com/spaceone-dev/spaceone-design-system/commit/86fe0362da9ce056486540c201ed04e10d4ac6d7))
+
 # [1.1.0-beta.61](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.60...v1.1.0-beta.61) (2021-06-15)
 
 
