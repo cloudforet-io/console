@@ -1493,6 +1493,13 @@
 			"SUBTAB_SETTINGS": "",
 			"SUBTAB_TITLE_WEBHOOK": "",
 			"SUBTAB_WEBHOOK": "",
+			"SUMMARY": {
+				"ACKNOWLEDGED": "Acknowledged",
+				"ALERT": "Alert",
+				"OPEN_ALERT": "Open Alert",
+				"RESOLVED": "Resolved",
+				"TRIGGERED": "Triggered"
+			},
 			"TAB_ALERT": "Alert",
 			"TAB_MAINTENANCE_WINDOW": "유지 관리 기간",
 			"TAB_MEMBER": "구성원 ",

@@ -1493,6 +1493,13 @@
 			"SUBTAB_SETTINGS": "Settings",
 			"SUBTAB_TITLE_WEBHOOK": "Webhook",
 			"SUBTAB_WEBHOOK": "Webhook",
+			"SUMMARY": {
+				"ACKNOWLEDGED": "Acknowledged",
+				"ALERT": "Alert",
+				"OPEN_ALERT": "Open Alert",
+				"RESOLVED": "Resolved",
+				"TRIGGERED": "Triggered"
+			},
 			"TAB_ALERT": "Alert",
 			"TAB_MAINTENANCE_WINDOW": "Maintenance Window",
 			"TAB_MEMBER": "Member",

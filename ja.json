@@ -1493,6 +1493,13 @@
 			"SUBTAB_SETTINGS": "",
 			"SUBTAB_TITLE_WEBHOOK": "",
 			"SUBTAB_WEBHOOK": "",
+			"SUMMARY": {
+				"ACKNOWLEDGED": "",
+				"ALERT": "",
+				"OPEN_ALERT": "",
+				"RESOLVED": "",
+				"TRIGGERED": ""
+			},
 			"TAB_ALERT": "",
 			"TAB_MAINTENANCE_WINDOW": "",
 			"TAB_MEMBER": "メンバー",
