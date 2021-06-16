@@ -5,13 +5,16 @@
                  width="1em" height="1em"
             />
             <span class="title">{{ item.title }}</span>
-            <p-anchor v-if="itemType !== ITEM_TYPE.PROJECT"
+            <p-anchor v-if="showProjectLink"
                       class="project-link"
                       :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
                       :show-icon="false"
             >
                 {{ projects[item.project_id] ? projects[item.project_id].label : item.project_id }}
             </p-anchor>
+            <p-badge v-if="showMemberName && item.assignee" outline style-type="primary2">
+                {{ users[item.assignee] ? users[item.assignee].label : item.assignee }}
+            </p-badge>
         </div>
         <div class="right-part">
             <p-badge :style-type="badgeStyleTypeFormatter(item.state)">
@@ -44,10 +47,6 @@ const ALERT_STATE = Object.freeze({
     ACKNOWLEDGED: 'ACKNOWLEDGED',
     RESOLVED: 'RESOLVED',
 });
-const ITEM_TYPE = Object.freeze({
-    DEFAULT: 'DEFAULT',
-    PROJECT: 'PROJECT',
-});
 
 export default {
     name: 'AlertListItem',
@@ -61,17 +60,19 @@ export default {
             type: Object,
             default: () => ({}),
         },
-        itemType: {
-            type: String,
-            default: ITEM_TYPE.DEFAULT,
-            validator(itemType) {
-                return Object.values(ITEM_TYPE).includes(itemType);
-            },
+        showProjectLink: {
+            type: Boolean,
+            default: false,
+        },
+        showMemberName: {
+            type: Boolean,
+            default: false,
         },
     },
     setup() {
         const state = reactive({
             projects: computed(() => store.state.resource.project.items),
+            users: computed(() => store.state.resource.user.items),
         });
 
         /* util */
@@ -85,7 +86,6 @@ export default {
         return {
             ...toRefs(state),
             ALERT_URGENCY,
-            ITEM_TYPE,
             referenceRouter,
             capitalize,
             badgeStyleTypeFormatter,

@@ -303,8 +303,7 @@ export default {
         margin-bottom: 0.75rem;
     }
     .widget-layout {
-        @apply block border border-gray-200;
-        border-radius: 2px;
+        @apply block border border-gray-200 rounded-md;
         padding: 0;
     }
 }

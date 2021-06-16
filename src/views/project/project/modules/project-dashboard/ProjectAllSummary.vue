@@ -614,10 +614,9 @@ export default {
     margin-top: 0.625rem;
 
     .content-wrapper {
-        @apply bg-white border border-gray-200;
+        @apply bg-white border border-gray-200 rounded-md;
         position: relative;
         height: auto;
-        border-radius: 0.125rem;
         padding: 1rem;
 
         @screen lg {

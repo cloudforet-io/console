@@ -2,6 +2,7 @@
     <div class="grid grid-cols-12 project-dashboard-page">
         <project-all-summary class="col-span-12" :project-id="id" />
         <div class="col-span-12 lg:col-span-9 grid grid-cols-12 left-part">
+            <project-alert-widget class="col-span-12" :project-id="id" />
             <project-billing class="col-span-12" :project-id="id" />
             <project-personal-health-dashboard class="col-span-12" :providers="providers" :project-id="id" />
             <project-service-accounts class="col-span-12 service-accounts-table" :project-id="id" />
@@ -36,11 +37,13 @@ import ProjectServiceAccounts from '@/views/project/project/modules/project-dash
 import ProjectTrustedAdvisor from '@/views/project/project/modules/project-dashboard/ProjectTrustedAdvisor.vue';
 
 import { store } from '@/store';
+import ProjectAlertWidget from "@/views/project/project/modules/project-dashboard/ProjectAlertWidget.vue";
 
 
 export default {
     name: 'ProjectDashboardPage',
     components: {
+        ProjectAlertWidget,
         ProjectBilling,
         ProjectPersonalHealthDashboard,
         ProjectTrustedAdvisor,
@@ -95,29 +98,26 @@ export default {
     }
 
     .cloud-services {
-        @apply border border-gray-200;
+        @apply border border-gray-200 rounded-md;
         min-height: 25rem;
         max-height: 35rem;
-        border-radius: 2px;
-        @media screen and (width < 1024px) {
+
+        @screen tablet {
             height: 26rem;
         }
     }
 
     .trusted-advisor {
-        @apply border border-gray-200;
-        border-radius: 2px;
+        @apply border border-gray-200 rounded-md;
     }
 
     .service-accounts-table {
-        @apply border border-gray-200;
-        border-radius: 2px;
+        @apply border border-gray-200 rounded-md;
     }
 
     .daily-updates {
-        @apply border border-gray-200;
+        @apply border border-gray-200 rounded-md;
         max-height: 35rem;
-        border-radius: 2px;
     }
 }
 </style>

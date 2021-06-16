@@ -367,5 +367,11 @@ export default {
             right: 0.5rem;
         }
     }
+
+    @screen mobile {
+        .summary-content-wrapper {
+            height: auto;
+        }
+    }
 }
 </style>

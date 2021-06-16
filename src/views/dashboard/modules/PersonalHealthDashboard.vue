@@ -172,7 +172,6 @@ export default {
 }
 .p-data-table::v-deep {
     min-height: 8rem;
-    border-radius: 0.125rem;
     margin-top: 0.75rem;
     .table-container {
         max-height: 25rem;

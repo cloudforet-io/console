@@ -567,8 +567,7 @@ export default {
     margin-bottom: 0.75rem;
 }
 .content-wrapper {
-    @apply border border-gray-200;
-    border-radius: 0.125rem;
+    @apply border border-gray-200 rounded-md;
     padding: 1rem;
     .title {
         position: relative;

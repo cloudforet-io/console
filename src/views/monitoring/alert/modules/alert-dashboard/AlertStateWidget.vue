@@ -76,7 +76,7 @@
                         </div>
                     </template>
                     <template #item="{item, index}">
-                        <alert-list-item :item="item" />
+                        <alert-list-item :item="item" :show-project-link="true" />
                     </template>
                 </p-list-card>
             </div>
@@ -104,6 +104,7 @@ import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/te
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { ALERT_STATE } from '@/views/monitoring/alert/type';
+import { QueryStoreFilter } from '@/lib/query/type';
 import { store } from '@/store';
 
 
@@ -211,6 +212,19 @@ export default {
             apiQuery
                 .setSort('created_at', true)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+            const filters: QueryStoreFilter[] = [];
+            if (state.selectedUrgency !== ALERT_URGENCY.ALL) {
+                filters.push({ k: 'urgency', v: state.selectedUrgency, o: '=' });
+            }
+            if (tabState.activeTab === TAB_STATE.OPEN) {
+                filters.push({ k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' });
+            } else if (tabState.activeTab === TAB_STATE.RESOLVED) {
+                filters.push({ k: 'state', v: ALERT_STATE.RESOLVED, o: '=' });
+            }
+            if (state.isAssignedToMe) {
+                filters.push({ k: 'assignee', v: store.state.user.userId, o: '=' });
+            }
+            apiQuery.setFilters(filters);
             return apiQuery.data;
         };
         const listAlerts = async () => {
