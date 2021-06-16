@@ -148,6 +148,7 @@
                         <p-button
                             style-type="primary"
                             class="text-button"
+                            :disabled="!isScheduleValid"
                             @click="onClickSave(EDIT_TYPE.SCHEDULE)"
                         >
                             {{ $t('COMMON.TAGS.SAVE') }}
@@ -196,7 +197,7 @@
                             </p-tag>
                         </li>
                     </ul>
-                    <span v-else>{{$t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL')}}</span>
+                    <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL') }}</span>
                     <button class="edit-btn" @click="startEdit(EDIT_TYPE.TOPIC)">
                         <p-i name="ic_edit" width="1rem" height="1rem"
                              color="inherit" class="edit-icon"
@@ -312,8 +313,11 @@ export default {
             projectChannelId: props.channelData?.project_channel_id,
             channelNameForEdit: props.channelData?.name,
             dataListForEdit: props.channelData?.data,
+            //
             scheduleModeForEdit: props.channelData?.is_scheduled,
             scheduleForEdit: props.channelData?.schedule,
+            isScheduleValid: false,
+            //
             topicModeForEdit: undefined,
             topicForEdit: props.channelData?.subscriptions,
             notificationLevelForEdit: props.channelData?.notification_level,
@@ -477,6 +481,7 @@ export default {
         const onChangeSchedule = async (value) => {
             state.scheduleModeForEdit = value.is_scheduled;
             state.scheduleForEdit = value.schedule;
+            state.isScheduleValid = value.isScheduleValid;
         };
         const saveChangedSchedule = async () => {
             if (props.projectId) await setProjectChannelSchedule();

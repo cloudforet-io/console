@@ -29,8 +29,12 @@
                                :alert-data="alertInfo"
                                @update="getAlertData"
             />
-            <alert-detail-resource-info v-if="!loading && alertInfo.resource" :alert-data="alertInfo" :id="id" class="resource-info" />
-            <alert-detail-project-dependency v-if="!loading" :alert-data="alertInfo" :id="id" class="project-dependency" />
+            <alert-detail-resource-info v-if="!loading && alertInfo.resource" :id="id" :alert-data="alertInfo"
+                                        class="resource-info"
+            />
+            <alert-detail-project-dependency v-if="!loading" :id="id" :alert-data="alertInfo"
+                                             class="project-dependency"
+            />
             <alert-detail-note v-if="!loading" :id="id" class="note" />
             <alert-detail-timeline v-if="!loading" :id="id" class="timeline" />
         </section>

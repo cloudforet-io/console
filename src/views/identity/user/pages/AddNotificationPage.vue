@@ -41,7 +41,7 @@
             <p-button
                 style-type="primary-dark"
                 class="text-button"
-                :disabled="!isDataValid"
+                :disabled="!isDataValid || !isScheduleValid"
                 @click="onClickSave"
             >
                 {{ $t('COMMON.TAGS.SAVE') }}
@@ -100,6 +100,7 @@ export default {
             topicList: [],
             schedule: null,
             isScheduled: false,
+            isScheduleValid: false,
             notificationLevel: null,
         });
         const routeState = reactive({
@@ -171,6 +172,7 @@ export default {
         const onChangeSchedule = (value) => {
             state.schedule = value.schedule;
             state.isScheduled = value.is_scheduled;
+            state.isScheduleValid = value.isScheduleValid;
         };
 
         const onChangeTopic = (value) => {

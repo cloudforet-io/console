@@ -27,6 +27,7 @@
                 <p-select-dropdown :value="proxySchedule.start_hour"
                                    :items="timeList"
                                    :select-item="proxySchedule.start_hour"
+                                   :invalid="!isScheduleValid"
                                    class="dropdown"
                                    @input="onSelectStartHour"
                 />
@@ -34,6 +35,7 @@
                 <p-select-dropdown v-model="proxySchedule.end_hour"
                                    :select-item="proxySchedule.end_hour"
                                    :items="timeList"
+                                   :invalid="!isScheduleValid"
                                    class="dropdown"
                                    @input="onSelectEndHour"
                 />
@@ -47,7 +49,7 @@
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { PRadio, PSelectButton, PSelectDropdown } from '@spaceone/design-system';
+import { PRadio, PSelectButton, PSelectDropdown, PFieldGroup } from '@spaceone/design-system';
 import InfoMessage from '@/common/components/InfoMessage.vue';
 import { range } from 'lodash';
 import { store } from '@/store';
@@ -62,6 +64,7 @@ export default {
         PSelectButton,
         InfoMessage,
         PSelectDropdown,
+        PFieldGroup,
     },
     props: {
         is_scheduled: {
@@ -95,6 +98,7 @@ export default {
                 end_hour: 18,
             },
             timezone: computed(() => store.state.user.timezone),
+            isScheduleValid: computed(() => state.proxySchedule.start_hour !== state.proxySchedule.end_hour),
         });
 
         const emitChange = () => {
@@ -102,11 +106,13 @@ export default {
                 emit('change', {
                     schedule: state.proxySchedule,
                     is_scheduled: state.proxyIsScheduled,
+                    isScheduleValid: state.isScheduleValid,
                 });
             } else {
                 emit('change', {
                     schedule: {},
                     is_scheduled: state.proxyIsScheduled,
+                    isScheduleValid: state.isScheduleValid,
                 });
             }
         };
