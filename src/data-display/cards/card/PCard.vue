@@ -40,9 +40,8 @@ export default defineComponent<CardProps>({
 
 <style lang="postcss">
 .p-card {
-    @apply border rounded-lg;
+    @apply overflow-hidden border rounded-lg;
     header {
-        @apply rounded-t-lg border-b;
         padding: 0.5rem 1rem;
     }
     .body {
