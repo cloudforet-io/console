@@ -11,8 +11,8 @@
             :fields="fields"
             :items="items"
             :select-index.sync="selectIndex"
-            :sort-by="sortBy"
-            :sort-desc="sortDesc"
+            :sort-by.sync="sortBy"
+            :sort-desc.sync="sortDesc"
             :query-tags="tags"
             :key-item-sets="handlers.keyItemSets"
             :value-handler-map="handlers.valueHandlerMap"
@@ -146,11 +146,12 @@ import {
     durationFormatter, iso8601Formatter, showErrorMessage, showLoadingMessage, showSuccessMessage,
 } from '@/lib/util';
 import { capitalize } from 'lodash';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import dayjs from 'dayjs';
 import { store } from '@/store';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
-import dayjs from 'dayjs';
 import { FILE_NAME_PREFIX } from '@/lib/type';
 import { ALERT_ACTION } from '@/views/monitoring/alert/type';
 
@@ -187,12 +188,13 @@ export default {
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryHelper = new ApiQueryHelper();
+        const queryHelper = new ApiQueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const handlers = {
             keyItemSets: [{
                 title: 'Properties',
                 items: [
                     { name: 'title', label: 'Title' },
+                    { name: 'state', label: 'State' },
                     { name: 'status_message', label: 'Status Details' },
                     { name: 'project_id', label: 'Project' },
                     { name: 'created_at', label: 'Created' },
@@ -202,6 +204,7 @@ export default {
             }],
             valueHandlerMap: {
                 title: makeDistinctValueHandler('monitoring.Alert', 'title'),
+                state: makeDistinctValueHandler('monitoring.Alert', 'state'),
                 status_message: makeDistinctValueHandler('monitoring.Alert', 'status_message'),
                 project_id: makeReferenceValueHandler('identity.Project'),
                 created_at: makeDistinctValueHandler('monitoring.Alert', 'created_at'),
@@ -216,11 +219,10 @@ export default {
             items: [] as any,
             selectIndex: [] as number[],
             selectedItems: computed<any[]>(() => state.selectIndex.map(d => state.items[d])),
-            // isSelected: computed(() => state.selectIndex.length > 0),
             pageStart: 1,
             pageLimit: 15,
             sortDesc: false,
-            sortBy: 'urgency',
+            sortBy: 'created_at',
             totalCount: 0,
             selectedAlertState: ALERT_STATE.OPEN,
             selectedUrgency: ALERT_URGENCY.ALL,
@@ -404,15 +406,12 @@ export default {
 
         /* event */
         const onChange = async (changed: any = {}) => {
-            if (changed.sortBy !== undefined) {
-                state.sortBy = changed.sortBy;
-                state.sortDesc = changed.sortDesc;
-            }
             if (changed.pageStart !== undefined) state.pageStart = changed.pageStart;
             if (changed.pageLimit !== undefined) state.pageLimit = changed.pageLimit;
             if (changed.queryTags !== undefined) {
                 state.tags = changed.queryTags;
                 queryHelper.setFiltersAsQueryTag(changed.queryTags);
+                replaceUrlQuery('filters', queryHelper.rawQueryStrings);
             }
             await listAlerts();
         };
