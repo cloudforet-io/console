@@ -1,3 +1,10 @@
+# [1.1.0-beta.63](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.62...v1.1.0-beta.63) (2021-06-16)
+
+
+### Bug Fixes
+
+* white space between header and border ([#599](https://github.com/spaceone-dev/spaceone-design-system/issues/599)) ([60f535e](https://github.com/spaceone-dev/spaceone-design-system/commit/60f535e722dbe6d000b130d5d949f8c1914c2d03))
+
 # [1.1.0-beta.62](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.61...v1.1.0-beta.62) (2021-06-16)
 
 
