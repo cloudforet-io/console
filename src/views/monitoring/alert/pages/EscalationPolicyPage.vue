@@ -11,9 +11,9 @@
             search-type="query"
             :page-size.sync="tableState.pageLimit"
             :total-count="tableState.totalCount"
-            :query-tags="tableState.searchTags"
-            :key-item-sets="searchHandlers.keyItemSets"
-            :value-handler-map="searchHandlers.valueHandlerMap"
+            :query-tags="tableState.tags"
+            :key-item-sets="handlers.keyItemSets"
+            :value-handler-map="handlers.valueHandlerMap"
             @change="onChange"
             @refresh="onChange"
         >
@@ -78,8 +78,9 @@ import {
     iso8601Formatter, showErrorMessage, showSuccessMessage,
 } from '@/lib/util';
 import {
-    makeEnumValueHandler, makeReferenceValueHandler,
+    makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler,
 } from '@/lib/component-utils/query-search';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { store } from '@/store';
 
@@ -98,6 +99,25 @@ export default {
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const queryHelper = new ApiQueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
+        const handlers = {
+            keyItemSets: [{
+                title: 'Properties',
+                items: [
+                    { name: 'name', label: 'Name' },
+                    { name: 'finish_condition', label: 'Finish Condition' },
+                    { name: 'scope', label: 'Scope' },
+                    { name: 'project_id', label: 'Project' },
+                    { name: 'created_at', label: 'Created', dataType: 'datetime' },
+                ],
+            }] as KeyItemSet[],
+            valueHandlerMap: {
+                name: makeDistinctValueHandler('monitoring.EscalationPolicy', 'name'),
+                finish_condition: makeEnumValueHandler(FINISH_CONDITION),
+                scope: makeEnumValueHandler(SCOPE),
+                project_id: makeReferenceValueHandler('identity.Project'),
+            },
+        };
         const tableState = reactive({
             loading: true,
             actionItems: computed(() => ([
@@ -124,7 +144,7 @@ export default {
             totalCount: 0,
             pageLimit: 15,
             pageStart: 1,
-            searchTags: [],
+            tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
         });
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
@@ -143,32 +163,13 @@ export default {
                 { name: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY') },
             ]),
         });
-        const searchHandlers = {
-            keyItemSets: [{
-                title: 'Properties',
-                items: [
-                    { name: 'name', label: 'Name' },
-                    { name: 'rules', label: 'Escalation Rules' },
-                    { name: 'repeat_count', label: 'Repeat Time' },
-                    { name: 'finish_condition', label: 'Finish Condition' },
-                    { name: 'scope', label: 'Scope' },
-                    { name: 'project_id', label: 'Project' },
-                    { name: 'created_at', label: 'Created', dataType: 'datetime' },
-                ],
-            }] as KeyItemSet[],
-            valueHandlerMap: {
-                finish_condition: makeEnumValueHandler(FINISH_CONDITION),
-                scope: makeEnumValueHandler(SCOPE),
-                project_id: makeReferenceValueHandler('identity.Project'),
-            },
-        };
 
         /* api */
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
             apiQuery.setSort(tableState.sortBy, tableState.sortDesc)
                 .setPage(tableState.pageStart, tableState.pageLimit)
-                .setFiltersAsQueryTag(tableState.searchTags);
+                .setFiltersAsQueryTag(tableState.tags);
             return apiQuery.data;
         };
         const listEscalationPolicies = async () => {
@@ -236,8 +237,11 @@ export default {
         };
         const onChange = async (options: any = {}) => {
             if (options.pageStart !== undefined) tableState.pageStart = options.pageStart;
-            if (options.queryTags !== undefined) tableState.searchTags = options.queryTags;
-
+            if (options.queryTags !== undefined) tableState.tags = options.queryTags;
+            if (options.queryTags !== undefined) {
+                queryHelper.setFiltersAsQueryTag(options.queryTags);
+                await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
+            }
             await listEscalationPolicies();
         };
 
@@ -251,7 +255,7 @@ export default {
             ACTION,
             routeState,
             tableState,
-            searchHandlers,
+            handlers,
             onSelectAction,
             onChange,
             listEscalationPolicies,

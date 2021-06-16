@@ -21,10 +21,10 @@
             {{ ruleFormatter(value) }}
         </template>
         <template #col-finish_condition-format="{ value }">
-            <span class="capitalize">{{ value }}</span>
+            <span>{{ capitalize(value) }}</span>
         </template>
         <template #col-scope-format="{ value }">
-            <span class="capitalize">{{ value }}</span>
+            <span>{{ capitalize(value) }}</span>
         </template>
         <template #col-project_id-format="{ value }">
             <template v-if="value">
@@ -40,6 +40,8 @@
 </template>
 
 <script lang="ts">
+import { capitalize } from 'lodash';
+
 import {
     PDataTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
@@ -114,6 +116,7 @@ export default {
             ...toRefs(state),
             referenceRouter,
             ruleFormatter,
+            capitalize,
         };
     },
 };
