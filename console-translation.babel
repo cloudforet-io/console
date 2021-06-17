@@ -18798,7 +18798,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>ALT_E_CHANGED</name>
+                                        <name>ALT_E_STATE_CHANGED</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -18819,7 +18819,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>ALT_S_CHANGED</name>
+                                        <name>ALT_S_STATE_CHANGED</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
