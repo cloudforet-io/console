@@ -8,8 +8,8 @@
                          :total-count="totalCount"
                          :sort-desc="true"
                          sort-by="state"
-                         @change="getMaintenanceWindows"
-                         @refresh="getMaintenanceWindows()"
+                         @change="onChange"
+                         @refresh="onChange()"
         >
             <template #toolbox-left>
                 <p-select-dropdown :select-item="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ACTION')" :items="actionMenu" @input="onSelectAction">
@@ -62,6 +62,7 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { iso8601Formatter, showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { getApiQueryWithToolboxOptions } from '@/lib/component-utils/toolbox';
 
 import { i18n } from '@/translations';
 import { store } from '@/store';
@@ -130,24 +131,17 @@ export default {
             closeLoading: false,
         });
 
-        const apiQueryHelper = new ApiQueryHelper()
+        const maintenanceWindowApiQueryHelper = new ApiQueryHelper()
             .setOnly(...state.fields.map(d => d.name), 'maintenance_window_id')
             .setPageStart(1).setPageLimit(15)
             .setSort('state', true);
+        let maintenanceWindowQuery = maintenanceWindowApiQueryHelper.data;
 
-        const getApiQuery = (options) => {
-            if (options.pageStart !== undefined) apiQueryHelper.setPageStart(options.pageStart);
-            if (options.pageLimit !== undefined) apiQueryHelper.setPageLimit(options.pageLimit);
-            if (options.sortBy !== undefined) apiQueryHelper.setSort(options.sortBy, options.sortDesc);
-            if (options.searchText !== undefined) apiQueryHelper.setFilters([{ v: options.searchText || '' }]);
-            return apiQueryHelper.data;
-        };
-
-        const getMaintenanceWindows = async (options: any = {}) => {
+        const getMaintenanceWindows = async () => {
             state.loading = true;
             try {
                 const { total_count, results } = await SpaceConnector.client.monitoring.maintenanceWindow.list({
-                    query: getApiQuery(options),
+                    query: maintenanceWindowQuery,
                 });
 
                 state.totalCount = total_count;
@@ -159,6 +153,11 @@ export default {
             } finally {
                 state.loading = false;
             }
+        };
+
+        const onChange = async (options: any = {}) => {
+            maintenanceWindowQuery = getApiQueryWithToolboxOptions(maintenanceWindowApiQueryHelper, options) ?? maintenanceWindowQuery;
+            await getMaintenanceWindows();
         };
 
         const closeMaintenanceWindow = async () => {
@@ -193,7 +192,6 @@ export default {
             }
         };
 
-
         /* Init */
         (async () => {
             await getMaintenanceWindows();
@@ -201,9 +199,9 @@ export default {
 
         return {
             ...toRefs(state),
-            getMaintenanceWindows,
             closeMaintenanceWindow,
             onSelectAction,
+            onChange,
             iso8601Formatter,
             STATE,
         };
