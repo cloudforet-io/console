@@ -1,3 +1,10 @@
+# [1.1.0-beta.65](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.64...v1.1.0-beta.65) (2021-06-17)
+
+
+### Features
+
+* update select dropdown style ([#602](https://github.com/spaceone-dev/spaceone-design-system/issues/602)) ([4f7b67c](https://github.com/spaceone-dev/spaceone-design-system/commit/4f7b67c11c46f9d6456bab1ddb17ac6505264fdd))
+
 # [1.1.0-beta.64](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.63...v1.1.0-beta.64) (2021-06-17)
 
 
