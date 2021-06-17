@@ -15,8 +15,7 @@
                             :loading="tableState.loading"
                             :items="tableState.items"
                             :select-index.sync="tableState.selectIndex"
-                            :sort-by.sync="tableState.sortBy"
-                            :sort-desc.sync="tableState.sortDesc"
+                            @change="onChangeDataTable"
                         />
                     </template>
                     <template #create>
@@ -54,6 +53,7 @@ import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { iso8601Formatter, showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { getApiQueryWithToolboxOptions } from '@/lib/component-utils/toolbox';
 import { store } from '@/store';
 import EscalationPolicyForm from '@/views/monitoring/alert/modules/EscalationPolicyForm.vue';
 import { EscalationPolicyFormModel } from '@/views/monitoring/alert/type';
@@ -108,8 +108,6 @@ export default {
             loading: true,
             items: [] as any,
             selectIndex: [] as number[],
-            sortBy: '',
-            sortDesc: true,
         });
         const formState = reactive({
             inputModel: {} as EscalationPolicyFormModel,
@@ -129,17 +127,14 @@ export default {
         };
 
         /* api */
-        const apiQuery = new ApiQueryHelper();
-        const getQuery = () => {
-            apiQuery.setSort(tableState.sortBy, tableState.sortDesc);
-            return apiQuery.data;
-        };
+        const escalationPolicyApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
+        let escalationPolicyApiQuery = escalationPolicyApiQueryHelper.data;
         const listEscalationPolicies = async () => {
             try {
                 tableState.loading = true;
                 const res = await SpaceConnector.client.monitoring.escalationPolicy.list({
                     project_id: props.projectId,
-                    query: getQuery(),
+                    query: escalationPolicyApiQuery,
                 });
                 tableState.items = res.results.map(d => ({
                     ...d,
@@ -204,6 +199,10 @@ export default {
         const onChangeInputModel = (inputModel) => {
             formState.inputModel = inputModel;
         };
+        const onChangeDataTable = async (options: any = {}) => {
+            escalationPolicyApiQuery = getApiQueryWithToolboxOptions(escalationPolicyApiQueryHelper, options) ?? escalationPolicyApiQuery;
+            await listEscalationPolicies();
+        };
 
         watch([() => props.projectId, () => props.escalationPolicyId], ([projectId, escalationPolicyId]) => {
             if (projectId && escalationPolicyId) listEscalationPolicies();
@@ -216,6 +215,7 @@ export default {
             FORM_MODE,
             onClickConfirm,
             onChangeInputModel,
+            onChangeDataTable,
         };
     },
 };

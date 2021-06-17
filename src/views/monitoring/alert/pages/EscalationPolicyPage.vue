@@ -9,13 +9,12 @@
         />
         <p-toolbox
             search-type="query"
-            :page-size.sync="tableState.pageLimit"
             :total-count="tableState.totalCount"
             :query-tags="tableState.tags"
             :key-item-sets="handlers.keyItemSets"
             :value-handler-map="handlers.valueHandlerMap"
             @change="onChange"
-            @refresh="onChange"
+            @refresh="onChange()"
         >
             <template #left-area>
                 <p-icon-text-button
@@ -36,11 +35,10 @@
             </template>
         </p-toolbox>
         <escalation-policy-data-table
-            :loading="tableState.loading"
             :items="items"
+            :loading="tableState.loading"
             :select-index.sync="tableState.selectIndex"
-            :sort-by.sync="tableState.sortBy"
-            :sort-desc.sync="tableState.sortDesc"
+            @change="onChange"
         />
         <!--modal-->
         <escalation-policy-form-modal
@@ -83,6 +81,7 @@ import {
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { store } from '@/store';
+import { getApiQueryWithToolboxOptions } from '@/lib/component-utils/toolbox';
 
 
 export default {
@@ -99,7 +98,10 @@ export default {
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryHelper = new ApiQueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
+        const escalationPolicyApiQueryHelper = new ApiQueryHelper()
+            .setSort('created_at', true)
+            .setPage(1, 15)
+            .setFiltersAsRawQueryString(vm.$route.query.filters);
         const handlers = {
             keyItemSets: [{
                 title: 'Properties',
@@ -139,12 +141,12 @@ export default {
             ])),
             selectedActionItem: '',
             selectIndex: [],
-            sortBy: '',
+            sortBy: 'created_at',
             sortDesc: true,
             totalCount: 0,
             pageLimit: 15,
             pageStart: 1,
-            tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
+            tags: escalationPolicyApiQueryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
         });
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
@@ -165,18 +167,12 @@ export default {
         });
 
         /* api */
-        const apiQuery = new ApiQueryHelper();
-        const getQuery = () => {
-            apiQuery.setSort(tableState.sortBy, tableState.sortDesc)
-                .setPage(tableState.pageStart, tableState.pageLimit)
-                .setFiltersAsQueryTag(tableState.tags);
-            return apiQuery.data;
-        };
+        let escalationPolicyApiQuery = escalationPolicyApiQueryHelper.data;
         const listEscalationPolicies = async () => {
             try {
                 tableState.loading = true;
                 const res = await SpaceConnector.client.monitoring.escalationPolicy.list({
-                    query: getQuery(),
+                    query: escalationPolicyApiQuery,
                 });
                 state.escalationPolicies = res.results;
                 state.items = res.results.map(d => ({
@@ -236,11 +232,9 @@ export default {
             }
         };
         const onChange = async (options: any = {}) => {
-            if (options.pageStart !== undefined) tableState.pageStart = options.pageStart;
-            if (options.queryTags !== undefined) tableState.tags = options.queryTags;
+            escalationPolicyApiQuery = getApiQueryWithToolboxOptions(escalationPolicyApiQueryHelper, options) ?? escalationPolicyApiQuery;
             if (options.queryTags !== undefined) {
-                queryHelper.setFiltersAsQueryTag(options.queryTags);
-                await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
+                await replaceUrlQuery('filters', escalationPolicyApiQueryHelper.rawQueryStrings);
             }
             await listEscalationPolicies();
         };

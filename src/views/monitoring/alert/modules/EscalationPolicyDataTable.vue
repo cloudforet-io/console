@@ -1,15 +1,12 @@
 <template>
-    <p-data-table
-        selectable
-        sortable
-        :multi-select="false"
-        search-type="query"
-        :items="items"
-        :loading="loading"
-        :fields="fields"
-        :select-index.sync="proxySelectIndex"
-        :sort-by.sync="proxySortBy"
-        :sort-desc.sync="proxySortDesc"
+    <p-data-table :items="items" :fields="fields" :loading="loading"
+                  selectable sortable
+                  search-type="query"
+                  :multi-select="false"
+                  :select-index.sync="proxySelectIndex"
+                  sort-by="created_at"
+                  :sort-desc="true"
+                  @changeSort="onChangeSort"
     >
         <template #col-name-format="{ value }">
             <span>{{ value.label }}</span>
@@ -72,14 +69,6 @@ export default {
             type: Array,
             default: () => [],
         },
-        sortBy: {
-            type: String,
-            default: '',
-        },
-        sortDesc: {
-            type: Boolean,
-            default: true,
-        },
     },
     setup(props, { emit }) {
         const state = reactive({
@@ -94,8 +83,6 @@ export default {
                 { name: 'created_at', label: 'Created' },
             ] as DataTableField[],
             proxySelectIndex: makeProxy('selectIndex', props, emit),
-            proxySortBy: makeProxy('sortBy', props, emit),
-            proxySortDesc: makeProxy('sortDesc', props, emit),
         });
 
         /* util */
@@ -112,11 +99,17 @@ export default {
             return result.join('');
         };
 
+        /* event */
+        const onChangeSort = (sortBy, sortDesc) => {
+            emit('change', { sortBy, sortDesc });
+        };
+
         return {
             ...toRefs(state),
             referenceRouter,
             ruleFormatter,
             capitalize,
+            onChangeSort,
         };
     },
 };
