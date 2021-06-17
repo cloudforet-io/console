@@ -99,10 +99,9 @@ export default {
     overflow-y: hidden;
 
     .alert-contents {
-        @apply bg-gray-900;
+        @apply bg-gray-900 rounded-lg;
         position: relative;
         display: flex;
-        border-radius: 0.375rem;
         min-width: 17rem;
         max-width: 30rem;
         opacity: 0.9;

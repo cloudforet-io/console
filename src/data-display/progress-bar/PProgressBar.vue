@@ -71,20 +71,18 @@ export default {
     }
 
     .background-bar {
-        @apply bg-gray-100;
+        @apply bg-gray-100 rounded-sm;
         width: 100%;
         height: 0.375rem;
         overflow: hidden;
-        border-radius: 0.125rem;
     }
 
     .tracker-bar {
-        @apply bg-primary;
+        @apply bg-primary rounded-sm;
         height: 0.375rem;
         width: 0;
         overflow: hidden;
         transition: width 0.5s linear;
-        border-radius: 0.125rem;
         margin-top: -0.375rem;
     }
 }

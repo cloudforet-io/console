@@ -222,13 +222,12 @@ export default {
 <style lang="postcss">
 .p-button-modal {
     .modal-content {
-        @apply bg-white border border-gray-200;
+        @apply bg-white border border-gray-200 rounded-lg;
         display: flex;
         flex-direction: column;
         width: 100%;
         max-height: calc(100vh - 4rem);
         pointer-events: auto;
-        border-radius: 0.375rem;
         box-shadow: 0 0 0.5rem rgba(theme('colors.gray.900'), 0.32);
         transition: all 0.3s ease;
         justify-content: space-between;
@@ -295,9 +294,9 @@ export default {
             border: none;
 
             .modal-button {
+                @apply rounded;
                 height: 2.5rem;
                 font-size: 1rem;
-                border-radius: 0.25rem;
             }
 
             .cancel-button {

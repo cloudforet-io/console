@@ -85,9 +85,8 @@ export default {
 
 <style lang="postcss">
 .p-skeleton {
-    @apply rounded-sm inline-block w-full bg-gray-200;
+    @apply rounded-lg inline-block w-full bg-gray-200;
     opacity: 0.4;
-    border-radius: 0.375rem;
     height: 0.875rem;
     line-height: inherit;
     background-repeat: no-repeat;

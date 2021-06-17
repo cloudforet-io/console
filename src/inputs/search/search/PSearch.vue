@@ -133,8 +133,7 @@ export default defineComponent({
 
 <style lang="postcss">
 .p-search {
-    @apply flex items-center border border-gray-300 bg-white text-gray-900 px-2 w-full;
-    border-radius: 2px;
+    @apply flex items-center border border-gray-300 bg-white text-gray-900 px-2 w-full rounded;
     height: 2rem;
     line-height: 2rem;
     min-width: 0;

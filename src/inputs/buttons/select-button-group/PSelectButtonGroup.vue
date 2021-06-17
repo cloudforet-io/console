@@ -90,10 +90,9 @@ export default {
         margin-bottom: -0.5rem;
     }
     .select-button {
-        @apply bg-gray-100 border text-gray-900;
+        @apply bg-gray-100 border text-gray-900 rounded-2xl;
         height: 2rem;
         border-color: rgba(theme('colors.gray.400'), 0.7);
-        border-radius: 0.75rem;
         font-size: 0.875rem;
         line-height: 1.6;
         padding-left: 1rem;

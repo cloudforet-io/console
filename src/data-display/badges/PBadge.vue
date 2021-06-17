@@ -83,7 +83,7 @@ export default {
         border-radius: 100px;
     }
     &.badge-square {
-        border-radius: 2px;
+        @apply rounded-sm;
     }
 }
 

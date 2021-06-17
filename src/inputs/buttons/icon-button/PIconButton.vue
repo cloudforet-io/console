@@ -98,7 +98,7 @@ export default defineComponent({
     max-height: 2rem;
 
     &.circle {
-        border-radius: 50%;
+        @apply rounded-full;
     }
     &.lg {
         min-width: 2.5rem;

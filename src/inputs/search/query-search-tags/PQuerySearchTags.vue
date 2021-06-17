@@ -157,8 +157,8 @@ export default defineComponent({
         font-size: 0.75rem;
     }
     .delete-btn {
+        @apply rounded;
         flex: 0 0 auto;
-        border-radius: 0.125rem;
         padding: 0.125rem 0.5rem;
         height: auto;
         cursor: pointer;

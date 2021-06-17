@@ -105,7 +105,7 @@ export default defineComponent({
         }
     }
     .copy-button-alert {
-        @apply flex text-white;
+        @apply flex text-white rounded-sm;
         background-color: rgba(theme('colors.gray.900'), 0.88);
         position: absolute;
         font-weight: 400;
@@ -113,7 +113,6 @@ export default defineComponent({
         z-index: 2;
         width: 4.75rem;
         height: 1.5rem;
-        border-radius: 0.125rem;
         justify-content: center;
         align-items: center;
         cursor: default;

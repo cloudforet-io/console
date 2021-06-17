@@ -16,7 +16,7 @@
              height="1rem"
              class="delete-icon"
              color="inherit"
-             @click="$emit('delete')"
+             @click.stop="$emit('delete')"
         />
     </span>
 </template>
@@ -68,7 +68,7 @@ export default defineComponent<Props>({
 
 <style lang="postcss">
 .p-tag {
-    @apply bg-gray-200 text-gray-dark;
+    @apply bg-gray-200 text-gray-dark rounded;
     display: inline-flex;
     align-items: flex-start;
     overflow: hidden;
@@ -77,7 +77,6 @@ export default defineComponent<Props>({
     max-width: 100%;
     width: fit-content;
     margin-right: 0.5rem;
-    border-radius: 4px;
     &.deletable {
         .delete-icon {
             @apply text-gray-400;

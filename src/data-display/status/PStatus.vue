@@ -132,7 +132,7 @@ export default {
     align-items: center;
     justify-content: center;
     .circle {
-        border-radius: 50%;
+        @apply rounded-full;
         height: 0.5rem;
         width: 0.5rem;
         margin-right: 0.1rem;

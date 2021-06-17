@@ -12,7 +12,6 @@ export default {
 
 <style lang="postcss">
 .p-pane-layout {
-    @apply bg-white border border-gray-200;
-    border-radius: 2px;
+    @apply bg-white border border-gray-200 rounded-lg;
 }
 </style>

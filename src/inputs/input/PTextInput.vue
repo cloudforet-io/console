@@ -103,10 +103,9 @@ export default {
         @apply w-full;
     }
     .input-container {
-        @apply w-full inline-flex border bg-white text-gray-900;
+        @apply w-full inline-flex border bg-white text-gray-900 rounded;
         min-height: 2rem;
         height: 2rem;
-        border-radius: 2px;
         font-size: 0.875rem;
         line-height: 2rem;
         &.invalid {

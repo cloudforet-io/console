@@ -110,11 +110,10 @@ export default defineComponent<Props>({
 
 <style lang="postcss">
 .p-select-card {
-    @apply bg-white border-gray-200 text-gray-900;
+    @apply bg-white border-gray-200 text-gray-900 rounded;
     display: inline-block;
     position: relative;
     border-width: 1px;
-    border-radius: 4px;
     padding: 2rem 0.5rem;
     cursor: pointer;
     z-index: 0;

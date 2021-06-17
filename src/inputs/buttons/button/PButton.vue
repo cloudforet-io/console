@@ -112,9 +112,8 @@ export default {
 }
 
 .p-button {
-    @apply font-bold inline-flex justify-center items-center cursor-pointer text-center border border-transparent;
+    @apply font-bold inline-flex justify-center items-center cursor-pointer text-center border border-transparent rounded;
     padding: 0 0.875rem;
-    border-radius: 2px;
     opacity: 1;
     min-width: 6rem;
     height: 2rem;

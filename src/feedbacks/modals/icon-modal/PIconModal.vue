@@ -144,9 +144,8 @@ export default {
         }
     }
     .content-wrapper {
-        @apply bg-white mx-auto;
+        @apply bg-white mx-auto rounded-lg;
         text-align: center;
-        border-radius: 1rem;
         padding: 2.875rem 2rem 3.5rem;
         width: 100%;
         min-height: 10.5rem;
