@@ -1,3 +1,11 @@
+# [1.1.0-beta.64](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.63...v1.1.0-beta.64) (2021-06-17)
+
+
+### Features
+
+* add tree multi selection and add always show menu to context menu ([#600](https://github.com/spaceone-dev/spaceone-design-system/issues/600)) ([7a91aa7](https://github.com/spaceone-dev/spaceone-design-system/commit/7a91aa74e805d3cafc4f274073c199912589487c))
+* update border radius style ([#601](https://github.com/spaceone-dev/spaceone-design-system/issues/601)) ([274cc26](https://github.com/spaceone-dev/spaceone-design-system/commit/274cc26f4fe800bee7c2046b4e991eac8d3f7f94))
+
 # [1.1.0-beta.63](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.62...v1.1.0-beta.63) (2021-06-16)
 
 
