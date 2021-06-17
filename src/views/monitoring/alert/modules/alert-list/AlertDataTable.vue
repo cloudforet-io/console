@@ -11,12 +11,13 @@
             :fields="fields"
             :items="items"
             :select-index.sync="selectIndex"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
+            sort-by="created_at"
+            :sort-desc="true"
+            :page-size="15"
+            :total-count="totalCount"
             :query-tags="tags"
             :key-item-sets="handlers.keyItemSets"
             :value-handler-map="handlers.valueHandlerMap"
-            :page-size.sync="pageLimit"
             @change="onChange"
             @refresh="listAlerts"
             @export="onExportToExcel"
@@ -29,12 +30,12 @@
                         :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')"
                     >
                         <template #extra>
-                            <p-button v-for="(button, index) in buttonList"
+                            <p-button v-for="(button, index) in buttonGroup"
                                       :key="index"
                                       :style-type="button.styleType"
                                       :outline="true"
                                       :class="{'disabled': button.disabled}"
-                                      @click="onClickAlertAction(button)"
+                                      @click="onSelectAction(button)"
                             >
                                 {{ button.label }}
                             </p-button>
@@ -97,6 +98,7 @@
                                   name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT.DETAIL,
                                   params: { id: item.alert_id }
                               }"
+                              target="_self"
                     >
                         {{ value }}
                     </p-anchor>
@@ -124,8 +126,13 @@
         </p-toolbox-table>
         <delete-modal
             :header-title="$t('MONITORING.ALERT.ALERT_LIST.FORM.DELETE_MODAL_TITLE')"
-            :visible.sync="deleteState.visible"
+            :visible.sync="visibleDeleteModal"
             @confirm="deleteConfirm"
+        />
+        <alert-resolve-modal
+            :visible.sync="visibleResolveModal"
+            :alert="selectedItem"
+            @confirm="listAlerts"
         />
     </div>
 </template>
@@ -135,9 +142,9 @@ import {
     PToolboxTable, PSelectStatus, PSelectButton, PIconTextButton, PButton, PPanelTop, PBadge, PI, PAnchor,
 } from '@spaceone/design-system';
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
-
+import AlertResolveModal from '@/views/monitoring/alert/modules/alert-list/AlertResolveModal.vue';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
@@ -185,6 +192,7 @@ export default {
         PI,
         PAnchor,
         DeleteModal,
+        AlertResolveModal,
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -216,14 +224,13 @@ export default {
             timezone: computed(() => store.state.user.timezone),
             projects: computed(() => store.state.resource.project.items),
             loading: true,
-            items: [] as any,
             selectIndex: [] as number[],
-            selectedItems: computed<any[]>(() => state.selectIndex.map(d => state.items[d])),
+            selectedItems: computed(() => state.selectIndex.map(d => state.items[d])),
+            selectedItem: computed(() => state.items[state.selectIndex[0]]),
+            items: [] as any,
+            totalCount: 0,
             pageStart: 1,
             pageLimit: 15,
-            sortDesc: false,
-            sortBy: 'created_at',
-            totalCount: 0,
             selectedAlertState: ALERT_STATE.OPEN,
             selectedUrgency: ALERT_URGENCY.ALL,
             selectedAssignedState: ASSIGNED_STATE.ALL,
@@ -231,7 +238,7 @@ export default {
             keyItemSets: handlers.keyItemSets as KeyItemSet[],
             valueHandlerMap: handlers.valueHandlerMap,
             tags: queryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
-            buttonList: computed(() => ([
+            buttonGroup: computed(() => ([
                 {
                     name: 'acknowledge',
                     styleType: 'primary',
@@ -328,9 +335,9 @@ export default {
                 },
             ]),
         });
-
-        const deleteState = reactive({
-            visible: false,
+        const formState = reactive({
+            visibleDeleteModal: false,
+            visibleResolveModal: false,
         });
 
         /* util */
@@ -395,23 +402,27 @@ export default {
                     alert_id: state.selectedItems[0].alert_id,
                 });
                 await listAlerts();
-                showSuccessMessage('Alert Delete confirm', '', root);
+                showSuccessMessage(vm.$t('MONITORING.ALERT.ALERT_LIST.FORM.ALT_S_DELETE'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Alert Delete failure', '', root);
+                showErrorMessage(vm.$t('MONITORING.ALERT.ALERT_LIST.FORM.ALT_S_DELETE'), e, root);
             } finally {
-                deleteState.visible = false;
+                formState.visibleDeleteModal = false;
             }
         };
 
         /* event */
-        const onChange = async (changed: any = {}) => {
-            if (changed.pageStart !== undefined) state.pageStart = changed.pageStart;
-            if (changed.pageLimit !== undefined) state.pageLimit = changed.pageLimit;
-            if (changed.queryTags !== undefined) {
-                state.tags = changed.queryTags;
-                queryHelper.setFiltersAsQueryTag(changed.queryTags);
-                replaceUrlQuery('filters', queryHelper.rawQueryStrings);
+        const onChange = async (options) => {
+            if (options.sortBy !== undefined) {
+                state.sortBy = options.sortBy;
+                state.sortDesc = options.sortDesc;
+            }
+            if (options.pageStart !== undefined) state.pageStart = options.pageStart;
+            if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+            if (options.queryTags !== undefined) {
+                state.tags = options.queryTags;
+                queryHelper.setFiltersAsQueryTag(options.queryTags);
+                await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
             }
             await listAlerts();
         };
@@ -421,13 +432,13 @@ export default {
         };
         const onExportToExcel = async () => {
             try {
-                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
                 await store.dispatch('file/downloadExcel', {
                     url: '/monitoring/alert/list',
                     param: { query: getQuery() },
                     fields: state.excelFields,
                     file_name_prefix: FILE_NAME_PREFIX.alert,
                 });
+                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
             } catch (e) {
                 console.error(e);
             }
@@ -435,37 +446,39 @@ export default {
         const onClickAcknowledged = async () => {
             try {
                 await updateToAcknowledged();
-                showSuccessMessage('Change alert state success', '', vm.$root);
+                showSuccessMessage(vm.$t('MONITORING.ALERT.ALERT_LIST.ALT_S_STATE_CHANGED'), '', root);
                 await listAlerts();
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Change alert state failed', e, vm.$root);
+                showErrorMessage(vm.$t('MONITORING.ALERT.ALERT_LIST.ALT_E_STATE_CHANGED'), e, root);
             }
         };
-        const onClickDelete = () => {
-            deleteState.visible = true;
-        };
-        const onClickAlertAction = (button) => {
+        const onSelectAction = (button) => {
+            if (button.disabled) return;
             if (button.name === ALERT_ACTION.acknowledge) {
                 onClickAcknowledged();
             } else if (button.name === ALERT_ACTION.resolve) {
-                alert('resolve');
+                formState.visibleResolveModal = true;
             } else if (button.name === ALERT_ACTION.merge) {
                 alert('merge');
             } else if (button.name === ALERT_ACTION.delete) {
-                onClickDelete();
+                formState.visibleDeleteModal = true;
             }
         };
 
         (async () => {
-            await Promise.all([store.dispatch('resource/project/load'), listAlerts()]);
+            await Promise.all([
+                store.dispatch('resource/project/load'),
+                listAlerts(),
+            ]);
         })();
 
         return {
             ...toRefs(state),
-            deleteState,
+            ...toRefs(formState),
             handlers,
             ALERT_URGENCY,
+            ALERT_STATE,
             MONITORING_ROUTE,
             referenceRouter,
             capitalize,
@@ -475,8 +488,7 @@ export default {
             onChange,
             onSelectAssignedState,
             onExportToExcel,
-            onClickAlertAction,
-            onClickDelete,
+            onSelectAction,
             deleteConfirm,
         };
     },
@@ -484,8 +496,9 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .alert-data-table {
-    @apply overflow-hidden col-span-12 rounded-lg;
+    @apply col-span-12;
     .p-toolbox-table::v-deep {
+        @apply overflow-hidden rounded-lg;
         .panel-top-wrapper {
             @apply bg-white;
             .p-panel-top {

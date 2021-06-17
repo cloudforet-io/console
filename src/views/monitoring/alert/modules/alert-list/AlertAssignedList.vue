@@ -1,5 +1,6 @@
 <template>
     <p-list-card
+        v-if="totalCount > 0 || assignedVisible"
         :items="items"
         class="assigned-alert-list"
         style-type="indigo400"
@@ -13,6 +14,7 @@
             <p-i name="ic_delete" width="1.25rem" height="1.25rem"
                  class="ic_delete cursor-pointer"
                  color="inherit"
+                 @click="hideAssignedAlert"
             />
         </template>
         <template #item="{item, index}">
@@ -27,9 +29,7 @@ import {
 import AlertListItem from '@/views/monitoring/alert/components/AlertListItem.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { getPageStart } from '@/lib/component-utils/pagination';
 import { SpaceConnector } from '@/lib/space-connector';
-import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 import { store } from '@/store';
 
 export default {
@@ -42,9 +42,8 @@ export default {
     setup() {
         const state = reactive({
             items: [],
-            thisPage: 1,
-            allPage: 1,
-            pageSize: 10,
+            totalCount: 0,
+            assignedVisible: true,
         });
 
         /* api */
@@ -52,28 +51,35 @@ export default {
             const apiQuery = new ApiQueryHelper();
             apiQuery
                 .setSort('created_at', true)
-                .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize)
                 .setFilters([{ k: 'assignee', v: store.state.user.userId, o: '=' }]);
             return apiQuery.data;
         };
-        const assignedAlerts = async () => {
+        const getAssignedAlerts = async () => {
             try {
                 const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({ query: getQuery() });
-                state.allPage = getAllPage(total_count, 10);
                 state.items = results;
+                state.totalCount = total_count;
             } catch (e) {
+                state.items = [];
+                state.totalCount = 0;
                 console.error(e);
             }
         };
 
+        /* event */
+        const hideAssignedAlert = () => {
+            state.assignedVisible = false;
+        };
+
         /* init */
         (async () => {
-            await assignedAlerts();
+            await getAssignedAlerts();
         })();
 
         return {
             ...toRefs(state),
-            assignedAlerts,
+            getAssignedAlerts,
+            hideAssignedAlert,
         };
     },
 };
