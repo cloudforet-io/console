@@ -1,6 +1,6 @@
 <template>
     <p-list-card
-        v-if="totalCount > 0 || assignedVisible"
+        v-if="totalCount > 0 && assignedVisible"
         :items="items"
         class="assigned-alert-list"
         style-type="indigo400"

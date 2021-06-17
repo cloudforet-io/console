@@ -92,16 +92,14 @@
             </template>
             <template #col-title-format="{ value, item }">
                 <template v-if="value">
-                    <p-anchor class="alert-title"
-                              :show-icon="false"
-                              :to="{
-                                  name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT.DETAIL,
-                                  params: { id: item.alert_id }
-                              }"
-                              target="_self"
+                    <router-link class="alert-title"
+                                 :to="{
+                                     name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT.DETAIL,
+                                     params: { id: item.alert_id }
+                                 }"
                     >
                         {{ value }}
-                    </p-anchor>
+                    </router-link>
                 </template>
             </template>
             <template #col-state-format="{ value }">
@@ -122,6 +120,9 @@
                         {{ projects[value] ? projects[value].label : value }}
                     </p-anchor>
                 </template>
+            </template>
+            <template #col-webhook_id-format="{ value }">
+                {{ value ? webhookFormatter(value) : ' ' }}
             </template>
         </p-toolbox-table>
         <delete-modal
@@ -334,6 +335,7 @@ export default {
 
                 },
             ]),
+            webhookNameList: [] as any,
         });
         const formState = reactive({
             visibleDeleteModal: false,
@@ -345,6 +347,10 @@ export default {
             if (alertState === ALERT_STATE.TRIGGERED) return 'red100';
             if (alertState === ALERT_STATE.ACKNOWLEDGED) return 'blue200';
             return 'gray200';
+        };
+        const webhookFormatter = (webhookId) => {
+            const webhookName = state.webhookNameList.find(element => element.webhook_id === webhookId)?.name;
+            return webhookName;
         };
 
         /* api */
@@ -376,9 +382,9 @@ export default {
                     query: getQuery(),
                 });
                 state.items = results.map(d => ({
-                    ...d,
                     created_at: iso8601Formatter(d.created_at, state.timezone),
                     duration: durationFormatter(d.created_at, dayjs().format('YYYY-MM-DD HH:mm:ss'), state.timezone) || '--',
+                    ...d,
                 }));
                 state.totalCount = total_count;
                 state.selectIndex = [];
@@ -409,6 +415,12 @@ export default {
             } finally {
                 formState.visibleDeleteModal = false;
             }
+        };
+        const getWebhook = async () => {
+            const { results } = await SpaceConnector.client.monitoring.webhook.list({
+                query: { only: ['webhook_id', 'name'] },
+            });
+            state.webhookNameList = results;
         };
 
         /* event */
@@ -470,6 +482,7 @@ export default {
             await Promise.all([
                 store.dispatch('resource/project/load'),
                 listAlerts(),
+                getWebhook(),
             ]);
         })();
 
@@ -484,6 +497,7 @@ export default {
             capitalize,
             badgeStyleTypeFormatter,
             iso8601Formatter,
+            webhookFormatter,
             listAlerts,
             onChange,
             onSelectAssignedState,
