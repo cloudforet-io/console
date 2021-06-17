@@ -22,12 +22,6 @@ export const Template = (args, { argTypes }) => ({
         <p-context-menu :menu="menu"
                         :theme="theme"
                         :loading="loading"
-                        :autoHeight="autoHeight"
-                        :useCustomStyle="useCustomStyle"
-                        :position="position"
-                        :offsetTop="offsetTop"
-                        :width="width"
-                        :height="height"
                         :always-show-menu="alwaysShowMenu"
                         @select="onSelect"
                         @focus="onFocus"
@@ -123,23 +117,6 @@ Each `MenuItem` has the following type to represent it:
             components: { PContextMenu },
             template: `
         <p-context-menu :menu="[]" />
-`,
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-## Custom Style
-
-<Canvas>
-    <Story name="Custom Style" args={{menu: menuItems}} height={'18rem'}>
-        {{
-            props: Object.keys(getContextMenuArgTypes()),
-            components: { PContextMenu },
-            template: `
-        <div>TODO</div>
 `,
         }}
     </Story>

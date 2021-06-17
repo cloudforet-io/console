@@ -1,7 +1,6 @@
 <template>
-    <div ref="contextMenu" class="p-context-menu"
+    <div class="p-context-menu"
          :class="theme"
-         :style="{...autoHeightStyle,...contextMenuStyle}"
          @keyup.esc="onEsc"
     >
         <slot v-if="!alwaysShowMenu && menu.length === 0" name="no-data" v-bind="{...$props, uuid}">
@@ -77,13 +76,13 @@
 
 <script lang="ts">
 import {
-    computed, ref, onMounted, defineComponent, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PI from '@/foundation/icons/PI.vue';
 
-import { ContextMenuProps, CONTEXT_MENU_THEME, CONTEXT_MENU_POSITION } from '@/inputs/context-menu/type';
+import { ContextMenuProps, CONTEXT_MENU_THEME } from '@/inputs/context-menu/type';
 import { i18n } from '@/translations';
 
 export default defineComponent<ContextMenuProps>({
@@ -106,33 +105,6 @@ export default defineComponent<ContextMenuProps>({
             type: Boolean,
             default: false,
         },
-        autoHeight: {
-            type: Boolean,
-            default: false,
-        },
-        useCustomStyle: {
-            type: Boolean,
-            default: false,
-        },
-        position: {
-            type: String,
-            default: undefined,
-            validator(position?: any) {
-                return position === undefined || Object.values(CONTEXT_MENU_POSITION).includes(position);
-            },
-        },
-        offsetTop: {
-            type: Number,
-            default: undefined,
-        },
-        width: {
-            type: Number,
-            default: undefined,
-        },
-        height: {
-            type: Number,
-            default: undefined,
-        },
         alwaysShowMenu: {
             type: Boolean,
             default: false,
@@ -140,33 +112,6 @@ export default defineComponent<ContextMenuProps>({
     },
     setup(props: ContextMenuProps, { emit }) {
         const state = reactive({
-            contextMenu: null as HTMLElement|null,
-            contextMenuStyle: computed(() => {
-                if (!state.contextMenu || !props.useCustomStyle) return {};
-                const contextMenuStyle: any = {
-                    position: 'fixed',
-                    minWidth: 'auto',
-                    width: `${props.width}px`,
-                };
-                if (props.position === CONTEXT_MENU_POSITION.top) contextMenuStyle.top = `calc(${props.offsetTop ?? 0}px + ${props.height ?? 0}px)`;
-                if (props.position === CONTEXT_MENU_POSITION.bottom) contextMenuStyle.bottom = `calc(100vh - ${props.offsetTop ?? 0}px)`;
-                return contextMenuStyle;
-            }),
-            contextMenuHeight: 0,
-            autoHeightStyle: computed(() => {
-                if (props.autoHeight && state.contextMenuHeight) {
-                    return {
-                        maxHeight: `${state.contextMenuHeight}px`,
-                        overflowY: 'auto',
-                    };
-                } return {};
-            }),
-        });
-        onMounted(() => {
-            if (!props.autoHeight || !props.useCustomStyle) return;
-            const winHeight = window.innerHeight;
-            if (props.position === 'top') state.contextMenuHeight = winHeight - (props.offsetTop ?? 0) - (props.height ?? 0) - 12;
-            if (props.position === 'bottom') state.contextMenuHeight = (props.offsetTop ?? 0) - 12;
         });
 
         let focusedEl: HTMLElement|null = null;
@@ -279,8 +224,8 @@ export default defineComponent<ContextMenuProps>({
 }
 
 .p-context-menu {
+    @apply rounded;
     padding: 0;
-    border-radius: 2px;
     margin: -1px 0 0 0;
     min-width: 100%;
     cursor: default;

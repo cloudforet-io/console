@@ -18,7 +18,7 @@
                             :menu="bindingMenu"
                             :loading="loading"
                             :always-show-menu="alwaysShowMenu"
-                            auto-height
+                            :style="contextMenuStyle"
                             @select="onClickMenuItem"
                             @keyup:up:end="focusSearch"
                             @keyup:esc="focusSearch"
@@ -47,6 +47,7 @@ import PSearch from '@/inputs/search/search/PSearch.vue';
 import { reduce } from 'lodash';
 import { MenuItem } from '@/inputs/context-menu/type';
 import Fuse from 'fuse.js';
+import { useContextMenuCustomStyle } from '@/hooks/context-menu-custom-style';
 
 interface AutocompleteSearchProps {
     value: string;
@@ -147,6 +148,8 @@ export default defineComponent<AutocompleteSearchProps>({
             searchableItems: computed<MenuItem[]>(() => props.menu.filter(d => d.type === undefined || d.type === 'item')),
             fuse: computed(() => new Fuse(state.searchableItems, fuseOptions)),
         });
+
+        const { state: contextMenuCustomStyleState } = useContextMenuCustomStyle(computed(() => state.proxyVisibleMenu));
 
         const defaultHandler = (inputText: string, list: MenuItem[]) => {
             let results: MenuItem[] = [...list];
@@ -322,6 +325,7 @@ export default defineComponent<AutocompleteSearchProps>({
 
         return {
             ...toRefs(state),
+            ...toRefs(contextMenuCustomStyleState),
             allFocusOut,
             focusMenu,
             onClickMenuItem,
