@@ -8,15 +8,14 @@
           :ondragstart="onDragStart"
           :ondragend="onDragEnd"
           :unfold-when-dragover="true"
-          @node-folded-changed="onNodeFoldedChange"
     >
         <template #default="{node, path, tree, index}">
             <div class="node" :class="{
-                     selected: getSelectState(path),
                      'drag-target-parent': dragTargetParentPath ? dragTargetParentPath.toString() === path.toString() : false,
                      ...getClassNames(node)
                  }"
-                 @click.stop="changeSelectState(node, path)"
+                 @click.stop="onClickNode(node, path, $event)"
+                 @keypress.enter="onClickNode(node, path, $event)"
             >
                 <slot name="node" v-bind="{node, path, selected: getSelectState(path)}">
                     <span v-if="$scopedSlots[`left-extra`]" class="left-extra">
@@ -33,12 +32,12 @@
                                 <p-i v-if="toggleOptions.validator && toggleOptions.validator(node)"
                                      :name="node.$folded ? 'ic_tree_arrow' : 'ic_tree_arrow--opened'"
                                      width="1em" height="1em"
-                                     color="inherit transparent"
+                                     color="inherit"
                                 />
                             </template>
                         </slot>
                     </span>
-                    <p-text-input v-if="isEditing && path.toString() === selectedPath.toString()"
+                    <p-text-input v-if="isEditing && getSelectState(path)"
                                   v-model="editText" v-focus="true"
                                   :invalid="invalid"
                                   @blur="finishEdit(node)"
@@ -149,25 +148,51 @@ export default defineComponent({
                 return undefined;
             }),
             selectedItem: {} as { path?: number[]; node?: any},
-            selectedPath: computed(() => state.selectedItem.path || []),
-            selectedNode: computed(() => state.selectedItem.node || null),
+            selectedItems: [] as { path: number[]; node: any}[],
+            selectedPaths: computed(() => state.selectedItems.map(d => d.path)),
             isFetchAndFinding: false,
             dragTargetParentPath: null as any,
         });
 
-        const getSelectState = path => state.selectedPath.toString() === path.toString();
+        const getSelectState = path => !!state.selectedPaths.find(d => d.toString() === path.toString());
 
         const resetSelect = () => {
-            state.selectedItem = {};
+            state.selectedItems.forEach((d) => {
+                d.node.$nodeBackClass = '';
+            });
+            state.selectedItems = [];
         };
 
-        const setSelectItem = (node, path) => {
+        const setSelectItem = (node, path, value = true) => {
             if (state.isFetchAndFinding) return;
 
             if (props.selectOptions.validator) {
                 if (!props.selectOptions.validator(node)) return;
             }
-            state.selectedItem = { node, path };
+
+            // multi select
+            if (props.selectOptions.multiSelectable) {
+                const idx = state.selectedItems.findIndex(d => d.path.toString() === path.toString());
+                if (idx === -1) {
+                    if (value) {
+                        state.selectedItems.push({ node, path });
+                        node.$nodeBackClass = 'selected';
+                    }
+                } else {
+                    state.selectedItems.splice(idx, 1);
+                    node.$nodeBackClass = '';
+                }
+                return;
+            }
+
+            // single select
+            if (value) {
+                if (state.selectedItems[0]) state.selectedItems[0].node.$nodeBackClass = '';
+                state.selectedItems = [{ node, path }];
+                node.$nodeBackClass = 'selected';
+            } else {
+                resetSelect();
+            }
         };
 
         const startEdit = (node) => {
@@ -178,16 +203,10 @@ export default defineComponent({
             state.isEditing = true;
         };
 
-        const changeSelectState = (node, path) => {
+        const changeSelectState = (node, path, value = true) => {
             if (props.selectOptions.disabled) return;
 
-            if (state.selectedNode) {
-                if (state.selectedPath.toString() === path.toString()) {
-                    startEdit(state.selectedNode);
-                    return;
-                }
-            }
-            setSelectItem(node, path);
+            setSelectItem(node, path, value);
         };
 
         const onDragStart = (tree, e) => {
@@ -211,7 +230,7 @@ export default defineComponent({
                 return false;
             }
 
-            if (state.selectedNode && e.startPath.toString() === state.selectedPath.toString()) {
+            if (getSelectState(e.startPath)) {
                 setSelectItem(e.dragNode, e.targetPath);
             }
 
@@ -269,25 +288,44 @@ export default defineComponent({
 
             return node.children;
         };
-        const onToggle = async (node, path, tree) => {
-            if (node.$folded) {
-                tree.unfold(node, path);
-            } else {
-                tree.fold(node, path);
-            }
-        };
-        const onNodeFoldedChange = async (node, path) => {
-            if (node.$folded) {
+
+        const onNodeFoldedChange = async (node, path, folded) => {
+            if (folded) {
                 if (props.dataFetcher) {
                     node.children = [];
-                    if (state.selectedNode && path.every((d, i) => state.selectedPath[i] === d)) {
-                        if (state.selectedPath.toString() !== path.toString()) resetSelect();
-                    }
+
+                    state.selectedItems = state.selectedItems.filter(({ node: selectedNode, path: selectedPath }) => {
+                        const isChildOfToggledNode = selectedPath.length > path.length && path.every((d, i) => selectedPath[i] === d);
+                        if (isChildOfToggledNode) selectedNode.$nodeBackClass = '';
+                        return !isChildOfToggledNode;
+                    });
                 }
             } else {
                 await fetchData(node);
             }
         };
+
+        const onToggle = async (node, path, tree) => {
+            if (props.toggleOptions.disabled) return;
+            if (props.toggleOptions.validator && !props.toggleOptions.validator(node)) return;
+
+            if (node.$folded) {
+                tree.unfold(node, path);
+            } else {
+                tree.fold(node, path);
+            }
+            await onNodeFoldedChange(node, path, node.$folded);
+        };
+
+        const onClickNode = (node, path, e) => {
+            emit('click-node', node, path, e);
+
+            if (getSelectState(path)) startEdit(node);
+            else changeSelectState(node, path);
+
+            if (props.toggleOptions.toggleOnNodeClick) onToggle(node, path, state.treeRef);
+        };
+
         const addNode = (data) => {
             if (Array.isArray(data)) state.treeData = state.treeData.concat(data.map(d => getDefaultNode(d)));
             else state.treeData.push(getDefaultNode(data));
@@ -389,7 +427,7 @@ export default defineComponent({
         const deleteNodeByPath = (path) => {
             if (path.length === 0) return;
 
-            if (state.selectedPath.toString() === path.toString()) resetSelect();
+            if (getSelectState(path)) resetSelect();
             state.treeRef.removeNodeByPath(path);
         };
 
@@ -443,12 +481,17 @@ export default defineComponent({
             updateNodeByPath,
             updateNode,
             changeSelectState,
+            toggleNode: (node, path) => {
+                (async () => {
+                    await onToggle(node, path, state.treeRef);
+                })();
+            },
         };
 
 
-        watch(() => state.selectedPath, (path, before) => {
-            if (path.toString() === before.toString()) return;
-            emit('change-select', state.selectedNode, path);
+        watch(() => state.selectedPaths, (after, before) => {
+            if (after.toString() === before.toString()) return;
+            emit('change-select', state.selectedItems);
         });
 
 
@@ -463,6 +506,7 @@ export default defineComponent({
         return {
             ...toRefs(state),
             getSelectState,
+            onClickNode,
             changeSelectState,
             eachDraggable,
             eachDroppable,
@@ -470,7 +514,6 @@ export default defineComponent({
             onDragEnd,
             finishEdit,
             onToggle,
-            onNodeFoldedChange,
         };
     },
 });
@@ -489,21 +532,21 @@ export default defineComponent({
         }
     }
     .tree-node-back {
-        &:hover {
-            @apply text-secondary bg-secondary2;
+        @media (hover: hover) {
+            &:hover {
+                @apply text-secondary bg-secondary2;
+            }
         }
-        .tree-node .node.selected {
+        &.selected {
             @apply bg-blue-200;
         }
     }
     .tree-node {
-        @apply h-8 text-sm text-black cursor-pointer;
-        border-radius: 4px;
+        @apply h-8 text-sm text-black cursor-pointer rounded;
         .node {
             @apply h-full w-full inline-flex items-center;
             &.drag-target-parent {
-                @apply bg-secondary text-white;
-                border-radius: 4px;
+                @apply bg-secondary text-white rounded;
             }
         }
         .toggle {

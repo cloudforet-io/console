@@ -40,6 +40,7 @@
                         :offset-top="offsetTop"
                         :width="width"
                         :height="height"
+                        :always-show-menu="alwaysShowMenu"
                         @select="onSelectMenu"
         >
             <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
@@ -85,7 +86,7 @@ export default {
         },
         selectItem: {
             type: [String, Number],
-            required: true,
+            default: '',
         },
         invalid: {
             type: Boolean,
@@ -134,6 +135,10 @@ export default {
         buttonIcon: {
             type: String,
             default: undefined,
+        },
+        alwaysShowMenu: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: SelectDropdownProps, { emit, slots }) {

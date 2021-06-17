@@ -1,6 +1,6 @@
 import { ArgTypes } from '@storybook/addons';
 
-export const argTypes: ArgTypes = {
+export const getSearchArgTypes = (): ArgTypes => ({
     value: {
         name: 'value',
         type: { name: 'string', required: true },
@@ -295,4 +295,4 @@ export const argTypes: ArgTypes = {
             },
         },
     },
-};
+});

@@ -56,7 +56,7 @@ const getArgTypes = (category: string, info: [string, string][]) => {
     return argTypes;
 };
 
-export const argTypes: ArgTypes = {
+export const getContextMenuArgTypes = (): ArgTypes => ({
     menu: {
         name: 'menu',
         type: { name: 'array' },
@@ -221,6 +221,24 @@ export const argTypes: ArgTypes = {
             type: 'number',
         },
     },
+    alwaysShowMenu: {
+        name: 'alwaysShowMenu',
+        type: { name: 'boolean' },
+        description: 'Show menu always even if there is no menu to show.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     ...getArgTypes('slots', slots),
     ...getArgTypes('events', events),
-};
+});

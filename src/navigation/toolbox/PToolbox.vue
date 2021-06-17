@@ -80,43 +80,12 @@ import {
 import { makeOptionalProxy } from '@/util/composition-helpers';
 import PQuerySearch from '@/inputs/search/query-search/PQuerySearch.vue';
 import { QueryTag } from '@/inputs/search/query-search-tags/type';
-import { KeyItemSet, QueryItem, ValueHandlerMap } from '@/inputs/search/query-search/type';
+import { QueryItem } from '@/inputs/search/query-search/type';
 import PSearch from '@/inputs/search/search/PSearch.vue';
 import PQuerySearchTags from '@/inputs/search/query-search-tags/PQuerySearchTags.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
-import { TOOLBOX_TABLE_STYLE_TYPE } from '@/data-display/tables/toolbox-table/config';
+import { ToolboxOptions, ToolboxProps } from '@/navigation/toolbox/type';
 
-
-export interface ToolboxOptions {
-    pageStart?: number;
-    pageLimit?: number;
-    sortBy?: string;
-    queryTags?: QueryTag[];
-    searchText?: string;
-}
-
-export interface ToolboxProps {
-    paginationVisible?: boolean;
-    pageSizeChangeable?: boolean;
-    settingsVisible?: boolean;
-    sortable?: boolean;
-    exportable?: boolean;
-    refreshable?: boolean;
-    searchable?: boolean;
-    filtersVisible?: boolean;
-    searchType?: string;
-    thisPage?: number;
-    pageSize?: number;
-    totalCount?: number;
-    sortBy?: string;
-    pageSizeOptions?: number[];
-    sortByOptions?: string[];
-    keyItemSets?: KeyItemSet[];
-    valueHandlerMap?: ValueHandlerMap;
-    queryTags?: QueryTag[];
-    searchText?: string;
-    timezone?: string;
-}
 
 export default defineComponent<ToolboxProps>({
     name: 'PToolbox',

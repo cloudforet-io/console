@@ -1,8 +1,8 @@
-import { argTypes as searchArgTypes } from '@/inputs/search/search/story-helper';
-import { argTypes as contextMenuArgTypes } from '@/inputs/context-menu/story-helper';
+import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
+import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
 import { ArgTypes } from '@storybook/addons';
 
-const extraArgTypes = {
+const extraArgTypes: ArgTypes = {
     visibleMenu: {
         name: 'visibleMenu',
         type: { name: 'boolean' },
@@ -135,6 +135,7 @@ const extraArgTypes = {
 
 const initSearchArgTypes = (): ArgTypes => {
     const argTypes: ArgTypes = {};
+    const searchArgTypes = getSearchArgTypes();
     Object.keys(searchArgTypes).forEach((k) => {
         const item = searchArgTypes[k];
         if (item.table?.category === 'slots') {
@@ -150,9 +151,11 @@ const initSearchArgTypes = (): ArgTypes => {
 };
 
 const initContextMenuArgTypes = (): ArgTypes => {
+    const contextMenuArgTypes = getContextMenuArgTypes();
     const argTypes: ArgTypes = {
         menu: contextMenuArgTypes.menu,
         loading: contextMenuArgTypes.loading,
+        alwaysShowMenu: contextMenuArgTypes.alwaysShowMenu,
     };
     Object.keys(contextMenuArgTypes).forEach((k) => {
         const item = contextMenuArgTypes[k];
@@ -163,8 +166,8 @@ const initContextMenuArgTypes = (): ArgTypes => {
     return argTypes;
 };
 
-export const argTypes: ArgTypes = {
+export const getAutocompleteSearchArgTypes = (): ArgTypes => ({
     ...initSearchArgTypes(),
     ...initContextMenuArgTypes(),
     ...extraArgTypes,
-};
+});

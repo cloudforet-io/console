@@ -72,11 +72,12 @@ import {
 
 import PDataTable, { DataTableProps } from '@/data-display/tables/data-table/PDataTable.vue';
 import { makeOptionalProxy } from '@/util/composition-helpers';
-import PToolbox, { ToolboxOptions, ToolboxProps } from '@/navigation/toolbox/PToolbox.vue';
+import PToolbox from '@/navigation/toolbox/PToolbox.vue';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
 import { TOOLBOX_TABLE_STYLE_TYPE } from '@/data-display/tables/toolbox-table/config';
+import { ToolboxOptions, ToolboxProps } from '@/navigation/toolbox/type';
 
 export interface ToolboxTableOptions extends ToolboxOptions {
     sortDesc?: boolean;

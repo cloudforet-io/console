@@ -2,7 +2,7 @@ import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PAutocompleteSearch from './PAutocompleteSearch.vue';
 import PButton from '@/inputs/buttons/button/PButton';
 import { reactive, toRefs } from '@vue/composition-api';
-import { argTypes } from '@/inputs/search/autocomplete-search/story-helper';
+import { getAutocompleteSearchArgTypes } from '@/inputs/search/autocomplete-search/story-helper';
 import {getAutocompleteMenu, getAutocompleteMenuWithMultiTypes} from '@/inputs/search/autocomplete-search/mock';
 import Fuse from 'fuse.js'
 
@@ -11,7 +11,7 @@ import Fuse from 'fuse.js'
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A182254',
     },
-}} argTypes={argTypes}/>
+}} argTypes={getAutocompleteSearchArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({
@@ -21,6 +21,7 @@ export const Template = (args, { argTypes }) => ({
         <p-autocomplete-search
             :menu="menu"
             :loading="loading"
+            :always-show-menu="alwaysShowMenu"
             :placeholder="placeholder"
             :focused="focused"
             :disabeld="disabled"

@@ -226,9 +226,9 @@ export const ExpertTemplate = (args, { argTypes }) => ({
                 })
             }
         }
-        const onChangeSelect = (node, path) => {
-            state.selectedItem = node ? {node, path} : {}
-            state.editText = node? node.data.name : ''
+        const onChangeSelect = (selected) => {
+            state.selectedItem = selected.length > 0 ? selected[0] : {};
+            state.editText = selected.length ? selected[0].node.data.name : ''
         }
         const onStartDrag = (node, parent) => {
             console.debug('start drag', node, parent)

@@ -4,7 +4,7 @@
          :style="{...autoHeightStyle,...contextMenuStyle}"
          @keyup.esc="onEsc"
     >
-        <slot v-if="menu.length === 0" name="no-data" v-bind="{...$props, uuid}">
+        <slot v-if="!alwaysShowMenu && menu.length === 0" name="no-data" v-bind="{...$props, uuid}">
             <div key="no-data" class="context-content context-item no-drag empty" :class="theme">
                 <slot name="no-data-format" v-bind="{...$props, uuid}">
                     {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
@@ -132,6 +132,10 @@ export default defineComponent<ContextMenuProps>({
         height: {
             type: Number,
             default: undefined,
+        },
+        alwaysShowMenu: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: ContextMenuProps, { emit }) {

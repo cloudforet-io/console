@@ -3,7 +3,7 @@ import PContextMenu from './PContextMenu.vue';
 import PEmpty from '@/data-display/empty/PEmpty';
 import PI from '@/foundation/icons/PI.vue';
 import PRawData from '@/data-display/raw-data/PRawData';
-import {argTypes} from '@/inputs/context-menu/story-helper';
+import {getContextMenuArgTypes} from '@/inputs/context-menu/story-helper';
 import {menuItems} from '@/inputs/context-menu/mock';
 import { reactive, toRefs, watch } from '@vue/composition-api';
 
@@ -12,7 +12,7 @@ import { reactive, toRefs, watch } from '@vue/composition-api';
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A133521'
     }
-}} argTypes={argTypes}/>
+}} argTypes={getContextMenuArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({
@@ -28,6 +28,7 @@ export const Template = (args, { argTypes }) => ({
                         :offsetTop="offsetTop"
                         :width="width"
                         :height="height"
+                        :always-show-menu="alwaysShowMenu"
                         @select="onSelect"
                         @focus="onFocus"
                         @blur="onBlur"
@@ -84,7 +85,7 @@ Each `MenuItem` has the following type to represent it:
 <Canvas>
     <Story name="Basic" args={{menu: menuItems}} height={'18rem'}>
         {{
-            props: Object.keys(argTypes),
+            props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu },
             template: `
         <p-context-menu :menu="menu"/>
@@ -101,7 +102,7 @@ Each `MenuItem` has the following type to represent it:
 <Canvas>
     <Story name="Loading" args={{menu: menuItems}} height={'18rem'}>
         {{
-            props: Object.keys(argTypes),
+            props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu },
             template: `
         <p-context-menu :menu="menu" loading />
@@ -118,7 +119,7 @@ Each `MenuItem` has the following type to represent it:
 <Canvas>
     <Story name="No Data" args={{menu: menuItems}} height={'4rem'}>
         {{
-            props: Object.keys(argTypes),
+            props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu },
             template: `
         <p-context-menu :menu="[]" />
@@ -135,7 +136,7 @@ Each `MenuItem` has the following type to represent it:
 <Canvas>
     <Story name="Custom Style" args={{menu: menuItems}} height={'18rem'}>
         {{
-            props: Object.keys(argTypes),
+            props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu },
             template: `
         <div>TODO</div>
@@ -166,7 +167,7 @@ Context Menu have 4 types fot slots:
 <Canvas>
     <Story name="Loading Slots" args={{menu: menuItems}}>
         {{
-            props: Object.keys(argTypes),
+            props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu, PRawData },
             template: `
         <div class="flex h-full w-full flex-col">
@@ -223,7 +224,7 @@ Context Menu have 4 types fot slots:
 <Canvas>
     <Story name="No Data Slots" args={{menu: menuItems}}>
         {{
-            props: Object.keys(argTypes),
+            props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu, PEmpty, PRawData },
             template: `
         <div class="flex h-full w-full flex-col">
@@ -275,7 +276,7 @@ Context Menu have 4 types fot slots:
 <Canvas>
     <Story name="Menu Slot" args={{menu: menuItems}}>
         {{
-            props: Object.keys(argTypes),
+            props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu, PRawData },
             template: `
         <div class="flex h-full w-full flex-col">
@@ -327,7 +328,7 @@ Context Menu have 4 types fot slots:
 <Canvas>
     <Story name="Item Slots" args={{menu: menuItems}}>
         {{
-            props: Object.keys(argTypes),
+            props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu, PI, PRawData },
             template: `
         <div class="flex h-full w-full flex-col">
@@ -410,7 +411,7 @@ Context Menu have 4 types fot slots:
 <Canvas>
     <Story name="Divider Slots" args={{menu: menuItems}}>
         {{
-            props: Object.keys(argTypes),
+            props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu, PRawData },
             template: `
         <div class="flex h-full w-full flex-col">
@@ -464,7 +465,7 @@ Context Menu have 4 types fot slots:
 <Canvas>
     <Story name="Header Slots" args={{menu: menuItems}}>
         {{
-            props: Object.keys(argTypes),
+            props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu, PI, PRawData },
             template: `
         <div class="flex h-full w-full flex-col">

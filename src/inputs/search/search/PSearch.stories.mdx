@@ -1,14 +1,14 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PSearch from './PSearch.vue';
 import { reactive, toRefs } from '@vue/composition-api';
-import {argTypes} from '@/inputs/search/search/story-helper';
+import {getSearchArgTypes} from '@/inputs/search/search/story-helper';
 
 <Meta title='Inputs/Search' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=5952%3A1343',
     },
-}} argTypes={argTypes}/>
+}} argTypes={getSearchArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({
