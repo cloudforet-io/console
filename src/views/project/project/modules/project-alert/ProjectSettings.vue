@@ -1,17 +1,35 @@
 <template>
     <p-pane-layout class="project-settings">
-        <h3 class="sub-title">
+        <p class="sub-title">
             {{ $t('PROJECT.DETAIL.ALERT.SETTINGS') }}
-        </h3>
+        </p>
         <section class="section notification-policy-wrapper">
             <div class="section-title">
                 {{ $t('PROJECT.DETAIL.ALERT.NOTIFICATION_POLICY') }}
             </div>
             <div class="content-wrapper">
-                <p-i :name="notificationOption === NOTIFICATION_OPTION.all ? 'ic_bell' : 'ic_alert'" />
-                <span class="text">{{ notificationOptionFormatter(notificationOption) }}</span>
+                <p-i :name="notificationUrgency === NOTIFICATION_URGENCY.ALL ? 'ic_bell' : 'ic_alert'" />
+                <span class="text">{{ notificationOptionFormatter(notificationUrgency) }}</span>
             </div>
             <p-icon-button class="edit-button" name="ic_edit" @click="onClickUpdateNotificationPolicy" />
+        </section>
+        <section class="section auto-recovery-wrapper">
+            <div class="section-title">
+                {{ $t('PROJECT.DETAIL.ALERT.AUTO_RECOVERY') }}
+            </div>
+            <div class="content-wrapper">
+                <p-i v-if="isAutoRecovery" name="ic_automation" />
+                <span class="text">{{ isAutoRecovery ? $t('PROJECT.DETAIL.ALERT.AUTO_RESOLVE_ALERTS') : $t('PROJECT.DETAIL.ALERT.MANUAL_OPERATION') }}</span>
+            </div>
+            <p-icon-button class="edit-button" name="ic_edit" @click="onClickUpdateAutoRecovery" />
+        </section>
+        <section class="section event-rule">
+            <div class="section-title">
+                {{ $t('PROJECT.DETAIL.ALERT.EVENT_RULE') }}
+            </div>
+            <div class="content-wrapper">
+                <p-icon-button class="edit-button" name="ic_edit" />
+            </div>
         </section>
         <section class="section escalation-policy-wrapper">
             <div class="section-title">
@@ -29,7 +47,14 @@
         <project-notification-policy-update-modal
             :project-id="projectId"
             :visible.sync="updateNotificationPolicyModalVisible"
-            :notification-option="notificationOption"
+            :select-options="notificationUrgencyList"
+            :selected-option="notificationUrgency"
+            @refresh="getProjectAlertConfig"
+        />
+        <project-auto-recovery-update-modal
+            :project-id="projectId"
+            :visible.sync="updateAutoRecoveryModalVisible"
+            :selected-option="isAutoRecovery"
             @refresh="getProjectAlertConfig"
         />
         <project-escalation-policy-update-modal
@@ -46,29 +71,33 @@
 import { get } from 'lodash';
 
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import ProjectEscalationPolicy from '@/views/project/project/modules/project-alert/ProjectEscalationPolicy.vue';
 import ProjectNotificationPolicyUpdateModal
     from '@/views/project/project/modules/project-alert/ProjectNotificationPolicyUpdateModal.vue';
+import ProjectAutoRecoveryUpdateModal
+    from '@/views/project/project/modules/project-alert/ProjectAutoRecoveryUpdateModal.vue';
 import ProjectEscalationPolicyUpdateModal
     from '@/views/project/project/modules/project-alert/ProjectEscalationPolicyUpdateModal.vue';
 
 import { PI, PIconButton, PPaneLayout } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@/lib/space-connector';
+import { i18n } from '@/translations';
 
 
-enum NOTIFICATION_OPTION {
-    all = 'ALL',
-    highOnly = 'HIGH_ONLY'
-}
+const NOTIFICATION_URGENCY = Object.freeze({
+    ALL: 'ALL',
+    HIGH_ONLY: 'HIGH_ONLY',
+});
 
 export default {
     name: 'ProjectSettings',
     components: {
         ProjectNotificationPolicyUpdateModal,
+        ProjectAutoRecoveryUpdateModal,
         ProjectEscalationPolicyUpdateModal,
         ProjectEscalationPolicy,
         PPaneLayout,
@@ -82,28 +111,30 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            notificationOptions: computed(() => ([
+            notificationUrgencyList: computed(() => ([
                 {
-                    name: NOTIFICATION_OPTION.all,
-                    label: vm.$t('PROJECT.DETAIL.ALERT.ALL_NOTIFICATIONS'),
+                    name: NOTIFICATION_URGENCY.ALL,
+                    label: i18n.t('PROJECT.DETAIL.ALERT.ALL_NOTIFICATIONS'),
                 },
                 {
-                    name: NOTIFICATION_OPTION.highOnly,
-                    label: vm.$t('PROJECT.DETAIL.ALERT.HIGH_URGENCY_NOTIFICATIONS'),
+                    name: NOTIFICATION_URGENCY.HIGH_ONLY,
+                    label: i18n.t('PROJECT.DETAIL.ALERT.HIGH_URGENCY_NOTIFICATIONS'),
+                    icon: 'ic_alert',
                 },
             ])),
             projectAlertConfig: {},
-            notificationOption: computed(() => get(state.projectAlertConfig, 'options.notification_urgency')),
+            notificationUrgency: computed(() => get(state.projectAlertConfig, 'options.notification_urgency')),
+            isAutoRecovery: computed(() => get(state.projectAlertConfig, 'options.auto_recovery')),
             escalationPolicyId: computed(() => get(state.projectAlertConfig, 'escalation_policy_info.escalation_policy_id')),
             //
             updateNotificationPolicyModalVisible: false,
+            updateAutoRecoveryModalVisible: false,
             updateEscalationPolicyModalVisible: false,
         });
 
         /* util */
-        const notificationOptionFormatter = option => state.notificationOptions.find(d => d.name === option)?.label;
+        const notificationOptionFormatter = option => state.notificationUrgencyList.find(d => d.name === option)?.label;
 
         /* api */
         const getProjectAlertConfig = async () => {
@@ -121,6 +152,9 @@ export default {
         const onClickUpdateNotificationPolicy = () => {
             state.updateNotificationPolicyModalVisible = true;
         };
+        const onClickUpdateAutoRecovery = () => {
+            state.updateAutoRecoveryModalVisible = true;
+        };
         const onClickUpdateEscalationPolicy = () => {
             state.updateEscalationPolicyModalVisible = true;
         };
@@ -131,9 +165,10 @@ export default {
 
         return {
             ...toRefs(state),
-            NOTIFICATION_OPTION,
+            NOTIFICATION_URGENCY,
             getProjectAlertConfig,
             onClickUpdateNotificationPolicy,
+            onClickUpdateAutoRecovery,
             onClickUpdateEscalationPolicy,
             notificationOptionFormatter,
         };
@@ -143,17 +178,18 @@ export default {
 
 <style lang="postcss" scoped>
 .project-settings {
-    @apply border-none grid gap-4;
+    @apply border-none grid grid-cols-12 gap-4;
     margin: 2rem 1rem 0;
 
     .sub-title {
+        @apply col-span-12;
         font-size: 1.375rem;
         line-height: 145%;
         margin-bottom: 0.5rem;
     }
 
     .section {
-        @apply border border-gray-200 grid grid-cols-12;
+        @apply border border-gray-200 col-span-12;
         position: relative;
         border-radius: 0.375rem;
         box-sizing: border-box;
@@ -161,46 +197,52 @@ export default {
         padding: 1.5rem 1rem;
 
         .section-title {
-            @apply col-span-2;
             line-height: 1.5;
             font-size: 1.125rem;
-
-            @screen tablet {
-                @apply col-span-12;
-                padding-bottom: 1rem;
-            }
+            padding-bottom: 1rem;
         }
-
         .content-wrapper {
-            @apply col-span-10;
             font-size: 0.875rem;
-
-            @screen tablet {
-                @apply col-span-12;
-            }
         }
-
         .edit-button {
             position: absolute;
             top: 1.5rem;
             right: 1rem;
         }
 
-        &.notification-policy-wrapper {
+        &.notification-policy-wrapper, &.auto-recovery-wrapper {
+            @apply col-span-6;
             .content-wrapper {
+                @apply bg-gray-100;
+                text-align: center;
+                border-radius: 0.375rem;
+                padding: 0.875rem;
                 margin: auto 0;
 
                 .text {
                     vertical-align: middle;
                     margin-left: 0.5rem;
                 }
+            }
+        }
+        &.escalation-policy-wrapper {
+            @apply grid grid-cols-12;
+            .section-title {
+                @apply col-span-2;
+            }
+            .content-wrapper {
+                @apply col-span-9;
+            }
+        }
+    }
 
-                @screen tablet {
-                    @apply bg-gray-100;
-                    text-align: center;
-                    border-radius: 0.375rem;
-                    padding: 0.875rem;
-                }
+    @screen tablet {
+        .section {
+            &.notification-policy-wrapper, &.auto-recovery-wrapper {
+                @apply col-span-12;
+            }
+            &.escalation-policy-wrapper {
+                display: block;
             }
         }
     }

@@ -1,6 +1,6 @@
 <template>
     <p-button-modal
-        :header-title="$t('PROJECT.DETAIL.ALERT.SET_NOTIFICATION_POLICY_MODAL_TITLE')"
+        :header-title="$t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_MODAL_TITLE')"
         size="sm"
         fade
         :visible.sync="proxyVisible"
@@ -8,12 +8,11 @@
     >
         <template #body>
             <div class="content-wrapper">
-                <p>{{ $t('PROJECT.DETAIL.ALERT.SET_NOTIFICATION_MODAL_HELP_TEXT') }}</p>
+                <p>{{ $t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_MODAL_HELP_TEXT') }}</p>
                 <p-select-card v-for="option in selectOptions" :key="option.name"
-                               v-model="notificationUrgency"
+                               v-model="isAutoRecovery"
                                :value="option.name"
                                :label="option.label"
-                               :icon="option.icon"
                                block
                 />
             </div>
@@ -30,7 +29,7 @@ import {
     PButtonModal, PSelectCard,
 } from '@spaceone/design-system';
 
-import {reactive, toRefs, watch} from '@vue/composition-api';
+import {computed, reactive, toRefs, watch} from '@vue/composition-api';
 
 import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -39,7 +38,7 @@ import { i18n } from '@/translations';
 
 
 export default {
-    name: 'ProjectNotificationPolicyUpdateModal',
+    name: 'ProjectAutoRecoveryUpdateModal',
     components: {
         PButtonModal,
         PSelectCard,
@@ -53,19 +52,25 @@ export default {
             type: Boolean,
             required: true,
         },
-        selectOptions: {
-            type: Array,
-            default: () => ([]),
-        },
         selectedOption: {
-            type: String,
+            type: Boolean,
             default: undefined,
         },
     },
     setup(props, { emit, root }) {
         const state = reactive({
             proxyVisible: makeProxy<boolean>('visible', props, emit),
-            notificationUrgency: undefined,
+            selectOptions: computed(() => ([
+                {
+                    name: true,
+                    label: i18n.t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_YES'),
+                },
+                {
+                    name: false,
+                    label: i18n.t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_NO'),
+                },
+            ])),
+            isAutoRecovery: undefined,
         });
 
         const onClickConfirm = async () => {
@@ -73,21 +78,21 @@ export default {
                 await SpaceConnector.client.monitoring.projectAlertConfig.update({
                     project_id: props.projectId,
                     options: {
-                        notification_urgency: state.notificationUrgency,
+                        auto_recovery: state.isAutoRecovery,
                     },
                 });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_NOTIFICATION_POLICY'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_AUTO_RECOVERY'), '', root);
                 emit('refresh');
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_NOTIFICATION_POLICY'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_AUTO_RECOVERY'), e, root);
             } finally {
                 state.proxyVisible = false;
             }
         };
 
         watch(() => props.selectedOption, (selectedOption) => {
-            state.notificationUrgency = selectedOption;
+            state.isAutoRecovery = selectedOption;
         });
 
         return {

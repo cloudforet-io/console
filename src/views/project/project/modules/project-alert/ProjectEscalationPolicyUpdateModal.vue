@@ -1,7 +1,7 @@
 <template>
     <p-button-modal
         class="escalation-policy-update-modal"
-        :header-title="$t('PROJECT.DETAIL.ALERT.UPDATE_ESCALATION_POLICY_MODAL_TITLE')"
+        :header-title="$t('PROJECT.DETAIL.ALERT.SET_ESCALATION_POLICY_MODAL_TITLE')"
         fade
         :visible.sync="proxyVisible"
         @confirm="onClickConfirm"
