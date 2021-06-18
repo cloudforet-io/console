@@ -1,3 +1,10 @@
+# [1.1.0-beta.66](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.65...v1.1.0-beta.66) (2021-06-18)
+
+
+### Features
+
+* add auto hide in context menu custom style hook ([#603](https://github.com/spaceone-dev/spaceone-design-system/issues/603)) ([15732a0](https://github.com/spaceone-dev/spaceone-design-system/commit/15732a08dffa4db9ae93b10f966e9731d7230a1a))
+
 # [1.1.0-beta.65](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.64...v1.1.0-beta.65) (2021-06-17)
 
 
