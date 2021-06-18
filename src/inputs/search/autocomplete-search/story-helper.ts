@@ -1,27 +1,9 @@
 import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
 import { ArgTypes } from '@storybook/addons';
-import { getContextMenuCustomStyleArgTypes } from '@/hooks/context-menu-custom-style/story-helper';
+import { getContextMenuFixedStyleArgTypes } from '@/hooks/context-menu-fixed-style/story-helper';
 
 const extraArgTypes: ArgTypes = {
-    visibleMenu: {
-        name: 'visibleMenu',
-        type: { name: 'boolean' },
-        description: 'Whether to show the autocomplete menu or not. Automatically determined if no value is given. `sync` props',
-        defaultValue: undefined,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'undefined',
-            },
-        },
-        control: {
-            type: null,
-        },
-    },
     handler: {
         name: 'handler',
         type: { name: 'function' },
@@ -171,6 +153,6 @@ const initContextMenuArgTypes = (): ArgTypes => {
 export const getAutocompleteSearchArgTypes = (): ArgTypes => ({
     ...initSearchArgTypes(),
     ...initContextMenuArgTypes(),
-    ...getContextMenuCustomStyleArgTypes(),
+    ...getContextMenuFixedStyleArgTypes(),
     ...extraArgTypes,
 });

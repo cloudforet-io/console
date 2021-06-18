@@ -195,6 +195,12 @@ export default defineComponent({
 .p-dropdown-menu-button {
     position: relative;
 
+    .p-context-menu {
+        position: absolute;
+        margin-top: -1px;
+        z-index: 1000;
+    }
+
     .p-dropdown-button {
         display: inline-flex;
         min-width: 6.5rem;

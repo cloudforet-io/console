@@ -6,7 +6,7 @@ import { throttle } from 'lodash';
 import { Vue } from 'vue/types/vue';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 
-interface ContextMenuCustomStyleProps {
+export interface ContextMenuFixedStyleProps {
     useFixedMenuStyle?: boolean;
     visibleMenu?: boolean;
 }
@@ -25,8 +25,8 @@ const getScrollableParent = (ele?: Element|null): Element => {
     return isScrollable(ele) ? ele : getScrollableParent(ele.parentElement);
 };
 
-export const useContextMenuCustomStyle = (
-    props: ContextMenuCustomStyleProps,
+export const useContextMenuFixedStyle = (
+    props: ContextMenuFixedStyleProps,
 ) => {
     const vm = getCurrentInstance() as ComponentRenderProxy;
     const state = reactive({
@@ -39,13 +39,16 @@ export const useContextMenuCustomStyle = (
             const targetRects: DOMRect = state.targetElement?.getBoundingClientRect();
 
             const contextMenuStyle: Partial<CSSStyleDeclaration> = {
-                position: props.useFixedMenuStyle ? 'fixed' : 'absolute',
-                minWidth: 'auto',
                 overflowY: 'auto',
                 height: 'auto',
                 minHeight: '32px',
-                width: props.useFixedMenuStyle ? `${targetRects.width}px` : '100%',
             };
+
+            if (props.useFixedMenuStyle) {
+                contextMenuStyle.position = 'fixed';
+                contextMenuStyle.minWidth = 'auto';
+                contextMenuStyle.width = `${targetRects.width}px`;
+            }
 
             if (window.innerHeight * 0.9 > (targetRects.bottom)) {
                 const height = window.innerHeight - targetRects.bottom - 12;

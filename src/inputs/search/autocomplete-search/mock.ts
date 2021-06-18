@@ -8,7 +8,7 @@ const getMenuItem = () => ({
     // disabled: faker.random.boolean(),
 });
 
-export const getAutocompleteMenu = () => range(faker.random.number({ min: 10, max: 30 })).map(() => getMenuItem());
+export const getAutocompleteMenu = (min = 10, max = 30) => range(faker.random.number({ min: 10, max: 30 })).map(() => getMenuItem());
 export const getAutocompleteMenuWithMultiTypes = () => range(30).map((i) => {
     const result = getMenuItem();
 

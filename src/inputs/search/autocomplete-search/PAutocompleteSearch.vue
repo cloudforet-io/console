@@ -33,23 +33,26 @@
 </template>
 
 <script lang="ts">
-
-import {
-    AutocompleteHandler,
-} from '@/inputs/search/autocomplete-search/type';
-import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import {
     ComponentRenderProxy,
     computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { makeByPassListeners, makeOptionalProxy } from '@/util/composition-helpers';
-import PSearch from '@/inputs/search/search/PSearch.vue';
-import { reduce } from 'lodash';
-import { MenuItem } from '@/inputs/context-menu/type';
 import Fuse from 'fuse.js';
-import { useContextMenuCustomStyle } from '@/hooks/context-menu-custom-style';
+import { reduce } from 'lodash';
 
-interface AutocompleteSearchProps {
+import { makeByPassListeners, makeOptionalProxy } from '@/util/composition-helpers';
+import { ContextMenuFixedStyleProps, useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
+
+import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
+import PSearch from '@/inputs/search/search/PSearch.vue';
+
+import {
+    AutocompleteHandler,
+} from '@/inputs/search/autocomplete-search/type';
+import { MenuItem } from '@/inputs/context-menu/type';
+
+
+interface AutocompleteSearchProps extends ContextMenuFixedStyleProps {
     value: string;
     placeholder?: string;
     focused?: boolean;
@@ -58,11 +61,9 @@ interface AutocompleteSearchProps {
     isFocused?: boolean;
     menu: MenuItem[];
     loading?: boolean;
-    visibleMenu?: boolean;
     handler?: AutocompleteHandler;
     disableHandler?: boolean;
     exactMode?: boolean;
-    useFixedMenuStyle?: boolean;
 }
 
 const fuseOptions = {
@@ -118,7 +119,7 @@ export default defineComponent<AutocompleteSearchProps>({
             type: Boolean,
             default: false,
         },
-        /* context menu custom style props */
+        /* context menu fixed style props */
         visibleMenu: {
             type: Boolean,
             default: undefined,
@@ -145,7 +146,7 @@ export default defineComponent<AutocompleteSearchProps>({
     setup(props: AutocompleteSearchProps, { emit, slots, listeners }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        const { state: contextMenuCustomStyleState } = useContextMenuCustomStyle(props);
+        const { state: contextMenuFixedStyleState } = useContextMenuFixedStyle(props);
 
         const state = reactive({
             menuRef: null,
@@ -203,12 +204,12 @@ export default defineComponent<AutocompleteSearchProps>({
         };
 
         const hideMenu = () => {
-            if (state.isAutoMode) contextMenuCustomStyleState.proxyVisibleMenu = false;
+            if (state.isAutoMode) contextMenuFixedStyleState.proxyVisibleMenu = false;
             emit('hide-menu');
         };
 
         const showMenu = () => {
-            if (state.isAutoMode) contextMenuCustomStyleState.proxyVisibleMenu = true;
+            if (state.isAutoMode) contextMenuFixedStyleState.proxyVisibleMenu = true;
             emit('show-menu');
         };
 
@@ -225,7 +226,7 @@ export default defineComponent<AutocompleteSearchProps>({
         };
 
         const onWindowKeydown = (e: KeyboardEvent) => {
-            if (contextMenuCustomStyleState.proxyVisibleMenu && ['ArrowDown', 'ArrowUp'].includes(e.key)) {
+            if (contextMenuFixedStyleState.proxyVisibleMenu && ['ArrowDown', 'ArrowUp'].includes(e.key)) {
                 e.preventDefault();
             }
         };
@@ -260,7 +261,7 @@ export default defineComponent<AutocompleteSearchProps>({
         }, {}));
 
         const onInput = async (val: string, e) => {
-            if (!contextMenuCustomStyleState.proxyVisibleMenu) showMenu();
+            if (!contextMenuFixedStyleState.proxyVisibleMenu) showMenu();
 
             state.proxyValue = val;
             emit('input', val, e);
@@ -333,7 +334,7 @@ export default defineComponent<AutocompleteSearchProps>({
 
         return {
             ...toRefs(state),
-            ...toRefs(contextMenuCustomStyleState),
+            ...toRefs(contextMenuFixedStyleState),
             allFocusOut,
             focusMenu,
             onClickMenuItem,
@@ -365,6 +366,11 @@ export default defineComponent<AutocompleteSearchProps>({
     }
     .p-context-menu {
         @apply font-normal;
+        position: absolute;
+        margin-top: -1px;
+        z-index: 1000;
+        min-width: 100%;
+        width: 100%;
 
         /* min-width: unset; */
 

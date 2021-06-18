@@ -548,28 +548,12 @@ export default defineComponent({
     }
     .p-context-menu {
         @apply font-normal;
-        min-width: unset;
         max-width: 100%;
-        .secondary {
-            &.context-header {
-                @apply text-secondary;
-            }
-            &.context-item {
-                @apply truncate;
-                &:hover {
-                    @apply bg-blue-200;
-                    color: currentColor !important;
-                }
-                &:focus {
-                    @apply bg-blue-200;
-                    color: currentColor !important;
-                }
-                &:active {
-                    @apply bg-blue-200;
-                    color: currentColor !important;
-                }
-            }
-        }
+        position: absolute;
+        margin-top: -1px;
+        z-index: 1000;
+        min-width: auto;
+        width: auto;
     }
     &.no-menu .p-context-menu {
         border-width: 0;

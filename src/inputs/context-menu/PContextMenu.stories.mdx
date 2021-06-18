@@ -1,11 +1,16 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { reactive, toRefs, watch } from '@vue/composition-api';
+
 import PContextMenu from './PContextMenu.vue';
 import PEmpty from '@/data-display/empty/PEmpty';
 import PI from '@/foundation/icons/PI.vue';
 import PRawData from '@/data-display/raw-data/PRawData';
+
+import {CONTEXT_MENU_THEME} from '@/inputs/context-menu/type';
+
 import {getContextMenuArgTypes} from '@/inputs/context-menu/story-helper';
 import {menuItems} from '@/inputs/context-menu/mock';
-import { reactive, toRefs, watch } from '@vue/composition-api';
+
 
 <Meta title='Inputs/Context Menu' parameters={{
     design: {
@@ -19,17 +24,20 @@ export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PContextMenu },
     template: `
-        <p-context-menu :menu="menu"
-                        :theme="theme"
-                        :loading="loading"
-                        :always-show-menu="alwaysShowMenu"
-                        @select="onSelect"
-                        @focus="onFocus"
-                        @blur="onBlur"
-                        @keyup:up:end="$props['onKeyup:up:end']"
-                        @keyup:down:end="$props['onKeyup:down:end']"
-                        @keyup:esc="$props['onKeyup:esc']"
+    <div class="h-full overflow p-8">
+        <p-context-menu
+            :menu="menu"
+            :theme="theme"
+            :loading="loading"
+            :always-show-menu="alwaysShowMenu"
+            @select="onSelect"
+            @focus="onFocus"
+            @blur="onBlur"
+            @keyup:up:end="$props['onKeyup:up:end']"
+            @keyup:down:end="$props['onKeyup:down:end']"
+            @keyup:esc="$props['onKeyup:esc']"
         />
+    </div>
     `,
     setup() {
         return {}
@@ -125,6 +133,50 @@ Each `MenuItem` has the following type to represent it:
 <br/>
 <br/>
 
+## Invalid
+
+<Canvas>
+    <Story name="Invalid" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <p-context-menu :menu="menu" invalid />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Themes
+
+<Canvas>
+    <Story name="Themes" args={{menu: menuItems}} height={'18rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <div class="h-full overflow p-8">
+            <p class="mb-4 font-bold text-xl">{{CONTEXT_MENU_THEME.secondary}}</p>
+            <p-context-menu :menu="menu" :theme="CONTEXT_MENU_THEME.secondary" />
+            <p class="mt-8 mb-4 font-bold text-xl">{{CONTEXT_MENU_THEME.gray900}}</p>
+            <p-context-menu :menu="menu" :theme="CONTEXT_MENU_THEME.gray900" />
+        </div>
+`,
+            setup() {
+                return {
+                    CONTEXT_MENU_THEME
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 
 ## Slot Cases
 
@@ -147,10 +199,10 @@ Context Menu have 4 types fot slots:
             props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu, PRawData },
             template: `
-        <div class="flex h-full w-full flex-col">
+        <div class="flex h-full flex-col">
             <div>
                 <h2 class="mb-4">This is <strong>loading</strong> slot</h2>
-                <p-context-menu :menu="menu" loading style="position: relative;">
+                <p-context-menu :menu="menu" loading>
                     <template #loading>
                         <div style="position: absolute; display: flex; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center;">
                             ...loading
@@ -160,7 +212,7 @@ Context Menu have 4 types fot slots:
             </div>
             <div class="mt-4">
                 <h2 class=" mb-4">This is <strong>loading-format</strong> slot</h2>
-                <p-context-menu :menu="menu" loading style="position: relative;">
+                <p-context-menu :menu="menu" loading>
                     <template #loading-format>
                         ...loading
                     </template>
@@ -204,10 +256,10 @@ Context Menu have 4 types fot slots:
             props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu, PEmpty, PRawData },
             template: `
-        <div class="flex h-full w-full flex-col">
+        <div class="flex h-full flex-col">
             <div>
                 <h2 class="mb-4">This is <strong>no-data</strong> slot</h2>
-                <p-context-menu :menu="[]" style="position: relative;">
+                <p-context-menu :menu="[]" >
                     <template #no-data>
                         <p-empty>No Data</p-empty>
                     </template>
@@ -215,7 +267,7 @@ Context Menu have 4 types fot slots:
             </div>
             <div class="mt-4">
                 <h2 class="mb-4">This is <strong>no-data-format</strong> slot</h2>
-                <p-context-menu :menu="[]" style="position: relative;">
+                <p-context-menu :menu="[]">
                     <template #no-data-format>No Data</template>
                 </p-context-menu>
             </div>
@@ -256,10 +308,10 @@ Context Menu have 4 types fot slots:
             props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu, PRawData },
             template: `
-        <div class="flex h-full w-full flex-col">
+        <div class="flex h-full flex-col">
             <div class="mt-4">
                 <h2 class="mb-4">This is <strong>menu</strong> slot</h2>
-                <p-context-menu :menu="menu" style="position: relative;">
+                <p-context-menu :menu="menu">
                     <template #menu="{menu}">
                         <template v-for="(m, i) in menu">
                             <div v-if="m.type === undefined || m.type === 'item'" :key="i"
@@ -308,10 +360,10 @@ Context Menu have 4 types fot slots:
             props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu, PI, PRawData },
             template: `
-        <div class="flex h-full w-full flex-col">
+        <div class="flex h-full flex-col">
             <div>
                 <h2 class="mb-4">This is <strong>item</strong> slot</h2>
-                <p-context-menu :menu="menu" style="position: relative;">
+                <p-context-menu :menu="menu">
                     <template #item="{item}">
                         <div>
                             <p-i name="btn_gnb_top-logo"/>
@@ -322,7 +374,7 @@ Context Menu have 4 types fot slots:
             </div>
             <div class="mt-4">
                 <h2 class="mb-4">This is <strong>item-{item.name}</strong> slot</h2>
-                <p-context-menu :menu="menu" style="position: relative;">
+                <p-context-menu :menu="menu">
                     <template #item-collect="{item}">
                         <div>
                             <p-i name="btn_gnb_top-logo"/>
@@ -333,7 +385,7 @@ Context Menu have 4 types fot slots:
             </div>
             <div class="mt-4">
                 <h2 class="mb-4">This is <strong>item--format</strong> slot</h2>
-                <p-context-menu :menu="menu" style="position: relative;">
+                <p-context-menu :menu="menu">
                     <template #item--format="{item}">
                         <div>
                             <p-i name="btn_gnb_top-logo"/>
@@ -344,7 +396,7 @@ Context Menu have 4 types fot slots:
             </div>
             <div class="mt-4">
                 <h2 class="mb-4">This is <strong>item-{item.name}-format</strong> slot</h2>
-                <p-context-menu :menu="menu" style="position: relative;">
+                <p-context-menu :menu="menu">
                     <template #item-collect-format="{item}">
                         <div>
                             <p-i name="btn_gnb_top-logo"/>
@@ -391,10 +443,10 @@ Context Menu have 4 types fot slots:
             props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu, PRawData },
             template: `
-        <div class="flex h-full w-full flex-col">
+        <div class="flex h-full flex-col">
             <div>
                 <h2 class="mb-4">This is <strong>divider</strong> slot</h2>
-                <p-context-menu :menu="menu" style="position: relative;">
+                <p-context-menu :menu="menu">
                     <template #divider>
                         <div style="width: 100%; border-bottom: 1px solid darkgray; margin-top: 1rem;"></div>
                     </template>
@@ -402,7 +454,7 @@ Context Menu have 4 types fot slots:
             </div>
             <div class="mt-4">
                 <h2 class=" mb-4">This is <strong>divider-{item.name}</strong> slot</h2>
-                <p-context-menu :menu="menu" style="position: relative;">
+                <p-context-menu :menu="menu">
                     <template #divider-collect-divider>
                         <div style="width: calc(100% - 1rem); border-bottom: 2px dotted darkgray; margin: auto;"></div>
                     </template>
@@ -445,10 +497,10 @@ Context Menu have 4 types fot slots:
             props: Object.keys(getContextMenuArgTypes()),
             components: { PContextMenu, PI, PRawData },
             template: `
-        <div class="flex h-full w-full flex-col">
+        <div class="flex h-full flex-col">
             <div>
                 <h2 class="mb-4">This is <strong>header</strong> slot</h2>
-                <p-context-menu :menu="menu" style="position: relative;">
+                <p-context-menu :menu="menu">
                     <template #header="{item}">
                         <div>
                             <p-i name="btn_gnb_top-logo"/>
@@ -459,7 +511,7 @@ Context Menu have 4 types fot slots:
             </div>
             <div class="mt-4">
                 <h2 class="mb-4">This is <strong>header-{item.name}</strong> slot</h2>
-                <p-context-menu :menu="menu" style="position: relative;">
+                <p-context-menu :menu="menu">
                     <template #header-others="{item}">
                         <div>
                             <p-i name="btn_gnb_top-logo"/>
@@ -470,7 +522,7 @@ Context Menu have 4 types fot slots:
             </div>
             <div class="mt-4">
                 <h2 class="mb-4">This is <strong>header--format</strong> slot</h2>
-                <p-context-menu :menu="menu" style="position: relative;">
+                <p-context-menu :menu="menu">
                     <template #header--format="{item}">
                         <div>
                             <p-i name="btn_gnb_top-logo"/>
@@ -481,7 +533,7 @@ Context Menu have 4 types fot slots:
             </div>
             <div class="mt-4">
                 <h2 class="mb-4">This is <strong>header-{item.name}-format</strong> slot</h2>
-                <p-context-menu :menu="menu" style="position: relative;">
+                <p-context-menu :menu="menu">
                     <template #header-others-format="{item}">
                         <div>
                             <p-i name="btn_gnb_top-logo"/>

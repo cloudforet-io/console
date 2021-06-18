@@ -1,12 +1,17 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
-import PAutocompleteSearch from './PAutocompleteSearch.vue';
-import PButton from '@/inputs/buttons/button/PButton';
-import { reactive, toRefs } from '@vue/composition-api';
-import { getAutocompleteSearchArgTypes } from '@/inputs/search/autocomplete-search/story-helper';
-import {getAutocompleteMenu, getAutocompleteMenuWithMultiTypes} from '@/inputs/search/autocomplete-search/mock';
+import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
 import Fuse from 'fuse.js'
 
-<Meta title='Inputs/Search/Auto Complete Search' parameters={{
+import { makeOptionalProxy } from '@/util/composition-helpers';
+import PAutocompleteSearch from './PAutocompleteSearch.vue';
+import PButton from '@/inputs/buttons/button/PButton';
+import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
+
+import { getAutocompleteSearchArgTypes } from '@/inputs/search/autocomplete-search/story-helper';
+import {getAutocompleteMenu, getAutocompleteMenuWithMultiTypes} from '@/inputs/search/autocomplete-search/mock';
+
+
+<Meta title='InputargTypess/Search/Auto Complete Search' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A182254',
@@ -29,6 +34,7 @@ export const Template = (args, { argTypes }) => ({
             :disable-handler="disableHandler"
             :exact-mode="exactMode"
             :use-fixed-menu-style="useFixedMenuStyle"
+            :visible-menu.sync="proxyVisibleMenu"
             @search="onSearch"
             @focus="onFocus"
             @blur="onBlur"
@@ -41,6 +47,15 @@ export const Template = (args, { argTypes }) => ({
         >
         </p-autocomplete-search>
     `,
+    setup(props) {
+        const vm = getCurrentInstance();
+        const state = reactive({
+            proxyVisibleMenu: makeOptionalProxy('visibleMenu', vm, props.visibleMenu)
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
 });
 
 
@@ -53,7 +68,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Basic" args={{menu: getAutocompleteMenu()}}>
         {{
-            props: Object.keys(argTypes),
+            props: Object.keys(getAutocompleteSearchArgTypes()),
             components: { PAutocompleteSearch },
             template: `
         <p-autocomplete-search :menu="menu"/>
@@ -70,7 +85,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="With Header" args={{menu: getAutocompleteMenuWithMultiTypes()}}>
         {{
-            props: Object.keys(argTypes),
+            props: Object.keys(getAutocompleteSearchArgTypes()),
             components: { PAutocompleteSearch, PButton },
             template: `
         <p-autocomplete-search :menu="menu"/>
@@ -87,7 +102,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Control Manually" args={{menu: getAutocompleteMenu()}}>
         {{
-            props: Object.keys(argTypes),
+            props: Object.keys(getAutocompleteSearchArgTypes()),
             components: { PAutocompleteSearch, PButton },
             template: `
         <div>
@@ -132,7 +147,7 @@ export const Template = (args, { argTypes }) => ({
 <Canvas>
     <Story name="Using Handler" args={{menu: getAutocompleteMenuWithMultiTypes()}}>
         {{
-            props: Object.keys(argTypes),
+            props: Object.keys(getAutocompleteSearchArgTypes()),
             components: { PAutocompleteSearch, PButton },
             template: `
             <p-autocomplete-search :menu="menu" :handler="simpleHandler"/>
@@ -153,6 +168,50 @@ export const Template = (args, { argTypes }) => ({
                 }
                 return {
                     simpleHandler
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Use Fixed Menu Style
+
+<Canvas>
+    <Story name="Use Fixed Menu Style" >
+        {{
+            components: { PAutocompleteSearch, PToggleButton },
+            template: `
+        <div class="bg-gray-100 p-8" style="height: 200px; overflow-y: auto; width: 90%;">
+            <div style="height: 500px;">
+                <p class="text-lg mb-5 leading-7" :class="useFixedMenuStyle ? 'text-gray-800' : 'text-gray-400'">
+                    Use Fixed Menu Style: <strong> {{useFixedMenuStyle ? 'On' : 'Off' }}</strong> <p-toggle-button :value="useFixedMenuStyle" @change="onChange" /> <br/>
+                    The menu's style position will be set 'fixed'.<br/>
+                    Therefore, the menu is placed on front, except for all other fixed elements with high z-index.<br/>
+                    When you scroll parent elements, the menu will be automatically hidden.
+                </p>
+                <p-autocomplete-search v-if="show" :menu="menu" :use-fixed-menu-style="useFixedMenuStyle" />
+            </div>
+        </div>
+`,
+            setup() {
+                const state = reactive({
+                    menu: getAutocompleteMenu(30, 50),
+                    useFixedMenuStyle: true,
+                    show: true
+                })
+                const onChange = () => {
+                    state.show = false;
+                    state.useFixedMenuStyle = !state.useFixedMenuStyle;
+                    setTimeout(() => {
+                        state.show = true;
+                    }, 300)
+                }
+                return {
+                    ...toRefs(state),
+                    onChange
                 }
             }
         }}

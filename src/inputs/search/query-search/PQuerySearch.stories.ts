@@ -2,6 +2,7 @@
 import { toRefs, reactive } from '@vue/composition-api';
 import { action } from '@storybook/addon-actions';
 import casual, { arrayOf } from '@/util/casual';
+import faker from 'faker'
 import { withKnobs } from '@storybook/addon-knobs';
 import PQuerySearch from './PQuerySearch.vue';
 
@@ -44,7 +45,7 @@ export const querySearch = () => ({
 
         const valueItems = {
             project_id: arrayOf(10, () => casual.make_id('project')),
-            name: arrayOf(10, () => casual.word),
+            name: arrayOf(10, () => faker.lorem.sentence(50)),
             project_group_id: arrayOf(10, () => casual.make_id('pg')),
         };
 

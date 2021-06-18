@@ -1,5 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
-import { CONTEXT_MENU_POSITION, CONTEXT_MENU_THEME } from '@/inputs/context-menu/type';
+import { CONTEXT_MENU_THEME } from '@/inputs/context-menu/type';
 
 const slots: [string, string][] = [
     ['no-data', 'Slot for customizing the content to be displayed on the menu when there is no menu item'],
@@ -105,7 +105,7 @@ export const getContextMenuArgTypes = (): ArgTypes => ({
             },
             category: 'props',
             defaultValue: {
-                summary: false,
+                summary: 'false',
             },
         },
         control: {
@@ -116,6 +116,24 @@ export const getContextMenuArgTypes = (): ArgTypes => ({
         name: 'alwaysShowMenu',
         type: { name: 'boolean' },
         description: 'Show menu always even if there is no menu to show.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    invalid: {
+        name: 'invalid',
+        type: { name: 'boolean' },
+        description: 'Whether to apply invalid style or not.',
         defaultValue: false,
         table: {
             type: {

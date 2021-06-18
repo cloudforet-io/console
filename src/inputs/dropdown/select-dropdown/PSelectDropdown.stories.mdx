@@ -1,0 +1,194 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
+
+import {i18n} from '@/translations';
+import { makeOptionalProxy } from '@/util/composition-helpers';
+
+import PSelectDropdown from './PSelectDropdown.vue';
+
+import {getSelectDropdownArgTypes} from '@/inputs/dropdown/select-dropdown/story-helper';
+import {menuItems} from '@/inputs/context-menu/mock';
+
+<Meta title='Inputs/Select Dropdown' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
+    }
+}} argTypes={getSelectDropdownArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    i18n,
+    components: { PSelectDropdown },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-select-dropdown
+            :use-fixed-menu-style="useFixedMenuStyle"
+            :visible-menu="proxyVisibleMenu"
+            :invalid="invalid"
+            :loading="loading"
+            :always-show-menu="alwaysShowMenu"
+            :items="items"
+            :selected.sync="proxySelected"
+            :disabled="disabled"
+            :index-mode="indexMode"
+            :placeholder="placeholder"
+            :button-only="buttonOnly"
+            :button-style-type="buttonStyleType"
+            :button-icon="buttonIcon"
+            @select="onSelect"
+            @update:selected="onUpdateSelected"
+            @focus-menu="onFocusMenu"
+        ></p-select-dropdown>
+    </div>
+    `,
+    setup(props) {
+        const vm = getCurrentInstance();
+        const state = reactive({
+            proxyVisibleMenu: makeOptionalProxy('visibleMenu', vm, props.visibleMenu),
+            proxySelected: makeOptionalProxy('selected', vm, props.selected || '')
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+
+# PSelectDropdown
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            i18n,
+            components: { PSelectDropdown },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-select-dropdown :items="menuItems"></p-select-dropdown>
+    </div>
+    `,
+            setup() {
+                return {
+                    menuItems
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Disabled
+
+<Canvas>
+    <Story name="Disabled">
+        {{
+            i18n,
+            components: { PSelectDropdown },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-select-dropdown :items="menuItems" disabled></p-select-dropdown>
+    </div>
+    `,
+            setup() {
+                return {
+                    menuItems
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Invalid
+
+<Canvas>
+    <Story name="Invalid">
+        {{
+            i18n,
+            components: { PSelectDropdown },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-select-dropdown :items="menuItems" invalid></p-select-dropdown>
+    </div>
+    `,
+            setup() {
+                return {
+                    menuItems
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Button Only
+
+<Canvas>
+    <Story name="Button Only">
+        {{
+            i18n,
+            components: { PSelectDropdown },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-select-dropdown :items="menuItems" button-only></p-select-dropdown>
+    </div>
+    `,
+            setup() {
+                return {
+                    menuItems
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Default Slot
+
+<Canvas>
+    <Story name="Default Slot">
+        {{
+            i18n,
+            components: { PSelectDropdown },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-select-dropdown :items="menuItems">
+            Actions
+        </p-select-dropdown>
+    </div>
+    `,
+            setup() {
+                return {
+                    menuItems
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
