@@ -17,8 +17,8 @@
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIMEZONE_LABEL')">
                 <p-select-dropdown v-model="formState.timezone" :items="timezones"
                                    class="timezone"
-                                   @input="changeTimezone"
-                                   :use-custom-style="true"
+                                   @select="changeTimezone"
+                                   use-fixed-menu-style
                 />
             </p-field-group>
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_LABEL')"
@@ -73,8 +73,7 @@
                                                   :placeholder="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_PLACEHOLDER')"
                                     />
                                     <p-select-dropdown v-model="formState.intervalTimeType" class="w-1/2" :items="intervalTimeTypes"
-                                                       auto-height
-                                                       :use-custom-style="true"
+                                                       use-fixed-menu-style
                                     />
                                 </div>
                             </p-field-group>

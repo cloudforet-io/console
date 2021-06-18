@@ -3,6 +3,7 @@
         <p-autocomplete-search v-model="search" :placeholder="$t('COMMON.CUSTOM_FIELD_MODAL.SEARCH_TAG')"
                                :menu="allTagsMenuItems"
                                :loading="loading"
+                               use-fixed-menu-style
                                @select-menu="onSelectTag"
         >
             <template #menu-item--format="{item, id}">

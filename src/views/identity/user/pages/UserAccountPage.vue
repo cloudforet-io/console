@@ -41,7 +41,6 @@
             <p-field-group required :label="$t('COMMON.PROFILE.LANGUAGE')" class="input-form">
                 <p-select-dropdown v-model="language"
                                    :items="languages"
-                                   auto-height
                 />
             </p-field-group>
             <div class="save-btn">

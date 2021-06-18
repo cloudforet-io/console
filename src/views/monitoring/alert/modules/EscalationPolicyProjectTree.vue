@@ -93,9 +93,9 @@ export default {
         const onTreeInit = async (root) => {
             state.root = root;
         };
-        const onChangeSelect = (node, path) => {
-            state.selectedItem = node ? { node, path } : {};
-            emit('update:selected-project-id', node ? node.data.id : undefined);
+        const onChangeSelect = (selected) => {
+            state.selectedItem = selected.length > 0 ? selected[0] : {};
+            emit('update:selected-project-id', selected.length > 0 ? selected[0].node.data.id : undefined);
         };
         const changeSelectState = (node, path) => {
             state.root.changeSelectState(node, path);

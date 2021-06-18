@@ -41,15 +41,16 @@
                                 <span class="read-value">{{ supportResourceGroupTypeItems[selectedTypeIndex] ? supportResourceGroupTypeItems[selectedTypeIndex].label : '' }}</span>
                             </p-field-group>
                             <p-field-group v-else required :label="$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.RESOURCE_TYPE_SELECT')">
-                                <p-select-dropdown :select-item="selectedTypeIndex"
+                                <p-select-dropdown :selected="selectedTypeIndex"
                                                    index-mode
                                                    class="w-1/2"
                                                    :items="supportResourceGroupTypeItems"
-                                                   :placeholder="$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.RESOURCE_TYPE_DESC')"
                                                    :disabled="resourceTypeReadOnly"
                                                    :invalid="validState.showValidation && !validState.resourceType"
-                                                   @input="onSelectedTypeIndexChange"
-                                />
+                                                   @select="onSelectedTypeIndexChange"
+                                >
+                                    {{ $t('AUTOMATION.POWER_SCHEDULER.RESOURCE.RESOURCE_TYPE_DESC') }}
+                                </p-select-dropdown>
                             </p-field-group>
                         </div>
                     </section>

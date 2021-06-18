@@ -34,9 +34,8 @@
             <p-field-group :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')" class="input-form">
                 <p-select-dropdown v-model="formState.domainRole"
                                    :items="formState.domainRoleItem"
-                                   auto-height
                                    :disabled="formState.domainRoleItem.length < 2 || isSameId"
-                                   :use-custom-style="true"
+                                   use-fixed-menu-style
                                    class="dropdown"
                 />
             </p-field-group>

@@ -28,11 +28,11 @@
                     <template #default="{invalid}">
                         <p-select-dropdown v-model="projectRole"
                                            :items="projectRoleList"
-                                           auto-height
                                            :disabled="projectRoleList.length < 1"
-                                           :placeholder="$t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_ROLE')"
-                                           :use-custom-style="true"
-                        />
+                                           use-fixed-menu-style
+                        >
+                            {{ $t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_ROLE') }}
+                        </p-select-dropdown>
                     </template>
                 </p-field-group>
                 <div class="label-text-wrapper">

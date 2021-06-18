@@ -52,7 +52,6 @@
                         <template #default="{invalid}">
                             <p-select-dropdown v-model="projectRole"
                                                :items="projectRoleList"
-                                               auto-height
                                                :disabled="projectRoleList.length < 1"
                                                :placeholder="$t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_ROLE')"
                             />

@@ -399,12 +399,12 @@ export default {
             }
         };
 
-        const onChangeSelect = (node, path) => {
-            store.commit('projectPage/setSelectedItem', node ? { node, path } : {});
+        const onChangeSelect = (selected) => {
+            store.commit('projectPage/setSelectedItem', selected[0] || {});
         };
 
-        const onAllProjectChangeSelect = (node) => {
-            if (node && store.getters['projectPage/groupId'] && state.rootNode) {
+        const onAllProjectChangeSelect = (selected) => {
+            if (selected.length > 0 && store.getters['projectPage/groupId'] && state.rootNode) {
                 state.rootNode.resetSelect();
             }
         };

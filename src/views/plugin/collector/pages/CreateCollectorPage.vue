@@ -44,7 +44,7 @@
                                        :invalid="!isVersionValid"
                                        :required="true"
                         >
-                            <p-select-dropdown v-model="inputModel.version" :items="versions" auto-height />
+                            <p-select-dropdown v-model="inputModel.version" :items="versions" />
                         </p-field-group>
                     </div>
                 </div>

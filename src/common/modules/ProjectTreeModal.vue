@@ -142,8 +142,8 @@ export default {
             }
         };
 
-        const onChangeSelect = (node, path) => {
-            state.selectedItem = node ? { node, path } : {};
+        const onChangeSelect = (selected) => {
+            state.selectedItem = selected.length > 0 ? selected[0] : {};
         };
 
         const changeSelectState = (node, path) => {

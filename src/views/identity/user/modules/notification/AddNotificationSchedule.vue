@@ -24,20 +24,18 @@
                 {{ day.label }}
             </p-select-button>
             <div class="dropdown-wrapper">
-                <p-select-dropdown :value="proxySchedule.start_hour"
+                <p-select-dropdown :selected="proxySchedule.start_hour"
                                    :items="timeList"
-                                   :select-item="proxySchedule.start_hour"
                                    :invalid="!isScheduleValid"
                                    class="dropdown"
-                                   @input="onSelectStartHour"
+                                   @select="onSelectStartHour"
                 />
                 <span class="text">{{ $t('IDENTITY.USER.NOTIFICATION.FORM.TO') }}</span>
                 <p-select-dropdown v-model="proxySchedule.end_hour"
-                                   :select-item="proxySchedule.end_hour"
                                    :items="timeList"
                                    :invalid="!isScheduleValid"
                                    class="dropdown"
-                                   @input="onSelectEndHour"
+                                   @select="onSelectEndHour"
                 />
                 <span class="timezone-text">{{ $t('COMMON.PROFILE.TIMEZONE') }}: {{ timezone }}</span>
             </div>

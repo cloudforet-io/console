@@ -25,8 +25,8 @@
                     >
                         <span class="radio-label">{{ item.label }}</span>
                     </p-radio>
-                    <escalation-policy-project-tree v-if="inputModel.scope === SCOPE.project"
-                                                    :selected-project-id.sync="inputModel.project_id"
+                    <project-select-dropdown v-if="inputModel.scope === SCOPE.project"
+                                             @select="onSelectProject"
                     />
                 </div>
             </template>
@@ -78,6 +78,7 @@ import { PFieldGroup, PRadio, PTextInput } from '@spaceone/design-system';
 
 import EscalationRulesInputForm from '@/views/monitoring/alert/modules/EscalationRulesInputForm.vue';
 import EscalationPolicyProjectTree from '@/views/monitoring/alert/modules/EscalationPolicyProjectTree.vue';
+import ProjectSelectDropdown from '@/common/modules/project-select-dropdown/ProjectSelectDropdown.vue';
 
 import {
     EscalationPolicyFormModel, FINISH_CONDITION, SCOPE, ACTION,
@@ -92,6 +93,7 @@ export default {
     components: {
         EscalationRulesInputForm,
         EscalationPolicyProjectTree,
+        ProjectSelectDropdown,
         PFieldGroup,
         PTextInput,
         PRadio,
@@ -181,6 +183,9 @@ export default {
         const onChangeFinishCondition = (value) => {
             state.inputModel.finish_condition = value;
         };
+        const onSelectProject = (selected) => {
+            state.inputModel.project_id = selected[0]?.id;
+        };
 
         watch([() => props.mode, () => props.escalationPolicy], () => {
             initInputModel();
@@ -196,6 +201,7 @@ export default {
             ACTION,
             onChangeScope,
             onChangeFinishCondition,
+            onSelectProject,
         };
     },
 };

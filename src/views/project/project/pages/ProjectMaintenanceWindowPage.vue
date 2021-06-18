@@ -12,7 +12,7 @@
                          @refresh="onChange()"
         >
             <template #toolbox-left>
-                <p-select-dropdown :select-item="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ACTION')" :items="actionMenu" @input="onSelectAction">
+                <p-select-dropdown :selected="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ACTION')" :items="actionMenu" @select="onSelectAction">
                     {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ACTION') }}
                 </p-select-dropdown>
             </template>

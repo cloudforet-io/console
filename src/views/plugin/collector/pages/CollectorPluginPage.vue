@@ -34,7 +34,7 @@
                     />
                 </template>
                 <template #page-size>
-                    <p-select-dropdown v-model="sortBy" :items="sortMenu" @onSelected="getPlugins" />
+                    <p-select-dropdown v-model="sortBy" :items="sortMenu" @select="getPlugins" />
                 </template>
                 <template #toolbox-bottom>
                     <p v-if="resourceTypeSearchTags.length > 0" class="mb-4">
