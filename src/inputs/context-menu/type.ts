@@ -29,7 +29,7 @@ export interface ContextMenuProps {
     theme: keyof typeof CONTEXT_MENU_THEME;
     loading: boolean;
     autoHeight: boolean;
-    useCustomStyle: boolean;
+    useFixedMenuStyle: boolean;
     position?: CONTEXT_MENU_POSITION;
     offsetTop?: number;
     width?: number;

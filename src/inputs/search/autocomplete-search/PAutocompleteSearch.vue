@@ -1,6 +1,7 @@
 <template>
     <div class="p-autocomplete-search">
-        <p-search v-model="proxyValue"
+        <p-search ref="targetRef"
+                  v-model="proxyValue"
                   :placeholder="placeholder"
                   :focused="focused"
                   :disabled="disabled"
@@ -12,23 +13,22 @@
                 <slot :name="`search-${slot}`" v-bind="{...scope}" />
             </template>
         </p-search>
-        <div v-if="proxyVisibleMenu" class="menu-container">
-            <p-context-menu ref="menuRef"
-                            theme="secondary"
-                            :menu="bindingMenu"
-                            :loading="loading"
-                            :always-show-menu="alwaysShowMenu"
-                            :style="contextMenuStyle"
-                            @select="onClickMenuItem"
-                            @keyup:up:end="focusSearch"
-                            @keyup:esc="focusSearch"
-                            @focus="onFocusMenuItem"
-            >
-                <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
-                    <slot :name="`menu-${slot}`" v-bind="scope" />
-                </template>
-            </p-context-menu>
-        </div>
+        <p-context-menu v-if="proxyVisibleMenu"
+                        ref="menuRef"
+                        theme="secondary"
+                        :menu="bindingMenu"
+                        :loading="loading"
+                        :always-show-menu="alwaysShowMenu"
+                        :style="contextMenuStyle"
+                        @select="onClickMenuItem"
+                        @keyup:up:end="focusSearch"
+                        @keyup:esc="focusSearch"
+                        @focus="onFocusMenuItem"
+        >
+            <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
+                <slot :name="`menu-${slot}`" v-bind="scope" />
+            </template>
+        </p-context-menu>
     </div>
 </template>
 
@@ -62,6 +62,7 @@ interface AutocompleteSearchProps {
     handler?: AutocompleteHandler;
     disableHandler?: boolean;
     exactMode?: boolean;
+    useFixedMenuStyle?: boolean;
 }
 
 const fuseOptions = {
@@ -117,11 +118,16 @@ export default defineComponent<AutocompleteSearchProps>({
             type: Boolean,
             default: false,
         },
-        /* extra props */
+        /* context menu custom style props */
         visibleMenu: {
             type: Boolean,
             default: undefined,
         },
+        useFixedMenuStyle: {
+            type: Boolean,
+            default: false,
+        },
+        /* extra props */
         handler: {
             type: Function,
             default: undefined,
@@ -134,14 +140,17 @@ export default defineComponent<AutocompleteSearchProps>({
             type: Boolean,
             default: true,
         },
+
     },
     setup(props: AutocompleteSearchProps, { emit, slots, listeners }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+
+        const { state: contextMenuCustomStyleState } = useContextMenuCustomStyle(props);
+
         const state = reactive({
             menuRef: null,
             proxyValue: makeOptionalProxy('value', vm, ''),
             isAutoMode: computed(() => props.visibleMenu === undefined),
-            proxyVisibleMenu: makeOptionalProxy('visibleMenu', vm, false),
             proxyIsFocused: makeOptionalProxy('isFocused', vm, props.focused),
             filteredMenu: [] as MenuItem[],
             bindingMenu: computed<MenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
@@ -149,7 +158,6 @@ export default defineComponent<AutocompleteSearchProps>({
             fuse: computed(() => new Fuse(state.searchableItems, fuseOptions)),
         });
 
-        const { state: contextMenuCustomStyleState } = useContextMenuCustomStyle(computed(() => state.proxyVisibleMenu));
 
         const defaultHandler = (inputText: string, list: MenuItem[]) => {
             let results: MenuItem[] = [...list];
@@ -195,12 +203,12 @@ export default defineComponent<AutocompleteSearchProps>({
         };
 
         const hideMenu = () => {
-            if (state.isAutoMode) state.proxyVisibleMenu = false;
+            if (state.isAutoMode) contextMenuCustomStyleState.proxyVisibleMenu = false;
             emit('hide-menu');
         };
 
         const showMenu = () => {
-            if (state.isAutoMode) state.proxyVisibleMenu = true;
+            if (state.isAutoMode) contextMenuCustomStyleState.proxyVisibleMenu = true;
             emit('show-menu');
         };
 
@@ -217,7 +225,7 @@ export default defineComponent<AutocompleteSearchProps>({
         };
 
         const onWindowKeydown = (e: KeyboardEvent) => {
-            if (state.proxyVisibleMenu && ['ArrowDown', 'ArrowUp'].includes(e.key)) {
+            if (contextMenuCustomStyleState.proxyVisibleMenu && ['ArrowDown', 'ArrowUp'].includes(e.key)) {
                 e.preventDefault();
             }
         };
@@ -252,7 +260,7 @@ export default defineComponent<AutocompleteSearchProps>({
         }, {}));
 
         const onInput = async (val: string, e) => {
-            if (!state.proxyVisibleMenu) showMenu();
+            if (!contextMenuCustomStyleState.proxyVisibleMenu) showMenu();
 
             state.proxyValue = val;
             emit('input', val, e);

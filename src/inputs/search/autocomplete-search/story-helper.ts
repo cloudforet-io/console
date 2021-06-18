@@ -1,6 +1,7 @@
 import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
 import { ArgTypes } from '@storybook/addons';
+import { getContextMenuCustomStyleArgTypes } from '@/hooks/context-menu-custom-style/story-helper';
 
 const extraArgTypes: ArgTypes = {
     visibleMenu: {
@@ -75,6 +76,7 @@ const extraArgTypes: ArgTypes = {
             type: 'boolean',
         },
     },
+    /* events */
     onHideMenu: {
         name: 'hide-menu',
         description: 'Emitted when the menu starts to hide.',
@@ -169,5 +171,6 @@ const initContextMenuArgTypes = (): ArgTypes => {
 export const getAutocompleteSearchArgTypes = (): ArgTypes => ({
     ...initSearchArgTypes(),
     ...initContextMenuArgTypes(),
+    ...getContextMenuCustomStyleArgTypes(),
     ...extraArgTypes,
 });

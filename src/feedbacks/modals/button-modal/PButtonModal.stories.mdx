@@ -13,7 +13,7 @@ import faker from 'faker';
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=7654%3A182002',
     },
-}} component={PButtonModal} argTypes={{
+}} argTypes={{
     size: {
         name: 'size',
         type: { name: 'string' },
@@ -355,37 +355,16 @@ export const Template = (args, {argTypes} ) => ({
                 <p-button :styleType="themeColor" @click="launchModal">Launch a modal</p-button>
                 <p-button-modal
                                 :visible.sync="_visible"
-                                :show-popup.sync="isScrolling"
                                 @close="closeModal"
                 >
                     <template #body>
-                        <p-dropdown-menu-btn
-                            :menu="menu"
-                            :use-custom-style="useCustomStyle"
-                            :auto-height="autoHeight"
-                            :show-popup.sync="isScrolling"
-                        >
-                            dropdown menu btn
-                        </p-dropdown-menu-btn>
-                        <p>{{contents}}</p>
                         <p-select-dropdown
                             :items="items"
                             v-model="selectItem"
-                            :use-custom-style="useCustomStyle"
-                            :auto-height="autoHeight"
-                            :show-popup.sync="isScrolling"
+                            use-fixed-menu-style
                         >
                            select dropdown (default)
                         </p-select-dropdown>
-                        <p>{{contents}}</p>
-                        <p-dropdown-menu-btn
-                            :menu="menu"
-                            :use-custom-style="useCustomStyle"
-                            :auto-height="autoHeight"
-                            :show-popup.sync="isScrolling"
-                        >
-                            dropdown menu btn
-                        </p-dropdown-menu-btn>
                         <p>{{contents}}</p>
                     </template>
                 </p-button-modal>
@@ -419,9 +398,6 @@ export const Template = (args, {argTypes} ) => ({
                     type: 'item', label: 'Remove', name: 'remove', disabled: true,
                 },
             ],
-            autoHeight: true,
-            useCustomStyle: true,
-            isScrolling: false,
             items: [
                 { type: 'item', label: 'one', name: 'one' },
                 { type: 'item', label: 'two', name: 'two' },
@@ -453,7 +429,7 @@ export const Template = (args, {argTypes} ) => ({
                 { type: 'item', label: 'four', name: 'four' },
                 { type: 'item', label: 'five', name: 'five' },
                 { type: 'item', label: 'six', name: 'six' },
-            ]
+            ],
         });
         const launchModal = () => {
             state._visible = true;

@@ -23,9 +23,7 @@
                                            @click.stop="onCloseClick"
                             />
                         </h3>
-                        <div v-if="bodyVisible" class="modal-body" :class="allBodyClass"
-                             @scroll="onScroll"
-                        >
+                        <div v-if="bodyVisible" class="modal-body" :class="allBodyClass">
                             <slot name="body" />
                         </div>
                         <div v-if="footerVisible" class="modal-footer">
@@ -82,10 +80,6 @@ import '../modal.pcss';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 
-const documentEventMount = (eventName: string, func: any) => {
-    onMounted(() => document.addEventListener(eventName, func));
-    onUnmounted(() => document.removeEventListener(eventName, func));
-};
 
 export default {
     name: 'PButtonModal',
@@ -152,10 +146,6 @@ export default {
             type: Boolean,
             default: false,
         },
-        showPopup: {
-            type: Boolean,
-            default: false,
-        },
     },
     setup(props: ButtonModalProps, { emit }) {
         const state = reactive({
@@ -198,10 +188,6 @@ export default {
         const onConfirmClick = () => {
             emit('confirm');
         };
-        const onScroll = (event) => {
-            emit('update:showPopup', true);
-        };
-        documentEventMount('scroll', onScroll);
 
         return {
             ...toRefs(state),
@@ -213,7 +199,6 @@ export default {
             onCloseClick,
             onCancelClick,
             onConfirmClick,
-            onScroll,
         };
     },
 };

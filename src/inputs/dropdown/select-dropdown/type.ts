@@ -1,26 +1,18 @@
 import { MenuItem } from '@/inputs/context-menu/type';
+import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 
-enum BUTTON_STYLE_TYPE {
-    'primary-dark' = 'primary-dark'
-}
 
-export interface SelectDropdownStateType {
-    items: MenuItem[];
-    invalid: boolean;
-    autoHeight: boolean;
-    disabled: boolean;
-    loading: boolean;
+export interface SelectDropdownProps {
+    items?: MenuItem[];
+    selectItem?: string | number;
+    invalid?: boolean;
+    disabled?: boolean;
+    loading?: boolean;
     indexMode: boolean;
-    placeholder: string;
-    useCustomStyle: boolean;
-    showPopup: boolean;
-    buttonOnly: boolean;
-    buttonStyleType?: keyof BUTTON_STYLE_TYPE;
-    buttonIcon: string;
+    placeholder?: string;
+    useFixedMenuStyle?: boolean;
+    visibleMenu?: boolean;
+    buttonOnly?: boolean;
+    buttonStyleType?: BUTTON_STYLE;
+    buttonIcon?: string;
 }
-
-export interface SelectDropdownSyncStateType {
-    selectItem: string | number;
-}
-
-export interface SelectDropdownProps extends SelectDropdownStateType, SelectDropdownSyncStateType {}
