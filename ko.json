@@ -872,6 +872,7 @@
 					"TOPIC": "토픽"
 				},
 				"MANAGE": "관리",
+				"MANAGE_CHANNEL": "알림 채널 관리",
 				"MESSENGER": "메신저",
 				"NOTIFICATION_CHANNEL": "알림 채널",
 				"NOTI_CHANNEL_DESC": "SMS 및 음성 통화 지원 환경은 국가에 따라 다를 수 있습니다.",
@@ -1102,8 +1103,14 @@
 				"TOP_5_PROJECT_ACTIVITY": "Top 5 Project Activity"
 			},
 			"DETAIL": {
-				"ADD_NOTE": "노트 추가",
+				"ALT_E_DELETE_ALERT": "알람 삭제 실패",
+				"ALT_S_DELETE_ALERT": "알람 삭제 성공",
+				"DELETE_MODAL_DESC": "알람을 삭제하시겠습니까?",
+				"DELETE_MODAL_TITLE": "알람 삭제",
+				"EDIT_MODAL_TITLE": "알림 이름 수정",
 				"HEADER": {
+					"ALT_E_REASSIGN_MEMBER": "멤버 재할당 실패",
+					"ALT_S_REASSIGN_MEMBER": "재할당 성공",
 					"ASSIGNED_TO": "담당자",
 					"DURATION": "지속 기간",
 					"REASSIGN": "재할당",
@@ -1113,18 +1120,31 @@
 				"INFO": {
 					"ACKNOWLEDGED": "확인 시간",
 					"ALERT_ID": "경보 ID",
+					"ALT_E_UPDATE_DESCRIPTION": "설명 수정 실패",
+					"ALT_E_UPDATE_STATUS_MSG": "상태 메세지 수정 실패",
+					"ALT_S_UPDATE_DESCRIPTION": "설명 수정 성공",
+					"ALT_S_UPDATE_STATUS_MSG": "상태 메세지 수정 성공",
 					"CHANGE": "변경",
 					"CREATED": "생성 시간",
 					"DESC": "설명",
 					"EDIT": "편집",
 					"ESCALATION_POLICY": "에스컬레이션 정책",
+					"EXTRA_INFO": "추가 정보",
 					"PROJECT": "프로젝트",
 					"RESOLVED": "해결 시간",
+					"RULE": "룰",
 					"SEVERITY": "심각도",
-					"STATUS_DETAILS": "상태 설명",
+					"STATUS_MSG": "상태 메세지",
 					"TRIGGERED_BY": "트리거"
 				},
-				"NOTE": "노트",
+				"NOTE": {
+					"ADD_NOTE": "노트 추가",
+					"NOTE": "노트"
+				},
+				"PROJECT_DEPENDENCY": {
+					"NO_DATA": "연관된 프로젝트가 없습니다.",
+					"PROJECT_DEPENDENCY": "프로젝트 의존성"
+				},
 				"RESPONDER": {
 					"ADDITIONAL_RESPONDER": "추가 수신인 ",
 					"CURRENT": "현재",
@@ -1134,7 +1154,9 @@
 					"SEARCH_PLACEHOLDER": "구성원 검색",
 					"SHOW_RESPONDERS": "수신자 보기"
 				},
-				"TIMELINE": "타임라인"
+				"TIMELINE": {
+					"TIMELINE": "타임라인"
+				}
 			},
 			"ESCALATION_POLICY": {
 				"ACTION": "작업",
