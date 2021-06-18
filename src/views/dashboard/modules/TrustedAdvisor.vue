@@ -113,6 +113,7 @@ import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
 import { green, red, yellow } from '@/styles/colors';
 import { store } from '@/store';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 import config from '@/lib/config';
 
 am4core.useTheme(am4themes_animated);
@@ -280,7 +281,7 @@ export default {
             filters.push({ k: 'data.status', o: '=', v: status });
 
             return {
-                name: 'cloudServicePage',
+                name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 query: {
                     filters: queryHelper.setFilters(filters).rawQueryStrings,
                 },
@@ -302,7 +303,7 @@ export default {
             if (projectId) filters.push({ k: 'project_id', o: '=', v: projectId });
 
             return {
-                name: 'cloudServicePage',
+                name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 query: {
                     filters: queryHelper.setFilters(filters).rawQueryStrings,
                 },

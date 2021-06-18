@@ -3,7 +3,7 @@
         <p-breadcrumbs :routes="routeState.route" />
         <section class="page-title">
             <p-page-title :title="$t('AUTOMATION.SPOT_AUTOMATION.MAIN.SPOT_GROUP')" use-total-count :total-count="totalCount" />
-            <router-link :to="{ name: 'addSpotGroup' }">
+            <router-link :to="{ name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP.ADD._NAME }">
                 <p-icon-text-button style-type="primary-dark" outline name="ic_plus_bold"
                                     class="add-spot-group-btn"
                 >
@@ -76,6 +76,7 @@ import timezone from 'dayjs/plugin/timezone';
 import { store } from '@/store';
 import { Tags, TimeStamp } from '@/models';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
+import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 
 dayjs.extend(timezone);
 
@@ -446,6 +447,7 @@ export default {
         return {
             ...toRefs(state),
             routeState,
+            AUTOMATION_ROUTE,
             onChange,
             iso8601Formatter,
         };

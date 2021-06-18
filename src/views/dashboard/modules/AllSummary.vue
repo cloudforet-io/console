@@ -119,6 +119,7 @@ import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
 import { gray, primary, primary1 } from '@/styles/colors';
 import { store } from '@/store';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 import config from '@/lib/config';
 
 am4core.useTheme(am4themes_animated);
@@ -342,7 +343,7 @@ export default {
             if (type === DATA_TYPE.storage) query.primary = 'false';
 
             const location: Location = {
-                name: 'cloudServiceMain',
+                name: INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
                 query: {
                     filters: queryHelper.rawQueryStrings,
                     ...query,
@@ -551,14 +552,14 @@ export default {
                         filters.push({ k: 'provider', o: '=', v: d.provider },
                             { k: 'cloud_service_type', o: '=', v: d.cloud_service_type });
                         detailLocation = {
-                            name: 'server',
+                            name: INVENTORY_ROUTE.SERVER._NAME,
                             query: {
                                 filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
                             },
                         };
                     } else {
                         detailLocation = {
-                            name: 'cloudServicePage',
+                            name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                             params: {
                                 provider: d.provider,
                                 group: d.cloud_service_group,
@@ -596,7 +597,7 @@ export default {
                         let detailLocation: Location = {};
                         if (d.provider && d.cloud_service_group && d.cloud_service_type) {
                             detailLocation = {
-                                name: 'cloudServicePage',
+                                name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                                 params: {
                                     provider: d.provider,
                                     group: d.cloud_service_group,

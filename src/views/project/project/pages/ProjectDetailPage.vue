@@ -147,34 +147,34 @@ export default {
             tabs: computed(() => {
                 const items: TabItem[] = [
                     {
-                        name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY,
+                        name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                         label: vm.$t('PROJECT.DETAIL.TAB_SUMMARY'),
                         keepAlive: true,
                     },
                     {
-                        name: PROJECT_ROUTE.DETAIL.TAB.MEMBER,
+                        name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
                         label: vm.$t('PROJECT.DETAIL.TAB_MEMBER'),
                     },
                     {
-                        name: PROJECT_ROUTE.DETAIL.TAB.ALERT,
+                        name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                         label: vm.$t('PROJECT.DETAIL.TAB_ALERT'),
                     },
                     {
-                        name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS,
+                        name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
                         label: vm.$t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
                     },
                     {
-                        name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW,
+                        name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME,
                         label: vm.$t('PROJECT.DETAIL.TAB_MAINTENANCE_WINDOW'),
                     },
                     {
-                        name: PROJECT_ROUTE.DETAIL.TAB.TAG,
+                        name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
                         label: vm.$t('PROJECT.DETAIL.TAB_TAG'),
                     },
                 ];
                 return items;
             }),
-            activeTab: PROJECT_ROUTE.DETAIL.TAB.SUMMARY,
+            activeTab: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
         });
 
         const onUpdateActiveTab = (activeTab) => {
@@ -242,7 +242,7 @@ export default {
         }, { immediate: true });
 
         (async () => {
-            singleItemTabState.activeTab = vm.$route?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY;
+            singleItemTabState.activeTab = vm.$route?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
         })();
 
         return {

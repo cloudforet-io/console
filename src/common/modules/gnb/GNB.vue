@@ -73,6 +73,7 @@
 import vClickOutside from 'v-click-outside';
 import { TranslateResult } from 'vue-i18n';
 import { includes, isEmpty } from 'lodash';
+import { Location } from 'vue-router';
 
 import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
@@ -83,7 +84,11 @@ import { PI } from '@spaceone/design-system';
 import SiteMap from '@/common/modules/gnb/SiteMap.vue';
 import RightSideMenu from '@/common/modules/gnb/RightSideMenu.vue';
 
-import { Location } from 'vue-router';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
+import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
+import { MANAGEMENT_ROUTE } from '@/routes/management/management-route';
+import { DASHBOARD_ROUTE } from '@/routes/dashboard/dashboard-route';
+import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 import { store } from '@/store';
 import config from '@/lib/config';
 
@@ -145,7 +150,7 @@ export default {
             showAutomation: computed(() => state.showPowerScheduler || state.showSpotAutomation),
             isAdmin: computed((() => store.getters['user/isAdmin'])),
             hasPermission: computed((() => store.getters['user/hasPermission'])),
-            dashboardLink: computed(() => (state.hasPermission ? { name: 'dashboard' } : {})),
+            dashboardLink: computed(() => (state.hasPermission ? { name: DASHBOARD_ROUTE._NAME } : {})),
             menuList: computed<Menu[]>(() => [
                 {
                     name: PARENT_CATEGORY.project,
@@ -156,10 +161,10 @@ export default {
                 {
                     name: PARENT_CATEGORY.inventory,
                     label: vm.$t('MENU.INVENTORY.INVENTORY'),
-                    to: { name: 'inventory' },
+                    to: { name: INVENTORY_ROUTE._NAME },
                     subMenuList: [
-                        { label: vm.$t('MENU.INVENTORY.SERVER'), to: { name: 'server' }, show: true },
-                        { label: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), to: { name: 'cloudService' }, show: true },
+                        { label: vm.$t('MENU.INVENTORY.SERVER'), to: { name: INVENTORY_ROUTE.SERVER._NAME }, show: true },
+                        { label: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), to: { name: INVENTORY_ROUTE.CLOUD_SERVICE._NAME }, show: true },
                     ],
                 },
                 {
@@ -192,17 +197,17 @@ export default {
                     name: PARENT_CATEGORY.automation,
                     label: vm.$t('MENU.AUTOMATION.AUTOMATION'),
                     show: state.showAutomation,
-                    to: { name: 'automation' },
+                    to: { name: AUTOMATION_ROUTE._NAME },
                     subMenuList: [
                         {
                             label: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'),
-                            to: { name: 'automation' },
+                            to: { name: AUTOMATION_ROUTE.POWER_SCHEDULER._NAME },
                             isNew: true,
                             show: state.showPowerScheduler,
                         },
                         {
                             label: vm.$t('MENU.AUTOMATION.SPOT_AUTOMATION'),
-                            to: { name: 'spotGroup' },
+                            to: { name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP._NAME },
                             isNew: true,
                             show: state.showSpotAutomation,
                         },
@@ -211,19 +216,18 @@ export default {
                 {
                     name: PARENT_CATEGORY.plugin,
                     label: vm.$t('MENU.PLUGIN.PLUGIN'),
-                    to: { name: 'plugin' },
+                    to: { name: PLUGIN_ROUTE._NAME },
                     subMenuList: [
-                        { label: vm.$t('MENU.PLUGIN.COLLECTOR'), to: { name: 'collector' }, show: true },
+                        { label: vm.$t('MENU.PLUGIN.COLLECTOR'), to: { name: PLUGIN_ROUTE.COLLECTOR._NAME }, show: true },
                     ],
                 },
                 {
                     name: PARENT_CATEGORY.management,
                     label: vm.$t('MENU.MANAGEMENT.MANAGEMENT'),
-                    to: { name: 'collectorHistory' },
+                    to: { name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME },
                     subMenuList: [
-                        // { label: vm.$t('MENU.MANAGEMENT.PLUGIN'), to: { name: 'supervisorPlugins' }, show: state.isAdmin },
                         {
-                            label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), to: { name: 'collectorHistory' }, isNew: true, show: true,
+                            label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), to: { name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME }, isNew: true, show: true,
                         },
                     ],
                 },

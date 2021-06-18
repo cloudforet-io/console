@@ -5,36 +5,37 @@ const CollectorHistoryPage = () => import(/* webpackChunkName: "CollectorHistory
 const JobInformationPage = () => import(/* webpackChunkName: "CollectorHistory" */ '@/views/management/collector-history/pages/JobInformationPage.vue');
 
 export const MANAGEMENT_ROUTE = Object.freeze({
-    MAIN: 'management',
+    _NAME: 'management',
     SUPERVISOR: {
-        MAIN: 'supervisor',
-        PLUGIN: 'supervisorPlugins',
+        _NAME: 'supervisor',
+        PLUGIN: { _NAME: 'supervisorPlugins' },
     },
     HISTORY: {
+        _NAME: 'history',
         COLLECTOR: {
-            MAIN: 'collectorHistory',
-            JOB: 'collectorJobHistory',
+            _NAME: 'collectorHistory',
+            JOB: { _NAME: 'collectorJobHistory' },
         },
     },
 });
 
 export default {
     path: 'management',
-    name: MANAGEMENT_ROUTE.MAIN,
+    name: MANAGEMENT_ROUTE._NAME,
     redirect: '/management/supervisor/plugins',
     meta: { label: 'Management' },
     component: { template: '<router-view />' },
     children: [
         {
             path: 'supervisor',
-            name: MANAGEMENT_ROUTE.SUPERVISOR.MAIN,
+            name: MANAGEMENT_ROUTE.SUPERVISOR._NAME,
             meta: { label: 'Supervisor' },
             redirect: '/management/supervisor/plugins',
             component: { template: '<router-view />' },
             children: [
                 {
                     path: 'plugins',
-                    name: MANAGEMENT_ROUTE.SUPERVISOR.PLUGIN,
+                    name: MANAGEMENT_ROUTE.SUPERVISOR.PLUGIN._NAME,
                     meta: {
                         label: 'Plugins',
                         isDomainOwnerOnly: true,
@@ -45,18 +46,17 @@ export default {
         },
         {
             path: 'collector-history',
-            name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR.MAIN,
             meta: { label: 'Collector History' },
             component: { template: '<keep-alive><router-view /></keep-alive>' },
             children: [
                 {
                     path: '/',
-                    name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR.MAIN,
+                    name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME,
                     component: CollectorHistoryPage,
                 },
                 {
                     path: ':jobId',
-                    name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR.JOB,
+                    name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR.JOB._NAME,
                     props: true,
                     component: JobInformationPage,
                 },

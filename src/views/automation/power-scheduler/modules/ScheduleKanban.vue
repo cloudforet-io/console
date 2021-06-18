@@ -134,8 +134,9 @@ import {
 import ResourceGroupPage from '@/views/automation/power-scheduler/pages/ResourceGroupPage.vue';
 import { KanbanItem, ViewMode, ResourceGroupItem } from '@/views/automation/power-scheduler/type';
 import { SpaceConnector } from '@/lib/space-connector';
-import { store } from '@/store';
 import { assetUrlConverter, showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { store } from '@/store';
+import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 
 interface ColumnType {
     title: string;
@@ -305,7 +306,7 @@ export default {
             } else {
                 if (!state.selectedItem?.resource_group.resource_group_id) return;
                 vm.$router.push({
-                    name: 'powerSchedulerResourceGroup',
+                    name: AUTOMATION_ROUTE.POWER_SCHEDULER.RESOURCE_GROUP._NAME,
                     params: {
                         projectId: props.projectId,
                         scheduleId: props.scheduleId,

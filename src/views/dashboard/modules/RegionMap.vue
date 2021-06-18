@@ -85,6 +85,7 @@ import WidgetLayout from '@/common/components/WidgetLayout.vue';
 import { Location } from 'vue-router';
 import { QueryHelper } from '@/lib/query';
 import config from '@/lib/config';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 
 am4core.useTheme(am4themesAnimated);
 
@@ -339,7 +340,7 @@ export default {
 
         const goToCloudService = (item) => {
             const res: Location = {
-                name: 'cloudServicePage',
+                name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: item.provider,
                     group: item.cloud_service_group,

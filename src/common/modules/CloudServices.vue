@@ -75,7 +75,8 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
-import {assetUrlConverter} from "@/lib/util";
+import { assetUrlConverter } from '@/lib/util';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 
 
 interface Value {
@@ -128,7 +129,7 @@ export default {
                 const filters: QueryStoreFilter[] = [];
                 if (props.projectId) filters.push({ k: 'project_id', o: '=', v: props.projectId });
                 return {
-                    name: 'cloudService',
+                    name: INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
                     query: {
                         filters: queryHelper.setFilters(filters).rawQueryStrings,
                     },
@@ -140,7 +141,7 @@ export default {
             let link;
             if (!projectId) {
                 link = {
-                    name: 'cloudServicePage',
+                    name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                     params: {
                         provider: data.provider,
                         group: data.cloud_service_group,
@@ -150,7 +151,7 @@ export default {
             }
             if (projectId) {
                 link = {
-                    name: 'cloudServicePage',
+                    name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                     params: {
                         provider: data.provider,
                         group: data.cloud_service_group,

@@ -32,14 +32,14 @@
                                     <span class="summary-item-text">{{ $t('PROJECT.LANDING.SERVER') }}</span>
                                     <router-link v-if="cardSummary[item.project_id]"
                                                  class="summary-item-num"
-                                                 :to="getLocation(item.project_id, 'server')"
+                                                 :to="getLocation(item.project_id, INVENTORY_ROUTE.SERVER._NAME)"
                                     >{{ cardSummary[item.project_id].serverCount }}</router-link>
                                     <span v-else class="summary-item-num none">N/A</span>
                                     <span class="mx-2 text-gray-300 divider">|</span>
                                     <span class="summary-item-text">{{ $t('PROJECT.LANDING.CLOUD_SERVICES') }}</span>
                                     <router-link v-if="cardSummary[item.project_id]"
                                                  class="summary-item-num"
-                                                 :to="getLocation(item.project_id, 'cloudService')"
+                                                 :to="getLocation(item.project_id, INVENTORY_ROUTE.CLOUD_SERVICE._NAME)"
                                     >{{ cardSummary[item.project_id].cloudServiceCount }}
                                     </router-link>
                                     <span v-else class="summary-item-num none">N/A</span>
@@ -133,7 +133,6 @@ import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/te
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { ProjectGroup } from '@/views/project/project/type';
 import { range, uniq } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
@@ -141,6 +140,7 @@ import { QueryHelper } from '@/lib/query';
 import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import ProjectFormModal from '@/views/project/project/modules/ProjectFormModal.vue';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 
 
 export default {
@@ -338,6 +338,7 @@ export default {
 
         return {
             ...toRefs(state),
+            INVENTORY_ROUTE,
             getProvider,
             goToServiceAccount,
             getDistinctProviders,

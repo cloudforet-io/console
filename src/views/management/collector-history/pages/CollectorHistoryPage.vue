@@ -93,7 +93,7 @@
                 <p-icon-text-button
                     class="create-collector-button"
                     name="ic_plus_bold"
-                    @click="$router.push({ name: 'createCollector' })"
+                    @click="$router.push({ name: PLUGIN_ROUTE.COLLECTOR.CREATE._NAME })"
                 >
                     {{ $t('MANAGEMENT.COLLECTOR_HISTORY.MAIN.MODAL_CREATE_COLLECTOR') }}
                 </p-icon-text-button>
@@ -121,7 +121,7 @@ import PCollectorHistoryChart from '@/views/management/collector-history/modules
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { iso8601Formatter, durationFormatter } from '@/lib/util';
+import { iso8601Formatter, durationFormatter, numberFormatter } from '@/lib/util';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
@@ -130,10 +130,10 @@ import { getPageStart } from '@/lib/component-utils/pagination';
 import { store } from '@/store';
 import { QueryHelper } from '@/lib/query';
 import { MANAGEMENT_ROUTE } from '@/routes/management/management-route';
+import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
 import { peacock, green, red } from '@/styles/colors';
 import { JOB_STATUS } from '@/views/management/collector-history/pages/config';
-import { numberFormatter } from '@/lib/util';
-import HandbookButton from '@/common/components/HandbookButton.vue';
+import router from '@/routes';
 
 
 const PROGRESS_BAR_COLOR = peacock[400];
@@ -300,8 +300,8 @@ export default {
 
         /* event */
         const onSelect = (item) => {
-            vm.$router.push({
-                name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR.JOB,
+            router.push({
+                name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR.JOB._NAME,
                 params: { jobId: item.job_id },
             }).catch(() => {});
         };
@@ -359,6 +359,7 @@ export default {
             handlers,
             PROGRESS_BAR_COLOR,
             COMPLETED_ICON_COLOR,
+            PLUGIN_ROUTE,
             JOB_STATUS,
             onSelect,
             onChange,

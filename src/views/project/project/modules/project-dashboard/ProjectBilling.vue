@@ -130,7 +130,7 @@ import { QueryHelper } from '@/lib/query';
 import {
     gray, safe, secondary, secondary1, green, blue,
 } from '@/styles/colors';
-import Color from 'color';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 import config from '@/lib/config';
 
 am4core.useTheme(am4themes_animated);
@@ -328,7 +328,7 @@ export default {
             state.chart = chart;
         };
         const getLink = data => ({
-            name: 'cloudServicePage',
+            name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
             params: {
                 provider: data.provider,
                 group: data.cloud_service_group,

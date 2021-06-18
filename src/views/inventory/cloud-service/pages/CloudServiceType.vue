@@ -211,10 +211,11 @@ import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
 import {
-    assetUrlConverter, showErrorMessage, showLoadingMessage, showSuccessMessage,
+    assetUrlConverter, showLoadingMessage,
 } from '@/lib/util';
 import { DynamicLayout } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { FILE_NAME_PREFIX } from '@/lib/type';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 
 
 interface RegionModel extends Tags {
@@ -380,7 +381,7 @@ export default {
             }
 
             const res: Location = {
-                name: 'cloudServicePage',
+                name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 params: {
                     provider: item.provider,
                     group: item.cloud_service_group,

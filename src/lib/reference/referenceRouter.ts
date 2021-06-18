@@ -3,6 +3,10 @@ import { concat } from 'lodash';
 import { Location } from 'vue-router';
 import { Reference, ReferenceType } from '@/lib/reference/type';
 import { QueryHelper } from '@/lib/query';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
+import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
+import { PROJECT_ROUTE } from '@/routes/project/project-route';
+import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 
 interface LinkFormatter {
     (baseUrl: string, data: string, reference: Reference, query: Location['query']): Location;
@@ -102,22 +106,22 @@ type RouterMap = Record<ReferenceType, { name: string; formatter: LinkFormatter}
 const routerMap: RouterMap = {
     'inventory.Server':
         {
-            name: 'server',
+            name: INVENTORY_ROUTE.SERVER._NAME,
             formatter: serverLinkFormatter,
         },
     'identity.Project':
         {
-            name: 'projectDetail',
+            name: PROJECT_ROUTE.DETAIL._NAME,
             formatter: projectLinkFormatter,
         },
     'identity.ProjectGroup':
         {
-            name: 'projectMain',
+            name: PROJECT_ROUTE._NAME,
             formatter: projectGroupLinkFormatter,
         },
     'inventory.Collector':
         {
-            name: 'collector',
+            name: PLUGIN_ROUTE.COLLECTOR._NAME,
             formatter: collectorLinkFormatter,
         },
     'identity.ServiceAccount':
@@ -127,17 +131,17 @@ const routerMap: RouterMap = {
         },
     'inventory.CloudService':
         {
-            name: 'cloudServiceSearch',
+            name: INVENTORY_ROUTE.CLOUD_SERVICE.SEARCH._NAME,
             formatter: cloudServiceLinkFormatter,
         },
     'inventory.CloudServiceType':
         {
-            name: 'cloudServiceTypeSearch',
+            name: INVENTORY_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME,
             formatter: cloudServiceTypeLinkFormatter,
         },
     'spot_automation.SpotGroup':
         {
-            name: 'spotGroupDetail',
+            name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP.DETAIL._NAME,
             formatter: spotGroupLinkFormatter,
         },
 };

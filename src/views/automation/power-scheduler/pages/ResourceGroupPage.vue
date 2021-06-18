@@ -160,7 +160,9 @@ import { QueryHelper } from '@/lib/query';
 
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
-import { ResourceGroup, Resource, ResourceGroupItem } from '../type';
+import { ResourceGroup, Resource, ResourceGroupItem } from '@/views/automation/power-scheduler/type';
+import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
+import router from '@/routes';
 
 
 interface Props {
@@ -484,7 +486,7 @@ export default {
         };
 
         const onClickCancel = async () => {
-            if (props.resourceGroupId) await vm.$router.go(-1);
+            if (props.resourceGroupId) await router.go(-1);
             else emit('cancel');
         };
 
@@ -530,8 +532,8 @@ export default {
                 formState.resourceGroup = res;
             } catch (e) {
                 showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.ALT_E_ID_INVALID_TITLE'), vm.$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.ALT_E_ID_INVALID_DESC'), vm.$root);
-                await vm.$router.replace({
-                    name: 'powerScheduler',
+                await router.replace({
+                    name: AUTOMATION_ROUTE.POWER_SCHEDULER.ADD._NAME,
                     params: {
                         projectId: props.projectId,
                         scheduleId: props.scheduleId as string,

@@ -57,7 +57,7 @@
             <p-data-loader class="flex-grow" :data="items" :loading="dataLoading">
                 <li class="project-card-list">
                     <article v-for="(item, i) in items" :key="i" class="project-item">
-                        <router-link :to="{name: 'spotGroup'}" class="item-wrapper">
+                        <router-link :to="{ name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP._NAME }" class="item-wrapper">
                             <p class="project-group-name">
                                 {{ item.project_group_info.name }}
                             </p>
@@ -92,7 +92,7 @@
                             <div v-else>
                                 <p-anchor class="go-add" :show-icon="false"
                                           :to="{
-                                              name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP.ADD,
+                                              name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP.ADD._NAME,
                                               params: {
                                                   projectId: item.project_id
                                               }
@@ -114,7 +114,7 @@
                     <section class="no-project">
                         <img src="@/assets/images/illust_star.svg">
                         <span class="no-project-text">{{ $t('AUTOMATION.SPOT_AUTOMATION.DASHBOARD.NO_PROJECT') }}</span>
-                        <router-link :to="projectPath">
+                        <router-link :to="{ name: PROJECT_ROUTE._NAME }">
                             <p-icon-text-button
                                 style-type="primary1"
                                 name="ic_plus_bold"
@@ -246,8 +246,6 @@ export default {
             ]),
         });
 
-        const projectPath = vm?.$router.resolve({ name: PROJECT_ROUTE.MAIN }).href;
-
         /* util */
         const numberFormatter = (num) => {
             if (Math.abs(num) < 10000) {
@@ -377,7 +375,7 @@ export default {
             numberFormatter,
             commaFormatter,
             AUTOMATION_ROUTE,
-            projectPath,
+            PROJECT_ROUTE,
         };
     },
 };

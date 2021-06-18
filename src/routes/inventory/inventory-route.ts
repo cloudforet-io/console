@@ -9,22 +9,21 @@ const CloudService = () => import(/* webpackChunkName: "CloudService" */ '@/view
 const NoResource = () => import(/* webpackChunkName: "NoResource" */ '@/common/pages/NoResource.vue');
 
 export const INVENTORY_ROUTE = Object.freeze({
-    SERVER: {
-        MAIN: 'server',
-    },
+    _NAME: 'inventory',
+    SERVER: { _NAME: 'server' },
     CLOUD_SERVICE: {
-        MAIN: 'cloudService',
-        TYPE: 'cloudServiceMain',
-        SEARCH: 'cloudServiceSearch',
-        TYPE_SEARCH: 'cloudServiceTypeSearch',
-        NO_RESOURCE: 'noCloudService',
-        DETAIL: 'cloudServicePage',
+        _NAME: 'cloudService',
+        TYPE: { _NAME: 'cloudServiceMain' },
+        SEARCH: { _NAME: 'cloudServiceSearch' },
+        TYPE_SEARCH: { _NAME: 'cloudServiceTypeSearch' },
+        NO_RESOURCE: { _NAME: 'noCloudService' },
+        DETAIL: { _NAME: 'cloudServicePage' },
     },
 });
 
 export default {
     path: 'inventory',
-    name: 'inventory',
+    name: INVENTORY_ROUTE._NAME,
     redirect: 'inventory/server',
     meta: { label: 'Inventory' },
     component: { template: '<router-view />' },
@@ -38,26 +37,26 @@ export default {
             children: [
                 {
                     path: '/',
-                    name: INVENTORY_ROUTE.SERVER.MAIN,
+                    name: INVENTORY_ROUTE.SERVER._NAME,
                     component: Server,
                 },
             ],
         },
         {
             path: 'cloud-service',
-            name: INVENTORY_ROUTE.CLOUD_SERVICE.MAIN,
+            name: INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
             redirect: '/inventory/cloud-service',
             meta: { label: 'Cloud Service' },
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
-                    name: INVENTORY_ROUTE.CLOUD_SERVICE.TYPE,
+                    name: INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
                     component: CloudService,
                 },
                 {
                     path: 'search/:searchKey/:id',
-                    name: INVENTORY_ROUTE.CLOUD_SERVICE.SEARCH,
+                    name: INVENTORY_ROUTE.CLOUD_SERVICE.SEARCH._NAME,
                     meta: {
                         label: 'search',
                     },
@@ -66,7 +65,7 @@ export default {
                 },
                 {
                     path: 'type/search/:id',
-                    name: INVENTORY_ROUTE.CLOUD_SERVICE.TYPE_SEARCH,
+                    name: INVENTORY_ROUTE.CLOUD_SERVICE.TYPE_SEARCH._NAME,
                     meta: {
                         label: 'search',
                     },
@@ -75,7 +74,7 @@ export default {
                 },
                 {
                     path: 'no-resource',
-                    name: INVENTORY_ROUTE.CLOUD_SERVICE.NO_RESOURCE,
+                    name: INVENTORY_ROUTE.CLOUD_SERVICE.NO_RESOURCE._NAME,
                     component: NoResource,
                 },
                 {
@@ -88,7 +87,7 @@ export default {
                     children: [
                         {
                             path: '/',
-                            name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL,
+                            name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                             props: true,
                             component: CloudServicePage,
                         },

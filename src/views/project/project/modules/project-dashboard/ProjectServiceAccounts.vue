@@ -54,6 +54,7 @@ import { store } from '@/store';
 import { SpaceConnector } from '@/lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { QueryHelper } from '@/lib/query';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 
 enum DATA_TYPE {
     compute = 'compute',
@@ -111,7 +112,7 @@ export default {
             ]);
 
             const location: Location = {
-                name: 'cloudServiceMain',
+                name: INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
                 query: {
                     filters: queryHelper.rawQueryStrings,
                     ...query,

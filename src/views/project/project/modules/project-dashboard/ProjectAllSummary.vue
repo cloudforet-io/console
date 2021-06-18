@@ -118,6 +118,7 @@ import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
 import { gray, peacock } from '@/styles/colors';
 import { store } from '@/store';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 import config from '@/lib/config';
 
 am4core.useTheme(am4themes_animated);
@@ -336,7 +337,7 @@ export default {
             queryHelper.setFilters([{ k: 'project_id', o: '=', v: props.projectId }]);
 
             const location: Location = {
-                name: 'cloudServiceMain',
+                name: INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
                 query: {
                     filters: queryHelper.rawQueryStrings,
                     ...query,
@@ -485,14 +486,14 @@ export default {
                             { k: 'cloud_service_type', o: '=', v: d.cloud_service_type },
                         );
                         detailLocation = {
-                            name: 'server',
+                            name: INVENTORY_ROUTE.SERVER._NAME,
                             query: {
                                 filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
                             },
                         };
                     } else {
                         detailLocation = {
-                            name: 'cloudServicePage',
+                            name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                             params: {
                                 provider: d.provider,
                                 group: d.cloud_service_group,

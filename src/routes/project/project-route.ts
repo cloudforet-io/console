@@ -9,18 +9,23 @@ const ProjectAlertPage = () => import(/* webpackChunkName: "ProjectAlertPage" */
 const ProjectNotificationsPage = () => import(/* webpackChunkName: "ProjectNotificationsPage" */ '@/views/project/project/pages/ProjectNotificationsPage.vue');
 const ProjectMaintenanceWindowPage = () => import(/* webpackChunkName: "ProjectMaintenanceWindowPage" */ '@/views/project/project/pages/ProjectMaintenanceWindowPage.vue');
 const ProjectTagPage = () => import(/* webpackChunkName: "ProjectTagPage" */ '@/views/project/project/pages/ProjectTagPage.vue');
+const AddEventRulePage = () => import(/* webpackChunkName: "AddEventRulePage" */ '@/views/project/project/pages/AddEventRulePage.vue');
 
 export const PROJECT_ROUTE = Object.freeze({
-    MAIN: 'projectMain',
+    _NAME: 'projectMain',
     DETAIL: {
-        MAIN: 'projectDetail',
+        _NAME: 'projectDetail',
         TAB: {
-            SUMMARY: 'projectSummary',
-            MEMBER: 'projectMember',
-            ALERT: 'projectAlert',
-            NOTIFICATIONS: 'projectNotifications',
-            MAINTENANCE_WINDOW: 'projectMaintenanceWindow',
-            TAG: 'projectTag',
+            _NAME: 'projectTab',
+            SUMMARY: { _NAME: 'projectSummary' },
+            MEMBER: { _NAME: 'projectMember' },
+            ALERT: {
+                _NAME: 'projectAlert',
+                EVENT_RULE: { _NAME: 'projectEventRule' },
+            },
+            NOTIFICATIONS: { _NAME: 'projectNotifications' },
+            MAINTENANCE_WINDOW: { _NAME: 'projectMaintenanceWindow' },
+            TAG: { _NAME: 'projectTag' },
         },
     },
 });
@@ -32,50 +37,58 @@ export default {
     children: [
         {
             path: '/',
-            name: PROJECT_ROUTE.MAIN,
+            name: PROJECT_ROUTE._NAME,
             props: true,
             component: ProjectPage,
         },
         {
             path: ':id',
-            name: PROJECT_ROUTE.DETAIL.MAIN,
+            name: PROJECT_ROUTE.DETAIL._NAME,
             redirect: ':id/summary',
             props: true,
             component: ProjectDetailPage,
             children: [
                 {
                     path: 'summary',
-                    name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY,
+                    name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
                     props: true,
                     component: ProjectDashboardPage,
                 },
                 {
                     path: 'member',
-                    name: PROJECT_ROUTE.DETAIL.TAB.MEMBER,
+                    name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
                     props: true,
                     component: ProjectMemberPage,
                 },
                 {
                     path: 'alert',
-                    name: PROJECT_ROUTE.DETAIL.TAB.ALERT,
+                    name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                     props: true,
                     component: ProjectAlertPage,
+                    children: [
+                        {
+                            path: 'event-rule',
+                            name: PROJECT_ROUTE.DETAIL.TAB.ALERT.EVENT_RULE._NAME,
+                            props: true,
+                            component: AddEventRulePage,
+                        },
+                    ],
                 },
                 {
                     path: 'notifications',
-                    name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS,
+                    name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
                     props: true,
                     component: ProjectNotificationsPage,
                 },
                 {
                     path: 'maintenance-window',
-                    name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW,
+                    name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME,
                     props: true,
                     component: ProjectMaintenanceWindowPage,
                 },
                 {
                     path: 'tag',
-                    name: PROJECT_ROUTE.DETAIL.TAB.TAG,
+                    name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
                     props: true,
                     component: ProjectTagPage,
                 },

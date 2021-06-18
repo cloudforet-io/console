@@ -163,6 +163,7 @@ import { makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { Location } from 'vue-router';
 import { QueryHelper } from '@/lib/query';
 import { store } from '@/store';
+import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 
 interface Scheduler {
     name: string;
@@ -336,7 +337,7 @@ export default {
         * */
         const goToDetail = (item, scheduleId) => {
             const res: Location = {
-                name: 'powerScheduler',
+                name: AUTOMATION_ROUTE.POWER_SCHEDULER.ADD._NAME,
                 params: {
                     projectId: item.project_id,
                     scheduleId,

@@ -1,6 +1,6 @@
 <template>
     <article class="card-wrapper">
-        <router-link :to="{ name: 'spotGroupDetail',params: {id: cardData.spot_group_id}}">
+        <router-link :to="{ name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP.DETAIL._NAME ,params: {id: cardData.spot_group_id}}">
             <div class="card-header" :class="{'short': isShort}">
                 <div class="left-wrapper">
                     <p class="project-group-nav">
@@ -70,6 +70,7 @@ import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
+import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 
 
 export default {
@@ -125,6 +126,7 @@ export default {
         })();
         return {
             ...toRefs(state),
+            AUTOMATION_ROUTE,
             regionFormatter,
         };
     },

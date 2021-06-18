@@ -66,6 +66,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { QueryStoreFilter } from '@/lib/query/type';
 import { green, red, yellow } from '@/styles/colors';
 import { store } from '@/store';
+import {INVENTORY_ROUTE} from "@/routes/inventory/inventory-route";
 
 
 const TRUSTED_ADVISER = 'TrustedAdvisor';
@@ -168,7 +169,7 @@ export default {
             filters.push({ k: 'data.category', o: '=', v: category });
 
             return {
-                name: 'cloudServicePage',
+                name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 query: {
                     filters: queryHelper.setFilters(filters).rawQueryStrings,
                 },

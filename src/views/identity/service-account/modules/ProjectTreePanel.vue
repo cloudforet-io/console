@@ -200,7 +200,7 @@ export default {
         };
 
 
-        const projectPath = vm?.$router.resolve({ name: PROJECT_ROUTE.MAIN }).href;
+        const projectPath = vm?.$router.resolve({ name: PROJECT_ROUTE._NAME }).href;
         const goToProject = () => {
             window.open(projectPath);
         };

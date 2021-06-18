@@ -220,6 +220,8 @@ import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/in
 import { TranslateResult } from 'vue-i18n';
 import CustomFieldModal from '@/common/modules/custom-field-modal/CustomFieldModal.vue';
 import { FILE_NAME_PREFIX } from '@/lib/type';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
+import router from '@/routes';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -574,8 +576,8 @@ export default {
 
         const onClickSidebarItem = async (item) => {
             if (sidebarState.selectedItem.name !== item.name) {
-                await vm.$router.replace({
-                    name: 'cloudServicePage',
+                await router.replace({
+                    name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                     params: {
                         provider: props.provider,
                         group: props.group,

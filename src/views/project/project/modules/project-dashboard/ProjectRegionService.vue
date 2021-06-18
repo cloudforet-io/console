@@ -67,6 +67,7 @@ import { store } from '@/store';
 import { Location } from 'vue-router';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import config from '@/lib/config';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 
 am4core.useTheme(am4themes_animated);
 
@@ -216,7 +217,7 @@ export default {
             queryHelper.setFilters([{ k: 'project_id', o: '=', v: props.projectId }]);
 
             const location: Location = {
-                name: 'cloudServiceMain',
+                name: INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
                 query: {
                     filters: queryHelper.rawQueryStrings,
                     ...query,

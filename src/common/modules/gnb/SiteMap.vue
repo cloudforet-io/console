@@ -40,14 +40,15 @@
 </template>
 
 <script lang="ts">
+import vClickOutside from 'v-click-outside';
+
 import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import { PI } from '@spaceone/design-system';
 
-import vClickOutside from 'v-click-outside';
-import { store } from '@/store';
+import { DASHBOARD_ROUTE } from '@/routes/dashboard/dashboard-route';
 
 
 enum MENU_ICON {
@@ -87,9 +88,9 @@ export default {
         const state = reactive({
             siteMapMenuList: computed(() => ([
                 {
-                    name: 'dashboard',
+                    name: DASHBOARD_ROUTE._NAME,
                     label: vm.$t('MENU.DASHBOARD.DASHBOARD'),
-                    to: { name: 'dashboard' },
+                    to: { name: DASHBOARD_ROUTE._NAME },
                     subMenuList: [],
                 },
                 ...props.menuList,

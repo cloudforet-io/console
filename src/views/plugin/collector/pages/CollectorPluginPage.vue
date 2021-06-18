@@ -107,7 +107,7 @@
 </template>
 
 <script lang="ts">
-import { get, range, find } from 'lodash';
+import { get, range } from 'lodash';
 
 import {
     toRefs, reactive, watch, computed, getCurrentInstance, ComponentRenderProxy,
@@ -126,6 +126,8 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getPageStart } from '@/lib/component-utils/pagination';
 import { TimeStamp } from '@/models';
 import { assetUrlConverter } from '@/lib/util';
+import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
+import router from '@/routes';
 
 
 enum PLUGIN_STATE {
@@ -266,7 +268,7 @@ export default {
         };
 
         const onPluginCreate = (item) => {
-            root.$router.push({ path: `./collector-creator/${item.plugin_id}` });
+            router.push({ name: PLUGIN_ROUTE.COLLECTOR.CREATE.STEPS._NAME, params: { pluginId: item.plugin_id } });
         };
         const onSearch = (val) => {
             state.keyword = val;

@@ -40,6 +40,8 @@ import { FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteList from '@/common/modules/favorite-list/FavoriteList.vue';
 import SidebarTitle from '@/common/components/sidebar-title/SidebarTitle.vue';
 import { PI } from '@spaceone/design-system';
+import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
+import router from '@/routes';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -61,11 +63,11 @@ export default {
         const state = reactive({
             menuList: computed(() => [
                 {
-                    routeName: 'spotDashboard',
+                    routeName: AUTOMATION_ROUTE.SPOT_AUTOMATION.DASHBOARD._NAME,
                     label: vm.$t('AUTOMATION.SPOT_AUTOMATION.MAIN.DASHBOARD'),
                 },
                 {
-                    routeName: 'spotGroup',
+                    routeName: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP._NAME,
                     label: vm.$t('AUTOMATION.SPOT_AUTOMATION.MAIN.SPOT_GROUP'),
                 },
             ]) as unknown as MenuItem[],
@@ -78,7 +80,7 @@ export default {
         };
 
         const showPage = (routeName) => {
-            vm.$router.replace({ name: routeName }).catch(() => {});
+            router.replace({ name: routeName }).catch(() => {});
         };
         const selectSidebarItem = (route) => {
             if (route) state.selectedItem = state.menuList.find(d => d.routeName === route) as MenuItem;

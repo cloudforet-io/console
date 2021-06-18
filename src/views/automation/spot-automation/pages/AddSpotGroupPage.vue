@@ -67,6 +67,8 @@ import SpotGroupCheckModal from '@/views/automation/spot-automation/modules/Spot
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import ServiceCategorySelection from '@/views/automation/spot-automation/modules/ServiceCategorySelection.vue';
 import { SpotGroupResourceCategory } from '@/views/automation/spot-automation/type';
+import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
+import router from '@/routes';
 
 export default {
     name: 'AddSpotGroupPage',
@@ -111,9 +113,7 @@ export default {
             isAllValid: computed(() => state.isResourceValid && state.isSchedulePolicyValid && state.isRecommendTypesValid && state.isBaseInfoValid),
             loading: false,
             visibleCheckModal: false,
-            projectId: computed(() => {
-                return vm.$route.params.projectId;
-            }),
+            projectId: computed(() => vm.$route.params.projectId),
         });
 
         const routeState = reactive({
@@ -178,7 +178,7 @@ export default {
                 await SpaceConnector.client.spotAutomation.spotGroup.create(params);
 
                 showSuccessMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.ALT_S_CREATE_SPOT_GROUP'), '', vm.$root);
-                vm.$router.push({ name: 'spotGroup' });
+                await router.push({ name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP._NAME });
             } catch (e) {
                 console.error(e);
                 showErrorMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.ALT_E_CREATE_SPOT_GROUP'), e, vm.$root);

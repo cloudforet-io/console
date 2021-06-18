@@ -26,7 +26,7 @@
                                       @export="exportCollectorDataToExcel"
                 >
                     <template #toolbox-left>
-                        <router-link :to="{name:'collectorPlugins'}">
+                        <router-link :to="{ name: PLUGIN_ROUTE.COLLECTOR.CREATE.PLUGINS._NAME }">
                             <p-icon-text-button style-type="primary-dark"
                                                 name="ic_plus_bold"
                             >
@@ -196,6 +196,8 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import { store } from '@/store';
 import { QueryHelper } from '@/lib/query';
 import { FILE_NAME_PREFIX } from '@/lib/type';
+import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
+import { MANAGEMENT_ROUTE } from '@/routes/management/management-route';
 
 const GeneralPageLayout = (): Component => import('@/common/components/layouts/GeneralPageLayout.vue') as Component;
 const TagsPanel = (): Component => import('@/common/modules/tags-panel/TagsPanel.vue') as Component;
@@ -370,7 +372,7 @@ export default {
                     plugin_name: state.plugins[d.plugin_info.plugin_id]?.label,
                     plugin_icon: state.plugins[d.plugin_info.plugin_id]?.icon,
                     detailLink: {
-                        name: 'collectorHistory',
+                        name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME,
                         query: { filters: detailLinkQueryHelper.setFilters([{ k: 'collector_id', v: d.collector_id, o: '=' }]).rawQueryStrings },
                     },
                     ...d,
@@ -497,6 +499,7 @@ export default {
             multiTabState,
             singleTabState,
             checkModalState,
+            PLUGIN_ROUTE,
             onSelect,
             onChange,
             onClickUpdate,

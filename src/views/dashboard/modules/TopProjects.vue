@@ -3,7 +3,7 @@
         <template #title>
             <div class="top grid grid-cols-12">
                 <span class="title col-span-8 md:col-span-10">{{ $t('COMMON.WIDGETS.TOP_PROJECT_TITLE') }}</span>
-                <router-link :to="'/project'" class="create-project-button">
+                <router-link :to="{ name: PROJECT_ROUTE._NAME }" class="create-project-button">
                     <p-i name="ic_plus" width="1rem" height="1rem"
                          color="inherit"
                          class="add-icon"
@@ -106,6 +106,8 @@ import {
     gray, peacock, secondary,
 } from '@/styles/colors';
 import { QueryHelper } from '@/lib/query';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
+import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import config from '@/lib/config';
 
 am4core.useTheme(am4themes_animated);
@@ -239,14 +241,13 @@ export default {
         const queryHelper = new QueryHelper();
         const getLocation = (type, projectId) => {
             const query: Location['query'] = {};
-            const name = 'cloudServiceMain';
 
             query.provider = 'all';
             query.service = CLOUD_SERVICE_LABEL[type];
             if (type === 'storage') query.primary = 'false';
 
             const location: Location = {
-                name,
+                name: INVENTORY_ROUTE.CLOUD_SERVICE.TYPE._NAME,
                 query: {
                     filters: queryHelper.setFilters([
                         { k: 'project_id', v: projectId, o: '=' },
@@ -329,9 +330,7 @@ export default {
 
         return {
             ...toRefs(state),
-            onRowClick(item) {
-                vm.$router.push(`/project/${item.project_id}`);
-            },
+            PROJECT_ROUTE,
         };
     },
 };

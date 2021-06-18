@@ -94,6 +94,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { showErrorMessage } from '@/lib/util';
 import { store } from '@/store';
+import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 import router from '@/routes';
 
 dayjs.extend(timezone);
@@ -144,7 +145,7 @@ export default {
                     router.app.$root,
                 );
                 next({
-                    name: 'powerSchedulerLanding',
+                    name: AUTOMATION_ROUTE.POWER_SCHEDULER._NAME,
                     params: {},
                 });
                 return;
@@ -155,7 +156,7 @@ export default {
     },
     setup(props: Props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        if (!props.projectId) vm.$router.push('/error-page');
+        if (!props.projectId) router.push('/error-page');
 
         /** Breadcrumb */
         const routeState = reactive({
@@ -186,8 +187,8 @@ export default {
         const setMode = async () => {
             if (state.selectedSchedule?.schedule_id) {
                 try {
-                    await vm.$router.replace({
-                        name: 'powerSchedulerDetail',
+                    await router.replace({
+                        name: AUTOMATION_ROUTE.POWER_SCHEDULER.DETAIL._NAME,
                         params: {
                             projectId: props.projectId,
                             scheduleId: state.selectedSchedule.schedule_id,
@@ -196,8 +197,8 @@ export default {
                 } catch (e) {}
             } else {
                 try {
-                    await vm.$router.replace({
-                        name: 'powerScheduler',
+                    await router.replace({
+                        name: AUTOMATION_ROUTE.POWER_SCHEDULER.ADD._NAME,
                         params: {
                             projectId: props.projectId,
                         },

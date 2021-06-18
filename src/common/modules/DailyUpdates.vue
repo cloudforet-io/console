@@ -104,8 +104,9 @@ import WidgetLayout from '@/common/components/WidgetLayout.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { QueryHelper } from '@/lib/query';
-import { store } from '@/store';
 import { assetUrlConverter } from '@/lib/util';
+import { store } from '@/store';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
@@ -231,7 +232,7 @@ export default {
                     isServer: true,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
-                        name: 'cloudServicePage',
+                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,
@@ -246,7 +247,7 @@ export default {
                         },
                     },
                     deletedHref: {
-                        name: 'cloudServicePage',
+                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,
@@ -267,7 +268,7 @@ export default {
                     title: d.cloud_service_group,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
-                        name: 'cloudServicePage',
+                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,
@@ -281,7 +282,7 @@ export default {
                         },
                     },
                     deletedHref: {
-                        name: 'cloudServicePage',
+                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,
@@ -308,7 +309,7 @@ export default {
                     isServer: true,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
-                        name: 'cloudServicePage',
+                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,
@@ -322,7 +323,7 @@ export default {
                         },
                     },
                     deletedHref: {
-                        name: 'cloudServicePage',
+                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,
@@ -342,7 +343,7 @@ export default {
                     title: d.cloud_service_group,
                     icon: d.icon || props.providers[d.provider]?.icon,
                     createdHref: {
-                        name: 'cloudServicePage',
+                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,
@@ -355,7 +356,7 @@ export default {
                         },
                     },
                     deletedHref: {
-                        name: 'cloudServicePage',
+                        name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                         params: {
                             provider: d.provider,
                             group: d.cloud_service_group,

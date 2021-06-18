@@ -92,10 +92,10 @@ import WidgetLayout from '@/common/components/WidgetLayout.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { getPageStart } from '@/lib/component-utils/pagination';
 import { QueryHelper } from '@/lib/query';
 import { QueryStoreFilter } from '@/lib/query/type';
 import { store } from '@/store';
+import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 import numeral from 'numeral';
 
 
@@ -203,7 +203,7 @@ export default {
             filters.push({ k: 'data.status_code', o: '=', v: status });
 
             return {
-                name: 'cloudServicePage',
+                name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                 query: {
                     filters: queryHelper.setFilters(filters).rawQueryStrings,
                 },
