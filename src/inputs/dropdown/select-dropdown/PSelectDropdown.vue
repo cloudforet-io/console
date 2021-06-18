@@ -12,7 +12,11 @@
         >
             <span v-if="!buttonOnly" class="text" :class="{placeholder: !$scopedSlots.default && !selectedItem}">
                 <slot name="default">
-                    {{ selectedItem ? (selectedItem.label || selectedItem.name || '') : (placeholder || $t('COMPONENT.SELECT_DROPDOWN.SELECT')) }}
+                    {{
+                        selectedItem ?
+                            (selectedItem.label || selectedItem.name || '') :
+                            (placeholder || $t('COMPONENT.SELECT_DROPDOWN.SELECT'))
+                    }}
                 </slot>
             </span>
             <p-i :name="buttonIcon || (proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom')"
