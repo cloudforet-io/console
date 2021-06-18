@@ -1,7 +1,7 @@
 <template>
     <div class="right-side-menu">
         <div class="menu-wrapper">
-            <router-link :to="{ name: 'userAPIKey' }">
+            <router-link :to="{ name: IDENTITY_ROUTE.USER.API_KEY._NAME }">
                 <div v-if="!userState.isDomainOwner" class="menu-button code" :class="{'new-icon':!isNewIconHidden}"
                      @click="hideNewIcon"
                 >
@@ -95,19 +95,21 @@
 
 <script lang="ts">
 import vClickOutside from 'v-click-outside';
+import { Location } from 'vue-router';
 
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PAnchor, PI, PDivider } from '@spaceone/design-system';
-import { Location } from 'vue-router';
+import GNBNewIcon from '@/common/components/GNBNewIcon.vue';
+
 import router from '@/routes';
 import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { languages } from '@/store/modules/user/config';
+import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import config from '@/lib/config';
-import GNBNewIcon from '@/common/components/GNBNewIcon.vue';
 
 export default {
     name: 'RightSideMenu',
@@ -160,7 +162,7 @@ export default {
         };
         const openProfile = () => {
             emit('hide-menu');
-            vm.$router.replace({ name: 'userAccount' }).catch(() => {});
+            router.replace({ name: IDENTITY_ROUTE.USER.ACCOUNT._NAME }).catch(() => {});
         };
         const toggleLanguageMenu = () => {
             state.showLanguageMenu = !state.showLanguageMenu;
@@ -200,6 +202,7 @@ export default {
         return {
             ...toRefs(state),
             userState,
+            IDENTITY_ROUTE,
             signOut,
             changeLanguage,
             hideMenu,

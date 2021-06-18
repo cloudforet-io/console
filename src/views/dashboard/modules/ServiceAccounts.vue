@@ -70,6 +70,7 @@ import {
     gray, violet, white,
 } from '@/styles/colors';
 import { SpaceConnector } from '@/lib/space-connector';
+import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import config from '@/lib/config';
 
 am4core.useTheme(am4themes_animated);
@@ -182,7 +183,7 @@ export default {
 
         const getLink = (data) => {
             const link = {
-                name: 'serviceAccount',
+                name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME,
                 params: {
                     provider: data.provider,
                 },
@@ -224,7 +225,7 @@ export default {
 
         const goToServiceAccountPage = (item) => {
             const res: Location = {
-                name: 'serviceAccount',
+                name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME,
                 query: {
                     provider: item.provider,
                 },

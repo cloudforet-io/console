@@ -48,6 +48,7 @@ import SignInLeftContainer from '@/views/sign-in/modules/SignInLeftContainer.vue
 import { store } from '@/store';
 import config from '@/lib/config';
 import SignInRightContainer from '@/views/sign-in/modules/SignInRightContainer.vue';
+import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 
 
 export default {
@@ -115,8 +116,8 @@ export default {
             state.showErrorMessage = false;
             try {
                 const hasPermission = vm.$store.getters['user/hasPermission'];
-                if (!hasPermission && vm.$route.name !== 'userAccount') {
-                    await vm.$router.replace({ name: 'userAccount' });
+                if (!hasPermission && vm.$route.name !== IDENTITY_ROUTE.USER.ACCOUNT._NAME) {
+                    await vm.$router.replace({ name: IDENTITY_ROUTE.USER.ACCOUNT._NAME });
                 } else await vm.$router.push(props.nextPath);
             } catch (e) {
                 console.error(e);

@@ -47,15 +47,15 @@ export default {
         const state = reactive({
             menuList: computed(() => [
                 {
-                    routeName: MONITORING_ROUTE.ALERT_SYSTEM.DASHBOARD,
+                    routeName: MONITORING_ROUTE.ALERT_SYSTEM.DASHBOARD._NAME,
                     label: vm.$t('MONITORING.ALERT.MAIN.DASHBOARD'),
                 },
                 {
-                    routeName: MONITORING_ROUTE.ALERT_SYSTEM.ALERT.LIST,
+                    routeName: MONITORING_ROUTE.ALERT_SYSTEM.ALERT._NAME,
                     label: vm.$t('MONITORING.ALERT.MAIN.ALERT'),
                 },
                 {
-                    routeName: MONITORING_ROUTE.ALERT_SYSTEM.ESCALATION_POLICY,
+                    routeName: MONITORING_ROUTE.ALERT_SYSTEM.ESCALATION_POLICY._NAME,
                     label: vm.$t('MONITORING.ALERT.MAIN.ESCALATION_POLICY'),
                 },
             ]) as unknown as MenuItem[],

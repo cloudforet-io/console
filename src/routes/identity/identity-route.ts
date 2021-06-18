@@ -13,29 +13,29 @@ const ServiceAccountSearchPage = () => import(/* webpackChunkName: "ServiceAccou
 const NoResource = () => import(/* webpackChunkName: "NoResource" */ '@/common/pages/NoResource.vue');
 
 export const IDENTITY_ROUTE = Object.freeze({
-    MAIN: 'identity',
+    _NAME: 'identity',
     SERVICE_ACCOUNT: {
-        MAIN: 'serviceAccount',
-        SEARCH: 'serviceAccountSearch',
-        ADD: 'addServiceAccount',
-        NO_RESOURCE: 'noServiceAccount',
+        _NAME: 'serviceAccount',
+        SEARCH: { _NAME: 'serviceAccountSearch' },
+        ADD: { _NAME: 'addServiceAccount' },
+        NO_RESOURCE: { _NAME: 'noServiceAccount' },
     },
     USER: {
-        MAIN: 'user',
-        MANAGEMENT: 'userManagement',
-        ACCOUNT: 'userAccount',
-        API_KEY: 'userAPIKey',
+        _NAME: 'user',
+        MANAGEMENT: { _NAME: 'userManagement' },
+        ACCOUNT: { _NAME: 'userAccount' },
+        API_KEY: { _NAME: 'userAPIKey' },
         NOTIFICATION: {
-            MAIN: 'userNotification',
-            ADD: 'addNotification',
-            MANAGE: 'manageNotification',
+            _NAME: 'userNotification',
+            ADD: { _NAME: 'addNotification' },
+            MANAGE: { _NAME: 'manageNotification' },
         },
     },
 });
 
 export default {
     path: 'identity',
-    name: IDENTITY_ROUTE.MAIN,
+    name: IDENTITY_ROUTE._NAME,
     redirect: '/identity/service-account',
     meta: { label: 'Identity' },
     component: { template: '<router-view />' },
@@ -49,13 +49,13 @@ export default {
             children: [
                 {
                     path: '/',
-                    name: 'serviceAccount',
+                    name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME,
                     props: true,
                     component: ServiceAccount,
                 },
                 {
                     path: 'search/:id',
-                    name: 'serviceAccountSearch',
+                    name: IDENTITY_ROUTE.SERVICE_ACCOUNT.SEARCH._NAME,
                     meta: {
                         label: 'search',
                     },
@@ -64,14 +64,14 @@ export default {
                 },
                 {
                     path: 'add/:provider',
-                    name: 'addServiceAccount',
+                    name: IDENTITY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
                     meta: { label: 'Add Service Account' },
                     props: true,
                     component: AddServiceAccountPage,
                 },
                 {
                     path: 'no-resource',
-                    name: 'noServiceAccount',
+                    name: IDENTITY_ROUTE.SERVICE_ACCOUNT.NO_RESOURCE._NAME,
                     component: NoResource,
                 },
             ],
@@ -85,40 +85,40 @@ export default {
             children: [
                 {
                     path: '/',
-                    name: IDENTITY_ROUTE.USER.MAIN,
+                    name: IDENTITY_ROUTE.USER._NAME,
                     component: UserPage,
                     children: [
                         {
                             path: 'user-management',
-                            name: IDENTITY_ROUTE.USER.MANAGEMENT,
+                            name: IDENTITY_ROUTE.USER.MANAGEMENT._NAME,
                             component: UserManagement,
                         },
                         {
                             path: 'account',
-                            name: IDENTITY_ROUTE.USER.ACCOUNT,
+                            name: IDENTITY_ROUTE.USER.ACCOUNT._NAME,
                             component: UserAccount,
                         },
                         {
                             path: 'api-key',
-                            name: IDENTITY_ROUTE.USER.API_KEY,
+                            name: IDENTITY_ROUTE.USER.API_KEY._NAME,
                             component: UserAPIKeyPage,
                         },
                         {
                             path: 'notification',
-                            name: IDENTITY_ROUTE.USER.NOTIFICATION.MAIN,
+                            name: IDENTITY_ROUTE.USER.NOTIFICATION._NAME,
                             component: UserNotificationPage,
                         },
                     ],
                 },
                 {
                     path: 'notification/:userId',
-                    name: IDENTITY_ROUTE.USER.NOTIFICATION.MANAGE,
+                    name: IDENTITY_ROUTE.USER.NOTIFICATION.MANAGE._NAME,
                     component: ManageNotificationPage,
                     props: true,
                 },
                 {
                     path: 'notification/:protocol/:protocolId/:userId',
-                    name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
+                    name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD._NAME,
                     component: AddNotificationPage,
                     props: true,
                 },

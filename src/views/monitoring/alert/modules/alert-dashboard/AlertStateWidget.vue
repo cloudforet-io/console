@@ -259,7 +259,7 @@ export default {
         };
         const onClickListItem = (idx) => {
             const alertId = get(state.items[idx], 'alert_id');
-            if (alertId) vm.$router.push({ name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT.DETAIL, params: { id: alertId } });
+            if (alertId) vm.$router.push({ name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT.DETAIL._NAME, params: { id: alertId } });
         };
 
         (async () => {

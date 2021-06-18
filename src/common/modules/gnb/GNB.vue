@@ -89,6 +89,9 @@ import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
 import { MANAGEMENT_ROUTE } from '@/routes/management/management-route';
 import { DASHBOARD_ROUTE } from '@/routes/dashboard/dashboard-route';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
+import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
+import { PROJECT_ROUTE } from '@/routes/project/project-route';
+import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { store } from '@/store';
 import config from '@/lib/config';
 
@@ -155,7 +158,7 @@ export default {
                 {
                     name: PARENT_CATEGORY.project,
                     label: vm.$t('MENU.PROJECT.PROJECT'),
-                    to: state.hasPermission ? { name: 'projectMain' } : {},
+                    to: state.hasPermission ? { name: PROJECT_ROUTE._NAME } : {},
                     subMenuList: [],
                 },
                 {
@@ -170,24 +173,24 @@ export default {
                 {
                     name: PARENT_CATEGORY.identity,
                     label: vm.$t('MENU.IDENTITY.IDENTITY'),
-                    to: { name: 'identity' },
+                    to: { name: IDENTITY_ROUTE._NAME },
                     subMenuList: [
                         {
                             label: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'),
-                            to: { name: 'serviceAccount' },
+                            to: { name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME },
                             show: true,
                         },
-                        { label: vm.$t('MENU.IDENTITY.USER'), to: { name: 'userManagement' }, show: state.isAdmin },
+                        { label: vm.$t('MENU.IDENTITY.USER'), to: { name: IDENTITY_ROUTE.USER.MANAGEMENT._NAME }, show: state.isAdmin },
                     ],
                 },
                 {
                     name: PARENT_CATEGORY.monitoring,
                     label: vm.$t('MENU.MONITORING.MONITORING'),
-                    to: { name: 'monitoring' },
+                    to: { name: MONITORING_ROUTE._NAME },
                     subMenuList: [
                         {
                             label: vm.$t('MENU.MONITORING.ALERT_SYSTEM'),
-                            to: { name: 'alertDashboard' },
+                            to: { name: MONITORING_ROUTE.ALERT_SYSTEM.DASHBOARD._NAME },
                             isNew: true,
                             show: true,
                         },

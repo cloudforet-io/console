@@ -3,8 +3,8 @@
         <p-button
             style-type="primary1 outline"
             size="lg"
-            @click="openKeycloakSignIn"
             class="keycloak-btn"
+            @click="openKeycloakSignIn"
         >
             Sign In with Keycloak
         </p-button>
@@ -13,12 +13,13 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy,
-    defineComponent, getCurrentInstance, reactive, toRefs,
+    defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PButton } from '@spaceone/design-system';
 import KeycloakPage from '@/views/sign-in/pages/KeycloakPage.vue';
+import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
+import router from '@/routes';
 
 export default defineComponent({
     name: 'KEYCLOAK',
@@ -27,14 +28,12 @@ export default defineComponent({
         KeycloakPage,
     },
     setup(props, context) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const state = reactive({
             keycloakVisible: false,
         });
 
         const openKeycloakSignIn = () => {
-            vm.$router.push({ name: 'Keycloak' });
+            router.push({ name: SIGN_IN_ROUTE.KEYCLOAK._NAME });
         };
         return {
             openKeycloakSignIn,

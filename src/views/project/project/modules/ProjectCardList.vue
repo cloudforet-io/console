@@ -10,7 +10,7 @@
             <div class="project-cards">
                 <div v-for="(item, i) in items" :key="i" class="project-card-container">
                     <router-link class="card"
-                                 :to="{ name: 'projectDetail',params: {id: item.project_id}}"
+                                 :to="{ name: PROJECT_ROUTE.DETAIL._NAME, params: { id: item.project_id }}"
                     >
                         <div class="card-top-wrapper">
                             <div class="group-name">
@@ -55,7 +55,7 @@
                                         <router-link v-for="(provider, index) in getDistinctProviders(item.providers)"
                                                      :key="index"
                                                      :to="{
-                                                         name: 'serviceAccount',
+                                                         name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME,
                                                          query: { provider: getProvider(provider) ? provider : null },
                                                      }"
                                                      class="icon-link"
@@ -66,7 +66,7 @@
                                     </div>
                                 </div>
                                 <div class="account-add">
-                                    <router-link class="icon-wrapper" :to="{name: 'serviceAccount'}">
+                                    <router-link class="icon-wrapper" :to="{ name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME }">
                                         <p-i name="ic_plus_thin" scale="0.8" color="inherit" />
                                     </router-link>
                                     <span v-if="getDistinctProviders(item.providers).length === 0" class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
@@ -141,6 +141,9 @@ import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import ProjectFormModal from '@/views/project/project/modules/ProjectFormModal.vue';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
+import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
+import { PROJECT_ROUTE } from '@/routes/project/project-route';
+import router from '@/routes';
 
 
 export default {
@@ -187,8 +190,8 @@ export default {
 
         const getProvider = name => vm.$store.state.resource.provider.items[name] || {};
         const goToServiceAccount = (provider) => {
-            vm.$router.push({
-                name: 'serviceAccount',
+            router.push({
+                name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME,
                 query: { provider: getProvider(provider) ? provider : null },
             });
         };
@@ -339,6 +342,8 @@ export default {
         return {
             ...toRefs(state),
             INVENTORY_ROUTE,
+            IDENTITY_ROUTE,
+            PROJECT_ROUTE,
             getProvider,
             goToServiceAccount,
             getDistinctProviders,

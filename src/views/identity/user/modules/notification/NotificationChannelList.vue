@@ -49,7 +49,6 @@ import NotificationChannelItem from '@/views/identity/user/modules/notification/
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { store } from '@/store';
-import { Tags, TimeStamp } from '@/models';
 import { ChannelItem, ProtocolItem } from '@/views/identity/user/type';
 
 export default {
@@ -101,7 +100,7 @@ export default {
                 state.protocolList = res.results.map(d => ({
                     label: computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name })).value,
                     link: {
-                        name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD,
+                        name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD._NAME,
                         params: {
                             protocol: d.name.replace(/(\s*)/g, ''),
                             protocolId: d.protocol_id,

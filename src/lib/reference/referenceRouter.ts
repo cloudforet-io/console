@@ -7,6 +7,7 @@ import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
+import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 
 interface LinkFormatter {
     (baseUrl: string, data: string, reference: Reference, query: Location['query']): Location;
@@ -126,7 +127,7 @@ const routerMap: RouterMap = {
         },
     'identity.ServiceAccount':
         {
-            name: 'serviceAccountSearch',
+            name: IDENTITY_ROUTE.SERVICE_ACCOUNT.SEARCH._NAME,
             formatter: serviceAccountLinkFormatter,
         },
     'inventory.CloudService':

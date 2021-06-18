@@ -13,7 +13,7 @@
             <p-anchor v-if="scope === 'PROJECT'"
                       class="link-text"
                       :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATION_SETTINGS')"
-                      :to="{ name: IDENTITY_ROUTE.USER.NOTIFICATION.MAIN }"
+                      :to="{ name: IDENTITY_ROUTE.USER.NOTIFICATION._NAME }"
                       highlight
             />
         </div>

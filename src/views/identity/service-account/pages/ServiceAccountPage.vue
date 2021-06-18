@@ -138,6 +138,7 @@ import {
 } from '@vue/composition-api';
 import { get } from 'lodash';
 import { render } from 'ejs';
+import { TranslateResult } from 'vue-i18n';
 
 /* spaceone design system */
 import {
@@ -161,21 +162,23 @@ import ProjectTreeModal from '@/common/modules/ProjectTreeModal.vue';
 import ServiceAccountDetails from '@/views/identity/service-account/modules/ServiceAccountDetails.vue';
 import ServiceAccountCredentials from '@/views/identity/service-account/modules/ServiceAccountCredentials.vue';
 import ServiceAccountMember from '@/views/identity/service-account/modules/ServiceAccountMember.vue';
+import CustomFieldModal from '@/common/modules/custom-field-modal/CustomFieldModal.vue';
 
 /* utils */
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import {assetUrlConverter, showErrorMessage, showLoadingMessage, showSuccessMessage} from '@/lib/util';
+import {
+    assetUrlConverter, showErrorMessage, showLoadingMessage, showSuccessMessage,
+} from '@/lib/util';
 import { QueryHelper } from '@/lib/query';
 import { dynamicFieldsToExcelDataFields } from '@/lib/component-utils/dynamic-layout';
-import { store } from '@/store';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
+import { store } from '@/store';
+import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 
 /* types */
 import { Reference } from '@/lib/reference/type';
-import { TranslateResult } from 'vue-i18n';
-import CustomFieldModal from '@/common/modules/custom-field-modal/CustomFieldModal.vue';
 import { FILE_NAME_PREFIX } from '@/lib/type';
 
 
@@ -399,7 +402,7 @@ export default {
         /** Add & Delete Service Accounts Action (Dropdown) * */
         const clickAddServiceAccount = () => {
             vm.$router.push({
-                name: 'addServiceAccount',
+                name: IDENTITY_ROUTE.SERVICE_ACCOUNT.ADD._NAME,
                 params: { provider: selectedProvider.value },
                 query: { nextPath: vm.$route.fullPath },
             });

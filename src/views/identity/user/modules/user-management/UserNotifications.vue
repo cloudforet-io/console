@@ -85,7 +85,7 @@ export default {
             items: [] as ChannelItem[],
             protocolList: [] as ProtocolItem[],
             manageLink: {
-                name: IDENTITY_ROUTE.USER.NOTIFICATION.MANAGE,
+                name: IDENTITY_ROUTE.USER.NOTIFICATION.MANAGE._NAME,
                 params: { userId: encodeURIComponent(props.userId) },
             },
         });

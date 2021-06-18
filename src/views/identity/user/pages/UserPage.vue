@@ -91,12 +91,12 @@ export default {
         next((vm) => {
             const isAdmin = vm.$store.getters['user/isAdmin'];
             const isDomainOwner = vm.$store.getters['user/isDomainOwner'];
-            if (to.name === IDENTITY_ROUTE.USER.MAIN) {
-                if (isAdmin) next({ name: IDENTITY_ROUTE.USER.MANAGEMENT, query: to.query });
-                else next({ name: IDENTITY_ROUTE.USER.ACCOUNT, query: to.query });
-            } else if (to.name === IDENTITY_ROUTE.USER.MANAGEMENT && !isAdmin) next({ name: IDENTITY_ROUTE.USER.ACCOUNT, query: to.query });
-            else if (to.name === IDENTITY_ROUTE.USER.API_KEY && isDomainOwner) next({ name: IDENTITY_ROUTE.USER.ACCOUNT, query: to.query });
-            else if (to.name === IDENTITY_ROUTE.USER.NOTIFICATION.MAIN && isDomainOwner) next({ name: IDENTITY_ROUTE.USER.ACCOUNT, query: to.query });
+            if (to.name === IDENTITY_ROUTE.USER._NAME) {
+                if (isAdmin) next({ name: IDENTITY_ROUTE.USER.MANAGEMENT._NAME, query: to.query });
+                else next({ name: IDENTITY_ROUTE.USER.ACCOUNT._NAME, query: to.query });
+            } else if (to.name === IDENTITY_ROUTE.USER.MANAGEMENT._NAME && !isAdmin) next({ name: IDENTITY_ROUTE.USER.ACCOUNT._NAME, query: to.query });
+            else if (to.name === IDENTITY_ROUTE.USER.API_KEY._NAME && isDomainOwner) next({ name: IDENTITY_ROUTE.USER.ACCOUNT._NAME, query: to.query });
+            else if (to.name === IDENTITY_ROUTE.USER.NOTIFICATION._NAME && isDomainOwner) next({ name: IDENTITY_ROUTE.USER.ACCOUNT._NAME, query: to.query });
             else next(to);
         });
     },
@@ -115,22 +115,22 @@ export default {
             MenuList: [
                 {
                     label: vm.$t('IDENTITY.USER.ACCOUNT.ACCOUNT_N_PROFILE'),
-                    routeName: IDENTITY_ROUTE.USER.ACCOUNT,
+                    routeName: IDENTITY_ROUTE.USER.ACCOUNT._NAME,
                     userOnly: false,
                 },
                 {
                     label: vm.$t('IDENTITY.USER.MAIN.API_KEY'),
-                    routeName: IDENTITY_ROUTE.USER.API_KEY,
+                    routeName: IDENTITY_ROUTE.USER.API_KEY._NAME,
                     userOnly: true,
                 },
                 {
                     label: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION'),
-                    routeName: IDENTITY_ROUTE.USER.NOTIFICATION.MAIN,
+                    routeName: IDENTITY_ROUTE.USER.NOTIFICATION._NAME,
                     userOnly: true,
                 },
                 {
                     label: vm.$t('IDENTITY.USER.MAIN.USER_MANAGEMENT'),
-                    routeName: IDENTITY_ROUTE.USER.MANAGEMENT,
+                    routeName: IDENTITY_ROUTE.USER.MANAGEMENT._NAME,
                     userOnly: false,
                     isAdminMenu: true,
                 },
@@ -142,7 +142,7 @@ export default {
             vm.$router.replace({ name: item.routeName, query: { ...router.currentRoute.query } }).catch(() => {});
         };
         const selectSidebarItem = (routeName) => {
-            if (routeName === IDENTITY_ROUTE.USER.API_KEY && !userState.isDomainOwner) {
+            if (routeName === IDENTITY_ROUTE.USER.API_KEY._NAME && !userState.isDomainOwner) {
                 sidebarState.selectedItem = sidebarState.MenuList[1];
             } else if (routeName) sidebarState.selectedItem = sidebarState.MenuList.find(d => d.routeName === routeName) as SidebarItemType;
         };

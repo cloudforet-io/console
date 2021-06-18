@@ -1,11 +1,9 @@
 // Views
 import ErrorPage from '@/common/pages/ErrorPage.vue';
-import SignIn from '@/views/sign-in/pages/SignIn.vue';
-import DomainAdminSignIn from '@/views/sign-in/pages/DomainAdminSignIn.vue';
 import SignOut from '@/common/pages/SignOut.vue';
-import KEYCLOAK from '@/views/sign-in/pages/KeycloakPage.vue';
 
 // Routes
+import signInRoute from '@/routes/sign-in/sign-in-route';
 import dashboardRoute from '@/routes/dashboard/dashboard-route';
 import identityRoute from '@/routes/identity/identity-route';
 import inventoryRoute from '@/routes/inventory/inventory-route';
@@ -28,54 +26,6 @@ export const routerOptions = {
             component: ErrorPage,
         },
         {
-            path: '/sign-in',
-            component: { template: '<router-view />' },
-            meta: {
-                excludeAuth: true,
-                isSignInPage: true,
-            },
-            children: [
-                {
-                    path: '/',
-                    name: 'SignIn',
-                    meta: {
-                        excludeAuth: true,
-                        isSignInPage: true,
-
-                    },
-                    props: route => ({
-                        nextPath: route.query.nextPath || '/',
-                    }),
-                    component: SignIn,
-                },
-                {
-                    path: 'keycloak',
-                    name: 'Keycloak',
-                    meta: {
-                        excludeAuth: true,
-                        isSignInPage: true,
-                    },
-                    props: route => ({
-                        nextPath: route.query.nextPath || '/',
-                    }),
-                    component: KEYCLOAK,
-                },
-                {
-                    path: 'admin',
-                    name: 'AdminSignIn',
-                    meta: {
-                        excludeAuth: true,
-                        isSignInPage: true,
-                    },
-                    component: DomainAdminSignIn,
-                    props: route => ({
-                        admin: true,
-                        nextPath: route.query.nextPath || '/',
-                    }),
-                },
-            ],
-        },
-        {
             path: '/sign-out',
             name: 'SignOut',
             component: SignOut,
@@ -88,6 +38,7 @@ export const routerOptions = {
             redirect: '/dashboard',
             component: { template: '<router-view />' },
             children: [
+                signInRoute,
                 dashboardRoute,
                 identityRoute,
                 inventoryRoute,

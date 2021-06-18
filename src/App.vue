@@ -71,7 +71,8 @@ import { Location } from 'vue-router';
 import router from '@/routes';
 import TopNotification from '@/common/components/TopNotification.vue';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
-import { hideLoadingMessage, showLoadingMessage, showSuccessMessage } from './lib/util';
+import { hideLoadingMessage, showSuccessMessage } from '@/lib/util';
+import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 
 export default defineComponent({
     name: 'App',
@@ -100,8 +101,8 @@ export default defineComponent({
         };
 
         watch([() => vm.$store.getters['user/hasPermission'], () => vm.$route], async ([hasPermission, route]) => {
-            if (!route.meta.excludeAuth && !hasPermission && vm.$route.name !== 'userAccount') {
-                await vm.$router.replace({ name: 'userAccount' });
+            if (!route.meta.excludeAuth && !hasPermission && vm.$route.name !== IDENTITY_ROUTE.USER.ACCOUNT._NAME) {
+                await router.replace({ name: IDENTITY_ROUTE.USER.ACCOUNT._NAME });
             }
         }, { immediate: true });
 

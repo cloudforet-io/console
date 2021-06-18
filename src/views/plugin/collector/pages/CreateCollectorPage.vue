@@ -79,6 +79,8 @@ import ConfirmCredentials from '@/views/plugin/collector/modules/ConfirmCredenti
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
+import router from '@/routes';
 
 export default {
     name: 'CreateCollectorPage',
@@ -221,10 +223,10 @@ export default {
 
         /* event */
         const onClickBackButton = () => {
-            root.$router.push('/plugin/collector/create/plugins');
+            router.push({ name: PLUGIN_ROUTE.COLLECTOR.CREATE._NAME });
         };
         const onClickCancel = () => {
-            root.$router.go(-1);
+            router.go(-1);
         };
         const onClickConfirm = async () => {
             if (!formState.isConfValid || !formState.isTagsValid) {
@@ -245,7 +247,7 @@ export default {
             try {
                 await SpaceConnector.client.inventory.collector.create(params);
                 showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_S_CREATE_TITLE'), '', vm.$root);
-                await root.$router.push('/plugin/collector');
+                await router.push({ name: PLUGIN_ROUTE._NAME });
             } catch (e) {
                 console.error(e);
                 showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_CREATE_TITLE'), e, vm.$root);

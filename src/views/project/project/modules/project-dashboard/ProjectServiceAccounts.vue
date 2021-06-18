@@ -55,6 +55,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { QueryHelper } from '@/lib/query';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
+import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 
 enum DATA_TYPE {
     compute = 'compute',
@@ -134,7 +135,7 @@ export default {
                     provider: {
                         label: state.providers[item.provider].label,
                         color: state.providers[item.provider].color,
-                        to: { name: 'serviceAccount', query: { provider: item.provider } },
+                        to: { name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME, query: { provider: item.provider } },
                     },
                     service_account: {
                         label: item.service_account_name,

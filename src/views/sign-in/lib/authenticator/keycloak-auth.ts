@@ -1,6 +1,7 @@
 import Keycloak from 'keycloak-js';
 import { store } from '@/store';
 import { Authenticator } from '@/views/sign-in/lib/authenticator/index';
+import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
 import router from '@/routes';
 
 class KeycloakAuth extends Authenticator {
@@ -30,7 +31,7 @@ class KeycloakAuth extends Authenticator {
     }
 
     private static async onSignInFail() {
-        await router.replace({ name: 'SignIn', query: { error: 'error' } });
+        await router.replace({ name: SIGN_IN_ROUTE._NAME, query: { error: 'error' } });
         await KeycloakAuth.keycloak.logout();
     }
 

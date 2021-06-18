@@ -8,21 +8,21 @@ const EscalationPolicyPage = () => import(/* webpackChunkName: "EscalationPolicy
 const AlertDetailPage = () => import(/* webpackChunkName: "AlertDetailPage" */ '@/views/monitoring/alert/pages/AlertDetailPage.vue');
 
 export const MONITORING_ROUTE = Object.freeze({
-    MAIN: 'monitoring',
+    _NAME: 'monitoring',
     ALERT_SYSTEM: {
-        MAIN: 'alertSystem',
-        DASHBOARD: 'alertDashboard',
+        _NAME: 'alertSystem',
+        DASHBOARD: { _NAME: 'alertDashboard' },
         ALERT: {
-            LIST: 'alertList',
-            DETAIL: 'alertDetail',
+            _NAME: 'alertList',
+            DETAIL: { _NAME: 'alertDetail' },
         },
-        ESCALATION_POLICY: 'escalationPolicy',
+        ESCALATION_POLICY: { _NAME: 'escalationPolicy' },
     },
 });
 
 export default {
     path: 'monitoring',
-    name: MONITORING_ROUTE.MAIN,
+    name: MONITORING_ROUTE._NAME,
     redirect: '/monitoring/alert-system/dashboard',
     meta: { label: 'Monitoring' },
     component: { template: '<router-view />' },
@@ -34,29 +34,29 @@ export default {
             children: [
                 {
                     path: '/',
-                    name: MONITORING_ROUTE.ALERT_SYSTEM.MAIN,
+                    name: MONITORING_ROUTE.ALERT_SYSTEM._NAME,
                     component: MonitoringMainPage,
                     children: [
                         {
                             path: 'dashboard',
-                            name: MONITORING_ROUTE.ALERT_SYSTEM.DASHBOARD,
+                            name: MONITORING_ROUTE.ALERT_SYSTEM.DASHBOARD._NAME,
                             component: AlertDashboardPage,
                         },
                         {
                             path: 'alert',
-                            name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT.LIST,
+                            name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT._NAME,
                             component: AlertListPage,
                         },
                         {
                             path: 'escalation-policy',
-                            name: MONITORING_ROUTE.ALERT_SYSTEM.ESCALATION_POLICY,
+                            name: MONITORING_ROUTE.ALERT_SYSTEM.ESCALATION_POLICY._NAME,
                             component: EscalationPolicyPage,
                         },
                     ],
                 },
                 {
                     path: 'alert/:id',
-                    name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT.DETAIL,
+                    name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT.DETAIL._NAME,
                     props: true,
                     component: AlertDetailPage,
                 },

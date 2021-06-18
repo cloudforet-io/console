@@ -35,7 +35,7 @@ export default {
             ])),
         });
         const goToUserManagement = () => {
-            vm.$router.push({ name: IDENTITY_ROUTE.USER.MANAGEMENT });
+            vm.$router.push({ name: IDENTITY_ROUTE.USER.MANAGEMENT._NAME });
         };
         return {
             routeState,

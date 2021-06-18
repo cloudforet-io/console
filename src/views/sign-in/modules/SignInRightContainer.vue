@@ -52,6 +52,9 @@ import {
     PI,
 } from '@spaceone/design-system';
 import { ComponentRenderProxy, getCurrentInstance } from '@vue/composition-api';
+import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
+import router from '@/routes';
+
 
 export default {
     name: 'SignInRightContainer',
@@ -80,10 +83,10 @@ export default {
             emit('update:show-error-message', false);
         };
         const goToAdminSignIn = () => {
-            vm.$router.replace({ name: 'AdminSignIn' });
+            router.replace({ name: SIGN_IN_ROUTE.ADMIN._NAME });
         };
         const goToUserSignIn = () => {
-            vm.$router.replace({ name: 'SignIn' });
+            router.replace({ name: SIGN_IN_ROUTE._NAME });
         };
 
         return {

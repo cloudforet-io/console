@@ -94,7 +94,7 @@
                 <template v-if="value">
                     <router-link class="alert-title"
                                  :to="{
-                                     name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT.DETAIL,
+                                     name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT.DETAIL._NAME,
                                      params: { id: item.alert_id }
                                  }"
                     >
