@@ -40,7 +40,7 @@
         </section>
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
-                      :contents="'Alert를 삭제하시겠습니까?'"
+                      :contents="$t('MONITORING.ALERT.DETAIL.DELETE_MODAL_DESC')"
                       @confirm="alertDeleteConfirm"
         />
         <alert-title-edit-modal v-if="alertTitleEditFormVisible"
@@ -71,6 +71,7 @@ import AlertTitleEditModal from '@/views/monitoring/alert/modules/alert-detail/A
 import AlertDetailResourceInfo from '@/views/monitoring/alert/modules/alert-detail/AlertDetailResourceInfo.vue';
 import AlertDetailProjectDependency
     from '@/views/monitoring/alert/modules/alert-detail/AlertDetailProjectDependency.vue';
+import {i18n} from "@/translations";
 
 export default {
     name: 'AlertDetailPage',
@@ -106,15 +107,15 @@ export default {
 
         const routeState = reactive({
             route: computed(() => [
-                { name: vm.$t('MENU.MONITORING.MONITORING'), path: '/monitoring' },
-                { name: vm.$t('MENU.MONITORING.ALERT_SYSTEM'), path: '/monitoring/alert-system/dashboard' },
+                { name: i18n.t('MENU.MONITORING.MONITORING'), path: '/monitoring' },
+                { name: i18n.t('MENU.MONITORING.ALERT_SYSTEM'), path: '/monitoring/alert-system/dashboard' },
                 { name: props.id },
             ]),
         });
 
         const checkDeleteState = reactive({
             visible: false,
-            headerTitle: 'Alert를 삭제하시겠습니까?',
+            headerTitle: i18n.t('MONITORING.ALERT.DETAIL.DELETE_MODAL_TITLE'),
         });
 
         const getAlertData = async () => {
@@ -140,10 +141,10 @@ export default {
                 await SpaceConnector.client.monitoring.alert.delete({
                     alert_id: props.id,
                 });
-                showSuccessMessage('Alert Delete confirm', '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_S_DELETE_ALERT'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Alert Delete failure', '', root);
+                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_E_DELETE_ALERT'), '', root);
             } finally {
                 checkDeleteState.visible = false;
             }

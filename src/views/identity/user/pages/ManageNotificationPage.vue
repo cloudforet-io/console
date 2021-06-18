@@ -16,6 +16,7 @@ import {
 import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
+import {i18n} from "@/translations";
 
 export default {
     name: 'ManageNotificationPage',
@@ -26,9 +27,11 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const routeState = reactive({
             routes: computed(() => ([
-                { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/account' },
-                { name: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION') },
+                { name: i18n.t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
+                { name: i18n.t('MENU.IDENTITY.USER'), path: '/identity/user/user-management' },
+                { name: i18n.t('IDENTITY.USER.MAIN.ROOT_ACCOUNT'), path: '/identity/user/user-management' },
+                { name: i18n.t('IDENTITY.USER.MAIN.USER_MANAGEMENT'), path: '/identity/user/user-management' },
+                { name: i18n.t('IDENTITY.USER.NOTIFICATION.MANAGE_CHANNEL') },
             ])),
         });
         const goToUserManagement = () => {

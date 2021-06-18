@@ -22,7 +22,7 @@
                         </p-anchor>
                     </span>
                     <p-button style-type="gray-border" size="sm" @click="openChangeProjectModal">
-                        Change
+                        {{$t('MONITORING.ALERT.DETAIL.INFO.CHANGE')}}
                     </p-button>
                 </p>
             </template>
@@ -119,6 +119,7 @@ import { AlertDataModel } from '@/views/monitoring/alert/type';
 import { ProjectItemResp } from '@/views/project/project/type';
 import ProjectTreeModal from '@/common/modules/ProjectTreeModal.vue';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
+import {i18n} from "@/translations";
 
 interface PropsType {
     id: string;
@@ -158,18 +159,18 @@ export default {
 
         const state = reactive({
             fields: [
-                { name: 'triggered_by', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY') },
-                { name: 'escalation_policy_id', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.ESCALATION_POLICY') },
-                { name: 'project_id', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.PROJECT') },
-                { name: 'severity', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.SEVERITY') },
-                { name: 'created_at', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.CREATED') },
-                { name: 'acknowledged_at', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED') },
-                { name: 'resolved_at', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.RESOLVED') },
-                { name: 'alert_id', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.ALERT_ID') },
-                { name: 'description', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.DESC') },
-                { name: 'rule', label: 'Rule' },
-                { name: 'status_message', label: vm.$t('MONITORING.ALERT.DETAIL.INFO.STATUS_DETAILS') },
-                { name: 'additional_info', label: 'Additional Info' },
+                { name: 'triggered_by', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY') },
+                { name: 'escalation_policy_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ESCALATION_POLICY') },
+                { name: 'project_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.PROJECT') },
+                { name: 'severity', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.SEVERITY') },
+                { name: 'created_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.CREATED') },
+                { name: 'acknowledged_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED') },
+                { name: 'resolved_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED') },
+                { name: 'alert_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ALERT_ID') },
+                { name: 'description', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.DESC') },
+                { name: 'rule', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RULE') },
+                { name: 'status_message', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.STATUS_MSG') },
+                { name: 'additional_info', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.EXTRA_INFO') },
             ],
             data: props.alertData || {},
             escalationPolicyName: '',
@@ -216,12 +217,12 @@ export default {
                     alert_id: props.id,
                     description: state.descriptionInput,
                 });
-                showSuccessMessage('Update Description Success', '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_S_UPDATE_DESCRIPTION'), '', root);
                 state.isDescriptionEditMode = false;
                 emit('update');
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Update Description Failure', e, root);
+                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_E_UPDATE_DESCRIPTION'), e, root);
             }
         };
 
@@ -231,12 +232,12 @@ export default {
                     alert_id: props.id,
                     status_message: state.statusMessageInput,
                 });
-                showSuccessMessage('Update Status Message Success', '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_S_UPDATE_STATUS_MSG'), '', root);
                 state.isStatusMessageEditMode = false;
                 emit('update');
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Update Status Message Failure', e, root);
+                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_E_UPDATE_STATUS_MSG'), e, root);
             }
         };
 

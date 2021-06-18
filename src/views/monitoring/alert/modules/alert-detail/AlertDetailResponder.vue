@@ -22,7 +22,7 @@
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.ADDITIONAL_RESPONDER') }}
             </p>
             <p-autocomplete-search v-model="responderState.search" :menu="responderState.allMemberItems" :loading="responderState.loading"
-                                   class="autocomplete-search" @select-menu="onSelectMember" @update:value="addResponder"
+                                   class="autocomplete-search" @select-menu="onSelectMember"
             >
                 <template #menu-item--format="{item, id}">
                     <p-check-box :id="id" v-model="responderState.selectedMemberItems" class="tag-menu-item"
@@ -53,13 +53,13 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
-import { TimeStamp } from '@/models';
 import {
-    ALERT_SEVERITY, ALERT_STATE, ALERT_URGENCY, AlertDataModel,
+    AlertDataModel,
 } from '@/views/monitoring/alert/type';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import ProjectChannelList from '@/views/monitoring/alert/components/ProjectChannelList.vue';
+import { i18n } from '@/translations';
 
 interface PropsType {
     id?: string;
@@ -91,11 +91,11 @@ export default {
     setup(props: PropsType) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            items: [
-                { title: vm.$t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV1' },
-                { title: vm.$t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV2' },
-                { title: vm.$t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV3' },
-            ],
+            items: computed(() => [
+                { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV1' },
+                { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV2' },
+                { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV3' },
+            ]),
             loading: true,
             projectChannels: [],
         });
@@ -153,10 +153,13 @@ export default {
             }
         };
 
-        const onSelectMember = (item: MenuItem) => {
+        const onSelectMember = async (item: MenuItem) => {
             responderState.search = '';
             // const idx = state.selectedMemberItems.findIndex(k => k === item.name);
             responderState.selectedMemberItems = [...responderState.selectedMemberItems, item.name];
+            await responderState.selectedMemberItems.forEach((i) => {
+                addResponder(i);
+            });
         };
 
         const removeResponder = async (userID) => {

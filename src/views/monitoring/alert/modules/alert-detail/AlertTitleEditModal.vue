@@ -1,6 +1,6 @@
 <template>
     <p-button-modal
-        :header-title="'Edit Alert'"
+        :header-title="$t('MONITORING.ALERT.DETAIL.EDIT_MODAL_TITLE')"
         centered
         size="sm"
         fade
@@ -18,7 +18,7 @@
             >
                 <template #default="{invalid}">
                     <p-text-input v-model="alertTitleInput" class="block w-full" :invalid="isNameInvalid"
-                                  :placeholder="'Alert 편집'"
+                                  :placeholder="alertTitle"
                     />
                 </template>
             </p-field-group>
@@ -33,6 +33,7 @@ import {
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
+import {i18n} from "@/translations";
 
 export default {
     name: 'AlertTitleEditModal',
@@ -70,10 +71,10 @@ export default {
             alertTitleInput: props.alertTitle,
             nameInvalidText: computed(() => {
                 if (state.alertTitleInput.length === 0) {
-                    return vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
+                    return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
                 }
                 if (state.alertTitleInput.length > 40) {
-                    return vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
+                    return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
                 }
                 return undefined;
             }),

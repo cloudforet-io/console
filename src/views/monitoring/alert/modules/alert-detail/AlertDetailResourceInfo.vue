@@ -10,17 +10,12 @@
 
 <script lang="ts">
 import {
-    PPaneLayout, PDefinitionTable, PButton, PI, PTextarea, PTextInput,
+    PPaneLayout, PDefinitionTable,
 } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
-import { iso8601Formatter, showErrorMessage, showSuccessMessage } from '@/lib/util';
-import { SpaceConnector } from '@/lib/space-connector';
-import { store } from '@/store';
 import { AlertDataModel } from '@/views/monitoring/alert/type';
-import { ProjectItemResp } from '@/views/project/project/type';
-import ProjectTreeModal from '@/common/modules/ProjectTreeModal.vue';
 import { map } from 'lodash';
 
 interface PropsType {
@@ -45,8 +40,6 @@ export default {
         },
     },
     setup(props: PropsType, { emit, root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const state = reactive({
             fields: computed(() => map(state.data, (d, k) => ({ name: k, label: k.replace(/\_/g, ' ') }))),
             data: props.alertData?.resource || {},
@@ -63,4 +56,13 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.p-definition-table::v-deep {
+    .def-row {
+        td {
+            &:first-child {
+                @apply capitalize;
+            }
+        }
+    }
+}
 </style>

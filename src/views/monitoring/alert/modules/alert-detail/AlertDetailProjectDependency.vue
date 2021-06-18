@@ -1,9 +1,16 @@
 <template>
     <p-pane-layout class="project-dependency">
         <p-panel-top class="-ml-1">
-            Project Dependency
+            {{ $t('MONITORING.ALERT.DETAIL.PROJECT_DEPENDENCY.PROJECT_DEPENDENCY') }}
         </p-panel-top>
-        <p v-for="(item, index) in projectList" :key="`${item}-${index}`" class="project-name">
+        <p v-if="projectList.length === 0">
+            <p-empty class="mt-8">
+                {{$t('MONITORING.ALERT.DETAIL.PROJECT_DEPENDENCY.NO_DATA')}}
+            </p-empty>
+        </p>
+        <p v-for="(item, index) in projectList" v-else :key="`${item}-${index}`"
+           class="project-name"
+        >
             <p-anchor :to="referenceRouter(
                           item,
                           { resource_type: 'identity.Project' })"
@@ -16,7 +23,9 @@
 </template>
 
 <script lang="ts">
-import { PAnchor, PPaneLayout, PPanelTop } from '@spaceone/design-system';
+import {
+    PAnchor, PEmpty, PPaneLayout, PPanelTop,
+} from '@spaceone/design-system';
 import { AlertDataModel } from '@/views/monitoring/alert/type';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
@@ -33,6 +42,7 @@ export default {
         PPaneLayout,
         PPanelTop,
         PAnchor,
+        PEmpty,
     },
     props: {
         id: {
@@ -51,7 +61,6 @@ export default {
         });
 
         (async () => {
-            state.projectList = ['project-18655561c535', 'project-9074eea97d7e'];
             await store.dispatch('resource/project/load');
         })();
 

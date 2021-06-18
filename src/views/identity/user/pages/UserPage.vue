@@ -96,6 +96,7 @@ export default {
                 else next({ name: IDENTITY_ROUTE.USER.ACCOUNT, query: to.query });
             } else if (to.name === IDENTITY_ROUTE.USER.MANAGEMENT && !isAdmin) next({ name: IDENTITY_ROUTE.USER.ACCOUNT, query: to.query });
             else if (to.name === IDENTITY_ROUTE.USER.API_KEY && isDomainOwner) next({ name: IDENTITY_ROUTE.USER.ACCOUNT, query: to.query });
+            else if (to.name === IDENTITY_ROUTE.USER.NOTIFICATION.MAIN && isDomainOwner) next({ name: IDENTITY_ROUTE.USER.ACCOUNT, query: to.query });
             else next(to);
         });
     },
@@ -125,7 +126,7 @@ export default {
                 {
                     label: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION'),
                     routeName: IDENTITY_ROUTE.USER.NOTIFICATION.MAIN,
-                    userOnly: false,
+                    userOnly: true,
                 },
                 {
                     label: vm.$t('IDENTITY.USER.MAIN.USER_MANAGEMENT'),

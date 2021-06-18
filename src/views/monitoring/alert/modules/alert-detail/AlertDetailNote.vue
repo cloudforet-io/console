@@ -1,7 +1,7 @@
 <template>
     <p-pane-layout class="alert-detail-note">
         <p-panel-top>
-            {{ $t('MONITORING.ALERT.DETAIL.NOTE') }}
+            {{ $t('MONITORING.ALERT.DETAIL.NOTE.NOTE') }}
         </p-panel-top>
         <article class="note-wrapper">
             <p-collapsible-list :items="noteList" toggle-position="contents" :line-clamp="2">
@@ -14,7 +14,7 @@
             <p-button style-type="gray-border" size="md" class="add-btn"
                       @click="createNote"
             >
-                {{ $t('MONITORING.ALERT.DETAIL.ADD_NOTE') }}
+                {{ $t('MONITORING.ALERT.DETAIL.NOTE.ADD_NOTE') }}
             </p-button>
         </article>
     </p-pane-layout>

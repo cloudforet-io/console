@@ -33,6 +33,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { Options } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import {i18n} from "@/translations";
 
 export default {
     name: 'AlertReassignModal',
@@ -64,10 +65,10 @@ export default {
             loading: true,
             selectIndex: [] as number[],
             selectedUserID: computed(() => state.items[state.selectIndex]?.resource_id),
-            fields: computed(() => [
+            fields: [
                 { label: 'User ID', name: 'resource_id', type: 'item' },
                 { label: 'Name', name: 'resource_id', type: 'item' },
-            ]),
+            ],
             items: [] as any,
             options: {
                 sortBy: 'resource_id',
@@ -85,10 +86,10 @@ export default {
                     alert_id: props.alertId,
                     assignee: state.selectedUserID,
                 });
-                showSuccessMessage('Reassign Member success', '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_REASSIGN_MEMBER'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage('Reassign Member failure', e, root);
+                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_REASSIGN_MEMBER'), e, root);
             } finally {
                 state.proxyVisible = false;
             }
@@ -96,7 +97,6 @@ export default {
 
         const onClickReassign = async () => {
             await reassignMember();
-            console.log('confirm test')
             emit('confirm');
         };
 

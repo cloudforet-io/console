@@ -3,7 +3,7 @@
            class="alert-detail-timeline"
     >
         <template #timeline>
-            <p-panel-top>{{$t('MONITORING.ALERT.DETAIL.TIMELINE')}}</p-panel-top>
+            <p-panel-top>{{$t('MONITORING.ALERT.DETAIL.TIMELINE.TIMELINE')}}</p-panel-top>
             <ul class="timeline-wrapper">
                 <li class="timeline-item">
                     <span class="date">2021/05/17 17:33</span>
@@ -42,7 +42,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const tabState = reactive({
             tabs: computed(() => ([
-                { name: 'timeline', label: vm.$t('MONITORING.ALERT.DETAIL.TIMELINE') },
+                { name: 'timeline', label: vm.$t('MONITORING.ALERT.DETAIL.TIMELINE.TIMELINE') },
             ] as TabItem[])),
             activeTab: 'timeline',
         });
