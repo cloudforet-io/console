@@ -46,8 +46,9 @@ export const useContextMenuFixedStyle = (
 
             if (props.useFixedMenuStyle) {
                 contextMenuStyle.position = 'fixed';
-                contextMenuStyle.minWidth = 'auto';
-                contextMenuStyle.width = `${targetRects.width}px`;
+                contextMenuStyle.width = 'auto';
+                contextMenuStyle.minWidth = `${targetRects.width}px`;
+                contextMenuStyle.maxWidth = '100%'
             }
 
             if (window.innerHeight * 0.9 > (targetRects.bottom)) {
