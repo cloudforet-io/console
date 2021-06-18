@@ -5,6 +5,7 @@ import {i18n} from '@/translations';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 
 import PSelectDropdown from './PSelectDropdown.vue';
+import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
 
 import {getSelectDropdownArgTypes} from '@/inputs/dropdown/select-dropdown/story-helper';
 import {menuItems} from '@/inputs/context-menu/mock';
@@ -182,6 +183,51 @@ export const Template = (args, { argTypes }) => ({
 
 <br/>
 <br/>
+
+## Use Fixed Menu Style
+
+<Canvas>
+    <Story name="Use Fixed Menu Style" >
+        {{
+            components: { PSelectDropdown, PToggleButton },
+            template: `
+        <div class="bg-gray-100 p-8" style="height: 200px; overflow-y: auto; width: 90%;">
+            <div style="height: 500px;">
+                <p class="text-lg mb-5 leading-7" :class="useFixedMenuStyle ? 'text-gray-800' : 'text-gray-400'">
+                    Use Fixed Menu Style: <strong> {{useFixedMenuStyle ? 'On' : 'Off' }}</strong> <p-toggle-button :value="useFixedMenuStyle" @change="onChange" /> <br/>
+                    The menu's style position will be set 'fixed'.<br/>
+                    Therefore, the menu is placed on front, except for all other fixed elements with high z-index.<br/>
+                    When you scroll parent elements, the menu will be automatically hidden.
+                </p>
+                <p-select-dropdown v-if="show" :items="menuItems" :use-fixed-menu-style="useFixedMenuStyle" />
+            </div>
+        </div>
+`,
+            setup() {
+                const state = reactive({
+                    useFixedMenuStyle: true,
+                    show: true
+                })
+                const onChange = () => {
+                    state.show = false;
+                    state.useFixedMenuStyle = !state.useFixedMenuStyle;
+                    setTimeout(() => {
+                        state.show = true;
+                    }, 300)
+                }
+                return {
+                    ...toRefs(state),
+                    menuItems,
+                    onChange
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 
 ## Playground
 

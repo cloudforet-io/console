@@ -76,7 +76,7 @@ export const useContextMenuFixedStyle = (
         let scrollParent: Element|undefined;
         watch(() => state.targetElement, (targetElement) => {
             if (targetElement) {
-                scrollParent = getScrollableParent(targetElement);
+                scrollParent = getScrollableParent(targetElement.parentElement);
                 if (scrollParent) {
                     scrollParent.addEventListener('scroll', hideMenu);
                 }
