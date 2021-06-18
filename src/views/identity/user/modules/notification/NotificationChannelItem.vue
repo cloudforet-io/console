@@ -158,7 +158,7 @@
                 <div v-else class="content">
                     <p v-if="channelData.schedule">
                         <span v-for="day in channelData.schedule.day_of_week" :key="day"> {{ day }}</span><br>
-                        {{ channelData.schedule.start_hour }}:00 ~ {{ channelData.schedule.end_hour }}:00
+                        {{ displayStartHour }}:00 ~ {{ displayEndHour }}:00
                     </p>
                     <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME') }}</span>
                     <button class="edit-btn" @click="startEdit(EDIT_TYPE.SCHEDULE)">
@@ -221,7 +221,7 @@ import {
     PBadge, PDivider, PI, PIconButton, PPaneLayout, PTag, PToggleButton, PButton, PTextInput,
 } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import AddNotificationSchedule from '@/views/identity/user/modules/notification/AddNotificationSchedule.vue';
 import AddNotificationTopic from '@/views/identity/user/modules/notification/AddNotificationTopic.vue';
@@ -232,6 +232,8 @@ import InfoMessage from '@/common/components/InfoMessage.vue';
 import AddNotificationMemberGroup from '@/views/identity/user/modules/notification/AddNotificationMemberGroup.vue';
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 import { i18n } from '@/translations';
+import { store } from '@/store';
+import { utcToTimezoneFormatter } from '@/views/identity/user/lib/helper';
 
 enum EDIT_TYPE {
     NAME = 'name',
@@ -301,6 +303,9 @@ export default {
     },
     setup(props, { emit, root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+
+        const timezoneForFormatter = computed(() => store.state.user.timezone).value;
+
         const state = reactive({
             isActivated: props.channelData?.state === STATE_TYPE.ENABLED,
             isNameEditMode: false,
@@ -321,6 +326,9 @@ export default {
             topicModeForEdit: undefined,
             topicForEdit: props.channelData?.subscriptions,
             notificationLevelForEdit: props.channelData?.notification_level,
+            //
+            displayStartHour: computed(() => utcToTimezoneFormatter(props.channelData?.schedule?.start_hour, timezoneForFormatter)),
+            displayEndHour: computed(() => utcToTimezoneFormatter(props.channelData?.schedule?.end_hour, timezoneForFormatter)),
         });
         const checkDeleteState = reactive({
             visible: false,
@@ -451,6 +459,7 @@ export default {
             if (props.projectId) await updateProjectChannel(PARAM_KEY_TYPE.DATA, state.dataListForEdit);
             else await updateUserChannel(PARAM_KEY_TYPE.DATA, state.dataListForEdit);
         };
+
 
         const setUserChannelSchedule = async () => {
             try {

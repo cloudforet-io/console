@@ -31,7 +31,7 @@
                                    class="dropdown"
                                    @input="onSelectStartHour"
                 />
-                <span class="text">{{$t('IDENTITY.USER.NOTIFICATION.FORM.TO')}}</span>
+                <span class="text">{{ $t('IDENTITY.USER.NOTIFICATION.FORM.TO') }}</span>
                 <p-select-dropdown v-model="proxySchedule.end_hour"
                                    :select-item="proxySchedule.end_hour"
                                    :items="timeList"
@@ -49,10 +49,13 @@
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { PRadio, PSelectButton, PSelectDropdown, PFieldGroup } from '@spaceone/design-system';
+import {
+    PRadio, PSelectButton, PSelectDropdown, PFieldGroup,
+} from '@spaceone/design-system';
 import InfoMessage from '@/common/components/InfoMessage.vue';
 import { range } from 'lodash';
 import { store } from '@/store';
+import { timezoneToUtcFormatter } from '@/views/identity/user/lib/helper';
 
 const TIME_LIST = range(24);
 
@@ -67,7 +70,7 @@ export default {
         PFieldGroup,
     },
     props: {
-        is_scheduled: {
+        isScheduled: {
             type: Boolean,
             default: false,
         },
@@ -78,24 +81,26 @@ export default {
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const timezoneForFormatter = computed(() => store.state.user.timezone).value;
+
         const state = reactive({
             scheduleMode: computed(() => [{
                 label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME'), value: false,
             }, {
                 label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.CUSTOM'), value: true,
             }]),
-            proxyIsScheduled: props.is_scheduled ? props.is_scheduled : false,
+            proxyIsScheduled: props.isScheduled ? props.isScheduled : false,
             weekDay: [{ label: 'Monday', value: 'MON' }, { label: 'Tuesday', value: 'TUE' }, { label: 'Wednesday', value: 'WED' },
                 { label: 'Thursday', value: 'THU' }, { label: 'Friday', value: 'FRI' },
                 { label: 'Saturday', value: 'SAT' },
                 { label: 'Sunday', value: 'SUN' }],
             timeList: TIME_LIST.map(d => ({
-                type: 'item', label: `${d}:00`, name: d,
+                type: 'item', label: `${d}:00`, name: timezoneToUtcFormatter(d, timezoneForFormatter),
             })),
             proxySchedule: props.schedule ? props.schedule : {
                 day_of_week: ['MON', 'TUE', 'WED', 'THU', 'FRI'],
-                start_hour: 9,
-                end_hour: 18,
+                start_hour: timezoneToUtcFormatter(9, timezoneForFormatter),
+                end_hour: timezoneToUtcFormatter(18, timezoneForFormatter),
             },
             timezone: computed(() => store.state.user.timezone),
             isScheduleValid: computed(() => state.proxySchedule.start_hour !== state.proxySchedule.end_hour),
@@ -135,6 +140,7 @@ export default {
             state.proxySchedule.end_hour = value;
             emitChange();
         };
+
 
         return {
             ...toRefs(state),
