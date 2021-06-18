@@ -1,3 +1,10 @@
+# [1.1.0-beta.67](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.66...v1.1.0-beta.67) (2021-06-18)
+
+
+### Bug Fixes
+
+* update select dropdown component spec ([#605](https://github.com/spaceone-dev/spaceone-design-system/issues/605)) ([7f89c27](https://github.com/spaceone-dev/spaceone-design-system/commit/7f89c27205e527e583355f0ee1b215192c340fab))
+
 # [1.1.0-beta.66](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.65...v1.1.0-beta.66) (2021-06-18)
 
 
