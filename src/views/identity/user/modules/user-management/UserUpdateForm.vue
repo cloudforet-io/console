@@ -314,9 +314,6 @@ export default {
         .text-input {
             width: 25rem;
         }
-        .p-select-dropdown {
-            max-width: 14rem;
-        }
     }
 }
 </style>
