@@ -1,3 +1,10 @@
+# [1.1.0-beta.69](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.68...v1.1.0-beta.69) (2021-06-18)
+
+
+### Bug Fixes
+
+* update finding context menu fixed style scrollable parent ([#607](https://github.com/spaceone-dev/spaceone-design-system/issues/607)) ([589ba6a](https://github.com/spaceone-dev/spaceone-design-system/commit/589ba6aefffe4f31fa43eca9c5c4ac0b22761cc2))
+
 # [1.1.0-beta.68](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.67...v1.1.0-beta.68) (2021-06-18)
 
 
