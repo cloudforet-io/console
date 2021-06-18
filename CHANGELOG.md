@@ -1,3 +1,10 @@
+# [1.1.0-beta.68](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.67...v1.1.0-beta.68) (2021-06-18)
+
+
+### Bug Fixes
+
+* update context menu fixed style ([#606](https://github.com/spaceone-dev/spaceone-design-system/issues/606)) ([b1c76b3](https://github.com/spaceone-dev/spaceone-design-system/commit/b1c76b388f3d34a6ea78d46190b73475f6ed3f3a))
+
 # [1.1.0-beta.67](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.66...v1.1.0-beta.67) (2021-06-18)
 
 
