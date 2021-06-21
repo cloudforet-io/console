@@ -155,7 +155,7 @@
             </p-toolbox-table>
         </div>
         <delete-modal
-            :header-title="$t('MONITORING.ALERT.ALERT_LIST.FORM.DELETE_MODAL_TITLE')"
+            :header-title="$t('MONITORING.ALERT.ALERT_LIST.DELETE_MODAL.TITLE')"
             :visible.sync="visibleDeleteModal"
             @confirm="deleteConfirm"
         />

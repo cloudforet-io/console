@@ -3,13 +3,13 @@
         class="alert-resolve-update-modal"
         fade
         size="sm"
-        :header-title="$t('MONITORING.ALERT.ALERT_LIST.FORM.UPDATE_RESOLVE_MODAL_TITLE')"
+        :header-title="$t('MONITORING.ALERT.ALERT_LIST.UPDATE_RESOLVE_MODAL.TITLE')"
         :visible.sync="proxyVisible"
         @confirm="onClickConfirm"
     >
         <template #body>
             <p-field-group
-                :label="$t('MONITORING.ALERT.ALERT_LIST.FORM.UPDATE_RESOLVE_MODAL_LABEL_1')"
+                :label="$t('MONITORING.ALERT.ALERT_LIST.UPDATE_RESOLVE_MODAL.LABEL_NOTE')"
             >
                 <p-textarea v-model="noteInput" />
             </p-field-group>
