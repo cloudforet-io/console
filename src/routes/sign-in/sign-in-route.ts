@@ -11,7 +11,7 @@ export const SIGN_IN_ROUTE = Object.freeze({
 });
 
 export default {
-    path: 'sign-in',
+    path: '/sign-in',
     meta: {
         label: 'Sign In',
         excludeAuth: true,

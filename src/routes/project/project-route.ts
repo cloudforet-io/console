@@ -42,6 +42,12 @@ export default {
             component: ProjectPage,
         },
         {
+            path: ':id/event-rule',
+            name: PROJECT_ROUTE.DETAIL.TAB.ALERT.EVENT_RULE._NAME,
+            props: true,
+            component: AddEventRulePage,
+        },
+        {
             path: ':id',
             name: PROJECT_ROUTE.DETAIL._NAME,
             redirect: ':id/summary',
@@ -66,12 +72,12 @@ export default {
                     props: true,
                     component: ProjectAlertPage,
                     children: [
-                        {
-                            path: 'event-rule',
-                            name: PROJECT_ROUTE.DETAIL.TAB.ALERT.EVENT_RULE._NAME,
-                            props: true,
-                            component: AddEventRulePage,
-                        },
+                        // {
+                        //     path: 'event-rule',
+                        //     name: PROJECT_ROUTE.DETAIL.TAB.ALERT.EVENT_RULE._NAME,
+                        //     props: true,
+                        //     component: AddEventRulePage,
+                        // },
                     ],
                 },
                 {
