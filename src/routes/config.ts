@@ -31,6 +31,7 @@ export const routerOptions = {
             component: SignOut,
             meta: { label: '', excludeAuth: true, isSignInPage: false },
         },
+        signInRoute,
         {
             path: '/',
             name: 'root',
@@ -38,7 +39,6 @@ export const routerOptions = {
             redirect: '/dashboard',
             component: { template: '<router-view />' },
             children: [
-                signInRoute,
                 dashboardRoute,
                 identityRoute,
                 inventoryRoute,
