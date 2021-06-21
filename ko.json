@@ -1059,18 +1059,16 @@
 				"ACKNOWLEDGED": "Acknowledged",
 				"ALERT": "Alert",
 				"ALL": "All",
+				"ALT_E_DELETE": "Alert 삭제 실패",
 				"ALT_E_STATE_CHANGED": "Change alert state failure",
+				"ALT_S_DELETE": "Alert 삭제 완",
 				"ALT_S_STATE_CHANGED": "Change alert state success",
 				"ASSIGNED_TO_ME": "Assigned to me",
 				"ASSIGNED_TO_YOU_TITLE": "New alert assigned to you",
 				"CREATE": "생성",
 				"DELETE": "Delete",
-				"FORM": {
-					"ALT_E_DELETE": "Alert 삭제 실패",
-					"ALT_S_DELETE": "Alert 삭제 완",
-					"DELETE_MODAL_TITLE": "Are you sure you want to delete selected alert?",
-					"UPDATE_RESOLVE_MODAL_LABEL_1": "Note",
-					"UPDATE_RESOLVE_MODAL_TITLE": "Change to resolved state"
+				"DELETE_MODAL": {
+					"TITLE": "정말로 선택된 얼럿을 삭제하시겠습니까?"
 				},
 				"HIGH": "High",
 				"LOW": "Low",
@@ -1081,6 +1079,10 @@
 				"RESOLVED": "Resolved",
 				"STATE": "State",
 				"TRIGGERED": "Triggered",
+				"UPDATE_RESOLVE_MODAL": {
+					"LABEL_NOTE": "노트",
+					"TITLE": "Resolved 상태로 변경하기"
+				},
 				"URGENCY": "Urgency"
 			},
 			"DASHBOARD": {

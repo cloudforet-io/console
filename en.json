@@ -1059,18 +1059,16 @@
 				"ACKNOWLEDGED": "Acknowledged",
 				"ALERT": "Alert",
 				"ALL": "All",
+				"ALT_E_DELETE": "Delete alert failure",
 				"ALT_E_STATE_CHANGED": "Change alert state failure",
+				"ALT_S_DELETE": "Delete alert success",
 				"ALT_S_STATE_CHANGED": "Change alert state success",
 				"ASSIGNED_TO_ME": "Assigned to me",
 				"ASSIGNED_TO_YOU_TITLE": "New alert assigned to you",
 				"CREATE": "Create",
 				"DELETE": "Delete",
-				"FORM": {
-					"ALT_E_DELETE": "Delete alert failure",
-					"ALT_S_DELETE": "Delete alert success",
-					"DELETE_MODAL_TITLE": "Are you sure you want to delete selected alert?",
-					"UPDATE_RESOLVE_MODAL_LABEL_1": "Note",
-					"UPDATE_RESOLVE_MODAL_TITLE": "Change to resolved state"
+				"DELETE_MODAL": {
+					"TITLE": "Are you sure you want to delete selected alert?"
 				},
 				"HIGH": "High",
 				"LOW": "Low",
@@ -1081,6 +1079,10 @@
 				"RESOLVED": "Resolved",
 				"STATE": "State",
 				"TRIGGERED": "Triggered",
+				"UPDATE_RESOLVE_MODAL": {
+					"LABEL_NOTE": "Note",
+					"TITLE": "Change to resolved state"
+				},
 				"URGENCY": "Urgency"
 			},
 			"DASHBOARD": {
