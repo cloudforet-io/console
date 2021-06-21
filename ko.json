@@ -1070,6 +1070,18 @@
 				"DELETE_MODAL": {
 					"TITLE": "정말로 선택된 얼럿을 삭제하시겠습니까?"
 				},
+				"FORM": {
+					"ACTIVATE_PROJECT_ALERT": "프로젝트에 얼럿 활성화",
+					"HIGH": "높음",
+					"INVALID_NEED_TO_SET_PROJECT_ALERT": "이 프로젝트는 얼럿 설정이 필요합니다.  먼저 얼럿 설정을 해주세요.",
+					"LABEL_ALERT_TITLE": "얼럿 제목",
+					"LABEL_DESCRIPTION": "설명",
+					"LABEL_PROJECT": "프로젝트",
+					"LABEL_URGENCY": "긴급도",
+					"LOW": "낮음",
+					"TITLE_CREATE": "얼럿 생성",
+					"TITLE_UPDATE": "얼럿 변경"
+				},
 				"HIGH": "High",
 				"LOW": "Low",
 				"MERGE": "Merge",
@@ -1511,9 +1523,9 @@
 			"MODAL_VALIDATION_REQUIRED": "이름을 입력해 주세요.",
 			"MODAL_VALIDATION_SELECT_MEMBER": "구성원을 선택하세요",
 			"MODAL_VALIDATION_SELECT_ROLE": "권한을 선택하세요",
-			"PROJECT_ALERT_ACTIVATE": "",
+			"PROJECT_ALERT_ACTIVATE": "얼럿 활성화",
 			"PROJECT_ALERT_ACTIVATION_DESC_1": "",
-			"PROJECT_ALERT_ACTIVATION_DESC_2": "",
+			"PROJECT_ALERT_ACTIVATION_DESC_2": "통합된 외부 이벤트를 수신하거나 이 프로젝트를 관리하려면 '얼럿 활성화' 버튼을 클릭하세요.",
 			"PROJECT_ID": "프로젝트 아이디: ",
 			"PROJECT_MEMBER_LABEL": "라벨 ",
 			"PROJECT_ROLE": "프로젝트 권한 ",

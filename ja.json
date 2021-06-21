@@ -1070,6 +1070,18 @@
 				"DELETE_MODAL": {
 					"TITLE": ""
 				},
+				"FORM": {
+					"ACTIVATE_PROJECT_ALERT": "",
+					"HIGH": "",
+					"INVALID_NEED_TO_SET_PROJECT_ALERT": "",
+					"LABEL_ALERT_TITLE": "",
+					"LABEL_DESCRIPTION": "",
+					"LABEL_PROJECT": "",
+					"LABEL_URGENCY": "",
+					"LOW": "",
+					"TITLE_CREATE": "",
+					"TITLE_UPDATE": ""
+				},
 				"HIGH": "",
 				"LOW": "",
 				"MERGE": "",

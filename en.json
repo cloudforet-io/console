@@ -1070,6 +1070,18 @@
 				"DELETE_MODAL": {
 					"TITLE": "Are you sure you want to delete selected alert?"
 				},
+				"FORM": {
+					"ACTIVATE_PROJECT_ALERT": "Activate Alert of Project",
+					"HIGH": "High",
+					"INVALID_NEED_TO_SET_PROJECT_ALERT": "This project requires an alert setting.  Please set the alert first.",
+					"LABEL_ALERT_TITLE": "Alert Title",
+					"LABEL_DESCRIPTION": "Description",
+					"LABEL_PROJECT": "Project",
+					"LABEL_URGENCY": "Urgency",
+					"LOW": "Low",
+					"TITLE_CREATE": "Create Alert",
+					"TITLE_UPDATE": "Update Alert"
+				},
 				"HIGH": "High",
 				"LOW": "Low",
 				"MERGE": "Merge",
@@ -1511,9 +1523,9 @@
 			"MODAL_VALIDATION_REQUIRED": "Required field",
 			"MODAL_VALIDATION_SELECT_MEMBER": "Select a member ",
 			"MODAL_VALIDATION_SELECT_ROLE": "Select a Role",
-			"PROJECT_ALERT_ACTIVATE": "Active Alert",
+			"PROJECT_ALERT_ACTIVATE": "Activate Alert",
 			"PROJECT_ALERT_ACTIVATION_DESC_1": "Set an Alert of this Project",
-			"PROJECT_ALERT_ACTIVATION_DESC_2": "Click ‘Active Alert’ to recieve integrated external events or manage of this project.",
+			"PROJECT_ALERT_ACTIVATION_DESC_2": "Click ‘Activate Alert’ to receive integrated external events or manage of this project.",
 			"PROJECT_ID": "Project ID:",
 			"PROJECT_MEMBER_LABEL": "Labels",
 			"PROJECT_ROLE": "Project Role",
