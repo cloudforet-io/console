@@ -242,7 +242,11 @@ export default {
 
         /* init */
         (async () => {
-            await Promise.all([store.dispatch('resource/project/load'), listEscalationPolicies()]);
+            await Promise.all([
+                store.dispatch('resource/project/load'),
+                store.dispatch('resource/protocol/load'),
+                listEscalationPolicies(),
+            ]);
         })();
 
         return {
