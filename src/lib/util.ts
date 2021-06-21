@@ -22,12 +22,12 @@ export const durationFormatter = (createdAt: string, finishedAt: string, timezon
         const finishedAtTime = dayjs(iso8601Formatter(finishedAt, timezone));
         const durationSec = finishedAtTime.diff(createdAtTime, 'second');
         const durationMin = finishedAtTime.diff(createdAtTime, 'minute');
-        const durationHour = finishedAtTime.diff(createdAtTime, 'hour');
-        const durationDay = finishedAtTime.diff(createdAtTime, 'day');
+        const durationHours = finishedAtTime.diff(createdAtTime, 'hour');
+        const durationDays = finishedAtTime.diff(createdAtTime, 'day');
         if (durationSec < 60) return `${durationSec} sec`;
-        if (durationMin < 60) return `${durationSec} min`;
-        if (durationHour < 60) return `${durationHour} hour ${durationSec % 60} min`;
-        return `${durationDay % 24} day ${durationHour % 24} hour`;
+        if (durationMin < 60) return `${durationMin} min`;
+        if (durationHours < 24) return `${durationHours} hours ${durationMin % 60} min`;
+        return `${durationDays % 24} days ${durationHours % 24} hours`;
     }
     return null;
 };

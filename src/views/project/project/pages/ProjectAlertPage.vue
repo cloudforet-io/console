@@ -18,7 +18,7 @@
             @change="onChangeTab"
         >
             <template #alert>
-                <div>Project Alert</div>
+                <project-alert :project-id="id" />
             </template>
             <template #webhook>
                 <project-webhook :project-id="id" />
@@ -38,6 +38,7 @@ import {
 } from '@vue/composition-api';
 
 import { PButtonTab, PButton } from '@spaceone/design-system';
+import ProjectAlert from '@/views/project/project/modules/ProjectAlert.vue';
 import ProjectWebhook from '@/views/project/project/modules/ProjectWebhook.vue';
 import ProjectSettings from '@/views/project/project/modules/project-alert/ProjectSettings.vue';
 
@@ -49,8 +50,9 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 export default {
     name: 'ProjectAlertPage',
     components: {
-        ProjectSettings,
+        ProjectAlert,
         ProjectWebhook,
+        ProjectSettings,
         PButtonTab,
         PButton,
     },

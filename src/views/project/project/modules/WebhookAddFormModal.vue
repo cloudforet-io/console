@@ -112,7 +112,7 @@ export default {
         const setWebhookData = async (res) => {
             state.webhookTypeList = res.results.map(d => ({
                 pluginId: d.plugin_id,
-                label: d.tags.description,
+                label: d.name,
                 imageUrl: d.tags.icon,
                 data: d,
             }));

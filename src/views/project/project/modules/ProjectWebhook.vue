@@ -125,7 +125,7 @@ export default {
     props: {
         projectId: {
             type: String,
-            default: '',
+            default: undefined,
         },
     },
     setup(props, { root }) {

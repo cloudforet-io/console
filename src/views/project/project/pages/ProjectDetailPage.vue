@@ -41,6 +41,11 @@
                    @update:activeTab="onUpdateActiveTab"
             >
                 <keep-alive><router-view /></keep-alive>
+                <template #extra="tab">
+                    <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT')" style-type="primary3">
+                        {{ counts[ALERT_STATE.TRIGGERED] }}
+                    </p-badge>
+                </template>
             </p-tab>
             <p-button-modal :header-title="headerTitle"
                             :centered="true"
@@ -77,7 +82,7 @@ import {
 
 import {
     PTab, PPageTitle, PButtonModal,
-    PIconButton, PCopyButton, PBreadcrumbs, PButton, PIconTextButton,
+    PIconButton, PCopyButton, PBreadcrumbs, PButton, PIconTextButton, PBadge,
 } from '@spaceone/design-system';
 
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
@@ -93,6 +98,8 @@ import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { ProjectModel } from '@/views/project/project/type';
 import { TranslateResult } from 'vue-i18n';
 import MaintenanceWindowFormModal from '@/views/project/project/modules/MaintenanceWindowFormModal.vue';
+import { find } from 'lodash';
+import { ALERT_STATE } from '@/views/monitoring/alert/type';
 
 
 export default {
@@ -109,6 +116,7 @@ export default {
         PCopyButton,
         PBreadcrumbs,
         PIconTextButton,
+        PBadge,
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -130,6 +138,10 @@ export default {
             ]),
             users: computed(() => vm.$store.state.resource.user.items),
             maintenanceWindowFormVisible: false,
+            alertStateCounts: [],
+            counts: computed(() => ({
+                TRIGGERED: find(state.alertStateCounts, { state: ALERT_STATE.TRIGGERED })?.total || 0,
+            })),
         });
 
         /* api */
@@ -220,6 +232,18 @@ export default {
             if (data) item.value = data;
         };
 
+        const statAlerts = async () => {
+            try {
+                const { results } = await SpaceConnector.client.statistics.topic.alertStateCount({
+                    project_id: state.projectId,
+                });
+                state.alertStateCounts = results;
+            } catch (e) {
+                state.alertStateCounts = [];
+                console.error(e);
+            }
+        };
+
         /** Init */
         (async () => {
             await Promise.all([
@@ -228,6 +252,7 @@ export default {
                 vm.$store.dispatch('favorite/project/load'),
                 vm.$store.dispatch('resource/user/load'),
                 vm.$store.dispatch('resource/provider/load'),
+                statAlerts(),
             ]);
         })();
 
@@ -250,12 +275,13 @@ export default {
             ...toRefs(formState),
             singleItemTabState,
             onUpdateActiveTab,
-
+            ALERT_STATE,
             item,
             openProjectDeleteForm,
             projectDeleteFormConfirm,
             openProjectEditForm,
             onProjectFormComplete,
+            statAlerts,
 
         };
     },
@@ -293,7 +319,6 @@ export default {
             }
         }
     }
-
 }
 .p-page-title::v-deep {
     @apply mb-0;
