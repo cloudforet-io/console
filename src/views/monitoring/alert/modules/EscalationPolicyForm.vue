@@ -77,7 +77,6 @@ import {
 import { PFieldGroup, PRadio, PTextInput } from '@spaceone/design-system';
 
 import EscalationRulesInputForm from '@/views/monitoring/alert/modules/EscalationRulesInputForm.vue';
-import EscalationPolicyProjectTree from '@/views/monitoring/alert/modules/EscalationPolicyProjectTree.vue';
 import ProjectSelectDropdown from '@/common/modules/project-select-dropdown/ProjectSelectDropdown.vue';
 
 import {
@@ -92,7 +91,6 @@ export default {
     name: 'EscalationPolicyForm',
     components: {
         EscalationRulesInputForm,
-        EscalationPolicyProjectTree,
         ProjectSelectDropdown,
         PFieldGroup,
         PTextInput,

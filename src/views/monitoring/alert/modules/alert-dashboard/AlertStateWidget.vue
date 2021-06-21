@@ -6,7 +6,7 @@
         <div class="content-wrapper">
             <!--tabs-->
             <p-balloon-tab v-model="tabState.activeTab"
-                           class="tablet:hidden"
+                           class="desktop-balloon-tab"
                            :tabs="tabState.tabs"
                            size="lg"
                            position="left"
@@ -20,7 +20,7 @@
                 </template>
             </p-balloon-tab>
             <p-balloon-tab v-model="tabState.activeTab"
-                           class="hidden tablet:block"
+                           class="tablet-balloon-tab"
                            :tabs="tabState.tabs"
                            size="sm"
                            :style-type="tabState.tabItems[tabState.activeTab].styleType"
@@ -302,6 +302,10 @@ export default {
 
         .p-balloon-tab::v-deep {
             @apply col-span-3;
+
+            &.tablet-balloon-tab {
+                display: none;
+            }
             .balloon-group {
                 width: 100%;
 
@@ -371,6 +375,12 @@ export default {
             display: block;
 
             .p-balloon-tab::v-deep {
+                &.desktop-balloon-tab {
+                    display: none;
+                }
+                &.tablet-balloon-tab {
+                    display: flex;
+                }
                 .balloon-group {
                     margin-bottom: 1.5rem;
 

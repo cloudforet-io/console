@@ -12,7 +12,11 @@
             >
                 {{ projects[item.project_id] ? projects[item.project_id].label : item.project_id }}
             </p-anchor>
-            <p-badge v-if="showMemberName && item.assignee" outline style-type="primary2">
+            <p-badge v-if="showMemberName && item.assignee"
+                     outline
+                     style-type="primary2"
+                     class="member-name"
+            >
                 {{ users[item.assignee] ? users[item.assignee].label : item.assignee }}
             </p-badge>
         </div>
@@ -141,6 +145,9 @@ export default {
                 position: absolute;
                 left: -0.25rem;
                 top: 0.3rem;
+            }
+            .member-name {
+                display: none;
             }
         }
     }

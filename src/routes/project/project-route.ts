@@ -42,7 +42,7 @@ export default {
             component: ProjectPage,
         },
         {
-            path: ':id/event-rule',
+            path: ':projectId/event-rule',
             name: PROJECT_ROUTE.DETAIL.TAB.ALERT.EVENT_RULE._NAME,
             props: true,
             component: AddEventRulePage,
