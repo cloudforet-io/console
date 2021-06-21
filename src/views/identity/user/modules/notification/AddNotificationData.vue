@@ -36,6 +36,7 @@ import { notiChannelPhoneNumRegex } from '@/views/identity/user/lib/validations'
 import AddNotificationLevel from '@/views/identity/user/modules/notification/AddNotificationLevel.vue';
 import AddNotificationMemberGroup from '@/views/identity/user/modules/notification/AddNotificationMemberGroup.vue';
 import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/lib/space-connector/helper';
 
 const CHANNEL_TYPE = {
     AWS_SNS: 'AWSSNS',
@@ -103,12 +104,15 @@ export default {
             selectedMember: [],
         });
 
+        const apiQuery = new ApiQueryHelper();
+        apiQuery.setFilters([{ k: 'capability.supported_schema', v: props.supportedSchema, o: '=' }])
+            .setOnly('plugin_info');
         const getSchema = async () => {
             try {
-                const res = await SpaceConnector.client.repository.schema.get({
-                    name: props.supportedSchema,
+                const res = await SpaceConnector.client.notification.protocol.list({
+                    query: apiQuery.data,
                 });
-                state.schema = res.schema;
+                state.schema = res.results[0].plugin_info.metadata.data.schema;
             } catch (e) {
                 state.schema = {};
                 console.error(e);

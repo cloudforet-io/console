@@ -6,9 +6,9 @@
             </p-panel-top>
             <p-collapsible-list :items="items" theme="card" multi-unfoldable>
                 <template #title="{title, index}">
-                    <span class="level" :class="{'current': index + 1 === alertData.escalation_level}">{{ title }}</span>
-                    <span class="level font-bold" :class="{'current': index + 1 === alertData.escalation_level}"> {{ index+1 }} </span>
-                    <p-badge v-if="index + 1 === alertData.escalation_level" style-type="primary3">
+                    <span class="level" :class="{'current': index + 1 === alertData.escalation_step}">{{ title }}</span>
+                    <span class="level font-bold" :class="{'current': index + 1 === alertData.escalation_step}"> {{ index+1 }} </span>
+                    <p-badge v-if="index + 1 === alertData.escalation_step" style-type="primary3">
                         {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.CURRENT') }}
                     </p-badge>
                 </template>

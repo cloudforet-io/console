@@ -76,7 +76,7 @@ export default {
         const onDeleteTag = (idx) => {
             state.selectedMemberItems.splice(idx, 1);
             vm.$nextTick(() => {
-                state.selectedMember = [...state.selectedMember];
+                state.selectedMemberItems = [...state.selectedMemberItems];
             });
         };
 

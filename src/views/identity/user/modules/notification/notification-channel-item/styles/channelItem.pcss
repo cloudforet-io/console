@@ -1,0 +1,49 @@
+.content-wrapper {
+    display: flex;
+    flex-direction: row;
+    min-height: 2.5rem;
+    align-items: center;
+    &.edit-mode {
+        @apply bg-blue-100;
+    }
+    .content-title {
+        @apply text-gray-600;
+        min-width: 10.5rem;
+        padding-left: 1rem;
+        font-size: 0.875rem;
+        line-height: 170%;
+        text-transform: capitalize;
+    }
+    .content {
+        display: inherit;
+        flex-direction: row;
+        width: 100%;
+        justify-content: space-between;
+        font-size: 0.875rem;
+        line-height: 170%;
+        padding: 0.75rem 1rem;
+        .left-section {
+            display: inherit;
+            flex-direction: column;
+            gap: 0.125rem;
+        }
+    }
+    .edit-btn {
+        @apply text-blue-600;
+        padding-right: 0.5rem;
+        line-height: 160%;
+        .edit-icon {
+            margin-right: 0.25rem;
+        }
+        &:hover, &:active {
+            @apply cursor-pointer;
+        }
+    }
+    .button-group {
+        justify-content: flex-end;
+        flex-shrink: 0;
+        .text-button {
+            height: 1.5rem;
+        }
+    }
+}

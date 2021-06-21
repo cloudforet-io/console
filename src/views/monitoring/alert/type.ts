@@ -71,7 +71,7 @@ export interface AlertDataModel {
     severity: ALERT_SEVERITY;
     is_snoozed: true;
     snoozed_end_time: TimeStamp;
-    escalation_level: number;
+    escalation_step: number;
     escalation_ttl: number;
     webhook_id: string;
     escalation_policy_id: string;
