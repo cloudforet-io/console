@@ -1462,6 +1462,9 @@
 			"CLICK_ADD_MEMBER": "Click and Add Members",
 			"DELETE": "Delete",
 			"DOWNLOAD_FILE": "Download file",
+			"EVENT_RULE": {
+				"EVENT_RULE": "Event Rule"
+			},
 			"MAINTENANCE_WINDOW": {
 				"ACTION": "Action",
 				"ALT_E_CLOSE_MAINTENANCE_WINDOW": "Failed to Close Maintenance Window",
@@ -1558,6 +1561,36 @@
 			"WEBHOOK_ADD": "Add",
 			"WEBHOOK_DELETE": "Delete",
 			"WEBHOOK_UPDATE": "Update"
+		},
+		"EVENT_RULE": {
+			"ADD": "Add",
+			"ADDITIONAL_INFORMATION": "Additional Information",
+			"ADD_EVENT_RULE": "Add Event Rule",
+			"ALL": "All",
+			"ANY": "Any",
+			"ASSIGNEE": "Assignee",
+			"CONDITION": "Condition",
+			"CONTAINS": "contains",
+			"DELETE": "Delete",
+			"DO": "Do",
+			"DOES_NOT_CONTAIN": "does not contain",
+			"DOES_NOT_EQUAL": "does not equal",
+			"EDIT": "Edit",
+			"EQUALS": "equals",
+			"EVENT_RULE": "Event Rule",
+			"HIGH": "High",
+			"LOW": "Low",
+			"NOTIFICATIONS": "Notifications",
+			"NO_EVENT_RULES_HELP_TEXT": "To add event rules:\nClick the add button below.",
+			"NO_EVENT_RULES_TITLE": "No event rules on this project",
+			"OF_THE_FOLLOWING_ARE_MET": "of the following are met",
+			"ON": "On",
+			"PAUSE": "Pause",
+			"PROJECT_DEPENDENCIES": "Project Dependencies",
+			"PROJECT_ROUTING": "Project Routing",
+			"RESPONDER": "Responder",
+			"THESE_THINGS": "these things",
+			"URGENCY": "Urgency"
 		},
 		"LANDING": {
 			"ACTION_DELETE_THIS_GROUP": "Delete selected group",
