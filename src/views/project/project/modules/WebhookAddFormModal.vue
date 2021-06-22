@@ -4,19 +4,22 @@
         size="md"
         :header-title="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_TITLE')"
         :visible.sync="proxyVisible"
-        @confirm="onAddConfirm"
+        :disabled="!isNameValid || !isSelectedWebhookType"
+        :loading="loading"
+        @confirm="onClickConfirm"
     >
         <template #body>
             <p-field-group
                 :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_1')"
                 required
-                :invalid="isNameInvalid"
+                :invalid="showValidation && !isNameValid"
                 :invalid-text="nameInvalidText"
             >
                 <p-text-input
                     v-model="webhookName"
-                    :invalid="isNameInvalid"
+                    :invalid="showValidation && !isNameValid"
                     :placeholder="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_PLACEHOLDER')"
+                    @input.once="onFirstInputName"
                 />
             </p-field-group>
             <p-field-group
@@ -27,9 +30,9 @@
                     <p-select-card
                         v-for="(item, index) in webhookTypeList" :key="index"
                         v-model="selectedWebhookType"
-                        :value="item.pluginId"
-                        :image-url="item.imageUrl"
-                        :label="item.label"
+                        :value="item"
+                        :image-url="item.tags.icon"
+                        :label="item.name"
                     />
                 </div>
             </p-field-group>
@@ -39,8 +42,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -55,9 +57,10 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { i18n } from '@/translations';
 
-interface WebhookTypeList {
-    pluginId: string;
+interface WebhookType {
+    plugin_id: string;
     label: string;
     icon: string;
     data: any;
@@ -82,44 +85,30 @@ export default {
         },
     },
     setup(props, { emit, root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             plugins: computed(() => store.state.resource.plugin.items),
-            loading: true,
             proxyVisible: makeProxy('visible', props, emit),
+            loading: false,
             webhookName: '',
-            webhookTypeList: [] as WebhookTypeList [],
-            selectedWebhookType: undefined as undefined | string,
-            showValidation: false,
+            webhookTypeList: [] as WebhookType[],
+            selectedWebhookType: {} as WebhookType,
+            isSelectedWebhookType: computed(() => {
+                if (Object.keys(state.selectedWebhookType).length === 0) return false;
+                return true;
+            }),
             nameInvalidText: computed(() => {
-                if (!state.showValidation) return undefined;
-                if (!state.webhookName) {
-                    return vm.$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_REQUIRED');
-                }
-                if (state.webhookName.length > 40) {
-                    return vm.$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_INVALID_TEXT');
-                }
+                if (state.webhookName?.length === 0) return i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_REQUIRED');
+                if (state.webhookName?.length > 40) return i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_INVALID_TEXT');
                 return undefined;
             }),
-            isNameInvalid: computed(() => !!state.nameInvalidText),
+            isNameValid: computed(() => !state.nameInvalidText),
+            showValidation: false,
         });
-
-        const initInputModel = () => {
-            state.webhookName = '';
-            state.selectedWebhookType = undefined;
-            state.showValidation = false;
-        };
-        const setWebhookData = async (res) => {
-            state.webhookTypeList = res.results.map(d => ({
-                pluginId: d.plugin_id,
-                label: d.name,
-                imageUrl: d.tags.icon,
-                data: d,
-            }));
-        };
 
         /* api */
         const repositoryIdApiQuery = new ApiQueryHelper();
+        const listApiQuery = new ApiQueryHelper();
+
         const getRepositoryID = async () => {
             repositoryIdApiQuery.setFilters([{ k: 'repository_type', v: 'remote', o: '=' }]);
             const res = await SpaceConnector.client.repository.repository.list({
@@ -128,48 +117,66 @@ export default {
             const repositoryId = res.results[0].repository_id;
             return repositoryId;
         };
-        const listApiQuery = new ApiQueryHelper();
         const getListWebhookType = async () => {
-            state.loading = true;
             try {
                 listApiQuery.setFilters([{ k: 'service_type', v: 'monitoring.Webhook', o: '=' }]);
                 const repositoryId = await getRepositoryID();
-                const res = await SpaceConnector.client.repository.plugin.list({
+                const { results } = await SpaceConnector.client.repository.plugin.list({
                     repository_id: repositoryId,
                     query: listApiQuery.data,
                 });
-                await setWebhookData(res);
+                state.webhookTypeList = results;
             } catch (e) {
                 state.webhookTypeList = [];
                 console.error(e);
-            } finally {
-                state.loading = false;
             }
         };
+        const getPluginVersions = async () => {
+            const { results } = await SpaceConnector.client.repository.plugin.getVersions({
+                plugin_id: state.selectedWebhookType?.plugin_id,
+            });
+            const pluginVersion = results[0];
+            return pluginVersion;
+        };
         const createWebhook = async () => {
+            state.loading = true;
             try {
+                const pluginVersion = await getPluginVersions();
                 await SpaceConnector.client.monitoring.webhook.create({
                     name: state.webhookName,
                     plugin_info: {
-                        plugin_id: state.selectedWebhookType,
-                        version: '1.0',
+                        plugin_id: state.selectedWebhookType?.plugin_id,
+                        version: pluginVersion,
+                        options: {},
                     },
                     project_id: props.projectId,
                 });
-                showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_ADD_WEBHOOK'), '', root);
-                state.proxyVisible = false;
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ADD_WEBHOOK'), '', root);
             } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_ADD_WEBHOOK'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_ADD_WEBHOOK'), e, root);
+            } finally {
+                state.loading = false;
+                state.proxyVisible = false;
             }
         };
 
         /* event */
-        const onAddConfirm = async () => {
+        const onFirstInputName = (e) => {
             state.showValidation = true;
-            if (state.isNameInvalid || state.selectedWebhookType === undefined) return;
+            state.webhookName = e.target.value;
+        };
+        const onClickConfirm = async () => {
+            if (!state.showValidation) state.showValidation = true;
 
             await createWebhook();
             emit('confirm');
+        };
+
+        /* init */
+        const initInputModel = () => {
+            state.webhookName = '';
+            state.selectedWebhookType = {} as WebhookType;
+            state.showValidation = false;
         };
 
         watch(() => props.visible, () => {
@@ -179,7 +186,8 @@ export default {
 
         return {
             ...toRefs(state),
-            onAddConfirm,
+            onClickConfirm,
+            onFirstInputName,
         };
     },
 

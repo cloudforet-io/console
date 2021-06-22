@@ -1,25 +1,22 @@
 <template>
     <div class="project-webhook">
         <p-toolbox-table
+            search-type="query"
             selectable
             sortable
             exportable
-            search-type="query"
             :multi-select="false"
             :loading="loading"
+            :total-count="totalCount"
             :items="items"
             :fields="fields"
             :select-index.sync="selectIndex"
-            :sort-by.sync="sortBy"
-            :sort-desc.sync="sortDesc"
-            :page-size.sync="pageLimit"
-            :total-count="totalCount"
-            :query-tags="searchTags"
+            :query-tags="tags"
             :key-item-sets="handlers.keyItemSets"
             :value-handler-map="handlers.valueHandlerMap"
             :timezone="timezone"
-            @refresh="listWebhooks"
             @change="onChange"
+            @refresh="onChange()"
             @export="onExport"
         >
             <template #toolbox-top>
@@ -61,19 +58,19 @@
         </p-toolbox-table>
 
         <webhook-add-form-modal
-            :visible.sync="webhookAddFormVisible"
+            :visible.sync="addModalVisible"
             :project-id="projectId"
             @confirm="listWebhooks()"
         />
         <webhook-update-form-modal
-            v-if="webhookUpdateFormVisible"
-            :visible.sync="webhookUpdateFormVisible"
+            v-if="updateModalVisible"
+            :visible.sync="updateModalVisible"
             :webhook-info="selectedItems[0]"
             @confirm="listWebhooks()"
         />
         <delete-modal
             :header-title="$t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_CONTENT')"
-            :visible.sync="webhookDeleteFormVisible"
+            :visible.sync="deleteModalVisible"
             @confirm="onDeleteConfirm"
         />
     </div>
@@ -95,7 +92,6 @@ import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { QueryHelper } from '@/lib/query';
 
 import { store } from '@/store';
 import { userStateFormatter } from '@/views/identity/user/lib/helper';
@@ -108,6 +104,9 @@ import {
 } from '@/lib/component-utils/query-search';
 import { FILE_NAME_PREFIX } from '@/lib/type';
 import { WEBHOOK_STATE } from '@/views/monitoring/alert/type';
+import { i18n } from '@/translations';
+import { getApiQueryWithToolboxOptions } from '@/lib/component-utils/toolbox';
+import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 export default {
     name: 'ProjectWebhook',
@@ -130,8 +129,6 @@ export default {
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const queryHelper = new QueryHelper();
-
         const handlers = {
             keyItemSets: [{
                 title: 'Properties',
@@ -142,29 +139,34 @@ export default {
                     { name: 'webhook_url', label: 'Webhook URL' },
                     { name: 'created_at', label: 'Created', dataType: 'datetime' },
                 ],
-            }],
+            }]as KeyItemSet[],
             valueHandlerMap: {
                 name: makeDistinctValueHandler('monitoring.Webhook', 'name'),
                 state: makeEnumValueHandler(WEBHOOK_STATE),
                 'plugin_info.plugin_id': makeDistinctValueHandler('monitoring.Webhook', 'plugin_info.plugin_id'),
-                // 'plugin_info.plugin_id': makeReferenceValueHandler('inventory.Collector'),
                 webhook_url: makeDistinctValueHandler('monitoring.Webhook', 'webhook_url'),
                 created_at: makeDistinctValueHandler('monitoring.Webhook', 'created_at'),
             },
         };
+        const webhookListApiQueryHelper = new ApiQueryHelper()
+            .setPageStart(1).setPageLimit(15)
+            .setSort('created_at', true)
+            .setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
             loading: true,
+            timezone: computed(() => store.state.user.timezone),
+            plugins: computed(() => store.state.resource.plugin.items),
             dropdown: computed(() => ([
                 {
                     type: 'item',
                     name: 'update',
-                    label: vm.$t('PROJECT.DETAIL.WEBHOOK_UPDATE'),
+                    label: i18n.t('PROJECT.DETAIL.WEBHOOK_UPDATE'),
                     disabled: state.selectedItems.length !== 1,
                 },
                 {
                     type: 'item',
                     name: 'delete',
-                    label: vm.$t('PROJECT.DETAIL.WEBHOOK_DELETE'),
+                    label: i18n.t('PROJECT.DETAIL.WEBHOOK_DELETE'),
                     disabled: state.selectedItems.length !== 1,
                 },
             ] as MenuItem[])),
@@ -178,97 +180,71 @@ export default {
             items: [],
             selectIndex: [],
             selectedItems: computed(() => state.selectIndex.map(i => state.items[i])),
-            sortBy: 'name',
-            sortDesc: true,
             totalCount: 0,
-            pageLimit: 15,
-            pageStart: 1,
-            searchTags: [],
-            plugins: computed(() => store.state.resource.plugin.items),
-            timezone: computed(() => store.state.user.timezone),
+            tags: webhookListApiQueryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
         });
         const formState = reactive({
-            webhookAddFormVisible: false,
-            webhookUpdateFormVisible: false,
-            webhookDeleteFormVisible: false,
+            addModalVisible: false,
+            updateModalVisible: false,
+            deleteModalVisible: false,
             visibleCustomFieldModal: false,
         });
 
         /* api */
-        const apiQuery = new ApiQueryHelper();
-        const getQuery = () => {
-            apiQuery.setSort(state.sortBy, state.sortDesc)
-                .setPage(state.pageStart, state.pageLimit)
-                .setFiltersAsQueryTag(state.searchTags);
-            return apiQuery.data;
-        };
+        let webhookListApiQuery = webhookListApiQueryHelper.data;
         const listWebhooks = async () => {
             state.loading = true;
             try {
-                const res = await SpaceConnector.client.monitoring.webhook.list({
-                    query: getQuery(),
+                const { results, total_count } = await SpaceConnector.client.monitoring.webhook.list({
+                    query: webhookListApiQuery,
                 });
-                state.items = res.results.map(d => ({
+                state.items = results.map(d => ({
                     ...d,
                     plugin_name: state.plugins[d.plugin_info.plugin_id]?.label,
                     plugin_icon: state.plugins[d.plugin_info.plugin_id]?.icon,
                     created_at: iso8601Formatter(d.created_at, state.timezone),
                 }));
-                state.totalCount = res.total_count;
+                state.totalCount = total_count;
                 state.selectIndex = [];
             } catch (e) {
-                console.error(e);
                 state.items = [];
                 state.totalCount = 0;
+                console.error(e);
             } finally {
                 state.loading = false;
             }
         };
 
         /* event */
-        const onChange = async (changed: any = {}) => {
-            if (changed.sortBy !== undefined) {
-                state.sortBy = changed.sortBy;
-                state.sortDesc = changed.sortDesc;
-            }
-            if (changed.pageStart !== undefined) state.pageStart = changed.pageStart;
-            if (changed.queryTags !== undefined) state.searchTags = changed.queryTags;
-            if (changed.queryTags !== undefined) {
-                state.tags = changed.queryTags;
-                queryHelper.setFiltersAsQueryTag(changed.queryTags);
-                await replaceUrlQuery('filters', queryHelper.rawQueryStrings);
-            }
-            await listWebhooks();
-        };
         const onClickAdd = () => {
-            formState.webhookAddFormVisible = true;
+            formState.addModalVisible = true;
         };
         const onClickUpdate = () => {
-            formState.webhookUpdateFormVisible = true;
+            formState.updateModalVisible = true;
         };
         const onClickDelete = () => {
-            formState.webhookDeleteFormVisible = true;
+            formState.deleteModalVisible = true;
         };
         const onDeleteConfirm = async () => {
             try {
                 await SpaceConnector.client.monitoring.webhook.delete({
                     webhook_id: state.selectedItems.map(d => d.webhook_id),
                 });
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_WEBHOOK'), '', root);
                 await listWebhooks();
-                showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_DELETE_WEBHOOK'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_DELETE_WEBHOOK'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_DELETE_WEBHOOK'), e, root);
             } finally {
-                formState.webhookDeleteFormVisible = false;
+                formState.deleteModalVisible = false;
             }
         };
         const onExport = async () => {
             try {
-                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
+                showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', root);
                 await store.dispatch('file/downloadExcel', {
                     url: '/monitoring/webhook/list',
-                    param: { query: getQuery() },
+                    param: { query: webhookListApiQuery },
                     fields: [
                         { name: 'Name', key: 'name' },
                         { name: 'State', key: 'state' },
@@ -281,6 +257,13 @@ export default {
             } catch (e) {
                 console.error(e);
             }
+        };
+        const onChange = async (options: any = {}) => {
+            webhookListApiQuery = getApiQueryWithToolboxOptions(webhookListApiQueryHelper, options) ?? webhookListApiQuery;
+            if (options.queryTags !== undefined) {
+                await replaceUrlQuery('filters', webhookListApiQueryHelper.rawQueryStrings);
+            }
+            await listWebhooks();
         };
 
         /* init */
