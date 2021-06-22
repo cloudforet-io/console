@@ -25,14 +25,14 @@
             </p-select-button>
             <div class="dropdown-wrapper">
                 <p-select-dropdown :selected="proxySchedule.start_hour"
-                                   :items="timeList"
+                                   :items="startTimeList"
                                    :invalid="!isScheduleValid"
                                    class="dropdown"
                                    @select="onSelectStartHour"
                 />
                 <span class="text">{{ $t('IDENTITY.USER.NOTIFICATION.FORM.TO') }}</span>
                 <p-select-dropdown v-model="proxySchedule.end_hour"
-                                   :items="timeList"
+                                   :items="endTimeList"
                                    :invalid="!isScheduleValid"
                                    class="dropdown"
                                    @select="onSelectEndHour"
@@ -55,7 +55,8 @@ import { range } from 'lodash';
 import { store } from '@/store';
 import { timezoneToUtcFormatter } from '@/views/identity/user/lib/helper';
 
-const TIME_LIST = range(24);
+const START_TIME_LIST = range(0, 24);
+const END_TIME_LIST = range(1, 25);
 
 
 export default {
@@ -92,7 +93,10 @@ export default {
                 { label: 'Thursday', value: 'THU' }, { label: 'Friday', value: 'FRI' },
                 { label: 'Saturday', value: 'SAT' },
                 { label: 'Sunday', value: 'SUN' }],
-            timeList: TIME_LIST.map(d => ({
+            startTimeList: START_TIME_LIST.map(d => ({
+                type: 'item', label: `${d}:00`, name: timezoneToUtcFormatter(d, timezoneForFormatter),
+            })),
+            endTimeList: END_TIME_LIST.map(d => ({
                 type: 'item', label: `${d}:00`, name: timezoneToUtcFormatter(d, timezoneForFormatter),
             })),
             proxySchedule: props.schedule ? props.schedule : {
@@ -101,7 +105,7 @@ export default {
                 end_hour: timezoneToUtcFormatter(18, timezoneForFormatter),
             },
             timezone: computed(() => store.state.user.timezone),
-            isScheduleValid: computed(() => state.proxySchedule.start_hour !== state.proxySchedule.end_hour),
+            isScheduleValid: computed(() => (state.proxySchedule.start_hour !== state.proxySchedule.end_hour) || !state.proxyIsScheduled),
         });
 
         const emitChange = () => {

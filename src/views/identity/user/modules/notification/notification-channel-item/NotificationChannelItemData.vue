@@ -5,13 +5,13 @@
                 Slack Channel <br>
                 Slack Token
             </span>
-            <p v-for="(item, index) in Object.keys(channelData.data)" :key="`channel-data-key-${index}`">
+            <p v-for="(item, index) in keyList" :key="`channel-data-key-${index}`">
                 {{ item.replace(/\_/g, ' ') }}
             </p>
         </div>
         <div v-if="isEditMode" class="content">
             <div class="left-section">
-                <p v-if="Object.keys(dataForEdit).includes('users')">
+                <p v-if="keyList.includes('users')">
                     <add-notification-member-group :users="channelData.data.users" :project-id="projectId" @change="onChangeUser" />
                 </p>
                 <div v-else>
@@ -37,7 +37,7 @@
         </div>
         <div v-else class="content">
             <div class="left-section">
-                <div v-if="Object.keys(dataForEdit).includes('users')">
+                <div v-if="keyList.includes('users')">
                     <p-badge v-for="(item, index) in dataForEdit.users" :key="`users-${index}`" style-type="gray900"
                              outline
                              class="mr-2"
@@ -51,7 +51,7 @@
                     *********
                 </span>
                 <div v-else>
-                    <p v-for="(item, index) in Object.values(channelData.data)" :key="`channel-data-value-${index}`">
+                    <p v-for="(item, index) in valueList" :key="`channel-data-value-${index}`">
                         {{ item }}
                     </p>
                 </div>
@@ -73,7 +73,7 @@
 import {
     PBadge, PButton, PI, PTextInput,
 } from '@spaceone/design-system';
-import { reactive, toRefs } from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 import { useNotificationItem } from '@/views/identity/user/modules/notification/notification-channel-item/hooks';
 import { PARAM_KEY_TYPE, PROTOCOL_TYPE } from '@/views/identity/user/modules/notification/notification-channel-item/type';
 import AddNotificationMemberGroup from '@/views/identity/user/modules/notification/AddNotificationMemberGroup.vue';
@@ -113,6 +113,10 @@ export default {
             isEditMode: false,
             dataForEdit: props.channelData?.data,
         });
+        const state = reactive({
+            keyList: computed(() => Object.keys(notificationItemState.dataForEdit)),
+            valueList: computed(() => Object.values(notificationItemState.dataForEdit)),
+        });
 
         const saveChangedData = async () => {
             if (props.projectId) await updateProjectChannel(PARAM_KEY_TYPE.DATA, notificationItemState.dataForEdit);
@@ -130,6 +134,7 @@ export default {
 
         return {
             PROTOCOL_TYPE,
+            ...toRefs(state),
             ...toRefs(notificationItemState),
             onClickSave,
             cancelEdit,

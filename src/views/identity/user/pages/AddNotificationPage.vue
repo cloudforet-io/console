@@ -100,7 +100,7 @@ export default {
             topicList: [],
             schedule: null,
             isScheduled: false,
-            isScheduleValid: false,
+            isScheduleValid: true,
             notificationLevel: null,
         });
         const routeState = reactive({
