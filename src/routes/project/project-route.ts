@@ -19,14 +19,12 @@ export const PROJECT_ROUTE = Object.freeze({
             _NAME: 'projectTab',
             SUMMARY: { _NAME: 'projectSummary' },
             MEMBER: { _NAME: 'projectMember' },
-            ALERT: {
-                _NAME: 'projectAlert',
-                EVENT_RULE: { _NAME: 'projectEventRule' },
-            },
+            ALERT: { _NAME: 'projectAlert' },
             NOTIFICATIONS: { _NAME: 'projectNotifications' },
             MAINTENANCE_WINDOW: { _NAME: 'projectMaintenanceWindow' },
             TAG: { _NAME: 'projectTag' },
         },
+        EVENT_RULE: { _NAME: 'projectEventRule' },
     },
 });
 
@@ -43,7 +41,7 @@ export default {
         },
         {
             path: ':projectId/event-rule',
-            name: PROJECT_ROUTE.DETAIL.TAB.ALERT.EVENT_RULE._NAME,
+            name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME,
             props: true,
             component: AddEventRulePage,
         },
@@ -71,14 +69,6 @@ export default {
                     name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                     props: true,
                     component: ProjectAlertPage,
-                    children: [
-                        // {
-                        //     path: 'event-rule',
-                        //     name: PROJECT_ROUTE.DETAIL.TAB.ALERT.EVENT_RULE._NAME,
-                        //     props: true,
-                        //     component: AddEventRulePage,
-                        // },
-                    ],
                 },
                 {
                     path: 'notifications',

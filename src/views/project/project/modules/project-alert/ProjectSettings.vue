@@ -23,13 +23,14 @@
             </div>
             <p-icon-button class="edit-button" name="ic_edit" @click="onClickUpdateAutoRecovery" />
         </section>
-        <section class="section event-rule">
+        <section class="section event-rule-wrapper">
             <div class="section-title">
                 {{ $t('PROJECT.DETAIL.ALERT.EVENT_RULE') }}
             </div>
             <div class="content-wrapper">
-                <p-icon-button class="edit-button" name="ic_edit" />
+                <span class="text"><b>{{ eventRuleTotalCount }}</b> {{ $t('PROJECT.DETAIL.ALERT.RULES_ON_THIS_PROJECT') }}</span>
             </div>
+            <p-icon-button class="edit-button" name="ic_edit" @click="onClickEditEventRule" />
         </section>
         <section class="section escalation-policy-wrapper">
             <div class="section-title">
@@ -86,6 +87,8 @@ import { PI, PIconButton, PPaneLayout } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { i18n } from '@/translations';
+import router from "@/routes";
+import {PROJECT_ROUTE} from "@/routes/project/project-route";
 
 
 const NOTIFICATION_URGENCY = Object.freeze({
@@ -127,6 +130,7 @@ export default {
             notificationUrgency: computed(() => get(state.projectAlertConfig, 'options.notification_urgency')),
             isAutoRecovery: computed(() => get(state.projectAlertConfig, 'options.auto_recovery')),
             escalationPolicyId: computed(() => get(state.projectAlertConfig, 'escalation_policy_info.escalation_policy_id')),
+            eventRuleTotalCount: 0,
             //
             updateNotificationPolicyModalVisible: false,
             updateAutoRecoveryModalVisible: false,
@@ -147,6 +151,17 @@ export default {
                 console.error(e);
             }
         };
+        const getEventRuleCount = async () => {
+            try {
+                const { total_count } = await SpaceConnector.client.monitoring.eventRule.list({
+                    project_id: props.projectId,
+                });
+                state.eventRuleTotalCount = total_count;
+            } catch (e) {
+                state.eventRuleTotalCount = 0;
+                console.error(e);
+            }
+        };
 
         /* event */
         const onClickUpdateNotificationPolicy = () => {
@@ -158,9 +173,12 @@ export default {
         const onClickUpdateEscalationPolicy = () => {
             state.updateEscalationPolicyModalVisible = true;
         };
+        const onClickEditEventRule = () => {
+            router.push({ name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME, params: { projectId: props.projectId } });
+        };
 
         watch(() => props.projectId, (projectId) => {
-            if (projectId) getProjectAlertConfig();
+            if (projectId) Promise.all([getProjectAlertConfig(), getEventRuleCount()]);
         }, { immediate: true });
 
         return {
@@ -170,6 +188,7 @@ export default {
             onClickUpdateNotificationPolicy,
             onClickUpdateAutoRecovery,
             onClickUpdateEscalationPolicy,
+            onClickEditEventRule,
             notificationOptionFormatter,
         };
     },
@@ -210,8 +229,8 @@ export default {
             right: 1rem;
         }
 
-        &.notification-policy-wrapper, &.auto-recovery-wrapper {
-            @apply col-span-6;
+        &.notification-policy-wrapper, &.auto-recovery-wrapper, &.event-rule-wrapper {
+            @apply col-span-4;
             .content-wrapper {
                 @apply bg-gray-100;
                 text-align: center;
@@ -238,7 +257,7 @@ export default {
 
     @screen tablet {
         .section {
-            &.notification-policy-wrapper, &.auto-recovery-wrapper {
+            &.notification-policy-wrapper, &.auto-recovery-wrapper, &.event-rule-wrapper {
                 @apply col-span-12;
             }
             &.escalation-policy-wrapper {
