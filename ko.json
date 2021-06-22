@@ -1072,13 +1072,15 @@
 				},
 				"FORM": {
 					"ACTIVATE_PROJECT_ALERT": "프로젝트에 얼럿 활성화",
+					"CREATE_PROJECT": "프로젝트 생성하러 가기",
 					"HIGH": "높음",
-					"INVALID_NEED_TO_SET_PROJECT_ALERT": "이 프로젝트는 얼럿 설정이 필요합니다.  먼저 얼럿 설정을 해주세요.",
 					"LABEL_ALERT_TITLE": "얼럿 제목",
 					"LABEL_DESCRIPTION": "설명",
 					"LABEL_PROJECT": "프로젝트",
 					"LABEL_URGENCY": "긴급도",
 					"LOW": "낮음",
+					"NEED_TO_SET_PROJECT_ALERT": "이 프로젝트는 얼럿 설정이 필요합니다.  먼저 얼럿 설정을 해주세요.",
+					"SET_PROJECT_ALERT_NOW": "지금 바로 얼럿 설정하기",
 					"TITLE_CREATE": "얼럿 생성",
 					"TITLE_UPDATE": "얼럿 변경"
 				},

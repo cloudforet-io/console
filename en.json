@@ -1072,13 +1072,15 @@
 				},
 				"FORM": {
 					"ACTIVATE_PROJECT_ALERT": "Activate Alert of Project",
+					"CREATE_PROJECT": "Go create project",
 					"HIGH": "High",
-					"INVALID_NEED_TO_SET_PROJECT_ALERT": "This project requires an alert setting.  Please set the alert first.",
 					"LABEL_ALERT_TITLE": "Alert Title",
 					"LABEL_DESCRIPTION": "Description",
 					"LABEL_PROJECT": "Project",
 					"LABEL_URGENCY": "Urgency",
 					"LOW": "Low",
+					"NEED_TO_SET_PROJECT_ALERT": "This project requires an alert setting.  Please set the alert first.",
+					"SET_PROJECT_ALERT_NOW": "CLICK to set the alert now",
 					"TITLE_CREATE": "Create Alert",
 					"TITLE_UPDATE": "Update Alert"
 				},
