@@ -18886,6 +18886,27 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
+                                        <name>ALT_E_MERGE</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description></description>
+                                        <comment></comment>
+                                        <default_text></default_text>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
                                         <name>ALT_E_STATE_CHANGED</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description></description>
@@ -18929,6 +18950,27 @@
                                     </concept_node>
                                     <concept_node>
                                         <name>ALT_S_CREATE</name>
+                                        <definition_loaded>false</definition_loaded>
+                                        <description></description>
+                                        <comment></comment>
+                                        <default_text></default_text>
+                                        <translations>
+                                            <translation>
+                                                <language>en-US</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ja-JP</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                            <translation>
+                                                <language>ko-KR</language>
+                                                <approved>false</approved>
+                                            </translation>
+                                        </translations>
+                                    </concept_node>
+                                    <concept_node>
+                                        <name>ALT_S_CREATE (2)</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description></description>
                                         <comment></comment>
@@ -28784,9 +28826,9 @@
                             <concept_node>
                                 <name>ALT_E_CREATE_EVENT_RULE</name>
                                 <definition_loaded>false</definition_loaded>
-                                <description/>
-                                <comment/>
-                                <default_text/>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
                                 <translations>
                                     <translation>
                                         <language>en-US</language>
@@ -28805,9 +28847,9 @@
                             <concept_node>
                                 <name>ALT_E_UPDATE_EVENT_RULE</name>
                                 <definition_loaded>false</definition_loaded>
-                                <description/>
-                                <comment/>
-                                <default_text/>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
                                 <translations>
                                     <translation>
                                         <language>en-US</language>
@@ -28826,9 +28868,9 @@
                             <concept_node>
                                 <name>ALT_S_CREATE_EVENT_RULE</name>
                                 <definition_loaded>false</definition_loaded>
-                                <description/>
-                                <comment/>
-                                <default_text/>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
                                 <translations>
                                     <translation>
                                         <language>en-US</language>
@@ -28847,9 +28889,9 @@
                             <concept_node>
                                 <name>ALT_S_UPDATE_EVENT_RULE</name>
                                 <definition_loaded>false</definition_loaded>
-                                <description/>
-                                <comment/>
-                                <default_text/>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
                                 <translations>
                                     <translation>
                                         <language>en-US</language>
@@ -28910,9 +28952,9 @@
                             <concept_node>
                                 <name>CANCEL</name>
                                 <definition_loaded>false</definition_loaded>
-                                <description/>
-                                <comment/>
-                                <default_text/>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
                                 <translations>
                                     <translation>
                                         <language>en-US</language>
@@ -28973,9 +29015,9 @@
                             <concept_node>
                                 <name>CREATE</name>
                                 <definition_loaded>false</definition_loaded>
-                                <description/>
-                                <comment/>
-                                <default_text/>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
                                 <translations>
                                     <translation>
                                         <language>en-US</language>
@@ -29099,9 +29141,9 @@
                             <concept_node>
                                 <name>EDIT_EVENT_RULE</name>
                                 <definition_loaded>false</definition_loaded>
-                                <description/>
-                                <comment/>
-                                <default_text/>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
                                 <translations>
                                     <translation>
                                         <language>en-US</language>
@@ -29267,9 +29309,9 @@
                             <concept_node>
                                 <name>NO_SET</name>
                                 <definition_loaded>false</definition_loaded>
-                                <description/>
-                                <comment/>
-                                <default_text/>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
                                 <translations>
                                     <translation>
                                         <language>en-US</language>
@@ -29435,9 +29477,9 @@
                             <concept_node>
                                 <name>UPDATE</name>
                                 <definition_loaded>false</definition_loaded>
-                                <description/>
-                                <comment/>
-                                <default_text/>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
                                 <translations>
                                     <translation>
                                         <language>en-US</language>
