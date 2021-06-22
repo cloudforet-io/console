@@ -1431,6 +1431,7 @@
 				"NOTIFICATION_POLICY": "Notification Policy",
 				"REPEAT_ALL": "Repeat all",
 				"RESOLVED": "Resolved",
+				"RULES_ON_THIS_PROJECT": "rules on this project",
 				"SELECT_POLICY": "Select Policy",
 				"SETTINGS": "Settings",
 				"SET_AUTO_RECOVERY_MODAL_HELP_TEXT": "When the system fault recovers, do you automatically resolve the alert?",
