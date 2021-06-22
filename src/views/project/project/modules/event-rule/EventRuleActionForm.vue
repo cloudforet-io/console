@@ -7,29 +7,32 @@
             <div class="form-box">
                 <p>{{ $t('PROJECT.EVENT_RULE.NOTIFICATIONS') }}</p>
                 <div>
-                    <span class="toggle-text" :class="{on: formState.enableNotifications}">
-                        {{ formState.enableNotifications ? $t('PROJECT.EVENT_RULE.ON') : $t('PROJECT.EVENT_RULE.PAUSE') }}
+                    <span class="toggle-text" :class="{on: !actions.no_notification}">
+                        {{ actions.no_notification ? $t('PROJECT.EVENT_RULE.PAUSE') : $t('PROJECT.EVENT_RULE.ON') }}
                     </span>
                     <p-toggle-button theme="secondary"
-                                     :value="formState.enableNotifications"
+                                     :value="!actions.no_notification"
                                      @change="onToggleChange"
                     />
                 </div>
             </div>
             <div class="form-box">
                 <p>{{ $t('PROJECT.EVENT_RULE.PROJECT_ROUTING') }}</p>
+                <project-select-dropdown @select="onSelectProjectRouting" />
             </div>
             <div class="form-box">
                 <p>{{ $t('PROJECT.EVENT_RULE.PROJECT_DEPENDENCIES') }}</p>
+                <project-select-dropdown multi-selectable @select="onSelectProjectDependencies" />
             </div>
             <div class="form-box">
                 <p>{{ $t('PROJECT.EVENT_RULE.URGENCY') }}</p>
                 <div>
                     <p-radio v-for="(urgency, uIdx) in urgencyList"
                              :key="`urgency-${uIdx}`"
-                             v-model="formState.urgency"
+                             v-model="selectedUrgency"
                              :value="urgency.name"
                              class="mr-4"
+                             @change="onChangeUrgency"
                     >
                         {{ urgency.label }}
                     </p-radio>
@@ -37,78 +40,141 @@
             </div>
             <div class="form-box">
                 <p>{{ $t('PROJECT.EVENT_RULE.ASSIGNEE') }}</p>
+                <search-or-select-user :multi-select="false" :selected-users.sync="assignee" />
             </div>
             <div class="form-box">
                 <p>{{ $t('PROJECT.EVENT_RULE.RESPONDER') }}</p>
+                <search-or-select-user :selected-users.sync="responder" />
             </div>
-            <div class="form-box">
-                <p>{{ $t('PROJECT.EVENT_RULE.ADDITIONAL_INFORMATION') }}</p>
-                <p-icon-text-button style-type="gray900" name="ic_plus_bold"
-                                    outline
-                                    class="add-button"
-                                    @click="onClickAdd"
-                >
-                    {{ $t('PROJECT.EVENT_RULE.ADD') }}
-                </p-icon-text-button>
-            </div>
+            <!--            <div class="form-box">-->
+            <!--                <p>{{ $t('PROJECT.EVENT_RULE.ADDITIONAL_INFORMATION') }}</p>-->
+            <!--                <p-icon-text-button style-type="gray900" name="ic_plus_bold"-->
+            <!--                                    outline-->
+            <!--                                    class="add-button"-->
+            <!--                >-->
+            <!--                    {{ $t('PROJECT.EVENT_RULE.ADD') }}-->
+            <!--                </p-icon-text-button>-->
+            <!--                <div v-for="(info, idx) in Object.keys(actions.add_additional_info)" :key="`additional-info-${idx}`"-->
+            <!--                     class="additional-info-wrapper"-->
+            <!--                >-->
+            <!--                </div>-->
+            <!--            </div>-->
         </div>
     </section>
 </template>
 
 <script lang="ts">
+/* eslint-disable camelcase */
 import { i18n } from '@/translations';
 
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import {
-    PToggleButton, PRadio, PIconTextButton,
+    PToggleButton, PRadio,
 } from '@spaceone/design-system';
 
+import ProjectSelectDropdown from '@/common/modules/project-select-dropdown/ProjectSelectDropdown.vue';
+import SearchOrSelectUser from '@/common/modules/SearchOrSelectUser.vue';
 
-const ALERT_URGENCY = Object.freeze({
+
+const URGENCY = Object.freeze({
+    NO_SET: 'NO_SET',
     HIGH: 'HIGH',
     LOW: 'LOW',
 });
 
+type responder = {
+    resource_type: string;
+    resource_id: string;
+}
+
+interface Actions {
+    change_assignee: string;
+    change_urgency?: string;
+    change_project: string;
+    add_project_dependency: string[];
+    add_responder: responder[];
+    add_additional_info: Record<string, string>;
+    no_notification: boolean;
+}
+
 export default {
     name: 'EventRuleActionForm',
     components: {
+        SearchOrSelectUser,
+        ProjectSelectDropdown,
         PToggleButton,
         PRadio,
-        PIconTextButton,
     },
     props: {},
-    setup() {
+    setup(props, { emit }) {
         const state = reactive({
             urgencyList: computed(() => ([
                 {
-                    name: ALERT_URGENCY.HIGH,
+                    name: URGENCY.NO_SET,
+                    label: i18n.t('PROJECT.EVENT_RULE.NO_SET'),
+                },
+                {
+                    name: URGENCY.HIGH,
                     label: i18n.t('PROJECT.EVENT_RULE.HIGH'),
                 },
                 {
-                    name: ALERT_URGENCY.LOW,
+                    name: URGENCY.LOW,
                     label: i18n.t('PROJECT.EVENT_RULE.LOW'),
                 },
             ])),
-        });
-        const formState = reactive({
-            enableNotifications: false,
-            urgency: ALERT_URGENCY.HIGH,
+            selectedUrgency: URGENCY.NO_SET,
+            assignee: [],
+            responder: [],
+            actions: {
+                change_assignee: '',
+                change_urgency: undefined,
+                change_project: '',
+                add_project_dependency: [],
+                add_responder: [],
+                add_additional_info: {},
+                no_notification: true,
+            } as Actions,
         });
 
         /* event */
         const onToggleChange = ({ value }) => {
-            formState.enableNotifications = value;
+            state.actions.no_notification = !value;
         };
-        const onClickAdd = () => {
-            console.log('add!');
+        const onChangeUrgency = () => {
+            if (state.selectedUrgency === URGENCY.NO_SET) {
+                state.actions.change_urgency = undefined;
+            } else {
+                state.actions.change_urgency = state.selectedUrgency;
+            }
         };
+        const onSelectProjectRouting = (selected) => {
+            state.actions.change_project = selected[0]?.id;
+        };
+        const onSelectProjectDependencies = (selected) => {
+            state.actions.add_project_dependency = selected.map(d => d.id);
+        };
+
+        watch(() => state.actions, (actions) => {
+            emit('change', actions);
+        }, { immediate: true, deep: true });
+
+        watch(() => state.assignee, (assignee) => {
+            state.actions.change_assignee = assignee[0];
+        });
+
+        watch(() => state.responder, (responder) => {
+            state.actions.add_responder = responder.map(d => ({ resource_type: 'identity.User', resource_id: d }));
+        });
 
         return {
             ...toRefs(state),
-            formState,
             onToggleChange,
-            onClickAdd,
+            onChangeUrgency,
+            onSelectProjectRouting,
+            onSelectProjectDependencies,
         };
     },
 };
@@ -128,6 +194,8 @@ export default {
     .form-box {
         @apply border-b border-gray-100;
         display: flex;
+        min-height: 3.5rem;
+        align-items: center;
         justify-content: space-between;
         border-bottom-width: 0.25rem;
         padding: 1rem;
@@ -141,6 +209,12 @@ export default {
             &.on {
                 @apply text-secondary;
             }
+        }
+        .project-select-dropdown, .search-or-select-user {
+            width: 60%;
+        }
+        .additional-info-wrapper {
+
         }
     }
 }

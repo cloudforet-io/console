@@ -26,7 +26,11 @@
             </div>
             <div v-for="(condition, idx) of conditions" :key="`condition-${idx}`" class="input-wrapper">
                 <div class="left-part">
-                    <p-select-dropdown v-model="condition.key" class="input" />
+                    <p-select-dropdown v-model="condition.key"
+                                       class="input"
+                                       :items="keys"
+                                       use-fixed-menu-style
+                    />
                     <p-select-dropdown v-model="condition.operator"
                                        class="input"
                                        :items="operators"
@@ -48,7 +52,9 @@
 /* eslint-disable camelcase */
 import { i18n } from '@/translations';
 
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import {
     PIconTextButton, PRadio, PSelectDropdown, PTextInput, PIconButton,
@@ -85,9 +91,8 @@ export default {
         PIconButton,
     },
     props: {},
-    setup() {
+    setup(props, { emit }) {
         const state = reactive({
-            conditionsPolicy: CONDITIONS_POLICY.ALL as CONDITIONS_POLICY,
             conditionsPolicies: computed(() => ([
                 {
                     name: CONDITIONS_POLICY.ALL,
@@ -98,13 +103,6 @@ export default {
                     label: i18n.t('PROJECT.EVENT_RULE.ANY'),
                 },
             ])),
-            conditions: [
-                {
-                    key: '',
-                    value: '',
-                    operator: OPERATOR.contain,
-                },
-            ] as Condition[],
             operators: computed(() => ([
                 {
                     name: OPERATOR.contain,
@@ -123,6 +121,40 @@ export default {
                     label: i18n.t('PROJECT.EVENT_RULE.DOES_NOT_EQUAL'),
                 },
             ])),
+            conditionsPolicy: CONDITIONS_POLICY.ALL as CONDITIONS_POLICY,
+            conditions: [
+                {
+                    key: '',
+                    value: '',
+                    operator: OPERATOR.contain,
+                },
+            ] as Condition[],
+            keys: [
+                {
+                    name: 'title',
+                    label: 'Title',
+                },
+                {
+                    name: 'description',
+                    label: 'Description',
+                },
+                {
+                    name: 'rule',
+                    label: 'Rule',
+                },
+                {
+                    name: 'resource_id',
+                    label: 'Resource ID',
+                },
+                {
+                    name: 'resource_name',
+                    label: 'Resource Name',
+                },
+                {
+                    name: 'resource_type',
+                    label: 'Resource Type',
+                },
+            ],
         });
 
         /* event */
@@ -138,6 +170,13 @@ export default {
             conditions.splice(idx, 1);
             state.conditions = conditions;
         };
+
+        watch([() => state.conditionsPolicy, () => state.conditions], () => {
+            emit('change', {
+                conditionsPolicy: state.conditionsPolicy,
+                conditions: state.conditions,
+            });
+        }, { immediate: true, deep: true });
 
         return {
             ...toRefs(state),

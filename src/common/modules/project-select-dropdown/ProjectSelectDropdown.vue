@@ -1,48 +1,56 @@
 <template>
-    <p-select-dropdown class="project-select-dropdown"
-                       :loading="loading"
-                       :visible-menu.sync="visibleMenu"
-                       always-show-menu
-                       use-fixed-menu-style
-                       :invalid="invalid"
-                       :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
-    >
-        <div v-if="selectedItems.length > 0" class="tag-wrapper">
-            <p-tag v-for="({node, path}) in selectedItems" :key="node.data.id"
-                   :activated="visibleMenu"
+    <div class="project-select-dropdown">
+        <p-select-dropdown :loading="loading"
+                           :visible-menu.sync="visibleMenu"
+                           always-show-menu
+                           use-fixed-menu-style
+                           :invalid="invalid"
+                           :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
+        >
+            <div v-if="!multiSelectable && selectedItems.length > 0" class="tag-wrapper">
+                <p-tag v-for="({node, path}) in selectedItems" :key="node.data.id"
+                       :activated="visibleMenu"
+                       @delete="onDeleteTag(node, path)"
+                >
+                    {{ node.data.name }}
+                </p-tag>
+            </div>
+            <template #menu-menu>
+                <p-tree :edit-options="{disabled: true}"
+                        :drag-options="{disabled: true}"
+                        :toggle-options="toggleOptions"
+                        :select-options="selectOptions"
+                        :data-setter="dataSetter"
+                        :data-getter="dataGetter"
+                        :data-fetcher="dataFetcher"
+                        @init="onTreeInit"
+                        @change-select="onChangeSelect"
+                >
+                    <template #data="{node}">
+                        <span class="ml-1">{{ node.data.name }}</span>
+                    </template>
+                    <template #toggle-right="{node, path}">
+                        <p-i v-if="node.data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="project-group-icon"
+                             width="1rem" height="1rem" color="inherit transparent"
+                        />
+                        <component :is="selectComponent"
+                                   v-else
+                                   :selected="selectedProjects" :value="node.data"
+                                   :predicate="predicate"
+                                   @change="changeSelectState(node, path, ...arguments)"
+                        />
+                    </template>
+                </p-tree>
+            </template>
+        </p-select-dropdown>
+        <div v-if="multiSelectable && selectedItems.length" class="tag-box">
+            <p-tag v-for="({node, path}, idx) in selectedItems" :key="`tag-${idx}`"
                    @delete="onDeleteTag(node, path)"
             >
                 {{ node.data.name }}
             </p-tag>
         </div>
-        <template #menu-menu>
-            <p-tree :edit-options="{disabled: true}"
-                    :drag-options="{disabled: true}"
-                    :toggle-options="toggleOptions"
-                    :select-options="selectOptions"
-                    :data-setter="dataSetter"
-                    :data-getter="dataGetter"
-                    :data-fetcher="dataFetcher"
-                    @init="onTreeInit"
-                    @change-select="onChangeSelect"
-            >
-                <template #data="{node}">
-                    <span class="ml-1">{{ node.data.name }}</span>
-                </template>
-                <template #toggle-right="{node, path}">
-                    <p-i v-if="node.data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="project-group-icon"
-                         width="1rem" height="1rem" color="inherit transparent"
-                    />
-                    <component :is="selectComponent"
-                               v-else
-                               :selected="selectedProjects" :value="node.data"
-                               :predicate="predicate"
-                               @change="changeSelectState(node, path, ...arguments)"
-                    />
-                </template>
-            </p-tree>
-        </template>
-    </p-select-dropdown>
+    </div>
 </template>
 
 <script lang="ts">
@@ -162,21 +170,29 @@ export default {
 
 <style lang="postcss" scoped>
 .project-select-dropdown {
-    display: block;
-    width: 100%;
-    .tag-wrapper {
-        display: flex;
-        flex-wrap: wrap;
-    }
-    &.p-select-dropdown::v-deep {
+    .p-select-dropdown::v-deep {
+        display: block;
+        width: 100%;
         .dropdown-button {
             width: 100%;
         }
+    }
+    .tag-wrapper {
+        display: flex;
+        flex-wrap: wrap;
     }
     .p-tree::v-deep {
         padding: 0.25rem;
         .tree-node .node.selected {
 
+        }
+    }
+
+    .tag-box {
+        @apply text-gray-900;
+        margin-top: 0.625rem;
+        .p-tag {
+            margin-bottom: 0.5rem;
         }
     }
 }

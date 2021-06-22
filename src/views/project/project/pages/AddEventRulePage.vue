@@ -19,72 +19,84 @@
             </p-icon-text-button>
         </div>
         <div v-for="data in orderedCardData" :key="data.order" class="card-list-wrapper">
-            <p-card class="card" :style-type="isEditMode ? 'indigo400' : 'gray100'">
+            <p-card class="card"
+                    :style-type="isEditMode && selectedOrder === data.order ? 'indigo400' : 'gray100'"
+                    :header="isEditMode && selectedOrder === data.order ? $t('PROJECT.EVENT_RULE.EDIT_EVENT_RULE') : ''"
+            >
                 <template #header>
-                    <div class="left-part">
-                        <span class="order-text">#<strong>{{ data.order }}</strong></span>
-                        <span :class="{'disabled': data.order === 1 || isEditMode}"
-                              class="arrow-button"
-                              @click="onClickUpButton(data)"
-                        >
-                            <p-i name="ic_up" width="1rem" height="1rem"
-                                 color="inherit transparent"
-                            />
-                        </span>
-                        <span :class="{'disabled': data.order === orderedCardData.length || isEditMode}"
-                              class="arrow-button"
-                              @click="onClickDownButton(data)"
-                        >
-                            <p-i name="ic_down" width="1rem" height="1rem"
-                                 color="inherit transparent"
-                            />
-                        </span>
-                    </div>
-
-                    <div class="right-part">
-                        <span class="text-button delete"
-                              :class="{'disabled': isEditMode}"
-                              @click="onClickDeleteButton(data.order)"
-                        >
-                            {{ $t('PROJECT.EVENT_RULE.DELETE') }}
-                        </span>
-                        |
-                        <span class="text-button edit"
-                              :class="{'disabled': isEditMode}"
-                              @click="onClickEditButton()"
-                        >
-                            <p-i name="ic_edit" width="0.75rem" height="0.75rem"
-                                 color="inherit"
-                            />
-                            {{ $t('PROJECT.EVENT_RULE.EDIT') }}
-                        </span>
-                    </div>
+                    <template v-if="!(isEditMode && selectedOrder === data.order)">
+                        <div class="left-part">
+                            <span class="order-text">#<strong>{{ data.order }}</strong></span>
+                            <span :class="{'disabled': data.order === 1 || isEditMode}"
+                                  class="arrow-button"
+                                  @click="onClickUpButton(data)"
+                            >
+                                <p-i name="ic_up" width="1rem" height="1rem"
+                                     color="inherit transparent"
+                                />
+                            </span>
+                            <span :class="{'disabled': data.order === orderedCardData.length || isEditMode}"
+                                  class="arrow-button"
+                                  @click="onClickDownButton(data)"
+                            >
+                                <p-i name="ic_down" width="1rem" height="1rem"
+                                     color="inherit transparent"
+                                />
+                            </span>
+                        </div>
+                        <div class="right-part">
+                            <span class="text-button delete"
+                                  :class="{'disabled': isEditMode}"
+                                  @click="onClickDeleteButton(data.order)"
+                            >
+                                {{ $t('PROJECT.EVENT_RULE.DELETE') }}
+                            </span>
+                            |
+                            <span class="text-button edit"
+                                  :class="{'disabled': isEditMode}"
+                                  @click="onClickEditButton(data.order)"
+                            >
+                                <p-i name="ic_edit" width="0.75rem" height="0.75rem"
+                                     color="inherit"
+                                />
+                                {{ $t('PROJECT.EVENT_RULE.EDIT') }}
+                            </span>
+                        </div>
+                    </template>
                 </template>
-                <event-rule-content :data="data" />
-                <delete-modal :header-title="checkDeleteState.headerTitle"
-                              :visible.sync="checkDeleteState.visible"
-                              :contents="'Are you sure you want to delete this event rule?'"
-                              @confirm="eventRuleDeleteConfirm(data)"
+                <event-rule-form v-if="isEditMode && selectedOrder === data.order"
+                                 :project-id="projectId"
+                                 :event-rule-id="data.event_rule_id"
+                                 :mode="EDIT_MODE.UPDATE"
+                                 @confirm="onClickFormConfirm"
+                                 @cancel="onClickFormCancel"
                 />
+                <event-rule-content v-else :data="data" />
             </p-card>
         </div>
-        <!--            v-if="!isEditMode && mode !== EDIT_MODE.CREATE"-->
-        <p-icon-text-button
-            style-type="primary-dark" name="ic_plus_bold"
-            outline
-            class="add-event-rule-button"
-            @click="onClickAddEventRule"
+        <p-card v-if="isEditMode && mode === EDIT_MODE.CREATE"
+                class="card" style-type="indigo400"
+                :header="$t('PROJECT.EVENT_RULE.ADD_EVENT_RULE')"
+        >
+            <event-rule-form :project-id="projectId"
+                             :mode="EDIT_MODE.CREATE"
+                             @confirm="onClickFormConfirm"
+                             @cancel="onClickFormCancel"
+            />
+        </p-card>
+        <p-icon-text-button v-if="cardData.length"
+                            style-type="primary-dark" name="ic_plus_bold"
+                            outline
+                            class="add-event-rule-button"
+                            @click="onClickAddEventRule"
         >
             {{ $t('PROJECT.EVENT_RULE.ADD_EVENT_RULE') }}
         </p-icon-text-button>
-        <p-card class="card" style-type="indigo400"
-                :header="$t('PROJECT.EVENT_RULE.ADD_EVENT_RULE')"
-        >
-            <!--            v-if="isEditMode && mode === EDIT_MODE.CREATE"-->
-            <event-rule-condition-form class="event-rule-condition-form" />
-            <event-rule-action-form class="event-rule-action-form" />
-        </p-card>
-
+        <delete-modal :header-title="checkDeleteState.headerTitle"
+                      :visible.sync="checkDeleteState.visible"
+                      :contents="'Are you sure you want to delete this event rule?'"
+                      @confirm="eventRuleDeleteConfirm"
+        />
     </general-page-layout>
 </template>
 
@@ -102,8 +114,7 @@ import {
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 import EventRuleContent from '@/views/project/project/modules/event-rule/EventRuleContent.vue';
-import EventRuleActionForm from '@/views/project/project/modules/event-rule/EventRuleActionForm.vue';
-import EventRuleConditionForm from '@/views/project/project/modules/event-rule/EventRuleConditionForm.vue';
+import EventRuleForm from '@/views/project/project/modules/event-rule/EventRuleForm.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
@@ -118,9 +129,8 @@ type EDIT_MODE = typeof EDIT_MODE[keyof typeof EDIT_MODE];
 export default {
     name: 'AddEventRulePage',
     components: {
-        EventRuleConditionForm,
-        EventRuleActionForm,
         EventRuleContent,
+        EventRuleForm,
         GeneralPageLayout,
         DeleteModal,
         PBreadcrumbs,
@@ -142,6 +152,7 @@ export default {
             orderedCardData: computed(() => state.cardData.sort((a, b) => a.order - b.order)),
             isEditMode: false,
             mode: undefined as undefined | EDIT_MODE,
+            selectedOrder: undefined,
         });
         const routeState = reactive({
             routes: computed(() => ([
@@ -179,21 +190,22 @@ export default {
         };
         const listEventRule = async () => {
             try {
-                const res = await SpaceConnector.client.monitoring.eventRule.list();
+                const res = await SpaceConnector.client.monitoring.eventRule.list({
+                    project_id: props.projectId,
+                });
                 state.cardData = res.results;
-                console.log(state.cardData);
             } catch (e) {
                 state.cardData = [];
                 console.error(e);
             }
         };
+
+        /* event */
         const onClickAddEventRule = async () => {
             state.isEditMode = true;
             state.mode = EDIT_MODE.CREATE;
+            state.selectedOrder = undefined;
         };
-
-
-        /* event */
         const onClickUpButton = async (data) => {
             const tempCardData = [...state.cardData];
             const tempOrder = data.order;
@@ -225,25 +237,38 @@ export default {
                 state.cardData = tempCardData;
             }
         };
-        const eventRuleDeleteConfirm = async (data) => {
+        const eventRuleDeleteConfirm = async () => {
             try {
                 await SpaceConnector.client.monitoring.eventRule.delete({
-                    event_rule_id: data.event_rule_id,
+                    event_rule_id: state.orderedCardData[state.selectedOrder - 1].event_rule_id,
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_S_DELETE_ALERT'), '', root);
+                await listEventRule();
             } catch (e) {
                 console.error(e);
                 showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_E_DELETE_ALERT'), '', root);
             } finally {
                 checkDeleteState.visible = false;
+                state.selectedOrder = undefined;
             }
         };
-        const onClickDeleteButton = () => {
+        const onClickDeleteButton = (order) => {
             checkDeleteState.visible = true;
+            state.selectedOrder = order;
         };
-        const onClickEditButton = () => {
+        const onClickEditButton = (order) => {
             state.isEditMode = true;
-            console.log('edit!');
+            state.mode = EDIT_MODE.UPDATE;
+            state.selectedOrder = order;
+        };
+        const onClickFormConfirm = async () => {
+            state.isEditMode = false;
+            state.selectedOrder = undefined;
+            await listEventRule();
+        };
+        const onClickFormCancel = () => {
+            state.isEditMode = false;
+            state.selectedOrder = undefined;
         };
 
         (async () => {
@@ -263,6 +288,8 @@ export default {
             onClickDeleteButton,
             onClickEditButton,
             onClickAddEventRule,
+            onClickFormCancel,
+            onClickFormConfirm,
             eventRuleDeleteConfirm,
         };
     },
@@ -328,6 +355,7 @@ export default {
         .right-part {
             display: flex;
             align-items: center;
+            font-size: 0.875rem;
             .text-button {
                 cursor: pointer;
                 margin: 0 0.75rem;
@@ -339,36 +367,26 @@ export default {
                         @apply text-secondary;
                     }
                 }
-                &:disabled {
+                &.disabled {
                     @apply text-gray-300;
-                    cursor: not-allowed;
+                    pointer-events: none;
                 }
             }
         }
     }
 
     .body {
-        @apply grid grid-cols-12;
-        gap: 2rem;
         padding: 2rem;
-
-        .event-rule-condition-form {
-            @apply col-span-6;
-        }
-        .event-rule-action-form {
-            @apply col-span-6;
-        }
     }
+}
+.add-event-rule-button {
+    width: 100%;
 }
 
 @screen tablet {
     .card::v-deep {
         .body {
             display: block;
-
-            .event-rule-action-form {
-                padding-top: 2rem;
-            }
         }
     }
 }

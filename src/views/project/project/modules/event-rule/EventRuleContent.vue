@@ -1,5 +1,5 @@
 <template>
-    <fragment>
+    <div class="event-rule-content">
         <section class="left-section">
             <h4><b>{{ data.conditions_policy }}</b> of the following are met</h4>
             <ul v-for="(condition, idx) in data.conditions" :key="`${condition}-${idx}`" class="condition-list">
@@ -21,8 +21,8 @@
                         >
                             <td>{{ item.label }}</td>
                             <td v-if="item.name === 'no_notification'">
-                                <span v-if="items[item.name]">On</span>
-                                <span v-else>Pause Notification</span>
+                                <span v-if="items[item.name]">Pause Notification</span>
+                                <span v-else>On</span>
                             </td>
                             <td v-else-if="item.name === 'change_project'">
                                 <p-anchor :to="referenceRouter(
@@ -62,7 +62,7 @@
                 </tbody>
             </table>
         </section>
-    </fragment>
+    </div>
 </template>
 
 <script lang="ts">
@@ -121,6 +121,11 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.event-rule-content {
+    @apply grid grid-cols-12;
+    gap: 2rem;
+}
+
 h4 {
     font-size: 1rem;
     line-height: 160%;
@@ -179,9 +184,9 @@ table {
                 @apply border-none;
             }
         }
-
     }
 }
+
 @screen tablet {
     .left-section {
         @apply col-span-12;
