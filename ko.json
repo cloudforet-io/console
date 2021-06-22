@@ -1062,10 +1062,14 @@
 				"ACKNOWLEDGED": "Acknowledged",
 				"ALERT": "Alert",
 				"ALL": "All",
+				"ALT_E_CREATE": "얼럿 생성 실패",
 				"ALT_E_DELETE": "Alert 삭제 실패",
 				"ALT_E_STATE_CHANGED": "Change alert state failure",
+				"ALT_E_UPDATE": "얼럿 편집 실패",
+				"ALT_S_CREATE": "얼럿 생성 성공",
 				"ALT_S_DELETE": "Alert 삭제 완",
 				"ALT_S_STATE_CHANGED": "Change alert state success",
+				"ALT_S_UPDATE": "얼럿 편집 성공",
 				"ASSIGNED_TO_ME": "Assigned to me",
 				"ASSIGNED_TO_YOU_TITLE": "New alert assigned to you",
 				"CREATE": "생성",
@@ -1086,7 +1090,7 @@
 					"REQUIRED_TITLE": "제목을 입력해주세요.",
 					"SET_PROJECT_ALERT_NOW": "지금 바로 얼럿 설정하기",
 					"TITLE_CREATE": "얼럿 생성",
-					"TITLE_UPDATE": "얼럿 변경"
+					"TITLE_UPDATE": "얼럿 편집"
 				},
 				"HIGH": "High",
 				"LOW": "Low",
