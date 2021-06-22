@@ -1474,9 +1474,6 @@
 			"CLICK_ADD_MEMBER": "テーブル情報をクリックすると、メンバーが追加されます。",
 			"DELETE": "削除",
 			"DOWNLOAD_FILE": "ファイルをダウンロードする",
-			"EVENT_RULE": {
-				"EVENT_RULE": ""
-			},
 			"MAINTENANCE_WINDOW": {
 				"ACTION": "",
 				"ALT_E_CLOSE_MAINTENANCE_WINDOW": "",
@@ -1579,15 +1576,22 @@
 			"ADDITIONAL_INFORMATION": "",
 			"ADD_EVENT_RULE": "",
 			"ALL": "",
+			"ALT_E_CREATE_EVENT_RULE": "",
+			"ALT_E_UPDATE_EVENT_RULE": "",
+			"ALT_S_CREATE_EVENT_RULE": "",
+			"ALT_S_UPDATE_EVENT_RULE": "",
 			"ANY": "",
 			"ASSIGNEE": "",
+			"CANCEL": "キャンセル",
 			"CONDITION": "",
 			"CONTAINS": "",
+			"CREATE": "作成",
 			"DELETE": "",
 			"DO": "",
 			"DOES_NOT_CONTAIN": "",
 			"DOES_NOT_EQUAL": "",
 			"EDIT": "",
+			"EDIT_EVENT_RULE": "",
 			"EQUALS": "",
 			"EVENT_RULE": "",
 			"HIGH": "",
@@ -1595,6 +1599,7 @@
 			"NOTIFICATIONS": "",
 			"NO_EVENT_RULES_HELP_TEXT": "",
 			"NO_EVENT_RULES_TITLE": "",
+			"NO_SET": "",
 			"OF_THE_FOLLOWING_ARE_MET": "",
 			"ON": "",
 			"PAUSE": "",
@@ -1602,6 +1607,7 @@
 			"PROJECT_ROUTING": "",
 			"RESPONDER": "",
 			"THESE_THINGS": "",
+			"UPDATE": "編集",
 			"URGENCY": ""
 		},
 		"LANDING": {
