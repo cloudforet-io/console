@@ -128,12 +128,14 @@ export default {
     .check-icon {
         flex-shrink: 0;
         margin-right: 0.5rem;
+        margin-top: 0.125rem;
     }
     &:hover {
         @apply bg-blue-200;
     }
     .text {
         word-break: break-word;
+        white-space: normal;
     }
 }
 .tag-box {
@@ -145,11 +147,13 @@ export default {
 }
 .p-autocomplete-search::v-deep {
     .p-context-menu {
-        min-width: 100%;
         max-height: 50vh;
         .context-item:not(.empty) {
             padding: 0;
             white-space: unset;
+            .text {
+                max-width: calc(100% - 1.5rem);
+            }
         }
         .fake-no-data {
             height: 1rem;

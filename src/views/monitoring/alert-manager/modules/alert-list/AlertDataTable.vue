@@ -40,6 +40,7 @@
                         class="mr-4"
                         style-type="primary-dark"
                         name="ic_plus_bold"
+                        @click="visibleAlertFormModal = true"
                     >
                         {{ $t('MONITORING.ALERT.ALERT_LIST.CREATE') }}
                     </p-icon-text-button>
@@ -96,6 +97,7 @@
                 </template>
             </p-toolbox-table>
         </div>
+        <alert-form-modal :visible.sync="visibleAlertFormModal" @refresh="getAlerts()" />
     </div>
 </template>
 <script lang="ts">
@@ -129,6 +131,7 @@ import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 
 import AlertActions from '@/views/monitoring/alert-manager/modules/alert-list/AlertActions.vue';
 import AlertTableBottomFilters from '@/views/monitoring/alert-manager/modules/alert-list/AlertTableBottomFilters.vue';
+import AlertFormModal from '@/views/monitoring/alert-manager/modules/alert-list/AlertFormModal.vue';
 
 import {
     AlertBottomFilters, AlertListTableFilters,
@@ -186,6 +189,7 @@ const QUERY_SEARCH_HANDLER = {
 export default {
     name: 'AlertDataTable',
     components: {
+        AlertFormModal,
         AlertTableBottomFilters,
         AlertActions,
         PToolboxTable,
@@ -232,6 +236,7 @@ export default {
             valueHandlerMap: QUERY_SEARCH_HANDLER.valueHandlerMap,
             tags: tagQueryHelper.setKeyItemSets(QUERY_SEARCH_HANDLER.keyItemSets).queryTags,
             webhookNameList: [] as any,
+            visibleAlertFormModal: false,
         });
 
         /* util */

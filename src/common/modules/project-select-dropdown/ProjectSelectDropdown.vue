@@ -1,13 +1,15 @@
 <template>
     <p-select-dropdown class="project-select-dropdown"
                        :loading="loading"
+                       :visible-menu.sync="visibleMenu"
                        always-show-menu
                        use-fixed-menu-style
                        :invalid="invalid"
+                       :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
     >
-        <div class="tag-wrapper">
+        <div v-if="selectedItems.length > 0" class="tag-wrapper">
             <p-tag v-for="({node, path}) in selectedItems" :key="node.data.id"
-                   activated
+                   :activated="visibleMenu"
                    @delete="onDeleteTag(node, path)"
             >
                 {{ node.data.name }}
@@ -87,6 +89,7 @@ export default {
                     return data.item_type === 'PROJECT';
                 },
             })),
+            visibleMenu: false,
         });
 
         const predicate = (current, data) => current?.id === data.id;
@@ -128,6 +131,7 @@ export default {
 
         const onChangeSelect = (selected) => {
             state.selectedItems = selected;
+            if (!props.multiSelectable) state.visibleMenu = false;
             emit('select', state.selectedProjects);
         };
 
