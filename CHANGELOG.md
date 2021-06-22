@@ -1,3 +1,10 @@
+# [1.1.0-beta.71](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.70...v1.1.0-beta.71) (2021-06-22)
+
+
+### Bug Fixes
+
+* update input components focus style ([#609](https://github.com/spaceone-dev/spaceone-design-system/issues/609)) ([35ad953](https://github.com/spaceone-dev/spaceone-design-system/commit/35ad9538eb1bff054d2b2906c472a39045d46a2b))
+
 # [1.1.0-beta.70](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.69...v1.1.0-beta.70) (2021-06-21)
 
 
