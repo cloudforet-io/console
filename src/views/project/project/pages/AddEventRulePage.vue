@@ -40,7 +40,7 @@
                             />
                         </span>
                     </div>
-                    {{ data }}
+
                     <div class="right-part">
                         <span class="text-button delete"
                               :class="{'disabled': isEditMode}"
@@ -60,20 +60,20 @@
                         </span>
                     </div>
                 </template>
-                {{ data.event_rule_id }}
+                <event-rule-content :data="data" />
             </p-card>
-            <p-icon-text-button style-type="primary-dark" name="ic_plus_bold"
-                                outline
-                                class="add-event-rule-button"
-                                @click="onClickAddEventRule"
-            >
-                {{ $t('PROJECT.EVENT_RULE.ADD_EVENT_RULE') }}
-            </p-icon-text-button>
         </div>
+        <p-icon-text-button style-type="primary-dark" name="ic_plus_bold"
+                            outline
+                            class="add-event-rule-button"
+                            @click="onClickAddEventRule"
+        >
+            {{ $t('PROJECT.EVENT_RULE.ADD_EVENT_RULE') }}
+        </p-icon-text-button>
         <p-card class="card" style-type="indigo400"
                 :header="$t('PROJECT.EVENT_RULE.ADD_EVENT_RULE')"
         >
-<!--            v-if="isEditMode && mode === EDIT_MODE.CREATE"-->
+            <!--            v-if="isEditMode && mode === EDIT_MODE.CREATE"-->
             <event-rule-condition-form class="event-rule-condition-form" />
             <event-rule-action-form class="event-rule-action-form" />
         </p-card>
@@ -92,6 +92,7 @@ import {
 } from '@spaceone/design-system';
 
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
+import EventRuleContent from '@/views/project/project/modules/event-rule/EventRuleContent.vue';
 import EventRuleActionForm from '@/views/project/project/modules/event-rule/EventRuleActionForm.vue';
 import EventRuleConditionForm from '@/views/project/project/modules/event-rule/EventRuleConditionForm.vue';
 
@@ -109,6 +110,7 @@ export default {
     components: {
         EventRuleConditionForm,
         EventRuleActionForm,
+        EventRuleContent,
         GeneralPageLayout,
         PBreadcrumbs,
         PPageTitle,
@@ -164,6 +166,7 @@ export default {
             try {
                 const res = await SpaceConnector.client.monitoring.eventRule.list();
                 state.cardData = res.results;
+                console.log(state.cardData);
             } catch (e) {
                 state.cardData = [];
                 console.error(e);

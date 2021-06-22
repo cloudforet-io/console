@@ -2,7 +2,7 @@
     <p-pane-layout class="alert-detail-info">
         <p-definition-table :fields="fields" :data="data"
                             :skeleton-rows="10"
-                            :stripe="false"
+                            :style-type="'white'"
                             :disable-copy="true"
         >
             <template #data-escalation_policy_id>
@@ -22,7 +22,7 @@
                         </p-anchor>
                     </span>
                     <p-button style-type="gray-border" size="sm" @click="openChangeProjectModal">
-                        {{$t('MONITORING.ALERT.DETAIL.INFO.CHANGE')}}
+                        {{ $t('MONITORING.ALERT.DETAIL.INFO.CHANGE') }}
                     </p-button>
                 </p>
             </template>
@@ -119,7 +119,7 @@ import { AlertDataModel } from '@/views/monitoring/alert/type';
 import { ProjectItemResp } from '@/views/project/project/type';
 import ProjectTreeModal from '@/common/modules/ProjectTreeModal.vue';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
-import {i18n} from "@/translations";
+import { i18n } from '@/translations';
 
 interface PropsType {
     id: string;

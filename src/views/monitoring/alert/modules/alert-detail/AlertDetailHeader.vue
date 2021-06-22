@@ -123,7 +123,7 @@ export default {
         const changeAlertState = async (alertState: ALERT_STATE) => {
             state.alertState = alertState;
             try {
-                await SpaceConnector.client.monitoring.alert.updateState({
+                await SpaceConnector.client.monitoring.alert.update({
                     alert_id: props.id,
                     state: state.alertState,
                 });
