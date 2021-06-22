@@ -61,12 +61,19 @@
                     </div>
                 </template>
                 <event-rule-content :data="data" />
+                <delete-modal :header-title="checkDeleteState.headerTitle"
+                              :visible.sync="checkDeleteState.visible"
+                              :contents="'Are you sure you want to delete this event rule?'"
+                              @confirm="eventRuleDeleteConfirm(data)"
+                />
             </p-card>
         </div>
-        <p-icon-text-button style-type="primary-dark" name="ic_plus_bold"
-                            outline
-                            class="add-event-rule-button"
-                            @click="onClickAddEventRule"
+        <!--            v-if="!isEditMode && mode !== EDIT_MODE.CREATE"-->
+        <p-icon-text-button
+            style-type="primary-dark" name="ic_plus_bold"
+            outline
+            class="add-event-rule-button"
+            @click="onClickAddEventRule"
         >
             {{ $t('PROJECT.EVENT_RULE.ADD_EVENT_RULE') }}
         </p-icon-text-button>
@@ -77,6 +84,7 @@
             <event-rule-condition-form class="event-rule-condition-form" />
             <event-rule-action-form class="event-rule-action-form" />
         </p-card>
+
     </general-page-layout>
 </template>
 
@@ -92,11 +100,13 @@ import {
 } from '@spaceone/design-system';
 
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
+import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 import EventRuleContent from '@/views/project/project/modules/event-rule/EventRuleContent.vue';
 import EventRuleActionForm from '@/views/project/project/modules/event-rule/EventRuleActionForm.vue';
 import EventRuleConditionForm from '@/views/project/project/modules/event-rule/EventRuleConditionForm.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
+import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 
 
 const EDIT_MODE = Object.freeze({
@@ -112,6 +122,7 @@ export default {
         EventRuleActionForm,
         EventRuleContent,
         GeneralPageLayout,
+        DeleteModal,
         PBreadcrumbs,
         PPageTitle,
         PCard,
@@ -124,7 +135,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props) {
+    setup(props, { root }) {
         const state = reactive({
             project: {},
             cardData: [],
@@ -139,6 +150,10 @@ export default {
                 { name: state.project?.name, path: `/project/${props.projectId}` },
                 { name: i18n.t('PROJECT.EVENT_RULE.EVENT_RULE') },
             ])),
+        });
+        const checkDeleteState = reactive({
+            visible: false,
+            headerTitle: 'Delete Event Rule',
         });
 
         const changeOrder = (targetData, clickedData, tempOrder) => {
@@ -177,6 +192,7 @@ export default {
             state.mode = EDIT_MODE.CREATE;
         };
 
+
         /* event */
         const onClickUpButton = async (data) => {
             const tempCardData = [...state.cardData];
@@ -209,8 +225,21 @@ export default {
                 state.cardData = tempCardData;
             }
         };
+        const eventRuleDeleteConfirm = async (data) => {
+            try {
+                await SpaceConnector.client.monitoring.eventRule.delete({
+                    event_rule_id: data.event_rule_id,
+                });
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_S_DELETE_ALERT'), '', root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_E_DELETE_ALERT'), '', root);
+            } finally {
+                checkDeleteState.visible = false;
+            }
+        };
         const onClickDeleteButton = () => {
-            console.log('delete!');
+            checkDeleteState.visible = true;
         };
         const onClickEditButton = () => {
             state.isEditMode = true;
@@ -227,12 +256,14 @@ export default {
         return {
             ...toRefs(state),
             routeState,
+            checkDeleteState,
             EDIT_MODE,
             onClickUpButton,
             onClickDownButton,
             onClickDeleteButton,
             onClickEditButton,
             onClickAddEventRule,
+            eventRuleDeleteConfirm,
         };
     },
 };
@@ -262,11 +293,10 @@ export default {
 .card-list-wrapper {
     display: flex;
     flex-direction: column;
-
-    .add-event-rule-button {
-        width: 100%;
-        margin-top: 1rem;
-    }
+}
+.add-event-rule-button {
+    width: 100%;
+    margin-top: 1rem;
 }
 .card::v-deep {
     margin-bottom: 1rem;
