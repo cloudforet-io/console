@@ -49,6 +49,11 @@
                                 :alert-title="alertInfo.title"
                                 @confirm="alertTitleEditConfirm"
         />
+        <delete-modal :header-title="checkDeleteState.headerTitle"
+                      :visible.sync="checkDeleteState.visible"
+                      :contents="$t('MONITORING.ALERT.DETAIL.DELETE_MODAL_DESC')"
+                      @confirm="alertDeleteConfirm"
+        />
     </general-page-layout>
 </template>
 

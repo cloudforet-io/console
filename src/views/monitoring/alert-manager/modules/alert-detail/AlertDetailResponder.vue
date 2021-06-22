@@ -60,6 +60,7 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import ProjectChannelList from '@/views/monitoring/alert-manager/components/ProjectChannelList.vue';
 import { i18n } from '@/translations';
+import {store} from "@/store";
 
 interface PropsType {
     id?: string;
@@ -183,7 +184,7 @@ export default {
         };
 
         (async () => {
-            await Promise.all([listProjectChannel(), listMember()]);
+            await Promise.all([listProjectChannel(), listMember(), store.dispatch('resource/protocol/load')]);
         })();
 
 

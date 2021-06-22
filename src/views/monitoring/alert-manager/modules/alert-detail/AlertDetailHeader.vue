@@ -5,6 +5,7 @@
             <p-select-dropdown :items="ALERT_STATE_LIST"
                                :selected="alertState"
                                @select="changeAlertState"
+                               class="state-dropdown"
             />
         </p>
         <p class="content-wrapper">
@@ -12,6 +13,7 @@
             <p-select-dropdown :items="ALERT_URGENCY_LIST"
                                :selected="alertUrgency"
                                @select="changeAlertUrgency"
+                               class="state-dropdown"
             />
         </p>
         <p class="content-wrapper">
@@ -165,6 +167,9 @@ export default {
     padding-left: 1rem;
     padding-top: 1.5rem;
     padding-bottom: 1.5rem;
+    .state-dropdown {
+        width: 9rem;
+    }
 
     @screen mobile {
         flex-wrap: wrap;
