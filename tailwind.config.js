@@ -28,7 +28,7 @@ module.exports = {
             lg: '0.375rem', // 6px
             xl: '0.5rem', // 8px
             '2xl': '0.75rem', // 12px
-            full: '50%',
+            full: '9999px',
         },
         colors,
         spacing: {

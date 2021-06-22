@@ -107,12 +107,21 @@ export default defineComponent<Props>({
     &:not(.disabled).highlight {
         @apply text-secondary;
     }
-    &:hover {
+
+    @media (hover: hover) {
+        &:hover {
+            .text {
+                @apply underline;
+            }
+            .disabled {
+                text-decoration: none;
+            }
+        }
+    }
+
+    &:focus, &:active, &focus-within {
         .text {
             @apply underline;
-        }
-        .disabled {
-            text-decoration: none;
         }
     }
 }

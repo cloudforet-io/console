@@ -4,7 +4,7 @@
     >
         <p-button ref="targetRef"
                   :disabled="disabled"
-                  :tabindex="-1"
+                  :tabindex="0"
                   class="dropdown-button"
                   :style-type="buttonStyleType"
                   @click="onClick"
@@ -24,7 +24,7 @@
                  class="dropdown-icon"
             />
         </p-button>
-        <p-context-menu v-if="proxyVisibleMenu"
+        <p-context-menu v-show="proxyVisibleMenu"
                         ref="contextMenuRef"
                         :menu="items"
                         :loading="loading"
@@ -238,6 +238,11 @@ export default defineComponent<SelectDropdownProps>({
         font-weight: normal;
         text-align: left;
 
+        &:focus, &:active {
+            @apply border-secondary text-secondary;
+            outline: none;
+        }
+
         .text {
             flex-grow: 1;
             flex-shrink: 0;
@@ -263,6 +268,7 @@ export default defineComponent<SelectDropdownProps>({
             padding: 0.25rem;
         }
     }
+
     &.disabled {
         .dropdown-button {
             @apply bg-gray-100 text-gray-400;
@@ -271,6 +277,9 @@ export default defineComponent<SelectDropdownProps>({
     &:not(.disabled).invalid {
         .dropdown-button {
             @apply border border-alert;
+            &:focus, &:active {
+                @apply border border-alert;
+            }
         }
     }
     &:not(.invalid):not(.disabled).active {

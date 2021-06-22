@@ -19,7 +19,7 @@
                         :menu="bindingMenu"
                         :loading="loading"
                         :always-show-menu="alwaysShowMenu"
-                        :style="contextMenuStyle"
+                        :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"
                         @select="onClickMenuItem"
                         @keyup:up:end="focusSearch"
                         @keyup:esc="focusSearch"

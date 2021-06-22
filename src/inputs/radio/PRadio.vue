@@ -1,10 +1,11 @@
 <template>
     <span class="p-radio"
+          :tabindex="0"
           @click.stop.prevent="onClick"
+          @keypress.stop.prevent="onClick"
           v-on="$listeners"
     >
         <slot name="radio-left" v-bind="{isSelected}" />
-        <input type="radio">
         <slot :slot-scope="$props" name="icon"
               v-bind="{isSelected, iconName}"
         >
@@ -85,15 +86,6 @@ export default defineComponent<Props>({
 
 <style lang="postcss">
 .p-radio {
-
-    input {
-        position: absolute;
-        opacity: 0;
-        cursor: pointer;
-        height: 0;
-        width: 0;
-    }
-
     &:hover {
         .text {
             @apply text-blue-500;
@@ -125,5 +117,10 @@ export default defineComponent<Props>({
         @apply text-red-500 cursor-pointer;
     }
 
+    &:focus, &:active, &:focus-within {
+        .radio-icon {
+            outline: 1px auto theme('colors.gray.400');
+        }
+    }
 }
 </style>
