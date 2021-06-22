@@ -416,6 +416,9 @@
 			"TIMEZONE": "タイムゾーン",
 			"TITLE": "個人情報"
 		},
+		"PROJECT_SELECT_DROPDOWN": {
+			"PLACEHOLDER": ""
+		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "セッション時間が経過しています。",
 			"SIGNIN": "ログイン"
@@ -1080,6 +1083,7 @@
 					"LABEL_URGENCY": "",
 					"LOW": "",
 					"NEED_TO_SET_PROJECT_ALERT": "",
+					"REQUIRED_TITLE": "",
 					"SET_PROJECT_ALERT_NOW": "",
 					"TITLE_CREATE": "",
 					"TITLE_UPDATE": ""

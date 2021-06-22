@@ -416,6 +416,9 @@
 			"TIMEZONE": "Time Zone",
 			"TITLE": "Profile"
 		},
+		"PROJECT_SELECT_DROPDOWN": {
+			"PLACEHOLDER": "Select Project"
+		},
 		"SESSION_MODAL": {
 			"SESSION_EXPIRED": "Your session has expired.",
 			"SIGNIN": "Sign In"
@@ -1080,6 +1083,7 @@
 					"LABEL_URGENCY": "Urgency",
 					"LOW": "Low",
 					"NEED_TO_SET_PROJECT_ALERT": "This project requires an alert setting.  Please set the alert first.",
+					"REQUIRED_TITLE": "Please enter title",
 					"SET_PROJECT_ALERT_NOW": "CLICK to set the alert now",
 					"TITLE_CREATE": "Create Alert",
 					"TITLE_UPDATE": "Update Alert"
