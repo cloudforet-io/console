@@ -1087,6 +1087,7 @@
 					"LABEL_URGENCY": "긴급도",
 					"LOW": "낮음",
 					"NEED_TO_SET_PROJECT_ALERT": "이 프로젝트는 얼럿 설정이 필요합니다.  먼저 얼럿 설정을 해주세요.",
+					"REQUIRED_PROJECT": "프로젝트를 선택해주세요.",
 					"REQUIRED_TITLE": "제목을 입력해주세요.",
 					"SET_PROJECT_ALERT_NOW": "지금 바로 얼럿 설정하기",
 					"TITLE_CREATE": "얼럿 생성",

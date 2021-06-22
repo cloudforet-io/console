@@ -1087,6 +1087,7 @@
 					"LABEL_URGENCY": "",
 					"LOW": "",
 					"NEED_TO_SET_PROJECT_ALERT": "",
+					"REQUIRED_PROJECT": "",
 					"REQUIRED_TITLE": "",
 					"SET_PROJECT_ALERT_NOW": "",
 					"TITLE_CREATE": "",
