@@ -1487,9 +1487,6 @@
 			"CLICK_ADD_MEMBER": "테이블 정보를 클릭하면 구성원이 추가됩니다.",
 			"DELETE": "삭제 ",
 			"DOWNLOAD_FILE": "파일 다운로드 ",
-			"EVENT_RULE": {
-				"EVENT_RULE": "Event Rule"
-			},
 			"MAINTENANCE_WINDOW": {
 				"ACTION": "작업",
 				"ALT_E_CLOSE_MAINTENANCE_WINDOW": "유지 관리 기간 닫기 실패",
@@ -1592,15 +1589,22 @@
 			"ADDITIONAL_INFORMATION": "Additional Information",
 			"ADD_EVENT_RULE": "Add Event Rule",
 			"ALL": "All",
+			"ALT_E_CREATE_EVENT_RULE": "Create Event Rule failure",
+			"ALT_E_UPDATE_EVENT_RULE": "Update Event Rule failure",
+			"ALT_S_CREATE_EVENT_RULE": "Create Event Rule success",
+			"ALT_S_UPDATE_EVENT_RULE": "Update Event Rule success",
 			"ANY": "Any",
 			"ASSIGNEE": "Assignee",
+			"CANCEL": "취소",
 			"CONDITION": "Condition",
 			"CONTAINS": "contains",
+			"CREATE": "생성",
 			"DELETE": "Delete",
 			"DO": "Do",
 			"DOES_NOT_CONTAIN": "does not contain",
 			"DOES_NOT_EQUAL": "does not equal",
 			"EDIT": "Edit",
+			"EDIT_EVENT_RULE": "Edit Event Rule",
 			"EQUALS": "equals",
 			"EVENT_RULE": "Event Rule",
 			"HIGH": "High",
@@ -1608,6 +1612,7 @@
 			"NOTIFICATIONS": "알림",
 			"NO_EVENT_RULES_HELP_TEXT": "To add event rules:\nClick the add button below.",
 			"NO_EVENT_RULES_TITLE": "No event rules on this project",
+			"NO_SET": "No set",
 			"OF_THE_FOLLOWING_ARE_MET": "of the following are met",
 			"ON": "켜짐",
 			"PAUSE": "Pause",
@@ -1615,6 +1620,7 @@
 			"PROJECT_ROUTING": "Project Routing",
 			"RESPONDER": "수신자",
 			"THESE_THINGS": "these things",
+			"UPDATE": "편집",
 			"URGENCY": "긴급도"
 		},
 		"LANDING": {
