@@ -18970,7 +18970,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>ALT_S_CREATE (2)</name>
+                                        <name>ALT_S_DELETE</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description></description>
                                         <comment></comment>
@@ -18991,7 +18991,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>ALT_S_DELETE</name>
+                                        <name>ALT_S_MERGE</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description></description>
                                         <comment></comment>
