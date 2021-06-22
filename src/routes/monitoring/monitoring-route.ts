@@ -1,11 +1,11 @@
 import { RouteConfig } from 'vue-router';
 
-const MonitoringMainPage = () => import(/* webpackChunkName: "MonitoringMainPage" */ '@/views/monitoring/alert/pages/MonitoringMainPage.vue');
+const MonitoringMainPage = () => import(/* webpackChunkName: "MonitoringMainPage" */ '@/views/monitoring/alert-manager/pages/MonitoringMainPage.vue');
 
-const AlertDashboardPage = () => import(/* webpackChunkName: "AlertDashboardPage" */ '@/views/monitoring/alert/pages/AlertDashboardPage.vue');
-const AlertListPage = () => import(/* webpackChunkName: "AlertListPage" */ '@/views/monitoring/alert/pages/AlertListPage.vue');
-const EscalationPolicyPage = () => import(/* webpackChunkName: "EscalationPolicyPage" */ '@/views/monitoring/alert/pages/EscalationPolicyPage.vue');
-const AlertDetailPage = () => import(/* webpackChunkName: "AlertDetailPage" */ '@/views/monitoring/alert/pages/AlertDetailPage.vue');
+const AlertDashboardPage = () => import(/* webpackChunkName: "AlertDashboardPage" */ '@/views/monitoring/alert-manager/pages/AlertDashboardPage.vue');
+const AlertListPage = () => import(/* webpackChunkName: "AlertListPage" */ '@/views/monitoring/alert-manager/pages/AlertListPage.vue');
+const EscalationPolicyPage = () => import(/* webpackChunkName: "EscalationPolicyPage" */ '@/views/monitoring/alert-manager/pages/EscalationPolicyPage.vue');
+const AlertDetailPage = () => import(/* webpackChunkName: "AlertDetailPage" */ '@/views/monitoring/alert-manager/pages/AlertDetailPage.vue');
 
 export const MONITORING_ROUTE = Object.freeze({
     _NAME: 'monitoring',

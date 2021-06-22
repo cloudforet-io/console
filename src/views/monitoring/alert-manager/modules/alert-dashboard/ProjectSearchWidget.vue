@@ -42,7 +42,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import {
     PToolbox, PListCard,
 } from '@spaceone/design-system';
-import AlertListItem from '@/views/monitoring/alert/components/AlertListItem.vue';
+import AlertListItem from '@/views/monitoring/alert-manager/components/AlertListItem.vue';
 
 import { store } from '@/store';
 

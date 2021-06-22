@@ -61,9 +61,8 @@ import {
     PListCard, PSelectButton, PTextPagination,
 } from '@spaceone/design-system';
 
-import AlertListItem from '@/views/monitoring/alert/components/AlertListItem.vue';
+import AlertListItem from '@/views/monitoring/alert-manager/components/AlertListItem.vue';
 
-import { ALERT_STATE } from '@/views/monitoring/alert/type';
 import { QueryStoreFilter } from '@/lib/query/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
@@ -75,6 +74,9 @@ import { alert, secondary } from '@/styles/colors';
 import { store } from '@/store';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import router from '@/routes';
+import { Location } from 'vue-router';
+import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
+import { AlertListPageUrlQuery } from '@/views/monitoring/alert-manager/type';
 
 
 const ASSIGNED_STATE = Object.freeze({
@@ -142,16 +144,17 @@ export default {
         });
 
         /* util */
-        const alertLinkFormatter = (alertState) => {
-            const filters: QueryStoreFilter[] = [
+        const linkQueryHelper = new QueryHelper();
+        const alertLinkFormatter = (alertState): Location => {
+            linkQueryHelper.setFilters([
                 { k: 'project_id', o: '=', v: props.projectId },
-                { k: 'state', o: '=', v: alertState },
-            ];
+            ]);
             return {
                 name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT._NAME,
                 query: {
-                    filters: queryHelper.setFilters(filters).rawQueryStrings,
-                },
+                    filters: linkQueryHelper.rawQueryStrings,
+                    state: alertState,
+                } as AlertListPageUrlQuery,
             };
         };
 

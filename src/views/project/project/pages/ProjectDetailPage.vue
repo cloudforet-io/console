@@ -99,8 +99,7 @@ import { ProjectModel } from '@/views/project/project/type';
 import { TranslateResult } from 'vue-i18n';
 import MaintenanceWindowFormModal from '@/views/project/project/modules/MaintenanceWindowFormModal.vue';
 import { find } from 'lodash';
-import { ALERT_STATE } from '@/views/monitoring/alert/type';
-
+import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
 
 export default {
     name: 'ProjectDetailPage',

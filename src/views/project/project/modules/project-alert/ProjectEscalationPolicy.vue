@@ -54,11 +54,11 @@ import {
 } from '@vue/composition-api';
 
 import { PBadge, PDivider, PI } from '@spaceone/design-system';
-import ProjectChannelList from '@/views/monitoring/alert/components/ProjectChannelList.vue';
+import ProjectChannelList from '@/views/monitoring/alert-manager/components/ProjectChannelList.vue';
 
-import { FINISH_CONDITION } from '@/views/monitoring/alert/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { FINISH_CONDITION } from '@/views/monitoring/alert-manager/lib/config';
 
 
 const CHANNEL_SCHEMA = Object.freeze({

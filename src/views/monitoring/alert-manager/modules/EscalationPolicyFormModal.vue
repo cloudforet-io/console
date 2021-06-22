@@ -29,12 +29,13 @@ import {
 } from '@vue/composition-api';
 
 import { PButtonModal } from '@spaceone/design-system';
-import EscalationPolicyForm from '@/views/monitoring/alert/modules/EscalationPolicyForm.vue';
+import EscalationPolicyForm from '@/views/monitoring/alert-manager/modules/EscalationPolicyForm.vue';
 
 import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import { ACTION, SCOPE, EscalationPolicyFormModel } from '@/views/monitoring/alert/type';
+import { EscalationPolicyFormModel } from '@/views/monitoring/alert-manager/type';
+import { ACTION, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
 
 
 export default {

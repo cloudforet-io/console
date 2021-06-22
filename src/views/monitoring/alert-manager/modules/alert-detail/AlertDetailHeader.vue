@@ -40,14 +40,14 @@
 <script lang="ts">
 import { PButton, PPaneLayout, PSelectDropdown } from '@spaceone/design-system';
 import { reactive, toRefs, UnwrapRef } from '@vue/composition-api';
-import { ALERT_STATE, ALERT_URGENCY, AlertDataModel } from '@/views/monitoring/alert/type';
-import AlertReassignModal from '@/views/monitoring/alert/modules/alert-detail/AlertReassignModal.vue';
+import { AlertDataModel } from '@/views/monitoring/alert-manager/type';
+import AlertReassignModal from '@/views/monitoring/alert-manager/modules/alert-detail/AlertReassignModal.vue';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { TimeStamp } from '@/models';
 import { iso8601Formatter } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
+import { ALERT_STATE, ALERT_URGENCY } from '@/views/monitoring/alert-manager/lib/config';
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);

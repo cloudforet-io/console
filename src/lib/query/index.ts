@@ -113,13 +113,17 @@ export class QueryHelper {
         if (Array.isArray(rawQueryStrings)) {
             rawQueryStrings.forEach((q) => {
                 if (q) {
-                    const [v, k, o] = JSON.parse(q) as RawQuery;
-                    this._filters.push({ k, v, o });
+                    try {
+                        const [v, k, o] = JSON.parse(q) as RawQuery;
+                        this._filters.push({ k, v, o });
+                    } catch (e) { console.error('QUERY HELPER - raw query string parsing error. input: ', rawQueryStrings, '\nerror: ', e); }
                 }
             });
-        } else if (typeof rawQueryStrings === 'string') {
-            const [v, k, o] = JSON.parse(rawQueryStrings) as RawQuery;
-            this._filters.push({ k, v, o });
+        } else if (typeof rawQueryStrings === 'string' && rawQueryStrings) {
+            try {
+                const [v, k, o] = JSON.parse(rawQueryStrings) as RawQuery;
+                this._filters.push({ k, v, o });
+            } catch (e) { console.error('QUERY HELPER - raw query string parsing error. input: ', rawQueryStrings, '\nerror: ', e); }
         }
         return this;
     }

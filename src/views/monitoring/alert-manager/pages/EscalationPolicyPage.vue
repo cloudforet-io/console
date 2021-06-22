@@ -66,11 +66,10 @@ import {
 import {
     PBreadcrumbs, PPageTitle, PIconTextButton, PSelectDropdown, PToolbox,
 } from '@spaceone/design-system';
-import EscalationPolicyFormModal from '@/views/monitoring/alert/modules/EscalationPolicyFormModal.vue';
+import EscalationPolicyFormModal from '@/views/monitoring/alert-manager/modules/EscalationPolicyFormModal.vue';
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
-import EscalationPolicyDataTable from '@/views/monitoring/alert/modules/EscalationPolicyDataTable.vue';
+import EscalationPolicyDataTable from '@/views/monitoring/alert-manager/modules/EscalationPolicyDataTable.vue';
 
-import { ACTION, FINISH_CONDITION, SCOPE } from '@/views/monitoring/alert/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import {
@@ -83,6 +82,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { store } from '@/store';
 import { getApiQueryWithToolboxOptions } from '@/lib/component-utils/toolbox';
+import { ACTION, FINISH_CONDITION, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
 
 
 export default {

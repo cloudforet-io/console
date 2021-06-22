@@ -30,7 +30,7 @@
 import {
     PListCard, PI,
 } from '@spaceone/design-system';
-import AlertListItem from '@/views/monitoring/alert/components/AlertListItem.vue';
+import AlertListItem from '@/views/monitoring/alert-manager/components/AlertListItem.vue';
 import {
     ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';

@@ -115,7 +115,7 @@ import { iso8601Formatter, showErrorMessage, showSuccessMessage } from '@/lib/ut
 import { SpaceConnector } from '@/lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
-import { AlertDataModel } from '@/views/monitoring/alert/type';
+import { AlertDataModel } from '@/views/monitoring/alert-manager/type';
 import { ProjectItemResp } from '@/views/project/project/type';
 import ProjectTreeModal from '@/common/modules/ProjectTreeModal.vue';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';

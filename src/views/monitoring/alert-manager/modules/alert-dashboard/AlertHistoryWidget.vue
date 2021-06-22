@@ -47,7 +47,7 @@ import {
     PCard, PI, PDatePagination,
 } from '@spaceone/design-system';
 
-import AlertHistoryChart from '@/views/monitoring/alert/modules/alert-dashboard/AlertHistoryChart.vue';
+import AlertHistoryChart from '@/views/monitoring/alert-manager/modules/alert-dashboard/AlertHistoryChart.vue';
 import { store } from '@/store';
 
 dayjs.extend(utc);

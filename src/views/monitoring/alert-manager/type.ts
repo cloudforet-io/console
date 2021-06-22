@@ -1,36 +1,16 @@
 /* eslint-disable camelcase */
 
 import { TimeStamp } from '@/models';
+import { QueryStoreFilter } from '@/lib/query/type';
+import {
+    ALERT_SEVERITY, ALERT_STATE,
+    ALERT_STATE_FILTER, ALERT_URGENCY,
+    ASSIGNED_STATE,
+    FINISH_CONDITION,
+    SCOPE,
+} from '@/views/monitoring/alert-manager/lib/config';
+import { RouteQueryString } from '@/lib/router-query-string';
 
-export enum ACTION {
-    create = 'create',
-    delete = 'delete',
-    update = 'update',
-    default = 'default',
-}
-
-export enum ALERT_ACTION {
-    acknowledge = 'acknowledge',
-    resolve = 'resolve',
-    merge = 'merge',
-    delete = 'delete',
-}
-
-export enum SCOPE {
-    global = 'GLOBAL',
-    project = 'PROJECT',
-}
-
-export enum FINISH_CONDITION {
-    acknowledged = 'ACKNOWLEDGED',
-    resolved = 'RESOLVED',
-}
-
-export const WEBHOOK_STATE = {
-    ENABLED: 'ENABLED',
-    DISABLED: 'DISABLED',
-} as const;
-export type WEBHOOK_STATE = typeof WEBHOOK_STATE[keyof typeof WEBHOOK_STATE];
 
 export interface Rule {
     notification_level: string;
@@ -86,26 +66,14 @@ export interface AlertDataModel {
     escalated_at: TimeStamp;
 }
 
+export interface AlertBottomFilters {
+    state: ALERT_STATE_FILTER;
+    urgency: ALERT_URGENCY;
+    assigned: ASSIGNED_STATE;
+}
 
-export const ALERT_STATE = {
-    TRIGGERED: 'TRIGGERED',
-    ACKNOWLEDGED: 'ACKNOWLEDGED',
-    RESOLVED: 'RESOLVED',
-} as const;
-export type ALERT_STATE = typeof ALERT_STATE[keyof typeof ALERT_STATE];
+export interface AlertListTableFilters extends AlertBottomFilters {
+    filters: QueryStoreFilter[];
+}
 
-export const ALERT_URGENCY = {
-    HIGH: 'HIGH',
-    LOW: 'LOW',
-} as const;
-export type ALERT_URGENCY = typeof ALERT_URGENCY[keyof typeof ALERT_URGENCY];
-
-export const ALERT_SEVERITY = {
-    CRITICAL: 'CRITICAL',
-    ERROR: 'ERROR',
-    WARNING: 'WARNING',
-    INFO: 'INFO',
-    NOT_AVAILABLE: 'NOT AVAILABLE',
-    NONE: 'NONE',
-};
-export type ALERT_SEVERITY = typeof ALERT_SEVERITY[keyof typeof ALERT_SEVERITY];
+export type AlertListPageUrlQuery = Partial<Record<'state' | 'urgency' | 'assigned' | 'filters', RouteQueryString>>

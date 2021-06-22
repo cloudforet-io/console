@@ -7,7 +7,7 @@
 </template>
 
 <script lang="ts">
-import AlertDataTable from '@/views/monitoring/alert/modules/alert-list/AlertDataTable.vue';
+import AlertDataTable from '@/views/monitoring/alert-manager/modules/alert-list/AlertDataTable.vue';
 
 export default {
     name: 'ProjectWebhook',

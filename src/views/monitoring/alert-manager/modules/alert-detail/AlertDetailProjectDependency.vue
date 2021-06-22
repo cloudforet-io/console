@@ -26,7 +26,7 @@
 import {
     PAnchor, PEmpty, PPaneLayout, PPanelTop,
 } from '@spaceone/design-system';
-import { AlertDataModel } from '@/views/monitoring/alert/type';
+import { AlertDataModel } from '@/views/monitoring/alert-manager/type';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';

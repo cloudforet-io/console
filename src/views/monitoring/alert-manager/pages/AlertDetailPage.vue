@@ -58,20 +58,20 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
-import AlertDetailHeader from '@/views/monitoring/alert/modules/alert-detail/AlertDetailHeader.vue';
-import AlertDetailInfo from '@/views/monitoring/alert/modules/alert-detail/AlertDetailInfo.vue';
-import AlertDetailResponder from '@/views/monitoring/alert/modules/alert-detail/AlertDetailResponder.vue';
-import AlertDetailTimeline from '@/views/monitoring/alert/modules/alert-detail/AlertDetailTimeline.vue';
-import AlertDetailNote from '@/views/monitoring/alert/modules/alert-detail/AlertDetailNote.vue';
+import AlertDetailHeader from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailHeader.vue';
+import AlertDetailInfo from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailInfo.vue';
+import AlertDetailResponder from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailResponder.vue';
+import AlertDetailTimeline from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailTimeline.vue';
+import AlertDetailNote from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailNote.vue';
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 import { SpaceConnector } from '@/lib/space-connector';
-import { AlertDataModel } from '@/views/monitoring/alert/type';
+import { AlertDataModel } from '@/views/monitoring/alert-manager/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import AlertTitleEditModal from '@/views/monitoring/alert/modules/alert-detail/AlertTitleEditModal.vue';
-import AlertDetailResourceInfo from '@/views/monitoring/alert/modules/alert-detail/AlertDetailResourceInfo.vue';
+import AlertTitleEditModal from '@/views/monitoring/alert-manager/modules/alert-detail/AlertTitleEditModal.vue';
+import AlertDetailResourceInfo from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailResourceInfo.vue';
 import AlertDetailProjectDependency
-    from '@/views/monitoring/alert/modules/alert-detail/AlertDetailProjectDependency.vue';
-import {i18n} from "@/translations";
+    from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailProjectDependency.vue';
+import { i18n } from '@/translations';
 
 export default {
     name: 'AlertDetailPage',

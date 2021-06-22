@@ -49,7 +49,7 @@ import {
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { makeProxy } from '@/lib/compostion-util';
-import { WEBHOOK_STATE } from '@/views/monitoring/alert/type';
+import { WEBHOOK_STATE } from '@/views/monitoring/alert-manager/lib/config';
 
 export default {
     name: 'WebhookUpdateFormModal',

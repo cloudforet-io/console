@@ -131,7 +131,7 @@ import {
     PAnchor, PBadge, PIconButton, PSelectDropdown, PI, PIconTextButton, PTextInput, PRadio,
 } from '@spaceone/design-system';
 
-import ProjectChannelList from '@/views/monitoring/alert/components/ProjectChannelList.vue';
+import ProjectChannelList from '@/views/monitoring/alert-manager/components/ProjectChannelList.vue';
 
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import { makeProxy } from '@/lib/compostion-util';

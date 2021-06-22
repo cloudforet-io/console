@@ -55,10 +55,10 @@ import {
 import { SpaceConnector } from '@/lib/space-connector';
 import {
     AlertDataModel,
-} from '@/views/monitoring/alert/type';
+} from '@/views/monitoring/alert-manager/type';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import ProjectChannelList from '@/views/monitoring/alert/components/ProjectChannelList.vue';
+import ProjectChannelList from '@/views/monitoring/alert-manager/components/ProjectChannelList.vue';
 import { i18n } from '@/translations';
 
 interface PropsType {

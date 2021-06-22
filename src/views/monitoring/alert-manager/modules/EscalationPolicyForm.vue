@@ -76,12 +76,13 @@ import {
 
 import { PFieldGroup, PRadio, PTextInput } from '@spaceone/design-system';
 
-import EscalationRulesInputForm from '@/views/monitoring/alert/modules/EscalationRulesInputForm.vue';
+import EscalationRulesInputForm from '@/views/monitoring/alert-manager/modules/EscalationRulesInputForm.vue';
 import ProjectSelectDropdown from '@/common/modules/project-select-dropdown/ProjectSelectDropdown.vue';
 
 import {
-    EscalationPolicyFormModel, FINISH_CONDITION, SCOPE, ACTION,
-} from '@/views/monitoring/alert/type';
+    EscalationPolicyFormModel,
+} from '@/views/monitoring/alert-manager/type';
+import { ACTION, FINISH_CONDITION, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
 
 
 const DEFAULT_REPEAT_COUNT = 0;

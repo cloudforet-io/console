@@ -47,7 +47,7 @@ import {
     PButtonModal, PBoxTab,
 } from '@spaceone/design-system';
 
-import EscalationPolicyDataTable from '@/views/monitoring/alert/modules/EscalationPolicyDataTable.vue';
+import EscalationPolicyDataTable from '@/views/monitoring/alert-manager/modules/EscalationPolicyDataTable.vue';
 
 import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -55,8 +55,8 @@ import { iso8601Formatter, showErrorMessage, showSuccessMessage } from '@/lib/ut
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getApiQueryWithToolboxOptions } from '@/lib/component-utils/toolbox';
 import { store } from '@/store';
-import EscalationPolicyForm from '@/views/monitoring/alert/modules/EscalationPolicyForm.vue';
-import { EscalationPolicyFormModel } from '@/views/monitoring/alert/type';
+import EscalationPolicyForm from '@/views/monitoring/alert-manager/modules/EscalationPolicyForm.vue';
+import { EscalationPolicyFormModel } from '@/views/monitoring/alert-manager/type';
 
 
 enum FORM_MODE {

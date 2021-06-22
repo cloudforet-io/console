@@ -15,7 +15,7 @@ import {
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
-import { AlertDataModel } from '@/views/monitoring/alert/type';
+import { AlertDataModel } from '@/views/monitoring/alert-manager/type';
 import { map } from 'lodash';
 
 interface PropsType {

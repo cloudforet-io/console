@@ -24,11 +24,11 @@ import {
     PBreadcrumbs, PPageTitle,
 } from '@spaceone/design-system';
 
-import AlertStateWidget from '@/views/monitoring/alert/modules/alert-dashboard/AlertStateWidget.vue';
-import AlertHistoryWidget from '@/views/monitoring/alert/modules/alert-dashboard/AlertHistoryWidget.vue';
-import CurrentProjectStatusWidget from '@/views/monitoring/alert/modules/alert-dashboard/CurrentProjectStatusWidget.vue';
-import Top5ProjectActivityWidget from '@/views/monitoring/alert/modules/alert-dashboard/Top5ProjectActivityWidget.vue';
-import ProjectSearchWidget from '@/views/monitoring/alert/modules/alert-dashboard/ProjectSearchWidget.vue';
+import AlertStateWidget from '@/views/monitoring/alert-manager/modules/alert-dashboard/AlertStateWidget.vue';
+import AlertHistoryWidget from '@/views/monitoring/alert-manager/modules/alert-dashboard/AlertHistoryWidget.vue';
+import CurrentProjectStatusWidget from '@/views/monitoring/alert-manager/modules/alert-dashboard/CurrentProjectStatusWidget.vue';
+import Top5ProjectActivityWidget from '@/views/monitoring/alert-manager/modules/alert-dashboard/Top5ProjectActivityWidget.vue';
+import ProjectSearchWidget from '@/views/monitoring/alert-manager/modules/alert-dashboard/ProjectSearchWidget.vue';
 import { store } from '@/store';
 
 export default {

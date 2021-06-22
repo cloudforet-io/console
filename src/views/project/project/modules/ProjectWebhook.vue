@@ -103,7 +103,7 @@ import {
     makeDistinctValueHandler, makeEnumValueHandler,
 } from '@/lib/component-utils/query-search';
 import { FILE_NAME_PREFIX } from '@/lib/type';
-import { WEBHOOK_STATE } from '@/views/monitoring/alert/type';
+import { WEBHOOK_STATE } from '@/views/monitoring/alert-manager/lib/config';
 import { i18n } from '@/translations';
 import { getApiQueryWithToolboxOptions } from '@/lib/component-utils/toolbox';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';

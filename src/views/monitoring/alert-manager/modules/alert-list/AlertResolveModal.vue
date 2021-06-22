@@ -23,13 +23,13 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
-    PButtonModal, PBoxTab, PTextarea, PFieldGroup,
+    PButtonModal, PTextarea, PFieldGroup,
 } from '@spaceone/design-system';
 import { makeProxy } from '@/lib/compostion-util';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
-import { ALERT_STATE } from '@/views/monitoring/alert/type';
+import {ALERT_STATE} from "@/views/monitoring/alert-manager/lib/config";
 
 export default {
     name: 'AlertResolveModal',
