@@ -25,6 +25,12 @@
             :alert="selectedItems[0]"
             @confirm="$emit('refresh')"
         />
+
+        <alert-merge-modal
+            :visible.sync="visibleMergeModal"
+            :items="selectedItems"
+            @confirm="$emit('refresh')"
+        />
     </div>
 </template>
 
@@ -39,11 +45,13 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 import AlertResolveModal from '@/views/monitoring/alert-manager/modules/alert-list/AlertResolveModal.vue';
 import { ALERT_ACTION, ALERT_STATE_FILTER } from '@/views/monitoring/alert-manager/lib/config';
+import AlertMergeModal from '@/views/monitoring/alert-manager/modules/alert-list/AlertMergeModal.vue';
 
 
 export default {
     name: 'AlertActions',
     components: {
+        AlertMergeModal,
         AlertResolveModal,
         PButton,
         PSelectDropdown,
@@ -85,6 +93,7 @@ export default {
             ])),
             visibleDeleteModal: false,
             visibleResolveModal: false,
+            visibleMergeModal: false,
         });
 
         const updateAlertState = async (alertState: ALERT_STATE_FILTER) => {
@@ -101,6 +110,7 @@ export default {
                 showErrorMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_STATE_CHANGED'), e, root);
             }
         };
+
 
         const onDeleteConfirm = async () => {
             try {
@@ -123,7 +133,7 @@ export default {
             } else if (type === ALERT_ACTION.resolve) {
                 state.visibleResolveModal = true;
             } else if (type === ALERT_ACTION.merge) {
-                // TODO
+                state.visibleMergeModal = true;
             } else if (type === ALERT_ACTION.delete) {
                 state.visibleDeleteModal = true;
             }

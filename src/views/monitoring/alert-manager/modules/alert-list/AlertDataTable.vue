@@ -66,7 +66,7 @@
                     </template>
                 </template>
                 <template #col-state-format="{ value }">
-                    <p-badge :style-type="badgeStyleTypeFormatter(value)">
+                    <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)">
                         {{ capitalize(value) }}
                     </p-badge>
                 </template>
@@ -140,6 +140,7 @@ import {
     AlertBottomFilters, AlertListTableFilters,
 } from '@/views/monitoring/alert-manager/type';
 import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/views/monitoring/alert-manager/lib/config';
+import { alertStateBadgeStyleTypeFormatter } from '@/views/monitoring/alert-manager/lib/helper';
 
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm';
@@ -244,12 +245,6 @@ export default {
             visibleAlertFormModal: false,
         });
 
-        /* util */
-        const badgeStyleTypeFormatter = (alertState) => {
-            if (alertState === ALERT_STATE_FILTER.TRIGGERED) return 'red100';
-            if (alertState === ALERT_STATE_FILTER.ACKNOWLEDGED) return 'blue200';
-            return 'gray200';
-        };
 
         const webhookFormatter = webhookId => state.webhookNameList.find(element => element.webhook_id === webhookId)?.name;
 
@@ -380,7 +375,7 @@ export default {
             referenceRouter,
             capitalize,
             webhookFormatter,
-            badgeStyleTypeFormatter,
+            alertStateBadgeStyleTypeFormatter,
             getAlerts,
             onChange,
             onExportToExcel,
