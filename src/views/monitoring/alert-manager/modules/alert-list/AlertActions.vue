@@ -62,13 +62,13 @@ export default {
                     name: ALERT_ACTION.acknowledge,
                     styleType: 'primary',
                     label: i18n.t('MONITORING.ALERT.ALERT_LIST.ACKNOWLEDGED'),
-                    disabled: props.selectedItems.length !== 1 || props.selectedItems[0]?.state !== ALERT_STATE_FILTER.TRIGGERED,
+                    disabled: props.selectedItems.length < 1 || props.selectedItems[0]?.state !== ALERT_STATE_FILTER.TRIGGERED,
                 },
                 {
                     name: ALERT_ACTION.resolve,
                     styleType: 'secondary-dark',
                     label: i18n.t('MONITORING.ALERT.ALERT_LIST.RESOLVE'),
-                    disabled: props.selectedItems.length !== 1 || props.selectedItems[0]?.state === ALERT_STATE_FILTER.RESOLVED,
+                    disabled: props.selectedItems.length !== 1 || props.selectedItems[0]?.state !== ALERT_STATE_FILTER.ACKNOWLEDGED,
                 },
                 {
                     name: ALERT_ACTION.merge,

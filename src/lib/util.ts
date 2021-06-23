@@ -24,10 +24,10 @@ export const durationFormatter = (createdAt: string, finishedAt: string, timezon
         const durationMin = finishedAtTime.diff(createdAtTime, 'minute');
         const durationHours = finishedAtTime.diff(createdAtTime, 'hour');
         const durationDays = finishedAtTime.diff(createdAtTime, 'day');
-        if (durationSec < 60) return `${durationSec} sec`;
-        if (durationMin < 60) return `${durationMin} min`;
-        if (durationHours < 24) return `${durationHours} hours ${durationMin % 60} min`;
-        return `${durationDays % 24} days ${durationHours % 24} hours`;
+        if (durationSec < 60) return `${durationSec}s`;
+        if (durationMin < 60) return `${durationMin}m`;
+        if (durationHours < 24) return `${durationHours}h ${durationMin % 60}m`;
+        return `${durationDays % 24}d ${durationHours % 24}h`;
     }
     return null;
 };

@@ -42,7 +42,7 @@
             >
                 <keep-alive><router-view /></keep-alive>
                 <template #extra="tab">
-                    <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT')" style-type="primary3">
+                    <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && counts[ALERT_STATE.TRIGGERED] !== 0" style-type="primary3">
                         {{ counts[ALERT_STATE.TRIGGERED] }}
                     </p-badge>
                 </template>

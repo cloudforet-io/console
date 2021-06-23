@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <fragment>
         <div class="alert-data-table">
             <p-toolbox-table
                 style-type="light-gray"
@@ -77,6 +77,9 @@
                     />
                     <span class="title">{{ capitalize(value) }}</span>
                 </template>
+                <template #col-resource-format="{ value }">
+                    {{ value.name }}
+                </template>
                 <template #col-project_id-format="{ value }">
                     <template v-if="value">
                         <p-anchor :to="referenceRouter(value,{ resource_type: 'identity.Project' })">
@@ -98,7 +101,7 @@
             </p-toolbox-table>
         </div>
         <alert-form-modal :visible.sync="visibleAlertFormModal" @refresh="getAlerts()" />
-    </div>
+    </fragment>
 </template>
 <script lang="ts">
 import {
@@ -147,6 +150,7 @@ const TABLE_FIELDS = [
     { name: 'state', label: 'State' },
     { name: 'urgency', label: 'Urgency' },
     { name: 'status_message', label: 'Status Details' },
+    { name: 'resource', label: 'Resource' },
     { name: 'project_id', label: 'Project' },
     { name: 'created_at', label: 'Created' },
     { name: 'created_at', label: 'Duration', sortable: false },
@@ -159,6 +163,7 @@ const EXCEL_FIELDS = [
     { key: 'state', name: 'State' },
     { key: 'urgency', name: 'Urgency' },
     { key: 'status_message', name: 'Status Details' },
+    { key: 'resource', name: 'Resource' },,
     { key: 'project_id', name: 'Project' },
     { key: 'created_at', name: 'Created', type: 'datetime' },
     { key: 'assignee', name: 'Assigned to' },
@@ -390,20 +395,25 @@ export default {
 .alert-data-table {
     @apply col-span-12;
     .p-toolbox-table::v-deep {
-        @apply overflow-hidden rounded-lg;
+        @apply overflow-hidden rounded-lg border-0;
         .panel-top-wrapper {
-            @apply bg-white;
+            @apply bg-white rounded-tl-lg rounded-tr-lg border-gray-200;
+            border-width: 1px;
             .p-panel-top {
                 margin-top: 1.5rem;
             }
         }
-    }
-
-    .alert-title {
-        @apply text-blue-600;
-    }
-    .ic_state_duplicated path {
-        fill: theme('colors.red.200');
+        .p-toolbox {
+            .p-dropdown-menu-button {
+                @apply bg-white;
+            }
+        }
+        .alert-title {
+            @apply text-blue-600;
+        }
+        .ic_state_duplicated path {
+            fill: theme('colors.red.200');
+        }
     }
 }
 </style>
