@@ -194,19 +194,19 @@ export default {
 
         const checkPassword = (password) => {
             // password1
-            if (password.replace(/ /g, '').length !== password.length) {
+            if (formState.passwordCheck && (password.replace(/ /g, '').length !== password.length)) {
                 validationState.isPasswordValid = false;
                 validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
-            } else if (password.length < 8) {
+            } else if (password.length > 0 && password.length < 8) {
                 validationState.isPasswordValid = false;
                 validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 8 });
-            } else if (!password.match(/[a-z]/)) {
+            } else if (password.length && !password.match(/[a-z]/)) {
                 validationState.isPasswordValid = false;
                 validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
-            } else if (!password.match(/[A-Z]/)) {
+            } else if (password.length && !password.match(/[A-Z]/)) {
                 validationState.isPasswordValid = false;
                 validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
-            } else if (!password.match(/[0-9]/)) {
+            } else if (password.length && !password.match(/[0-9]/)) {
                 validationState.isPasswordValid = false;
                 validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
             } else {
@@ -215,11 +215,12 @@ export default {
             }
 
             // password2
-            if (!formState.passwordCheck) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
-            }
-            if (password !== formState.passwordCheck) {
+            // if (password && !formState.passwordCheck) {
+            //     validationState.isPasswordValid = false;
+            //     validationState.passwordCheckInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
+            // }
+            // else
+            if (password && password !== formState.passwordCheck) {
                 validationState.isPasswordCheckValid = false;
                 validationState.passwordCheckInvalidText = vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID');
             } else {
