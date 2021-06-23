@@ -28,6 +28,14 @@
                     {{ Object.keys(value)[0] }} : {{ Object.values(value)[0] }}
                 </p>
             </template>
+            <template #col-schedule-format="{value}">
+                <p v-if="value">
+                    <span v-for="day in value.day_of_week" :key="day"> {{ day }}</span><br>
+                    {{ utcToTimezoneFormatter(value.start_hour, timezone) }}:00 ~
+                    {{ utcToTimezoneFormatter(value.end_hour, timezone) }}:00
+                </p>
+                <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME') }}</span>
+            </template>
             <template #col-subscriptions-format="{value}">
                 <ul v-if="value.length > 0">
                     <li v-for="(item, index) in value" :key="`topic-${index}`">
@@ -55,6 +63,8 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ChannelItem, ProtocolItem } from '@/views/identity/user/type';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import { i18n } from '@/translations';
+import { utcToTimezoneFormatter } from '@/views/identity/user/lib/helper';
+import { store } from '@/store';
 
 export default {
     name: 'UserNotifications',
@@ -88,6 +98,7 @@ export default {
                 name: IDENTITY_ROUTE.USER.NOTIFICATION.MANAGE._NAME,
                 params: { userId: encodeURIComponent(props.userId) },
             },
+            timezone: computed(() => store.state.user.timezone),
         });
 
         const apiQuery = new ApiQueryHelper();
@@ -135,6 +146,7 @@ export default {
 
         return {
             ...toRefs(state),
+            utcToTimezoneFormatter,
         };
     },
 };

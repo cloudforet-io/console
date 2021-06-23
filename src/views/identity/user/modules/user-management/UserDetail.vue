@@ -85,7 +85,7 @@ export default {
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const baseState = reactive({
-            title: computed(() => vm.$t('IDENTITY.USER.MAIN.BASE_INFORMATION')),
+            title: computed(() => vm.$t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')),
             loading: true,
             fields: computed(() => [
                 { name: 'user_id', label: vm.$t('IDENTITY.USER.MAIN.USER_ID') },

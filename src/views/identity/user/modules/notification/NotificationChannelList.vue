@@ -6,7 +6,7 @@
             </h3>
             <ul class="channel-list-wrapper">
                 <div v-for="item in protocolList"
-                     :key="item.label"
+                     :key="item.protocol_id"
                      class="channel-item-wrapper"
                 >
                     <router-link :to="item.link">
