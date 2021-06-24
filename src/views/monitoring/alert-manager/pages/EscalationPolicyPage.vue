@@ -27,7 +27,7 @@
                 </p-icon-text-button>
                 <p-select-dropdown
                     :selected="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
-                    :items="tableState.actionItems"
+                    :items="actionItems"
                     :disabled="!selectedItem"
                     @select="onSelectAction"
                 >
@@ -38,7 +38,7 @@
         <escalation-policy-data-table
             :items="items"
             :loading="tableState.loading"
-            :select-index.sync="tableState.selectIndex"
+            :select-index.sync="selectIndex"
             @change="onChange"
         />
         <!--modal-->
@@ -123,25 +123,6 @@ export default {
         };
         const tableState = reactive({
             loading: true,
-            actionItems: computed(() => ([
-                {
-                    type: 'item',
-                    name: 'update',
-                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.UPDATE'),
-                },
-                {
-                    type: 'item',
-                    name: 'delete',
-                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.DELETE'),
-                },
-                {
-                    type: 'item',
-                    name: 'default',
-                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.SET_AS_DEFAULT'),
-                },
-            ])),
-            selectedActionItem: '',
-            selectIndex: [],
             sortBy: 'created_at',
             sortDesc: true,
             totalCount: 0,
@@ -152,9 +133,29 @@ export default {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             pageTitle: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY'),
+            actionItems: computed(() => ([
+                {
+                    type: 'item',
+                    name: 'update',
+                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.UPDATE'),
+                },
+                {
+                    type: 'item',
+                    name: 'delete',
+                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.DELETE'),
+                    disabled: state.selectedItem?.is_default,
+                },
+                {
+                    type: 'item',
+                    name: 'default',
+                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.SET_AS_DEFAULT'),
+                    disabled: state.selectedItem?.scope === SCOPE.project,
+                },
+            ])),
             escalationPolicies: [],
             items: [],
-            selectedItem: computed(() => state.escalationPolicies[tableState.selectIndex[0]]),
+            selectIndex: [],
+            selectedItem: computed(() => state.escalationPolicies[state.selectIndex[0]]),
             deleteModalVisible: false,
             formModalVisible: false,
             formMode: undefined,

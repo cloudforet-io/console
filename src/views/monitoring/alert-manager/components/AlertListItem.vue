@@ -9,6 +9,7 @@
                       class="project-link"
                       :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
                       :show-icon="false"
+                      target="_self"
             >
                 {{ projects[item.project_id] ? projects[item.project_id].label : item.project_id }}
             </p-anchor>

@@ -79,6 +79,7 @@
                 </template>
             </div>
             <p-icon-button
+                v-if="rules.length > 1"
                 class="delete-button"
                 name="ic_trashcan"
                 @click="onClickDeleteRule(idx)"

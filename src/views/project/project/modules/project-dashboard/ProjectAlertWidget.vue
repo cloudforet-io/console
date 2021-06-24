@@ -63,7 +63,6 @@ import {
 
 import AlertListItem from '@/views/monitoring/alert-manager/components/AlertListItem.vue';
 
-import { QueryStoreFilter } from '@/lib/query/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
@@ -99,7 +98,6 @@ export default {
         },
     },
     setup(props) {
-        const queryHelper = new QueryHelper();
         const state = reactive({
             alertStates: computed(() => ([
                 {
