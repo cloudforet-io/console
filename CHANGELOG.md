@@ -1,3 +1,10 @@
+# [1.1.0-beta.75](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.74...v1.1.0-beta.75) (2021-06-24)
+
+
+### Features
+
+* add fetch and find nodes to tree ([#613](https://github.com/spaceone-dev/spaceone-design-system/issues/613)) ([75257fd](https://github.com/spaceone-dev/spaceone-design-system/commit/75257fd491618df11dd9fe64232b68f5f0cd83b9))
+
 # [1.1.0-beta.74](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.73...v1.1.0-beta.74) (2021-06-24)
 
 
