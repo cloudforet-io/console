@@ -265,7 +265,6 @@ export default {
         }
 
         .modal-body {
-            @apply text-gray-600;
             flex-grow: 1;
             max-height: $body-max-height;
             overflow: auto;

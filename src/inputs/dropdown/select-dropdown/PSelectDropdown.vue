@@ -223,6 +223,7 @@ export default defineComponent<SelectDropdownProps>({
 
 <style lang="postcss">
 .p-select-dropdown {
+    @apply bg-white;
     position: relative;
     display: inline-block;
     min-width: 6.5rem;
