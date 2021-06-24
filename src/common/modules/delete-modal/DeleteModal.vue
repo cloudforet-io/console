@@ -5,6 +5,7 @@
                     :fade="true"
                     :backdrop="true"
                     :visible.sync="proxyVisible"
+                    :disabled="disabled"
                     theme-color="alert"
                     @confirm="$emit('confirm')"
     >
@@ -12,6 +13,9 @@
             <p class="delete-modal-content">
                 <slot>{{ contents }}</slot>
             </p>
+        </template>
+        <template #confirm-button>
+            {{ confirmText }}
         </template>
     </p-button-modal>
 </template>
@@ -31,11 +35,19 @@ export default {
             type: Boolean,
             default: false,
         },
+        disabled: {
+            type: Boolean,
+            default: false,
+        },
         headerTitle: {
             type: String,
             default: '',
         },
         contents: {
+            type: String,
+            default: '',
+        },
+        confirmText: {
             type: String,
             default: '',
         },

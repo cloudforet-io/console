@@ -69,10 +69,23 @@
             @confirm="listWebhooks()"
         />
         <delete-modal
-            :header-title="$t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_CONTENT')"
+            :header-title="$t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_TITLE')"
+            :confirm-text="$t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK')"
             :visible.sync="deleteModalVisible"
+            :disabled="!isNameValid"
             @confirm="onDeleteConfirm"
-        />
+        >
+            <template #default>
+                <p class="desc">
+                    <strong>{{ $t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_CONTENT_1') }}</strong>
+                    <span> {{ $t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_CONTENT_2') }}</span>
+                </p>
+                <strong>{{ $t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_CONTENT_3') }}</strong>
+                <p-text-input
+                    v-model="inputWebhookName"
+                />
+            </template>
+        </delete-modal>
     </div>
 </template>
 
@@ -83,7 +96,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PToolboxTable, PPanelTop, PIconTextButton, PDropdownMenuBtn, PStatus, PLazyImg,
+    PToolboxTable, PPanelTop, PIconTextButton, PDropdownMenuBtn, PStatus, PLazyImg, PTextInput,
 } from '@spaceone/design-system';
 import WebhookAddFormModal from '@/views/project/project/modules/WebhookAddFormModal.vue';
 import WebhookUpdateFormModal from '@/views/project/project/modules/WebhookUpdateFormModal.vue';
@@ -120,6 +133,7 @@ export default {
         PDropdownMenuBtn,
         PStatus,
         PLazyImg,
+        PTextInput,
     },
     props: {
         projectId: {
@@ -182,6 +196,13 @@ export default {
             selectedItems: computed(() => state.selectIndex.map(i => state.items[i])),
             totalCount: 0,
             tags: webhookListApiQueryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
+            inputWebhookName: '',
+            isNameValid: computed(() => {
+                const selectedWebhook = state.selectedItems[0];
+                if (!selectedWebhook) return false;
+                if (state.inputWebhookName === selectedWebhook.name) return true;
+                return false;
+            }),
         });
         const formState = reactive({
             addModalVisible: false,
@@ -223,12 +244,13 @@ export default {
             formState.updateModalVisible = true;
         };
         const onClickDelete = () => {
+            state.inputWebhookName = '';
             formState.deleteModalVisible = true;
         };
         const onDeleteConfirm = async () => {
             try {
                 await SpaceConnector.client.monitoring.webhook.delete({
-                    webhook_id: state.selectedItems.map(d => d.webhook_id),
+                    webhook_id: state.selectedItems[0].webhook_id,
                 });
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_WEBHOOK'), '', root);
                 await listWebhooks();
@@ -297,6 +319,19 @@ export default {
     .p-toolbox-table::v-deep {
         .p-toolbox {
             padding-top: 0;
+        }
+    }
+    .p-button-modal::v-deep {
+        .delete-modal-content {
+            @apply text-gray-900;
+            margin-bottom: 1rem;
+            .desc {
+                margin: 2rem 0;
+            }
+            .p-text-input {
+                @apply w-full;
+                margin-top: 1rem;
+            }
         }
     }
 }
