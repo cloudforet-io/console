@@ -1,3 +1,10 @@
+# [1.1.0-beta.72](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.71...v1.1.0-beta.72) (2021-06-24)
+
+
+### Bug Fixes
+
+* dropdown and modal css ([#610](https://github.com/spaceone-dev/spaceone-design-system/issues/610)) ([e843e8c](https://github.com/spaceone-dev/spaceone-design-system/commit/e843e8ca6db775bd86626c1b67c21f6d76d3c2d6))
+
 # [1.1.0-beta.71](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.70...v1.1.0-beta.71) (2021-06-22)
 
 
