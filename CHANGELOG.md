@@ -1,3 +1,10 @@
+# [1.1.0-beta.73](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.72...v1.1.0-beta.73) (2021-06-24)
+
+
+### Bug Fixes
+
+* update copy button css and text detecting logic ([#611](https://github.com/spaceone-dev/spaceone-design-system/issues/611)) ([c2bff90](https://github.com/spaceone-dev/spaceone-design-system/commit/c2bff906caf4ec7a2557e955887c9697bf4c6af8))
+
 # [1.1.0-beta.72](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.71...v1.1.0-beta.72) (2021-06-24)
 
 
