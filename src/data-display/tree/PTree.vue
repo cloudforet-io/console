@@ -73,6 +73,7 @@ import {
 import {
     computed, defineComponent, reactive, toRefs, watch,
 } from '@vue/composition-api';
+import { unionBy } from 'lodash';
 import PI from '@/foundation/icons/PI.vue';
 import PTextInput from '@/inputs/input/PTextInput.vue';
 import { focus } from 'vue-focus';
@@ -190,6 +191,46 @@ export default defineComponent({
                 if (state.selectedItems[0]) state.selectedItems[0].node.$nodeBackClass = '';
                 state.selectedItems = [{ node, path }];
                 node.$nodeBackClass = 'selected';
+            } else {
+                resetSelect();
+            }
+        };
+        const setSelectItems = (items: {node: any; path: number[]}[], value = true) => {
+            if (state.isFetchAndFinding) return;
+
+            let targetItems: {node: any; path: number[]}[];
+
+            if (props.selectOptions.validator) {
+                targetItems = items.filter(({ node }) => props.selectOptions.validator(node));
+            } else {
+                targetItems = items;
+            }
+
+            // multi select
+            if (props.selectOptions.multiSelectable) {
+                if (!state.treeRef) return;
+
+                targetItems = unionBy(state.selectedItems, targetItems, d => d.path.toString());
+                if (value) {
+                    targetItems.forEach(({ node }) => {
+                        node.$nodeBackClass = 'selected';
+                    });
+                    state.selectedItems = targetItems;
+                } else {
+                    targetItems.forEach(({ node }) => {
+                        node.$nodeBackClass = '';
+                    });
+                    state.selectedItems = [];
+                }
+
+                return;
+            }
+
+            // single select
+            if (value) {
+                if (state.selectedItems[0]) state.selectedItems[0].node.$nodeBackClass = '';
+                state.selectedItems = [targetItems[0]];
+                targetItems[0].node.$nodeBackClass = 'selected';
             } else {
                 resetSelect();
             }
@@ -361,8 +402,7 @@ export default defineComponent({
             resetSelect();
             return null;
         };
-        const fetchAndFindNode = async (predicates: any[]) => {
-            state.isFetchAndFinding = true;
+        const fetchAndFind = async (predicates: any[]): Promise<{node: any|null; path: number[]}> => {
             let node: any = null;
             const path: number[] = [];
 
@@ -378,7 +418,7 @@ export default defineComponent({
                     idx = children.findIndex(d => predicate(d.data));
                     if (idx === -1) {
                         state.isFetchAndFinding = false;
-                        return null;
+                        return { node: null, path: [] };
                     }
                 }
 
@@ -390,11 +430,35 @@ export default defineComponent({
                 }
             }
 
+            return { node, path };
+        };
+        const fetchAndFindNode = async (predicates: any[]): Promise<{node: any|null; path: number[]}> => {
+            state.isFetchAndFinding = true;
+
+            const { node, path } = await fetchAndFind(predicates);
+
             if (node) {
                 state.isFetchAndFinding = false;
                 setSelectItem(node, path);
             }
-            return node;
+            return { node, path };
+        };
+        const fetchAndFindNodes = async (predicateList: any[][]): Promise<{node: any; path: number[]}[]> => {
+            state.isFetchAndFinding = true;
+
+            const foundItems: {node: any; path: number[]}[] = [];
+
+            for (let i = 0; i < predicateList.length; i++) {
+                const predicates = predicateList[i];
+                const { node, path } = await fetchAndFind(predicates);
+                if (node) {
+                    foundItems.push({ node, path });
+                }
+            }
+
+            state.isFetchAndFinding = false;
+            setSelectItems(foundItems);
+            return foundItems;
         };
         const getAllNodes = (node, nodes: any[] = []) => {
             const children: any[] = node?.children || state.treeData;
@@ -472,6 +536,7 @@ export default defineComponent({
             addNode,
             findNode,
             fetchAndFindNode,
+            fetchAndFindNodes,
             resetSelect,
             getAllNodes,
             getAllItems,
