@@ -16,7 +16,7 @@
             <div>
                 <p-radio v-for="policy in conditionsPolicies"
                          :key="policy.name"
-                         v-model="conditionsPolicy"
+                         v-model="proxyConditionsPolicy"
                          :value="policy.name"
                          class="mr-4"
                 >
@@ -24,7 +24,7 @@
                 </p-radio>
                 <span>{{ $t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</span>
             </div>
-            <div v-for="(condition, idx) of conditions" :key="`condition-${idx}`" class="input-wrapper">
+            <div v-for="(condition, idx) of proxyConditions" :key="`condition-${idx}`" class="input-wrapper">
                 <div class="left-part">
                     <p-select-dropdown v-model="condition.key"
                                        class="input"
@@ -40,7 +40,7 @@
                 </div>
                 <p-icon-button name="ic_trashcan"
                                class="delete-button"
-                               :class="{ opacity: conditions.length < 2}"
+                               :class="{ opacity: proxyConditions.length < 2}"
                                @click="onClickDelete(idx)"
                 />
             </div>
@@ -52,34 +52,25 @@
 /* eslint-disable camelcase */
 import { i18n } from '@/translations';
 
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
     PIconTextButton, PRadio, PSelectDropdown, PTextInput, PIconButton,
 } from '@spaceone/design-system';
+
+import { makeProxy } from '@/lib/compostion-util';
 
 
 const CONDITIONS_POLICY = Object.freeze({
     ALL: 'ALL',
     ANY: 'ANY',
 });
-type CONDITIONS_POLICY = typeof CONDITIONS_POLICY[keyof typeof CONDITIONS_POLICY];
-
 const OPERATOR = Object.freeze({
     eq: 'eq',
     contain: 'contain',
     not: 'not',
     not_contain: 'not_contain',
 });
-type OPERATOR = typeof OPERATOR[keyof typeof OPERATOR];
-
-interface Condition {
-    key: string;
-    value: string;
-    operator: OPERATOR;
-}
 
 export default {
     name: 'EventRuleConditionForm',
@@ -90,7 +81,16 @@ export default {
         PTextInput,
         PIconButton,
     },
-    props: {},
+    props: {
+        conditionsPolicy: {
+            type: String,
+            default: CONDITIONS_POLICY.ALL,
+        },
+        conditions: {
+            type: Array,
+            default: () => ([]),
+        },
+    },
     setup(props, { emit }) {
         const state = reactive({
             conditionsPolicies: computed(() => ([
@@ -121,14 +121,8 @@ export default {
                     label: i18n.t('PROJECT.EVENT_RULE.DOES_NOT_EQUAL'),
                 },
             ])),
-            conditionsPolicy: CONDITIONS_POLICY.ALL as CONDITIONS_POLICY,
-            conditions: [
-                {
-                    key: '',
-                    value: '',
-                    operator: OPERATOR.contain,
-                },
-            ] as Condition[],
+            proxyConditionsPolicy: makeProxy('conditionsPolicy', props, emit),
+            proxyConditions: makeProxy('conditions', props, emit),
             keys: [
                 {
                     name: 'title',
@@ -159,24 +153,17 @@ export default {
 
         /* event */
         const onClickAdd = () => {
-            state.conditions.push({
+            state.proxyConditions.push({
                 key: '',
                 value: '',
                 operator: OPERATOR.contain,
             });
         };
         const onClickDelete = (idx) => {
-            const conditions = [...state.conditions];
+            const conditions = [...state.proxyConditions];
             conditions.splice(idx, 1);
-            state.conditions = conditions;
+            state.proxyConditions = conditions;
         };
-
-        watch([() => state.conditionsPolicy, () => state.conditions], () => {
-            emit('change', {
-                conditionsPolicy: state.conditionsPolicy,
-                conditions: state.conditions,
-            });
-        }, { immediate: true, deep: true });
 
         return {
             ...toRefs(state),

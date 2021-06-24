@@ -7,11 +7,11 @@
             <div class="form-box">
                 <p>{{ $t('PROJECT.EVENT_RULE.NOTIFICATIONS') }}</p>
                 <div>
-                    <span class="toggle-text" :class="{on: !actions.no_notification}">
-                        {{ actions.no_notification ? $t('PROJECT.EVENT_RULE.PAUSE') : $t('PROJECT.EVENT_RULE.ON') }}
+                    <span class="toggle-text" :class="{on: !proxyActions.no_notification}">
+                        {{ proxyActions.no_notification ? $t('PROJECT.EVENT_RULE.PAUSE') : $t('PROJECT.EVENT_RULE.ON') }}
                     </span>
                     <p-toggle-button theme="secondary"
-                                     :value="!actions.no_notification"
+                                     :value="!proxyActions.no_notification"
                                      @change="onToggleChange"
                     />
                 </div>
@@ -29,7 +29,7 @@
                 <div>
                     <p-radio v-for="(urgency, uIdx) in urgencyList"
                              :key="`urgency-${uIdx}`"
-                             v-model="selectedUrgency"
+                             v-model="formState.selectedUrgency"
                              :value="urgency.name"
                              class="mr-4"
                              @change="onChangeUrgency"
@@ -40,25 +40,31 @@
             </div>
             <div class="form-box">
                 <p>{{ $t('PROJECT.EVENT_RULE.ASSIGNEE') }}</p>
-                <search-or-select-user :multi-select="false" :selected-users.sync="assignee" />
+                <search-or-select-user :multi-select="false" :selected-users.sync="formState.assignee" />
             </div>
             <div class="form-box">
                 <p>{{ $t('PROJECT.EVENT_RULE.RESPONDER') }}</p>
-                <search-or-select-user :selected-users.sync="responder" />
+                <search-or-select-user :selected-users.sync="formState.responder" />
             </div>
-            <!--            <div class="form-box">-->
-            <!--                <p>{{ $t('PROJECT.EVENT_RULE.ADDITIONAL_INFORMATION') }}</p>-->
-            <!--                <p-icon-text-button style-type="gray900" name="ic_plus_bold"-->
-            <!--                                    outline-->
-            <!--                                    class="add-button"-->
-            <!--                >-->
-            <!--                    {{ $t('PROJECT.EVENT_RULE.ADD') }}-->
-            <!--                </p-icon-text-button>-->
-            <!--                <div v-for="(info, idx) in Object.keys(actions.add_additional_info)" :key="`additional-info-${idx}`"-->
-            <!--                     class="additional-info-wrapper"-->
-            <!--                >-->
-            <!--                </div>-->
-            <!--            </div>-->
+            <div class="form-box additional-information">
+                <tags-input-group ref="tagsRef"
+                                  show-header
+                                  :tags.sync="actions.add_additional_info"
+                >
+                    <template #addButton="{addPair}">
+                        <div class="top-part">
+                            <p>{{ $t('PROJECT.EVENT_RULE.ADDITIONAL_INFORMATION') }}</p>
+                            <p-icon-text-button style-type="gray900" outline
+                                                name="ic_plus_bold"
+                                                class="mb-2"
+                                                @click="addPair($event)"
+                            >
+                                {{ $t('PROJECT.EVENT_RULE.ADD') }}
+                            </p-icon-text-button>
+                        </div>
+                    </template>
+                </tags-input-group>
+            </div>
         </div>
     </section>
 </template>
@@ -72,11 +78,14 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PToggleButton, PRadio,
+    PToggleButton, PRadio, PIconTextButton,
 } from '@spaceone/design-system';
 
 import ProjectSelectDropdown from '@/common/modules/project-select-dropdown/ProjectSelectDropdown.vue';
 import SearchOrSelectUser from '@/common/modules/SearchOrSelectUser.vue';
+import TagsInputGroup from '@/common/components/tags-input-group/TagsInputGroup.vue';
+
+import { makeProxy } from '@/lib/compostion-util';
 
 
 const URGENCY = Object.freeze({
@@ -85,32 +94,25 @@ const URGENCY = Object.freeze({
     LOW: 'LOW',
 });
 
-type responder = {
-    resource_type: string;
-    resource_id: string;
-}
-
-interface Actions {
-    change_assignee: string;
-    change_urgency?: string;
-    change_project: string;
-    add_project_dependency: string[];
-    add_responder: responder[];
-    add_additional_info: Record<string, string>;
-    no_notification: boolean;
-}
-
 export default {
     name: 'EventRuleActionForm',
     components: {
         SearchOrSelectUser,
         ProjectSelectDropdown,
+        TagsInputGroup,
         PToggleButton,
         PRadio,
+        PIconTextButton,
     },
-    props: {},
+    props: {
+        actions: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
     setup(props, { emit }) {
         const state = reactive({
+            tagsRef: null as any,
             urgencyList: computed(() => ([
                 {
                     name: URGENCY.NO_SET,
@@ -125,52 +127,59 @@ export default {
                     label: i18n.t('PROJECT.EVENT_RULE.LOW'),
                 },
             ])),
-            selectedUrgency: URGENCY.NO_SET,
-            assignee: [],
-            responder: [],
-            actions: {
-                change_assignee: '',
-                change_urgency: undefined,
-                change_project: '',
-                add_project_dependency: [],
-                add_responder: [],
-                add_additional_info: {},
-                no_notification: true,
-            } as Actions,
+            proxyActions: makeProxy('actions', props, emit),
         });
+        const formState = reactive({
+            selectedUrgency: URGENCY.NO_SET,
+            assignee: [] as string[],
+            responder: [],
+        });
+
+        /* util */
+        const initActionsData = (actions) => {
+            if (actions.change_urgency) {
+                formState.selectedUrgency = actions.change_urgency;
+            } else {
+                formState.selectedUrgency = URGENCY.NO_SET;
+            }
+            if (actions.change_assignee) formState.assignee = [actions.change_assignee];
+            formState.responder = actions.add_responder.map(d => d.resource_id);
+            state.tagsRef.init();
+        };
 
         /* event */
         const onToggleChange = ({ value }) => {
-            state.actions.no_notification = !value;
+            state.proxyActions.no_notification = !value;
         };
         const onChangeUrgency = () => {
-            if (state.selectedUrgency === URGENCY.NO_SET) {
-                state.actions.change_urgency = undefined;
+            if (formState.selectedUrgency === URGENCY.NO_SET) {
+                state.proxyActions.change_urgency = undefined;
             } else {
-                state.actions.change_urgency = state.selectedUrgency;
+                state.proxyActions.change_urgency = formState.selectedUrgency;
             }
         };
         const onSelectProjectRouting = (selected) => {
-            state.actions.change_project = selected[0]?.id;
+            state.proxyActions.change_project = selected[0]?.id;
         };
         const onSelectProjectDependencies = (selected) => {
-            state.actions.add_project_dependency = selected.map(d => d.id);
+            state.proxyActions.add_project_dependency = selected.map(d => d.id);
         };
 
-        watch(() => state.actions, (actions) => {
-            emit('change', actions);
-        }, { immediate: true, deep: true });
-
-        watch(() => state.assignee, (assignee) => {
-            state.actions.change_assignee = assignee[0];
+        watch(() => formState.assignee, (assignee) => {
+            state.proxyActions.change_assignee = assignee[0];
         });
 
-        watch(() => state.responder, (responder) => {
-            state.actions.add_responder = responder.map(d => ({ resource_type: 'identity.User', resource_id: d }));
+        watch(() => formState.responder, (responder) => {
+            state.proxyActions.add_responder = responder.map(d => ({ resource_type: 'identity.User', resource_id: d }));
+        });
+
+        watch(() => props.actions, (actions) => {
+            initActionsData(actions);
         });
 
         return {
             ...toRefs(state),
+            formState,
             onToggleChange,
             onChangeUrgency,
             onSelectProjectRouting,
@@ -201,6 +210,17 @@ export default {
         padding: 1rem;
         &:last-child {
             border: none;
+        }
+        &.additional-information::v-deep {
+            display: block;
+            .top-part {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .tag-header {
+                display: none;
+            }
         }
 
         .toggle-text {

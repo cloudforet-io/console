@@ -1,13 +1,20 @@
 <template>
     <div class="event-rule-form">
-        <event-rule-condition-form class="event-rule-condition-form" @change="onChangeConditionInput" />
-        <event-rule-action-form class="event-rule-action-form" @change="onChangeActionInput" />
+        <event-rule-condition-form
+            class="event-rule-condition-form"
+            :conditions-policy.sync="conditionsPolicy"
+            :conditions.sync="conditions"
+        />
+        <event-rule-action-form
+            class="event-rule-action-form"
+            :actions.sync="actions"
+        />
         <div class="button-group">
             <p-button style-type="gray900" :outline="true" @click="onClickCancel">
                 {{ $t('PROJECT.EVENT_RULE.CANCEL') }}
             </p-button>
             <p-button style-type="primary-dark" @click="onClickConfirm">
-                {{ $t('PROJECT.EVENT_RULE.CREATE') }}
+                {{ mode === EDIT_MODE.CREATE ? $t('PROJECT.EVENT_RULE.CREATE') : $t('PROJECT.EVENT_RULE.UPDATE') }}
             </p-button>
         </div>
     </div>
@@ -15,23 +22,59 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import { reactive, toRefs, watch } from '@vue/composition-api';
+
 import {
     PButton,
 } from '@spaceone/design-system';
 
 import EventRuleActionForm from '@/views/project/project/modules/event-rule/EventRuleActionForm.vue';
 import EventRuleConditionForm from '@/views/project/project/modules/event-rule/EventRuleConditionForm.vue';
-import { reactive } from '@vue/composition-api';
+
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { i18n } from '@/translations';
 
+
+const CONDITIONS_POLICY = Object.freeze({
+    ALL: 'ALL',
+    ANY: 'ANY',
+});
+type CONDITIONS_POLICY = typeof CONDITIONS_POLICY[keyof typeof CONDITIONS_POLICY];
+
+const OPERATOR = Object.freeze({
+    eq: 'eq',
+    contain: 'contain',
+    not: 'not',
+    not_contain: 'not_contain',
+});
+type OPERATOR = typeof OPERATOR[keyof typeof OPERATOR];
+
+interface Condition {
+    key: string;
+    value: string;
+    operator: OPERATOR;
+}
 
 const EDIT_MODE = Object.freeze({
     CREATE: 'CREATE',
     UPDATE: 'UPDATE',
 });
 type EDIT_MODE = typeof EDIT_MODE[keyof typeof EDIT_MODE];
+
+type Responder = {
+    resource_type: string;
+    resource_id: string;
+}
+interface Actions {
+    change_assignee: string;
+    change_urgency?: string;
+    change_project: string;
+    add_project_dependency: string[];
+    add_responder: Responder[];
+    add_additional_info: Record<string, string>;
+    no_notification: boolean;
+}
 
 export default {
     name: 'EventRuleForm',
@@ -55,19 +98,45 @@ export default {
         },
     },
     setup(props, { emit, root }) {
-        const formState = reactive({
-            conditionsPolicy: '',
-            conditions: [],
-            actions: {},
+        const state = reactive({
+            conditionsPolicy: CONDITIONS_POLICY.ALL as CONDITIONS_POLICY,
+            conditions: [
+                {
+                    key: '',
+                    value: '',
+                    operator: OPERATOR.contain,
+                },
+            ] as Condition[],
+            actions: {
+                change_assignee: '',
+                change_urgency: undefined,
+                change_project: '',
+                add_project_dependency: [],
+                add_responder: [],
+                add_additional_info: {},
+                no_notification: true,
+            } as Actions,
         });
 
         /* api */
+        const getEventRule = async () => {
+            try {
+                const res = await SpaceConnector.client.monitoring.eventRule.get({
+                    event_rule_id: props.eventRuleId,
+                });
+                state.conditionsPolicy = res.conditions_policy;
+                state.conditions = res.conditions;
+                state.actions = res.actions;
+            } catch (e) {
+                console.error(e);
+            }
+        };
         const createEventRule = async () => {
             try {
                 await SpaceConnector.client.monitoring.eventRule.create({
-                    conditions: formState.conditions,
-                    conditions_policy: formState.conditionsPolicy,
-                    actions: formState.actions,
+                    conditions: state.conditions,
+                    conditions_policy: state.conditionsPolicy,
+                    actions: state.actions,
                     project_id: props.projectId,
                 });
                 showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_CREATE_EVENT_RULE'), '', root);
@@ -80,9 +149,9 @@ export default {
             try {
                 await SpaceConnector.client.monitoring.eventRule.update({
                     event_rule_id: props.eventRuleId,
-                    conditions: formState.conditions,
-                    conditions_policy: formState.conditionsPolicy,
-                    actions: formState.actions,
+                    conditions: state.conditions,
+                    conditions_policy: state.conditionsPolicy,
+                    actions: state.actions,
                 });
                 showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_UPDATE_EVENT_RULE'), '', root);
             } catch (e) {
@@ -103,19 +172,16 @@ export default {
         const onClickCancel = () => {
             emit('cancel');
         };
-        const onChangeConditionInput = (data) => {
-            formState.conditionsPolicy = data.conditionsPolicy;
-            formState.conditions = data.conditions;
-        };
-        const onChangeActionInput = (data) => {
-            formState.actions = { ...data };
-        };
+
+        watch(() => props.eventRuleId, async (eventRuleId) => {
+            if (eventRuleId) await getEventRule();
+        }, { immediate: true });
 
         return {
+            ...toRefs(state),
+            EDIT_MODE,
             onClickConfirm,
             onClickCancel,
-            onChangeConditionInput,
-            onChangeActionInput,
         };
     },
 };

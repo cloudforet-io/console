@@ -3,7 +3,8 @@
         <p-autocomplete-search v-model="search"
                                :loading="loading"
                                :menu="userItems"
-                               @select-menu="onSelectMember"
+                               use-fixed-menu-style
+                               @select-menu="onSelectUser"
         >
             <template #menu-item--format="{item, id}">
                 <p-check-box v-if="multiSelect"
@@ -67,13 +68,12 @@ export default {
             userItems: computed(() => state.users.map(d => ({
                 name: d.user_id,
                 label: d.name,
-                type: 'item',
             }))),
             proxySelectedUsers: makeProxy('selectedUsers', props, emit),
         });
 
         /* api */
-        const listMember = async () => {
+        const listUser = async () => {
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.identity.user.list();
@@ -96,7 +96,7 @@ export default {
         };
 
         /* event */
-        const onSelectMember = async (item: MenuItem) => {
+        const onSelectUser = async (item: MenuItem) => {
             state.search = '';
             state.proxySelectedUsers = [...state.proxySelectedUsers, item.name];
         };
@@ -106,12 +106,12 @@ export default {
         };
 
         (async () => {
-            await listMember();
+            await listUser();
         })();
 
         return {
             ...toRefs(state),
-            onSelectMember,
+            onSelectUser,
             onDeleteTag,
             nameFormatter,
         };
