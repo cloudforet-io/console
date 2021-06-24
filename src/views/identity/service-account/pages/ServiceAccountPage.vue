@@ -58,14 +58,12 @@
                             >
                                 {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ADD') }}
                             </p-icon-text-button>
-                            <p-dropdown-menu-btn
-                                class="left-toolbox-item"
-                                :menu="tableState.dropdown"
-                                @click-delete="clickDeleteServiceAccount"
-                                @click-project="clickProject"
+                            <p-select-dropdown class="left-toolbox-item"
+                                               :items="tableState.dropdown"
+                                               @select="onSelectDropdown"
                             >
                                 {{ $t('IDENTITY.SERVICE_ACCOUNT.MAIN.ACTION') }}
-                            </p-dropdown-menu-btn>
+                            </p-select-dropdown>
                         </template>
                     </p-dynamic-layout>
                 </template>
@@ -143,7 +141,7 @@ import { TranslateResult } from 'vue-i18n';
 /* spaceone design system */
 import {
     PRadio, PI, PDivider, PBreadcrumbs, PPageTitle, PHorizontalLayout, PIconTextButton,
-    PDropdownMenuBtn, PTab, PDynamicLayout, PEmpty, PDoubleCheckModal, PLazyImg,
+    PTab, PDynamicLayout, PEmpty, PDoubleCheckModal, PLazyImg, PSelectDropdown,
 } from '@spaceone/design-system';
 import {
     DynamicLayoutEventListener,
@@ -196,7 +194,7 @@ export default {
         CustomFieldModal,
         ProjectTreeModal,
         PDoubleCheckModal,
-        PDropdownMenuBtn,
+        PSelectDropdown,
         PIconTextButton,
         ServiceAccountDetails,
         PEmpty,
@@ -451,6 +449,7 @@ export default {
             tableState.visibleCustomFieldModal = true;
         };
 
+
         /** Change Project & Release Project Action */
         const changeProjectState = reactive({
             visible: false,
@@ -502,6 +501,14 @@ export default {
             }
             changeProjectState.loading = false;
             changeProjectState.visible = false;
+        };
+
+        const onSelectDropdown = (name) => {
+            switch (name) {
+            case 'delete': clickDeleteServiceAccount(); break;
+            case 'project': clickProject(); break;
+            default: break;
+            }
         };
 
         /** Tabs */
@@ -583,6 +590,7 @@ export default {
             fieldHandler,
             reloadTable,
             onClickSettings,
+            onSelectDropdown,
 
             changeProjectState,
             clickProject,

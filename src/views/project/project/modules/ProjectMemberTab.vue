@@ -22,12 +22,11 @@
                 >
                     {{ $t('PROJECT.DETAIL.ADD') }}
                 </p-icon-text-button>
-                <p-dropdown-menu-btn :menu="memberTableState.dropdownMenu"
-                                     @click-delete="memberDeleteClick"
-                                     @click-update="openMemberUpdateForm"
+                <p-select-dropdown :items="memberTableState.dropdownMenu"
+                                   @select="onSelectDropdown"
                 >
                     {{ $t('IDENTITY.USER.MAIN.ACTION') }}
-                </p-dropdown-menu-btn>
+                </p-select-dropdown>
             </template>
             <template #col-resource_id-format="{ value }">
                 {{ memberTableState.users[value].name }}
@@ -66,10 +65,8 @@
 <script lang="ts">
 import {
     PBadge,
-    PDropdownMenuBtn,
     PIconTextButton,
-    PPaneLayout,
-    PPanelTop,
+    PPanelTop, PSelectDropdown,
     PTableCheckModal,
     PToolboxTable,
 } from '@spaceone/design-system';
@@ -112,11 +109,10 @@ interface MemberListApiResponse {
 export default {
     name: 'ProjectMemberTab',
     components: {
-        PPaneLayout,
         PToolboxTable,
         PPanelTop,
         PIconTextButton,
-        PDropdownMenuBtn,
+        PSelectDropdown,
         PBadge,
         PTableCheckModal,
         SProjectMemberAddModal,
@@ -231,7 +227,6 @@ export default {
             await listMembers();
         };
 
-
         const openMemberAddForm = () => {
             formState.memberAddFormVisible = true;
         };
@@ -270,6 +265,14 @@ export default {
             checkMemberDeleteState.subTitle = vm.$t('PROJECT.DETAIL.MODAL_DELETE_MEMBER_CONTENT');
             checkMemberDeleteState.themeColor = 'alert';
             checkMemberDeleteState.visible = true;
+        };
+
+        const onSelectDropdown = (name) => {
+            switch (name) {
+            case 'delete': memberDeleteClick(); break;
+            case 'update': openMemberUpdateForm(); break;
+            default: break;
+            }
         };
 
         const deleteProjectMember = async (items) => {
@@ -312,9 +315,8 @@ export default {
             checkMemberDeleteState,
             openMemberAddForm,
             onAddMemberConfirm,
-            openMemberUpdateForm,
+            onSelectDropdown,
             onUpdateMemberConfirm,
-            memberDeleteClick,
             memberDeleteConfirm,
             listMembers,
             onChangeMemberTable,

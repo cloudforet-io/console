@@ -33,16 +33,12 @@
                                 {{ $t('PLUGIN.COLLECTOR.MAIN.CREATE') }}
                             </p-icon-text-button>
                         </router-link>
-                        <p-dropdown-menu-btn class="left-toolbox-item"
-                                             :menu="dropdown"
-                                             @click-update="onClickUpdate"
-                                             @click-enable="onClickEnable"
-                                             @click-disable="onClickDisable"
-                                             @click-delete="onClickDelete"
-                                             @click-collectData="onClickCollectData"
+                        <p-select-dropdown class="left-toolbox-item"
+                                           :items="dropdown"
+                                           @select="onSelectDropdown"
                         >
                             {{ $t('PLUGIN.COLLECTOR.MAIN.ACTION') }}
-                        </p-dropdown-menu-btn>
+                        </p-select-dropdown>
                     </template>
                     <template #col-plugin_info.plugin_id-format="{index, field, item}">
                         <p-lazy-img :src="item.plugin_icon"
@@ -177,7 +173,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PHorizontalLayout, PDropdownMenuBtn, PLazyImg, PPageTitle, PDataTable, PQuerySearchTable,
+    PHorizontalLayout, PSelectDropdown, PLazyImg, PPageTitle, PDataTable, PQuerySearchTable,
     PTab, PTableCheckModal, PIconTextButton, PStatus, PBreadcrumbs, PI, PEmpty,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -215,7 +211,7 @@ export default {
         PLazyImg,
         PHorizontalLayout,
         PIconTextButton,
-        PDropdownMenuBtn,
+        PSelectDropdown,
         PDataTable,
         PQuerySearchTable,
         PStatus,
@@ -465,6 +461,18 @@ export default {
             state.collectDataModalVisible = true;
         };
 
+        const onSelectDropdown = (name) => {
+            switch (name) {
+            case 'update': onClickUpdate(); break;
+            case 'enable': onClickEnable(); break;
+            case 'disable': onClickDisable(); break;
+            case 'delete': onClickDelete(); break;
+            case 'collectData': onClickCollectData(); break;
+            default: break;
+            }
+        };
+
+
         const exportCollectorDataToExcel = async () => {
             try {
                 showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
@@ -502,11 +510,7 @@ export default {
             PLUGIN_ROUTE,
             onSelect,
             onChange,
-            onClickUpdate,
-            onClickEnable,
-            onClickDisable,
-            onClickDelete,
-            onClickCollectData,
+            onSelectDropdown,
             checkModalConfirm,
             exportCollectorDataToExcel,
             iso8601Formatter,

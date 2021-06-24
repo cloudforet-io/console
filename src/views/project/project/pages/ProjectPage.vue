@@ -61,12 +61,11 @@
                                 >
                                     {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
                                 </p-icon-text-button>
-                                <p-dropdown-menu-btn v-if="storeState.groupId && !isPermissionDenied"
-                                                     :menu="settingMenu"
-                                                     button-only
-                                                     button-icon="ic_setting"
-                                                     @edit:select="openProjectGroupUpdateForm"
-                                                     @delete:select="openProjectGroupDeleteCheckModal"
+                                <p-select-dropdown v-if="storeState.groupId && !isPermissionDenied"
+                                                   :items="settingMenu"
+                                                   button-only
+                                                   button-icon="ic_setting"
+                                                   @select="onSelectSettingDropdown"
                                 />
                                 <div v-if="storeState.groupId && !isPermissionDenied"
                                      v-tooltip.top="$t('PROJECT.LANDING.MANAGE_PROJECT_GROUP_MEMBER')"
@@ -118,7 +117,7 @@ import {
 import PVerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.vue';
 
 import {
-    PI, PPageTitle, PBreadcrumbs, PIconTextButton, PDropdownMenuBtn,
+    PI, PPageTitle, PBreadcrumbs, PIconTextButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
@@ -127,7 +126,7 @@ import ProjectSearch from '@/views/project/project/modules/ProjectSearch.vue';
 import ProjectGroupTree from '@/views/project/project/modules/ProjectGroupTree.vue';
 import { SpaceConnector } from '@/lib/space-connector';
 import {
-    ProjectGroup, ProjectTreeItem,
+    ProjectGroup,
 } from '@/views/project/project/type';
 import ProjectCardList from '@/views/project/project/modules/ProjectCardList.vue';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
@@ -140,7 +139,6 @@ import ProjectPageStoreModule from '@/views/project/project/store';
 import { ProjectPageState } from '@/views/project/project/store/type';
 import SidebarTitle from '@/common/components/sidebar-title/SidebarTitle.vue';
 import ProjectGroupDeleteCheckModal from '@/views/project/project/modules/ProjectGroupDeleteCheckModal.vue';
-import router from '@/routes';
 
 
 export default {
@@ -154,7 +152,7 @@ export default {
         FavoriteButton,
         ProjectCardList,
         PBreadcrumbs,
-        PDropdownMenuBtn,
+        PSelectDropdown,
         ProjectGroupTree,
         PVerticalPageLayout,
         PI,
@@ -268,6 +266,13 @@ export default {
         const openProjectGroupUpdateForm = () => {
             store.dispatch('projectPage/openProjectGroupUpdateForm', storeState.selectedItem);
         };
+        const onSelectSettingDropdown = (name) => {
+            switch (name) {
+            case 'edit': openProjectGroupUpdateForm(); break;
+            case 'delete': openProjectGroupDeleteCheckModal(); break;
+            default: break;
+            }
+        };
 
         const openProjectGroupCreateForm = () => {
             store.dispatch('projectPage/openProjectGroupCreateForm');
@@ -316,9 +321,8 @@ export default {
             ...toRefs(state),
             onFavoriteDelete,
             beforeFavoriteRoute,
-            openProjectGroupDeleteCheckModal,
+            onSelectSettingDropdown,
             openProjectGroupMemberPage,
-            openProjectGroupUpdateForm,
             openProjectGroupCreateForm,
             onProjectGroupNavClick,
             openProjectForm,

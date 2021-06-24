@@ -11,15 +11,12 @@
                     >
                         {{ $t('IDENTITY.USER.MAIN.CREATE_API_KEY') }}
                     </p-icon-text-button>
-                    <p-dropdown-menu-btn
-                        class="dropdown-btn"
-                        :menu="dropdownMenu"
-                        @click-enable="onClickEnable"
-                        @click-disable="onClickDisable"
-                        @click-delete="onClickDelete"
+                    <p-select-dropdown class="dropdown-btn"
+                                       :items="dropdownMenu"
+                                       @select="onSelectDropdown"
                     >
                         {{ $t('IDENTITY.USER.MAIN.ACTION') }}
-                    </p-dropdown-menu-btn>
+                    </p-select-dropdown>
                 </div>
                 <div class="table-desc">
                     {{ $t('IDENTITY.USER.MAIN.API_TABLE_DESC') }}
@@ -71,7 +68,7 @@
 
 <script lang="ts">
 import {
-    PEmpty, PIconTextButton, PDropdownMenuBtn, PDataTable, PPaneLayout, PTableCheckModal, PStatus,
+    PIconTextButton, PDataTable, PPaneLayout, PTableCheckModal, PStatus, PSelectDropdown,
 } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, UnwrapRef, watch,
@@ -89,10 +86,13 @@ import { TimeStamp } from '@/models';
 import { store } from '@/store';
 
 export interface APIKeyItem {
+    // eslint-disable-next-line camelcase
     api_key: string;
+    // eslint-disable-next-line camelcase
     api_key_id: string;
     created_at: TimeStamp;
     domain_id?: string;
+    // eslint-disable-next-line camelcase
     last_accessed_at?: TimeStamp;
     state?: string;
     user_id?: string;
@@ -116,11 +116,10 @@ export default {
     name: 'UserAPIKey',
     components: {
         UserAPIKeyModal,
-        PEmpty,
         PStatus,
         PPaneLayout,
         PIconTextButton,
-        PDropdownMenuBtn,
+        PSelectDropdown,
         PDataTable,
         PTableCheckModal,
     },
@@ -298,6 +297,15 @@ export default {
             checkModalState.visible = true;
         };
 
+        const onSelectDropdown = (name) => {
+            switch (name) {
+            case 'enable': onClickEnable(); break;
+            case 'disable': onClickDisable(); break;
+            case 'delete': onClickDelete(); break;
+            default: break;
+            }
+        };
+
         const checkModalConfirm = async (item) => {
             checkModalState.loading = true;
             if (checkModalState.mode === 'delete') await deleteAPIKey(item);
@@ -349,9 +357,7 @@ export default {
             iso8601Formatter,
             userStateFormatter,
             onSelect,
-            onClickEnable,
-            onClickDisable,
-            onClickDelete,
+            onSelectDropdown,
             checkModalConfirm,
             openAPIKeyConfirmModal,
             confirm,

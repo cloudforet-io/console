@@ -35,17 +35,13 @@
                         >
                             {{ $t('IDENTITY.USER.MAIN.ADD') }}
                         </p-icon-text-button>
-                        <p-dropdown-menu-btn
-                            id="dropdown-btn"
-                            class="left-toolbox-item"
-                            :menu="dropdownMenu"
-                            @click-enable="clickEnable"
-                            @click-disable="clickDisable"
-                            @click-delete="clickDelete"
-                            @click-update="clickUpdate"
+                        <p-select-dropdown class="left-toolbox-item"
+                                           :items="dropdownMenu"
+
+                                           @select="onSelectDropdown"
                         >
                             {{ $t('IDENTITY.USER.MAIN.ACTION') }}
-                        </p-dropdown-menu-btn>
+                        </p-select-dropdown>
                     </template>
                     <template #col-state-format="{value}">
                         <p-status v-bind="userStateFormatter(value)" class="capitalize" />
@@ -188,7 +184,7 @@ import {
 
 import {
     PEmpty, PQuerySearchTable, PBreadcrumbs, PIconTextButton, PStatus,
-    PHorizontalLayout, PDropdownMenuBtn, PTab, PDataTable, PTableCheckModal, PPageTitle,
+    PHorizontalLayout, PTab, PDataTable, PTableCheckModal, PPageTitle, PSelectDropdown,
 } from '@spaceone/design-system';
 
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -250,7 +246,7 @@ export default {
         UserUpdateForm,
         PStatus,
         PHorizontalLayout,
-        PDropdownMenuBtn,
+        PSelectDropdown,
         UserDetail,
         UserAssignedRole,
         UserAPIKeyTable,
@@ -535,6 +531,16 @@ export default {
             modalState.visible = true;
         };
 
+        const onSelectDropdown = (name) => {
+            switch (name) {
+            case 'enable': clickEnable(); break;
+            case 'disable': clickDisable(); break;
+            case 'delete': clickDelete(); break;
+            case 'update': clickUpdate(); break;
+            default: break;
+            }
+        };
+
         const getUsersParam = items => ({ users: map(items, 'user_id') });
         const bindRole = async (userId, roleId) => {
             try {
@@ -667,10 +673,7 @@ export default {
             multiItemTabState,
             getUsers,
             clickAdd,
-            clickUpdate,
-            clickDelete,
-            clickEnable,
-            clickDisable,
+            onSelectDropdown,
             userFormConfirm,
             checkModalConfirm,
             onSelect,

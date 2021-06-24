@@ -31,15 +31,12 @@
                             >
                                 {{ $t('INVENTORY.SERVER.MAIN.COLLECT_DATA') }}
                             </p-icon-text-button>
-                            <p-dropdown-menu-btn
-                                id="server-dropdown-btn"
-                                class="left-toolbox-item"
-                                :menu="tableState.dropdown"
-                                @click-delete="onClickDelete"
-                                @click-project="onClickChangeProject"
+                            <p-select-dropdown class="left-toolbox-item"
+                                               :items="tableState.dropdown"
+                                               @select="onSelectDropdown"
                             >
                                 {{ $t('INVENTORY.SERVER.MAIN.ACTION') }}
-                            </p-dropdown-menu-btn>
+                            </p-select-dropdown>
                         </div>
                     </template>
                 </p-dynamic-layout>
@@ -135,7 +132,6 @@
 /* eslint-disable camelcase */
 import { get } from 'lodash';
 import { TranslateResult } from 'vue-i18n';
-import dayjs from 'dayjs';
 
 import {
     reactive,
@@ -144,7 +140,7 @@ import {
 
 import {
     PPageTitle, PHorizontalLayout, PDynamicLayout, PIconTextButton,
-    PDropdownMenuBtn, PTab, PTableCheckModal, PEmpty,
+    PTab, PTableCheckModal, PEmpty, PSelectDropdown,
 } from '@spaceone/design-system';
 import {
     DynamicLayoutEventListener,
@@ -170,7 +166,7 @@ import {
     makeQuerySearchPropsWithSearchSchema,
 } from '@/lib/component-utils/dynamic-layout';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import {showErrorMessage, showLoadingMessage, showSuccessMessage} from '@/lib/util';
+import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/lib/util';
 import { QueryHelper } from '@/lib/query';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
@@ -243,7 +239,7 @@ export default {
         ProjectTreeModal,
         PTableCheckModal,
         PTab,
-        PDropdownMenuBtn,
+        PSelectDropdown,
         PIconTextButton,
         PDynamicLayout,
         PHorizontalLayout,
@@ -561,6 +557,13 @@ export default {
                 await listServerData();
             }
         };
+        const onSelectDropdown = (name) => {
+            switch (name) {
+            case 'delete': onClickDelete(); break;
+            case 'project': onClickChangeProject(); break;
+            default: break;
+            }
+        };
 
         const reloadTable = async () => {
             await getTableSchema();
@@ -590,14 +593,13 @@ export default {
 
             /* Change Project */
             changeProjectState,
-            onClickChangeProject,
             changeProject,
 
             /* Actions & Checking */
             checkTableModalState,
-            onClickDelete,
             onClickCollectData,
             checkModalConfirm,
+            onSelectDropdown,
 
             /* Tabs */
             singleItemTabState,

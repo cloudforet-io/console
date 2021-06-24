@@ -29,13 +29,12 @@
                     {{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_ADD') }}
                 </p-icon-text-button>
 
-                <p-dropdown-menu-btn :menu="dropdown"
-                                     class="ml-4"
-                                     @click-update="openEditModal(true)"
-                                     @click-delete="deleteVisible = true"
+                <p-select-dropdown :items="dropdown"
+                                   class="ml-4"
+                                   @select="onSelectDropdown"
                 >
                     {{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_ACTION') }}
-                </p-dropdown-menu-btn>
+                </p-select-dropdown>
             </template>
             <template #col-schedule-format="{value}">
                 <span v-if="value.hours.length > 0">
@@ -88,7 +87,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PIconTextButton, PToolboxTable, PDropdownMenuBtn, PTableCheckModal, PLottie,
+    PIconTextButton, PToolboxTable, PSelectDropdown, PTableCheckModal, PLottie,
 } from '@spaceone/design-system';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -107,7 +106,7 @@ export default {
     components: {
         PLottie,
         PTableCheckModal,
-        PDropdownMenuBtn,
+        PSelectDropdown,
         PToolboxTable,
         PIconTextButton,
         EditScheduleModal,
@@ -129,10 +128,10 @@ export default {
             supportedSchedules: computed(() => get(props.collector, 'plugin_info.metadata.supported_schedules')),
             dropdown: computed<MenuItem[]>(() => [
                 {
-                    name: 'update', label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_UPDATE'), type: 'item', disabled: state.selectIndex.length !== 1,
+                    name: 'update', label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_UPDATE'), disabled: state.selectIndex.length !== 1,
                 },
                 {
-                    name: 'delete', label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_DELETE'), type: 'item', disabled: state.selectIndex.length === 0,
+                    name: 'delete', label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_DELETE'), disabled: state.selectIndex.length === 0,
                 },
             ]),
             multiItems: computed(() => state.selectIndex.map(idx => state.items[idx])),
@@ -188,6 +187,14 @@ export default {
             state.editVisible = true;
         };
 
+        const onSelectDropdown = (name) => {
+            switch (name) {
+            case 'update': openEditModal(true); break;
+            case 'delete': state.deleteVisible = true; break;
+            default: break;
+            }
+        };
+
         const apiQuery = new ApiQueryHelper();
         const listSchedules = debounce(async (): Promise<void> => {
             tableState.loading = true;
@@ -237,6 +244,7 @@ export default {
             tableState,
             getTimezoneHours,
             openEditModal,
+            onSelectDropdown,
             listSchedules,
             onConfirmDelete,
             intervalFormatter,

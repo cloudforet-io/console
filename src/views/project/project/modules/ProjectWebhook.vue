@@ -35,13 +35,9 @@
                 >
                     {{ $t('PROJECT.DETAIL.ADD') }}
                 </p-icon-text-button>
-                <p-dropdown-menu-btn
-                    :menu="dropdown"
-                    @click-update="onClickUpdate"
-                    @click-delete="onClickDelete"
-                >
+                <p-select-dropdown :items="dropdown" @select="onSelectDropdown">
                     {{ $t('PROJECT.DETAIL.WEBHOOK_ACTION') }}
-                </p-dropdown-menu-btn>
+                </p-select-dropdown>
             </template>
             <template #col-plugin_info.plugin_id-format="{index, field, item}">
                 <p-lazy-img :src="item.plugin_icon"
@@ -99,7 +95,14 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PToolboxTable, PPanelTop, PIconTextButton, PDropdownMenuBtn, PStatus, PLazyImg, PTextInput, PCopyButton
+    PToolboxTable,
+    PPanelTop,
+    PIconTextButton,
+    PStatus,
+    PLazyImg,
+    PTextInput,
+    PCopyButton,
+    PSelectDropdown,
 } from '@spaceone/design-system';
 import WebhookAddFormModal from '@/views/project/project/modules/WebhookAddFormModal.vue';
 import WebhookUpdateFormModal from '@/views/project/project/modules/WebhookUpdateFormModal.vue';
@@ -133,7 +136,7 @@ export default {
         PToolboxTable,
         PPanelTop,
         PIconTextButton,
-        PDropdownMenuBtn,
+        PSelectDropdown,
         PStatus,
         PLazyImg,
         PTextInput,
@@ -251,6 +254,13 @@ export default {
             state.inputWebhookName = '';
             formState.deleteModalVisible = true;
         };
+        const onSelectDropdown = (name) => {
+            switch (name) {
+            case 'update': onClickUpdate(); break;
+            case 'delete': onClickDelete(); break;
+            default: break;
+            }
+        };
         const onDeleteConfirm = async () => {
             try {
                 await SpaceConnector.client.monitoring.webhook.delete({
@@ -305,8 +315,7 @@ export default {
             userStateFormatter,
             listWebhooks,
             onClickAdd,
-            onClickUpdate,
-            onClickDelete,
+            onSelectDropdown,
             onDeleteConfirm,
             onExport,
             onChange,

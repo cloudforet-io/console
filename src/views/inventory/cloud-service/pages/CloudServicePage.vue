@@ -64,13 +64,12 @@
                                         {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.COLLECT_DATA') }}
                                     </p-icon-text-button>
 
-                                    <p-dropdown-menu-btn class="left-toolbox-item mr-4"
-                                                         :menu="tableState.dropdown"
-                                                         @click-delete="clickDelete"
-                                                         @click-project="clickProject"
+                                    <p-select-dropdown class="left-toolbox-item mr-4"
+                                                       :items="tableState.dropdown"
+                                                       @select="onSelectDropdown"
                                     >
                                         {{ $t('INVENTORY.CLOUD_SERVICE.PAGE.ACTION') }}
-                                    </p-dropdown-menu-btn>
+                                    </p-select-dropdown>
                                 </template>
                             </p-dynamic-layout>
                         </template>
@@ -179,7 +178,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PHorizontalLayout, PDropdownMenuBtn, PTab, PDynamicLayout,
+    PHorizontalLayout, PSelectDropdown, PTab, PDynamicLayout,
     PPageTitle, PLazyImg, PBreadcrumbs, PIconTextButton, PEmpty, PDivider, PTableCheckModal,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -292,7 +291,7 @@ export default {
         PIconTextButton,
         PTab,
         TagsPanel,
-        PDropdownMenuBtn,
+        PSelectDropdown,
         PEmpty,
         ProjectTreeModal,
         SCollectModal,
@@ -423,7 +422,6 @@ export default {
         const onSelect: DynamicLayoutEventListener['select'] = (selectIndex) => {
             typeOptionState.selectIndex = selectIndex;
         };
-
 
         const schemaQueryHelper = new QueryHelper();
         const getTableSchema = async (): Promise<null|DynamicLayout> => {
@@ -691,6 +689,13 @@ export default {
             checkTableModalState.api = SpaceConnector.client.inventory.cloudService.delete;
             checkTableModalState.params = {};
         };
+        const onSelectDropdown = (name) => {
+            switch (name) {
+            case 'delete': clickDelete(); break;
+            case 'project': clickProject(); break;
+            default: break;
+            }
+        };
 
         const checkModalConfirm = async () => {
             const resetCheckTableModalState = () => {
@@ -765,7 +770,6 @@ export default {
 
             /* Change Project */
             changeProjectState,
-            clickProject,
             changeProject,
 
             /* Tabs */
@@ -775,8 +779,7 @@ export default {
             /* Actions */
             onClickSidebarItem,
             clickCollectData,
-
-            clickDelete,
+            onSelectDropdown,
             checkModalConfirm,
 
             /* Monitoring Tab */
