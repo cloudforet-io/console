@@ -1,3 +1,10 @@
+# [1.1.0-beta.74](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.73...v1.1.0-beta.74) (2021-06-24)
+
+
+### Bug Fixes
+
+* remove dropdown menu btn ([#612](https://github.com/spaceone-dev/spaceone-design-system/issues/612)) ([bc21d0c](https://github.com/spaceone-dev/spaceone-design-system/commit/bc21d0cd90ef6696c6cb0a02ba8337f8aad34d26))
+
 # [1.1.0-beta.73](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.72...v1.1.0-beta.73) (2021-06-24)
 
 
