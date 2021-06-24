@@ -689,6 +689,9 @@ export default {
         flex-wrap: wrap;
         button {
             width: 40%;
+            &:not(.active) {
+                @apply border-transparent;
+            }
         }
     }
 

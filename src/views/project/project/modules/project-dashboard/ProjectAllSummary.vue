@@ -611,6 +611,11 @@ export default {
         }
     }
 }
+.p-balloon-tab::v-deep {
+    .tab-pane {
+        padding-bottom: 0;
+    }
+}
 .bottom-part {
     margin-top: 0.625rem;
 

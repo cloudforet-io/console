@@ -10,10 +10,10 @@
             <span class="col-rule">
                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RULE') }}
             </span>
-            <p-anchor v-if="scope === 'PROJECT'"
+            <p-anchor v-if="scope === SCOPE.project && projectId"
                       class="link-text"
-                      :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATION_SETTINGS')"
-                      :to="{ name: IDENTITY_ROUTE.USER.NOTIFICATION._NAME }"
+                      :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATIONS_SETTINGS')"
+                      :to="{ name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME, params: { id: projectId } }"
                       highlight
             />
         </div>
@@ -35,11 +35,13 @@
                     </template>
                 </p-select-dropdown>
             </span>
-            <span v-if="rule.escalate_minutes" class="col-rule">
+            <span v-if="showEscalatesAfterForm(idx)" class="col-rule">
                 <span class="label">
-                    {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATES_AFTER') }}
+                    {{ idx === rules.length - 1 ? $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.REPEAT_AFTER') : $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATES_AFTER') }}
                 </span>
                 <p-text-input v-model.number="rule.escalate_minutes"
+                              type="number"
+                              :min="0"
                               class="rule-input"
                 >
                     <template #right-extra>
@@ -65,12 +67,15 @@
                         </template>
                     </p-select-dropdown>
                 </span>
-                <template v-if="rule.escalate_minutes">
+                <template v-if="showEscalatesAfterForm(idx)">
                     <span class="label">
-                        {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATES_AFTER') }}
+                        {{ idx === rules.length - 1 ? $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.REPEAT_AFTER') : $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATES_AFTER') }}
                     </span>
                     <span class="input">
-                        <p-text-input v-model.number="rule.escalate_minutes" type="number" class="rule-input">
+                        <p-text-input v-model.number="rule.escalate_minutes"
+                                      type="number"
+                                      :min="0"
+                                      class="rule-input">
                             <template #right-extra>
                                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.MIN') }}
                             </template>
@@ -134,7 +139,8 @@ import {
 
 import ProjectChannelList from '@/views/monitoring/alert-manager/components/ProjectChannelList.vue';
 
-import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
+import { PROJECT_ROUTE } from '@/routes/project/project-route';
+import { SCOPE } from '@/views/monitoring/alert-manager/lib/config';
 import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
@@ -211,19 +217,26 @@ export default {
             }
         };
 
+        /* util */
+        const showEscalatesAfterForm = (idx) => {
+            if (idx < props.rules.length - 1) return true;
+            return state.proxyRepeatCount > 0;
+        };
+
         /* event */
         const onClickDeleteRule = (idx) => {
             const rules = props.rules;
             rules.splice(idx, 1);
-            if (rules.length > 0) rules[rules.length - 1].escalate_minutes = undefined;
+            if (rules.length > 0 && !state.proxyRepeatCount) rules[rules.length - 1].escalate_minutes = undefined;
             emit('update:rules', rules);
         };
         const onClickAddStep = () => {
             const rules = props.rules;
-            if (rules.length > 0) rules[rules.length - 1].escalate_minutes = 30;
+            if (rules.length > 0 && !state.proxyRepeatCount) rules[rules.length - 1].escalate_minutes = 30;
+
             rules.push({
                 notification_level: NOTIFICATION_LEVELS[rules.length + 1].name,
-                escalate_minutes: undefined,
+                escalate_minutes: state.proxyRepeatCount > 0 ? 30 : undefined,
             });
             emit('update:rules', rules);
         };
@@ -232,13 +245,22 @@ export default {
             if (projectId) listProjectChannel();
         }, { immediate: true });
 
+        watch(() => state.proxyRepeatCount, (after, before) => {
+            const rules = props.rules;
+            if (!before && after > 0) rules[rules.length - 1].escalate_minutes = 30;
+            if (!after) rules[rules.length - 1].escalate_minutes = undefined;
+            emit('update:rules', rules);
+        });
+
         return {
             ...toRefs(state),
-            IDENTITY_ROUTE,
+            PROJECT_ROUTE,
             NOTIFICATION_LEVELS,
             MINIFIED_NOTIFICATION_LEVELS,
+            SCOPE,
             onClickDeleteRule,
             onClickAddStep,
+            showEscalatesAfterForm,
         };
     },
 };
@@ -266,11 +288,12 @@ export default {
             @apply col-span-2;
         }
         .col-rule {
-            @apply col-span-4;
+            @apply col-span-3;
         }
         .link-text {
             position: absolute;
             right: 0;
+            font-weight: normal;
         }
     }
 
@@ -289,9 +312,15 @@ export default {
         }
         .col-notification {
             @apply col-span-2;
+            .p-select-dropdown {
+                min-width: 6rem;
+            }
         }
         .col-rule {
-            @apply col-span-5;
+            @apply col-span-4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
 
             .label {
                 @apply text-gray-900;
@@ -405,7 +434,7 @@ export default {
                         }
                     }
                     .rule-input {
-                        width: 100%;
+                        width: 6rem;
                     }
                 }
             }
@@ -422,7 +451,7 @@ export default {
             .col-input {
                 @apply col-span-4;
                 .repeat-input {
-                    width: 100%;
+                    width: 6rem;
                 }
             }
             .col-label {

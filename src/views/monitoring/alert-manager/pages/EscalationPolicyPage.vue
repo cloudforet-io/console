@@ -163,7 +163,7 @@ export default {
         const routeState = reactive({
             route: computed(() => [
                 { name: vm.$t('MENU.MONITORING.MONITORING'), path: '/monitoring' },
-                { name: vm.$t('MENU.MONITORING.ALERT_SYSTEM'), path: '/monitoring/alert-manager/dashboard' },
+                { name: vm.$t('MENU.MONITORING.ALERT_MANAGER'), path: '/monitoring/alert-manager/dashboard' },
                 { name: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY') },
             ]),
         });

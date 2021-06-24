@@ -25,9 +25,6 @@
                     >
                         <span class="radio-label">{{ item.label }}</span>
                     </p-radio>
-                    <project-select-dropdown v-if="inputModel.scope === SCOPE.project"
-                                             @select="onSelectProject"
-                    />
                 </div>
             </template>
             <template #label-extra>
@@ -35,6 +32,23 @@
                     {{ inputModel.scope }}
                 </span>
             </template>
+        </p-field-group>
+        <p-field-group v-if="showScope & inputModel.scope === SCOPE.project"
+                       class="project-field"
+                       required
+        >
+            <template #label>
+                <span>{{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_LABEL') }}</span>
+                <p-anchor class="link-text"
+                          :to="{ name: PROJECT_ROUTE._NAME }"
+                          :text="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GO_CREATE_PROJECT')"
+                          :show-icon="true"
+                          highlight
+                />
+            </template>
+            <project-select-dropdown v-if="inputModel.scope === SCOPE.project"
+                                     @select="onSelectProject"
+            />
         </p-field-group>
         <p-field-group
             :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.FINISH_CONDITION_LABEL')"
@@ -74,7 +88,9 @@ import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PFieldGroup, PRadio, PTextInput } from '@spaceone/design-system';
+import {
+    PFieldGroup, PRadio, PTextInput, PAnchor,
+} from '@spaceone/design-system';
 
 import EscalationRulesInputForm from '@/views/monitoring/alert-manager/modules/EscalationRulesInputForm.vue';
 import ProjectSelectDropdown from '@/common/modules/project-select-dropdown/ProjectSelectDropdown.vue';
@@ -83,6 +99,7 @@ import {
     EscalationPolicyFormModel,
 } from '@/views/monitoring/alert-manager/type';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
+import { PROJECT_ROUTE } from '@/routes/project/project-route';
 
 
 const DEFAULT_REPEAT_COUNT = 0;
@@ -96,6 +113,7 @@ export default {
         PFieldGroup,
         PTextInput,
         PRadio,
+        PAnchor,
     },
     props: {
         mode: {
@@ -198,6 +216,7 @@ export default {
             ...toRefs(state),
             SCOPE,
             ACTION,
+            PROJECT_ROUTE,
             onChangeScope,
             onChangeFinishCondition,
             onSelectProject,
@@ -208,6 +227,20 @@ export default {
 
 <style lang="postcss" scoped>
 .escalation-policy-form {
+    .project-field::v-deep {
+        .label-box {
+            display: block;
+            .form-label {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                .link-text {
+                    font-weight: normal;
+                    font-size: 0.75rem;
+                }
+            }
+        }
+    }
     .p-text-input {
         .input-container {
             border-radius: 0.25rem;
