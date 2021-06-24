@@ -22,13 +22,12 @@
                     </div>
                     <slot v-if="pageSizeVisible" name="page-size">
                         <div class="tool">
-                            <p-dropdown-menu-btn
-                                class="page-size-dropdown"
-                                :menu="pageSizeOptions"
-                                @select="changePageSize"
+                            <p-select-dropdown class="page-size-dropdown"
+                                               :items="pageSizeOptions"
+                                               @select="changePageSize"
                             >
                                 {{ proxyState.pageSize }}
-                            </p-dropdown-menu-btn>
+                            </p-select-dropdown>
                         </div>
                     </slot>
                     <div v-if="excelVisible" class="tool">
@@ -79,7 +78,6 @@ import { flatMap } from 'lodash';
 import PGridLayout from '@/others/deprecated/grid-layout/PGridLayout.vue';
 import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import PDropdownMenuBtn from '@/inputs/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
@@ -87,15 +85,16 @@ import {
 import { makeOptionalProxy } from '@/util/composition-helpers';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import { ToolboxGridLayoutProps } from '@/others/deprecated/toolbox-grid-layout/type';
+import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 
 export default {
     name: 'PToolboxGridLayout',
     components: {
+        PSelectDropdown,
         PLottie,
         PGridLayout,
         PTextPagination,
         PIconButton,
-        PDropdownMenuBtn,
     },
     events: ['pageChange', 'select', 'clickRefresh'],
     props: {

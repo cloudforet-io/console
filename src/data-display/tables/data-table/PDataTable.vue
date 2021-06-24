@@ -134,7 +134,7 @@
 import {
     toRefs, computed, reactive, watch, getCurrentInstance, ComponentRenderProxy, defineComponent,
 } from '@vue/composition-api';
-import { get } from 'lodash';
+import { get, range } from 'lodash';
 import { copyAnyData } from '@/util/helpers';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 import { DataTableField, DataTableFieldType } from '@/data-display/tables/data-table/type';
@@ -381,7 +381,7 @@ export default defineComponent<DataTableProps>({
         };
         const onSelectAllToggle = () => {
             if (state.allState) {
-                proxyState.selectIndex = Array.from(new Array(props.items.length).keys());
+                proxyState.selectIndex = range(props.items.length);
             } else {
                 proxyState.selectIndex = [];
             }

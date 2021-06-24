@@ -89,7 +89,6 @@ export { default as PContextMenu } from './inputs/context-menu/PContextMenu.vue'
 export { default as PDatePagination } from './navigation/pagination/date-pagination/PDatePagination.vue';
 export { default as PDefinition } from './data-display/tables/definition-table/definition/PDefinition.vue';
 export { default as PSelectDropdown } from './inputs/dropdown/select-dropdown/PSelectDropdown.vue';
-export { default as PDropdownMenuBtn } from './inputs/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 export { default as PDynamicField } from './data-display/dynamic/dynamic-field/PDynamicField.vue';
 export { default as PDynamicLayout } from './data-display/dynamic/dynamic-layout/PDynamicLayout.vue';
 export { default as PJsonSchemaForm } from './inputs/forms/json-schema-form/PJsonSchemaForm.vue';

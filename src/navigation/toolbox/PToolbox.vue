@@ -24,20 +24,20 @@
                     />
                 </div>
                 <div v-if="pageSizeChangeable" class="tool">
-                    <p-dropdown-menu-btn class="dropdown-list"
-                                         :menu="pageMenu"
-                                         @select="onChangePageSize"
+                    <p-select-dropdown class="dropdown-list"
+                                       :items="pageMenu"
+                                       @select="onChangePageSize"
                     >
                         {{ proxyState.pageSize }}
-                    </p-dropdown-menu-btn>
+                    </p-select-dropdown>
                 </div>
                 <div v-if="sortable" class="tool">
-                    <p-dropdown-menu-btn class="dropdown-list"
-                                         :menu="sortByMenu"
-                                         @select="onChangeSortBy"
+                    <p-select-dropdown class="dropdown-list"
+                                       :items="sortByMenu"
+                                       @select="onChangeSortBy"
                     >
-                        {{ proxyState.sortBy }}
-                    </p-dropdown-menu-btn>
+                        {{ proxyState.pageSize }}
+                    </p-select-dropdown>
                 </div>
                 <div>
                     <div v-if="exportable" class="tool">
@@ -72,7 +72,6 @@
 
 <script lang="ts">
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
-import PDropdownMenuBtn from '@/inputs/dropdown/dropdown-menu-btn/PDropdownMenuBtn.vue';
 import PTextPagination from '@/navigation/pagination/text-pagination/PTextPagination.vue';
 import {
     ComponentRenderProxy, computed, defineComponent, getCurrentInstance, reactive, toRefs,
@@ -85,16 +84,17 @@ import PSearch from '@/inputs/search/search/PSearch.vue';
 import PQuerySearchTags from '@/inputs/search/query-search-tags/PQuerySearchTags.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 import { ToolboxOptions, ToolboxProps } from '@/navigation/toolbox/type';
+import PSelectDropdown from '@/inputs/dropdown/select-dropdown/PSelectDropdown.vue';
 
 
 export default defineComponent<ToolboxProps>({
     name: 'PToolbox',
     components: {
+        PSelectDropdown,
         PQuerySearchTags,
         PSearch,
         PQuerySearch,
         PTextPagination,
-        PDropdownMenuBtn,
         PIconButton,
     },
     props: {

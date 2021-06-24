@@ -1,6 +1,5 @@
 import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
 import PButtonModal from "@/feedbacks/modals/button-modal/PButtonModal";
-import PDropdownMenuBtn from "@/inputs/dropdown/dropdown-menu-btn/PDropdownMenuBtn";
 import PSelectDropdown from "@/inputs/dropdown/select-dropdown/PSelectDropdown";
 import { THEME_COLORS, ModalSizeType } from '@/feedbacks/modals/button-modal/type';
 import {computed, reactive, toRefs, onMounted, onUnmounted, ref} from "@vue/composition-api";
@@ -350,7 +349,7 @@ import faker from 'faker';
 
 export const Template = (args, {argTypes} ) => ({
     props: Object.keys(argTypes),
-    components: { PButtonModal, PButton, PDropdownMenuBtn, PSelectDropdown },
+    components: { PButtonModal, PButton, PSelectDropdown },
     template: `<div>
                 <p-button :styleType="themeColor" @click="launchModal">Launch a modal</p-button>
                 <p-button-modal
