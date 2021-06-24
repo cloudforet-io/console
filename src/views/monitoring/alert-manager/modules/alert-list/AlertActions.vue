@@ -76,7 +76,7 @@ export default {
                     name: ALERT_ACTION.resolve,
                     styleType: 'secondary-dark',
                     label: i18n.t('MONITORING.ALERT.ALERT_LIST.RESOLVE'),
-                    disabled: props.selectedItems.length !== 1 || props.selectedItems[0]?.state !== ALERT_STATE_FILTER.ACKNOWLEDGED,
+                    disabled: props.selectedItems.length !== 1 || [ALERT_STATE_FILTER.ACKNOWLEDGED, ALERT_STATE_FILTER.TRIGGERED].includes(props.selectedItems[0]?.state),
                 },
                 {
                     name: ALERT_ACTION.merge,

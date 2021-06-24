@@ -108,7 +108,7 @@ export default {
                 { name: 'start_time', label: 'Start Time' },
                 { name: 'end_time', label: 'End Time' },
                 { name: 'created_by', label: 'Created By' },
-                { name: 'created_at', label: 'Created At' },
+                { name: 'created_at', label: 'Created' },
             ],
             items: [] as any[],
             timezone: computed(() => store.state.user.timezone),

@@ -29,7 +29,7 @@ import { makeProxy } from '@/lib/compostion-util';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { store } from '@/store';
-import {ALERT_STATE} from "@/views/monitoring/alert-manager/lib/config";
+import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
 
 export default {
     name: 'AlertResolveModal',
@@ -68,11 +68,16 @@ export default {
             }
         };
         const createNote = async () => {
-            await SpaceConnector.client.monitoring.note.create({
+            const params: any = {
                 alert_id: props.alert.alert_id,
                 user_id: state.userId,
-                note: state.noteInput,
-            });
+            };
+
+            if (state.noteInput) {
+                params.note = state.noteInput;
+            }
+
+            await SpaceConnector.client.monitoring.note.create(params);
         };
 
         /* Handlers */
