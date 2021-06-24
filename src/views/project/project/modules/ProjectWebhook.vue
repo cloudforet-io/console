@@ -55,6 +55,9 @@
                     v-bind="userStateFormatter(value)"
                 />
             </template>
+            <template #col-webhook_url-format="{ value }">
+                <p-copy-button>{{ value }}</p-copy-button>
+            </template>
         </p-toolbox-table>
 
         <webhook-add-form-modal
@@ -96,7 +99,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PToolboxTable, PPanelTop, PIconTextButton, PDropdownMenuBtn, PStatus, PLazyImg, PTextInput,
+    PToolboxTable, PPanelTop, PIconTextButton, PDropdownMenuBtn, PStatus, PLazyImg, PTextInput, PCopyButton
 } from '@spaceone/design-system';
 import WebhookAddFormModal from '@/views/project/project/modules/WebhookAddFormModal.vue';
 import WebhookUpdateFormModal from '@/views/project/project/modules/WebhookUpdateFormModal.vue';
@@ -134,6 +137,7 @@ export default {
         PStatus,
         PLazyImg,
         PTextInput,
+        PCopyButton,
     },
     props: {
         projectId: {
