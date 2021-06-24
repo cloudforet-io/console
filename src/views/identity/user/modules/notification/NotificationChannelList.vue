@@ -4,23 +4,35 @@
             <h3 class="sub-title">
                 {{ $t('IDENTITY.USER.NOTIFICATION.NOTIFICATION_CHANNEL') }}
             </h3>
-            <ul class="channel-list-wrapper">
+            <ul v-if="protocolList.length > 0" class="channel-list-wrapper">
                 <div v-for="item in protocolList"
                      :key="item.protocol_id"
                      class="channel-item-wrapper"
                 >
                     <router-link :to="item.link">
                         <li class="channel-item">
+                            <p-lazy-img :src="assetUrlConverter(item.tags.icon)"
+                                        class="rounded flex-shrink-0 service-img"
+                            />
                             <span class="text">
                                 <p-i name="ic_plus_bold"
                                      width="0.625rem" height="0.625rem"
                                 />
                                 {{ item.label }}
                             </span>
+                            <span v-if="item.protocolType === 'INTERNAL'" class="item-desc">
+                                (Forward to the member's <br>
+                                personal notification channel)
+                            </span>
                         </li>
                     </router-link>
                 </div>
             </ul>
+            <span v-else>
+                <p-empty v-if="channelList.length === 0" class="empty-msg protocol">
+                    No Protocol Channel
+                </p-empty>
+            </span>
             <p-divider class="divider" />
             <ul v-for="item in channelList" :key="item.user_channel_id">
                 <li class="mb-4">
@@ -39,11 +51,12 @@
 
 <script lang="ts">
 import {
-    PDivider, PI, PEmpty, PPaneLayout,
+    PDivider, PI, PEmpty, PPaneLayout, PLazyImg,
 } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+import { assetUrlConverter } from '@/lib/util';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import NotificationChannelItem from '@/views/identity/user/modules/notification/NotificationChannelItem.vue';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -59,6 +72,7 @@ export default {
         PI,
         PDivider,
         PEmpty,
+        PLazyImg,
     },
     props: {
         projectId: {
@@ -114,6 +128,8 @@ export default {
                             protocolType: d.protocol_type,
                         },
                     },
+                    protocolType: d.protocol_type,
+                    tags: d.tags,
                 }));
             } catch (e) {
                 state.protocolList = [];
@@ -178,6 +194,7 @@ export default {
         return {
             ...toRefs(state),
             routeState,
+            assetUrlConverter,
             onChangeChannelItem,
             listChannel,
         };
@@ -218,18 +235,34 @@ export default {
     display: flex;
     flex-direction: column;
     place-content: center;
-    text-align: center;
+    align-items: center;
     height: 8.625rem;
     min-height: 8.625rem;
     border-radius: 0.375rem;
     .text {
         @apply text-primaryDark font-bold;
+        line-height: 160%;
     }
+    .item-desc {
+        @apply text-violet-800;
+        font-size: 0.75rem;
+        line-height: 150%;
+        text-align: center;
+    }
+    &:hover {
+        @apply bg-blue-100;
+    }
+}
+.service-img {
+    margin-bottom: 1rem;
 }
 .divider {
     margin-bottom: 1.5rem;
 }
 .empty-msg {
     margin-top: 2.5rem;
+    &.protocol {
+        margin-bottom: 2.5rem;
+    }
 }
 </style>

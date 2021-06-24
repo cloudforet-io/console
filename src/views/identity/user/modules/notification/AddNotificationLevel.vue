@@ -18,7 +18,6 @@ import { PFieldGroup, PSelectDropdown } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
 
 const LEVEL_LIST = Object.freeze([
-    { label: 'All', name: 'ALL', type: 'item' },
     { label: 'Level 1', name: 'LV1', type: 'item' },
     { label: 'Level 2', name: 'LV2', type: 'item' },
     { label: 'Level 3', name: 'LV3', type: 'item' },
@@ -40,7 +39,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            proxyNotificationLevel: props.notificationLevel ? props.notificationLevel : 'ALL',
+            proxyNotificationLevel: props.notificationLevel ? props.notificationLevel : 'LV1',
         });
         const emitChange = () => {
             emit('change', {

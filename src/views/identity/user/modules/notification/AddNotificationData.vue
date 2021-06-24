@@ -17,6 +17,7 @@
         <p-json-schema-form
             :model="schemaModel" :schema="schema" :is-valid.sync="isSchemaModelValid"
             @update:model="onChangeModel"
+            class="schema-form"
         />
         <div v-if="projectId && protocol === CHANNEL_TYPE.SPACEONE_USER">
             <add-notification-member-group :project-id="projectId" @change="onChangeMember" />
@@ -170,5 +171,10 @@ export default {
 .base-info-input {
     max-width: 30rem;
     margin-top: 1.25rem;
+}
+.p-json-schema-form::v-deep {
+    .form-group {
+        margin-bottom: 0.75rem;
+    }
 }
 </style>

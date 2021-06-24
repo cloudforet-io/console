@@ -2,13 +2,15 @@
     <section class="notification-wrapper">
         <p-breadcrumbs class="flex-grow" :routes="routeState.routes" />
         <p-page-title :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')" />
-        <notification-channel-list />
+        <p-pane-layout class="list-wrapper">
+            <notification-channel-list />
+        </p-pane-layout>
     </section>
 </template>
 
 <script lang="ts">
 import {
-    PBreadcrumbs, PPageTitle,
+    PBreadcrumbs, PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive,
@@ -21,6 +23,7 @@ export default {
         NotificationChannelList,
         PBreadcrumbs,
         PPageTitle,
+        PPaneLayout,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -39,4 +42,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.list-wrapper {
+    padding-bottom: 2.5rem;
+}
 </style>
