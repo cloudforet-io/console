@@ -12,6 +12,7 @@
                 <p-button
                     style-type="primary"
                     class="text-button"
+                    :disabled="!isTopicValid"
                     @click="onClickSave"
                 >
                     {{ $t('COMMON.TAGS.SAVE') }}
@@ -74,6 +75,7 @@ export default {
         const state = reactive({
             topicModeForEdit: undefined,
             topicForEdit: props.channelData?.subscriptions,
+            isTopicValid: false,
         });
         const {
             state: notificationItemState,
@@ -120,6 +122,7 @@ export default {
         const onChangeTopic = (value) => {
             state.topicModeForEdit = value.topicMode;
             state.topicForEdit = value.selectedTopic;
+            state.isTopicValid = value.isTopicValid;
         };
         const saveChangedTopic = async () => {
             if (props.projectId) await setProjectChannelSubscription();

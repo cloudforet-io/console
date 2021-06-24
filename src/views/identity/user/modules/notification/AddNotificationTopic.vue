@@ -6,18 +6,22 @@
         >
             <span class="radio-label" @click="onChangeTopicMode(item.value)">{{ item.label }}</span>
         </p-radio>
-        <article v-if="isTopicModeSelected" class="topic-wrapper">
-            <h5 class="setting">
-                {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
-            </h5>
-            <p-check-box v-for="item in TOPIC_LIST" :key="item.value"
-                         v-model="selectedTopic"
-                         :value="item.value"
-                         @change="onChangeTopic"
-            >
-                <span class="topic-label">{{ item.label }}</span>
-            </p-check-box>
+        <article v-if="isTopicModeSelected" class="topic-wrapper" :class="{'invalid': !isTopicValid}">
+            <div class="topic-content-wrapper" :class="{'invalid': !isTopicValid}">
+                <h5 class="setting">
+                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
+                </h5>
+                <p-check-box v-for="item in TOPIC_LIST" :key="item.value"
+                             v-model="selectedTopic"
+                             :value="item.value"
+                             :invalid="!isTopicValid"
+                             @change="onChangeTopic"
+                >
+                    <span class="topic-label">{{ item.label }}</span>
+                </p-check-box>
+            </div>
         </article>
+        <p v-if="!isTopicValid" class="invalid-text">Required</p>
     </div>
 </template>
 
@@ -57,12 +61,14 @@ export default {
             }]),
             isTopicModeSelected: props.topicMode ? props.topicMode : false,
             selectedTopic: props.topic.length > 0 ? props.topic : [] as string[],
+            isTopicValid: computed(() => !state.isTopicModeSelected || (state.isTopicModeSelected && state.selectedTopic.length > 0)),
         });
 
         const emitChange = () => {
             emit('change', {
                 topicMode: state.isTopicModeSelected,
                 selectedTopic: state.selectedTopic,
+                isTopicValid: state.isTopicValid,
             });
         };
         const onChangeTopicMode = (value) => {
@@ -98,6 +104,21 @@ export default {
         line-height: 140%;
         margin-bottom: 1.125rem;
     }
+    &.invalid {
+        @apply border rounded-md border-alert;
+        padding: 1rem;
+        margin-right: 1rem;
+    }
+}
+.topic-content-wrapper {
+    &.invalid {
+        margin-left: -1rem;
+    }
+}
+.invalid-text {
+    @apply text-red-500;
+    font-size: 0.875rem;
+    line-height: 150%;
 }
 .topic-label {
     min-width: 6.25rem;

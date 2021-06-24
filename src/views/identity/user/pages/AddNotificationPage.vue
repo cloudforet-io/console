@@ -41,7 +41,7 @@
             <p-button
                 style-type="primary-dark"
                 class="text-button"
-                :disabled="!isDataValid || !isScheduleValid"
+                :disabled="!isDataValid || !isScheduleValid || !isTopicValid"
                 @click="onClickSave"
             >
                 {{ $t('COMMON.TAGS.SAVE') }}
@@ -98,6 +98,8 @@ export default {
             data: {},
             topicMode: false,
             topicList: [],
+            isTopicValid: true,
+            //
             schedule: null,
             isScheduled: false,
             isScheduleValid: true,
@@ -178,6 +180,7 @@ export default {
         const onChangeTopic = (value) => {
             state.topicMode = value.topicMode;
             state.topicList = value.selectedTopic;
+            state.isTopicValid = value.isTopicValid;
         };
 
         (async () => {

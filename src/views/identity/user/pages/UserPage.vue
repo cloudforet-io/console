@@ -28,10 +28,11 @@
             <ul v-for="(item) in sidebarState.MenuList" :key="item.label"
                 class="menu-item"
                 :class="{'selected': item.label === sidebarState.selectedItem.label, 'hide': (item.userOnly && userState.isDomainOwner) || item.isAdminMenu}"
-
                 @click="showPage(item)"
             >
-                <li v-if="!item.isAdminMenu">{{ item.label }}</li>
+                <li v-if="!item.isAdminMenu">{{ item.label }}
+                    <span v-if="item.beta" class="beta">beta</span>
+                </li>
             </ul>
             <div v-if="userState.isAdmin" class="admin-menu-wrapper">
                 <div class="menu-title">
@@ -78,6 +79,7 @@ interface SidebarItemType {
     routeName?: string;
     userOnly?: boolean;
     isAdminMenu?: boolean;
+    beta?: boolean;
 }
 
 export default {
@@ -127,6 +129,7 @@ export default {
                     label: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION'),
                     routeName: IDENTITY_ROUTE.USER.NOTIFICATION._NAME,
                     userOnly: true,
+                    beta: true,
                 },
                 {
                     label: vm.$t('IDENTITY.USER.MAIN.USER_MANAGEMENT'),
@@ -227,6 +230,13 @@ export default {
     }
     &.hide {
         display: none;
+    }
+    .beta {
+        @apply text-coral-500;
+        font-size: 0.75rem;
+        line-height: 120%;
+        margin-left: 0.25rem;
+        vertical-align: top;
     }
 }
 .admin-menu-wrapper {

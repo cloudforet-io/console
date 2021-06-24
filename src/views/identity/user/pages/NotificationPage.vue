@@ -30,7 +30,8 @@ export default {
         const routeState = reactive({
             routes: computed(() => ([
                 { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/account' },
+                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/user-management' },
+                { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
                 { name: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION') },
             ])),
         });
