@@ -1,23 +1,20 @@
 <template>
     <tr class="p-definition">
         <td class="key">
-            <slot name="key" v-bind="{name, label, data, value: displayData, hoverCopy: isMouseOver, copy}">
+            <slot name="key" v-bind="{name, label, data, value: displayData}">
                 {{ label || name }}
             </slot>
         </td>
         <td class="value-wrapper">
-            <span ref="field" class="value" :class="{hover: isMouseOver}">
-                <slot name="default" v-bind="{name, label, data, value: displayData, hoverCopy: isMouseOver, copy}">
-                    {{ displayData }}
-                </slot>
-                <p-copy-button v-if="showCopy"
-                               width="0.8rem" height="0.8rem"
-                               @copy="copy"
-                               @mouseover="onMouseOver()" @mouseout="onMouseOut()"
-                />
+            <span class="value">
+                <p-copy-button width="0.8rem" height="0.8rem" auto-hide-icon>
+                    <slot name="default" v-bind="{name, label, data, value: displayData}">
+                        {{ displayData }}
+                    </slot>
+                </p-copy-button>
             </span>
             <span class="extra">
-                <slot name="extra" v-bind="{name, label, data, value: displayData, hoverCopy: isMouseOver, copy}" />
+                <slot name="extra" v-bind="{name, label, data, value: displayData}" />
             </span>
         </td>
     </tr>
@@ -27,12 +24,8 @@
 import {
     computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
-import { copyAnyData, copyTextToClipboard, isNotEmpty } from '@/util/helpers';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
-import { mouseOverState } from '@/hooks/mouse-over-state';
 import { DefinitionProps } from '@/data-display/tables/definition-table/definition/type';
-
-const searchElemInnerText = (elem: HTMLElement): string => elem.innerText;
 
 export default defineComponent<DefinitionProps>({
     name: 'PDefinition',
@@ -59,28 +52,14 @@ export default defineComponent<DefinitionProps>({
             default: undefined,
         },
     },
-    setup(props: DefinitionProps, { emit, slots }) {
+    setup(props: DefinitionProps) {
         const state = reactive({
-            field: null as HTMLFormElement|null,
             displayData: computed(() => (props.formatter ? props.formatter(props.data, props) : props.data)),
-            showCopy: computed(() => {
-                if (props.disableCopy) return false;
-                if (slots.default) return isNotEmpty(state.displayData);
-                if (state.field) return !!searchElemInnerText(state.field);
-                return true;
-            }),
         });
 
-        const copy = (): void => {
-            if (props.formatter) copyAnyData(props.formatter(props.data, props));
-            else if (state.field) copyTextToClipboard(searchElemInnerText(state.field));
-            emit('copy', props);
-        };
 
         return {
             ...toRefs(state),
-            ...mouseOverState(),
-            copy,
         };
     },
 });
@@ -97,11 +76,7 @@ export default defineComponent<DefinitionProps>({
         @apply inline-flex items-center flex-grow cursor-text;
         flex-wrap: wrap;
         max-width: calc(100% - 18rem);
-        .value {
-            &.hover {
-                @apply text-blue-500;
-            }
-        }
+
         .p-copy-button {
             @apply ml-2 flex-shrink-0;
         }

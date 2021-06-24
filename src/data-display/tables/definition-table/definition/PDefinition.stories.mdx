@@ -173,8 +173,6 @@ export const Template = (args, { argTypes }) => ({
 | label | label props. |
 | data | data props. |
 | value | actual data. it's usually the same with 'data'. it's different only when 'formatter(data)' is different value with 'data'. |
-| copy | function that invoked when copy button is clicked. |
-| hoverCopy | Indication of copy button is hovered. |
 
 <br/>
 
@@ -198,8 +196,8 @@ export const Template = (args, { argTypes }) => ({
             name="Default Slot"
             data="Slot: default"
         >
-            <template #default="{value, hoverCopy}">
-                <span :class="hoverCopy ? 'text-secondary' : 'text-peacock'">{{value}}</span>
+            <template #default="{value}">
+                <span class="ext-peacock'">{{value}}</span>
             </template>
         </p-definition>
         <p-definition

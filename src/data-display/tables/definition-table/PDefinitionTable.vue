@@ -13,7 +13,6 @@
                               :name="item.name"
                               :data="item.data"
                               :disable-copy="disableCopy"
-                              @copy="onCopy(item, idx)"
                 >
                     <template #default="scope">
                         <slot name="data" v-bind="{
@@ -121,9 +120,6 @@ export default defineComponent<DefinitionTableProps>({
 
         return {
             ...toRefs(state),
-            onCopy(bind, idx) {
-                emit('copy', bind, idx);
-            },
         };
     },
 });

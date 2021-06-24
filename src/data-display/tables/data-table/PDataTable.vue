@@ -30,14 +30,14 @@
                                       v-bind="getHeadSlotProps(field, index)"
                                 >
                                     <span class="th-contents">
-                                        <span>
+                                        <span class="th-text">
                                             <slot :name="`th-${field.name}-format`"
                                                   v-bind="getHeadSlotProps(field, index)"
                                             >
                                                 {{ field.label ? field.label : field.name }}
                                             </slot>
                                             <p-copy-button v-if="colCopy" class="ml-2"
-                                                           width="0.875rem" height="0.875rem"
+                                                           copy-manually
                                                            @copy="onClickColCopy(index)"
                                             />
                                         </span>
@@ -507,10 +507,14 @@ export default defineComponent<DataTableProps>({
         border-spacing: 0;
         table-layout: fixed;
     }
+    thead {
+        tr {
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+    }
     th {
-        position: sticky;
-        top: 0;
-        z-index: 1;
         vertical-align: bottom;
         line-height: 1.25rem;
         font-size: 0.875rem;
@@ -522,6 +526,10 @@ export default defineComponent<DataTableProps>({
         .th-contents {
             @apply flex justify-between pl-4;
             line-height: 2;
+            .th-text {
+                display: inline-flex;
+                align-content: center;
+            }
         }
         .sort-icon {
             @apply text-gray-500 float-right my-px;

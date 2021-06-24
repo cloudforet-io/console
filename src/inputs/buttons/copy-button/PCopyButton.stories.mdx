@@ -1,12 +1,18 @@
 import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
+
+import { copyAnyData } from '@/util/helpers';
+
+import PTextarea from '@/inputs/textarea/PTextarea';
 import PCopyButton from "@/inputs/buttons/copy-button/PCopyButton";
+
+
 
 <Meta title='Inputs/Buttons/Copy Button' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=8075%3A2235'
     }
-}} component={PCopyButton} argTypes={{
+}} argTypes={{
     value: {
         name: 'value',
         type: {name: 'string'},
@@ -25,9 +31,45 @@ import PCopyButton from "@/inputs/buttons/copy-button/PCopyButton";
             type: 'text'
         }
     },
-    default: {
+    autoHideIcon: {
+        name: 'value',
+        type: {name: 'boolean'},
+        description: 'Whether to auto hide icon when there is not text to copy or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            }
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    copyManually: {
+        name: 'copyManually',
+        type: {name: 'boolean'},
+        description: 'Whether to copy manually by event or not. When it is `true`, this component just emit `copy` event, and do nothing.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean'
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            }
+        },
+        control: {
+            type: 'boolean'
+        }
+    },
+    // slots
+    defaultSlot: {
         name: 'default',
-        type: {name: 'string'},
         description: 'Slot for contents of copy button',
         defaultValue: 'Please, place any string to copy by button next to.',
         table: {
@@ -40,42 +82,30 @@ import PCopyButton from "@/inputs/buttons/copy-button/PCopyButton";
             type: 'text'
         }
     },
-    alertPosition: {
-        name: 'alertPosition',
-        type: {name: 'string'},
-        description: 'Position of alert message',
-        defaultValue: 'right',
+    // events
+    onCopy: {
+        name: 'copy',
+        description: 'Event emitted when clicked copy button. Only works when `copyManually` props is `true`.',
+        defaultValue: 'Please, place any string to copy by button next to.',
         table: {
             type: {
-                summary: 'string'
+                summary: null
             },
-            category: 'props',
-            defaultValue: {
-                summary: 'right',
-            }
+            category: 'events',
         },
-        control: {
-            type: 'select',
-            options: ['right', 'bottom-end']
-        }
+        control: null
     },
-    iconColor: {
-        name: 'iconColor',
-        type: {name: 'string'},
-        description: 'Color of copy icon',
-        defaultValue: null,
+    onCopied: {
+        name: 'copied',
+        description: 'Event emitted when actually copy happened. Only works when there is text for copy to clipboard in slot or `value` props.',
+        defaultValue: 'Please, place any string to copy by button next to.',
         table: {
             type: {
-                summary: 'string'
+                summary: null
             },
-            category: 'props',
-            defaultValue: {
-                summary: 'null'
-            }
+            category: 'events',
         },
-        control: {
-            type: 'color',
-        }
+        control: null
     },
 }}/>
 
@@ -85,10 +115,13 @@ export const Template = (args, {argTypes}) => ({
     template: `
         <div style="display:flex; align-items:center; justify-content:center; height:150px;">
             <p-copy-button
-                :icon-color="iconColor"
-                :alert-position="alertPosition"
-                :value="value">
-                {{$props.default}}
+                :value="value"
+                :auto-hide-icon="autoHideIcon"
+                :copy-manually="copyManually"
+                @copy="onCopy"
+                @copied="onCopied"
+            >
+                {{$props.defaultSlot}}
             </p-copy-button>
         </div>`,
 });
@@ -99,30 +132,74 @@ export const Template = (args, {argTypes}) => ({
 <br/>
 <br/>
 
-## Alert Position
+## Basic
 
 <Canvas>
-    <Story name="alert-position" height="150px">
+    <Story name="Basic">
         {{
-            components: {PCopyButton},
-            template: `
-                <div style="display:flex; flex-direction: column; align-items:center; justify-content:center; height:100px;">
-                    <p-copy-button
-                        style="margin-top: 30px"
-                        alert-position="right"
-                        value="copyText">
-                        right
-                    </p-copy-button>
-                    <p-copy-button
-                        style="margin-top: 40px"
-                        alert-position="bottom-end"
-                        value="copyText">
-                        bottom-end
-                    </p-copy-button>
-                </div>`,
+    components: { PCopyButton },
+    template: `
+    <div style="display:flex; align-items:center; justify-content:center; height:150px;">
+        <p-copy-button>
+            Hello, World!
+        </p-copy-button>
+    </div>`,
         }}
     </Story>
 </Canvas>
+
+<br/>
+<br/>
+
+## Auto Hide Icon
+
+<Canvas>
+    <Story name="Auto Hide Icon">
+        {{
+            components: { PCopyButton },
+            template: `
+    <div style="height:150px;">
+        <p class="mb-4 text-xl">Has text to copy:
+            <p-copy-button auto-hide-icon>
+                Hello, World!
+            </p-copy-button>
+        </p>
+        <p class="my-4 text-xl">Has NO text to copy:
+            <p-copy-button auto-hide-icon></p-copy-button>
+        </p>
+    </div>`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Copy Manually
+
+<Canvas>
+    <Story name="Copy Manually">
+        {{
+            components: { PCopyButton, PTextarea },
+            template: `
+    <div style="height:150px;">
+        <p class="mb-4 text-xl">Check copied text.</p>
+        <p-textarea class="mb-4" />
+        <p-copy-button copy-manually @copy="onCopy">Hello, World!</p-copy-button>
+    </div>`,
+            setup() {
+                return {
+                    onCopy() {
+                        copyAnyData('This is copied text!')
+                    }
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
 
 ## Playground
 
