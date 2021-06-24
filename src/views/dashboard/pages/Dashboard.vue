@@ -46,7 +46,7 @@ import ServiceAccounts from '@/views/dashboard/modules/ServiceAccounts.vue';
 import AllSummary from '@/views/dashboard/modules/AllSummary.vue';
 import TopProjects from '@/views/dashboard/modules/TopProjects.vue';
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
-import ResourceMap from '@/views/dashboard/modules/RegionMap.vue';
+import ResourceMap from '@/views/dashboard/modules/ResourceMap.vue';
 import CollectorProgress from '@/views/dashboard/modules/CollectingProgress.vue';
 import FavoritesWidget from '@/views/dashboard/modules/FavoritesWidget.vue';
 import TrustedAdvisor from '@/views/dashboard/modules/TrustedAdvisor.vue';

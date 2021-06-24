@@ -37,7 +37,7 @@
                                  :to="goToCloudService(item)"
                     >
                         <div class="progress-bar-label">
-                            <span class="label-text text-xs">{{ item.cloud_service_group }}</span>
+                            <span class="label-text text-xs">{{ item.display_name || item.cloud_service_group }}</span>
                             <span class="label-number text-xs text-gray-600">{{ item.count }}</span>
                         </div>
                         <p-progress-bar :percentage="(item.count / maxValue) * 100"

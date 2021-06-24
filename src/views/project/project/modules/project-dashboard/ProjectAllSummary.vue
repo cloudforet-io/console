@@ -426,7 +426,7 @@ export default {
             const defaultParam: any = {
                 query: {
                     sort: {
-                        name: 'count',
+                        key: 'count',
                         desc: true,
                     },
                 },
@@ -449,7 +449,7 @@ export default {
                     ...defaultParam,
                     is_major: true,
                 };
-                param.query.sort = { name: 'size', desc: true };
+                param.query.sort = { key: 'size', desc: true };
                 param.fields = [
                     {
                         name: 'size',
