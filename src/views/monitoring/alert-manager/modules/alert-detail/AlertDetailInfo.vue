@@ -6,7 +6,7 @@
                             :disable-copy="true"
         >
             <template #data-escalation_policy_id>
-                <p-anchor :to="{ name: MONITORING_ROUTE.ALERT_SYSTEM.ESCALATION_POLICY }" highlight>
+                <p-anchor :to="{ name: MONITORING_ROUTE.ALERT_MANAGER.ESCALATION_POLICY }" highlight>
                     {{ escalationPolicyName }}
                 </p-anchor>
             </template>

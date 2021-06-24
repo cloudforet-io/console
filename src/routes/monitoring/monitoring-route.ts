@@ -9,8 +9,8 @@ const AlertDetailPage = () => import(/* webpackChunkName: "AlertDetailPage" */ '
 
 export const MONITORING_ROUTE = Object.freeze({
     _NAME: 'monitoring',
-    ALERT_SYSTEM: {
-        _NAME: 'alertSystem',
+    ALERT_MANAGER: {
+        _NAME: 'alertManager',
         DASHBOARD: { _NAME: 'alertDashboard' },
         ALERT: {
             _NAME: 'alertList',
@@ -23,43 +23,44 @@ export const MONITORING_ROUTE = Object.freeze({
 export default {
     path: 'monitoring',
     name: MONITORING_ROUTE._NAME,
-    redirect: '/monitoring/alert-system/dashboard',
+    redirect: '/monitoring/alert-manager/dashboard',
     meta: { label: 'Monitoring' },
     component: { template: '<router-view />' },
     children: [
         {
-            path: 'alert-system',
-            meta: { label: 'Alert System' },
+            path: 'alert-manager',
+            meta: { label: 'Alert Manager' },
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
-                    name: MONITORING_ROUTE.ALERT_SYSTEM._NAME,
+                    name: MONITORING_ROUTE.ALERT_MANAGER._NAME,
+                    redirect: 'escalation-policy',
                     component: MonitoringMainPage,
                     children: [
-                        {
-                            path: 'dashboard',
-                            name: MONITORING_ROUTE.ALERT_SYSTEM.DASHBOARD._NAME,
-                            component: AlertDashboardPage,
-                        },
-                        {
-                            path: 'alert',
-                            name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT._NAME,
-                            component: AlertListPage,
-                        },
+                        // {
+                        //     path: 'dashboard',
+                        //     name: MONITORING_ROUTE.ALERT_MANAGER.DASHBOARD._NAME,
+                        //     component: AlertDashboardPage,
+                        // },
+                        // {
+                        //     path: 'alert',
+                        //     name: MONITORING_ROUTE.ALERT_MANAGER.ALERT._NAME,
+                        //     component: AlertListPage,
+                        // },
                         {
                             path: 'escalation-policy',
-                            name: MONITORING_ROUTE.ALERT_SYSTEM.ESCALATION_POLICY._NAME,
+                            name: MONITORING_ROUTE.ALERT_MANAGER.ESCALATION_POLICY._NAME,
                             component: EscalationPolicyPage,
                         },
                     ],
                 },
-                {
-                    path: 'alert/:id',
-                    name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT.DETAIL._NAME,
-                    props: true,
-                    component: AlertDetailPage,
-                },
+                // {
+                //     path: 'alert/:id',
+                //     name: MONITORING_ROUTE.ALERT_MANAGER.ALERT.DETAIL._NAME,
+                //     props: true,
+                //     component: AlertDetailPage,
+                // },
             ],
         },
     ],

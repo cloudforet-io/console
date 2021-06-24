@@ -21,11 +21,11 @@
                     />
                 </div>
                 <div class="top-right-group">
-                    <p-icon-text-button name="ic_state_manual" style-type="gray900"
-                                        @click="maintenanceWindowFormVisible = true"
-                    >
-                        {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CREATE') }}
-                    </p-icon-text-button>
+<!--                    <p-icon-text-button name="ic_state_manual" style-type="gray900"-->
+<!--                                        @click="maintenanceWindowFormVisible = true"-->
+<!--                    >-->
+<!--                        {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CREATE') }}-->
+<!--                    </p-icon-text-button>-->
                     <p class="copy-project-id">
                         <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
                         {{ projectId }}
@@ -174,10 +174,10 @@ export default {
                         name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
                         label: vm.$t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
                     },
-                    {
-                        name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME,
-                        label: vm.$t('PROJECT.DETAIL.TAB_MAINTENANCE_WINDOW'),
-                    },
+                    // {
+                    //     name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME,
+                    //     label: vm.$t('PROJECT.DETAIL.TAB_MAINTENANCE_WINDOW'),
+                    // },
                     {
                         name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
                         label: vm.$t('PROJECT.DETAIL.TAB_TAG'),

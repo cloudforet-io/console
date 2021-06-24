@@ -150,7 +150,7 @@ export default {
                 { k: 'project_id', o: '=', v: props.projectId },
             ]);
             return {
-                name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT._NAME,
+                name: MONITORING_ROUTE.ALERT_MANAGER.ALERT._NAME,
                 query: {
                     filters: linkQueryHelper.rawQueryStrings,
                     state: alertState,
@@ -198,7 +198,7 @@ export default {
         /* event */
         const onClickListItem = (idx) => {
             const alertId = get(state.items[idx], 'alert_id');
-            if (alertId) router.push({ name: MONITORING_ROUTE.ALERT_SYSTEM.ALERT.DETAIL._NAME, params: { id: alertId } });
+            if (alertId) router.push({ name: MONITORING_ROUTE.ALERT_MANAGER.ALERT.DETAIL._NAME, params: { id: alertId } });
         };
 
         watch(() => props.projectId, async (projectId) => {

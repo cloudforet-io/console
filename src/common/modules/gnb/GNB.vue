@@ -190,7 +190,7 @@ export default {
                     subMenuList: [
                         {
                             label: vm.$t('MENU.MONITORING.ALERT_SYSTEM'),
-                            to: { name: MONITORING_ROUTE.ALERT_SYSTEM.DASHBOARD._NAME },
+                            to: { name: MONITORING_ROUTE.ALERT_MANAGER._NAME },
                             isNew: true,
                             show: true,
                         },
