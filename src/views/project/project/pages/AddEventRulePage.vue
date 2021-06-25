@@ -390,7 +390,7 @@ export default {
     }
 
     .body {
-        padding: 2rem;
+        padding: 1.5rem 1rem;
     }
 }
 

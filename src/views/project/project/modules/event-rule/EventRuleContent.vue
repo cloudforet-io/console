@@ -14,11 +14,12 @@
             <h4><b>{{ $t('PROJECT.EVENT_RULE.DO') }}</b> {{ $t('PROJECT.EVENT_RULE.THESE_THINGS') }}</h4>
             <table>
                 <tbody>
-                    <tr v-for="(item, index) in fields" :key="`${item}-${index}`">
-                        <template v-if="items[item.name].length ||
-                            item.name === 'stop_processing' && !!items[item.name] ||
-                            item.name === 'add_additional_info' && Object.values(items[item.name]).length ||
-                            item.name === 'no_notification' && items[item.name]"
+                    <template v-for="(item, index) in fields">
+                        <tr v-if="items[item.name].length ||
+                                item.name === 'stop_processing' && !!items[item.name] ||
+                                item.name === 'add_additional_info' && Object.values(items[item.name]).length ||
+                                item.name === 'no_notification' && items[item.name]"
+                            :key="`${item}-${index}`"
                         >
                             <td>{{ item.label }}</td>
                             <td v-if="item.name === 'no_notification'">
@@ -60,8 +61,8 @@
                             <td v-else>
                                 {{ items[item.name] }}
                             </td>
-                        </template>
-                    </tr>
+                        </tr>
+                    </template>
                 </tbody>
             </table>
         </section>
@@ -159,14 +160,6 @@ table {
         @apply px-4 py-2;
     }
 
-    thead {
-        tr {
-            th, td {
-                @apply border-black border-t border-b font-bold;
-            }
-        }
-    }
-
     tbody {
         width: 100%;
         tr {
@@ -186,8 +179,10 @@ table {
                     line-height: 150%;
                 }
             }
-            &:last-child {
-                @apply border-none;
+            td {
+                &:first-child {
+                    min-width: 11rem;
+                }
             }
         }
     }
@@ -196,14 +191,10 @@ table {
 @screen tablet {
     .left-section {
         @apply col-span-12;
-        margin-left: -1rem;
-        padding-right: 1rem;
     }
     .right-section {
         @apply col-span-12;
         margin-top: 1rem;
-        margin-left: -1rem;
-        padding-right: 1rem;
     }
 }
 </style>
