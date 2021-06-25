@@ -371,6 +371,7 @@ export default {
             align-items: center;
             font-size: 0.875rem;
             .text-button {
+                @apply text-gray-800;
                 cursor: pointer;
                 margin: 0 0.75rem;
                 &:hover {

@@ -95,7 +95,7 @@
 import { get } from 'lodash';
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, onActivated, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import ProjectEscalationPolicy from '@/views/project/project/modules/project-alert/ProjectEscalationPolicy.vue';
@@ -221,12 +221,16 @@ export default {
             router.push({ name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME, params: { projectId: props.projectId } });
         };
 
-        watch(() => props.projectId, (projectId) => {
-            if (projectId) Promise.all([getProjectAlertConfig(), getEventRuleCount()]);
-        }, { immediate: true });
-
         watch(() => state.escalationPolicyId, async () => {
             await getEscalationPolicy();
+        });
+
+        const init = async () => {
+            if (props.projectId) await Promise.all([getProjectAlertConfig(), getEventRuleCount()]);
+        };
+
+        onActivated(() => {
+            init();
         });
 
         return {
