@@ -7,6 +7,7 @@ export interface TabItem {
     name: string;
     label?: string | TranslateResult;
     keepAlive?: boolean;
+    isBeta: boolean;
 }
 
 export interface TabProps {
@@ -19,9 +20,13 @@ const getTabState = (props: TabProps) => {
     const state = reactive({
         tabItems: computed<Required<TabItem>[]>(() => props.tabs.map((value) => {
             if (typeof value === 'string') {
-                return { name: value, label: value, keepAlive: false };
+                return {
+                    name: value, label: value, keepAlive: false, isBeta: false,
+                };
             }
-            return { name: value.name, label: value.label ?? value.name, keepAlive: !!value.keepAlive };
+            return {
+                name: value.name, label: value.label ?? value.name, keepAlive: !!value.keepAlive, isBeta: value.isBeta,
+            };
         })),
         nonKeepTabNames: computed<string[]>(() => {
             if (props.keepAliveAll) return [];

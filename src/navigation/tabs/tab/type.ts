@@ -4,4 +4,5 @@ export interface TabItem {
     name: string;
     label?: string | TranslateResult;
     keepAlive?: boolean;
+    isBeta?: boolean;
 }
