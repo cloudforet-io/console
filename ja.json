@@ -1219,7 +1219,7 @@
 				"ESCALATION_POLICY": "",
 				"FORM": {
 					"ACKNOWLEDGED": "",
-					"ADD_STEP": "",
+					"ADD_RULE": "",
 					"ALT_E_CREATE_POLICY": "",
 					"ALT_E_UPDATE_POLICY": "",
 					"ALT_S_CREATE_POLICY": "",
@@ -1478,7 +1478,8 @@
 				"SET_NOTIFICATION_MODAL_HELP_TEXT": "",
 				"SET_NOTIFICATION_POLICY_MODAL_TITLE": "",
 				"STEP": "",
-				"TIME": ""
+				"TIME": "",
+				"UPDATE": "編集"
 			},
 			"ALT_E_ACTIVATE_ALERT": "",
 			"ALT_E_ADD_MEMBER": "メンバー追加に失敗",
@@ -1637,8 +1638,10 @@
 			"PROJECT_DEPENDENCIES": "",
 			"PROJECT_ROUTING": "",
 			"RESPONDER": "",
+			"SAVE": "保存",
+			"THEN_STOP_PROCESSING": "",
 			"THESE_THINGS": "",
-			"UPDATE": "編集",
+			"TITLE_INFO_MESSAGE": "",
 			"URGENCY": ""
 		},
 		"LANDING": {

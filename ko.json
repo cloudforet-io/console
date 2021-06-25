@@ -1219,7 +1219,7 @@
 				"ESCALATION_POLICY": "Escalation Policy",
 				"FORM": {
 					"ACKNOWLEDGED": "Acknowledged",
-					"ADD_STEP": "Add Step",
+					"ADD_RULE": "Add Rule",
 					"ALT_E_CREATE_POLICY": "Create Escalation Policy failure",
 					"ALT_E_UPDATE_POLICY": "Update Escalation Policy failure",
 					"ALT_S_CREATE_POLICY": "Create Escalation Policy success",
@@ -1452,7 +1452,7 @@
 				"ALT_S_CHANGE_NOTIFICATION_POLICY": "Change notification policy success",
 				"AUTO_RECOVERY": "Auto Recovery",
 				"AUTO_RESOLVE_ALERTS": "Automatically Resolve Alerts",
-				"CHANGE": "Change",
+				"CHANGE": "변경",
 				"CREATE_NEW_POLICY": "Create New Policy",
 				"ESCALATES_AFTER": "Escalates after",
 				"ESCALATION_POLICY": "Escalation Policy",
@@ -1478,7 +1478,8 @@
 				"SET_NOTIFICATION_MODAL_HELP_TEXT": "What should responders be notified",
 				"SET_NOTIFICATION_POLICY_MODAL_TITLE": "Set Notification Policy",
 				"STEP": "STEP",
-				"TIME": "time | times"
+				"TIME": "time | times",
+				"UPDATE": "편집"
 			},
 			"ALT_E_ACTIVATE_ALERT": "",
 			"ALT_E_ADD_MEMBER": "구성원 추가 실패",
@@ -1637,8 +1638,10 @@
 			"PROJECT_DEPENDENCIES": "프로젝트 의존성",
 			"PROJECT_ROUTING": "Project Routing",
 			"RESPONDER": "수신자",
+			"SAVE": "저장",
+			"THEN_STOP_PROCESSING": "Then stop processing",
 			"THESE_THINGS": "these things",
-			"UPDATE": "편집",
+			"TITLE_INFO_MESSAGE": "Event rules are executed in ascending order.",
 			"URGENCY": "긴급도"
 		},
 		"LANDING": {

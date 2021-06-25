@@ -1219,7 +1219,7 @@
 				"ESCALATION_POLICY": "Escalation Policy",
 				"FORM": {
 					"ACKNOWLEDGED": "Acknowledged",
-					"ADD_STEP": "Add Step",
+					"ADD_RULE": "Add Rule",
 					"ALT_E_CREATE_POLICY": "Create Escalation Policy failure",
 					"ALT_E_UPDATE_POLICY": "Update Escalation Policy failure",
 					"ALT_S_CREATE_POLICY": "Create Escalation Policy success",
@@ -1478,7 +1478,8 @@
 				"SET_NOTIFICATION_MODAL_HELP_TEXT": "What should responders be notified",
 				"SET_NOTIFICATION_POLICY_MODAL_TITLE": "Set Notification Policy",
 				"STEP": "STEP",
-				"TIME": "time | times"
+				"TIME": "time | times",
+				"UPDATE": "Update"
 			},
 			"ALT_E_ACTIVATE_ALERT": "Activate alert failure",
 			"ALT_E_ADD_MEMBER": "Add member failure",
@@ -1637,8 +1638,10 @@
 			"PROJECT_DEPENDENCIES": "Project Dependencies",
 			"PROJECT_ROUTING": "Project Routing",
 			"RESPONDER": "Responder",
+			"SAVE": "Save",
+			"THEN_STOP_PROCESSING": "Then stop processing",
 			"THESE_THINGS": "these things",
-			"UPDATE": "Update",
+			"TITLE_INFO_MESSAGE": "Event rules are executed in ascending order.",
 			"URGENCY": "Urgency"
 		},
 		"LANDING": {
