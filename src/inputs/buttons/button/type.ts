@@ -8,6 +8,7 @@ export enum BUTTON_STYLE {
     secondary1 = 'secondary1',
     gray = 'gray',
     gray900 = 'gray900',
+    'gray-border' = 'gray-border',
     'gray900-hover' = 'gray900-hover',
     'gray900-border' = 'gray900-border',
     alert = 'alert',

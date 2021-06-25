@@ -182,6 +182,10 @@ export default {
         &:hover {
             @apply bg-white text-blue-500 border-blue-500;
         }
+        &.disabled {
+            @apply bg-transparent text-gray-300 border-gray-300;
+            cursor: not-allowed;
+        }
     }
     &.transparent {
         @apply bg-transparent text-gray-900;
