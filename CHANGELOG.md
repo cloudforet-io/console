@@ -1,3 +1,10 @@
+# [1.1.0-beta.77](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.76...v1.1.0-beta.77) (2021-06-25)
+
+
+### Features
+
+* add beta tag in tab ([#615](https://github.com/spaceone-dev/spaceone-design-system/issues/615)) ([af8a57a](https://github.com/spaceone-dev/spaceone-design-system/commit/af8a57aa6249a821ce050e38510bf0b15e4d780e))
+
 # [1.1.0-beta.76](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.75...v1.1.0-beta.76) (2021-06-25)
 
 
