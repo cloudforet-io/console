@@ -12,6 +12,24 @@ import { TOGGLE_BUTTON_THEME } from "@/inputs/buttons/toggle-button/config";
     }}
     component={ PToggleButton }
     argTypes={{
+        sync: {
+            name: 'sync',
+            type: { name: 'boolean' },
+            description: 'If set to true, will be watching changes in value property and overwrite the current state of the button whenever value prop changes',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
         value: {
             name: 'value',
             type: { name: 'boolean' },

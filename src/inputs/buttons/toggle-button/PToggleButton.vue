@@ -1,6 +1,7 @@
 <template>
     <toggle-button
         :value="value"
+        :sync="sync"
         :color="colors"
         :width="32"
         :height="16"
@@ -28,6 +29,10 @@ export default {
         ToggleButton,
     },
     props: {
+        sync: {
+            type: Boolean,
+            default: false,
+        },
         value: {
             type: Boolean,
             default: false,
