@@ -107,6 +107,7 @@ export default {
             keyItemSets: [{
                 title: 'Properties',
                 items: [
+                    { name: 'escalation_policy_id', label: 'Escalation Policy' },
                     { name: 'name', label: 'Name' },
                     { name: 'finish_condition', label: 'Finish Condition' },
                     { name: 'scope', label: 'Scope' },
@@ -115,6 +116,7 @@ export default {
                 ],
             }] as KeyItemSet[],
             valueHandlerMap: {
+                escalation_policy_id: makeDistinctValueHandler('monitoring.EscalationPolicy', 'escalation_policy_id'),
                 name: makeDistinctValueHandler('monitoring.EscalationPolicy', 'name'),
                 finish_condition: makeEnumValueHandler(FINISH_CONDITION),
                 scope: makeEnumValueHandler(SCOPE),

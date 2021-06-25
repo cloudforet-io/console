@@ -14,7 +14,7 @@
                 <slot>{{ contents }}</slot>
             </p>
         </template>
-        <template #confirm-button>
+        <template v-if="confirmText" #confirm-button>
             {{ confirmText }}
         </template>
     </p-button-modal>

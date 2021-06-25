@@ -18,9 +18,6 @@
                 />
             </div>
         </template>
-        <template #confirm-button>
-            {{ $t('PROJECT.DETAIL.ALERT.CHANGE') }}
-        </template>
     </p-button-modal>
 </template>
 

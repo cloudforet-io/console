@@ -28,12 +28,19 @@
                 </div>
             </template>
             <template #label-extra>
-                <span v-if="mode === 'update'" class="scope-text">
+                <span v-if="mode === ACTION.update" class="scope-text">
                     {{ inputModel.scope }}
+                    <span v-if="inputModel.scope === SCOPE.project">
+                        (<p-anchor :to="referenceRouter(inputModel.project_id,{ resource_type: 'identity.Project' })"
+                                   :text="projects[inputModel.project_id] ? projects[inputModel.project_id].label : inputModel.project_id"
+                                   :show-icon="true"
+                                   highlight
+                        />)
+                    </span>
                 </span>
             </template>
         </p-field-group>
-        <p-field-group v-if="showScope & inputModel.scope === SCOPE.project"
+        <p-field-group v-if="showScope && inputModel.scope === SCOPE.project && mode === ACTION.create"
                        class="project-field"
                        required
         >
@@ -46,9 +53,7 @@
                           highlight
                 />
             </template>
-            <project-select-dropdown v-if="inputModel.scope === SCOPE.project"
-                                     @select="onSelectProject"
-            />
+            <project-select-dropdown @select="onSelectProject" />
         </p-field-group>
         <p-field-group
             :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.FINISH_CONDITION_LABEL')"
@@ -99,7 +104,9 @@ import {
     EscalationPolicyFormModel,
 } from '@/views/monitoring/alert-manager/type';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
+import { store } from '@/store';
 
 
 const DEFAULT_REPEAT_COUNT = 0;
@@ -137,6 +144,7 @@ export default {
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            projects: computed(() => store.state.resource.project.items),
             inputModel: {
                 name: '',
                 scope: SCOPE.global,
@@ -214,6 +222,7 @@ export default {
 
         return {
             ...toRefs(state),
+            referenceRouter,
             SCOPE,
             ACTION,
             PROJECT_ROUTE,

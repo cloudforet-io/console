@@ -123,7 +123,7 @@
                 :disabled="rules.length >= 5"
                 @click="onClickAddStep"
             >
-                {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ADD_STEP') }}
+                {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ADD_RULE') }}
             </p-icon-text-button>
         </div>
     </div>

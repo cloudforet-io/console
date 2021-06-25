@@ -1,7 +1,7 @@
 <template>
     <p-button-modal
-        class="escalation-policy-update-modal"
-        :header-title="$t('PROJECT.DETAIL.ALERT.SET_ESCALATION_POLICY_MODAL_TITLE')"
+        class="escalation-policy-change-modal"
+        :header-title="$t('PROJECT.DETAIL.ALERT.CHANGE_ESCALATION_POLICY_MODAL_TITLE')"
         fade
         :visible.sync="proxyVisible"
         @confirm="onClickConfirm"
@@ -31,9 +31,6 @@
                 </p-box-tab>
             </div>
         </template>
-        <template #confirm-button>
-            {{ $t('PROJECT.DETAIL.ALERT.CHANGE') }}
-        </template>
     </p-button-modal>
 </template>
 
@@ -48,15 +45,15 @@ import {
 } from '@spaceone/design-system';
 
 import EscalationPolicyDataTable from '@/views/monitoring/alert-manager/modules/EscalationPolicyDataTable.vue';
+import EscalationPolicyForm from '@/views/monitoring/alert-manager/modules/EscalationPolicyForm.vue';
 
 import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { iso8601Formatter, showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getApiQueryWithToolboxOptions } from '@/lib/component-utils/toolbox';
-import { store } from '@/store';
-import EscalationPolicyForm from '@/views/monitoring/alert-manager/modules/EscalationPolicyForm.vue';
 import { EscalationPolicyFormModel } from '@/views/monitoring/alert-manager/type';
+import { store } from '@/store';
 
 
 enum FORM_MODE {
@@ -65,7 +62,7 @@ enum FORM_MODE {
 }
 
 export default {
-    name: 'ProjectEscalationPolicyUpdateModal',
+    name: 'ProjectEscalationPolicyChangeModal',
     components: {
         EscalationPolicyForm,
         EscalationPolicyDataTable,
@@ -127,13 +124,14 @@ export default {
         };
 
         /* api */
-        const escalationPolicyApiQueryHelper = new ApiQueryHelper().setSort('created_at', true);
+        const escalationPolicyApiQueryHelper = new ApiQueryHelper()
+            .setSort('created_at', true)
+            .setFilters([{ k: 'project_id', v: [props.projectId, null], o: '=' }]);
         let escalationPolicyApiQuery = escalationPolicyApiQueryHelper.data;
         const listEscalationPolicies = async () => {
             try {
                 tableState.loading = true;
                 const res = await SpaceConnector.client.monitoring.escalationPolicy.list({
-                    project_id: props.projectId,
                     query: escalationPolicyApiQuery,
                 });
                 tableState.items = res.results.map(d => ({
@@ -222,7 +220,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.escalation-policy-update-modal::v-deep {
+.escalation-policy-change-modal::v-deep {
     .modal-content {
         height: 53.75rem;
     }

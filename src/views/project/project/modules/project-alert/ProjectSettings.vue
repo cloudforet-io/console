@@ -39,10 +39,28 @@
             <div class="content-wrapper">
                 <project-escalation-policy
                     :project-id="projectId"
-                    :escalation-policy-id="escalationPolicyId"
+                    :escalation-policy="escalationPolicy"
                 />
             </div>
-            <p-icon-button class="edit-button" name="ic_edit" @click="onClickUpdateEscalationPolicy" />
+            <div class="edit-button text-button-group">
+                <p-button class="text-button"
+                          style-type="gray-border"
+                          size="sm"
+                          :outline="true"
+                          :disabled="escalationPolicy.scope === SCOPE.global"
+                          @click="onClickUpdateEscalationPolicy"
+                >
+                    {{ $t('PROJECT.DETAIL.ALERT.UPDATE') }}
+                </p-button>
+                <p-button class="text-button"
+                          style-type="gray-border"
+                          size="sm"
+                          :outline="true"
+                          @click="onClickChangeEscalationPolicy"
+                >
+                    {{ $t('PROJECT.DETAIL.ALERT.CHANGE') }}
+                </p-button>
+            </div>
         </section>
         <!--modals-->
         <project-notification-policy-update-modal
@@ -58,11 +76,16 @@
             :selected-option="isAutoRecovery"
             @refresh="getProjectAlertConfig"
         />
-        <project-escalation-policy-update-modal
+        <project-escalation-policy-change-modal
             :project-id="projectId"
-            :visible.sync="updateEscalationPolicyModalVisible"
+            :visible.sync="changeEscalationPolicyModalVisible"
             :escalation-policy-id="escalationPolicyId"
             @refresh="getProjectAlertConfig"
+        />
+        <escalation-policy-form-modal
+            :visible.sync="updateEscalationPolicyModalVisible"
+            :mode="ACTION.update"
+            :escalation-policy="escalationPolicy"
         />
     </p-pane-layout>
 </template>
@@ -80,15 +103,19 @@ import ProjectNotificationPolicyUpdateModal
     from '@/views/project/project/modules/project-alert/ProjectNotificationPolicyUpdateModal.vue';
 import ProjectAutoRecoveryUpdateModal
     from '@/views/project/project/modules/project-alert/ProjectAutoRecoveryUpdateModal.vue';
-import ProjectEscalationPolicyUpdateModal
-    from '@/views/project/project/modules/project-alert/ProjectEscalationPolicyUpdateModal.vue';
+import ProjectEscalationPolicyChangeModal
+    from '@/views/project/project/modules/project-alert/ProjectEscalationPolicyChangeModal.vue';
+import EscalationPolicyFormModal from '@/views/monitoring/alert-manager/modules/EscalationPolicyFormModal.vue';
 
-import { PI, PIconButton, PPaneLayout } from '@spaceone/design-system';
+import {
+    PI, PIconButton, PPaneLayout, PButton,
+} from '@spaceone/design-system';
 
 import { SpaceConnector } from '@/lib/space-connector';
+import { ACTION, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
+import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { i18n } from '@/translations';
-import router from "@/routes";
-import {PROJECT_ROUTE} from "@/routes/project/project-route";
+import router from '@/routes';
 
 
 const NOTIFICATION_URGENCY = Object.freeze({
@@ -101,11 +128,13 @@ export default {
     components: {
         ProjectNotificationPolicyUpdateModal,
         ProjectAutoRecoveryUpdateModal,
-        ProjectEscalationPolicyUpdateModal,
+        ProjectEscalationPolicyChangeModal,
         ProjectEscalationPolicy,
+        EscalationPolicyFormModal,
         PPaneLayout,
         PI,
         PIconButton,
+        PButton,
     },
     props: {
         projectId: {
@@ -127,6 +156,7 @@ export default {
                 },
             ])),
             projectAlertConfig: {},
+            escalationPolicy: {},
             notificationUrgency: computed(() => get(state.projectAlertConfig, 'options.notification_urgency')),
             isAutoRecovery: computed(() => get(state.projectAlertConfig, 'options.auto_recovery')),
             escalationPolicyId: computed(() => get(state.projectAlertConfig, 'escalation_policy_info.escalation_policy_id')),
@@ -135,6 +165,7 @@ export default {
             updateNotificationPolicyModalVisible: false,
             updateAutoRecoveryModalVisible: false,
             updateEscalationPolicyModalVisible: false,
+            changeEscalationPolicyModalVisible: false,
         });
 
         /* util */
@@ -162,6 +193,16 @@ export default {
                 console.error(e);
             }
         };
+        const getEscalationPolicy = async () => {
+            try {
+                state.escalationPolicy = await SpaceConnector.client.monitoring.escalationPolicy.get({
+                    escalation_policy_id: state.escalationPolicyId,
+                });
+            } catch (e) {
+                state.escalationPolicy = {};
+                console.error(e);
+            }
+        };
 
         /* event */
         const onClickUpdateNotificationPolicy = () => {
@@ -173,6 +214,9 @@ export default {
         const onClickUpdateEscalationPolicy = () => {
             state.updateEscalationPolicyModalVisible = true;
         };
+        const onClickChangeEscalationPolicy = () => {
+            state.changeEscalationPolicyModalVisible = true;
+        };
         const onClickEditEventRule = () => {
             router.push({ name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME, params: { projectId: props.projectId } });
         };
@@ -181,13 +225,20 @@ export default {
             if (projectId) Promise.all([getProjectAlertConfig(), getEventRuleCount()]);
         }, { immediate: true });
 
+        watch(() => state.escalationPolicyId, async () => {
+            await getEscalationPolicy();
+        });
+
         return {
             ...toRefs(state),
             NOTIFICATION_URGENCY,
+            ACTION,
+            SCOPE,
             getProjectAlertConfig,
             onClickUpdateNotificationPolicy,
             onClickUpdateAutoRecovery,
             onClickUpdateEscalationPolicy,
+            onClickChangeEscalationPolicy,
             onClickEditEventRule,
             notificationOptionFormatter,
         };
@@ -228,6 +279,13 @@ export default {
             top: 1.5rem;
             right: 1rem;
         }
+        .text-button-group {
+            display: flex;
+            gap: 0.5rem;
+            .text-button {
+                padding: 0.5rem;
+            }
+        }
 
         &.notification-policy-wrapper, &.auto-recovery-wrapper, &.event-rule-wrapper {
             @apply col-span-4;
@@ -245,13 +303,7 @@ export default {
             }
         }
         &.escalation-policy-wrapper {
-            @apply grid grid-cols-12;
-            .section-title {
-                @apply col-span-2;
-            }
-            .content-wrapper {
-                @apply col-span-9;
-            }
+            display: block;
         }
     }
 
@@ -259,9 +311,6 @@ export default {
         .section {
             &.notification-policy-wrapper, &.auto-recovery-wrapper, &.event-rule-wrapper {
                 @apply col-span-12;
-            }
-            &.escalation-policy-wrapper {
-                display: block;
             }
         }
     }
