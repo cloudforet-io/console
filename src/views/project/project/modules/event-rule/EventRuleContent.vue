@@ -18,12 +18,11 @@
                         <template v-if="items[item.name].length ||
                             item.name === 'stop_processing' && !!items[item.name] ||
                             item.name === 'add_additional_info' && Object.values(items[item.name]).length ||
-                            item.name === 'no_notification'"
+                            item.name === 'no_notification' && items[item.name]"
                         >
                             <td>{{ item.label }}</td>
                             <td v-if="item.name === 'no_notification'">
-                                <span v-if="items[item.name]">{{$t('PROJECT.EVENT_RULE.PAUSE_NOTIFICATION')}}</span>
-                                <span v-else>On</span>
+                                <span class="text-secondary">ON</span>
                             </td>
                             <td v-else-if="item.name === 'change_project'">
                                 <p-anchor :to="referenceRouter(
@@ -76,6 +75,7 @@ import {
 import { PAnchor } from '@spaceone/design-system';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 export default {
     name: 'EventRuleContent',
@@ -90,23 +90,22 @@ export default {
     },
     setup(props) {
         const state = reactive({
-            fields: [
-                { name: 'no_notification', label: 'Notifications' },
-                { name: 'change_project', label: 'Project Routing' },
-                { name: 'add_project_dependency', label: 'Project Dependencies' },
-                { name: 'change_urgency', label: 'Urgency' },
-                { name: 'change_assignee', label: 'Assignee' },
-                { name: 'add_responder', label: 'Responder' },
-                { name: 'add_additional_info', label: 'Additional Information' },
-                { name: 'stop_processing', label: 'Then Stop Processing' },
-            ],
+            fields: computed(() => ([
+                { name: 'no_notification', label: i18n.t('PROJECT.EVENT_RULE.SNOOZED_NOTIFICATIONS') },
+                { name: 'change_project', label: i18n.t('PROJECT.EVENT_RULE.PROJECT_ROUTING') },
+                { name: 'add_project_dependency', label: i18n.t('PROJECT.EVENT_RULE.PROJECT_DEPENDENCIES') },
+                { name: 'change_urgency', label: i18n.t('PROJECT.EVENT_RULE.URGENCY') },
+                { name: 'change_assignee', label: i18n.t('PROJECT.EVENT_RULE.ASSIGNEE') },
+                { name: 'add_responder', label: i18n.t('PROJECT.EVENT_RULE.RESPONDER') },
+                { name: 'add_additional_info', label: i18n.t('PROJECT.EVENT_RULE.ADDITIONAL_INFORMATION') },
+                { name: 'stop_processing', label: i18n.t('PROJECT.EVENT_RULE.THEN_STOP_PROCESSING') },
+            ])),
             items: [] as any,
             projects: computed(() => store.state.resource.project.items),
         });
 
         const getData = () => {
             state.items = { ...props.data.change_project, ...props.data.actions, ...props.data.options };
-            console.log(state.items);
         };
 
         watch(() => props.data, () => {

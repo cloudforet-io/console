@@ -1,10 +1,15 @@
 <template>
     <general-page-layout class="add-service-account-container">
         <p-breadcrumbs class="flex-grow" :routes="routeState.routes" />
-        <p-page-title child :title="$t('PROJECT.EVENT_RULE.EVENT_RULE')"
+        <p-page-title child
                       class="page-title"
                       @goBack="$router.go(-1)"
-        />
+        >
+            <template #title>
+                <span>{{ $t('PROJECT.EVENT_RULE.EVENT_RULE') }}</span>
+                <info-message :message="$t('PROJECT.EVENT_RULE.TITLE_INFO_MESSAGE')" />
+            </template>
+        </p-page-title>
         <div v-if="!isEditMode && !cardData.length" class="no-data-wrapper">
             <p class="title">
                 {{ $t('PROJECT.EVENT_RULE.NO_EVENT_RULES_TITLE') }}
@@ -85,6 +90,7 @@
             />
         </p-card>
         <p-icon-text-button v-if="cardData.length"
+                            :disabled="isEditMode"
                             style-type="primary-dark" name="ic_plus_bold"
                             outline
                             class="add-event-rule-button"
@@ -115,6 +121,7 @@ import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 import EventRuleContent from '@/views/project/project/modules/event-rule/EventRuleContent.vue';
 import EventRuleForm from '@/views/project/project/modules/event-rule/EventRuleForm.vue';
+import InfoMessage from '@/common/components/InfoMessage.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
@@ -133,6 +140,7 @@ export default {
         EventRuleForm,
         GeneralPageLayout,
         DeleteModal,
+        InfoMessage,
         PBreadcrumbs,
         PPageTitle,
         PCard,
@@ -297,6 +305,12 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.page-title {
+    .info-message {
+        font-weight: normal;
+        margin-left: 1rem;
+    }
+}
 .no-data-wrapper {
     @apply border border-gray-200 rounded-md;
     width: 100%;
@@ -378,9 +392,6 @@ export default {
     .body {
         padding: 2rem;
     }
-}
-.add-event-rule-button {
-    width: 100%;
 }
 
 @screen tablet {

@@ -24,26 +24,29 @@
                 </p-radio>
                 <span>{{ $t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</span>
             </div>
-            <div v-for="(condition, idx) of proxyConditions" :key="`condition-${idx}`" class="input-wrapper">
-                <div class="left-part">
-                    <p-select-dropdown v-model="condition.key"
-                                       class="input"
-                                       :items="keys"
-                                       use-fixed-menu-style
+            <template v-for="(condition, idx) of proxyConditions">
+                <p-divider v-if="idx > 0" :key="`divider-${idx}`" />
+                <div :key="`condition-${idx}`" class="input-wrapper">
+                    <div class="left-part">
+                        <p-select-dropdown v-model="condition.key"
+                                           class="input"
+                                           :items="keys"
+                                           use-fixed-menu-style
+                        />
+                        <p-select-dropdown v-model="condition.operator"
+                                           class="input"
+                                           :items="operators"
+                                           use-fixed-menu-style
+                        />
+                        <p-text-input v-model="condition.value" class="input" />
+                    </div>
+                    <p-icon-button name="ic_trashcan"
+                                   class="delete-button"
+                                   :class="{ opacity: proxyConditions.length < 2}"
+                                   @click="onClickDelete(idx)"
                     />
-                    <p-select-dropdown v-model="condition.operator"
-                                       class="input"
-                                       :items="operators"
-                                       use-fixed-menu-style
-                    />
-                    <p-text-input v-model="condition.value" class="input" />
                 </div>
-                <p-icon-button name="ic_trashcan"
-                               class="delete-button"
-                               :class="{ opacity: proxyConditions.length < 2}"
-                               @click="onClickDelete(idx)"
-                />
-            </div>
+            </template>
         </div>
     </section>
 </template>
@@ -55,7 +58,7 @@ import { i18n } from '@/translations';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PIconTextButton, PRadio, PSelectDropdown, PTextInput, PIconButton,
+    PIconTextButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider,
 } from '@spaceone/design-system';
 
 import { makeProxy } from '@/lib/compostion-util';
@@ -80,6 +83,7 @@ export default {
         PSelectDropdown,
         PTextInput,
         PIconButton,
+        PDivider,
     },
     props: {
         conditionsPolicy: {
@@ -216,6 +220,30 @@ export default {
                 pointer-events: none;
                 opacity: 0;
             }
+        }
+    }
+    .p-divider {
+        display: none;
+    }
+}
+
+@screen mobile {
+    .content-wrapper {
+        .input-wrapper {
+            margin: 1rem 0;
+            .left-part {
+                display: block;
+                .input {
+                    width: 100%;
+                    padding-bottom: 0.5rem;
+                    &:last-child {
+                        padding-bottom: 0;
+                    }
+                }
+            }
+        }
+        .p-divider {
+            display: block;
         }
     }
 }

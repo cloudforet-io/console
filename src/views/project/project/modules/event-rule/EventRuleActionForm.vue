@@ -5,31 +5,39 @@
         </p>
         <div class="content-wrapper">
             <div class="form-box">
-                <p>{{ $t('PROJECT.EVENT_RULE.NOTIFICATIONS') }}</p>
+                <p class="label">
+                    {{ $t('PROJECT.EVENT_RULE.SNOOZED_NOTIFICATIONS') }}
+                </p>
                 <div>
-                    <span class="toggle-text" :class="{on: !proxyActions.no_notification}">
-                        {{ proxyActions.no_notification ? $t('PROJECT.EVENT_RULE.PAUSE') : $t('PROJECT.EVENT_RULE.ON') }}
-                    </span>
+                    <span v-if="proxyActions.no_notification" class="toggle-text">ON</span>
                     <p-toggle-button theme="secondary"
-                                     :value="!proxyActions.no_notification"
+                                     sync
+                                     :value="proxyActions.no_notification"
                                      @change="onToggleChange"
                     />
                 </div>
             </div>
-            <div class="form-box">
-                <p>{{ $t('PROJECT.EVENT_RULE.PROJECT_ROUTING') }}</p>
+            <div class="form-box mobile-block">
+                <p class="label">
+                    {{ $t('PROJECT.EVENT_RULE.PROJECT_ROUTING') }}
+                </p>
                 <project-select-dropdown :selected-project-ids="actions.change_project ? [actions.change_project] : []"
                                          @select="onSelectProjectRouting"
                 />
             </div>
-            <div class="form-box">
-                <p>{{ $t('PROJECT.EVENT_RULE.PROJECT_DEPENDENCIES') }}</p>
+            <div class="form-box mobile-block">
+                <p class="label">
+                    {{ $t('PROJECT.EVENT_RULE.PROJECT_DEPENDENCIES') }}
+                </p>
                 <project-select-dropdown multi-selectable
                                          :selected-project-ids="actions.add_project_dependency || []"
-                                         @select="onSelectProjectDependencies" />
+                                         @select="onSelectProjectDependencies"
+                />
             </div>
-            <div class="form-box">
-                <p>{{ $t('PROJECT.EVENT_RULE.URGENCY') }}</p>
+            <div class="form-box mobile-block">
+                <p class="label">
+                    {{ $t('PROJECT.EVENT_RULE.URGENCY') }}
+                </p>
                 <div>
                     <p-radio v-for="(urgency, uIdx) in urgencyList"
                              :key="`urgency-${uIdx}`"
@@ -42,12 +50,16 @@
                     </p-radio>
                 </div>
             </div>
-            <div class="form-box">
-                <p>{{ $t('PROJECT.EVENT_RULE.ASSIGNEE') }}</p>
+            <div class="form-box mobile-block">
+                <p class="label">
+                    {{ $t('PROJECT.EVENT_RULE.ASSIGNEE') }}
+                </p>
                 <search-or-select-user :multi-select="false" :selected-users.sync="formState.assignee" />
             </div>
-            <div class="form-box">
-                <p>{{ $t('PROJECT.EVENT_RULE.RESPONDER') }}</p>
+            <div class="form-box mobile-block">
+                <p class="label">
+                    {{ $t('PROJECT.EVENT_RULE.RESPONDER') }}
+                </p>
                 <search-or-select-user :selected-users.sync="formState.responder" />
             </div>
             <div class="form-box additional-information">
@@ -70,6 +82,12 @@
                 </tags-input-group>
             </div>
         </div>
+        <p-check-box v-model="proxyOptions.stop_processing"
+                     :value="true"
+                     class="stop-processing-input"
+        >
+            {{ $t('PROJECT.EVENT_RULE.THEN_STOP_PROCESSING') }}
+        </p-check-box>
     </section>
 </template>
 
@@ -82,7 +100,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PToggleButton, PRadio, PIconTextButton,
+    PToggleButton, PRadio, PIconTextButton, PCheckBox,
 } from '@spaceone/design-system';
 
 import ProjectSelectDropdown from '@/common/modules/project-select-dropdown/ProjectSelectDropdown.vue';
@@ -107,9 +125,14 @@ export default {
         PToggleButton,
         PRadio,
         PIconTextButton,
+        PCheckBox,
     },
     props: {
         actions: {
+            type: Object,
+            default: () => ({}),
+        },
+        options: {
             type: Object,
             default: () => ({}),
         },
@@ -132,6 +155,7 @@ export default {
                 },
             ])),
             proxyActions: makeProxy('actions', props, emit),
+            proxyOptions: makeProxy('options', props, emit),
         });
         const formState = reactive({
             selectedUrgency: URGENCY.NO_SET,
@@ -153,7 +177,7 @@ export default {
 
         /* event */
         const onToggleChange = ({ value }) => {
-            state.proxyActions.no_notification = !value;
+            state.proxyActions.no_notification = value;
         };
         const onChangeUrgency = () => {
             if (formState.selectedUrgency === URGENCY.NO_SET) {
@@ -179,6 +203,10 @@ export default {
 
         watch(() => props.actions, (actions) => {
             initActionsData(actions);
+        });
+
+        watch(() => props.options, (options) => {
+            state.proxyOptions = options;
         });
 
         return {
@@ -208,6 +236,7 @@ export default {
         @apply border-b border-gray-100;
         display: flex;
         min-height: 3.5rem;
+        line-height: 1.5;
         align-items: center;
         justify-content: space-between;
         border-bottom-width: 0.25rem;
@@ -228,17 +257,40 @@ export default {
         }
 
         .toggle-text {
-            @apply text-gray-500;
+            @apply text-secondary;
             padding-right: 0.5rem;
-            &.on {
-                @apply text-secondary;
-            }
         }
         .project-select-dropdown, .search-or-select-user {
             width: 60%;
         }
         .additional-info-wrapper {
 
+        }
+    }
+}
+.stop-processing-input {
+    display: block;
+    text-align: right;
+    padding-top: 0.75rem;
+}
+
+@screen mobile {
+    .content-wrapper {
+        .form-box {
+            &.mobile-block {
+                display: block;
+                .label {
+                    padding-bottom: 0.75rem;
+                }
+                .project-select-dropdown, .search-or-select-user {
+                    width: 100%;
+                }
+            }
+            &.additional-information::v-deep {
+                .p-field-group {
+                    width: 45%;
+                }
+            }
         }
     }
 }

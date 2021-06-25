@@ -8,13 +8,17 @@
         <event-rule-action-form
             class="event-rule-action-form"
             :actions.sync="actions"
+            :options.sync="options"
         />
         <div class="button-group">
             <p-button style-type="gray900" :outline="true" @click="onClickCancel">
                 {{ $t('PROJECT.EVENT_RULE.CANCEL') }}
             </p-button>
-            <p-button style-type="primary-dark" @click="onClickConfirm">
-                {{ mode === EDIT_MODE.CREATE ? $t('PROJECT.EVENT_RULE.CREATE') : $t('PROJECT.EVENT_RULE.UPDATE') }}
+            <p-button :disabled="!isAllValid"
+                      style-type="primary-dark"
+                      @click="onClickConfirm"
+            >
+                {{ mode === EDIT_MODE.CREATE ? $t('PROJECT.EVENT_RULE.ADD') : $t('PROJECT.EVENT_RULE.SAVE') }}
             </p-button>
         </div>
     </div>
@@ -114,8 +118,12 @@ export default {
                 add_project_dependency: [],
                 add_responder: [],
                 add_additional_info: {},
-                no_notification: true,
+                no_notification: false,
             } as Actions,
+            options: {
+                stop_processing: true,
+            },
+            isAllValid: false,
         });
 
         /* api */
@@ -127,6 +135,7 @@ export default {
                 state.conditionsPolicy = res.conditions_policy;
                 state.conditions = res.conditions;
                 state.actions = res.actions;
+                state.options = res.options;
             } catch (e) {
                 console.error(e);
             }
@@ -137,6 +146,7 @@ export default {
                     conditions: state.conditions,
                     conditions_policy: state.conditionsPolicy,
                     actions: state.actions,
+                    options: state.options,
                     project_id: props.projectId,
                 });
                 showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_CREATE_EVENT_RULE'), '', root);
@@ -152,6 +162,7 @@ export default {
                     conditions: state.conditions,
                     conditions_policy: state.conditionsPolicy,
                     actions: state.actions,
+                    options: state.options,
                 });
                 showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_UPDATE_EVENT_RULE'), '', root);
             } catch (e) {
@@ -176,6 +187,10 @@ export default {
         watch(() => props.eventRuleId, async (eventRuleId) => {
             if (eventRuleId) await getEventRule();
         }, { immediate: true });
+
+        watch(() => state.conditions, (conditions) => {
+            state.isAllValid = conditions.every(d => d.key && d.value);
+        }, { immediate: true, deep: true });
 
         return {
             ...toRefs(state),
@@ -217,4 +232,6 @@ export default {
         }
     }
 }
+
+
 </style>
