@@ -72,11 +72,6 @@ import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { i18n } from '@/translations';
 
 
-const CHANNEL_SCHEMA = Object.freeze({
-    spaceone_user: 'Member',
-    slack_webhook: 'Slack',
-});
-
 export default {
     name: 'ProjectEscalationPolicy',
     components: {
@@ -159,7 +154,6 @@ export default {
 
         return {
             ...toRefs(state),
-            CHANNEL_SCHEMA,
             MONITORING_ROUTE,
             notificationLevelFormatter,
             channelFormatter,

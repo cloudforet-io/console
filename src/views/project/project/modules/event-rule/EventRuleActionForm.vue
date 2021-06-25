@@ -34,7 +34,7 @@
                                          @select="onSelectProjectDependencies"
                 />
             </div>
-            <div class="form-box mobile-block">
+            <div class="form-box urgency">
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.URGENCY') }}
                 </p>
@@ -48,6 +48,7 @@
                     >
                         {{ urgency.label }}
                     </p-radio>
+                    <p-select-dropdown v-model="formState.selectedUrgency" :items="urgencyList" />
                 </div>
             </div>
             <div class="form-box mobile-block">
@@ -100,7 +101,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PToggleButton, PRadio, PIconTextButton, PCheckBox,
+    PToggleButton, PRadio, PIconTextButton, PCheckBox, PSelectDropdown,
 } from '@spaceone/design-system';
 
 import ProjectSelectDropdown from '@/common/modules/project-select-dropdown/ProjectSelectDropdown.vue';
@@ -126,6 +127,7 @@ export default {
         PRadio,
         PIconTextButton,
         PCheckBox,
+        PSelectDropdown,
     },
     props: {
         actions: {
@@ -244,6 +246,11 @@ export default {
         &:last-child {
             border: none;
         }
+        &.urgency {
+            .p-select-dropdown {
+                display: none;
+            }
+        }
         &.additional-information::v-deep {
             display: block;
             .top-part {
@@ -272,6 +279,21 @@ export default {
     display: block;
     text-align: right;
     padding-top: 0.75rem;
+}
+
+@screen tablet {
+    .content-wrapper {
+        .form-box {
+            &.urgency {
+                .p-radio {
+                    display: none;
+                }
+                .p-select-dropdown {
+                    display: block;
+                }
+            }
+        }
+    }
 }
 
 @screen mobile {

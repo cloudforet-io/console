@@ -88,6 +88,8 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
+import { cloneDeep } from 'lodash';
+
 import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs, watch,
@@ -191,7 +193,7 @@ export default {
                 state.inputModel.project_id = undefined;
                 state.inputModel.repeat_count = DEFAULT_REPEAT_COUNT;
             } else if (props.mode === ACTION.update && props.escalationPolicy) {
-                state.inputModel = props.escalationPolicy;
+                state.inputModel = cloneDeep(props.escalationPolicy);
             }
         };
 
