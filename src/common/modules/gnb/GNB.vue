@@ -52,6 +52,7 @@
                             <router-link v-if="subMenu.show" :key="index" :to="subMenu.to">
                                 <div class="sub-menu">
                                     <span>{{ subMenu.label }}</span>
+                                    <span v-if="subMenu.isBeta" class="beta-text">beta</span>
                                     <span v-if="subMenu.isNew" class="new-text">new</span>
                                 </div>
                             </router-link>
@@ -93,6 +94,7 @@ import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 import config from '@/lib/config';
 
 
@@ -111,6 +113,7 @@ interface SubMenu {
     to: Location['query'];
     show: boolean;
     isNew?: boolean;
+    isBeta?: boolean;
 }
 interface Menu {
     name: keyof typeof PARENT_CATEGORY;
@@ -157,59 +160,59 @@ export default {
             menuList: computed<Menu[]>(() => [
                 {
                     name: PARENT_CATEGORY.project,
-                    label: vm.$t('MENU.PROJECT.PROJECT'),
+                    label: i18n.t('MENU.PROJECT.PROJECT'),
                     to: state.hasPermission ? { name: PROJECT_ROUTE._NAME } : {},
                     subMenuList: [],
                 },
                 {
                     name: PARENT_CATEGORY.inventory,
-                    label: vm.$t('MENU.INVENTORY.INVENTORY'),
+                    label: i18n.t('MENU.INVENTORY.INVENTORY'),
                     to: { name: INVENTORY_ROUTE._NAME },
                     subMenuList: [
-                        { label: vm.$t('MENU.INVENTORY.SERVER'), to: { name: INVENTORY_ROUTE.SERVER._NAME }, show: true },
-                        { label: vm.$t('MENU.INVENTORY.CLOUD_SERVICE'), to: { name: INVENTORY_ROUTE.CLOUD_SERVICE._NAME }, show: true },
+                        { label: i18n.t('MENU.INVENTORY.SERVER'), to: { name: INVENTORY_ROUTE.SERVER._NAME }, show: true },
+                        { label: i18n.t('MENU.INVENTORY.CLOUD_SERVICE'), to: { name: INVENTORY_ROUTE.CLOUD_SERVICE._NAME }, show: true },
                     ],
                 },
                 {
                     name: PARENT_CATEGORY.identity,
-                    label: vm.$t('MENU.IDENTITY.IDENTITY'),
+                    label: i18n.t('MENU.IDENTITY.IDENTITY'),
                     to: { name: IDENTITY_ROUTE._NAME },
                     subMenuList: [
                         {
-                            label: vm.$t('MENU.IDENTITY.SERVICE_ACCOUNT'),
+                            label: i18n.t('MENU.IDENTITY.SERVICE_ACCOUNT'),
                             to: { name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME },
                             show: true,
                         },
-                        { label: vm.$t('MENU.IDENTITY.USER'), to: { name: IDENTITY_ROUTE.USER.MANAGEMENT._NAME }, show: state.isAdmin },
+                        { label: i18n.t('MENU.IDENTITY.USER'), to: { name: IDENTITY_ROUTE.USER.MANAGEMENT._NAME }, show: state.isAdmin },
                     ],
                 },
                 {
                     name: PARENT_CATEGORY.monitoring,
-                    label: vm.$t('MENU.MONITORING.MONITORING'),
+                    label: i18n.t('MENU.MONITORING.MONITORING'),
                     to: { name: MONITORING_ROUTE._NAME },
                     subMenuList: [
                         {
-                            label: vm.$t('MENU.MONITORING.ALERT_SYSTEM'),
+                            label: i18n.t('MENU.MONITORING.ALERT_MANAGER'),
                             to: { name: MONITORING_ROUTE.ALERT_MANAGER._NAME },
-                            isNew: true,
+                            isBeta: true,
                             show: true,
                         },
                     ],
                 },
                 {
                     name: PARENT_CATEGORY.automation,
-                    label: vm.$t('MENU.AUTOMATION.AUTOMATION'),
+                    label: i18n.t('MENU.AUTOMATION.AUTOMATION'),
                     show: state.showAutomation,
                     to: { name: AUTOMATION_ROUTE._NAME },
                     subMenuList: [
                         {
-                            label: vm.$t('MENU.AUTOMATION.POWER_SCHEDULER'),
+                            label: i18n.t('MENU.AUTOMATION.POWER_SCHEDULER'),
                             to: { name: AUTOMATION_ROUTE.POWER_SCHEDULER._NAME },
                             isNew: true,
                             show: state.showPowerScheduler,
                         },
                         {
-                            label: vm.$t('MENU.AUTOMATION.SPOT_AUTOMATION'),
+                            label: i18n.t('MENU.AUTOMATION.SPOT_AUTOMATION'),
                             to: { name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP._NAME },
                             isNew: true,
                             show: state.showSpotAutomation,
@@ -218,19 +221,19 @@ export default {
                 },
                 {
                     name: PARENT_CATEGORY.plugin,
-                    label: vm.$t('MENU.PLUGIN.PLUGIN'),
+                    label: i18n.t('MENU.PLUGIN.PLUGIN'),
                     to: { name: PLUGIN_ROUTE._NAME },
                     subMenuList: [
-                        { label: vm.$t('MENU.PLUGIN.COLLECTOR'), to: { name: PLUGIN_ROUTE.COLLECTOR._NAME }, show: true },
+                        { label: i18n.t('MENU.PLUGIN.COLLECTOR'), to: { name: PLUGIN_ROUTE.COLLECTOR._NAME }, show: true },
                     ],
                 },
                 {
                     name: PARENT_CATEGORY.management,
-                    label: vm.$t('MENU.MANAGEMENT.MANAGEMENT'),
+                    label: i18n.t('MENU.MANAGEMENT.MANAGEMENT'),
                     to: { name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME },
                     subMenuList: [
                         {
-                            label: vm.$t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), to: { name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME }, isNew: true, show: true,
+                            label: i18n.t('MENU.MANAGEMENT.COLLECTOR_HISTORY'), to: { name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME }, show: true,
                         },
                     ],
                 },
@@ -357,6 +360,13 @@ export default {
                 &:active {
                     @apply bg-white;
                 }
+            }
+            .beta-text {
+                @apply text-coral;
+                font-size: 0.75rem;
+                vertical-align: text-top;
+                cursor: default;
+                margin-left: 0.25rem;
             }
             .new-text {
                 font-size: 0.75rem;

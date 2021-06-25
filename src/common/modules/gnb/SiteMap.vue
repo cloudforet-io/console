@@ -28,6 +28,7 @@
                                     <li class="submenu" @click="hideMenu">
                                         {{ subMenu.label }}
                                         <span v-if="subMenu.isNew" class="new-text">new</span>
+                                        <span v-if="subMenu.isBeta" class="beta-text">beta</span>
                                     </li>
                                 </router-link>
                             </div>
@@ -56,6 +57,7 @@ enum MENU_ICON {
     project = 'ic_project',
     inventory = 'ic_inventory',
     identity = 'ic_identity',
+    monitoring = 'ic_monitoring',
     automation = 'ic_automation',
     plugin = 'ic_plugin',
     management = 'ic_management',
@@ -183,6 +185,13 @@ export default {
                 &:hover {
                     @apply text-primary;
                     transition: all ease 0.3s;
+                }
+                .beta-text {
+                    @apply text-coral;
+                    font-size: 0.75rem;
+                    vertical-align: super;
+                    cursor: default;
+                    margin-left: 0.25rem;
                 }
                 .new-text {
                     font-size: 0.75rem;
