@@ -1,3 +1,10 @@
+# [1.1.0-beta.78](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.77...v1.1.0-beta.78) (2021-06-25)
+
+
+### Bug Fixes
+
+* add sync props to PToggleButton ([#616](https://github.com/spaceone-dev/spaceone-design-system/issues/616)) ([6beb562](https://github.com/spaceone-dev/spaceone-design-system/commit/6beb56212b9247993cc67f0f1647ba8c456ad142))
+
 # [1.1.0-beta.77](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.76...v1.1.0-beta.77) (2021-06-25)
 
 
