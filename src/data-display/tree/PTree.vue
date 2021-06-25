@@ -28,13 +28,11 @@
                             <p-i v-if="node.loading" name="ic_working"
                                  width="1rem" height="1rem"
                             />
-                            <template v-else>
-                                <p-i v-if="toggleOptions.validator && toggleOptions.validator(node)"
-                                     :name="node.$folded ? 'ic_tree_arrow' : 'ic_tree_arrow--opened'"
-                                     width="1em" height="1em"
-                                     color="inherit"
-                                />
-                            </template>
+                            <p-i v-else-if="!toggleOptions.validator || (toggleOptions.validator && toggleOptions.validator(node))"
+                                 :name="node.$folded ? 'ic_tree_arrow' : 'ic_tree_arrow--opened'"
+                                 width="1em" height="1em"
+                                 color="inherit"
+                            />
                         </slot>
                     </span>
                     <p-text-input v-if="isEditing && getSelectState(path)"
@@ -68,54 +66,68 @@
 <script lang="ts">
 /* eslint-disable no-await-in-loop */
 import {
-    Tree, Fold, Draggable,
+    Tree as TreeComp, Fold, Draggable, Store, Tree as OriginTree,
 } from 'he-tree-vue';
 import {
-    computed, defineComponent, reactive, toRefs, watch,
+    computed, defineComponent, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { unionBy } from 'lodash';
 import PI from '@/foundation/icons/PI.vue';
 import PTextInput from '@/inputs/input/PTextInput.vue';
 import { focus } from 'vue-focus';
+import {
+    TreeNode,
+    Tree,
+    Predicate,
+    TreeItem,
+    ToggleOptions,
+    SelectOptions,
+    EditOptions,
+    DragOptions,
+    DataGetter,
+    DataSetter,
+    GetClassNames, DataFetcher,
+} from '@/data-display/tree/type';
+import { getDefaultNode } from '@/data-display/tree/helper';
 
-export default defineComponent({
+interface HeTree extends OriginTree, Fold, Draggable {}
+
+interface Props {
+    toggleOptions: ToggleOptions;
+    selectOptions: SelectOptions;
+    editOptions: EditOptions;
+    dragOptions: DragOptions;
+    dataGetter: DataGetter;
+    dataSetter: DataSetter;
+    dataFetcher?: DataFetcher;
+    fetchOnInit?: boolean;
+    getClassNames: GetClassNames;
+}
+
+export default defineComponent<Props>({
     name: 'PTree',
     components: {
         PTextInput,
         PI,
-        Tree: ((Tree as any).mixPlugins([Fold, Draggable]) as any),
+        Tree: ((TreeComp as any).mixPlugins([Fold, Draggable]) as any),
     },
     directives: { focus },
     props: {
         toggleOptions: {
             type: Object,
-            default: () => ({
-                disabled: false,
-                validator: () => true,
-            }),
+            default: () => ({}),
         },
         selectOptions: {
             type: Object,
-            default: () => ({
-                disabled: false,
-                validator: () => true,
-            }),
+            default: () => ({}),
         },
         editOptions: {
             type: Object,
-            default: () => ({
-                disabled: false,
-                editStartValidator: () => true,
-                validator: () => true,
-            }),
+            default: () => ({}),
         },
         dragOptions: {
             type: Object,
-            default: () => ({
-                disabled: false,
-                dragValidator: () => true,
-                dropValidator: () => true,
-            }),
+            default: () => ({}),
         },
         dataGetter: {
             type: Function,
@@ -138,24 +150,23 @@ export default defineComponent({
             default: () => ({}),
         },
     },
-    setup(props, { emit }) {
+    setup(props: Props, { emit }) {
         const state = reactive({
-            treeRef: undefined as any,
-            treeData: [],
+            treeRef: null as null|HeTree,
+            treeData: [] as TreeNode[],
             editText: '',
             isEditing: false,
             invalid: computed(() => {
                 if (props.editOptions.validator) return !props.editOptions.validator(state.editText);
                 return undefined;
             }),
-            selectedItem: {} as { path?: number[]; node?: any},
-            selectedItems: [] as { path: number[]; node: any}[],
-            selectedPaths: computed(() => state.selectedItems.map(d => d.path)),
+            selectedItems: [] as TreeNode[],
+            selectedPaths: computed<number[]>(() => state.selectedItems.map(d => d.path)),
             isFetchAndFinding: false,
-            dragTargetParentPath: null as any,
+            dragTargetParentPath: null as null|number[],
         });
 
-        const getSelectState = path => !!state.selectedPaths.find(d => d.toString() === path.toString());
+        const getSelectState = (path: number[]) => !!state.selectedPaths.find(d => d.toString() === path.toString());
 
         const resetSelect = () => {
             state.selectedItems.forEach((d) => {
@@ -164,12 +175,10 @@ export default defineComponent({
             state.selectedItems = [];
         };
 
-        const setSelectItem = (node, path, value = true) => {
+        const setSelectItem = (node: TreeNode, path, value = true) => {
             if (state.isFetchAndFinding) return;
 
-            if (props.selectOptions.validator) {
-                if (!props.selectOptions.validator(node)) return;
-            }
+            if (props.selectOptions.validator && !props.selectOptions.validator(node)) return;
 
             // multi select
             if (props.selectOptions.multiSelectable) {
@@ -200,8 +209,9 @@ export default defineComponent({
 
             let targetItems: {node: any; path: number[]}[];
 
-            if (props.selectOptions.validator) {
-                targetItems = items.filter(({ node }) => props.selectOptions.validator(node));
+            const validator = props.selectOptions.validator;
+            if (validator) {
+                targetItems = items.filter(({ node }) => validator(node));
             } else {
                 targetItems = items;
             }
@@ -236,7 +246,7 @@ export default defineComponent({
             }
         };
 
-        const startEdit = (node) => {
+        const startEdit = (node: TreeNode) => {
             if (props.editOptions.disabled) return;
             const validator = props.editOptions.editStartValidator;
             if (validator && !validator(node)) return;
@@ -244,35 +254,35 @@ export default defineComponent({
             state.isEditing = true;
         };
 
-        const changeSelectState = (node, path, value = true) => {
+        const changeSelectState = (node: TreeNode, path: number[], value = true): void => {
             if (props.selectOptions.disabled) return;
 
             setSelectItem(node, path, value);
         };
 
-        const onDragStart = (tree, e) => {
+        const onDragStart = (tree: HeTree, e: Store) => {
             const validator = props.dragOptions.startValidator;
-            const parent = tree.getNodeParentByPath(e.startPath);
+            const parent = e.startPath ? tree.getNodeParentByPath(e.startPath) as TreeNode : null;
 
-            if (validator && !validator(e.dragNode, parent)) return false;
+            if (validator && !validator(e.dragNode as TreeNode, parent)) return false;
 
             emit('start-drag', e.dragNode, parent);
             return true;
         };
 
-        const onDragEnd = (tree, e) => {
+        const onDragEnd = (tree: HeTree, e: Store) => {
             state.dragTargetParentPath = null;
-            const parent = tree.getNodeParentByPath(e.targetPath);
+            const parent = e.targetPath ? tree.getNodeParentByPath(e.targetPath) as TreeNode : null;
 
             const validator = props.dragOptions.endValidator;
 
-            if (validator && !validator(e.dragNode, parent)) {
+            if (validator && !validator(e.dragNode as TreeNode, parent)) {
                 emit('end-drag', e.dragNode, parent);
                 return false;
             }
 
-            if (getSelectState(e.startPath)) {
-                setSelectItem(e.dragNode, e.targetPath);
+            if (getSelectState(e.startPath ?? [])) {
+                setSelectItem(e.dragNode as TreeNode, e.targetPath);
             }
 
             emit('update-drag', e.dragNode, parent);
@@ -280,25 +290,28 @@ export default defineComponent({
             return true;
         };
 
-        const eachDraggable = (path, tree, e) => {
+        const eachDraggable = (path: number[], tree: HeTree, e: Store) => {
             const dragValidator = props.dragOptions.dragValidator;
-            if (dragValidator && !dragValidator(e.dragNode, tree.getNodeParentByPath(path))) return false;
+            if (dragValidator
+                && !dragValidator(e.dragNode as TreeNode, tree.getNodeParentByPath(path) as TreeNode)) {
+                return false;
+            }
             return true;
         };
-        const eachDroppable = (parentPath, tree, e) => {
+        const eachDroppable = (parentPath: number[], tree: HeTree, e: Store) => {
             const dropValidator = props.dragOptions.dropValidator;
 
-            let parent = null;
+            let parent: null|TreeNode = null;
             if (parentPath.length > 0) {
-                parent = tree.getNodeByPath(parentPath);
+                parent = tree.getNodeByPath(parentPath) as TreeNode;
             }
 
             state.dragTargetParentPath = parentPath;
 
-            if (dropValidator && !dropValidator(e.dragNode, parent)) return false;
+            if (dropValidator && !dropValidator(e.dragNode as TreeNode, parent)) return false;
             return true;
         };
-        const finishEdit = (node) => {
+        const finishEdit = (node: TreeNode) => {
             if (!state.isEditing) return;
 
             state.isEditing = false;
@@ -308,16 +321,11 @@ export default defineComponent({
 
             emit('finish-edit', node);
         };
-        const getDefaultNode = data => ({
-            data,
-            children: [],
-            $folded: true,
-            loading: false,
-        });
-        const fetchData = async (_node?) => {
+
+        const fetchData = async (_node?: TreeNode|null): Promise<TreeNode[]> => {
             if (!props.dataFetcher) return [];
 
-            const node = _node || {};
+            const node: Partial<TreeNode> = _node || {};
 
             node.loading = true;
             let res = props.dataFetcher(node);
@@ -330,7 +338,7 @@ export default defineComponent({
             return node.children;
         };
 
-        const onNodeFoldedChange = async (node, path, folded) => {
+        const onNodeFoldedChange = async (node: TreeNode, path: number[], folded?: boolean) => {
             if (folded) {
                 if (props.dataFetcher) {
                     node.children = [];
@@ -346,7 +354,7 @@ export default defineComponent({
             }
         };
 
-        const onToggle = async (node, path, tree) => {
+        const onToggle = async (node: TreeNode, path: number[], tree: HeTree) => {
             if (props.toggleOptions.disabled) return;
             if (props.toggleOptions.validator && !props.toggleOptions.validator(node)) return;
 
@@ -358,7 +366,7 @@ export default defineComponent({
             await onNodeFoldedChange(node, path, node.$folded);
         };
 
-        const onClickNode = (node, path, e) => {
+        const onClickNode = (node: TreeNode, path: number[], e: Store) => {
             emit('click-node', node, path, e);
 
             if (getSelectState(path)) startEdit(node);
@@ -367,11 +375,11 @@ export default defineComponent({
             if (props.toggleOptions.toggleOnNodeClick) onToggle(node, path, state.treeRef);
         };
 
-        const addNode = (data) => {
+        const addNode = (data: any[]|any): void => {
             if (Array.isArray(data)) state.treeData = state.treeData.concat(data.map(d => getDefaultNode(d)));
             else state.treeData.push(getDefaultNode(data));
         };
-        const findNodePath = (predicate: any, paths: number[] = [], _children?: any[]) => {
+        const findNodePath = (predicate: Predicate, paths: number[] = [], _children?: any[]): number[] => {
             let children: any[] = _children as unknown as any[];
             if (!children) children = state.treeData;
 
@@ -382,7 +390,7 @@ export default defineComponent({
                     return paths;
                 }
 
-                if (current.children) {
+                if (current?.children) {
                     const res = findNodePath(predicate, [...paths, i], current.children);
                     if (res.length) return res;
                 }
@@ -390,9 +398,9 @@ export default defineComponent({
 
             return [];
         };
-        const findNode = (predicate) => {
+        const findNode = (predicate: Predicate): null|TreeNode => {
             const path = findNodePath(predicate);
-            let node = null;
+            let node: null|TreeNode = null;
             if (state.treeRef) node = state.treeRef.getNodeByPath(path);
 
             if (node) {
@@ -402,13 +410,13 @@ export default defineComponent({
             resetSelect();
             return null;
         };
-        const fetchAndFind = async (predicates: any[]): Promise<{node: any|null; path: number[]}> => {
-            let node: any = null;
+        const fetchAndFind = async (predicates: Predicate[]): Promise<{node: TreeNode|null; path: number[]}> => {
+            let node: TreeNode|null = null;
             const path: number[] = [];
 
             for (let i = 0; i < predicates.length; i++) {
                 const predicate = predicates[i];
-                let children: any[] = node?.children || state.treeData;
+                let children: TreeNode[] = node?.children || state.treeData;
 
                 let idx: number = children.findIndex(d => predicate(d.data));
 
@@ -422,7 +430,7 @@ export default defineComponent({
                     }
                 }
 
-                node = children[idx] as any;
+                node = children[idx];
                 path.push(idx);
 
                 if (i < predicates.length - 1) {
@@ -432,7 +440,7 @@ export default defineComponent({
 
             return { node, path };
         };
-        const fetchAndFindNode = async (predicates: any[]): Promise<{node: any|null; path: number[]}> => {
+        const fetchAndFindNode = async (predicates: Predicate[]): Promise<{node: TreeNode|null; path: number[]}> => {
             state.isFetchAndFinding = true;
 
             const { node, path } = await fetchAndFind(predicates);
@@ -443,7 +451,7 @@ export default defineComponent({
             }
             return { node, path };
         };
-        const fetchAndFindNodes = async (predicateList: any[][]): Promise<{node: any; path: number[]}[]> => {
+        const fetchAndFindNodes = async (predicateList: Predicate[][]): Promise<{node: TreeNode; path: number[]}[]> => {
             state.isFetchAndFinding = true;
 
             const foundItems: {node: any; path: number[]}[] = [];
@@ -460,7 +468,7 @@ export default defineComponent({
             setSelectItems(foundItems);
             return foundItems;
         };
-        const getAllNodes = (node, nodes: any[] = []) => {
+        const getAllNodes = (node?: TreeNode|null, nodes: TreeNode[] = []): TreeNode[] => {
             const children: any[] = node?.children || state.treeData;
             children.forEach((d) => {
                 nodes.push(d);
@@ -469,17 +477,18 @@ export default defineComponent({
             return nodes;
         };
 
-        const getAllItems = (node, _path: number[] = []) => {
-            const children: any[] = node?.children || state.treeData;
-            let items: any[] = [];
+        const getAllItems = (node?: TreeNode|null, _path: number[] = []): TreeItem[] => {
+            const children: TreeNode[] = node?.children || state.treeData;
+            let items: TreeItem[] = [];
 
             children.forEach((d, i) => {
                 const path = [..._path];
                 path.push(i);
 
-                const data: any = {};
-                data.path = path;
-                data.node = d;
+                const data: TreeItem = {
+                    path,
+                    node: d,
+                };
                 items.push(data);
                 if (d.children && d.children.length) {
                     items = items.concat(getAllItems(d, path));
@@ -488,22 +497,22 @@ export default defineComponent({
             return items;
         };
 
-        const deleteNodeByPath = (path) => {
+        const deleteNodeByPath = (path: number[]): void => {
             if (path.length === 0) return;
 
             if (getSelectState(path)) resetSelect();
             state.treeRef.removeNodeByPath(path);
         };
 
-        const deleteNode = (predicate) => {
+        const deleteNode = (predicate: Predicate): void => {
             const path = findNodePath(predicate);
             deleteNodeByPath(path);
         };
 
-        const addChildNodeByPath = (path, data, unfold = true) => {
+        const addChildNodeByPath = (path: number[], data: any[]|any, unfold = true): void => {
             if (path.length === 0) addNode(data);
             else {
-                const parent = state.treeRef.getNodeByPath(path);
+                const parent = state.treeRef.getNodeByPath(path) as TreeNode || null;
                 if (parent) {
                     if (Array.isArray(data)) {
                         parent.children = parent.children.concat(data.map(d => getDefaultNode(d)));
@@ -517,7 +526,7 @@ export default defineComponent({
             }
         };
 
-        const updateNodeByPath = (path, data) => {
+        const updateNodeByPath = (path: number[], data): void => {
             if (path.length === 0) return;
 
             const target = state.treeRef.getNodeByPath(path);
@@ -526,13 +535,21 @@ export default defineComponent({
             target.data = data;
         };
 
-        const updateNode = (predicate, data) => {
+        const updateNode = (predicate: Predicate, data): void => {
             const path = findNodePath(predicate);
             updateNodeByPath(path, data);
         };
 
-        const root = {
+        watch(() => state.selectedPaths, (after, before) => {
+            if (after.toString() === before.toString()) return;
+            emit('change-select', state.selectedItems);
+        });
+
+
+        /* Init */
+        const root: Tree = {
             fetchData,
+            changeSelectState,
             addNode,
             findNode,
             fetchAndFindNode,
@@ -545,28 +562,28 @@ export default defineComponent({
             addChildNodeByPath,
             updateNodeByPath,
             updateNode,
-            changeSelectState,
-            toggleNode: (node, path) => {
+            toggleNode: (node: TreeNode, path: number[]) => {
                 (async () => {
                     await onToggle(node, path, state.treeRef);
                 })();
             },
+            getNodeParentByPath(path: number[]) {
+                return state.treeRef.getNodeParentByPath(path) || null;
+            },
+            getNodeByPath(path: number[]) {
+                return state.treeRef.getNodeByPath(path) || null;
+            },
         };
 
-
-        watch(() => state.selectedPaths, (after, before) => {
-            if (after.toString() === before.toString()) return;
-            emit('change-select', state.selectedItems);
+        onMounted(() => {
+            (async () => {
+                if (props.fetchOnInit) {
+                    await fetchData();
+                }
+                emit('init', root);
+            })();
         });
 
-
-        /* Init */
-        (async () => {
-            if (props.fetchOnInit) {
-                await fetchData();
-            }
-            emit('init', root);
-        })();
 
         return {
             ...toRefs(state),

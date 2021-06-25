@@ -1,10 +1,10 @@
 <template>
     <div class="p-breadcrumbs">
         <span v-for="(route, idx) in routes" :key="idx">
-            <span v-if="route.path">
+            <span v-if="route.to || route.path">
                 <router-link
                     v-if="isLengthOverFive(idx)" class="menu"
-                    :to="getPath(route)"
+                    :to="getLocation(route)"
                 >
                     <span v-if="idx !== routes.length - 1" class="inline-block link">{{ route.name }}</span>
                     <span v-else class="inline-block current-page">{{ route.name }}</span>
@@ -16,9 +16,7 @@
                 </router-link>
             </span>
             <span v-else>
-                <div
-                    v-if="isLengthOverFive(idx)" class="menu"
-                >
+                <div v-if="isLengthOverFive(idx)" class="menu">
                     <span v-if="idx !== routes.length - 1" class="inline-block link"
                           @click="$emit('click', route, idx)"
                     >{{ route.name }}</span>
@@ -30,7 +28,7 @@
                     </span>
                 </div>
             </span>
-            <span v-if="routes.length>=5&&idx===2&&!state.isShown">
+            <span v-if="routes.length >= 5 && idx === 2 && !state.isShown">
                 <span class="inline-block link hidden-underline" @click="showHidden">...</span>
                 <p-i name="ic_breadcrumb_arrow" width="1rem" height="1rem"
                      class="arrow-icon" color="inherit white"
@@ -41,10 +39,21 @@
 </template>
 
 <script lang="ts">
+import { defineComponent, reactive } from '@vue/composition-api';
 import PI from '@/foundation/icons/PI.vue';
-import { reactive } from '@vue/composition-api';
+import { Location } from 'vue-router';
 
-export default {
+interface Route {
+    name: string;
+    path?: string;
+    to?: Location;
+}
+
+interface Props {
+    routes: Route[];
+}
+
+export default defineComponent<Props>({
     name: 'PBreadcrumbs',
     components: {
         PI,
@@ -52,25 +61,29 @@ export default {
     props: {
         routes: {
             type: Array,
-            default: null,
+            default: () => [],
         },
     },
-    setup(props) {
+    setup(props: Props) {
         const state = reactive({
             isShown: false,
         });
-        const getPath = route => `${route.path}`;
+        const getLocation = (route: Route): Location => {
+            if (route.to) return route.to;
+            if (route.path) return { path: route.path };
+            return {};
+        };
         const showHidden = () => { state.isShown = true; };
         const isLengthOverFive = idx => props.routes.length < 5 || (props.routes.length >= 5 && (idx < 1 || idx > props.routes.length - 3)) || state.isShown;
 
         return {
             state,
-            getPath,
+            getLocation,
             showHidden,
             isLengthOverFive,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss">
