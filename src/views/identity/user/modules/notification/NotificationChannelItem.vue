@@ -53,6 +53,7 @@ import NotificationChannelItemSchedule
     from '@/views/identity/user/modules/notification/notification-channel-item/NotificationChannelItemSchedule.vue';
 import NotificationChannelItemTopic
     from '@/views/identity/user/modules/notification/notification-channel-item/NotificationChannelItemTopic.vue';
+import { PROTOCOL_TYPE } from '@/views/identity/user/modules/notification/notification-channel-item/type';
 
 enum EDIT_TYPE {
     NAME = 'name',
@@ -61,12 +62,6 @@ enum EDIT_TYPE {
     TOPIC = 'topic',
     LEVEL = 'notification_level',
     USERS = 'users',
-}
-
-enum PROTOCOL_TYPE {
-    AWS_SNS = 'AWS SNS',
-    SLACK = 'Slack Protocol',
-    MEGAZONE = 'Megazone Voicecall Protocol'
 }
 
 interface ParamType {

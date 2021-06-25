@@ -1,7 +1,7 @@
 <template>
     <div class="event-rule-content">
         <section class="left-section">
-            <h4><b>{{ data.conditions_policy }}</b> of the following are met</h4>
+            <h4><b>{{ data.conditions_policy }}</b> {{$t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET')}}</h4>
             <ul v-for="(condition, idx) in data.conditions" :key="`${condition}-${idx}`" class="condition-list">
                 <li>
                     <span class="text-blue-800">{{ condition.key }}</span>
@@ -11,7 +11,7 @@
             </ul>
         </section>
         <section class="right-section">
-            <h4><b>Do</b> these things</h4>
+            <h4><b>{{$t('PROJECT.EVENT_RULE.DO')}}</b> {{$t('PROJECT.EVENT_RULE.THESE_THINGS')}}</h4>
             <table>
                 <tbody>
                     <tr v-for="(item, index) in fields" :key="`${item}-${index}`">
@@ -21,7 +21,7 @@
                         >
                             <td>{{ item.label }}</td>
                             <td v-if="item.name === 'no_notification'">
-                                <span v-if="items[item.name]">Pause Notification</span>
+                                <span v-if="items[item.name]">{{$t('PROJECT.EVENT_RULE.PAUSE')}}</span>
                                 <span v-else>On</span>
                             </td>
                             <td v-else-if="item.name === 'change_project'">

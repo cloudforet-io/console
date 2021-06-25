@@ -21,8 +21,7 @@
                                 {{ item.label }}
                             </span>
                             <span v-if="item.protocolType === 'INTERNAL'" class="item-desc">
-                                (Forward to the member's <br>
-                                personal notification channel)
+                                {{ $t('IDENTITY.USER.NOTIFICATION.SPACEONE_USER_DESC') }}
                             </span>
                         </li>
                     </router-link>
@@ -30,7 +29,7 @@
             </ul>
             <span v-else>
                 <p-empty v-if="channelList.length === 0" class="empty-msg protocol">
-                    No Protocol Channel
+                    {{$t('IDENTITY.USER.NOTIFICATION.NO_PROTOCOL')}}
                 </p-empty>
             </span>
             <p-divider class="divider" />
@@ -248,6 +247,7 @@ export default {
         font-size: 0.75rem;
         line-height: 150%;
         text-align: center;
+        max-width: 12.5rem;
     }
     &:hover {
         @apply bg-blue-100;
