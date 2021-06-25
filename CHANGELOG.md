@@ -1,3 +1,10 @@
+# [1.1.0-beta.76](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.75...v1.1.0-beta.76) (2021-06-25)
+
+
+### Bug Fixes
+
+* add disabled style to gray-border button ([#614](https://github.com/spaceone-dev/spaceone-design-system/issues/614)) ([cc15a38](https://github.com/spaceone-dev/spaceone-design-system/commit/cc15a38d4de9da86af2d288a18fe7fac2e33c4eb))
+
 # [1.1.0-beta.75](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.74...v1.1.0-beta.75) (2021-06-24)
 
 
