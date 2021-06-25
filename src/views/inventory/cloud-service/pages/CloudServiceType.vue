@@ -67,19 +67,20 @@
                      class="region-list"
                 >
                     <p-check-box :selected="filterState.regionFilter" :value="region.region_id"
-                                 @change="onClickRegion"
-                    />
-                    <span class="region-list-text">
-                        <div class="region-type">
-                            <span class="region-provider"
-                                  :style="{color: providers[region.provider] ? providers[region.provider].color : undefined}"
-                            >
-                                {{ providers[region.provider] ? providers[region.provider].label : region.provider }}
-                            </span>
-                            {{ region.name }}
-                        </div>
-                        <span class="region-code">{{ region.region_code }} </span>
-                    </span>
+                                 @change="onClickRegion" class="flex"
+                    >
+                        <span class="region-list-text">
+                            <div class="region-type">
+                                <span class="region-provider"
+                                      :style="{color: providers[region.provider] ? providers[region.provider].color : undefined}"
+                                >
+                                    {{ providers[region.provider] ? providers[region.provider].label : region.provider }}
+                                </span>
+                                {{ region.name }}
+                            </div>
+                            <span class="region-code">{{ region.region_code }} </span>
+                        </span>
+                    </p-check-box>
                 </div>
             </div>
         </template>

@@ -4,6 +4,13 @@
         <p-page-title child :title="pageTitle" class="page-title"
                       @goBack="$router.go(-1)"
         />
+<!--        <info-button-->
+<!--            class="flex-shrink-0"-->
+<!--        >-->
+<!--            <template #contents>-->
+<!--                test-->
+<!--            </template>-->
+<!--        </info-button>-->
         <section class="content-list-wrapper">
             <p-pane-layout class="content-wrapper">
                 <h3 class="content-title">
@@ -65,6 +72,7 @@ import VueI18n from 'vue-i18n';
 import { store } from '@/store';
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import InfoButton from '@/common/components/InfoButton.vue';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -75,6 +83,7 @@ export default {
         AddNotificationSchedule,
         AddNotificationTopic,
         GeneralPageLayout,
+        InfoButton,
         PBreadcrumbs,
         PPaneLayout,
         PPageTitle,
@@ -84,15 +93,18 @@ export default {
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            notificationLevel: 'LV1',
             type: '',
             pageTitle: '' as TranslateResult,
+            description: null,
+            //
             userId: decodeURIComponent(vm.$route.params.userId),
             projectId: vm.$route.query.projectId,
             protocolId: vm.$route.params.protocolId,
             protocolType: vm.$route.query.protocolType,
             supportedSchema: vm.$route.query.supported_schema,
+            //
             isDataValid: false,
+            notificationLevel: 'LV1',
             //
             channelName: '',
             data: {},
