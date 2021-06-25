@@ -23,7 +23,7 @@
                         >
                             <td>{{ item.label }}</td>
                             <td v-if="item.name === 'no_notification'">
-                                <span class="text-secondary">ON</span>
+                                <span class="text-secondary">{{ $t('PROJECT.EVENT_RULE.ON') }}</span>
                             </td>
                             <td v-else-if="item.name === 'change_project'">
                                 <p-anchor :to="referenceRouter(
