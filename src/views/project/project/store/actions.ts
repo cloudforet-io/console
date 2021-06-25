@@ -23,7 +23,7 @@ export const selectNode: Action<ProjectPageState, any> = async ({ state, commit,
         const paths = res.open_path || [];
 
         if (state.rootNode) {
-            const node = await state.rootNode.fetchAndFindNode(paths.map(d => (data => data.id === d)));
+            const { node } = await state.rootNode.fetchAndFindNode(paths.map(d => (data => data.id === d)));
             return node;
         }
     } catch (e) {

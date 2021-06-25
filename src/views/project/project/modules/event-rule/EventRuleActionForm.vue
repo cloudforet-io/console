@@ -18,11 +18,15 @@
             </div>
             <div class="form-box">
                 <p>{{ $t('PROJECT.EVENT_RULE.PROJECT_ROUTING') }}</p>
-                <project-select-dropdown @select="onSelectProjectRouting" />
+                <project-select-dropdown :selected-project-ids="actions.change_project ? [actions.change_project] : []"
+                                         @select="onSelectProjectRouting"
+                />
             </div>
             <div class="form-box">
                 <p>{{ $t('PROJECT.EVENT_RULE.PROJECT_DEPENDENCIES') }}</p>
-                <project-select-dropdown multi-selectable @select="onSelectProjectDependencies" />
+                <project-select-dropdown multi-selectable
+                                         :selected-project-ids="actions.add_project_dependency || []"
+                                         @select="onSelectProjectDependencies" />
             </div>
             <div class="form-box">
                 <p>{{ $t('PROJECT.EVENT_RULE.URGENCY') }}</p>

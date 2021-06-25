@@ -7,12 +7,11 @@
                            :invalid="invalid"
                            :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
         >
-            <div v-if="!multiSelectable && selectedItems.length > 0" class="tag-wrapper">
-                <p-tag v-for="({node, path}) in selectedItems" :key="node.data.id"
-                       :activated="visibleMenu"
-                       @delete="onDeleteTag(node, path)"
+            <div v-if="!multiSelectable && selectedItem" class="tag-wrapper">
+                <p-tag :activated="visibleMenu"
+                       @delete="onDeleteTag(selectedItem.node, selectedItem.path)"
                 >
-                    {{ node.data.name }}
+                    {{ selectedItem.node.data.name }}
                 </p-tag>
             </div>
             <template #menu-menu>
@@ -57,7 +56,9 @@
 import {
     PCheckBox, PI, PRadio, PSelectDropdown, PTag, PTree,
 } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs,
+} from '@vue/composition-api';
 import { ProjectGroup } from '@/views/identity/service-account/type';
 import { SpaceConnector } from '@/lib/space-connector';
 
@@ -72,6 +73,10 @@ export default {
         PI,
     },
     props: {
+        selectedProjectIds: {
+            type: Array,
+            default: () => [],
+        },
         multiSelectable: {
             type: Boolean,
             default: false,
@@ -85,6 +90,7 @@ export default {
         const state = reactive({
             root: null as any,
             selectedItems: [] as any[],
+            selectedItem: computed(() => state.selectedItems[0]),
             selectedProjects: computed<string[]>(() => state.selectedItems.map(d => d.node.data)),
             selectComponent: computed(() => {
                 if (props.multiSelectable) return PCheckBox;
@@ -133,8 +139,36 @@ export default {
                 if (state.loading) state.loading = false;
             }
         };
+
+        const getSearchPath = async (id: string, type: string): Promise<string[]> => {
+            try {
+                const res = await SpaceConnector.client.identity.project.tree.search({
+                    item_id: id,
+                    item_type: type,
+                });
+                return res.open_path || [];
+            } catch (e) {
+                console.error(e);
+                return [];
+            }
+        };
+
+        const findNodes = async () => {
+            if (!state.root) return;
+
+            const pathList: string[][] = await Promise.all(props.selectedProjectIds.map(d => getSearchPath(d, 'PROJECT')));
+            const predicateList = pathList.map(paths => paths.map(d => (data => data.id === d)));
+            await state.root.fetchAndFindNodes(predicateList);
+        };
+
         const onTreeInit = async (root) => {
             state.root = root;
+
+            if (props.selectedProjectIds.length) {
+                await findNodes();
+            } else {
+                await root.fetchData();
+            }
         };
 
         const onChangeSelect = (selected) => {
