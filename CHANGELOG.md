@@ -1,3 +1,10 @@
+# [1.1.0-beta.80](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.79...v1.1.0-beta.80) (2021-06-25)
+
+
+### Features
+
+* add location to breadcrumbs and refactor tree ([#618](https://github.com/spaceone-dev/spaceone-design-system/issues/618)) ([f8113f3](https://github.com/spaceone-dev/spaceone-design-system/commit/f8113f34e2d4ef842a42fe8dc8d3deec1321ce89))
+
 # [1.1.0-beta.79](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.78...v1.1.0-beta.79) (2021-06-25)
 
 
