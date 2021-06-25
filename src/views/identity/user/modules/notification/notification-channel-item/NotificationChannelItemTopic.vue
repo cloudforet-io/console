@@ -15,7 +15,7 @@
                     :disabled="!isTopicValid"
                     @click="onClickSave"
                 >
-                    {{ $t('COMMON.TAGS.SAVE') }}
+                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SAVE_CHANGES') }}
                 </p-button>
             </div>
         </div>
@@ -28,11 +28,13 @@
                 </li>
             </ul>
             <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL') }}</span>
-            <button class="edit-btn" @click="startEdit">
+            <button class="edit-btn" :class="{'edit-disable':disableEdit}"
+                    @click="startEdit(EDIT_TYPE.TOPIC)"
+            >
                 <p-i name="ic_edit" width="1rem" height="1rem"
                      color="inherit" class="edit-icon"
                 />
-                {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
+                <span class="edit-text">{{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}</span>
             </button>
         </div>
     </li>
@@ -44,7 +46,11 @@ import {
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { useNotificationItem } from '@/views/identity/user/modules/notification/notification-channel-item/hooks';
-import { PARAM_KEY_TYPE, PROTOCOL_TYPE } from '@/views/identity/user/modules/notification/notification-channel-item/type';
+import {
+    EDIT_TYPE,
+    PARAM_KEY_TYPE,
+    PROTOCOL_TYPE,
+} from '@/views/identity/user/modules/notification/notification-channel-item/type';
 import { utcToTimezoneFormatter } from '@/views/identity/user/lib/helper';
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
@@ -69,6 +75,10 @@ export default {
         projectId: {
             type: String,
             default: null,
+        },
+        disableEdit: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit, root }) {
@@ -135,6 +145,7 @@ export default {
         };
 
         return {
+            EDIT_TYPE,
             PROTOCOL_TYPE,
             ...toRefs(state),
             ...toRefs(notificationItemState),
@@ -151,4 +162,12 @@ export default {
 
 <style lang="postcss" scoped>
 @import './styles/channelItem.pcss';
+.content-wrapper::v-deep .edit-btn {
+    &.edit-disable {
+        @apply text-gray-300 cursor-not-allowed;
+        &:active {
+            @apply pointer-events-none;
+        }
+    }
+}
 </style>

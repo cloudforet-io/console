@@ -19,10 +19,12 @@ export const useNotificationItem = (obj: NotificationItemState) => {
     const state = reactive<NotificationItemState>(obj);
     const cancelEdit = () => {
         state.isEditMode = false;
+        vm.$emit('edit', undefined);
     };
 
-    const startEdit = () => {
+    const startEdit = (value) => {
         state.isEditMode = true;
+        vm.$emit('edit', value);
     };
 
     const updateUserChannel = async (paramKey, paramValue) => {

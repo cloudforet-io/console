@@ -39,9 +39,9 @@
             <template #col-subscriptions-format="{value}">
                 <ul v-if="value.length > 0">
                     <li v-for="(item, index) in value" :key="`topic-${index}`">
-                        <p-tag :deletable="false">
+                        <p-badge style-type="gray200" shape="square" class="rounded">
                             {{ item }}
-                        </p-tag>
+                        </p-badge>
                     </li>
                 </ul>
                 <span v-else>
@@ -71,7 +71,7 @@ export default {
     components: {
         PDataTable,
         PPanelTop,
-        PTag,
+        PBadge,
         PButton,
     },
     props: {

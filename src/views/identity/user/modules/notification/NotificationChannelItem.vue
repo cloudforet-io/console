@@ -12,15 +12,35 @@
             />
         </div>
         <ul class="card-body">
-            <notification-channel-item-name :channel-data="channelData" :project-id="projectId" @change="onChange" />
+            <notification-channel-item-name :channel-data="channelData" :project-id="projectId"
+                                            :disable-edit="editTarget && editTarget !== EDIT_TYPE.NAME"
+                                            @change="onChange"
+                                            @edit="onEdit"
+            />
             <p-divider />
-            <notification-channel-item-data :channel-data="channelData" :project-id="projectId" @change="onChange" />
+            <notification-channel-item-data :channel-data="channelData" :project-id="projectId"
+                                            :disable-edit="editTarget && editTarget !== EDIT_TYPE.DATA"
+                                            @change="onChange"
+                                            @edit="onEdit"
+            />
             <p-divider v-if="projectId" />
-            <notification-channel-item-level :channel-data="channelData" :project-id="projectId" @change="onChange" />
+            <notification-channel-item-level :channel-data="channelData" :project-id="projectId"
+                                             :disable-edit="editTarget && editTarget !== EDIT_TYPE.LEVEL"
+                                             @change="onChange"
+                                             @edit="onEdit"
+            />
             <p-divider />
-            <notification-channel-item-schedule :channel-data="channelData" :project-id="projectId" @change="onChange" />
+            <notification-channel-item-schedule :channel-data="channelData" :project-id="projectId"
+                                                :disable-edit="editTarget && editTarget !== EDIT_TYPE.SCHEDULE"
+                                                @change="onChange"
+                                                @edit="onEdit"
+            />
             <p-divider />
-            <notification-channel-item-topic :channel-data="channelData" :project-id="projectId" @change="onChange" />
+            <notification-channel-item-topic :channel-data="channelData" :project-id="projectId"
+                                             :disable-edit="editTarget && editTarget !== EDIT_TYPE.TOPIC"
+                                             @change="onChange"
+                                             @edit="onEdit"
+            />
             <p-divider />
         </ul>
         <delete-modal :header-title="checkDeleteState.headerTitle"
@@ -53,16 +73,8 @@ import NotificationChannelItemSchedule
     from '@/views/identity/user/modules/notification/notification-channel-item/NotificationChannelItemSchedule.vue';
 import NotificationChannelItemTopic
     from '@/views/identity/user/modules/notification/notification-channel-item/NotificationChannelItemTopic.vue';
-import { PROTOCOL_TYPE } from '@/views/identity/user/modules/notification/notification-channel-item/type';
+import { EDIT_TYPE, PROTOCOL_TYPE } from '@/views/identity/user/modules/notification/notification-channel-item/type';
 
-enum EDIT_TYPE {
-    NAME = 'name',
-    DATA = 'data',
-    SCHEDULE = 'schedule',
-    TOPIC = 'topic',
-    LEVEL = 'notification_level',
-    USERS = 'users',
-}
 
 interface ParamType {
     user_channel_id?: string;
@@ -105,12 +117,11 @@ export default {
     },
     setup(props, { emit, root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-
-
         const state = reactive({
             isActivated: props.channelData?.state === STATE_TYPE.ENABLED,
             userChannelId: props.channelData?.user_channel_id,
             projectChannelId: props.channelData?.project_channel_id,
+            editTarget: undefined,
         });
         const checkDeleteState = reactive({
             visible: false,
@@ -228,15 +239,20 @@ export default {
             else await deleteUserChannel();
         };
 
+        const onEdit = (value) => {
+            state.editTarget = value;
+        };
+
         return {
-            EDIT_TYPE,
             PROTOCOL_TYPE,
+            EDIT_TYPE,
             ...toRefs(state),
             checkDeleteState,
             onToggleChange,
             onClickDelete,
             deleteChannelConfirm,
             onChange,
+            onEdit,
         };
     },
 };
@@ -263,54 +279,4 @@ export default {
     flex-direction: column;
     margin-top: 0.75rem;
 }
-.content-wrapper {
-    display: flex;
-    flex-direction: row;
-    min-height: 2.5rem;
-    align-items: center;
-    &.edit-mode {
-        @apply bg-blue-100;
-    }
-    .content-title {
-        @apply text-gray-600;
-        min-width: 10.5rem;
-        padding-left: 1rem;
-        font-size: 0.875rem;
-        line-height: 170%;
-        text-transform: capitalize;
-    }
-    .content {
-        display: inherit;
-        flex-direction: row;
-        width: 100%;
-        justify-content: space-between;
-        font-size: 0.875rem;
-        line-height: 170%;
-        padding: 0.75rem 1rem;
-        .left-section {
-            display: inherit;
-            flex-direction: column;
-            gap: 0.125rem;
-        }
-    }
-    .edit-btn {
-        @apply text-blue-600;
-        padding-right: 0.5rem;
-        line-height: 160%;
-        .edit-icon {
-            margin-right: 0.25rem;
-        }
-        &:hover, &:active {
-            @apply cursor-pointer;
-        }
-    }
-    .button-group {
-        justify-content: flex-end;
-        flex-shrink: 0;
-        .text-button {
-            height: 1.5rem;
-        }
-    }
-}
-
 </style>

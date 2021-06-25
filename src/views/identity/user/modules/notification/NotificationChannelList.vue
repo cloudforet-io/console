@@ -12,11 +12,13 @@
                     <router-link :to="item.link">
                         <li class="channel-item">
                             <p-lazy-img :src="assetUrlConverter(item.tags.icon)"
-                                        class="rounded flex-shrink-0 service-img"
+                                        :width="item.name === PROTOCOL_TYPE.SLACK ? '8rem' : '2.75rem'"
+                                        height="2.25rem"
+                                        class="service-img"
                             />
                             <span class="text">
                                 <p-i name="ic_plus_bold"
-                                     width="0.625rem" height="0.625rem"
+                                     width="1rem" height="1rem"
                                 />
                                 {{ item.label }}
                             </span>
@@ -29,7 +31,7 @@
             </ul>
             <span v-else>
                 <p-empty v-if="channelList.length === 0" class="empty-msg protocol">
-                    {{$t('IDENTITY.USER.NOTIFICATION.NO_PROTOCOL')}}
+                    {{ $t('IDENTITY.USER.NOTIFICATION.NO_PROTOCOL') }}
                 </p-empty>
             </span>
             <p-divider class="divider" />
@@ -62,6 +64,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { store } from '@/store';
 import { ChannelItem, ProtocolItem } from '@/views/identity/user/type';
+import { PROTOCOL_TYPE } from '@/views/identity/user/modules/notification/notification-channel-item/type';
 
 export default {
     name: 'NotificationChannelList',
@@ -129,6 +132,7 @@ export default {
                     },
                     protocolType: d.protocol_type,
                     tags: d.tags,
+                    name: d.name,
                 }));
             } catch (e) {
                 state.protocolList = [];
@@ -193,6 +197,7 @@ export default {
         return {
             ...toRefs(state),
             routeState,
+            PROTOCOL_TYPE,
             assetUrlConverter,
             onChangeChannelItem,
             listChannel,

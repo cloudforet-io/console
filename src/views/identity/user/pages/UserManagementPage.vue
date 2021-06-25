@@ -208,6 +208,7 @@ import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/hel
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/lib/util';
 import { FILE_NAME_PREFIX } from '@/lib/type';
+import {i18n} from "@/translations";
 
 interface UserModel {
     created_at: Timestamp;
@@ -393,20 +394,20 @@ export default {
         });
         const routeState = reactive({
             routes: computed(() => ([
-                { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/user-management' },
-                { name: vm.$t('IDENTITY.USER.MAIN.ROOT_ACCOUNT'), path: '/identity/user/user-management' },
-                { name: vm.$t('IDENTITY.USER.MAIN.USER_MANAGEMENT') },
+                { name: i18n.t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
+                { name: i18n.t('MENU.IDENTITY.USER'), path: '/identity/user/user-management' },
+                { name: i18n.t('IDENTITY.USER.MAIN.ROOT_ACCOUNT'), path: '/identity/user/user-management' },
+                { name: i18n.t('IDENTITY.USER.MAIN.USER_MANAGEMENT') },
             ])),
         });
 
         const singleItemTabState = reactive({
             tabs: computed(() => ([
-                { label: vm.$t('IDENTITY.USER.MAIN.DETAILS'), name: 'detail', keepAlive: true },
-                { label: vm.$t('IDENTITY.USER.MAIN.TAG'), name: 'tag', keepAlive: true },
-                { label: vm.$t('IDENTITY.USER.MAIN.ASSIGNED_ROLES'), name: 'assigned_role', keepAlive: true },
-                { label: vm.$t('IDENTITY.USER.MAIN.API_KEY'), name: 'api_key', keepAlive: true },
-                { label: 'Notifications', name: 'notifications', keepAlive: true },
+                { label: i18n.t('IDENTITY.USER.MAIN.DETAILS'), name: 'detail', keepAlive: true },
+                { label: i18n.t('IDENTITY.USER.MAIN.TAG'), name: 'tag', keepAlive: true },
+                { label: i18n.t('IDENTITY.USER.MAIN.ASSIGNED_ROLES'), name: 'assigned_role', keepAlive: true },
+                { label: i18n.t('IDENTITY.USER.MAIN.API_KEY'), name: 'api_key', keepAlive: true },
+                { label: i18n.t('IDENTITY.USER.MAIN.NOTIFICATION'), name: 'notifications', keepAlive: true },
             ] as TabItem[])),
             activeTab: 'detail',
         });

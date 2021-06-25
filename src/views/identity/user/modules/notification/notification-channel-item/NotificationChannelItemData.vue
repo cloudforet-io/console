@@ -31,7 +31,7 @@
                     class="text-button"
                     @click="onClickSave"
                 >
-                    {{ $t('COMMON.TAGS.SAVE') }}
+                    {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SAVE_CHANGES') }}
                 </p-button>
             </div>
         </div>
@@ -59,7 +59,9 @@
             <p v-if="channelData.protocol_name === PROTOCOL_TYPE.SLACK">
                 <info-message :message="$t('IDENTITY.USER.NOTIFICATION.CANNOT_EDIT_SLACK')" />
             </p>
-            <button v-else class="edit-btn" @click="startEdit">
+            <button v-else class="edit-btn" :class="{'edit-disable':disableEdit}"
+                    @click="startEdit(EDIT_TYPE.DATA)"
+            >
                 <p-i name="ic_edit" width="1rem" height="1rem"
                      color="inherit" class="edit-icon"
                 />
@@ -75,7 +77,11 @@ import {
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { useNotificationItem } from '@/views/identity/user/modules/notification/notification-channel-item/hooks';
-import { PARAM_KEY_TYPE, PROTOCOL_TYPE } from '@/views/identity/user/modules/notification/notification-channel-item/type';
+import {
+    EDIT_TYPE,
+    PARAM_KEY_TYPE,
+    PROTOCOL_TYPE,
+} from '@/views/identity/user/modules/notification/notification-channel-item/type';
 import AddNotificationMemberGroup from '@/views/identity/user/modules/notification/AddNotificationMemberGroup.vue';
 import InfoMessage from '@/common/components/InfoMessage.vue';
 
@@ -98,6 +104,10 @@ export default {
         projectId: {
             type: String,
             default: null,
+        },
+        disableEdit: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }) {
@@ -133,6 +143,7 @@ export default {
         };
 
         return {
+            EDIT_TYPE,
             PROTOCOL_TYPE,
             ...toRefs(state),
             ...toRefs(notificationItemState),
@@ -149,4 +160,12 @@ export default {
 
 <style lang="postcss" scoped>
 @import './styles/channelItem.pcss';
+.content-wrapper::v-deep .edit-btn {
+    &.edit-disable {
+        @apply text-gray-300 cursor-not-allowed;
+        &:active {
+            @apply pointer-events-none;
+        }
+    }
+}
 </style>
