@@ -8,11 +8,16 @@
 </template>
 
 <script lang="ts">
-import { useSelect } from '@/hooks/select';
-import { toRefs } from '@vue/composition-api';
+import { SelectProps, useSelect } from '@/hooks/select';
+import { defineComponent, toRefs } from '@vue/composition-api';
 import { SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
 
-export default {
+interface Props extends SelectProps {
+    styleType?: SELECT_BUTTON_STYLE_TYPE;
+    size?: SELECT_BUTTON_SIZE;
+}
+
+export default defineComponent<Props>({
     name: 'PSelectButton',
     model: {
         prop: 'selected',
@@ -59,7 +64,7 @@ export default {
             onClick,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
@@ -85,7 +90,7 @@ export default {
         }
     }
 
-    &.secondary { @mixin style-type theme('colors.white'), theme('colors.gray.300'), theme('colors.gray.900'), theme('colors.blue.500'), theme('colors.white'), theme('colors.blue.200'); }
+    &.secondary { @mixin style-type transparent, theme('colors.gray.300'), theme('colors.gray.900'), theme('colors.blue.500'), theme('colors.white'), theme('colors.blue.200'); }
     &.gray { @mixin style-type transparent, theme('colors.gray.500'), theme('colors.gray.500'), theme('colors.gray.500'), theme('colors.white'), theme('colors.gray.100'); }
 
     @define-mixin size $font-size, $padding-x, $padding-y, $line-height {
@@ -95,6 +100,6 @@ export default {
     }
 
     &.md { @mixin size 0.875rem, 0.375rem, 1rem, 1.6; }
-    &.sm { @mixin size 0.75rem, 0.25rem, 0.5rem, 1.5; }
+    &.sm { @mixin size 0.75rem, 0.25rem, 0.5rem, 1.2; }
 }
 </style>

@@ -343,6 +343,7 @@ export default defineComponent<ToolboxTableProps>({
             background-color: $bg-color;
         }
         .p-toolbox {
+            border-top-width: 1px;
             border-bottom-width: 1px;
             border-color: $border-color;
         }
