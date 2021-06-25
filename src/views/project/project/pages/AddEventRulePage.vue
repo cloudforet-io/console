@@ -31,7 +31,7 @@
                                   class="arrow-button"
                                   @click="onClickUpButton(data)"
                             >
-                                <p-i name="ic_up" width="1rem" height="1rem"
+                                <p-i name="ic_up" width="1.5rem" height="1.5rem"
                                      color="inherit transparent"
                                 />
                             </span>
@@ -39,7 +39,7 @@
                                   class="arrow-button"
                                   @click="onClickDownButton(data)"
                             >
-                                <p-i name="ic_down" width="1rem" height="1rem"
+                                <p-i name="ic_down" width="1.5rem" height="1.5rem"
                                      color="inherit transparent"
                                 />
                             </span>
@@ -51,7 +51,7 @@
                             >
                                 {{ $t('PROJECT.EVENT_RULE.DELETE') }}
                             </span>
-                            |
+                            <span class="text-gray-300">|</span>
                             <span class="text-button edit"
                                   :class="{'disabled': isEditMode}"
                                   @click="onClickEditButton(data.order)"
@@ -94,7 +94,7 @@
         </p-icon-text-button>
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
-                      :contents="'Are you sure you want to delete this event rule?'"
+                      :contents="$t('PROJECT.EVENT_RULE.DELETE_MODAL_DESC')"
                       @confirm="eventRuleDeleteConfirm"
         />
     </general-page-layout>
@@ -164,7 +164,7 @@ export default {
         });
         const checkDeleteState = reactive({
             visible: false,
-            headerTitle: 'Delete Event Rule',
+            headerTitle: i18n.t('PROJECT.EVENT_RULE.DELETE_MODAL_TITLE'),
         });
 
         const changeOrder = (targetData, clickedData, tempOrder) => {
@@ -361,10 +361,10 @@ export default {
                 margin: 0 0.75rem;
                 &:hover {
                     &.delete {
-                        @apply text-alert;
+                        @apply text-alert underline;
                     }
                     &.edit {
-                        @apply text-secondary;
+                        @apply text-secondary underline;
                     }
                 }
                 &.disabled {

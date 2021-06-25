@@ -84,7 +84,7 @@ export default {
     setup(props, context) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            escalationLevel: 1,
+            notificationLevel: 'LV1',
             type: '',
             pageTitle: '' as TranslateResult,
             userId: decodeURIComponent(vm.$route.params.userId),
@@ -103,7 +103,6 @@ export default {
             schedule: null,
             isScheduled: false,
             isScheduleValid: true,
-            notificationLevel: null,
         });
         const routeState = reactive({
             routes: computed(() => ([
@@ -134,6 +133,7 @@ export default {
         };
 
         const createProjectChannel = async () => {
+            console.log(state.notificationLevel);
             try {
                 await SpaceConnector.client.notification.projectChannel.create({
                     protocol_id: state.protocolId,

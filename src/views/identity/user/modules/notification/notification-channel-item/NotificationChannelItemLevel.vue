@@ -19,7 +19,7 @@
             </div>
         </div>
         <div v-else class="content">
-            <p>{{ channelData.notification_level }}</p>
+            <p-badge style-type="gray900" outline class="level-badge">{{ channelData.notification_level }}</p-badge>
             <button class="edit-btn" @click="startEdit">
                 <p-i name="ic_edit" width="1rem" height="1rem"
                      color="inherit" class="edit-icon"
@@ -31,7 +31,9 @@
 </template>
 
 <script lang="ts">
-import { PButton, PI, PTextInput } from '@spaceone/design-system';
+import {
+    PBadge, PButton, PI, PTextInput,
+} from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
 import { useNotificationItem } from '@/views/identity/user/modules/notification/notification-channel-item/hooks';
 import { PARAM_KEY_TYPE, PROTOCOL_TYPE } from '@/views/identity/user/modules/notification/notification-channel-item/type';
@@ -42,6 +44,7 @@ export default {
     components: {
         PButton,
         PI,
+        PBadge,
         AddNotificationLevel,
     },
     props: {
@@ -97,4 +100,7 @@ export default {
 
 <style lang="postcss" scoped>
 @import './styles/channelItem.pcss';
+.level-badge {
+    @apply rounded;
+}
 </style>

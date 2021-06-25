@@ -38,9 +38,9 @@
         <div v-else class="content">
             <div class="left-section">
                 <div v-if="keyList.includes('users')">
-                    <p-badge v-for="(item, index) in dataForEdit.users" :key="`users-${index}`" style-type="gray900"
-                             outline
-                             class="mr-2"
+                    <p-badge v-for="(item, index) in dataForEdit.users" :key="`users-${index}`"
+                             style-type="gray200" shape="square"
+                             class="mr-2 rounded"
                     >
                         {{ item }}
                     </p-badge>

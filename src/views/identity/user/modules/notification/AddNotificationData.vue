@@ -83,7 +83,7 @@ export default {
 
         const state = reactive({
             channelName: undefined,
-            notificationLevel: '',
+            notificationLevel: 'LV1',
             schemaModel: {},
             schema: {},
             isSchemaModelValid: false,

@@ -22,9 +22,9 @@
         <div v-else class="content">
             <ul v-if="channelData.subscriptions.length > 0">
                 <li v-for="(item, index) in channelData.subscriptions" :key="`topic-${index}`">
-                    <p-tag :deletable="false">
+                    <p-badge style-type="gray200" shape="square">
                         {{ item }}
-                    </p-tag>
+                    </p-badge>
                 </li>
             </ul>
             <span v-else>{{ $t('IDENTITY.USER.NOTIFICATION.FORM.RECEIVE_ALL') }}</span>
@@ -58,7 +58,7 @@ export default {
     components: {
         PButton,
         PI,
-        PTag,
+        PBadge,
         AddNotificationTopic,
     },
     props: {

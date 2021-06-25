@@ -1,34 +1,34 @@
 <template>
     <div class="event-rule-content">
         <section class="left-section">
-            <h4><b>{{ data.conditions_policy }}</b> {{$t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET')}}</h4>
+            <h4><b>{{ data.conditions_policy }}</b> {{ $t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</h4>
             <ul v-for="(condition, idx) in data.conditions" :key="`${condition}-${idx}`" class="condition-list">
                 <li>
-                    <span class="text-blue-800">{{ condition.key }}</span>
+                    <span class="text-blue-900">{{ condition.key }}</span>
                     {{ condition.operator }}
-                    <span class="text-blue-800">{{ condition.value }}</span>
+                    <span class="text-blue-900">{{ condition.value }}</span>
                 </li>
             </ul>
         </section>
         <section class="right-section">
-            <h4><b>{{$t('PROJECT.EVENT_RULE.DO')}}</b> {{$t('PROJECT.EVENT_RULE.THESE_THINGS')}}</h4>
+            <h4><b>{{ $t('PROJECT.EVENT_RULE.DO') }}</b> {{ $t('PROJECT.EVENT_RULE.THESE_THINGS') }}</h4>
             <table>
                 <tbody>
                     <tr v-for="(item, index) in fields" :key="`${item}-${index}`">
                         <template v-if="items[item.name].length ||
                             item.name === 'stop_processing' && !!items[item.name] ||
+                            item.name === 'add_additional_info' && Object.values(items[item.name]).length ||
                             item.name === 'no_notification'"
                         >
                             <td>{{ item.label }}</td>
                             <td v-if="item.name === 'no_notification'">
-                                <span v-if="items[item.name]">{{$t('PROJECT.EVENT_RULE.PAUSE')}}</span>
+                                <span v-if="items[item.name]">{{$t('PROJECT.EVENT_RULE.PAUSE_NOTIFICATION')}}</span>
                                 <span v-else>On</span>
                             </td>
                             <td v-else-if="item.name === 'change_project'">
                                 <p-anchor :to="referenceRouter(
-                                              items[item],
-                                              { resource_type: 'identity.Project' })"
-                                          highlight
+                                    items[item],
+                                    { resource_type: 'identity.Project' })"
                                 >
                                     {{ projects[items[item.name]] ? projects[items[item.name]].label : items[item.name] }}
                                 </p-anchor>
@@ -38,9 +38,8 @@
                                    class="project-name"
                                 >
                                     <p-anchor :to="referenceRouter(
-                                                  projectId,
-                                                  { resource_type: 'identity.Project' })"
-                                              highlight
+                                        projectId,
+                                        { resource_type: 'identity.Project' })"
                                     >
                                         {{ projects[projectId] ? projects[projectId].label : projectId }}
                                     </p-anchor>
@@ -51,7 +50,12 @@
                                     {{ user.resource_id }}
                                 </p>
                             </td>
-                            <td v-else-if="item.name === 'stop_processing'">
+                            <td v-else-if="item.name === 'add_additional_info'">
+                                <p v-for="(info, index) in Object.entries(items[item.name])" :key="`${info}-${index}`">
+                                    <span class="font-bold">{{ info[0] }}</span>: {{ info[1] }}
+                                </p>
+                            </td>
+                            <td v-else-if="item.name === 'stop_processing'" class="stop-processing">
                                 <span v-if="items[item.name]" />
                             </td>
                             <td v-else>
@@ -93,6 +97,7 @@ export default {
                 { name: 'change_urgency', label: 'Urgency' },
                 { name: 'change_assignee', label: 'Assignee' },
                 { name: 'add_responder', label: 'Responder' },
+                { name: 'add_additional_info', label: 'Additional Information' },
                 { name: 'stop_processing', label: 'Then Stop Processing' },
             ],
             items: [] as any,
@@ -101,6 +106,7 @@ export default {
 
         const getData = () => {
             state.items = { ...props.data.change_project, ...props.data.actions, ...props.data.options };
+            console.log(state.items);
         };
 
         watch(() => props.data, () => {
@@ -167,13 +173,14 @@ table {
         tr {
             @apply border-gray-300 border-b;
             td, th {
-
                 width: 100%;
+                vertical-align: top;
                 &:first-child {
                     @apply text-gray-500;
                     font-size: 0.875rem;
                     line-height: 150%;
                     width: 11rem;
+                    flex-shrink: 0;
                 }
                 &:last-child {
                     font-size: 0.875rem;
@@ -190,10 +197,14 @@ table {
 @screen tablet {
     .left-section {
         @apply col-span-12;
+        margin-left: -1rem;
+        padding-right: 1rem;
     }
     .right-section {
         @apply col-span-12;
         margin-top: 1rem;
+        margin-left: -1rem;
+        padding-right: 1rem;
     }
 }
 </style>
