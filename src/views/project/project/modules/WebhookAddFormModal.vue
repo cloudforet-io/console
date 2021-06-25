@@ -10,7 +10,7 @@
     >
         <template #body>
             <p-field-group
-                :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_1')"
+                :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_NAME')"
                 required
                 :invalid="showValidation && !isNameValid"
                 :invalid-text="nameInvalidText"
@@ -23,18 +23,26 @@
                 />
             </p-field-group>
             <p-field-group
-                :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_2')"
+                :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_TYPE')"
                 required
             >
                 <div class="select-card-wrapper">
                     <p-select-card
-                        v-for="(item, index) in webhookTypeList" :key="index"
-                        v-model="selectedWebhookType"
-                        :value="item"
+                        v-for="(item, index) in webhookTypeList"
+                        :key="index" v-model="selectedWebhookType"
+                        icon="ic_collector_tags"
                         :image-url="item.tags.icon"
+                        :value="item"
                         :label="item.name"
+                        @click="onClickWebhookType(selectedWebhookType)"
                     />
                 </div>
+            </p-field-group>
+            <p-field-group
+                :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_VERSION')"
+                required
+            >
+                <p-select-dropdown v-model="version" :items="versions" use-fixed-menu-style />
             </p-field-group>
         </template>
     </p-button-modal>
@@ -49,7 +57,7 @@ import {
     PButtonModal,
     PFieldGroup,
     PTextInput,
-    PSelectCard,
+    PSelectCard, PSelectDropdown,
 } from '@spaceone/design-system';
 
 import { makeProxy } from '@/lib/compostion-util';
@@ -73,6 +81,7 @@ export default {
         PFieldGroup,
         PTextInput,
         PSelectCard,
+        PSelectDropdown,
     },
     props: {
         visible: {
@@ -96,6 +105,8 @@ export default {
                 if (Object.keys(state.selectedWebhookType).length === 0) return false;
                 return true;
             }),
+            versions: [],
+            version: '',
             nameInvalidText: computed(() => {
                 if (state.webhookName?.length === 0) return i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_REQUIRED');
                 if (state.webhookName?.length > 40) return i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_INVALID_TEXT');
@@ -131,22 +142,32 @@ export default {
                 console.error(e);
             }
         };
-        const getPluginVersions = async () => {
-            const { results } = await SpaceConnector.client.repository.plugin.getVersions({
-                plugin_id: state.selectedWebhookType?.plugin_id,
-            });
-            const pluginVersion = results[0];
-            return pluginVersion;
+        const getVersions = async (selectedPluginId) => {
+            state.versions = [];
+            try {
+                const { results } = await SpaceConnector.client.repository.plugin.getVersions({
+                    plugin_id: selectedPluginId,
+                });
+                results.forEach((value, index) => {
+                    if (index === 0) {
+                        state.versions.push({ type: 'item', label: `${value} (latest)`, name: value });
+                    } else {
+                        state.versions.push({ type: 'item', label: value, name: value });
+                    }
+                });
+                state.version = results[0];
+            } catch (e) {
+                console.error(e);
+            }
         };
         const createWebhook = async () => {
             state.loading = true;
             try {
-                const pluginVersion = await getPluginVersions();
                 await SpaceConnector.client.monitoring.webhook.create({
                     name: state.webhookName,
                     plugin_info: {
                         plugin_id: state.selectedWebhookType?.plugin_id,
-                        version: pluginVersion,
+                        version: state.version,
                         options: {},
                     },
                     project_id: props.projectId,
@@ -171,6 +192,9 @@ export default {
             await createWebhook();
             emit('confirm');
         };
+        const onClickWebhookType = async (selectedWebhookType) => {
+            await getVersions(selectedWebhookType.plugin_id);
+        };
 
         /* init */
         const initInputModel = () => {
@@ -188,6 +212,7 @@ export default {
             ...toRefs(state),
             onClickConfirm,
             onFirstInputName,
+            onClickWebhookType,
         };
     },
 
@@ -211,6 +236,9 @@ export default {
             @apply ml-0;
         }
     }
+}
+.p-select-dropdown {
+    min-width: 11rem;
 }
 
 @screen mobile {

@@ -80,9 +80,7 @@
                     <span> {{ $t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_CONTENT_2') }}</span>
                 </p>
                 <strong>{{ $t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_CONTENT_3') }}</strong>
-                <p-text-input
-                    v-model="inputWebhookName"
-                />
+                <p-text-input v-model="inputWebhookName" />
             </template>
         </delete-modal>
     </div>
@@ -157,6 +155,7 @@ export default {
                     { name: 'name', label: 'Name' },
                     { name: 'state', label: 'State' },
                     { name: 'plugin_info.plugin_id', label: 'Plugin' },
+                    { name: 'plugin_info.version', label: 'Version' },
                     { name: 'webhook_url', label: 'Webhook URL' },
                     { name: 'created_at', label: 'Created', dataType: 'datetime' },
                 ],
@@ -195,6 +194,7 @@ export default {
                 { name: 'name', label: 'Name' },
                 { name: 'state', label: 'State' },
                 { name: 'plugin_info.plugin_id', label: 'Type' },
+                { name: 'plugin_info.version', label: 'Version' },
                 { name: 'webhook_url', label: 'Webhook URL' },
                 { name: 'created_at', label: 'Created' },
             ],
@@ -224,6 +224,7 @@ export default {
             state.loading = true;
             try {
                 const { results, total_count } = await SpaceConnector.client.monitoring.webhook.list({
+                    project_id: props.projectId,
                     query: webhookListApiQuery,
                 });
                 state.items = results.map(d => ({
