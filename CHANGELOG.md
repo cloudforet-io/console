@@ -1,3 +1,10 @@
+# [1.1.0-beta.79](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.78...v1.1.0-beta.79) (2021-06-25)
+
+
+### Bug Fixes
+
+* fixed minor css bugs ([#617](https://github.com/spaceone-dev/spaceone-design-system/issues/617)) ([c3015a9](https://github.com/spaceone-dev/spaceone-design-system/commit/c3015a935c5e6aa1feb920b858f895bb09fb4a86))
+
 # [1.1.0-beta.78](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.77...v1.1.0-beta.78) (2021-06-25)
 
 
