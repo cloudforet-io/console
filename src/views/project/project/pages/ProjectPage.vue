@@ -93,6 +93,7 @@
                     </p-page-title>
                     <project-card-list class="card-container"
                                        :parent-groups="storeState.parentGroups"
+                                       @create-project-group="openProjectGroupCreateForm"
                     />
 
                     <project-group-form-modal v-if="storeState.projectGroupFormVisible" />
@@ -266,6 +267,7 @@ export default {
         const openProjectGroupUpdateForm = () => {
             store.dispatch('projectPage/openProjectGroupUpdateForm', storeState.selectedItem);
         };
+
         const onSelectSettingDropdown = (name) => {
             switch (name) {
             case 'edit': openProjectGroupUpdateForm(); break;
