@@ -27,7 +27,7 @@ import {
     PButtonModal, PSelectCard,
 } from '@spaceone/design-system';
 
-import {reactive, toRefs, watch} from '@vue/composition-api';
+import { reactive, toRefs, watch } from '@vue/composition-api';
 
 import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
@@ -74,7 +74,7 @@ export default {
                     },
                 });
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_NOTIFICATION_POLICY'), '', root);
-                emit('refresh');
+                emit('confirm');
             } catch (e) {
                 console.error(e);
                 showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_NOTIFICATION_POLICY'), e, root);

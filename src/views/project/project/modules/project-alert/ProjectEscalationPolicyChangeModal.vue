@@ -185,7 +185,7 @@ export default {
 
             try {
                 await updateEscalationPolicy();
-                emit('refresh');
+                emit('confirm');
                 showSuccessMessage(vm.$t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_ESCALATION_POLICY'), '', root);
             } catch (e) {
                 console.error(e);

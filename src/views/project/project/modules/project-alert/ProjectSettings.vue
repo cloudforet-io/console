@@ -68,24 +68,25 @@
             :visible.sync="updateNotificationPolicyModalVisible"
             :select-options="notificationUrgencyList"
             :selected-option="notificationUrgency"
-            @refresh="getProjectAlertConfig"
+            @confirm="getProjectAlertConfig"
         />
         <project-auto-recovery-update-modal
             :project-id="projectId"
             :visible.sync="updateAutoRecoveryModalVisible"
             :selected-option="isAutoRecovery"
-            @refresh="getProjectAlertConfig"
+            @confirm="getProjectAlertConfig"
         />
         <project-escalation-policy-change-modal
             :project-id="projectId"
             :visible.sync="changeEscalationPolicyModalVisible"
             :escalation-policy-id="escalationPolicyId"
-            @refresh="getProjectAlertConfig"
+            @confirm="getProjectAlertConfig"
         />
         <escalation-policy-form-modal
             :visible.sync="updateEscalationPolicyModalVisible"
             :mode="ACTION.update"
             :escalation-policy="escalationPolicy"
+            @confirm="getEscalationPolicy"
         />
     </p-pane-layout>
 </template>
@@ -239,6 +240,7 @@ export default {
             ACTION,
             SCOPE,
             getProjectAlertConfig,
+            getEscalationPolicy,
             onClickUpdateNotificationPolicy,
             onClickUpdateAutoRecovery,
             onClickUpdateEscalationPolicy,

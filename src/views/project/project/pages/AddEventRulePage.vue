@@ -223,8 +223,10 @@ export default {
                     event_rule_id: data.event_rule_id,
                     order: tempOrder - 1,
                 });
+                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_REORDER_EVENT_RULES'), '', root);
             } catch (e) {
                 changeOrder(tempCardData[data.order], tempCardData[data.order - 1], tempOrder);
+                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_REORDER_EVENT_RULES'), '', root);
             } finally {
                 state.cardData = tempCardData;
             }
@@ -239,8 +241,10 @@ export default {
                     order: tempOrder + 1,
                 });
                 state.cardData = tempCardData;
+                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_REORDER_EVENT_RULES'), '', root);
             } catch (e) {
                 changeOrder(tempCardData[data.order - 2], tempCardData[data.order - 1], tempOrder);
+                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_REORDER_EVENT_RULES'), '', root);
             } finally {
                 state.cardData = tempCardData;
             }
@@ -250,11 +254,11 @@ export default {
                 await SpaceConnector.client.monitoring.eventRule.delete({
                     event_rule_id: state.orderedCardData[state.selectedOrder - 1].event_rule_id,
                 });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_S_DELETE_ALERT'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_DELETE_EVENT_RULE'), '', root);
                 await listEventRule();
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_E_DELETE_ALERT'), '', root);
+                showErrorMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_DELETE_EVENT_RULE'), '', root);
             } finally {
                 checkDeleteState.visible = false;
                 state.selectedOrder = undefined;
