@@ -29,6 +29,14 @@
             <template #data-created_at>
                 {{ iso8601Formatter(data.created_at, timezone) }}
             </template>
+            <template #data-acknowledged_at>
+               <span v-if="data.acknowledged_at"> {{ iso8601Formatter(data.acknowledged_at, timezone) }}</span>
+                <span v-else>--</span>
+            </template>
+            <template #data-resolved_at>
+                <span v-if="data.resolved_at"> {{ iso8601Formatter(data.resolved_at, timezone) }}</span>
+                <span v-else>--</span>
+            </template>
             <template #data-description>
                 <p v-if="!isDescriptionEditMode" class="content-wrapper">
                     <span class="description">{{ data.description }}</span>
@@ -86,6 +94,14 @@
                         </p-button>
                     </div>
                 </div>
+            </template>
+            <template #data-rule="{value}">
+                <p v-if="Object.keys(value).length === 0">
+                    --
+                </p>
+                <p v-else>
+                    {{ value }}
+                </p>
             </template>
             <template #data-additional_info="{value}">
                 <p v-if="Object.keys(value).length === 0">

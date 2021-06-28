@@ -22,10 +22,11 @@
                           class="ml-2"
                           @click="onClickReassign"
                 >
-                    {{ $t('MONITORING.ALERT.DETAIL.HEADER.REASSIGN') }}
+                    {{ $t('MONITORING.ALERT.DETAIL.HEADER.ASSIGN') }}
                 </p-button>
             </span>
-            <span class="email">{{ alertData.assignee }}</span>
+            <span v-if="alertData.assignee" class="email">{{ alertData.assignee }}</span>
+            <span v-else>--</span>
         </p>
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.DURATION') }}</span>

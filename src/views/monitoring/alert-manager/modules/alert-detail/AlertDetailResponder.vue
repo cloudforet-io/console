@@ -13,6 +13,7 @@
                     </p-badge>
                 </template>
                 <template #default="{data}">
+                    {{ data }}
                     <p class="data-wrapper">
                         <project-channel-list :project-channels="projectChannels" :notification-level="data" />
                     </p>

@@ -18,7 +18,12 @@
                              :loading="loading"
                              :total-count="totalCount"
                              @change="onChangeTable"
-            />
+                             @refresh="onChangeTable()"
+            >
+                <template #col-resource_id-format="{ value }">
+                    {{ users[value].name }}
+                </template>
+            </p-toolbox-table>
         </template>
     </p-button-modal>
 </template>
@@ -30,10 +35,11 @@ import {
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
-import { Options } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
-import {i18n} from "@/translations";
+import { i18n } from '@/translations';
+import store from '@/store';
+import { getApiQueryWithToolboxOptions } from '@/lib/component-utils/toolbox';
 
 export default {
     name: 'AlertReassignModal',
@@ -56,7 +62,6 @@ export default {
         },
     },
     setup(props, { emit, root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             //
             modalLoading: false,
@@ -66,18 +71,12 @@ export default {
             selectIndex: [] as number[],
             selectedUserID: computed(() => state.items[state.selectIndex]?.resource_id),
             fields: [
-                { label: 'User ID', name: 'resource_id', type: 'item' },
+                { label: 'User ID', name: 'user_id', type: 'item' },
                 { label: 'Name', name: 'resource_id', type: 'item' },
             ],
             items: [] as any,
-            options: {
-                sortBy: 'resource_id',
-                sortDesc: true,
-                pageStart: 1,
-                pageLimit: 15,
-                searchText: '',
-            },
             totalCount: 0,
+            users: computed(() => store.state.resource.user.items),
         });
 
         const reassignMember = async () => {
@@ -100,22 +99,24 @@ export default {
             emit('confirm');
         };
 
-        const apiQuery = new ApiQueryHelper();
-        const getQuery = () => apiQuery.setSort(state.options.sortBy, state.options.sortDesc)
-            .setPage(
-                state.options.pageStart,
-                state.options.pageLimit,
-            ).setFilters([{ v: state.options.searchText }])
-            .data;
+
+        const assignApiQueryHelper = new ApiQueryHelper()
+            .setPageStart(1).setPageLimit(15)
+            .setSort('resource_id', true);
+
+        let assignApiQuery = assignApiQueryHelper.data;
 
         const listMemberInProject = async () => {
             try {
                 state.loading = true;
                 const res = await SpaceConnector.client.identity.project.member.list({
                     project_id: props.projectId,
-                    query: getQuery(),
+                    query: assignApiQuery,
                 });
-                state.items = res.results;
+                state.items = res.results.map(d => ({
+                    ...d,
+                    user_id: d.resource_id,
+                }));
             } catch (e) {
                 console.error(e);
                 state.items = [];
@@ -124,23 +125,12 @@ export default {
             }
         };
 
-        const onChangeTable = async (changed: any = {}) => {
-            if (changed.sortBy !== undefined) {
-                apiQuery.setSort(changed.sortBy, changed.sortDesc);
-            }
-            if (changed.pageLimit !== undefined) {
-                apiQuery.setPageLimit(changed.pageLimit);
-            }
-            if (changed.pageStart !== undefined) {
-                apiQuery.setPageStart(changed.pageStart);
-            }
-            if (changed.searchText !== undefined) {
-                apiQuery.setFilters([{ v: changed.searchText }]);
-            }
+        const onChangeTable = async (options: any = {}) => {
+            assignApiQuery = getApiQueryWithToolboxOptions(assignApiQueryHelper, options) ?? assignApiQuery;
             await listMemberInProject();
         };
         (async () => {
-            await listMemberInProject();
+            await Promise.all([store.dispatch('resource/user/load'), listMemberInProject()]);
         })();
         return {
             ...toRefs(state),

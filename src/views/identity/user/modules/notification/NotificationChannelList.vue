@@ -165,7 +165,7 @@ export default {
 
         const listProjectChannel = async () => {
             try {
-                channelApiQuery.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]);
+                channelApiQuery.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]).setSort('notification_level', true);
                 const res = await SpaceConnector.client.notification.projectChannel.list({
                     query: channelApiQuery.data,
                 });
