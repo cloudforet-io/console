@@ -1,5 +1,6 @@
 import { TimeStamp } from '@/models';
-import { TreeItem } from '@spaceone/design-system/dist/src/data-display/tree/type';
+import { TreeItem } from '@spaceone/design-system/dist/src/data-display/tree/tree-node/type';
+import { RootTreeNode } from '@spaceone/design-system/dist/src/data-display/tree/type';
 
 export type ItemType = 'PROJECT_GROUP'|'PROJECT'
 
