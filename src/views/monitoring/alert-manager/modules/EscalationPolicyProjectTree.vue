@@ -35,7 +35,7 @@ import {
 } from '@spaceone/design-system';
 
 import { ProjectGroup } from '@/views/identity/service-account/type';
-import { ProjectGroupTreeItem } from '@/views/project/project/type';
+import { ProjectGroupTreeItem, ProjectTreeRoot } from '@/views/project/project/type';
 import { SpaceConnector } from '@/lib/space-connector';
 
 export default {
@@ -53,7 +53,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            root: null as any,
+            root: null as ProjectTreeRoot|null,
             selectedItem: {} as ProjectGroupTreeItem,
             selectedNode: computed(() => state.selectedItem.node),
         });

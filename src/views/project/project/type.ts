@@ -1,6 +1,5 @@
 import { TimeStamp } from '@/models';
-import { TreeItem } from '@spaceone/design-system/dist/src/data-display/tree/tree-node/type';
-import { RootTreeNode } from '@spaceone/design-system/dist/src/data-display/tree/type';
+import { TreeItem, Tree } from '@spaceone/design-system/dist/src/data-display/tree/type';
 
 export type ItemType = 'PROJECT_GROUP'|'PROJECT'
 
@@ -53,6 +52,8 @@ export interface ProjectGroup {
 
 export type ProjectTreeItem = TreeItem<ProjectItemResp>
 
+export type ProjectTreeRoot = Tree<ProjectItemResp>
+
 export interface FavoriteButtonProps {
     itemId: string;
     favoriteType: string;
@@ -62,7 +63,4 @@ export interface FavoriteButtonProps {
     readOnly?: boolean;
 }
 
-export interface ProjectGroupTreeItem {
-    node?: any;
-    path?: number[];
-}
+export type ProjectGroupTreeItem = Partial<ProjectTreeItem>

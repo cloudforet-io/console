@@ -24,7 +24,7 @@ export const INVENTORY_ROUTE = Object.freeze({
 export default {
     path: 'inventory',
     name: INVENTORY_ROUTE._NAME,
-    redirect: 'inventory/server',
+    redirect: 'inventory/cloud-service',
     meta: { label: 'Inventory' },
     component: { template: '<router-view />' },
     children: [

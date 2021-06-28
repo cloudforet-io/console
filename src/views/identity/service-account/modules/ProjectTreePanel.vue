@@ -100,7 +100,7 @@ import {
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { ProjectGroupTreeItem } from '@/views/project/project/type';
+import { ProjectGroupTreeItem, ProjectTreeRoot } from '@/views/project/project/type';
 import { ProjectGroup } from '@/views/identity/service-account/type';
 
 
@@ -125,7 +125,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            root: null as any,
+            root: null as ProjectTreeRoot|null,
             selectedItem: {} as ProjectGroupTreeItem,
             selectedNode: computed(() => state.selectedItem.node),
             hasProject: true,

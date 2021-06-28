@@ -64,9 +64,10 @@ import {
 } from '@spaceone/design-system';
 import { makeProxy } from '@spaceone/design-system/src/util/composition-helpers';
 
-import { ProjectGroupTreeItem } from '@/views/project/project/type';
+import {ProjectGroupTreeItem, ProjectTreeRoot} from '@/views/project/project/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ProjectGroup } from '@/views/identity/service-account/type';
+import Vue from "vue";
 
 
 interface Props {
@@ -99,8 +100,8 @@ export default {
     },
     setup(props: Props, { emit }) {
         const state = reactive({
-            treeRef: null as null|any,
-            root: null as any,
+            treeRef: null as null|Vue,
+            root: null as ProjectTreeRoot|null,
             selectedItem: {} as ProjectGroupTreeItem,
             selectedNode: computed(() => state.selectedItem.node),
             proxyVisible: makeProxy('visible', props, emit),

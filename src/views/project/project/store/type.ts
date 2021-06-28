@@ -1,11 +1,11 @@
-import { ProjectGroupTreeItem } from '@/views/project/project/type';
+import { ProjectGroupTreeItem, ProjectTreeRoot } from '@/views/project/project/type';
 
 export interface ProjectPageState {
     isInitiated: boolean;
 
     searchText?: string;
 
-    rootNode?: any|null;
+    rootNode?: ProjectTreeRoot|null;
     selectedItem: ProjectGroupTreeItem;
     treeEditMode: boolean;
 

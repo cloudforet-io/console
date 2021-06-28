@@ -61,6 +61,7 @@ import {
 } from '@vue/composition-api';
 import { ProjectGroup } from '@/views/identity/service-account/type';
 import { SpaceConnector } from '@/lib/space-connector';
+import { ProjectTreeRoot } from '@/views/project/project/type';
 
 export default {
     name: 'ProjectSelectDropdown',
@@ -88,7 +89,7 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            root: null as any,
+            root: null as ProjectTreeRoot|null,
             selectedItems: [] as any[],
             selectedItem: computed(() => state.selectedItems[0]),
             selectedProjects: computed<string[]>(() => state.selectedItems.map(d => d.node.data)),
