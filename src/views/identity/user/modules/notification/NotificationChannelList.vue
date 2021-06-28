@@ -35,7 +35,7 @@
                 </p-empty>
             </span>
             <p-divider class="divider" />
-            <ul v-for="item in channelList" :key="item.user_channel_id">
+            <ul v-for="item in channelList" :key="`${item.name}-${item.created_at}`">
                 <li class="mb-4">
                     <notification-channel-item :channel-data="item" :project-id="projectId"
                                                @change="onChangeChannelItem"
@@ -165,7 +165,7 @@ export default {
 
         const listProjectChannel = async () => {
             try {
-                channelApiQuery.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]).setSort('notification_level', true);
+                channelApiQuery.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]).setSort('notification_level', false);
                 const res = await SpaceConnector.client.notification.projectChannel.list({
                     query: channelApiQuery.data,
                 });
