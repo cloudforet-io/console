@@ -18,6 +18,7 @@
                     class="block w-full"
                     :invalid="isNameInvalid"
                     :placeholder="$t('PROJECT.DETAIL.MODAL_UPDATE_WEBHOOK_PLACEHOLDER')"
+                    :disabled="loading"
                 />
             </p-field-group>
             <p-field-group
@@ -28,6 +29,7 @@
                     <p-toggle-button
                         theme="secondary"
                         :value="enabled"
+                        :disabled="loading"
                         @change="onToggleChange"
                     />
                     <span class="label">{{ enabled ? 'Enabled' : 'Disabled' }}</span>
@@ -37,7 +39,12 @@
                 :label="$t('PROJECT.DETAIL.MODAL_UPDATE_WEBHOOK_LABEL_VERSION')"
                 required
             >
-                <p-select-dropdown v-model="selectedVersion" :items="versions" use-fixed-menu-style />
+                <p-select-dropdown v-model="selectedVersion"
+                                   :items="versions"
+                                   :disabled="loading"
+                                   use-fixed-menu-style
+                >
+                </p-select-dropdown>
             </p-field-group>
         </template>
     </p-button-modal>

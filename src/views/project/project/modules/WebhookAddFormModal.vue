@@ -19,6 +19,7 @@
                     v-model="webhookName"
                     :invalid="showValidation && !isNameValid"
                     :placeholder="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_PLACEHOLDER')"
+                    :disabled="loading"
                     @input.once="onFirstInputName"
                 />
             </p-field-group>
@@ -34,6 +35,7 @@
                         icon="ic_webhook"
                         :value="item"
                         :label="item.name"
+                        :disabled="loading"
                         @click="onClickWebhookType(selectedWebhookType)"
                     />
                 </div>
@@ -42,7 +44,9 @@
                 :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_VERSION')"
                 required
             >
-                <p-select-dropdown v-model="version" :items="versions" use-fixed-menu-style />
+                <p-select-dropdown v-model="version" :items="versions" :disabled="loading"
+                                   use-fixed-menu-style
+                />
             </p-field-group>
         </template>
     </p-button-modal>
@@ -188,6 +192,7 @@ export default {
         };
         const onClickConfirm = async () => {
             if (!state.showValidation) state.showValidation = true;
+            if (!state.version) return;
 
             await createWebhook();
             emit('confirm');
@@ -200,6 +205,7 @@ export default {
         const initInputModel = () => {
             state.webhookName = '';
             state.selectedWebhookType = {} as WebhookType;
+            state.version = '';
             state.showValidation = false;
         };
 
