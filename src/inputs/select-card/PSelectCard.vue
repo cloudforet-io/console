@@ -8,7 +8,7 @@
         />
         <div class="contents">
             <slot v-bind="{isSelected}">
-                <p-lazy-img v-if="imageUrl || icon" :src="imageUrl" :error-icon="icon"
+                <p-lazy-img v-if="imageUrl || icon" :src="imageUrl" :error-icon="icon || 'smile-face'"
                             :width="block ? '1rem' : '3rem'" :height="block ? '1rem' : '3rem'"
                 />
                 <span v-if="label" class="label">{{ label }}</span>
@@ -154,6 +154,11 @@ export default defineComponent<Props>({
             margin-right: 0;
             margin-bottom: 1rem;
             flex-shrink: 0;
+            .error {
+                path {
+                    fill: theme('colors.gray.300');
+                }
+            }
         }
 
         .label {
