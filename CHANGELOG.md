@@ -1,3 +1,10 @@
+# [1.1.0-beta.84](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.83...v1.1.0-beta.84) (2021-06-28)
+
+
+### Features
+
+* add disabled border-color to PSelectCard ([#623](https://github.com/spaceone-dev/spaceone-design-system/issues/623)) ([c39298c](https://github.com/spaceone-dev/spaceone-design-system/commit/c39298c05ee955a53e60b790a76ff3c1c93c0ecd))
+
 # [1.1.0-beta.83](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.82...v1.1.0-beta.83) (2021-06-28)
 
 
