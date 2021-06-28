@@ -134,7 +134,7 @@ export default defineComponent<Props>({
         @apply border-secondary text-secondary;
     }
     &.disabled {
-        @apply text-gray-400;
+        @apply border-gray-200 text-gray-400;
         cursor: not-allowed;
     }
     .marker {
