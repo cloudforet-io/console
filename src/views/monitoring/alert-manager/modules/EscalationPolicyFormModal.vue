@@ -26,7 +26,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    reactive, toRefs, watch, ComponentRenderProxy, getCurrentInstance,
+    reactive, toRefs, ComponentRenderProxy, getCurrentInstance,
 } from '@vue/composition-api';
 
 import { PButtonModal } from '@spaceone/design-system';
@@ -108,10 +108,6 @@ export default {
             else if (props.mode === ACTION.update) await updateEscalationPolicy();
             emit('confirm');
         };
-
-        watch(() => props.visible, () => {
-            state.isAllValid = false;
-        });
 
         return {
             ...toRefs(state),

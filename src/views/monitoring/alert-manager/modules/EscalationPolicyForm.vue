@@ -106,6 +106,7 @@ import ProjectSelectDropdown from '@/common/modules/project-select-dropdown/Proj
 import { EscalationPolicyFormModel } from '@/views/monitoring/alert-manager/type';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
+import { makeProxy } from '@/lib/compostion-util';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -146,6 +147,8 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             projects: computed(() => store.state.resource.project.items),
+            proxyIsAllValid: makeProxy('isAllValid', props, emit),
+            //
             inputModel: {
                 name: '',
                 scope: SCOPE.global,
@@ -200,15 +203,17 @@ export default {
                 state.inputModel.finish_condition = FINISH_CONDITION.acknowledged;
                 state.inputModel.project_id = undefined;
                 state.inputModel.repeat_count = DEFAULT_REPEAT_COUNT;
+                state.proxyIsAllValid = false;
             } else if (props.mode === ACTION.update && props.escalationPolicy) {
                 state.inputModel = cloneDeep(props.escalationPolicy);
+                state.proxyIsAllValid = true;
             }
         };
 
         /* event */
         const onChangeInputModel = () => {
             state.showValidation = true;
-            emit('update:is-all-valid', state.isNameValid && state.isProjectValid);
+            state.proxyIsAllValid = state.isNameValid && state.isProjectValid;
             emit('change', state.inputModel);
         };
         const onChangeScope = (value) => {

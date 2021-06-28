@@ -4,6 +4,7 @@
         :header-title="$t('PROJECT.DETAIL.ALERT.CHANGE_ESCALATION_POLICY_MODAL_TITLE')"
         fade
         :visible.sync="proxyVisible"
+        :disabled="!isModalValid"
         @confirm="onClickConfirm"
     >
         <template #body>
@@ -85,6 +86,16 @@ export default {
     },
     setup(props, { emit, root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const tableState = reactive({
+            loading: true,
+            items: [] as any,
+            selectIndex: [] as number[],
+        });
+        const formState = reactive({
+            inputModel: {} as EscalationPolicyFormModel,
+            showValidation: false,
+            isAllValid: false,
+        });
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             proxyVisible: makeProxy<boolean>('visible', props, emit),
@@ -100,16 +111,10 @@ export default {
             ])),
             activeTab: FORM_MODE.select,
             changedEscalationPolicyId: undefined,
-        });
-        const tableState = reactive({
-            loading: true,
-            items: [] as any,
-            selectIndex: [] as number[],
-        });
-        const formState = reactive({
-            inputModel: {} as EscalationPolicyFormModel,
-            showValidation: false,
-            isAllValid: false,
+            isModalValid: computed(() => {
+                if (state.activeTab === FORM_MODE.select) return tableState.selectIndex.length;
+                return formState.isAllValid;
+            }),
         });
 
         /* util */
