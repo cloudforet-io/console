@@ -1239,6 +1239,7 @@
 					"NOTIFICATION_LV": "Notification LV",
 					"PROJECT": "Project",
 					"PROJECT_LABEL": "Project",
+					"PROJECT_REQUIRED": "Please select project.",
 					"REPEAT": "repeat",
 					"REPEAT_AFTER": "Repeat after",
 					"REPEAT_ALL": "Repeat all",

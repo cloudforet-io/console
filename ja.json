@@ -1239,6 +1239,7 @@
 					"NOTIFICATION_LV": "お知らせLV",
 					"PROJECT": "プロジェクト",
 					"PROJECT_LABEL": "プロジェクト",
+					"PROJECT_REQUIRED": "プロジェクトを選択してください。",
 					"REPEAT": "繰り返す",
 					"REPEAT_AFTER": "後で繰り返す",
 					"REPEAT_ALL": "すべて繰り返す",
