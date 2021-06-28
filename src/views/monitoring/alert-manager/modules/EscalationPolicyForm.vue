@@ -43,6 +43,8 @@
         <p-field-group v-if="showScope && inputModel.scope === SCOPE.project && mode === ACTION.create"
                        class="project-field"
                        required
+                       :invalid="!isProjectValid"
+                       :invalid-text="projectInvalidText"
         >
             <template #label>
                 <span>{{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_LABEL') }}</span>
@@ -53,7 +55,7 @@
                           highlight
                 />
             </template>
-            <project-select-dropdown @select="onSelectProject" />
+            <project-select-dropdown :invalid="!isProjectValid" @select="onSelectProject" />
         </p-field-group>
         <p-field-group
             :label="$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.FINISH_CONDITION_LABEL')"
@@ -91,24 +93,22 @@
 import { cloneDeep } from 'lodash';
 
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
-    PFieldGroup, PRadio, PTextInput, PAnchor,
+    PAnchor, PFieldGroup, PRadio, PTextInput,
 } from '@spaceone/design-system';
 
 import EscalationRulesInputForm from '@/views/monitoring/alert-manager/modules/EscalationRulesInputForm.vue';
 import ProjectSelectDropdown from '@/common/modules/project-select-dropdown/ProjectSelectDropdown.vue';
 
-import {
-    EscalationPolicyFormModel,
-} from '@/views/monitoring/alert-manager/type';
+import { EscalationPolicyFormModel } from '@/views/monitoring/alert-manager/type';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 
 const DEFAULT_REPEAT_COUNT = 0;
@@ -144,7 +144,6 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             projects: computed(() => store.state.resource.project.items),
             inputModel: {
@@ -160,25 +159,34 @@ export default {
             nameInvalidText: computed(() => {
                 if (!state.showValidation) return undefined;
                 if (!state.inputModel.name) {
-                    return vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
+                    return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
                 }
                 if (state.inputModel.name.length > 40) {
-                    return vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
+                    return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
+                }
+                return undefined;
+            }),
+            isProjectValid: computed(() => !state.projectInvalidText),
+            projectInvalidText: computed(() => {
+                if (!state.showValidation) return undefined;
+                if (state.inputModel.scope === SCOPE.global) return undefined;
+                if (!state.inputModel.project_id) {
+                    return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT_REQUIRED');
                 }
                 return undefined;
             }),
             scopes: computed(() => [
                 {
-                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'), value: SCOPE.global,
+                    label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'), value: SCOPE.global,
                 }, {
-                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: SCOPE.project,
+                    label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'), value: SCOPE.project,
                 },
             ]),
             finishConditions: computed(() => [
                 {
-                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ACKNOWLEDGED'), value: FINISH_CONDITION.acknowledged,
+                    label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ACKNOWLEDGED'), value: FINISH_CONDITION.acknowledged,
                 }, {
-                    label: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RESOLVED'), value: FINISH_CONDITION.resolved,
+                    label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.RESOLVED'), value: FINISH_CONDITION.resolved,
                 },
             ]),
         });
@@ -200,7 +208,7 @@ export default {
         /* event */
         const onChangeInputModel = () => {
             state.showValidation = true;
-            emit('update:is-all-valid', state.isNameValid);
+            emit('update:is-all-valid', state.isNameValid && state.isProjectValid);
             emit('change', state.inputModel);
         };
         const onChangeScope = (value) => {

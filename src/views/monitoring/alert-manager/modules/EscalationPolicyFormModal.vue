@@ -6,6 +6,7 @@
         :fade="true"
         :backdrop="true"
         :visible.sync="proxyVisible"
+        :disabled="!isAllValid"
         @confirm="onClickPolicyConfirm"
     >
         <template #body>
