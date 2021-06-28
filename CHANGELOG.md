@@ -1,3 +1,10 @@
+# [1.1.0-beta.82](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.81...v1.1.0-beta.82) (2021-06-28)
+
+
+### Features
+
+* add disabled props to PToggleButton ([#620](https://github.com/spaceone-dev/spaceone-design-system/issues/620)) ([bc63233](https://github.com/spaceone-dev/spaceone-design-system/commit/bc632338f6748cab66ef9d7cff957b96379e0d8a))
+
 # [1.1.0-beta.81](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.80...v1.1.0-beta.81) (2021-06-28)
 
 
