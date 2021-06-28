@@ -1,3 +1,10 @@
+# [1.1.0-beta.81](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.80...v1.1.0-beta.81) (2021-06-28)
+
+
+### Features
+
+* add default icon in p select card ([#619](https://github.com/spaceone-dev/spaceone-design-system/issues/619)) ([e061c45](https://github.com/spaceone-dev/spaceone-design-system/commit/e061c45c60400e1351b46d4f662b12a68f775f59))
+
 # [1.1.0-beta.80](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.79...v1.1.0-beta.80) (2021-06-25)
 
 
