@@ -1,14 +1,13 @@
 <template>
     <fragment>
         <p-autocomplete-search v-model="search" :menu="allMemberItems" :loading="loading"
-                               use-fixed-menu-style
                                class="autocomplete-search" @select-menu="onSelectMember"
         >
             <template #menu-item--format="{item, id}">
                 <p-check-box :id="id" v-model="selectedMemberItems" class="tag-menu-item"
                              :value="item.name"
                 >
-                    {{item.name}} ({{ userItem[item.label].name }})
+                    {{ item.name }} {{ userItem[item.name] ? `(${userItem[item.name].label})`: '' }}
                 </p-check-box>
             </template>
             <template #menu-no-data-format>
@@ -70,8 +69,8 @@ export default {
 
         const onSelectMember = (item: MenuItem) => {
             state.search = '';
-            // const idx = state.selectedMemberItems.findIndex(k => k === item.name);
-            state.selectedMemberItems = [...state.selectedMemberItems, item.name];
+            const idx = state.selectedMemberItems.findIndex(k => k === item.name);
+            if (idx === -1) state.selectedMemberItems.push(item.name);
         };
 
         const onDeleteTag = (idx) => {
