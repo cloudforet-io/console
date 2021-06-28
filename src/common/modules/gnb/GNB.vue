@@ -169,8 +169,8 @@ export default {
                     label: i18n.t('MENU.INVENTORY.INVENTORY'),
                     to: { name: INVENTORY_ROUTE._NAME },
                     subMenuList: [
-                        { label: i18n.t('MENU.INVENTORY.SERVER'), to: { name: INVENTORY_ROUTE.SERVER._NAME }, show: true },
                         { label: i18n.t('MENU.INVENTORY.CLOUD_SERVICE'), to: { name: INVENTORY_ROUTE.CLOUD_SERVICE._NAME }, show: true },
+                        { label: i18n.t('MENU.INVENTORY.SERVER'), to: { name: INVENTORY_ROUTE.SERVER._NAME }, show: true },
                     ],
                 },
                 {
