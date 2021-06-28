@@ -1553,7 +1553,7 @@
 			"MODAL_DELETE_WEBHOOK": "Delete this webhook",
 			"MODAL_DELETE_WEBHOOK_CONTENT_1": "This action cannot be undone.",
 			"MODAL_DELETE_WEBHOOK_CONTENT_2": "There will be no alerts created by this webhook.",
-			"MODAL_DELETE_WEBHOOK_CONTENT_3": "Type Webhook Name to Confirm.",
+			"MODAL_DELETE_WEBHOOK_CONTENT_3": "Type {webhookName} to Confirm.",
 			"MODAL_DELETE_WEBHOOK_TITLE": "Delete the selected webhook permanently.",
 			"MODAL_UPDATE_MEMBER_TITLE": "Update Member Information",
 			"MODAL_UPDATE_PROJECT_TITLE": "Update Project",
