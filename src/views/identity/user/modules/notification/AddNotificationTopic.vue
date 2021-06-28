@@ -97,7 +97,7 @@ export default {
     line-height: 150%;
 }
 .topic-wrapper {
-    margin-top: 2.625rem;
+    margin-top: 1.375rem;
     .setting {
         @apply font-bold;
         font-size: 0.875rem;
@@ -123,5 +123,6 @@ export default {
 .topic-label {
     min-width: 6.25rem;
     margin-right: 0.5rem;
+    margin-left: 0.25rem;
 }
 </style>

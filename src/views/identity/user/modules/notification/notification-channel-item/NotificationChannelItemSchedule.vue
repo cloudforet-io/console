@@ -115,6 +115,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', root);
                 notificationItemState.isEditMode = false;
+                emit('edit', undefined);
             } catch (e) {
                 console.error(e);
                 showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, root);
@@ -129,6 +130,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_PROJECT_CHANNEL'), '', root);
                 notificationItemState.isEditMode = false;
+                emit('edit', undefined);
             } catch (e) {
                 console.error(e);
                 showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'), e, root);
