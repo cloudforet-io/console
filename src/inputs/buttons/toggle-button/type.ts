@@ -8,4 +8,5 @@ export interface ToggleButtonProps {
     margin: number;
     name?: string; // Name to attach to the generated input field
     theme: string;
+    disabled: boolean;
 }

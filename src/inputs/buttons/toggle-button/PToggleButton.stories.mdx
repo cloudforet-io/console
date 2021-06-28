@@ -66,6 +66,24 @@ import { TOGGLE_BUTTON_THEME } from "@/inputs/buttons/toggle-button/config";
                 type: 'select',
                 options: Object.keys(TOGGLE_BUTTON_THEME),
             },
+        },
+        disabled: {
+            name: 'disabled',
+            type: {name: 'boolean'},
+            description: 'Button does not react on mouse events',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
         }
     }}
 />
@@ -78,6 +96,7 @@ export const Template = (args, { argTypes }) => ({
     <p-toggle-button
         :value="value"
         :theme="theme"
+        :disabled="disabled"
         @change="onToggleChange"
     />
 </div>`,
@@ -114,6 +133,23 @@ export const Template = (args, { argTypes }) => ({
     />
 </div>`
     }}
+    </Story>
+</Canvas>
+
+## Disabled
+<Canvas>
+    <Story name="toggle button disabeld">
+        {{
+            components: { PToggleButton },
+            template: `
+<div style="display:flex; align-items:center; justify-content:center;">
+    <p-toggle-button
+        :value="true"
+        :disabled="true"
+        class="mr-8"
+    />
+</div>`
+        }}
     </Story>
 </Canvas>
 

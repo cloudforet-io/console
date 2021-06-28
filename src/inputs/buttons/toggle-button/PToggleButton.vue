@@ -6,6 +6,7 @@
         :width="32"
         :height="16"
         :margin="2"
+        :disabled="disabled"
         v-on="$listeners"
     />
 </template>
@@ -43,6 +44,10 @@ export default {
             validator(theme) {
                 return Object.keys(TOGGLE_BUTTON_THEME).includes(theme);
             },
+        },
+        disabled: {
+            type: Boolean,
+            default: false,
         },
     },
 
