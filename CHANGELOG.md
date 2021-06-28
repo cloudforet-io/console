@@ -1,3 +1,10 @@
+# [1.1.0-beta.83](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.82...v1.1.0-beta.83) (2021-06-28)
+
+
+### Bug Fixes
+
+* autocomplete search menu set left position ([#621](https://github.com/spaceone-dev/spaceone-design-system/issues/621)) ([1767b31](https://github.com/spaceone-dev/spaceone-design-system/commit/1767b3144f5871b8a81da46dd60c467f38b7fe83))
+
 # [1.1.0-beta.82](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.81...v1.1.0-beta.82) (2021-06-28)
 
 
