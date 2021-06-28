@@ -50,7 +50,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 export default {
     name: 'ProjectAlertPage',
     components: {
-        ProjectAlert,
+        // ProjectAlert,
         ProjectWebhook,
         ProjectSettings,
         PButtonTab,

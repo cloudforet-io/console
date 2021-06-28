@@ -41,6 +41,7 @@
             </template>
             <template #col-plugin_info.plugin_id-format="{index, field, item}">
                 <p-lazy-img :src="item.plugin_icon"
+                            error-icon="ic_webhook"
                             width="1.5rem" height="1.5rem" class="mr-2"
                 />
                 {{ item.plugin_name }}

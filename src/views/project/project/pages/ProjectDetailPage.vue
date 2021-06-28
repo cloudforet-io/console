@@ -21,11 +21,11 @@
                     />
                 </div>
                 <div class="top-right-group">
-<!--                    <p-icon-text-button name="ic_state_manual" style-type="gray900"-->
-<!--                                        @click="maintenanceWindowFormVisible = true"-->
-<!--                    >-->
-<!--                        {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CREATE') }}-->
-<!--                    </p-icon-text-button>-->
+                    <!--                    <p-icon-text-button name="ic_state_manual" style-type="gray900"-->
+                    <!--                                        @click="maintenanceWindowFormVisible = true"-->
+                    <!--                    >-->
+                    <!--                        {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CREATE') }}-->
+                    <!--                    </p-icon-text-button>-->
                     <p class="copy-project-id">
                         <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
                         {{ projectId }}
@@ -41,10 +41,13 @@
                    @update:activeTab="onUpdateActiveTab"
             >
                 <keep-alive><router-view /></keep-alive>
+                <!--                <template #extra="tab">-->
+                <!--                    <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && counts[ALERT_STATE.TRIGGERED] !== 0" style-type="primary3">-->
+                <!--                        {{ counts[ALERT_STATE.TRIGGERED] }}-->
+                <!--                    </p-badge>-->
+                <!--                </template>-->
                 <template #extra="tab">
-                    <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && counts[ALERT_STATE.TRIGGERED] !== 0" style-type="primary3">
-                        {{ counts[ALERT_STATE.TRIGGERED] }}
-                    </p-badge>
+                    <span v-if="tab.isBeta" class="beta-text">beta</span>
                 </template>
             </p-tab>
             <p-button-modal :header-title="headerTitle"
@@ -114,8 +117,8 @@ export default {
         PIconButton,
         PCopyButton,
         PBreadcrumbs,
-        PIconTextButton,
-        PBadge,
+        // PIconTextButton,
+        // PBadge,
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -137,10 +140,10 @@ export default {
             ]),
             users: computed(() => vm.$store.state.resource.user.items),
             maintenanceWindowFormVisible: false,
-            alertStateCounts: [],
-            counts: computed(() => ({
-                TRIGGERED: find(state.alertStateCounts, { state: ALERT_STATE.TRIGGERED })?.total || 0,
-            })),
+            // alertStateCounts: [],
+            // counts: computed(() => ({
+            //     TRIGGERED: find(state.alertStateCounts, { state: ALERT_STATE.TRIGGERED })?.total || 0,
+            // })),
         });
 
         /* api */
@@ -169,14 +172,17 @@ export default {
                     {
                         name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                         label: vm.$t('PROJECT.DETAIL.TAB_ALERT'),
+                        isBeta: true,
                     },
                     {
                         name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
                         label: vm.$t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
+                        isBeta: true,
                     },
                     // {
                     //     name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME,
                     //     label: vm.$t('PROJECT.DETAIL.TAB_MAINTENANCE_WINDOW'),
+                    //     isBeta: true,
                     // },
                     {
                         name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
@@ -231,17 +237,17 @@ export default {
             if (data) item.value = data;
         };
 
-        const statAlerts = async () => {
-            try {
-                const { results } = await SpaceConnector.client.statistics.topic.alertStateCount({
-                    project_id: state.projectId,
-                });
-                state.alertStateCounts = results;
-            } catch (e) {
-                state.alertStateCounts = [];
-                console.error(e);
-            }
-        };
+        // const statAlerts = async () => {
+        //     try {
+        //         const { results } = await SpaceConnector.client.statistics.topic.alertStateCount({
+        //             project_id: state.projectId,
+        //         });
+        //         state.alertStateCounts = results;
+        //     } catch (e) {
+        //         state.alertStateCounts = [];
+        //         console.error(e);
+        //     }
+        // };
 
         /** Init */
         (async () => {
@@ -251,7 +257,7 @@ export default {
                 vm.$store.dispatch('favorite/project/load'),
                 vm.$store.dispatch('resource/user/load'),
                 vm.$store.dispatch('resource/provider/load'),
-                statAlerts(),
+                // statAlerts(),
             ]);
         })();
 
@@ -280,7 +286,7 @@ export default {
             projectDeleteFormConfirm,
             openProjectEditForm,
             onProjectFormComplete,
-            statAlerts,
+            // statAlerts,
 
         };
     },
@@ -329,6 +335,13 @@ export default {
 .p-tab::v-deep {
     border-radius: 0.375rem;
     margin: auto;
+    .beta-text {
+        @apply text-coral;
+        font-size: 0.75rem;
+        vertical-align: super;
+        cursor: default;
+        margin-left: 0.25rem;
+    }
 }
 
 .delete-btn {

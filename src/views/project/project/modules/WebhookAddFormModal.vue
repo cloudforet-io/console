@@ -30,8 +30,8 @@
                     <p-select-card
                         v-for="(item, index) in webhookTypeList"
                         :key="index" v-model="selectedWebhookType"
-                        icon="ic_collector_tags"
                         :image-url="item.tags.icon"
+                        icon="ic_webhook"
                         :value="item"
                         :label="item.name"
                         @click="onClickWebhookType(selectedWebhookType)"
@@ -231,7 +231,7 @@ export default {
     .p-select-card::v-deep {
         flex-basis: 25%;
         height: 9.0625rem;
-        margin-left: 1rem;
+        margin-left: 0.5rem;
         &:first-child {
             @apply ml-0;
         }
