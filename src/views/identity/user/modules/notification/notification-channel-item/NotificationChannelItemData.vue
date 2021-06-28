@@ -42,7 +42,7 @@
                              style-type="gray200" shape="square"
                              class="mr-2 rounded"
                     >
-                        {{ item }}
+                        {{ item }} ({{ userItem[item].name }})
                     </p-badge>
                 </div>
 
@@ -84,6 +84,7 @@ import {
 } from '@/views/identity/user/modules/notification/notification-channel-item/type';
 import AddNotificationMemberGroup from '@/views/identity/user/modules/notification/AddNotificationMemberGroup.vue';
 import InfoMessage from '@/common/components/InfoMessage.vue';
+import store from "@/store";
 
 
 export default {
@@ -126,6 +127,7 @@ export default {
         const state = reactive({
             keyList: computed(() => Object.keys(notificationItemState.dataForEdit)),
             valueList: computed(() => Object.values(notificationItemState.dataForEdit)),
+            userItem: computed(() => store.state.resource.user.items),
         });
 
         const saveChangedData = async () => {

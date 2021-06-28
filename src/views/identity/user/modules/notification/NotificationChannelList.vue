@@ -191,6 +191,7 @@ export default {
 
         (async () => {
             await listProtocol();
+            await store.dispatch('resource/user/load');
             await listChannel();
         })();
 

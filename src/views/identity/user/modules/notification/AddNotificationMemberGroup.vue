@@ -1,13 +1,14 @@
 <template>
     <fragment>
         <p-autocomplete-search v-model="search" :menu="allMemberItems" :loading="loading"
+                               use-fixed-menu-style
                                class="autocomplete-search" @select-menu="onSelectMember"
         >
             <template #menu-item--format="{item, id}">
                 <p-check-box :id="id" v-model="selectedMemberItems" class="tag-menu-item"
                              :value="item.name"
                 >
-                    {{ item.label }}
+                    {{item.name}} ({{ userItem[item.label].name }})
                 </p-check-box>
             </template>
             <template #menu-no-data-format>
@@ -16,7 +17,7 @@
         </p-autocomplete-search>
         <div class="tag-box">
             <p-tag v-for="(tag, i) in selectedMemberItems" :key="tag" @delete="onDeleteTag(i)">
-                {{ tag ? tag : '' }}
+                {{ tag ? tag : '' }} ({{ userItem[tag].name }})
             </p-tag>
         </div>
     </fragment>
@@ -25,10 +26,11 @@
 <script lang="ts">
 import { PAutocompleteSearch, PCheckBox, PTag } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@/lib/space-connector';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import store from '@/store';
 
 export default {
     name: 'AddNotificationMemberGroup',
@@ -57,7 +59,7 @@ export default {
                 type: 'item',
             }))),
             selectedMemberItems: props.users || [],
-
+            userItem: computed(() => store.state.resource.user.items),
         });
 
         const emitChange = () => {
@@ -70,7 +72,6 @@ export default {
             state.search = '';
             // const idx = state.selectedMemberItems.findIndex(k => k === item.name);
             state.selectedMemberItems = [...state.selectedMemberItems, item.name];
-            emitChange();
         };
 
         const onDeleteTag = (idx) => {
@@ -80,7 +81,11 @@ export default {
             });
         };
 
-        (async () => {
+        watch(() => state.selectedMemberItems, () => {
+            emitChange();
+        });
+
+        const listProjectMember = async () => {
             state.loading = true;
             try {
                 const res = await SpaceConnector.client.identity.project.member.list({
@@ -93,6 +98,10 @@ export default {
             } finally {
                 state.loading = false;
             }
+        };
+
+        (async () => {
+            await Promise.all([store.dispatch('resource/user/load'), listProjectMember()]);
         })();
         return {
             ...toRefs(state),
