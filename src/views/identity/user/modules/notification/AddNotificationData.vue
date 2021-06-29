@@ -16,11 +16,15 @@
         <add-notification-level v-if="projectId" @change="onChangeLevel" />
         <p-json-schema-form
             :model="schemaModel" :schema="schema" :is-valid.sync="isSchemaModelValid"
-            @update:model="onChangeModel"
             class="schema-form"
+            @update:model="onChangeModel"
         />
         <div v-if="projectId && protocol === CHANNEL_TYPE.SPACEONE_USER">
-            <add-notification-member-group :project-id="projectId" @change="onChangeMember" />
+            <p-field-group :label="$t('MENU.IDENTITY.USER')" required>
+                <template #default>
+                    <add-notification-member-group :project-id="projectId" @change="onChangeMember" />
+                </template>
+            </p-field-group>
         </div>
     </div>
 </template>
@@ -76,6 +80,10 @@ export default {
             type: String,
             default: '',
         },
+        protocolId: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -106,8 +114,7 @@ export default {
         });
 
         const apiQuery = new ApiQueryHelper();
-        apiQuery.setFilters([{ k: 'capability.supported_schema', v: props.supportedSchema, o: '=' }])
-            .setOnly('plugin_info');
+        apiQuery.setFilters([{ k: 'protocol_id', v: props.protocolId, o: '=' }]);
         const getSchema = async () => {
             try {
                 const res = await SpaceConnector.client.notification.protocol.list({
@@ -175,6 +182,9 @@ export default {
 .p-json-schema-form::v-deep {
     .form-group {
         margin-bottom: 0.75rem;
+    }
+    .form-control {
+        max-width: 30rem;
     }
 }
 </style>

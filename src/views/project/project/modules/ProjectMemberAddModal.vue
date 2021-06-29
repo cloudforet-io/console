@@ -12,9 +12,6 @@
                             :items="items"
                             :total-count="totalCount"
                             :loading="loading"
-                            :style="{
-                                height: '19rem', padding: '-1rem'
-                            }"
                             :selectable="false"
                             :excel-visible="false"
                             :sort-by.sync="options.sortBy"

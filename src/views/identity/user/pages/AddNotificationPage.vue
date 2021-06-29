@@ -16,7 +16,8 @@
                 <h3 class="content-title">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.BASE_INFO') }}
                 </h3>
-                <add-notification-data :project-id="projectId" :supported-schema="supportedSchema" :protocol-type="protocolType"
+                <add-notification-data :project-id="projectId" :supported-schema="supportedSchema"
+                                       :protocol-type="protocolType" :protocol-id="protocolId"
                                        @change="onChangeData"
                 />
             </p-pane-layout>
