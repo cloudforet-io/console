@@ -19,7 +19,29 @@
             </div>
         </div>
         <div v-else class="content">
-            <p-badge style-type="gray900" outline class="level-badge">
+            <p-badge v-if="channelData.notification_level === 'LV1'" style-type="secondary1" outline
+                     class="level-badge"
+            >
+                {{ channelData.notification_level }}
+            </p-badge>
+            <p-badge v-if="channelData.notification_level === 'LV2'" style-type="indigo" outline
+                     class="level-badge"
+            >
+                {{ channelData.notification_level }}
+            </p-badge>
+            <p-badge v-if="channelData.notification_level === 'LV3'" style-type="peacock" outline
+                     class="level-badge"
+            >
+                {{ channelData.notification_level }}
+            </p-badge>
+            <p-badge v-if="channelData.notification_level === 'LV4'" style-type="coral500" outline
+                     class="level-badge"
+            >
+                {{ channelData.notification_level }}
+            </p-badge>
+            <p-badge v-if="channelData.notification_level === 'LV5'" style-type="alert" outline
+                     class="level-badge"
+            >
                 {{ channelData.notification_level }}
             </p-badge>
             <button class="edit-btn" :class="{'edit-disable':disableEdit}"
