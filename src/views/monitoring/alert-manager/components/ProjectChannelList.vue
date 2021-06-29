@@ -54,7 +54,12 @@ export default {
             protocols: computed(() => store.state.resource.protocol.items),
         });
 
-        const channelFormatter = level => filter(props.projectChannels, { notification_level: level });
+        const channelFormatter = (level) => {
+            if (level === 'ALL') {
+                return props.projectChannels;
+            }
+            return filter(props.projectChannels, { notification_level: level });
+        };
         const protocolNameFormatter = (protocolId) => {
             const protocolName = get(state.protocols, protocolId);
             return protocolName ? protocolName.label : protocolId;
