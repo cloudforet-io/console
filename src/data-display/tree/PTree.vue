@@ -66,7 +66,7 @@
 <script lang="ts">
 /* eslint-disable no-await-in-loop */
 import {
-    Tree as TreeComp, Fold, Draggable, Store, Tree as OriginTree,
+    Tree as OriginTree, Fold, Draggable, Store, walkTreeData, walkTreeDataCallback, cloneTreeDataOptions, cloneTreeData,
 } from 'he-tree-vue';
 import {
     computed, defineComponent, onMounted, reactive, toRefs, watch,
@@ -109,7 +109,7 @@ export default defineComponent<Props>({
     components: {
         PTextInput,
         PI,
-        Tree: ((TreeComp as any).mixPlugins([Fold, Draggable]) as any),
+        Tree: ((OriginTree as any).mixPlugins([Fold, Draggable]) as any),
     },
     directives: { focus },
     props: {
@@ -468,31 +468,22 @@ export default defineComponent<Props>({
             setSelectItems(foundItems);
             return foundItems;
         };
-        const getAllNodes = (node?: TreeNode|null, nodes: TreeNode[] = []): TreeNode[] => {
-            const children: any[] = node?.children || state.treeData;
-            children.forEach((d) => {
-                nodes.push(d);
-                if (d.children && d.children.length) getAllNodes(d, nodes);
+        const getAllNodes = (_node?: TreeNode|null): TreeNode[] => {
+            if (!state.treeRef) return [];
+
+            const items: TreeNode[] = [];
+            walkTreeData(_node?.children || state.treeData, (node) => {
+                items.push(node as TreeNode);
             });
-            return nodes;
+            return items;
         };
 
-        const getAllItems = (node?: TreeNode|null, _path: number[] = []): TreeItem[] => {
-            const children: TreeNode[] = node?.children || state.treeData;
-            let items: TreeItem[] = [];
+        const getAllItems = (_node?: TreeNode|null): TreeItem[] => {
+            if (!state.treeRef) return [];
 
-            children.forEach((d, i) => {
-                const path = [..._path];
-                path.push(i);
-
-                const data: TreeItem = {
-                    path,
-                    node: d,
-                };
-                items.push(data);
-                if (d.children && d.children.length) {
-                    items = items.concat(getAllItems(d, path));
-                }
+            const items: TreeItem[] = [];
+            walkTreeData(_node?.children || state.treeData, (node, index, parent, path) => {
+                items.push({ node: node as TreeNode, path });
             });
             return items;
         };
@@ -517,7 +508,7 @@ export default defineComponent<Props>({
                     if (Array.isArray(data)) {
                         parent.children = parent.children.concat(data.map(d => getDefaultNode(d)));
                     } else {
-                        parent.children.push(getDefaultNode(data));
+                        parent.children = [...parent.children, getDefaultNode(data)];
                     }
                     if (unfold) parent.$folded = false;
                 } else {
@@ -531,7 +522,6 @@ export default defineComponent<Props>({
 
             const target = state.treeRef.getNodeByPath(path);
             if (!target) return;
-
             target.data = data;
         };
 
@@ -568,10 +558,20 @@ export default defineComponent<Props>({
                 })();
             },
             getNodeParentByPath(path: number[]) {
-                return state.treeRef.getNodeParentByPath(path) || null;
+                return state.treeRef?.getNodeParentByPath(path) || null;
             },
             getNodeByPath(path: number[]) {
-                return state.treeRef.getNodeByPath(path) || null;
+                return state.treeRef?.getNodeByPath(path) || null;
+            },
+            walkTreeData(treeData: TreeNode[]|null, handler: walkTreeDataCallback, options?: {reverse: boolean}) {
+                if (!state.treeRef) return;
+
+                walkTreeData(treeData === null ? state.treeData : treeData, handler, options);
+            },
+            cloneTreeData(treeData: TreeNode[]|null, options: cloneTreeDataOptions): TreeNode[] {
+                if (!state.treeRef) return [];
+
+                return cloneTreeData(treeData === null ? state.treeData : treeData, options) as TreeNode[];
             },
         };
 

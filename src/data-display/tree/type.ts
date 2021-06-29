@@ -1,4 +1,4 @@
-import { Node } from 'he-tree-vue';
+import { cloneTreeDataOptions, Node, walkTreeDataCallback } from 'he-tree-vue';
 
 export interface TreeNode<T=any> extends Node {
     data: T;
@@ -66,8 +66,8 @@ export interface Tree<T=any> {
     fetchAndFindNode: (predicates: Predicate<T>[]) => Promise<{node: TreeNode<T>|null; path: number[]}>;
     fetchAndFindNodes: (predicateList: Predicate<T>[][]) => Promise<{node: TreeNode<T>; path: number[]}[]>;
     resetSelect: () => void;
-    getAllNodes: (node?: TreeNode<T>|null, nodes?: TreeNode<T>[]) => TreeNode<T>[];
-    getAllItems: (node?: TreeNode<T>|null, path?: number[]) => TreeItem<T>[];
+    getAllNodes: (node?: TreeNode<T>|null) => TreeNode<T>[];
+    getAllItems: (node?: TreeNode<T>|null) => TreeItem<T>[];
     deleteNodeByPath: (path: number[]) => void;
     deleteNode: (predicate: Predicate<T>) => void;
     addChildNodeByPath: (path: number[], data: T[]|T, unfold?: boolean) => void;
@@ -77,4 +77,6 @@ export interface Tree<T=any> {
     // he tree vue api
     getNodeParentByPath: (path: number[]) => TreeNode<T>|null;
     getNodeByPath: (path: number[]) => TreeNode<T>;
+    walkTreeData: (treeData: TreeNode<T>[]|null, handler: walkTreeDataCallback, options?: {reverse: boolean}) => void;
+    cloneTreeData(treeData: TreeNode<T>[]|null, options?: cloneTreeDataOptions): TreeNode[];
 }

@@ -502,18 +502,20 @@ You can use tree methods by tree instance that passed by `init` event. <br/>
 |toggleNode| It toggles a node that found by path. |
 |getNodeParentByPath| It returns parent node by path. |
 |getNodeByPath| It returns node by path. |
+|walkTreeData| Iterate tree nodes <br/> Arguments: (treeData: TreeNode[](or null), handler: Function, options: {}) <br/> Handler: (node: TreeNode, index: number, parent: TreeNode(or null), path: number[]) <br/> - return false: stop walk <br/> - return 'skip children' <br/> - return 'skip siblings' <br/> Options: {Boolean} reverse|
+|cloneTreeData| Clones tree nodes <br> options - afterNodeCreated: (newNode, {oldNode: node, index, parent, path}) |
 
 ```typescript
 interface Tree<T=any> {
-    fetchData: (node?: TreeNode<T>|null) => Promise<TreeNode<T>[]>;
+     fetchData: (node?: TreeNode<T>|null) => Promise<TreeNode<T>[]>;
     changeSelectState: (node: TreeNode<T>, path: number[], value?: boolean) => void;
     addNode: (data: T[]|T) => void;
     findNode: (predicate: Predicate<T>) => TreeNode<T>|null;
     fetchAndFindNode: (predicates: Predicate<T>[]) => Promise<{node: TreeNode<T>|null; path: number[]}>;
     fetchAndFindNodes: (predicateList: Predicate<T>[][]) => Promise<{node: TreeNode<T>; path: number[]}[]>;
     resetSelect: () => void;
-    getAllNodes: (node?: TreeNode<T>|null, nodes?: TreeNode<T>[]) => TreeNode<T>[];
-    getAllItems: (node?: TreeNode<T>|null, path?: number[]) => TreeItem<T>[];
+    getAllNodes: (node?: TreeNode<T>|null) => TreeNode<T>[];
+    getAllItems: (node?: TreeNode<T>|null) => TreeItem<T>[];
     deleteNodeByPath: (path: number[]) => void;
     deleteNode: (predicate: Predicate<T>) => void;
     addChildNodeByPath: (path: number[], data: T[]|T, unfold?: boolean) => void;
@@ -523,6 +525,8 @@ interface Tree<T=any> {
     // he tree vue api
     getNodeParentByPath: (path: number[]) => TreeNode<T>|null;
     getNodeByPath: (path: number[]) => TreeNode<T>;
+    walkTreeData: (treeData: TreeNode<T>[]|null, callback: walkTreeDataCallback, options?: {reverse: boolean}) => void;
+    cloneTreeData(treeData: TreeNode<T>[]|null, options?: cloneTreeDataOptions): TreeNode[];
 }
 
 interface Predicate<T=any> {
