@@ -1,3 +1,10 @@
+# [1.1.0-beta.90](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.89...v1.1.0-beta.90) (2021-06-29)
+
+
+### Bug Fixes
+
+* fix minor css bugs in panel top and autocomplete search ([#629](https://github.com/spaceone-dev/spaceone-design-system/issues/629)) ([2fd1855](https://github.com/spaceone-dev/spaceone-design-system/commit/2fd18554dda5f7da15cd800c20413c15a2d8c302))
+
 # [1.1.0-beta.89](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.88...v1.1.0-beta.89) (2021-06-29)
 
 
