@@ -116,6 +116,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ACTION, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { i18n } from '@/translations';
+import { store } from '@/store';
 import router from '@/routes';
 
 
@@ -227,7 +228,13 @@ export default {
         });
 
         const init = async () => {
-            if (props.projectId) await Promise.all([getProjectAlertConfig(), getEventRuleCount()]);
+            if (props.projectId) {
+                await Promise.all([
+                    getProjectAlertConfig(),
+                    getEventRuleCount(),
+                    store.dispatch('resource/protocol/load'),
+                ]);
+            }
         };
 
         onActivated(() => {
