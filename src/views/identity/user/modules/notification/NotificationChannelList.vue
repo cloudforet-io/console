@@ -4,7 +4,7 @@
             <h3 class="sub-title">
                 {{ $t('IDENTITY.USER.NOTIFICATION.NOTIFICATION_CHANNEL') }}
             </h3>
-            <p-data-loader class="flex-grow" :data="protocolList" :loading="loading">
+            <p-data-loader :data="protocolList" :loading="loading">
                 <ul class="channel-list-wrapper">
                     <div v-for="item in protocolList"
                          :key="item.protocol_id"
@@ -30,13 +30,17 @@
                                     />
                                     {{ item.label }}
                                 </span>
-                                <span v-if="item.protocolType === 'INTERNAL'" class="item-desc">
-                                    {{ $t('IDENTITY.USER.NOTIFICATION.SPACEONE_USER_DESC') }}
-                                </span>
+                                <!--                                <span v-if="item.protocolType === 'INTERNAL'" class="item-desc">-->
+                                <!--                                    {{ $t('IDENTITY.USER.NOTIFICATION.SPACEONE_USER_DESC') }}-->
+                                <!--                                </span>-->
                             </li>
                         </router-link>
                     </div>
                 </ul>
+                <p class="spaceone-desc">
+                    <p-i name="ic_notifications_member" width="1.125rem" class="mr-2" />
+                    <b>SpaceOne User:</b> {{ $t('IDENTITY.USER.NOTIFICATION.SPACEONE_USER_DESC') }}
+                </p>
                 <template #no-data>
                     <p-empty class="empty-msg protocol">
                         {{ $t('IDENTITY.USER.NOTIFICATION.NO_PROTOCOL') }}
@@ -274,14 +278,29 @@ export default {
     font-size: 1.375rem;
     line-height: 145%;
 }
+.p-data-loader::v-deep {
+    .data-wrapper {
+        overflow-y: hidden;
+    }
+}
+.spaceone-desc {
+    @apply bg-gray-100 text-gray-700;
+    height: 2.125rem;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    padding: 0.5rem 0.75rem;
+    line-height: 150%;
+    font-size: 0.75rem;
+}
 .channel-list-wrapper {
     display: grid;
     row-gap: 0.5rem;
     column-gap: 0.5rem;
     grid-template-columns: repeat(auto-fit, minmax(216px, 1fr));
     margin-top: 1.125rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 0.5rem;
     gap: 0.5rem;
+    overflow-y: hidden;
 }
 .channel-item-wrapper {
     &.hide {

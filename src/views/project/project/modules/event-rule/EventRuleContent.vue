@@ -33,7 +33,7 @@
                             </td>
                             <td v-else-if="item.name === 'change_project'">
                                 <p-anchor :to="referenceRouter(
-                                    items[item],
+                                    items[item.name],
                                     { resource_type: 'identity.Project' })"
                                 >
                                     {{ projects[items[item.name]] ? projects[items[item.name]].label : items[item.name] }}
