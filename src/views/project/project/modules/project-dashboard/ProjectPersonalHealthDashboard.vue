@@ -36,11 +36,9 @@
                                 @change="onChange"
                 >
                     <template #col-event-format="{ value }">
-                        <router-link :to="value.to">
-                            <p-anchor highlight>
-                                {{ value.name }}
-                            </p-anchor>
-                        </router-link>
+                        <p-anchor :to="value.to" highlight>
+                            {{ value.name }}
+                        </p-anchor>
                     </template>
                     <template #col-region_code-format="{ value }">
                         <span>{{ regionFormatter(value) }}</span>
@@ -56,11 +54,9 @@
                                     <span class="value">{{ resource.aws_account_id }}</span>
                                 </template>
                                 <template v-else>
-                                    <router-link :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })">
-                                        <p-anchor highlight>
-                                            <span class="link-text">{{ resource.entity_value }}</span>
-                                        </p-anchor>
-                                    </router-link>
+                                    <p-anchor :to="referenceRouter(resource.entity_value, { resource_type: 'inventory.CloudService' })" highlight>
+                                        {{ resource.entity_value }}
+                                    </p-anchor>
                                 </template>
                             </div>
                         </div>
@@ -84,7 +80,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PAnchor, PI, PSearchTable,
+    PAnchor, PSearchTable,
 } from '@spaceone/design-system';
 
 import WidgetLayout from '@/common/components/WidgetLayout.vue';
@@ -116,7 +112,6 @@ export default {
         },
     },
     components: {
-        PI,
         PAnchor,
         PSearchTable,
         WidgetLayout,
@@ -347,11 +342,6 @@ export default {
     @apply bg-white;
     height: 18.75rem;
     border-width: 0;
-    .link-text {
-        @apply truncate;
-        display: inline-block;
-        width: 9rem;
-    }
     .affected-resources-wrapper {
         display: flex;
         width: 10rem;
@@ -364,16 +354,6 @@ export default {
         .label {
             @apply text-gray-600;
         }
-    }
-}
-
-.link-text {
-    @apply text-secondary;
-    &:hover {
-        text-decoration: underline;
-    }
-    .p-i-icon {
-        margin-bottom: 0.125rem;
     }
 }
 </style>

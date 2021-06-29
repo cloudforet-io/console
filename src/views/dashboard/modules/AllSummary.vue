@@ -116,6 +116,7 @@ import {
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { QueryHelper } from '@/lib/query';
+import { commaFormatter } from '@/lib/util';
 import { QueryStoreFilter } from '@/lib/query/type';
 import { gray, primary, primary1 } from '@/styles/colors';
 import { store } from '@/store';
@@ -152,11 +153,7 @@ interface ChartData {
     bulletText?: string | number;
     tooltipText?: string | number;
 }
-interface Data {
-    type: keyof typeof DATA_TYPE;
-    label: TranslateResult;
-    summaryTitle?: TranslateResult;
-}
+
 interface SummaryData {
     type: string;
     provider: string;
@@ -193,10 +190,6 @@ export default {
             };
             return Intl.NumberFormat('en', options).format(num);
         };
-        const commaFormatter = (num) => {
-            if (num) return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',');
-            return num;
-        };
 
         const state = reactive({
             loading: false,
@@ -220,7 +213,6 @@ export default {
             storageBoxSuffix: 'TB' as Unit,
             storageTrendSuffix: 'TB' as Unit,
             tabs: computed(() => Object.values(DATA_TYPE)),
-            selectedIndex: 0,
             activeTab: DATA_TYPE.compute,
             dataMap: computed(() => ({
                 [DATA_TYPE.compute]: { label: vm.$t('COMMON.WIDGETS.ALL_SUMMARY.COMPUTE') },
@@ -324,15 +316,17 @@ export default {
             chart.cursor.behavior = 'none';
         };
 
-        let selectedIndexInterval;
-        const setBoxInterval = () => {
-            selectedIndexInterval = setInterval(() => {
+        let tabInterval;
+        const setTabInterval = () => {
+            tabInterval = setInterval(() => {
                 disposeChart();
-                if (state.selectedIndex < 3) {
-                    state.selectedIndex += 1;
+                let activeTabIndex = state.tabs.indexOf(state.activeTab);
+                if (activeTabIndex < 3) {
+                    activeTabIndex += 1;
                 } else {
-                    state.selectedIndex = 0;
+                    activeTabIndex = 0;
                 }
+                state.activeTab = state.tabs[activeTabIndex];
             }, BOX_SWITCH_INTERVAL);
         };
         const getLocation = (type) => {
@@ -624,19 +618,19 @@ export default {
         };
 
         /* event */
-        const onChangeTab = (name, idx) => {
-            if (idx !== state.selectedIndex) disposeChart();
-            state.selectedIndex = idx;
-            if (selectedIndexInterval) clearInterval(selectedIndexInterval);
+        const onChangeTab = (name) => {
+            if (state.activeTab !== name) disposeChart();
+            state.activeTab = name;
+            if (tabInterval) clearInterval(tabInterval);
         };
         const onClickDateTypeButton = (type) => {
             state.selectedDateType = type;
-            if (selectedIndexInterval) clearInterval(selectedIndexInterval);
+            if (tabInterval) clearInterval(tabInterval);
         };
 
         const init = async () => {
             await Promise.all([getSummaryInfo(DATA_TYPE.compute), Object.keys(DATA_TYPE).forEach(d => getCount(d)), getBillingCount()]);
-            setBoxInterval();
+            setTabInterval();
         };
         const chartInit = async () => {
             await getTrend(DATA_TYPE.compute);
