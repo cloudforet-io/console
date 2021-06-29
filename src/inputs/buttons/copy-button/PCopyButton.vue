@@ -162,9 +162,9 @@ export default defineComponent<Props>({
 
 .p-copy-button {
     @apply text-gray-900;
-    display: inline-flex;
+    display: inline-block;
     font-size: 0.875rem;
-    align-items: center;
+    vertical-align: middle;
 
     .copy-icon {
         @apply text-gray-500;
