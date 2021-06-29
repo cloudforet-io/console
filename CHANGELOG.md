@@ -1,3 +1,15 @@
+# [1.1.0-beta.88](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.87...v1.1.0-beta.88) (2021-06-29)
+
+
+### Bug Fixes
+
+* select card not binding marker bug fix ([#627](https://github.com/spaceone-dev/spaceone-design-system/issues/627)) ([e58e021](https://github.com/spaceone-dev/spaceone-design-system/commit/e58e02102f820096f8bfb703ce8605ab40cb54b5))
+
+
+### Features
+
+* add icon color to select card and error icon color to lazy img ([#626](https://github.com/spaceone-dev/spaceone-design-system/issues/626)) ([1aca9dc](https://github.com/spaceone-dev/spaceone-design-system/commit/1aca9dc9f7aa5f9b5d61613d7a4b1a262dbd8b90))
+
 # [1.1.0-beta.87](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.86...v1.1.0-beta.87) (2021-06-29)
 
 
