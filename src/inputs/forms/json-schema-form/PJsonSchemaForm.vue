@@ -96,6 +96,16 @@ export default {
                     };
                     errorContainerUiSchema.children.push(newErrorUiSchema);
                 }
+                if (value.pattern) {
+                    const newErrorUiSchema = cloneDeep(defaultErrorUiSchema);
+                    newErrorUiSchema.displayOptions.schema.not = {
+                        pattern: value.pattern,
+                    };
+                    newErrorUiSchema.fieldOptions.domProps = {
+                        innerHTML: 'invalid format',
+                    };
+                    errorContainerUiSchema.children.push(newErrorUiSchema);
+                }
             } else if (value.type === 'number' || value.type === 'integer') {
                 if (value.minimum !== undefined) {
                     const newErrorUiSchema = cloneDeep(defaultErrorUiSchema);
@@ -236,7 +246,6 @@ export default {
             font-weight: bold;
             letter-spacing: 0;
             margin-bottom: 0.25rem;
-            //margin-right: 0.375rem;
         }
         .required-mark {
             @apply text-alert;
