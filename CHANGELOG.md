@@ -1,3 +1,10 @@
+# [1.1.0-beta.89](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.88...v1.1.0-beta.89) (2021-06-29)
+
+
+### Bug Fixes
+
+* change copy button from inline flex to inline block ([#628](https://github.com/spaceone-dev/spaceone-design-system/issues/628)) ([f9b57b3](https://github.com/spaceone-dev/spaceone-design-system/commit/f9b57b3fcbffd90e2f309fe2a4ef0daac1347cc0))
+
 # [1.1.0-beta.88](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.87...v1.1.0-beta.88) (2021-06-29)
 
 
