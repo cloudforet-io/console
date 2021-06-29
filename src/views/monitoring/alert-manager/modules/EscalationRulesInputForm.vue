@@ -380,18 +380,20 @@ export default {
     }
 
     .p-select-dropdown::v-deep {
-        .p-dropdown-button {
+        .dropdown-button {
             min-width: 6rem;
         }
         .context-item {
             @apply border-b border-secondary;
             box-sizing: border-box;
+            width: 100%;
             &:last-child {
                 border: none;
             }
         }
         .p-radio {
             display: flex;
+            width: 100%;
             .p-i-icon {
                 margin-top: 0.125rem;
             }

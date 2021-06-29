@@ -134,7 +134,7 @@ export default {
         });
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            pageTitle: vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY'),
+            pageTitle: computed(() => vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ESCALATION_POLICY')),
             actionItems: computed(() => ([
                 {
                     type: 'item',

@@ -192,7 +192,9 @@ export default {
                     language,
                     timezone: userState.timezone,
                 });
-                showSuccessMessage(vm.$t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '', root);
+                vm.$nextTick(() => {
+                    showSuccessMessage(vm.$t('COMMON.GNB.ACCOUNT.ALT_S_UPDATE'), '', root);
+                });
                 emit('hide-menu');
             } catch (e) {
                 showErrorMessage(vm.$t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'), e, root);
