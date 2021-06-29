@@ -4,55 +4,68 @@
             <h3 class="sub-title">
                 {{ $t('IDENTITY.USER.NOTIFICATION.NOTIFICATION_CHANNEL') }}
             </h3>
-            <ul v-if="protocolList.length > 0" class="channel-list-wrapper">
-                <div v-for="item in protocolList"
-                     :key="item.protocol_id"
-                     class="channel-item-wrapper"
-                >
-                    <router-link :to="item.link">
-                        <li class="channel-item">
-                            <p-lazy-img :src="assetUrlConverter(item.tags.icon)"
-                                        :width="item.name === PROTOCOL_TYPE.SLACK ? '8rem' : '2.75rem'"
-                                        height="2.25rem"
-                                        class="service-img"
-                            />
-                            <span class="text">
-                                <p-i name="ic_plus_bold"
-                                     width="1rem" height="1rem"
+            <p-data-loader class="flex-grow" :data="protocolList" :loading="loading">
+                <ul v-if="protocolList.length > 0" class="channel-list-wrapper">
+                    <div v-for="item in protocolList"
+                         :key="item.protocol_id"
+                         class="channel-item-wrapper"
+                    >
+                        <router-link :to="item.link">
+                            <li class="channel-item">
+                                <p-lazy-img v-if="item.protocolType === 'INTERNAL'"
+                                            :src="assetUrlConverter('https://spaceone-custom-assets.s3.ap-northeast-2.amazonaws.com/console-assets/icons/notifications_member.svg')"
+                                            width="2.25rem"
+                                            height="2.25rem"
+                                            class="service-img"
                                 />
-                                {{ item.label }}
-                            </span>
-                            <span v-if="item.protocolType === 'INTERNAL'" class="item-desc">
-                                {{ $t('IDENTITY.USER.NOTIFICATION.SPACEONE_USER_DESC') }}
-                            </span>
-                        </li>
-                    </router-link>
-                </div>
-            </ul>
-            <span v-else>
-                <p-empty v-if="channelList.length === 0" class="empty-msg protocol">
-                    {{ $t('IDENTITY.USER.NOTIFICATION.NO_PROTOCOL') }}
-                </p-empty>
-            </span>
+                                <p-lazy-img v-else :src="assetUrlConverter(item.icon)"
+                                            width="2.25rem"
+                                            height="2.25rem"
+                                            class="service-img"
+                                />
+                                <span class="text">
+                                    <p-i name="ic_plus_bold"
+                                         width="1rem" height="1rem"
+                                         color="inherit transparent"
+                                    />
+                                    {{ item.label }}
+                                </span>
+                                <span v-if="item.protocolType === 'INTERNAL'" class="item-desc">
+                                    {{ $t('IDENTITY.USER.NOTIFICATION.SPACEONE_USER_DESC') }}
+                                </span>
+                            </li>
+                        </router-link>
+                    </div>
+                </ul>
+                <template #no-data>
+                    <p-empty class="empty-msg protocol">
+                        {{ $t('IDENTITY.USER.NOTIFICATION.NO_PROTOCOL') }}
+                    </p-empty>
+                </template>
+            </p-data-loader>
             <p-divider class="divider" />
-            <ul v-for="item in channelList" :key="`${item.name}-${item.created_at}`">
-                <li class="mb-4">
-                    <notification-channel-item :channel-data="item" :project-id="projectId"
-                                               @change="onChangeChannelItem"
-                                               @confirm="listChannel"
-                    />
-                </li>
-            </ul>
-            <p-empty v-if="channelList.length === 0" class="empty-msg">
-                {{ $t('IDENTITY.USER.NOTIFICATION.NO_NOTI_CHANNEL') }}
-            </p-empty>
+            <p-data-loader class="flex-grow" :data="channelList" :loading="channelLoading">
+                <ul v-for="item in channelList" :key="`${item.name}-${item.created_at}`">
+                    <li class="mb-4">
+                        <notification-channel-item :channel-data="item" :project-id="projectId"
+                                                   @change="onChangeChannelItem"
+                                                   @confirm="listChannel"
+                        />
+                    </li>
+                </ul>
+                <template #no-data>
+                    <p-empty class="empty-msg">
+                        {{ $t('IDENTITY.USER.NOTIFICATION.NO_NOTI_CHANNEL') }}
+                    </p-empty>
+                </template>
+            </p-data-loader>
         </p-pane-layout>
     </section>
 </template>
 
 <script lang="ts">
 import {
-    PDivider, PI, PEmpty, PPaneLayout, PLazyImg,
+    PDivider, PI, PEmpty, PPaneLayout, PLazyImg, PDataLoader,
 } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
@@ -75,6 +88,7 @@ export default {
         PDivider,
         PEmpty,
         PLazyImg,
+        PDataLoader,
     },
     props: {
         projectId: {
@@ -87,6 +101,7 @@ export default {
         const state = reactive({
             protocolList: [] as ProtocolItem[],
             loading: true,
+            channelLoading: true,
             // eslint-disable-next-line no-use-before-define
             userId: computed(() => ((vm.$route.params.userId) ? decodeURIComponent(vm.$route.params.userId) : store.state.user.userId)),
             channelList: [] as ChannelItem[],
@@ -99,6 +114,31 @@ export default {
                 { name: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION') },
             ])),
         });
+
+        const repositoryIdApiQuery = new ApiQueryHelper();
+        const getRepositoryID = async () => {
+            repositoryIdApiQuery.setFilters([{ k: 'repository_type', v: 'remote', o: '=' }]);
+            const res = await SpaceConnector.client.repository.repository.list({
+                query: repositoryIdApiQuery.data,
+            });
+            const repositoryId = res.results[0].repository_id;
+            return repositoryId;
+        };
+
+        const pluginQuery = new ApiQueryHelper();
+        const getIcon = async (pluginId) => {
+            const repositoryId = await getRepositoryID();
+            pluginQuery.setFilters([{
+                k: 'plugin_id',
+                v: pluginId,
+                o: '=',
+            }]).setOnly('plugin_id', 'name', 'tags');
+            const { results } = await SpaceConnector.client.repository.plugin.list({
+                repository_id: repositoryId,
+                query: pluginQuery.data,
+            });
+            return results[0]?.tags?.icon || '';
+        };
 
         const apiQuery = new ApiQueryHelper();
         const listProtocol = async () => {
@@ -113,7 +153,7 @@ export default {
                     });
                 }
                 state.protocolResp = res.results;
-                state.protocolList = res.results.map(d => ({
+                state.protocolList = await Promise.all(res.results.map(async d => ({
                     label: computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name })).value,
                     link: {
                         name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD._NAME,
@@ -132,8 +172,9 @@ export default {
                     },
                     protocolType: d.protocol_type,
                     tags: d.tags,
+                    icon: await getIcon(d.plugin_info.plugin_id) || '',
                     name: d.name,
-                }));
+                })));
             } catch (e) {
                 state.protocolList = [];
                 state.protocolResp = [];
@@ -148,6 +189,7 @@ export default {
         const channelApiQuery = new ApiQueryHelper();
         const listUserChannel = async () => {
             try {
+                state.channelLoading = true;
                 channelApiQuery.setFilters([{ k: 'user_id', v: state.userId, o: '=' }]);
                 const res = await SpaceConnector.client.notification.userChannel.list({
                     query: channelApiQuery.data,
@@ -160,11 +202,14 @@ export default {
             } catch (e) {
                 state.channelList = [];
                 console.error(e);
+            } finally {
+                state.channelLoading = false;
             }
         };
 
         const listProjectChannel = async () => {
             try {
+                state.channelLoading = true;
                 channelApiQuery.setFilters([{ k: 'project_id', v: props.projectId, o: '=' }]).setSort('notification_level', false);
                 const res = await SpaceConnector.client.notification.projectChannel.list({
                     query: channelApiQuery.data,
@@ -177,6 +222,8 @@ export default {
             } catch (e) {
                 state.channelList = [];
                 console.error(e);
+            } finally {
+                state.channelLoading = false;
             }
         };
 
