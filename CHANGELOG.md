@@ -1,3 +1,10 @@
+# [1.1.0-beta.85](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.84...v1.1.0-beta.85) (2021-06-29)
+
+
+### Features
+
+* add pattern invalid message ([#624](https://github.com/spaceone-dev/spaceone-design-system/issues/624)) ([45c87dd](https://github.com/spaceone-dev/spaceone-design-system/commit/45c87dd7fe4e2ca8c2d2ae6b4e89e26279ac9238))
+
 # [1.1.0-beta.84](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.83...v1.1.0-beta.84) (2021-06-28)
 
 
