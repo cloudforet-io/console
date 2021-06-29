@@ -1,3 +1,10 @@
+# [1.1.0-beta.86](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.85...v1.1.0-beta.86) (2021-06-29)
+
+
+### Features
+
+* add walk tree data method to tree and refactor some methods ([#622](https://github.com/spaceone-dev/spaceone-design-system/issues/622)) ([d186b27](https://github.com/spaceone-dev/spaceone-design-system/commit/d186b27f4e57e7d01f901015032e78fee2d84251))
+
 # [1.1.0-beta.85](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.84...v1.1.0-beta.85) (2021-06-29)
 
 
