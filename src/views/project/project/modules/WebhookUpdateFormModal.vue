@@ -43,8 +43,7 @@
                                    :items="versions"
                                    :disabled="loading"
                                    use-fixed-menu-style
-                >
-                </p-select-dropdown>
+                />
             </p-field-group>
         </template>
     </p-button-modal>

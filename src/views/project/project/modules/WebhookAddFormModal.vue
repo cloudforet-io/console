@@ -4,7 +4,7 @@
         size="md"
         :header-title="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_TITLE')"
         :visible.sync="proxyVisible"
-        :disabled="!isNameValid || !isSelectedWebhookType"
+        :disabled="showValidation && (!isNameValid || !isSelectedWebhookType || !isSelectedVersion)"
         :loading="loading"
         @confirm="onClickConfirm"
     >
@@ -36,6 +36,7 @@
                         :value="item"
                         :label="item.name"
                         :disabled="loading"
+                        :invalid="showValidation && !isSelectedVersion"
                         @click="onClickWebhookType(selectedWebhookType)"
                     />
                 </div>
@@ -44,7 +45,9 @@
                 :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_VERSION')"
                 required
             >
-                <p-select-dropdown v-model="version" :items="versions" :disabled="loading"
+                <p-select-dropdown v-model="version"
+                                   :items="versions"
+                                   :disabled="loading"
                                    use-fixed-menu-style
                 />
             </p-field-group>
@@ -103,6 +106,12 @@ export default {
             proxyVisible: makeProxy('visible', props, emit),
             loading: false,
             webhookName: '',
+            nameInvalidText: computed(() => {
+                if (state.webhookName?.length === 0) return i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_REQUIRED');
+                if (state.webhookName?.length > 40) return i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_INVALID_TEXT');
+                return undefined;
+            }),
+            isNameValid: computed(() => !state.nameInvalidText),
             webhookTypeList: [] as WebhookType[],
             selectedWebhookType: {} as WebhookType,
             isSelectedWebhookType: computed(() => {
@@ -111,12 +120,10 @@ export default {
             }),
             versions: [],
             version: '',
-            nameInvalidText: computed(() => {
-                if (state.webhookName?.length === 0) return i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_REQUIRED');
-                if (state.webhookName?.length > 40) return i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_INVALID_TEXT');
-                return undefined;
+            isSelectedVersion: computed(() => {
+                if (state.version) return true;
+                return false;
             }),
-            isNameValid: computed(() => !state.nameInvalidText),
             showValidation: false,
         });
 
@@ -161,6 +168,7 @@ export default {
                 });
                 state.version = results[0];
             } catch (e) {
+                state.versions = [];
                 console.error(e);
             }
         };
@@ -187,17 +195,21 @@ export default {
 
         /* event */
         const onFirstInputName = (e) => {
+            state.disabled = true;
             state.showValidation = true;
             state.webhookName = e.target.value;
         };
         const onClickConfirm = async () => {
-            if (!state.showValidation) state.showValidation = true;
-            if (!state.version) return;
+            if (!state.showValidation) {
+                state.showValidation = true;
+                return;
+            }
 
             await createWebhook();
             emit('confirm');
         };
         const onClickWebhookType = async (selectedWebhookType) => {
+            state.version = '';
             await getVersions(selectedWebhookType.plugin_id);
         };
 
@@ -205,7 +217,9 @@ export default {
         const initInputModel = () => {
             state.webhookName = '';
             state.selectedWebhookType = {} as WebhookType;
+            state.versions = [];
             state.version = '';
+            state.disabled = false;
             state.showValidation = false;
         };
 
@@ -221,7 +235,6 @@ export default {
             onClickWebhookType,
         };
     },
-
 };
 </script>
 

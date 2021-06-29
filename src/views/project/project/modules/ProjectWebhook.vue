@@ -80,7 +80,11 @@
                     <strong>{{ $t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_CONTENT_1') }}</strong>
                     <span> {{ $t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_CONTENT_2') }}</span>
                 </p>
-                <strong>{{ $t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_CONTENT_3') }}</strong>
+                <i18n path="PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_CONTENT_3">
+                    <template #webhookName>
+                        <strong>{{ selectedItems[0].name }}</strong>
+                    </template>
+                </i18n>
                 <p-text-input v-model="inputWebhookName" />
             </template>
         </delete-modal>
