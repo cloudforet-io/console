@@ -3,7 +3,7 @@
          @click="onClick"
          v-on="$listeners"
     >
-        <p-i :name="iconName"
+        <p-i :name="markerIconName"
              class="marker" width="1.25rem" height="1.25rem"
         />
         <div class="contents">
@@ -97,6 +97,16 @@ export default defineComponent<Props>({
         const { state: selectState, onClick } = useSelect(props, context);
 
         const state = reactive({
+            markerIconName: computed(() => {
+                if (props.multiSelectable) {
+                    if (props.disabled) return 'ic_checkbox--disabled';
+                    if (selectState.isSelected) return 'ic_checkbox--checked';
+                    return 'ic_checkbox';
+                }
+                if (props.disabled) return 'ic_radio--disabled';
+                if (selectState.isSelected) return 'ic_checkbox_circle--checked';
+                return 'ic_radio';
+            }),
             errorIcon: computed(() => {
                 if (typeof props.icon === 'string') return props.icon;
                 if (props.icon) return 'smile-face';
@@ -104,22 +114,11 @@ export default defineComponent<Props>({
             }),
         });
 
-        const iconName = computed(() => {
-            if (props.multiSelectable) {
-                if (props.disabled) return 'ic_checkbox--disabled';
-                if (state.isSelected) return 'ic_checkbox--checked';
-                return 'ic_checkbox';
-            }
-            if (props.disabled) return 'ic_radio--disabled';
-            if (state.isSelected) return 'ic_checkbox_circle--checked';
-            return 'ic_radio';
-        });
 
         return {
             ...toRefs(selectState),
             ...toRefs(state),
             onClick,
-            iconName,
         };
     },
 });

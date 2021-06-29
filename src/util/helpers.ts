@@ -1,6 +1,6 @@
 import _, { get, toString } from 'lodash';
-import colors from '@/styles/colors';
-
+;
+import colors from '@/styles/colors'
 /** @function
  * @name copyTextToClipboard
  * @description copy given text to clipboard
