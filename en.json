@@ -1235,7 +1235,7 @@
 					"NAME_INVALID_TEXT": "The maximum length of a name is 40 characters.",
 					"NAME_LABEL": "Name",
 					"NAME_REQUIRED": "Please enter name.",
-					"NOTIFICATIONS_SETTINGS": "Project \\Notifications Settings",
+					"NOTIFICATIONS_SETTINGS": "Project Notifications Settings",
 					"NOTIFICATION_LEVEL": "Notification Level",
 					"NOTIFICATION_LV": "Notification LV",
 					"PROJECT": "Project",
