@@ -23,7 +23,7 @@
         <div v-else class="content">
             <p>{{ channelData.name }}</p>
             <button class="edit-btn" :class="{'edit-disable':disableEdit}"
-                    @click="startEdit(EDIT_TYPE.NAME)"
+                    @click="startEdit(EDIT_TYPE.NAME, channelData.name)"
             >
                 <p-i name="ic_edit" width="1rem" height="1rem"
                      color="inherit" class="edit-icon"

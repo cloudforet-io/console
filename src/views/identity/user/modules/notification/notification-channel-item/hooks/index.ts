@@ -4,6 +4,7 @@ import {
     ParamType,
 } from '@/views/identity/user/modules/notification/notification-channel-item/type';
 import { ComponentRenderProxy, getCurrentInstance, reactive } from '@vue/composition-api';
+import { cloneDeep } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { i18n } from '@/translations';
@@ -17,13 +18,23 @@ interface NotificationItemState {
 export const useNotificationItem = (obj: NotificationItemState) => {
     const vm = getCurrentInstance() as ComponentRenderProxy;
     const state = reactive<NotificationItemState>(obj);
-    const cancelEdit = () => {
+    const cancelEdit = (initialData) => {
         state.isEditMode = false;
+        if (typeof initialData === 'object') {
+            state.dataForEdit = cloneDeep(initialData);
+        } else {
+            state.dataForEdit = initialData;
+        }
         vm.$emit('edit', undefined);
     };
 
-    const startEdit = (value) => {
+    const startEdit = (value, initialData) => {
         state.isEditMode = true;
+        if (typeof initialData === 'object') {
+            state.dataForEdit = cloneDeep(initialData);
+        } else {
+            state.dataForEdit = initialData;
+        }
         vm.$emit('edit', value);
     };
 

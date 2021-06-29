@@ -15,15 +15,15 @@
                     <add-notification-member-group :users="channelData.data.users" :project-id="projectId" @change="onChangeUser" />
                 </p>
                 <div v-else>
-                    <p v-for="(item, index) in dataForEdit" :key="`channel-editable-data-value-${index}`">
-                        <p-text-input v-model="dataForEdit[index]"
+                    <p v-for="(value, key) in dataForEdit" :key="`channel-editable-data-value-${key}`">
+                        <p-text-input v-model="dataForEdit[key]"
                                       class="block"
                         />
                     </p>
                 </div>
             </div>
             <div class="button-group">
-                <p-button :outline="true" class="text-button" @click="cancelEdit">
+                <p-button :outline="true" class="text-button" @click="cancelEdit(channelData.data)">
                     {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>
                 <p-button
@@ -60,7 +60,7 @@
                 <info-message :message="$t('IDENTITY.USER.NOTIFICATION.CANNOT_EDIT_SLACK')" />
             </p>
             <button v-else class="edit-btn" :class="{'edit-disable':disableEdit}"
-                    @click="startEdit(EDIT_TYPE.DATA)"
+                    @click="startEdit(EDIT_TYPE.DATA, channelData.data)"
             >
                 <p-i name="ic_edit" width="1rem" height="1rem"
                      color="inherit" class="edit-icon"
@@ -76,6 +76,7 @@ import {
     PBadge, PButton, PI, PTextInput,
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
+import { cloneDeep } from 'lodash';
 import { useNotificationItem } from '@/views/identity/user/modules/notification/notification-channel-item/hooks';
 import {
     EDIT_TYPE,
@@ -84,7 +85,7 @@ import {
 } from '@/views/identity/user/modules/notification/notification-channel-item/type';
 import AddNotificationMemberGroup from '@/views/identity/user/modules/notification/AddNotificationMemberGroup.vue';
 import InfoMessage from '@/common/components/InfoMessage.vue';
-import store from "@/store";
+import store from '@/store';
 
 
 export default {
@@ -122,7 +123,7 @@ export default {
             userChannelId: props.channelData?.user_channel_id,
             projectChannelId: props.channelData?.project_channel_id,
             isEditMode: false,
-            dataForEdit: props.channelData?.data,
+            dataForEdit: cloneDeep(props.channelData?.data),
         });
         const state = reactive({
             keyList: computed(() => Object.keys(notificationItemState.dataForEdit)),

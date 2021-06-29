@@ -30,6 +30,7 @@ import {
 import { SpaceConnector } from '@/lib/space-connector';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import store from '@/store';
+import { cloneDeep } from 'lodash';
 
 export default {
     name: 'AddNotificationMemberGroup',
@@ -57,7 +58,7 @@ export default {
                 label: d.resource_id,
                 type: 'item',
             }))),
-            selectedMemberItems: props.users || [],
+            selectedMemberItems: cloneDeep(props.users) || [],
             userItem: computed(() => store.state.resource.user.items),
         });
 
