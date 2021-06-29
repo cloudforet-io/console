@@ -108,6 +108,7 @@ import {
 import {
     PI, PIconButton, PTree, PButton, PDataLoader,
 } from '@spaceone/design-system';
+import { TreeItem } from '@spaceone/design-system/dist/src/data-display/tree/type';
 import { SpaceConnector } from '@/lib/space-connector';
 import {
     ProjectItemResp,

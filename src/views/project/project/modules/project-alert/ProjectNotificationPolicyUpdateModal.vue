@@ -14,6 +14,7 @@
                                :value="option.name"
                                :label="option.label"
                                :icon="option.icon"
+                               :icon-color="urgencyColor"
                                block
                 />
             </div>
@@ -33,7 +34,7 @@ import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/util';
 import { i18n } from '@/translations';
-
+import { red } from '@/styles/colors';
 
 export default {
     name: 'ProjectNotificationPolicyUpdateModal',
@@ -83,13 +84,14 @@ export default {
             }
         };
 
-        watch(() => props.selectedOption, (selectedOption) => {
+        watch([() => props.selectedOption, () => props.visible], ([selectedOption]) => {
             state.notificationUrgency = selectedOption;
         });
 
         return {
             ...toRefs(state),
             onClickConfirm,
+            urgencyColor: red[400],
         };
     },
 };

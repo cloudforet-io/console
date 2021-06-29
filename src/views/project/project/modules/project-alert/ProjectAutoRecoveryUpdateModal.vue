@@ -90,7 +90,7 @@ export default {
             }
         };
 
-        watch(() => props.selectedOption, (selectedOption) => {
+        watch([() => props.selectedOption, () => props.visible], ([selectedOption]) => {
             state.isAutoRecovery = selectedOption;
         });
 

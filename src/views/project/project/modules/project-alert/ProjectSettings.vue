@@ -8,7 +8,7 @@
                 {{ $t('PROJECT.DETAIL.ALERT.NOTIFICATION_POLICY') }}
             </div>
             <div class="content-wrapper">
-                <p-i :name="notificationUrgency === NOTIFICATION_URGENCY.ALL ? 'ic_bell' : 'ic_alert'" />
+                <p-i v-if="notificationUrgency" :name="notificationUrgency === NOTIFICATION_URGENCY.ALL ? 'ic_bell' : 'ic_alert'" />
                 <span class="text">{{ notificationOptionFormatter(notificationUrgency) }}</span>
             </div>
             <p-icon-button class="edit-button" name="ic_edit" @click="onClickUpdateNotificationPolicy" />

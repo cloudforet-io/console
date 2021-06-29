@@ -84,6 +84,7 @@
                 :rules.sync="inputModel.rules"
                 :repeat-count.sync="inputModel.repeat_count"
                 :project-id="inputModel.project_id"
+                :in-modal="inModal"
             />
         </p-field-group>
     </div>
@@ -138,6 +139,10 @@ export default {
         escalationPolicy: {
             type: Object,
             default: undefined,
+        },
+        inModal: {
+            type: Boolean,
+            default: false,
         },
         /* sync */
         isAllValid: {
@@ -284,6 +289,9 @@ export default {
         text-transform: capitalize;
         font-weight: normal;
         padding-left: 0.5rem;
+        .p-anchor {
+            vertical-align: top;
+        }
     }
     .help-text {
         @apply text-gray-900;

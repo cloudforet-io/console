@@ -22,15 +22,13 @@
                 <p-badge outline style-type="gray">{{ idx + 1 }}</p-badge>
             </span>
             <span class="col-notification">
-                <p-select-dropdown v-model="rule.notification_level" :items="NOTIFICATION_LEVELS">
+                <p-select-dropdown v-model="rule.notification_level" :use-fixed-menu-style="inModal" :items="NOTIFICATION_LEVELS">
                     <template #menu-item--format="{item}">
                         <p-radio v-model="rule.notification_level"
                                  :value="item.name"
                         >
-                            <div class="item">
-                                <p>{{ item.label }}</p>
-                                <project-channel-list :project-channels="projectChannels" :notification-level="item.name" />
-                            </div>
+                            <p>{{ item.label }}</p>
+                            <project-channel-list :project-channels="projectChannels" :notification-level="item.name" />
                         </p-radio>
                     </template>
                 </p-select-dropdown>
@@ -200,6 +198,10 @@ export default {
         projectId: {
             type: String,
             default: undefined,
+        },
+        inModal: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props, { emit }) {
@@ -390,8 +392,11 @@ export default {
         }
         .p-radio {
             display: flex;
-            .item {
-                margin-left: 0.25rem;
+            .p-i-icon {
+                margin-top: 0.125rem;
+            }
+            .text {
+                padding-left: 0.25rem;
                 .project-channel-list {
                     @apply bg-transparent;
                     padding: 0;

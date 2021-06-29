@@ -30,7 +30,7 @@
                     <p-i :name="item.icon" height="1rem" width="1rem"
                          class="mr-1"
                     />
-                    <div class="ellipsis">
+                    <div class="name">
                         <template v-if="trimmedValue">
                             <span v-for="(text, i) in item.label.split(regex)" :key="i">
                                 <strong v-if="i !== 0">{{ getMatchText(item.label) }}</strong>
@@ -337,23 +337,13 @@ export default {
 <style lang="postcss" scoped>
 .project-search {
     @apply w-full;
+    padding: 0 0.75rem;
     .p-autocomplete-search::v-deep {
-        @apply px-3;
         .p-search {
             overflow-x: hidden;
             overflow-y: hidden;
             input {
                 min-width: 0;
-            }
-        }
-        .menu-container {
-            @apply pr-4;
-            .p-context-menu {
-                min-width: 100%;
-            }
-            .context-item {
-                padding-top: 0.41rem;
-                padding-bottom: 0.41rem;
             }
         }
     }
@@ -372,12 +362,12 @@ export default {
     .menu-item {
         @apply text-gray-900 cursor-pointer;
         display: flex;
-        align-items: center;
         .p-i-icon {
             flex-shrink: 0;
+            margin-top: 0.125rem;
         }
-        .ellipsis {
-            @apply truncate;
+        .name {
+            word-break: break-all;
             line-height: 1.4;
         }
         .link-icon {
