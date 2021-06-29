@@ -5,7 +5,7 @@
                 {{ $t('IDENTITY.USER.NOTIFICATION.NOTIFICATION_CHANNEL') }}
             </h3>
             <p-data-loader class="flex-grow" :data="protocolList" :loading="loading">
-                <ul v-if="protocolList.length > 0" class="channel-list-wrapper">
+                <ul class="channel-list-wrapper">
                     <div v-for="item in protocolList"
                          :key="item.protocol_id"
                          class="channel-item-wrapper"
@@ -45,14 +45,16 @@
             </p-data-loader>
             <p-divider class="divider" />
             <p-data-loader class="flex-grow" :data="channelList" :loading="channelLoading">
-                <ul v-for="item in channelList" :key="`${item.name}-${item.created_at}`">
-                    <li class="mb-4">
-                        <notification-channel-item :channel-data="item" :project-id="projectId"
-                                                   @change="onChangeChannelItem"
-                                                   @confirm="listChannel"
-                        />
-                    </li>
-                </ul>
+                <div style="min-height: 6.5rem;">
+                    <ul v-for="item in channelList" :key="`${item.name}-${item.created_at}`">
+                        <li class="mb-4">
+                            <notification-channel-item :channel-data="item" :project-id="projectId"
+                                                       @change="onChangeChannelItem"
+                                                       @confirm="listChannel"
+                            />
+                        </li>
+                    </ul>
+                </div>
                 <template #no-data>
                     <p-empty class="empty-msg">
                         {{ $t('IDENTITY.USER.NOTIFICATION.NO_NOTI_CHANNEL') }}
@@ -99,12 +101,12 @@ export default {
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            protocolList: [] as ProtocolItem[],
+            protocolList: undefined as unknown as ProtocolItem[],
             loading: true,
             channelLoading: true,
             // eslint-disable-next-line no-use-before-define
             userId: computed(() => ((vm.$route.params.userId) ? decodeURIComponent(vm.$route.params.userId) : store.state.user.userId)),
-            channelList: [] as ChannelItem[],
+            channelList: undefined as unknown as ChannelItem[],
             protocolResp: [] as ProtocolItem[],
         });
         const routeState = reactive({
