@@ -1,3 +1,10 @@
+# [1.1.0-beta.87](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.86...v1.1.0-beta.87) (2021-06-29)
+
+
+### Bug Fixes
+
+* vertical-align in PRadio ([#625](https://github.com/spaceone-dev/spaceone-design-system/issues/625)) ([eaee215](https://github.com/spaceone-dev/spaceone-design-system/commit/eaee21543a2271c154bafc7c69793ab48ecec76d))
+
 # [1.1.0-beta.86](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.85...v1.1.0-beta.86) (2021-06-29)
 
 
