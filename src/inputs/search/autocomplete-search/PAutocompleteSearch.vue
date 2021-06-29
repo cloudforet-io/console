@@ -364,7 +364,6 @@ export default defineComponent<AutocompleteSearchProps>({
     .p-context-menu {
         @apply font-normal;
         position: absolute;
-        left: 0;
         margin-top: -1px;
         z-index: 1000;
         min-width: 100%;

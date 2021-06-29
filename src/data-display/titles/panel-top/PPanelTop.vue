@@ -41,6 +41,7 @@ export default {
     align-items: center;
     .title {
         @apply text-2xl;
+        line-height: 1.2;
     }
     .total-count {
         @apply text-gray-500 text-lg;
