@@ -23,12 +23,14 @@
                 </div>
             </div>
             <div class="button-group">
-                <p-button :outline="true" class="text-button" @click="cancelEdit(channelData.data)">
+                <p-button :outline="true" size="sm" class="cancel-button"
+                          @click="cancelEdit(channelData.data)"
+                >
                     {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>
                 <p-button
                     style-type="primary"
-                    class="text-button"
+                    size="sm"
                     @click="onClickSave"
                 >
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SAVE_CHANGES') }}

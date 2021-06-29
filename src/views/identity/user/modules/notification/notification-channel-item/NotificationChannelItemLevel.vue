@@ -6,12 +6,14 @@
         <div v-if="isEditMode" class="content">
             <add-notification-level :notification-level="channelData.notification_level" @change="onChangeLevel" />
             <div class="button-group">
-                <p-button :outline="true" class="text-button" @click="cancelEdit">
+                <p-button :outline="true" size="sm" class="cancel-button"
+                          @click="cancelEdit"
+                >
                     {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>
                 <p-button
                     style-type="primary"
-                    class="text-button"
+                    size="sm"
                     @click="onClickSave"
                 >
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SAVE_CHANGES') }}
