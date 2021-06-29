@@ -78,9 +78,6 @@
                       :path="idx === rules.length - 1 ? 'MONITORING.ALERT.ESCALATION_POLICY.FORM.REPEAT_AFTER' : 'MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATES_AFTER'"
                       class="col-mobile-rule"
                 >
-                    <!--                    <template #default="value">-->
-                    <!--                        <strong>{{ value }}</strong>-->
-                    <!--                    </template>-->
                     <template #minute>
                         <p-text-input v-model.number="rule.escalate_minutes"
                                       type="number"
@@ -93,22 +90,6 @@
                         </p-text-input>
                     </template>
                 </i18n>
-                <!--                <template v-if="showEscalatesAfterForm(idx)">-->
-                <!--                    <span class="label">-->
-                <!--                        {{ idx === rules.length - 1 ? $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.REPEAT_AFTER') : $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATES_AFTER') }}-->
-                <!--                    </span>-->
-                <!--                    <span class="input">-->
-                <!--                        <p-text-input v-model.number="rule.escalate_minutes"-->
-                <!--                                      type="number"-->
-                <!--                                      :min="0"-->
-                <!--                                      class="rule-input"-->
-                <!--                        >-->
-                <!--                            <template #right-extra>-->
-                <!--                                {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.MIN') }}-->
-                <!--                            </template>-->
-                <!--                        </p-text-input>-->
-                <!--                    </span>-->
-                <!--                </template>-->
             </div>
             <p-icon-button
                 v-if="rules.length > 1"
