@@ -186,7 +186,7 @@ export default {
             state.items = [...state.items];
 
             state.validations.splice(idx, 1);
-            if (!props.showValidation) return;
+
             validateKey();
         };
 

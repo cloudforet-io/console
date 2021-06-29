@@ -121,7 +121,7 @@ export default {
                 no_notification: false,
             } as Actions,
             options: {
-                stop_processing: true,
+                stop_processing: false,
             },
             isAllValid: false,
         });
