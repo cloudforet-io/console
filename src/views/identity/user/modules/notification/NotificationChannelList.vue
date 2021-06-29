@@ -30,9 +30,6 @@
                                     />
                                     {{ item.label }}
                                 </span>
-                                <!--                                <span v-if="item.protocolType === 'INTERNAL'" class="item-desc">-->
-                                <!--                                    {{ $t('IDENTITY.USER.NOTIFICATION.SPACEONE_USER_DESC') }}-->
-                                <!--                                </span>-->
                             </li>
                         </router-link>
                     </div>
@@ -182,7 +179,7 @@ export default {
                     },
                     protocolType: d.protocol_type,
                     tags: d.tags,
-                    icon: await getIcon(d.plugin_info.plugin_id) || '',
+                    icon: await getIcon(d?.plugin_info?.plugin_id || '') || '',
                     name: d.name,
                 })));
             } catch (e) {

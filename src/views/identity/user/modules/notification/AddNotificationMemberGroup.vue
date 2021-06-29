@@ -114,7 +114,7 @@ export default {
 
 <style lang="postcss" scoped>
 .autocomplete-search {
-    max-width: 26.25rem;
+    max-width: 30rem;
 }
 .tag-menu-item {
     @apply w-full;
