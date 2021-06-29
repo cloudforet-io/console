@@ -1206,6 +1206,7 @@
 				}
 			},
 			"ESCALATION_POLICY": {
+				"ACKNOWLEDGED": "Acknowledged",
 				"ACTION": "Action",
 				"ALT_E_DELETE_POLICY": "Failed to Delete Escalation Policy",
 				"ALT_E_SET_AS_DEFAULT": "Failed to Change Default Escalation Policy",
@@ -1234,7 +1235,7 @@
 					"NAME_INVALID_TEXT": "The maximum length of a name is 40 characters.",
 					"NAME_LABEL": "Name",
 					"NAME_REQUIRED": "Please enter name.",
-					"NOTIFICATIONS_SETTINGS": "Notifications Settings",
+					"NOTIFICATIONS_SETTINGS": "Project \\Notifications Settings",
 					"NOTIFICATION_LEVEL": "Notification Level",
 					"NOTIFICATION_LV": "Notification LV",
 					"PROJECT": "Project",
@@ -1250,6 +1251,9 @@
 					"STEP": "Step",
 					"TIME": "time(s)"
 				},
+				"GLOBAL": "Global",
+				"PROJECT": "Project",
+				"RESOLVED": "Resolved",
 				"SET_AS_DEFAULT": "Set as default",
 				"UPDATE": "Update",
 				"UPDATE_MODAL_TITLE": "Update Escalation Policy"
@@ -1470,7 +1474,7 @@
 				"REPEAT_ALL": "Repeat all",
 				"RESOLVED": "Resolved",
 				"RULES_ON_THIS_PROJECT": "Rules on This Project",
-				"SELECT_POLICY": "Select Policy",
+				"SELECT_POLICY": "Choose an existing policy",
 				"SETTINGS": "Settings",
 				"SET_AUTO_RECOVERY_MODAL_HELP_TEXT": "When the system fault recovers, do you automatically resolve the alert?",
 				"SET_AUTO_RECOVERY_MODAL_TITLE": "Set Auto Recovery",

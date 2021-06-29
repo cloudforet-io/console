@@ -1062,7 +1062,7 @@
 	"MONITORING": {
 		"ALERT": {
 			"ALERT_LIST": {
-				"ACKNOWLEDGED": "확인됨",
+				"ACKNOWLEDGED": "확인",
 				"ALERT": "얼럿",
 				"ALL": "전체",
 				"ALT_E_CREATE": "얼럿 생성 실패",
@@ -1117,7 +1117,7 @@
 				"OPEN": "열림",
 				"OPEN_ALERT": "나에게 지정된 얼럿",
 				"RESOLVE": "해결",
-				"RESOLVED": "해결됨",
+				"RESOLVED": "해결",
 				"STATE": "상태",
 				"TRIGGERED": "트리거됨",
 				"UPDATE_RESOLVE_MODAL": {
@@ -1142,7 +1142,7 @@
 				"MONTHLY_TOTAL": "월간 합계",
 				"OPEN": "열림",
 				"PROJECT_HEALTH_BOARD": "Project Health Board",
-				"RESOLVED": "해결됨",
+				"RESOLVED": "해결",
 				"TOP_5_PROJECT_ACTIVITY": "Top 5 프로젝트 활동"
 			},
 			"DETAIL": {
@@ -1206,6 +1206,7 @@
 				}
 			},
 			"ESCALATION_POLICY": {
+				"ACKNOWLEDGED": "확인",
 				"ACTION": "작업",
 				"ALT_E_DELETE_POLICY": "에스컬레이션 정책 삭제 실패",
 				"ALT_E_SET_AS_DEFAULT": "기본 에스컬레이션 정책 변경 실패",
@@ -1218,7 +1219,7 @@
 				"DELETE_MODAL_TITLE": "선택한 에스컬레이션 정책을 삭제하시겠습니까?",
 				"ESCALATION_POLICY": "에스컬레이션 정책",
 				"FORM": {
-					"ACKNOWLEDGED": "확인됨",
+					"ACKNOWLEDGED": "확인",
 					"ADD_RULE": "규칙 추가",
 					"ALT_E_CREATE_POLICY": "에스컬레이션 정책 생성 실패",
 					"ALT_E_UPDATE_POLICY": "에스컬레이션 정책 변경 실패",
@@ -1227,14 +1228,14 @@
 					"ESCALATES_AFTER": "{minute} 후 다음 단계 실행",
 					"ESCALATION_RULES_HELP_TEXT": "최소 1개 이상의 규칙이 있어야 합니다. (5개 까지)",
 					"ESCALATION_RULES_LABEL": "에스컬레이션 규칙",
-					"FINISH_CONDITION_LABEL": "종료 조건",
+					"FINISH_CONDITION_LABEL": "종료 조건(상태)",
 					"GLOBAL": "글로벌",
 					"GO_CREATE_PROJECT": "프로젝트 생성하러 가기",
 					"MIN": "분",
 					"NAME_INVALID_TEXT": "40글자 미만으로 입력해주세요.",
 					"NAME_LABEL": "이름",
 					"NAME_REQUIRED": "이름을 입력해 주세요.",
-					"NOTIFICATIONS_SETTINGS": "알림 설정",
+					"NOTIFICATIONS_SETTINGS": "프로젝트 알림 설정",
 					"NOTIFICATION_LEVEL": "알림 레벨",
 					"NOTIFICATION_LV": "알림 레벨",
 					"PROJECT": "프로젝트",
@@ -1244,12 +1245,15 @@
 					"REPEAT_AFTER": "{minute} 후 반복",
 					"REPEAT_ALL": "전체 반복",
 					"REPEAT_LABEL_HELP_TEXT": "위 스텝들 모두 적용",
-					"RESOLVED": "해결됨",
+					"RESOLVED": "해결",
 					"RULE": "규칙",
 					"SCOPE_LABEL": "범위",
 					"STEP": "단계",
 					"TIME": "번"
 				},
+				"GLOBAL": "글로벌",
+				"PROJECT": "프로젝트",
+				"RESOLVED": "해결",
 				"SET_AS_DEFAULT": "기본으로 설정하기",
 				"UPDATE": "편집",
 				"UPDATE_MODAL_TITLE": "에스컬레이션 정책 편집"
@@ -1443,7 +1447,7 @@
 		"DETAIL": {
 			"ADD": "추가 ",
 			"ALERT": {
-				"ACKNOWLEDGED": "확인됨",
+				"ACKNOWLEDGED": "확인",
 				"ALL_NOTIFICATIONS": "모든 알림 받기",
 				"ALT_E_CHANGE_AUTO_RECOVERY": "자동 복구 변경 실패",
 				"ALT_E_CHANGE_ESCALATION_POLICY": "에스컬레이션 정책 변경 실패",
@@ -1461,16 +1465,16 @@
 				"ESCALATION_RULES_LABEL": "에스컬레이션 규칙",
 				"EVENT_RULE": "이벤트 규칙",
 				"FINISH_CONDITION_LABEL": "종료 조건",
-				"HIGH_URGENCY_NOTIFICATIONS": "높은 긴급도 알림만 받기",
+				"HIGH_URGENCY_NOTIFICATIONS": "긴급 알림만 받기",
 				"MANUAL_OPERATION": "직접 해결하기",
 				"MINUTE": "분",
 				"NAME_LABEL": "이름",
 				"NOTIFICATION_LEVEL": "알림 레벨",
 				"NOTIFICATION_POLICY": "알림 정책",
 				"REPEAT_ALL": "전체 반복",
-				"RESOLVED": "해결됨",
+				"RESOLVED": "해결",
 				"RULES_ON_THIS_PROJECT": "개의 규칙이 이 프로젝트에 있음",
-				"SELECT_POLICY": "정책 선택",
+				"SELECT_POLICY": "기존 정책 선택",
 				"SETTINGS": "설정",
 				"SET_AUTO_RECOVERY_MODAL_HELP_TEXT": "시스템 장애가 복구되면 자동으로 얼럿을 해결할까요?",
 				"SET_AUTO_RECOVERY_MODAL_TITLE": "자동 복구 설정",
@@ -1586,10 +1590,10 @@
 			"SUBTAB_TITLE_WEBHOOK": "웹훅",
 			"SUBTAB_WEBHOOK": "웹훅",
 			"SUMMARY": {
-				"ACKNOWLEDGED": "확인됨",
+				"ACKNOWLEDGED": "확인",
 				"ALERT": "얼럿",
 				"OPEN_ALERT": "오픈된 얼럿",
-				"RESOLVED": "해결됨",
+				"RESOLVED": "해결",
 				"TRIGGERED": "트리거됨"
 			},
 			"TAB_ALERT": "얼럿",
