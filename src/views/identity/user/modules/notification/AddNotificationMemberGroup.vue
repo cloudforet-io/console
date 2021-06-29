@@ -55,7 +55,7 @@ export default {
             allMember: [] as string[],
             allMemberItems: computed(() => state.allMember.map(d => ({
                 name: d.resource_id,
-                label: d.resource_id,
+                label: state.userItem[d.resource_id] ? `(${state.userItem[d.resource_id].label})` : '',
                 type: 'item',
             }))),
             selectedMemberItems: cloneDeep(props.users) || [],
@@ -115,6 +115,9 @@ export default {
 <style lang="postcss" scoped>
 .autocomplete-search {
     max-width: 26.25rem;
+}
+.tag-menu-item {
+    @apply w-full;
 }
 .tag-box {
     @apply text-gray-900;

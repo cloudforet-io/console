@@ -14,18 +14,19 @@
             :fields="fields"
             :striped="false"
         >
-            <template #col-data-format="{ value }">
-                <p v-if="Object.keys(value)[0] === 'webhook_url'">
-                    <!-- masking token -->
-                    {{ Object.keys(value)[0] }} : {{ Object.values(value)[0].replace(/(?<=.{0})./gi, "*") }}
-                </p>
-                <div v-else-if="value.length > 1">
-                    <p v-for="(value, index) in value" :key="`item-${index}`">
+            <template #col-data-format="{ index, field, item }">
+                <div v-if="item.data.length > 1">
+                    <p v-for="(value, index) in item.data" :key="`item-${index}`">
                         {{ Object.keys(value)[0] }} : {{ Object.values(value)[0] }}
                     </p>
                 </div>
+                <p v-else-if="index === Object.values(items).findIndex(d => d.protocol_type === 'Slack')">
+                    <!-- masking token -->
+                    Slack Channel: ******,
+                    Slack Token: ******
+                </p>
                 <p v-else>
-                    {{ Object.keys(value)[0] }} : {{ Object.values(value)[0] }}
+                    {{ Object.keys(item.data)[0] }} : {{ Object.values(item.data)[0] }}
                 </p>
             </template>
             <template #col-schedule-format="{value}">
@@ -96,7 +97,7 @@ export default {
             protocolList: [] as ProtocolItem[],
             manageLink: {
                 name: IDENTITY_ROUTE.USER.NOTIFICATION.MANAGE._NAME,
-                params: { userId: encodeURIComponent(props.userId) },
+                params: { userId: computed(() => encodeURIComponent(props.userId)) },
             },
             timezone: computed(() => store.state.user.timezone),
         });

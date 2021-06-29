@@ -6,7 +6,7 @@
         >
             <span class="radio-label" @click="onChangeTopicMode(item.value)">{{ item.label }}</span>
         </p-radio>
-        <article v-if="isTopicModeSelected" class="topic-wrapper" :class="{'invalid': !isTopicValid}">
+        <article v-if="isTopicModeSelected" class="topic-wrapper">
             <div class="topic-content-wrapper" :class="{'invalid': !isTopicValid}">
                 <h5 class="setting">
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SETTING') }}
@@ -104,17 +104,8 @@ export default {
         line-height: 140%;
         margin-bottom: 1.125rem;
     }
-    &.invalid {
-        @apply border rounded-md border-alert;
-        padding: 1rem;
-        margin-right: 1rem;
-    }
 }
-.topic-content-wrapper {
-    &.invalid {
-        margin-left: -1rem;
-    }
-}
+
 .invalid-text {
     @apply text-red-500;
     font-size: 0.875rem;

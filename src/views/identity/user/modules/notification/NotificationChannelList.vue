@@ -145,8 +145,12 @@ export default {
             try {
                 state.loading = true;
                 let res;
-                if (props.projectId) res = await SpaceConnector.client.notification.protocol.list();
-                else {
+                if (props.projectId) {
+                    apiQuery.setSort('protocol_type');
+                    res = await SpaceConnector.client.notification.protocol.list({
+                        query: apiQuery.data,
+                    });
+                } else {
                     apiQuery.setFilters([{ k: 'protocol_type', o: '=', v: 'EXTERNAL' }]);
                     res = await SpaceConnector.client.notification.protocol.list({
                         query: apiQuery.data,
