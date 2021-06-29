@@ -1650,7 +1650,7 @@
 			"PROJECT_ROUTING": "프로젝트 라우팅",
 			"RESPONDER": "수신자",
 			"SAVE": "저장",
-			"SNOOZED_NOTIFICATIONS": "알림 일시중지(snooze)",
+			"SNOOZED_NOTIFICATIONS": "알림 중지",
 			"THEN_STOP_PROCESSING": "이후 작업 실행하지 않기",
 			"THESE_THINGS": "다음 작업들",
 			"TITLE_INFO_MESSAGE": "이벤트 규칙은 오름차순으로 실행됩니다.",
