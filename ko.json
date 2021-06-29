@@ -1471,7 +1471,7 @@
 				"NAME_LABEL": "이름",
 				"NOTIFICATION_LEVEL": "알림 레벨",
 				"NOTIFICATION_POLICY": "알림 정책",
-				"REPEAT_ALL": "전체 반복",
+				"REPEAT_ALL": "전체 {count}번 반복",
 				"RESOLVED": "해결",
 				"RULES_ON_THIS_PROJECT": "개의 규칙이 이 프로젝트에 있음",
 				"SELECT_POLICY": "기존 정책 선택",

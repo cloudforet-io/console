@@ -1471,7 +1471,7 @@
 				"NAME_LABEL": "Name",
 				"NOTIFICATION_LEVEL": "Notification Level",
 				"NOTIFICATION_POLICY": "Notification Policy",
-				"REPEAT_ALL": "Repeat all",
+				"REPEAT_ALL": "Repeat all {count} times ",
 				"RESOLVED": "Resolved",
 				"RULES_ON_THIS_PROJECT": "Rules on This Project",
 				"SELECT_POLICY": "Choose an existing policy",
