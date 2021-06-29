@@ -1,9 +1,7 @@
 <template>
     <div class="search-or-select-user">
         <p-autocomplete-search v-model="search"
-                               :loading="loading"
                                :menu="userItems"
-                               use-fixed-menu-style
                                @select-menu="onSelectUser"
         >
             <template #menu-item--format="{item, id}">
@@ -12,22 +10,22 @@
                              v-model="proxySelectedUsers"
                              :value="item.name"
                 >
-                    {{ nameFormatter(item) }}
+                    {{ nameFormatter(item.name) }}
                 </p-check-box>
                 <p-radio v-else
                          v-model="proxySelectedUsers"
                          :value="item.name"
                 >
-                    {{ nameFormatter(item) }}
+                    {{ nameFormatter(item.name) }}
                 </p-radio>
             </template>
             <template #menu-no-data-format>
-                <div v-if="loading" class="fake-no-data" />
+                <div v-if="!users.length" class="fake-no-data" />
             </template>
         </p-autocomplete-search>
         <div v-if="proxySelectedUsers.length" class="tag-box">
             <p-tag v-for="(tag, i) in proxySelectedUsers" :key="tag" @delete="onDeleteTag(i)">
-                {{ tag ? tag : '' }}
+                {{ nameFormatter(tag) }}
             </p-tag>
         </div>
     </div>
@@ -37,10 +35,11 @@
 import {
     PAutocompleteSearch, PTag, PCheckBox, PRadio,
 } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from '@vue/composition-api';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { SpaceConnector } from '@/lib/space-connector';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 import { makeProxy } from '@/lib/compostion-util';
+import { store } from '@/store';
+
 
 export default {
     name: 'SearchOrSelectUser',
@@ -62,52 +61,38 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
-            loading: true,
             search: '',
-            users: [] as string[],
-            userItems: computed(() => state.users.map(d => ({
-                name: d.user_id,
-                label: d.name,
+            users: computed(() => store.state.resource.user.items),
+            userItems: computed(() => Object.keys(state.users).map(k => ({
+                name: k,
+                label: state.users[k]?.name,
             }))),
             proxySelectedUsers: makeProxy('selectedUsers', props, emit),
         });
 
-        /* api */
-        const listUser = async () => {
-            state.loading = true;
-            try {
-                const res = await SpaceConnector.client.identity.user.list();
-                state.users = res.results;
-            } catch (e) {
-                state.users = [];
-                console.error(e);
-            } finally {
-                state.loading = false;
-            }
-        };
-
         /* util */
-        const nameFormatter = (item) => {
-            let result = item.name;
-            if (item.label) {
-                result += ` (${item.label})`;
-            }
-            return result;
+        const nameFormatter = (userId) => {
+            const userName = state.users[userId].name;
+            if (userName) return `${userId} (${userName})`;
+            return userId;
         };
 
         /* event */
         const onSelectUser = async (item: MenuItem) => {
             state.search = '';
-            state.proxySelectedUsers = [...state.proxySelectedUsers, item.name];
+            if (props.multiSelect) {
+                const idx = state.proxySelectedUsers.findIndex(k => k === item.name);
+                if (idx === -1) {
+                    state.proxySelectedUsers.push(item.name);
+                }
+            } else {
+                state.proxySelectedUsers = [item.name];
+            }
         };
         const onDeleteTag = async (idx) => {
             await state.proxySelectedUsers.splice(idx, 1);
             state.proxySelectedUsers = [...state.proxySelectedUsers];
         };
-
-        (async () => {
-            await listUser();
-        })();
 
         return {
             ...toRefs(state),
