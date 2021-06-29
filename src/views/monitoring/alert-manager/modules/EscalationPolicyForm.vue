@@ -29,12 +29,13 @@
             </template>
             <template #label-extra>
                 <span v-if="mode === ACTION.update" class="scope-text">
-                    {{ inputModel.scope }}
+                    <span>{{ scopeLabels[inputModel.scope] || inputModel.scope }}</span>
                     <span v-if="inputModel.scope === SCOPE.project">
                         (<p-anchor :to="referenceRouter(inputModel.project_id,{ resource_type: 'identity.Project' })"
                                    :text="projects[inputModel.project_id] ? projects[inputModel.project_id].label : inputModel.project_id"
                                    :show-icon="true"
                                    highlight
+                                   class="align-top"
                         />)
                     </span>
                 </span>
@@ -66,7 +67,7 @@
                      :value="inputModel.finish_condition"
                      @change="onChangeFinishCondition(item.value)"
             >
-                <span class="radio-label">{{ item.label }}</span>
+                {{ item.label }}
             </p-radio>
         </p-field-group>
         <p-field-group
@@ -178,6 +179,10 @@ export default {
                 }
                 return undefined;
             }),
+            scopeLabels: computed(() => ({
+                [SCOPE.global]: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'),
+                [SCOPE.project]: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.PROJECT'),
+            })),
             scopes: computed(() => [
                 {
                     label: i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.GLOBAL'), value: SCOPE.global,
@@ -270,11 +275,8 @@ export default {
             border-radius: 0.25rem;
         }
     }
-    .radio-label {
-        font-size: 0.875rem;
-        line-height: 1.2;
-
-        &:first-child {
+    .p-radio {
+        &:first-of-type {
             margin-right: 1.125rem;
         }
     }

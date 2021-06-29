@@ -1,17 +1,23 @@
 <template>
     <div class="event-rule-content">
         <section class="left-section">
-            <h4><b>{{ data.conditions_policy }}</b> {{ $t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</h4>
+            <h4><b>{{ conditions[data.conditions_policy] }}</b> {{ $t('PROJECT.EVENT_RULE.OF_THE_FOLLOWING_ARE_MET') }}</h4>
             <ul v-for="(condition, idx) in data.conditions" :key="`${condition}-${idx}`" class="condition-list">
                 <li>
-                    <span class="text-blue-900">{{ condition.key }}</span>
+                    <span class="text-blue-900 capitalize">{{ condition.key }}</span>
                     {{ condition.operator }}
                     <span class="text-blue-900">{{ condition.value }}</span>
                 </li>
             </ul>
         </section>
         <section class="right-section">
-            <h4><b>{{ $t('PROJECT.EVENT_RULE.DO') }}</b> {{ $t('PROJECT.EVENT_RULE.THESE_THINGS') }}</h4>
+            <h4>
+                <i18n path="PROJECT.EVENT_RULE.DO">
+                    <template #actions>
+                        <strong>{{ $t('PROJECT.EVENT_RULE.THESE_THINGS') }}</strong>
+                    </template>
+                </i18n>
+            </h4>
             <table>
                 <tbody>
                     <template v-for="(item, index) in fields">
@@ -103,6 +109,12 @@ export default {
             ])),
             items: [] as any,
             projects: computed(() => store.state.resource.project.items),
+            conditions: computed(() => {
+                return {
+                    ANY: i18n.t('PROJECT.EVENT_RULE.ANY'),
+                    ALL: i18n.t('PROJECT.EVENT_RULE.ALL'),
+                }
+            })
         });
 
         const getData = () => {

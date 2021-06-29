@@ -1,7 +1,11 @@
 <template>
     <section class="event-rule-action-form">
         <p class="title-wrapper">
-            <strong>{{ $t('PROJECT.EVENT_RULE.DO') }}</strong> {{ $t('PROJECT.EVENT_RULE.THESE_THINGS') }}
+            <i18n path="PROJECT.EVENT_RULE.DO">
+                <template #actions>
+                    <strong>{{ $t('PROJECT.EVENT_RULE.THESE_THINGS') }}</strong>
+                </template>
+            </i18n>
         </p>
         <div class="content-wrapper">
             <div class="form-box">

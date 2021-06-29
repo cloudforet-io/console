@@ -327,5 +327,11 @@ export default {
             }
         }
     }
+
+    @screen mobile {
+        .section-title {
+            padding-right: 8.4375rem;
+        }
+    }
 }
 </style>

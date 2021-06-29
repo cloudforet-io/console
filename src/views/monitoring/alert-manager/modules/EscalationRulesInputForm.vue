@@ -35,20 +35,27 @@
                     </template>
                 </p-select-dropdown>
             </span>
-            <span v-if="showEscalatesAfterForm(idx)" class="col-rule">
-                <span class="label">
-                    {{ idx === rules.length - 1 ? $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.REPEAT_AFTER') : $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATES_AFTER') }}
-                </span>
-                <p-text-input v-model.number="rule.escalate_minutes"
-                              type="number"
-                              :min="0"
-                              class="rule-input"
-                >
-                    <template #right-extra>
-                        {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.MIN') }}
-                    </template>
-                </p-text-input>
-            </span>
+
+
+            <i18n v-if="showEscalatesAfterForm(idx)"
+                  :path="idx === rules.length - 1 ? 'MONITORING.ALERT.ESCALATION_POLICY.FORM.REPEAT_AFTER' : 'MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATES_AFTER'"
+                  class="col-rule"
+            >
+                <template #default="value">
+                    <strong>{{ value }}</strong>
+                </template>
+                <template #minute>
+                    <p-text-input v-model.number="rule.escalate_minutes"
+                                  type="number"
+                                  :min="0"
+                                  class="rule-input"
+                    >
+                        <template #right-extra>
+                            {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.MIN') }}
+                        </template>
+                    </p-text-input>
+                </template>
+            </i18n>
             <div class="col-mobile-input">
                 <span class="label">
                     {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATION_LV') }}
@@ -67,21 +74,41 @@
                         </template>
                     </p-select-dropdown>
                 </span>
-                <template v-if="showEscalatesAfterForm(idx)">
-                    <span class="label">
-                        {{ idx === rules.length - 1 ? $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.REPEAT_AFTER') : $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATES_AFTER') }}
-                    </span>
-                    <span class="input">
+                <i18n v-if="showEscalatesAfterForm(idx)"
+                      :path="idx === rules.length - 1 ? 'MONITORING.ALERT.ESCALATION_POLICY.FORM.REPEAT_AFTER' : 'MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATES_AFTER'"
+                      class="col-mobile-rule"
+                >
+                    <!--                    <template #default="value">-->
+                    <!--                        <strong>{{ value }}</strong>-->
+                    <!--                    </template>-->
+                    <template #minute>
                         <p-text-input v-model.number="rule.escalate_minutes"
                                       type="number"
                                       :min="0"
-                                      class="rule-input">
+                                      class="rule-input"
+                        >
                             <template #right-extra>
                                 {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.MIN') }}
                             </template>
                         </p-text-input>
-                    </span>
-                </template>
+                    </template>
+                </i18n>
+                <!--                <template v-if="showEscalatesAfterForm(idx)">-->
+                <!--                    <span class="label">-->
+                <!--                        {{ idx === rules.length - 1 ? $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.REPEAT_AFTER') : $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ESCALATES_AFTER') }}-->
+                <!--                    </span>-->
+                <!--                    <span class="input">-->
+                <!--                        <p-text-input v-model.number="rule.escalate_minutes"-->
+                <!--                                      type="number"-->
+                <!--                                      :min="0"-->
+                <!--                                      class="rule-input"-->
+                <!--                        >-->
+                <!--                            <template #right-extra>-->
+                <!--                                {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.MIN') }}-->
+                <!--                            </template>-->
+                <!--                        </p-text-input>-->
+                <!--                    </span>-->
+                <!--                </template>-->
             </div>
             <p-icon-button
                 v-if="rules.length > 1"
@@ -317,17 +344,13 @@ export default {
             }
         }
         .col-rule {
-            @apply col-span-4;
+            @apply col-span-4 text-gray-900;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            font-size: 0.875rem;
+            line-height: 1.4;
 
-            .label {
-                @apply text-gray-900;
-                font-size: 0.875rem;
-                line-height: 1.4;
-                padding-right: 0.5rem;
-            }
             .rule-input {
                 width: 6rem;
             }
@@ -429,12 +452,20 @@ export default {
                 .input {
                     @apply col-span-4;
                     .p-select-dropdown::v-deep {
-                        .p-dropdown-button {
-                            min-width: 100%;
-                        }
+                        min-width: 100%;
                     }
                     .rule-input {
                         width: 6rem;
+                    }
+                }
+                .col-mobile-rule {
+                    @apply col-span-8;
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    .rule-input {
+                        width: 50%;
+                        min-width: 5.5rem;
                     }
                 }
             }

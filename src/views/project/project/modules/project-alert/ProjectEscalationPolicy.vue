@@ -28,9 +28,11 @@
                         <template v-if="rule.escalate_minutes">
                             <span class="vertical-divider"> | </span>
                             <span class="text">
-                                {{ $t('PROJECT.DETAIL.ALERT.ESCALATES_AFTER') }}
-                                <strong>{{ rule.escalate_minutes }}</strong>
-                                {{ $t('PROJECT.DETAIL.ALERT.MINUTE') }}
+                                <i18n path="PROJECT.DETAIL.ALERT.ESCALATES_AFTER">
+                                    <template #minute>
+                                        <strong>{{ rule.escalate_minutes }}</strong>
+                                    </template>
+                                </i18n>
                             </span>
                         </template>
                         <project-channel-list :project-channels="projectChannels" :notification-level="rule.notification_level" />
@@ -39,11 +41,11 @@
                 </div>
                 <div class="repeat-wrapper">
                     <p-i name="ic_repeat" />
-                    <span>
-                        {{ $t('PROJECT.DETAIL.ALERT.REPEAT_ALL') }}
-                        <strong>{{ repeatCount }}</strong>
-                        {{ $tc('PROJECT.DETAIL.ALERT.REPEAT_ALL', repeatCount) }}
-                    </span>
+                    <i18n path="PROJECT.DETAIL.ALERT.REPEAT_ALL" class="ml-2">
+                        <template #count>
+                            <strong>{{ repeatCount }}</strong>
+                        </template>
+                    </i18n>
                 </div>
             </div>
         </section>
