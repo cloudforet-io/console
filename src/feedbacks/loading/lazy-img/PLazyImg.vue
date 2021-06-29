@@ -14,7 +14,7 @@
         <span v-show="!loading && status === LOAD_STATUS.errored" key="error-img" class="img-container error">
             <slot name="error" v-bind="{...$props, ...$data}">
                 <p-i :name="errorIcon || 'ic_collector_tags'" :style="{height, width}"
-                     :height="height"
+                     :height="height" :color="errorIconColor"
                      :width="width"
                 />
             </slot>
@@ -40,6 +40,7 @@ interface Props {
     width?: string;
     src: string;
     errorIcon?: string;
+    errorIconColor?: string;
     loading?: boolean;
     alt?: string;
 }
@@ -72,6 +73,10 @@ export default defineComponent<Props>({
         errorIcon: {
             type: String,
             default: 'ic_collector_tags',
+        },
+        errorIconColor: {
+            type: String,
+            default: '',
         },
         loading: {
             type: Boolean,

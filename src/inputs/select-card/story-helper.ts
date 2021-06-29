@@ -1,7 +1,7 @@
 import { argTypes as selectArgTypes } from '@/hooks/select/story-helper';
 import { ArgTypes } from '@storybook/addons';
 
-const getArgTypes = () => {
+export const getSelectCardArgTypes = () => {
     const argTypes: ArgTypes = {
         ...selectArgTypes,
         block: {
@@ -60,18 +60,37 @@ const getArgTypes = () => {
         },
         icon: {
             name: 'icon',
-            type: { name: 'string' },
+            type: { name: 'string, boolean' },
             description: `Card icon.
         It has a lower priority than \`imageUrl\` props.
-        So it is rendered only when there is no value in \`imageUrl\` props or when the image load fails.`,
+        So it is rendered only when there is no value in \`imageUrl\` props or when the image load fails.
+        If it is \`true\`, default icon will be rendered.`,
             defaultValue: 'ic_service_compute-engine',
+            table: {
+                type: {
+                    summary: 'string, boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'undefined',
+                },
+            },
+            control: {
+                type: 'text',
+            },
+        },
+        iconColor: {
+            name: 'iconColor',
+            type: { name: 'string' },
+            description: 'Card icon\'s color.',
+            defaultValue: '',
             table: {
                 type: {
                     summary: 'string',
                 },
                 category: 'props',
                 defaultValue: {
-                    summary: 'undefined',
+                    summary: '""',
                 },
             },
             control: {
@@ -109,4 +128,3 @@ const getArgTypes = () => {
     };
     return argTypes;
 };
-export const argTypes = getArgTypes();

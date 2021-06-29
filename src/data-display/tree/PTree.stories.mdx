@@ -503,7 +503,7 @@ You can use tree methods by tree instance that passed by `init` event. <br/>
 |getNodeParentByPath| It returns parent node by path. |
 |getNodeByPath| It returns node by path. |
 |walkTreeData| Iterate tree nodes <br/> Arguments: (treeData: TreeNode[](or null), handler: Function, options: {}) <br/> Handler: (node: TreeNode, index: number, parent: TreeNode(or null), path: number[]) <br/> - return false: stop walk <br/> - return 'skip children' <br/> - return 'skip siblings' <br/> Options: {Boolean} reverse|
-|cloneTreeData| Clones tree nodes <br> options - afterNodeCreated: (newNode, {oldNode: node, index, parent, path}) |
+|cloneTreeData| Clones tree nodes <br/> options - afterNodeCreated: (newNode, {oldNode: node, index, parent, path}) |
 
 ```typescript
 interface Tree<T=any> {

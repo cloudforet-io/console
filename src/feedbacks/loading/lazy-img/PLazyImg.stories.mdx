@@ -4,159 +4,29 @@ import PButton from '@/inputs/buttons/button/PButton';
 import PLottie from '@/foundation/lottie/PLottie';
 import { reactive, toRefs } from '@vue/composition-api';
 import faker from 'faker';
+import {getLazyImgArgTypes} from '@/feedbacks/loading/lazy-img/story-helper';
 
 <Meta title='Feedbacks/Loading/Lazy Image' parameters={{
     design: {
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6132%3A133538',
     }
-}} argTypes={{
-    height: {
-        name: 'height',
-        type: { name: 'string' },
-        description: `Height of image`,
-        defaultValue: '2rem',
-        table: {
-            type: {
-                summary: 'string'
-            },
-            defaultValue: {
-                summary: '"2rem"'
-            },
-            category: 'props'
-        },
-        control: {
-            type: 'text'
-        }
-    },
-    width: {
-        name: 'width',
-        type: { name: 'string' },
-        description: `Height of image`,
-        defaultValue: '2rem',
-        table: {
-            type: {
-                summary: 'string'
-            },
-            defaultValue: {
-                summary: '"2rem"'
-            },
-            category: 'props'
-        },
-        control: {
-            type: 'text'
-        }
-    },
-    src: {
-        name: 'src',
-        type: { name: 'string' },
-        description: `Source of image`,
-        defaultValue: '',
-        table: {
-            type: {
-                summary: 'string'
-            },
-            defaultValue: {
-                summary: 'undefined'
-            },
-            category: 'props'
-        },
-        control: {
-            type: 'text'
-        }
-    },
-    errorIcon: {
-        name: 'errorIcon',
-        type: { name: 'string' },
-        description: `Alternative icon name when failed to load image. Refer to Icon component.`,
-        defaultValue: 'ic_collector_tags',
-        table: {
-            type: {
-                summary: 'string'
-            },
-            defaultValue: {
-                summary: '"ic_collector_tags"'
-            },
-            category: 'props'
-        },
-        control: {
-            type: 'text'
-        }
-    },
-    loading: {
-        name: 'loading',
-        type: { name: 'boolean' },
-        description: `Manual loading controller. If it's not given, it works automatically.`,
-        defaultValue: undefined,
-        table: {
-            type: {
-                summary: 'boolean'
-            },
-            defaultValue: {
-                summary: 'undefined'
-            },
-            category: 'props'
-        },
-        control: {
-            type: 'boolean'
-        }
-    },
-    alt: {
-        name: 'alt',
-        type: { name: 'string' },
-        description: `alt attribute of image tag.`,
-        defaultValue: undefined,
-        table: {
-            type: {
-                summary: 'string'
-            },
-            defaultValue: {
-                summary: 'undefined'
-            },
-            category: 'props'
-        },
-        control: {
-            type: 'text'
-        }
-    },
-    preloaderSlot: {
-        name: 'preloader',
-        description: 'Slot for image loader',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null
-            },
-            defaultValue: {
-                summary: null
-            },
-            category: 'slots'
-        },
-        control: null
-    },
-    errorSlot: {
-        name: 'error',
-        description: 'Slot for error icon',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null
-            },
-            defaultValue: {
-                summary: null
-            },
-            category: 'slots'
-        },
-        control: null
-    }
-}}/>
+}} argTypes={getLazyImgArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PLazyImg },
     template: `
-          <p-lazy-img v-bind="$props"></p-lazy-img>
+        <p-lazy-img
+            :height="height"
+            :width="width"
+            :src="src"
+            :errorIcon="errorIcon"
+            :errorIconColor="errorIconColor"
+            :loading="loading"
+            :alt="alt"
+        ></p-lazy-img>
     `,
     setup() {
         return {}
@@ -193,6 +63,10 @@ export const Template = (args, { argTypes }) => ({
         <div class="flex items-center mb-4">
             <h2 class=" mr-4">Default: </h2>
             <p-lazy-img src="" />
+        </div>
+        <div class="flex items-center mb-4">
+            <h2 class=" mr-4">Custom Error Icon Color: </h2>
+            <p-lazy-img src="" error-icon-color="red white" />
         </div>
         <div class="flex items-center mb-4">
             <h2 class=" mr-4">Custom Error Icon: </h2>
