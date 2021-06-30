@@ -130,7 +130,7 @@ export default defineComponent<Props>({
             }
 
             const observer = new MutationObserver((mutation) => {
-                state.hasText = mutation.some(d => !!d.target.textContent);
+                state.hasText = mutation.some(d => !!d.target.textContent?.trim());
             });
 
             observer.observe(textRef, {
@@ -141,7 +141,7 @@ export default defineComponent<Props>({
 
             state.observer = observer;
 
-            state.hasText = !!textRef.textContent;
+            state.hasText = !!textRef.textContent?.trim();
         }, { immediate: true });
 
 
