@@ -1,3 +1,10 @@
+# [1.1.0-beta.91](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.90...v1.1.0-beta.91) (2021-06-30)
+
+
+### Bug Fixes
+
+* update copy button to check trimmed string ([#630](https://github.com/spaceone-dev/spaceone-design-system/issues/630)) ([b756f18](https://github.com/spaceone-dev/spaceone-design-system/commit/b756f1801b83e3171d4125dd9688181ab2278191))
+
 # [1.1.0-beta.90](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.89...v1.1.0-beta.90) (2021-06-29)
 
 
