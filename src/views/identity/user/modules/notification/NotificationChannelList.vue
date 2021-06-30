@@ -282,7 +282,7 @@ export default {
 }
 .spaceone-desc {
     @apply bg-gray-100 text-gray-700;
-    height: 2.125rem;
+    min-height: 2.125rem;
     width: 100%;
     margin-bottom: 1.5rem;
     padding: 0.5rem 0.75rem;
@@ -315,6 +315,7 @@ export default {
     border-radius: 0.375rem;
     .text {
         @apply text-primaryDark font-bold;
+        text-align: center;
         line-height: 160%;
     }
     .item-desc {

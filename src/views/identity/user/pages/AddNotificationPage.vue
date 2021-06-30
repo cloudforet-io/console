@@ -231,9 +231,7 @@ export default {
     }
 }
 .content-wrapper {
-    padding-left: 1rem;
-    padding-top: 2rem;
-    padding-bottom: 3.5rem;
+    padding: 2rem 1rem 3.5rem;
 }
 .content-title {
     font-size: 1.5rem;
