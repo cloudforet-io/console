@@ -34,7 +34,7 @@
                         </router-link>
                     </div>
                 </ul>
-                <p class="spaceone-desc">
+                <p v-if="projectId" class="spaceone-desc">
                     <p-i name="ic_notifications_member" width="1.125rem" class="mr-2" />
                     <b>SpaceOne User:</b> {{ $t('IDENTITY.USER.NOTIFICATION.SPACEONE_USER_DESC') }}
                 </p>
@@ -44,7 +44,7 @@
                     </p-empty>
                 </template>
             </p-data-loader>
-            <p-divider class="divider" />
+            <p-divider class="mt-6 divider" />
             <p-data-loader class="flex-grow" :data="channelList" :loading="channelLoading">
                 <div style="min-height: 6.5rem;">
                     <ul v-for="item in channelList" :key="`${item.name}-${item.created_at}`">
@@ -284,7 +284,7 @@ export default {
     @apply bg-gray-100 text-gray-700;
     min-height: 2.125rem;
     width: 100%;
-    margin-bottom: 1.5rem;
+    margin-top: 0.5rem;
     padding: 0.5rem 0.75rem;
     line-height: 150%;
     font-size: 0.75rem;
@@ -295,7 +295,6 @@ export default {
     column-gap: 0.5rem;
     grid-template-columns: repeat(auto-fit, minmax(216px, 1fr));
     margin-top: 1.125rem;
-    margin-bottom: 0.5rem;
     gap: 0.5rem;
     overflow-y: hidden;
 }
