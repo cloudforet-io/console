@@ -53,7 +53,7 @@ interface UserDetailData {
     user_id: string;
     name: string;
     state: string;
-    email: string;
+    email?: string;
     // eslint-disable-next-line camelcase
     user_type: string;
     backend: string;
