@@ -78,7 +78,7 @@ import TagsInputGroup from '@/common/components/tags-input-group/TagsInputGroup.
 import ConfirmCredentials from '@/views/plugin/collector/modules/ConfirmCredentials.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
 import router from '@/routes';
 

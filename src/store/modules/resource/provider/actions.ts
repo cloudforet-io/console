@@ -1,7 +1,7 @@
 import { SpaceConnector } from '@/lib/space-connector';
 import { ResourceMap } from '@/store/modules/resource/type';
 import { indigo } from '@/styles/colors';
-import { assetUrlConverter } from '@/lib/util';
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 const SPECIAL_LABEL_MAP = {
     // eslint-disable-next-line camelcase

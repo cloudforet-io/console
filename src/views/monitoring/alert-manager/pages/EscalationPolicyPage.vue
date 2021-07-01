@@ -72,9 +72,8 @@ import EscalationPolicyDataTable from '@/views/monitoring/alert-manager/modules/
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import {
-    iso8601Formatter, showErrorMessage, showSuccessMessage,
-} from '@/lib/util';
+import { iso8601Formatter } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import {
     makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler,
 } from '@/lib/component-utils/query-search';

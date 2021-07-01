@@ -36,7 +36,7 @@ import EventRuleActionForm from '@/views/project/project/modules/event-rule/Even
 import EventRuleConditionForm from '@/views/project/project/modules/event-rule/EventRuleConditionForm.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 
 

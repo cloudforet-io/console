@@ -84,7 +84,7 @@ import dayjs from 'dayjs';
 import { makeProxy } from '@/lib/compostion-util';
 import { i18n } from '@/translations';
 import { store } from '@/store';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@/lib/space-connector';
 
 const SCHEDULE_TYPE = Object.freeze({

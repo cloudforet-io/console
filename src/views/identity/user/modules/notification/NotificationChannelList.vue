@@ -73,7 +73,7 @@ import {
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { assetUrlConverter } from '@/lib/util';
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import NotificationChannelItem from '@/views/identity/user/modules/notification/NotificationChannelItem.vue';
 import { SpaceConnector } from '@/lib/space-connector';

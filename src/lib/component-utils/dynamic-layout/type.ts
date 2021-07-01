@@ -4,8 +4,13 @@ import {
     SearchDataType,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
-import { Reference } from '@/lib/reference/type';
 
+
+export interface Reference {
+    resource_type: string;
+    // eslint-disable-next-line camelcase
+    reference_key?: string;
+}
 
 export interface SearchKeyItem extends SearchKeyOptions {
     reference?: string;

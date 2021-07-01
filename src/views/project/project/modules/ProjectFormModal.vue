@@ -37,7 +37,7 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { makeProxy } from '@/lib/compostion-util';
 import VueI18n from 'vue-i18n';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 
 import TranslateResult = VueI18n.TranslateResult;

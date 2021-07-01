@@ -206,7 +206,7 @@ import {
 } from '@/views/automation/power-scheduler/type';
 
 import { changeTimezoneToLocal, changeTimezoneToUTC } from '@/views/automation/power-scheduler/lib/util';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { store } from '@/store';

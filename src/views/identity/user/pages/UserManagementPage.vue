@@ -206,9 +206,9 @@ import { store } from '@/store';
 import { SpaceConnector } from '@/lib/space-connector';
 import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { FILE_NAME_PREFIX } from '@/lib/type';
-import {i18n} from "@/translations";
+import { i18n } from '@/translations';
 
 interface UserModel {
     created_at: Timestamp;

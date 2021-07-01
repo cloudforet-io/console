@@ -156,7 +156,7 @@ export default {
             proxyIsAllValid: makeProxy('isAllValid', props, emit),
             //
             inputModel: {
-                name: '',
+                name: undefined as undefined | string,
                 scope: SCOPE.global,
                 rules: [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }],
                 finish_condition: FINISH_CONDITION.acknowledged,
@@ -166,7 +166,8 @@ export default {
             showValidation: false,
             isNameValid: computed(() => !state.nameInvalidText),
             nameInvalidText: computed(() => {
-                if (!state.showValidation) return undefined;
+                // if (!state.showValidation) return undefined;
+                if (state.inputModel.name === undefined) return undefined;
                 if (!state.inputModel.name) {
                     return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
                 }
@@ -222,7 +223,7 @@ export default {
 
         /* event */
         const onChangeInputModel = () => {
-            state.showValidation = true;
+            // state.showValidation = true;
             state.proxyIsAllValid = state.isNameValid && state.isProjectValid;
             emit('change', state.inputModel);
         };

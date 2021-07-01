@@ -92,7 +92,7 @@ import { SCHEDULE_STATUS, Schedule } from '@/views/automation/power-scheduler/ty
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { showErrorMessage } from '@/lib/util';
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 import router from '@/routes';

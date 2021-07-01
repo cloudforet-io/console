@@ -60,7 +60,7 @@ import {
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@/lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { makeProxy } from '@/lib/compostion-util';
 import { WEBHOOK_STATE } from '@/views/monitoring/alert-manager/lib/config';
 import { i18n } from '@/translations';

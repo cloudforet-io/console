@@ -102,7 +102,7 @@ import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 
 import { SupervisorPluginModel } from '@/views/management/supervisor/type';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@/lib/space-connector';
 import {
     makeDistinctValueHandler, makeEnumValueHandler,

@@ -32,22 +32,20 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PSearchTable, PTextList, PBadge, PPanelTop,
+    PSearchTable, PBadge, PPanelTop,
 } from '@spaceone/design-system';
-import { Options, SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
+import { SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { getPageStart } from '@/lib/component-utils/pagination';
-import config from '@/lib/config';
 import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/type';
-import {showLoadingMessage} from "@/lib/util";
+import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 
 export default {
     name: 'ServerMember',
     components: {
-        PPanelTop, PBadge, PTextList, PSearchTable,
+        PPanelTop, PBadge, PSearchTable,
     },
     props: {
         serverIds: {

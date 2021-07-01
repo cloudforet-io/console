@@ -41,3 +41,8 @@ export interface Query {
     minimal?: boolean;
     count_only?: boolean;
 }
+
+export interface MockInfo {
+    all?: boolean;
+    endpoint?: string;
+}

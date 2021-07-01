@@ -29,7 +29,7 @@ import { map } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';
 import { SpotGroupResourceCategory } from '@/views/automation/spot-automation/type';
 import AddSection from '@/views/automation/spot-automation/components/AddSection.vue';
-import { assetUrlConverter } from '@/lib/util';
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
 
 interface SupportResourceGroupTypes {
     [resourceType: string]: {

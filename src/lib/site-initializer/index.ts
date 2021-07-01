@@ -6,6 +6,8 @@ import { GTag } from '@/lib/gtag';
 import { i18n } from '@/translations';
 import * as am4core from '@amcharts/amcharts4/core';
 import { loadFonts } from '@/styles/fonts';
+import { QueryHelper } from '@/lib/query';
+import { computed } from '@vue/composition-api';
 
 const initConfig = async () => {
     await config.init();
@@ -15,7 +17,7 @@ const initApiClient = async () => {
     await SpaceConnector.init(config.get('CONSOLE_API.ENDPOINT'), () => {
         // Add session expiration process
         store.dispatch('user/setIsSessionExpired', true);
-    });
+    }, { endpoint: config.get('MOCK.ENDPOINT'), all: config.get('MOCK.ALL') });
 };
 
 const initDomain = async () => {
@@ -44,6 +46,10 @@ const initLanguageAndFonts = async () => {
     }, { immediate: true });
 };
 
+const initQueryHelper = () => {
+    QueryHelper.init(computed(() => store.state.user.timezone));
+};
+
 const initAmchartsLicense = () => {
     if (config.get('AMCHARTS_LICENSE.ENABLED')) {
         am4core.addLicense(config.get('AMCHARTS_LICENSE.CHARTS'));
@@ -70,6 +76,7 @@ const init = async () => {
         await initApiClient();
         await initDomain();
         await initLanguageAndFonts();
+        initQueryHelper();
         if (config.get('GTAG_ID') !== 'DISABLED') initGtag();
         initAmchartsLicense();
     } catch (e) {

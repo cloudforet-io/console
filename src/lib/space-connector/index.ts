@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import { AxiosRequestConfig } from 'axios';
 import API from './api';
-import { SessionTimeoutCallback, APIInfo } from './type';
+import { SessionTimeoutCallback, APIInfo, MockInfo } from './type';
 
 const API_REFLECTION_URL = '/api/reflection';
 
@@ -12,13 +12,13 @@ export class SpaceConnector {
 
     private _client: any = {};
 
-    constructor(endpoint: string, sessionTimeoutCallback: SessionTimeoutCallback = () => undefined) {
-        this.api = new API(endpoint, sessionTimeoutCallback);
+    constructor(endpoint: string, sessionTimeoutCallback: SessionTimeoutCallback = () => undefined, mockInfo: MockInfo) {
+        this.api = new API(endpoint, sessionTimeoutCallback, mockInfo);
     }
 
-    static async init(endpoint: string, sessionTimeoutCallback?: SessionTimeoutCallback): Promise<void> {
+    static async init(endpoint: string, sessionTimeoutCallback?: SessionTimeoutCallback, mockInfo: MockInfo = {}): Promise<void> {
         if (!SpaceConnector.instance) {
-            SpaceConnector.instance = new SpaceConnector(endpoint, sessionTimeoutCallback);
+            SpaceConnector.instance = new SpaceConnector(endpoint, sessionTimeoutCallback, mockInfo);
             await SpaceConnector.instance.loadAPI();
         }
     }

@@ -1,5 +1,5 @@
 import {
-    computed, ref, getCurrentInstance, Ref,
+    computed, getCurrentInstance, Ref,
 } from '@vue/composition-api';
 
 /**
@@ -32,30 +32,4 @@ export const makeProxy = <T extends any>(name: string, props: any = null, emit: 
             }
         },
     });
-};
-
-
-/**
- * 여러 엘리먼트에서 마우스 오버 여부 추적에 필요한 함수 모음
- * @param disabled
- * @return {{onMouseOut: onMouseOut, isMouseOver: Ref<HasDefined<S> extends true ? S : RefValue<T>>, onMouseOver: onMouseOver}}
- */
-export const mouseOverState = (disabled?: boolean) => {
-    const disable = disabled || false;
-    const isMouseOver = ref(false);
-    const onMouseOver = () => {
-        if (!disable && !isMouseOver.value) {
-            isMouseOver.value = true;
-        }
-    };
-    const onMouseOut = () => {
-        if (!disable && isMouseOver.value) {
-            isMouseOver.value = false;
-        }
-    };
-    return {
-        isMouseOver,
-        onMouseOver,
-        onMouseOut,
-    };
 };

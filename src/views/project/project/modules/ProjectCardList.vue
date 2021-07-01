@@ -138,7 +138,7 @@ import axios, { CancelTokenSource } from 'axios';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { QueryHelper } from '@/lib/query';
 import { store } from '@/store';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ProjectFormModal from '@/views/project/project/modules/ProjectFormModal.vue';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';

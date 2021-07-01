@@ -61,7 +61,8 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { iso8601Formatter, showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { iso8601Formatter } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { getApiQueryWithToolboxOptions } from '@/lib/component-utils/toolbox';
 
 import { i18n } from '@/translations';

@@ -94,7 +94,7 @@ import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import ProjectFormModal from '@/views/project/project/modules/ProjectFormModal.vue';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@/lib/space-connector';
 
 import { PROJECT_ROUTE } from '@/routes/project/project-route';

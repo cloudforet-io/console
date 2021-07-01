@@ -18,6 +18,7 @@ import {
 } from '@/lib/query/config';
 import { setDatetimeToFilters } from '@/lib/query/helper';
 import { flatten, forEach } from 'lodash';
+import { ComputedRef } from '@vue/composition-api';
 
 dayjs.extend(utc);
 dayjs.extend(tz);
@@ -57,9 +58,15 @@ const filterToQueryTag = (filter: { k?: string; v: QueryStoreFilterValue; o?: Ra
 };
 
 export class QueryHelper {
-    private _keyMap: Record<string, KeyItem> = {}
+    private static timezone: ComputedRef<string> | undefined;
+
+    private _keyMap: Record<string, KeyItem> = {};
 
     private _filters: QueryStoreFilter[] = [];
+
+    static init(timezone: ComputedRef<string>) {
+        QueryHelper.timezone = timezone;
+    }
 
     setKeyItemSets(keyItemSets: KeyItemSet[]): this {
         this._keyMap = {};
@@ -180,7 +187,7 @@ export class QueryHelper {
             if (f.k) {
                 if (datetimeRawQueryOperatorToQueryTagOperatorMap[f.o as string]) {
                     /* datetime case */
-                    setDatetimeToFilters(filter, f);
+                    setDatetimeToFilters(filter, f, QueryHelper.timezone?.value);
                 } else if (Array.isArray(f.v)) {
                     /* plural case */
                     if (rawQueryOperatorToPluralApiQueryOperatorMap[f.o || '']) {

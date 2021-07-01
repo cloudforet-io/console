@@ -123,9 +123,8 @@ import { i18n } from '@/translations';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import {
-    durationFormatter, iso8601Formatter, showLoadingMessage,
-} from '@/lib/util';
+import { durationFormatter, iso8601Formatter } from '@/lib/util';
+import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { FILE_NAME_PREFIX } from '@/lib/type';

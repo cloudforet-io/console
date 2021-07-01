@@ -166,9 +166,10 @@ import CustomFieldModal from '@/common/modules/custom-field-modal/CustomFieldMod
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import {
-    assetUrlConverter, showErrorMessage, showLoadingMessage, showSuccessMessage,
-} from '@/lib/util';
+    showErrorMessage, showSuccessMessage, showLoadingMessage,
+} from '@/lib/helper/notice-alert-helper';
 import { QueryHelper } from '@/lib/query';
 import { dynamicFieldsToExcelDataFields } from '@/lib/component-utils/dynamic-layout';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';

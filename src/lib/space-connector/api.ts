@@ -3,8 +3,7 @@ import axios, {
 } from 'axios';
 import jwt from 'jsonwebtoken';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
-import config from '@/lib/config';
-import { SessionTimeoutCallback } from './type';
+import { MockInfo, SessionTimeoutCallback } from '@/lib/space-connector/type';
 
 const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
@@ -40,8 +39,7 @@ export class APIError extends Error {
     }
 }
 
-const setMockMode = (request: AxiosRequestConfig) => {
-    const mockEndpoint = config.get('MOCK.ENDPOINT');
+const setMockMode = (request: AxiosRequestConfig, mockEndpoint?: string) => {
     if (mockEndpoint) request.baseURL = mockEndpoint;
 };
 
@@ -60,10 +58,13 @@ class API {
         headers: {
             'Content-Type': 'application/json',
         },
-    }
+    };
 
-    constructor(baseURL: string, sessionTimeoutCallback: SessionTimeoutCallback) {
+    private mockInfo: MockInfo = {};
+
+    constructor(baseURL: string, sessionTimeoutCallback: SessionTimeoutCallback, mockInfo: MockInfo) {
         this.sessionTimeoutCallback = sessionTimeoutCallback;
+        this.mockInfo = mockInfo;
 
         const axiosConfig = this.getAxiosConfig(baseURL);
         this.instance = axios.create(axiosConfig);
@@ -132,8 +133,8 @@ class API {
             this.defaultAxiosConfig.baseURL = baseURL;
         }
 
-        if (config.get('MOCK.ALL')) {
-            setMockMode(this.defaultAxiosConfig);
+        if (this.mockInfo.all) {
+            setMockMode(this.defaultAxiosConfig, this.mockInfo.endpoint);
         }
 
         return this.defaultAxiosConfig;
@@ -148,7 +149,7 @@ class API {
 
             // Set mock mode
             if (request.headers.MOCK_MODE) {
-                setMockMode(request);
+                setMockMode(request, this.mockInfo.endpoint);
             }
 
             return request;

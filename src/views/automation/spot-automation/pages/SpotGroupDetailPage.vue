@@ -99,7 +99,7 @@ import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
 import { TranslateResult } from 'vue-i18n';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { spotGroupNameRegex } from '@/views/automation/spot-automation/lib/validations';
 
 export default {

@@ -6,10 +6,19 @@ import {
 } from '@/lib/component-utils/query-search';
 import { DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { Filter } from '@/lib/space-connector/type';
-import { ConsoleDynamicField, ConsoleSearchSchema } from '@/lib/component-utils/dynamic-layout/type';
-import { ExcelDataField } from '@/store/modules/file/type';
+import { ConsoleDynamicField, ConsoleSearchSchema, Reference } from '@/lib/component-utils/dynamic-layout/type';
 import { forEach } from 'lodash';
 import { EnumOptions } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
+
+
+interface ExcelDataField {
+    key: string;
+    name: string;
+    type?: 'datetime'|'enum';
+    // eslint-disable-next-line camelcase
+    enum_items?: object;
+    reference?: Reference;
+}
 
 /**
  * @name makeQuerySearchPropsWithSearchSchema

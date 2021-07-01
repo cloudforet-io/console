@@ -84,7 +84,7 @@ import {
     PButtonModal, PTag, PSearchTable, PSelectDropdown, PFieldGroup, PTextInput, PButton, PI,
 } from '@spaceone/design-system';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { isEqual } from 'lodash';
 import { SpaceConnector } from '@/lib/space-connector';
 import VueI18n from 'vue-i18n';

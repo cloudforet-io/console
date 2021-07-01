@@ -1,5 +1,5 @@
 import { pluginStateColor, userStateColor } from '@/views/identity/user/lib/config';
-import {iso8601Formatter} from '@/lib/util';
+import { iso8601Formatter } from '@/lib/util';
 import dayjs from 'dayjs';
 
 const colorBindFactory = (colorMapping, textFnc) => value => ({

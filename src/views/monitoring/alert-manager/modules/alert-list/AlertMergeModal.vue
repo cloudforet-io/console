@@ -84,7 +84,8 @@ import { i18n } from '@/translations';
 import { alertStateBadgeStyleTypeFormatter } from '@/views/monitoring/alert-manager/lib/helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
-import { iso8601Formatter, showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { iso8601Formatter } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@/lib/space-connector';
 
 import AlertSelectDropdown from '@/views/monitoring/alert-manager/modules/alert-list/AlertSelectDropdown.vue';

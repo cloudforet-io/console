@@ -37,7 +37,7 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import { ProjectGroup } from '@/views/project/project/type';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';

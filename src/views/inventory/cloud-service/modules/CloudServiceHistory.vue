@@ -36,12 +36,11 @@ import {
 import {
     PSearchTable, PTextList, PPanelTop, PBadge,
 } from '@spaceone/design-system';
-import { Options, SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 
-import { getPageStart } from '@/lib/component-utils/pagination';
 import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import {iso8601Formatter, showLoadingMessage} from '@/lib/util';
+import { iso8601Formatter } from '@/lib/util';
+import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/type';
 

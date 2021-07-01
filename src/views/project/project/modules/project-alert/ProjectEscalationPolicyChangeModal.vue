@@ -50,7 +50,8 @@ import EscalationPolicyForm from '@/views/monitoring/alert-manager/modules/Escal
 
 import { makeProxy } from '@/lib/compostion-util';
 import { SpaceConnector } from '@/lib/space-connector';
-import { iso8601Formatter, showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { iso8601Formatter } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { getApiQueryWithToolboxOptions } from '@/lib/component-utils/toolbox';
 import { EscalationPolicyFormModel } from '@/views/monitoring/alert-manager/type';

@@ -79,9 +79,10 @@ import { SpaceConnector } from '@/lib/space-connector';
 import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { userStateFormatter } from '@/views/identity/user/lib/helper';
 import { TranslateResult } from 'vue-i18n';
+import { iso8601Formatter } from '@/lib/util';
 import {
-    hideLoadingMessage, showErrorMessage, showLoadingMessage, showSuccessMessage, iso8601Formatter,
-} from '@/lib/util';
+    showErrorMessage, showSuccessMessage, showLoadingMessage, hideLoadingMessage,
+} from '@/lib/helper/notice-alert-helper';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
 

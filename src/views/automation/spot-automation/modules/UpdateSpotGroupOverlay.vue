@@ -54,7 +54,7 @@ import OverlayPageLayout from '@/common/components/layouts/OverlayPageLayout.vue
 import { PButton, PPageTitle } from '@spaceone/design-system';
 import SpotGroupCheckModal from '@/views/automation/spot-automation/modules/SpotGroupCheckModal.vue';
 import { SETTINGS_TYPE } from '@/views/automation/spot-automation/lib/config';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { makeProxy } from '@/lib/compostion-util';
 

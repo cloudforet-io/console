@@ -156,7 +156,7 @@ import {
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { showErrorMessage } from '@/lib/util';
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { QueryHelper } from '@/lib/query';
 
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';

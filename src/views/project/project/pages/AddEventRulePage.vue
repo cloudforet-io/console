@@ -124,7 +124,7 @@ import EventRuleForm from '@/views/project/project/modules/event-rule/EventRuleF
 import InfoMessage from '@/common/components/InfoMessage.vue';
 
 import { SpaceConnector } from '@/lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 
 const EDIT_MODE = Object.freeze({

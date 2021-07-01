@@ -157,9 +157,10 @@ import {
 } from '@/views/automation/power-scheduler/type';
 
 import { SpaceConnector } from '@/lib/space-connector';
+import { iso8601Formatter } from '@/lib/util';
 import {
-    iso8601Formatter, showErrorMessage, showSuccessMessage,
-} from '@/lib/util';
+    showErrorMessage, showSuccessMessage,
+} from '@/lib/helper/notice-alert-helper';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PIconButton, PButton, PPageTitle, PI, PLottie,

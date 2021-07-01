@@ -134,7 +134,8 @@ import {
 import ResourceGroupPage from '@/views/automation/power-scheduler/pages/ResourceGroupPage.vue';
 import { KanbanItem, ViewMode, ResourceGroupItem } from '@/views/automation/power-scheduler/type';
 import { SpaceConnector } from '@/lib/space-connector';
-import { assetUrlConverter, showErrorMessage, showSuccessMessage } from '@/lib/util';
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 

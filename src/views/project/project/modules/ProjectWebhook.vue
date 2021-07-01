@@ -118,9 +118,8 @@ import { ApiQueryHelper } from '@/lib/space-connector/helper';
 import { store } from '@/store';
 import { userStateFormatter } from '@/views/identity/user/lib/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import {
-    iso8601Formatter, showErrorMessage, showLoadingMessage, showSuccessMessage,
-} from '@/lib/util';
+import { iso8601Formatter } from '@/lib/util';
+import { showErrorMessage, showSuccessMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import {
     makeDistinctValueHandler, makeEnumValueHandler,
 } from '@/lib/component-utils/query-search';
