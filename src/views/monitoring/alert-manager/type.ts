@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 import { TimeStamp } from '@/models';
-import { QueryStoreFilter } from '@/lib/query/type';
+import { QueryStoreFilter } from '@/core-lib/query/type';
 import {
     ALERT_SEVERITY, ALERT_STATE,
     ALERT_STATE_FILTER, ALERT_URGENCY,

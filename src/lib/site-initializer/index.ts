@@ -1,12 +1,12 @@
 import config from '@/lib/config';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { store } from '@/store';
 import router from '@/routes';
 import { GTag } from '@/lib/gtag';
 import { i18n } from '@/translations';
 import * as am4core from '@amcharts/amcharts4/core';
 import { loadFonts } from '@/styles/fonts';
-import { QueryHelper } from '@/lib/query';
+import { QueryHelper } from '@/core-lib/query';
 import { computed } from '@vue/composition-api';
 
 const initConfig = async () => {

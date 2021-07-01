@@ -102,15 +102,15 @@ import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 
 import { SupervisorPluginModel } from '@/views/management/supervisor/type';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { SpaceConnector } from '@/lib/space-connector';
+import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import {
     makeDistinctValueHandler, makeEnumValueHandler,
-} from '@/lib/component-utils/query-search';
+} from '@/core-lib/component-util/query-search';
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { QueryHelper } from '@/lib/query';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { getPageStart } from '@/lib/component-utils/pagination';
+import { QueryHelper } from '@/core-lib/query';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { getPageStart } from '@/core-lib/component-util/pagination';
 import { pluginStateFormatter } from '@/views/identity/user/lib/helper';
 
 enum STATE {

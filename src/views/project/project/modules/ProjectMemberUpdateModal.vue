@@ -72,7 +72,7 @@
 <script lang="ts">
 import {
     makeProxy,
-} from '@/lib/compostion-util';
+} from '@/core-lib/compostion-util';
 
 import {
     ComponentRenderProxy, computed,
@@ -84,9 +84,9 @@ import {
     PButtonModal, PTag, PSearchTable, PSelectDropdown, PFieldGroup, PTextInput, PButton, PI,
 } from '@spaceone/design-system';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
 import { isEqual } from 'lodash';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import VueI18n from 'vue-i18n';
 
 import TranslateResult = VueI18n.TranslateResult;

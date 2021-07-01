@@ -32,7 +32,7 @@ import {
     PI,
 } from '@spaceone/design-system';
 
-import { commaFormatter, numberFormatter } from '@/lib/util';
+import { commaFormatter, numberFormatter } from '@/core-lib/util';
 
 export default {
     name: 'SpotGroupBillingSummary',

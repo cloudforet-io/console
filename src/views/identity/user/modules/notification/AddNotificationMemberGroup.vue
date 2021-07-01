@@ -27,7 +27,7 @@ import { PAutocompleteSearch, PCheckBox, PTag } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import store from '@/store';
 import { cloneDeep } from 'lodash';

@@ -112,7 +112,7 @@ import ProjectSelectDropdown from '@/common/modules/project-select-dropdown/Proj
 import SearchOrSelectUser from '@/common/modules/SearchOrSelectUser.vue';
 import TagsInputGroup from '@/common/components/tags-input-group/TagsInputGroup.vue';
 
-import { makeProxy } from '@/lib/compostion-util';
+import { makeProxy } from '@/core-lib/compostion-util';
 
 
 const URGENCY = Object.freeze({

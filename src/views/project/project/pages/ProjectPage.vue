@@ -125,7 +125,7 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import ProjectGroupFormModal from '@/views/project/project/modules/ProjectGroupFormModal.vue';
 import ProjectSearch from '@/views/project/project/modules/ProjectSearch.vue';
 import ProjectGroupTree from '@/views/project/project/modules/ProjectGroupTree.vue';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import {
     ProjectGroup,
 } from '@/views/project/project/type';

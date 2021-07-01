@@ -144,15 +144,15 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { QueryHelper } from '@/lib/query';
+import { QueryHelper } from '@/core-lib/query';
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { getPageStart, getThisPage } from '@/lib/component-utils/pagination';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { SpaceConnector } from '@/lib/space-connector';
+import { getPageStart, getThisPage } from '@/core-lib/component-util/pagination';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { Tags, TimeStamp } from '@/models';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
-import { makeDistinctValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
+import { makeDistinctValueHandler, makeReferenceValueHandler } from '@/core-lib/component-util/query-search';
 
 const handlers = {
     keyItemSets: [{

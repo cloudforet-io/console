@@ -11,7 +11,7 @@
 
 import { reactive, toRefs, watch } from '@vue/composition-api';
 import { PDynamicLayout } from '@spaceone/design-system';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 
 export default {
     name: 'ServiceAccountDetails',

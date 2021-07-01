@@ -47,7 +47,7 @@ import {
 import { PPaneLayout, PStatus, PI } from '@spaceone/design-system';
 
 import { JOB_STATUS } from '@/views/management/collector-history/pages/config';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { coral, green } from '@/styles/colors';
 
 

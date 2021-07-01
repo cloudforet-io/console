@@ -4,9 +4,9 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import { isEmpty } from 'lodash';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { locationQueryToString } from '@/lib/router-query-string';
-import { QueryHelper } from '@/lib/query';
+import { QueryHelper } from '@/core-lib/query';
 
 const DEFAULT_URL = '/inventory/cloud-service';
 const ERROR_URL = '/inventory/cloud-service/no-resource';

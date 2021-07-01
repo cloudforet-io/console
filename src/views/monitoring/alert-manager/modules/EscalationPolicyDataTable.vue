@@ -48,7 +48,7 @@ import {
 } from '@spaceone/design-system';
 
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { makeProxy } from '@/lib/compostion-util';
+import { makeProxy } from '@/core-lib/compostion-util';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { alertStateBadgeStyleTypeFormatter, alertScopeBadgeStyleTypeFormatter } from '@/views/monitoring/alert-manager/lib/helper';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';

@@ -34,7 +34,7 @@ import {
 
 import { PChartLoader, PDatePagination, PSkeleton } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import {
     gray, green, coral,
 } from '@/styles/colors';

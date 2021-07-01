@@ -1,5 +1,5 @@
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { Query } from '@/lib/space-connector/type';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { Query } from '@/core-lib/space-connector/type';
 
 export const getApiQueryWithToolboxOptions = (apiQueryHelper: ApiQueryHelper, options: any = {}): undefined|Query => {
     if (!Object.keys(options).length) return undefined;

@@ -1,6 +1,6 @@
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { ResourceMap } from '@/store/modules/resource/type';
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import { assetUrlConverter } from '@/core-lib/helper/asset-helper';
 
 export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {
     if (lazyLoad && Object.keys(state.items).length > 0) return;

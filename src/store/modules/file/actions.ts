@@ -1,5 +1,5 @@
 import { ExcelDataField, FileState } from '@/store/modules/file/type';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { Action } from 'vuex';
 import config from '@/lib/config';
 import axios from 'axios';

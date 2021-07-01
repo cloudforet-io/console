@@ -61,10 +61,10 @@ import BaseInformationInput from '@/views/automation/spot-automation/modules/Bas
 import SchedulePolicySettings from '@/views/automation/spot-automation/modules/SchedulePolicySettings.vue';
 import InstanceTypeSelection from '@/views/automation/spot-automation/modules/InstanceTypeSelection.vue';
 import { SETTINGS_TYPE } from '@/views/automation/spot-automation/lib/config';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { store } from '@/store';
 import SpotGroupCheckModal from '@/views/automation/spot-automation/modules/SpotGroupCheckModal.vue';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
 import ServiceCategorySelection from '@/views/automation/spot-automation/modules/ServiceCategorySelection.vue';
 import { SpotGroupResourceCategory } from '@/views/automation/spot-automation/type';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';

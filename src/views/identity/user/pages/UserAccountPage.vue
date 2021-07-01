@@ -108,7 +108,7 @@ import { languages, timezoneList } from '@/store/modules/user/config';
 import { LanguageCode, UpdateUserRequest } from '@/store/modules/user/type';
 import { TranslateResult } from 'vue-i18n';
 import { store } from '@/store';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
 
 export default {
     name: 'UserAccountPage',

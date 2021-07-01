@@ -34,8 +34,8 @@ import AlertListItem from '@/views/monitoring/alert-manager/components/AlertList
 import {
     ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { SpaceConnector } from '@/lib/space-connector';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { get } from 'lodash';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { store } from '@/store';

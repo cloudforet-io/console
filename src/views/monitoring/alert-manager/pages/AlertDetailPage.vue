@@ -69,9 +69,9 @@ import AlertDetailResponder from '@/views/monitoring/alert-manager/modules/alert
 import AlertDetailTimeline from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailTimeline.vue';
 import AlertDetailNote from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailNote.vue';
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { AlertDataModel } from '@/views/monitoring/alert-manager/type';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
 import AlertTitleEditModal from '@/views/monitoring/alert-manager/modules/alert-detail/AlertTitleEditModal.vue';
 import AlertDetailResourceInfo from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailResourceInfo.vue';
 import AlertDetailProjectDependency

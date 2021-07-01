@@ -37,7 +37,7 @@ import {
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { makeProxy } from '@/lib/compostion-util';
+import { makeProxy } from '@/core-lib/compostion-util';
 import { store } from '@/store';
 
 

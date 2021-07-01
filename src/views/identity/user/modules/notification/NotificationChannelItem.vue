@@ -58,8 +58,8 @@ import {
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { SpaceConnector } from '@/lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 import { i18n } from '@/translations';
 

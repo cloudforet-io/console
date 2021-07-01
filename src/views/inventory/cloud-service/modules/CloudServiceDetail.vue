@@ -45,15 +45,15 @@ import {
     dynamicFieldsToExcelDataFields,
     getApiActionByLayoutType,
     makeQuerySearchPropsWithSearchSchema,
-} from '@/lib/component-utils/dynamic-layout';
-import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
+} from '@/core-lib/component-util/dynamic-layout';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { find } from 'lodash';
-import { FILE_NAME_PREFIX } from '@/lib/type';
-import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
+import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { showLoadingMessage } from '@/core-lib/helper/notice-alert-helper';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
     sortBy: '',

@@ -1,4 +1,4 @@
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { FavoriteItem } from '@/store/modules/favorite/type';
 
 const FAVORITE_TYPE = 'spot-group';

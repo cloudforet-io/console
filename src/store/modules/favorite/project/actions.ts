@@ -1,4 +1,4 @@
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { FavoriteState, FavoriteItem } from '@/store/modules/favorite/type';
 import { Action } from 'vuex';
 

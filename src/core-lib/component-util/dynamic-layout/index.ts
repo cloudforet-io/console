@@ -3,10 +3,10 @@ import {
     makeDistinctValueHandler,
     makeEnumValueHandler,
     makeReferenceValueHandler,
-} from '@/lib/component-utils/query-search';
+} from '@/core-lib/component-util/query-search';
 import { DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { Filter } from '@/lib/space-connector/type';
-import { ConsoleDynamicField, ConsoleSearchSchema, Reference } from '@/lib/component-utils/dynamic-layout/type';
+import { Filter } from '@/core-lib/space-connector/type';
+import { ConsoleDynamicField, ConsoleSearchSchema, Reference } from '@/core-lib/component-util/dynamic-layout/type';
 import { forEach } from 'lodash';
 import { EnumOptions } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 

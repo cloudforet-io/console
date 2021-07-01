@@ -71,7 +71,7 @@ import { Location } from 'vue-router';
 import router from '@/routes';
 import TopNotification from '@/common/components/TopNotification.vue';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
-import { hideLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { hideLoadingMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 
 export default defineComponent({

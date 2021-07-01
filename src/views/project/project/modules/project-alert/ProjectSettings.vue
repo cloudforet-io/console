@@ -112,7 +112,7 @@ import {
     PI, PIconButton, PPaneLayout, PButton,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { ACTION, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { i18n } from '@/translations';

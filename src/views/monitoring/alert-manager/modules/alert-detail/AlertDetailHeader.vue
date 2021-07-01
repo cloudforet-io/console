@@ -48,8 +48,8 @@ import AlertReassignModal from '@/views/monitoring/alert-manager/modules/alert-d
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import relativeTime from 'dayjs/plugin/relativeTime';
-import { iso8601Formatter } from '@/lib/util';
-import { SpaceConnector } from '@/lib/space-connector';
+import { iso8601Formatter } from '@/core-lib/util';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { ALERT_STATE, ALERT_URGENCY } from '@/views/monitoring/alert-manager/lib/config';
 
 dayjs.extend(relativeTime);

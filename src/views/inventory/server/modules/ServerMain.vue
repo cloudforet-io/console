@@ -158,22 +158,22 @@ import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
 import ProjectTreeModal from '@/common/modules/ProjectTreeModal.vue';
 import { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
 
-import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import {
     dynamicFieldsToExcelDataFields,
     makeQuerySearchPropsWithSearchSchema,
-} from '@/lib/component-utils/dynamic-layout';
+} from '@/core-lib/component-util/dynamic-layout';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { QueryHelper } from '@/lib/query';
+import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { QueryHelper } from '@/core-lib/query';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import CustomFieldModal from '@/common/modules/custom-field-modal/CustomFieldModal.vue';
-import { FILE_NAME_PREFIX } from '@/lib/type';
+import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 
 interface ProjectItemResp {

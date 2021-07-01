@@ -57,15 +57,15 @@ import {
     reactive, toRefs, watch, onUnmounted, computed,
 } from '@vue/composition-api';
 
-import { SpaceConnector } from '@/lib/space-connector';
-import { QueryHelper } from '@/lib/query';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { QueryHelper } from '@/core-lib/query';
 import {
     gray, violet, white, coral, yellow, secondary1,
 } from '@/styles/colors';
 import Color from 'color';
 import { store } from '@/store';
 import { Location } from 'vue-router';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import config from '@/lib/config';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 

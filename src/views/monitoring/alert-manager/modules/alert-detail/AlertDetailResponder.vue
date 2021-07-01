@@ -53,12 +53,12 @@ import {
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import {
     AlertDataModel,
 } from '@/views/monitoring/alert-manager/type';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import ProjectChannelList from '@/views/monitoring/alert-manager/components/ProjectChannelList.vue';
 import { i18n } from '@/translations';
 import {store} from "@/store";

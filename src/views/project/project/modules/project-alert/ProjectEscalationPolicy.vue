@@ -66,10 +66,10 @@ import {
 import ProjectChannelList from '@/views/monitoring/alert-manager/components/ProjectChannelList.vue';
 
 import { FINISH_CONDITION } from '@/views/monitoring/alert-manager/lib/config';
-import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { QueryHelper } from '@/lib/query';
-import { QueryStoreFilter } from '@/lib/query/type';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { QueryHelper } from '@/core-lib/query';
+import { QueryStoreFilter } from '@/core-lib/query/type';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { i18n } from '@/translations';
 

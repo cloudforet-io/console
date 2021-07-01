@@ -37,10 +37,10 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import { ProjectGroup } from '@/views/project/project/type';
 
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { makeProxy } from '@/lib/compostion-util';
-import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { makeProxy } from '@/core-lib/compostion-util';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import VueI18n from 'vue-i18n';
 import { store } from '@/store';
 

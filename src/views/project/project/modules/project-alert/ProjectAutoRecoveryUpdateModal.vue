@@ -30,9 +30,9 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { makeProxy } from '@/lib/compostion-util';
-import { SpaceConnector } from '@/lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { makeProxy } from '@/core-lib/compostion-util';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 
 

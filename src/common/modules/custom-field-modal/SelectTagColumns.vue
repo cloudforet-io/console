@@ -35,7 +35,7 @@ import {
 } from '@vue/composition-api';
 import { TAGS_PREFIX } from '@/common/modules/custom-field-modal/config';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { makeProxy } from '@/lib/compostion-util';
+import { makeProxy } from '@/core-lib/compostion-util';
 
 interface Props {
     selectedKeys: string[];

@@ -79,7 +79,7 @@ import {
     secondary, peacock, gray, alert, blue,
 } from '@/styles/colors';
 import { store } from '@/store';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import config from '@/lib/config';
 
 

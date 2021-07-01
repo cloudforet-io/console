@@ -71,11 +71,11 @@ import {
 } from '@spaceone/design-system';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { SpaceConnector } from '@/lib/space-connector';
-import { makeEnumValueHandler, makeReferenceValueHandler } from '@/lib/component-utils/query-search';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { makeEnumValueHandler, makeReferenceValueHandler } from '@/core-lib/component-util/query-search';
 import { JOB_TASK_STATUS } from '@/views/management/collector-history/pages/config';
-import { iso8601Formatter, durationFormatter } from '@/lib/util';
+import { iso8601Formatter, durationFormatter } from '@/core-lib/util';
 import { green, primaryDark, red } from '@/styles/colors';
 import { store } from '@/store';
 

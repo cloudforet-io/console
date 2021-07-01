@@ -105,8 +105,8 @@ import {
     PButtonModal, PSelectDropdown, PFieldGroup, PButton, PTextInput, PBoxTab,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@/lib/compostion-util';
-import { SpaceConnector } from '@/lib/space-connector';
+import { makeProxy } from '@/core-lib/compostion-util';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { store } from '@/store';
 
 interface AuthType {

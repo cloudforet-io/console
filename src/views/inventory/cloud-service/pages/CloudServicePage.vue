@@ -204,20 +204,20 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import {
     dynamicFieldsToExcelDataFields,
     makeQuerySearchPropsWithSearchSchema,
-} from '@/lib/component-utils/dynamic-layout';
-import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
+} from '@/core-lib/component-util/dynamic-layout';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
-import { showErrorMessage, showSuccessMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
+import { assetUrlConverter } from '@/core-lib/helper/asset-helper';
+import { showErrorMessage, showSuccessMessage, showLoadingMessage } from '@/core-lib/helper/notice-alert-helper';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
-import { QueryHelper } from '@/lib/query';
+import { QueryHelper } from '@/core-lib/query';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { TranslateResult } from 'vue-i18n';
 import CustomFieldModal from '@/common/modules/custom-field-modal/CustomFieldModal.vue';
-import { FILE_NAME_PREFIX } from '@/lib/type';
+import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 import router from '@/routes';
 

@@ -98,8 +98,8 @@ import {
 } from '@spaceone/design-system';
 
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
-import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import { ProjectGroupTreeItem, ProjectTreeRoot } from '@/views/project/project/type';
 import { ProjectGroup } from '@/views/identity/service-account/type';
 

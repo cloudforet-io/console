@@ -51,9 +51,9 @@ import {
 import WidgetLayout from '@/common/components/WidgetLayout.vue';
 
 import { store } from '@/store';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { QueryHelper } from '@/lib/query';
+import { QueryHelper } from '@/core-lib/query';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 

@@ -23,7 +23,7 @@
 <script lang="ts">
 import { PButtonModal } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
-import { makeProxy } from '@/lib/compostion-util';
+import { makeProxy } from '@/core-lib/compostion-util';
 
 export default {
     name: 'DeleteModal',

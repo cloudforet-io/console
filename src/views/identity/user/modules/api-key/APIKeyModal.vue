@@ -80,7 +80,7 @@ import {
     PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PRawData, PIconTextButton, PAnchor,
 } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
-import { makeProxy } from '@/lib/compostion-util';
+import { makeProxy } from '@/core-lib/compostion-util';
 import yaml from 'js-yaml';
 import { APIKeyItem } from '@/views/identity/user/modules/api-key/APIKeyTable.vue';
 

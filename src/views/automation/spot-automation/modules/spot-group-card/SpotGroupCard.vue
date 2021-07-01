@@ -68,7 +68,7 @@ import SpotGroupCardDesktop from '@/views/automation/spot-automation/modules/spo
 import SpotGroupCardMobile from '@/views/automation/spot-automation/modules/spot-group-card/SpotGroupCardMobile.vue';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { store } from '@/store';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 

@@ -26,9 +26,9 @@ import {
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { TimeStamp } from '@/models';
-import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { iso8601Formatter } from '@/lib/util';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { iso8601Formatter } from '@/core-lib/util';
 import { store } from '@/store';
 
 interface NoteModel {

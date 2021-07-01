@@ -39,8 +39,8 @@ import {
     PPanelTop, PDefinitionTable, PLazyImg, PDataTable, PStatus, PTextList,
 } from '@spaceone/design-system';
 
-import { iso8601Formatter } from '@/lib/util';
-import { SpaceConnector } from '@/lib/space-connector';
+import { iso8601Formatter } from '@/core-lib/util';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { store } from '@/store';
 
 export default {

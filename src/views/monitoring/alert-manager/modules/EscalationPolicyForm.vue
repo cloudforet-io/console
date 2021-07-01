@@ -108,7 +108,7 @@ import ProjectSelectDropdown from '@/common/modules/project-select-dropdown/Proj
 import { EscalationPolicyFormModel } from '@/views/monitoring/alert-manager/type';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { makeProxy } from '@/lib/compostion-util';
+import { makeProxy } from '@/core-lib/compostion-util';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { store } from '@/store';
 import { i18n } from '@/translations';

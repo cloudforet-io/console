@@ -119,16 +119,16 @@ import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import PCollectorHistoryChart from '@/views/management/collector-history/modules/CollectorHistoryChart.vue';
 
-import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { iso8601Formatter, durationFormatter, numberFormatter } from '@/lib/util';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { iso8601Formatter, durationFormatter, numberFormatter } from '@/core-lib/util';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import {
     makeEnumValueHandler, makeDistinctValueHandler, makeReferenceValueHandler,
-} from '@/lib/component-utils/query-search';
-import { getPageStart } from '@/lib/component-utils/pagination';
+} from '@/core-lib/component-util/query-search';
+import { getPageStart } from '@/core-lib/component-util/pagination';
 import { store } from '@/store';
-import { QueryHelper } from '@/lib/query';
+import { QueryHelper } from '@/core-lib/query';
 import { MANAGEMENT_ROUTE } from '@/routes/management/management-route';
 import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
 import { peacock, green, red } from '@/styles/colors';

@@ -164,21 +164,21 @@ import CustomFieldModal from '@/common/modules/custom-field-modal/CustomFieldMod
 
 /* utils */
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { assetUrlConverter } from '@/core-lib/helper/asset-helper';
 import {
     showErrorMessage, showSuccessMessage, showLoadingMessage,
-} from '@/lib/helper/notice-alert-helper';
-import { QueryHelper } from '@/lib/query';
-import { dynamicFieldsToExcelDataFields } from '@/lib/component-utils/dynamic-layout';
+} from '@/core-lib/helper/notice-alert-helper';
+import { QueryHelper } from '@/core-lib/query';
+import { dynamicFieldsToExcelDataFields } from '@/core-lib/component-util/dynamic-layout';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { store } from '@/store';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 
 /* types */
 import { Reference } from '@/lib/reference/type';
-import { FILE_NAME_PREFIX } from '@/lib/type';
+import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 
 
 interface ProjectItemResp {

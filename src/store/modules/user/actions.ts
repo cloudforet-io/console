@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 
 import jwt from 'jsonwebtoken';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import {
     UserState, SignInRequest, UpdateUserRequest, UserRole
 } from './type';

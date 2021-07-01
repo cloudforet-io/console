@@ -106,7 +106,7 @@ import GNBNewIcon from '@/common/components/GNBNewIcon.vue';
 
 import router from '@/routes';
 import { store } from '@/store';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
 import { languages } from '@/store/modules/user/config';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import config from '@/lib/config';

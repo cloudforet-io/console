@@ -45,7 +45,7 @@ import {
 import {
     gray, peacock, secondary, primary1,
 } from '@/styles/colors';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import config from '@/lib/config';
 
 am4core.useTheme(am4themes_animated);

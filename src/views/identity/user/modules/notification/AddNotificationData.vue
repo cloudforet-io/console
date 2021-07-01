@@ -40,8 +40,8 @@ import {
 import { notiChannelPhoneNumRegex } from '@/views/identity/user/lib/validations';
 import AddNotificationLevel from '@/views/identity/user/modules/notification/AddNotificationLevel.vue';
 import AddNotificationMemberGroup from '@/views/identity/user/modules/notification/AddNotificationMemberGroup.vue';
-import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 
 const CHANNEL_TYPE = {
     AWS_SNS: 'AWSSNS',

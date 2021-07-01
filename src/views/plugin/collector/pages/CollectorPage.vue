@@ -181,15 +181,15 @@ import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/ty
 
 import { CollectorModel } from '@/views/plugin/collector/type';
 
-import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
-import { iso8601Formatter } from '@/lib/util';
-import { showErrorMessage, showSuccessMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
-import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-utils/dynamic-layout';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { iso8601Formatter } from '@/core-lib/util';
+import { showErrorMessage, showSuccessMessage, showLoadingMessage } from '@/core-lib/helper/notice-alert-helper';
+import { makeQuerySearchPropsWithSearchSchema } from '@/core-lib/component-util/dynamic-layout';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { store } from '@/store';
-import { QueryHelper } from '@/lib/query';
-import { FILE_NAME_PREFIX } from '@/lib/type';
+import { QueryHelper } from '@/core-lib/query';
+import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
 import { MANAGEMENT_ROUTE } from '@/routes/management/management-route';
 

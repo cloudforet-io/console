@@ -36,12 +36,12 @@ import {
 } from '@spaceone/design-system';
 import { SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 
-import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 
 import { store } from '@/store';
-import { FILE_NAME_PREFIX } from '@/lib/type';
-import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
+import { FILE_NAME_PREFIX } from '@/lib/excel-export';
+import { showLoadingMessage } from '@/core-lib/helper/notice-alert-helper';
 
 export default {
     name: 'CloudServiceAdmin',

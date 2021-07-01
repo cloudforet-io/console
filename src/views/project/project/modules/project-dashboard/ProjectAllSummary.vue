@@ -113,9 +113,9 @@ import {
     PChartLoader, PSkeleton, PButton, PBalloonTab,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@/lib/space-connector';
-import { QueryHelper } from '@/lib/query';
-import { QueryStoreFilter } from '@/lib/query/type';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { QueryHelper } from '@/core-lib/query';
+import { QueryStoreFilter } from '@/core-lib/query/type';
 import { gray, peacock } from '@/styles/colors';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';

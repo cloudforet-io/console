@@ -59,9 +59,9 @@ import {
     PButtonModal, PToggleButton, PFieldGroup, PTextInput, PSelectDropdown,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@/lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { makeProxy } from '@/lib/compostion-util';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { makeProxy } from '@/core-lib/compostion-util';
 import { WEBHOOK_STATE } from '@/views/monitoring/alert-manager/lib/config';
 import { i18n } from '@/translations';
 

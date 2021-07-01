@@ -1,6 +1,6 @@
 import Vue from 'vue';
 import VueRouter from 'vue-router';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { routerOptions } from '@/routes/config';
 import { GTag } from '@/lib/gtag';
 import config from '@/lib/config';

@@ -25,7 +25,7 @@ import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
 import router from '@/routes';
 import { store } from '@/store';
 import { i18n } from '@/translations';
-import { QueryHelper } from '@/lib/query';
+import { QueryHelper } from '@/core-lib/query';
 
 import AlertAssignedList from '@/views/monitoring/alert-manager/modules/alert-list/AlertAssignedList.vue';
 import AlertDataTable from '@/views/monitoring/alert-manager/modules/alert-list/AlertDataTable.vue';

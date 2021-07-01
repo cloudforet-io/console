@@ -47,7 +47,7 @@ import {
 
 import { userStateFormatter } from '@/views/identity/user/lib/helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import { Tags } from '@/models';
 
 interface UserRoleItem {

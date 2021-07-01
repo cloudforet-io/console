@@ -73,16 +73,16 @@ import {
 import {
     Options,
 } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 
 import { TranslateResult } from 'vue-i18n';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
 
 import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
 import ProjectMemberUpdateModal from '@/views/project/project/modules/ProjectMemberUpdateModal.vue';

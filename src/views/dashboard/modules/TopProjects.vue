@@ -101,11 +101,11 @@ import {
 import WidgetLayout from '@/common/components/WidgetLayout.vue';
 
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { SpaceConnector } from '@/lib/space-connector';
+import { SpaceConnector } from '@/core-lib/space-connector';
 import {
     gray, peacock, secondary,
 } from '@/styles/colors';
-import { QueryHelper } from '@/lib/query';
+import { QueryHelper } from '@/core-lib/query';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import config from '@/lib/config';

@@ -156,11 +156,11 @@ import {
     defaultSchedule, SCHEDULE_STATUS, Schedule, ViewMode,
 } from '@/views/automation/power-scheduler/type';
 
-import { SpaceConnector } from '@/lib/space-connector';
-import { iso8601Formatter } from '@/lib/util';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { iso8601Formatter } from '@/core-lib/util';
 import {
     showErrorMessage, showSuccessMessage,
-} from '@/lib/helper/notice-alert-helper';
+} from '@/core-lib/helper/notice-alert-helper';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PIconButton, PButton, PPageTitle, PI, PLottie,

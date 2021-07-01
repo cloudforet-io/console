@@ -73,11 +73,11 @@ import {
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import { assetUrlConverter } from '@/core-lib/helper/asset-helper';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import NotificationChannelItem from '@/views/identity/user/modules/notification/NotificationChannelItem.vue';
-import { SpaceConnector } from '@/lib/space-connector';
-import { ApiQueryHelper } from '@/lib/space-connector/helper';
+import { SpaceConnector } from '@/core-lib/space-connector';
+import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { ChannelItem, ProtocolItem } from '@/views/identity/user/type';
 import { PROTOCOL_TYPE } from '@/views/identity/user/modules/notification/notification-channel-item/type';

@@ -31,7 +31,7 @@ import {
 } from '@spaceone/design-system';
 
 import { TAGS_PREFIX } from '@/common/modules/custom-field-modal/config';
-import { makeProxy } from '@/lib/compostion-util';
+import { makeProxy } from '@/core-lib/compostion-util';
 
 export default {
     name: 'AlertSelectDropdown',
