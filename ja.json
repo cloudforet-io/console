@@ -1492,6 +1492,8 @@
 			"ALT_E_DELETE_MEMBER": "メンバー削除に失敗",
 			"ALT_E_DELETE_PROJECT": "プロジェクト削除に失敗",
 			"ALT_E_DELETE_WEBHOOK": "",
+			"ALT_E_PROJECT_INVALID_DESC": "プロジェクトリストを確認してください",
+			"ALT_E_PROJECT_INVALID_TITLE": "該当するプロジェクトがありません",
 			"ALT_E_UPDATE_PROJECT": "プロジェクト編集に失敗",
 			"ALT_E_UPDATE_WEBHOOK": "",
 			"ALT_S_ACTIVATE_ALERT": "",

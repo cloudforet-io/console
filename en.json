@@ -1492,6 +1492,8 @@
 			"ALT_E_DELETE_MEMBER": "Failed to Delete Member",
 			"ALT_E_DELETE_PROJECT": "Failed to Delete Project",
 			"ALT_E_DELETE_WEBHOOK": "Failed to Delete Webhook",
+			"ALT_E_PROJECT_INVALID_DESC": "Please check the list.",
+			"ALT_E_PROJECT_INVALID_TITLE": "There is no matching project.",
 			"ALT_E_UPDATE_PROJECT": "Failed to Update Project",
 			"ALT_E_UPDATE_WEBHOOK": "Failed to Update Webhook",
 			"ALT_S_ACTIVATE_ALERT": "Success to Activate Alert ",

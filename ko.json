@@ -1492,6 +1492,8 @@
 			"ALT_E_DELETE_MEMBER": "구성원 삭제 실패",
 			"ALT_E_DELETE_PROJECT": "프로젝트 삭제 실패",
 			"ALT_E_DELETE_WEBHOOK": "웹훅 삭제 실패",
+			"ALT_E_PROJECT_INVALID_DESC": "프로젝트 목록을 확인해주세요.",
+			"ALT_E_PROJECT_INVALID_TITLE": "해당 프로젝트가 없습니다.",
 			"ALT_E_UPDATE_PROJECT": "프로젝트 편집 실패",
 			"ALT_E_UPDATE_WEBHOOK": "프로젝트 편집 실패",
 			"ALT_S_ACTIVATE_ALERT": "얼럿 활성화 성공",
