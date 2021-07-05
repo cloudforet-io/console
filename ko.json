@@ -1509,17 +1509,17 @@
 			"DOWNLOAD_FILE": "파일 다운로드 ",
 			"MAINTENANCE_WINDOW": {
 				"ACTION": "작업",
-				"ALT_E_CLOSE_MAINTENANCE_WINDOW": "유지 관리 기간 닫기 실패",
+				"ALT_E_CLOSE_MAINTENANCE_WINDOW": "유지 관리 기간 종료 실패",
 				"ALT_E_CREATE_MAINTENANCE_WINDOW": "유지 관리 기간 생성 실패",
 				"ALT_E_UPDATE_MAINTENANCE_WINDOW": "유지 관리 기간 편집 실패",
-				"ALT_S_CLOSE_MAINTENANCE_WINDOW": "유지 관리 기간 닫기 성공",
+				"ALT_S_CLOSE_MAINTENANCE_WINDOW": "유지 관리 기간 종료 성공",
 				"ALT_S_CREATE_MAINTENANCE_WINDOW": "유지 관리 기간 생성 성공",
 				"ALT_S_UPDATE_MAINTENANCE_WINDOW": "유지 관리 기간 편집 성공",
 				"CHECK_MODAL": {
 					"DESC_CLOSE": "선택한 유지 관리 기간을 삭제하시겠습니까?",
 					"TITLE_CLOSE": "유지 관리 기간 닫기"
 				},
-				"CLOSE": "닫기",
+				"CLOSE": "종료",
 				"CREATE": "유지 관리 기간 생성",
 				"FORM": {
 					"CREATE_TITLE": "유지 관리 기간 생성",
