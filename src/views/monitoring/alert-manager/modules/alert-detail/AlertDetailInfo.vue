@@ -48,7 +48,7 @@
                     </button>
                 </p>
                 <div v-else class="content-wrapper">
-                    <p-text-input v-model="descriptionInput" />
+                    <p-textarea v-model="descriptionInput" />
                     <div class="button-group">
                         <p-button :outline="true" class="text-button"
                                   size="sm" @click="cancelEdit(EDIT_MODE.DESCRIPTION)"

@@ -6,14 +6,13 @@
             </p-panel-top>
             <p-collapsible-list :items="items" theme="card" multi-unfoldable>
                 <template #title="{title, index}">
-                    <span class="level" :class="{'current': index + 1 === alertData.escalation_step}">{{ title }}</span>
-                    <span class="level font-bold" :class="{'current': index + 1 === alertData.escalation_step}"> {{ index+1 }} </span>
-                    <p-badge v-if="index + 1 === alertData.escalation_step" style-type="primary3">
+                    <!--                    <span class="level" :class="{'current': items[index].data === `LV${alertData.escalation_step}`}">{{ title }}</span>-->
+                    <span class="level font-bold" :class="{'current': items[index].data === `LV${alertData.escalation_step}`}"> {{ items[index].data }} </span>
+                    <p-badge v-if="items[index].data === `LV${alertData.escalation_step}`" style-type="primary3">
                         {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.CURRENT') }}
                     </p-badge>
                 </template>
                 <template #default="{data}">
-                    {{ data }}
                     <p class="data-wrapper">
                         <project-channel-list :project-channels="projectChannels" :notification-level="data" />
                     </p>
@@ -23,13 +22,13 @@
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.ADDITIONAL_RESPONDER') }}
             </p>
             <p-autocomplete-search v-model="responderState.search" :menu="responderState.allMemberItems" :loading="responderState.loading"
-                                   class="autocomplete-search" @select-menu="onSelectMember"
+                                   class="autocomplete-search" @select-menu="onSelectMember" @hide-menu="addResponder"
             >
                 <template #menu-item--format="{item, id}">
                     <p-check-box :id="id" v-model="responderState.selectedMemberItems" class="tag-menu-item"
                                  :value="item.name"
                     >
-                        {{ item.label }}
+                        {{ item.name }} ({{ item.label ? item.label : item.name }})
                     </p-check-box>
                 </template>
                 <template #menu-no-data-format>
@@ -39,6 +38,8 @@
             <div class="tag-box">
                 <p-tag v-for="(tag, i) in responderState.selectedMemberItems" :key="tag" @delete="onDeleteTag(i)">
                     {{ tag ? tag : '' }}
+                    <template v-if="!responderState.loading">({{ responderState.allMemberItems.find((d) => d.name === tag).label }})</template>
+                    <template v-else>''</template>
                 </p-tag>
             </div>
         </article>
@@ -53,6 +54,7 @@ import {
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
+import { difference } from 'lodash';
 import { SpaceConnector } from '@/core-lib/space-connector';
 import {
     AlertDataModel,
@@ -61,7 +63,7 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import ProjectChannelList from '@/views/monitoring/alert-manager/components/ProjectChannelList.vue';
 import { i18n } from '@/translations';
-import {store} from "@/store";
+import { store } from '@/store';
 
 interface PropsType {
     id?: string;
@@ -90,10 +92,11 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props: PropsType) {
+    setup(props: PropsType, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             items: computed(() => [
+                { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'ALL' },
                 { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV1' },
                 { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV2' },
                 { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV3' },
@@ -143,13 +146,22 @@ export default {
             }
         };
 
-        const addResponder = async (userID) => {
-            try {
-                await SpaceConnector.client.monitoring.alert.addResponder({
+        const addResponderAPI = async (items) => {
+            await Promise.all(items.map((d) => {
+                SpaceConnector.client.monitoring.alert.addResponder({
                     alert_id: props.id,
                     resource_type: 'identity.User',
-                    resource_id: userID,
+                    resource_id: d,
                 });
+            }));
+        };
+
+        const addResponder = async () => {
+            try {
+                const originResponders = Object.fromEntries((
+                    Object.entries(props.alertData.responders).map(([key, { resource_id }]) => [key, resource_id])));
+                const targetItems = difference(responderState.selectedMemberItems, Object.values(originResponders));
+                await addResponderAPI(targetItems);
             } catch (e) {
                 console.error(e);
             }
@@ -157,11 +169,8 @@ export default {
 
         const onSelectMember = async (item: MenuItem) => {
             responderState.search = '';
-            // const idx = state.selectedMemberItems.findIndex(k => k === item.name);
-            responderState.selectedMemberItems = [...responderState.selectedMemberItems, item.name];
-            await responderState.selectedMemberItems.forEach((i) => {
-                addResponder(i);
-            });
+            const idx = responderState.selectedMemberItems.findIndex(k => k === item.name);
+            if (idx === -1) responderState.selectedMemberItems.push(item.name);
         };
 
         const removeResponder = async (userID) => {
@@ -185,7 +194,8 @@ export default {
         };
 
         (async () => {
-            await Promise.all([listProjectChannel(), listMember(), store.dispatch('resource/protocol/load')]);
+            await Promise.all([listProjectChannel(), listMember(),
+                store.dispatch('resource/protocol/load'), store.dispatch('resource/user/load')]);
         })();
 
 

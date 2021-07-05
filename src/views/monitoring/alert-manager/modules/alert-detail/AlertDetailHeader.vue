@@ -4,16 +4,16 @@
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.STATE') }}</span>
             <p-select-dropdown :items="ALERT_STATE_LIST"
                                :selected="alertState"
-                               @select="changeAlertState"
                                class="state-dropdown"
+                               @select="changeAlertState"
             />
         </p>
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.URGENCY') }}</span>
             <p-select-dropdown :items="ALERT_URGENCY_LIST"
                                :selected="alertUrgency"
-                               @select="changeAlertUrgency"
                                class="state-dropdown"
+                               @select="changeAlertUrgency"
             />
         </p>
         <p class="content-wrapper">
@@ -51,6 +51,8 @@ import relativeTime from 'dayjs/plugin/relativeTime';
 import { iso8601Formatter } from '@/core-lib/util';
 import { SpaceConnector } from '@/core-lib/space-connector';
 import { ALERT_STATE, ALERT_URGENCY } from '@/views/monitoring/alert-manager/lib/config';
+import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { i18n } from '@/translations';
 
 dayjs.extend(relativeTime);
 dayjs.extend(utc);
@@ -107,7 +109,7 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props: PropsType, { emit }) {
+    setup(props: PropsType, { emit, root }) {
         const state: UnwrapRef<HeaderState> = reactive({
             alertState: props.alertData?.state,
             alertUrgency: props.alertData?.urgency,
@@ -130,8 +132,10 @@ export default {
                     alert_id: props.id,
                     state: state.alertState,
                 });
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_STATE'), '', root);
             } catch (e) {
                 console.error(e);
+                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_STATE'), e, root);
             }
         };
 
@@ -142,8 +146,10 @@ export default {
                     alert_id: props.id,
                     urgency: state.alertUrgency,
                 });
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_URGENCY'), '', root);
             } catch (e) {
                 console.error(e);
+                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_URGENCY'), e, root);
             }
         };
 
