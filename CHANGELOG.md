@@ -1,3 +1,10 @@
+# [1.1.0-beta.92](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.91...v1.1.0-beta.92) (2021-07-05)
+
+
+### Features
+
+* hide outline on click ([#631](https://github.com/spaceone-dev/spaceone-design-system/issues/631)) ([6068130](https://github.com/spaceone-dev/spaceone-design-system/commit/6068130cbf9cee81eb8fdf60583ec537ba910a78))
+
 # [1.1.0-beta.91](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.90...v1.1.0-beta.91) (2021-06-30)
 
 
