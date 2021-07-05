@@ -77,12 +77,12 @@ export default {
                             props: true,
                             component: ProjectNotificationsPage,
                         },
-                        // {
-                        //     path: 'maintenance-window',
-                        //     name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME,
-                        //     props: true,
-                        //     component: ProjectMaintenanceWindowPage,
-                        // },
+                        {
+                            path: 'maintenance-window',
+                            name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME,
+                            props: true,
+                            component: ProjectMaintenanceWindowPage,
+                        },
                         {
                             path: 'tag',
                             name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
