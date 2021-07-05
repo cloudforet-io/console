@@ -1,3 +1,10 @@
+# [1.1.0-beta.93](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.92...v1.1.0-beta.93) (2021-07-05)
+
+
+### Bug Fixes
+
+* data table with field width case css bug fix ([#632](https://github.com/spaceone-dev/spaceone-design-system/issues/632)) ([4a5d408](https://github.com/spaceone-dev/spaceone-design-system/commit/4a5d408dea5edb0b81fd96132e6b6e3e1239c231))
+
 # [1.1.0-beta.92](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.91...v1.1.0-beta.92) (2021-07-05)
 
 
