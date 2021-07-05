@@ -474,7 +474,6 @@ export default {
 
                 const summaryQueryHelper = new QueryHelper();
                 res.results.forEach((d) => {
-                    let detailLocation: Location;
                     const filters: QueryStoreFilter[] = [];
                     filters.push({
                         k: 'project_id', o: '=', v: props.projectId,
@@ -485,14 +484,14 @@ export default {
                             { k: 'provider', o: '=', v: d.provider },
                             { k: 'cloud_service_type', o: '=', v: d.cloud_service_type },
                         );
-                        detailLocation = {
-                            name: INVENTORY_ROUTE.SERVER._NAME,
-                            query: {
-                                filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
-                            },
-                        };
-                    } else {
-                        detailLocation = {
+                    }
+
+                    summaryData.push({
+                        provider: d.provider,
+                        label: state.providers[d.provider].label,
+                        type: d.display_name || d.cloud_service_group,
+                        count: type === DATA_TYPE.storage ? byteFormatter(d.size) : commaFormatter(d.count),
+                        to: {
                             name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                             params: {
                                 provider: d.provider,
@@ -502,14 +501,7 @@ export default {
                             query: {
                                 filters: summaryQueryHelper.setFilters(filters).rawQueryStrings,
                             },
-                        };
-                    }
-                    summaryData.push({
-                        provider: d.provider,
-                        label: state.providers[d.provider].label,
-                        type: d.display_name || d.cloud_service_group,
-                        count: type === DATA_TYPE.storage ? byteFormatter(d.size) : commaFormatter(d.count),
-                        to: detailLocation,
+                        },
                     });
                 });
                 state.summaryData = summaryData;

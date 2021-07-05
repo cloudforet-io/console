@@ -650,7 +650,10 @@ export default {
     margin-bottom: 0.5rem;
     font-size: 1.5rem;
 }
->>> .p-dynamic-layout-table .p-search-table {
-    border-width: 1px;
+>>> .p-dynamic-layout-table .p-toolbox-table {
+    @apply border border-gray-200 rounded-lg;
+    .p-data-table {
+        min-height: unset;
+    }
 }
 </style>

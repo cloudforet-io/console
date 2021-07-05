@@ -855,7 +855,7 @@ export default {
             .title {
                 @apply mb-1 w-full truncate;
                 font-size: 1rem;
-                line-height: 1.2;
+                line-height: 1.4;
             }
             .sub-title {
                 @apply w-full flex items-center;

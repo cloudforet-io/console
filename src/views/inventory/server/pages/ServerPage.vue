@@ -9,8 +9,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive,
+    computed, reactive,
 } from '@vue/composition-api';
 
 import { PBreadcrumbs } from '@spaceone/design-system';
@@ -18,7 +17,7 @@ import { PBreadcrumbs } from '@spaceone/design-system';
 import ServerMain from '@/views/inventory/server/modules/ServerMain.vue';
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import { store } from '@/store';
-
+import { i18n } from '@/translations';
 
 export default {
     name: 'Server',
@@ -28,11 +27,10 @@ export default {
         PBreadcrumbs,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const routeState = reactive({
             route: computed(() => [
-                { name: vm.$t('MENU.INVENTORY.INVENTORY'), path: '/inventory' },
-                { name: vm.$t('MENU.INVENTORY.SERVER') },
+                { name: i18n.t('MENU.INVENTORY.INVENTORY'), path: '/inventory' },
+                { name: i18n.t('MENU.INVENTORY.SERVER') },
             ]),
         });
         (async () => {
@@ -43,5 +41,4 @@ export default {
         };
     },
 };
-
 </script>
