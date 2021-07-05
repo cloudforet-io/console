@@ -46,14 +46,14 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             menuList: computed(() => [
-                // {
-                //     routeName: MONITORING_ROUTE.ALERT_MANAGER.DASHBOARD._NAME,
-                //     label: vm.$t('MONITORING.ALERT.MAIN.DASHBOARD'),
-                // },
-                // {
-                //     routeName: MONITORING_ROUTE.ALERT_MANAGER.ALERT._NAME,
-                //     label: vm.$t('MONITORING.ALERT.MAIN.ALERT'),
-                // },
+                {
+                    routeName: MONITORING_ROUTE.ALERT_MANAGER.DASHBOARD._NAME,
+                    label: vm.$t('MONITORING.ALERT.MAIN.DASHBOARD'),
+                },
+                {
+                    routeName: MONITORING_ROUTE.ALERT_MANAGER.ALERT._NAME,
+                    label: vm.$t('MONITORING.ALERT.MAIN.ALERT'),
+                },
                 {
                     routeName: MONITORING_ROUTE.ALERT_MANAGER.ESCALATION_POLICY._NAME,
                     label: vm.$t('MONITORING.ALERT.MAIN.ESCALATION_POLICY'),

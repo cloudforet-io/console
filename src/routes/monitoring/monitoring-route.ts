@@ -38,16 +38,16 @@ export default {
                     redirect: 'escalation-policy',
                     component: MonitoringMainPage,
                     children: [
-                        // {
-                        //     path: 'dashboard',
-                        //     name: MONITORING_ROUTE.ALERT_MANAGER.DASHBOARD._NAME,
-                        //     component: AlertDashboardPage,
-                        // },
-                        // {
-                        //     path: 'alert',
-                        //     name: MONITORING_ROUTE.ALERT_MANAGER.ALERT._NAME,
-                        //     component: AlertListPage,
-                        // },
+                        {
+                            path: 'dashboard',
+                            name: MONITORING_ROUTE.ALERT_MANAGER.DASHBOARD._NAME,
+                            component: AlertDashboardPage,
+                        },
+                        {
+                            path: 'alert',
+                            name: MONITORING_ROUTE.ALERT_MANAGER.ALERT._NAME,
+                            component: AlertListPage,
+                        },
                         {
                             path: 'escalation-policy',
                             name: MONITORING_ROUTE.ALERT_MANAGER.ESCALATION_POLICY._NAME,
@@ -55,12 +55,12 @@ export default {
                         },
                     ],
                 },
-                // {
-                //     path: 'alert/:id',
-                //     name: MONITORING_ROUTE.ALERT_MANAGER.ALERT.DETAIL._NAME,
-                //     props: true,
-                //     component: AlertDetailPage,
-                // },
+                {
+                    path: 'alert/:id',
+                    name: MONITORING_ROUTE.ALERT_MANAGER.ALERT.DETAIL._NAME,
+                    props: true,
+                    component: AlertDetailPage,
+                },
             ],
         },
     ],
