@@ -102,6 +102,7 @@
                             </td>
                             <td v-for="(field, i) in fieldsData"
                                 :key="`td-${contextKey}-${index}-${i}`"
+                                :class="{'has-width': !!field.width}"
                             >
                                 <slot :name="`col-${field.name}-format`" v-bind="getColSlotProps(item, index, field, )">
                                     <slot :name="`col-${i}-format`" v-bind="getColSlotProps(item, index, field, )">
@@ -553,10 +554,15 @@ export default defineComponent<DataTableProps>({
     td {
         @apply h-10 px-4 z-0 align-middle min-w-28 text-sm;
         vertical-align: middle;
+        &.has-width {
+            word-break: break-word;
+            padding-top: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
     }
     tr {
         &.row-height-fixed {
-            td {
+            td:not(.has-width) {
                 overflow-x: hidden;
                 white-space: nowrap;
             }

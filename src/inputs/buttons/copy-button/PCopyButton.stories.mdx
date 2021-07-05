@@ -4,6 +4,7 @@ import { copyAnyData } from '@/util/helpers';
 
 import PTextarea from '@/inputs/textarea/PTextarea';
 import PCopyButton from "@/inputs/buttons/copy-button/PCopyButton";
+import { getCopyButtonArgTypes } from '@/inputs/buttons/copy-button/story-helper';
 
 
 
@@ -12,102 +13,7 @@ import PCopyButton from "@/inputs/buttons/copy-button/PCopyButton";
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=8075%3A2235'
     }
-}} argTypes={{
-    value: {
-        name: 'value',
-        type: {name: 'string'},
-        description: 'Text to be copied',
-        defaultValue: 'Please, place any string to copy by button next to.',
-        table: {
-            type: {
-                summary: 'string'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'null',
-            }
-        },
-        control: {
-            type: 'text'
-        }
-    },
-    autoHideIcon: {
-        name: 'value',
-        type: {name: 'boolean'},
-        description: 'Whether to auto hide icon when there is not text to copy or not.',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'false',
-            }
-        },
-        control: {
-            type: 'boolean'
-        }
-    },
-    copyManually: {
-        name: 'copyManually',
-        type: {name: 'boolean'},
-        description: 'Whether to copy manually by event or not. When it is `true`, this component just emit `copy` event, and do nothing.',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean'
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'false',
-            }
-        },
-        control: {
-            type: 'boolean'
-        }
-    },
-    // slots
-    defaultSlot: {
-        name: 'default',
-        description: 'Slot for contents of copy button',
-        defaultValue: 'Please, place any string to copy by button next to.',
-        table: {
-            type: {
-                summary: null
-            },
-            category: 'slots',
-        },
-        control: {
-            type: 'text'
-        }
-    },
-    // events
-    onCopy: {
-        name: 'copy',
-        description: 'Event emitted when clicked copy button. Only works when `copyManually` props is `true`.',
-        defaultValue: 'Please, place any string to copy by button next to.',
-        table: {
-            type: {
-                summary: null
-            },
-            category: 'events',
-        },
-        control: null
-    },
-    onCopied: {
-        name: 'copied',
-        description: 'Event emitted when actually copy happened. Only works when there is text for copy to clipboard in slot or `value` props.',
-        defaultValue: 'Please, place any string to copy by button next to.',
-        table: {
-            type: {
-                summary: null
-            },
-            category: 'events',
-        },
-        control: null
-    },
-}}/>
+}} argTypes={getCopyButtonArgTypes()}/>
 
 export const Template = (args, {argTypes}) => ({
     props: Object.keys(argTypes),
@@ -121,7 +27,7 @@ export const Template = (args, {argTypes}) => ({
                 @copy="onCopy"
                 @copied="onCopied"
             >
-                {{$props.defaultSlot}}
+                {{ defaultSlot }}
             </p-copy-button>
         </div>`,
 });
@@ -204,9 +110,9 @@ export const Template = (args, {argTypes}) => ({
 ## Playground
 
 <Canvas>
-    <Story name="playground" height="150px">
+    <Story name="Playground" height="150px">
         {Template.bind({})}
     </Story>
 </Canvas>
 
-<ArgsTable story="playground" />
+<ArgsTable story="Playground" />

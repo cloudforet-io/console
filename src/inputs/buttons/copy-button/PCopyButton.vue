@@ -139,7 +139,7 @@ export default defineComponent<Props>({
                 characterData: true,
             });
 
-            state.observer = observer;
+            state.textObserver = observer;
 
             state.hasText = !!textRef.textContent?.trim();
         }, { immediate: true });

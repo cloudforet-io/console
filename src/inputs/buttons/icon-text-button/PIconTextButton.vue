@@ -127,7 +127,7 @@ export default {
         });
         const defaultIconColor = computed(() => {
             if (props.disabled) {
-                return palette.gray[400];
+                return palette.gray[300];
             }
             return 'inherit';
         });
