@@ -179,6 +179,10 @@ export class QueryHelper {
         return this.rawQueries.map(q => JSON.stringify(q));
     }
 
+    get rawQueryString(): string {
+        return JSON.stringify(this.rawQueries);
+    }
+
     get apiQuery(): Required<Pick<Query, 'filter'|'keyword'>> {
         const filter: Filter[] = [];
         const keyword: string[] = [];

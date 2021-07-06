@@ -4,7 +4,11 @@
 
         <p-toolbox-table :loading="loading" :fields="fields" :items="items"
                          searchable selectable sortable
+                         search-type="query"
                          :select-index.sync="selectIndex"
+                         :query-tags="queryTags"
+                         :key-item-sets="keyItemSets"
+                         :value-handler-map="valueHandlerMap"
                          :total-count="totalCount"
                          :sort-desc="true"
                          sort-by="state"
@@ -12,9 +16,17 @@
                          @refresh="onChange()"
         >
             <template #toolbox-left>
-                <p-select-dropdown :selected="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ACTION')" :items="actionMenu" @select="onSelectAction">
-                    {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ACTION') }}
-                </p-select-dropdown>
+                <p-button style-type="primary-dark" class="mr-4" :outline="true"
+                          :disabled="selectedItems.length !== 1 || selectedItemState === STATE.CLOSED"
+                          @click="visibleUpdateModal = true"
+                >
+                    {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.UPDATE') }}
+                </p-button>
+                <p-button style-type="primary-dark" :outline="true"
+                          :disabled="selectedItems.length !== 1 || selectedItemState === STATE.CLOSED" @click="visibleCloseCheckModal = true"
+                >
+                    {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CLOSE') }}
+                </p-button>
             </template>
             <template #col-state-format="{value}">
                 <p-badge :style-type="STATE[value] === STATE.OPEN ? 'yellow200' : 'gray200'">
@@ -34,6 +46,7 @@
 
         <maintenance-window-form-modal :visible.sync="visibleUpdateModal" edit-mode
                                        :maintenance-window-id="selectedItems[0] && selectedItems[0].maintenance_window_id"
+                                       @confirm="getMaintenanceWindows"
         />
 
         <p-table-check-modal :visible.sync="visibleCloseCheckModal"
@@ -51,30 +64,31 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import {
-    PBadge,
-    PPanelTop, PSelectDropdown, PTableCheckModal, PToolboxTable,
+    PBadge, PButton,
+    PPanelTop, PTableCheckModal, PToolboxTable,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 import { SpaceConnector } from '@/core-lib/space-connector';
 import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@/core-lib/util';
 import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
 import { getApiQueryWithToolboxOptions } from '@/core-lib/component-util/toolbox';
+import { makeDistinctValueHandlerMap } from '@/core-lib/component-util/query-search';
+import { QueryHelper } from '@/core-lib/query';
 
 import { i18n } from '@/translations';
 import { store } from '@/store';
 
 import MaintenanceWindowFormModal from '@/views/project/project/modules/MaintenanceWindowFormModal.vue';
+import { replaceUrlQuery } from '@/lib/router-query-string';
 
-const ACTION = Object.freeze({
-    update: 'update',
-    close: 'close',
-} as const);
-type ACTION = typeof ACTION[keyof typeof ACTION]
 
 const STATE = Object.freeze({
     NONE: 'None',
@@ -83,14 +97,38 @@ const STATE = Object.freeze({
 } as const);
 type STATE = typeof STATE[keyof typeof STATE]
 
+const keyItemSets: KeyItemSet[] = [
+    {
+        title: 'Properties',
+        items: [
+            { name: 'title', label: 'Title' },
+            { name: 'state', label: 'State' },
+            { name: 'start_time', label: 'Start Time', dataType: 'datetime' },
+            { name: 'end_time', label: 'End Time', dataType: 'datetime' },
+            { name: 'created_by', label: 'Created By' },
+            { name: 'created_at', label: 'Created', dataType: 'datetime' },
+        ],
+    },
+];
+const valueHandlerMap = makeDistinctValueHandlerMap(keyItemSets, 'monitoring.MaintenanceWindow');
+
+const fields = [
+    { name: 'title', label: 'Title', width: '437px' },
+    { name: 'state', label: 'State' },
+    { name: 'start_time', label: 'Start Time' },
+    { name: 'end_time', label: 'End Time' },
+    { name: 'created_by', label: 'Created By' },
+    { name: 'created_at', label: 'Created' },
+];
+
 export default {
     name: 'ProjectMaintenanceWindowPage',
     components: {
         PPanelTop,
         PToolboxTable,
-        PSelectDropdown,
         PTableCheckModal,
         PBadge,
+        PButton,
         MaintenanceWindowFormModal,
     },
     props: {
@@ -100,43 +138,30 @@ export default {
         },
     },
     setup(props, { root }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
+        const maintenanceWindowApiQueryHelper = new ApiQueryHelper()
+            .setOnly(...fields.map(d => d.name), 'maintenance_window_id')
+            .setPageStart(1).setPageLimit(15)
+            .setSort('state', true)
+            .setKeyItemSets(keyItemSets)
+            .setFiltersAsRawQueryString(vm.$route.query.filters);
+        let maintenanceWindowQuery = maintenanceWindowApiQueryHelper.data;
+
         const state = reactive({
             totalCount: 0,
             loading: true,
-            fields: [
-                { name: 'title', label: 'Title' },
-                { name: 'state', label: 'State' },
-                { name: 'start_time', label: 'Start Time' },
-                { name: 'end_time', label: 'End Time' },
-                { name: 'created_by', label: 'Created By' },
-                { name: 'created_at', label: 'Created' },
-            ],
             items: [] as any[],
             timezone: computed(() => store.state.user.timezone),
             selectIndex: [] as number[],
             selectedItems: computed<any[]>(() => state.selectIndex.map(d => state.items[d])),
-            actionMenu: computed<MenuItem[]>(() => [
-                {
-                    name: ACTION.update,
-                    label: i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.UPDATE'),
-                    disabled: state.selectedItems.length !== 1 || STATE[state.selectedItems[0]?.state] === STATE.CLOSED,
-                },
-                {
-                    name: ACTION.close,
-                    label: i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CLOSE'),
-                    disabled: state.selectedItems.length !== 1 || STATE[state.selectedItems[0]?.state] === STATE.CLOSED,
-                },
-            ]),
+            selectedItemState: computed(() => STATE[state.selectedItems[0]?.state]),
+            queryTags: maintenanceWindowApiQueryHelper.queryTags,
             visibleUpdateModal: false,
             visibleCloseCheckModal: false,
             closeLoading: false,
         });
 
-        const maintenanceWindowApiQueryHelper = new ApiQueryHelper()
-            .setOnly(...state.fields.map(d => d.name), 'maintenance_window_id')
-            .setPageStart(1).setPageLimit(15)
-            .setSort('state', true);
-        let maintenanceWindowQuery = maintenanceWindowApiQueryHelper.data;
 
         const getMaintenanceWindows = async () => {
             state.loading = true;
@@ -158,6 +183,9 @@ export default {
 
         const onChange = async (options: any = {}) => {
             maintenanceWindowQuery = getApiQueryWithToolboxOptions(maintenanceWindowApiQueryHelper, options) ?? maintenanceWindowQuery;
+            if (options.queryTags) {
+                replaceUrlQuery('filters', maintenanceWindowApiQueryHelper.rawQueryStrings);
+            }
             await getMaintenanceWindows();
         };
 
@@ -179,19 +207,16 @@ export default {
             }
         };
 
-        const onSelectAction = (action: ACTION) => {
-            switch (action) {
-            case ACTION.update: {
-                state.visibleUpdateModal = true;
-                break;
+
+        const urlQueryHandler = new QueryHelper();
+        watch(() => vm.$route.query, async (query) => {
+            urlQueryHandler.setFiltersAsRawQueryString(query.filters);
+            if (urlQueryHandler.rawQueryString !== maintenanceWindowApiQueryHelper.rawQueryString) {
+                maintenanceWindowQuery = maintenanceWindowApiQueryHelper.setFilters(urlQueryHandler.filters).data;
+                state.queryTags = maintenanceWindowApiQueryHelper.queryTags;
+                await getMaintenanceWindows();
             }
-            case ACTION.close: {
-                state.visibleCloseCheckModal = true;
-                break;
-            }
-            default: break;
-            }
-        };
+        });
 
         /* Init */
         (async () => {
@@ -201,10 +226,13 @@ export default {
         return {
             ...toRefs(state),
             closeMaintenanceWindow,
-            onSelectAction,
             onChange,
             iso8601Formatter,
+            getMaintenanceWindows,
             STATE,
+            fields,
+            keyItemSets,
+            valueHandlerMap,
         };
     },
 };

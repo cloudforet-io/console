@@ -17,9 +17,9 @@
             keep-alive-all
             @change="onChangeTab"
         >
-            <!--            <template #alert>-->
-            <!--                <project-alert :project-id="id" />-->
-            <!--            </template>-->
+            <template #alert>
+                <project-alert :project-id="id" />
+            </template>
             <template #webhook>
                 <project-webhook :project-id="id" />
             </template>
@@ -50,7 +50,7 @@ import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-a
 export default {
     name: 'ProjectAlertPage',
     components: {
-        // ProjectAlert,
+        ProjectAlert,
         ProjectWebhook,
         ProjectSettings,
         PButtonTab,
@@ -71,11 +71,11 @@ export default {
         });
         const tabState = reactive({
             tabs: computed(() => ([
-                // { name: 'alert', label: vm.$t('PROJECT.DETAIL.SUBTAB_ALERT'), keepAlive: true },
+                { name: 'alert', label: vm.$t('PROJECT.DETAIL.SUBTAB_ALERT'), keepAlive: true },
                 { name: 'webhook', label: vm.$t('PROJECT.DETAIL.SUBTAB_WEBHOOK'), keepAlive: true },
                 { name: 'settings', label: vm.$t('PROJECT.DETAIL.SUBTAB_SETTINGS'), keepAlive: true },
             ] as TabItem[])),
-            activeTab: 'webhook',
+            activeTab: 'alert',
         });
 
         /* api */

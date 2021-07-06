@@ -16,7 +16,7 @@
                            :invalid-text="titleInvalidText"
             >
                 <p-text-input v-model="title" class="w-full" :invalid="showValidation && !!titleInvalidText"
-                              @input.once="onFirstInputTitle"
+                              block @input.once="onFirstInputTitle"
                 />
             </p-field-group>
             <p-field-group class="schedule-field" :label="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.LABEL_SCHEDULE')"
@@ -148,10 +148,14 @@ export default {
                 if (state.title?.length === 0) return i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.REQUIRED');
                 return undefined;
             }),
-            scheduleRadioItems: computed(() => [
-                { name: SCHEDULE_TYPE.startNow, label: i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.START_NOW') },
-                { name: SCHEDULE_TYPE.startAtTime, label: i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.START_AT_TIME') },
-            ]),
+            scheduleRadioItems: computed(() => {
+                const items = [
+                    { name: SCHEDULE_TYPE.startNow, label: i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.START_NOW') },
+                    { name: SCHEDULE_TYPE.startAtTime, label: i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.START_AT_TIME') },
+                ];
+                if (props.editMode) items.splice(0, 1);
+                return items;
+            }),
             selectedScheduleType: SCHEDULE_TYPE.startNow,
             durationItems: computed(() => [
                 { name: DURATION.m15, label: `15 ${i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.MINUTES')}` },
@@ -204,13 +208,14 @@ export default {
 
         const createMaintenanceWindow = async () => {
             try {
-                await SpaceConnector.client.monitoring.maintenanceWindow.create({
+                const res = await SpaceConnector.client.monitoring.maintenanceWindow.create({
                     title: state.title,
                     projects: [props.projectId],
                     ...getTimeParams(),
                 });
 
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ALT_S_CREATE_MAINTENANCE_WINDOW'), '', root);
+                return res.maintenance_window_id;
             } catch (e) {
                 showErrorMessage(i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ALT_E_CREATE_MAINTENANCE_WINDOW'), e, root);
                 throw e;
@@ -219,7 +224,7 @@ export default {
 
         const updateMaintenanceWindow = async () => {
             try {
-                await SpaceConnector.client.monitoring.maintenanceWindow.update({
+                const res = await SpaceConnector.client.monitoring.maintenanceWindow.update({
                     // eslint-disable-next-line camelcase
                     maintenance_window_id: props.maintenanceWindowId,
                     title: state.title,
@@ -228,6 +233,7 @@ export default {
                 });
 
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ALT_S_UPDATE_MAINTENANCE_WINDOW'), '', root);
+                return res.maintenance_window_id;
             } catch (e) {
                 showErrorMessage(i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ALT_E_UPDATE_MAINTENANCE_WINDOW'), e, root);
                 throw e;
@@ -259,10 +265,12 @@ export default {
                 checkTimes();
                 getTimeParams();
 
-                if (props.editMode) await updateMaintenanceWindow();
-                else await createMaintenanceWindow();
+                let maintenanceWindowId;
+                if (props.editMode) maintenanceWindowId = await updateMaintenanceWindow();
+                else maintenanceWindowId = await createMaintenanceWindow();
 
                 state.proxyVisible = false;
+                emit('confirm', maintenanceWindowId);
             } catch (e) {
                 console.error(e);
             } finally {

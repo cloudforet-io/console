@@ -1,59 +1,57 @@
 <template>
     <general-page-layout>
-        <div class="page-inner">
-            <p-data-loader :loading="loading">
-                <p-breadcrumbs :routes="pageNavigation" />
-                <div v-if="item" class="top-wrapper">
-                    <p-page-title :title="item.name" child @goBack="$router.go(-1)" />
-                    <div class="btns">
-                        <span class="favorite-btn-wrapper">
-                            <favorite-button :item-id="projectId"
-                                             favorite-type="project"
-                                             resource-type="identity.Project"
-                            />
-                        </span>
-                        <p-icon-button name="ic_trashcan"
-                                       class="delete-btn"
-                                       @click="openProjectDeleteForm"
+        <p-data-loader class="page-inner" :loading="loading">
+            <p-breadcrumbs :routes="pageNavigation" />
+            <div v-if="item" class="top-wrapper">
+                <p-page-title :title="item.name" child @goBack="$router.go(-1)" />
+                <div class="btns">
+                    <span class="favorite-btn-wrapper">
+                        <favorite-button :item-id="projectId"
+                                         favorite-type="project"
+                                         resource-type="identity.Project"
                         />
-                        <p-icon-button name="ic_edit-text"
-                                       class="edit-btn"
-                                       @click="openProjectEditForm"
-                        />
-                    </div>
-                    <div class="top-right-group">
-                        <p-icon-text-button name="ic_state_manual" style-type="gray900"
-                                            @click="maintenanceWindowFormVisible = true"
-                        >
-                            {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CREATE') }}
-                        </p-icon-text-button>
-                        <p class="copy-project-id">
-                            <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
-                            {{ projectId }}
-                            <p-copy-button class="icon"
-                                           :value="projectId"
-                            />
-                        </p>
-                    </div>
+                    </span>
+                    <p-icon-button name="ic_trashcan"
+                                   class="delete-btn"
+                                   @click="openProjectDeleteForm"
+                    />
+                    <p-icon-button name="ic_edit-text"
+                                   class="edit-btn"
+                                   @click="openProjectEditForm"
+                    />
                 </div>
+                <div class="top-right-group">
+                    <p-icon-text-button name="ic_state_manual" style-type="gray900"
+                                        @click="maintenanceWindowFormVisible = true"
+                    >
+                        {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CREATE') }}
+                    </p-icon-text-button>
+                    <p class="copy-project-id">
+                        <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
+                        {{ projectId }}
+                        <p-copy-button class="icon"
+                                       :value="projectId"
+                        />
+                    </p>
+                </div>
+            </div>
 
-                <p-tab v-if="item"
-                       :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab"
-                       :class="[singleItemTabState.activeTab]"
-                       @update:activeTab="onUpdateActiveTab"
-                >
-                    <keep-alive><router-view /></keep-alive>
-                    <template #extra="tab">
-                        <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && counts[ALERT_STATE.TRIGGERED] !== 0" style-type="primary3">
-                            {{ counts[ALERT_STATE.TRIGGERED] }}
-                        </p-badge>
-                    </template>
-                    <template #extra="tab">
-                        <span v-if="tab.isBeta" class="beta-text">beta</span>
-                    </template>
-                </p-tab>
-            </p-data-loader>
-        </div>
+            <p-tab v-if="item"
+                   :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab"
+                   :class="[singleItemTabState.activeTab]"
+                   @change="onChangeTab"
+            >
+                <keep-alive><router-view /></keep-alive>
+                <template #extra="tab">
+                    <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && counts[ALERT_STATE.TRIGGERED] !== 0" style-type="primary3">
+                        {{ counts[ALERT_STATE.TRIGGERED] }}
+                    </p-badge>
+                </template>
+                <template #extra="tab">
+                    <span v-if="tab.isBeta" class="beta-text">beta</span>
+                </template>
+            </p-tab>
+        </p-data-loader>
 
         <p-button-modal :header-title="headerTitle"
                         :centered="true"
@@ -78,7 +76,9 @@
                             :project="item"
                             @complete="onProjectFormComplete"
         />
-        <maintenance-window-form-modal :visible.sync="maintenanceWindowFormVisible" :project-id="projectId" />
+        <maintenance-window-form-modal :visible.sync="maintenanceWindowFormVisible" :project-id="projectId"
+                                       @confirm="onCreateMaintenanceWindow"
+        />
     </general-page-layout>
 </template>
 
@@ -100,14 +100,15 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@/core-lib/space-connector';
+import { QueryHelper } from '@/core-lib/query';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 
+import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
+import MaintenanceWindowFormModal from '@/views/project/project/modules/MaintenanceWindowFormModal.vue';
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import ProjectFormModal from '@/views/project/project/modules/ProjectFormModal.vue';
 import { ProjectModel } from '@/views/project/project/type';
-import MaintenanceWindowFormModal from '@/views/project/project/modules/MaintenanceWindowFormModal.vue';
-import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
 
 
 export default {
@@ -180,45 +181,38 @@ export default {
 
         /** Tabs */
         const singleItemTabState = reactive({
-            tabs: computed(() => {
-                const items: TabItem[] = [
-                    {
-                        name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
-                        label: i18n.t('PROJECT.DETAIL.TAB_SUMMARY'),
-                        keepAlive: true,
-                    },
-                    {
-                        name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
-                        label: i18n.t('PROJECT.DETAIL.TAB_MEMBER'),
-                    },
-                    {
-                        name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
-                        label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
-                        isBeta: true,
-                    },
-                    {
-                        name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
-                        label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
-                        isBeta: true,
-                    },
-                    {
-                        name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME,
-                        label: i18n.t('PROJECT.DETAIL.TAB_MAINTENANCE_WINDOW'),
-                        isBeta: true,
-                    },
-                    {
-                        name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
-                        label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
-                    },
-                ];
-                return items;
-            }),
+            tabs: computed<TabItem[]>(() => [
+                {
+                    name: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
+                    label: i18n.t('PROJECT.DETAIL.TAB_SUMMARY'),
+                    keepAlive: true,
+                },
+                {
+                    name: PROJECT_ROUTE.DETAIL.TAB.MEMBER._NAME,
+                    label: i18n.t('PROJECT.DETAIL.TAB_MEMBER'),
+                },
+                {
+                    name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
+                    label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
+                    isBeta: true,
+                },
+                {
+                    name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
+                    label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
+                    isBeta: true,
+                },
+                {
+                    name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME,
+                    label: i18n.t('PROJECT.DETAIL.TAB_MAINTENANCE_WINDOW'),
+                    isBeta: true,
+                },
+                {
+                    name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
+                    label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
+                },
+            ]),
             activeTab: PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME,
         });
-
-        const onUpdateActiveTab = (activeTab) => {
-            router.replace({ name: activeTab }).catch(() => {});
-        };
 
         // Member modal
         const formState = reactive({
@@ -259,6 +253,18 @@ export default {
             state.item = data || null;
         };
 
+        const onChangeTab = (activeTab) => {
+            if (activeTab === router.currentRoute.name) return;
+            router.replace({ name: activeTab });
+        };
+
+        const urlQueryHelper = new QueryHelper();
+        const onCreateMaintenanceWindow = (maintenanceWindowId: string) => {
+            singleItemTabState.activeTab = PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME;
+            urlQueryHelper.setFilters([{ k: 'maintenance_window_id', v: maintenanceWindowId }]);
+            router.replace({ name: singleItemTabState.activeTab, query: { filters: urlQueryHelper.rawQueryStrings } });
+        };
+
         const statAlerts = async () => {
             try {
                 const { results } = await SpaceConnector.client.statistics.topic.alertStateCount({
@@ -272,7 +278,15 @@ export default {
         };
 
         /** Init */
+        watch(() => state.projectId, async (projectId) => {
+            if (projectId) await getProject(projectId);
+            else forceRouteToProjectPage();
+        }, { immediate: true });
+
         (async () => {
+            if (router.currentRoute.name !== singleItemTabState.activeTab) {
+                singleItemTabState.activeTab = router.currentRoute.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
+            }
             await Promise.all([
                 // getPageNavigation(),
                 store.dispatch('resource/project/load'),
@@ -284,24 +298,16 @@ export default {
         })();
 
 
-        watch(() => state.projectId, async (projectId) => {
-            if (projectId) await getProject(projectId);
-            else forceRouteToProjectPage();
-        }, { immediate: true });
-
-        (async () => {
-            singleItemTabState.activeTab = router.currentRoute.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
-        })();
-
         return {
             ...toRefs(state),
             ...toRefs(formState),
             singleItemTabState,
-            onUpdateActiveTab,
             openProjectDeleteForm,
             projectDeleteFormConfirm,
             openProjectEditForm,
             onProjectFormComplete,
+            onChangeTab,
+            onCreateMaintenanceWindow,
             statAlerts,
             ALERT_STATE,
 
@@ -312,6 +318,7 @@ export default {
 
 <style lang="postcss" scoped>
 .page-inner {
+    height: 100%;
     max-width: 1368px;
     margin: 0 auto;
 }
