@@ -1,3 +1,10 @@
+# [1.1.0-beta.94](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.93...v1.1.0-beta.94) (2021-07-06)
+
+
+### Bug Fixes
+
+* fix padding-x of button ([#633](https://github.com/spaceone-dev/spaceone-design-system/issues/633)) ([414626b](https://github.com/spaceone-dev/spaceone-design-system/commit/414626b8bcbed3b042c12ce56caecd1499b4f61d))
+
 # [1.1.0-beta.93](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.92...v1.1.0-beta.93) (2021-07-05)
 
 
