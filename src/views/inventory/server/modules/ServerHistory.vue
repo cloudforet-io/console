@@ -38,7 +38,7 @@ import { Options, SearchTableListeners } from '@spaceone/design-system/dist/src/
 import { SpaceConnector } from '@/core-lib/space-connector';
 import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@/core-lib/util';
-import { showLoadingMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 

@@ -78,7 +78,7 @@ import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query
 import { SpaceConnector } from '@/core-lib/space-connector';
 import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import { iso8601Formatter } from '@/core-lib/util';
-import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { getApiQueryWithToolboxOptions } from '@/core-lib/component-util/toolbox';
 import { makeDistinctValueHandlerMap } from '@/core-lib/component-util/query-search';
 import { QueryHelper } from '@/core-lib/query';

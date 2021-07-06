@@ -36,7 +36,7 @@ import {
 import { makeProxy } from '@/core-lib/compostion-util';
 import { SpaceConnector } from '@/core-lib/space-connector';
 import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import store from '@/store';
 import { getApiQueryWithToolboxOptions } from '@/core-lib/component-util/toolbox';

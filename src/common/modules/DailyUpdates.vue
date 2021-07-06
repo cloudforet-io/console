@@ -104,7 +104,7 @@ import WidgetLayout from '@/common/components/WidgetLayout.vue';
 
 import { SpaceConnector } from '@/core-lib/space-connector';
 import { QueryHelper } from '@/core-lib/query';
-import { assetUrlConverter } from '@/core-lib/helper/asset-helper';
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 

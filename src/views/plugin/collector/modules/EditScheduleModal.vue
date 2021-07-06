@@ -101,7 +101,7 @@ import {
 
 import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/views/plugin/collector/type';
 import { TranslateResult } from 'vue-i18n';
-import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@/core-lib/space-connector';
 import { makeProxy } from '@/core-lib/compostion-util';
 import { store } from '@/store';

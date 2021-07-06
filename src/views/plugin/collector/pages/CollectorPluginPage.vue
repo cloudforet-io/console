@@ -125,7 +125,7 @@ import { SpaceConnector } from '@/core-lib/space-connector';
 import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import { getPageStart } from '@/core-lib/component-util/pagination';
 import { TimeStamp } from '@/models';
-import { assetUrlConverter } from '@/core-lib/helper/asset-helper';
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
 import router from '@/routes';
 

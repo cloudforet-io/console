@@ -35,7 +35,7 @@ import EscalationPolicyForm from '@/views/monitoring/alert-manager/modules/Escal
 
 import { makeProxy } from '@/core-lib/compostion-util';
 import { SpaceConnector } from '@/core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { EscalationPolicyFormModel } from '@/views/monitoring/alert-manager/type';
 import { ACTION, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
 

@@ -111,7 +111,7 @@ import {
 } from '@spaceone/design-system';
 import { SearchTableListeners, Options } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 
-import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { isEqual } from 'lodash';
 import { SpaceConnector } from '@/core-lib/space-connector';
 import { ApiQueryHelper } from '@/core-lib/space-connector/helper';

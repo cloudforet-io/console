@@ -70,7 +70,7 @@ import {
 import { makeProxy } from '@spaceone/design-system/src/util/composition-helpers';
 
 import { CollectModalProps } from '@/common/modules/collect-modal/type';
-import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@/core-lib/space-connector';
 import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 

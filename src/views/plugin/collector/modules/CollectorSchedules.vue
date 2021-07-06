@@ -94,7 +94,7 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 
 import EditScheduleModal from '@/views/plugin/collector/modules/EditScheduleModal.vue';
 import { iso8601Formatter } from '@/core-lib/util';
-import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@/core-lib/space-connector';
 import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import { getPageStart } from '@/core-lib/component-util/pagination';

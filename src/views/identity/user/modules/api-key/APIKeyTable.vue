@@ -82,7 +82,7 @@ import { TranslateResult } from 'vue-i18n';
 import { iso8601Formatter } from '@/core-lib/util';
 import {
     showErrorMessage, showSuccessMessage, showLoadingMessage, hideLoadingMessage,
-} from '@/core-lib/helper/notice-alert-helper';
+} from '@/lib/helper/notice-alert-helper';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
 

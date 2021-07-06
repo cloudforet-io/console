@@ -52,7 +52,7 @@ import {
 } from '@/views/identity/user/modules/notification/notification-channel-item/type';
 import { utcToTimezoneFormatter } from '@/views/identity/user/lib/helper';
 import { SpaceConnector } from '@/core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import AddNotificationSchedule from '@/views/identity/user/modules/notification/AddNotificationSchedule.vue';

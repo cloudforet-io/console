@@ -40,7 +40,7 @@ import { SpaceConnector } from '@/core-lib/space-connector';
 import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { showLoadingMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 
 export default {
     name: 'ServerMember',

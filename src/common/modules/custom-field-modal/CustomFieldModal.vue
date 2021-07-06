@@ -87,7 +87,7 @@ import {
 import { makeProxy } from '@/core-lib/compostion-util';
 import { SpaceConnector } from '@/core-lib/space-connector';
 import { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
-import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import draggable from 'vuedraggable';
 import ColumnItem from '@/common/modules/custom-field-modal/ColumnItem.vue';

@@ -51,7 +51,7 @@ import EscalationPolicyForm from '@/views/monitoring/alert-manager/modules/Escal
 import { makeProxy } from '@/core-lib/compostion-util';
 import { SpaceConnector } from '@/core-lib/space-connector';
 import { iso8601Formatter } from '@/core-lib/util';
-import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import { getApiQueryWithToolboxOptions } from '@/core-lib/component-util/toolbox';
 import { EscalationPolicyFormModel } from '@/views/monitoring/alert-manager/type';

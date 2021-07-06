@@ -124,7 +124,7 @@ import { SpaceConnector } from '@/core-lib/space-connector';
 import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { durationFormatter, iso8601Formatter } from '@/core-lib/util';
-import { showLoadingMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@/core-lib/component-util/query-search';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';

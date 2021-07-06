@@ -54,7 +54,7 @@ import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { find } from 'lodash';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
-import { showLoadingMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 
 const defaultFetchOptions: DynamicLayoutFetchOptions = {
     sortBy: '',

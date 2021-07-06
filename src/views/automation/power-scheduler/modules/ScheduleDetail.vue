@@ -160,7 +160,7 @@ import { SpaceConnector } from '@/core-lib/space-connector';
 import { iso8601Formatter } from '@/core-lib/util';
 import {
     showErrorMessage, showSuccessMessage,
-} from '@/core-lib/helper/notice-alert-helper';
+} from '@/lib/helper/notice-alert-helper';
 
 import {
     PButtonModal, PFieldGroup, PTextInput, PIconButton, PButton, PPageTitle, PI, PLottie,

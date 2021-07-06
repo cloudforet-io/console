@@ -117,7 +117,7 @@ import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { store } from '@/store';
 import SidebarTitle from '@/common/components/sidebar-title/SidebarTitle.vue';
 import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 export default {
     name: 'ProjectGroupTree',

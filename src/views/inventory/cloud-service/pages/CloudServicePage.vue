@@ -208,8 +208,8 @@ import {
 import { SpaceConnector } from '@/core-lib/space-connector';
 import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { assetUrlConverter } from '@/core-lib/helper/asset-helper';
-import { showErrorMessage, showSuccessMessage, showLoadingMessage } from '@/core-lib/helper/notice-alert-helper';
+import { assetUrlConverter } from '@/lib/helper/asset-helper';
+import { showErrorMessage, showSuccessMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import { QueryHelper } from '@/core-lib/query';

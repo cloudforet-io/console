@@ -206,7 +206,7 @@ import { store } from '@/store';
 import { SpaceConnector } from '@/core-lib/space-connector';
 import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { i18n } from '@/translations';
 

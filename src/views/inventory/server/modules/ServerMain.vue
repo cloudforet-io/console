@@ -166,7 +166,7 @@ import {
     makeQuerySearchPropsWithSearchSchema,
 } from '@/core-lib/component-util/dynamic-layout';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { QueryHelper } from '@/core-lib/query';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';

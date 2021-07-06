@@ -98,7 +98,7 @@ import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/ty
 import router from '@/routes';
 import { store } from '@/store';
 import { i18n } from '@/translations';
-import { showErrorMessage, showSuccessMessage } from '@/core-lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@/core-lib/space-connector';
 import { QueryHelper } from '@/core-lib/query';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
