@@ -686,9 +686,6 @@ export default {
             &:not(.active) {
                 @apply border-transparent;
             }
-            &:focus:not(:focus-visible) {
-                outline: none;
-            }
         }
     }
 

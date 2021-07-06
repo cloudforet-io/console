@@ -39,11 +39,11 @@ i, span, div, input, textarea, article, main, ul, li {
   text-align: inherit;
 }
 
-textarea:focus, input:focus {
+textarea:focus:not(:focus-visible), input:focus:not(:focus-visible) {
   outline: none;
 }
 
-:focus {
+:focus:not(:focus-visible) {
   outline: none;
 }
 

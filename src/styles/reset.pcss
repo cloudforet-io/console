@@ -42,10 +42,10 @@ i, span, div, input, textarea, article, main, ul, li {
     vertical-align: inherit;
     text-align: inherit;
 }
-textarea:focus, input:focus {
+textarea:focus:not(:focus-visible), input:focus:not(:focus-visible) {
     outline: none;
 }
-:focus {
+:focus:not(:focus-visible) {
     outline: none;
 }
 h1, h2, h3, h4, h5, h6 {
