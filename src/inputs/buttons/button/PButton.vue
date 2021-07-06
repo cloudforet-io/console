@@ -145,6 +145,7 @@ export default {
     &.sm {
         min-width: 3.25rem;
         height: 1.5rem;
+        padding: 0 0.5rem;
         text-align: center;
         font-size: 0.75rem;
         line-height: 0.875rem;
