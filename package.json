@@ -1,22 +1,21 @@
 {
-  "name": "@spaceone/core-lib",
-  "version": "1.0.0",
+  "name": "@spaceone/console-core-lib",
+  "version": "1.0.14",
   "description": "SpaceONE Console Core Library",
-  "main": "dist/index.js",
   "scripts": {
+    "prepub": "cp package.json dist/package.json",
+    "pub": "cd dist && npm publish",
+    "postpub": "rimraf dist/package.json",
     "build": "babel src --out-dir dist --extensions \".ts\" --source-maps inline --copy-files",
     "build:watch": "babel --watch src --out-dir dist --extensions \".ts\" --source-maps inline --copy-files"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yuda110/console-core-lib.git"
+    "url": "git+https://github.com/spaceone-dev/console-core-lib.git"
   },
   "author": "SpaceONE",
   "license": "Apache-2.0",
-  "bugs": {
-    "url": "https://github.com/yuda110/console-core-lib/issues"
-  },
-  "homepage": "https://github.com/yuda110/console-core-lib#readme",
+  "homepage": "https://github.com/spaceone-dev/console-core-lib#readme",
   "dependencies": {
     "@spaceone/design-system": "^1.1.0-beta.94",
     "axios": "^0.21.1",
@@ -39,8 +38,5 @@
     "eslint-plugin-import": "^2.23.4",
     "nodemon": "^2.0.9",
     "typescript": "^4.3.5"
-  },
-  "files": [
-    "/src/*"
-  ]
+  }
 }
