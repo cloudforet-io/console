@@ -1171,6 +1171,7 @@
 					"ALT_E_UPDATE_STATUS_MSG": "Failed to Update Status Message",
 					"ALT_S_UPDATE_DESCRIPTION": "Success to Update Description ",
 					"ALT_S_UPDATE_STATUS_MSG": "Success to Update Status Message ",
+					"CANCEL": "Cancel",
 					"CHANGE": "Change",
 					"CREATED": "Created",
 					"DESC": "Description",
@@ -1180,6 +1181,7 @@
 					"PROJECT": "Project",
 					"RESOLVED": "Resolved",
 					"RULE": "Rule",
+					"SAVE_CHANGES": "Save Changes",
 					"SEVERITY": "Severity",
 					"STATUS_MSG": "Status Message",
 					"TRIGGERED_BY": "Triggered By"
@@ -1190,7 +1192,7 @@
 				},
 				"PROJECT_DEPENDENCY": {
 					"NO_DATA": "No Project Data",
-					"PROJECT_DEPENDENCY": "Projetc Dependency"
+					"PROJECT_DEPENDENCY": "Project Dependency"
 				},
 				"RESPONDER": {
 					"ADDITIONAL_RESPONDER": "Additional Responder",

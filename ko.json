@@ -1171,6 +1171,7 @@
 					"ALT_E_UPDATE_STATUS_MSG": "상태 메세지 수정 실패",
 					"ALT_S_UPDATE_DESCRIPTION": "설명 수정 성공",
 					"ALT_S_UPDATE_STATUS_MSG": "상태 메세지 수정 성공",
+					"CANCEL": "취소",
 					"CHANGE": "변경",
 					"CREATED": "생성 시간",
 					"DESC": "설명",
@@ -1180,6 +1181,7 @@
 					"PROJECT": "프로젝트",
 					"RESOLVED": "해결 시간",
 					"RULE": "규칙",
+					"SAVE_CHANGES": "변경사항 저장",
 					"SEVERITY": "심각도",
 					"STATUS_MSG": "상태 메세지",
 					"TRIGGERED_BY": "트리거"

@@ -1171,6 +1171,7 @@
 					"ALT_E_UPDATE_STATUS_MSG": "状態メッセージ修正に失敗",
 					"ALT_S_UPDATE_DESCRIPTION": "説明修正に成功",
 					"ALT_S_UPDATE_STATUS_MSG": "状態メッセージ修正に成功",
+					"CANCEL": "",
 					"CHANGE": "変更",
 					"CREATED": "作成時間",
 					"DESC": "説明",
@@ -1180,6 +1181,7 @@
 					"PROJECT": "プロジェクト",
 					"RESOLVED": "解決時間",
 					"RULE": "ルール",
+					"SAVE_CHANGES": "",
 					"SEVERITY": "緊急度",
 					"STATUS_MSG": "状態メッセージ",
 					"TRIGGERED_BY": "トリガー"
