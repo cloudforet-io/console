@@ -1,0 +1,27 @@
+{
+  "compilerOptions": {
+    "experimentalDecorators": true,
+    "target": "es2018",
+    "module": "CommonJS",
+    "strict": true,
+    "jsx": "preserve",
+    "importHelpers": true,
+    "moduleResolution": "node",
+    "allowJs": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "baseUrl": ".",
+    "declaration": true,
+    "outDir": "dist",
+//    "types": ["webpack-env", "@types/jest"],
+    "paths": {
+      "@/*": ["src/*"]
+    },
+  },
+  "include": ["*.ts"],
+  "exclude": ["node_modules"]
+}
