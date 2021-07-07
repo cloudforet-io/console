@@ -3,7 +3,7 @@ import axios, {
 } from 'axios';
 import jwt from 'jsonwebtoken';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
-import { MockInfo, SessionTimeoutCallback } from '@/core-lib/space-connector/type';
+import { MockInfo, SessionTimeoutCallback } from '@/space-connector/type';
 
 const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';

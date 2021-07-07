@@ -9,8 +9,8 @@ import {
     map, size, flatMap, flatten, uniq, cloneDeep,
 } from 'lodash';
 import { SearchEnumItem, SearchEnums } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { Filter } from '@/core-lib/space-connector/type';
+import { SpaceConnector } from '../../space-connector';
+import { Filter } from '@/space-connector/type';
 
 type KeyTuple = [string, string|undefined, KeyDataType|undefined] // name, label, dataType
 type KeyParam = Array<KeyTuple | string | KeyItemSet>

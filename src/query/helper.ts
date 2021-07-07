@@ -1,7 +1,7 @@
 import dayjs from 'dayjs';
-import { rawQueryOperatorToApiQueryOperatorMap } from '@/core-lib/query/config';
-import { Filter } from '@/core-lib/space-connector/type';
-import { QueryStoreFilter } from '@/core-lib/query/type';
+import { rawQueryOperatorToApiQueryOperatorMap } from '@/query/config';
+import { Filter } from '@/space-connector/type';
+import { QueryStoreFilter } from '@/query/type';
 
 export const setDatetimeToFilters = (filters: Filter[], filter: QueryStoreFilter, timezone = 'UTC') => {
     const f = filter as Required<QueryStoreFilter>;

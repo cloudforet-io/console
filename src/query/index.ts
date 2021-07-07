@@ -5,18 +5,18 @@ import {
     OperatorType,
     QueryItem,
 } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
-import { Filter, FilterOperator, Query } from '@/core-lib/space-connector/type';
+import { Filter, FilterOperator, Query } from '@/space-connector/type';
 import {
     QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator,
-} from '@/core-lib/query/type';
+} from '@/query/type';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
 import {
     datetimeRawQueryOperatorToQueryTagOperatorMap, rawQueryOperatorToApiQueryOperatorMap,
     rawQueryOperatorToPluralApiQueryOperatorMap,
-} from '@/core-lib/query/config';
-import { setDatetimeToFilters } from '@/core-lib/query/helper';
+} from '@/query/config';
+import { setDatetimeToFilters } from '@/query/helper';
 import { flatten, forEach } from 'lodash';
 import { ComputedRef } from '@vue/composition-api';
 
