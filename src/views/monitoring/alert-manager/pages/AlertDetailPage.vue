@@ -18,25 +18,30 @@
             </template>
         </p-page-title>
         <section class="detail-contents-wrapper">
-            <alert-detail-header v-if="!loading" :id="id" class="header"
-                                 :alert-data="alertInfo"
-                                 @confirm="getAlertData"
-            />
-            <alert-detail-responder v-if="!loading" :id="id" class="responder"
-                                    :alert-data="alertInfo"
-            />
-            <alert-detail-info v-if="!loading" :id="id" class="info"
-                               :alert-data="alertInfo"
-                               @update="getAlertData"
-            />
-            <alert-detail-resource-info v-if="!loading && alertInfo.resource" :id="id" :alert-data="alertInfo"
-                                        class="resource-info"
-            />
-            <alert-detail-project-dependency v-if="!loading" :id="id" :alert-data="alertInfo"
-                                             class="project-dependency"
-            />
-            <alert-detail-note v-if="!loading" :id="id" class="note" />
-            <alert-detail-timeline v-if="!loading" :id="id" class="timeline" />
+            <div class="grid col-span-8 left-wrapper">
+                <alert-detail-header v-if="!loading" :id="id" class="header"
+                                     :alert-data="alertInfo"
+                                     @confirm="getAlertData"
+                />
+
+                <alert-detail-info v-if="!loading" :id="id" class="info"
+                                   :alert-data="alertInfo"
+                                   @update="getAlertData"
+                />
+                <alert-detail-resource-info v-if="!loading && alertInfo.resource" :id="id" :alert-data="alertInfo"
+                                            class="resource-info"
+                />
+                <alert-detail-timeline v-if="!loading" :id="id" class="timeline" />
+            </div>
+            <div class="grid col-span-4 right-wrapper">
+                <alert-detail-responder v-if="!loading" :id="id" class="responder"
+                                        :alert-data="alertInfo"
+                />
+                <alert-detail-project-dependency v-if="!loading" :id="id" :alert-data="alertInfo"
+                                                 class="project-dependency"
+                />
+                <alert-detail-note v-if="!loading" :id="id" class="note" />
+            </div>
         </section>
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
@@ -195,71 +200,61 @@ export default {
     @apply grid grid-cols-12 gap-4 w-full;
     grid-auto-flow: row;
     grid-auto-rows: max-content;
-
-    .header {
-        @apply col-span-8 row-start-1 row-end-1;
-        max-height: 6.125rem;
+    .left-wrapper {
+        @apply gap-4;
     }
-    .responder {
-        @apply col-span-4 row-start-1 row-end-3;
-    }
-    .info {
-        @apply col-span-8 row-start-2 row-end-2;
-    }
-    .resource-info {
-        @apply col-span-8 row-start-3 row-end-3;
-    }
-    .project-dependency {
-        @apply col-span-4 row-start-3 row-end-3;
-        min-height: 10rem;
-    }
-    .note {
-        @apply col-span-4 row-start-4 row-end-4;
-    }
-    .timeline {
-        @apply col-span-8 col-start-1 row-start-4 row-end-4;
-        max-height: 32.125rem;
+    .right-wrapper {
+        @apply gap-4;
     }
 
     @screen tablet {
-        .header {
-            @apply col-span-12 row-start-1 row-end-1;
-            max-height: none;
-        }
-        .info {
-            @apply col-span-12 row-start-2 row-end-2;
-        }
-        .resource-info {
-            @apply col-span-12 row-start-3 row-end-3;
-        }
-        .timeline {
-            @apply col-span-12 row-start-4 row-end-4;
-            max-height: none;
-        }
-        .responder {
-            @apply col-span-6 row-start-5 row-end-5;
-        }
-        .note {
-            @apply col-span-6 row-start-5 row-end-5;
-        }
-        .project-dependency {
-            @apply col-span-6 row-start-6 row-end-6;
-            min-height: 10rem;
+        .left-wrapper {
+            @apply row-start-1 row-end-1 col-span-12;
+            .header {
+                @apply col-span-12 row-start-1 row-end-1;
+                max-height: none;
+            }
+            .info {
+                @apply col-span-12 row-start-2 row-end-2;
+            }
+            .resource-info {
+                @apply col-span-12 row-start-3 row-end-3;
+            }
+            .timeline {
+                @apply col-span-12 row-start-4 row-end-4;
+                max-height: none;
+            }
         }
 
+        .right-wrapper {
+            @apply row-start-2 row-end-2 col-span-12;
+            .responder {
+                @apply col-span-6 row-start-5 row-end-5;
+            }
+            .note {
+                @apply col-span-6 row-start-5 row-end-5;
+            }
+            .project-dependency {
+                @apply col-span-6 row-start-6 row-end-6;
+                min-height: 10rem;
+            }
+        }
     }
 
     @screen mobile {
-        .responder {
-            @apply col-span-12 row-start-5 row-end-5;
+        .right-wrapper {
+            @apply col-span-12;
+            .responder {
+                @apply row-start-5 row-end-5;
+            }
+            .project-dependency {
+                @apply row-start-6 row-end-6 col-start-1;
+            }
+            .note {
+                @apply row-start-7 row-end-7 col-start-1;
+            }
         }
-        .project-dependency {
-            @apply col-span-12 row-start-6 row-end-6 col-start-1;
-            min-height: 10rem;
-        }
-        .note {
-            @apply col-span-12 row-start-7 row-end-7 col-start-1;
-        }
+
     }
 
 }
