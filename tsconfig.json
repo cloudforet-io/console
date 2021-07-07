@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "experimentalDecorators": true,
-    "target": "es2018",
+    "target": "es6",
     "module": "CommonJS",
     "strict": true,
     "jsx": "preserve",
@@ -17,11 +17,10 @@
     "baseUrl": ".",
     "declaration": true,
     "outDir": "dist",
-//    "types": ["webpack-env", "@types/jest"],
     "paths": {
       "@/*": ["src/*"]
     },
   },
-  "include": ["*.ts"],
-  "exclude": ["node_modules"]
+  "include": ["src/*"],
+  "exclude": ["node_modules", "./node_modules/**"]
 }
