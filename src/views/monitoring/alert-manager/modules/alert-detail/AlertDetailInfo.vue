@@ -34,7 +34,6 @@
                 <span v-if="Object.keys(value).length === 0">
                     --
                 </span>
-                {{ value }}
             </template>
             <template #data-additional_info="{value}">
                 <span v-if="Object.keys(value).length === 0">

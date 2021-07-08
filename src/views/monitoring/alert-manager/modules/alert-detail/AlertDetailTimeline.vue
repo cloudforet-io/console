@@ -3,18 +3,12 @@
            class="alert-detail-timeline"
     >
         <template #timeline>
-            <p-panel-top>{{$t('MONITORING.ALERT.DETAIL.TIMELINE.TIMELINE')}}</p-panel-top>
-            <ul class="timeline-wrapper">
-                <li class="timeline-item">
-                    <span class="date">2021/05/17 17:33</span>
-                    <span class="content">ljh@mz.co.kr (이제훈) updated urgency to low</span>
-                </li>
-                <li class="timeline-item">
-                    <span class="date">2021/05/17 17:33</span>
-                    <span class="content">ljh@mz.co.kr (이제훈) updated urgency to low</span>
-                </li>
-            </ul>
-
+            <p-panel-top>{{ $t('MONITORING.ALERT.DETAIL.TIMELINE.TIMELINE') }}</p-panel-top>
+            <alert-detail-vertical-timeline />
+        </template>
+        <template #event-list>
+            <p-panel-top>Event list</p-panel-top>
+            <alert-detail-vertical-timeline />
         </template>
     </p-tab>
 </template>
@@ -25,10 +19,13 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive,
 } from '@vue/composition-api';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
+import AlertDetailVerticalTimeline
+    from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailVerticalTimeline.vue';
 
 export default {
     name: 'AlertDetailTimeline',
     components: {
+        AlertDetailVerticalTimeline,
         PTab,
         PPanelTop,
     },
@@ -43,6 +40,7 @@ export default {
         const tabState = reactive({
             tabs: computed(() => ([
                 { name: 'timeline', label: vm.$t('MONITORING.ALERT.DETAIL.TIMELINE.TIMELINE') },
+                { name: 'event-list', label: 'Event List' },
             ] as TabItem[])),
             activeTab: 'timeline',
         });
@@ -56,23 +54,4 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.timeline-wrapper {
-    display: flex;
-    padding-left: 1rem;
-    flex-direction: column;
-    gap: 1rem;
-}
-.timeline-item {
-    display: inherit;
-    gap: 2rem;
-    .date {
-        @apply text-gray-500;
-        font-size: 0.875rem;
-        line-height: 170%;
-    }
-    .content {
-        font-size: 0.875rem;
-        line-height: 170%;
-    }
-}
 </style>

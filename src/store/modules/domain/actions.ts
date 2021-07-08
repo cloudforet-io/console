@@ -12,7 +12,7 @@ const getExtendedAuthType = (authType): ExtendedAuthType | undefined => EXTENDED
 
 const getAuthOptions = (pluginInfo): any => {
     const pluginOptions = pluginInfo?.options || {};
-    const pluginMetadata = pluginInfo?.options.metadata || {};
+    const pluginMetadata = pluginInfo?.metadata || {};
     return {
         ...pluginOptions,
         ...pluginMetadata,
