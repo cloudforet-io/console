@@ -63,11 +63,11 @@ import {
 
 import AlertListItem from '@/views/monitoring/alert-manager/components/AlertListItem.vue';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { getPageStart } from '@/core-lib/component-util/pagination';
-import { QueryHelper } from '@/core-lib/query';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { i18n } from '@/translations';
 import { alert, secondary } from '@/styles/colors';
 import { store } from '@/store';

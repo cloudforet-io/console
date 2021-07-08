@@ -43,7 +43,7 @@ import ProjectWebhook from '@/views/project/project/modules/ProjectWebhook.vue';
 import ProjectSettings from '@/views/project/project/modules/project-alert/ProjectSettings.vue';
 
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 

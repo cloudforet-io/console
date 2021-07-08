@@ -93,11 +93,11 @@ import { DataTableField } from '@spaceone/design-system/dist/src/data-display/ta
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import EditScheduleModal from '@/views/plugin/collector/modules/EditScheduleModal.vue';
-import { iso8601Formatter } from '@/core-lib/util';
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { getPageStart } from '@/core-lib/component-util/pagination';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
 import { store } from '@/store';
 
 export default {

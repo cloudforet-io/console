@@ -75,10 +75,10 @@ import {
 } from '@spaceone/design-system';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
-import { iso8601Formatter } from '@/core-lib/util';
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { makeReferenceValueHandler } from '@/core-lib/component-util/query-search';
+import { iso8601Formatter } from '@spaceone/console-core-lib';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';

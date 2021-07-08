@@ -70,17 +70,17 @@ import EscalationPolicyFormModal from '@/views/monitoring/alert-manager/modules/
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 import EscalationPolicyDataTable from '@/views/monitoring/alert-manager/modules/EscalationPolicyDataTable.vue';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { iso8601Formatter } from '@/core-lib/util';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import {
     makeDistinctValueHandler, makeEnumValueHandler, makeReferenceValueHandler,
-} from '@/core-lib/component-util/query-search';
+} from '@spaceone/console-core-lib/component-util/query-search';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { store } from '@/store';
-import { getApiQueryWithToolboxOptions } from '@/core-lib/component-util/toolbox';
+import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
 
 

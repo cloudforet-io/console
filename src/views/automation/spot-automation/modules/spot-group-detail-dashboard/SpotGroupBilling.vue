@@ -54,8 +54,8 @@ import { DataTableField } from '@spaceone/design-system/dist/src/data-display/ta
 import InstanceBillingChart from '@/views/automation/spot-automation/components/InstanceBillingChart.vue';
 import SpotGroupBillingSummary from '@/views/automation/spot-automation/modules/spot-group-detail-dashboard/SpotGroupBillingSummary.vue';
 
-import { commaFormatter, numberFormatter } from '@/core-lib/util';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 
 interface TableData {

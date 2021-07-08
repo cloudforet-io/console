@@ -71,7 +71,7 @@ import {
 import TagsInputGroup from '@/common/components/tags-input-group/TagsInputGroup.vue';
 import FNB from '@/common/modules/FNB.vue';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 interface Props {

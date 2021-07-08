@@ -74,7 +74,7 @@ import { PDataTable, PI } from '@spaceone/design-system';
 
 import WidgetLayout from '@/common/components/WidgetLayout.vue';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 

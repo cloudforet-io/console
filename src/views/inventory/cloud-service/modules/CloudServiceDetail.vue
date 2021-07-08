@@ -45,9 +45,9 @@ import {
     dynamicFieldsToExcelDataFields,
     getApiActionByLayoutType,
     makeQuerySearchPropsWithSearchSchema,
-} from '@/core-lib/component-util/dynamic-layout';
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+} from '@spaceone/console-core-lib/component-util/dynamic-layout';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';

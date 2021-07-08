@@ -72,7 +72,7 @@
 <script lang="ts">
 import {
     makeProxy,
-} from '@/core-lib/compostion-util';
+} from '@spaceone/console-core-lib';
 
 import {
     ComponentRenderProxy, computed,
@@ -86,7 +86,7 @@ import {
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { isEqual } from 'lodash';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import VueI18n from 'vue-i18n';
 
 import TranslateResult = VueI18n.TranslateResult;

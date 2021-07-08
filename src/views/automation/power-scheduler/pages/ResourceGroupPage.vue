@@ -145,11 +145,11 @@ import {
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 
-import { makeProxy } from '@/core-lib/compostion-util';
+import { makeProxy } from '@spaceone/console-core-lib';
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { makeQuerySearchPropsWithSearchSchema } from '@/core-lib/component-util/dynamic-layout';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { makeQuerySearchPropsWithSearchSchema } from '@spaceone/console-core-lib/component-util/dynamic-layout';
 import {
     forEach, camelCase, findIndex, map,
 } from 'lodash';
@@ -157,7 +157,7 @@ import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
-import { QueryHelper } from '@/core-lib/query';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';

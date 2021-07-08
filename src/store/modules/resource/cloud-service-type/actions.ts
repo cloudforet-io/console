@@ -1,4 +1,4 @@
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ResourceMap } from '@/store/modules/resource/type';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 

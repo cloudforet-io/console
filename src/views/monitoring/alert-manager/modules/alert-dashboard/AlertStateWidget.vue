@@ -98,12 +98,12 @@ import {
 
 import AlertListItem from '@/views/monitoring/alert-manager/components/AlertListItem.vue';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
-import { getPageStart } from '@/core-lib/component-util/pagination';
+import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
-import { QueryStoreFilter } from '@/core-lib/query/type';
+import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { store } from '@/store';
 import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
 

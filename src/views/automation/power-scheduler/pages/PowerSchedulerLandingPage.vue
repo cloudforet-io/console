@@ -152,16 +152,16 @@ import PageInformation from '@/views/automation/power-scheduler/modules/PageInfo
 import ScheduleHeatmap from '@/views/automation/power-scheduler/modules/ScheduleHeatmap.vue';
 
 /* Utils */
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { getPageStart } from '@/core-lib/component-util/pagination';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
 import dayjs from 'dayjs';
 
 /* Types */
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { makeReferenceValueHandler } from '@/core-lib/component-util/query-search';
+import { makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import { Location } from 'vue-router';
-import { QueryHelper } from '@/core-lib/query';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { store } from '@/store';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 

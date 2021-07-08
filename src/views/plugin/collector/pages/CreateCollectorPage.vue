@@ -77,7 +77,7 @@ import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue
 import TagsInputGroup from '@/common/components/tags-input-group/TagsInputGroup.vue';
 import ConfirmCredentials from '@/views/plugin/collector/modules/ConfirmCredentials.vue';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
 import router from '@/routes';

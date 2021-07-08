@@ -60,7 +60,7 @@ import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { ProjectGroup } from '@/views/identity/service-account/type';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ProjectTreeRoot } from '@/views/project/project/type';
 
 export default {

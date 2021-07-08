@@ -75,13 +75,13 @@ import {
 } from '@spaceone/design-system';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { iso8601Formatter } from '@/core-lib/util';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { getApiQueryWithToolboxOptions } from '@/core-lib/component-util/toolbox';
-import { makeDistinctValueHandlerMap } from '@/core-lib/component-util/query-search';
-import { QueryHelper } from '@/core-lib/query';
+import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
+import { makeDistinctValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 
 import { i18n } from '@/translations';
 import { store } from '@/store';

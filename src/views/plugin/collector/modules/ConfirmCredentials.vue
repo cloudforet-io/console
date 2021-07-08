@@ -33,8 +33,8 @@ import {
 
 import { PDataTable, PI } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
 export default {
     name: 'ConfirmCredentials',

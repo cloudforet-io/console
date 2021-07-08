@@ -116,7 +116,7 @@ import {
 import { SETTINGS_TYPE } from '@/views/automation/spot-automation/lib/config';
 import { throttle } from 'lodash';
 import TryAgainButton from '@/views/automation/spot-automation/components/TryAgainButton.vue';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import AddSection from '@/views/automation/spot-automation/components/AddSection.vue';
 import InfoMessage from '@/common/components/InfoMessage.vue';
 

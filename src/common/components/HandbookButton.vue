@@ -45,7 +45,7 @@ import {
     reactive,
     toRefs, watch,
 } from '@vue/composition-api';
-import { makeProxy } from '@/core-lib/compostion-util';
+import { makeProxy } from '@spaceone/console-core-lib';
 import { store } from '@/store';
 
 interface Props {

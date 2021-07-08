@@ -35,7 +35,7 @@ import { PChartLoader } from '@spaceone/design-system';
 import {
     gray, peacock, secondary, white,
 } from '@/styles/colors';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import config from '@/lib/config';
 
 

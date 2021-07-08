@@ -2,7 +2,7 @@
 import { concat } from 'lodash';
 import { Location } from 'vue-router';
 import { Reference, ReferenceType } from '@/lib/reference/type';
-import { QueryHelper } from '@/core-lib/query';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';

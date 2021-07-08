@@ -114,10 +114,10 @@ import {
     PChartLoader, PSkeleton, PButton, PBalloonTab,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { QueryHelper } from '@/core-lib/query';
-import { commaFormatter } from '@/core-lib/util';
-import { QueryStoreFilter } from '@/core-lib/query/type';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { commaFormatter } from '@spaceone/console-core-lib';
+import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { gray, primary, primary1 } from '@/styles/colors';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';

@@ -112,21 +112,21 @@ import WebhookUpdateFormModal from '@/views/project/project/modules/WebhookUpdat
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
 import { store } from '@/store';
 import { userStateFormatter } from '@/views/identity/user/lib/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { iso8601Formatter } from '@/core-lib/util';
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { showErrorMessage, showSuccessMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import {
     makeDistinctValueHandler, makeEnumValueHandler,
-} from '@/core-lib/component-util/query-search';
+} from '@spaceone/console-core-lib/component-util/query-search';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { WEBHOOK_STATE } from '@/views/monitoring/alert-manager/lib/config';
 import { i18n } from '@/translations';
-import { getApiQueryWithToolboxOptions } from '@/core-lib/component-util/toolbox';
+import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 export default {

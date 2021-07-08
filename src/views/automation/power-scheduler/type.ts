@@ -1,9 +1,9 @@
 /* eslint-disable camelcase */
-import { Filter } from '@/core-lib/space-connector/type';
+import { Filter } from '@spaceone/console-core-lib/space-connector/type';
 import {
     gray, safe,
 } from '@/styles/colors';
-import { RawQuery } from '@/core-lib/query/type';
+import { RawQuery } from '@spaceone/console-core-lib/query/type';
 
 export const modes = ['READ', 'CREATE'];
 export type ViewMode = typeof modes[number];

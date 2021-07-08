@@ -43,15 +43,15 @@
 
 <script lang="ts">
 import { PAnchor, PLazyImg, PPaneLayout } from '@spaceone/design-system';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     computed, onActivated, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
 import { ResourceMap } from '@/store/modules/resource/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { iso8601Formatter } from '@/core-lib/util';
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 
 interface Props {
     jobId: string;

@@ -75,11 +75,11 @@ import {
 } from '@vue/composition-api';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import UserAPIKeyModal from '@/views/identity/user/modules/api-key/APIKeyModal.vue';
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { userStateFormatter } from '@/views/identity/user/lib/helper';
 import { TranslateResult } from 'vue-i18n';
-import { iso8601Formatter } from '@/core-lib/util';
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
     showErrorMessage, showSuccessMessage, showLoadingMessage, hideLoadingMessage,
 } from '@/lib/helper/notice-alert-helper';

@@ -109,14 +109,14 @@ import {
     PI, PIconButton, PTree, PButton, PDataLoader,
 } from '@spaceone/design-system';
 import { TreeItem } from '@spaceone/design-system/dist/src/data-display/tree/type';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     ProjectItemResp,
 } from '@/views/project/project/type';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import { store } from '@/store';
 import SidebarTitle from '@/common/components/sidebar-title/SidebarTitle.vue';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 export default {

@@ -1,4 +1,4 @@
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ResourceMap } from '@/store/modules/resource/type';
 
 export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Error> => {

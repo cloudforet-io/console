@@ -30,8 +30,8 @@ import {
 
 import { reactive, toRefs, watch } from '@vue/composition-api';
 
-import { makeProxy } from '@/core-lib/compostion-util';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { makeProxy } from '@spaceone/console-core-lib';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { red } from '@/styles/colors';

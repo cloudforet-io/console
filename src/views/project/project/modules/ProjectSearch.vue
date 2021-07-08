@@ -68,8 +68,8 @@ import { MenuItem as ContextMenuItem } from '@spaceone/design-system/dist/src/in
 
 import { debounce } from 'lodash';
 import { ItemType } from '@/views/project/project/type';
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
 
 const LIMIT = 5;

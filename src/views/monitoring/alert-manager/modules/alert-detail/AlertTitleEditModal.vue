@@ -31,8 +31,8 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { makeProxy } from '@/core-lib/compostion-util';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { makeProxy } from '@spaceone/console-core-lib';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {i18n} from "@/translations";
 
 export default {

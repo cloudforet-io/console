@@ -108,9 +108,9 @@ import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/te
 
 import WidgetLayout from '@/common/components/WidgetLayout.vue';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { QueryHelper } from '@/core-lib/query';
-import { QueryStoreFilter } from '@/core-lib/query/type';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { green, red, yellow } from '@/styles/colors';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';

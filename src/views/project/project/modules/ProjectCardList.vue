@@ -131,12 +131,12 @@ import {
 } from '@spaceone/design-system';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { range, uniq } from 'lodash';
 import axios, { CancelTokenSource } from 'axios';
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
-import { QueryHelper } from '@/core-lib/query';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ProjectFormModal from '@/views/project/project/modules/ProjectFormModal.vue';

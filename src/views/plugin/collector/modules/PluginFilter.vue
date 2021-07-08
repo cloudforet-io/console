@@ -42,7 +42,7 @@ import {
     PSearch, PRadio, PCheckBox, PDivider,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@/core-lib/compostion-util';
+import { makeProxy } from '@spaceone/console-core-lib';
 
 export default {
     name: 'PluginFilter',

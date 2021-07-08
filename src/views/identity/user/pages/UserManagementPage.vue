@@ -200,10 +200,10 @@ import PTagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
 import UserAPIKeyTable from '@/views/identity/user/modules/api-key/APIKeyTable.vue';
 import UserNotifications from '@/views/identity/user/modules/user-management/UserNotifications.vue';
 
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { makeDistinctValueHandler, makeEnumValueHandler } from '@/core-lib/component-util/query-search';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { makeDistinctValueHandler, makeEnumValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import { store } from '@/store';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';

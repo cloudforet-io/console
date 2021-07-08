@@ -64,18 +64,18 @@ import {
 import {
     PBreadcrumbs, PPageTitle, PDivider, PToolbox, PIconTextButton, PDataLoader, PLottie, PCheckBox,
 } from '@spaceone/design-system';
-import { QueryHelper } from '@/core-lib/query';
-import { iso8601Formatter } from '@/core-lib/util';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { getPageStart, getThisPage } from '@/core-lib/component-util/pagination';
+import { getPageStart, getThisPage } from '@spaceone/console-core-lib/component-util/pagination';
 import SpotGroupCard from '@/views/automation/spot-automation/modules/spot-group-card/SpotGroupCard.vue';
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import dayjs from 'dayjs';
 import timezone from 'dayjs/plugin/timezone';
 import { store } from '@/store';
 import { Tags, TimeStamp } from '@/models';
-import { makeDistinctValueHandler, makeReferenceValueHandler } from '@/core-lib/component-util/query-search';
+import { makeDistinctValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 
 dayjs.extend(timezone);

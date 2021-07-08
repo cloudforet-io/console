@@ -59,8 +59,8 @@ import {
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ChannelItem, ProtocolItem } from '@/views/identity/user/type';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import { i18n } from '@/translations';

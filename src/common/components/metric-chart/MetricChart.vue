@@ -63,7 +63,7 @@ import { PChartLoader, PLottie, PSkeleton } from '@spaceone/design-system';
 import { reactive, toRefs, watch } from '@vue/composition-api';
 
 import { MetricChartProps } from '@/common/components/metric-chart/type';
-import { commaFormatter, numberFormatter } from '@/core-lib/util';
+import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
 

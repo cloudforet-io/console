@@ -79,14 +79,14 @@ import {
     PAnchor, PBadge, PButtonModal, PFieldGroup,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@/core-lib/compostion-util';
+import { makeProxy } from '@spaceone/console-core-lib';
 import { i18n } from '@/translations';
 import { alertStateBadgeStyleTypeFormatter } from '@/views/monitoring/alert-manager/lib/helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
-import { iso8601Formatter } from '@/core-lib/util';
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 import AlertSelectDropdown from '@/views/monitoring/alert-manager/modules/alert-list/AlertSelectDropdown.vue';
 

@@ -34,16 +34,16 @@ import {
     PDynamicLayout, PFieldGroup,
 } from '@spaceone/design-system';
 import { store } from '@/store';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { QueryHelper } from '@/core-lib/query';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import {
     DynamicLayoutEventListener,
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { makeQuerySearchPropsWithSearchSchema } from '@/core-lib/component-util/dynamic-layout';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { makeQuerySearchPropsWithSearchSchema } from '@spaceone/console-core-lib/component-util/dynamic-layout';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { SpotGroupResourceCategory } from '@/views/automation/spot-automation/type';

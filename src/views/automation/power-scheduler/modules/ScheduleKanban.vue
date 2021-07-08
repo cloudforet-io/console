@@ -133,7 +133,7 @@ import {
 
 import ResourceGroupPage from '@/views/automation/power-scheduler/pages/ResourceGroupPage.vue';
 import { KanbanItem, ViewMode, ResourceGroupItem } from '@/views/automation/power-scheduler/type';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';

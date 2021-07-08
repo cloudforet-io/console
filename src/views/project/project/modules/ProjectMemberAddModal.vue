@@ -98,7 +98,7 @@
 <script lang="ts">
 import {
     makeProxy,
-} from '@/core-lib/compostion-util';
+} from '@spaceone/console-core-lib';
 
 import {
     ComponentRenderProxy, computed,
@@ -113,9 +113,9 @@ import { SearchTableListeners, Options } from '@spaceone/design-system/dist/src/
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { isEqual } from 'lodash';
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { getPageStart } from '@/core-lib/component-util/pagination';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
 import VueI18n from 'vue-i18n';
 
 import TranslateResult = VueI18n.TranslateResult;

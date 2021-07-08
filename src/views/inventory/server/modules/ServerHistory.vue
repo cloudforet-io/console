@@ -35,9 +35,9 @@ import {
 } from '@spaceone/design-system';
 import { Options, SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { iso8601Formatter } from '@/core-lib/util';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';

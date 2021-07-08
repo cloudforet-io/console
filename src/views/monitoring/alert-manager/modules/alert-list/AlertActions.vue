@@ -39,7 +39,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { PButton, PSelectDropdown } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';

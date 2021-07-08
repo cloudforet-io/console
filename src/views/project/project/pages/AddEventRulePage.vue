@@ -123,7 +123,7 @@ import EventRuleContent from '@/views/project/project/modules/event-rule/EventRu
 import EventRuleForm from '@/views/project/project/modules/event-rule/EventRuleForm.vue';
 import InfoMessage from '@/common/components/InfoMessage.vue';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 

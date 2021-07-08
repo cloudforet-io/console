@@ -76,14 +76,14 @@ import {
 import { PChartLoader, PSkeleton, PProgressBar } from '@spaceone/design-system';
 
 import { range } from 'lodash';
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
 import { coral, gray } from '@/styles/colors';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import WidgetLayout from '@/common/components/WidgetLayout.vue';
 import { Location } from 'vue-router';
-import { QueryHelper } from '@/core-lib/query';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import config from '@/lib/config';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 

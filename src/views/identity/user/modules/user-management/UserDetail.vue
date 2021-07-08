@@ -37,7 +37,7 @@ import {
 import { PPanelTop, PDefinitionTable, PStatus } from '@spaceone/design-system';
 
 import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/helper';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 import { Tags } from '@/models';
 // const arrayFormatter = value => ((value && Array.isArray(value) && value.length > 0) ? value.join(', ') : '');

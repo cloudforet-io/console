@@ -164,14 +164,14 @@ import CustomFieldModal from '@/common/modules/custom-field-modal/CustomFieldMod
 
 /* utils */
 import { replaceUrlQuery } from '@/lib/router-query-string';
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import {
     showErrorMessage, showSuccessMessage, showLoadingMessage,
 } from '@/lib/helper/notice-alert-helper';
-import { QueryHelper } from '@/core-lib/query';
-import { dynamicFieldsToExcelDataFields } from '@/core-lib/component-util/dynamic-layout';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { dynamicFieldsToExcelDataFields } from '@spaceone/console-core-lib/component-util/dynamic-layout';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { store } from '@/store';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';

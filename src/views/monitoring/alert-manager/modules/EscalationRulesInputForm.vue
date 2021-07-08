@@ -147,9 +147,9 @@ import ProjectChannelList from '@/views/monitoring/alert-manager/components/Proj
 
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { SCOPE } from '@/views/monitoring/alert-manager/lib/config';
-import { makeProxy } from '@/core-lib/compostion-util';
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { makeProxy } from '@spaceone/console-core-lib';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
 
 const NOTIFICATION_LEVELS = Object.freeze([

@@ -38,8 +38,8 @@ import {
 } from '@spaceone/design-system';
 import { SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
 
 export default {

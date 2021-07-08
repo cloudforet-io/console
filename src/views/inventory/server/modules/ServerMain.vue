@@ -158,16 +158,16 @@ import TagsPanel from '@/common/modules/tags-panel/TagsPanel.vue';
 import ProjectTreeModal from '@/common/modules/ProjectTreeModal.vue';
 import { MonitoringProps, MonitoringResourceType } from '@/common/modules/monitoring/type';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import {
     dynamicFieldsToExcelDataFields,
     makeQuerySearchPropsWithSearchSchema,
-} from '@/core-lib/component-util/dynamic-layout';
+} from '@spaceone/console-core-lib/component-util/dynamic-layout';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { QueryHelper } from '@/core-lib/query';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { Reference } from '@/lib/reference/type';
 import { store } from '@/store';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';

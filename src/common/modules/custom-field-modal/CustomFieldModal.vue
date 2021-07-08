@@ -84,8 +84,8 @@ import { camelCase, unionBy, uniq } from 'lodash';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { makeProxy } from '@/core-lib/compostion-util';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { makeProxy } from '@spaceone/console-core-lib';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
@@ -93,7 +93,7 @@ import draggable from 'vuedraggable';
 import ColumnItem from '@/common/modules/custom-field-modal/ColumnItem.vue';
 import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-field-modal/config';
 import SelectTagColumns from '@/common/modules/custom-field-modal/SelectTagColumns.vue';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
 interface Props {
     visible: boolean;

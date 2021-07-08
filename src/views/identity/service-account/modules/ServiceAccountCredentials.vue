@@ -25,9 +25,9 @@ import {
 } from '@vue/composition-api';
 
 import { PPanelTop, PSearchTable } from '@spaceone/design-system';
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { iso8601Formatter } from '@/core-lib/util';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { store } from '@/store';
 
 export default {

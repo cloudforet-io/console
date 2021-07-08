@@ -74,7 +74,7 @@
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     PCheckBox, PLottie, PToggleButton, PI,
 } from '@spaceone/design-system';

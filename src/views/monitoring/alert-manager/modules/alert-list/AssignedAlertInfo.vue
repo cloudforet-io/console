@@ -19,7 +19,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { find } from 'lodash';
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ALERT_STATE_FILTER } from '@/views/monitoring/alert-manager/lib/config';
 import { store } from '@/store';
 

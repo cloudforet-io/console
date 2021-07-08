@@ -125,8 +125,8 @@ import {
     PSkeleton,
 } from '@spaceone/design-system';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { QueryHelper } from '@/core-lib/query';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import {
     gray, safe, secondary, secondary1, green, blue,
 } from '@/styles/colors';

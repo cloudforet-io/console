@@ -106,9 +106,9 @@ import {
     blue, coral, green, peacock, violet, yellow, indigo,
 } from '@/styles/colors';
 import { Metric, MonitoringProps } from '@/common/modules/monitoring/type';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
 import router from '@/routes';
 

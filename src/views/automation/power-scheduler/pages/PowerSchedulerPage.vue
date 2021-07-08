@@ -90,8 +90,8 @@ import VerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.v
 import ScheduleDetail from '@/views/automation/power-scheduler/modules/ScheduleDetail.vue';
 import { SCHEDULE_STATUS, Schedule } from '@/views/automation/power-scheduler/type';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';

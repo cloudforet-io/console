@@ -156,8 +156,8 @@ import {
     defaultSchedule, SCHEDULE_STATUS, Schedule, ViewMode,
 } from '@/views/automation/power-scheduler/type';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { iso8601Formatter } from '@/core-lib/util';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import {
     showErrorMessage, showSuccessMessage,
 } from '@/lib/helper/notice-alert-helper';

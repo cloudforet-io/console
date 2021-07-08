@@ -25,9 +25,9 @@ import {
 import {
     PButtonModal, PTextarea, PFieldGroup,
 } from '@spaceone/design-system';
-import { makeProxy } from '@/core-lib/compostion-util';
+import { makeProxy } from '@spaceone/console-core-lib';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
 import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
 

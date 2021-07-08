@@ -36,7 +36,7 @@ import {
 
 import { ProjectGroup } from '@/views/identity/service-account/type';
 import { ProjectGroupTreeItem, ProjectTreeRoot } from '@/views/project/project/type';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 export default {
     name: 'EscalationPolicyProjectTree',

@@ -71,10 +71,10 @@ import { PSelectableItem, PSkeleton, PI } from '@spaceone/design-system';
 
 import WidgetLayout from '@/common/components/WidgetLayout.vue';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
-import { QueryHelper } from '@/core-lib/query';
-import { QueryStoreFilter } from '@/core-lib/query/type';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 

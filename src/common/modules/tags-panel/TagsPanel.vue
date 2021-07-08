@@ -39,7 +39,7 @@ import { PDataTable, PPanelTop, PButton } from '@spaceone/design-system';
 
 import TagsPage from '@/common/pages/TagsPage.vue';
 
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 interface Props {
     resourceKey: string;

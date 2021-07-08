@@ -55,11 +55,11 @@ import {
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { makeProxy } from '@/core-lib/compostion-util';
+import { makeProxy } from '@spaceone/console-core-lib';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import ProjectSelectDropdown from '@/common/modules/project-select-dropdown/ProjectSelectDropdown.vue';
 import { i18n } from '@/translations';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { ProjectItemResp } from '@/views/project/project/type';
 import {ALERT_URGENCY} from "@/views/monitoring/alert-manager/lib/config";

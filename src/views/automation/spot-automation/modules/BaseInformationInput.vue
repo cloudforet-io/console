@@ -56,7 +56,7 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import TagsInputGroup from '@/common/components/tags-input-group/TagsInputGroup.vue';
-import { makeProxy } from '@/core-lib/compostion-util';
+import { makeProxy } from '@spaceone/console-core-lib';
 import AddSection from '@/views/automation/spot-automation/components/AddSection.vue';
 import { spotGroupNameRegex } from '@/views/automation/spot-automation/lib/validations';
 

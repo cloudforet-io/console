@@ -73,13 +73,13 @@ import {
 import {
     Options,
 } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
-import { ApiQueryHelper } from '@/core-lib/space-connector/helper';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 import { TranslateResult } from 'vue-i18n';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';

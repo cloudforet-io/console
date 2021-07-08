@@ -38,7 +38,7 @@ import ProjectTrustedAdvisor from '@/views/project/project/modules/project-dashb
 // import ProjectAlertWidget from '@/views/project/project/modules/project-dashboard/ProjectAlertWidget.vue';
 
 import { store } from '@/store';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 
 export default {

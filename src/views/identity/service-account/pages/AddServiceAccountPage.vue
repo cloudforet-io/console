@@ -155,7 +155,7 @@ import ProjectTreePanel from '@/views/identity/service-account/modules/ProjectTr
 import TagsInputGroup from '@/common/components/tags-input-group/TagsInputGroup.vue';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ProjectGroup, ProviderModel } from '@/views/identity/service-account/type';
 import { TranslateResult } from 'vue-i18n';
 import InfoButton from '@/common/components/InfoButton.vue';

@@ -6,7 +6,7 @@
 import {
     ComponentRenderProxy,
 } from '@vue/composition-api';
-import { SpaceConnector } from '@/core-lib/space-connector';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 const DEFAULT_URL = '/identity/service-account';
 const ERROR_URL = '/identity/service-account/no-resource';
