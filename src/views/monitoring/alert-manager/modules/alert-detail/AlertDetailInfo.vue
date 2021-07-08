@@ -1,8 +1,8 @@
 <template>
-    <p-pane-layout class="alert-detail-info">
+    <p-pane-layout class="alert-detail-info border-none">
         <p-definition-table :fields="fields" :data="data"
                             :skeleton-rows="10"
-                            :style-type="'white'"
+                            style-type="white"
                             :disable-copy="true"
         >
             <template #data-escalation_policy_id>
@@ -10,7 +10,9 @@
                     {{ escalationPolicyName }}
                 </p-anchor>
             </template>
-            <template #data-project_id />
+            <template #data-project_id>
+                <alert-detail-info-project :id="id" :alert-data="data" @update="$emit('update')" />
+            </template>
             <template #data-created_at>
                 {{ iso8601Formatter(data.created_at, timezone) }}
             </template>
@@ -29,20 +31,20 @@
                 <alert-detail-info-status-msg :id="id" :alert-data="data" @update="$emit('update')" />
             </template>
             <template #data-rule="{value}">
-                <p v-if="Object.keys(value).length === 0">
+                <span v-if="Object.keys(value).length === 0">
                     --
-                </p>
-                <p v-else>
-                    {{ value }}
-                </p>
+                </span>
+                {{ value }}
             </template>
             <template #data-additional_info="{value}">
-                <p v-if="Object.keys(value).length === 0">
+                <span v-if="Object.keys(value).length === 0">
                     --
-                </p>
-                <p v-else>
-                    {{ value }}
-                </p>
+                </span>
+                <template v-else>
+                    <p v-for="([k, v]) in Object.entries(value)" class="additional-info">
+                        <b>{{ k }}</b>: {{ v }}
+                    </p>
+                </template>
             </template>
         </p-definition-table>
     </p-pane-layout>
@@ -127,34 +129,6 @@ export default {
             projects: computed(() => store.state.resource.project.items),
         });
 
-        // const formState = reactive({
-        //     changeProjectModalVisible: false,
-        //     loading: false,
-        //     projectId: props.alertData?.project_id,
-        // });
-        //
-        // const openChangeProjectModal = () => {
-        //     formState.changeProjectModalVisible = true;
-        // };
-        //
-        // const changeProject = async (data?: ProjectItemResp|null) => {
-        //     if (data) {
-        //         formState.loading = true;
-        //         try {
-        //             await SpaceConnector.client.monitoring.alert.update({
-        //                 alert_id: props.id,
-        //                 project_id: data.id,
-        //             });
-        //             emit('update');
-        //         } catch (e) {
-        //             console.error(e);
-        //         } finally {
-        //             formState.loading = false;
-        //             formState.changeProjectModalVisible = false;
-        //         }
-        //     }
-        // };
-
         const getEscalationPolicy = async () => {
             try {
                 const res = await SpaceConnector.client.monitoring.escalationPolicy.get({
@@ -187,9 +161,23 @@ export default {
 
 <style lang="postcss" scoped>
 .p-definition-table::v-deep {
-    >>>.value-wrapper .value {
-        width: 100%;
+    .def-row {
+        tr {
+            >>> .value {
+                width: 100%;
+
+                >>>.p-copy-button {
+                    width: 100%;
+                }
+            }
+        }
     }
+}
+
+.additional-info {
+    @apply text-gray-500;
+    font-size: 0.875rem;
+    line-height: 140%;
 }
 
 </style>

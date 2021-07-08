@@ -5,7 +5,7 @@
             <p-i name="ic_edit" width="1rem" height="1rem"
                  color="inherit" class="edit-icon"
             />
-            {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
+            {{$t('MONITORING.ALERT.DETAIL.INFO.EDIT')}}
         </button>
     </p>
     <div v-else class="content-wrapper">
@@ -14,7 +14,7 @@
             <p-button :outline="true" class="text-button"
                       size="sm" @click="cancelEdit(EDIT_MODE.STATUS_MSG)"
             >
-                {{ $t('COMMON.TAGS.CANCEL') }}
+                {{$t('MONITORING.ALERT.DETAIL.INFO.CANCEL')}}
             </p-button>
             <p-button
                 style-type="primary"
@@ -22,7 +22,7 @@
                 class="text-button"
                 @click="onClickSave(EDIT_MODE.STATUS_MSG)"
             >
-                {{ $t('COMMON.TAGS.SAVE') }}
+                {{$t('MONITORING.ALERT.DETAIL.INFO.SAVE_CHANGES')}}
             </p-button>
         </div>
     </div>

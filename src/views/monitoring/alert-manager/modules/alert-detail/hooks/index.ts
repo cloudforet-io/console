@@ -22,20 +22,20 @@ export const useAlertDetailItem = (obj: AlertDetailItemState) => {
     const vm = getCurrentInstance() as ComponentRenderProxy;
     const state = reactive<AlertDetailItemState>(obj);
     const cancelEdit = () => {
-    	state.isEditMode = false;
+        state.isEditMode = false;
     };
 
     const startEdit = () => {
-    	state.isEditMode = true;
+        state.isEditMode = true;
     };
 
     const getParams = (editMode: EDIT_MODE) => {
-    	const param = {} as ParamType;
-    	param.alert_id = state.alertId;
-    	if (editMode === EDIT_MODE.DESCRIPTION) param.description = state.dataForUpdate;
-    	if (editMode === EDIT_MODE.STATUS_MSG) param.status_message = state.dataForUpdate;
-    	if (editMode === EDIT_MODE.PROJECT) param.project_id = state.dataForUpdate;
-    	return param;
+        const param = {} as ParamType;
+        param.alert_id = state.alertId;
+        if (editMode === EDIT_MODE.DESCRIPTION) param.description = state.dataForUpdate;
+        else if (editMode === EDIT_MODE.STATUS_MSG) param.status_message = state.dataForUpdate;
+        else if (editMode === EDIT_MODE.PROJECT) param.project_id = state.dataForUpdate;
+        return param;
     };
     const updateAlert = async (editMode: EDIT_MODE) => {
         try {
@@ -49,8 +49,8 @@ export const useAlertDetailItem = (obj: AlertDetailItemState) => {
     };
 
     const onClickSave = async (editMode: EDIT_MODE) => {
-    	await updateAlert(editMode);
-    	vm.$emit('update');
+        await updateAlert(editMode);
+        vm.$emit('update');
     };
 
 

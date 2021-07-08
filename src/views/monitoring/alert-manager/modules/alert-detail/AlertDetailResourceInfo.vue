@@ -1,8 +1,8 @@
 <template>
-    <p-pane-layout class="alert-detail-info">
+    <p-pane-layout class="alert-detail-info border-none">
         <p-definition-table :fields="fields" :data="data"
                             :skeleton-rows="3"
-                            :stripe="false"
+                            style-type="white"
                             :disable-copy="true"
         />
     </p-pane-layout>

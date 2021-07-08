@@ -14,7 +14,7 @@
             <p-button :outline="true" class="text-button"
                       size="sm" @click="cancelEdit(EDIT_MODE.DESCRIPTION)"
             >
-                {{ $t('COMMON.TAGS.CANCEL') }}
+                {{$t('MONITORING.ALERT.DETAIL.INFO.CANCEL')}}
             </p-button>
             <p-button
                 style-type="primary"
@@ -22,7 +22,7 @@
                 class="text-button"
                 @click="onClickSave(EDIT_MODE.DESCRIPTION)"
             >
-                {{ $t('COMMON.TAGS.SAVE') }}
+                {{ $t('MONITORING.ALERT.DETAIL.INFO.SAVE_CHANGES') }}
             </p-button>
         </div>
     </div>
