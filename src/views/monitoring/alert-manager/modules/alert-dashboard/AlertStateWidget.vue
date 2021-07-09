@@ -15,7 +15,7 @@
             >
                 <template #tab="{label, name}">
                     <div class="tab-button">
-                        {{ label }} <span class="count">{{ tabState.tabItems[name].count }}</span>
+                        {{ label }} <span class="count">{{ commaFormatter(tabState.tabItems[name].count) }}</span>
                     </div>
                 </template>
             </p-balloon-tab>
@@ -26,7 +26,7 @@
                            :style-type="tabState.tabItems[tabState.activeTab].styleType"
             >
                 <template #tab="{label, name}">
-                    <span>{{ label }} <strong>{{ tabState.tabItems[name].count }}</strong></span>
+                    <span>{{ label }} <strong>{{ commaFormatter(tabState.tabItems[name].count) }}</strong></span>
                 </template>
             </p-balloon-tab>
             <!--tab content-->
@@ -98,12 +98,13 @@ import {
 
 import AlertListItem from '@/views/monitoring/alert-manager/components/AlertListItem.vue';
 
+import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
+import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
-import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import { commaFormatter } from '@spaceone/console-core-lib';
 import { store } from '@/store';
 import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
 
@@ -238,7 +239,7 @@ export default {
         };
         const statAlerts = async () => {
             try {
-                const { results } = await SpaceConnector.client.statistics.topic.alertStateCount();
+                const { results } = await SpaceConnector.client.monitoring.dashboard.alertCountByState();
                 const resolvedCount = find(results, { state: ALERT_STATE.RESOLVED }).total;
                 const acknowledgedCount = find(results, { state: ALERT_STATE.ACKNOWLEDGED }).total;
                 const triggeredCount = find(results, { state: ALERT_STATE.TRIGGERED }).total;
@@ -278,6 +279,7 @@ export default {
             onSelectAssignedState,
             onClickListItem,
             listAlerts,
+            commaFormatter,
         };
     },
 };
@@ -339,14 +341,8 @@ export default {
                 .left-part {
                     display: inline-flex;
                     flex-grow: 1;
-
-                    .p-select-status {
-                        font-size: 0.875rem;
-                        padding-right: 0.5rem;
-                        &:last-child {
-                            padding-right: 0;
-                        }
-                    }
+                    gap: 1rem;
+                    font-size: 0.875rem;
                 }
 
                 .right-part {

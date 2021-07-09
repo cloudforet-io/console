@@ -35,7 +35,7 @@ export default {
                 {
                     path: '/',
                     name: MONITORING_ROUTE.ALERT_MANAGER._NAME,
-                    redirect: 'escalation-policy',
+                    redirect: 'dashboard',
                     component: MonitoringMainPage,
                     children: [
                         {

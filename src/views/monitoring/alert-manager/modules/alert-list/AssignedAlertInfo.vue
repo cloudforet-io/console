@@ -45,7 +45,7 @@ export default {
 
         const getStatAlerts = async () => {
             try {
-                const { results } = await SpaceConnector.client.statistics.topic.alertStateCount({
+                const { results } = await SpaceConnector.client.monitoring.dashboard.alertCountByState({
                     assignee: store.state.user.userId,
                     // assignee: 'whdalsrnt@mz.co.kr',
                 });

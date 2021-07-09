@@ -267,7 +267,7 @@ export default {
 
         const statAlerts = async () => {
             try {
-                const { results } = await SpaceConnector.client.statistics.topic.alertStateCount({
+                const { results } = await SpaceConnector.client.monitoring.dashboard.alertCountByState({
                     project_id: state.projectId,
                 });
                 state.alertStateCounts = results;

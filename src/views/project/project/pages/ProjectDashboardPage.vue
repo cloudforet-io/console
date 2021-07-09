@@ -2,7 +2,7 @@
     <div class="grid grid-cols-12 project-dashboard-page">
         <project-all-summary class="col-span-12" :project-id="id" />
         <div class="col-span-12 lg:col-span-9 grid grid-cols-12 left-part">
-            <!--            <project-alert-widget class="col-span-12" :project-id="id" />-->
+            <project-alert-widget class="col-span-12" :project-id="id" />
             <project-billing class="col-span-12" :project-id="id" />
             <project-personal-health-dashboard class="col-span-12" :providers="providers" :project-id="id" />
             <project-service-accounts class="col-span-12 service-accounts-table" :project-id="id" />
@@ -35,7 +35,7 @@ import ProjectAllSummary from '@/views/project/project/modules/project-dashboard
 import ProjectBilling from '@/views/project/project/modules/project-dashboard/ProjectBilling.vue';
 import ProjectServiceAccounts from '@/views/project/project/modules/project-dashboard/ProjectServiceAccounts.vue';
 import ProjectTrustedAdvisor from '@/views/project/project/modules/project-dashboard/ProjectTrustedAdvisor.vue';
-// import ProjectAlertWidget from '@/views/project/project/modules/project-dashboard/ProjectAlertWidget.vue';
+import ProjectAlertWidget from '@/views/project/project/modules/project-dashboard/ProjectAlertWidget.vue';
 
 import { store } from '@/store';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -44,7 +44,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 export default {
     name: 'ProjectDashboardPage',
     components: {
-        // ProjectAlertWidget,
+        ProjectAlertWidget,
         ProjectBilling,
         ProjectPersonalHealthDashboard,
         ProjectTrustedAdvisor,
@@ -83,7 +83,7 @@ export default {
             await Promise.all([
                 store.dispatch('resource/cloudServiceType/load'),
                 store.dispatch('resource/region/load'),
-                // getProjectAlertConfig(),
+                getProjectAlertConfig(),
             ]);
         })();
 

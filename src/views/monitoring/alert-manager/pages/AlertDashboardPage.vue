@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, ComponentRenderProxy, getCurrentInstance,
+    computed, reactive,
 } from '@vue/composition-api';
 
 import {
@@ -29,7 +29,9 @@ import AlertHistoryWidget from '@/views/monitoring/alert-manager/modules/alert-d
 import CurrentProjectStatusWidget from '@/views/monitoring/alert-manager/modules/alert-dashboard/CurrentProjectStatusWidget.vue';
 import Top5ProjectActivityWidget from '@/views/monitoring/alert-manager/modules/alert-dashboard/Top5ProjectActivityWidget.vue';
 import ProjectSearchWidget from '@/views/monitoring/alert-manager/modules/alert-dashboard/ProjectSearchWidget.vue';
+
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 export default {
     name: 'AlertDashboardPage',
@@ -43,14 +45,11 @@ export default {
         PPageTitle,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-        const state = reactive({
-        });
         const routeState = reactive({
             route: computed(() => [
-                { name: vm.$t('MENU.MONITORING.MONITORING'), path: '/monitoring' },
-                { name: vm.$t('MENU.MONITORING.ALERT_SYSTEM'), path: '/monitoring/alert-manager/dashboard' },
-                { name: vm.$t('MONITORING.ALERT.DASHBOARD.DASHBOARD') },
+                { name: i18n.t('MENU.MONITORING.MONITORING'), path: '/monitoring' },
+                { name: i18n.t('MENU.MONITORING.ALERT_MANAGER'), path: '/monitoring/alert-manager/dashboard' },
+                { name: i18n.t('MONITORING.ALERT.DASHBOARD.DASHBOARD') },
             ]),
         });
 
