@@ -1,3 +1,10 @@
+# [1.1.0-beta.99](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.98...v1.1.0-beta.99) (2021-07-09)
+
+
+### Features
+
+* add without outline case to select dropdown and add focus, active style to icon button ([#638](https://github.com/spaceone-dev/spaceone-design-system/issues/638)) ([6540915](https://github.com/spaceone-dev/spaceone-design-system/commit/65409151d20632fdffac7c2af4261468eb5593d5))
+
 # [1.1.0-beta.98](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.97...v1.1.0-beta.98) (2021-07-09)
 
 
