@@ -106,6 +106,7 @@ export default {
 
     .left-part {
         display: inherit;
+        width: 78%;
         flex-grow: 1;
         align-items: center;
         margin: auto 0;

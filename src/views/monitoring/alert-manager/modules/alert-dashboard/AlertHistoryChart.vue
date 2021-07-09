@@ -23,8 +23,8 @@ import {
 
 import { PChartLoader, PSkeleton } from '@spaceone/design-system';
 import { gray, red } from '@/styles/colors';
-import { store } from '@/store';
 import config from '@/lib/config';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 am4core.useTheme(am4themes_animated);
 am4core.options.autoSetClassName = true;
@@ -80,13 +80,12 @@ export default {
                 const existData = data.find(d => d.date === now.format('YYYY-MM-DD'));
 
                 if (existData) {
-                    const total = existData.open + existData.resolved;
-                    const openPercentage = Math.round((existData.open / total) * 100);
+                    const openPercentage = Math.round((existData.open_count / existData.total_count) * 100);
                     const resolvedPercentage = 100 - openPercentage;
                     chartData.push({
                         date: now.format('YYYY-MM-DD'),
-                        open: existData.open,
-                        resolved: existData.resolved,
+                        open: existData.open_count,
+                        resolved: existData.resolved_count,
                         openPercentage,
                         resolvedPercentage,
                     });
@@ -201,34 +200,17 @@ export default {
         /* api */
         const getData = async () => {
             state.loading = true;
-            const chartData = [
-                {
-                    date: '2021-06-05',
-                    open: 30,
-                    resolved: 16,
-                },
-                {
-                    date: '2021-06-07',
-                    open: 10,
-                    resolved: 10,
-                },
-                {
-                    date: '2021-06-08',
-                    open: 10,
-                    resolved: 0,
-                },
-                {
-                    date: '2021-06-09',
-                    open: 9,
-                    resolved: 2,
-                },
-                {
-                    date: '2021-06-10',
-                    open: 0,
-                    resolved: 0,
-                },
-            ];
-            state.chartData = initChartData(chartData);
+
+            try {
+                const { results } = await SpaceConnector.client.monitoring.dashboard.dailyAlertHistory({
+                    start: props.currentDate.subtract(1, 'month').format('YYYY-MM-01'),
+                    end: props.currentDate.add(1, 'month').format('YYYY-MM-01'),
+                });
+                state.chartData = initChartData(results);
+            } catch (e) {
+                state.chartData = [];
+                console.error(e);
+            }
             state.loading = false;
         };
 

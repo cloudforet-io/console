@@ -8,11 +8,14 @@
         </div>
         <div class="content-wrapper">
             <div class="summary-wrapper">
-                <p-card v-for="(item, idx) in summaryItems" :key="`p-card-${idx}`">
+                <p-card v-for="(item, idx) in [createdSummaryData, resolvedSummaryData]" :key="`p-card-${idx}`">
                     <template #header>
                         <span class="text">{{ item.name === ALERT_STATE.CREATED ? $t('MONITORING.ALERT.DASHBOARD.CREATED') : $t('MONITORING.ALERT.DASHBOARD.RESOLVED') }}</span>
-                        <span class="increase-text" :class="[item.increase > 0 ? 'increase' : item.increase < 0 ? 'decrease' : '']">
-                            <span>{{ Math.abs(item.increase) }}</span>
+                        <span v-if="item.increase"
+                              class="increase-text"
+                              :class="[item.increase > 0 ? 'increase' : item.increase < 0 ? 'decrease' : '']"
+                        >
+                            <span>{{ commaFormatter(Math.abs(item.increase)) }}</span>
                             <p-i v-if="item.increase !== 0"
                                  :name="item.increase > 0 ? 'ic_increase' : 'ic_decrease'"
                                  height="0.75rem" width="0.75rem"
@@ -21,8 +24,8 @@
                         </span>
                     </template>
                     <div class="count-wrapper">
-                        <span>{{ item.dailyAverage }}</span>
-                        <span>{{ item.monthlyTotal }}</span>
+                        <span>{{ commaFormatter(item.dailyAverage) }}</span>
+                        <span>{{ commaFormatter(item.monthlyTotal) }}</span>
                     </div>
                     <div class="label-wrapper">
                         <span>{{ $t('MONITORING.ALERT.DASHBOARD.DAILY_AVERAGE') }}</span>
@@ -38,17 +41,20 @@
 </template>
 
 <script lang="ts">
+import { find } from 'lodash';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
-import { reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs, watch } from '@vue/composition-api';
 
 import {
     PCard, PI, PDatePagination,
 } from '@spaceone/design-system';
 
 import AlertHistoryChart from '@/views/monitoring/alert-manager/modules/alert-dashboard/AlertHistoryChart.vue';
-import { store } from '@/store';
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 
 dayjs.extend(utc);
 
@@ -69,25 +75,83 @@ export default {
     setup() {
         const state = reactive({
             currentDate: dayjs.utc(),
-            summaryItems: [
-                {
-                    name: ALERT_STATE.CREATED,
-                    increase: 1,
-                    dailyAverage: 8.5,
-                    monthlyTotal: 145,
-                },
-                {
-                    name: ALERT_STATE.RESOLVED,
-                    increase: -2,
-                    dailyAverage: 1.3,
-                    monthlyTotal: 23,
-                },
-            ],
+            createdSummaryData: {
+                name: ALERT_STATE.CREATED,
+                increase: 0,
+                dailyAverage: 0,
+                monthlyTotal: 0,
+            },
+            resolvedSummaryData: {
+                name: ALERT_STATE.RESOLVED,
+                increase: 0,
+                dailyAverage: 0,
+                monthlyTotal: 0,
+            },
+        });
+
+        /* util */
+        const initSummaryData = () => {
+            state.createdSummaryData.increase = 0;
+            state.createdSummaryData.dailyAverage = 0;
+            state.createdSummaryData.monthlyTotal = 0;
+
+            state.resolvedSummaryData.increase = 0;
+            state.resolvedSummaryData.dailyAverage = 0;
+            state.resolvedSummaryData.monthlyTotal = 0;
+        };
+        const setSummaryData = (current, results) => {
+            initSummaryData();
+            const currentMonthData = find(results, { date: current.format('YYYY-MM') });
+            if (!currentMonthData) {
+                return;
+            }
+
+            const daysInMonth = current.daysInMonth();
+            state.createdSummaryData.monthlyTotal = currentMonthData.total_count;
+            state.createdSummaryData.dailyAverage = numberFormatter(currentMonthData.total_count / daysInMonth);
+            state.resolvedSummaryData.monthlyTotal = currentMonthData.resolved_count;
+            state.resolvedSummaryData.dailyAverage = numberFormatter(currentMonthData.resolved_count / daysInMonth);
+
+            // get increase/decrease count if not this month
+            if (current.format('YYYY-MM') !== dayjs.utc().format('YYYY-MM')) {
+                const prevMonthData = find(results, { date: current.subtract(1, 'month').format('YYYY-MM') });
+                if (prevMonthData) {
+                    state.createdSummaryData.increase = currentMonthData.total_count - prevMonthData.total_count;
+                    state.resolvedSummaryData.increase = currentMonthData.resolved_count - prevMonthData.resolved_count;
+                } else {
+                    state.createdSummaryData.increase = currentMonthData.total_count;
+                    state.resolvedSummaryData.increase = currentMonthData.resolved_count;
+                }
+            }
+        };
+
+        /* api */
+        const getAlertHistorySummary = async () => {
+            try {
+                const current = state.currentDate.startOf('month');
+                const { results } = await SpaceConnector.client.monitoring.dashboard.alertHistorySummary({
+                    start: current.subtract(1, 'month').format('YYYY-MM-01'),
+                    end: current.add(1, 'month').format('YYYY-MM-01'),
+                });
+                setSummaryData(current, results);
+            } catch (e) {
+                initSummaryData();
+                console.error(e);
+            }
+        };
+
+        (async () => {
+            await getAlertHistorySummary();
+        })();
+
+        watch(() => state.currentDate, async () => {
+            await getAlertHistorySummary();
         });
 
         return {
             ...toRefs(state),
             ALERT_STATE,
+            commaFormatter,
         };
     },
 };
@@ -131,7 +195,6 @@ export default {
                     justify-content: space-between;
                     align-items: center;
                     line-height: 1.2;
-                    //padding: 0.5rem 1rem;
 
                     .text {
                         @apply text-gray-900;
