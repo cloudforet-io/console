@@ -1,3 +1,10 @@
+# [1.1.0-beta.100](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.99...v1.1.0-beta.100) (2021-07-09)
+
+
+### Bug Fixes
+
+* remove min-width from select dropdown button only case ([#639](https://github.com/spaceone-dev/spaceone-design-system/issues/639)) ([8fc7e44](https://github.com/spaceone-dev/spaceone-design-system/commit/8fc7e4430449ed41f5de7a5170caf56b51e4bd23))
+
 # [1.1.0-beta.99](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.98...v1.1.0-beta.99) (2021-07-09)
 
 
