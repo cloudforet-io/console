@@ -285,6 +285,10 @@ export default defineComponent<SelectDropdownProps>({
         width: auto;
     }
 
+    &.button-only {
+        min-width: unset;
+    }
+
     &.outline {
         min-width: 6.5rem;
         .dropdown-button {
