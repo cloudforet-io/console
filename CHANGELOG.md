@@ -1,3 +1,10 @@
+# [1.1.0-beta.95](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.94...v1.1.0-beta.95) (2021-07-09)
+
+
+### Features
+
+* add card without header ([#634](https://github.com/spaceone-dev/spaceone-design-system/issues/634)) ([974208c](https://github.com/spaceone-dev/spaceone-design-system/commit/974208c4748cb365b3c5348fdfb8207605db98f7))
+
 # [1.1.0-beta.94](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.93...v1.1.0-beta.94) (2021-07-06)
 
 
