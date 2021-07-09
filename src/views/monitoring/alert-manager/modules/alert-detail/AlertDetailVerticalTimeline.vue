@@ -3,28 +3,7 @@
         <ul class="timeline-list">
             <li class="timeline-item">
                 <div class="timestamp">
-                    2021/05/17<br>
-                    <b>12:32:01</b>
-                </div>
-                <div class="item-detail">
-                    test description
-                </div>
-            </li>
-            <li class="timeline-item">
-                <div class="timestamp">
-                    2021/05/17<br>
-                    <b>12:32:01</b>
-                </div>
-                <div class="item-detail">
-                    test<br>
-                    test<br>
-                    test
-                </div>
-            </li>
-            <li class="timeline-item">
-                <div class="timestamp">
-                    2021/05/17<br>
-                    <b>12:32:01</b>
+                    {{ item.created_at ? iso8601Formatter(item.created_at, timezone) : '' }}
                 </div>
                 <div class="item-detail">
                     <slot name="timeline-detail" />
@@ -35,9 +14,30 @@
 </template>
 
 <script lang="ts">
+import { iso8601Formatter } from '@spaceone/console-core-lib';
+
 export default {
     name: 'AlertDetailVerticalTimeline',
+    components: {
+
+    },
+    props: {
+        item: {
+            type: Object,
+            default: () => ({}),
+        },
+        timezone: {
+            type: String,
+            default: undefined,
+        },
+    },
+    setup() {
+        return {
+            iso8601Formatter,
+        };
+    },
 };
+
 </script>
 
 <style lang="postcss" scoped>
@@ -57,21 +57,21 @@ export default {
         &:before {
             @apply border-4 border-primary3 bg-primary;
             position: absolute;
-            left: -7px;
+            left: -0.4375rem;
             content: " ";
             border-radius: 500%;
             height: 0.875rem;
             width: 0.875rem;
             transition: all 500ms ease-in-out;
         }
-        &:last-child {
-            border-left: 0;
-        }
+        //&:last-child {
+        //    border-left: 0;
+        //}
     }
 }
 .timestamp {
     position: absolute;
-    width: 100px;
+    width: 6.25rem;
     left: -7.5rem;
     text-align: right;
     font-size: 0.875rem;

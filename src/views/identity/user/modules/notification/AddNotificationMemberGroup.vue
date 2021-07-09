@@ -1,7 +1,8 @@
 <template>
     <fragment>
         <p-autocomplete-search v-model="search" :menu="allMemberItems" :loading="loading"
-                               class="autocomplete-search" @select-menu="onSelectMember"
+                               class="autocomplete-search" use-fixed-menu-style
+                               @select-menu="onSelectMember"
         >
             <template #menu-item--format="{item, id}">
                 <p-check-box :id="id" v-model="selectedMemberItems" class="tag-menu-item"
@@ -85,13 +86,21 @@ export default {
             emitChange();
         });
 
+        const removeDuplicatedElement = (duplicatedArr) => {
+            const res = duplicatedArr.filter((item, i) => (
+                duplicatedArr.findIndex((item2, j) => item.resource_id === item2.resource_id) === i
+            ));
+            return res;
+        };
+
         const listProjectMember = async () => {
             state.loading = true;
             try {
-                const res = await SpaceConnector.client.identity.project.member.list({
+                const { results } = await SpaceConnector.client.identity.project.member.list({
                     project_id: props.projectId,
+                    include_parent_member: true,
                 });
-                state.allMember = res.results;
+                state.allMember = removeDuplicatedElement(results);
             } catch (e) {
                 state.allMember = [];
                 console.error(e);

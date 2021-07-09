@@ -66,6 +66,24 @@ export interface AlertDataModel {
     escalated_at: TimeStamp;
 }
 
+export interface Event {
+    additional_info: object;
+    alert_id: string;
+    created_at: TimeStamp;
+    description: string;
+    event_id: string;
+    event_key: string;
+    event_type: string;
+    occurred_at: TimeStamp;
+    project_id: string;
+    raw_data: object;
+    resource: object;
+    rule: string;
+    severity: string;
+    title: string;
+    webhook_id: string;
+}
+
 export interface AlertBottomFilters {
     state: ALERT_STATE_FILTER;
     urgency: ALERT_URGENCY;

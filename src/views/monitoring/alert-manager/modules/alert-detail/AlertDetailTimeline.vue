@@ -8,7 +8,7 @@
         </template>
         <template #event-list>
             <p-panel-top>Event list</p-panel-top>
-            <alert-detail-vertical-timeline />
+            <alert-detail-event-list />
         </template>
     </p-tab>
 </template>
@@ -21,10 +21,12 @@ import {
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import AlertDetailVerticalTimeline
     from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailVerticalTimeline.vue';
+import AlertDetailEventList from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailEventList.vue';
 
 export default {
     name: 'AlertDetailTimeline',
     components: {
+        AlertDetailEventList,
         AlertDetailVerticalTimeline,
         PTab,
         PPanelTop,

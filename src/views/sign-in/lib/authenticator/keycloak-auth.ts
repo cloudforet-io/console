@@ -9,11 +9,8 @@ class KeycloakAuth extends Authenticator {
 
     private static init() {
         const authOptions = store.state.domain.authOptions;
-        console.log(authOptions, 'authOptions');
         const issuer = authOptions.issuer;
-        console.log(issuer, 'issuer');
         const parsedIssuer = issuer.split('/');
-        console.log(parsedIssuer, 'parsedIssuer');
 
         const authIndex = parsedIssuer.indexOf('auth');
         const baseUrl = parsedIssuer[authIndex - 1];
