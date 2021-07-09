@@ -1,3 +1,10 @@
+# [1.1.0-beta.96](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.95...v1.1.0-beta.96) (2021-07-09)
+
+
+### Bug Fixes
+
+* remove isBeta from tab ([#635](https://github.com/spaceone-dev/spaceone-design-system/issues/635)) ([1356997](https://github.com/spaceone-dev/spaceone-design-system/commit/1356997ffb8e6eda4ca843bc7de32942c913f9e1))
+
 # [1.1.0-beta.95](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.94...v1.1.0-beta.95) (2021-07-09)
 
 
