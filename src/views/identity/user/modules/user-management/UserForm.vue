@@ -278,27 +278,12 @@ export default {
                 }
                 if (formState.activeTab === 'external') {
                     await checkOauth();
-                } else if (formState.activeTab === 'local') {
-                    checkEmailFormat(formState.user_id);
                 }
                 if (typeof validationState.isUserIdValid !== 'boolean') validationState.isUserIdValid = true;
             } else {
                 validationState.isUserIdValid = false;
                 validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
             }
-        };
-
-        const checkEmail = async () => {
-            const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-            if (formState.email) {
-                if (!regex.test(formState.email)) {
-                    validationState.isEmailValid = false;
-                    validationState.emailInvalidText = vm.$t('IDENTITY.USER.FORM.EMAIL_INVALID');
-                } else {
-                    validationState.isEmailValid = true;
-                    validationState.emailInvalidText = '';
-                }
-            } else validationState.isEmailValid = true;
         };
 
         const checkPassword = (password) => {
