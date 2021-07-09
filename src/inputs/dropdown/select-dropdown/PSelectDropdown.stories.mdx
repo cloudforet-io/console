@@ -142,9 +142,30 @@ export const Template = (args, { argTypes }) => ({
             i18n,
             components: { PSelectDropdown },
             template: `
-    <div class="h-full w-full overflow p-8">
-        <p-select-dropdown :items="menuItems" button-only></p-select-dropdown>
-    </div>
+<table style="border-collapse: separate; border-spacing: 16px;">
+    <thead>
+        <tr>
+            <th>icon / variations</th>
+            <th>default</th>
+            <th>disabled</th>
+            <th>invalid</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>default</th>
+            <td><p-select-dropdown :items="menuItems" button-only /></td>
+            <td><p-select-dropdown :items="menuItems" button-only disabled /></td>
+            <td><p-select-dropdown :items="menuItems" button-only invalid /></td>
+        </tr>
+        <tr>
+            <th>custom</th>
+            <td><p-select-dropdown :items="menuItems" button-only button-icon="ic_setting" /></td>
+            <td><p-select-dropdown :items="menuItems" button-only button-icon="ic_setting" disabled /></td>
+            <td><p-select-dropdown :items="menuItems" button-only button-icon="ic_setting" invalid /></td>
+        </tr>
+    </tbody>
+</table>
     `,
             setup() {
                 return {

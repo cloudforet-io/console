@@ -1,16 +1,20 @@
 <template>
     <p-button
         class="p-icon-button"
-        :class="[activated ? 'activated' : '', shape, size]"
+        :class="{ activated, [size]: true, loading}"
         :style-type="styleType"
         :outline="outline"
-        :disabled="disabled"
+        :disabled="disabled || loading"
         v-on="$listeners"
     >
-        <slot>
+        <p-lottie v-if="loading" name="thin-spinner" auto
+                  :width="sizeValue"
+                  :height="sizeValue"
+        />
+        <slot v-else>
             <p-i :name="name"
-                 :width="width"
-                 :height="height"
+                 :width="sizeValue"
+                 :height="sizeValue"
                  :color="color"
                  :animation="animation"
             />
@@ -19,13 +23,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, defineComponent, reactive, toRefs,
+} from '@vue/composition-api';
 
 import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import {
-    ICON_BUTTON_SHAPE, ICON_BUTTON_SIZE, ICON_BUTTON_STYLE_TYPE, IconButtonProps,
+    ICON_BUTTON_SIZE, ICON_BUTTON_STYLE_TYPE, IconButtonProps,
 } from '@/inputs/buttons/icon-button/type';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 
@@ -55,6 +61,10 @@ export default defineComponent({
             type: Boolean,
             default: false,
         },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
         outline: {
             type: Boolean,
             default: false,
@@ -63,11 +73,6 @@ export default defineComponent({
             type: String,
             default: 'md',
             validator: value => Object.keys(ICON_BUTTON_SIZE).includes(value as string),
-        },
-        shape: {
-            type: String,
-            default: 'circle',
-            validator: value => Object.keys(ICON_BUTTON_SHAPE).includes(value as string),
         },
         animation: {
             type: String,
@@ -79,8 +84,7 @@ export default defineComponent({
     },
     setup(props: IconButtonProps) {
         const state = reactive({
-            width: ICON_BUTTON_SIZE[props.size],
-            height: ICON_BUTTON_SIZE[props.size],
+            sizeValue: computed(() => ICON_BUTTON_SIZE[props.size] || '1.5rem'),
         });
         return {
             ...toRefs(state),
@@ -91,15 +95,15 @@ export default defineComponent({
 
 <style lang="postcss">
 .p-icon-button {
-    @apply rounded-sm p-0 inline-flex justify-center items-center;
+    @apply rounded-l p-0 inline-flex justify-center items-center;
     min-width: 2rem;
     min-height: 2rem;
     max-width: 2rem;
     max-height: 2rem;
-
-    &.circle {
-        @apply rounded-full;
+    .p-i-icon {
+        flex-shrink: 0;
     }
+
     &.lg {
         min-width: 2.5rem;
         min-height: 2.5rem;
@@ -112,20 +116,23 @@ export default defineComponent({
         max-width: 1.5rem;
         max-height: 1.5rem;
     }
-    &.loading:hover {
-        cursor: not-allowed;
-        &.transparent {
+
+    /* style types */
+    &.transparent {
+        @apply rounded-full;
+        &.loading:hover {
             @apply bg-transparent;
+        }
+        &.activated {
+            @apply text-secondary;
         }
     }
     &.gray-border {
-        @apply border-gray-300;
+        &:not(.loading):not(.disabled) {
+            @apply border-gray-300;
+        }
         &:not(.disabled):not(.loading):not(.activated):hover {
             @apply text-gray-900 border-gray-900;
-        }
-        &.disabled, &.loading {
-            @apply bg-gray-200 text-gray-400 border-white;
-            cursor: not-allowed;
         }
         &.activated {
             @apply text-secondary border-secondary;

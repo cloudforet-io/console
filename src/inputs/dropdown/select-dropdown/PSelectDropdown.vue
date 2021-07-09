@@ -20,6 +20,8 @@
                 </slot>
             </span>
             <p-icon-button :name="buttonIcon || (proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom')"
+                           :activated="proxyVisibleMenu"
+                           :disabled="disabled"
                            color="inherit"
                            class="dropdown-icon"
             />
@@ -271,18 +273,26 @@ export default defineComponent<SelectDropdownProps>({
         }
     }
 
-    &.disabled {
+    &.disabled:not(.button-only) {
         .dropdown-button {
             @apply bg-gray-100 text-gray-400;
         }
     }
     &:not(.disabled).invalid {
-        .dropdown-button {
-            @apply border border-alert;
-            &:focus, &:active {
+        &:not(.button-only) {
+            .dropdown-button {
+                @apply border border-alert;
+                &:focus, &:active {
+                    @apply border border-alert;
+                }
+            }
+        }
+        &.button-only {
+            .dropdown-button .p-icon-button {
                 @apply border border-alert;
             }
         }
+
     }
     &:not(.invalid):not(.disabled).active {
         .dropdown-button {
