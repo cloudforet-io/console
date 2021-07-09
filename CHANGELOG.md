@@ -1,3 +1,10 @@
+# [1.1.0-beta.98](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.97...v1.1.0-beta.98) (2021-07-09)
+
+
+### Features
+
+* apply updated icon button style and apply disabled and active style to select dropdown button only case ([#637](https://github.com/spaceone-dev/spaceone-design-system/issues/637)) ([545a3e3](https://github.com/spaceone-dev/spaceone-design-system/commit/545a3e37db45c285085d1e01e2a00a0638b28f04))
+
 # [1.1.0-beta.97](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.96...v1.1.0-beta.97) (2021-07-09)
 
 
