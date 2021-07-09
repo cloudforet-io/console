@@ -170,7 +170,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
         name: 'thisPage',
         type: { name: 'number' },
         description: 'Current page. sync props.',
-        defaultValue: undefined,
+        defaultValue: 1,
         table: {
             type: {
                 summary: 'number',
@@ -188,7 +188,7 @@ export const getToolboxArgTypes = (): ArgTypes => ({
         name: 'pageSize',
         type: { name: 'number' },
         description: 'Page size to show data. sync props.',
-        defaultValue: undefined,
+        defaultValue: 24,
         table: {
             type: {
                 summary: 'number',

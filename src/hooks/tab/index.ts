@@ -7,7 +7,6 @@ export interface TabItem {
     name: string;
     label?: string | TranslateResult;
     keepAlive?: boolean;
-    isBeta: boolean;
 }
 
 export interface TabProps {
@@ -21,11 +20,11 @@ const getTabState = (props: TabProps) => {
         tabItems: computed<Required<TabItem>[]>(() => props.tabs.map((value) => {
             if (typeof value === 'string') {
                 return {
-                    name: value, label: value, keepAlive: false, isBeta: false,
+                    name: value, label: value, keepAlive: false,
                 };
             }
             return {
-                name: value.name, label: value.label ?? value.name, keepAlive: !!value.keepAlive, isBeta: value.isBeta,
+                name: value.name, label: value.label ?? value.name, keepAlive: !!value.keepAlive,
             };
         })),
         nonKeepTabNames: computed<string[]>(() => {

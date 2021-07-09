@@ -19,9 +19,9 @@
                     }}
                 </slot>
             </span>
-            <p-i :name="buttonIcon || (proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom')"
-                 color="inherit"
-                 class="dropdown-icon"
+            <p-icon-button :name="buttonIcon || (proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom')"
+                           color="inherit"
+                           class="dropdown-icon"
             />
         </p-button>
         <p-context-menu v-show="proxyVisibleMenu"
@@ -53,13 +53,13 @@ import {
 
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
-import PI from '@/foundation/icons/PI.vue';
 
 import { useContextMenuFixedStyle, ContextMenuFixedStyleProps } from '@/hooks/context-menu-fixed-style';
 
 import { MenuItem } from '@/inputs/context-menu/type';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 import { makeOptionalProxy } from '@/util/composition-helpers';
+import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 
 
 interface SelectDropdownProps extends ContextMenuFixedStyleProps {
@@ -82,7 +82,7 @@ export default defineComponent<SelectDropdownProps>({
         clickOutside: vClickOutside.directive,
     },
     components: {
-        PI,
+        PIconButton,
         PButton,
         PContextMenu,
     },
@@ -267,6 +267,7 @@ export default defineComponent<SelectDropdownProps>({
         min-width: unset;
         .dropdown-button {
             padding: 0.25rem;
+            border-width: 0;
         }
     }
 

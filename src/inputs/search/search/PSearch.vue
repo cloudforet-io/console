@@ -140,7 +140,7 @@ export default defineComponent({
     &.disabled {
         @apply border-gray-200 bg-gray-100;
     }
-    &.focused {
+    &.focused, &:focus-within {
         @apply border-secondary bg-blue-100;
     }
     &:hover {
@@ -154,6 +154,9 @@ export default defineComponent({
         height: calc(2rem - 2px);
         &::placeholder {
             @apply text-gray-300;
+        }
+        &:focus {
+            outline: none;
         }
     }
     .right {
