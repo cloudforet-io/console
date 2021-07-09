@@ -5,7 +5,7 @@
              invalid,
              disabled,
              active: proxyVisibleMenu,
-             outline: !withoutOutline
+             ['without-outline']: withoutOutline
          }"
     >
         <p-icon-button v-if="buttonOnly"
@@ -251,15 +251,15 @@ export default defineComponent<SelectDropdownProps>({
     @apply bg-white;
     position: relative;
     display: inline-block;
-    min-width: unset;
+    min-width: 6.5rem;
     .dropdown-button {
-        @apply border-transparent text-gray-900 rounded;
+        @apply border-gray-300 text-gray-900 rounded;
         min-width: unset;
         width: 100%;
         display: inline-flex;
         justify-content: space-between;
 
-        padding: 0 0.25rem 0 0;
+        padding: 0 0.25rem 0 0.5rem;
         margin-right: -1px;
         font-weight: normal;
         text-align: left;
@@ -273,7 +273,7 @@ export default defineComponent<SelectDropdownProps>({
         }
 
         &:focus, &:active {
-            @apply text-secondary;
+            @apply border-secondary text-secondary;
             outline: none;
         }
     }
@@ -289,13 +289,13 @@ export default defineComponent<SelectDropdownProps>({
         min-width: unset;
     }
 
-    &.outline {
-        min-width: 6.5rem;
+    &.without-outline {
+        min-width: unset;
         .dropdown-button {
-            @apply border-gray-300;
-            padding-left: 0.5rem;
+            @apply border-transparent;
+            padding-left: 0;
             &:focus, &:active {
-                @apply border-secondary;
+                @apply border-transparent;
             }
         }
     }
@@ -303,18 +303,18 @@ export default defineComponent<SelectDropdownProps>({
     /* disabled */
     &.disabled {
         .dropdown-button {
-            @apply text-gray-300;
+            @apply bg-gray-100 text-gray-300;
             cursor: not-allowed;
         }
-        &.outline {
+        &.without-outline {
             .dropdown-button {
-                @apply bg-gray-100;
+                @apply bg-transparent;
             }
         }
     }
 
     /* invalid */
-    &:not(.disabled).outline.invalid {
+    &:not(.disabled):not(.without-outline).invalid {
         .dropdown-button {
             @apply border border-alert;
             &:focus, &:active {
@@ -324,14 +324,14 @@ export default defineComponent<SelectDropdownProps>({
     }
 
     /* active */
-    &:not(.invalid):not(.disabled).outline.active {
+    &:not(.invalid):not(.disabled):not(.without-outline).active {
         .dropdown-button {
             @apply border-secondary text-secondary;
         }
     }
 
     /* hover */
-    &:not(.invalid):not(.disabled):not(.active).outline {
+    &:not(.invalid):not(.disabled):not(.active):not(.without-outline) {
         .dropdown-button {
             @media (hover: hover) {
                 &:not(.active):not(.disabled):hover {
@@ -340,7 +340,7 @@ export default defineComponent<SelectDropdownProps>({
             }
         }
     }
-    &:not(.disabled):not(.active):not(.outline) {
+    &:not(.disabled):not(.active).without-outline {
         .dropdown-button {
             @media (hover: hover) {
                 &:not(.active):not(.disabled):hover {
