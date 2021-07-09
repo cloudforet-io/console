@@ -1077,11 +1077,15 @@
 				"ALT_S_UPDATE": "얼럿 편집 성공",
 				"ASSIGNED_TO_ME": "나에게 지정된 것만",
 				"ASSIGNED_TO_YOU_TITLE": "나에게 지정된 새로운 얼럿",
+				"BUTTON_ACKNOWLEDGE": "확인",
+				"BUTTON_DELETE": "삭제",
+				"BUTTON_MERGE": "병합",
+				"BUTTON_RESOLVE": "해결",
 				"CREATE": "생성",
-				"DELETE": "삭제",
-				"DELETE_MODAL": {
-					"TITLE": "정말로 선택된 얼럿을 삭제하시겠습니까?"
+				"DELETE_CHECK_MODAL": {
+					"TITLE": "선택된 얼럿을 삭제하시겠습니까?"
 				},
+				"ERROR": "에러",
 				"FORM": {
 					"ACTIVATE_PROJECT_ALERT": "프로젝트에 얼럿 활성화",
 					"CREATE_PROJECT": "프로젝트 생성하러 가기",
@@ -1100,7 +1104,6 @@
 				},
 				"HIGH": "높음",
 				"LOW": "낮음",
-				"MERGE": "병합",
 				"MERGE_MODAL": {
 					"LABEL_ASSIGNED": "담당자",
 					"LABEL_CREATED": "생성 일시",
@@ -1116,13 +1119,18 @@
 				},
 				"OPEN": "열림",
 				"OPEN_ALERT": "나에게 지정된 얼럿",
-				"RESOLVE": "해결",
 				"RESOLVED": "해결",
 				"STATE": "상태",
-				"TRIGGERED": "트리거됨",
+				"TRIGGERED": "트리거",
+				"UPDATE_ACKNOWLEDGE_MODAL": {
+					"ASSIGN_TO_ME_YES": "네, 선택된 얼럿을 저에게 할당하겠습니다.",
+					"ASSIGN_TO_YOU": "선택된 얼럿을 할당할까요?",
+					"TITLE": "{count}개의 얼럿 acknowledged 상태로 변경하기"
+				},
 				"UPDATE_RESOLVE_MODAL": {
 					"LABEL_NOTE": "노트",
-					"TITLE": "Resolved 상태로 변경하기"
+					"NOTREOPEN": "resolved 상태로 변경되면, 이 얼럿을 다시 열 수 없습니다.",
+					"TITLE": "{count}개의 얼럿 Resolved 상태로 변경하기"
 				},
 				"URGENCY": "긴급도"
 			},
@@ -1602,7 +1610,7 @@
 				"ALERT": "얼럿",
 				"OPEN_ALERT": "오픈된 얼럿",
 				"RESOLVED": "해결",
-				"TRIGGERED": "트리거됨"
+				"TRIGGERED": "트리거"
 			},
 			"TAB_ALERT": "얼럿",
 			"TAB_MAINTENANCE_WINDOW": "유지 관리 기간",

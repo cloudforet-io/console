@@ -1077,11 +1077,15 @@
 				"ALT_S_UPDATE": "Success to Update Alert",
 				"ASSIGNED_TO_ME": "Assigned to me",
 				"ASSIGNED_TO_YOU_TITLE": "New alert assigned to you",
+				"BUTTON_ACKNOWLEDGE": "Acknowledge",
+				"BUTTON_DELETE": "Delete",
+				"BUTTON_MERGE": "Merge",
+				"BUTTON_RESOLVE": "Resolve",
 				"CREATE": "Create",
-				"DELETE": "Delete",
-				"DELETE_MODAL": {
-					"TITLE": "Are you sure you want to delete selected alert?"
+				"DELETE_CHECK_MODAL": {
+					"TITLE": "Are you sure you want to delete selected alert(s)?"
 				},
+				"ERROR": "Error",
 				"FORM": {
 					"ACTIVATE_PROJECT_ALERT": "Activate Alert of Project",
 					"CREATE_PROJECT": "Go create project",
@@ -1100,7 +1104,6 @@
 				},
 				"HIGH": "High",
 				"LOW": "Low",
-				"MERGE": "Merge",
 				"MERGE_MODAL": {
 					"LABEL_ASSIGNED": "Assigned to",
 					"LABEL_CREATED": "Created",
@@ -1116,13 +1119,18 @@
 				},
 				"OPEN": "Open",
 				"OPEN_ALERT": "Your open alert",
-				"RESOLVE": "Resolve",
 				"RESOLVED": "Resolved",
 				"STATE": "State",
 				"TRIGGERED": "Triggered",
+				"UPDATE_ACKNOWLEDGE_MODAL": {
+					"ASSIGN_TO_ME_YES": "Yes, I want to assign to me.",
+					"ASSIGN_TO_YOU": "Do you want to assign selected alert(s) to you?",
+					"TITLE": "Change {count} alert(s) to acknowledged state "
+				},
 				"UPDATE_RESOLVE_MODAL": {
 					"LABEL_NOTE": "Note",
-					"TITLE": "Change to resolved state"
+					"NOTREOPEN": "Once resolved, this alert cannot be reopened.",
+					"TITLE": "Change {count} alert(s) to resolved state"
 				},
 				"URGENCY": "Urgency"
 			},

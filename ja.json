@@ -1077,11 +1077,15 @@
 				"ALT_S_UPDATE": "アラート編集に成功",
 				"ASSIGNED_TO_ME": "自分にアサインする",
 				"ASSIGNED_TO_YOU_TITLE": "あなたに新しいアラートがアサインされました",
+				"BUTTON_ACKNOWLEDGE": "",
+				"BUTTON_DELETE": "削除",
+				"BUTTON_MERGE": "マージ",
+				"BUTTON_RESOLVE": "",
 				"CREATE": "作成",
-				"DELETE": "削除",
-				"DELETE_MODAL": {
+				"DELETE_CHECK_MODAL": {
 					"TITLE": "選択したアラートをしても宜しいですか？"
 				},
+				"ERROR": "",
 				"FORM": {
 					"ACTIVATE_PROJECT_ALERT": "プロジェクトのアラートを有効化",
 					"CREATE_PROJECT": "プロジェクトの作成に移動",
@@ -1100,7 +1104,6 @@
 				},
 				"HIGH": "高い",
 				"LOW": "低い",
-				"MERGE": "マージ",
 				"MERGE_MODAL": {
 					"LABEL_ASSIGNED": "担当者",
 					"LABEL_CREATED": "作成時間",
@@ -1116,12 +1119,17 @@
 				},
 				"OPEN": "開く",
 				"OPEN_ALERT": "",
-				"RESOLVE": "",
 				"RESOLVED": "",
 				"STATE": "",
 				"TRIGGERED": "",
+				"UPDATE_ACKNOWLEDGE_MODAL": {
+					"ASSIGN_TO_ME_YES": "",
+					"ASSIGN_TO_YOU": "",
+					"TITLE": ""
+				},
 				"UPDATE_RESOLVE_MODAL": {
 					"LABEL_NOTE": "ノート",
+					"NOTREOPEN": "",
 					"TITLE": "Resolvedに変更する"
 				},
 				"URGENCY": ""
