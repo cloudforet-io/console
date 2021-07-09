@@ -1,3 +1,10 @@
+# [1.1.0-beta.97](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.96...v1.1.0-beta.97) (2021-07-09)
+
+
+### Features
+
+* add icons and lotties ([#636](https://github.com/spaceone-dev/spaceone-design-system/issues/636)) ([8044b28](https://github.com/spaceone-dev/spaceone-design-system/commit/8044b28352fa52c5245fb5338b831e4abbeb1e27))
+
 # [1.1.0-beta.96](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.95...v1.1.0-beta.96) (2021-07-09)
 
 
