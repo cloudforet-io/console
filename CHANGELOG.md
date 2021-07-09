@@ -1,3 +1,10 @@
+# [1.1.0-beta.101](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.100...v1.1.0-beta.101) (2021-07-09)
+
+
+### Bug Fixes
+
+* update props from outline to without-outline  in select dropdown ([#640](https://github.com/spaceone-dev/spaceone-design-system/issues/640)) ([ba0600a](https://github.com/spaceone-dev/spaceone-design-system/commit/ba0600a2b22d48a109a58481f1feee9e0031c164))
+
 # [1.1.0-beta.100](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.99...v1.1.0-beta.100) (2021-07-09)
 
 
