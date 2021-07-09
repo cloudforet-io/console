@@ -1137,13 +1137,17 @@
 				"CURRENT_PROJECT_STATUS": "현재 프로젝트 상태",
 				"DAILY_AVERAGE": "일 평균",
 				"DASHBOARD": "대시보드",
+				"HEALTHY": "정상",
 				"HIGH": "높음",
+				"ISSUE": "",
 				"LOW": "낮음",
+				"MAINTENANCE": "",
 				"MONTHLY_TOTAL": "월간 합계",
 				"OPEN": "열림",
 				"PROJECT_HEALTH_BOARD": "Project Health Board",
 				"RESOLVED": "해결",
-				"TOP_5_PROJECT_ACTIVITY": "Top 5 프로젝트 활동"
+				"TOP_5_PROJECT_ACTIVITY": "Top 5 프로젝트 활동",
+				"TOTAL": "총"
 			},
 			"DETAIL": {
 				"ALT_E_DELETE_ALERT": "알람 삭제 실패",

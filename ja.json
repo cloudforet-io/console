@@ -1137,13 +1137,17 @@
 				"CURRENT_PROJECT_STATUS": "現在のプロジェクト状態",
 				"DAILY_AVERAGE": "日平均",
 				"DASHBOARD": "ダッシュボード",
+				"HEALTHY": "正常",
 				"HIGH": "高い",
+				"ISSUE": "",
 				"LOW": "低い",
+				"MAINTENANCE": "",
 				"MONTHLY_TOTAL": "月平均",
 				"OPEN": "開く",
 				"PROJECT_HEALTH_BOARD": "プロジェクトヘルスボード",
 				"RESOLVED": "",
-				"TOP_5_PROJECT_ACTIVITY": "Top5のプロジェクト活動"
+				"TOP_5_PROJECT_ACTIVITY": "Top5のプロジェクト活動",
+				"TOTAL": "合計"
 			},
 			"DETAIL": {
 				"ALT_E_DELETE_ALERT": "アラート削除に失敗",

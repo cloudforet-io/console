@@ -1137,13 +1137,17 @@
 				"CURRENT_PROJECT_STATUS": "Current Project Status",
 				"DAILY_AVERAGE": "Daily Average",
 				"DASHBOARD": "Dashboard",
+				"HEALTHY": "Healthy",
 				"HIGH": "High",
+				"ISSUE": "Issue",
 				"LOW": "Low",
+				"MAINTENANCE": "Maintenance",
 				"MONTHLY_TOTAL": "Monthly Total",
 				"OPEN": "Open",
 				"PROJECT_HEALTH_BOARD": "Project Health Board",
 				"RESOLVED": "Resolved",
-				"TOP_5_PROJECT_ACTIVITY": "Top 5 Project Activity"
+				"TOP_5_PROJECT_ACTIVITY": "Top 5 Project Activity",
+				"TOTAL": "Total"
 			},
 			"DETAIL": {
 				"ALT_E_DELETE_ALERT": "Failed to Delete Alert",
