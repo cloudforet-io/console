@@ -36,6 +36,7 @@ export const Template = (args, { argTypes }) => ({
             :index-mode="indexMode"
             :placeholder="placeholder"
             :button-only="buttonOnly"
+            :without-outline="withoutOutline"
             :button-style-type="buttonStyleType"
             :button-icon="buttonIcon"
             @select="onSelect"
@@ -163,6 +164,51 @@ export const Template = (args, { argTypes }) => ({
             <td><p-select-dropdown :items="menuItems" button-only button-icon="ic_setting" /></td>
             <td><p-select-dropdown :items="menuItems" button-only button-icon="ic_setting" disabled /></td>
             <td><p-select-dropdown :items="menuItems" button-only button-icon="ic_setting" invalid /></td>
+        </tr>
+    </tbody>
+</table>
+    `,
+            setup() {
+                return {
+                    menuItems
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Without Outline
+
+<Canvas>
+    <Story name="Without Outline">
+        {{
+            i18n,
+            components: { PSelectDropdown },
+            template: `
+<table style="border-collapse: separate; border-spacing: 16px;">
+    <thead>
+        <tr>
+            <th>case / variations</th>
+            <th>default</th>
+            <th>disabled</th>
+            <th>invalid</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>default(outline)</th>
+            <td><p-select-dropdown :items="menuItems" /></td>
+            <td><p-select-dropdown :items="menuItems" disabled /></td>
+            <td><p-select-dropdown :items="menuItems" invalid /></td>
+        </tr>
+        <tr>
+            <th>without outline</th>
+            <td><p-select-dropdown :items="menuItems" without-outline /></td>
+            <td><p-select-dropdown :items="menuItems" without-outline disabled /></td>
+            <td><p-select-dropdown :items="menuItems" without-outline invalid /></td>
         </tr>
     </tbody>
 </table>

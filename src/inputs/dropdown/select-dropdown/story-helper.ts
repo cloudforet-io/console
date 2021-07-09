@@ -129,13 +129,29 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
                 type: 'boolean',
             },
         },
+        withoutOutline: {
+            name: 'withoutOutline',
+            type: { name: 'boolean' },
+            description: 'Whether to show outline or not.',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
         buttonStyleType: {
             name: 'buttonStyleType',
             type: { name: 'string' },
-            description: `
-                Button style. Useful when \`buttonOnly\` props is \`true\`.
-                ${[undefined, ...Object.values(BUTTON_STYLE)]} are available.
-            `,
+            description: `Button style. Useful when \`buttonOnly\` props is \`true\`. \n${
+                ['undefined', ...Object.values(BUTTON_STYLE)].map(d => `\`${d}\``)} are available.`,
             defaultValue: undefined,
             table: {
                 type: {
@@ -244,6 +260,6 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
                 },
                 category: 'events',
             },
-        }
+        },
     };
 };
