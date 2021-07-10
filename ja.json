@@ -1135,6 +1135,7 @@
 				"URGENCY": ""
 			},
 			"DASHBOARD": {
+				"ALERT": "アラート",
 				"ALERT_HISTORY": "アラート履歴",
 				"ALERT_STATE": "アラート状態",
 				"ALL": "すべて",
@@ -1151,6 +1152,7 @@
 				"LOW": "低い",
 				"MAINTENANCE": "",
 				"MONTHLY_TOTAL": "月平均",
+				"MORE_ALERTS_HELP_TEXT": "",
 				"OPEN": "開く",
 				"PROJECT_HEALTH_BOARD": "プロジェクトヘルスボード",
 				"RESOLVED": "",

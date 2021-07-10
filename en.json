@@ -1135,6 +1135,7 @@
 				"URGENCY": "Urgency"
 			},
 			"DASHBOARD": {
+				"ALERT": "Alert",
 				"ALERT_HISTORY": "Alert History",
 				"ALERT_STATE": "Alert State",
 				"ALL": "All",
@@ -1151,6 +1152,7 @@
 				"LOW": "Low",
 				"MAINTENANCE": "Maintenance",
 				"MONTHLY_TOTAL": "Monthly Total",
+				"MORE_ALERTS_HELP_TEXT": "more alert(s) was created",
 				"OPEN": "Open",
 				"PROJECT_HEALTH_BOARD": "Project Health Board",
 				"RESOLVED": "Resolved",

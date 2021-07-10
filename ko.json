@@ -1135,6 +1135,7 @@
 				"URGENCY": "긴급도"
 			},
 			"DASHBOARD": {
+				"ALERT": "얼럿",
 				"ALERT_HISTORY": "얼럿 히스토리",
 				"ALERT_STATE": "얼럿 상태",
 				"ALL": "전체",
@@ -1151,6 +1152,7 @@
 				"LOW": "낮음",
 				"MAINTENANCE": "",
 				"MONTHLY_TOTAL": "월간 합계",
+				"MORE_ALERTS_HELP_TEXT": "",
 				"OPEN": "열림",
 				"PROJECT_HEALTH_BOARD": "Project Health Board",
 				"RESOLVED": "해결",
