@@ -601,7 +601,7 @@ export default defineComponent<DataTableProps>({
     }
 
     .invalid-cover {
-        @apply absolute w-full h-full overflow-hidden border border-alert;
+        @apply absolute w-full h-full overflow-hidden border border-alert rounded-lg;
         pointer-events: none;
         top: 0;
         z-index: 1;

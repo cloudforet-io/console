@@ -71,7 +71,7 @@ export default defineComponent<Props>({
 
 <style lang="postcss">
 .p-tab {
-    @apply rounded-sm border border-gray-200 bg-white;
+    @apply rounded-lg border border-gray-200 bg-white;
     min-height: 19rem;
     ul.tab-item-wrapper {
         @apply border-gray-100;

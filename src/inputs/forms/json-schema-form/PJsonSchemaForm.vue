@@ -262,13 +262,12 @@ export default {
             font-weight: normal;
         }
         .form-control {
-            @apply text-gray-900 border border-gray-300;
+            @apply text-gray-900 border border-gray-300 rounded;
             display: block;
             width: 100%;
             max-width: 25rem;
             font-size: 0.875rem;
             line-height: 1.3rem;
-            border-radius: 0.125rem;
             box-shadow: none;
             padding: 0.375rem 0.5rem;
 

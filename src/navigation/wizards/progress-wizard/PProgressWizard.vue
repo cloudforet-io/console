@@ -230,13 +230,13 @@ export default {
                 @mixin triangle calc($(height) / 2), 1, theme('colors.black');
             }
             &:last-child {
-                @apply border-r border-black;
+                @apply border-r border-black rounded-r-lg;
                 .triangle, .triangle-bg {
                     display: none;
                 }
             }
             &:first-child {
-                @apply border-l border-black;
+                @apply border-l border-black rounded-l-lg;
             }
             &.active {
                 @apply text-lg font-bold bg-black text-white;
