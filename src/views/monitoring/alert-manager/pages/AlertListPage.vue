@@ -60,7 +60,7 @@ export default {
         const routeState = reactive({
             route: computed(() => [
                 { name: i18n.t('MENU.MONITORING.MONITORING'), path: '/monitoring' },
-                { name: i18n.t('MENU.MONITORING.ALERT_SYSTEM'), path: '/monitoring/alert-manager/dashboard' },
+                { name: i18n.t('MENU.MONITORING.ALERT_MANAGER'), path: '/monitoring/alert-manager/dashboard' },
                 { name: i18n.t('MONITORING.ALERT.ALERT_LIST.ALERT') },
             ]),
         });

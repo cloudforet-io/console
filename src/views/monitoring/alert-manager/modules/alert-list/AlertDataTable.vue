@@ -30,7 +30,7 @@
                             :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')"
                         >
                             <template #extra>
-                                <alert-actions :selected-items="selectedItems" @refresh="getAlerts()" />
+                                <alert-actions :selected-items="selectedItems" :webhook-list="webhookNameList" @refresh="getAlerts()" />
                             </template>
                         </p-panel-top>
                     </div>
@@ -66,8 +66,8 @@
                     </template>
                 </template>
                 <template #col-state-format="{ value }">
-                    <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)">
-                        {{ capitalize(value) }}
+                    <p-badge :style-type="alertStateBadgeStyleTypeFormatter(value)" :outline="value === ALERT_STATE.ERROR">
+                        {{ alertStateLabels[value] }}
                     </p-badge>
                 </template>
                 <template #col-urgency-format="{ value }">
@@ -75,10 +75,10 @@
                          width="1em" height="1em" class="mr-1"
                          :class="{'ic_state_duplicated': !(value === ALERT_URGENCY.HIGH)}"
                     />
-                    <span class="title">{{ capitalize(value) }}</span>
+                    <span>{{ urgencyLabels[value] }}</span>
                 </template>
                 <template #col-resource-format="{ value }">
-                    {{ value.name }}
+                    {{ value ? value.name : '' }}
                 </template>
                 <template #col-project_id-format="{ value }">
                     <template v-if="value">
@@ -134,11 +134,15 @@ import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import AlertActions from '@/views/monitoring/alert-manager/modules/alert-list/AlertActions.vue';
 import AlertTableBottomFilters from '@/views/monitoring/alert-manager/modules/alert-list/AlertTableBottomFilters.vue';
 import AlertFormModal from '@/views/monitoring/alert-manager/modules/alert-list/AlertFormModal.vue';
+import {
+    ALERT_STATE, ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE,
+} from '@/views/monitoring/alert-manager/lib/config';
+
 
 import {
     AlertBottomFilters, AlertListTableFilters,
 } from '@/views/monitoring/alert-manager/type';
-import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/views/monitoring/alert-manager/lib/config';
+
 import { alertStateBadgeStyleTypeFormatter } from '@/views/monitoring/alert-manager/lib/helper';
 
 
@@ -163,7 +167,7 @@ const EXCEL_FIELDS = [
     { key: 'state', name: 'State' },
     { key: 'urgency', name: 'Urgency' },
     { key: 'status_message', name: 'Status Details' },
-    { key: 'resource', name: 'Resource' },,
+    { key: 'resource', name: 'Resource' },
     { key: 'project_id', name: 'Project' },
     { key: 'created_at', name: 'Created', type: 'datetime' },
     { key: 'assignee', name: 'Assigned to' },
@@ -242,6 +246,16 @@ export default {
             tags: tagQueryHelper.setKeyItemSets(QUERY_SEARCH_HANDLER.keyItemSets).queryTags,
             webhookNameList: [] as any,
             visibleAlertFormModal: false,
+            alertStateLabels: computed(() => ({
+                TRIGGERED: i18n.t('MONITORING.ALERT.ALERT_LIST.TRIGGERED'),
+                ACKNOWLEDGED: i18n.t('MONITORING.ALERT.ALERT_LIST.ACKNOWLEDGED'),
+                RESOLVED: i18n.t('MONITORING.ALERT.ALERT_LIST.RESOLVED'),
+                ERROR: i18n.t('MONITORING.ALERT.ALERT_LIST.ERROR'),
+            })),
+            urgencyLabels: computed(() => ({
+                HIGH: i18n.t('MONITORING.ALERT.ALERT_LIST.HIGH'),
+                LOW: i18n.t('MONITORING.ALERT.ALERT_LIST.LOW'),
+            })),
         });
 
 
@@ -367,6 +381,7 @@ export default {
             TABLE_FIELDS,
             EXCEL_FIELDS,
             QUERY_SEARCH_HANDLER,
+            ALERT_STATE,
             ALERT_URGENCY,
             ALERT_STATE_FILTER,
             MONITORING_ROUTE,
@@ -389,10 +404,9 @@ export default {
 .alert-data-table {
     @apply col-span-12;
     .p-toolbox-table::v-deep {
-        @apply overflow-hidden rounded-lg border-0;
+        @apply overflow-hidden rounded-l;
         .panel-top-wrapper {
-            @apply bg-white rounded-tl-lg rounded-tr-lg border-gray-200;
-            border-width: 1px;
+            @apply bg-white;
             .p-panel-top {
                 margin-top: 1.5rem;
             }
@@ -404,6 +418,9 @@ export default {
         }
         .alert-title {
             @apply text-blue-600;
+            &:hover {
+                @apply underline;
+            }
         }
         .ic_state_duplicated path {
             fill: theme('colors.red.200');

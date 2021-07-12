@@ -1,9 +1,24 @@
-import { ALERT_STATE_FILTER, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
+import { ALERT_STATE, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
 
 export const alertStateBadgeStyleTypeFormatter = (alertState) => {
-    if (alertState === ALERT_STATE_FILTER.TRIGGERED) return 'red100';
-    if (alertState === ALERT_STATE_FILTER.ACKNOWLEDGED) return 'blue200';
-    return 'gray200';
+    let style = '';
+    switch (alertState) {
+    case ALERT_STATE.TRIGGERED:
+        style = 'red100';
+        break;
+    case ALERT_STATE.ACKNOWLEDGED:
+        style = 'blue200';
+        break;
+    case ALERT_STATE.RESOLVED:
+        style = 'gray200';
+        break;
+    case ALERT_STATE.ERROR:
+        style = 'alert';
+        break;
+    default: style = '';
+        break;
+    }
+    return style;
 };
 
 export const alertScopeBadgeStyleTypeFormatter = (scope) => {

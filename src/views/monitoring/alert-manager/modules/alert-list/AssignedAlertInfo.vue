@@ -47,7 +47,6 @@ export default {
             try {
                 const { results } = await SpaceConnector.client.monitoring.dashboard.alertCountByState({
                     assignee: store.state.user.userId,
-                    // assignee: 'whdalsrnt@mz.co.kr',
                 });
                 state.countsAssignedAlerts = results;
             } catch (e) {

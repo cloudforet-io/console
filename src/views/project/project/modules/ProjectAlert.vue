@@ -26,9 +26,7 @@ export default {
 <style lang="postcss" scoped>
 .project-alert::v-deep {
     .p-toolbox-table {
-        .panel-top-wrapper {
-            @apply border-0;
-        }
+        @apply border-0;
         .p-data-table {
             th:nth-child(8), td:nth-child(8) {
                 @apply hidden;

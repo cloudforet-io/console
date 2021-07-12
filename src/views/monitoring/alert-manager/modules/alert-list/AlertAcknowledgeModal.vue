@@ -1,45 +1,39 @@
 <template>
     <p-button-modal
-        class="alert-resolve-update-modal"
+        class="alert-acknowledge-update-modal"
         fade
         size="sm"
-        :header-title="$t('MONITORING.ALERT.ALERT_LIST.UPDATE_RESOLVE_MODAL.TITLE', {count: alerts.length})"
+        :header-title="$t('MONITORING.ALERT.ALERT_LIST.UPDATE_ACKNOWLEDGE_MODAL.TITLE', {count: alerts.length})"
         :visible.sync="proxyVisible"
         @confirm="onClickConfirm"
     >
         <template #body>
-            <p>{{ $t('MONITORING.ALERT.ALERT_LIST.UPDATE_RESOLVE_MODAL.NOTREOPEN') }}</p>
-            <p-field-group
-                :label="$t('MONITORING.ALERT.ALERT_LIST.UPDATE_RESOLVE_MODAL.LABEL_NOTE')"
-                class="mt-4"
-            >
-                <p-textarea v-model="noteInput" />
-            </p-field-group>
+            <div class="body-inner">
+                <p>{{ $t('MONITORING.ALERT.ALERT_LIST.UPDATE_ACKNOWLEDGE_MODAL.ASSIGN_TO_YOU') }}</p>
+                <p-check-box v-model="isAssignedToMe">
+                    <span> {{ $t('MONITORING.ALERT.ALERT_LIST.UPDATE_ACKNOWLEDGE_MODAL.ASSIGN_TO_ME_YES') }}</span>
+                </p-check-box>
+            </div>
         </template>
     </p-button-modal>
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
-import {
-    PButtonModal, PTextarea, PFieldGroup,
-} from '@spaceone/design-system';
+import { PButtonModal, PCheckBox } from '@spaceone/design-system';
 import { makeProxy } from '@spaceone/console-core-lib';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { store } from '@/store';
 import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
 import { i18n } from '@/translations';
 
 export default {
-    name: 'AlertResolveModal',
+    name: 'AlertAcknowledgeModalModal',
     components: {
         PButtonModal,
-        PTextarea,
-        PFieldGroup,
+        PCheckBox,
     },
     props: {
         visible: {
@@ -54,39 +48,24 @@ export default {
     setup(props, { emit, root }) {
         const state = reactive({
             proxyVisible: makeProxy<boolean>('visible', props, emit),
-            noteInput: '',
-            userId: computed(() => store.state.user.userId),
+            isAssignedToMe: true,
         });
 
         /* api */
-        const updateToResolve = async () => {
+        const updateToAcknowledge = async () => {
             try {
                 await SpaceConnector.client.monitoring.alert.changeState({
                     alerts: props.alerts?.map(d => d.alert_id),
-                    state: ALERT_STATE.RESOLVED,
+                    state: ALERT_STATE.ACKNOWLEDGED,
                 });
             } catch (e) {
                 console.error(e);
             }
         };
-        const createNote = async () => {
-            const params: any = {
-                alert_id: props.alert.alert_id,
-                user_id: state.userId,
-            };
 
-            if (state.noteInput) {
-                params.note = state.noteInput;
-            }
-
-            await SpaceConnector.client.monitoring.note.create(params);
-        };
-
-        /* Handlers */
         const onClickConfirm = async () => {
             try {
-                await updateToResolve();
-                // if (state.noteInput) await createNote();
+                await updateToAcknowledge();
                 emit('confirm');
                 showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_STATE_CHANGED'), '', root);
             } catch (e) {
@@ -99,7 +78,7 @@ export default {
 
         /* initiators */
         const reset = async () => {
-            state.noteInput = '';
+            state.isAssignedToMe = true;
         };
 
         watch(() => props.visible, async (visible) => {
@@ -113,3 +92,11 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.body-inner {
+    padding: 2rem 0 2.75rem;
+    p {
+        padding-bottom: 0.75rem;
+    }
+}
+</style>

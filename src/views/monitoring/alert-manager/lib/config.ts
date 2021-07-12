@@ -10,7 +10,7 @@ export enum ACTION {
 export const EDIT_MODE = {
     DESCRIPTION: 'description',
     STATUS_MSG: 'status_message',
-    PROJECT: 'project'
+    PROJECT: 'project',
 } as const;
 export type EDIT_MODE = typeof EDIT_MODE[keyof typeof EDIT_MODE];
 
@@ -43,6 +43,7 @@ export const ALERT_STATE = {
     TRIGGERED: 'TRIGGERED',
     ACKNOWLEDGED: 'ACKNOWLEDGED',
     RESOLVED: 'RESOLVED',
+    ERROR: 'ERROR',
 } as const;
 export type ALERT_STATE = typeof ALERT_STATE[keyof typeof ALERT_STATE];
 
