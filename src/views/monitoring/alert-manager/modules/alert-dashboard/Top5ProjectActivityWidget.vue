@@ -22,24 +22,24 @@
                 </p-select-status>
             </div>
         </div>
-        <div class="content-wrapper">
-            <div v-for="(item, idx) in items" :key="`table-row-${idx}`"
+        <div v-if="!loading" class="content-wrapper">
+            <div v-for="(projectId, idx) in top5Projects" :key="`table-row-${idx}`"
                  class="table-row"
             >
-                <p-anchor :to="referenceRouter(item.projectId,{ resource_type: 'identity.Project' })"
+                <p-anchor :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
                           :show-icon="false"
                           class="col-name"
                 >
-                    <span v-tooltip.bottom="projectNameFormatter(item.projectId)" class="tablet:hidden">{{ projectNameFormatter(item.projectId) }}</span>
-                    <span class="tablet-text">{{ projectNameFormatter(item.projectId) }}</span>
+                    <span v-tooltip.bottom="projectNameFormatter(projectId)" class="tablet:hidden">{{ projectNameFormatter(projectId) }}</span>
+                    <span class="tablet-text">{{ projectNameFormatter(projectId) }}</span>
                 </p-anchor>
                 <div class="col-activity">
-                    <div v-for="(activity, aIdx) in item.activities" :key="`activity-${aIdx}`"
+                    <div v-for="(activity, aIdx) in activity[projectId]" :key="`activity-${aIdx}`"
                          class="box-wrapper"
                     >
                         <div class="box" :class="activity.status ? activity.status : 'empty'">
                             <top5-project-activity-tooltip
-                                :project-id="item.projectId"
+                                :project-id="projectId"
                                 :status="activity.status"
                                 :date="activity.date"
                                 :period="selectedPeriod"
@@ -116,9 +116,10 @@ export default {
     },
     setup() {
         const state = reactive({
+            loading: true,
             projects: computed(() => store.state.resource.project.items),
             top5Projects: [] as string[],
-            items: [] as ProjectActivity[],
+            activity: {},
             periods: [
                 {
                     name: PERIOD['7D'],
@@ -173,7 +174,6 @@ export default {
         };
         const getActivities = async (projectId) => {
             try {
-                state.items = [];
                 const unit = state.selectedPeriod.includes('d') ? 'day' : 'hour';
                 const end = dayjs.utc().add(1, unit);
                 const start = end.subtract(periodNumberFormatter(state.selectedPeriod), unit);
@@ -183,12 +183,9 @@ export default {
                     start: start.toISOString(),
                     end: end.toISOString(),
                 });
-                state.items.push({
-                    projectId,
-                    activities: activityFormatter(results, unit, start, end),
-                });
+                state.activity[projectId] = activityFormatter(results, unit, start, end);
             } catch (e) {
-                state.items = [];
+                state.activity[projectId] = [];
                 console.error(e);
             }
         };
@@ -202,8 +199,10 @@ export default {
         };
 
         watch(() => state.selectedPeriod, async () => {
+            state.loading = true;
             await getTop5ProjectList();
             await Promise.all(state.top5Projects.map(d => getActivities(d)));
+            state.loading = false;
         }, { immediate: true });
 
         return {
