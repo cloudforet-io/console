@@ -94,4 +94,11 @@ export interface AlertListTableFilters extends AlertBottomFilters {
     filters: QueryStoreFilter[];
 }
 
+export interface AlertStateUpdateParams {
+    alerts: string[];
+    state: ALERT_STATE;
+    assignee?: string;
+    note?: string;
+}
+
 export type AlertListPageUrlQuery = Partial<Record<'state' | 'urgency' | 'assigned' | 'filters', RouteQueryString>>

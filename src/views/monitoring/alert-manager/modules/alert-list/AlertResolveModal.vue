@@ -32,6 +32,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
 import { i18n } from '@/translations';
+import { AlertStateUpdateParams } from '@/views/monitoring/alert-manager/type';
 
 export default {
     name: 'AlertResolveModal',
@@ -59,11 +60,12 @@ export default {
         /* api */
         const updateToResolve = async () => {
             try {
-                await SpaceConnector.client.monitoring.alert.updateState({
+                const params: AlertStateUpdateParams = {
                     alerts: props.alerts?.map(d => d.alert_id),
                     state: ALERT_STATE.RESOLVED,
-                    note: state.noteInput,
-                });
+                };
+                if (state.noteInput) params.note = state.noteInput;
+                await SpaceConnector.client.monitoring.alert.updateState(params);
             } catch (e) {
                 console.error(e);
             }

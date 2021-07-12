@@ -19,9 +19,7 @@
 </template>
 
 <script lang="ts">
-import {
-    computed, reactive, toRefs, watch,
-} from '@vue/composition-api';
+import { reactive, toRefs, watch } from '@vue/composition-api';
 import { PButtonModal, PCheckBox } from '@spaceone/design-system';
 import { makeProxy } from '@spaceone/console-core-lib';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -29,6 +27,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
 import { i18n } from '@/translations';
 import { store } from '@/store';
+import { AlertStateUpdateParams } from '@/views/monitoring/alert-manager/type';
 
 export default {
     name: 'AlertAcknowledgeModalModal',
@@ -55,7 +54,7 @@ export default {
         /* api */
         const updateToAcknowledge = async () => {
             try {
-                const params = {
+                const params: AlertStateUpdateParams = {
                     alerts: props.alerts?.map(d => d.alert_id),
                     state: ALERT_STATE.ACKNOWLEDGED,
                 };
