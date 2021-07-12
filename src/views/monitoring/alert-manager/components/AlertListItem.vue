@@ -1,31 +1,37 @@
 <template>
     <div class="alert-list-item">
-        <div class="left-part">
-            <p-i :name="item.urgency === ALERT_URGENCY.HIGH ? 'ic_alert' : 'ic_state_duplicated'"
-                 width="1em" height="1em"
-            />
-            <span class="title">{{ item.title }}</span>
-            <p-anchor v-if="showProjectLink"
-                      class="project-link"
-                      :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
-                      :show-icon="false"
-                      target="_self"
-            >
-                {{ projects[item.project_id] ? projects[item.project_id].label : item.project_id }}
-            </p-anchor>
-            <p-badge v-if="showMemberName && item.assignee"
-                     outline
-                     style-type="primary2"
-                     class="member-name"
-            >
-                {{ users[item.assignee] ? users[item.assignee].label : item.assignee }}
-            </p-badge>
+        <div class="flex">
+            <div class="left-part">
+                <p-i :name="item.urgency === ALERT_URGENCY.HIGH ? 'ic_alert' : 'ic_state_duplicated'"
+                     width="1em" height="1em"
+                />
+                <span class="title">{{ item.title }}</span>
+                <p-anchor v-if="showProjectLink"
+                          class="project-link"
+                          :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
+                          :show-icon="false"
+                          target="_self"
+                >
+                    {{ projects[item.project_id] ? projects[item.project_id].label : item.project_id }}
+                </p-anchor>
+                <p-badge v-if="showMemberName && item.assignee"
+                         outline
+                         style-type="primary2"
+                         class="member-name"
+                >
+                    {{ users[item.assignee] ? users[item.assignee].label : item.assignee }}
+                </p-badge>
+            </div>
+            <div class="right-part">
+                <p-badge :style-type="badgeStyleTypeFormatter(item.state)">
+                    {{ capitalize(item.state) }}
+                </p-badge>
+                <span class="date">{{ dateFormatter(item.created_at) }}</span>
+            </div>
         </div>
-        <div class="right-part">
-            <p-badge :style-type="badgeStyleTypeFormatter(item.state)">
-                {{ capitalize(item.state) }}
-            </p-badge>
-            <span class="date">{{ dateFormatter(item.created_at) }}</span>
+        <div v-if="showStatusMessage && item.status_message" class="status-message">
+            <p-i name="ic_reply" width="1rem" height="1rem" />
+            <span>{{ item.status_message }}</span>
         </div>
     </div>
 </template>
@@ -73,6 +79,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        showStatusMessage: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup() {
         const state = reactive({
@@ -102,8 +112,6 @@ export default {
 
 <style lang="postcss" scoped>
 .alert-list-item {
-    display: flex;
-
     .left-part {
         display: inherit;
         width: 78%;
@@ -134,6 +142,12 @@ export default {
             font-size: 0.75rem;
             margin-left: 0.5rem;
         }
+    }
+    .status-message {
+        @apply text-gray-500;
+        font-size: 0.75rem;
+        padding-left: 1rem;
+        padding-top: 0.25rem;
     }
 
     @screen mobile {

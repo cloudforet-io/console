@@ -58,6 +58,7 @@
                                            :all-page="allPage"
                                            @pageChange="onPageChange"
                         />
+                        <p-icon-button name="ic_refresh" @click="onClickRefresh" />
                     </div>
                 </div>
                 <!--list-->
@@ -93,7 +94,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PBalloonTab, PListCard, PSelectStatus, PTextPagination, PSelectButton, PCheckBox,
+    PBalloonTab, PListCard, PSelectStatus, PTextPagination, PSelectButton, PCheckBox, PIconButton,
 } from '@spaceone/design-system';
 
 import AlertListItem from '@/views/monitoring/alert-manager/components/AlertListItem.vue';
@@ -136,6 +137,7 @@ export default {
         PTextPagination,
         PSelectButton,
         PCheckBox,
+        PIconButton,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -262,6 +264,10 @@ export default {
             const alertId = get(state.items[idx], 'alert_id');
             if (alertId) vm.$router.push({ name: MONITORING_ROUTE.ALERT_MANAGER.ALERT.DETAIL._NAME, params: { id: alertId } });
         };
+        const onClickRefresh = async () => {
+            state.thisPage = 1;
+            await listAlerts();
+        };
 
         (async () => {
             await Promise.all([listAlerts(), statAlerts()]);
@@ -278,6 +284,7 @@ export default {
             onPageChange,
             onSelectAssignedState,
             onClickListItem,
+            onClickRefresh,
             listAlerts,
             commaFormatter,
         };
@@ -347,6 +354,7 @@ export default {
 
                 .right-part {
                     display: flex;
+                    align-items: center;
                     height: 1.5rem;
 
                     .p-select-button {

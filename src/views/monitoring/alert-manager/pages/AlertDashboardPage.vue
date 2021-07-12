@@ -10,14 +10,14 @@
             </h2>
             <current-project-status-widget class="current-project-status-widget" />
             <top5-project-activity-widget class="top5-project-activity-widget" />
-            <project-search-widget class="col-span-12" />
+            <project-search-widget :activated-projects="activatedProjects" class="col-span-12" />
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, reactive,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
@@ -30,6 +30,7 @@ import CurrentProjectStatusWidget from '@/views/monitoring/alert-manager/modules
 import Top5ProjectActivityWidget from '@/views/monitoring/alert-manager/modules/alert-dashboard/Top5ProjectActivityWidget.vue';
 import ProjectSearchWidget from '@/views/monitoring/alert-manager/modules/alert-dashboard/ProjectSearchWidget.vue';
 
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -45,6 +46,9 @@ export default {
         PPageTitle,
     },
     setup() {
+        const state = reactive({
+            activatedProjects: [] as string[],
+        });
         const routeState = reactive({
             route: computed(() => [
                 { name: i18n.t('MENU.MONITORING.MONITORING'), path: '/monitoring' },
@@ -53,11 +57,24 @@ export default {
             ]),
         });
 
-        (() => {
-            store.dispatch('resource/project/load');
+        /* api */
+        const listProjectAlertConfig = async () => {
+            try {
+                const { results } = await SpaceConnector.client.monitoring.projectAlertConfig.list();
+                state.activatedProjects = results.map(d => d.project_id);
+            } catch (e) {
+            }
+        };
+
+        (async () => {
+            await Promise.all([
+                listProjectAlertConfig(),
+                store.dispatch('resource/project/load'),
+            ]);
         })();
 
         return {
+            ...toRefs(state),
             routeState,
         };
     },

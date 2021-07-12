@@ -1,102 +1,131 @@
 <template>
     <div class="project-search-widget">
-        <p-toolbox :page-size="pageSize"
+        <p-toolbox search-type="query"
+                   :query-tags="tags"
+                   :key-item-sets="handlers.keyItemSets"
+                   :value-handler-map="handlers.valueHandlerMap"
                    :total-count="totalCount"
                    @change="onChange"
-                   @refresh="getData()"
+                   @refresh="onChange()"
         />
         <div class="box-group">
-            <div class="box">
+            <div v-for="(item, idx) in items" :key="`box-${idx}`" class="box">
                 <p class="sub-title">
-                    Project Group
+                    {{ projectGroupNameFormatter(item.project_id) }}
                 </p>
                 <p class="title">
-                    Project Name
+                    {{ projectNameFormatter(item.project_id) }}
                 </p>
-                <p-list-card style-type="yellow100">
-                    <template #header>
-                        Maintenance Window
-                    </template>
-                    <template #item="{item, index}">
-                        <alert-list-item :item="item" />
-                    </template>
-                </p-list-card>
-                <p-list-card>
-                    <template #header>
-                        Open Alert (6)
-                    </template>
-                    <template #item="{item, index}">
-                        <alert-list-item :item="item" />
-                    </template>
-                </p-list-card>
+                <div class="content-wrapper">
+                    <!--                    <project-maintenance-window-list-item v-if="item.maintenance_window_count > 0" :project-id="item.project_id" />-->
+                    <project-alert-list-item v-if="item.alert_count > 0" :project-id="item.project_id" />
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { range } from 'lodash';
-
-import { computed, reactive, toRefs } from '@vue/composition-api';
-
 import {
-    PToolbox, PListCard,
-} from '@spaceone/design-system';
-import AlertListItem from '@/views/monitoring/alert-manager/components/AlertListItem.vue';
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
+import { PToolbox } from '@spaceone/design-system';
+import ProjectAlertListItem from '@/views/monitoring/alert-manager/modules/alert-dashboard/ProjectAlertListItem.vue';
+import ProjectMaintenanceWindowListItem from '@/views/monitoring/alert-manager/modules/alert-dashboard/ProjectMaintenanceWindowListItem.vue';
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import { store } from '@/store';
+import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 
 export default {
     name: 'ProjectSearchWidget',
     components: {
         PToolbox,
-        PListCard,
-        AlertListItem,
+        ProjectAlertListItem,
+        ProjectMaintenanceWindowListItem,
     },
-    setup() {
+    props: {
+        activatedProjects: {
+            type: Array,
+            default: () => ([]),
+        },
+    },
+    setup(props) {
         const state = reactive({
             projects: computed(() => store.state.resource.project.items),
-            pageStart: 1,
-            pageSize: 24,
             totalCount: 0,
-            items: [
-                {
-                    projectId: 'project-18655561c535',
-                },
-                {
-                    projectId: 'project-2db511294a9d',
-                },
-                {
-                    projectId: 'project-113c197ce1f2',
-                },
-                {
-                    projectId: 'project-9074eea97d7e',
-                },
-            ],
+            items: [],
+            tags: [],
         });
+        const handlers = {
+            keyItemSets: [{
+                title: 'Properties',
+                items: [
+                    { name: 'project_id', label: 'Project' },
+                ],
+            }] as KeyItemSet[],
+            valueHandlerMap: {
+                project_id: makeReferenceValueHandler('identity.Project'),
+            },
+        };
+
+        /* util */
+        const projectGroupNameFormatter = (projectId) => {
+            const projectLabel = state.projects[projectId]?.label;
+            const projectName = state.projects[projectId]?.name;
+            if (!projectLabel || projectLabel === projectName) return undefined;
+            return projectLabel.replace(` > ${projectName}`, '');
+        };
+        const projectNameFormatter = projectId => state.projects[projectId]?.name || projectId;
+        const countFormatter = (count) => {
+            if (count > 15) return '15+';
+            return count;
+        };
 
         /* api */
-        const getData = async () => {
-            //
+        // const AlertByProjectApiQueryHelper = new ApiQueryHelper()
+        //     .setPageStart(1).setPageLimit(24);
+        // let AlertByProjectApiQuery = AlertByProjectApiQueryHelper.data;
+        const listAlertByProject = async () => {
+            try {
+                const { results, total_count } = await SpaceConnector.client.monitoring.dashboard.alertByProject({
+                    // eslint-disable-next-line camelcase
+                    activated_projects: props.activatedProjects,
+                    // query: AlertByProjectApiQuery,
+                });
+                state.items = results;
+                state.totalCount = total_count;
+            } catch (e) {
+                console.error(e);
+            }
         };
 
         /* event */
         const onChange = async (options: any) => {
-            if (options.pageLimit !== undefined) {
-                state.pageSize = options.pageLimit;
-            }
-            if (options.pageStart !== undefined) {
-                state.pageStart = options.pageStart;
-            }
-            await getData();
+            // AlertByProjectApiQuery = getApiQueryWithToolboxOptions(AlertByProjectApiQueryHelper, options) ?? AlertByProjectApiQuery;
+            // if (options.queryTags !== undefined) {
+            //     await replaceUrlQuery('filters', AlertByProjectApiQueryHelper.rawQueryStrings);
+            // }
+            await listAlertByProject();
         };
+
+        /* init */
+        watch(() => props.activatedProjects, async (activatedProjects) => {
+            if (activatedProjects.length) {
+                await listAlertByProject();
+            }
+        });
 
         return {
             ...toRefs(state),
+            handlers,
             onChange,
-            getData,
-            range,
+            projectGroupNameFormatter,
+            projectNameFormatter,
+            countFormatter,
         };
     },
 };
@@ -130,9 +159,12 @@ export default {
                 line-height: 1.6;
                 font-size: 1rem;
                 font-weight: bold;
+                margin-bottom: 0.75rem;
             }
-            .p-list-card {
-                margin-top: 0.75rem;
+            .content-wrapper {
+                display: flex;
+                flex-direction: column;
+                height: 15rem;
             }
         }
     }

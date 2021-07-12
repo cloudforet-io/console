@@ -203,7 +203,7 @@ export default {
 
             try {
                 const { results } = await SpaceConnector.client.monitoring.dashboard.dailyAlertHistory({
-                    start: props.currentDate.subtract(1, 'month').format('YYYY-MM-01'),
+                    start: props.currentDate.format('YYYY-MM-01'),
                     end: props.currentDate.add(1, 'month').format('YYYY-MM-01'),
                 });
                 state.chartData = initChartData(results);

@@ -12,23 +12,23 @@
             </p-chart-loader>
             <div class="legend-wrapper">
                 <p class="legend">
-                    <span>Total</span>
-                    <span class="count">16</span>
+                    <span>{{ $t('MONITORING.ALERT.DASHBOARD.TOTAL') }}</span>
+                    <span class="count">{{ count.total }}</span>
                 </p>
                 <p class="legend issue">
                     <span class="circle" />
-                    <span class="label">Issue</span>
-                    <span class="count">3</span>
+                    <span class="label">{{ $t('MONITORING.ALERT.DASHBOARD.ISSUE') }}</span>
+                    <span class="count">{{ count.issue }}</span>
                 </p>
                 <p class="legend maintenance">
                     <span class="circle" />
-                    <span class="label">Maintenance</span>
-                    <span class="count">1</span>
+                    <span class="label">{{ $t('MONITORING.ALERT.DASHBOARD.MAINTENANCE') }}</span>
+                    <span class="count">{{ count.maintenance }}</span>
                 </p>
                 <p class="legend healthy">
                     <span class="circle" />
-                    <span class="label">Healthy</span>
-                    <span class="count">12</span>
+                    <span class="label">{{ $t('MONITORING.ALERT.DASHBOARD.HEALTHY') }}</span>
+                    <span class="count">{{ count.healthy }}</span>
                 </p>
             </div>
         </div>
@@ -41,7 +41,9 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 
-import { reactive, toRefs, watch } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import { PChartLoader } from '@spaceone/design-system';
 
@@ -49,6 +51,7 @@ import {
     violet, green, red, yellow, white, gray,
 } from '@/styles/colors';
 import config from '@/lib/config';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 
 am4core.useTheme(am4themes_animated);
@@ -71,26 +74,32 @@ export default {
     },
     setup() {
         const state = reactive({
-            loading: false, // todo true,
+            loading: true,
+            count: {
+                total: 0,
+                issue: 0,
+                maintenance: 0,
+                healthy: 0,
+            },
             loaderRef: null,
             chartRef: null as HTMLElement | null,
-            data: [
+            data: computed(() => ([
                 {
                     status: PROJECT_STATUS.issue,
-                    count: 3,
-                    color: green[500],
-                },
-                {
-                    status: PROJECT_STATUS.maintenance,
-                    count: 1,
+                    count: state.count.issue,
                     color: red[400],
                 },
                 {
-                    status: PROJECT_STATUS.healthy,
-                    count: 12,
+                    status: PROJECT_STATUS.maintenance,
+                    count: state.count.maintenance,
                     color: yellow[400],
                 },
-            ] as ChartData[],
+                {
+                    status: PROJECT_STATUS.healthy,
+                    count: state.count.healthy,
+                    color: green[500],
+                },
+            ] as ChartData[])),
             chart: null as null | any,
             chartRegistry: {},
         });
@@ -149,6 +158,26 @@ export default {
             if (isLoading) label.text = '';
             label.text = '{values.value.sum}';
         };
+
+        /* api */
+        const getCurrentProjectStatus = async () => {
+            try {
+                state.loading = true;
+                const { results, total_count } = await SpaceConnector.client.monitoring.dashboard.currentProjectStatus();
+                state.count.total = total_count;
+                state.count.issue = results.filter(d => d.is_issued).length;
+                state.count.healthy = total_count - state.count.issue;
+                // todo: maintenance 향후 추가 예정
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        (async () => {
+            await getCurrentProjectStatus();
+        })();
 
         watch([() => state.loading, () => state.loaderRef, () => state.chartRef], ([loading, loaderCtx, chartCtx]) => {
             if (loading && loaderCtx) {
