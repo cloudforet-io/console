@@ -1,3 +1,10 @@
+# [1.1.0-beta.102](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.101...v1.1.0-beta.102) (2021-07-12)
+
+
+### Bug Fixes
+
+* apply updated border radius ([47700e0](https://github.com/spaceone-dev/spaceone-design-system/commit/47700e07f11a5f55d0873a9100f36a12ddfe5230))
+
 # [1.1.0-beta.101](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.100...v1.1.0-beta.101) (2021-07-09)
 
 
