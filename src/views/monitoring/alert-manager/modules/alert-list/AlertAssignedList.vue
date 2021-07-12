@@ -27,18 +27,26 @@
     </p-list-card>
 </template>
 <script lang="ts">
+import { get } from 'lodash';
+
+import {
+    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+
 import {
     PListCard, PI,
 } from '@spaceone/design-system';
 import AlertListItem from '@/views/monitoring/alert-manager/components/AlertListItem.vue';
-import {
-    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
+
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { get } from 'lodash';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { store } from '@/store';
+
+import utc from 'dayjs/plugin/utc';
+import dayjs from 'dayjs';
+
+dayjs.extend(utc);
 
 export default {
     name: 'AlertAssignedList',

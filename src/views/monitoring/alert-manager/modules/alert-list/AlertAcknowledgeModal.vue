@@ -20,7 +20,7 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { PButtonModal, PCheckBox } from '@spaceone/design-system';
 import { makeProxy } from '@spaceone/console-core-lib';
@@ -28,6 +28,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
 import { i18n } from '@/translations';
+import { store } from '@/store';
 
 export default {
     name: 'AlertAcknowledgeModalModal',
@@ -54,10 +55,12 @@ export default {
         /* api */
         const updateToAcknowledge = async () => {
             try {
-                await SpaceConnector.client.monitoring.alert.changeState({
+                const params = {
                     alerts: props.alerts?.map(d => d.alert_id),
                     state: ALERT_STATE.ACKNOWLEDGED,
-                });
+                };
+                if (state.isAssignedToMe) params.assignee = store.state.user.userId;
+                await SpaceConnector.client.monitoring.alert.updateState(params);
             } catch (e) {
                 console.error(e);
             }

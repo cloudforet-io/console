@@ -31,12 +31,10 @@ import AlertAssignedList from '@/views/monitoring/alert-manager/modules/alert-li
 import AlertDataTable from '@/views/monitoring/alert-manager/modules/alert-list/AlertDataTable.vue';
 import AssignedAlertInfo from '@/views/monitoring/alert-manager/modules/alert-list/AssignedAlertInfo.vue';
 
-
 import {
     AlertListPageUrlQuery, AlertListTableFilters,
 } from '@/views/monitoring/alert-manager/type';
 import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/views/monitoring/alert-manager/lib/config';
-
 
 export default {
     name: 'AlertListPage',
@@ -64,7 +62,6 @@ export default {
                 { name: i18n.t('MONITORING.ALERT.ALERT_LIST.ALERT') },
             ]),
         });
-
 
         const replaceAlertListPageUrlQuery = (query: AlertListPageUrlQuery) => {
             router.replace({

@@ -22,7 +22,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
     PButtonModal, PTextarea, PFieldGroup,
@@ -30,7 +30,6 @@ import {
 import { makeProxy } from '@spaceone/console-core-lib';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { store } from '@/store';
 import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
 import { i18n } from '@/translations';
 
@@ -55,38 +54,25 @@ export default {
         const state = reactive({
             proxyVisible: makeProxy<boolean>('visible', props, emit),
             noteInput: '',
-            userId: computed(() => store.state.user.userId),
         });
 
         /* api */
         const updateToResolve = async () => {
             try {
-                await SpaceConnector.client.monitoring.alert.changeState({
+                await SpaceConnector.client.monitoring.alert.updateState({
                     alerts: props.alerts?.map(d => d.alert_id),
                     state: ALERT_STATE.RESOLVED,
+                    note: state.noteInput,
                 });
             } catch (e) {
                 console.error(e);
             }
-        };
-        const createNote = async () => {
-            const params: any = {
-                alert_id: props.alert.alert_id,
-                user_id: state.userId,
-            };
-
-            if (state.noteInput) {
-                params.note = state.noteInput;
-            }
-
-            await SpaceConnector.client.monitoring.note.create(params);
         };
 
         /* Handlers */
         const onClickConfirm = async () => {
             try {
                 await updateToResolve();
-                // if (state.noteInput) await createNote();
                 emit('confirm');
                 showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_STATE_CHANGED'), '', root);
             } catch (e) {
