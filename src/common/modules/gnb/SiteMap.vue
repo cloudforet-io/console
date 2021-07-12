@@ -27,8 +27,8 @@
                                 <router-link v-if="subMenu" :to="subMenu.to">
                                     <li class="submenu" @click="hideMenu">
                                         {{ subMenu.label }}
-                                        <span v-if="subMenu.isNew" class="new-text">new</span>
-                                        <span v-if="subMenu.isBeta" class="beta-text">beta</span>
+                                        <new-mark  v-if="subMenu.isNew"/>
+                                        <beta-mark v-if="subMenu.isBeta"/>
                                     </li>
                                 </router-link>
                             </div>
@@ -50,6 +50,8 @@ import {
 import { PI } from '@spaceone/design-system';
 
 import { DASHBOARD_ROUTE } from '@/routes/dashboard/dashboard-route';
+import NewMark from "@/common/components/marks/NewMark.vue";
+import BetaMark from "@/common/components/marks/BetaMark.vue";
 
 
 enum MENU_ICON {
@@ -66,6 +68,8 @@ enum MENU_ICON {
 export default {
     name: 'SiteMap',
     components: {
+        BetaMark,
+        NewMark,
         PI,
     },
     directives: {
@@ -185,22 +189,6 @@ export default {
                 &:hover {
                     @apply text-primary;
                     transition: all ease 0.3s;
-                }
-                .beta-text {
-                    @apply text-coral;
-                    font-size: 0.75rem;
-                    vertical-align: super;
-                    cursor: default;
-                    margin-left: 0.25rem;
-                }
-                .new-text {
-                    font-size: 0.75rem;
-                    background: linear-gradient(to right, theme('colors.primary'), theme('colors.secondary'));
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    vertical-align: super;
-                    cursor: default;
-                    margin-left: 0.25rem;
                 }
             }
         }

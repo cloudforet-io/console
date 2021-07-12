@@ -52,8 +52,8 @@
                             <router-link v-if="subMenu.show" :key="index" :to="subMenu.to">
                                 <div class="sub-menu">
                                     <span>{{ subMenu.label }}</span>
-                                    <span v-if="subMenu.isBeta" class="beta-text">beta</span>
-                                    <span v-if="subMenu.isNew" class="new-text">new</span>
+                                    <beta-mark v-if="subMenu.isBeta" />
+                                    <new-mark v-if="subMenu.isNew" />
                                 </div>
                             </router-link>
                         </template>
@@ -96,6 +96,8 @@ import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import config from '@/lib/config';
+import BetaMark from '@/common/components/marks/BetaMark.vue';
+import NewMark from '@/common/components/marks/NewMark.vue';
 
 
 enum PARENT_CATEGORY {
@@ -123,11 +125,13 @@ interface Menu {
     subMenuList: SubMenu[];
 }
 
-const ALLOWED_MENUS_FOR_ALL_USERS = ['support', 'account'];
+const ALLOWED_MENUS_FOR_ALL_USERS = ['support', 'account', 'notifications'];
 
 export default {
     name: 'GNB',
     components: {
+        NewMark,
+        BetaMark,
         SiteMap,
         RightSideMenu,
         PI,
@@ -360,22 +364,6 @@ export default {
                 &:active {
                     @apply bg-white;
                 }
-            }
-            .beta-text {
-                @apply text-coral;
-                font-size: 0.75rem;
-                vertical-align: text-top;
-                cursor: default;
-                margin-left: 0.25rem;
-            }
-            .new-text {
-                font-size: 0.75rem;
-                background: linear-gradient(to right, theme('colors.primary'), theme('colors.secondary'));
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
-                vertical-align: text-top;
-                cursor: default;
-                margin-left: 0.25rem;
             }
         }
     }

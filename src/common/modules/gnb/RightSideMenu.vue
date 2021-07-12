@@ -14,6 +14,20 @@
             </router-link>
         </div>
         <div class="menu-wrapper">
+            <div class="menu-button notifications"
+                 :class="{opened: openedMenu === 'notifications'}"
+                 @click.stop="toggleMenu('notifications')"
+            >
+                <p-i class="menu-icon"
+                     name="ic_bell"
+                     color="inherit"
+                />
+            </div>
+            <g-n-b-notifications v-if="openedMenu === 'notifications'"
+                                 v-click-outside="hideMenu"
+            />
+        </div>
+        <div class="menu-wrapper">
             <div class="menu-button opacity"
                  :class="{opened: openedMenu === 'support'}"
                  @click.stop="toggleMenu('support')"
@@ -110,10 +124,12 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import { languages } from '@/store/modules/user/config';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import config from '@/lib/config';
+import GNBNotifications from '@/common/modules/gnb/GNBNotifications.vue';
 
 export default {
     name: 'RightSideMenu',
     components: {
+        GNBNotifications,
         PDivider,
         PAnchor,
         PI,
@@ -236,7 +252,7 @@ export default {
                 @apply text-primary;
                 opacity: 1;
             }
-            &.code {
+            &.code, &.notifications {
                 @apply text-gray-500;
                 margin-right: 1.5rem;
                 &:hover {
@@ -363,6 +379,20 @@ export default {
                     margin-top: 1rem;
                 }
             }
+        }
+    }
+    .gnb-notifications {
+        position: absolute;
+        top: 2.5rem;
+        right: 0;
+        left: auto;
+        margin: 3px 0;
+    }
+
+    @screen mobile {
+        .gnb-notifications {
+            position: fixed;
+            z-index: 200;
         }
     }
 }
