@@ -5,6 +5,8 @@
                    :key-item-sets="handlers.keyItemSets"
                    :value-handler-map="handlers.valueHandlerMap"
                    :total-count="totalCount"
+                   :page-size.sync="pageLimit"
+                   :page-size-options="[12, 24, 36]"
                    @change="onChange"
                    @refresh="onChange()"
         />
@@ -16,8 +18,8 @@
                 <p class="title">
                     {{ projectNameFormatter(item.project_id) }}
                 </p>
-                <div class="content-wrapper">
-                    <!--                    <project-maintenance-window-list-item v-if="item.maintenance_window_count > 0" :project-id="item.project_id" />-->
+                <div class="content-wrapper" :class="{'multiple-items': item.alert_count > 0 && item.maintenance_window_count > 0}">
+                    <project-maintenance-window-list-item v-if="item.maintenance_window_count > 0" :project-id="item.project_id" />
                     <project-alert-list-item v-if="item.alert_count > 0" :project-id="item.project_id" />
                 </div>
             </div>
@@ -35,7 +37,9 @@ import ProjectAlertListItem from '@/views/monitoring/alert-manager/modules/alert
 import ProjectMaintenanceWindowListItem from '@/views/monitoring/alert-manager/modules/alert-dashboard/ProjectMaintenanceWindowListItem.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
+import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { store } from '@/store';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
@@ -57,6 +61,7 @@ export default {
         const state = reactive({
             projects: computed(() => store.state.resource.project.items),
             totalCount: 0,
+            pageLimit: 12,
             items: [],
             tags: [],
         });
@@ -86,15 +91,15 @@ export default {
         };
 
         /* api */
-        // const AlertByProjectApiQueryHelper = new ApiQueryHelper()
-        //     .setPageStart(1).setPageLimit(24);
-        // let AlertByProjectApiQuery = AlertByProjectApiQueryHelper.data;
+        const AlertByProjectApiQueryHelper = new ApiQueryHelper()
+            .setPageStart(1).setPageLimit(state.pageLimit);
+        let AlertByProjectApiQuery = AlertByProjectApiQueryHelper.data;
         const listAlertByProject = async () => {
             try {
                 const { results, total_count } = await SpaceConnector.client.monitoring.dashboard.alertByProject({
                     // eslint-disable-next-line camelcase
                     activated_projects: props.activatedProjects,
-                    // query: AlertByProjectApiQuery,
+                    query: AlertByProjectApiQuery,
                 });
                 state.items = results;
                 state.totalCount = total_count;
@@ -105,10 +110,7 @@ export default {
 
         /* event */
         const onChange = async (options: any) => {
-            // AlertByProjectApiQuery = getApiQueryWithToolboxOptions(AlertByProjectApiQueryHelper, options) ?? AlertByProjectApiQuery;
-            // if (options.queryTags !== undefined) {
-            //     await replaceUrlQuery('filters', AlertByProjectApiQueryHelper.rawQueryStrings);
-            // }
+            AlertByProjectApiQuery = getApiQueryWithToolboxOptions(AlertByProjectApiQueryHelper, options) ?? AlertByProjectApiQuery;
             await listAlertByProject();
         };
 
@@ -145,7 +147,7 @@ export default {
 
         .box {
             @apply col-span-6 bg-white border border-gray-200 rounded-md;
-            height: 20.375rem;
+            height: 20rem;
             box-sizing: border-box;
             box-shadow: 0 0.125rem 0.25rem rgba(theme('colors.black'), 0.06);
             padding: 1rem;
@@ -164,15 +166,21 @@ export default {
             .content-wrapper {
                 display: flex;
                 flex-direction: column;
-                height: 15rem;
-            }
-        }
-    }
+                gap: 0.75rem;
 
-    @screen tablet {
-        .box-group {
-            .box {
-                height: 21.375rem;
+                .project-maintenance-window-list-item::v-deep, .project-alert-list-item::v-deep {
+                    .body {
+                        max-height: 12.5rem;
+                    }
+                }
+
+                &.multiple-items {
+                    .project-maintenance-window-list-item::v-deep, .project-alert-list-item::v-deep {
+                        .body {
+                            max-height: 5rem;
+                        }
+                    }
+                }
             }
         }
     }

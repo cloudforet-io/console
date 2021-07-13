@@ -78,7 +78,7 @@ dayjs.extend(utc);
 const ACTIVITY = Object.freeze({
     HIGH: 'HIGH',
     LOW: 'LOW',
-    MAINTENANCE: 'MAINTENANCE',
+    // MAINTENANCE: 'MAINTENANCE',
 });
 const ACTIVITY_COLOR = Object.freeze({
     HIGH: red[400],
@@ -86,9 +86,14 @@ const ACTIVITY_COLOR = Object.freeze({
     MAINTENANCE: yellow[400],
 });
 const PERIOD = Object.freeze({
+    '14D': '14d',
     '7D': '7d',
     '24H': '24h',
     '12H': '12h',
+});
+const DATE_TYPE = Object.freeze({
+    DAILY: 'DAILY',
+    HOURLY: 'HOURLY',
 });
 
 interface Activity {
@@ -122,6 +127,10 @@ export default {
             activity: {},
             periods: [
                 {
+                    name: PERIOD['14D'],
+                    label: '14d',
+                },
+                {
                     name: PERIOD['7D'],
                     label: '7d',
                 },
@@ -134,7 +143,7 @@ export default {
                     label: '12h',
                 },
             ],
-            selectedPeriod: PERIOD['7D'],
+            selectedPeriod: PERIOD['14D'],
             showTooltip: false,
         });
 
@@ -175,11 +184,12 @@ export default {
         const getActivities = async (projectId) => {
             try {
                 const unit = state.selectedPeriod.includes('d') ? 'day' : 'hour';
-                const end = dayjs.utc().add(1, unit);
+                const end = dayjs.utc().add(1, unit).startOf(unit);
                 const start = end.subtract(periodNumberFormatter(state.selectedPeriod), unit);
+
                 const { results } = await SpaceConnector.client.monitoring.dashboard.top5ProjectActivityAlertDetails({
                     project_id: projectId,
-                    granularity: state.selectedPeriod.includes('d') ? 'DAILY' : 'HOURLY',
+                    granularity: state.selectedPeriod.includes('d') ? DATE_TYPE.DAILY : DATE_TYPE.HOURLY,
                     start: start.toISOString(),
                     end: end.toISOString(),
                 });

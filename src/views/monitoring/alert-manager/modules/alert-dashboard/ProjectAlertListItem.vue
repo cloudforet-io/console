@@ -1,30 +1,47 @@
 <template>
-    <p-list-card :items="items">
+    <p-list-card class="project-alert-list-item"
+                 :items="items"
+                 :loading="loading"
+    >
         <template #header>
             {{ $t('MONITORING.ALERT.DASHBOARD.OPEN_ALERT') }} ({{ totalCount > 15 ? '15+' : totalCount }})
         </template>
         <template #item="{item, index}">
-            <alert-list-item :item="item" :show-status-message="true" />
+            <alert-list-item v-if="index < 15" :item="item" :show-status-message="true" />
+            <div v-else class="view-all-text">
+                <p-anchor :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME, params: { id: projectId } }"
+                          :text="$t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_ALERTS')"
+                          :show-icon="false"
+                          target="_self"
+                          highlight
+                />
+            </div>
         </template>
     </p-list-card>
 </template>
 
 <script lang="ts">
-import { PListCard } from '@spaceone/design-system';
+import {
+    PListCard, PAnchor,
+} from '@spaceone/design-system';
 
-import AlertListItem from '@/views/monitoring/alert-manager/components/AlertListItem.vue';
 import {
     reactive, toRefs, watch,
 } from '@vue/composition-api';
+
+import AlertListItem from '@/views/monitoring/alert-manager/components/AlertListItem.vue';
+
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
+import { PROJECT_ROUTE } from '@/routes/project/project-route';
 
 
 export default {
     name: 'ProjectAlertListItem',
     components: {
         PListCard,
+        PAnchor,
         AlertListItem,
     },
     props: {
@@ -45,7 +62,7 @@ export default {
         const getQuery = () => {
             apiQuery
                 .setSort('created_at', true)
-                .setPage(1, 15)
+                .setPage(1, 16)
                 .setFilters([{ k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' }]);
             return apiQuery.data;
         };
@@ -59,6 +76,8 @@ export default {
                 state.items = results;
                 state.totalCount = total_count;
             } catch (e) {
+                state.items = [];
+                state.totalCount = 0;
                 console.error(e);
             } finally {
                 state.loading = false;
@@ -71,6 +90,7 @@ export default {
 
         return {
             ...toRefs(state),
+            PROJECT_ROUTE,
         };
     },
 };
@@ -79,8 +99,11 @@ export default {
 <style lang="postcss" scoped>
 .p-list-card::v-deep {
     .body {
-        max-height: 13rem;
         overflow-y: auto;
+
+        .view-all-text {
+            text-align: center;
+        }
     }
 }
 </style>
