@@ -1585,6 +1585,10 @@
 			"MODAL_DELETE_WEBHOOK_CONTENT_2": "There will be no alerts created by this webhook.",
 			"MODAL_DELETE_WEBHOOK_CONTENT_3": "Type {webhookName} to Confirm.",
 			"MODAL_DELETE_WEBHOOK_TITLE": "Delete the selected webhook permanently.",
+			"MODAL_DISABLE_WEBHOOK_DESC": "Are you sure you want to disable selected webhook below?",
+			"MODAL_DISABLE_WEBHOOK_TITLE": "Disable Webhook",
+			"MODAL_ENABLE_WEBHOOK_DESC": "Are you sure you want to enable selected webhook below?",
+			"MODAL_ENABLE_WEBHOOK_TITLE": "Enable Webhook",
 			"MODAL_UPDATE_MEMBER_TITLE": "Update Member Information",
 			"MODAL_UPDATE_PROJECT_TITLE": "Update Project",
 			"MODAL_UPDATE_WEBHOOK": "Update",
@@ -1632,6 +1636,8 @@
 			"WEBHOOK_ACTION": "Action",
 			"WEBHOOK_ADD": "Add",
 			"WEBHOOK_DELETE": "Delete",
+			"WEBHOOK_DISABLE": "Disable",
+			"WEBHOOK_ENABLE": "Enable",
 			"WEBHOOK_UPDATE": "Update"
 		},
 		"EVENT_RULE": {

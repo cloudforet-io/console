@@ -1585,6 +1585,10 @@
 			"MODAL_DELETE_WEBHOOK_CONTENT_2": " 이 웹훅에 의해 생성된 얼럿이 없습니다.",
 			"MODAL_DELETE_WEBHOOK_CONTENT_3": "확인을 위해 {webhookName} 을 입력해주세요.",
 			"MODAL_DELETE_WEBHOOK_TITLE": "선택한 웹훅을 영구적으로 삭제합니다.",
+			"MODAL_DISABLE_WEBHOOK_DESC": "선택한 웹훅을 비활성화 하시겠습니까?",
+			"MODAL_DISABLE_WEBHOOK_TITLE": "웹훅 비활성화",
+			"MODAL_ENABLE_WEBHOOK_DESC": "선택한 웹훅을 활성화 하시겠습니까?",
+			"MODAL_ENABLE_WEBHOOK_TITLE": "웹훅 활성화",
 			"MODAL_UPDATE_MEMBER_TITLE": "구성원 정보 변경 ",
 			"MODAL_UPDATE_PROJECT_TITLE": "프로젝트 변경 ",
 			"MODAL_UPDATE_WEBHOOK": "변경",
@@ -1632,6 +1636,8 @@
 			"WEBHOOK_ACTION": "작업",
 			"WEBHOOK_ADD": "추가",
 			"WEBHOOK_DELETE": "삭제",
+			"WEBHOOK_DISABLE": "비활성화",
+			"WEBHOOK_ENABLE": "활성화",
 			"WEBHOOK_UPDATE": "변경"
 		},
 		"EVENT_RULE": {
