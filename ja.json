@@ -374,6 +374,7 @@
 				"ROLE_ROOT_ADMIN": "ルート管理者"
 			},
 			"NOTIFICATION": {
+				"ALT_E_LIST_NOTIFICATION": "",
 				"NO_NOTIFICATION": "",
 				"NO_NOTI_DESC_1": "",
 				"NO_NOTI_DESC_2": "",

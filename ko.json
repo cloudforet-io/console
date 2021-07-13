@@ -374,10 +374,11 @@
 				"ROLE_ROOT_ADMIN": "Root 관리자"
 			},
 			"NOTIFICATION": {
+				"ALT_E_LIST_NOTIFICATION": "알림 목록 가져오기 실패",
 				"NO_NOTIFICATION": "알림이 없습니다.",
 				"NO_NOTI_DESC_1": "알림을 받으면,",
 				"NO_NOTI_DESC_2": "이 곳에 표시됩니다.",
-				"TITLE": "알"
+				"TITLE": "알림"
 			},
 			"SUPPORT": {
 				"LABEL_API_GUIDE": "API 가이드",
