@@ -1173,6 +1173,14 @@
 				"DELETE_MODAL_DESC": "알람을 삭제하시겠습니까?",
 				"DELETE_MODAL_TITLE": "알람 삭제",
 				"EDIT_MODAL_TITLE": "알림 이름 수정",
+				"EVENT_LIST": {
+					"COPY_ALL": "모두 복사",
+					"DATETIME": "날짜",
+					"EVENT_DETAILS": "이벤트 상세 설명",
+					"EVENT_LIST": "이벤트 목록",
+					"MORE": "더보기",
+					"PLACEHOLDER": "타입이나 날짜로 이벤트를 검색하세요"
+				},
 				"HEADER": {
 					"ALT_E_ASSIGN_MEMBER": "담당자 지 실패",
 					"ALT_E_UPDATE_STATE": "상태 변경 실패",
@@ -1195,6 +1203,8 @@
 					"ALT_S_UPDATE_STATUS_MSG": "상태 메세지 수정 성공",
 					"CANCEL": "취소",
 					"CHANGE": "변경",
+					"CHANGE_PROJECT_MODAL_DESC": "얼럿의 프로젝트가 변경되면, 에스컬레이션 규칙의 첫 번째 단계부터 알림이 다시 전송됩니다.",
+					"CHANGE_PROJECT_MODAL_TITLE": "프로젝트를 변경하시겠습니까?",
 					"CREATED": "생성 시간",
 					"DESC": "설명",
 					"EDIT": "편집",

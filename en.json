@@ -1173,6 +1173,14 @@
 				"DELETE_MODAL_DESC": "Are you sure you want to delete alert?",
 				"DELETE_MODAL_TITLE": "Delete Alert",
 				"EDIT_MODAL_TITLE": "Edit Alert Name",
+				"EVENT_LIST": {
+					"COPY_ALL": "Copy All",
+					"DATETIME": "DateTime",
+					"EVENT_DETAILS": "Event Details",
+					"EVENT_LIST": "Event List",
+					"MORE": "More",
+					"PLACEHOLDER": "Search for events by type, or date"
+				},
 				"HEADER": {
 					"ALT_E_ASSIGN_MEMBER": "Failed to Assign Member",
 					"ALT_E_UPDATE_STATE": "Failed to Update State",
@@ -1195,6 +1203,8 @@
 					"ALT_S_UPDATE_STATUS_MSG": "Success to Update Status Message ",
 					"CANCEL": "Cancel",
 					"CHANGE": "Change",
+					"CHANGE_PROJECT_MODAL_DESC": "If this alert’s project is changed, notifications will be sent again from the first step of the escalation policy.",
+					"CHANGE_PROJECT_MODAL_TITLE": "Are you sure you want to change the project?",
 					"CREATED": "Created",
 					"DESC": "Description",
 					"EDIT": "Edit",

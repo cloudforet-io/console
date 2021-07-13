@@ -1173,6 +1173,14 @@
 				"DELETE_MODAL_DESC": "アラートを削除しますか？",
 				"DELETE_MODAL_TITLE": "アラート削除",
 				"EDIT_MODAL_TITLE": "アラート名を修正",
+				"EVENT_LIST": {
+					"COPY_ALL": "",
+					"DATETIME": "",
+					"EVENT_DETAILS": "",
+					"EVENT_LIST": "",
+					"MORE": "",
+					"PLACEHOLDER": ""
+				},
 				"HEADER": {
 					"ALT_E_ASSIGN_MEMBER": "担当指定に失敗",
 					"ALT_E_UPDATE_STATE": "ステータス変更に失敗",
@@ -1195,6 +1203,8 @@
 					"ALT_S_UPDATE_STATUS_MSG": "状態メッセージ修正に成功",
 					"CANCEL": "",
 					"CHANGE": "変更",
+					"CHANGE_PROJECT_MODAL_DESC": "",
+					"CHANGE_PROJECT_MODAL_TITLE": "",
 					"CREATED": "作成時間",
 					"DESC": "説明",
 					"EDIT": "編集",
