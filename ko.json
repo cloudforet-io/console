@@ -373,6 +373,12 @@
 				"ROLE_DOMAIN_ADMIN": "도메인 관리자",
 				"ROLE_ROOT_ADMIN": "Root 관리자"
 			},
+			"NOTIFICATION": {
+				"NO_NOTIFICATION": "알림이 없습니다.",
+				"NO_NOTI_DESC_1": "알림을 받으면,",
+				"NO_NOTI_DESC_2": "이 곳에 표시됩니다.",
+				"TITLE": "알"
+			},
 			"SUPPORT": {
 				"LABEL_API_GUIDE": "API 가이드",
 				"LABEL_GITHUB": "GitHub",

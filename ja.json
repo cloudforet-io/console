@@ -373,6 +373,12 @@
 				"ROLE_DOMAIN_ADMIN": "ドメイン管理者",
 				"ROLE_ROOT_ADMIN": "ルート管理者"
 			},
+			"NOTIFICATION": {
+				"NO_NOTIFICATION": "",
+				"NO_NOTI_DESC_1": "",
+				"NO_NOTI_DESC_2": "",
+				"TITLE": ""
+			},
 			"SUPPORT": {
 				"LABEL_API_GUIDE": "APIガイド ",
 				"LABEL_GITHUB": "GitHub",
