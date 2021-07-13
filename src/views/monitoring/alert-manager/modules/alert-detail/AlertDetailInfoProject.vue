@@ -1,44 +1,61 @@
 <template>
-    <p v-if="!isEditMode" class="content-wrapper">
-        <span class="project">
-            <p-anchor :to="referenceRouter(
-                          alertData.project_id,
-                          { resource_type: 'identity.Project' })"
-                      highlight
+    <div>
+        <p v-if="!isEditMode" class="content-wrapper">
+            <span class="project">
+                <p-anchor :to="referenceRouter(
+                              alertData.project_id,
+                              { resource_type: 'identity.Project' })"
+                          highlight
+                >
+                    {{ projects[alertData.project_id] ? projects[alertData.project_id].label : alertData.project_id }}
+                </p-anchor>
+            </span>
+            <p-button style-type="gray-border" size="sm" class="add-button"
+                      @click="startEdit(EDIT_MODE.PROJECT)"
             >
-                {{ projects[alertData.project_id] ? projects[alertData.project_id].label : alertData.project_id }}
-            </p-anchor>
-        </span>
-        <p-button style-type="gray-border" size="sm" class="add-button"
-                  @click="startEdit(EDIT_MODE.PROJECT)"
-        >
-            {{ $t('MONITORING.ALERT.DETAIL.INFO.CHANGE') }}
-        </p-button>
-    </p>
-    <div v-else class="content-wrapper">
-        <project-select-dropdown :selected-project-ids="dataForUpdate ? [dataForUpdate] : []"
-                                 @select="onSelectProject"
-        />
-        <div class="button-group">
-            <p-button :outline="true" size="sm" class="cancel-button"
-                      @click="cancelEdit(EDIT_MODE.PROJECT)"
-            >
-                {{ $t('COMMON.TAGS.CANCEL') }}
+                {{ $t('MONITORING.ALERT.DETAIL.INFO.CHANGE') }}
             </p-button>
-            <p-button
-                style-type="primary"
-                size="sm"
-                @click="onClickSave(EDIT_MODE.PROJECT)"
-            >
-                {{ $t('MONITORING.ALERT.DETAIL.INFO.SAVE_CHANGES') }}
-            </p-button>
+        </p>
+        <div v-else class="content-wrapper">
+            <project-select-dropdown :selected-project-ids="dataForUpdate ? [dataForUpdate] : []"
+                                     @select="onSelectProject"
+            />
+            <div class="button-group">
+                <p-button :outline="true" size="sm" class="cancel-button"
+                          @click="cancelEdit(EDIT_MODE.PROJECT)"
+                >
+                    {{ $t('COMMON.TAGS.CANCEL') }}
+                </p-button>
+                <p-button
+                    style-type="primary"
+                    size="sm"
+                    @click="openModal"
+                >
+                    {{ $t('MONITORING.ALERT.DETAIL.INFO.SAVE_CHANGES') }}
+                </p-button>
+            </div>
         </div>
+        <p-button-modal
+            :header-title="$t('MONITORING.ALERT.DETAIL.INFO.CHANGE_PROJECT_MODAL_TITLE')"
+            centered
+            size="sm"
+            fade
+            :scrollable="false"
+            backdrop
+            theme-color="alert"
+            :visible.sync="modalVisible"
+            @confirm="onClickSave(EDIT_MODE.PROJECT)"
+        >
+            <template #body>
+                {{$t('MONITORING.ALERT.DETAIL.INFO.CHANGE_PROJECT_MODAL_DESC')}}
+            </template>
+        </p-button-modal>
     </div>
 </template>
 
 <script lang="ts">
 import {
-    PTextarea, PButton, PI, PAnchor,
+    PTextarea, PButton, PI, PAnchor, PButtonModal,
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { useAlertDetailItem } from '@/views/monitoring/alert-manager/modules/alert-detail/hooks';
@@ -53,6 +70,7 @@ export default {
         ProjectSelectDropdown,
         PAnchor,
         PButton,
+        PButtonModal,
     },
     props: {
         id: {
@@ -79,7 +97,13 @@ export default {
 
         const state = reactive({
             projects: computed(() => store.state.resource.project.items),
+            isModalLoading: true,
+            modalVisible: false,
         });
+
+        const openModal = () => {
+            state.modalVisible = true;
+        };
 
         const onSelectProject = (selected) => {
             alertDetailItemState.dataForUpdate = selected[0]?.id;
@@ -95,6 +119,7 @@ export default {
             updateAlert,
             onClickSave,
             onSelectProject,
+            openModal,
         };
     },
 };
