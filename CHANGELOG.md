@@ -1,3 +1,10 @@
+# [1.1.0-beta.103](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.102...v1.1.0-beta.103) (2021-07-13)
+
+
+### Bug Fixes
+
+* remove relative from definition table ([#642](https://github.com/spaceone-dev/spaceone-design-system/issues/642)) ([ce44175](https://github.com/spaceone-dev/spaceone-design-system/commit/ce44175c72cffe855a12f1fb8705cdbeae31c7a2))
+
 # [1.1.0-beta.102](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.101...v1.1.0-beta.102) (2021-07-12)
 
 
