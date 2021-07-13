@@ -1167,7 +1167,9 @@
 				"RESOLVED": "",
 				"SCHEDULE": "スケジュール",
 				"TOP_5_PROJECT_ACTIVITY": "Top5のプロジェクト活動",
-				"TOTAL": "合計"
+				"TOTAL": "合計",
+				"VIEW_ALL_OPEN_ALERTS": "",
+				"VIEW_ALL_OPEN_MAINTENANCE_WINDOW": ""
 			},
 			"DETAIL": {
 				"ALT_E_DELETE_ALERT": "アラート削除に失敗",

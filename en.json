@@ -1167,7 +1167,9 @@
 				"RESOLVED": "Resolved",
 				"SCHEDULE": "Schedule",
 				"TOP_5_PROJECT_ACTIVITY": "Top 5 Project Activity",
-				"TOTAL": "Total"
+				"TOTAL": "Total",
+				"VIEW_ALL_OPEN_ALERTS": "View all open alerts",
+				"VIEW_ALL_OPEN_MAINTENANCE_WINDOW": "View all open maintenance windows"
 			},
 			"DETAIL": {
 				"ALT_E_DELETE_ALERT": "Failed to Delete Alert",
