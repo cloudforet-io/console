@@ -378,7 +378,9 @@
 				"NO_NOTIFICATION": "No Notifications",
 				"NO_NOTI_DESC_1": "When you get notifications, ",
 				"NO_NOTI_DESC_2": "they’ll show up here.",
-				"TITLE": "Notifications"
+				"TITLE": "Notifications",
+				"TODAY": "Today",
+				"YESTERDAY": "Yesterday"
 			},
 			"SUPPORT": {
 				"LABEL_API_GUIDE": "API Guide",

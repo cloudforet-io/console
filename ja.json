@@ -378,7 +378,9 @@
 				"NO_NOTIFICATION": "",
 				"NO_NOTI_DESC_1": "",
 				"NO_NOTI_DESC_2": "",
-				"TITLE": ""
+				"TITLE": "",
+				"TODAY": "",
+				"YESTERDAY": ""
 			},
 			"SUPPORT": {
 				"LABEL_API_GUIDE": "APIガイド ",
