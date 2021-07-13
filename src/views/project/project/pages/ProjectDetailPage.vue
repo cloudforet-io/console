@@ -46,9 +46,7 @@
                     <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && counts[ALERT_STATE.TRIGGERED] !== 0" style-type="primary3">
                         {{ counts[ALERT_STATE.TRIGGERED] }}
                     </p-badge>
-                </template>
-                <template #extra="tab">
-                    <span v-if="tab.isBeta" class="beta-text">beta</span>
+                    <beta-mark v-if="tab.name === 'projectAlert' || tab.name === 'projectNotifications' || tab.name === 'projectMaintenanceWindow'" />
                 </template>
             </p-tab>
         </p-data-loader>
@@ -110,6 +108,7 @@ import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import ProjectFormModal from '@/views/project/project/modules/ProjectFormModal.vue';
 import { ProjectModel } from '@/views/project/project/type';
 
+import BetaMark from '@/common/components/marks/BetaMark.vue';
 
 export default {
     name: 'ProjectDetailPage',
@@ -118,6 +117,7 @@ export default {
         GeneralPageLayout,
         ProjectFormModal,
         FavoriteButton,
+        BetaMark,
         PButtonModal,
         PPageTitle,
         PTab,
@@ -194,17 +194,14 @@ export default {
                 {
                     name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_ALERT'),
-                    isBeta: true,
                 },
                 {
                     name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
-                    isBeta: true,
                 },
                 {
                     name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_MAINTENANCE_WINDOW'),
-                    isBeta: true,
                 },
                 {
                     name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
@@ -359,12 +356,8 @@ export default {
 .p-tab::v-deep {
     border-radius: 0.375rem;
     margin: auto;
-    .beta-text {
-        @apply text-coral;
-        font-size: 0.75rem;
-        vertical-align: super;
-        cursor: default;
-        margin-left: 0.25rem;
+    .extra {
+        display: flex;
     }
 }
 
