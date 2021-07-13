@@ -1436,7 +1436,7 @@
 				"TAB_SELECTED_DATA": "Selected Data",
 				"TAB_TAG": "Tag",
 				"TITLE": "Collector",
-				"UPDATE": "Edit",
+				"UPDATE": "Update",
 				"UPDATE_MODAL_NAME_DUPLICATED": "Name is duplicated.",
 				"UPDATE_MODAL_NAME_INVALID": "Should NOT be shorter than 2 characters.",
 				"UPDATE_MODAL_NAME_LABEL": "Name",
