@@ -11,6 +11,18 @@ Vue.use(VueRouter);
 
 const router = new VueRouter(routerOptions);
 
+router.onError((error) => {
+    const pattern = /Loading chunk (\d)+ failed/g;
+    const isChunkLoadFailed = error.message.match(pattern);
+
+    if (isChunkLoadFailed && window.navigator.onLine) {
+        router.go(0);
+    } else if (!window.navigator.onLine) {
+        alert('Check your network!');
+    }
+});
+
+
 router.beforeEach(async (to, from, next) => {
     if (to.meta && to.meta.excludeAuth) {
         if (to.meta.isSignInPage) {
@@ -40,12 +52,5 @@ router.beforeEach(async (to, from, next) => {
 router.afterEach((to, from) => {
     if (config.get('GTAG_ID') !== 'DISABLED') GTag.setPageView(to);
 });
-
-router.onError((error) => {
-    if (/loading chunk \d* failed./i.test(error.message)) {
-        window.location.reload();
-    }
-});
-
 
 export default router;
