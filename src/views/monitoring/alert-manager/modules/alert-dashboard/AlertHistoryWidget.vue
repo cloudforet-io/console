@@ -66,6 +66,13 @@ const ALERT_STATE = {
     RESOLVED: 'resolved',
 };
 
+interface SummaryData {
+    name: string;
+    increase: number;
+    dailyAverage: number | string;
+    monthlyTotal: number;
+}
+
 export default {
     name: 'AlertHistoryWidget',
     components: {
@@ -88,13 +95,13 @@ export default {
                 increase: 0,
                 dailyAverage: 0,
                 monthlyTotal: 0,
-            },
+            } as SummaryData,
             resolvedSummaryData: {
                 name: ALERT_STATE.RESOLVED,
                 increase: 0,
                 dailyAverage: 0,
                 monthlyTotal: 0,
-            },
+            } as SummaryData,
         });
 
         /* util */
