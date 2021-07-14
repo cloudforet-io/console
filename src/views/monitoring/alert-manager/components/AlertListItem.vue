@@ -2,7 +2,7 @@
     <div class="alert-list-item">
         <div class="content-wrapper">
             <div class="left-part">
-                <p-i :name="item.urgency === ALERT_URGENCY.HIGH ? 'ic_alert' : 'ic_state_duplicated'"
+                <p-i :name="item.urgency === ALERT_URGENCY.HIGH ? 'ic_alert' : 'ic_urgency_low'"
                      width="1em" height="1em"
                 />
                 <span v-tooltip.bottom="item.title" class="title">{{ item.title }}</span>
@@ -24,7 +24,7 @@
                 >
                     {{ projectNameFormatter(item.project_id) }}
                 </p-anchor>
-                <p-badge :style-type="badgeStyleTypeFormatter(item.state)">
+                <p-badge :style-type="badgeStyleTypeFormatter(item.state)" class="badge">
                     {{ capitalize(item.state) }}
                 </p-badge>
                 <span class="date">{{ dateFormatter(item.created_at) }}</span>
@@ -116,13 +116,16 @@ export default {
 <style lang="postcss" scoped>
 .alert-list-item {
     .content-wrapper {
-        display: -webkit-box;
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
 
         .left-part {
-            display: inherit;
+            display: flex;
+            flex-shrink: 1;
             flex-grow: 1;
+            min-width: 30%;
             align-items: center;
-            margin: auto 0;
 
             &:hover {
                 .title {
@@ -140,15 +143,28 @@ export default {
                 width: 90%;
                 margin-right: 0.5rem;
             }
+            .member-name {
+                margin-right: 0.5rem;
+            }
         }
         .right-part {
-            @apply flex-shrink-0;
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            flex-shrink: 0;
+            flex-grow: 1;
+            max-width: 70%;
             .project-link {
                 @apply text-gray-500;
                 margin-right: 0.5rem;
             }
+            .badge {
+                flex-shrink: 0;
+                margin: auto 0;
+            }
             .date {
                 @apply text-gray-500;
+                flex-shrink: 0;
                 font-size: 0.75rem;
                 margin-left: 0.5rem;
             }
@@ -168,14 +184,25 @@ export default {
         line-height: 1.5;
         padding-left: 1rem;
 
-        .left-part {
-            .p-i-icon {
-                position: absolute;
-                left: -0.25rem;
-                top: 0.3rem;
+        .content-wrapper {
+            display: block;
+            .left-part {
+                display: block;
+                .p-i-icon {
+                    position: absolute;
+                    left: -0.25rem;
+                    top: 0.3rem;
+                }
+                .title {
+                    width: 100%;
+                }
+                .member-name {
+                    display: none;
+                }
             }
-            .member-name {
-                display: none;
+            .right-part {
+                display: block;
+                max-width: unset;
             }
         }
     }

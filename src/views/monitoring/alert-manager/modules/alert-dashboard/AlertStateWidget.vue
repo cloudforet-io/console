@@ -203,7 +203,7 @@ export default {
                 {
                     name: ALERT_URGENCY.LOW,
                     label: i18n.t('MONITORING.ALERT.DASHBOARD.LOW'),
-                    icon: 'ic_state_duplicated',
+                    icon: 'ic_urgency_low',
                 },
             ])),
             assignedStateList: computed(() => [

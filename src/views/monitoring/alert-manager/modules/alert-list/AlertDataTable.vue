@@ -71,9 +71,9 @@
                     </p-badge>
                 </template>
                 <template #col-urgency-format="{ value }">
-                    <p-i :name="value === ALERT_URGENCY.HIGH ? 'ic_alert' : 'ic_state_duplicated'"
+                    <p-i :name="value === ALERT_URGENCY.HIGH ? 'ic_alert' : 'ic_urgency_low'"
                          width="1em" height="1em" class="mr-1"
-                         :class="{'ic_state_duplicated': !(value === ALERT_URGENCY.HIGH)}"
+                         :class="{'ic_urgency_low': !(value === ALERT_URGENCY.HIGH)}"
                     />
                     <span>{{ urgencyLabels[value] }}</span>
                 </template>
@@ -421,9 +421,6 @@ export default {
             &:hover {
                 @apply underline;
             }
-        }
-        .ic_state_duplicated path {
-            fill: theme('colors.red.200');
         }
     }
 }
