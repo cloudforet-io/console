@@ -5,6 +5,7 @@
             :total-count="totalCount"
             :page-size-changeable="false"
             :pagination-visible="false"
+            class="mb-4"
             @change="onChange"
             @refresh="onChange()"
         />
@@ -13,7 +14,12 @@
                                             class="timeline"
             >
                 <template #timeline-detail>
-                    <span class="severity">[{{ item.severity }}]</span> {{ item.title }} <br>
+                    <div class="title" @click="onOpenModal(item)">
+                        <span class="severity">[{{ item.severity }}]</span> {{ item.title }}
+                        <p-i name="ic_arrow_right" width="0.8em" height="0.8em"
+                             color="inherit"
+                        />
+                    </div>
                     {{ item.description }}
                 </template>
             </alert-detail-vertical-timeline>
@@ -25,6 +31,30 @@
         >
             {{ $t('MONITORING.ALERT.DETAIL.EVENT_LIST.MORE') }}
         </p-button>
+        <p-button-modal
+            v-if="modalVisible"
+            :header-title="$t('MONITORING.ALERT.DETAIL.EVENT_LIST.EVENT_DETAILS')"
+            size="md"
+            :visible.sync="modalVisible"
+            @confirm="onClickConfirm"
+        >
+            <template #body>
+                <div class="content-wrapper">
+                    <p-raw-data :item="selectedItem.raw_data" class="code-block" />
+                </div>
+            </template>
+            <template #footer-extra>
+                <p-button
+                    style-type="gray-border"
+                    @click="onCopyClick"
+                >
+                    <p-i name="ic_copy" width="1em" height="1em"
+                         color="inherit transparent" class="mr-2"
+                    />
+                    {{ $t('MONITORING.ALERT.DETAIL.EVENT_LIST.COPY_ALL') }}
+                </p-button>
+            </template>
+        </p-button-modal>
     </section>
 </template>
 
@@ -35,11 +65,14 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { store } from '@/store';
-import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 import AlertDetailVerticalTimeline
     from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailVerticalTimeline.vue';
 import { Event } from '@/views/monitoring/alert-manager/type';
-import { PButton, PToolbox } from '@spaceone/design-system';
+import {
+    PButton, PButtonModal, PI, PRawData, PToolbox,
+} from '@spaceone/design-system';
+import { copyAnyData } from '@/lib/helper/copy-helper';
 
 const PAGE_SIZE = 10;
 
@@ -49,6 +82,9 @@ export default {
         AlertDetailVerticalTimeline,
         PToolbox,
         PButton,
+        PButtonModal,
+        PRawData,
+        PI,
     },
     props: {
         id: {
@@ -59,8 +95,7 @@ export default {
     setup(props) {
         const eventListApiQueryHelper = new ApiQueryHelper()
             .setSort('created_at', true)
-            .setPage(1, 10)
-            .setFilters([{ k: 'alert_id', v: props.id, o: '=' }]);
+            .setPage(1, 10);
         let eventListApiQuery = eventListApiQueryHelper.data;
 
         const state = reactive({
@@ -69,19 +104,26 @@ export default {
             totalCount: 0,
             thisPage: 1,
             pageLimit: 10,
+            selectedItem: {} as any,
+            modalVisible: false,
         });
 
+        const searchQueryHelper = new QueryHelper();
+
         const listEvent = async () => {
+            eventListApiQueryHelper.setFilters([...searchQueryHelper.filters]);
+            if (props.id) eventListApiQueryHelper.addFilter({ k: 'alert_id', v: props.id, o: '=' });
+            eventListApiQuery = eventListApiQueryHelper.data;
             const { results, total_count } = await SpaceConnector.client.monitoring.event.list({ query: eventListApiQuery });
             state.itemList = results;
             state.totalCount = total_count;
         };
 
         const onChange = async (options: any = {}) => {
-            eventListApiQuery = getApiQueryWithToolboxOptions(eventListApiQueryHelper, options) ?? eventListApiQuery;
             if (options.searchText !== undefined) {
                 eventListApiQueryHelper.setPageStart(1);
                 eventListApiQueryHelper.setPageLimit(10);
+                searchQueryHelper.setFilters([{ v: options.searchText }]);
             }
             await listEvent();
         };
@@ -93,6 +135,19 @@ export default {
             await listEvent();
         };
 
+        const onOpenModal = (item) => {
+            state.modalVisible = true;
+            state.selectedItem = item;
+        };
+
+        const onClickConfirm = () => {
+            state.modalVisible = false;
+        };
+
+        const onCopyClick = () => {
+            copyAnyData(state.selectedItem.raw_data);
+        };
+
         (async () => {
             await listEvent();
         })();
@@ -101,6 +156,9 @@ export default {
             ...toRefs(state),
             onChange,
             onClickMore,
+            onOpenModal,
+            onClickConfirm,
+            onCopyClick,
         };
     },
 };
@@ -112,15 +170,20 @@ export default {
     padding-right: 1.5rem;
     padding-bottom: 2.5rem;
 }
+.title {
+    &:hover {
+        @apply text-blue-500 cursor-pointer;
+    }
+}
 .severity {
     @apply font-bold capitalize;
-}
-.timeline {
-    padding-top: 1rem;
 }
 .more-button {
     display: flex;
     width: 100%;
     margin-top: 1.5rem;
+}
+.content-wrapper {
+    max-height: 20.68rem;
 }
 </style>

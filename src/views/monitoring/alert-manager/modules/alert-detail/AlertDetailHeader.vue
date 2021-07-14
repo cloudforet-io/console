@@ -5,6 +5,7 @@
             <p-select-dropdown :items="ALERT_STATE_LIST"
                                :selected="alertState"
                                class="state-dropdown"
+                               :disabled="alertState === ALERT_STATE.ERROR"
                                @select="changeAlertState"
             />
         </p>
@@ -12,9 +13,15 @@
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.URGENCY') }}</span>
             <p-select-dropdown :items="ALERT_URGENCY_LIST"
                                :selected="alertUrgency"
+                               :disabled="alertState === ALERT_STATE.ERROR"
                                class="state-dropdown"
                                @select="changeAlertUrgency"
-            />
+            >
+                <p-i v-if="alertUrgency === ALERT_URGENCY.HIGH" name="ic_alert" width="1em"
+                     height="1em"
+                />
+                {{ alertUrgency }}
+            </p-select-dropdown>
         </p>
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.ASSIGNED_TO') }}
@@ -41,7 +48,9 @@
 </template>
 
 <script lang="ts">
-import { PButton, PPaneLayout, PSelectDropdown } from '@spaceone/design-system';
+import {
+    PButton, PPaneLayout, PSelectDropdown, PI,
+} from '@spaceone/design-system';
 import { reactive, toRefs, UnwrapRef } from '@vue/composition-api';
 import { AlertDataModel } from '@/views/monitoring/alert-manager/type';
 import AlertReassignModal from '@/views/monitoring/alert-manager/modules/alert-detail/AlertReassignModal.vue';
@@ -68,11 +77,12 @@ const ALERT_STATE_LIST = Object.freeze([
     { label: 'Triggered', name: 'TRIGGERED' },
     { label: 'Acknowledged', name: 'ACKNOWLEDGED' },
     { label: 'Resolved', name: 'RESOLVED' },
+    { label: 'Error', name: 'ERROR' },
 ]);
 
 const ALERT_URGENCY_LIST = Object.freeze([
-    { label: 'High', name: 'HIGH' },
-    { label: 'Low', name: 'LOW' },
+    { label: 'HIGH', name: 'HIGH' },
+    { label: 'LOW', name: 'LOW' },
 ]);
 
 interface PropsType {
@@ -98,6 +108,7 @@ export default {
         PPaneLayout,
         PSelectDropdown,
         PButton,
+        PI,
     },
     props: {
         id: {
@@ -155,6 +166,8 @@ export default {
 
         return {
             ...toRefs(state),
+            ALERT_STATE,
+            ALERT_URGENCY,
             ALERT_STATE_LIST,
             ALERT_URGENCY_LIST,
             onClickReassign,
