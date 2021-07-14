@@ -8,6 +8,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import { loadFonts } from '@/styles/fonts';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { computed } from '@vue/composition-api';
+import dayjs from 'dayjs';
 
 const initConfig = async () => {
     await config.init();
@@ -38,11 +39,17 @@ const initGtag = () => {
     }, { immediate: true });
 };
 
-
+const dayjsLanguageMap: Record<string, any> = {};
 const initLanguageAndFonts = async () => {
     store.watch(state => state.user.language, async (lang) => {
-        await loadFonts(lang);
+        const loadPromises = [loadFonts(lang)];
+        if (!dayjsLanguageMap[lang]) {
+            loadPromises.push(import(`dayjs/locale/${lang}`));
+        }
+        await Promise.all(loadPromises);
+
         i18n.locale = lang as string;
+        dayjs.locale(lang as string);
     }, { immediate: true });
 };
 

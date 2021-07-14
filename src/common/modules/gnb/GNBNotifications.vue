@@ -1,7 +1,7 @@
 <template>
     <div class="gnb-notifications">
         <div class="top-wrapper">
-            <span class="title">Notifications</span>
+            <span class="title">{{ $t('COMMON.GNB.NOTIFICATION.TITLE') }}</span>
             <p-select-dropdown class="more-button" :items="moreMenuItems"
                                button-only button-icon="ic_more"
             />
@@ -17,18 +17,17 @@
             <div v-else-if="notifications.length === 0" class="no-data">
                 <img src="@/assets/images/illust_astronaut_radio.svg">
                 <p class="title">
-                    No Notifications
+                    {{ $t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION') }}
                 </p>
                 <p class="desc">
-                    <span>When you get notifications, </span>
-                    <span>they'll show up here.</span>
+                    <span>{{ $t('COMMON.GNB.NOTIFICATION.NO_NOTI_DESC_1') }}&nbsp;</span>
+                    <span>{{ $t('COMMON.GNB.NOTIFICATION.NO_NOTI_DESC_2') }}</span>
                 </p>
             </div>
             <template v-else>
                 <g-n-b-notification-item v-for="(item, i) in notifications" :key="i"
-                                         :date-header="item.dateHeader"
-                                         :is-new="item.isNew"
-                                         :link="item.link"
+                                         :data="item"
+                                         :before-data="i === 0 ? null : notifications[i - 1]"
                 />
             </template>
         </div>
@@ -40,8 +39,13 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import {
     PIconButton, PSkeleton, PSelectDropdown,
 } from '@spaceone/design-system';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+
 import GNBNotificationItem from '@/common/modules/gnb/GNBNotificationItem.vue';
 import GNBNotificationDateHeader from '@/common/modules/gnb/GNBNotificationDateHeader.vue';
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import { i18n } from '@/translations';
 
 export default {
     name: 'GNBNotifications',
@@ -52,20 +56,60 @@ export default {
         PSelectDropdown,
         PIconButton,
     },
-    setup() {
+    setup(props, { root }) {
         const state = reactive({
             loading: false,
-            // notifications: [],
-            notifications: [
-                { isNew: true, dateHeader: 'Today' },
-                { isNew: true, link: 'http://www.naver.com', dateHeader: 'Yesterday' },
-                { isNew: true },
-                { dateHeader: 'Last 7 days' },
-                {}, {}],
+            notifications: [],
             moreMenuItems: computed(() => [
                 { name: 'delete', label: 'Delete All' },
             ]),
         });
+
+        const setReadNotifications = async (notifications: any[]) => {
+            try {
+                await SpaceConnector.client.notification.notification.setRead({
+                    notifications: notifications.filter(d => !d.is_read).map(d => d.notification_id),
+                }, {
+                    headers: {
+                        MOCK_MODE: true,
+                    },
+                });
+            } catch (e) {
+                console.error(e);
+            }
+        };
+
+        const notificationApiHelper = new ApiQueryHelper();
+        const notificationApiQuery = notificationApiHelper.data;
+        const listNotifications = async () => {
+            if (state.loading) return;
+
+            state.loading = true;
+
+            try {
+                const { results } = await SpaceConnector.client.notification.notification.list({
+                    query: notificationApiQuery,
+                }, {
+                    headers: {
+                        MOCK_MODE: true,
+                    },
+                });
+                state.notifications = results;
+                setReadNotifications(results);
+            } catch (e) {
+                state.notifications = [];
+                console.error(e);
+                showErrorMessage(i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'), e, root);
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        /* Init */
+        (async () => {
+            await listNotifications();
+        })();
+
         return {
             ...toRefs(state),
         };
