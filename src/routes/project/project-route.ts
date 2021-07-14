@@ -11,6 +11,11 @@ const ProjectMaintenanceWindowPage = () => import(/* webpackChunkName: "ProjectM
 const ProjectTagPage = () => import(/* webpackChunkName: "ProjectTagPage" */ '@/views/project/project/pages/ProjectTagPage.vue');
 const AddEventRulePage = () => import(/* webpackChunkName: "AddEventRulePage" */ '@/views/project/project/pages/AddEventRulePage.vue');
 
+const ProjectAlert = () => import(/* webpackChunkName: "ProjectAlert" */ '@/views/project/project/modules/ProjectAlert.vue');
+const ProjectWebhook = () => import(/* webpackChunkName: "ProjectWebhook" */ '@/views/project/project/modules/ProjectWebhook.vue');
+const ProjectSettings = () => import(/* webpackChunkName: "ProjectSettings" */ '@/views/project/project/modules/ProjectSettings.vue');
+
+
 export const PROJECT_ROUTE = Object.freeze({
     _NAME: 'projectMain',
     DETAIL: {
@@ -19,7 +24,12 @@ export const PROJECT_ROUTE = Object.freeze({
             _NAME: 'projectTab',
             SUMMARY: { _NAME: 'projectSummary' },
             MEMBER: { _NAME: 'projectMember' },
-            ALERT: { _NAME: 'projectAlert' },
+            ALERT: {
+                _NAME: 'projectAlert',
+                ALERT: { _NAME: 'projectAlertList' },
+                WEBHOOK: { _NAME: 'projectWebhook' },
+                SETTINGS: { _NAME: 'projectSettings' },
+            },
             NOTIFICATIONS: { _NAME: 'projectNotifications' },
             MAINTENANCE_WINDOW: { _NAME: 'projectMaintenanceWindow' },
             TAG: { _NAME: 'projectTag' },
@@ -68,8 +78,29 @@ export default {
                         {
                             path: 'alert',
                             name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
+                            redirect: 'alert/alert',
                             props: true,
                             component: ProjectAlertPage,
+                            children: [
+                                {
+                                    path: 'alert',
+                                    name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
+                                    props: true,
+                                    component: ProjectAlert,
+                                },
+                                {
+                                    path: 'webhook',
+                                    name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK._NAME,
+                                    props: true,
+                                    component: ProjectWebhook,
+                                },
+                                {
+                                    path: 'settings',
+                                    name: PROJECT_ROUTE.DETAIL.TAB.ALERT.SETTINGS._NAME,
+                                    props: true,
+                                    component: ProjectSettings,
+                                },
+                            ],
                         },
                         {
                             path: 'notifications',

@@ -38,7 +38,7 @@
             </div>
             <div class="content-wrapper">
                 <project-escalation-policy
-                    :project-id="projectId"
+                    :project-id="id"
                     :escalation-policy="escalationPolicy"
                 />
             </div>
@@ -64,20 +64,20 @@
         </section>
         <!--modals-->
         <project-notification-policy-update-modal
-            :project-id="projectId"
+            :project-id="id"
             :visible.sync="updateNotificationPolicyModalVisible"
             :select-options="notificationUrgencyList"
             :selected-option="notificationUrgency"
             @confirm="getProjectAlertConfig"
         />
         <project-auto-recovery-update-modal
-            :project-id="projectId"
+            :project-id="id"
             :visible.sync="updateAutoRecoveryModalVisible"
             :selected-option="isAutoRecovery"
             @confirm="getProjectAlertConfig"
         />
         <project-escalation-policy-change-modal
-            :project-id="projectId"
+            :project-id="id"
             :visible.sync="changeEscalationPolicyModalVisible"
             :escalation-policy-id="escalationPolicyId"
             @confirm="getProjectAlertConfig"
@@ -96,7 +96,7 @@
 import { get } from 'lodash';
 
 import {
-    computed, onActivated, reactive, toRefs, watch,
+    computed, onActivated, reactive, toRefs, watch, watchEffect,
 } from '@vue/composition-api';
 
 import ProjectEscalationPolicy from '@/views/project/project/modules/project-alert/ProjectEscalationPolicy.vue';
@@ -139,7 +139,7 @@ export default {
         PButton,
     },
     props: {
-        projectId: {
+        id: {
             type: String,
             default: undefined,
         },
@@ -177,7 +177,7 @@ export default {
         const getProjectAlertConfig = async () => {
             try {
                 state.projectAlertConfig = await SpaceConnector.client.monitoring.projectAlertConfig.get({
-                    project_id: props.projectId,
+                    project_id: props.id,
                 });
             } catch (e) {
                 state.projectAlertConfig = {};
@@ -187,7 +187,7 @@ export default {
         const getEventRuleCount = async () => {
             try {
                 const { total_count } = await SpaceConnector.client.monitoring.eventRule.list({
-                    project_id: props.projectId,
+                    project_id: props.id,
                 });
                 state.eventRuleTotalCount = total_count;
             } catch (e) {
@@ -220,7 +220,7 @@ export default {
             state.changeEscalationPolicyModalVisible = true;
         };
         const onClickEditEventRule = () => {
-            router.push({ name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME, params: { projectId: props.projectId } });
+            router.push({ name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME, params: { projectId: props.id } });
         };
 
         watch(() => state.escalationPolicyId, async () => {
@@ -228,7 +228,7 @@ export default {
         });
 
         const init = async () => {
-            if (props.projectId) {
+            if (props.id) {
                 await Promise.all([
                     getProjectAlertConfig(),
                     getEventRuleCount(),

@@ -10,22 +10,12 @@
                 {{ $t('PROJECT.DETAIL.PROJECT_ALERT_ACTIVATE') }}
             </p-button>
         </div>
-        <p-button-tab
-            v-else
-            :tabs="tabState.tabs"
-            :active-tab.sync="tabState.activeTab"
-            keep-alive-all
-            @change="onChangeTab"
+        <p-button-tab v-else
+                      :tabs="tabState.tabs"
+                      :active-tab.sync="tabState.activeTab"
+                      @change="onChangeTab"
         >
-            <template #alert>
-                <project-alert :project-id="id" />
-            </template>
-            <template #webhook>
-                <project-webhook :project-id="id" />
-            </template>
-            <template #settings>
-                <project-settings :project-id="id" />
-            </template>
+            <keep-alive><router-view /></keep-alive>
         </p-button-tab>
     </div>
 </template>
@@ -34,25 +24,22 @@
 import { isEmpty } from 'lodash';
 
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, onActivated, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PButtonTab, PButton } from '@spaceone/design-system';
-import ProjectAlert from '@/views/project/project/modules/ProjectAlert.vue';
-import ProjectWebhook from '@/views/project/project/modules/ProjectWebhook.vue';
-import ProjectSettings from '@/views/project/project/modules/project-alert/ProjectSettings.vue';
 
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { PROJECT_ROUTE } from '@/routes/project/project-route';
+import { i18n } from '@/translations';
+import router from '@/routes';
 
 
 export default {
     name: 'ProjectAlertPage',
     components: {
-        ProjectAlert,
-        ProjectWebhook,
-        ProjectSettings,
         PButtonTab,
         PButton,
     },
@@ -63,19 +50,17 @@ export default {
         },
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const state = reactive({
             loading: true,
             isActivated: false,
         });
         const tabState = reactive({
             tabs: computed(() => ([
-                { name: 'alert', label: vm.$t('PROJECT.DETAIL.SUBTAB_ALERT'), keepAlive: true },
-                { name: 'webhook', label: vm.$t('PROJECT.DETAIL.SUBTAB_WEBHOOK'), keepAlive: true },
-                { name: 'settings', label: vm.$t('PROJECT.DETAIL.SUBTAB_SETTINGS'), keepAlive: true },
+                { name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME, label: i18n.t('PROJECT.DETAIL.SUBTAB_ALERT') },
+                { name: PROJECT_ROUTE.DETAIL.TAB.ALERT.WEBHOOK._NAME, label: i18n.t('PROJECT.DETAIL.SUBTAB_WEBHOOK') },
+                { name: PROJECT_ROUTE.DETAIL.TAB.ALERT.SETTINGS._NAME, label: i18n.t('PROJECT.DETAIL.SUBTAB_SETTINGS') },
             ] as TabItem[])),
-            activeTab: 'alert',
+            activeTab: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
         });
 
         /* api */
@@ -100,18 +85,26 @@ export default {
                 });
                 state.isActivated = true;
                 tabState.activeTab = 'settings';
-                showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_ACTIVATE_ALERT'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ACTIVATE_ALERT'), '', root);
             } catch (e) {
                 state.isActivated = false;
                 console.error(e);
-                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_ACTIVATE_ALERT'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_ACTIVATE_ALERT'), e, root);
             }
         };
 
         /* event */
-        const onChangeTab = async (tab) => {
-            tabState.activeTab = tab;
+        const onChangeTab = async (activeTab) => {
+            if (activeTab === router.currentRoute.name) return;
+            await router.replace({ name: activeTab });
         };
+
+        /* init */
+        onActivated(() => {
+            if (router.currentRoute.name !== tabState.activeTab) {
+                tabState.activeTab = router.currentRoute.name || PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME;
+            }
+        });
 
         watch(() => props.id, (projectId) => {
             if (projectId) getProjectAlertConfig();

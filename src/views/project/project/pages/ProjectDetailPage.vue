@@ -281,9 +281,8 @@ export default {
         }, { immediate: true });
 
         (async () => {
-            if (router.currentRoute.name !== singleItemTabState.activeTab) {
-                singleItemTabState.activeTab = router.currentRoute.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
-            }
+            const exactRoute = router.currentRoute.matched.find(d => singleItemTabState.tabs.find(tab => tab.name === d.name));
+            singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
             await Promise.all([
                 // getPageNavigation(),
                 store.dispatch('resource/project/load'),

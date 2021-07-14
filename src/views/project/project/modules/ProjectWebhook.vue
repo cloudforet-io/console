@@ -63,7 +63,7 @@
 
         <webhook-add-form-modal
             :visible.sync="addModalVisible"
-            :project-id="projectId"
+            :project-id="id"
             @confirm="listWebhooks()"
         />
         <p-table-check-modal
@@ -180,7 +180,7 @@ export default {
         PTableCheckModal,
     },
     props: {
-        projectId: {
+        id: {
             type: String,
             default: undefined,
         },
@@ -281,7 +281,7 @@ export default {
             state.loading = true;
             try {
                 const { results, total_count } = await SpaceConnector.client.monitoring.webhook.list({
-                    project_id: props.projectId,
+                    project_id: props.id,
                     query: webhookListApiQuery,
                 });
                 state.items = results.map(d => ({

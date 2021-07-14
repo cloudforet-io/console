@@ -52,6 +52,7 @@
 
 <script lang="ts">
 import { find, get } from 'lodash';
+import { Location } from 'vue-router';
 
 import {
     computed, reactive, toRefs, watch,
@@ -63,19 +64,18 @@ import {
 
 import AlertListItem from '@/views/monitoring/alert-manager/components/AlertListItem.vue';
 
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
+import { AlertListPageUrlQuery } from '@/views/monitoring/alert-manager/type';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
-import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { i18n } from '@/translations';
 import { alert, secondary } from '@/styles/colors';
 import { store } from '@/store';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import router from '@/routes';
-import { Location } from 'vue-router';
-import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
-import { AlertListPageUrlQuery } from '@/views/monitoring/alert-manager/type';
+import { PROJECT_ROUTE } from '@/routes/project/project-route';
 
 
 const ASSIGNED_STATE = Object.freeze({
@@ -142,19 +142,12 @@ export default {
         });
 
         /* util */
-        const linkQueryHelper = new QueryHelper();
-        const alertLinkFormatter = (alertState): Location => {
-            linkQueryHelper.setFilters([
-                { k: 'project_id', o: '=', v: props.projectId },
-            ]);
-            return {
-                name: MONITORING_ROUTE.ALERT_MANAGER.ALERT._NAME,
-                query: {
-                    filters: linkQueryHelper.rawQueryStrings,
-                    state: alertState,
-                } as AlertListPageUrlQuery,
-            };
-        };
+        const alertLinkFormatter = (alertState): Location => ({
+            name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
+            query: {
+                state: alertState,
+            } as AlertListPageUrlQuery,
+        });
 
         /* api */
         const apiQuery = new ApiQueryHelper();
@@ -165,7 +158,9 @@ export default {
             if (state.selectedAssignedState === ASSIGNED_STATE.ASSIGNED_TO_ME) {
                 apiQuery.setFilters([{ k: 'assignee', v: store.state.user.userId, o: '=' }]);
             } else {
-                apiQuery.setFilters([]);
+                apiQuery.setFilters([
+                    { k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' },
+                ]);
             }
             return apiQuery.data;
         };
