@@ -2,13 +2,9 @@
     <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab"
            class="alert-detail-timeline"
     >
-        <template #timeline>
-            <p-panel-top>{{ $t('MONITORING.ALERT.DETAIL.TIMELINE.TIMELINE') }}</p-panel-top>
-            <alert-detail-vertical-timeline />
-        </template>
         <template #event-list>
-            <p-panel-top>Event list</p-panel-top>
-            <alert-detail-event-list />
+            <p-panel-top>{{ $t('MONITORING.ALERT.DETAIL.EVENT_LIST.EVENT_LIST') }}</p-panel-top>
+            <alert-detail-event-list :id="id" />
         </template>
     </p-tab>
 </template>
@@ -19,15 +15,13 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive,
 } from '@vue/composition-api';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import AlertDetailVerticalTimeline
-    from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailVerticalTimeline.vue';
 import AlertDetailEventList from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailEventList.vue';
+import { i18n } from '@/translations';
 
 export default {
     name: 'AlertDetailTimeline',
     components: {
         AlertDetailEventList,
-        AlertDetailVerticalTimeline,
         PTab,
         PPanelTop,
     },
@@ -41,10 +35,9 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const tabState = reactive({
             tabs: computed(() => ([
-                { name: 'timeline', label: vm.$t('MONITORING.ALERT.DETAIL.TIMELINE.TIMELINE') },
-                { name: 'event-list', label: 'Event List' },
+                { name: 'event-list', label: i18n.t('MONITORING.ALERT.DETAIL.EVENT_LIST.EVENT_LIST') },
             ] as TabItem[])),
-            activeTab: 'timeline',
+            activeTab: 'event-list',
         });
         return {
             tabState,
