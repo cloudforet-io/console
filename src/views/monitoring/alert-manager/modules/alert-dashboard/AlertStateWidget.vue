@@ -369,6 +369,17 @@ export default {
                 .body {
                     max-height: 14.5rem;
                     overflow-y: auto;
+                    li:hover {
+                        .title {
+                            text-decoration: underline;
+                        }
+                    }
+                }
+                &.no-data {
+                    display: flex;
+                    height: 100%;
+                    align-items: center;
+                    justify-content: center;
                 }
             }
         }

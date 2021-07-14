@@ -58,6 +58,10 @@ export default {
             type: Object,
             default: dayjs.utc(),
         },
+        activatedProjects: {
+            type: Array,
+            default: () => ([]),
+        },
     },
     setup(props) {
         const state = reactive(({
@@ -198,20 +202,22 @@ export default {
         };
 
         /* api */
-        const getData = async () => {
-            state.loading = true;
-
+        const getDailyAlertHistory = async () => {
             try {
+                state.loading = true;
                 const { results } = await SpaceConnector.client.monitoring.dashboard.dailyAlertHistory({
                     start: props.currentDate.format('YYYY-MM-01'),
                     end: props.currentDate.add(1, 'month').format('YYYY-MM-01'),
+                    // eslint-disable-next-line camelcase
+                    activated_projects: props.activatedProjects,
                 });
                 state.chartData = initChartData(results);
             } catch (e) {
                 state.chartData = [];
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
-            state.loading = false;
         };
 
         watch([() => state.chartRef, () => state.chartData], ([chartContext, data]) => {
@@ -220,8 +226,10 @@ export default {
             }
         });
 
-        watch(() => props.currentDate, () => {
-            getData();
+        watch([() => props.currentDate, () => props.activatedProjects], ([currentData, activatedProjects]) => {
+            if (activatedProjects.length) {
+                getDailyAlertHistory();
+            }
         }, { immediate: true });
 
         return {

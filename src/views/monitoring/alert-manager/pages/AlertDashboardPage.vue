@@ -4,7 +4,7 @@
         <p-page-title :title="$t('MONITORING.ALERT.DASHBOARD.DASHBOARD')" />
         <div class="widget-wrapper">
             <alert-state-widget class="alert-state-widget" />
-            <alert-history-widget class="alert-history-widget" />
+            <alert-history-widget :activated-projects="activatedProjects" class="alert-history-widget" />
             <h2 class="widget-title">
                 {{ $t('MONITORING.ALERT.DASHBOARD.PROJECT_HEALTH_BOARD') }}
             </h2>

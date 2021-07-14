@@ -34,7 +34,7 @@
                 </p-card>
             </div>
             <div class="chart-wrapper col-span-9">
-                <alert-history-chart :current-date="currentDate" />
+                <alert-history-chart :current-date="currentDate" :activated-projects="activatedProjects" />
             </div>
         </div>
     </div>
@@ -45,7 +45,9 @@ import { find } from 'lodash';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 
-import { reactive, toRefs, watch } from '@vue/composition-api';
+import {
+    reactive, toRefs, watch, watchEffect,
+} from '@vue/composition-api';
 
 import {
     PCard, PI, PDatePagination,
@@ -72,7 +74,13 @@ export default {
         PI,
         PDatePagination,
     },
-    setup() {
+    props: {
+        activatedProjects: {
+            type: Array,
+            default: () => ([]),
+        },
+    },
+    setup(props) {
         const state = reactive({
             currentDate: dayjs.utc(),
             createdSummaryData: {
@@ -132,6 +140,8 @@ export default {
                 const { results } = await SpaceConnector.client.monitoring.dashboard.alertHistorySummary({
                     start: current.subtract(1, 'month').format('YYYY-MM-01'),
                     end: current.add(1, 'month').format('YYYY-MM-01'),
+                    // eslint-disable-next-line camelcase
+                    activated_projects: props.activatedProjects,
                 });
                 setSummaryData(current, results);
             } catch (e) {
@@ -140,9 +150,12 @@ export default {
             }
         };
 
-        (async () => {
-            await getAlertHistorySummary();
-        })();
+
+        watchEffect(async () => {
+            if (props.activatedProjects.length) {
+                await getAlertHistorySummary();
+            }
+        });
 
         watch(() => state.currentDate, async () => {
             await getAlertHistorySummary();

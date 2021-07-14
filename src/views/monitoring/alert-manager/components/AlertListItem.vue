@@ -1,19 +1,11 @@
 <template>
     <div class="alert-list-item">
-        <div class="flex">
+        <div class="content-wrapper">
             <div class="left-part">
                 <p-i :name="item.urgency === ALERT_URGENCY.HIGH ? 'ic_alert' : 'ic_state_duplicated'"
                      width="1em" height="1em"
                 />
-                <span class="title">{{ item.title }}</span>
-                <p-anchor v-if="showProjectLink"
-                          class="project-link"
-                          :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
-                          :show-icon="false"
-                          target="_self"
-                >
-                    {{ projects[item.project_id] ? projects[item.project_id].label : item.project_id }}
-                </p-anchor>
+                <span v-tooltip.bottom="item.title" class="title">{{ item.title }}</span>
                 <p-badge v-if="showMemberName && item.assignee"
                          outline
                          style-type="primary2"
@@ -23,6 +15,14 @@
                 </p-badge>
             </div>
             <div class="right-part">
+                <p-anchor v-if="showProjectLink"
+                          class="project-link"
+                          :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
+                          :show-icon="false"
+                          target="_self"
+                >
+                    {{ projects[item.project_id] ? projects[item.project_id].label : item.project_id }}
+                </p-anchor>
                 <p-badge :style-type="badgeStyleTypeFormatter(item.state)">
                     {{ capitalize(item.state) }}
                 </p-badge>
@@ -112,37 +112,40 @@ export default {
 
 <style lang="postcss" scoped>
 .alert-list-item {
-    .left-part {
-        display: inherit;
-        width: 78%;
-        flex-grow: 1;
-        align-items: center;
-        margin: auto 0;
+    .content-wrapper {
+        display: -webkit-box;
 
-        .p-i-icon {
-            @apply flex-shrink-0;
-            margin-right: 0.5rem;
-        }
-        .title {
-            @apply truncate;
-            display: block;
-            margin-right: 0.5rem;
-        }
-        .project-link {
-            @apply flex-shrink-0 text-gray-500;
+        .left-part {
             display: inherit;
-            max-width: calc(100% - 2rem);
-            margin-right: 0.5rem;
+            flex-grow: 1;
+            align-items: center;
+            margin: auto 0;
+
+            .p-i-icon {
+                @apply flex-shrink-0;
+                margin-right: 0.5rem;
+            }
+            .title {
+                @apply truncate;
+                display: block;
+                width: 90%;
+                margin-right: 0.5rem;
+            }
+        }
+        .right-part {
+            @apply flex-shrink-0;
+            .project-link {
+                @apply text-gray-500;
+                margin-right: 0.5rem;
+            }
+            .date {
+                @apply text-gray-500;
+                font-size: 0.75rem;
+                margin-left: 0.5rem;
+            }
         }
     }
-    .right-part {
-        @apply flex-shrink-0;
-        .date {
-            @apply text-gray-500;
-            font-size: 0.75rem;
-            margin-left: 0.5rem;
-        }
-    }
+
     .status-message {
         @apply text-gray-500;
         font-size: 0.75rem;

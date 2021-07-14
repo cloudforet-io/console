@@ -28,6 +28,7 @@
             >
                 <p-anchor :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
                           :show-icon="false"
+                          target="_self"
                           class="col-name"
                 >
                     <span v-tooltip.bottom="projectNameFormatter(projectId)" class="tablet:hidden">{{ projectNameFormatter(projectId) }}</span>
@@ -257,6 +258,7 @@ export default {
             @apply text-gray-700;
             display: flex;
             gap: 1rem;
+            justify-content: flex-end;
             font-size: 0.875rem;
         }
     }
@@ -304,7 +306,7 @@ export default {
                         &.LOW {
                             @apply bg-red-200;
                             &:hover {
-                                @apply border-red-700;
+                                @apply border-red-400;
                                 border-width: 0.25rem;
                             }
                         }
@@ -339,10 +341,6 @@ export default {
                 display: flex;
                 padding-left: 0;
                 padding-bottom: 1rem;
-            }
-
-            .period-wrapper {
-                flex-direction: row-reverse;
             }
         }
 
