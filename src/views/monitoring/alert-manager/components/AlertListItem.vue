@@ -16,12 +16,13 @@
             </div>
             <div class="right-part">
                 <p-anchor v-if="showProjectLink"
+                          v-tooltip.bottom="projectNameFormatter(item.project_id)"
                           class="project-link"
                           :to="referenceRouter(item.project_id,{ resource_type: 'identity.Project' })"
                           :show-icon="false"
                           target="_self"
                 >
-                    {{ projects[item.project_id] ? projects[item.project_id].label : item.project_id }}
+                    {{ projectNameFormatter(item.project_id) }}
                 </p-anchor>
                 <p-badge :style-type="badgeStyleTypeFormatter(item.state)">
                     {{ capitalize(item.state) }}
@@ -97,6 +98,7 @@ export default {
             return 'gray200';
         };
         const dateFormatter = date => dayjs.utc(date).format('MM/DD HH:mm');
+        const projectNameFormatter = projectId => state.projects[projectId]?.label || projectId;
 
         return {
             ...toRefs(state),
@@ -105,6 +107,7 @@ export default {
             capitalize,
             badgeStyleTypeFormatter,
             dateFormatter,
+            projectNameFormatter,
         };
     },
 };
@@ -120,6 +123,12 @@ export default {
             flex-grow: 1;
             align-items: center;
             margin: auto 0;
+
+            &:hover {
+                .title {
+                    text-decoration: underline;
+                }
+            }
 
             .p-i-icon {
                 @apply flex-shrink-0;

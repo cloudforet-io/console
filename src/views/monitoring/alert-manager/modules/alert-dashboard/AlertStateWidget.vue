@@ -62,7 +62,20 @@
                     </div>
                 </div>
                 <!--list-->
-                <p-list-card :items="items" :hoverable="true" @click="onClickListItem">
+                <p-empty v-if="!loading && !items.length">
+                    <div>
+                        <p-i name="ic_alert" color="inherit transparent" />
+                        <p class="text">
+                            {{ $t('MONITORING.ALERT.DASHBOARD.NO_ALERT') }}
+                        </p>
+                    </div>
+                </p-empty>
+                <p-list-card v-else
+                             :items="items"
+                             :loading="loading"
+                             :hoverable="true"
+                             @click="onClickListItem"
+                >
                     <template #header>
                         <div class="mobile-header">
                             <p-check-box v-model="isAssignedToMe">
@@ -94,11 +107,12 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PBalloonTab, PListCard, PSelectStatus, PTextPagination, PSelectButton, PCheckBox, PIconButton,
+    PBalloonTab, PListCard, PSelectStatus, PTextPagination, PSelectButton, PCheckBox, PIconButton, PEmpty, PI,
 } from '@spaceone/design-system';
 
 import AlertListItem from '@/views/monitoring/alert-manager/components/AlertListItem.vue';
 
+import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -107,7 +121,7 @@ import { getPageStart } from '@spaceone/console-core-lib/component-util/paginati
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { commaFormatter } from '@spaceone/console-core-lib';
 import { store } from '@/store';
-import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
+import { i18n } from '@/translations';
 
 
 const TAB_STATE = Object.freeze({
@@ -138,6 +152,8 @@ export default {
         PSelectButton,
         PCheckBox,
         PIconButton,
+        PEmpty,
+        PI,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -145,15 +161,15 @@ export default {
             tabs: computed(() => ([
                 {
                     name: TAB_STATE.OPEN,
-                    label: vm.$t('MONITORING.ALERT.DASHBOARD.OPEN'),
+                    label: i18n.t('MONITORING.ALERT.DASHBOARD.OPEN'),
                 },
                 {
                     name: TAB_STATE.RESOLVED,
-                    label: vm.$t('MONITORING.ALERT.DASHBOARD.RESOLVED'),
+                    label: i18n.t('MONITORING.ALERT.DASHBOARD.RESOLVED'),
                 },
                 {
                     name: TAB_STATE.ALL,
-                    label: vm.$t('MONITORING.ALERT.DASHBOARD.ALL_STATE'),
+                    label: i18n.t('MONITORING.ALERT.DASHBOARD.ALL_STATE'),
                 },
             ])),
             activeTab: TAB_STATE.OPEN,
@@ -173,30 +189,31 @@ export default {
             },
         });
         const state = reactive({
+            loading: true,
             urgencyList: computed(() => ([
                 {
                     name: ALERT_URGENCY.ALL,
-                    label: vm.$t('MONITORING.ALERT.DASHBOARD.ALL_URGENCY'),
+                    label: i18n.t('MONITORING.ALERT.DASHBOARD.ALL_URGENCY'),
                 },
                 {
                     name: ALERT_URGENCY.HIGH,
-                    label: vm.$t('MONITORING.ALERT.DASHBOARD.HIGH'),
+                    label: i18n.t('MONITORING.ALERT.DASHBOARD.HIGH'),
                     icon: 'ic_alert',
                 },
                 {
                     name: ALERT_URGENCY.LOW,
-                    label: vm.$t('MONITORING.ALERT.DASHBOARD.LOW'),
+                    label: i18n.t('MONITORING.ALERT.DASHBOARD.LOW'),
                     icon: 'ic_state_duplicated',
                 },
             ])),
             assignedStateList: computed(() => [
                 {
                     name: ASSIGNED_STATE.ALL,
-                    label: vm.$t('MONITORING.ALERT.DASHBOARD.ALL'),
+                    label: i18n.t('MONITORING.ALERT.DASHBOARD.ALL'),
                 },
                 {
                     name: ASSIGNED_STATE.ASSIGNED_TO_ME,
-                    label: vm.$t('MONITORING.ALERT.DASHBOARD.ASSIGNED_TO_ME'),
+                    label: i18n.t('MONITORING.ALERT.DASHBOARD.ASSIGNED_TO_ME'),
                 },
             ]),
             //
@@ -232,11 +249,14 @@ export default {
         };
         const listAlerts = async () => {
             try {
+                state.loading = true;
                 const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({ query: getQuery() });
                 state.allPage = getAllPage(total_count, 10);
                 state.items = results;
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
         const statAlerts = async () => {
@@ -369,17 +389,23 @@ export default {
                 .body {
                     max-height: 14.5rem;
                     overflow-y: auto;
-                    li:hover {
-                        .title {
-                            text-decoration: underline;
-                        }
-                    }
                 }
                 &.no-data {
                     display: flex;
                     height: 100%;
                     align-items: center;
                     justify-content: center;
+                }
+            }
+            .p-empty {
+                @apply border border-gray-200 text-gray-300 rounded-md;
+                text-align: center;
+                .p-i-icon {
+                    margin-bottom: 0.5rem;
+                }
+                .text {
+                    font-size: 1rem;
+                    line-height: 1.6;
                 }
             }
         }
