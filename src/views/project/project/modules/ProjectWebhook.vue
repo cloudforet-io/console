@@ -35,7 +35,11 @@
                 >
                     {{ $t('PROJECT.DETAIL.ADD') }}
                 </p-icon-text-button>
-                <p-select-dropdown :items="dropdown" @select="onSelectDropdown">
+                <p-select-dropdown
+                    :items="dropdown"
+                    :disabled="!isSelectedItem"
+                    @select="onSelectDropdown"
+                >
                     {{ $t('PROJECT.DETAIL.WEBHOOK_ACTION') }}
                 </p-select-dropdown>
             </template>
@@ -62,10 +66,38 @@
             :project-id="projectId"
             @confirm="listWebhooks()"
         />
+        <p-table-check-modal
+            :visible.sync="checkModalState.visible"
+            :header-title="checkModalState.title"
+            :sub-title="checkModalState.subTitle"
+            :theme-color="checkModalState.themeColor"
+            :fields="fields"
+            size="md"
+            :selectable="false"
+            :items="selectedItem"
+            @confirm="checkModalConfirm"
+        >
+            <template #col-plugin_info.plugin_id-format="{index, field, item}">
+                <p-lazy-img :src="item.plugin_icon"
+                            error-icon="ic_webhook"
+                            width="1.5rem" height="1.5rem" class="mr-2"
+                />
+                {{ item.plugin_name }}
+            </template>
+            <template #col-state-format="{ value }">
+                <p-status
+                    class="capitalize"
+                    v-bind="userStateFormatter(value)"
+                />
+            </template>
+            <template #col-webhook_url-format="{ value }">
+                <p-copy-button>{{ value }}</p-copy-button>
+            </template>
+        </p-table-check-modal>
         <webhook-update-form-modal
             v-if="updateModalVisible"
             :visible.sync="updateModalVisible"
-            :webhook-info="selectedItems[0]"
+            :selected-item="selectedItem"
             @confirm="listWebhooks()"
         />
         <delete-modal
@@ -73,7 +105,7 @@
             :confirm-text="$t('PROJECT.DETAIL.MODAL_DELETE_WEBHOOK')"
             :visible.sync="deleteModalVisible"
             :disabled="!isNameValid"
-            @confirm="onDeleteConfirm"
+            @confirm="deleteWebhookConfirm"
         >
             <template #default>
                 <p class="desc">
@@ -82,7 +114,7 @@
                 </p>
                 <i18n path="PROJECT.DETAIL.MODAL_DELETE_WEBHOOK_CONTENT_3">
                     <template #webhookName>
-                        <strong>{{ selectedItems[0].name }}</strong>
+                        <strong>{{ isSelectedItem ? selectedItem[0].name : '' }}</strong>
                     </template>
                 </i18n>
                 <p-text-input v-model="inputWebhookName" />
@@ -106,6 +138,7 @@ import {
     PTextInput,
     PCopyButton,
     PSelectDropdown,
+    PTableCheckModal,
 } from '@spaceone/design-system';
 import WebhookAddFormModal from '@/views/project/project/modules/WebhookAddFormModal.vue';
 import WebhookUpdateFormModal from '@/views/project/project/modules/WebhookUpdateFormModal.vue';
@@ -128,6 +161,7 @@ import { WEBHOOK_STATE } from '@/views/monitoring/alert-manager/lib/config';
 import { i18n } from '@/translations';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { TranslateResult } from 'vue-i18n';
 
 export default {
     name: 'ProjectWebhook',
@@ -143,6 +177,7 @@ export default {
         PLazyImg,
         PTextInput,
         PCopyButton,
+        PTableCheckModal,
     },
     props: {
         projectId: {
@@ -183,15 +218,26 @@ export default {
             dropdown: computed(() => ([
                 {
                     type: 'item',
+                    name: 'enable',
+                    label: i18n.t('PROJECT.DETAIL.WEBHOOK_ENABLE'),
+                    disabled: state.selectedItem[0]?.state === WEBHOOK_STATE.ENABLED,
+                },
+                {
+                    type: 'item',
+                    name: 'disable',
+                    label: i18n.t('PROJECT.DETAIL.WEBHOOK_DISABLE'),
+                    disabled: state.selectedItem[0]?.state === WEBHOOK_STATE.DISABLED,
+                },
+                { type: 'divider' },
+                {
+                    type: 'item',
                     name: 'update',
                     label: i18n.t('PROJECT.DETAIL.WEBHOOK_UPDATE'),
-                    disabled: state.selectedItems.length !== 1,
                 },
                 {
                     type: 'item',
                     name: 'delete',
                     label: i18n.t('PROJECT.DETAIL.WEBHOOK_DELETE'),
-                    disabled: state.selectedItems.length !== 1,
                 },
             ] as MenuItem[])),
             fields: [
@@ -204,12 +250,13 @@ export default {
             ],
             items: [],
             selectIndex: [],
-            selectedItems: computed(() => state.selectIndex.map(i => state.items[i])),
+            selectedItem: computed(() => state.selectIndex.map(i => state.items[i])),
+            isSelectedItem: computed(() => state.selectedItem.length),
             totalCount: 0,
             tags: webhookListApiQueryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
             inputWebhookName: '',
             isNameValid: computed(() => {
-                const selectedWebhook = state.selectedItems[0];
+                const selectedWebhook = state.selectedItem[0];
                 if (!selectedWebhook) return false;
                 if (state.inputWebhookName === selectedWebhook.name) return true;
                 return false;
@@ -219,7 +266,13 @@ export default {
             addModalVisible: false,
             updateModalVisible: false,
             deleteModalVisible: false,
-            visibleCustomFieldModal: false,
+        });
+        const checkModalState = reactive({
+            mode: '',
+            title: '' as TranslateResult,
+            subTitle: '' as TranslateResult,
+            themeColor: '',
+            visible: false,
         });
 
         /* api */
@@ -247,10 +300,74 @@ export default {
                 state.loading = false;
             }
         };
+        const enableWebhook = async () => {
+            try {
+                await SpaceConnector.client.monitoring.webhook.enable({
+                    // eslint-disable-next-line camelcase
+                    webhook_id: state.selectedItem[0].webhook_id,
+                });
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ENABLE_WEBHOOK'), '', root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_ENABLE_WEBHOOK'), e, root);
+            } finally {
+                state.selectedIndex = [];
+                await listWebhooks();
+                checkModalState.visible = false;
+            }
+        };
+        const disableWebhook = async () => {
+            try {
+                await SpaceConnector.client.monitoring.webhook.disable({
+                    // eslint-disable-next-line camelcase
+                    webhook_id: state.selectedItem[0].webhook_id,
+                });
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DISABLE_WEBHOOK'), '', root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_DISABLE_WEBHOOK'), e, root);
+            } finally {
+                state.selectedIndex = [];
+                await listWebhooks();
+                checkModalState.visible = false;
+            }
+        };
+        const deleteWebhookConfirm = async () => {
+            try {
+                await SpaceConnector.client.monitoring.webhook.delete({
+                    webhook_id: state.selectedItem[0].webhook_id,
+                });
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_WEBHOOK'), '', root);
+            } catch (e) {
+                console.error(e);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_DELETE_WEBHOOK'), e, root);
+            } finally {
+                await listWebhooks();
+                formState.deleteModalVisible = false;
+            }
+        };
 
         /* event */
         const onClickAdd = () => {
             formState.addModalVisible = true;
+        };
+        const checkModalConfirm = async () => {
+            if (checkModalState.mode === WEBHOOK_STATE.ENABLED) await enableWebhook();
+            else if (checkModalState.mode === WEBHOOK_STATE.DISABLED) await disableWebhook();
+        };
+        const onClickEnable = () => {
+            checkModalState.visible = true;
+            checkModalState.mode = WEBHOOK_STATE.ENABLED;
+            checkModalState.title = i18n.t('PROJECT.DETAIL.MODAL_ENABLE_WEBHOOK_TITLE');
+            checkModalState.subTitle = i18n.t('PROJECT.DETAIL.MODAL_ENABLE_WEBHOOK_DESC');
+            checkModalState.themeColor = 'safe';
+        };
+        const onClickDisable = () => {
+            checkModalState.visible = true;
+            checkModalState.mode = WEBHOOK_STATE.DISABLED;
+            checkModalState.title = i18n.t('PROJECT.DETAIL.MODAL_DISABLE_WEBHOOK_TITLE');
+            checkModalState.subTitle = i18n.t('PROJECT.DETAIL.MODAL_DISABLE_WEBHOOK_DESC');
+            checkModalState.themeColor = 'alert';
         };
         const onClickUpdate = () => {
             formState.updateModalVisible = true;
@@ -261,23 +378,11 @@ export default {
         };
         const onSelectDropdown = (name) => {
             switch (name) {
+            case 'enable': onClickEnable(); break;
+            case 'disable': onClickDisable(); break;
             case 'update': onClickUpdate(); break;
             case 'delete': onClickDelete(); break;
             default: break;
-            }
-        };
-        const onDeleteConfirm = async () => {
-            try {
-                await SpaceConnector.client.monitoring.webhook.delete({
-                    webhook_id: state.selectedItems[0].webhook_id,
-                });
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_WEBHOOK'), '', root);
-                await listWebhooks();
-            } catch (e) {
-                console.error(e);
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_DELETE_WEBHOOK'), e, root);
-            } finally {
-                formState.deleteModalVisible = false;
             }
         };
         const onExport = async () => {
@@ -316,14 +421,16 @@ export default {
         return {
             ...toRefs(state),
             ...toRefs(formState),
+            checkModalState,
             handlers,
             userStateFormatter,
             listWebhooks,
             onClickAdd,
             onSelectDropdown,
-            onDeleteConfirm,
+            deleteWebhookConfirm,
             onExport,
             onChange,
+            checkModalConfirm,
         };
     },
 };

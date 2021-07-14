@@ -22,20 +22,6 @@
                 />
             </p-field-group>
             <p-field-group
-                :label="$t('PROJECT.DETAIL.MODAL_UPDATE_WEBHOOK_LABEL_STATE')"
-                required
-            >
-                <div class="toggle-wrapper">
-                    <p-toggle-button
-                        theme="secondary"
-                        :value="enabled"
-                        :disabled="loading"
-                        @change="onToggleChange"
-                    />
-                    <span class="label">{{ enabled ? 'Enabled' : 'Disabled' }}</span>
-                </div>
-            </p-field-group>
-            <p-field-group
                 :label="$t('PROJECT.DETAIL.MODAL_UPDATE_WEBHOOK_LABEL_VERSION')"
                 required
             >
@@ -50,61 +36,53 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PToggleButton, PFieldGroup, PTextInput, PSelectDropdown,
+    PButtonModal, PFieldGroup, PTextInput, PSelectDropdown,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { makeProxy } from '@spaceone/console-core-lib';
-import { WEBHOOK_STATE } from '@/views/monitoring/alert-manager/lib/config';
 import { i18n } from '@/translations';
 
 export default {
     name: 'WebhookUpdateFormModal',
     components: {
         PButtonModal,
-        PToggleButton,
         PFieldGroup,
         PTextInput,
         PSelectDropdown,
     },
     props: {
-        webhookInfo: {
-            type: Object,
-            default: undefined,
+        selectedItem: {
+            type: Array,
+            default: () => [],
         },
         visible: {
             type: Boolean,
             default: false,
         },
     },
-    setup(props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+    setup(props, { emit, root }) {
         const state = reactive({
             loading: false,
             proxyVisible: makeProxy('visible', props, emit),
-            webhookName: props.webhookInfo.name,
-            state: props.webhookInfo.state,
-            enabled: computed(() => {
-                if (state.state === WEBHOOK_STATE.ENABLED) return true;
-                return false;
-            }),
+            webhookName: props.selectedItem[0].name,
+            state: props.selectedItem[0].state,
             versions: [],
-            selectedVersion: props.webhookInfo.plugin_info.version,
+            selectedVersion: props.selectedItem[0].plugin_info.version,
             showValidation: false,
             nameInvalidText: computed(() => {
                 if (!state.showValidation) return undefined;
                 if (!state.webhookName) {
-                    return vm.$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_REQUIRED');
+                    return i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_REQUIRED');
                 }
                 if (state.webhookName.length > 40) {
-                    return vm.$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_INVALID_TEXT');
+                    return i18n.t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_NAME_INVALID_TEXT');
                 }
                 return undefined;
             }),
@@ -115,39 +93,23 @@ export default {
         const updateWebhook = async () => {
             try {
                 await SpaceConnector.client.monitoring.webhook.update({
-                    webhook_id: props.webhookInfo.webhook_id,
+                    // eslint-disable-next-line camelcase
+                    webhook_id: props.selectedItem[0].webhook_id,
                     name: state.webhookName,
                 });
             } catch (e) {
                 console.error(e);
             }
         };
-        const enableWebhook = async () => {
-            try {
-                await SpaceConnector.client.monitoring.webhook.enable({
-                    webhook_id: props.webhookInfo.webhook_id,
-                });
-            } catch (e) {
-                console.error(e);
-            }
-        };
-        const disableWebhook = async () => {
-            try {
-                await SpaceConnector.client.monitoring.webhook.disable({
-                    webhook_id: props.webhookInfo.webhook_id,
-                });
-            } catch (e) {
-                console.error(e);
-            }
-        };
         const updateWebhookVersion = async () => {
-            const nowWebhookVersion = props.webhookInfo.plugin_info.version;
+            const nowWebhookVersion = props.selectedItem[0].plugin_info.version;
             const changedWebhookVersion = state.selectedVersion;
             if (nowWebhookVersion === changedWebhookVersion) return;
 
             try {
                 await SpaceConnector.client.monitoring.webhook.updatePlugin({
-                    webhook_id: props.webhookInfo.webhook_id,
+                    // eslint-disable-next-line camelcase
+                    webhook_id: props.selectedItem[0].webhook_id,
                     version: state.selectedVersion,
                 });
             } catch (e) {
@@ -156,7 +118,7 @@ export default {
         };
         const getVersions = async () => {
             const { results } = await SpaceConnector.client.repository.plugin.getVersions({
-                plugin_id: props.webhookInfo.plugin_info.plugin_id,
+                plugin_id: props.selectedItem[0].plugin_info.plugin_id,
             });
             results.forEach((value, index) => {
                 if (index === 0) {
@@ -168,28 +130,19 @@ export default {
         };
 
         /* event */
-        const onToggleChange = () => {
-            if (state.state === WEBHOOK_STATE.ENABLED) state.state = WEBHOOK_STATE.DISABLED;
-            else state.state = WEBHOOK_STATE.ENABLED;
-        };
         const onUpdateConfirm = async () => {
             state.showValidation = true;
             if (state.isNameInvalid) return;
             state.loading = true;
 
             try {
-                if (state.state === WEBHOOK_STATE.ENABLED) await enableWebhook();
-                else await disableWebhook();
-
                 await updateWebhook();
-
                 await updateWebhookVersion();
-
-                showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_UPDATE_WEBHOOK'), '', vm.$root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_WEBHOOK'), '', root);
                 state.proxyVisible = false;
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_UPDATE_WEBHOOK'), e, vm.$root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_WEBHOOK'), e, root);
             } finally {
                 state.loading = false;
                 emit('confirm');
@@ -202,7 +155,6 @@ export default {
 
         return {
             ...toRefs(state),
-            onToggleChange,
             onUpdateConfirm,
         };
     },
@@ -211,18 +163,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.toggle-wrapper {
-    @apply flex items-center;
-    .toggled + .label {
-        @apply text-secondary;
-    }
-    .label {
-        @apply text-gray-400;
-        margin-left: 0.25rem;
-        font-size: 0.875rem;
-        line-height: 1.5;
-    }
-}
 .p-select-dropdown {
     min-width: 11rem;
 }
