@@ -69,7 +69,9 @@
                                     <router-link class="icon-wrapper" :to="{ name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME }">
                                         <p-i name="ic_plus_thin" scale="0.8" color="inherit" />
                                     </router-link>
-                                    <span v-if="getDistinctProviders(item.providers).length === 0" class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
+                                    <router-link :to="{ name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME }">
+                                        <span v-if="getDistinctProviders(item.providers).length === 0" class="add-label"> {{ $t('PROJECT.LANDING.ADD_SERVICE_ACCOUNT') }}</span>
+                                    </router-link>
                                 </div>
                             </div>
                             <div class="favorite-wrapper">

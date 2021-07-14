@@ -35,6 +35,7 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import router from '@/routes';
 import { makeProxy } from '@spaceone/console-core-lib';
 import VueI18n from 'vue-i18n';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -82,7 +83,7 @@ export default {
             projectNameInvalidText: computed(() => {
                 let invalidText = '' as TranslateResult;
                 if (typeof state.projectName === 'string') {
-                    if (state.projectName.length === 0) {
+                    if ((state.projectName.trim()).length === 0) {
                         invalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_REQUIRED');
                     } else if (state.projectName.length > 40) {
                         invalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_LENGTH');
@@ -93,7 +94,7 @@ export default {
                 return invalidText;
             }),
             isProjectNameValid: computed(() => {
-                if (state.projectName) {
+                if (state.projectName.trim()) {
                     return !(state.projectName.length === 0 || state.projectName.length > 40 || state.projectNames.includes(state.projectName));
                 }
                 return false;
@@ -128,7 +129,7 @@ export default {
             try {
                 await SpaceConnector.client.identity.project.update({
                     ...params,
-                    project_id: props.project?.project_id,
+                    project_id: props.project?.project_id || router.currentRoute.params.id,
                 });
                 showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '', vm.$root);
             } catch (e) {
