@@ -21,7 +21,7 @@ class ApiQueryHelper extends QueryHelper {
     setPage(start: number, limit: number): ApiQueryHelper {
         this._data.page = {
             start,
-            limit,
+            limit
         };
         return this;
     }
@@ -47,8 +47,28 @@ class ApiQueryHelper extends QueryHelper {
     setSort(key: string, desc = false): ApiQueryHelper {
         this._data.sort = {
             key,
-            desc,
+            desc
         };
+        return this;
+    }
+
+    setSortKey(key: string): ApiQueryHelper {
+        if (!this._data.sort) {
+            this._data.sort = {
+                desc: false
+            };
+        }
+
+        this._data.sort.key = key;
+        return this;
+    }
+
+    setSortDesc(desc = false): ApiQueryHelper {
+        if (!this._data.sort) {
+            this._data.sort = {};
+        }
+
+        this._data.sort.desc = desc;
         return this;
     }
 
@@ -69,5 +89,5 @@ class ApiQueryHelper extends QueryHelper {
 }
 
 export {
-    ApiQueryHelper,
+    ApiQueryHelper
 };
