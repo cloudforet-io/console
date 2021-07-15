@@ -1565,15 +1565,18 @@
 					"TITLE_CLOSE": "유지 관리 기간 닫기"
 				},
 				"CLOSE": "종료",
+				"CLOSE_NOW": "지금 종료",
 				"CREATE": "유지 관리 기간 생성",
 				"FORM": {
 					"CREATE_TITLE": "유지 관리 기간 생성",
+					"DAYS": "일",
 					"DESC": "유지 관리 기간 동안, 이 프로젝트에 새 알림이 생성되지 않습니다.",
 					"HOURS": "시간",
 					"LABEL_END_TIME": "종료 시각",
 					"LABEL_SCHEDULE": "스케줄",
 					"LABEL_START_TIME": "시작 시각",
 					"LABEL_TIMEZONE": "타임존",
+					"LABEL_TIME_PERIOD": "유지 관리 기간",
 					"LABEL_TITLE": "제목",
 					"MINUTES": "분",
 					"REQUIRED": "필수 입력 항목입니다.",

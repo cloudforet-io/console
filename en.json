@@ -1565,15 +1565,18 @@
 					"TITLE_CLOSE": "Close Maintenance Window"
 				},
 				"CLOSE": "Close",
+				"CLOSE_NOW": "Close Now",
 				"CREATE": "Create Maintenance Window",
 				"FORM": {
 					"CREATE_TITLE": "Create Maintenance Window",
+					"DAYS": "days",
 					"DESC": "During a maintenance window, no new alert will be created on this project.",
 					"HOURS": "hours",
 					"LABEL_END_TIME": "End Time",
 					"LABEL_SCHEDULE": "Schedule",
 					"LABEL_START_TIME": "Start Time",
 					"LABEL_TIMEZONE": "Timezone",
+					"LABEL_TIME_PERIOD": "Maintenance Time Period",
 					"LABEL_TITLE": "Title",
 					"MINUTES": "minutes",
 					"REQUIRED": "Required field",

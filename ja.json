@@ -1565,15 +1565,18 @@
 					"TITLE_CLOSE": "メンテナンス期間を閉じる"
 				},
 				"CLOSE": "閉じる",
+				"CLOSE_NOW": "",
 				"CREATE": "メンテナンス期間の作成",
 				"FORM": {
 					"CREATE_TITLE": "メンテナンス期間の作成",
+					"DAYS": "",
 					"DESC": "メンテナンス期間中、このプロジェクトに新しい通知は作成できません",
 					"HOURS": "時間",
 					"LABEL_END_TIME": "終了時間",
 					"LABEL_SCHEDULE": "スケジュール",
 					"LABEL_START_TIME": "開始時間",
 					"LABEL_TIMEZONE": "タイムゾーン",
+					"LABEL_TIME_PERIOD": "",
 					"LABEL_TITLE": "タイトル",
 					"MINUTES": "分",
 					"REQUIRED": "必須入力項目です",
