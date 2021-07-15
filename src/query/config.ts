@@ -1,5 +1,5 @@
-import { RawQueryOperator } from '@/query/type';
-import { FilterOperator } from '@/space-connector/type';
+import { RawQueryOperator } from '@src/query/type';
+import { FilterOperator } from '@src/space-connector/type';
 import { OperatorType } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 export const rawQueryOperatorToApiQueryOperatorMap: Record<RawQueryOperator, FilterOperator> = {

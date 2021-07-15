@@ -10,7 +10,7 @@ import {
 } from 'lodash';
 import { SearchEnumItem, SearchEnums } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { SpaceConnector } from '../../space-connector';
-import { Filter } from '@/space-connector/type';
+import { Filter } from '@src/space-connector/type';
 
 type KeyTuple = [string, string|undefined, KeyDataType|undefined] // name, label, dataType
 type KeyParam = Array<KeyTuple | string | KeyItemSet>

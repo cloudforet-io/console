@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
-import { QueryHelper } from '@/query';
-import { Query } from '@/space-connector/type';
+import { QueryHelper } from '@src/query';
+import { Query } from '@src/space-connector/type';
 
 class ApiQueryHelper extends QueryHelper {
     private _data: Query = {};
