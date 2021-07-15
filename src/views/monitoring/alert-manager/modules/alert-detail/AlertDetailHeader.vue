@@ -55,16 +55,12 @@ import { reactive, toRefs, UnwrapRef } from '@vue/composition-api';
 import { AlertDataModel } from '@/views/monitoring/alert-manager/type';
 import AlertReassignModal from '@/views/monitoring/alert-manager/modules/alert-detail/AlertReassignModal.vue';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import relativeTime from 'dayjs/plugin/relativeTime';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ALERT_STATE, ALERT_URGENCY } from '@/views/monitoring/alert-manager/lib/config';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 
-dayjs.extend(relativeTime);
-dayjs.extend(utc);
 
 interface HeaderState {
     alertState: ALERT_STATE;

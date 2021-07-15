@@ -43,10 +43,8 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { store } from '@/store';
 
-import utc from 'dayjs/plugin/utc';
 import dayjs from 'dayjs';
 
-dayjs.extend(utc);
 
 export default {
     name: 'AlertAssignedList',

@@ -1,12 +1,6 @@
 import { pluginStateColor, userStateColor } from '@/views/identity/user/lib/config';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import Timezone from 'dayjs/plugin/timezone';
-
-dayjs.extend(Timezone);
-
-dayjs.extend(utc);
 
 const colorBindFactory = (colorMapping, textFnc) => value => ({
     text: textFnc(value),

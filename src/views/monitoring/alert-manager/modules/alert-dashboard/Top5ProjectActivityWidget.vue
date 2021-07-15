@@ -56,7 +56,6 @@
 <script lang="ts">
 import { capitalize, find } from 'lodash';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 
 import {
     computed, reactive, toRefs, watch,
@@ -72,8 +71,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 import { red, yellow } from '@/styles/colors';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-
-dayjs.extend(utc);
 
 
 const ACTIVITY = Object.freeze({

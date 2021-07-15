@@ -72,13 +72,11 @@ import SpotGroupCard from '@/views/automation/spot-automation/modules/spot-group
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
 import { store } from '@/store';
 import { Tags, TimeStamp } from '@/models';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 
-dayjs.extend(timezone);
 
 const handlers = {
     keyItemSets: [{

@@ -2,10 +2,12 @@
     <div ref="containerRef" class="gnb-notifications">
         <div class="top-wrapper">
             <span class="title">{{ $t('COMMON.GNB.NOTIFICATION.TITLE') }}</span>
-            <p-select-dropdown class="more-button" :items="moreMenuItems"
-                               button-only button-icon="ic_more"
-            />
-            <p-icon-button class="settings-button" name="ic_setting" color="inherit" />
+            <!--            <p-select-dropdown class="more-button" :items="moreMenuItems"-->
+            <!--                               button-only button-icon="ic_more"-->
+            <!--            />-->
+            <router-link :to="{name: IDENTITY_ROUTE.USER.NOTIFICATION._NAME}">
+                <p-icon-button class="settings-button" name="ic_setting" color="inherit" />
+            </router-link>
         </div>
         <div class="contents-wrapper">
             <template v-if="notifications.length === 0">
@@ -46,12 +48,13 @@ import {
     computed, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
-    PIconButton, PSkeleton, PSelectDropdown,
+    PIconButton, PSkeleton,
 } from '@spaceone/design-system';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
 import { i18n } from '@/translations';
+import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import GNBNotificationItem from '@/common/modules/gnb/GNBNotificationItem.vue';
 import GNBNotificationDateHeader from '@/common/modules/gnb/GNBNotificationDateHeader.vue';
@@ -63,8 +66,8 @@ export default {
         GNBNotificationDateHeader,
         GNBNotificationItem,
         PSkeleton,
-        PSelectDropdown,
         PIconButton,
+        // PSelectDropdown,
     },
     setup(props, { root, refs }) {
         const state = reactive({
@@ -81,10 +84,6 @@ export default {
             try {
                 await SpaceConnector.client.notification.notification.setRead({
                     notifications: notifications.filter(d => !d.is_read).map(d => d.notification_id),
-                }, {
-                    headers: {
-                        MOCK_MODE: true,
-                    },
                 });
             } catch (e) {
                 console.error(e);
@@ -108,10 +107,6 @@ export default {
             try {
                 const { results, total_count } = await SpaceConnector.client.notification.notification.list({
                     query: notificationApiHelper.data,
-                }, {
-                    headers: {
-                        MOCK_MODE: true,
-                    },
                 });
 
                 totalCount = total_count;
@@ -177,6 +172,7 @@ export default {
 
         return {
             ...toRefs(state),
+            IDENTITY_ROUTE,
         };
     },
 };

@@ -34,7 +34,6 @@
 
 <script lang="ts">
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 
 import {
     reactive, toRefs, watch,
@@ -48,8 +47,6 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 
-
-dayjs.extend(utc);
 
 export default {
     name: 'ProjectMaintenanceWindowListItem',

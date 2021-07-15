@@ -181,9 +181,6 @@
 /* eslint-disable camelcase */
 import { get, map, range } from 'lodash';
 import dayjs, { Dayjs } from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import utc from 'dayjs/plugin/utc';
-import timezone from 'dayjs/plugin/timezone';
 import { VueSelecto } from 'vue-selecto';
 
 import {
@@ -211,10 +208,6 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
 import { timezoneList } from '@/store/modules/user/config';
-
-dayjs.extend(isSameOrBefore);
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 
 enum EDIT_MODE {

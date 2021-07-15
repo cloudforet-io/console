@@ -75,7 +75,6 @@
 <script lang="ts">
 import { findIndex } from 'lodash';
 import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
 
 import {
     ComponentRenderProxy,
@@ -96,8 +95,6 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
 import router from '@/routes';
-
-dayjs.extend(timezone);
 
 
 interface Props {

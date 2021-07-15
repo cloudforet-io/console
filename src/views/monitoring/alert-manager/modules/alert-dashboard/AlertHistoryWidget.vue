@@ -43,7 +43,6 @@
 <script lang="ts">
 import { find } from 'lodash';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 
 import {
     reactive, toRefs, watch, watchEffect,
@@ -57,8 +56,6 @@ import AlertHistoryChart from '@/views/monitoring/alert-manager/modules/alert-da
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
-
-dayjs.extend(utc);
 
 
 const ALERT_STATE = {

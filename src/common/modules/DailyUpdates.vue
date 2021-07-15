@@ -92,8 +92,6 @@
 /* eslint-disable camelcase */
 import { find, range } from 'lodash';
 import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone';
-import utc from 'dayjs/plugin/utc';
 
 import {
     ComponentRenderProxy, getCurrentInstance, reactive, toRefs, UnwrapRef,
@@ -107,9 +105,6 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
-
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 
 interface CloudService {

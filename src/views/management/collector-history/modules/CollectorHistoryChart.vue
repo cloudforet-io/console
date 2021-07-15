@@ -23,7 +23,6 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import dayjs from 'dayjs';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -41,7 +40,6 @@ import {
 import { store } from '@/store';
 import config from '@/lib/config';
 
-dayjs.extend(isSameOrBefore);
 
 am4core.useTheme(am4themes_animated);
 

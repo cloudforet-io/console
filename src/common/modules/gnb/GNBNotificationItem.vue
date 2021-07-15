@@ -6,21 +6,22 @@
             <new-mark v-if="isNew" class="new-mark" />
             <div class="contents-wrapper">
                 <p class="title">
-                    <p-i name="ic_state_duplicated" width="1rem" height="1rem"
+                    <p-i v-if="icon" :name="icon" width="1rem"
+                         height="1rem"
                          class="mr-1"
                     />
                     <span>{{ title }}</span>
                 </p>
-                <p-anchor :class="{collapsed: isCollapsed, 'no-link': !link}"
-                          :href="link" target="_self"
-                          :show-icon="false"
-                          :highlight="!!link"
-                          @mouseenter.native="link ? changeLinkMouseEnterState(true) : undefined"
-                          @mouseleave.native="link ? changeLinkMouseEnterState(false) : undefined"
-                >
-                    {{ contents }}
-                </p-anchor>
-                <p-collapsible-toggle v-model="isCollapsed" />
+                <p-collapsible-panel v-model="isCollapsed" :line-clamp="3">
+                    <component :is="link ? 'a' : 'span'" :class="{collapsed: isCollapsed, 'link': link}"
+                               :href="link" target="_self"
+                               class="contents"
+                               @mouseenter="link ? changeLinkMouseEnterState(true) : undefined"
+                               @mouseleave="link ? changeLinkMouseEnterState(false) : undefined"
+                    >
+                        {{ contents }}
+                    </component>
+                </p-collapsible-panel>
                 <div class="datetime">
                     {{ occurred }}
                 </div>
@@ -32,9 +33,10 @@
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import dayjs, { Dayjs } from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
 
-import { PCollapsibleToggle, PI, PAnchor } from '@spaceone/design-system';
+import {
+    PCollapsiblePanel, PI, PAnchor,
+} from '@spaceone/design-system';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 
 import { store } from '@/store';
@@ -43,19 +45,12 @@ import { i18n } from '@/translations';
 import NewMark from '@/common/components/marks/NewMark.vue';
 import GNBNotificationDateHeader from '@/common/modules/gnb/GNBNotificationDateHeader.vue';
 
-
-dayjs.extend(relativeTime, {
-    thresholds: [
-        { l: 'd', r: 1, d: 'day' },
-        { l: 'd', r: 1, d: 'day' },
-        { l: 'dd', r: 29, d: 'day' },
-        { l: 'M', r: 1, d: 'month' },
-        { l: 'MM', r: 11, d: 'month' },
-        { l: 'y', d: 'year' },
-        { l: 'yy', d: 'year' },
-    ],
-    rounding: Math.ceil, // Any time before midnight is considered as the previous date.
-});
+const NOTIFICATION_TYPE_ICONS = {
+    INFO: '',
+    ERROR: 'ic_alert',
+    SUCCESS: 'ic_state_active',
+    WARNING: 'ic_state_duplicated',
+};
 
 export default {
     name: 'GNBNotificationItem',
@@ -64,7 +59,7 @@ export default {
         NewMark,
         PI,
         PAnchor,
-        PCollapsibleToggle,
+        PCollapsiblePanel,
     },
     props: {
         data: {
@@ -104,6 +99,7 @@ export default {
                 return dateHeader;
             }),
             isNew: computed(() => !props.data.is_read),
+            icon: computed(() => NOTIFICATION_TYPE_ICONS[props.data.notification_type]),
             title: computed(() => props.data.message?.title),
             link: computed(() => props.data.message?.link),
             contents: computed(() => props.data.message?.description),
@@ -145,27 +141,23 @@ export default {
         .contents-wrapper {
             flex-grow: 1;
         }
-        .p-anchor::v-deep {
+        .p-collapsible-panel {
             display: block;
             font-size: 0.875rem;
             margin-bottom: 0.125rem;
-            .text {
-                display: -webkit-box;
-                -webkit-box-orient: vertical;
-                overflow: hidden;
-                text-overflow: ellipsis;
-                line-height: 1.5rem;
-                word-break: break-word;
+            padding: 0;
+        }
+        .contents {
+            opacity: 0.8;
+
+            &.link {
+                @apply text-blue-800;
             }
-            &.collapsed {
-                .text {
-                    -webkit-line-clamp: 3;
-                }
-            }
-            &.no-link:hover {
-                cursor: unset;
-                .text {
-                    text-decoration: none;
+
+            @media (hover: hover) {
+                &.link:hover {
+                    opacity: 1;
+                    text-decoration: underline;
                 }
             }
         }

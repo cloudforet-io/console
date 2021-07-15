@@ -6,6 +6,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { DisplayState } from '@/store/modules/display/type';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 
+
 export const showHandbook = ({ commit }): void => {
     commit('setVisibleSidebar', true);
     commit('setSidebarType', SIDEBAR_TYPE.handbook);

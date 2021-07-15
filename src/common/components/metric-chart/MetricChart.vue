@@ -51,10 +51,8 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
-import { find, get } from 'lodash';
+import { get } from 'lodash';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -67,7 +65,6 @@ import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
 
-dayjs.extend(utc);
 am4core.useTheme(am4themes_animated);
 am4core.options.autoSetClassName = true;
 am4core.options.classNamePrefix = 'MetricChart';

@@ -11,8 +11,6 @@
 /* eslint-disable camelcase */
 import { capitalize } from 'lodash';
 import dayjs from 'dayjs';
-import utc from 'dayjs/plugin/utc';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themes_animated from '@amcharts/amcharts4/themes/animated';
@@ -29,8 +27,6 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 am4core.useTheme(am4themes_animated);
 am4core.options.autoSetClassName = true;
 am4core.options.classNamePrefix = 'AlertHistoryChart';
-dayjs.extend(isSameOrBefore);
-dayjs.extend(utc);
 
 interface ChartData {
     date: string;
