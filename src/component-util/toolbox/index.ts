@@ -1,21 +1,32 @@
 import { ApiQueryHelper } from '@src/space-connector/helper';
 import { Query } from '@src/space-connector/type';
+import {ToolboxOptions} from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 
-export const setApiQueryWithToolboxOptions = (apiQueryHelper: ApiQueryHelper, options: any = {}): undefined|Query => {
-    if (!Object.keys(options).length) return undefined;
+interface Options extends ToolboxOptions {
+    sortDesc?: boolean;
+}
 
-    if (options.pageStart !== undefined) apiQueryHelper.setPageStart(options.pageStart);
-    if (options.pageLimit !== undefined) apiQueryHelper.setPageLimit(options.pageLimit);
-    if (options.sortBy !== undefined) apiQueryHelper.setSort(options.sortBy, options.sortDesc);
-    if (options.queryTags !== undefined) {
+type Exclude = Partial<Record<keyof Options, boolean>>
+
+export const setApiQueryWithToolboxOptions = (apiQueryHelper: ApiQueryHelper, options: Options = {}, exclude: Exclude = {}): ApiQueryHelper => {
+    if (!Object.keys(options).length) return apiQueryHelper;
+
+    if (options.pageStart !== undefined && !exclude.pageStart) apiQueryHelper.setPageStart(options.pageStart);
+    if (options.pageLimit !== undefined && !exclude.pageLimit) apiQueryHelper.setPageLimit(options.pageLimit);
+
+    if (options.sortBy !== undefined && !exclude.sortBy) apiQueryHelper.setSortKey(options.sortBy);
+    if (options.sortDesc !== undefined && !exclude.sortDesc) apiQueryHelper.setSortDesc(options.sortDesc);
+
+    if (options.queryTags !== undefined && !exclude.sortDesc) {
         apiQueryHelper.setFiltersAsQueryTag(options.queryTags);
-    } else if (options.searchText !== undefined) {
+    } else if (options.searchText !== undefined && !exclude.sortDesc) {
         apiQueryHelper.setFilters([{ v: options.searchText || '' }]);
     }
-    return apiQueryHelper.data;
+
+    return apiQueryHelper;
 };
 
-export const getApiQueryWithToolboxOptions = (apiQueryHelper: ApiQueryHelper, options: any = {}): undefined|Query => {
-    setApiQueryWithToolboxOptions(apiQueryHelper, options);
+export const getApiQueryWithToolboxOptions = (apiQueryHelper: ApiQueryHelper, options: any = {}, exclude: Exclude = {}): undefined|Query => {
+    setApiQueryWithToolboxOptions(apiQueryHelper, options, exclude);
     return apiQueryHelper.data;
 };
