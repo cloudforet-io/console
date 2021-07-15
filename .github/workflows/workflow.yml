@@ -32,7 +32,7 @@ jobs:
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm install
       - name: Build
-        run: npm run build && npm run css
+        run: npm run build && npm run css && npm run tsc-alias
       - name: Release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

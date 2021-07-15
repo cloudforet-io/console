@@ -45,6 +45,7 @@
     "test": "jest",
     "cm": "cz",
     "prepare": "husky install",
+    "tsc-alias": "tsc-alias -p tsconfig.build.json",
     "semantic-release": "SKIP_PREPARE_COMMIT_MSG=1 SKIP_COMMIT_MSG=1 semantic-release"
   },
   "dependencies": {
@@ -170,6 +171,7 @@
     "tailwindcss": "^1.2.0",
     "ts-jest": "^26.4.4",
     "ts-loader": "^7.0.4",
+    "tsc-alias": "^1.3.7",
     "typescript": "^3.8.3",
     "vue-jest": "^3.0.7",
     "vue-loader": "^15.8.3",
