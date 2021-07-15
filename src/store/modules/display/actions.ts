@@ -47,12 +47,12 @@ export const checkNotification: Action<DisplayState, any> = async ({ commit, sta
 
         checkNotificationQueryHelper.setFilters([
             fixedCheckNotificationFilter,
-            { k: 'message.occurred_at', v: currentTime.utc().toISOString(), o: '<=t' },
+            { k: 'created_at', v: currentTime.utc().toISOString(), o: '<=t' },
         ]);
 
         if (stoppedCheckingNotificationTime) {
             checkNotificationQueryHelper.addFilter(
-                { k: 'message.occurred_at', v: stoppedCheckingNotificationTime.utc().toISOString(), o: '>t' },
+                { k: 'created_at', v: stoppedCheckingNotificationTime.utc().toISOString(), o: '>t' },
             );
         }
 
