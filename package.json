@@ -1,6 +1,6 @@
 {
   "name": "@spaceone/console-core-lib",
-  "version": "1.0.20",
+  "version": "1.0.0",
   "description": "SpaceONE Console Core Library",
   "scripts": {
     "prepub": "cp package.json dist/package.json",
