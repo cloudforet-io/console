@@ -9,6 +9,7 @@ const state: DisplayState = {
     sidebarType: SIDEBAR_TYPE.info,
     isInitialized: false,
     isDownloaded: false,
+    uncheckedNotificationCount: 0,
 };
 
 export default {

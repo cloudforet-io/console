@@ -16,3 +16,7 @@ export const setIsInitialized = (state: DisplayState, isInitialized: boolean): v
 export const setIsDownloaded = (state: DisplayState, isDownloaded: boolean): void => {
     state.isDownloaded = isDownloaded;
 };
+
+export const setUncheckedNotificationCount = (state: DisplayState, count: number): void => {
+    state.uncheckedNotificationCount = count;
+};

@@ -3,12 +3,10 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
 import router from '@/routes';
 import { GTag } from '@/lib/gtag';
-import { i18n } from '@/translations';
 import * as am4core from '@amcharts/amcharts4/core';
-import { loadFonts } from '@/styles/fonts';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { computed } from '@vue/composition-api';
-import dayjs from 'dayjs';
+import { initLanguageAndFonts } from '@/lib/site-initializer/locales';
 
 const initConfig = async () => {
     await config.init();
@@ -39,19 +37,6 @@ const initGtag = () => {
     }, { immediate: true });
 };
 
-const dayjsLanguageMap: Record<string, any> = {};
-const initLanguageAndFonts = async () => {
-    store.watch(state => state.user.language, async (lang) => {
-        const loadPromises = [loadFonts(lang)];
-        if (!dayjsLanguageMap[lang]) {
-            loadPromises.push(import(`dayjs/locale/${lang}`));
-        }
-        await Promise.all(loadPromises);
-
-        i18n.locale = lang as string;
-        dayjs.locale(lang as string);
-    }, { immediate: true });
-};
 
 const initQueryHelper = () => {
     QueryHelper.init(computed(() => store.state.user.timezone));

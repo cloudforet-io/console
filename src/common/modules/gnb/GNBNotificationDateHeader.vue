@@ -1,6 +1,6 @@
 <template>
     <p class="notification-date-header">
-        {{ datetime }}
+        {{ value }}
     </p>
 </template>
 
@@ -8,7 +8,7 @@
 export default {
     name: 'GNBNotificationDateHeader',
     props: {
-        datetime: {
+        value: {
             type: String,
             default: '',
         },

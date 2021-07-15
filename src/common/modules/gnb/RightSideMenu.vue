@@ -19,8 +19,8 @@
                  @click.stop="toggleMenu('notifications')"
             >
                 <p-i class="menu-icon"
-                     name="ic_bell"
-                     color="inherit"
+                     :name="hasNotifications ? 'ic_bell_noti' : 'ic_bell'"
+                     :color="hasNotifications ? undefined : 'inherit'"
                 />
             </div>
             <g-n-b-notifications v-if="openedMenu === 'notifications'"
@@ -153,6 +153,7 @@ export default {
                 label: v, name: k,
             }))),
             isNewIconHidden: store.getters['settings/getItem']('hide_new_icon', '/gnb'),
+            hasNotifications: computed(() => store.getters['display/hasUncheckedNotifications']),
         });
         const userState = reactive({
             name: computed(() => store.state.user.name),
@@ -170,10 +171,18 @@ export default {
 
         /* event */
         const hideMenu = () => {
-            state.showLanguageMenu = false;
+            if (props.openedMenu === 'notifications') {
+                store.dispatch('display/startCheckNotification');
+            } else if (props.openedMenu === 'account') {
+                state.showLanguageMenu = false;
+            }
+
             emit('hide-menu');
         };
         const toggleMenu = (menu) => {
+            if (menu === 'notifications') {
+                store.dispatch('display/stopCheckNotification');
+            }
             emit('toggle-menu', menu);
         };
         const openProfile = () => {
@@ -217,6 +226,9 @@ export default {
             }
         };
 
+        /* Init */
+        store.dispatch('display/startCheckNotification');
+
         return {
             ...toRefs(state),
             userState,
@@ -248,15 +260,17 @@ export default {
                 @apply text-primary;
                 opacity: 1;
             }
-            &:hover {
-                @apply text-primary;
-                opacity: 1;
-            }
             &.code, &.notifications {
-                @apply text-gray-500;
                 margin-right: 1.5rem;
+                &:not(.opened):not(:hover) {
+                    @apply text-gray-500;
+                }
+            }
+
+            @media (hover: hover) {
                 &:hover {
                     @apply text-primary;
+                    opacity: 1;
                 }
             }
 
@@ -273,6 +287,7 @@ export default {
                     background-size: cover;
                     box-shadow: inset 0 0 0 2px theme('colors.gray.200');
                     margin-top: 0.5rem;
+                    border-radius: 0.625rem;
 
                     &.admin {
                         background: url('~@/assets/icons/admin.svg') no-repeat center center;
@@ -287,10 +302,6 @@ export default {
                         box-shadow: inset 0 0 0 2px theme('colors.primary');
                     }
                 }
-            }
-
-            .menu-icon {
-                border-radius: 0.625rem;
             }
         }
         .sub-menu-wrapper {

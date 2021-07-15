@@ -1,6 +1,6 @@
 <template>
     <div class="notification-item">
-        <g-n-b-notification-date-header v-if="dateHeader" :datetime="dateHeader" />
+        <g-n-b-notification-date-header v-if="dateHeader" :value="dateHeader" />
         <slot name="relative-time" />
         <div class="item-wrapper" :class="{'link-hover': isLinkMouseEntered}">
             <new-mark v-if="isNew" class="new-mark" />
@@ -54,7 +54,7 @@ dayjs.extend(relativeTime, {
         { l: 'y', d: 'year' },
         { l: 'yy', d: 'year' },
     ],
-    rounding: number => Math.ceil(number),
+    rounding: Math.ceil, // Any time before midnight is considered as the previous date.
 });
 
 export default {

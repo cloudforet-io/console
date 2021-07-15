@@ -1,5 +1,5 @@
 <template>
-    <div class="gnb-notifications">
+    <div ref="containerRef" class="gnb-notifications">
         <div class="top-wrapper">
             <span class="title">{{ $t('COMMON.GNB.NOTIFICATION.TITLE') }}</span>
             <p-select-dropdown class="more-button" :items="moreMenuItems"
@@ -8,44 +8,54 @@
             <p-icon-button class="settings-button" name="ic_setting" color="inherit" />
         </div>
         <div class="contents-wrapper">
-            <template v-if="loading">
-                <g-n-b-notification-date-header datetime="Today" class="ml-2" />
-                <div v-for="i in [0, 1]" :key="`${i}-skeleton`" class="px-4 py-2">
-                    <p-skeleton height="40px" />
+            <template v-if="notifications.length === 0">
+                <template v-if="loading">
+                    <g-n-b-notification-date-header :value="$t('COMMON.GNB.NOTIFICATION.TODAY')" class="ml-2" />
+                    <div v-for="i in [0, 1]" :key="`${i}-skeleton`" class="px-4 py-2">
+                        <p-skeleton height="40px" />
+                    </div>
+                </template>
+                <div v-else class="no-data">
+                    <img src="@/assets/images/illust_astronaut_radio.svg">
+                    <p class="title">
+                        {{ $t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION') }}
+                    </p>
+                    <p class="desc">
+                        <span>{{ $t('COMMON.GNB.NOTIFICATION.NO_NOTI_DESC_1') }}&nbsp;</span>
+                        <span>{{ $t('COMMON.GNB.NOTIFICATION.NO_NOTI_DESC_2') }}</span>
+                    </p>
                 </div>
             </template>
-            <div v-else-if="notifications.length === 0" class="no-data">
-                <img src="@/assets/images/illust_astronaut_radio.svg">
-                <p class="title">
-                    {{ $t('COMMON.GNB.NOTIFICATION.NO_NOTIFICATION') }}
-                </p>
-                <p class="desc">
-                    <span>{{ $t('COMMON.GNB.NOTIFICATION.NO_NOTI_DESC_1') }}&nbsp;</span>
-                    <span>{{ $t('COMMON.GNB.NOTIFICATION.NO_NOTI_DESC_2') }}</span>
-                </p>
-            </div>
             <template v-else>
-                <g-n-b-notification-item v-for="(item, i) in notifications" :key="i"
+                <g-n-b-notification-item v-for="(item, i) in notifications" :key="item.notification_id"
+                                         ref="notificationItemRefs"
                                          :data="item"
                                          :before-data="i === 0 ? null : notifications[i - 1]"
                 />
+                <div v-if="loading" class="px-4 py-2">
+                    <p-skeleton height="40px" />
+                </div>
             </template>
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import Vue from 'vue';
+import {
+    computed, onMounted, onUnmounted, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import {
     PIconButton, PSkeleton, PSelectDropdown,
 } from '@spaceone/design-system';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
+import { i18n } from '@/translations';
+import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import GNBNotificationItem from '@/common/modules/gnb/GNBNotificationItem.vue';
 import GNBNotificationDateHeader from '@/common/modules/gnb/GNBNotificationDateHeader.vue';
-import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
-import { i18n } from '@/translations';
+
 
 export default {
     name: 'GNBNotifications',
@@ -56,8 +66,10 @@ export default {
         PSelectDropdown,
         PIconButton,
     },
-    setup(props, { root }) {
+    setup(props, { root, refs }) {
         const state = reactive({
+            containerRef: null as Element|null,
+            notificationItemRefs: [] as Vue[],
             loading: false,
             notifications: [],
             moreMenuItems: computed(() => [
@@ -79,31 +91,84 @@ export default {
             }
         };
 
-        const notificationApiHelper = new ApiQueryHelper();
-        const notificationApiQuery = notificationApiHelper.data;
+        let totalCount: number|undefined;
+        let pageStart = 1;
+        const pageLimit = 15;
+        const notificationApiHelper = new ApiQueryHelper()
+            .setPage(pageStart, pageLimit)
+            .setSort('message.occurred_at');
+
         const listNotifications = async () => {
             if (state.loading) return;
+
+            if (typeof totalCount === 'number' && state.notifications.length >= totalCount) return;
 
             state.loading = true;
 
             try {
-                const { results } = await SpaceConnector.client.notification.notification.list({
-                    query: notificationApiQuery,
+                const { results, total_count } = await SpaceConnector.client.notification.notification.list({
+                    query: notificationApiHelper.data,
                 }, {
                     headers: {
                         MOCK_MODE: true,
                     },
                 });
-                state.notifications = results;
+
+                totalCount = total_count;
+                state.notifications = state.notifications.concat(results);
                 setReadNotifications(results);
             } catch (e) {
-                state.notifications = [];
                 console.error(e);
                 showErrorMessage(i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'), e, root);
             } finally {
                 state.loading = false;
             }
         };
+
+        /* Intersection Observe */
+        let intersectionObserver: IntersectionObserver|undefined;
+        let observedElement: Element|undefined;
+
+        const updateObservingElement = (el: Element) => {
+            if (!intersectionObserver) return;
+
+            if (observedElement) intersectionObserver.unobserve(observedElement);
+            intersectionObserver.observe(el);
+            observedElement = el;
+        };
+
+        const onElementObserved = (entries: IntersectionObserverEntry[]) => {
+            const lastEntry = entries[entries.length - 1];
+            if (lastEntry.isIntersecting) {
+                pageStart += pageLimit;
+                notificationApiHelper.setPageStart(pageStart);
+                listNotifications();
+            }
+        };
+
+        onMounted(() => {
+            if (!state.containerRef || intersectionObserver) return;
+
+            intersectionObserver = new IntersectionObserver((entries) => {
+                onElementObserved(entries);
+            }, {
+                root: state.containerRef,
+            });
+        });
+
+        onUnmounted(() => {
+            if (intersectionObserver) {
+                intersectionObserver.disconnect();
+                intersectionObserver = undefined;
+            }
+        });
+
+        watch(() => state.notificationItemRefs, (items) => {
+            if (items.length !== state.notifications.length) return;
+
+            const lastElement = items[items.length - 1]?.$el;
+            if (lastElement) updateObservingElement(lastElement);
+        });
 
         /* Init */
         (async () => {
@@ -126,7 +191,7 @@ export default {
     width: 100vw;
     height: 100vh;
     max-height: calc(100vh - $gnb-height - 24px);
-    padding-bottom: 0.5rem;
+    overflow-y: scroll;
     .top-wrapper {
         width: 100%;
         display: flex;
@@ -157,9 +222,6 @@ export default {
         }
     }
     .contents-wrapper {
-        flex-grow: 1;
-        overflow-y: auto;
-        height: 100%;
         padding: 0.25rem 0 0.5rem 0;
         line-height: 1;
         .notification-item {

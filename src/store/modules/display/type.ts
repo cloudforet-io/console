@@ -5,4 +5,5 @@ export interface DisplayState {
     sidebarType: SIDEBAR_TYPE;
     isInitialized: boolean;
     isDownloaded: boolean;
+    uncheckedNotificationCount: number;
 }
