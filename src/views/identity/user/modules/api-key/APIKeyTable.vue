@@ -29,6 +29,7 @@
                 :select-index.sync="selectedIndex"
                 :striped="false"
                 :selectable="true"
+                :multi-select="false"
             >
                 <template #col-state-format="{value}">
                     <p-status v-bind="userStateFormatter(value)" class="capitalize" />

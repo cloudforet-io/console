@@ -192,6 +192,11 @@ export default {
     @apply bg-gray-100;
 }
 .p-page-title::v-deep {
+    h2 {
+        flex-wrap: wrap;
+        max-width: 100%;
+        padding-right: 0.5rem;
+    }
     .extra {
         justify-content: flex-start;
     }

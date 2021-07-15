@@ -84,9 +84,14 @@
                 />
             </template>
             <template #api_key>
-                <user-a-p-i-key-table
-                    :user-id="selectedUsers[0].user_id"
-                />
+                <section>
+                    <p-panel-top>
+                        {{ $t('IDENTITY.USER.MAIN.API_KEY') }}
+                    </p-panel-top>
+                    <user-a-p-i-key-table class="api-key-table"
+                                          :user-id="selectedUsers[0].user_id"
+                    />
+                </section>
             </template>
             <template #notifications>
                 <user-notifications :user-id="selectedUsers[0].user_id" />
@@ -184,7 +189,7 @@ import {
 
 import {
     PEmpty, PQuerySearchTable, PBreadcrumbs, PIconTextButton, PStatus,
-    PHorizontalLayout, PTab, PDataTable, PTableCheckModal, PPageTitle, PSelectDropdown,
+    PHorizontalLayout, PTab, PDataTable, PTableCheckModal, PPageTitle, PSelectDropdown, PPanelTop,
 } from '@spaceone/design-system';
 
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -257,6 +262,7 @@ export default {
         PDataTable,
         PTableCheckModal,
         PPageTitle,
+        PPanelTop,
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -708,4 +714,11 @@ export default {
 .selected-data-tab {
     @apply mt-8;
 }
+
+.api-key-table::v-deep {
+    .main-table-wrapper {
+        border: 0;
+    }
+}
+
 </style>

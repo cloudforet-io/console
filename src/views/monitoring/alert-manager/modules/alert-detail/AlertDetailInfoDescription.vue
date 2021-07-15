@@ -9,7 +9,7 @@
         </button>
     </p>
     <div v-else class="content-wrapper">
-        <p-textarea v-model="dataForUpdate" />
+        <p-textarea v-model="dataForUpdate" class="textarea" />
         <div class="button-group">
             <p-button :outline="true" class="text-button"
                       size="sm" @click="cancelEdit(EDIT_MODE.DESCRIPTION)"

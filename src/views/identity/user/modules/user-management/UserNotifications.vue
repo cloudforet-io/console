@@ -1,13 +1,17 @@
 <template>
     <section class="user-notifications-tab">
-        <div class="tab-header">
-            <p-panel-top>{{ title }}</p-panel-top>
-            <router-link :to="manageLink">
-                <p-button style-type="primary-dark">
-                    {{ $t('IDENTITY.USER.NOTIFICATION.MANAGE') }}
-                </p-button>
-            </router-link>
-        </div>
+        <p-panel-top>
+            {{ title }}
+            <template #extra>
+                <router-link :to="manageLink">
+                    <p-button style-type="primary-dark">
+                        {{ $t('IDENTITY.USER.NOTIFICATION.MANAGE') }}
+                    </p-button>
+                </router-link>
+            </template>
+        </p-panel-top>
+
+
         <p-data-table
             :items="items"
             :loading="loading"
@@ -156,7 +160,7 @@ export default {
 <style lang="postcss" scoped>
 .tab-header {
     display: flex;
-    justify-content: space-between;
+
     align-items: center;
     padding-right: 1rem;
 }

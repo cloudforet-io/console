@@ -10,8 +10,11 @@
                     <span class="date">{{ iso8601Formatter(noteList[index].created_at, timezone) }}</span>
                 </template>
             </p-collapsible-list>
+        </article>
+        <article class="add-note-wrapper">
             <p-textarea v-model="noteInput" />
             <p-button style-type="gray-border" size="md" class="add-btn"
+                      :disabled="(noteInput.trim()).length === 0"
                       @click="createNote"
             >
                 {{ $t('MONITORING.ALERT.DETAIL.NOTE.ADD_NOTE') }}
@@ -121,8 +124,8 @@ export default {
     padding-bottom: 2.5rem;
 }
 .note-wrapper {
-    @apply px-4 flex flex-col;
-    margin-top: 1.5rem;
+    @apply flex flex-col;
+    margin-top: 0.5rem;
     .author {
         @apply text-blue-900 font-bold;
         font-size: 0.875rem;
@@ -134,6 +137,9 @@ export default {
         font-size: 0.75rem;
         line-height: 150%;
     }
+}
+.add-note-wrapper {
+    @apply px-4 pt-2;
 }
 .add-btn {
     width: 6.125rem;
