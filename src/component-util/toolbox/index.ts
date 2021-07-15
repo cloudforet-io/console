@@ -1,7 +1,7 @@
 import { ApiQueryHelper } from '@src/space-connector/helper';
 import { Query } from '@src/space-connector/type';
 
-export const getApiQueryWithToolboxOptions = (apiQueryHelper: ApiQueryHelper, options: any = {}): undefined|Query => {
+export const setApiQueryWithToolboxOptions = (apiQueryHelper: ApiQueryHelper, options: any = {}): undefined|Query => {
     if (!Object.keys(options).length) return undefined;
 
     if (options.pageStart !== undefined) apiQueryHelper.setPageStart(options.pageStart);
@@ -12,5 +12,10 @@ export const getApiQueryWithToolboxOptions = (apiQueryHelper: ApiQueryHelper, op
     } else if (options.searchText !== undefined) {
         apiQueryHelper.setFilters([{ v: options.searchText || '' }]);
     }
+    return apiQueryHelper.data;
+};
+
+export const getApiQueryWithToolboxOptions = (apiQueryHelper: ApiQueryHelper, options: any = {}): undefined|Query => {
+    setApiQueryWithToolboxOptions(apiQueryHelper, options);
     return apiQueryHelper.data;
 };
