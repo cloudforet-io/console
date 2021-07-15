@@ -92,9 +92,9 @@ export default {
 
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            beforeDataHeader: computed(() => dataHeaderFormatter(props.beforeData?.message?.occurred_at || '', state.timezone)),
+            beforeDataHeader: computed(() => dataHeaderFormatter(props.beforeData?.created_at || '', state.timezone)),
             dateHeader: computed(() => {
-                const dateHeader = dataHeaderFormatter(props.data.message?.occurred_at || '', state.timezone);
+                const dateHeader = dataHeaderFormatter(props.data.created_at || '', state.timezone);
                 if (state.beforeDataHeader && state.beforeDataHeader === dateHeader) return '';
                 return dateHeader;
             }),
@@ -104,9 +104,9 @@ export default {
             link: computed(() => props.data.message?.link),
             contents: computed(() => props.data.message?.description),
             occurred: computed(() => {
-                if (!props.data.message?.occurred_at) return '';
+                if (!props.data.created_at) return '';
 
-                return iso8601Formatter(props.data.message.occurred_at, state.timezone);
+                return iso8601Formatter(props.data.created_at, state.timezone);
             }),
             isLinkMouseEntered: false,
             isCollapsed: true,

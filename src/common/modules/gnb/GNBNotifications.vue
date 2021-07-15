@@ -29,7 +29,7 @@
                 </div>
             </template>
             <template v-else>
-                <g-n-b-notification-item v-for="(item, i) in notifications" :key="item.notification_id"
+                <g-n-b-notification-item v-for="(item, i) in notifications" :key="`${item.notification_id}-${i}`"
                                          ref="notificationItemRefs"
                                          :data="item"
                                          :before-data="i === 0 ? null : notifications[i - 1]"
@@ -81,9 +81,12 @@ export default {
         });
 
         const setReadNotifications = async (notifications: any[]) => {
+            const ids = notifications.filter(d => !d.is_read).map(d => d.notification_id);
+            if (ids.length === 0) return;
+
             try {
                 await SpaceConnector.client.notification.notification.setRead({
-                    notifications: notifications.filter(d => !d.is_read).map(d => d.notification_id),
+                    notifications: ids,
                 });
             } catch (e) {
                 console.error(e);
@@ -95,12 +98,10 @@ export default {
         const pageLimit = 15;
         const notificationApiHelper = new ApiQueryHelper()
             .setPage(pageStart, pageLimit)
-            .setSort('message.occurred_at');
+            .setSort('created_at', true);
 
         const listNotifications = async () => {
             if (state.loading) return;
-
-            if (typeof totalCount === 'number' && state.notifications.length >= totalCount) return;
 
             state.loading = true;
 
@@ -132,13 +133,19 @@ export default {
             observedElement = el;
         };
 
+        let lastCalledPageStart: number|undefined;
         const onElementObserved = (entries: IntersectionObserverEntry[]) => {
+            if (typeof totalCount === 'number' && state.notifications.length >= totalCount) return;
+            if (lastCalledPageStart === pageStart) return;
+
             const lastEntry = entries[entries.length - 1];
-            if (lastEntry.isIntersecting) {
-                pageStart += pageLimit;
-                notificationApiHelper.setPageStart(pageStart);
-                listNotifications();
-            }
+            if (!lastEntry.isIntersecting) return;
+
+            pageStart += pageLimit;
+            notificationApiHelper.setPageStart(pageStart);
+            listNotifications();
+
+            lastCalledPageStart = pageStart;
         };
 
         onMounted(() => {
@@ -148,6 +155,7 @@ export default {
                 onElementObserved(entries);
             }, {
                 root: state.containerRef,
+                threshold: 0.6,
             });
         });
 
@@ -162,7 +170,9 @@ export default {
             if (items.length !== state.notifications.length) return;
 
             const lastElement = items[items.length - 1]?.$el;
-            if (lastElement) updateObservingElement(lastElement);
+            if (lastElement) {
+                updateObservingElement(lastElement);
+            }
         });
 
         /* Init */
