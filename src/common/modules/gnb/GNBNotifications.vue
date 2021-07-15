@@ -100,7 +100,10 @@ export default {
         const notificationApiHelper = new ApiQueryHelper()
             .setPage(pageStart, pageLimit)
             .setSort('created_at', true)
-            .setFilters([{ k: 'created_at', v: dayjs().subtract(7, 'day').utc().toISOString(), o: '>=t' }]);
+            .setFilters([
+                { k: 'created_at', v: dayjs().subtract(7, 'day').utc().toISOString(), o: '>=t' },
+                { k: 'created_at', v: dayjs().utc().toISOString(), o: '<t' },
+            ]);
 
         const listNotifications = async () => {
             if (state.loading) return;
