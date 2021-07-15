@@ -17,7 +17,7 @@
     "emitDeclarationOnly": true,
     "sourceMap": true,
     "declaration": true,
-    "outDir": "dist",
+    "outDir": "src",
     "baseUrl": ".",
     "paths": {
       "@src/*": ["src/*"]

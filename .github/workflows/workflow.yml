@@ -36,7 +36,7 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
-        run: cp package.json dist/package.json && cd dist && npm run semantic-release
+        run: npm run semantic-release
       - name: Slack
         if: always()
         uses: 8398a7/action-slack@v3.2.0
