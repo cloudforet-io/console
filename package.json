@@ -1,6 +1,6 @@
 {
   "name": "@spaceone/console-core-lib",
-  "version": "1.0.21",
+  "version": "1.0.22",
   "description": "SpaceONE Console Core Library",
   "scripts": {
     "build": "npm run babel && npm run tsc",
@@ -48,7 +48,9 @@
     "typescript": "^4.3.5"
   },
   "release": {
-    "branches": ["master"],
+    "branches": [
+      "master"
+    ],
     "plugins": [
       "@semantic-release/commit-analyzer",
       "@semantic-release/release-notes-generator",
