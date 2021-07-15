@@ -1,3 +1,10 @@
+# [1.1.0-beta.104](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.103...v1.1.0-beta.104) (2021-07-15)
+
+
+### Bug Fixes
+
+* add resolving alias to workflow after build ([#643](https://github.com/spaceone-dev/spaceone-design-system/issues/643)) ([ca34cf5](https://github.com/spaceone-dev/spaceone-design-system/commit/ca34cf53a30982c0e8981af51217f4a5c09b3e63))
+
 # [1.1.0-beta.103](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.102...v1.1.0-beta.103) (2021-07-13)
 
 
