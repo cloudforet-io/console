@@ -79,7 +79,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
+import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { makeDistinctValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 
@@ -140,13 +140,14 @@ export default {
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
+        const tableQueryHandler = new QueryHelper()
+            .setKeyItemSets(keyItemSets)
+            .setFiltersAsRawQueryString(vm.$route.query.filters);
+
         const maintenanceWindowApiQueryHelper = new ApiQueryHelper()
             .setOnly(...fields.map(d => d.name), 'maintenance_window_id')
             .setPageStart(1).setPageLimit(15)
-            .setSort('state', true)
-            .setKeyItemSets(keyItemSets)
-            .setFiltersAsRawQueryString(vm.$route.query.filters);
-        let maintenanceWindowQuery = maintenanceWindowApiQueryHelper.data;
+            .setSort('state', true);
 
         const state = reactive({
             totalCount: 0,
@@ -156,7 +157,7 @@ export default {
             selectIndex: [] as number[],
             selectedItems: computed<any[]>(() => state.selectIndex.map(d => state.items[d])),
             selectedItemState: computed(() => STATE[state.selectedItems[0]?.state]),
-            queryTags: maintenanceWindowApiQueryHelper.queryTags,
+            queryTags: tableQueryHandler.queryTags,
             visibleUpdateModal: false,
             visibleCloseCheckModal: false,
             closeLoading: false,
@@ -166,8 +167,11 @@ export default {
         const getMaintenanceWindows = async () => {
             state.loading = true;
             try {
+                maintenanceWindowApiQueryHelper.setFilters([...tableQueryHandler.filters]);
+                if (props.id) maintenanceWindowApiQueryHelper.addFilter({ k: 'projects', v: [props.id] });
+
                 const { total_count, results } = await SpaceConnector.client.monitoring.maintenanceWindow.list({
-                    query: maintenanceWindowQuery,
+                    query: maintenanceWindowApiQueryHelper.data,
                 });
 
                 state.totalCount = total_count;
@@ -182,12 +186,23 @@ export default {
         };
 
         const onChange = async (options: any = {}) => {
-            maintenanceWindowQuery = getApiQueryWithToolboxOptions(maintenanceWindowApiQueryHelper, options) ?? maintenanceWindowQuery;
+            setApiQueryWithToolboxOptions(maintenanceWindowApiQueryHelper, options, { queryTags: true });
             if (options.queryTags) {
+                // it triggers execution of router.query watch handler
                 replaceUrlQuery('filters', maintenanceWindowApiQueryHelper.rawQueryStrings);
             }
             await getMaintenanceWindows();
         };
+
+        const urlQueryHelper = new QueryHelper().setKeyItemSets(keyItemSets);
+        watch(() => vm.$route.query, async (query) => {
+            urlQueryHelper.setFiltersAsRawQueryString(query.filters);
+            if (tableQueryHandler.rawQueryString !== urlQueryHelper.rawQueryString) {
+                tableQueryHandler.setFilters(urlQueryHelper.filters);
+                state.queryTags = tableQueryHandler.queryTags;
+                await getMaintenanceWindows();
+            }
+        });
 
         const closeMaintenanceWindow = async () => {
             state.closeLoading = true;
@@ -207,16 +222,6 @@ export default {
             }
         };
 
-
-        const urlQueryHandler = new QueryHelper();
-        watch(() => vm.$route.query, async (query) => {
-            urlQueryHandler.setFiltersAsRawQueryString(query.filters);
-            if (urlQueryHandler.rawQueryString !== maintenanceWindowApiQueryHelper.rawQueryString) {
-                maintenanceWindowQuery = maintenanceWindowApiQueryHelper.setFilters(urlQueryHandler.filters).data;
-                state.queryTags = maintenanceWindowApiQueryHelper.queryTags;
-                await getMaintenanceWindows();
-            }
-        });
 
         /* Init */
         (async () => {

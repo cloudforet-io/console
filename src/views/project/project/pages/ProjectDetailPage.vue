@@ -21,11 +21,6 @@
                     />
                 </div>
                 <div class="top-right-group">
-                    <p-icon-text-button name="ic_state_manual" style-type="gray900"
-                                        @click="maintenanceWindowFormVisible = true"
-                    >
-                        {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CREATE') }}
-                    </p-icon-text-button>
                     <p class="copy-project-id">
                         <strong class="label">{{ $t('PROJECT.DETAIL.PROJECT_ID') }}&nbsp; </strong>
                         {{ projectId }}
@@ -33,6 +28,13 @@
                                        :value="projectId"
                         />
                     </p>
+                    <p-icon-text-button name="ic_state_manual" style-type="gray900"
+                                        class="ml-3"
+                                        outline
+                                        @click="maintenanceWindowFormVisible = true"
+                    >
+                        {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CREATE') }}
+                    </p-icon-text-button>
                 </div>
             </div>
 
@@ -335,7 +337,6 @@ export default {
             @apply inline-flex items-center text-gray-500;
             font-size: 0.875rem;
             height: 2rem;
-            margin-left: 0.875rem;
             .label {
                 @apply text-gray-dark;
             }
