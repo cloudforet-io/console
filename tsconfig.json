@@ -13,14 +13,16 @@
     "noImplicitAny": false,
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
+    "isolatedModules": true,
+    "emitDeclarationOnly": true,
     "sourceMap": true,
-    "baseUrl": ".",
     "declaration": true,
     "outDir": "dist",
+    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@src/*": ["src/*"]
     },
   },
-  "include": ["src/*"],
+  "include": ["src"],
   "exclude": ["node_modules", "./node_modules/**"]
 }

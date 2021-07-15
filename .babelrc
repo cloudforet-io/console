@@ -5,12 +5,14 @@
   ],
   "plugins": [
     "@babel/plugin-transform-runtime",
+    "@babel/proposal-class-properties",
+    "@babel/plugin-syntax-dynamic-import",
     [
       "module-resolver",
       {
         "root": ["./src/"],
         "alias": {
-          "@": "./src/"
+          "@src": "./src/"
         }
       }
     ]
