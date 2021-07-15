@@ -76,7 +76,7 @@ export const tagsToObject = (tags: Array<{ key: string; value: string }>): Recor
  * @return {Ref<*>}
  */
 /* eslint-disable arrow-parens */
-export const makeProxy = <T extends any>(name: string, props: any = null, emit: any = null): Ref<T> => {
+export const makeProxy = <T = any>(name: string, props: any = null, emit: any = null): Ref<T> => {
     let _props = props;
     let _emit = emit;
     if (!_props && !_emit) {
