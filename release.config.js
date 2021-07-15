@@ -9,7 +9,12 @@ module.exports = {
         '@semantic-release/github',
         //
         '@semantic-release/git',
-        '@semantic-release/changelog',
+        [
+            '@semantic-release/changelog',
+            {
+                changelogFile: 'CHANGELOG.md'
+            }
+        ],
         ['@semantic-release/exec', {
             'prepareCmd': 'cp package.json dist/package.json && cd dist'
         }]
