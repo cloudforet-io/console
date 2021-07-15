@@ -1230,8 +1230,8 @@
 					"NOTE": "Note"
 				},
 				"PROJECT_DEPENDENCY": {
-					"NO_DATA": "No Project Data",
-					"PROJECT_DEPENDENCY": "Project Dependency"
+					"NO_DATA": "No Dependencies",
+					"PROJECT_DEPENDENCY": "Project Dependencies"
 				},
 				"RESPONDER": {
 					"ADDITIONAL_RESPONDER": "Additional Responder",
