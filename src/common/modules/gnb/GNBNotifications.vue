@@ -58,6 +58,7 @@ import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import GNBNotificationItem from '@/common/modules/gnb/GNBNotificationItem.vue';
 import GNBNotificationDateHeader from '@/common/modules/gnb/GNBNotificationDateHeader.vue';
+import dayjs from 'dayjs';
 
 
 export default {
@@ -98,7 +99,8 @@ export default {
         const pageLimit = 15;
         const notificationApiHelper = new ApiQueryHelper()
             .setPage(pageStart, pageLimit)
-            .setSort('created_at', true);
+            .setSort('created_at', true)
+            .setFilters([{ k: 'created_at', v: dayjs().subtract(7, 'day').utc().toISOString(), o: '>=t' }]);
 
         const listNotifications = async () => {
             if (state.loading) return;
