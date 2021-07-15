@@ -3,8 +3,8 @@
   "version": "1.0.23",
   "description": "SpaceONE Console Core Library",
   "scripts": {
-    "build": "npm run babel && npm run tsc",
-    "babel": "babel src --out-dir . --extensions \".ts\" --source-maps inline --copy-files",
+    "build": "npm run babel && npm run tsc && cp -r dist/. . && rimraf src",
+    "babel": "babel src --out-dir dist --extensions \".ts\" --source-maps inline --copy-files",
     "tsc": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
     "semantic-release": "SKIP_PREPARE_COMMIT_MSG=1 SKIP_COMMIT_MSG=1 semantic-release"
   },
