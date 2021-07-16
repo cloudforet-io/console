@@ -34,8 +34,8 @@
                     <template v-if="$scopedSlots.key" #key="scope">
                         <slot name="key" v-bind="{...scope, index: idx, items}" />
                     </template>
-                    <template #extra="scope">
-                        <slot v-if="$scopedSlots.extra" name="extra" v-bind="scope" />
+                    <template v-if="$scopedSlots.extra" #extra="scope">
+                        <slot name="extra" v-bind="scope" />
                     </template>
                 </p-definition>
             </tbody>

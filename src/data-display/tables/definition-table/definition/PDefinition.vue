@@ -103,6 +103,7 @@ export default defineComponent<DefinitionProps>({
     }
 
     &.block {
+        display: flex;
         .value {
             flex-grow: 1;
         }
