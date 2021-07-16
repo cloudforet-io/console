@@ -1,3 +1,10 @@
+# [1.1.0-beta.105](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.104...v1.1.0-beta.105) (2021-07-16)
+
+
+### Features
+
+* make definition table to off copy button of each field ([#644](https://github.com/spaceone-dev/spaceone-design-system/issues/644)) ([8ab3546](https://github.com/spaceone-dev/spaceone-design-system/commit/8ab3546ebb510ffd3eabc3e4d4c2c9f459024354))
+
 # [1.1.0-beta.104](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.103...v1.1.0-beta.104) (2021-07-15)
 
 
