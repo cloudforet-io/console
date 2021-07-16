@@ -150,7 +150,7 @@ const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm';
 
 const TABLE_FIELDS = [
     { name: 'alert_number', label: 'No' },
-    { name: 'title', label: 'Title' },
+    { name: 'title', label: 'Title', width: '437px' },
     { name: 'state', label: 'State' },
     { name: 'urgency', label: 'Urgency' },
     { name: 'status_message', label: 'Status Details' },

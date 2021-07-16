@@ -4,7 +4,7 @@
                         : $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.CREATE_TITLE')"
                     :visible.sync="proxyVisible"
                     :loading="loading"
-                    :disabled="showValidation && !!titleInvalidText"
+                    :disabled="showValidation && (!!titleInvalidText || isTimePeriodInvalid)"
                     @confirm="onClickConfirm"
     >
         <template #body>
@@ -28,7 +28,7 @@
                 >
                     {{ label }}
                 </p-radio>
-                <div class="time-selection-wrapper">
+                <div class="time-selection-wrapper" :class="{'invalid':showValidation && isTimePeriodInvalid}">
                     <template v-if="selectedScheduleType === SCHEDULE_TYPE.startNow">
                         <p-select-button v-for="{name, label} in durationItems" :key="name" v-model="selectedDuration"
                                          :value="name" class="mr-2"
@@ -68,20 +68,35 @@
                     </table>
                 </div>
             </p-field-group>
+            <p-field-group class="period-field" :label="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.LABEL_TIME_PERIOD')" required>
+                <span v-if="selectedScheduleType === SCHEDULE_TYPE.startNow">
+                    {{ timePeriod }}
+                </span>
+                <span v-else>
+                    {{ isTimePeriodInvalid ? '--' : timePeriodFormatter(startTimeInput, endTimeInput) }}
+                </span>
+            </p-field-group>
+        </template>
+        <template v-if="editMode" #footer-extra>
+            <p-button style-type="alert" size="lg" :outline="true"
+                      @click="onClickClose(maintenanceWindowId)"
+            >
+                {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CLOSE_NOW') }}
+            </p-button>
         </template>
     </p-button-modal>
 </template>
 
 <script lang="ts">
 import {
-    PButtonModal, PFieldGroup, PRadio, PSelectButton, PTextInput,
+    PButtonModal, PFieldGroup, PRadio, PSelectButton, PTextInput, PButton,
 } from '@spaceone/design-system';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import dayjs from 'dayjs';
 
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy, iso8601Formatter } from '@spaceone/console-core-lib';
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -120,6 +135,7 @@ export default {
         PRadio,
         PTextInput,
         PSelectButton,
+        PButton,
     },
     props: {
         visible: {
@@ -148,6 +164,13 @@ export default {
                 if (state.title?.length === 0) return i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.REQUIRED');
                 return undefined;
             }),
+            isTimePeriodInvalid: computed(() => {
+                if (props.editMode) state.showValidation = true;
+                const timeDiff = dayjs(state.startTimeInput).diff(state.endTimeInput, 'minute');
+                // eslint-disable-next-line no-restricted-globals
+                if (timeDiff > 0 || isNaN(timeDiff)) return true;
+                return false;
+            }),
             scheduleRadioItems: computed(() => {
                 const items = [
                     { name: SCHEDULE_TYPE.startNow, label: i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.START_NOW') },
@@ -170,6 +193,10 @@ export default {
             endTimeInput: dayjs().add(1, 'hour').format(DATE_TIME_FORMAT),
             minTime: dayjs().format(DATE_TIME_FORMAT),
             showValidation: false,
+            timePeriod: computed(() => {
+                const timePeriod = state.durationItems.find(d => d.name === state.selectedDuration)?.label;
+                return timePeriod;
+            }),
         });
 
 
@@ -193,6 +220,23 @@ export default {
             end_time: dayjs.tz(dayjs(state.endTimeInput, DATE_TIME_FORMAT), state.timezone).utc().toISOString(),
         });
 
+        const timePeriodFormatter = (startTimeInput, endTimeInput) => {
+            const startTime = iso8601Formatter(startTimeInput, 'UTC');
+            const endTime = iso8601Formatter(endTimeInput, 'UTC');
+            const timeDiff = dayjs(endTime).diff(startTime, 'minute');
+            const days = Math.floor(timeDiff / 1440);
+            const hours = Math.floor((timeDiff % 1440) / 60);
+            const minutes = Math.floor((timeDiff % 1440) % 60);
+
+            const timePeriod = () => {
+                let period = '';
+                if (days !== 0) period = `${days} ${i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.DAYS')}`;
+                if (hours !== 0) period += ` ${hours} ${i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.HOURS')}`;
+                if (minutes !== 0) period += ` ${minutes} ${i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.MINUTES')}`;
+                return period;
+            };
+            return timePeriod();
+        };
 
         /* API calls */
         const getMaintenanceWindow = async () => {
@@ -258,6 +302,7 @@ export default {
             if (!state.showValidation) state.showValidation = true;
 
             if (state.titleInvalidText) return;
+            if (state.isTimePeriodInvalid) return;
 
             state.loading = true;
 
@@ -278,6 +323,10 @@ export default {
             }
         };
 
+        const onClickClose = (maintenanceWindowId) => {
+            emit('close', maintenanceWindowId);
+            state.proxyVisible = false;
+        };
 
         /* Initiators */
         const reset = async () => {
@@ -312,6 +361,8 @@ export default {
             onFirstInputTitle,
             onChangeStartTime,
             onClickConfirm,
+            onClickClose,
+            timePeriodFormatter,
             SCHEDULE_TYPE,
         };
     },
@@ -339,6 +390,17 @@ export default {
     min-height: 8.5rem;
     &.invalid {
         @apply border-alert;
+    }
+}
+.period-field {
+    display: flex;
+    align-items: center;
+    span {
+        display: inline-block;
+        margin-bottom: 0.25rem;
+        margin-left: 0.5rem;
+        font-size: 0.875rem;
+        line-height: 1.4;
     }
 }
 table {

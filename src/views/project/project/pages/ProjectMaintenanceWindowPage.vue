@@ -23,7 +23,7 @@
                     {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.UPDATE') }}
                 </p-button>
                 <p-button style-type="primary-dark" :outline="true"
-                          :disabled="selectedItems.length !== 1 || selectedItemState === STATE.CLOSED" @click="visibleCloseCheckModal = true"
+                          :disabled="!selectedItems.length || selectedItemState === STATE.CLOSED" @click="visibleCloseCheckModal = true"
                 >
                     {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CLOSE') }}
                 </p-button>
@@ -47,6 +47,7 @@
         <maintenance-window-form-modal :visible.sync="visibleUpdateModal" edit-mode
                                        :maintenance-window-id="selectedItems[0] && selectedItems[0].maintenance_window_id"
                                        @confirm="getMaintenanceWindows"
+                                       @close="closeMaintenanceWindow"
         />
 
         <p-table-check-modal :visible.sync="visibleCloseCheckModal"
@@ -208,12 +209,12 @@ export default {
             state.closeLoading = true;
             try {
                 await SpaceConnector.client.monitoring.maintenanceWindow.close({
-                    maintenance_window_id: state.selectedItems[0]?.maintenance_window_id,
+                    maintenance_windows: state.selectedItems.map(d => d.maintenance_window_id),
                 });
                 state.visibleCloseCheckModal = false;
 
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ALT_S_CLOSE_MAINTENANCE_WINDOW'), '', root);
-                getMaintenanceWindows();
+                await getMaintenanceWindows();
             } catch (e) {
                 showErrorMessage(i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ALT_E_CLOSE_MAINTENANCE_WINDOW'), e, root);
                 console.error(e);
