@@ -47,6 +47,10 @@ textarea:focus:not(:focus-visible), input:focus:not(:focus-visible) {
   outline: none;
 }
 
+input[type=text]:focus {
+    outline: none;
+}
+
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Noto Sans', 'Roboto', arial, sans-serif;
   margin: 0;

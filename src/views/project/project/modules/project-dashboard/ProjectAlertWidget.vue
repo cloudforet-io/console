@@ -10,7 +10,7 @@
                              class="button"
                              :style="{ color: alertState.color }"
                 >
-                    <strong>{{ counts[alertState.name] }}</strong> {{ alertState.label }}
+                    <strong>{{ commaFormatter(counts[alertState.name]) }}</strong> {{ alertState.label }}
                 </router-link>
             </div>
             <p-list-card :items="items" :loading="loading" :hoverable="true"
@@ -76,7 +76,7 @@ import { store } from '@/store';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import router from '@/routes';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
-
+import { commaFormatter } from '@spaceone/console-core-lib';
 
 const ASSIGNED_STATE = Object.freeze({
     ALL: 'ALL',
@@ -205,6 +205,7 @@ export default {
             listAlerts,
             onClickListItem,
             alertLinkFormatter,
+            commaFormatter,
         };
     },
 };
