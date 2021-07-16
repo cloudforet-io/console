@@ -123,7 +123,7 @@ import { i18n } from '@/translations';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { durationFormatter, iso8601Formatter } from '@spaceone/console-core-lib';
+import { durationFormatter, iso8601Formatter, commaFormatter } from '@spaceone/console-core-lib';
 import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
@@ -144,7 +144,6 @@ import {
 } from '@/views/monitoring/alert-manager/type';
 
 import { alertStateBadgeStyleTypeFormatter } from '@/views/monitoring/alert-manager/lib/helper';
-
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm';
 
@@ -309,7 +308,7 @@ export default {
                 });
 
                 state.items = results;
-                state.totalCount = total_count;
+                state.totalCount = commaFormatter(total_count);
                 state.selectIndex = [];
             } catch (e) {
                 state.totalCount = 0;
@@ -396,6 +395,7 @@ export default {
             onUpdateBottomFilters,
             iso8601Formatter,
             alertDurationFormatter,
+            commaFormatter,
         };
     },
 };

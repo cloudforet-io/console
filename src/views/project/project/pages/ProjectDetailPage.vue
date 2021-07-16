@@ -46,7 +46,7 @@
                 <keep-alive><router-view /></keep-alive>
                 <template #extra="tab">
                     <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && counts[ALERT_STATE.TRIGGERED] !== 0" style-type="primary3">
-                        {{ counts[ALERT_STATE.TRIGGERED] }}
+                        {{ commaFormatter(counts[ALERT_STATE.TRIGGERED]) }}
                     </p-badge>
                     <beta-mark v-if="tab.name === 'projectAlert' || tab.name === 'projectNotifications' || tab.name === 'projectMaintenanceWindow'" />
                 </template>
@@ -109,6 +109,7 @@ import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue
 import FavoriteButton from '@/common/modules/FavoriteButton.vue';
 import ProjectFormModal from '@/views/project/project/modules/ProjectFormModal.vue';
 import { ProjectModel } from '@/views/project/project/type';
+import { commaFormatter } from '@spaceone/console-core-lib';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 
@@ -308,7 +309,7 @@ export default {
             onCreateMaintenanceWindow,
             statAlerts,
             ALERT_STATE,
-
+            commaFormatter,
         };
     },
 };
