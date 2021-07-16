@@ -1,6 +1,6 @@
 <template>
     <p v-if="!isEditMode" class="content-wrapper">
-        <span class="description">{{ alertData.description }}</span>
+        <span class="description">{{ alertData.description }}&zwnj;</span>
         <button class="edit-btn" @click="startEdit(EDIT_MODE.DESCRIPTION)">
             <p-i name="ic_edit" width="1rem" height="1rem"
                  color="inherit" class="edit-icon"

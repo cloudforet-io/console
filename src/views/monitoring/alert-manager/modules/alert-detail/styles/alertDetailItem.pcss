@@ -1,21 +1,14 @@
 .content-wrapper {
     display: inline-flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
     width: 100%;
-}
-.button-group {
-    justify-content: flex-end;
-    flex-shrink: 0;
-    .text-button {
-        height: 1.5rem;
-    }
 }
 .edit-btn {
     @apply text-blue-600;
-    padding-right: 0.5rem;
     line-height: 160%;
     min-width: 2.875rem;
+    flex-shrink: 0;
     .edit-icon {
         margin-right: 0.25rem;
     }
@@ -23,12 +16,14 @@
         @apply cursor-pointer;
     }
 }
-
 .button-group {
     justify-content: flex-end;
     flex-shrink: 0;
     margin-left: 0.5rem;
     .cancel-button {
         margin-right: 0.5rem;
+    }
+    .text-button {
+        height: 1.5rem;
     }
 }

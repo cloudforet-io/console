@@ -1,16 +1,18 @@
 <template>
-    <div>
+    <fragment>
         <p v-if="!isEditMode" class="content-wrapper">
             <span class="project">
-                <p-anchor :to="referenceRouter(
-                              alertData.project_id,
-                              { resource_type: 'identity.Project' })"
-                          highlight
-                >
-                    {{ projects[alertData.project_id] ? projects[alertData.project_id].label : alertData.project_id }}
-                </p-anchor>
+                <p-copy-button>
+                    <p-anchor :to="referenceRouter(
+                                  alertData.project_id,
+                                  { resource_type: 'identity.Project' })"
+                              highlight
+                    >
+                        {{ projects[alertData.project_id] ? projects[alertData.project_id].label : alertData.project_id }}
+                    </p-anchor>
+                </p-copy-button>
             </span>
-            <p-button style-type="gray-border" size="sm" class="add-button"
+            <p-button style-type="gray-border" size="sm" class="add-button ml-2"
                       @click="startEdit(EDIT_MODE.PROJECT)"
             >
                 {{ $t('MONITORING.ALERT.DETAIL.INFO.CHANGE') }}
@@ -20,7 +22,7 @@
             <project-select-dropdown :selected-project-ids="dataForUpdate ? [dataForUpdate] : []"
                                      @select="onSelectProject"
             />
-            <div class="button-group">
+            <div class="button-group ml-2">
                 <p-button :outline="true" size="sm" class="cancel-button"
                           @click="cancelEdit(EDIT_MODE.PROJECT)"
                 >
@@ -47,15 +49,15 @@
             @confirm="onClickSave(EDIT_MODE.PROJECT)"
         >
             <template #body>
-                {{$t('MONITORING.ALERT.DETAIL.INFO.CHANGE_PROJECT_MODAL_DESC')}}
+                {{ $t('MONITORING.ALERT.DETAIL.INFO.CHANGE_PROJECT_MODAL_DESC') }}
             </template>
         </p-button-modal>
-    </div>
+    </fragment>
 </template>
 
 <script lang="ts">
 import {
-    PTextarea, PButton, PI, PAnchor, PButtonModal,
+    PButton, PAnchor, PButtonModal, PCopyButton,
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { useAlertDetailItem } from '@/views/monitoring/alert-manager/modules/alert-detail/hooks';
@@ -71,6 +73,7 @@ export default {
         PAnchor,
         PButton,
         PButtonModal,
+        PCopyButton,
     },
     props: {
         id: {
@@ -82,7 +85,7 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props, { emit }) {
+    setup(props) {
         const {
             state: alertDetailItemState,
             cancelEdit,
