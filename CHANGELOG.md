@@ -1,3 +1,10 @@
+# [1.1.0-beta.106](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.105...v1.1.0-beta.106) (2021-07-16)
+
+
+### Features
+
+* add block to definition table ([#645](https://github.com/spaceone-dev/spaceone-design-system/issues/645)) ([d51bbb4](https://github.com/spaceone-dev/spaceone-design-system/commit/d51bbb4b32bc8a52cf1b8c640f64fd9899aaa66b))
+
 # [1.1.0-beta.105](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.104...v1.1.0-beta.105) (2021-07-16)
 
 
