@@ -115,12 +115,12 @@ export default {
                     is_scheduled: state.scheduleModeForEdit,
                     schedule: state.scheduleForEdit,
                 });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_TOPIC'), '', root);
+                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '', root);
                 notificationItemState.isEditMode = false;
                 emit('edit', undefined);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, root);
+                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'), e, root);
             }
         };
         const setProjectChannelSchedule = async () => {
@@ -130,12 +130,12 @@ export default {
                     is_scheduled: state.scheduleModeForEdit,
                     schedule: state.scheduleForEdit,
                 });
-                showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_UPDATE_PROJECT_CHANNEL'), '', root);
+                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '', root);
                 notificationItemState.isEditMode = false;
                 emit('edit', undefined);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'), e, root);
+                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'), e, root);
             }
         };
 
