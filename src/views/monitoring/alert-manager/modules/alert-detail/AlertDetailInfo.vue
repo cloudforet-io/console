@@ -3,7 +3,7 @@
         <p-definition-table :fields="fields" :data="data"
                             :skeleton-rows="10"
                             style-type="white"
-                            :disable-copy="true"
+                            block
         >
             <template #data-escalation_policy_id>
                 <p-anchor :to="{ name: MONITORING_ROUTE.ALERT_MANAGER.ESCALATION_POLICY }" highlight>
@@ -40,7 +40,7 @@
                     --
                 </span>
                 <template v-else>
-                    <p v-for="([k, v]) in Object.entries(value)" class="additional-info">
+                    <p v-for="([k, v]) in Object.entries(value)" :key="k" class="additional-info">
                         <b>{{ k }}</b>: {{ v }}
                     </p>
                 </template>
@@ -51,19 +51,16 @@
 
 <script lang="ts">
 import {
-    PPaneLayout, PDefinitionTable, PButton, PI, PTextarea, PTextInput, PAnchor,
+    PPaneLayout, PDefinitionTable, PAnchor,
 } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 import { AlertDataModel } from '@/views/monitoring/alert-manager/type';
-import { ProjectItemResp } from '@/views/project/project/type';
-import ProjectTreeModal from '@/common/modules/ProjectTreeModal.vue';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { i18n } from '@/translations';
 import AlertDetailInfoProject from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailInfoProject.vue';
@@ -72,7 +69,7 @@ import AlertDetailInfoStatusMsg
 import AlertDetailInfoDescription
     from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailInfoDescription.vue';
 
-interface PropsType {
+interface Props {
     id: string;
     alertData: AlertDataModel;
 }
@@ -103,23 +100,21 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props: PropsType, { emit, root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
+    setup(props: Props) {
         const state = reactive({
             fields: [
                 { name: 'triggered_by', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY') },
                 { name: 'escalation_policy_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ESCALATION_POLICY') },
-                { name: 'project_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.PROJECT') },
-                { name: 'severity', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.SEVERITY') },
-                { name: 'created_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.CREATED') },
-                { name: 'acknowledged_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED') },
-                { name: 'resolved_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED') },
+                { name: 'project_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.PROJECT'), disableCopy: true },
+                { name: 'severity', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.SEVERITY'), disableCopy: true },
+                { name: 'created_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.CREATED'), disableCopy: true },
+                { name: 'acknowledged_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ACKNOWLEDGED'), disableCopy: true },
+                { name: 'resolved_at', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RESOLVED'), disableCopy: true },
                 { name: 'alert_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ALERT_ID') },
-                { name: 'description', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.DESC') },
-                { name: 'rule', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RULE') },
-                { name: 'status_message', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.STATUS_MSG') },
-                { name: 'additional_info', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.EXTRA_INFO') },
+                { name: 'description', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.DESC'), disableCopy: true },
+                { name: 'rule', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RULE'), disableCopy: true },
+                { name: 'status_message', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.STATUS_MSG'), disableCopy: true },
+                { name: 'additional_info', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.EXTRA_INFO'), disableCopy: true },
             ],
             data: props.alertData || {},
             escalationPolicyName: '',
@@ -159,20 +154,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.p-definition-table::v-deep {
-    .def-row {
-        tr {
-            >>> .value {
-                width: 100%;
-
-                >>>.p-copy-button {
-                    width: 100%;
-                }
-            }
-        }
-    }
-}
-
 .additional-info {
     @apply text-gray-500;
     font-size: 0.875rem;
