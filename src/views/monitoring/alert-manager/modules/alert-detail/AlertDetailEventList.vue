@@ -172,7 +172,7 @@ export default {
 }
 .title {
     &:hover {
-        @apply text-blue-500 cursor-pointer;
+        @apply text-blue-500 cursor-pointer underline;
     }
 }
 .severity {

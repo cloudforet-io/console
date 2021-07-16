@@ -7,7 +7,9 @@
                                class="state-dropdown"
                                :disabled="alertState === ALERT_STATE.ERROR"
                                @select="changeAlertState"
-            />
+            >
+                <span class="capitalize">{{ alertState.toLowerCase() }}</span>
+            </p-select-dropdown>
         </p>
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.URGENCY') }}</span>
@@ -18,9 +20,9 @@
                                @select="changeAlertUrgency"
             >
                 <p-i v-if="alertUrgency === ALERT_URGENCY.HIGH" name="ic_alert" width="1em"
-                     height="1em"
+                     height="1em" class="mr-2"
                 />
-                {{ alertUrgency }}
+                <span class="capitalize">{{ alertUrgency.toLowerCase() }}</span>
             </p-select-dropdown>
         </p>
         <p class="content-wrapper">
@@ -73,7 +75,6 @@ const ALERT_STATE_LIST = Object.freeze([
     { label: 'Triggered', name: 'TRIGGERED' },
     { label: 'Acknowledged', name: 'ACKNOWLEDGED' },
     { label: 'Resolved', name: 'RESOLVED' },
-    { label: 'Error', name: 'ERROR' },
 ]);
 
 const ALERT_URGENCY_LIST = Object.freeze([
