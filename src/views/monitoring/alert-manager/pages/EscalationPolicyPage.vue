@@ -7,40 +7,42 @@
                       :total-count="tableState.totalCount"
                       :selected-count="selectedItem ? 1 : 0"
         />
-        <p-toolbox
-            search-type="query"
-            :total-count="tableState.totalCount"
-            :query-tags="tableState.tags"
-            :key-item-sets="handlers.keyItemSets"
-            :value-handler-map="handlers.valueHandlerMap"
-            @change="onChange"
-            @refresh="onChange()"
-        >
-            <template #left-area>
-                <p-icon-text-button
-                    class="create-button"
-                    style-type="primary-dark"
-                    name="ic_plus_bold"
-                    @click="onSelectAction(ACTION.create)"
-                >
-                    {{ $t('MONITORING.ALERT.ESCALATION_POLICY.CREATE') }}
-                </p-icon-text-button>
-                <p-select-dropdown
-                    :selected="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
-                    :items="actionItems"
-                    :disabled="!selectedItem"
-                    @select="onSelectAction"
-                >
-                    {{ $t('MONITORING.ALERT.ESCALATION_POLICY.ACTION') }}
-                </p-select-dropdown>
-            </template>
-        </p-toolbox>
-        <escalation-policy-data-table
-            :items="items"
-            :loading="tableState.loading"
-            :select-index.sync="selectIndex"
-            @change="onChange"
-        />
+        <div class="table-wrapper">
+            <p-toolbox
+                search-type="query"
+                :total-count="tableState.totalCount"
+                :query-tags="tableState.tags"
+                :key-item-sets="handlers.keyItemSets"
+                :value-handler-map="handlers.valueHandlerMap"
+                @change="onChange"
+                @refresh="onChange()"
+            >
+                <template #left-area>
+                    <p-icon-text-button
+                        class="create-button"
+                        style-type="primary-dark"
+                        name="ic_plus_bold"
+                        @click="onSelectAction(ACTION.create)"
+                    >
+                        {{ $t('MONITORING.ALERT.ESCALATION_POLICY.CREATE') }}
+                    </p-icon-text-button>
+                    <p-select-dropdown
+                        :selected="$t('MONITORING.ALERT.ESCALATION_POLICY.ACTION')"
+                        :items="actionItems"
+                        :disabled="!selectedItem"
+                        @select="onSelectAction"
+                    >
+                        {{ $t('MONITORING.ALERT.ESCALATION_POLICY.ACTION') }}
+                    </p-select-dropdown>
+                </template>
+            </p-toolbox>
+            <escalation-policy-data-table
+                :items="items"
+                :loading="tableState.loading"
+                :select-index.sync="selectIndex"
+                @change="onChange"
+            />
+        </div>
         <!--modal-->
         <escalation-policy-form-modal
             :visible.sync="formModalVisible"
@@ -124,11 +126,7 @@ export default {
         };
         const tableState = reactive({
             loading: true,
-            sortBy: 'created_at',
-            sortDesc: true,
             totalCount: 0,
-            pageLimit: 15,
-            pageStart: 1,
             tags: escalationPolicyApiQueryHelper.setKeyItemSets(handlers.keyItemSets).queryTags,
         });
         const state = reactive({
@@ -268,7 +266,12 @@ export default {
 
 <style lang="postcss" scoped>
 .escalation-policy-page {
+    .table-wrapper {
+        @apply border border-gray-200 rounded-md;
+    }
     .p-toolbox::v-deep {
+        padding: 1.5rem 1rem 0.5rem;
+
         .left-area-wrapper {
             display: flex;
         }

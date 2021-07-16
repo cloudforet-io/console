@@ -74,7 +74,6 @@
                              :items="items"
                              :loading="loading"
                              :hoverable="true"
-                             @click="onClickListItem"
                 >
                     <template #header>
                         <div class="mobile-header">
@@ -100,10 +99,10 @@
 
 <script lang="ts">
 /* eslint-disable camelcase */
-import { get, find, sum } from 'lodash';
+import { find, sum } from 'lodash';
 
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -156,7 +155,6 @@ export default {
         PI,
     },
     setup() {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const tabState = reactive({
             tabs: computed(() => ([
                 {
@@ -280,10 +278,6 @@ export default {
         const onSelectAssignedState = (assignedState) => {
             state.isAssignedToMe = assignedState === ASSIGNED_STATE.ASSIGNED_TO_ME;
         };
-        const onClickListItem = (idx) => {
-            const alertId = get(state.items[idx], 'alert_id');
-            if (alertId) vm.$router.push({ name: MONITORING_ROUTE.ALERT_MANAGER.ALERT.DETAIL._NAME, params: { id: alertId } });
-        };
         const onClickRefresh = async () => {
             state.thisPage = 1;
             await listAlerts();
@@ -303,7 +297,6 @@ export default {
             tabState,
             onPageChange,
             onSelectAssignedState,
-            onClickListItem,
             onClickRefresh,
             listAlerts,
             commaFormatter,
@@ -337,9 +330,10 @@ export default {
             }
             .balloon-group {
                 width: 100%;
+                margin-left: 0;
 
                 button {
-                    height: 4.5rem;
+                    height: 4.4rem;
                     padding: 1rem;
                     margin: 0.375rem 0;
                 }

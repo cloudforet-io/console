@@ -6,7 +6,7 @@
                             block
         >
             <template #data-escalation_policy_id>
-                <p-anchor :to="{ name: MONITORING_ROUTE.ALERT_MANAGER.ESCALATION_POLICY }" highlight>
+                <p-anchor :to="{ name: MONITORING_ROUTE.ALERT_MANAGER.ESCALATION_POLICY._NAME }" highlight>
                     {{ escalationPolicyName }}
                 </p-anchor>
             </template>

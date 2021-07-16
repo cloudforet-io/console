@@ -22,33 +22,36 @@
                 </p-select-status>
             </div>
         </div>
-        <div v-if="!loading" class="content-wrapper">
-            <div v-for="(projectId, idx) in top5Projects" :key="`table-row-${idx}`"
-                 class="table-row"
-            >
-                <p-anchor :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
-                          :show-icon="false"
-                          target="_self"
-                          class="col-name"
+        <div class="content-wrapper">
+            <p-skeleton v-if="loading" width="100%" height="100%" />
+            <template v-else>
+                <div v-for="(projectId, idx) in top5Projects" :key="`table-row-${idx}`"
+                     class="table-row"
                 >
-                    <span v-tooltip.bottom="projectNameFormatter(projectId)" class="tablet:hidden">{{ projectNameFormatter(projectId) }}</span>
-                    <span class="tablet-text">{{ projectNameFormatter(projectId) }}</span>
-                </p-anchor>
-                <div class="col-activity">
-                    <div v-for="(activity, aIdx) in activity[projectId]" :key="`activity-${aIdx}`"
-                         class="box-wrapper"
+                    <p-anchor :to="referenceRouter(projectId,{ resource_type: 'identity.Project' })"
+                              :show-icon="false"
+                              target="_self"
+                              class="col-name"
                     >
-                        <div class="box" :class="activity.status ? activity.status : 'empty'">
-                            <top5-project-activity-tooltip
-                                :project-id="projectId"
-                                :status="activity.status"
-                                :date="activity.date"
-                                :period="selectedPeriod"
-                            />
+                        <span v-tooltip.bottom="projectNameFormatter(projectId)" class="tablet:hidden">{{ projectNameFormatter(projectId) }}</span>
+                        <span class="tablet-text">{{ projectNameFormatter(projectId) }}</span>
+                    </p-anchor>
+                    <div class="col-activity">
+                        <div v-for="(activity, aIdx) in activity[projectId]" :key="`activity-${aIdx}`"
+                             class="box-wrapper"
+                        >
+                            <div class="box" :class="activity.status ? activity.status : 'empty'">
+                                <top5-project-activity-tooltip
+                                    :project-id="projectId"
+                                    :status="activity.status"
+                                    :date="activity.date"
+                                    :period="selectedPeriod"
+                                />
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </template>
         </div>
     </div>
 </template>
@@ -62,7 +65,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PAnchor, PSelectStatus, PStatus,
+    PAnchor, PSelectStatus, PStatus, PSkeleton,
 } from '@spaceone/design-system';
 
 import Top5ProjectActivityTooltip from '@/views/monitoring/alert-manager/modules/alert-dashboard/Top5ProjectActivityTooltip.vue';
@@ -109,6 +112,7 @@ export default {
         PAnchor,
         PStatus,
         PSelectStatus,
+        PSkeleton,
         Top5ProjectActivityTooltip,
     },
     props: {
@@ -263,6 +267,7 @@ export default {
         @apply grid;
         display: grid;
         gap: 0.125rem;
+        height: 6.75rem;
 
         .table-row {
             @apply grid grid-cols-12;
