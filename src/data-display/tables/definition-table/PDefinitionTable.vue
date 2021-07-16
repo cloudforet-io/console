@@ -12,7 +12,8 @@
                               :label="item.label"
                               :name="item.name"
                               :data="item.data"
-                              :disable-copy="disableCopy"
+                              :disable-copy="disableCopy || item.disableCopy"
+                              :formatter="item.formatter"
                 >
                     <template #default="scope">
                         <slot name="data" v-bind="{

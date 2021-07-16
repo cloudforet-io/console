@@ -7,7 +7,13 @@
         </td>
         <td class="value-wrapper">
             <span class="value">
-                <p-copy-button width="0.8rem" height="0.8rem" auto-hide-icon>
+                <slot v-if="disableCopy" name="default" v-bind="{name, label, data, value: displayData}">
+                    {{ displayData }}
+                </slot>
+                <p-copy-button v-else
+                               width="0.8rem" height="0.8rem"
+                               auto-hide-icon
+                >
                     <slot name="default" v-bind="{name, label, data, value: displayData}">
                         {{ displayData }}
                     </slot>
@@ -78,7 +84,7 @@ export default defineComponent<DefinitionProps>({
         max-width: calc(100% - 18rem);
 
         .p-copy-button {
-            @apply ml-2 flex-shrink-0;
+            @apply flex-shrink-0;
         }
         .extra {
             flex-grow: 1;

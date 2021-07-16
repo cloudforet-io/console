@@ -37,6 +37,10 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+It uses the [Definition component](?path=/docs/data-display-tables-definition-table-definition--basic) internally. <br/>
+`fields` props is an array of objects whose properties are the set of definition component's props. <br/>
+
+
 
 ## Basic
 <Canvas>
@@ -259,23 +263,45 @@ export const Template = (args, { argTypes }) => ({
 
 ## Disable Copy
 
+If you give `true` to `disableCopy` props, it globally off all copy buttons. <br/>
+If you want to off the specific row(field), set `disableCopy` property with `true` to that field's object. <br/>
+
+e.g.<br/>
+
+```javascript
+fields: [
+    { label: 'Id', name: 'collector_id' },
+    { label: 'Name', name: 'name' },
+    { label: 'Provider', name: 'provider', disableCopy: true }, // will be hide copy button to this field
+]
+```
+
+
 <Canvas>
     <Story name="Disable Copy">
         {{
             components: { PDefinitionTable },
             template: `
-<p-definition-table
-    :fields="fields"
-    :data="data"
-    disable-copy
-/>
+<div>
+    <p class="text-xl mb-4">Globally disable copy button</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+        disable-copy
+    />
+    <p class="text-xl my-4">Disable specific row(field)'s copy button</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    />
+</div>
 `,
             setup() {
                 const state = reactive({
                     fields: [
                         { label: 'Id', name: 'collector_id' },
                         { label: 'Name', name: 'name' },
-                        { label: 'Provider', name: 'provider' },
+                        { label: 'Provider', name: 'provider', disableCopy: true },
                     ],
                     data: {
                         collector_id: 'collector-6746d641c98b',
