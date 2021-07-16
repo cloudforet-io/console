@@ -23,6 +23,9 @@ export const Template = (args, { argTypes }) => ({
     :data="data"
     :loading="loading"
     :skeleton-rows="skeletonRows"
+    :disable-copy="disableCopy"
+    :style-type="styleType"
+    :block="block"
 />`,
     setup() {
         return {
@@ -302,6 +305,76 @@ fields: [
                         { label: 'Id', name: 'collector_id' },
                         { label: 'Name', name: 'name' },
                         { label: 'Provider', name: 'provider', disableCopy: true },
+                    ],
+                    data: {
+                        collector_id: 'collector-6746d641c98b',
+                        name: 'collector name',
+                        provider: 'aws',
+                    }
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+## Block
+
+If you give `true` to `block` props, it will make all value column's width full. <br/>
+If you want to make block the specific row(field), set `block` property with `true` to that field's object. <br/>
+It is useful when you give something into extra slot and want to align it to the right. <br/>
+
+e.g.
+
+```javascript
+fields: [
+    { label: 'Id', name: 'collector_id' },
+    { label: 'Name', name: 'name' },
+    { label: 'Provider', name: 'provider', block: true }, // will be make block to only this field
+]
+```
+
+
+<Canvas>
+    <Story name="Block">
+        {{
+            components: { PDefinitionTable, PButton },
+            template: `
+<div>
+    <p class="text-xl mb-4">Make all value columns expand</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+        block
+    >
+        <template #extra>
+            <p-button style-type="secondary" size="sm">Edit</p-button>
+        </template>
+    </p-definition-table>
+    <p class="text-xl my-4">Make specific row(field)'s value column expand</p>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    >
+        <template #extra>
+            <p-button style-type="secondary" size="sm">Edit</p-button>
+        </template>
+    </p-definition-table>
+</div>
+<!-- <div> -->
+`,
+            setup() {
+                const state = reactive({
+                    fields: [
+                        { label: 'Id', name: 'collector_id' },
+                        { label: 'Name', name: 'name' },
+                        { label: 'Provider', name: 'provider', block: true },
                     ],
                     data: {
                         collector_id: 'collector-6746d641c98b',

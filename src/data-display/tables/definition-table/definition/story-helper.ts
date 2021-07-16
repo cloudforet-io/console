@@ -88,6 +88,21 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
             },
         },
     },
+    block: {
+        name: 'block',
+        type: { name: 'boolean' },
+        description: 'Whether to show value with full width or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+    },
     /* slots */
     defaultSlot: {
         name: 'default',

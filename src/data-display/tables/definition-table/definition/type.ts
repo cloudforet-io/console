@@ -4,4 +4,5 @@ export interface DefinitionProps {
     data: any;
     disableCopy?: boolean;
     formatter?: (data: any, props: DefinitionProps) => any;
+    block?: boolean;
 }

@@ -138,7 +138,7 @@ import {
 import { get, range } from 'lodash';
 import { copyAnyData } from '@/util/helpers';
 import { makeOptionalProxy } from '@/util/composition-helpers';
-import { DataTableField, DataTableFieldType } from '@/data-display/tables/data-table/type';
+import { DataTableFieldType, DataTableProps } from '@/data-display/tables/data-table/type';
 
 import PCheckBox from '@/inputs/checkbox/PCheckBox.vue';
 import PRadio from '@/inputs/radio/PRadio.vue';
@@ -147,29 +147,6 @@ import PLottie from '@/foundation/lottie/PLottie.vue';
 import PI from '@/foundation/icons/PI.vue';
 import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
 
-export interface DataTableProps {
-    loading: boolean;
-    fields: DataTableField[];
-    items: any[];
-    sortable?: boolean;
-    sortBy?: string;
-    sortDesc?: boolean;
-    colCopy?: boolean;
-    selectable?: boolean;
-    selectIndex?: number[] | number;
-    multiSelect?: boolean;
-    rowClickMultiSelectMode?: boolean;
-    useCursorLoading?: boolean;
-    tableStyleType?: DATA_TABLE_STYLE_TYPE;
-    striped?: boolean;
-    bordered?: boolean|null|unknown;
-    disableHover?: boolean;
-    rowHeightFixed?: boolean;
-    rowCursorPointer?: boolean;
-    invalid?: boolean;
-    getRowClassNames?: (item: any, i: number) => Record<string, boolean>;
-    getRowSelectable?: (item: any, i: number) => boolean;
-}
 
 export default defineComponent<DataTableProps>({
     name: 'PDataTable',

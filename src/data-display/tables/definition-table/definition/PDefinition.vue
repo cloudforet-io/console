@@ -1,5 +1,5 @@
 <template>
-    <tr class="p-definition">
+    <tr class="p-definition" :class="{block}">
         <td class="key">
             <slot name="key" v-bind="{name, label, data, value: displayData}">
                 {{ label || name }}
@@ -19,7 +19,7 @@
                     </slot>
                 </p-copy-button>
             </span>
-            <span class="extra">
+            <span v-if="$scopedSlots.extra" class="extra">
                 <slot name="extra" v-bind="{name, label, data, value: displayData}" />
             </span>
         </td>
@@ -57,6 +57,10 @@ export default defineComponent<DefinitionProps>({
             type: Function,
             default: undefined,
         },
+        block: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: DefinitionProps) {
         const state = reactive({
@@ -89,12 +93,22 @@ export default defineComponent<DefinitionProps>({
         .extra {
             flex-grow: 1;
             flex-shrink: 0;
+            margin-left: 0.5rem;
         }
     }
     .key, .value-wrapper {
         @apply py-2 px-4 text-sm;
         line-height: 1.45;
         cursor: unset;
+    }
+
+    &.block {
+        .value {
+            flex-grow: 1;
+        }
+        .extra {
+            flex-grow: unset;
+        }
     }
 
     @screen mobile {

@@ -82,6 +82,24 @@ export const getDefinitionTableArgTypes = (): ArgTypes => ({
             type: 'number',
         },
     },
+    disableCopy: {
+        name: 'disableCopy',
+        type: { name: 'boolean' },
+        description: 'Whether to GLOBALLY disable copy button or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     styleType: {
         name: 'styleType',
         type: { name: 'string' },
@@ -99,6 +117,21 @@ export const getDefinitionTableArgTypes = (): ArgTypes => ({
         control: {
             type: 'select',
             options: Object.values(DEFINITION_TABLE_STYLE_TYPE),
+        },
+    },
+    block: {
+        name: 'block',
+        type: { name: 'boolean' },
+        description: 'Whether to GLOBALLY show value with full width or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
         },
     },
 });

@@ -12,6 +12,7 @@ export interface DefinitionTableProps {
     skeletonRows?: number;
     disableCopy?: boolean;
     styleType?: DEFINITION_TABLE_STYLE_TYPE;
+    block?: boolean;
 }
 
 export type DefinitionField = Omit<DefinitionProps, 'data'>

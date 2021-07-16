@@ -27,6 +27,7 @@ export const Template = (args, { argTypes }) => ({
     :data="data"
     :disable-copy="disableCopy"
     :formatter="formatter"
+    :block="block"
 >
 </p-definition>`,
     setup(props) {
@@ -157,6 +158,51 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+
+## Block
+
+<Canvas>
+    <Story name="Block">
+        {{
+            components:{ PDefinition, PButton },
+            template: `
+<table class="w-full">
+    <tbody>
+        <p-definition
+            name="Default(block: false)"
+            label="Default(block: false)"
+            :data="data"
+        >
+            <template #extra>
+                <p-button style-type="secondary" size="sm">Edit</p-button>
+            </template>
+        </p-definition>
+        <p-definition
+            name="Block(block: true)"
+            label="Block(block: true)"
+            :data="data"
+            block
+        >
+            <template #extra>
+                <p-button style-type="secondary" size="sm">Edit</p-button>
+            </template>
+        </p-definition>
+    </tbody>
+</table>
+<!-- <div> -->
+`,
+            setup() {
+                return {
+                    data: faker.lorem.sentence(1)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Slots
 | Slot name | Description |
 | ---- | ----------- |
@@ -182,7 +228,7 @@ export const Template = (args, { argTypes }) => ({
 {{
     components:{ PDefinition, PButton },
     template: `
-<table>
+<table class="w-full">
     <tbody>
         <p-definition
             name="Key Slot"
@@ -205,7 +251,7 @@ export const Template = (args, { argTypes }) => ({
             data="Slot: extra"
         >
             <template #extra>
-                <div class="text-peacock ml-4 w-full"><p-button style-type="secondary" size="sm">Edit</p-button></div>
+                <p-button style-type="secondary" size="sm">Edit</p-button>
             </template>
         </p-definition>
     </tbody>

@@ -14,6 +14,7 @@
                               :data="item.data"
                               :disable-copy="disableCopy || item.disableCopy"
                               :formatter="item.formatter"
+                              :block="block || item.block"
                 >
                     <template #default="scope">
                         <slot name="data" v-bind="{
@@ -34,7 +35,7 @@
                         <slot name="key" v-bind="{...scope, index: idx, items}" />
                     </template>
                     <template #extra="scope">
-                        <slot name="extra" v-bind="scope" />
+                        <slot v-if="$scopedSlots.extra" name="extra" v-bind="scope" />
                     </template>
                 </p-definition>
             </tbody>
@@ -105,6 +106,10 @@ export default defineComponent<DefinitionTableProps>({
             validator(styleType: any) {
                 return Object.values(DEFINITION_TABLE_STYLE_TYPE).includes(styleType);
             },
+        },
+        block: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: DefinitionTableProps, { emit, slots }) {

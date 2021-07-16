@@ -70,22 +70,16 @@ import {
     ComponentRenderProxy, defineComponent, getCurrentInstance, reactive, watch,
 } from '@vue/composition-api';
 
-import PDataTable, { DataTableProps } from '@/data-display/tables/data-table/PDataTable.vue';
+import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 import PToolbox from '@/navigation/toolbox/PToolbox.vue';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
 import { TOOLBOX_TABLE_STYLE_TYPE } from '@/data-display/tables/toolbox-table/config';
-import { ToolboxOptions, ToolboxProps } from '@/navigation/toolbox/type';
+import { ToolboxOptions } from '@/navigation/toolbox/type';
+import { ToolboxTableOptions, ToolboxTableProps } from '@/data-display/tables/toolbox-table/type';
 
-export interface ToolboxTableOptions extends ToolboxOptions {
-    sortDesc?: boolean;
-}
-
-export interface ToolboxTableProps extends DataTableProps, ToolboxProps {
-    styleType?: TOOLBOX_TABLE_STYLE_TYPE;
-}
 
 export default defineComponent<ToolboxTableProps>({
     name: 'PToolboxTable',
