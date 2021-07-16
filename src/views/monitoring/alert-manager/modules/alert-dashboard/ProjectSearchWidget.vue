@@ -11,7 +11,9 @@
                    @refresh="onChange()"
         />
         <div class="box-group">
-            <div v-for="(item, idx) in items" :key="`box-${idx}`" class="box">
+            <div v-for="(item, idx) in items" :key="`box-${idx}`" class="box"
+                 @click="onClickProjectBox(item)"
+            >
                 <p class="sub-title">
                     {{ projectGroupNameFormatter(item.project_id) }}
                 </p>
@@ -36,12 +38,14 @@ import { PToolbox } from '@spaceone/design-system';
 import ProjectAlertListItem from '@/views/monitoring/alert-manager/modules/alert-dashboard/ProjectAlertListItem.vue';
 import ProjectMaintenanceWindowListItem from '@/views/monitoring/alert-manager/modules/alert-dashboard/ProjectMaintenanceWindowListItem.vue';
 
+import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { store } from '@/store';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { PROJECT_ROUTE } from '@/routes/project/project-route';
+import router from '@/routes';
 
 
 export default {
@@ -113,6 +117,13 @@ export default {
             AlertByProjectApiQuery = getApiQueryWithToolboxOptions(AlertByProjectApiQueryHelper, options) ?? AlertByProjectApiQuery;
             await listAlertByProject();
         };
+        const onClickProjectBox = (item) => {
+            if (item.maintenance_window_count > 0) {
+                router.push({ name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME, params: { id: item.project_id } });
+            } else {
+                router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME, params: { id: item.project_id } });
+            }
+        };
 
         /* init */
         watch(() => props.activatedProjects, async (activatedProjects) => {
@@ -125,6 +136,7 @@ export default {
             ...toRefs(state),
             handlers,
             onChange,
+            onClickProjectBox,
             projectGroupNameFormatter,
             projectNameFormatter,
             countFormatter,
@@ -150,7 +162,12 @@ export default {
             height: 20rem;
             box-sizing: border-box;
             box-shadow: 0 0.125rem 0.25rem rgba(theme('colors.black'), 0.06);
+            cursor: pointer;
             padding: 1rem;
+
+            &:hover {
+                @apply bg-secondary2;
+            }
 
             .sub-title {
                 @apply text-gray-500;

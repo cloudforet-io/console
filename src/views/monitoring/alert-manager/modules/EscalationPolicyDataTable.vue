@@ -4,8 +4,8 @@
                   search-type="query"
                   :multi-select="false"
                   :select-index.sync="proxySelectIndex"
-                  sort-by="created_at"
-                  :sort-desc="true"
+                  :sort-by.sync="sortBy"
+                  :sort-desc.sync="sortDesc"
                   @changeSort="onChangeSort"
     >
         <template #col-name-format="{ value }">
@@ -97,6 +97,8 @@ export default {
                 { name: 'created_at', label: 'Created' },
             ] as DataTableField[],
             proxySelectIndex: makeProxy('selectIndex', props, emit),
+            sortBy: 'created_at',
+            sortDesc: true,
         });
 
         /* util */
@@ -104,9 +106,11 @@ export default {
             const result = [] as string[];
             rules.forEach((rule, idx) => {
                 let formattedRule = rule.notification_level;
-                if (idx + 1 < rules.length) {
+                if (rule.escalate_minutes > 0) {
                     formattedRule += ` (${rule.escalate_minutes}min)`;
-                    formattedRule += ' > ';
+                    if (idx + 1 < rules.length) {
+                        formattedRule += ' > ';
+                    }
                 }
                 result.push(formattedRule);
             });

@@ -5,7 +5,13 @@
                 <p-i :name="item.urgency === ALERT_URGENCY.HIGH ? 'ic_alert' : 'ic_urgency_low'"
                      width="1em" height="1em"
                 />
-                <span v-tooltip.bottom="item.title" class="title">{{ item.title }}</span>
+                <p-anchor class="title"
+                          target="_self"
+                          :show-icon="false"
+                          :to="{ name: MONITORING_ROUTE.ALERT_MANAGER.ALERT.DETAIL._NAME, params: { id: item.alert_id } }"
+                >
+                    <span v-tooltip.bottom="item.title">{{ item.title }}</span>
+                </p-anchor>
                 <p-badge v-if="showMemberName && item.assignee"
                          outline
                          style-type="primary2"
@@ -48,6 +54,7 @@ import {
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { store } from '@/store';
+import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 
 
 const ALERT_URGENCY = Object.freeze({
@@ -103,6 +110,7 @@ export default {
         return {
             ...toRefs(state),
             ALERT_URGENCY,
+            MONITORING_ROUTE,
             referenceRouter,
             capitalize,
             badgeStyleTypeFormatter,
@@ -141,6 +149,7 @@ export default {
                 @apply truncate;
                 display: block;
                 width: 90%;
+                vertical-align: baseline;
                 margin-right: 0.5rem;
             }
             .member-name {

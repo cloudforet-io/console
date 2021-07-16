@@ -84,7 +84,8 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { TranslateResult } from 'vue-i18n';
 import { find } from 'lodash';
@@ -132,6 +133,7 @@ export default {
         PDataLoader,
     },
     setup(props, { root }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,
             item: null as null|ProjectModel,
@@ -295,6 +297,11 @@ export default {
                 statAlerts(),
             ]);
         })();
+
+        watch(() => vm.$route.name, () => {
+            const exactRoute = router.currentRoute.matched.find(d => singleItemTabState.tabs.find(tab => tab.name === d.name));
+            singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
+        });
 
 
         return {
