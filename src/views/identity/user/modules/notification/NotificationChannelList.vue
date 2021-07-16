@@ -167,7 +167,7 @@ export default {
                         params: {
                             protocol: d.name.replace(/(\s*)/g, ''),
                             protocolId: d.protocol_id,
-                            userId: state.userId,
+                            userId: encodeURIComponent(state.userId),
                         },
                         query: {
                             protocolLabel: encodeURIComponent(d.name),

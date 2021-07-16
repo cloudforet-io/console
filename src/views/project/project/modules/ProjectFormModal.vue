@@ -94,8 +94,8 @@ export default {
                 return invalidText;
             }),
             isProjectNameValid: computed(() => {
-                if (state.projectName.trim()) {
-                    return !(state.projectName.length === 0 || state.projectName.length > 40 || state.projectNames.includes(state.projectName));
+                if (state.projectName) {
+                    return !(state.projectName.trim().length === 0 || state.projectName.trim().length > 40 || state.projectNames.includes(state.projectName));
                 }
                 return false;
             }),
