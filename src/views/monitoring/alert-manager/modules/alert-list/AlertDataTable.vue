@@ -344,6 +344,7 @@ export default {
 
         const onExportToExcel = async () => {
             try {
+                showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', root);
                 await store.dispatch('file/downloadExcel', {
                     url: '/monitoring/alert/list',
                     param: {
@@ -353,7 +354,6 @@ export default {
                     // eslint-disable-next-line camelcase
                     file_name_prefix: FILE_NAME_PREFIX.alert,
                 });
-                showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', root);
             } catch (e) {
                 console.error(e);
             }

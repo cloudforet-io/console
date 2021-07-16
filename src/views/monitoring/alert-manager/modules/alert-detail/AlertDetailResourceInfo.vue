@@ -63,6 +63,9 @@ export default {
                 @apply capitalize;
             }
         }
+        &:last-child {
+            @apply border-b border-gray-300 rounded-none;
+        }
     }
 }
 </style>
