@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import VueRouter from 'vue-router';
+import VueRouter, { Route } from 'vue-router';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { routerOptions } from '@/routes/config';
 import { GTag } from '@/lib/gtag';
@@ -8,22 +8,21 @@ import config from '@/lib/config';
 
 Vue.use(VueRouter);
 
-
 const router = new VueRouter(routerOptions);
 
-router.onError((error) => {
-    const pattern = /Loading chunk (\d)+ failed/g;
-    const isChunkLoadFailed = error.message.match(pattern);
+let nextPath: string;
 
-    if (isChunkLoadFailed && window.navigator.onLine) {
-        router.go(0);
-    } else if (!window.navigator.onLine) {
-        alert('Check your network!');
+router.onError((error) => {
+    console.error(error);
+
+    if (error.name === 'ChunkLoadError') {
+        window.location.href = nextPath || '/';
     }
 });
 
-
 router.beforeEach(async (to, from, next) => {
+    nextPath = to.fullPath;
+
     if (to.meta && to.meta.excludeAuth) {
         if (to.meta.isSignInPage) {
             if (SpaceConnector.isTokenAlive) {
