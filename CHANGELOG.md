@@ -1,3 +1,10 @@
+# [1.1.0-beta.107](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.106...v1.1.0-beta.107) (2021-07-16)
+
+
+### Bug Fixes
+
+* make flex when definition block and hide extra when slot is not given in definition table ([#646](https://github.com/spaceone-dev/spaceone-design-system/issues/646)) ([fb79a77](https://github.com/spaceone-dev/spaceone-design-system/commit/fb79a77be556c8b73b8795ecc56b99495b4b9f23))
+
 # [1.1.0-beta.106](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.105...v1.1.0-beta.106) (2021-07-16)
 
 
