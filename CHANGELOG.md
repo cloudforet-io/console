@@ -1,3 +1,10 @@
+# [1.1.0-beta.110](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.109...v1.1.0-beta.110) (2021-07-19)
+
+
+### Bug Fixes
+
+* update ic_bell, ic_bell_noti icons ([#649](https://github.com/spaceone-dev/spaceone-design-system/issues/649)) ([8a03c89](https://github.com/spaceone-dev/spaceone-design-system/commit/8a03c89bbfe5f2b7be606a2d3a5a9ce03b1b09b3))
+
 # [1.1.0-beta.109](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.108...v1.1.0-beta.109) (2021-07-19)
 
 
