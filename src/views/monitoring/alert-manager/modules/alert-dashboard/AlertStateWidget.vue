@@ -113,7 +113,6 @@ import AlertListItem from '@/views/monitoring/alert-manager/components/AlertList
 
 import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
 import { getAllPage } from '@spaceone/design-system/src/navigation/pagination/text-pagination/helper';
-import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
@@ -154,7 +153,13 @@ export default {
         PEmpty,
         PI,
     },
-    setup() {
+    props: {
+        activatedProjects: {
+            type: Array,
+            default: () => ([]),
+        },
+    },
+    setup(props) {
         const tabState = reactive({
             tabs: computed(() => ([
                 {
@@ -230,7 +235,9 @@ export default {
             apiQuery
                 .setSort('created_at', true)
                 .setPage(getPageStart(state.thisPage, state.pageSize), state.pageSize);
+
             const filters: QueryStoreFilter[] = [];
+            filters.push({ k: 'project_id', v: props.activatedProjects, o: '' });
             if (state.selectedUrgency !== ALERT_URGENCY.ALL) {
                 filters.push({ k: 'urgency', v: state.selectedUrgency, o: '=' });
             }
@@ -259,10 +266,12 @@ export default {
         };
         const statAlerts = async () => {
             try {
-                const { results } = await SpaceConnector.client.monitoring.dashboard.alertCountByState();
-                const resolvedCount = find(results, { state: ALERT_STATE.RESOLVED }).total;
-                const acknowledgedCount = find(results, { state: ALERT_STATE.ACKNOWLEDGED }).total;
-                const triggeredCount = find(results, { state: ALERT_STATE.TRIGGERED }).total;
+                const { results } = await SpaceConnector.client.monitoring.dashboard.alertCountByState({
+                    activated_projects: props.activatedProjects,
+                });
+                const resolvedCount = find(results, { state: ALERT_STATE.RESOLVED })?.total || 0;
+                const acknowledgedCount = find(results, { state: ALERT_STATE.ACKNOWLEDGED })?.total || 0;
+                const triggeredCount = find(results, { state: ALERT_STATE.TRIGGERED })?.total || 0;
                 tabState.tabItems.OPEN.count = sum([acknowledgedCount, triggeredCount]);
                 tabState.tabItems.RESOLVED.count = resolvedCount;
                 tabState.tabItems.ALL.count = sum([resolvedCount, acknowledgedCount, triggeredCount]);
@@ -283,9 +292,12 @@ export default {
             await listAlerts();
         };
 
-        (async () => {
-            await Promise.all([listAlerts(), statAlerts()]);
-        })();
+        /* init */
+        watch(() => props.activatedProjects, async (activatedProjects) => {
+            if (activatedProjects.length) {
+                await Promise.all([listAlerts(), statAlerts()]);
+            }
+        });
 
         watch([() => state.isAssignedToMe, () => tabState.activeTab], async () => {
             state.thisPage = 1;
@@ -330,12 +342,19 @@ export default {
             }
             .balloon-group {
                 width: 100%;
-                margin-left: 0;
+                margin: 0;
 
                 button {
-                    height: 4.4rem;
+                    height: 4.375rem;
                     padding: 1rem;
                     margin: 0.375rem 0;
+
+                    &:first-child {
+                        margin-top: 0;
+                    }
+                    &:last-child {
+                        margin-bottom: 0;
+                    }
                 }
 
                 .tab-button {

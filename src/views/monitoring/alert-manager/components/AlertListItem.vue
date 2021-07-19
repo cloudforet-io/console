@@ -94,6 +94,7 @@ export default {
     },
     setup() {
         const state = reactive({
+            timezone: computed(() => store.state.user.timezone),
             projects: computed(() => store.state.resource.project.items),
             users: computed(() => store.state.resource.user.items),
         });
@@ -104,7 +105,11 @@ export default {
             if (alertState === ALERT_STATE.ACKNOWLEDGED) return 'blue200';
             return 'gray200';
         };
-        const dateFormatter = date => dayjs.utc(date).format('MM/DD HH:mm');
+        const dateFormatter = (date) => {
+            const offset = (dayjs().tz(state.timezone).utcOffset());
+            const timezoneDate = dayjs(date).utcOffset(offset);
+            return timezoneDate.format('MM/DD HH:mm');
+        };
         const projectNameFormatter = projectId => state.projects[projectId]?.label || projectId;
 
         return {

@@ -167,7 +167,10 @@ export default {
         const listAlerts = async () => {
             try {
                 state.loading = true;
-                const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({ query: getQuery() });
+                const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({
+                    project_id: props.projectId,
+                    query: getQuery(),
+                });
                 state.totalCount = total_count;
                 state.allPage = getAllPage(total_count, 10);
                 state.items = results;
