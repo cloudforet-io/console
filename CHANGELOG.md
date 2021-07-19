@@ -1,3 +1,10 @@
+# [1.1.0-beta.109](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.108...v1.1.0-beta.109) (2021-07-19)
+
+
+### Bug Fixes
+
+* add commaFormatter to total count ([#647](https://github.com/spaceone-dev/spaceone-design-system/issues/647)) ([d66d986](https://github.com/spaceone-dev/spaceone-design-system/commit/d66d9863d439905f2f0fadb852e6a55d8a8621ab))
+
 # [1.1.0-beta.108](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.107...v1.1.0-beta.108) (2021-07-19)
 
 
