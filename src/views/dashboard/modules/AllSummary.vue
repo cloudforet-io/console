@@ -64,7 +64,9 @@
                                              :class="{'link-text': !!data.to.name}"
                                 >
                                     <div class="text-group">
-                                        <span class="provider" :style="{ color: providers[data.provider] ? providers[data.provider].color : ''}">{{ data.label }}</span>
+                                        <span class="provider" :style="{ color: providers[data.provider] ? providers[data.provider].color : ''}">
+                                            {{ providers[data.provider] ? providers[data.provider].label : providers[data.provider] }}
+                                        </span>
                                         <span class="type">{{ data.type }}</span>
                                     </div>
                                     <span class="count">{{ data.count }}</span>
@@ -157,7 +159,6 @@ interface ChartData {
 interface SummaryData {
     type: string;
     provider: string;
-    label: string | TranslateResult;
     count: number | string;
     to: string | Location;
 }
@@ -563,7 +564,6 @@ export default {
                     }
                     summaryData.push({
                         provider: d.provider,
-                        label: state.providers[d.provider].label,
                         type: d.display_name || d.cloud_service_group,
                         count: type === DATA_TYPE.storage ? byteFormatter(d.size) : commaFormatter(d.count),
                         to: detailLocation,
@@ -602,7 +602,6 @@ export default {
 
                         summaryData.push({
                             provider: d.provider,
-                            label: state.providers[d.provider].label,
                             type: d.cloud_service_group || d.service_code,
                             count: numberFormatter(d.billing_data[0].cost),
                             to: detailLocation,
@@ -629,7 +628,11 @@ export default {
         };
 
         const init = async () => {
-            await Promise.all([getSummaryInfo(DATA_TYPE.compute), Object.keys(DATA_TYPE).forEach(d => getCount(d)), getBillingCount()]);
+            await Promise.all([
+                getSummaryInfo(DATA_TYPE.compute),
+                Object.keys(DATA_TYPE).forEach(d => getCount(d)),
+                getBillingCount(),
+            ]);
             setTabInterval();
         };
         const chartInit = async () => {
@@ -873,6 +876,7 @@ export default {
                     overflow: hidden;
                     text-overflow: ellipsis;
                     white-space: nowrap;
+                    vertical-align: text-top;
 
                     .type {
                         padding-left: 0.5rem;
