@@ -1080,7 +1080,7 @@
 				"ALT_E_STATE_CHANGED": "얼럿 상태 변경 실패",
 				"ALT_E_UPDATE": "얼럿 편집 실패",
 				"ALT_S_CREATE": "얼럿 생성 성공",
-				"ALT_S_DELETE": "Alert 삭제 완",
+				"ALT_S_DELETE": "얼럿 삭제 완료",
 				"ALT_S_MERGE": "얼럿 병합 성공",
 				"ALT_S_STATE_CHANGED": "얼럿 상태 변경 성공",
 				"ALT_S_UPDATE": "얼럿 편집 성공",
