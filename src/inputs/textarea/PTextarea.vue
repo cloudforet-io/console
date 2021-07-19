@@ -59,15 +59,20 @@ export default defineComponent({
 
 <style lang="postcss">
 .p-textarea {
-    @apply bg-white border border-gray-300 rounded;
+    @apply bg-white border border-gray-300 rounded text-gray-900;
     width: 100%;
     min-height: 4rem;
     padding: 0.5rem;
     font-size: 0.875rem;
     line-height: 1.2;
+    &:read-only {
+        &:active, &:focus {
+            outline: none;
+        }
+    }
     &:active:not(:disabled):not(:read-only):not(.invalid),
     &:focus:not(:disabled):not(:read-only):not(.invalid) {
-        @apply border-secondary text-secondary;
+        @apply border-secondary;
     }
     &:disabled {
         @apply bg-gray-100 text-gray-300;

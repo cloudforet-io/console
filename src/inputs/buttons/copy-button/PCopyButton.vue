@@ -167,6 +167,7 @@ export default defineComponent<Props>({
     vertical-align: middle;
 
     .copy-text {
+        margin-right: 0.5rem;
         cursor: text;
     }
 
