@@ -5,7 +5,10 @@
             <!--            <p-select-dropdown class="more-button" :items="moreMenuItems"-->
             <!--                               button-only button-icon="ic_more"-->
             <!--            />-->
-            <router-link :to="{name: IDENTITY_ROUTE.USER.NOTIFICATION._NAME}">
+            <router-link :to="{name: IDENTITY_ROUTE.USER.NOTIFICATION._NAME}"
+                         class="inline-flex"
+                         @click.native="$emit('click-settings')"
+            >
                 <p-icon-button class="settings-button" name="ic_setting" color="inherit" />
             </router-link>
         </div>
@@ -59,6 +62,7 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import GNBNotificationItem from '@/common/modules/gnb/GNBNotificationItem.vue';
 import GNBNotificationDateHeader from '@/common/modules/gnb/GNBNotificationDateHeader.vue';
 import dayjs from 'dayjs';
+import store from '@/store';
 
 
 export default {
@@ -103,6 +107,7 @@ export default {
             .setFilters([
                 { k: 'created_at', v: dayjs().subtract(7, 'day').utc().toISOString(), o: '>=t' },
                 { k: 'created_at', v: dayjs().utc().toISOString(), o: '<t' },
+                { k: 'user_id', v: store.state.user.userId, o: '=' },
             ]);
 
         const listNotifications = async () => {

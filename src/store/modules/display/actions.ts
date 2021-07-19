@@ -37,22 +37,26 @@ export const finishDownloading = ({ commit }): void => {
     commit('setIsDownloaded', true);
 };
 
-let stoppedCheckingNotificationTime: Dayjs;
 
 const fixedCheckNotificationFilter: QueryStoreFilter = { k: 'is_read', v: false, o: '=' };
 const checkNotificationQueryHelper = new ApiQueryHelper().setCountOnly();
-export const checkNotification: Action<DisplayState, any> = async ({ commit, state }): Promise<void> => {
+export const checkNotification: Action<DisplayState, any> = async ({
+    commit, state, rootState, rootGetters,
+}): Promise<void> => {
     try {
-        const currentTime = dayjs();
+        const currentTime = dayjs().utc().toISOString();
 
         checkNotificationQueryHelper.setFilters([
             fixedCheckNotificationFilter,
-            { k: 'created_at', v: currentTime.utc().toISOString(), o: '<=t' },
+            { k: 'created_at', v: currentTime, o: '<=t' },
+            { k: 'user_id', v: rootState.user.userId, o: '=' },
         ]);
 
-        if (stoppedCheckingNotificationTime) {
+        const lastCheckedTime = rootGetters['settings/getItem']('last_checked_notification', '/gnb');
+
+        if (lastCheckedTime) {
             checkNotificationQueryHelper.addFilter(
-                { k: 'created_at', v: stoppedCheckingNotificationTime.utc().toISOString(), o: '>t' },
+                { k: 'created_at', v: lastCheckedTime, o: '>t' },
             );
         }
 
@@ -67,8 +71,14 @@ export const checkNotification: Action<DisplayState, any> = async ({ commit, sta
 };
 
 let checkNotificationInterval: number|undefined;
-export const stopCheckNotification: Action<DisplayState, any> = ({ commit }): void => {
-    stoppedCheckingNotificationTime = dayjs();
+export const stopCheckNotification: Action<DisplayState, any> = ({ commit, dispatch }): void => {
+    const lastCheckedTime = dayjs().utc().toISOString();
+    dispatch('settings/setItem', {
+        key: 'last_checked_notification',
+        value: lastCheckedTime,
+        path: '/gnb',
+    }, { root: true });
+
     commit('setUncheckedNotificationCount', 0);
 
     if (checkNotificationInterval) {
