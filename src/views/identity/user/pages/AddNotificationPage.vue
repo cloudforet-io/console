@@ -4,13 +4,6 @@
         <p-page-title child :title="pageTitle" class="page-title"
                       @goBack="$router.go(-1)"
         />
-<!--        <info-button-->
-<!--            class="flex-shrink-0"-->
-<!--        >-->
-<!--            <template #contents>-->
-<!--                test-->
-<!--            </template>-->
-<!--        </info-button>-->
         <section class="content-list-wrapper">
             <p-pane-layout class="content-wrapper">
                 <h3 class="content-title">
@@ -73,7 +66,6 @@ import VueI18n from 'vue-i18n';
 import { store } from '@/store';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import InfoButton from '@/common/components/InfoButton.vue';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -84,7 +76,6 @@ export default {
         AddNotificationSchedule,
         AddNotificationTopic,
         GeneralPageLayout,
-        InfoButton,
         PBreadcrumbs,
         PPaneLayout,
         PPageTitle,
@@ -97,6 +88,7 @@ export default {
             type: '',
             pageTitle: '' as TranslateResult,
             description: null,
+            project: {} as any,
             //
             userId: decodeURIComponent(vm.$route.params.userId),
             projectId: vm.$route.query.projectId,
@@ -117,12 +109,20 @@ export default {
             isScheduled: false,
             isScheduleValid: true,
         });
+
+        const USER_ROUTE = [
+            { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
+            { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/account' },
+            { name: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION') },
+        ];
+
+        const PROJECT_ROUTE = [
+            { name: vm.$t('MENU.PROJECT.PROJECT'), path: '/identity' },
+            { name: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION') },
+        ]
+
         const routeState = reactive({
-            routes: computed(() => ([
-                { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/account' },
-                { name: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION') },
-            ])),
+            routes: computed(() => (state.projectId ? PROJECT_ROUTE : USER_ROUTE)),
         });
 
         const createUserChannel = async () => {
@@ -146,7 +146,6 @@ export default {
         };
 
         const createProjectChannel = async () => {
-            console.log(state.notificationLevel);
             try {
                 await SpaceConnector.client.notification.projectChannel.create({
                     protocol_id: state.protocolId,

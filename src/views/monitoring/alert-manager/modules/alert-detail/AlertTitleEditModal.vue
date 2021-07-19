@@ -73,9 +73,9 @@ export default {
                 if (state.alertTitleInput.length === 0) {
                     return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
                 }
-                if (state.alertTitleInput.length > 40) {
-                    return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
-                }
+                // if (state.alertTitleInput.length > 40) {
+                //     return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
+                // }
                 return undefined;
             }),
             isNameInvalid: computed(() => !!state.nameInvalidText),

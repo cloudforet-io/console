@@ -1,10 +1,10 @@
 <template>
     <p-pane-layout class="project-dependency">
-        <p-panel-top class="-ml-1">
+        <p-panel-top class="panel-title">
             {{ $t('MONITORING.ALERT.DETAIL.PROJECT_DEPENDENCY.PROJECT_DEPENDENCY') }}
         </p-panel-top>
         <p v-if="projectList.length === 0">
-            <p-empty class="mt-8">
+            <p-empty class="empty-message">
                 {{$t('MONITORING.ALERT.DETAIL.PROJECT_DEPENDENCY.NO_DATA')}}
             </p-empty>
         </p>
@@ -76,8 +76,14 @@ export default {
 .project-dependency {
     padding: 0 1rem 2.5rem 1rem;
 }
+.panel-title {
+    @apply -ml-1;
+}
 .project-name {
     font-size: 0.875rem;
     margin-bottom: 0.75rem;
+}
+.empty-message {
+    @apply mt-8;
 }
 </style>
