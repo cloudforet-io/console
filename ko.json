@@ -389,7 +389,7 @@
 			}
 		},
 		"HANDBOOK_BUTTON": {
-			"DONT_DISPLAY": "다시 열지 않기",
+			"DONT_DISPLAY": "다시 오픈하지 않기",
 			"HANDBOOK": "Handbook"
 		},
 		"INFO_BUTTON": {
@@ -1075,7 +1075,7 @@
 				"ALERT": "얼럿",
 				"ALL": "전체",
 				"ALT_E_CREATE": "얼럿 생성 실패",
-				"ALT_E_DELETE": "Alert 삭제 실패",
+				"ALT_E_DELETE": "얼럿 삭제 실패",
 				"ALT_E_MERGE": "얼럿 병합 실패",
 				"ALT_E_STATE_CHANGED": "얼럿 상태 변경 실패",
 				"ALT_E_UPDATE": "얼럿 편집 실패",
@@ -1084,12 +1084,12 @@
 				"ALT_S_MERGE": "얼럿 병합 성공",
 				"ALT_S_STATE_CHANGED": "얼럿 상태 변경 성공",
 				"ALT_S_UPDATE": "얼럿 편집 성공",
-				"ASSIGNED_TO_ME": "나에게 지정된 것만",
-				"ASSIGNED_TO_YOU_TITLE": "나에게 지정된 새로운 얼럿",
+				"ASSIGNED_TO_ME": "나에게 할당된 것만",
+				"ASSIGNED_TO_YOU_TITLE": "나에게 할당된 새로운 얼럿",
 				"BUTTON_ACKNOWLEDGE": "확인",
 				"BUTTON_DELETE": "삭제",
 				"BUTTON_MERGE": "병합",
-				"BUTTON_RESOLVE": "해결",
+				"BUTTON_RESOLVE": "완료",
 				"CREATE": "생성",
 				"DELETE_CHECK_MODAL": {
 					"TITLE": "선택된 얼럿을 삭제하시겠습니까?"
@@ -1126,20 +1126,20 @@
 					"SELECT_ALERT_ DESC": "병합할 얼럿을 선택해주세요.",
 					"TITLE": "얼럿 병합하기"
 				},
-				"OPEN": "열림",
-				"OPEN_ALERT": "나에게 지정된 얼럿",
-				"RESOLVED": "해결",
+				"OPEN": "오픈",
+				"OPEN_ALERT": "나에게 할당된 얼럿",
+				"RESOLVED": "완료",
 				"STATE": "상태",
-				"TRIGGERED": "트리거",
+				"TRIGGERED": "생성",
 				"UPDATE_ACKNOWLEDGE_MODAL": {
 					"ASSIGN_TO_ME_YES": "네, 선택된 얼럿을 저에게 할당하겠습니다.",
 					"ASSIGN_TO_YOU": "선택된 얼럿을 할당할까요?",
-					"TITLE": "{count}개의 얼럿 acknowledged 상태로 변경하기"
+					"TITLE": "{count}개의 얼럿을 확인 상태로 변경하기"
 				},
 				"UPDATE_RESOLVE_MODAL": {
 					"LABEL_NOTE": "노트",
-					"NOTREOPEN": "resolved 상태로 변경되면, 이 얼럿을 다시 열 수 없습니다.",
-					"TITLE": "{count}개의 얼럿 Resolved 상태로 변경하기"
+					"NOTREOPEN": "완료 상태로 변경되면, 이 얼럿을 다시 오픈할 수 없습니다.",
+					"TITLE": "{count}개의 얼럿을 완료 상태로 변경하기"
 				},
 				"URGENCY": "긴급도"
 			},
@@ -1164,10 +1164,10 @@
 				"MONTHLY_TOTAL": "월간 합계",
 				"MORE_ALERTS_HELP_TEXT": "개의 얼럿 더 보기",
 				"NO_ALERT": "얼럿이 없습니다.",
-				"OPEN": "열림",
+				"OPEN": "오픈",
 				"OPEN_ALERT": "오픈된 얼럿",
 				"PROJECT_HEALTH_BOARD": "프로젝트 상태 보드",
-				"RESOLVED": "해결",
+				"RESOLVED": "완료",
 				"SCHEDULE": "스케줄",
 				"TOP_5_PROJECT_ACTIVITY": "Top 5 프로젝트 활동",
 				"TOTAL": "총",
@@ -1186,16 +1186,17 @@
 					"EVENT_DETAILS": "이벤트 상세 설명",
 					"EVENT_LIST": "이벤트 목록",
 					"MORE": "더보기",
+					"NO_EVENT": "이벤트가 없습니다.",
 					"PLACEHOLDER": "타입이나 날짜로 이벤트를 검색하세요"
 				},
 				"HEADER": {
-					"ALT_E_ASSIGN_MEMBER": "담당자 지 실패",
+					"ALT_E_ASSIGN_MEMBER": "담당자 할당 실패",
 					"ALT_E_UPDATE_STATE": "상태 변경 실패",
 					"ALT_E_UPDATE_URGENCY": "긴급도 변경 실패",
-					"ALT_S_ASSIGN_MEMBER": "담당자 지정 성공",
+					"ALT_S_ASSIGN_MEMBER": "담당자 할당 성공",
 					"ALT_S_UPDATE_STATE": "상태 변경 성공",
 					"ALT_S_UPDATE_URGENCY": "긴급도 변경 성공",
-					"ASSIGN": "지정",
+					"ASSIGN": "할당",
 					"ASSIGNED_TO": "담당자",
 					"DURATION": "지속 기간",
 					"STATE": "상태",
@@ -1218,12 +1219,13 @@
 					"ESCALATION_POLICY": "에스컬레이션 정책",
 					"EXTRA_INFO": "추가 정보",
 					"PROJECT": "프로젝트",
-					"RESOLVED": "해결 시간",
+					"RESOLVED": "완료 시간",
 					"RULE": "규칙",
 					"SAVE_CHANGES": "변경사항 저장",
 					"SEVERITY": "심각도",
+					"STATUS_DETAILS": "상태 상세 정보",
 					"STATUS_MSG": "상태 메세지",
-					"TRIGGERED_BY": "트리거"
+					"TRIGGERED_BY": "생성"
 				},
 				"NOTE": {
 					"ADD_NOTE": "노트 추가",
@@ -1286,7 +1288,7 @@
 					"REPEAT_AFTER": "{minute} 후 반복",
 					"REPEAT_ALL": "전체 반복",
 					"REPEAT_LABEL_HELP_TEXT": "위 스텝들 모두 적용",
-					"RESOLVED": "해결",
+					"RESOLVED": "완료",
 					"RULE": "규칙",
 					"SCOPE_LABEL": "범위",
 					"STEP": "단계",
@@ -1294,7 +1296,7 @@
 				},
 				"GLOBAL": "글로벌",
 				"PROJECT": "프로젝트",
-				"RESOLVED": "해결",
+				"RESOLVED": "완료",
 				"SET_AS_DEFAULT": "기본으로 설정하기",
 				"UPDATE": "편집",
 				"UPDATE_MODAL_TITLE": "에스컬레이션 정책 편집"
@@ -1497,7 +1499,7 @@
 				"ALT_S_CHANGE_ESCALATION_POLICY": "에스컬레이션 정책 변경 성공",
 				"ALT_S_CHANGE_NOTIFICATION_POLICY": "알림 정책 변경 성공",
 				"AUTO_RECOVERY": "자동 복구",
-				"AUTO_RESOLVE_ALERTS": "자동으로 얼럿 해결하기",
+				"AUTO_RESOLVE_ALERTS": "자동으로 얼럿 완료하기",
 				"CHANGE": "변경",
 				"CHANGE_ESCALATION_POLICY_MODAL_TITLE": "에스컬레이션 정책 변경",
 				"CREATE_NEW_POLICY": "새로운 정책 생성",
@@ -1513,14 +1515,14 @@
 				"NOTIFICATION_LEVEL": "알림 레벨",
 				"NOTIFICATION_POLICY": "알림 정책",
 				"REPEAT_ALL": "전체 {count}번 반복",
-				"RESOLVED": "해결",
+				"RESOLVED": "완료",
 				"RULES_ON_THIS_PROJECT": "개의 규칙이 이 프로젝트에 있음",
 				"SELECT_POLICY": "기존 정책 선택",
 				"SETTINGS": "설정",
-				"SET_AUTO_RECOVERY_MODAL_HELP_TEXT": "시스템 장애가 복구되면 자동으로 얼럿을 해결할까요?",
+				"SET_AUTO_RECOVERY_MODAL_HELP_TEXT": "시스템 장애가 복구되면 자동으로 얼럿을 완료할까요?",
 				"SET_AUTO_RECOVERY_MODAL_TITLE": "자동 복구 설정",
-				"SET_AUTO_RECOVERY_NO": "아니오, 직접 해결합니다.",
-				"SET_AUTO_RECOVERY_YES": "네, 자동으로 얼럿을 해결합니다.",
+				"SET_AUTO_RECOVERY_NO": "아니오, 직접 완료합니다.",
+				"SET_AUTO_RECOVERY_YES": "네, 자동으로 얼럿을 완료합니다.",
 				"SET_NOTIFICATION_MODAL_HELP_TEXT": "수신자에게 어떤 알림을 보내시겠습니까?",
 				"SET_NOTIFICATION_POLICY_MODAL_TITLE": "알림 정책 설정",
 				"STEP": "단계",
@@ -1647,8 +1649,8 @@
 				"ACKNOWLEDGED": "확인",
 				"ALERT": "얼럿",
 				"OPEN_ALERT": "오픈된 얼럿",
-				"RESOLVED": "해결",
-				"TRIGGERED": "트리거"
+				"RESOLVED": "완료",
+				"TRIGGERED": "생성"
 			},
 			"TAB_ALERT": "얼럿",
 			"TAB_MAINTENANCE_WINDOW": "유지 관리 기간",

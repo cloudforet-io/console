@@ -1071,7 +1071,7 @@
 	"MONITORING": {
 		"ALERT": {
 			"ALERT_LIST": {
-				"ACKNOWLEDGED": "",
+				"ACKNOWLEDGED": "確認",
 				"ALERT": "アラート",
 				"ALL": "すべて",
 				"ALT_E_CREATE": "アラート作成に失敗",
@@ -1086,15 +1086,15 @@
 				"ALT_S_UPDATE": "アラート編集に成功",
 				"ASSIGNED_TO_ME": "自分にアサインされたアラート",
 				"ASSIGNED_TO_YOU_TITLE": "あなたに新しいアラートがアサインされました",
-				"BUTTON_ACKNOWLEDGE": "",
+				"BUTTON_ACKNOWLEDGE": "確認",
 				"BUTTON_DELETE": "削除",
 				"BUTTON_MERGE": "マージ",
-				"BUTTON_RESOLVE": "",
+				"BUTTON_RESOLVE": "完了",
 				"CREATE": "作成",
 				"DELETE_CHECK_MODAL": {
 					"TITLE": "選択したアラートをしても宜しいですか？"
 				},
-				"ERROR": "",
+				"ERROR": "エラー",
 				"FORM": {
 					"ACTIVATE_PROJECT_ALERT": "プロジェクトのアラートを有効化",
 					"CREATE_PROJECT": "プロジェクトの作成に移動",
@@ -1126,20 +1126,20 @@
 					"SELECT_ALERT_ DESC": "マーシするアラートを選択してください。",
 					"TITLE": "アラートをマージする"
 				},
-				"OPEN": "Open",
-				"OPEN_ALERT": "私に指定されたアラート",
-				"RESOLVED": "Resolved",
+				"OPEN": "発生",
+				"OPEN_ALERT": "私にアサインされたアラート",
+				"RESOLVED": "完了",
 				"STATE": "状態",
-				"TRIGGERED": "Triggered",
+				"TRIGGERED": "生成",
 				"UPDATE_ACKNOWLEDGE_MODAL": {
 					"ASSIGN_TO_ME_YES": "はい、選択されたアラートを自分にアサインします。",
 					"ASSIGN_TO_YOU": "選択されたアラートをアサインしますか？",
-					"TITLE": "{count}個のアラートをacknowledged状態に変更"
+					"TITLE": "{count}個のアラートを確認状態に変更"
 				},
 				"UPDATE_RESOLVE_MODAL": {
 					"LABEL_NOTE": "ノート",
-					"NOTREOPEN": "解決済みに変更されると、このアラートを再度開くことはできません。",
-					"TITLE": "解決済みに変更する"
+					"NOTREOPEN": "完了に変更されると、このアラートを再度開くことはできません。",
+					"TITLE": "完了に変更する"
 				},
 				"URGENCY": "緊急度"
 			},
@@ -1150,28 +1150,28 @@
 				"ALL": "すべて",
 				"ALL_STATE": "すべての状態",
 				"ALL_URGENCY": "すべての緊急度",
-				"ASSIGNED_TO_ME": "自分にアサイン",
+				"ASSIGNED_TO_ME": "自分にアサインされたアラート",
 				"CREATED": "作成",
 				"CURRENT_PROJECT_STATUS": "現在のプロジェクト状態",
 				"DAILY_AVERAGE": "日平均",
 				"DASHBOARD": "ダッシュボード",
 				"HEALTHY": "正常",
 				"HIGH": "高い",
-				"ISSUE": "Issue",
+				"ISSUE": "問題",
 				"LOW": "低い",
 				"MAINTENANCE": "メンテナンス",
 				"MAINTENANCE_WINDOW": "メンテナンス期間",
 				"MONTHLY_TOTAL": "月平均",
 				"MORE_ALERTS_HELP_TEXT": "多くのアラートが作成されました",
 				"NO_ALERT": "アラートがありません",
-				"OPEN": "Open",
-				"OPEN_ALERT": "Openアラート",
+				"OPEN": "発生",
+				"OPEN_ALERT": "発生したアラート",
 				"PROJECT_HEALTH_BOARD": "プロジェクトヘルスボード",
-				"RESOLVED": "Resolved",
+				"RESOLVED": "完了",
 				"SCHEDULE": "スケジュール",
 				"TOP_5_PROJECT_ACTIVITY": "Top5のプロジェクト活動",
 				"TOTAL": "合計",
-				"VIEW_ALL_OPEN_ALERTS": "全てのOpenアラートを見る",
+				"VIEW_ALL_OPEN_ALERTS": "全ての発生アラートを見る",
 				"VIEW_ALL_OPEN_MAINTENANCE_WINDOW": "全てのメンテナンス期間を見る"
 			},
 			"DETAIL": {
@@ -1186,6 +1186,7 @@
 					"EVENT_DETAILS": "イベント詳細",
 					"EVENT_LIST": "イベントリスト",
 					"MORE": "もっと見る",
+					"NO_EVENT": "イベントがありません。",
 					"PLACEHOLDER": "タイプや日付でイベントを検索する"
 				},
 				"HEADER": {
@@ -1218,12 +1219,13 @@
 					"ESCALATION_POLICY": "エスカレーションポリシー",
 					"EXTRA_INFO": "追加情報",
 					"PROJECT": "プロジェクト",
-					"RESOLVED": "解決時間",
+					"RESOLVED": "完了時間",
 					"RULE": "ルール",
 					"SAVE_CHANGES": "変更内容を保存",
 					"SEVERITY": "緊急度",
+					"STATUS_DETAILS": "ステータスの詳細",
 					"STATUS_MSG": "状態メッセージ",
-					"TRIGGERED_BY": "トリガー"
+					"TRIGGERED_BY": "生成"
 				},
 				"NOTE": {
 					"ADD_NOTE": "ノート追加",
@@ -1247,7 +1249,7 @@
 				}
 			},
 			"ESCALATION_POLICY": {
-				"ACKNOWLEDGED": "Acknowledged",
+				"ACKNOWLEDGED": "確認",
 				"ACTION": "作業",
 				"ALT_E_DELETE_POLICY": "エスカレーションポリシー削除に失敗",
 				"ALT_E_SET_AS_DEFAULT": "default エスカレーションポリシー修正に失敗",
@@ -1260,7 +1262,7 @@
 				"DELETE_MODAL_TITLE": "エスカレーションポリシーを削除しますか？",
 				"ESCALATION_POLICY": "エスカレーションポリシー",
 				"FORM": {
-					"ACKNOWLEDGED": "Acknowledged",
+					"ACKNOWLEDGED": "確認",
 					"ADD_RULE": "ルール追加",
 					"ALT_E_CREATE_POLICY": "エスカレーションポリシー作成に失敗",
 					"ALT_E_UPDATE_POLICY": "エスカレーションポリシー修正に失敗",
@@ -1286,7 +1288,7 @@
 					"REPEAT_AFTER": "後で繰り返す",
 					"REPEAT_ALL": "すべて繰り返す",
 					"REPEAT_LABEL_HELP_TEXT": "上記のすべてのステップにApplyする",
-					"RESOLVED": "解決済み",
+					"RESOLVED": "完了",
 					"RULE": "ルール",
 					"SCOPE_LABEL": "スコア",
 					"STEP": "ステップ",
@@ -1294,7 +1296,7 @@
 				},
 				"GLOBAL": "グローバル",
 				"PROJECT": "プロジェクト",
-				"RESOLVED": "解決済み",
+				"RESOLVED": "完了",
 				"SET_AS_DEFAULT": "defaultに設定する",
 				"UPDATE": "編集",
 				"UPDATE_MODAL_TITLE": "エスカレーションポリシー修正"
@@ -1488,8 +1490,8 @@
 		"DETAIL": {
 			"ADD": "追加",
 			"ALERT": {
-				"ACKNOWLEDGED": "Acknowledged",
-				"ALL_NOTIFICATIONS": "全てのAcknowledged",
+				"ACKNOWLEDGED": "確認",
+				"ALL_NOTIFICATIONS": "全ての通知",
 				"ALT_E_CHANGE_AUTO_RECOVERY": "自動復旧の変更に失敗",
 				"ALT_E_CHANGE_ESCALATION_POLICY": "エスカレーションポリシーの変更に失敗",
 				"ALT_E_CHANGE_NOTIFICATION_POLICY": "通知ポリシーの変更に失敗",
@@ -1497,7 +1499,7 @@
 				"ALT_S_CHANGE_ESCALATION_POLICY": "エスカレーションポリシーの変更に成功",
 				"ALT_S_CHANGE_NOTIFICATION_POLICY": "通知ポリシーの変更に成功",
 				"AUTO_RECOVERY": "自動復旧",
-				"AUTO_RESOLVE_ALERTS": "アラートを自動的にResolveにする",
+				"AUTO_RESOLVE_ALERTS": "アラートを自動的に完了にする",
 				"CHANGE": "変更",
 				"CHANGE_ESCALATION_POLICY_MODAL_TITLE": "エスカレーションポリシーの変更",
 				"CREATE_NEW_POLICY": "新しいエスカレーションポリシーを作成",
@@ -1513,14 +1515,14 @@
 				"NOTIFICATION_LEVEL": "通知レベル",
 				"NOTIFICATION_POLICY": "通知ポリシー",
 				"REPEAT_ALL": "全て{count}回繰り返す",
-				"RESOLVED": "Resolved",
+				"RESOLVED": "完了",
 				"RULES_ON_THIS_PROJECT": "このプロジェクトのルール",
 				"SELECT_POLICY": "既存ポリシーを選択",
 				"SETTINGS": "設定",
-				"SET_AUTO_RECOVERY_MODAL_HELP_TEXT": "システム障害が復旧されたら、アラートを自動的にresolveにしますか？",
+				"SET_AUTO_RECOVERY_MODAL_HELP_TEXT": "システム障害が復旧されたら、アラートを自動的に完了にしますか？",
 				"SET_AUTO_RECOVERY_MODAL_TITLE": "自動復旧設定",
 				"SET_AUTO_RECOVERY_NO": "いいえ、手動で行います。",
-				"SET_AUTO_RECOVERY_YES": "はい、自動的にアラートをresolveにします。",
+				"SET_AUTO_RECOVERY_YES": "はい、自動的にアラートを完了にします。",
 				"SET_NOTIFICATION_MODAL_HELP_TEXT": "受信者にどのような通知を送りましょうか？",
 				"SET_NOTIFICATION_POLICY_MODAL_TITLE": "通知ポリシー設定",
 				"STEP": "ステップ",
@@ -1644,11 +1646,11 @@
 			"SUBTAB_TITLE_WEBHOOK": "ウェプフク",
 			"SUBTAB_WEBHOOK": "ウェプフク",
 			"SUMMARY": {
-				"ACKNOWLEDGED": "Acknowledged",
+				"ACKNOWLEDGED": "確認",
 				"ALERT": "アラート",
-				"OPEN_ALERT": "Openアラート",
-				"RESOLVED": "Resolved",
-				"TRIGGERED": "Triggered"
+				"OPEN_ALERT": "発生 アラート",
+				"RESOLVED": "完了",
+				"TRIGGERED": "生成"
 			},
 			"TAB_ALERT": "アラート",
 			"TAB_MAINTENANCE_WINDOW": "メンテナンス期間",

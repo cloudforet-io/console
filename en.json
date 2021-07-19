@@ -129,7 +129,7 @@
 					"NAME_REQUIRED": "Required field",
 					"TAG_ADD": "Add tags",
 					"TAG_DESC_1": "Click a button to add tags.",
-					"TAG_DESC_2": "",
+					"TAG_DESC_2": "Click a button below to add tags.",
 					"TAG_LABEL": "Tags"
 				},
 				"CANCEL": "Cancel",
@@ -148,21 +148,21 @@
 				"CREATE": "Create",
 				"CREATE_TITLE": "Create Spot Group",
 				"INSTANCE_TYPE": {
-					"DESC": "",
+					"DESC": "Recommended instance between performance and cost",
 					"LABEL": "Instance Type",
-					"ONE_MORE_REQUIRED": "At least one instance type required.",
+					"ONE_MORE_REQUIRED": "At least one instance type is required.",
 					"OPTIMIZED_TYPE": "Recommend Optimized Instance Type"
 				},
 				"LOAD_FAILED": "Oops, Looks like something went wrong.",
 				"RESOURCE": {
 					"LABEL": "Resource",
 					"RESOURCE_DESC": "Show only resources of not belonging to Spot Group",
-					"RESOURCE_REQUIRED": "Please, a select resource."
+					"RESOURCE_REQUIRED": "Please select a resource"
 				},
 				"SCHEDULE_POLICY": {
 					"DESC": "Number of spot instance changes based on Instance number. (On-Demend is fixed value.) ",
 					"LABEL": "Instance Distribution",
-					"SETTING_LABEL": "Capacity Setting",
+					"SETTING_LABEL": "Capacity Settings",
 					"SETTING_ONDEMAND": "On-Demand",
 					"SETTING_SPOT_INSTANCE": "Spot Instance",
 					"SETTING_TYPE_COUNT": "Count",
@@ -172,7 +172,7 @@
 				},
 				"SELECT_RESOURCE": "Select resource first and set the other options",
 				"TRY_AGAIN": "Try again",
-				"TRY_AGAIN_DESC": "Cannot read resource information. Please, contact to Domain Admin. "
+				"TRY_AGAIN_DESC": "Cannot read resource information. Please contact to domain admin. "
 			},
 			"DASHBOARD": {
 				"ACCUMULATE_COST": "Total Savings",
@@ -185,7 +185,7 @@
 				},
 				"LAST_MONTH": "Last month",
 				"LAST_SIX_MONTHS": "Last 6 months",
-				"NO_PROJECT": "Manage Spot Group based on Project",
+				"NO_PROJECT": "Please manage Spot Group based on project",
 				"PAGE_TITLE": "Dashboard",
 				"SAVING_COST": "Savings",
 				"SPOT_GROUP_BY_PROJECT": "Spot Group on Project",
@@ -193,8 +193,8 @@
 				"USED_SPOT_GROUP": "Running Spot Group"
 			},
 			"DETAIL": {
-				"ALT_E_DELETE_SPOT_GROUP": "Failed to Delete Spot Group",
-				"ALT_S_DELETE_SPOT_GROUP": "Success to Delete Spot Group",
+				"ALT_E_DELETE_SPOT_GROUP": "Failed to delete Spot Group",
+				"ALT_S_DELETE_SPOT_GROUP": "Success to delete Spot Group",
 				"BASE_INFO": {
 					"EDIT": "Edit",
 					"ON_DEMAND": "On-Demand",
@@ -1186,6 +1186,7 @@
 					"EVENT_DETAILS": "Event Details",
 					"EVENT_LIST": "Event List",
 					"MORE": "More",
+					"NO_EVENT": "No Event",
 					"PLACEHOLDER": "Search for events by type, or date"
 				},
 				"HEADER": {
@@ -1222,6 +1223,7 @@
 					"RULE": "Rule",
 					"SAVE_CHANGES": "Save Changes",
 					"SEVERITY": "Severity",
+					"STATUS_DETAILS": "Status Details",
 					"STATUS_MSG": "Status Message",
 					"TRIGGERED_BY": "Triggered By"
 				},
@@ -1277,8 +1279,8 @@
 					"NAME_LABEL": "Name",
 					"NAME_REQUIRED": "Please enter name.",
 					"NOTIFICATIONS_SETTINGS": "Project Notifications Settings",
-					"NOTIFICATION_LEVEL": "Notification Level",
-					"NOTIFICATION_LV": "Notification LV",
+					"NOTIFICATION_LEVEL": "Notifications Level",
+					"NOTIFICATION_LV": "Notifications LV",
 					"PROJECT": "Project",
 					"PROJECT_LABEL": "Project",
 					"PROJECT_REQUIRED": "Please select project.",
