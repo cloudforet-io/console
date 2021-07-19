@@ -18,7 +18,7 @@
                     &nbsp;({{ $t('COMPONENT.PAGE_TITLE.SELECTED_OF',{selectedCount,totalCount}) }})
                 </span>
                 <span v-else class="total-count">
-                    &nbsp;({{ totalCount }})
+                    &nbsp;({{ commaFormatter(totalCount) }})
                 </span>
             </template>
         </slot>
@@ -30,6 +30,7 @@
 
 <script lang="ts">
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import { commaFormatter } from '@/util/helpers';
 
 export default {
     name: 'PPageTitle',
@@ -61,8 +62,14 @@ export default {
             default: 0,
         },
     },
+    setup() {
+        return {
+            commaFormatter,
+        };
+    },
 };
 </script>
+import { commaFormatter } from '@/util/helpers';
 
 <style lang="postcss">
 .p-page-title {

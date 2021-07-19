@@ -6,7 +6,7 @@
             </slot>
         </span>
         <span v-if="useTotalCount" class="total-count">
-            &nbsp;({{ totalCount }})
+            &nbsp;({{ commaFormatter(totalCount) }})
         </span>
         <span class="extra">
             <slot name="extra" />
@@ -14,6 +14,8 @@
     </div>
 </template>
 <script lang="ts">
+import { commaFormatter } from '@/util/helpers';
+
 export default {
     name: 'PPanelTop',
     props: {
@@ -29,6 +31,11 @@ export default {
             type: String,
             default: '',
         },
+    },
+    setup() {
+        return {
+            commaFormatter,
+        };
     },
 };
 </script>
