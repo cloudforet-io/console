@@ -29,7 +29,7 @@
                     </div>
                     <div class="label-wrapper">
                         <span>{{ $t('MONITORING.ALERT.DASHBOARD.DAILY_AVERAGE') }}</span>
-                        <span>{{ $t('MONITORING.ALERT.DASHBOARD.MONTHLY_TOTAL') }}</span>
+                        <span class="text-right">{{ $t('MONITORING.ALERT.DASHBOARD.MONTHLY_TOTAL') }}</span>
                     </div>
                 </p-card>
             </div>

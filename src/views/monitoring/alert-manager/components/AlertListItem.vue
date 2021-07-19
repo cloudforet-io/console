@@ -153,7 +153,7 @@ export default {
             .title {
                 @apply truncate;
                 display: block;
-                width: 90%;
+                max-width: 90%;
                 vertical-align: baseline;
                 margin-right: 0.5rem;
             }

@@ -13,9 +13,7 @@
                     <strong>{{ commaFormatter(counts[alertState.name]) }}</strong> {{ alertState.label }}
                 </router-link>
             </div>
-            <p-list-card :items="items" :loading="loading" :hoverable="true"
-                         @click="onClickListItem"
-            >
+            <p-list-card :items="items" :loading="loading" :hoverable="true">
                 <template #header>
                     <p class="left-part">
                         <strong>{{ $t('PROJECT.DETAIL.SUMMARY.OPEN_ALERT') }}</strong> ({{ totalCount }})
@@ -191,12 +189,6 @@ export default {
             }
         };
 
-        /* event */
-        const onClickListItem = (idx) => {
-            const alertId = get(state.items[idx], 'alert_id');
-            if (alertId) router.push({ name: MONITORING_ROUTE.ALERT_MANAGER.ALERT.DETAIL._NAME, params: { id: alertId } });
-        };
-
         watch(() => props.projectId, async (projectId) => {
             if (projectId) {
                 await Promise.all([statAlerts(), listAlerts()]);
@@ -206,7 +198,6 @@ export default {
         return {
             ...toRefs(state),
             listAlerts,
-            onClickListItem,
             alertLinkFormatter,
             commaFormatter,
         };
