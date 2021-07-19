@@ -57,6 +57,9 @@ export default {
 
 <style lang="postcss" scoped>
 .p-definition-table::v-deep {
+    .no-data {
+        min-height: 2.25rem;
+    }
     .def-row {
         td {
             &:first-child {

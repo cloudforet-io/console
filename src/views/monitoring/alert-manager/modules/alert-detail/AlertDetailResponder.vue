@@ -1,7 +1,7 @@
 <template>
     <p-pane-layout class="alert-detail-responder">
         <article class="responder-wrapper">
-            <p-panel-top class="-ml-1">
+            <p-panel-top class="panel-title">
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.RESPONDER') }}
             </p-panel-top>
             <p-collapsible-list :items="items" theme="card" multi-unfoldable>
@@ -20,6 +20,7 @@
             </p-collapsible-list>
             <p class="search-title">
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.ADDITIONAL_RESPONDER') }}
+                <span class="text-gray-500"> ({{responderState.selectedMemberItems.length}})</span>
             </p>
             <p-autocomplete-search v-model="responderState.search" :menu="responderState.allMemberItems" :loading="responderState.loading"
                                    class="autocomplete-search" @select-menu="onSelectMember" @hide-menu="addResponder"
@@ -215,6 +216,9 @@ export default {
 <style lang="postcss" scoped>
 .alert-detail-responder {
     padding: 0 1rem 2.5rem 1rem;
+}
+.panel-title {
+    @apply -ml-1;
 }
 .level {
     font-size: 1rem;

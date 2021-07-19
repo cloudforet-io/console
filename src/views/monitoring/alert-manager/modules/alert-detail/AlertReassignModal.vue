@@ -85,10 +85,10 @@ export default {
                     alert_id: props.alertId,
                     assignee: state.selectedUserID,
                 });
-                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_REASSIGN_MEMBER'), '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_ASSIGN_MEMBER'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_REASSIGN_MEMBER'), e, root);
+                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_ASSIGN_MEMBER'), e, root);
             } finally {
                 state.proxyVisible = false;
             }
@@ -109,14 +109,16 @@ export default {
         const listMemberInProject = async () => {
             try {
                 state.loading = true;
-                const res = await SpaceConnector.client.identity.project.member.list({
+                const { results, total_count } = await SpaceConnector.client.identity.project.member.list({
                     project_id: props.projectId,
                     query: assignApiQuery,
+                    include_parent_member: true,
                 });
-                state.items = res.results.map(d => ({
+                state.items = results.map(d => ({
                     ...d,
                     user_id: d.resource_id,
                 }));
+                state.totalCount = total_count;
             } catch (e) {
                 console.error(e);
                 state.items = [];

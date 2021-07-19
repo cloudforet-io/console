@@ -10,6 +10,7 @@ const ProjectNotificationsPage = () => import(/* webpackChunkName: "ProjectNotif
 const ProjectMaintenanceWindowPage = () => import(/* webpackChunkName: "ProjectMaintenanceWindowPage" */ '@/views/project/project/pages/ProjectMaintenanceWindowPage.vue');
 const ProjectTagPage = () => import(/* webpackChunkName: "ProjectTagPage" */ '@/views/project/project/pages/ProjectTagPage.vue');
 const AddEventRulePage = () => import(/* webpackChunkName: "AddEventRulePage" */ '@/views/project/project/pages/AddEventRulePage.vue');
+const AddNotificationPage = () => import(/* webpackChunkName: "AddNotificationPage" */ '@/views/identity/user/pages/AddNotificationPage.vue');
 
 const ProjectAlert = () => import(/* webpackChunkName: "ProjectAlert" */ '@/views/project/project/modules/ProjectAlert.vue');
 const ProjectWebhook = () => import(/* webpackChunkName: "ProjectWebhook" */ '@/views/project/project/modules/ProjectWebhook.vue');
@@ -30,7 +31,10 @@ export const PROJECT_ROUTE = Object.freeze({
                 WEBHOOK: { _NAME: 'projectWebhook' },
                 SETTINGS: { _NAME: 'projectSettings' },
             },
-            NOTIFICATIONS: { _NAME: 'projectNotifications' },
+            NOTIFICATIONS: {
+                _NAME: 'projectNotifications',
+                ADD: { _NAME: 'addProjectNotification' },
+            },
             MAINTENANCE_WINDOW: { _NAME: 'projectMaintenanceWindow' },
             TAG: { _NAME: 'projectTag' },
         },
@@ -131,6 +135,12 @@ export default {
                     name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME,
                     props: route => ({ projectId: route.params.id }),
                     component: AddEventRulePage,
+                },
+                {
+                    path: 'notification/:protocol/:protocolId/:userId',
+                    name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME,
+                    component: AddNotificationPage,
+                    props: true,
                 },
             ],
         },

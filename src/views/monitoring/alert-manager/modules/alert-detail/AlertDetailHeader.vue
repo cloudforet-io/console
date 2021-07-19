@@ -22,6 +22,9 @@
                 <p-i v-if="alertUrgency === ALERT_URGENCY.HIGH" name="ic_alert" width="1em"
                      height="1em" class="mr-2"
                 />
+                <p-i v-if="alertUrgency === ALERT_URGENCY.LOW" name="ic_state_duplicated" width="1em"
+                     height="1em" class="mr-2"
+                />
                 <span class="capitalize">{{ alertUrgency.toLowerCase() }}</span>
             </p-select-dropdown>
         </p>

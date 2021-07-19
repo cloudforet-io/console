@@ -119,7 +119,7 @@ export default {
             route: computed(() => [
                 { name: i18n.t('MENU.MONITORING.MONITORING'), path: '/monitoring' },
                 { name: i18n.t('MENU.MONITORING.ALERT_MANAGER'), path: '/monitoring/alert-manager/dashboard' },
-                { name: props.id },
+                { name: `${props.id} #${state.alertInfo?.alert_number}` },
             ]),
         });
 
