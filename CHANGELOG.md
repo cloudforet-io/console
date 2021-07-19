@@ -1,3 +1,10 @@
+# [1.1.0-beta.111](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.110...v1.1.0-beta.111) (2021-07-19)
+
+
+### Features
+
+* update textarea css style and  copy button margin bug fix ([#650](https://github.com/spaceone-dev/spaceone-design-system/issues/650)) ([db541c2](https://github.com/spaceone-dev/spaceone-design-system/commit/db541c288b91e20ec62eb334c88ba1a5515a5e99))
+
 # [1.1.0-beta.110](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.109...v1.1.0-beta.110) (2021-07-19)
 
 
