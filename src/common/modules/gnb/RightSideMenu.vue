@@ -13,7 +13,7 @@
                 </div>
             </router-link>
         </div>
-        <div class="menu-wrapper">
+        <div v-if="!userState.isDomainOwner" class="menu-wrapper">
             <div class="menu-button notifications"
                  :class="{opened: openedMenu === 'notifications'}"
                  @click.stop="toggleMenu('notifications')"
@@ -25,6 +25,7 @@
             </div>
             <g-n-b-notifications v-if="openedMenu === 'notifications'"
                                  v-click-outside="hideMenu"
+                                 @click-settings="hideMenu"
             />
         </div>
         <div class="menu-wrapper">
@@ -192,10 +193,10 @@ export default {
         const toggleLanguageMenu = () => {
             state.showLanguageMenu = !state.showLanguageMenu;
         };
-        const hideNewIcon = async () => {
+        const hideNewIcon = () => {
             if (!state.isNewIconHidden) {
                 state.isNewIconHidden = true;
-                await store.dispatch('settings/setItem', {
+                store.dispatch('settings/setItem', {
                     key: 'hide_new_icon',
                     value: true,
                     path: '/gnb',
