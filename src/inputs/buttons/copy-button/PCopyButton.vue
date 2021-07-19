@@ -1,7 +1,7 @@
 <template>
     <span class="p-copy-button">
         <span v-if="$scopedSlots.default" ref="textRef"
-              class="mr-2"
+              class="copy-text"
         >
             <slot name="default" />
         </span>
@@ -166,17 +166,18 @@ export default defineComponent<Props>({
     font-size: 0.875rem;
     vertical-align: middle;
 
+    .copy-text {
+        cursor: text;
+    }
+
     .copy-icon {
         @apply text-gray-500;
         &.active {
             @apply text-secondary;
         }
-    }
 
-    @media (hover: hover) {
-        &:hover {
-            @apply text-secondary;
-            .copy-icon {
+        @media (hover: hover) {
+            &:hover {
                 @apply text-secondary;
                 cursor: pointer;
             }

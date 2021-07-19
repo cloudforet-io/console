@@ -36,10 +36,10 @@
                                        :items="sortByMenu"
                                        @select="onChangeSortBy"
                     >
-                        {{ proxyState.pageSize }}
+                        {{ proxyState.sortBy }}
                     </p-select-dropdown>
                 </div>
-                <div>
+                <div class="right-tool-group">
                     <div v-if="exportable" class="tool">
                         <p-icon-button name="ic_excel"
                                        @click="$emit('export', $event)"
@@ -315,6 +315,9 @@ export default defineComponent<ToolboxProps>({
         flex-grow: 1;
         order: 2;
         flex-wrap: wrap;
+        .right-tool-group {
+            display: flex;
+        }
         .dropdown-list {
             .p-dropdown-btn {
                 min-width: 6rem;
@@ -323,6 +326,7 @@ export default defineComponent<ToolboxProps>({
         .tool {
             @apply ml-2 mb-4;
             display: inline-block;
+            flex-shrink: 0;
         }
     }
     .filters-wrapper {

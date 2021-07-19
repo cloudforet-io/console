@@ -145,7 +145,7 @@ export const Template = (args,{argTypes})=>({
             components:{ PBadge },
             template: `
                 <div class="w-full h-full flex flex-wrap items-center justify-center">
-                    <p-badge v-for="styleType in styleTypes" :styleType="styleType" class="m-2">
+                    <p-badge v-for="styleType in styleTypes" :styleType="styleType" :key="styleType" class="m-2">
                         {{styleType}}
                     </p-badge>
                 </div>`,
