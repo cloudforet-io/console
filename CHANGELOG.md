@@ -1,3 +1,10 @@
+# [1.1.0-beta.108](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.107...v1.1.0-beta.108) (2021-07-19)
+
+
+### Features
+
+* update copy button hover styling and fix toolbox minor bugs ([#648](https://github.com/spaceone-dev/spaceone-design-system/issues/648)) ([086d7df](https://github.com/spaceone-dev/spaceone-design-system/commit/086d7dfd67109e08c9c37a0057ffad69bb84d400))
+
 # [1.1.0-beta.107](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.106...v1.1.0-beta.107) (2021-07-16)
 
 
