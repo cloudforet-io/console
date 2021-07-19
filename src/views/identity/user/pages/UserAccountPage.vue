@@ -141,8 +141,9 @@ export default {
             userType: computed(() => store.state.user.backend) as unknown as string,
             language: '' as LanguageCode | undefined,
             timezone: '' as string | undefined,
+            formattedTimezone: computed(() => state.timezone.replace(' (default)', '')),
             languages: map(languages, (d, k) => ({
-                type: 'item', label: d === 'en' ? `${d} (default)` : d, name: k,
+                type: 'item', label: k === 'en' ? `${d} (default)` : d, name: k,
             })),
             timezones: map(timezoneList, d => ({
                 type: 'item', label: d === 'UTC' ? `${d} (default)` : d, name: d,
@@ -161,7 +162,7 @@ export default {
             isPasswordCheckValid: undefined as undefined | boolean,
             passwordCheckInvalidText: '' as TranslateResult | string,
             timezoneInvalidText: computed(() => {
-                if (!state.timezone || !timezoneList.includes(state.timezone)) return vm.$t('IDENTITY.USER.FORM.TIMEZONE_INVALID');
+                if (!state.timezone || !timezoneList.includes(state.formattedTimezone)) return vm.$t('IDENTITY.USER.FORM.TIMEZONE_INVALID');
                 return '';
             }),
             showValidation: false,
@@ -246,7 +247,7 @@ export default {
             const userParam: UpdateUserRequest = {
                 email: state.email,
                 language: state.language,
-                timezone: state.timezone,
+                timezone: state.formattedTimezone,
             };
             await updateUser(userParam);
         };

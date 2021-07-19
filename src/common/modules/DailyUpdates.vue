@@ -469,6 +469,8 @@ export default {
 
 .no-data-wrapper {
     @apply w-full;
+    display: flex;
+    flex-direction: column;
     height: 12.5rem;
     text-align: center;
     .no-data-img {
