@@ -35,6 +35,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { i18n } from '@/translations';
 import router from '@/routes';
+import store from '@/store';
 
 
 export default {
@@ -109,6 +110,13 @@ export default {
         watch(() => props.id, (projectId) => {
             if (projectId) getProjectAlertConfig();
         }, { immediate: true });
+
+        (async () => {
+            await Promise.all([
+                store.dispatch('resource/user/load'),
+                store.dispatch('resource/webhook/load'),
+            ]);
+        })();
 
         return {
             ...toRefs(state),

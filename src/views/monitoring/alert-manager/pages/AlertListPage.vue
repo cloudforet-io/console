@@ -102,7 +102,11 @@ export default {
 
         /* init */
         (async () => {
-            await store.dispatch('resource/project/load');
+            await Promise.all([
+                store.dispatch('resource/project/load'),
+                store.dispatch('resource/user/load'),
+                store.dispatch('resource/webhook/load'),
+            ]);
         })();
 
         return {

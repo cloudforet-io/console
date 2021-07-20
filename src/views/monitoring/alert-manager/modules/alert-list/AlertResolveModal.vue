@@ -8,7 +8,6 @@
         @confirm="onClickConfirm"
     >
         <template #body>
-            <p>{{ $t('MONITORING.ALERT.ALERT_LIST.UPDATE_RESOLVE_MODAL.NOTREOPEN') }}</p>
             <p-field-group
                 :label="$t('MONITORING.ALERT.ALERT_LIST.UPDATE_RESOLVE_MODAL.LABEL_NOTE')"
                 class="mt-4"

@@ -69,6 +69,7 @@ export const ALERT_STATE_FILTER = Object.freeze({
     TRIGGERED: 'TRIGGERED',
     ACKNOWLEDGED: 'ACKNOWLEDGED',
     RESOLVED: 'RESOLVED',
+    ERROR: 'ERROR',
     ALL: 'ALL',
 } as const);
 export type ALERT_STATE_FILTER = typeof ALERT_STATE_FILTER[keyof typeof ALERT_STATE_FILTER];

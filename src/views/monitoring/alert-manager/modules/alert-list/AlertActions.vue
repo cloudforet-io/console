@@ -54,7 +54,7 @@
                 </template>
             </template>
             <template #col-webhook_id-format="{ value }">
-                {{ value ? webhookFormatter(value) : ' ' }}
+                {{ value ? (webhooks(value) ? webhooks(value).label : value) : ' ' }}
             </template>
         </p-table-check-modal>
 
@@ -128,10 +128,6 @@ export default {
             type: Array,
             default: () => [],
         },
-        webhookList: {
-            type: Array,
-            default: () => [],
-        },
     },
     setup(props, { emit, root }) {
         const state = reactive({
@@ -180,9 +176,8 @@ export default {
                 HIGH: i18n.t('MONITORING.ALERT.ALERT_LIST.HIGH'),
                 LOW: i18n.t('MONITORING.ALERT.ALERT_LIST.LOW'),
             })),
+            webhooks: computed(() => store.state.resource.webhook.items),
         });
-
-        const webhookFormatter = webhookId => props.webhookList.find(element => element.webhook_id === webhookId)?.name;
 
         const alertDurationFormatter = value => durationFormatter(value, dayjs().format(DATE_TIME_FORMAT), state.timezone) || '--';
 
@@ -220,7 +215,6 @@ export default {
             onSelectAction,
             onDeleteConfirm,
             alertDurationFormatter,
-            webhookFormatter,
             alertStateBadgeStyleTypeFormatter,
             iso8601Formatter,
             TABLE_FIELDS,
