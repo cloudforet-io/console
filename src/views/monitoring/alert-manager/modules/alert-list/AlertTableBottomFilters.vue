@@ -86,6 +86,7 @@ export default {
                 { name: ALERT_STATE_FILTER.ACKNOWLEDGED, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ACKNOWLEDGED') },
                 { name: ALERT_STATE_FILTER.TRIGGERED, label: i18n.t('MONITORING.ALERT.ALERT_LIST.TRIGGERED') },
                 { name: ALERT_STATE_FILTER.RESOLVED, label: i18n.t('MONITORING.ALERT.ALERT_LIST.RESOLVED') },
+                { name: ALERT_STATE_FILTER.ERROR, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ERROR') },
                 { name: ALERT_STATE_FILTER.ALL, label: i18n.t('MONITORING.ALERT.ALERT_LIST.ALL') },
             ]),
             urgencyList: computed(() => [

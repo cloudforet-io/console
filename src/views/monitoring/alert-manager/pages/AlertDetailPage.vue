@@ -149,7 +149,7 @@ export default {
         const alertDeleteConfirm = async () => {
             try {
                 await SpaceConnector.client.monitoring.alert.delete({
-                    alert_id: props.id,
+                    alerts: [props.id],
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_S_DELETE_ALERT'), '', root);
             } catch (e) {

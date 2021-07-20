@@ -10,6 +10,7 @@ import plugin from './plugin';
 import user from './user';
 import spotGroup from './spot-group';
 import protocol from './protocol';
+import webhook from './webhook';
 import * as actions from './actions';
 
 export default {
@@ -27,6 +28,7 @@ export default {
         user,
         spotGroup,
         protocol,
+        webhook,
     },
     actions,
 };

@@ -11,13 +11,13 @@
                 sort-by="created_at"
                 :sort-desc="true"
                 :loading="loading"
-                :fields="TABLE_FIELDS"
+                :fields="fields"
                 :items="items"
                 :select-index.sync="selectIndex"
                 :total-count="totalCount"
                 :query-tags="tags"
-                :key-item-sets="QUERY_SEARCH_HANDLER.keyItemSets"
-                :value-handler-map="QUERY_SEARCH_HANDLER.valueHandlerMap"
+                :key-item-sets="querySearchHandlerState.keyItemSets"
+                :value-handler-map="querySearchHandlerState.valueHandlerMap"
                 @change="onChange"
                 @refresh="getAlerts()"
                 @export="onExportToExcel"
@@ -30,7 +30,9 @@
                             :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')"
                         >
                             <template #extra>
-                                <alert-actions :selected-items="selectedItems" :webhook-list="webhookNameList" @refresh="getAlerts()" />
+                                <alert-actions :selected-items="selectedItems"
+                                               @refresh="getAlerts()"
+                                />
                             </template>
                         </p-panel-top>
                     </div>
@@ -96,7 +98,10 @@
                     </template>
                 </template>
                 <template #col-webhook_id-format="{ value }">
-                    {{ value ? webhookFormatter(value) : ' ' }}
+                    {{ value ? (webhooks[value] ? webhooks[value].label : value) : ' ' }}
+                </template>
+                <template #col-triggered_by-format="{ value }">
+                    {{ value ? triggeredByFormatter(value) : ' ' }}
                 </template>
             </p-toolbox-table>
         </div>
@@ -117,6 +122,7 @@ import {
     PI,
     PAnchor,
 } from '@spaceone/design-system';
+import { KeyItemSet, KeyItem } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 
 import { store } from '@/store';
 import { i18n } from '@/translations';
@@ -126,7 +132,6 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { durationFormatter, iso8601Formatter, commaFormatter } from '@spaceone/console-core-lib';
 import { showLoadingMessage } from '@/lib/helper/notice-alert-helper';
 import { makeDistinctValueHandler, makeReferenceValueHandler } from '@spaceone/console-core-lib/component-util/query-search';
-import { KeyItemSet } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
@@ -142,57 +147,11 @@ import {
 import {
     AlertBottomFilters, AlertListTableFilters,
 } from '@/views/monitoring/alert-manager/type';
+import { alertStateBadgeStyleTypeFormatter, triggeredByFormatter } from '@/views/monitoring/alert-manager/lib/helper';
 
-import { alertStateBadgeStyleTypeFormatter } from '@/views/monitoring/alert-manager/lib/helper';
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm';
 
-const TABLE_FIELDS = [
-    { name: 'alert_number', label: 'No' },
-    { name: 'title', label: 'Title', width: '437px' },
-    { name: 'state', label: 'State' },
-    { name: 'urgency', label: 'Urgency' },
-    { name: 'status_message', label: 'Status Details', width: '320px' },
-    { name: 'resource', label: 'Resource' },
-    { name: 'project_id', label: 'Project' },
-    { name: 'created_at', label: 'Created' },
-    { name: 'created_at', label: 'Duration', sortable: false },
-    { name: 'assignee', label: 'Assigned to' },
-    { name: 'webhook_id', label: 'Triggered by' },
-];
-const EXCEL_FIELDS = [
-    { key: 'alert_number', name: 'No' },
-    { key: 'title', name: 'Title' },
-    { key: 'state', name: 'State' },
-    { key: 'urgency', name: 'Urgency' },
-    { key: 'status_message', name: 'Status Details' },
-    { key: 'resource', name: 'Resource' },
-    { key: 'project_id', name: 'Project' },
-    { key: 'created_at', name: 'Created', type: 'datetime' },
-    { key: 'assignee', name: 'Assigned to' },
-    { key: 'webhook_id', name: 'Triggered by' },
-];
-const QUERY_SEARCH_HANDLER = {
-    keyItemSets: [{
-        title: 'Properties',
-        items: [
-            { name: 'title', label: 'Title' },
-            { name: 'status_message', label: 'Status Details' },
-            { name: 'project_id', label: 'Project' },
-            { name: 'created_at', label: 'Created', dataType: 'datetime' },
-            { name: 'webhook_id', label: 'Triggered by' },
-        ],
-    }] as KeyItemSet[],
-    valueHandlerMap: {
-        title: makeDistinctValueHandler('monitoring.Alert', 'title'),
-        // eslint-disable-next-line camelcase
-        status_message: makeDistinctValueHandler('monitoring.Alert', 'status_message'),
-        project_id: makeReferenceValueHandler('identity.Project'),
-        created_at: makeDistinctValueHandler('monitoring.Alert', 'created_at'),
-        // eslint-disable-next-line camelcase
-        webhook_id: makeDistinctValueHandler('monitoring.Alert', 'assignee'),
-    },
-};
 
 export default {
     name: 'AlertDataTable',
@@ -232,18 +191,96 @@ export default {
     setup(props, { root, emit }) {
         const tagQueryHelper = new ApiQueryHelper().setFilters(props.filters);
 
+        const valueHandlerFilters = new QueryHelper().setFilters([
+            { k: 'project_id', v: props.projectId, o: '=' },
+        ]).apiQuery.filter;
+
+
+        const querySearchHandlerState = reactive({
+            keyItemSets: computed<KeyItemSet[]>(() => {
+                const items: KeyItem[] = [
+                    // { name: 'alert_number', label: 'Alert Number', dataType: 'integer' },
+                    { name: 'alert_id', label: 'Alert ID' },
+                    { name: 'assignee', label: 'Assignee' },
+                    { name: 'resource.resource_type', label: 'Resource Name' },
+                    { name: 'project_id', label: 'Project' },
+                    { name: 'created_at', label: 'Created', dataType: 'datetime' },
+                    { name: 'resolved_at', label: 'Resolved', dataType: 'datetime' },
+                    { name: 'webhook_id', label: 'Webhook' },
+                ];
+
+                if (props.projectId) items.splice(2, 1);
+                return [{ title: 'Properties', items }] as KeyItemSet[];
+            }),
+            valueHandlerMap: computed(() => {
+                if (props.prjectId) {
+                    return {
+                        // alert_number: makeDistinctValueHandler('monitoring.Alert', 'alert_number', 'integer', valueHandlerFilters),
+                        alert_id: makeDistinctValueHandler('monitoring.Alert', 'alert_id', undefined, valueHandlerFilters),
+                        assignee: makeDistinctValueHandler('monitoring.Alert', 'assignee', undefined, valueHandlerFilters),
+                        'resource.resource_type': makeDistinctValueHandler('monitoring.Alert', 'resource.resource_type', undefined, valueHandlerFilters),
+                        created_at: makeDistinctValueHandler('monitoring.Alert', 'created_at', 'datetime', valueHandlerFilters),
+                        resolved_at: makeDistinctValueHandler('monitoring.Alert', 'resolved_at', 'datetime', valueHandlerFilters),
+                        webhook_id: makeReferenceValueHandler('monitoring.Webhook'),
+                    };
+                }
+                return {
+                    // alert_number: makeDistinctValueHandler('monitoring.Alert', 'alert_number', 'integer'),
+                    alert_id: makeDistinctValueHandler('monitoring.Alert', 'alert_id'),
+                    assignee: makeDistinctValueHandler('monitoring.Alert', 'assignee'),
+                    'resource.resource_type': makeDistinctValueHandler('monitoring.Alert', 'resource.resource_type'),
+                    project_id: makeReferenceValueHandler('identity.Project'),
+                    created_at: makeDistinctValueHandler('monitoring.Alert', 'created_at', 'datetime'),
+                    resolved_at: makeDistinctValueHandler('monitoring.Alert', 'resolved_at', 'datetime'),
+                    webhook_id: makeReferenceValueHandler('monitoring.Webhook'),
+                };
+            }),
+        });
+
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
             projects: computed(() => store.state.resource.project.items),
             loading: true,
             selectIndex: [] as number[],
             selectedItems: computed(() => state.selectIndex.map(d => state.items[d])),
+            fields: computed(() => {
+                const fields = [
+                    { name: 'alert_number', label: 'No' },
+                    { name: 'title', label: 'Title', width: '437px' },
+                    { name: 'state', label: 'State' },
+                    { name: 'urgency', label: 'Urgency' },
+                    { name: 'status_message', label: 'Status Details' },
+                    { name: 'resource', label: 'Resource' },
+                    { name: 'project_id', label: 'Project' },
+                    { name: 'created_at', label: 'Created' },
+                    { name: 'created_at', label: 'Duration', sortable: false },
+                    { name: 'assignee', label: 'Assigned to' },
+                    { name: 'triggered_by', label: 'Triggered by' },
+                ];
+
+                if (state.totalCount === 0) { fields[1].width = 'auto'; }
+                return fields;
+            }),
+            excelFields: computed(() => {
+                const fields = [
+                    { key: 'alert_number', name: 'No' },
+                    { key: 'title', name: 'Title' },
+                    { key: 'state', name: 'State' },
+                    { key: 'urgency', name: 'Urgency' },
+                    { key: 'status_message', name: 'Status Details' },
+                    { key: 'resource', name: 'Resource' },
+                    { name: 'project_id', label: 'Project' },
+                    { key: 'created_at', name: 'Created', type: 'datetime' },
+                    { key: 'assignee', name: 'Assigned to' },
+                    { key: 'triggered_by', name: 'Triggered by' },
+                ];
+
+                if (props.projectId) fields.splice(6, 1);
+                return fields;
+            }),
             items: [] as any,
             totalCount: 0,
-            keyItemSets: QUERY_SEARCH_HANDLER.keyItemSets as KeyItemSet[],
-            valueHandlerMap: QUERY_SEARCH_HANDLER.valueHandlerMap,
-            tags: tagQueryHelper.setKeyItemSets(QUERY_SEARCH_HANDLER.keyItemSets).queryTags,
-            webhookNameList: [] as any,
+            tags: tagQueryHelper.setKeyItemSets(querySearchHandlerState.keyItemSets).queryTags,
             visibleAlertFormModal: false,
             alertStateLabels: computed(() => ({
                 TRIGGERED: i18n.t('MONITORING.ALERT.ALERT_LIST.TRIGGERED'),
@@ -257,9 +294,7 @@ export default {
             })),
         });
 
-
-        const webhookFormatter = webhookId => state.webhookNameList.find(element => element.webhook_id === webhookId)?.name;
-
+        /* formatters & autocomplete handlers */
         const alertDurationFormatter = value => durationFormatter(value, dayjs().format(DATE_TIME_FORMAT), state.timezone) || '--';
 
 
@@ -290,7 +325,7 @@ export default {
         };
 
         const alertApiQueryHelper = new ApiQueryHelper()
-            .setOnly(...TABLE_FIELDS.map(d => d.name), 'alert_id')
+            .setOnly(...state.fields.map(d => d.name), 'alert_id')
             .setPageStart(1).setPageLimit(15)
             .setSort('created_at', true);
         let alertApiQuery = alertApiQueryHelper.data;
@@ -308,7 +343,7 @@ export default {
                 });
 
                 state.items = results;
-                state.totalCount = commaFormatter(total_count);
+                state.totalCount = total_count;
                 state.selectIndex = [];
             } catch (e) {
                 state.totalCount = 0;
@@ -317,13 +352,6 @@ export default {
             } finally {
                 state.loading = false;
             }
-        };
-
-        const getWebhooks = async () => {
-            const { results } = await SpaceConnector.client.monitoring.webhook.list({
-                query: { only: ['webhook_id', 'name'] },
-            });
-            state.webhookNameList = results;
         };
 
 
@@ -349,8 +377,7 @@ export default {
                     param: {
                         query: alertApiQuery,
                     },
-                    fields: EXCEL_FIELDS,
-                    // eslint-disable-next-line camelcase
+                    fields: state.excelFields,
                     file_name_prefix: FILE_NAME_PREFIX.alert,
                 });
             } catch (e) {
@@ -372,14 +399,12 @@ export default {
                 urgency: props.urgency,
                 assigned: props.assigned,
             });
-            await Promise.all([getAlerts(), getWebhooks()]);
+            await getAlerts();
         })();
 
         return {
             ...toRefs(state),
-            TABLE_FIELDS,
-            EXCEL_FIELDS,
-            QUERY_SEARCH_HANDLER,
+            querySearchHandlerState,
             ALERT_STATE,
             ALERT_URGENCY,
             ALERT_STATE_FILTER,
@@ -387,7 +412,6 @@ export default {
             ASSIGNED_STATE,
             referenceRouter,
             capitalize,
-            webhookFormatter,
             alertStateBadgeStyleTypeFormatter,
             getAlerts,
             onChange,
@@ -396,6 +420,7 @@ export default {
             iso8601Formatter,
             alertDurationFormatter,
             commaFormatter,
+            triggeredByFormatter,
         };
     },
 };
