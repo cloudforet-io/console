@@ -4,13 +4,17 @@
             <p-panel-top class="panel-title">
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.RESPONDER') }}
             </p-panel-top>
-            <p-collapsible-list :items="items" theme="card" multi-unfoldable>
+            <p-collapsible-list :items="items" theme="card" multi-unfoldable
+                                :unfolded-indices="[alertData.escalation_step]"
+            >
                 <template #title="{title, index}">
-                    <!--                    <span class="level" :class="{'current': items[index].data === `LV${alertData.escalation_step}`}">{{ title }}</span>-->
-                    <span class="level font-bold" :class="{'current': items[index].data === `LV${alertData.escalation_step}`}"> {{ items[index].data }} </span>
-                    <p-badge v-if="items[index].data === `LV${alertData.escalation_step}`" style-type="primary3">
-                        {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.CURRENT') }}
-                    </p-badge>
+                    <p class="responder-info" :class="{'current': items[index].data === `LV${alertData.escalation_step}`}">
+                        <span class="step">[{{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.STEP') }} {{ index+1 }}]</span>
+                        <span class="level">{{ items[index].data }}</span>
+                        <p-badge v-if="items[index].data === `LV${alertData.escalation_step}`" style-type="primary3">
+                            {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.CURRENT') }}
+                        </p-badge>
+                    </p>
                 </template>
                 <template #default="{data}">
                     <p class="data-wrapper">
@@ -20,7 +24,7 @@
             </p-collapsible-list>
             <p class="search-title">
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.ADDITIONAL_RESPONDER') }}
-                <span class="text-gray-500"> ({{responderState.selectedMemberItems.length}})</span>
+                <span class="text-gray-500"> ({{ responderState.selectedMemberItems.length }})</span>
             </p>
             <p-autocomplete-search v-model="responderState.search" :menu="responderState.allMemberItems" :loading="responderState.loading"
                                    class="autocomplete-search" @select-menu="onSelectMember" @hide-menu="addResponder"
@@ -39,8 +43,12 @@
             <div class="tag-box">
                 <p-tag v-for="(tag, i) in responderState.selectedMemberItems" :key="tag" @delete="onDeleteTag(i)">
                     {{ tag ? tag : '' }}
-                    <template v-if="!responderState.loading">({{ responderState.allMemberItems.find((d) => d.name === tag).label }})</template>
-                    <template v-else>''</template>
+                    <template v-if="!responderState.loading">
+                        ({{ responderState.allMemberItems.find((d) => d.name === tag).label }})
+                    </template>
+                    <template v-else>
+                        ''
+                    </template>
                 </p-tag>
             </div>
         </article>
@@ -220,11 +228,15 @@ export default {
 .panel-title {
     @apply -ml-1;
 }
-.level {
+.responder-info {
+    display: inline-flex;
     font-size: 1rem;
     line-height: 125%;
     &.current {
         @apply text-violet-500;
+    }
+    .level {
+        @apply font-bold mx-2;
     }
 }
 
