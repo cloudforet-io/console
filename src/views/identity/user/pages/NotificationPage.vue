@@ -1,6 +1,7 @@
 <template>
     <section class="notification-wrapper">
-        <p-breadcrumbs class="flex-grow" :routes="routeState.routes" />
+        <p-breadcrumbs v-if="isAdmin" class="flex-grow" :routes="routeState.adminRoutes" />
+        <p-breadcrumbs v-else class="flex-grow" :routes="routeState.userRoutes" />
         <p-page-title :title="$t('IDENTITY.USER.MAIN.NOTIFICATION')" />
         <p-pane-layout class="list-wrapper">
             <notification-channel-list />
@@ -13,9 +14,10 @@ import {
     PBreadcrumbs, PPageTitle, PPaneLayout,
 } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import NotificationChannelList from '@/views/identity/user/modules/notification/NotificationChannelList.vue';
+import {store} from "../../../../store";
 
 export default {
     name: 'NotificationPage',
@@ -27,8 +29,15 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        const state = reactive({
+            isAdmin: computed(() => store.getters['user/isAdmin']).value,
+        })
         const routeState = reactive({
-            routes: computed(() => ([
+            userRoutes: computed(() => ([
+                { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
+                { name: vm.$t('IDENTITY.USER.MAIN.NOTIFICATION') },
+            ])),
+            adminRoutes: computed(() => ([
                 { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
                 { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/user-management' },
                 { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
@@ -37,6 +46,7 @@ export default {
         });
         return {
             routeState,
+            ...toRefs(state),
         };
     },
 };

@@ -49,7 +49,7 @@
             @confirm="onClickSave(EDIT_MODE.PROJECT)"
         >
             <template #body>
-                {{ $t('MONITORING.ALERT.DETAIL.INFO.CHANGE_PROJECT_MODAL_DESC') }}
+                <p class="modal-body">{{ $t('MONITORING.ALERT.DETAIL.INFO.CHANGE_PROJECT_MODAL_DESC') }}</p>
             </template>
         </p-button-modal>
     </fragment>
@@ -130,4 +130,7 @@ export default {
 
 <style lang="postcss" scoped>
 @import './styles/alertDetailItem.pcss';
+.modal-body {
+    margin-top: 2rem;
+}
 </style>
