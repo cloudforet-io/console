@@ -77,6 +77,13 @@ export default {
                 }
             }
         }
+        .member-tab::v-deep {
+            .p-toolbox-table {
+                @apply border border-gray-200 rounded-md;
+                border-style: solid;
+                padding-bottom: 2.5rem;
+            }
+        }
         .project-group-pane {
             min-height: 23.5rem;
             overflow-y: auto;

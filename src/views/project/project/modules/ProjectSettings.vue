@@ -234,7 +234,6 @@ export default {
                     getEventRuleCount(),
                     store.dispatch('resource/protocol/load'),
                 ]);
-                await getEscalationPolicy();
             }
         };
 

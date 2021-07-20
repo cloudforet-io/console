@@ -57,7 +57,7 @@
 import { get, filter } from 'lodash';
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, onActivated, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -153,6 +153,10 @@ export default {
                 await listProjectChannel();
             }
         }, { immediate: true });
+
+        onActivated(async () => {
+            await listProjectChannel();
+        });
 
         return {
             ...toRefs(state),
