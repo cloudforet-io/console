@@ -1,3 +1,10 @@
+# [1.1.0-beta.112](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.111...v1.1.0-beta.112) (2021-07-20)
+
+
+### Bug Fixes
+
+* add number formatting to search input in query search ([#651](https://github.com/spaceone-dev/spaceone-design-system/issues/651)) ([fb544e1](https://github.com/spaceone-dev/spaceone-design-system/commit/fb544e11b87f77215bbc99eea1877083ae455f6d))
+
 # [1.1.0-beta.111](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.110...v1.1.0-beta.111) (2021-07-19)
 
 
