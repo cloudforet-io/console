@@ -110,6 +110,7 @@ dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const ROOT_KEY_SETTER = ':';
+const NUMBER_TYPES = ['integer', 'float'];
 
 export default defineComponent({
     name: 'PQuerySearch',
@@ -262,8 +263,9 @@ export default defineComponent({
             let res: HandlerResponse = { results: [] };
             updateLoading(true);
 
+            const input = NUMBER_TYPES.includes(state.currentDataType) ? Number(inputText) : inputText;
             if (state.handler) {
-                const func = state.handler(inputText,
+                const func = state.handler(input,
                     state.rootKey as KeyItem,
                     state.currentDataType,
                     state.subPath,
