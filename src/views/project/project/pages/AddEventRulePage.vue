@@ -10,7 +10,7 @@
                 <info-message :message="$t('PROJECT.EVENT_RULE.TITLE_INFO_MESSAGE')" />
             </template>
         </p-page-title>
-        <div v-if="!isEditMode && !cardData.length" class="no-data-wrapper">
+        <div v-if="!loading && !isEditMode && !cardData.length" class="no-data-wrapper">
             <p class="title">
                 {{ $t('PROJECT.EVENT_RULE.NO_EVENT_RULES_TITLE') }}
             </p>
@@ -155,6 +155,7 @@ export default {
     },
     setup(props, { root }) {
         const state = reactive({
+            loading: true,
             project: {},
             cardData: [],
             orderedCardData: computed(() => state.cardData.sort((a, b) => a.order - b.order)),
@@ -198,6 +199,7 @@ export default {
         };
         const listEventRule = async () => {
             try {
+                state.loading = true;
                 const res = await SpaceConnector.client.monitoring.eventRule.list({
                     project_id: props.projectId,
                 });
@@ -205,6 +207,8 @@ export default {
             } catch (e) {
                 state.cardData = [];
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
 
