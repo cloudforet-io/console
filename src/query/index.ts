@@ -28,7 +28,7 @@ interface QueryTag extends Tag, QueryItem {}
 const filterToQueryTag = (filter: { k?: string; v: QueryStoreFilterValue; o?: RawQueryOperator }, keyMap: Record<string, KeyItem>): QueryTag | null => {
     if (filter.k === undefined || filter.k === null) {
         /* no key case */
-        if (filter.v === null) return null;
+        if (filter.v === null || filter.v === undefined) return null;
         return { value: { label: filter.v.toString(), name: filter.v } };
     }
     if (filter.v === null || filter.v === undefined) {
