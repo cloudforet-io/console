@@ -1,17 +1,22 @@
 <template>
-    <router-link :to="to || {}" custom>
-        <template #default="{href: toHref }">
-            <a class="p-anchor" :class="{disabled, highlight}" :target="target"
-               :href="!disabled && (to ? toHref : href)"
-               v-on="anchorListeners"
+    <router-link :to="to || {}" class="p-anchor" custom
+                 :class="{disabled, highlight}"
+    >
+        <template #default="{href: toHref, navigate}">
+            <a class="p-anchor" :class="{disabled, highlight}"
+               :target="target"
+               :href="to ? (toHref || href ): href"
+               @click="onClick(navigate, $event)"
             >
-                <slot name="left-extra" v-bind="{...$props, toHref}" />
+                <slot name="left-extra" v-bind="{...$props, href: to ? (toHref || href ): href}" />
                 <span class="text" :class="{disabled}">
-                    <slot v-bind="{...$props, toHref}">
+                    <slot v-bind="{...$props}">
                         {{ text }}
                     </slot>
                 </span>
-                <slot v-if="showIcon || (showIcon && target === '_blank')" name="icon" v-bind="{...$props, toHref}">
+                <slot v-if="showIcon || (showIcon && target === '_blank')" name="icon"
+                      v-bind="{...$props, href: to ? (toHref || href ): href}"
+                >
                     <p-i name="ic_external-link"
                          height="1em" width="1em"
                          color="inherit"
@@ -26,7 +31,6 @@
 <script lang="ts">
 import PI from '@/foundation/icons/PI.vue';
 import { Location } from 'vue-router';
-import { makeByPassListeners } from '@/util/composition-helpers';
 import { defineComponent } from '@vue/composition-api';
 
 
@@ -41,7 +45,9 @@ interface Props {
 
 export default defineComponent<Props>({
     name: 'PAnchor',
-    components: { PI },
+    components: {
+        PI,
+    },
     props: {
         text: {
             type: String,
@@ -72,16 +78,13 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props: Props, { listeners }) {
-        const anchorListeners = {
-            ...listeners,
-            click(e) {
-                e.stopPropagation();
-                makeByPassListeners(listeners, 'click', e);
-            },
+    setup() {
+        const onClick = (navigate, e) => {
+            e.stopPropagation();
+            navigate(e);
         };
 
-        return { anchorListeners };
+        return { onClick };
     },
 });
 </script>

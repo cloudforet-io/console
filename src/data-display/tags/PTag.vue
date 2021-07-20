@@ -81,7 +81,6 @@ export default defineComponent<Props>({
         .delete-icon {
             @apply text-gray-400;
             cursor: pointer;
-            margin-left: 0.25rem;
             margin-top: 1px;
             flex-shrink: 0;
         }
@@ -116,6 +115,7 @@ export default defineComponent<Props>({
         white-space: normal;
         word-break: break-word;
         max-width: 100%;
+        margin-right: 0.25rem;
     }
 }
 </style>
