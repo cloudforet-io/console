@@ -12,7 +12,7 @@
                  class="ic_notification"
                  color="white"
             />
-            {{ $t('MONITORING.ALERT.ALERT_LIST.ASSIGNED_TO_YOU_TITLE') }}
+            {{ $t('MONITORING.ALERT.ALERT_LIST.ASSIGNED_TO_ME_TITLE') }}
             <p-i name="ic_delete" width="1.25rem" height="1.25rem"
                  class="ic_delete cursor-pointer"
                  color="inherit"
