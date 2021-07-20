@@ -3,18 +3,18 @@ import {
     KeyItem,
     KeyItemSet,
     OperatorType,
-    QueryItem,
+    QueryItem
 } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { Filter, FilterOperator, Query } from '@src/space-connector/type';
 import {
-    QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator,
+    QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator
 } from '@src/query/type';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
 import {
     datetimeRawQueryOperatorToQueryTagOperatorMap, rawQueryOperatorToApiQueryOperatorMap,
-    rawQueryOperatorToPluralApiQueryOperatorMap,
+    rawQueryOperatorToPluralApiQueryOperatorMap
 } from '@src/query/config';
 import { setDatetimeToFilters } from '@src/query/helper';
 import { flatten, forEach } from 'lodash';
@@ -36,7 +36,7 @@ const filterToQueryTag = (filter: { k?: string; v: QueryStoreFilterValue; o?: Ra
         return {
             key: keyMap[filter.k] || { label: filter.k, name: filter.k },
             value: { label: 'Null', name: null },
-            operator: filter.o && filter.o.startsWith('!') ? '!' : '=',
+            operator: filter.o && filter.o.startsWith('!') ? '!' : '='
         };
     }
     if (datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string]) {
@@ -46,14 +46,14 @@ const filterToQueryTag = (filter: { k?: string; v: QueryStoreFilterValue; o?: Ra
         return {
             key,
             value: { label: filter.v.toString(), name: filter.v },
-            operator: datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string],
+            operator: datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string]
         };
     }
     /* general case */
     return {
         key: keyMap[filter.k] || { label: filter.k, name: filter.k },
         value: { label: filter.v.toString(), name: filter.v },
-        operator: datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string] || filter.o || '' as OperatorType,
+        operator: datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string] || filter.o || '' as OperatorType
     };
 };
 
@@ -82,8 +82,8 @@ export class QueryHelper {
         const filterMap: any = {};
         queryTags.forEach((q) => {
             if (!q.invalid) {
-                if (q.key) {
-                    const key = this._keyMap[q.key.name] || q.key;
+                if (q.key && typeof q.key === 'object') {
+                    const key = this._keyMap[q.key.name] || { ...q.key };
                     const op = (key.dataType === 'datetime' ? `${q.operator}t` : q.operator) as RawQueryOperator;
                     if (filterMap[key.name]) {
                         if (filterMap[key.name][op]) filterMap[key.name][op].push(q.value.name);
@@ -217,7 +217,7 @@ export class QueryHelper {
         });
         return {
             filter,
-            keyword: keyword.join(' ') || '',
+            keyword: keyword.join(' ') || ''
         };
     }
 }
