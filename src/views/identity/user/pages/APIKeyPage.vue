@@ -1,7 +1,8 @@
 <template>
     <section class="api-key-wrapper">
         <div class="flex">
-            <p-breadcrumbs class="flex-grow" :routes="routeState.routes" />
+            <p-breadcrumbs v-if="isAdmin" class="flex-grow" :routes="routeState.adminRoutes" />
+            <p-breadcrumbs v-else class="flex-grow" :routes="routeState.userRoutes" />
             <handbook-button :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab"
                              type="identity/user/api-key"
                              class="flex-shrink-0"
@@ -79,11 +80,17 @@ export default {
             ],
             items: [] as EndpointItem[],
             userId: computed(() => store.state.user.userId),
+            isAdmin: computed(() => store.getters['user/isAdmin']).value,
         });
         const routeState = reactive({
-            routes: computed(() => ([
+            userRoutes: computed(() => ([
+                { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
+                { name: vm.$t('IDENTITY.USER.MAIN.API_KEY') },
+            ])),
+            adminRoutes: computed(() => ([
                 { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },
-                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/account' },
+                { name: vm.$t('MENU.IDENTITY.USER'), path: '/identity/user/user-management' },
+                { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },
                 { name: vm.$t('IDENTITY.USER.MAIN.API_KEY') },
             ])),
         });
