@@ -2,6 +2,7 @@
     <div class="search-or-select-user">
         <p-autocomplete-search v-model="search"
                                :menu="userItems"
+                               use-fixed-menu-style
                                @select-menu="onSelectUser"
         >
             <template #menu-item--format="{item, id}">
