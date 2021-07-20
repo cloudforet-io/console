@@ -66,7 +66,7 @@ export default {
         td {
             &:first-child {
                 @apply capitalize;
-                width: 10rem;
+                //width: 10rem;
             }
         }
     }
