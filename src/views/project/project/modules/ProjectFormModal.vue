@@ -7,7 +7,7 @@
         :scrollable="false"
         backdrop
         :visible.sync="proxyVisible"
-        :disabled="showValidation && !isProjectNameValid"
+        :disabled="loading || (showValidation && !isProjectNameValid)"
         @confirm="confirm"
     >
         <template #body>
@@ -100,6 +100,7 @@ export default {
                 return false;
             }),
             showValidation: false,
+            loading: false
         });
 
 
@@ -114,7 +115,7 @@ export default {
             state.projectNames = res.results.map(d => d.name);
         };
 
-        const crateProject = async (params) => {
+        const createProject = async (params) => {
             try {
                 await SpaceConnector.client.identity.project.create(params);
                 await store.dispatch('resource/project/load');
@@ -139,9 +140,11 @@ export default {
         };
 
         const confirm = async () => {
+            if (state.loading) return;
             if (!state.showValidation) state.showValidation = true;
             if (!state.isProjectNameValid) return;
 
+            state.loading = true;
             const params = {
                 project_group_id: props.projectGroupId,
                 name: state.projectName,
@@ -151,12 +154,13 @@ export default {
                 if (state.updateMode) {
                     await updateProject(params);
                 } else {
-                    await crateProject(params);
+                    await createProject(params);
                 }
                 emit('complete', params);
             } catch (e) {
                 console.error(e);
             } finally {
+                state.loading = false;
                 state.proxyVisible = false;
                 state.showValidation = false;
             }

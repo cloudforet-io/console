@@ -5,10 +5,12 @@
                            always-show-menu
                            use-fixed-menu-style
                            :invalid="invalid"
+                           :disabled="readonly"
                            :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
         >
             <div v-if="!multiSelectable && selectedItem" class="tag-wrapper">
                 <p-tag :activated="visibleMenu"
+                       :deletable="!readonly"
                        @delete="onDeleteTag(selectedItem.node, selectedItem.path)"
                 >
                     {{ selectedItem.node.data.name }}
@@ -86,6 +88,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        readonly: {
+            type: Boolean,
+            default: false
+        }
     },
     setup(props, { emit }) {
         const state = reactive({

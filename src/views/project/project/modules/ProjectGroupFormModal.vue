@@ -6,7 +6,7 @@
                     fade
                     backdrop
                     :visible.sync="proxyVisible"
-                    :disabled="showValidation && !isValid"
+                    :disabled="loading || (showValidation && !isValid)"
                     @confirm="confirm"
     >
         <template #body>
@@ -92,6 +92,7 @@ export default {
                 return false;
             }),
             showValidation: false,
+            loading: false,
         });
 
         const projectGroupNameApiQuery = new ApiQueryHelper().setOnly('name');
@@ -132,9 +133,13 @@ export default {
                 throw new Error(e);
             }
         };
+
         const confirm = async () => {
+            if (state.loading) return;
             if (!state.showValidation) state.showValidation = true;
             if (!state.isValid) return;
+
+            state.loading = true;
             const item = {
                 name: state.projectGroupName,
             };
@@ -144,6 +149,7 @@ export default {
             if (!state.updateMode) await createProjectGroup(item);
             else await updateProjectGroup(item);
 
+            state.loading = false;
             store.commit('projectPage/setProjectGroupFormVisible', false);
         };
 
