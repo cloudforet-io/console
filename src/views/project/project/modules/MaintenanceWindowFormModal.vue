@@ -21,6 +21,8 @@
             </p-field-group>
             <p-field-group class="schedule-field" :label="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.LABEL_SCHEDULE')"
                            required
+                           :invalid="showValidation && isTimePeriodInvalid"
+                           :invalid-text="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.INVALID_TEXT')"
             >
                 <p-radio v-for="{name, label} in scheduleRadioItems" :key="name" v-model="selectedScheduleType"
                          :value="name"

@@ -9,21 +9,30 @@
             @change="onChange"
             @refresh="onChange()"
         />
-        <template v-for="(item, idx) in itemList">
-            <alert-detail-vertical-timeline :key="item.event_id" :item="item" :timezone="timezone"
-                                            class="timeline"
-            >
-                <template #timeline-detail>
-                    <div class="title" @click="onOpenModal(item)">
-                        <span class="severity">[{{ item.severity }}]</span> {{ item.title }}
-                        <p-i name="ic_arrow_right" width="0.8em" height="0.8em"
-                             color="inherit"
-                        />
-                    </div>
-                    {{ item.description }}
-                </template>
-            </alert-detail-vertical-timeline>
+        <template v-if="itemList.length > 0">
+            <div v-for="(item, idx) in itemList" :key="item.event_id">
+                <alert-detail-vertical-timeline
+                    :key="item.event_id" :item="item" :timezone="timezone"
+                    :event-type="item.event_type"
+                    class="timeline"
+                >
+                    <template #timeline-detail>
+                        <div class="list-item" @click="onOpenModal(item)">
+                            <span class="severity">[{{ item.severity }}]</span> {{ item.title }}
+                            <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                                 color="inherit"
+                            />
+                            <p class="desc">
+                                {{ item.description }}
+                            </p>
+                        </div>
+                    </template>
+                </alert-detail-vertical-timeline>
+            </div>
         </template>
+        <p-empty v-else>
+            {{ $t('MONITORING.ALERT.DETAIL.EVENT_LIST.NO_EVENT') }}
+        </p-empty>
         <p-button v-if="itemList.length > 9" size="md"
                   style-type="primary-dark outline"
                   class="more-button"
@@ -70,7 +79,7 @@ import AlertDetailVerticalTimeline
     from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailVerticalTimeline.vue';
 import { Event } from '@/views/monitoring/alert-manager/type';
 import {
-    PButton, PButtonModal, PI, PRawData, PToolbox,
+    PButton, PButtonModal, PI, PRawData, PToolbox, PEmpty,
 } from '@spaceone/design-system';
 import { copyAnyData } from '@/lib/helper/copy-helper';
 
@@ -85,6 +94,7 @@ export default {
         PButtonModal,
         PRawData,
         PI,
+        PEmpty,
     },
     props: {
         id: {
@@ -170,10 +180,17 @@ export default {
     padding-right: 1.5rem;
     padding-bottom: 2.5rem;
 }
-.title {
+.list-item {
     &:hover {
         @apply text-blue-500 cursor-pointer underline;
+        .desc {
+            @apply text-blue-500;
+        }
     }
+    .desc {
+        @apply text-gray-500;
+    }
+
 }
 .severity {
     @apply font-bold capitalize;

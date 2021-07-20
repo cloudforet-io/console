@@ -33,7 +33,8 @@ import {
 } from '@vue/composition-api';
 import { makeProxy } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import {i18n} from "@/translations";
+import { i18n } from '@/translations';
+import { showErrorMessage, showSuccessMessage } from '../../../../../lib/helper/notice-alert-helper';
 
 export default {
     name: 'AlertTitleEditModal',
@@ -63,7 +64,7 @@ export default {
             default: null,
         },
     },
-    setup(props, { emit }) {
+    setup(props, { emit, root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,
@@ -88,8 +89,10 @@ export default {
                     alert_id: props.alertId,
                     title: state.alertTitleInput,
                 });
+                showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_TITLE'), '', root);
             } catch (e) {
                 console.error(e);
+                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_TITLE'), e, root);
             } finally {
                 state.loading = false;
             }
