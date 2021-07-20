@@ -159,5 +159,14 @@ export default {
     font-size: 0.875rem;
     line-height: 140%;
 }
-
+.p-definition-table::v-deep {
+    .def-row {
+        td {
+            &:first-child {
+                @apply capitalize;
+                width: 10rem;
+            }
+        }
+    }
+}
 </style>

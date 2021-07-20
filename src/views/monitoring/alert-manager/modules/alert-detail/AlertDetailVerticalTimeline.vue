@@ -1,7 +1,7 @@
 <template>
     <div class="timeline-wrapper">
         <ul class="timeline-list">
-            <li class="timeline-item">
+            <li class="timeline-item" :class="eventType">
                 <div class="timestamp">
                     {{ item.created_at ? iso8601Formatter(item.created_at, timezone) : '' }}
                 </div>
@@ -30,6 +30,10 @@ export default {
             type: String,
             default: undefined,
         },
+        eventType: {
+            type: String,
+            default: undefined,
+        },
     },
     setup() {
         return {
@@ -41,6 +45,14 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+@define-mixin circle-style {
+    position: absolute;
+    left: -0.4375rem;
+    content: " ";
+    border-radius: 500%;
+    height: 0.875rem;
+    width: 0.875rem;
+}
 .timeline-wrapper {
     .timeline-list {
         padding: 0;
@@ -53,20 +65,28 @@ export default {
         padding-left: 1rem;
         padding-bottom: 1.5rem;
         min-height: 3.25rem;
-
         &:before {
+            @mixin circle-style;
             @apply border-4 border-primary3 bg-primary;
-            position: absolute;
-            left: -0.4375rem;
-            content: " ";
-            border-radius: 500%;
-            height: 0.875rem;
-            width: 0.875rem;
-            transition: all 500ms ease-in-out;
         }
-        //&:last-child {
-        //    border-left: 0;
-        //}
+        &.ALERT {
+            &:before {
+                @mixin circle-style;
+                @apply border-4 border-red-200 bg-red-400;
+            }
+        }
+        &.ERROR {
+            &:before {
+                @mixin circle-style;
+                @apply border-4 border-red-500 bg-red-200;
+            }
+        }
+        &.RECOVERY {
+            &:before {
+                @mixin circle-style;
+                @apply border-4 border-green-300 bg-green-500;
+            }
+        }
     }
 }
 .timestamp {
