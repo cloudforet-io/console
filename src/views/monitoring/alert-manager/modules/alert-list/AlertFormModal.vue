@@ -28,11 +28,17 @@
                            :invalid-text="projectInvalidText"
             >
                 <template #label-extra>
-                    <p-anchor class="go-project" highlight :to="{name: PROJECT_ROUTE._NAME }">
+                    <p-anchor v-if="!projectId" class="go-project" highlight
+                              :to="{name: PROJECT_ROUTE._NAME }"
+                    >
                         {{ $t('MONITORING.ALERT.ALERT_LIST.FORM.CREATE_PROJECT') }}
                     </p-anchor>
                 </template>
-                <project-select-dropdown :invalid="projectInvalid" @select="onSelectProject" />
+                <project-select-dropdown :invalid="projectInvalid"
+                                         :selected-project-ids="projectId ? [projectId] : undefined"
+                                         :readonly="!!projectId"
+                                         @select="onSelectProject"
+                />
             </p-field-group>
             <p-button v-if="projectInvalid && isProjectAlertSet === false" class="project-set-button" style-type="secondary-dark"
                       size="sm" @click="setProjectAlert"
@@ -62,7 +68,7 @@ import { i18n } from '@/translations';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { ProjectItemResp } from '@/views/project/project/type';
-import {ALERT_URGENCY} from "@/views/monitoring/alert-manager/lib/config";
+import { ALERT_URGENCY } from '@/views/monitoring/alert-manager/lib/config';
 
 export default {
     name: 'AlertFormModal',
@@ -81,6 +87,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        projectId: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props, { emit, root }) {
         const state = reactive({
@@ -89,7 +99,7 @@ export default {
             // inputs
             title: undefined as undefined|string,
             urgency: ALERT_URGENCY.HIGH,
-            projectId: undefined as undefined|null|string,
+            selectedProjectId: props.projectId as undefined|null|string,
             description: '',
             // validation
             titleInvalidText: computed(() => {
@@ -99,19 +109,19 @@ export default {
             titleInvalid: computed(() => state.title !== undefined && !!state.titleInvalidText),
             isProjectAlertSet: undefined as undefined|boolean,
             projectInvalidText: computed(() => {
-                if (state.projectId === null) return i18n.t('MONITORING.ALERT.ALERT_LIST.FORM.REQUIRED_PROJECT');
+                if (state.selectedProjectId === null) return i18n.t('MONITORING.ALERT.ALERT_LIST.FORM.REQUIRED_PROJECT');
                 if (state.isProjectAlertSet === false) return i18n.t('MONITORING.ALERT.ALERT_LIST.FORM.NEED_TO_SET_PROJECT_ALERT');
                 return undefined;
             }),
-            projectInvalid: computed(() => state.projectId !== undefined && !!state.projectInvalidText),
-            isAllValid: computed(() => state.title !== undefined && !state.titleInvalid && state.projectId !== undefined && !state.projectInvalid),
+            projectInvalid: computed(() => state.selectedProjectId !== undefined && !!state.projectInvalidText),
+            isAllValid: computed(() => state.title !== undefined && !state.titleInvalid && state.selectedProjectId !== undefined && !state.projectInvalid),
         });
 
         const checkProject = async () => {
             state.isProjectAlertSet = undefined;
             try {
                 await SpaceConnector.client.monitoring.projectAlertConfig.get({
-                    project_id: state.projectId,
+                    project_id: state.selectedProjectId,
                 });
                 state.isProjectAlertSet = true;
             } catch (e) {
@@ -122,7 +132,7 @@ export default {
         const setProjectAlert = async () => {
             try {
                 await SpaceConnector.client.monitoring.projectAlertConfig.create({
-                    project_id: state.projectId,
+                    project_id: state.selectedProjectId,
                 });
                 state.isProjectAlertSet = true;
             } catch (e) {
@@ -136,7 +146,7 @@ export default {
                 await SpaceConnector.client.monitoring.alert.create({
                     title: state.title,
                     urgency: state.urgency,
-                    project_id: state.projectId,
+                    project_id: state.selectedProjectId,
                     description: state.description,
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_CREATE'), '', root);
@@ -164,13 +174,13 @@ export default {
         };
 
         const onSelectProject = async (projects: ProjectItemResp[]) => {
-            state.projectId = projects[0]?.id ?? null;
-            if (state.projectId) await checkProject();
+            state.selectedProjectId = projects[0]?.id ?? null;
+            if (state.selectedProjectId) await checkProject();
         };
 
         const reset = () => {
             state.title = undefined;
-            state.projectId = undefined;
+            state.selectedProjectId = undefined;
             state.urgency = ALERT_URGENCY.HIGH;
             state.description = '';
 

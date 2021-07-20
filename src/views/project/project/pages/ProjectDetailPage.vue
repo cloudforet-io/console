@@ -56,11 +56,12 @@
         <p-button-modal :header-title="headerTitle"
                         :centered="true"
                         :scrollable="false"
-                        size="md"
+                        size="sm"
                         :fade="true"
                         :backdrop="true"
                         :visible.sync="projectDeleteFormVisible"
                         :theme-color="themeColor"
+                        :loading="modalLoading"
                         @confirm="projectDeleteFormConfirm"
         >
             <template #body>
@@ -223,6 +224,7 @@ export default {
             headerTitle: '' as TranslateResult,
             themeColor: '',
             modalContent: '' as TranslateResult,
+            modalLoading: false,
         });
 
         const openProjectDeleteForm = () => {
@@ -233,6 +235,9 @@ export default {
         };
 
         const projectDeleteFormConfirm = async () => {
+            if (formState.modalLoading) return;
+
+            formState.modalLoading = true;
             try {
                 await SpaceConnector.client.identity.project.delete({
                     project_id: state.projectId,
@@ -243,6 +248,7 @@ export default {
             } catch (e) {
                 showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'), e, root);
             } finally {
+                formState.modalLoading = false;
                 formState.projectDeleteFormVisible = false;
             }
         };

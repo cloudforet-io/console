@@ -57,14 +57,16 @@
                 </template>
                 <template #col-title-format="{ value, item }">
                     <template v-if="value">
-                        <router-link class="alert-title"
-                                     :to="{
-                                         name: MONITORING_ROUTE.ALERT_MANAGER.ALERT.DETAIL._NAME,
-                                         params: { id: item.alert_id }
-                                     }"
+                        <p-anchor target="_self"
+                                  :show-icon="false"
+                                  highlight
+                                  :to="{
+                                      name: MONITORING_ROUTE.ALERT_MANAGER.ALERT.DETAIL._NAME,
+                                      params: { id: item.alert_id }
+                                  }"
                         >
                             {{ value }}
-                        </router-link>
+                        </p-anchor>
                     </template>
                 </template>
                 <template #col-state-format="{ value }">
@@ -105,7 +107,7 @@
                 </template>
             </p-toolbox-table>
         </div>
-        <alert-form-modal :visible.sync="visibleAlertFormModal" @refresh="getAlerts()" />
+        <alert-form-modal :visible.sync="visibleAlertFormModal" :project-id="projectId" @refresh="getAlerts()" />
     </fragment>
 </template>
 <script lang="ts">
@@ -439,12 +441,6 @@ export default {
         .p-toolbox {
             .p-dropdown-menu-button {
                 @apply bg-white;
-            }
-        }
-        .alert-title {
-            @apply text-blue-600;
-            &:hover {
-                @apply underline;
             }
         }
     }

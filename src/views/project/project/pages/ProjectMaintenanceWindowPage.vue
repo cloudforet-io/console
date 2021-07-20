@@ -67,7 +67,7 @@
 <script lang="ts">
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch, watchEffect,
 } from '@vue/composition-api';
 
 import {
@@ -89,6 +89,7 @@ import { store } from '@/store';
 
 import MaintenanceWindowFormModal from '@/views/project/project/modules/MaintenanceWindowFormModal.vue';
 import { replaceUrlQuery } from '@/lib/router-query-string';
+import { PROJECT_ROUTE } from '@/routes/project/project-route';
 
 
 const STATE = Object.freeze({
@@ -141,7 +142,7 @@ export default {
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        const tableQueryHandler = new QueryHelper()
+        const tagQueryHandler = new QueryHelper()
             .setKeyItemSets(keyItemSets)
             .setFiltersAsRawQueryString(vm.$route.query.filters);
 
@@ -152,13 +153,13 @@ export default {
 
         const state = reactive({
             totalCount: 0,
-            loading: true,
+            loading: false,
             items: [] as any[],
             timezone: computed(() => store.state.user.timezone),
             selectIndex: [] as number[],
             selectedItems: computed<any[]>(() => state.selectIndex.map(d => state.items[d])),
             selectedItemState: computed(() => STATE[state.selectedItems[0]?.state]),
-            queryTags: tableQueryHandler.queryTags,
+            queryTags: tagQueryHandler.queryTags,
             visibleUpdateModal: false,
             visibleCloseCheckModal: false,
             closeLoading: false,
@@ -166,9 +167,11 @@ export default {
 
 
         const getMaintenanceWindows = async () => {
+            if (state.loading) return;
+
             state.loading = true;
             try {
-                maintenanceWindowApiQueryHelper.setFilters([...tableQueryHandler.filters]);
+                maintenanceWindowApiQueryHelper.setFilters([...tagQueryHandler.filters]);
                 if (props.id) maintenanceWindowApiQueryHelper.addFilter({ k: 'projects', v: [props.id] });
 
                 const { total_count, results } = await SpaceConnector.client.monitoring.maintenanceWindow.list({
@@ -189,20 +192,20 @@ export default {
         const onChange = async (options: any = {}) => {
             setApiQueryWithToolboxOptions(maintenanceWindowApiQueryHelper, options, { queryTags: true });
             if (options.queryTags) {
-                // it triggers execution of router.query watch handler
-                replaceUrlQuery('filters', maintenanceWindowApiQueryHelper.rawQueryStrings);
-            }
-            await getMaintenanceWindows();
-        };
-
-        const urlQueryHelper = new QueryHelper().setKeyItemSets(keyItemSets);
-        watch(() => vm.$route.query, async (query) => {
-            urlQueryHelper.setFiltersAsRawQueryString(query.filters);
-            if (tableQueryHandler.rawQueryString !== urlQueryHelper.rawQueryString) {
-                tableQueryHandler.setFilters(urlQueryHelper.filters);
-                state.queryTags = tableQueryHandler.queryTags;
+                // it makes route query watcher trigger getMaintenanceWindows()
+                state.queryTags = options.queryTags;
+                const strings = tagQueryHandler.setFiltersAsQueryTag(options.queryTags).rawQueryStrings;
+                await replaceUrlQuery('filters', strings);
+            } else {
                 await getMaintenanceWindows();
             }
+        };
+
+        watch(() => vm.$route.query, async (query) => {
+            if (vm.$route.name !== PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME) return;
+            tagQueryHandler.setFiltersAsRawQueryString(query.filters);
+            state.queryTags = tagQueryHandler.queryTags;
+            await getMaintenanceWindows();
         });
 
         const closeMaintenanceWindow = async () => {
