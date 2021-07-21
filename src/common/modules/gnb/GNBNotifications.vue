@@ -83,6 +83,7 @@ export default {
             moreMenuItems: computed(() => [
                 { name: 'delete', label: 'Delete All' },
             ]),
+            timezone: computed(() => store.state.user.timezone),
         });
 
         const setReadNotifications = async (notifications: any[]) => {
@@ -98,6 +99,7 @@ export default {
             }
         };
 
+        const currentTime = dayjs();
         let totalCount: number|undefined;
         let pageStart = 1;
         const pageLimit = 15;
@@ -105,8 +107,8 @@ export default {
             .setPage(pageStart, pageLimit)
             .setSort('created_at', true)
             .setFilters([
-                { k: 'created_at', v: dayjs().subtract(7, 'day').utc().toISOString(), o: '>=t' },
-                { k: 'created_at', v: dayjs().utc().toISOString(), o: '<t' },
+                { k: 'created_at', v: currentTime.subtract(7, 'day').format('YYYY-MM-DD HH:mm:ss'), o: '>=t' },
+                { k: 'created_at', v: currentTime.format('YYYY-MM-DD HH:mm:ss'), o: '<t' },
                 { k: 'user_id', v: store.state.user.userId, o: '=' },
             ]);
 

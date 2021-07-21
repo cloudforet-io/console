@@ -44,7 +44,7 @@ export const checkNotification: Action<DisplayState, any> = async ({
     commit, state, rootState, rootGetters,
 }): Promise<void> => {
     try {
-        const currentTime = dayjs().utc().toISOString();
+        const currentTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
 
         checkNotificationQueryHelper.setFilters([
             fixedCheckNotificationFilter,
@@ -72,7 +72,7 @@ export const checkNotification: Action<DisplayState, any> = async ({
 
 let checkNotificationInterval: number|undefined;
 export const stopCheckNotification: Action<DisplayState, any> = ({ commit, dispatch }): void => {
-    const lastCheckedTime = dayjs().utc().toISOString();
+    const lastCheckedTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
     dispatch('settings/setItem', {
         key: 'last_checked_notification',
         value: lastCheckedTime,
