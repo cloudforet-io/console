@@ -4,21 +4,21 @@
             <p-panel-top class="panel-title">
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.RESPONDER') }}
             </p-panel-top>
-            <p-collapsible-list :items="items" theme="card" multi-unfoldable
-                                :unfolded-indices="[alertData.escalation_step]"
+            <p-collapsible-list :items="escalationRuleItems" theme="card" multi-unfoldable
+                                :unfolded-indices="[alertData.escalation_step - 1]"
             >
-                <template #title="{title, index}">
-                    <p class="responder-info" :class="{'current': items[index].data === `LV${alertData.escalation_step}`}">
+                <template #title="{data, title, index}">
+                    <p class="responder-info" :class="{'current': data.notification_level === `LV${alertData.escalation_step}` }">
                         <span class="step">[{{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.STEP') }} {{ index+1 }}]</span>
-                        <span class="level">{{ items[index].data }}</span>
-                        <p-badge v-if="items[index].data === `LV${alertData.escalation_step}`" style-type="primary3">
+                        <span class="level">{{ data.notification_level }}</span>
+                        <p-badge v-if="data.notification_level === `LV${alertData.escalation_step}`" style-type="primary3">
                             {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.CURRENT') }}
                         </p-badge>
                     </p>
                 </template>
-                <template #default="{data}">
+                <template #default="{data, index}">
                     <p class="data-wrapper">
-                        <project-channel-list :project-channels="projectChannels" :notification-level="data" />
+                        <project-channel-list :project-channels="projectChannels" :notification-level="data.notification_level" />
                     </p>
                 </template>
             </p-collapsible-list>
@@ -71,12 +71,18 @@ import ProjectChannelList from '@/views/monitoring/alert-manager/components/Proj
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import { UserState } from '@/store/modules/user/type';
+import VueI18n from 'vue-i18n';
+
+import TranslateResult = VueI18n.TranslateResult;
 
 interface PropsType {
     id?: string;
     alertData: AlertDataModel;
 }
-
+interface Rule {
+    title: TranslateResult;
+    data: object;
+}
 export default {
     name: 'AlertDetailResponder',
     components: {
@@ -103,11 +109,11 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             items: computed(() => [
-                { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'ALL' },
                 { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV1' },
                 { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV2' },
                 { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV3' },
             ]),
+            escalationRuleItems: [] as Rule[],
             loading: true,
             projectChannels: [],
         });
@@ -206,8 +212,19 @@ export default {
             });
         };
 
+        const listEscalationPolicy = async () => {
+            const { rules } = await SpaceConnector.client.monitoring.escalationPolicy.get({
+                // eslint-disable-next-line camelcase
+                escalation_policy_id: props.alertData.escalation_policy_id,
+            });
+            state.escalationRuleItems = rules.map(d => ({
+                title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'),
+                data: d,
+            }));
+        };
+
         (async () => {
-            await Promise.all([listProjectChannel(), listMember(),
+            await Promise.all([listProjectChannel(), listMember(), listEscalationPolicy(),
                 store.dispatch('resource/protocol/load'), store.dispatch('resource/user/load')]);
         })();
 

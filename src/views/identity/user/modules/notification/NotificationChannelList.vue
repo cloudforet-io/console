@@ -71,7 +71,7 @@ import {
     PDivider, PI, PEmpty, PPaneLayout, PLazyImg, PDataLoader,
 } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, onActivated, reactive, toRefs,
 } from '@vue/composition-api';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
@@ -243,6 +243,10 @@ export default {
         const onChangeChannelItem = async () => {
             await listChannel();
         };
+
+        onActivated(async () => {
+            await listChannel();
+        });
 
         (async () => {
             await listProtocol();
