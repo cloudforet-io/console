@@ -13,7 +13,7 @@
                 </p-copy-button>
             </span>
             <p-button style-type="gray-border" size="sm" class="add-button ml-2"
-                      @click="startEdit(EDIT_MODE.PROJECT)"
+                      @click="startEdit(alertData.project_id)"
             >
                 {{ $t('MONITORING.ALERT.DETAIL.INFO.CHANGE') }}
             </p-button>
@@ -24,7 +24,7 @@
             />
             <div class="button-group ml-2">
                 <p-button :outline="true" size="sm" class="cancel-button"
-                          @click="cancelEdit(EDIT_MODE.PROJECT)"
+                          @click="cancelEdit(alertData.project_id)"
                 >
                     {{ $t('COMMON.TAGS.CANCEL') }}
                 </p-button>

@@ -3,6 +3,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { EDIT_MODE } from '@/views/monitoring/alert-manager/lib/config';
+import {cloneDeep} from "lodash";
 
 interface AlertDetailItemState {
 	isEditMode: boolean;
@@ -21,12 +22,22 @@ interface ParamType {
 export const useAlertDetailItem = (obj: AlertDetailItemState) => {
     const vm = getCurrentInstance() as ComponentRenderProxy;
     const state = reactive<AlertDetailItemState>(obj);
-    const cancelEdit = () => {
+    const cancelEdit = (initialData) => {
         state.isEditMode = false;
+        if (typeof initialData === 'object') {
+            state.dataForUpdate = cloneDeep(initialData);
+        } else {
+            state.dataForUpdate = initialData;
+        }
     };
 
-    const startEdit = () => {
+    const startEdit = (initialData) => {
         state.isEditMode = true;
+        if (typeof initialData === 'object') {
+            state.dataForUpdate = cloneDeep(initialData);
+        } else {
+            state.dataForUpdate = initialData;
+        }
     };
 
     const getParams = (editMode: EDIT_MODE) => {

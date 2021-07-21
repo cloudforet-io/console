@@ -1,7 +1,7 @@
 <template>
     <p v-if="!isEditMode" class="content-wrapper">
         <span class="description">{{ alertData.description }}&zwnj;</span>
-        <button class="edit-btn" @click="startEdit(EDIT_MODE.DESCRIPTION)">
+        <button class="edit-btn" @click="startEdit(alertData.description)">
             <p-i name="ic_edit" width="1rem" height="1rem"
                  color="inherit" class="edit-icon"
             />
@@ -12,7 +12,7 @@
         <p-textarea v-model="dataForUpdate" class="textarea" />
         <div class="button-group">
             <p-button :outline="true" class="text-button"
-                      size="sm" @click="cancelEdit(EDIT_MODE.DESCRIPTION)"
+                      size="sm" @click="cancelEdit(alertData.description)"
             >
                 {{$t('MONITORING.ALERT.DETAIL.INFO.CANCEL')}}
             </p-button>
