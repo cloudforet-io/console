@@ -56,13 +56,13 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
+import { store } from '@/store';
 import { i18n } from '@/translations';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import GNBNotificationItem from '@/common/modules/gnb/GNBNotificationItem.vue';
 import GNBNotificationDateHeader from '@/common/modules/gnb/GNBNotificationDateHeader.vue';
 import dayjs from 'dayjs';
-import store from '@/store';
 
 
 export default {
@@ -145,10 +145,9 @@ export default {
             observedElement = el;
         };
 
-        let lastCalledPageStart: number|undefined;
         const onElementObserved = (entries: IntersectionObserverEntry[]) => {
+            if (state.loading) return;
             if (typeof totalCount === 'number' && state.notifications.length >= totalCount) return;
-            if (lastCalledPageStart === pageStart) return;
 
             const lastEntry = entries[entries.length - 1];
             if (!lastEntry.isIntersecting) return;
@@ -156,8 +155,6 @@ export default {
             pageStart += pageLimit;
             notificationApiHelper.setPageStart(pageStart);
             listNotifications();
-
-            lastCalledPageStart = pageStart;
         };
 
         onMounted(() => {
