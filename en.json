@@ -1135,12 +1135,12 @@
 				"UPDATE_ACKNOWLEDGE_MODAL": {
 					"ASSIGN_TO_ME_YES": "Yes, I want to assign the selected alert(s) to me.",
 					"ASSIGN_TO_YOU": "Do you want to assign selected alert(s) to you?",
-					"TITLE": "Change {count} alert(s) to acknowledged state "
+					"TITLE": "Are you sure you want to change {count} alert(s) to acknowledged state?"
 				},
 				"UPDATE_RESOLVE_MODAL": {
 					"LABEL_NOTE": "Note",
 					"NOTREOPEN": "Once resolved, this alert cannot be reopened.",
-					"TITLE": "Change {count} alert(s) to resolved state"
+					"TITLE": "Are you sure you want to change {count} alert(s) to resolved state?"
 				},
 				"URGENCY": "Urgency"
 			},
@@ -1611,8 +1611,8 @@
 			"MODAL_DELETE_PROJECT_CONTENT": "Are you sure you want to delete the project?",
 			"MODAL_DELETE_PROJECT_TITLE": "Delete Project",
 			"MODAL_DELETE_WEBHOOK": "Delete this webhook",
-			"MODAL_DELETE_WEBHOOK_CONTENT_1": "This action cannot be undone.",
-			"MODAL_DELETE_WEBHOOK_CONTENT_2": "There will be no alerts created by this webhook.",
+			"MODAL_DELETE_WEBHOOK_CONTENT_1": "You can no longer receive events with this webhook, and",
+			"MODAL_DELETE_WEBHOOK_CONTENT_2": "this action cannot be undone.",
 			"MODAL_DELETE_WEBHOOK_CONTENT_3": "Type {webhookName} to Confirm.",
 			"MODAL_DELETE_WEBHOOK_TITLE": "Delete the selected webhook permanently.",
 			"MODAL_DISABLE_WEBHOOK_DESC": "Are you sure you want to disable selected webhook below?",

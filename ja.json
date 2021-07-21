@@ -1134,13 +1134,13 @@
 				"TRIGGERED": "生成",
 				"UPDATE_ACKNOWLEDGE_MODAL": {
 					"ASSIGN_TO_ME_YES": "はい、選択されたアラートを自分にアサインします。",
-					"ASSIGN_TO_YOU": "選択されたアラートをアサインしますか？",
-					"TITLE": "{count}個のアラートを確認状態に変更"
+					"ASSIGN_TO_YOU": "選択されたアラートを私にアサインしますか？",
+					"TITLE": "{count}個のアラートを確認の状態に変更しますか？"
 				},
 				"UPDATE_RESOLVE_MODAL": {
 					"LABEL_NOTE": "ノート",
 					"NOTREOPEN": "完了に変更されると、このアラートを再度開くことはできません。",
-					"TITLE": "完了に変更する"
+					"TITLE": "{count}個のアラートを完了の状態に変更しますか？"
 				},
 				"URGENCY": "緊急度"
 			},
@@ -1611,8 +1611,8 @@
 			"MODAL_DELETE_PROJECT_CONTENT": "このプロジェクトを削除しますか？",
 			"MODAL_DELETE_PROJECT_TITLE": "プロジェクト削除",
 			"MODAL_DELETE_WEBHOOK": "削除",
-			"MODAL_DELETE_WEBHOOK_CONTENT_1": "この作業は取り消すことができません。",
-			"MODAL_DELETE_WEBHOOK_CONTENT_2": "このウェプフクにより作成されたアラートはありません。",
+			"MODAL_DELETE_WEBHOOK_CONTENT_1": "このウェプフクでこれ以上イベントを受信することができず、",
+			"MODAL_DELETE_WEBHOOK_CONTENT_2": "この作業は取り消すことができません。",
 			"MODAL_DELETE_WEBHOOK_CONTENT_3": "確認のため、{webhookName}を入力してください。",
 			"MODAL_DELETE_WEBHOOK_TITLE": "選択したウェプフクを完全に削除します。",
 			"MODAL_DISABLE_WEBHOOK_DESC": "選択したウェプフクを無効化にしますか？",

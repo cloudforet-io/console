@@ -1134,13 +1134,13 @@
 				"TRIGGERED": "생성",
 				"UPDATE_ACKNOWLEDGE_MODAL": {
 					"ASSIGN_TO_ME_YES": "네, 선택된 얼럿을 나에게 할당하겠습니다.",
-					"ASSIGN_TO_YOU": "선택된 얼럿을 할당할까요?",
-					"TITLE": "{count}개의 얼럿을 확인 상태로 변경하기"
+					"ASSIGN_TO_YOU": "선택된 얼럿을 나에게 할당할까요?",
+					"TITLE": "{count}개의 얼럿을 확인 상태로 변경하시겠습니까?"
 				},
 				"UPDATE_RESOLVE_MODAL": {
 					"LABEL_NOTE": "노트",
 					"NOTREOPEN": "완료 상태로 변경되면, 이 얼럿을 다시 오픈할 수 없습니다.",
-					"TITLE": "{count}개의 얼럿을 완료 상태로 변경하기"
+					"TITLE": "{count}개의 얼럿을 완료 상태로 변경하시겠습니까?"
 				},
 				"URGENCY": "긴급도"
 			},
@@ -1611,8 +1611,8 @@
 			"MODAL_DELETE_PROJECT_CONTENT": "이 프로젝트를 삭제하시겠습니까? ",
 			"MODAL_DELETE_PROJECT_TITLE": "프로젝트 삭제 ",
 			"MODAL_DELETE_WEBHOOK": "삭제",
-			"MODAL_DELETE_WEBHOOK_CONTENT_1": "이 작업은 취소 할 수 없습니다.",
-			"MODAL_DELETE_WEBHOOK_CONTENT_2": " 이 웹훅에 의해 생성된 얼럿이 없습니다.",
+			"MODAL_DELETE_WEBHOOK_CONTENT_1": "이 웹훅으로 더 이상 이벤트를 수신할 수 없으며,",
+			"MODAL_DELETE_WEBHOOK_CONTENT_2": "이 작업은 취소 할 수 없습니다.",
 			"MODAL_DELETE_WEBHOOK_CONTENT_3": "확인을 위해 {webhookName} 을 입력해주세요.",
 			"MODAL_DELETE_WEBHOOK_TITLE": "선택한 웹훅을 영구적으로 삭제합니다.",
 			"MODAL_DISABLE_WEBHOOK_DESC": "선택한 웹훅을 비활성화 하시겠습니까?",
