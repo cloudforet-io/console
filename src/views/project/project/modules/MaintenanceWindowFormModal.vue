@@ -228,7 +228,7 @@ export default {
             const timeDiff = dayjs(endTime).diff(startTime, 'minute');
             const days = Math.floor(timeDiff / 1440);
             const hours = Math.floor((timeDiff % 1440) / 60);
-            const minutes = Math.floor((timeDiff % 1440) % 60);
+            const minutes = Math.floor((timeDiff % 60) % 60);
 
             const timePeriod = () => {
                 let period = '';

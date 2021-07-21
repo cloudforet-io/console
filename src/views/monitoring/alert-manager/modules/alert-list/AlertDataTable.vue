@@ -152,7 +152,7 @@ import {
 import { alertStateBadgeStyleTypeFormatter, triggeredByFormatter } from '@/views/monitoring/alert-manager/lib/helper';
 
 
-const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm';
+const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
 
 
 export default {
