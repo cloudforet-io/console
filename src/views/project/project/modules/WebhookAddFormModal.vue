@@ -48,6 +48,7 @@
                 <p-select-dropdown v-model="version"
                                    :items="versions"
                                    :disabled="loading"
+                                   :placeholder="loading ? $t('PROJECT.DETAIL.MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER') : $t('COMPONENT.SELECT_DROPDOWN.SELECT')"
                                    use-fixed-menu-style
                 />
             </p-field-group>
@@ -154,6 +155,7 @@ export default {
             }
         };
         const getVersions = async (selectedPluginId) => {
+            state.loading = true;
             state.versions = [];
             try {
                 const { results } = await SpaceConnector.client.repository.plugin.getVersions({
@@ -170,6 +172,8 @@ export default {
             } catch (e) {
                 state.versions = [];
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
         const createWebhook = async () => {
