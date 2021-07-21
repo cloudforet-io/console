@@ -17,16 +17,20 @@
 </template>
 
 <script lang="ts">
+import dayjs from 'dayjs';
+
+import {
+    onMounted, reactive, toRefs, computed,
+} from '@vue/composition-api';
+
 import {
     PI,
 } from '@spaceone/design-system';
-import {
-    onMounted, reactive, toRefs,
-} from '@vue/composition-api';
+
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import dayjs from 'dayjs';
+import { store } from '@/store';
 
 export default {
     name: 'Top5ProjectActivityTooltip',
@@ -57,11 +61,12 @@ export default {
             totalCount: 0,
             alerts: [],
             moreCount: undefined as undefined | number,
+            timezone: computed(() => store.state.user.timezone),
         });
 
         /* util */
         const dateFormatter = (date) => {
-            const current = dayjs.utc(date);
+            const current = state.timezone === 'UTC' ? dayjs.utc(date) : dayjs.utc(date).tz(state.timezone);
             if (props.period.includes('d')) {
                 return `${current.format('YYYY/MM/DD 00:00:00')} ~ ${current.format('23:59:59')}`;
             }
@@ -70,17 +75,22 @@ export default {
 
         /* api */
         const getQuery = () => {
+            const unit = props.period.includes('d') ? 'day' : 'hour';
             const apiQuery = new ApiQueryHelper().setPage(1, 10);
             const filters: QueryStoreFilter[] = [];
+            const currentTime = state.timezone === 'UTC' ? dayjs.utc(props.date) : dayjs.utc(props.date).tz(state.timezone);
+            const start = currentTime.format('YYYY-MM-DD HH:00');
+            const end = currentTime.add(1, unit).format('YYYY-MM-DD HH:00');
+
             filters.push({
                 k: 'created_at',
                 o: '>=t',
-                v: props.date,
+                v: start,
             });
             filters.push({
                 k: 'created_at',
                 o: '<t',
-                v: dayjs.utc(props.date).add(1, 'day').format('YYYY-MM-DD'),
+                v: end,
             });
             apiQuery.setFilters(filters);
             return apiQuery.data;
