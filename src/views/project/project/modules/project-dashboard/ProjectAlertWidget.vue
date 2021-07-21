@@ -16,7 +16,7 @@
             <p-list-card :items="items" :loading="loading" :hoverable="true">
                 <template #header>
                     <p class="left-part">
-                        <strong>{{ $t('PROJECT.DETAIL.SUMMARY.OPEN_ALERT') }}</strong> ({{ totalCount }})
+                        <strong>{{ $t('PROJECT.DETAIL.SUMMARY.OPEN_ALERT') }}</strong> ({{ commaFormatter(totalCount) }})
                     </p>
                     <p class="right-part">
                         <p-select-button v-for="(state, idx) in assignedStateList" :key="`assigned-${idx}`"

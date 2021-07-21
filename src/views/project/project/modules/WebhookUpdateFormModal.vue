@@ -28,6 +28,7 @@
                 <p-select-dropdown v-model="selectedVersion"
                                    :items="versions"
                                    :disabled="loading"
+                                   :placeholder="$t('PROJECT.DETAIL.MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER')"
                                    use-fixed-menu-style
                 />
             </p-field-group>
@@ -117,16 +118,25 @@ export default {
             }
         };
         const getVersions = async () => {
-            const { results } = await SpaceConnector.client.repository.plugin.getVersions({
-                plugin_id: props.selectedItem[0].plugin_info.plugin_id,
-            });
-            results.forEach((value, index) => {
-                if (index === 0) {
-                    state.versions.push({ type: 'item', label: `${value} (latest)`, name: value });
-                } else {
-                    state.versions.push({ type: 'item', label: value, name: value });
-                }
-            });
+            state.loading = true;
+            state.versions = [];
+            try {
+                const { results } = await SpaceConnector.client.repository.plugin.getVersions({
+                    plugin_id: props.selectedItem[0].plugin_info.plugin_id,
+                });
+                results.forEach((value, index) => {
+                    if (index === 0) {
+                        state.versions.push({ type: 'item', label: `${value} (latest)`, name: value });
+                    } else {
+                        state.versions.push({ type: 'item', label: value, name: value });
+                    }
+                });
+            } catch (e) {
+                state.versions = [];
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
         };
 
         /* event */
