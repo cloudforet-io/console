@@ -1632,6 +1632,7 @@
 			"MODAL_VALIDATION_REQUIRED": "이름을 입력해 주세요.",
 			"MODAL_VALIDATION_SELECT_MEMBER": "구성원을 선택하세요",
 			"MODAL_VALIDATION_SELECT_ROLE": "권한을 선택하세요",
+			"MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER": "로딩중...",
 			"PROJECT_ALERT_ACTIVATE": "얼럿 활성화",
 			"PROJECT_ALERT_ACTIVATION_DESC_1": "이 프로젝트의 얼럿 설정하기",
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "통합된 외부 이벤트를 수신하거나 이 프로젝트를 관리하려면 '얼럿 활성화' 버튼을 클릭하세요.",

@@ -1632,6 +1632,7 @@
 			"MODAL_VALIDATION_REQUIRED": "名前を入力してください",
 			"MODAL_VALIDATION_SELECT_MEMBER": "メンバーを選択してください。",
 			"MODAL_VALIDATION_SELECT_ROLE": "権限を選択してください。",
+			"MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER": "ロード中...",
 			"PROJECT_ALERT_ACTIVATE": "通知有効化",
 			"PROJECT_ALERT_ACTIVATION_DESC_1": "このプロジェクトのアラートを設定する",
 			"PROJECT_ALERT_ACTIVATION_DESC_2": "統合された外部イベントを受信するかこのプロジェクトを管理のためには「通知有効化」をクリックしてください。",
