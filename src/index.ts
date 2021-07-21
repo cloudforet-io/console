@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 
 import {
-    computed, getCurrentInstance, Ref,
+    computed, getCurrentInstance, Ref
 } from '@vue/composition-api';
 
 dayjs.extend(tz);
@@ -23,17 +23,26 @@ export const durationFormatter = (createdAt: string, finishedAt: string, timezon
     if (createdAt && finishedAt) {
         const createdAtTime = dayjs(iso8601Formatter(createdAt, timezone));
         const finishedAtTime = dayjs(iso8601Formatter(finishedAt, timezone));
-        const durationSec = finishedAtTime.diff(createdAtTime, 'second');
-        const durationMin = finishedAtTime.diff(createdAtTime, 'minute');
-        const durationHours = finishedAtTime.diff(createdAtTime, 'hour');
-        const durationDays = finishedAtTime.diff(createdAtTime, 'day');
-        if (durationSec < 60) return `${durationSec}s`;
-        if (durationMin < 60) return `${durationMin}m`;
-        if (durationHours < 24) return `${durationHours}h ${durationMin % 60}m`;
-        return `${durationDays % 24}d ${durationHours % 24}h`;
+        const timeDiff = dayjs(finishedAtTime).diff(createdAtTime, 'second');
+        const days = Math.floor(timeDiff / 86400);
+        const hours = Math.floor((timeDiff % 86400) / 3600);
+        const minutes = Math.floor((timeDiff % 3600) / 60);
+        const seconds = Math.floor((timeDiff % 60) % 60);
+
+        const duration = () => {
+            let duration = '';
+            if (days !== 0) return duration = `${days}d ${hours}h`;
+            if (hours !== 0) return duration = ` ${hours}h ${minutes}m`;
+            if (minutes !== 0) return duration = `${minutes}m ${seconds}s`;
+            if (seconds !== 0) return duration = `${seconds}s`;
+            return duration;
+        };
+
+        return duration();
     }
     return null;
 };
+
 export const numberFormatter = (num) => {
     if (Math.abs(num) < 10000) {
         return Math.round(num * 100) / 100;
@@ -96,6 +105,6 @@ export const makeProxy = <T = any>(name: string, props: any = null, emit: any = 
             } else {
                 _emit(val);
             }
-        },
+        }
     });
 };
