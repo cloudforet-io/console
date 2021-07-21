@@ -44,10 +44,7 @@
                 <p-tag v-for="(tag, i) in responderState.selectedMemberItems" :key="tag" @delete="onDeleteTag(i)">
                     {{ tag ? tag : '' }}
                     <template v-if="!responderState.loading">
-                        ({{ responderState.allMemberItems.find((d) => d.name === tag).label }})
-                    </template>
-                    <template v-else>
-                        ''
+                        ({{ responderNameFormatter(tag) }})
                     </template>
                 </p-tag>
             </div>
@@ -73,6 +70,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import ProjectChannelList from '@/views/monitoring/alert-manager/components/ProjectChannelList.vue';
 import { i18n } from '@/translations';
 import { store } from '@/store';
+import { UserState } from '@/store/modules/user/type';
 
 interface PropsType {
     id?: string;
@@ -117,7 +115,7 @@ export default {
         const responderState = reactive({
             search: '',
             loading: true,
-            allMember: [] as string[],
+            allMember: [] as UserState[],
             allMemberItems: computed(() => responderState.allMember.map(d => ({
                 name: d.user_id,
                 label: d.name,
@@ -125,6 +123,12 @@ export default {
             }))),
             selectedMemberItems: props.alertData.responders.map(d => d.resource_id),
         });
+
+        const responderNameFormatter = (resourceId) => {
+            const target = responderState.allMemberItems.find(d => d.name === resourceId);
+            if (target.label) return target.label;
+            return target.name;
+        };
 
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
@@ -214,6 +218,7 @@ export default {
             onSelectMember,
             addResponder,
             onDeleteTag,
+            responderNameFormatter,
         };
     },
 };
