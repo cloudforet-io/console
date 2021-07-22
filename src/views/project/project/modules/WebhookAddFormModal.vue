@@ -47,7 +47,7 @@
             >
                 <p-select-dropdown v-model="version"
                                    :items="versions"
-                                   :disabled="loading"
+                                   :disabled="loading || !isSelectedVersion"
                                    :placeholder="loading ? $t('PROJECT.DETAIL.MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER') : $t('COMPONENT.SELECT_DROPDOWN.SELECT')"
                                    use-fixed-menu-style
                 />

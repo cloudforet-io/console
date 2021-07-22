@@ -3,7 +3,7 @@
         <p-breadcrumbs :routes="routeState.route" />
         <p-page-title :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')" />
         <div class="content-wrapper grid grid-cols-12 gap-4">
-<!--            <alert-assigned-list class="col-span-12" />-->
+            <!--            <alert-assigned-list class="col-span-12" />-->
             <assigned-alert-info @select="onSelectAlertState" />
             <alert-data-table :alert-state="alertState"
                               :urgency="urgency"

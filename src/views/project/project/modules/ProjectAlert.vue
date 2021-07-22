@@ -13,9 +13,10 @@ import {
     onActivated, reactive, toRefs,
 } from '@vue/composition-api';
 import AlertDataTable from '@/views/monitoring/alert-manager/modules/alert-list/AlertDataTable.vue';
-import { ALERT_STATE_FILTER } from '@/views/monitoring/alert-manager/lib/config';
+import {ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE} from '@/views/monitoring/alert-manager/lib/config';
 import { AlertListPageUrlQuery, AlertListTableFilters } from '@/views/monitoring/alert-manager/type';
 import router from '@/routes';
+import {QueryHelper} from "@spaceone/console-core-lib/query";
 
 export default {
     name: 'ProjectAlert',
@@ -29,8 +30,11 @@ export default {
         },
     },
     setup() {
+        const tagQueryHelper = new QueryHelper().setFiltersAsRawQueryString(router.currentRoute.query.filters);
         const state = reactive({
             alertState: router.currentRoute.query.state ?? ALERT_STATE_FILTER.OPEN,
+            urgency: router.currentRoute.query.state ?? ALERT_URGENCY.ALL,
+            assigned: router.currentRoute.query.state ?? ASSIGNED_STATE.ALL,
         });
 
         /* util */
@@ -47,6 +51,18 @@ export default {
             if (changed.state) {
                 state.alertState = changed.state;
                 query.state = changed.state;
+            }
+            if (changed.urgency) {
+                state.urgency = changed.urgency;
+                query.urgency = changed.urgency;
+            }
+            if (changed.assigned) {
+                state.assigned = changed.assigned;
+                query.assigned = changed.assigned;
+            }
+            if (changed.filters) {
+                tagQueryHelper.setFilters(changed.filters);
+                query.filters = tagQueryHelper.rawQueryStrings;
             }
             replaceAlertListPageUrlQuery(query);
         };
