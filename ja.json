@@ -1192,10 +1192,12 @@
 				},
 				"HEADER": {
 					"ALT_E_ASSIGN_MEMBER": "担当指定に失敗",
+					"ALT_E_UPDATE_ALERT": "アラート変更に失敗",
 					"ALT_E_UPDATE_STATE": "ステータス変更に失敗",
 					"ALT_E_UPDATE_TITLE": "タイトルの変更に失敗",
 					"ALT_E_UPDATE_URGENCY": "緊急度変更に失敗",
 					"ALT_S_ASSIGN_MEMBER": "担当者指定に成功",
+					"ALT_S_UPDATE_ALERT": "アラート変更に成功",
 					"ALT_S_UPDATE_STATE": "ステータス変更に成功",
 					"ALT_S_UPDATE_TITLE": "タイトルの変更に成功",
 					"ALT_S_UPDATE_URGENCY": "緊急度変更に成功",

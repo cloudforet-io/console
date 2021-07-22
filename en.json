@@ -1192,10 +1192,12 @@
 				},
 				"HEADER": {
 					"ALT_E_ASSIGN_MEMBER": "Failed to Assign Member",
+					"ALT_E_UPDATE_ALERT": "Failed to Update Alert",
 					"ALT_E_UPDATE_STATE": "Failed to Update State",
 					"ALT_E_UPDATE_TITLE": "Failed to Update Title ",
 					"ALT_E_UPDATE_URGENCY": "Failed to Update Urgency",
 					"ALT_S_ASSIGN_MEMBER": "Successfully Assigned Member ",
+					"ALT_S_UPDATE_ALERT": "Successfully Updated Alert",
 					"ALT_S_UPDATE_STATE": "Successfully Updated State ",
 					"ALT_S_UPDATE_TITLE": "Successfully Updated Title",
 					"ALT_S_UPDATE_URGENCY": "Successfully Updated Urgency ",
