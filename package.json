@@ -3,10 +3,12 @@
   "version": "1.2.4",
   "description": "SpaceONE Console Core Library",
   "scripts": {
-    "build": "npm run babel && npm run tsc && cp -r dist/. . && rimraf src",
+    "build": "npm run babel && npm run tsc",
+    "build:watch": "babel src --watch --out-dir dist --extensions \".ts\" --source-maps inline --copy-files",
+    "tsc:watch": "tsc-watch",
     "babel": "babel src --out-dir dist --extensions \".ts\" --source-maps inline --copy-files",
     "tsc": "tsc --project tsconfig.json && tsc-alias -p tsconfig.json",
-    "semantic-release": "SKIP_PREPARE_COMMIT_MSG=1 SKIP_COMMIT_MSG=1 semantic-release"
+    "semantic-release": "SKIP_PREPARE_COMMIT_MSG=1 SKIP_COMMIT_MSG=1 cp -r dist/. . && rimraf src && semantic-release"
   },
   "repository": {
     "type": "git",
@@ -48,6 +50,7 @@
     "nodemon": "^2.0.9",
     "semantic-release": "^17.4.4",
     "tsc-alias": "^1.3.7",
+    "tsc-watch": "^4.4.0",
     "typescript": "^4.3.5"
   },
   "release": {
