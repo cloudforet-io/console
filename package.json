@@ -1,6 +1,6 @@
 {
   "name": "@spaceone/console-core-lib",
-  "version": "1.2.5",
+  "version": "1.2.6",
   "description": "SpaceONE Console Core Library",
   "scripts": {
     "build": "npm run babel && npm run tsc",
