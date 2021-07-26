@@ -64,10 +64,13 @@ export default {
         const state = reactive({
             search: '',
             users: computed(() => store.state.resource.user.items),
-            userItems: computed(() => Object.keys(state.users).map(k => ({
-                name: k,
-                label: k,
-            }))),
+            userItems: computed(() => Object.keys(state.users).map((k) => {
+                const userName = state.users[k]?.name;
+                return {
+                    name: k,
+                    label: userName ? `${k} (${userName})` : k,
+                };
+            })),
             proxySelectedUsers: makeProxy('selectedUsers', props, emit),
         });
 
