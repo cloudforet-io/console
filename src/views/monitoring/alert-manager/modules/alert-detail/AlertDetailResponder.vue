@@ -26,14 +26,14 @@
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.ADDITIONAL_RESPONDER') }}
                 <span class="text-gray-500"> ({{ responderState.selectedMemberItems.length }})</span>
             </p>
-            <p-autocomplete-search v-model="responderState.search" :menu="responderState.allMemberItems" :loading="responderState.loading"
+            <p-autocomplete-search v-model="responderState.search" :menu="responderState.allMemberItems"
                                    class="autocomplete-search" @select-menu="onSelectMember" @hide-menu="addResponder"
             >
                 <template #menu-item--format="{item, id}">
                     <p-check-box :id="id" v-model="responderState.selectedMemberItems" class="tag-menu-item"
                                  :value="item.name"
                     >
-                        {{ nameFormatter(item.name) || '' }}
+                        {{ item.label }}
                     </p-check-box>
                 </template>
                 <template #menu-no-data-format>
@@ -42,9 +42,8 @@
             </p-autocomplete-search>
             <div class="tag-box">
                 <p-tag v-for="(tag, i) in responderState.selectedMemberItems" :key="tag" @delete="onDeleteTag(i)">
-                    {{ tag ? tag : '' }}
                     <template v-if="!responderState.loading">
-                        ({{ nameFormatter(tag) }})
+                        {{ tag ? responderNameFormatter(tag) : '' }}
                     </template>
                 </p-tag>
             </div>
@@ -121,27 +120,28 @@ export default {
         const responderState = reactive({
             search: '',
             loading: true,
-            allMember: [] as UserState[],
-            allMemberItems: computed(() => responderState.allMember.map(d => ({
-                name: d.user_id,
-                label: d.user_id,
-                type: 'item',
-            }))),
+            allMember: [] as any[],
+            allMemberItems: computed(() => {
+                const userItems = responderState.userItem;
+                return responderState.allMember.map((d) => {
+                    const userName = userItems[d.user_id]?.name;
+                    return {
+                        name: d.user_id,
+                        label: userName ? `${d.user_id} (${userName})` : d.user_id,
+                        type: 'item',
+                    };
+                });
+            }),
             selectedMemberItems: props.alertData.responders.map(d => d.resource_id),
             userItem: computed(() => store.state.resource.user.items),
         });
 
         const responderNameFormatter = (resourceId) => {
             const target = responderState.allMemberItems.find(d => d.name === resourceId);
-            if (target.label) return target.label;
-            return target.name;
+            if (target?.label) return target.label;
+            return resourceId;
         };
 
-        const nameFormatter = (userId) => {
-            const userName = responderState.userItem[userId].name;
-            if (userName) return `${userId} (${userName})`;
-            return userId;
-        };
 
         const apiQuery = new ApiQueryHelper();
         const getQuery = () => {
@@ -243,7 +243,6 @@ export default {
             addResponder,
             onDeleteTag,
             responderNameFormatter,
-            nameFormatter,
         };
     },
 };

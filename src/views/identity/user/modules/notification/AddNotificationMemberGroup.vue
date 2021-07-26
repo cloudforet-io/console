@@ -8,7 +8,7 @@
                 <p-check-box :id="id" v-model="selectedMemberItems" class="tag-menu-item"
                              :value="item.name"
                 >
-                    {{ nameFormatter(item.name) || '' }}
+                    {{ item.label }}
                 </p-check-box>
             </template>
             <template #menu-no-data-format>
@@ -50,15 +50,22 @@ export default {
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const state = reactive({
             search: '',
             loading: true,
-            allMember: [] as string[],
-            allMemberItems: computed(() => state.allMember.map(d => ({
-                name: d.resource_id,
-                label: d.resource_id,
-                type: 'item',
-            }))),
+            allMember: [] as any[],
+            allMemberItems: computed(() => {
+                const userItems = state.userItem;
+                return state.allMember.map((d) => {
+                    const userName = userItems[d.resource_id]?.name;
+                    return {
+                        name: d.resource_id,
+                        label: userName ? `${d.resource_id} (${userName})` : d.resource_id,
+                        type: 'item',
+                    };
+                });
+            }),
             selectedMemberItems: cloneDeep(props.users) || [],
             userItem: computed(() => store.state.resource.user.items),
         });
@@ -81,6 +88,8 @@ export default {
                 state.selectedMemberItems = [...state.selectedMemberItems];
             });
         };
+
+
         const nameFormatter = (userId) => {
             const userName = state.userItem[userId].name;
             if (userName) return `${userId} (${userName})`;
