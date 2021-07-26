@@ -1,3 +1,10 @@
+# [1.1.0-beta.114](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.113...v1.1.0-beta.114) (2021-07-26)
+
+
+### Bug Fixes
+
+* update anchor click event handler ([#653](https://github.com/spaceone-dev/spaceone-design-system/issues/653)) ([2eed290](https://github.com/spaceone-dev/spaceone-design-system/commit/2eed290a623954edd0a814a9fd94343c2b926627))
+
 # [1.1.0-beta.113](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.112...v1.1.0-beta.113) (2021-07-20)
 
 
