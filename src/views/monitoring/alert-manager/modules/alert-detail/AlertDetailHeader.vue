@@ -95,9 +95,9 @@ const calculateTime = (time) => {
     const createdTime = iso8601Formatter(time, 'UTC');
     const todayTime = iso8601Formatter(today, 'UTC');
     const timeForCalculate = dayjs(todayTime).diff(createdTime, 'minute');
-    const days = Math.floor(timeForCalculate / 1440);
-    const hours = Math.floor((timeForCalculate % 1440) / 60);
-    const minutes = Math.floor((timeForCalculate % 1440) % 60);
+    const days = Math.floor((timeForCalculate / 1440) % 365);
+    const hours = Math.floor((timeForCalculate / 60) % 24);
+    const minutes = Math.floor(timeForCalculate % 60);
     return `${days}d ${hours}h ${minutes}m`;
 };
 
