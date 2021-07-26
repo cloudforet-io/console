@@ -6,7 +6,7 @@
             <a class="p-anchor" :class="{disabled, highlight}"
                :target="target"
                :href="to ? (toHref || href ): href"
-               @click="onClick(navigate, $event)"
+               @click.stop="navigate"
             >
                 <slot name="left-extra" v-bind="{...$props, href: to ? (toHref || href ): href}" />
                 <span class="text" :class="{disabled}">
@@ -77,14 +77,6 @@ export default defineComponent<Props>({
             type: Boolean,
             default: false,
         },
-    },
-    setup() {
-        const onClick = (navigate, e) => {
-            e.stopPropagation();
-            navigate(e);
-        };
-
-        return { onClick };
     },
 });
 </script>
