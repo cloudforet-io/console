@@ -8,7 +8,7 @@
                 <p-check-box :id="id" v-model="selectedMemberItems" class="tag-menu-item"
                              :value="item.name"
                 >
-                    {{ item.name }} {{ userItem[item.name] ? `(${userItem[item.name].label})`: '' }}
+                    {{ nameFormatter(item.name) || '' }}
                 </p-check-box>
             </template>
             <template #menu-no-data-format>
@@ -56,7 +56,7 @@ export default {
             allMember: [] as string[],
             allMemberItems: computed(() => state.allMember.map(d => ({
                 name: d.resource_id,
-                label: state.userItem[d.resource_id] ? `(${state.userItem[d.resource_id].label})` : '',
+                label: d.resource_id,
                 type: 'item',
             }))),
             selectedMemberItems: cloneDeep(props.users) || [],
@@ -80,6 +80,11 @@ export default {
             vm.$nextTick(() => {
                 state.selectedMemberItems = [...state.selectedMemberItems];
             });
+        };
+        const nameFormatter = (userId) => {
+            const userName = state.userItem[userId].name;
+            if (userName) return `${userId} (${userName})`;
+            return userId;
         };
 
         watch(() => state.selectedMemberItems, () => {
@@ -116,6 +121,7 @@ export default {
             ...toRefs(state),
             onSelectMember,
             onDeleteTag,
+            nameFormatter,
         };
     },
 };

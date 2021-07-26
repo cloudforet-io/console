@@ -33,7 +33,7 @@
                     <p-check-box :id="id" v-model="responderState.selectedMemberItems" class="tag-menu-item"
                                  :value="item.name"
                     >
-                        {{ item.name }} ({{ item.label ? item.label : item.name }})
+                        {{ nameFormatter(item.name) || '' }}
                     </p-check-box>
                 </template>
                 <template #menu-no-data-format>
@@ -44,7 +44,7 @@
                 <p-tag v-for="(tag, i) in responderState.selectedMemberItems" :key="tag" @delete="onDeleteTag(i)">
                     {{ tag ? tag : '' }}
                     <template v-if="!responderState.loading">
-                        ({{ responderNameFormatter(tag) }})
+                        ({{ nameFormatter(tag) }})
                     </template>
                 </p-tag>
             </div>
@@ -124,16 +124,23 @@ export default {
             allMember: [] as UserState[],
             allMemberItems: computed(() => responderState.allMember.map(d => ({
                 name: d.user_id,
-                label: d.name,
+                label: d.user_id,
                 type: 'item',
             }))),
             selectedMemberItems: props.alertData.responders.map(d => d.resource_id),
+            userItem: computed(() => store.state.resource.user.items),
         });
 
         const responderNameFormatter = (resourceId) => {
             const target = responderState.allMemberItems.find(d => d.name === resourceId);
             if (target.label) return target.label;
             return target.name;
+        };
+
+        const nameFormatter = (userId) => {
+            const userName = responderState.userItem[userId].name;
+            if (userName) return `${userId} (${userName})`;
+            return userId;
         };
 
         const apiQuery = new ApiQueryHelper();
@@ -236,6 +243,7 @@ export default {
             addResponder,
             onDeleteTag,
             responderNameFormatter,
+            nameFormatter,
         };
     },
 };

@@ -66,7 +66,7 @@ export default {
             users: computed(() => store.state.resource.user.items),
             userItems: computed(() => Object.keys(state.users).map(k => ({
                 name: k,
-                label: state.users[k]?.name,
+                label: k,
             }))),
             proxySelectedUsers: makeProxy('selectedUsers', props, emit),
         });
