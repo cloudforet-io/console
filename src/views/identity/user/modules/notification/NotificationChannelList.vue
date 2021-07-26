@@ -164,7 +164,7 @@ export default {
                 state.protocolList = await Promise.all(res.results.map(async d => ({
                     label: computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name })).value,
                     link: {
-                        name: props.projectId ? PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS.ADD._NAME : IDENTITY_ROUTE.USER.NOTIFICATION.ADD._NAME,
+                        name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD._NAME,
                         params: {
                             protocol: d.name.replace(/(\s*)/g, ''),
                             protocolId: d.protocol_id,
