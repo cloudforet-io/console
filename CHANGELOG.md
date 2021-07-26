@@ -1,3 +1,10 @@
+# [1.1.0-beta.115](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.114...v1.1.0-beta.115) (2021-07-26)
+
+
+### Bug Fixes
+
+* change fuse lib to regex in default handler of autocomplete search ([#655](https://github.com/spaceone-dev/spaceone-design-system/issues/655)) ([4362e43](https://github.com/spaceone-dev/spaceone-design-system/commit/4362e431a3d5d14a3316ca3708039fe8f33f0266))
+
 # [1.1.0-beta.114](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.113...v1.1.0-beta.114) (2021-07-26)
 
 
