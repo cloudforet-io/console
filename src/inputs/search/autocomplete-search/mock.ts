@@ -3,7 +3,7 @@ import { range } from 'lodash';
 
 const getMenuItem = () => ({
     name: faker.random.uuid(),
-    label: faker.random.word(),
+    label: `${faker.random.word()} (${faker.random.word()})`,
     type: 'item',
     // disabled: faker.random.boolean(),
 });

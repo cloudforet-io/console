@@ -160,11 +160,21 @@ export default defineComponent<AutocompleteSearchProps>({
         });
 
 
+        // const defaultHandler = (inputText: string, list: MenuItem[]) => {
+        //     let results: MenuItem[] = [...list];
+        //     const trimmed = inputText.trim();
+        //     if (trimmed) {
+        //         results = state.fuse.search(trimmed);
+        //     }
+        //     return { results };
+        // };
+
         const defaultHandler = (inputText: string, list: MenuItem[]) => {
             let results: MenuItem[] = [...list];
             const trimmed = inputText.trim();
             if (trimmed) {
-                results = state.fuse.search(trimmed);
+                const regex = new RegExp(inputText, 'i');
+                results = results.filter(d => regex.test(d.label as string));
             }
             return { results };
         };
