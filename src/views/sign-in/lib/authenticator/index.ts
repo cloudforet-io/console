@@ -1,5 +1,6 @@
 import { store } from '@/store';
-import router from '@/routes';
+import VueRouter from 'vue-router';
+import { SpaceRouter } from '@/routes';
 
 
 abstract class Authenticator {
@@ -18,7 +19,7 @@ abstract class Authenticator {
 
     static async signOut(): Promise<void> {
         try {
-            await router.app.$store.dispatch('user/signOut');
+            if (SpaceRouter.router) await SpaceRouter.router.app.$store.dispatch('user/signOut');
         } catch (e) {
             console.error('user sign out failed', e);
         }

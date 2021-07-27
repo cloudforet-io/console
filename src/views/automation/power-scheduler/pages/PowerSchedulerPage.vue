@@ -94,7 +94,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
-import router from '@/routes';
+import {SpaceRouter} from '@/routes';
 
 
 interface Props {
@@ -137,9 +137,9 @@ export default {
         (async () => {
             if (!await validateProjectId(to.params.projectId)) {
                 showErrorMessage(
-                    router.app.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_PROJECT_INVALID_TITLE'),
-                    router.app.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_PROJECT_INVALID_DESC'),
-                    router.app.$root,
+                    SpaceRouter.router.app.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_PROJECT_INVALID_TITLE'),
+                    SpaceRouter.router.app.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_PROJECT_INVALID_DESC'),
+                    SpaceRouter.router.app.$root,
                 );
                 next({
                     name: AUTOMATION_ROUTE.POWER_SCHEDULER._NAME,
@@ -153,7 +153,7 @@ export default {
     },
     setup(props: Props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        if (!props.projectId) router.push('/error-page');
+        if (!props.projectId) vm.$router.push('/error-page');
 
         /** Breadcrumb */
         const routeState = reactive({
@@ -184,7 +184,7 @@ export default {
         const setMode = async () => {
             if (state.selectedSchedule?.schedule_id) {
                 try {
-                    await router.replace({
+                    await vm.$router.replace({
                         name: AUTOMATION_ROUTE.POWER_SCHEDULER.DETAIL._NAME,
                         params: {
                             projectId: props.projectId,
@@ -194,7 +194,7 @@ export default {
                 } catch (e) {}
             } else {
                 try {
-                    await router.replace({
+                    await vm.$router.replace({
                         name: AUTOMATION_ROUTE.POWER_SCHEDULER.ADD._NAME,
                         params: {
                             projectId: props.projectId,

@@ -68,7 +68,7 @@ import {
 
 import GNB from '@/common/modules/gnb/GNB.vue';
 import { Location } from 'vue-router';
-import router from '@/routes';
+
 import TopNotification from '@/common/components/TopNotification.vue';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { hideLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -97,12 +97,12 @@ export default defineComponent({
             const res: Location = {
                 name: 'SignOut',
             };
-            await router.push(res);
+            await vm.$router.push(res);
         };
 
         watch([() => vm.$store.getters['user/hasPermission'], () => vm.$route], async ([hasPermission, route]) => {
             if (!route.meta.excludeAuth && !hasPermission && vm.$route.name !== IDENTITY_ROUTE.USER.ACCOUNT._NAME) {
-                await router.replace({ name: IDENTITY_ROUTE.USER.ACCOUNT._NAME });
+                await vm.$router.replace({ name: IDENTITY_ROUTE.USER.ACCOUNT._NAME });
             }
         }, { immediate: true });
 

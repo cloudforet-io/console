@@ -1,8 +1,7 @@
 import { forEach } from 'lodash';
 import { Location } from 'vue-router';
-import router from '@/routes';
+import { SpaceRouter } from '@/routes';
 
-import dayjs from 'dayjs';
 
 export type RouteQueryString = string | (string | null)[] | null | undefined;
 
@@ -10,7 +9,7 @@ export type RouteQueryString = string | (string | null)[] | null | undefined;
 /** QueryString Converter Helpers */
 export const replaceUrlQuery = async (key: string, value: RouteQueryString) => {
     try {
-        await router.replace({ query: { ...router.currentRoute.query, [key]: value } });
+        await SpaceRouter.router.replace({ query: { ...SpaceRouter.router.currentRoute.query, [key]: value } });
     } catch (e) {
 
     }

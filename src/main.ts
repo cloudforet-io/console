@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueCompositionApi from '@vue/composition-api';
-import router from '@/routes/index';
 import { store } from '@/store';
+import { SpaceRouter } from '@/routes';
 import directive from '@/directives';
 import { i18n } from '@/translations';
 import Fragment from 'vue-fragment';
@@ -14,6 +14,7 @@ import App from './App.vue';
 import '@/styles/style.pcss';
 import '@spaceone/design-system/css/light-style.css';
 
+
 /** ********** SET VUE PLUGINS ************** */
 Vue.use(VueCompositionApi);
 // @ts-ignore
@@ -25,13 +26,13 @@ directive(Vue);
 
 Vue.use(SpaceDesignSystem);
 
-
 (async () => {
     await siteInit();
 
+
     new Vue({
         el: '#app',
-        router,
+        router: SpaceRouter.router,
         i18n,
         store,
         components: {

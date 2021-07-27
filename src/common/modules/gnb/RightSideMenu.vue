@@ -119,7 +119,6 @@ import {
 import { PAnchor, PI, PDivider } from '@spaceone/design-system';
 import GNBNewIcon from '@/common/components/GNBNewIcon.vue';
 
-import router from '@/routes';
 import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { languages } from '@/store/modules/user/config';
@@ -188,7 +187,7 @@ export default {
         };
         const openProfile = () => {
             emit('hide-menu');
-            router.replace({ name: IDENTITY_ROUTE.USER.ACCOUNT._NAME }).catch(() => {});
+            vm.$router.replace({ name: IDENTITY_ROUTE.USER.ACCOUNT._NAME }).catch(() => {});
         };
         const toggleLanguageMenu = () => {
             state.showLanguageMenu = !state.showLanguageMenu;
@@ -210,7 +209,7 @@ export default {
             const res: Location = {
                 name: 'SignOut',
             };
-            await router.push(res);
+            await vm.$router.push(res);
         };
         const changeLanguage = async (language) => {
             try {

@@ -94,7 +94,8 @@ import {
 import dayjs from 'dayjs';
 
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import MetricChart from '@/common/components/metric-chart/MetricChart.vue';
@@ -110,7 +111,6 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
-import router from '@/routes';
 
 
 enum MONITORING_TYPE {
@@ -207,6 +207,7 @@ export default {
         },
     },
     setup(props: MonitoringProps) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             showLoader: computed(() => props.loading || state.metricsLoading),
             timezone: computed(() => store.state.user.timezone),
@@ -238,7 +239,7 @@ export default {
             resources = resources.map((resource, idx) => ({
                 ...resource,
                 color: colors[idx],
-                link: router.resolve(referenceRouter(resource.id, { resource_type: 'inventory.Server' })).href,
+                link: vm.$router.resolve(referenceRouter(resource.id, { resource_type: 'inventory.Server' })).href,
             }));
             state.availableResources = sortBy(resources, m => m.name);
         };

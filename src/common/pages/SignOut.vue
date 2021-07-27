@@ -2,7 +2,7 @@
     <div>Sign Out..</div>
 </template>
 <script lang="ts">
-import router from '@/routes';
+import { SpaceRouter } from '@/routes';
 import { store } from '@/store';
 import { loadAuth } from '@/views/sign-in/lib/authenticator/loader';
 import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
@@ -23,7 +23,8 @@ export default {
             } catch (e) {
                 console.error(e);
             } finally {
-                await router.push({ name: SIGN_IN_ROUTE._NAME, query: { ...to.query, nextPath: to.query.nextPath, error: to.query.error } });
+                // TODO: change from using SpaceRouter to next()
+                await SpaceRouter.router.push({ name: SIGN_IN_ROUTE._NAME, query: { ...to.query, nextPath: to.query.nextPath, error: to.query.error } });
             }
         })();
     },

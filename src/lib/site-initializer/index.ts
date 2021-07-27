@@ -1,12 +1,15 @@
 import config from '@/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
-import router from '@/routes';
+import { SpaceRouter } from '@/routes';
 import { GTag } from '@/lib/gtag';
 import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { computed } from '@vue/composition-api';
 import { initLanguageAndFonts } from '@/lib/site-initializer/locales';
+import { routes } from '@/routes/routes';
+import { rootDomainRoutes } from '@/routes/root-domain-routes';
+
 
 const initConfig = async () => {
     await config.init();
@@ -31,6 +34,7 @@ const initDomain = async () => {
 };
 
 const initGtag = () => {
+    if (config.get('GTAG_ID') === 'DISABLED') return;
     GTag.init();
     store.watch(state => state.user.userId, (userId) => {
         GTag.setGtagUserID(store.state.domain.domainId, userId);
@@ -50,11 +54,14 @@ const initAmchartsLicense = () => {
     }
 };
 
-// const checkAuth = async () => {
-//     if (!router.currentRoute.meta && !router.currentRoute.meta.excludeAuth && !SpaceConnector.isTokenAlive) {
-//         await router.push({ name: 'SignIn', query: { nextPath: router.currentRoute.fullPath, error: router.currentRoute.query.error } });
-//     }
-// };
+const initRouter = () => {
+    console.debug(store.state.domain.name);
+    if (store.state.domain.name === 'root') {
+        SpaceRouter.init(rootDomainRoutes);
+    } else {
+        SpaceRouter.init(routes);
+    }
+};
 
 const removeInitializer = () => {
     const el = document.getElementById('site-loader-wrapper');
@@ -62,19 +69,17 @@ const removeInitializer = () => {
 };
 
 const init = async () => {
-    try {
-        await initConfig();
-        // await checkAuth();
-        await initApiClient();
-        await initDomain();
-        await initLanguageAndFonts();
-        initQueryHelper();
-        if (config.get('GTAG_ID') !== 'DISABLED') initGtag();
-        initAmchartsLicense();
-    } catch (e) {
-        throw e;
-    }
+    /* Init SpaceONE Console */
+    await initConfig();
+    await initApiClient();
+    await initDomain();
+    initRouter();
+    await initLanguageAndFonts();
+    initQueryHelper();
+    initGtag();
+    initAmchartsLicense();
 };
+
 
 const MIN_LOADING_TIME = 1000;
 export const siteInit = async () => {
@@ -103,7 +108,10 @@ export const siteInit = async () => {
     } catch (e) {
         console.error(e);
         store.dispatch('display/finishInitializing');
-        await router.push('/error-page');
+
+        if (SpaceRouter.router) {
+            await SpaceRouter.router.push('/error-page');
+        }
     } finally {
         isFinishedInitializing = true;
         if (isMinTimePassed) {
