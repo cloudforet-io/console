@@ -15,7 +15,6 @@
                         />
                     </template>
                 </favorite-list>
-
                 <p class="sidebar-title">
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.SERVICE_PROVIDER') }}
                 </p>
@@ -33,11 +32,6 @@
                                     width="1.5rem" height="1.5rem"
                         />
                         <span class="provider-name">{{ provider.label }}</span>
-                    </template>
-                    <template #icon="{ iconName }">
-                        <p-i class="radio-icon float-right" width="1.25rem" height="1.25rem"
-                             :name="iconName"
-                        />
                     </template>
                 </p-radio>
                 <p class="sidebar-title">
@@ -67,7 +61,7 @@
                      class="region-list"
                 >
                     <p-check-box :selected="filterState.regionFilter" :value="region.region_id"
-                                 @change="onClickRegion" class="flex"
+                                 class="flex" @change="onClickRegion"
                     >
                         <span class="region-list-text">
                             <div class="region-type">
@@ -241,7 +235,6 @@ export default {
         PRadio,
         PIconTextButton,
         PVerticalPageLayout,
-        PI,
         PPageTitle,
         PBreadcrumbs,
         PCheckBox,
@@ -734,28 +727,26 @@ export default {
 }
 #region-title {
     @apply text-gray-900 text-sm font-bold;
-    padding-top: 1.375rem;
+    padding-top: 2.75rem;
     padding-left: 1rem;
 }
 .sidebar-divider {
     @apply w-full;
     padding-left: 0;
-    margin-top: 0.5625rem;
-    margin-bottom: 1rem;
+    margin-top: 0.4375rem;
+    margin-bottom: 0.75rem;
 }
-
-.provider-wrapper {
-    @apply border-b border-gray-100;
+.provider-wrapper::v-deep {
     display: flex;
+    min-height: 1.75rem;
     align-items: center;
     cursor: pointer;
-    padding: 0.5rem 0.5rem 0.5rem 0.25rem;
-    margin: 0 0.75rem;
-    &:first-of-type {
-        margin-top:-.69rem;
+    margin: 0.25rem 0.75rem;
+    .p-lazy-img {
+        flex-shrink: 0;
     }
-    &:last-of-type {
-        @apply border-b-0;
+    .radio-icon {
+        flex-shrink: 0;
     }
     .provider-name {
         display: inline-block;
@@ -764,25 +755,38 @@ export default {
         font-size: 0.875rem;
         line-height: 1.5;
     }
+    &:hover {
+        @apply bg-secondary2;
+        .provider-name {
+            @apply text-secondary;
+        }
+    }
 }
-
 .no-region {
     @apply text-gray-400 text-sm;
     padding-left: 1rem;
+    padding-bottom: 2.75rem;
 }
 .region-list {
     display: flex;
-    padding-left: 1rem;
+    padding-left: 0.75rem;
+    padding-right: 1.625rem;
+    margin-bottom: 0.75rem;
     width: 100%;
+
+    .p-checkbox::v-deep {
+        .check-icon {
+            flex-shrink: 0;
+        }
+    }
+    &:last-of-type {
+        padding-bottom: 2.75rem;
+    }
 }
 .region-list-text {
     @apply text-sm;
-    margin-bottom: 0.875rem;
     display: flex;
     flex-direction: column;
-    &:hover {
-        @apply text-secondary cursor-pointer;
-    }
     .region-type {
         padding-left: 0.25rem;
     }
@@ -793,11 +797,18 @@ export default {
         @apply text-gray-400;
         padding-left: 0.25rem;
     }
+    &:hover {
+        @apply text-secondary cursor-pointer;
+        .region-provider,
+        .region-code {
+            @apply text-secondary !important;
+        }
+    }
 }
 .service-categories {
     @apply text-sm;
-    margin-left: 1rem;
-    padding-bottom: 0.625rem;
+    margin-left: 0.75rem;
+    padding-bottom: 0.5rem;
     .service {
         padding-left: 0.25rem;
         &:hover {
@@ -824,7 +835,6 @@ export default {
     grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
     gap: 1rem;
 }
-
 .cloud-service-type-item {
     @apply px-6 bg-white border border-gray-200;
     height: 6rem;
@@ -880,7 +890,6 @@ export default {
         }
     }
 }
-
 .page-title {
     @apply capitalize;
     margin-bottom: 0;
