@@ -4,7 +4,7 @@
 <script lang="ts">
 import { SpaceRouter } from '@/routes';
 import { store } from '@/store';
-import { loadAuth } from '@/views/sign-in/lib/authenticator/loader';
+import { loadAuth } from '@/views/sign-in/authenticator/loader';
 import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
 
 export default {

@@ -11,7 +11,7 @@ import {
 
 import { PButton } from '@spaceone/design-system';
 
-import { loadAuth } from '@/views/sign-in/lib/authenticator/loader';
+import { loadAuth } from '@/views/sign-in/authenticator/loader';
 
 export default defineComponent({
     name: 'GoogleSignIn',

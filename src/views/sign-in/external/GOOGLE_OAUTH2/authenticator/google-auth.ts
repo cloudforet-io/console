@@ -1,5 +1,5 @@
 import { store } from '@/store';
-import { Authenticator } from '@/views/sign-in/lib/authenticator/index';
+import { Authenticator } from '@/views/sign-in/authenticator';
 import { loadGapiInsideDOM } from 'gapi-script';
 
 // @ts-ignore

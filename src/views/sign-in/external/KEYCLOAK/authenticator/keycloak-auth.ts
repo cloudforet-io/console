@@ -1,6 +1,6 @@
 import Keycloak from 'keycloak-js';
 import { store } from '@/store';
-import { Authenticator } from '@/views/sign-in/lib/authenticator/index';
+import { Authenticator } from '@/views/sign-in/authenticator';
 import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
 import { SpaceRouter } from '@/routes';
 

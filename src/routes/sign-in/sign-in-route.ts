@@ -2,7 +2,7 @@ import { RouteConfig } from 'vue-router';
 
 const SignIn = () => import(/* webpackChunkName: "SignIn" */ '@/views/sign-in/pages/SignIn.vue');
 const DomainAdminSignIn = () => import(/* webpackChunkName: "DomainAdminSignIn" */ '@/views/sign-in/pages/DomainAdminSignIn.vue');
-const KeycloakPage = () => import(/* webpackChunkName: "KeycloakPage" */ '@/views/sign-in/pages/KeycloakPage.vue');
+const KeycloakPage = () => import(/* webpackChunkName: "KeycloakPage" */ '@/views/sign-in/external/KEYCLOAK/pages/KeycloakPage.vue');
 
 export const SIGN_IN_ROUTE = Object.freeze({
     _NAME: 'signIn',

@@ -1,4 +1,4 @@
-import { Authenticator } from '@/views/sign-in/lib/authenticator/index';
+import { Authenticator } from '@/views/sign-in/authenticator';
 
 class SpaceAuth extends Authenticator {
 

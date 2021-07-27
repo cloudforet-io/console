@@ -18,7 +18,7 @@ import {
 } from '@vue/composition-api';
 
 import { PButton } from '@spaceone/design-system';
-import KeycloakPage from '@/views/sign-in/pages/KeycloakPage.vue';
+import KeycloakPage from '@/views/sign-in/external/KEYCLOAK/pages/KeycloakPage.vue';
 import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
 
 export default defineComponent({

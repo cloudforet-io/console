@@ -37,7 +37,7 @@ import {
     toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import IDPWSignIn from '@/views/sign-in/templates/ID_PW.vue';
+import IDPWSignIn from '@/views/sign-in/local/template/ID_PW.vue';
 import SignInLeftContainer from '@/views/sign-in/modules/SignInLeftContainer.vue';
 import SignInRightContainer from '@/views/sign-in/modules/SignInRightContainer.vue';
 

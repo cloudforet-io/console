@@ -52,8 +52,8 @@ import {
 import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
 
 import { TranslateResult } from 'vue-i18n';
-import { SpaceAuth } from '@/views/sign-in/lib/authenticator/space-auth';
-import { loadAuth } from '@/views/sign-in/lib/authenticator/loader';
+import { SpaceAuth } from '@/views/sign-in/local/authenticator/space-auth';
+import { loadAuth } from '@/views/sign-in/authenticator/loader';
 
 export default defineComponent({
     name: 'IDPWSignIn',

@@ -7,7 +7,7 @@ import {
     ComponentRenderProxy, defineComponent, getCurrentInstance, onMounted,
 } from '@vue/composition-api';
 import { PButton } from '@spaceone/design-system';
-import { loadAuth } from '@/views/sign-in/lib/authenticator/loader';
+import { loadAuth } from '@/views/sign-in/authenticator/loader';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 
 export default defineComponent({
