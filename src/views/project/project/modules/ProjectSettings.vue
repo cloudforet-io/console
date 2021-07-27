@@ -96,7 +96,8 @@
 import { get } from 'lodash';
 
 import {
-    computed, onActivated, reactive, toRefs, watch, watchEffect,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, onActivated, reactive, toRefs, watch, watchEffect,
 } from '@vue/composition-api';
 
 import ProjectEscalationPolicy from '@/views/project/project/modules/project-alert/ProjectEscalationPolicy.vue';
@@ -117,7 +118,6 @@ import { ACTION, SCOPE } from '@/views/monitoring/alert-manager/lib/config';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { i18n } from '@/translations';
 import { store } from '@/store';
-import router from '@/routes';
 
 
 const NOTIFICATION_URGENCY = Object.freeze({
@@ -145,6 +145,7 @@ export default {
         },
     },
     setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             notificationUrgencyList: computed(() => ([
                 {
@@ -220,7 +221,7 @@ export default {
             state.changeEscalationPolicyModalVisible = true;
         };
         const onClickEditEventRule = () => {
-            router.push({ name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME, params: { projectId: props.id } });
+            vm.$router.push({ name: PROJECT_ROUTE.DETAIL.EVENT_RULE._NAME, params: { projectId: props.id } });
         };
 
         watch(() => state.escalationPolicyId, async () => {

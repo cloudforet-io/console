@@ -97,7 +97,6 @@ import {
 } from '@spaceone/design-system';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 
-import router from '@/routes';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -166,7 +165,7 @@ export default {
                 i18n.t('PROJECT.DETAIL.ALT_E_PROJECT_INVALID_DESC'),
                 root,
             );
-            router.push({ name: PROJECT_ROUTE._NAME });
+            vm.$router.push({ name: PROJECT_ROUTE._NAME });
         };
 
         /* api */
@@ -244,7 +243,7 @@ export default {
                 });
                 // await store.dispatch('favorite/project/removeItem', { id: projectId.value });
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '', root);
-                router.go(-1);
+                vm.$router.go(-1);
             } catch (e) {
                 showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'), e, root);
             } finally {
@@ -262,15 +261,15 @@ export default {
         };
 
         const onChangeTab = (activeTab) => {
-            if (activeTab === router.currentRoute.name) return;
-            router.replace({ name: activeTab });
+            if (activeTab === vm.$router.currentRoute.name) return;
+            vm.$router.replace({ name: activeTab });
         };
 
         const urlQueryHelper = new QueryHelper();
         const onCreateMaintenanceWindow = (maintenanceWindowId: string) => {
             singleItemTabState.activeTab = PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME;
             urlQueryHelper.setFilters([{ k: 'maintenance_window_id', v: maintenanceWindowId }]);
-            router.replace({ name: singleItemTabState.activeTab, query: { filters: urlQueryHelper.rawQueryStrings } });
+            vm.$router.replace({ name: singleItemTabState.activeTab, query: { filters: urlQueryHelper.rawQueryStrings } });
         };
 
         const statAlerts = async () => {
@@ -292,7 +291,7 @@ export default {
         }, { immediate: true });
 
         (async () => {
-            const exactRoute = router.currentRoute.matched.find(d => singleItemTabState.tabs.find(tab => tab.name === d.name));
+            const exactRoute = vm.$router.currentRoute.matched.find(d => singleItemTabState.tabs.find(tab => tab.name === d.name));
             singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
             await Promise.all([
                 // getPageNavigation(),
@@ -305,7 +304,7 @@ export default {
         })();
 
         watch(() => vm.$route.name, () => {
-            const exactRoute = router.currentRoute.matched.find(d => singleItemTabState.tabs.find(tab => tab.name === d.name));
+            const exactRoute = vm.$router.currentRoute.matched.find(d => singleItemTabState.tabs.find(tab => tab.name === d.name));
             singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
         });
 

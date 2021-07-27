@@ -133,7 +133,6 @@ import { MANAGEMENT_ROUTE } from '@/routes/management/management-route';
 import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
 import { peacock, green, red } from '@/styles/colors';
 import { JOB_STATUS } from '@/views/management/collector-history/pages/config';
-import router from '@/routes';
 
 
 const PROGRESS_BAR_COLOR = peacock[400];
@@ -300,7 +299,7 @@ export default {
 
         /* event */
         const onSelect = (item) => {
-            router.push({
+            vm.$router.push({
                 name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR.JOB._NAME,
                 params: { jobId: item.job_id },
             }).catch(() => {});

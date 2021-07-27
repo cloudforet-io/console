@@ -71,8 +71,6 @@ import { getPageStart } from '@spaceone/console-core-lib/component-util/paginati
 import { i18n } from '@/translations';
 import { alert, secondary } from '@/styles/colors';
 import { store } from '@/store';
-import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
-import router from '@/routes';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { commaFormatter } from '@spaceone/console-core-lib';
 

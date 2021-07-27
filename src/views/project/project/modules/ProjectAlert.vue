@@ -10,13 +10,13 @@
 
 <script lang="ts">
 import {
+    ComponentRenderProxy, getCurrentInstance,
     onActivated, reactive, toRefs,
 } from '@vue/composition-api';
 import AlertDataTable from '@/views/monitoring/alert-manager/modules/alert-list/AlertDataTable.vue';
-import {ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE} from '@/views/monitoring/alert-manager/lib/config';
+import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/views/monitoring/alert-manager/lib/config';
 import { AlertListPageUrlQuery, AlertListTableFilters } from '@/views/monitoring/alert-manager/type';
-import router from '@/routes';
-import {QueryHelper} from "@spaceone/console-core-lib/query";
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 
 export default {
     name: 'ProjectAlert',
@@ -30,18 +30,19 @@ export default {
         },
     },
     setup() {
-        const tagQueryHelper = new QueryHelper().setFiltersAsRawQueryString(router.currentRoute.query.filters);
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const tagQueryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
-            alertState: router.currentRoute.query.state ?? ALERT_STATE_FILTER.OPEN,
-            urgency: router.currentRoute.query.state ?? ALERT_URGENCY.ALL,
-            assigned: router.currentRoute.query.state ?? ASSIGNED_STATE.ALL,
+            alertState: vm.$route.query.state ?? ALERT_STATE_FILTER.OPEN,
+            urgency: vm.$route.query.state ?? ALERT_URGENCY.ALL,
+            assigned: vm.$route.query.state ?? ASSIGNED_STATE.ALL,
         });
 
         /* util */
         const replaceAlertListPageUrlQuery = (query: AlertListPageUrlQuery) => {
-            router.replace({
+            vm.$router.replace({
                 query: {
-                    ...router.currentRoute.query,
+                    ...vm.$route.query,
                     ...query,
                 },
             }).catch(() => {});
@@ -68,7 +69,7 @@ export default {
         };
 
         onActivated(() => {
-            state.alertState = router.currentRoute.query.state;
+            state.alertState = vm.$route.query.state;
         });
 
         return {

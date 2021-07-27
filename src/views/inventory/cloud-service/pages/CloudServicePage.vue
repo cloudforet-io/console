@@ -219,7 +219,6 @@ import { TranslateResult } from 'vue-i18n';
 import CustomFieldModal from '@/common/modules/custom-field-modal/CustomFieldModal.vue';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
-import router from '@/routes';
 
 const DEFAULT_PAGE_SIZE = 15;
 
@@ -573,7 +572,7 @@ export default {
 
         const onClickSidebarItem = async (item) => {
             if (sidebarState.selectedItem.name !== item.name) {
-                await router.replace({
+                await vm.$router.replace({
                     name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                     params: {
                         provider: props.provider,

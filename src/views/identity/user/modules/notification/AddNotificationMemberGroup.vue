@@ -30,7 +30,7 @@ import {
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import store from '@/store';
+import { store } from '@/store';
 import { cloneDeep } from 'lodash';
 
 export default {

@@ -24,7 +24,8 @@
 import { isEmpty } from 'lodash';
 
 import {
-    computed, onActivated, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, onActivated, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PButtonTab, PButton } from '@spaceone/design-system';
@@ -34,8 +35,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
 import { i18n } from '@/translations';
-import router from '@/routes';
-import store from '@/store';
+import { store } from '@/store';
 
 
 export default {
@@ -51,6 +51,7 @@ export default {
         },
     },
     setup(props, { root }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,
             isActivated: false,
@@ -96,14 +97,14 @@ export default {
 
         /* event */
         const onChangeTab = async (activeTab) => {
-            if (activeTab === router.currentRoute.name) return;
-            await router.replace({ name: activeTab });
+            if (activeTab === vm.$route.name) return;
+            await vm.$router.replace({ name: activeTab });
         };
 
         /* init */
         onActivated(() => {
-            if (router.currentRoute.name !== tabState.activeTab) {
-                tabState.activeTab = router.currentRoute.name || PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME;
+            if (vm.$route.name !== tabState.activeTab) {
+                tabState.activeTab = vm.$route.name || PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME;
             }
         });
 

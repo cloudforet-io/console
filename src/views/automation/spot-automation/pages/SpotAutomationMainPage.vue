@@ -41,7 +41,6 @@ import FavoriteList from '@/common/modules/favorite-list/FavoriteList.vue';
 import SidebarTitle from '@/common/components/sidebar-title/SidebarTitle.vue';
 import { PI } from '@spaceone/design-system';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
-import router from '@/routes';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -80,7 +79,7 @@ export default {
         };
 
         const showPage = (routeName) => {
-            router.replace({ name: routeName }).catch(() => {});
+            vm.$router.replace({ name: routeName }).catch(() => {});
         };
         const selectSidebarItem = (route) => {
             if (route) state.selectedItem = state.menuList.find(d => d.routeName === route) as MenuItem;

@@ -71,7 +71,6 @@ import { COLLECT_MODE, CollectorModel } from '@/views/plugin/collector/type';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
 import { MANAGEMENT_ROUTE } from '@/routes/management/management-route';
-import router from '@/routes';
 
 enum JOB_STATE {
     created = 'CREATED',
@@ -159,7 +158,7 @@ export default {
         };
 
         const goToCollectorHistory = async (item) => {
-            await router.push({
+            await vm.$router.push({
                 name: MANAGEMENT_ROUTE.HISTORY.COLLECTOR._NAME,
                 hash: item.job_id,
             });

@@ -27,8 +27,8 @@
                                 <router-link v-if="subMenu" :to="subMenu.to">
                                     <li class="submenu" @click="hideMenu">
                                         {{ subMenu.label }}
-                                        <new-mark  v-if="subMenu.isNew"/>
-                                        <beta-mark v-if="subMenu.isBeta"/>
+                                        <new-mark v-if="subMenu.isNew" />
+                                        <beta-mark v-if="subMenu.isBeta" />
                                     </li>
                                 </router-link>
                             </div>
@@ -50,8 +50,8 @@ import {
 import { PI } from '@spaceone/design-system';
 
 import { DASHBOARD_ROUTE } from '@/routes/dashboard/dashboard-route';
-import NewMark from "@/common/components/marks/NewMark.vue";
-import BetaMark from "@/common/components/marks/BetaMark.vue";
+import NewMark from '@/common/components/marks/NewMark.vue';
+import BetaMark from '@/common/components/marks/BetaMark.vue';
 
 
 enum MENU_ICON {

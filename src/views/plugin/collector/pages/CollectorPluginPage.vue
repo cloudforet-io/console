@@ -127,7 +127,6 @@ import { getPageStart } from '@spaceone/console-core-lib/component-util/paginati
 import { TimeStamp } from '@/models';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
-import router from '@/routes';
 
 
 enum PLUGIN_STATE {
@@ -268,7 +267,7 @@ export default {
         };
 
         const onPluginCreate = (item) => {
-            router.push({ name: PLUGIN_ROUTE.COLLECTOR.CREATE.STEPS._NAME, params: { pluginId: item.plugin_id } });
+            vm.$router.push({ name: PLUGIN_ROUTE.COLLECTOR.CREATE.STEPS._NAME, params: { pluginId: item.plugin_id } });
         };
         const onSearch = (val) => {
             state.keyword = val;

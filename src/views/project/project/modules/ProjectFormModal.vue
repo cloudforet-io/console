@@ -35,7 +35,6 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import router from '@/routes';
 import { makeProxy } from '@spaceone/console-core-lib';
 import VueI18n from 'vue-i18n';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -130,7 +129,7 @@ export default {
             try {
                 await SpaceConnector.client.identity.project.update({
                     ...params,
-                    project_id: props.project?.project_id || router.currentRoute.params.id,
+                    project_id: props.project?.project_id || vm.$router.currentRoute.params.id,
                 });
                 showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '', vm.$root);
             } catch (e) {

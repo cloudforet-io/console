@@ -87,7 +87,7 @@ import {
 } from '@/views/identity/user/modules/notification/notification-channel-item/type';
 import AddNotificationMemberGroup from '@/views/identity/user/modules/notification/AddNotificationMemberGroup.vue';
 import InfoMessage from '@/common/components/InfoMessage.vue';
-import store from '@/store';
+import { store } from '@/store';
 
 
 export default {

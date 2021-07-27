@@ -68,7 +68,6 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 import ServiceCategorySelection from '@/views/automation/spot-automation/modules/ServiceCategorySelection.vue';
 import { SpotGroupResourceCategory } from '@/views/automation/spot-automation/type';
 import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
-import router from '@/routes';
 
 export default {
     name: 'AddSpotGroupPage',
@@ -178,7 +177,7 @@ export default {
                 await SpaceConnector.client.spotAutomation.spotGroup.create(params);
 
                 showSuccessMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.ALT_S_CREATE_SPOT_GROUP'), '', vm.$root);
-                await router.push({ name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP._NAME });
+                await vm.$router.push({ name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP._NAME });
             } catch (e) {
                 console.error(e);
                 showErrorMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.ALT_E_CREATE_SPOT_GROUP'), e, vm.$root);

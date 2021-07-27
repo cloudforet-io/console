@@ -80,7 +80,6 @@ import ConfirmCredentials from '@/views/plugin/collector/modules/ConfirmCredenti
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
-import router from '@/routes';
 
 export default {
     name: 'CreateCollectorPage',
@@ -223,10 +222,10 @@ export default {
 
         /* event */
         const onClickBackButton = () => {
-            router.push({ name: PLUGIN_ROUTE.COLLECTOR.CREATE._NAME });
+            vm.$router.push({ name: PLUGIN_ROUTE.COLLECTOR.CREATE._NAME });
         };
         const onClickCancel = () => {
-            router.go(-1);
+            vm.$router.go(-1);
         };
         const onClickConfirm = async () => {
             if (!formState.isConfValid || !formState.isTagsValid) {
@@ -247,7 +246,7 @@ export default {
             try {
                 await SpaceConnector.client.inventory.collector.create(params);
                 showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_S_CREATE_TITLE'), '', vm.$root);
-                await router.push({ name: PLUGIN_ROUTE._NAME });
+                await vm.$router.push({ name: PLUGIN_ROUTE._NAME });
             } catch (e) {
                 console.error(e);
                 showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_CREATE_TITLE'), e, vm.$root);

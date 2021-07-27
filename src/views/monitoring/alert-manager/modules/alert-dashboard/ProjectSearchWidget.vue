@@ -31,7 +31,8 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PToolbox } from '@spaceone/design-system';
@@ -45,7 +46,6 @@ import { makeReferenceValueHandler } from '@spaceone/console-core-lib/component-
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { store } from '@/store';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
-import router from '@/routes';
 
 
 export default {
@@ -62,6 +62,7 @@ export default {
         },
     },
     setup(props) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             projects: computed(() => store.state.resource.project.items),
             totalCount: 0,
@@ -119,9 +120,9 @@ export default {
         };
         const onClickProjectBox = (item) => {
             if (item.maintenance_window_count > 0) {
-                router.push({ name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME, params: { id: item.project_id } });
+                vm.$router.push({ name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME, params: { id: item.project_id } });
             } else {
-                router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME, params: { id: item.project_id } });
+                vm.$router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME, params: { id: item.project_id } });
             }
         };
 

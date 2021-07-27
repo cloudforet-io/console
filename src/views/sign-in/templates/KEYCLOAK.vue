@@ -13,13 +13,13 @@
 
 <script lang="ts">
 import {
-    defineComponent, reactive, toRefs,
+    ComponentRenderProxy,
+    defineComponent, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PButton } from '@spaceone/design-system';
 import KeycloakPage from '@/views/sign-in/pages/KeycloakPage.vue';
 import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
-import router from '@/routes';
 
 export default defineComponent({
     name: 'KEYCLOAK',
@@ -28,12 +28,13 @@ export default defineComponent({
         KeycloakPage,
     },
     setup(props, context) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             keycloakVisible: false,
         });
 
         const openKeycloakSignIn = () => {
-            router.push({ name: SIGN_IN_ROUTE.KEYCLOAK._NAME });
+            vm.$router.push({ name: SIGN_IN_ROUTE.KEYCLOAK._NAME });
         };
         return {
             openKeycloakSignIn,

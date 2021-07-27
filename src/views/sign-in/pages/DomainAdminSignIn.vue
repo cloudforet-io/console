@@ -45,7 +45,6 @@ import { TranslateResult } from 'vue-i18n';
 import { store } from '@/store';
 import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
 import config from '@/lib/config';
-import router from '@/routes';
 
 
 export default {
@@ -122,7 +121,7 @@ export default {
             state.showErrorMessage = false;
         };
         const goToUserSignIn = () => {
-            if (props.admin) router.replace({ name: SIGN_IN_ROUTE._NAME });
+            if (props.admin) vm.$router.replace({ name: SIGN_IN_ROUTE._NAME });
         };
         return {
             ...toRefs(state),

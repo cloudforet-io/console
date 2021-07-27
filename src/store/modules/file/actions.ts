@@ -3,7 +3,6 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { Action } from 'vuex';
 import config from '@/lib/config';
 import axios from 'axios';
-import { store } from '@/store';
 
 interface HeaderMessage {
     title: string;
@@ -21,7 +20,7 @@ interface ExcelPayload {
     file_name_prefix?: string;
 }
 
-export const downloadExcel: Action<FileState, any> = async ({ commit, rootState }, payload: ExcelPayload[] | ExcelPayload): Promise<void> => {
+export const downloadExcel: Action<FileState, any> = async ({ commit, rootState, dispatch }, payload: ExcelPayload[] | ExcelPayload): Promise<void> => {
     try {
         let params;
         if (Array.isArray(payload)) {
@@ -81,9 +80,9 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState 
         if (typeof res === 'string') { // defensive code for case of unexpected response from the server. will be removed
             commit('setDownloadSource', config.get('CONSOLE_API.ENDPOINT') + res);
         } else {
-            store.dispatch('display/startDownloading');
+            dispatch('display/startDownloading');
             const { headers, data } = await axios.get(config.get('CONSOLE_API.ENDPOINT') + res.file_link, { responseType: 'blob' });
-            store.dispatch('display/finishDownloading');
+            dispatch('display/finishDownloading');
             const blob = new Blob([data], {
                 type: headers['content-type'],
             });

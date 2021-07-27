@@ -68,7 +68,6 @@ import { PDivider, PI } from '@spaceone/design-system';
 
 import VerticalPageLayout from '@/common/components/layouts/VerticalPageLayout.vue';
 import { store } from '@/store';
-import router from '@/routes';
 import VueI18n from 'vue-i18n';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 
@@ -142,7 +141,7 @@ export default {
         });
         const showPage = (item) => {
             sidebarState.selectedItem = item;
-            vm.$router.replace({ name: item.routeName, query: { ...router.currentRoute.query } }).catch(() => {});
+            vm.$router.replace({ name: item.routeName, query: { ...vm.$route.query } }).catch(() => {});
         };
         const selectSidebarItem = (routeName) => {
             if (routeName === IDENTITY_ROUTE.USER.API_KEY._NAME && !userState.isDomainOwner) {

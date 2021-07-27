@@ -18,11 +18,11 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
 
-import router from '@/routes';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -46,12 +46,13 @@ export default {
         PPageTitle,
     },
     setup() {
-        const tagQueryHelper = new QueryHelper().setFiltersAsRawQueryString(router.currentRoute.query.filters);
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const tagQueryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
             pageTitle: computed(() => i18n.t('MONITORING.ALERT.ALERT_LIST.ALERT')),
-            alertState: router.currentRoute.query.state ?? ALERT_STATE_FILTER.OPEN,
-            urgency: router.currentRoute.query.urgency ?? ALERT_URGENCY.ALL,
-            assigned: router.currentRoute.query.assigned ?? ASSIGNED_STATE.ALL,
+            alertState: vm.$route.query.state ?? ALERT_STATE_FILTER.OPEN,
+            urgency: vm.$route.query.urgency ?? ALERT_URGENCY.ALL,
+            assigned: vm.$route.query.assigned ?? ASSIGNED_STATE.ALL,
             filters: tagQueryHelper.filters,
         });
 
@@ -64,9 +65,9 @@ export default {
         });
 
         const replaceAlertListPageUrlQuery = (query: AlertListPageUrlQuery) => {
-            router.replace({
+            vm.$router.replace({
                 query: {
-                    ...router.currentRoute.query,
+                    ...vm.$route.query,
                     ...query,
                 },
             }).catch(() => {});

@@ -145,7 +145,6 @@ import ProjectFormModal from '@/views/project/project/modules/ProjectFormModal.v
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
-import router from '@/routes';
 
 
 export default {
@@ -192,7 +191,7 @@ export default {
 
         const getProvider = name => vm.$store.state.resource.provider.items[name] || {};
         const goToServiceAccount = (provider) => {
-            router.push({
+            vm.$router.push({
                 name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME,
                 query: { provider: getProvider(provider) ? provider : null },
             });
