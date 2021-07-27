@@ -920,9 +920,9 @@
 				"EMPTY_CLOUD_SERVICE": "Please, register Service Account first to collect cloud service resouces. ",
 				"FAVORITES": "Favorites",
 				"NO_REGION": "No Region",
-				"REGION": "Region",
-				"SERVICE_CATEGORY": "Service Category",
-				"SERVICE_PROVIDER": "Service Provider",
+				"REGION": "Regions",
+				"SERVICE_CATEGORY": "Service Categories",
+				"SERVICE_PROVIDER": "Service Providers",
 				"SHOW_MAJOR": "Show Major Services ",
 				"TITLE": "{provider} Cloud Service"
 			},
