@@ -55,7 +55,6 @@ const initAmchartsLicense = () => {
 };
 
 const initRouter = () => {
-    console.debug(store.state.domain.name);
     if (store.state.domain.name === 'root') {
         SpaceRouter.init(rootDomainRoutes);
     } else {

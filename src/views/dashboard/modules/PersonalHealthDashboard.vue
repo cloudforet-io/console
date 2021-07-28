@@ -88,7 +88,13 @@ export default {
         PDataTable,
         WidgetLayout,
     },
-    setup() {
+    props: {
+        extraParams: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
@@ -110,6 +116,7 @@ export default {
         const getData = async () => {
             try {
                 const res = await SpaceConnector.client.statistics.topic.phdSummary({
+                    ...props.extraParams,
                     period: EVENT_PERIOD,
                 });
 

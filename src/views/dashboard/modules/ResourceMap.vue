@@ -97,7 +97,13 @@ export default {
         WidgetLayout,
         PProgressBar,
     },
-    setup() {
+    props: {
+        extraParams: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
         const apiQuery = new ApiQueryHelper();
@@ -143,6 +149,7 @@ export default {
             state.selectedRegionCode = regionCode;
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceResources({
+                    ...props.extraParams,
                     query: apiQuery.setFilters([
                         { k: 'region_code', v: regionCode, o: '=' },
                         { k: 'provider', v: provider, o: '=' },
@@ -166,6 +173,7 @@ export default {
 
         const getRegionList = async () => {
             const resp = await SpaceConnector.client.inventory.region.list({
+                ...props.extraParams,
                 query: {
                     filter: [
                         {
@@ -199,6 +207,7 @@ export default {
             if (!initialRegionFromLocalStorage) {
                 let regionWithTheMostService = '';
                 const resp = await SpaceConnector.client.statistics.topic.cloudServiceByRegion({
+                    ...props.extraParams,
                     query: {
                         sort: {
                             name: 'count',

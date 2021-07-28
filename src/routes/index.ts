@@ -8,7 +8,6 @@ export class SpaceRouter {
     static router: VueRouter;
 
     static init(routes: RouteConfig[]) {
-        console.debug('init router');
         if (SpaceRouter.router) throw new Error('Router init failed: Already initiated.');
 
         Vue.use(VueRouter);

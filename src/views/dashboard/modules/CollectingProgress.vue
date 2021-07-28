@@ -105,7 +105,13 @@ export default {
         PSkeleton,
         PI,
     },
-    setup() {
+    props: {
+        extraParams: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,
@@ -147,7 +153,10 @@ export default {
                 apiQuery.setSort('created_at')
                     .setPage(1, 5)
                     .setFilters([{ k: 'status', v: [JOB_STATE.created, JOB_STATE.progress], o: '=' }]);
-                const res = await SpaceConnector.client.inventory.job.list({ query: apiQuery.data });
+                const res = await SpaceConnector.client.inventory.job.list({
+                    ...props.extraParams,
+                    query: apiQuery.data,
+                });
                 state.items = convertJobsToFieldItem(res.results);
             } catch (e) {
                 state.items = [];

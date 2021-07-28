@@ -162,7 +162,13 @@ export default {
         WidgetLayout,
         PI,
     },
-    setup() {
+    props: {
+        extraParams: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
 
@@ -319,7 +325,7 @@ export default {
         const getOverallData = async () => {
             chartState.loading = true;
             try {
-                const res = await SpaceConnector.client.statistics.topic.trustedAdvisorSummary();
+                const res = await SpaceConnector.client.statistics.topic.trustedAdvisorSummary(props.extraParams);
                 chartState.data = res.results;
             } catch (e) {
                 console.error(e);
@@ -330,7 +336,7 @@ export default {
         const getProjectSummary = async () => {
             state.loading = true;
             try {
-                const res = await SpaceConnector.client.statistics.topic.trustedAdvisorByProject();
+                const res = await SpaceConnector.client.statistics.topic.trustedAdvisorByProject(props.extraParams);
                 state.allPage = getAllPage(size(res), 6);
 
                 const projectSummaryData: ProjectSummaryData[] = [];

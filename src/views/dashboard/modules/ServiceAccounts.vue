@@ -99,6 +99,10 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        extraParams: {
+            type: Object,
+            default: () => ({}),
+        },
     },
     setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -195,7 +199,7 @@ export default {
             state.loading = true;
             state.data = [];
             try {
-                const res = await SpaceConnector.client.statistics.topic.serviceAccountByProvider();
+                const res = await SpaceConnector.client.statistics.topic.serviceAccountByProvider(props.extraParams);
 
                 if (res.results.length > 0) {
                     forEach(res.results, (d) => {

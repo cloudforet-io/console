@@ -147,7 +147,13 @@ export default {
         PSkeleton,
         PI,
     },
-    setup() {
+    props: {
+        extraParams: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
@@ -262,7 +268,7 @@ export default {
         const getData = async () => {
             state.loading = true;
             try {
-                const res = await SpaceConnector.client.statistics.topic.topProject();
+                const res = await SpaceConnector.client.statistics.topic.topProject(props.extraParams);
                 const data = res.results.map(d => ({
                     rank: d.rank,
                     project_group: {

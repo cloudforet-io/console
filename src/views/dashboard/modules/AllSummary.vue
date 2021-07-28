@@ -96,7 +96,10 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
+import {
+    reactive, toRefs, watch, computed,
+    onUnmounted, ComponentRenderProxy, getCurrentInstance,
+} from '@vue/composition-api';
 import {
     forEach, orderBy, range,
 } from 'lodash';
@@ -104,13 +107,8 @@ import bytes from 'bytes';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import am4themes_animated from '@amcharts/amcharts4/themes/animated';
-import { TranslateResult } from 'vue-i18n';
+import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import { Location } from 'vue-router';
-
-import {
-    reactive, toRefs, watch, computed, onUnmounted, ComponentRenderProxy, getCurrentInstance,
-} from '@vue/composition-api';
 
 import {
     PChartLoader, PSkeleton, PButton, PBalloonTab,
@@ -125,7 +123,7 @@ import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 import config from '@/lib/config';
 
-am4core.useTheme(am4themes_animated);
+am4core.useTheme(am4themesAnimated);
 
 /* enum */
 enum DATE_TYPE {
@@ -175,7 +173,13 @@ export default {
         PChartLoader,
         PBalloonTab,
     },
-    setup() {
+    props: {
+        extraParams: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
 
@@ -422,6 +426,7 @@ export default {
         const getBillingCount = async () => {
             try {
                 const res = await SpaceConnector.client.statistics.topic.billingSummary({
+                    ...props.extraParams,
                     granularity: DATE_TYPE.monthly,
                     start: dayjs.utc().startOf('month').format('YYYY-MM-DD'),
                     end: dayjs.utc().endOf('month').format('YYYY-MM-DD'),
@@ -437,6 +442,7 @@ export default {
         const getCount = async (type) => {
             try {
                 const res = await SpaceConnector.client.statistics.topic.cloudServiceSummary({
+                    ...props.extraParams,
                     labels: [CLOUD_SERVICE_LABEL[type]],
                 });
                 let count = 0 as number | string;
@@ -468,6 +474,7 @@ export default {
                         end = dayjs.utc().subtract(1, 'day').format('YYYY-MM-DD');
                     }
                     const res = await SpaceConnector.client.statistics.topic.billingSummary({
+                        ...props.extraParams,
                         granularity: state.selectedDateType,
                         start,
                         end,
@@ -482,6 +489,7 @@ export default {
                     }
                 } else {
                     const res = await SpaceConnector.client.statistics.topic.dailyCloudServiceSummary({
+                        ...props.extraParams,
                         label: CLOUD_SERVICE_LABEL[type],
                         granularity: state.selectedDateType,
                     });
@@ -495,6 +503,7 @@ export default {
         const getApiParameter = (type) => {
             let param;
             const defaultParam: any = {
+                ...props.extraParams,
                 labels: [CLOUD_SERVICE_LABEL[type]],
                 is_major: true,
                 query: {
@@ -580,6 +589,7 @@ export default {
             try {
                 state.loading = true;
                 const res = await SpaceConnector.client.statistics.topic.billingSummary({
+                    ...props.extraParams,
                     granularity: DATE_TYPE.monthly,
                     aggregation: 'inventory.CloudServiceType',
                     start: dayjs.utc().startOf('month').format('YYYY-MM-DD'),
