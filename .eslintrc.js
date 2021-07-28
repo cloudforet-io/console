@@ -1,7 +1,7 @@
 module.exports = {
     root: true,
     extends: [
-        'eslint:recommended',
+        'airbnb-base',
         'plugin:@typescript-eslint/eslint-recommended'
     ],
     parser: '@typescript-eslint/parser',
@@ -19,22 +19,27 @@ module.exports = {
     },
     globals: {
     },
+    settings: {
+        'import/resolver': {
+            typescript: {} // this loads <root dir>/tsconfig.json to eslint
+        }
+    },
     rules: {
-        'indent': ['error', 4, {
-            'ObjectExpression': 1,
-            'flatTernaryExpressions': true,
-            'ignoreComments': true,
-            'ArrayExpression': 1
+        indent: ['error', 4, {
+            ObjectExpression: 1,
+            flatTernaryExpressions: true,
+            ignoreComments: true,
+            ArrayExpression: 1
         }],
-        'quotes': ['error', 'single'],
+        quotes: ['error', 'single'],
         'comma-dangle': ['error', {
-            'arrays': 'never',
-            'objects': 'never',
-            'imports': 'never',
-            'exports': 'never',
-            'functions': 'never'
+            arrays: 'never',
+            objects: 'never',
+            imports: 'never',
+            exports: 'never',
+            functions: 'never'
         }],
-        'no-irregular-whitespace': ['error', {'skipComments': true}],
+        'no-irregular-whitespace': ['error', { skipComments: true }],
         'linebreak-style': [
             'error',
             'unix'
@@ -44,8 +49,13 @@ module.exports = {
         'no-duplicate-imports': 'error',
         'no-console': process.env.NODE_ENV === 'production' ? 'error' : 'off',
         'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off',
-        'semi': ['error', 'always'],
+        semi: ['error', 'always'],
+        'no-unused-vars': 'off',
+        'import/prefer-default-export': 'off',
+        'no-underscore-dangle': 'off',
+        'max-classes-per-file': 'off',
         // typescript rules
+        '@typescript-eslint/no-unused-vars': ['error'],
         '@typescript-eslint/explicit-member-accessibility': [
             'error',
             {

@@ -1,5 +1,5 @@
 import axios, {
-    AxiosError, AxiosInstance, AxiosRequestConfig,
+    AxiosError, AxiosInstance, AxiosRequestConfig
 } from 'axios';
 import jwt from 'jsonwebtoken';
 import createAuthRefreshInterceptor from 'axios-auth-refresh';
@@ -56,8 +56,8 @@ class API {
 
     private defaultAxiosConfig: AxiosRequestConfig = {
         headers: {
-            'Content-Type': 'application/json',
-        },
+            'Content-Type': 'application/json'
+        }
     };
 
     private mockInfo: MockInfo = {};
@@ -140,7 +140,6 @@ class API {
         return this.defaultAxiosConfig;
     }
 
-
     private setAxiosInterceptors(): void {
         // Axios request interceptor
         this.instance.interceptors.request.use((request) => {
@@ -170,6 +169,7 @@ class API {
             try {
                 const response = await this.refreshInstance.post(REFRESH_URL);
                 this.setToken(response.data.access_token, response.data.refresh_token);
+                // eslint-disable-next-line no-param-reassign
                 failedRequest.response.config.headers.Authorization = `Bearer ${this.accessToken}`;
                 return response;
             } catch (err) {
@@ -183,8 +183,8 @@ class API {
 
         // Axios response interceptor with error handling
         this.instance.interceptors.response.use(
-            response => response,
-            error => Promise.reject(new APIError(error)),
+            (response) => response,
+            (error) => Promise.reject(new APIError(error))
         );
     }
 }

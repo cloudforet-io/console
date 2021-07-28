@@ -1,5 +1,6 @@
-import _ from 'lodash';
+import { camelCase } from 'lodash';
 import { AxiosRequestConfig } from 'axios';
+
 import API from '@src/space-connector/api';
 import { SessionTimeoutCallback, APIInfo, MockInfo } from '@src/space-connector/type';
 
@@ -67,7 +68,7 @@ export class SpaceConnector {
         apiInfoArr = apiInfoArr.filter(Boolean);
 
         apiInfoArr.forEach((objPath, idx) => {
-            const objCamel = _.camelCase(objPath.trim());
+            const objCamel = camelCase(objPath.trim());
             if (!currentPath[objCamel]) {
                 // Bind APIHandler if last index
                 if ((apiInfoArr.length - 1) === idx) {
