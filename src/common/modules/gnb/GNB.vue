@@ -20,13 +20,13 @@
             </component>
             <div v-for="(menu, idx) in menuList"
                  :key="idx"
-                 class="menu-wrapper hidden md:inline-block"
+                 class="menu-wrapper"
             >
                 <div v-if="menu.show !== false"
                      class="menu-button mr-4 lg:mr-8"
                      :class="[{
                          opened: menu.subMenuList.length > 0 && openedMenu === menu.name,
-                         selected: menu.name === selectedMenu
+                         selected: menu.name === selectedMenu,
                      }]"
                      @click.stop="toggleMenu(menu.name)"
                 >
@@ -100,15 +100,16 @@ import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
 
 
-enum PARENT_CATEGORY {
-    project = 'project',
-    inventory = 'inventory',
-    identity = 'identity',
-    monitoring = 'monitoring',
-    automation = 'automation',
-    plugin = 'plugin',
-    management = 'management',
-}
+const PARENT_CATEGORY = {
+    project: 'project',
+    inventory: 'inventory',
+    identity: 'identity',
+    monitoring: 'monitoring',
+    automation: 'automation',
+    plugin: 'plugin',
+    management: 'management',
+};
+type PARENT_CATEGORY = typeof PARENT_CATEGORY[keyof typeof PARENT_CATEGORY]
 
 interface SubMenu {
     label: TranslateResult;
@@ -118,7 +119,7 @@ interface SubMenu {
     isBeta?: boolean;
 }
 interface Menu {
-    name: keyof typeof PARENT_CATEGORY;
+    name: PARENT_CATEGORY;
     label: TranslateResult;
     to: Location['query'];
     show?: boolean;
@@ -310,6 +311,11 @@ export default {
     }
     .menu-wrapper {
         position: relative;
+        display: inline-block;
+
+        @screen tablet {
+            display: none;
+        }
 
         .menu-button {
             @apply text-gray-900;
