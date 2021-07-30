@@ -4,7 +4,6 @@ export const CONTEXT_MENU_TYPE = {
     divider: 'divider',
     header: 'header',
     item: 'item',
-    info: 'info',
 } as const;
 
 export type CONTEXT_MENU_TYPE = typeof CONTEXT_MENU_TYPE[keyof typeof CONTEXT_MENU_TYPE];
@@ -31,4 +30,7 @@ export interface ContextMenuProps {
     loading?: boolean;
     alwaysShowMenu?: boolean;
     invalid?: boolean;
+    selected?: number[];
+    multiSelectable?: boolean;
+    showRadioIcon?: boolean;
 }

@@ -30,6 +30,9 @@ export const Template = (args, { argTypes }) => ({
             :theme="theme"
             :loading="loading"
             :always-show-menu="alwaysShowMenu"
+            :selected="selected"
+            :multi-selectable="multiSelectable"
+            :show-radio-icon="showRadioIcon"
             @select="onSelect"
             @focus="onFocus"
             @blur="onBlur"
@@ -60,7 +63,7 @@ Context Menu's `menu` props is an `array` of `MenuItem`.
 |-|-|-|
 |name|The key of the corresponding item|`string`|
 |label|Value to be displayed|`string`|
-|type|The type of item |`['divider', 'header', 'item', 'info']`|
+|type|The type of item |`['divider', 'header', 'item']`|
 |disabled|Whether to disable the selection|`boolean`|
 |link|A value given when it is necessary to move to a specific link when pressed. In this case, the corresponding item is displayed as a tag.|`string`|
 |target|When the link property is assigned to the corresponding item, it is bound to the a tag attribute together. |`string`|
@@ -76,9 +79,8 @@ Each `MenuItem` has the following type to represent it:
 |Type|Description|
 |-|-|
 |item|Default type. Selectable and Focusable. If no value is given to the type property of `MenuItem`, it is regarded as this type.|
-|divider| Divider. This type is designated when you want to display a divider line. For this type, you don't need any of the `MenuItem` properties. But if you want to customize divider for specific item with 'divider-{item.name}' slot, you need to give the name property.|
+|divider| Divider. This type is designated when you want to display a divider line. For this type, you don't need any of the `MenuItem` properties.|
 |header|Use it when you want to group items among related items and display the category of items. Not selectable, Not focusable.|
-|info|Not yet defined, but will be provided later|
 
 <br/>
 
@@ -177,76 +179,55 @@ Each `MenuItem` has the following type to represent it:
 <br/>
 <br/>
 
-
-## Slot Cases
-
-Context Menu have 4 types fot slots:
-
-|Slot Type|Description|Slots|
-|-|-|-|
-|Full replacement|A slot that replaces the entire corresponding slot area.|`loading`, `no-data`, `item`, `info`, `divider`|
-|Full replacement with style|A slot that replaces the inner area of the style of the entire corresponding slot area.|`loading-format`, `no-data-format`, `item--format`, `info--format`, `header--format`|
-|Specific replacement|A slot that replaces the specific corresponding slot area.|`item-<item.name>`, `divider-<item.name>`, `header-<item.name>`|
-|Specific replacement with style|A slot that replaces the inner area of the style of the specific corresponding slot area.|`item-<item.name>-format`, `header-<item.name>-format`|
-
-<br/>
-
-### Loading Slots
+## Show Radio Icon
 
 <Canvas>
-    <Story name="Loading Slots" args={{menu: menuItems}}>
+    <Story name="Show Radio Icon" args={{menu: menuItems}} height={'18rem'}>
         {{
             props: Object.keys(getContextMenuArgTypes()),
-            components: { PContextMenu, PRawData },
+            components: { PContextMenu },
             template: `
-        <div class="flex h-full flex-col">
-            <div>
-                <h2 class="mb-4">This is <strong>loading</strong> slot</h2>
-                <p-context-menu :menu="menu" loading>
-                    <template #loading>
-                        <div style="position: absolute; display: flex; top: 0; left: 0; width: 100%; height: 100%; align-items: center; justify-content: center;">
-                            ...loading
-                        </div>
-                    </template>
-                </p-context-menu>
-            </div>
-            <div class="mt-4">
-                <h2 class=" mb-4">This is <strong>loading-format</strong> slot</h2>
-                <p-context-menu :menu="menu" loading>
-                    <template #loading-format>
-                        ...loading
-                    </template>
-                </p-context-menu>
-            </div>
-            <div class="mt-4">
-                <h2 class="mb-4">Slot Props:</h2>
-                <p-context-menu :menu="menu" loading v-show="false">
-                    <template #loading-format="slotProps">
-                        <pre ref="slotPropsRef">{{slotProps}}</pre>
-                    </template>
-                </p-context-menu>
-                <p-raw-data :raw="slotPropsText" style="height: 10rem; overflow: scroll;"/>
-            </div>
-        </div>
-    <!--<div>-->
+        <p-context-menu :menu="menu" :show-radio-icon="true" />
 `,
-            setup() {
-                const state = reactive({
-                    slotPropsRef: null,
-                    slotPropsText: ''
-                })
-                watch(() => state.slotPropsRef, (slotPropsRef) => {
-                    if (slotPropsRef) state.slotPropsText = slotPropsRef.textContent
-                })
-                return {...toRefs((state))}
-            }
         }}
     </Story>
 </Canvas>
 
+<br/>
+<br/>
+
+## Multi Selectable
+
+<Canvas>
+    <Story name="Multi Selectable" args={{menu: menuItems}} height={'20rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <div>
+            <p-context-menu :menu="menu" :multi-selectable="true" :selected.sync="selected" />
+            <br/>
+            <p>Selected: {{ selected }}</p>
+        </div>
+`,
+        }}
+    </Story>
+</Canvas>
 
 <br/>
 <br/>
+
+## Slot Cases
+
+Context Menu have 2 types fot slots:
+
+|Slot Type|Description|Slots|
+|-|-|-|
+|Full replacement with style|A slot that replaces the inner area of the style of the entire corresponding slot area.|`no-data-format`, `item--format`|
+|Specific replacement|A slot that replaces the specific corresponding slot area.|`header-<item.name>`|
+
+<br/>
+
 
 ### No Data Slots
 
@@ -257,42 +238,15 @@ Context Menu have 4 types fot slots:
             components: { PContextMenu, PEmpty, PRawData },
             template: `
         <div class="flex h-full flex-col">
-            <div>
-                <h2 class="mb-4">This is <strong>no-data</strong> slot</h2>
-                <p-context-menu :menu="[]" >
-                    <template #no-data>
-                        <p-empty>No Data</p-empty>
-                    </template>
-                </p-context-menu>
-            </div>
             <div class="mt-4">
                 <h2 class="mb-4">This is <strong>no-data-format</strong> slot</h2>
                 <p-context-menu :menu="[]">
                     <template #no-data-format>No Data</template>
                 </p-context-menu>
             </div>
-            <div class="mt-4">
-                <h2 class="mb-4">Slot Props:</h2>
-                <p-context-menu :menu="[]" loading v-show="false">
-                    <template #no-data="slotProps">
-                        <pre ref="slotPropsRef">{{slotProps}}</pre>
-                    </template>
-                </p-context-menu>
-                <p-raw-data :raw="slotPropsText" style="height: 10rem; overflow: scroll;"/>
-            </div>
         </div>
 <!--<div>-->
 `,
-            setup() {
-                const state = reactive({
-                    slotPropsRef: null,
-                    slotPropsText: ''
-                })
-                watch(() => state.slotPropsRef, (slotPropsRef) => {
-                    if (slotPropsRef) state.slotPropsText = slotPropsRef.textContent
-                })
-                return {...toRefs((state))}
-            }
         }}
     </Story>
 </Canvas>
@@ -361,28 +315,6 @@ Context Menu have 4 types fot slots:
             components: { PContextMenu, PI, PRawData },
             template: `
         <div class="flex h-full flex-col">
-            <div>
-                <h2 class="mb-4">This is <strong>item</strong> slot</h2>
-                <p-context-menu :menu="menu">
-                    <template #item="{item}">
-                        <div>
-                            <p-i name="btn_gnb_top-logo"/>
-                            {{item.label}}
-                        </div>
-                    </template>
-                </p-context-menu>
-            </div>
-            <div class="mt-4">
-                <h2 class="mb-4">This is <strong>item-{item.name}</strong> slot</h2>
-                <p-context-menu :menu="menu">
-                    <template #item-collect="{item}">
-                        <div>
-                            <p-i name="btn_gnb_top-logo"/>
-                            This is custom for <strong>{{item.label}}</strong> item!
-                        </div>
-                    </template>
-                </p-context-menu>
-            </div>
             <div class="mt-4">
                 <h2 class="mb-4">This is <strong>item--format</strong> slot</h2>
                 <p-context-menu :menu="menu">
@@ -395,20 +327,9 @@ Context Menu have 4 types fot slots:
                 </p-context-menu>
             </div>
             <div class="mt-4">
-                <h2 class="mb-4">This is <strong>item-{item.name}-format</strong> slot</h2>
-                <p-context-menu :menu="menu">
-                    <template #item-collect-format="{item}">
-                        <div>
-                            <p-i name="btn_gnb_top-logo"/>
-                            This is custom for <strong>{{item.label}}</strong> item!
-                        </div>
-                    </template>
-                </p-context-menu>
-            </div>
-            <div class="mt-4">
                 <h2 class="mb-4">Slot Props:</h2>
                 <p-context-menu :menu="menu" loading v-show="false">
-                    <template #item-collect="slotProps">
+                    <template #item--format="slotProps">
                         <pre ref="slotPropsRef">{{slotProps}}</pre>
                     </template>
                 </p-context-menu>
@@ -434,60 +355,6 @@ Context Menu have 4 types fot slots:
 <br/>
 <br/>
 
-
-### Divider Slots
-
-<Canvas>
-    <Story name="Divider Slots" args={{menu: menuItems}}>
-        {{
-            props: Object.keys(getContextMenuArgTypes()),
-            components: { PContextMenu, PRawData },
-            template: `
-        <div class="flex h-full flex-col">
-            <div>
-                <h2 class="mb-4">This is <strong>divider</strong> slot</h2>
-                <p-context-menu :menu="menu">
-                    <template #divider>
-                        <div style="width: 100%; border-bottom: 1px solid darkgray; margin-top: 1rem;"></div>
-                    </template>
-                </p-context-menu>
-            </div>
-            <div class="mt-4">
-                <h2 class=" mb-4">This is <strong>divider-{item.name}</strong> slot</h2>
-                <p-context-menu :menu="menu">
-                    <template #divider-collect-divider>
-                        <div style="width: calc(100% - 1rem); border-bottom: 2px dotted darkgray; margin: auto;"></div>
-                    </template>
-                </p-context-menu>
-            </div>
-            <div class="mt-4">
-                <h2 class="mb-4">Slot Props:</h2>
-                <p-context-menu :menu="menu" loading v-show="false">
-                    <template #divder-collect-divider="slotProps">
-                        <pre ref="slotPropsRef">{{slotProps}}</pre>
-                    </template>
-                </p-context-menu>
-                <p-raw-data :raw="slotPropsText" style="height: 10rem; overflow: scroll;"/>
-            </div>
-        </div>
-<!--<div>-->
-`,
-            setup() {
-                const state = reactive({
-                    slotPropsRef: null,
-                    slotPropsText: ''
-                })
-                watch(() => state.slotPropsRef, (slotPropsRef) => {
-                    if (slotPropsRef) state.slotPropsText = slotPropsRef.textContent
-                })
-                return {...toRefs((state))}
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
 
 ### Header Slots
 
@@ -498,43 +365,10 @@ Context Menu have 4 types fot slots:
             components: { PContextMenu, PI, PRawData },
             template: `
         <div class="flex h-full flex-col">
-            <div>
-                <h2 class="mb-4">This is <strong>header</strong> slot</h2>
-                <p-context-menu :menu="menu">
-                    <template #header="{item}">
-                        <div>
-                            <p-i name="btn_gnb_top-logo"/>
-                            {{item.label}}
-                        </div>
-                    </template>
-                </p-context-menu>
-            </div>
             <div class="mt-4">
                 <h2 class="mb-4">This is <strong>header-{item.name}</strong> slot</h2>
                 <p-context-menu :menu="menu">
                     <template #header-others="{item}">
-                        <div>
-                            <p-i name="btn_gnb_top-logo"/>
-                            This is custom header for <strong>{{item.label}}</strong>
-                        </div>
-                    </template>
-                </p-context-menu>
-            </div>
-            <div class="mt-4">
-                <h2 class="mb-4">This is <strong>header--format</strong> slot</h2>
-                <p-context-menu :menu="menu">
-                    <template #header--format="{item}">
-                        <div>
-                            <p-i name="btn_gnb_top-logo"/>
-                            {{item.label}}
-                        </div>
-                    </template>
-                </p-context-menu>
-            </div>
-            <div class="mt-4">
-                <h2 class="mb-4">This is <strong>header-{item.name}-format</strong> slot</h2>
-                <p-context-menu :menu="menu">
-                    <template #header-others-format="{item}">
                         <div>
                             <p-i name="btn_gnb_top-logo"/>
                             This is custom header for <strong>{{item.label}}</strong>

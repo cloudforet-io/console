@@ -2,24 +2,11 @@ import { ArgTypes } from '@storybook/addons';
 import { CONTEXT_MENU_THEME } from '@/inputs/context-menu/type';
 
 const slots: [string, string][] = [
-    ['no-data', 'Slot for customizing the content to be displayed on the menu when there is no menu item'],
     ['no-data-format', '`no-data` slot with default style applied'],
     // eslint-disable-next-line max-len
     ['menu', 'This is a slot that allows you to customize a menu, and it is useful when you want to use only the functions of the context menu, but use it completely differently from the basic style.'],
-    ['item', 'Slot used when customizing all menu items whose type is \'item\''],
     ['item--format', 'Slot used when customizing all menu items whose type is \'item\' with default style applied'],
-    ['item-<item.name>', 'Slot used when customizing a specific menu item whose type is \'item\''],
-    ['item-<item.name>-format', 'Slot used when customizing a specific menu item whose type is \'item\' with default style applied'],
-    ['info', 'Slot used when customizing all menu items whose type is \'info\''],
-    ['info--format', 'Slot used when customizing all menu items whose type is \'info\' with default style applied'],
-    ['divider', 'Slot used when customizing all menu items whose type is \'divider\''],
-    ['divider-<item.name>', 'Slot used when customizing a specific menu item whose type is \'divider\''],
-    ['header', 'Slot used when customizing all menu items whose type is \'header\''],
-    ['header--format', 'Slot used when customizing all menu items whose type is \'header\' with default style applied'],
     ['header-<item.name>', 'Slot used when customizing a specific menu item whose type is \'header\''],
-    ['header-<item.name>-format', 'Slot used when customizing a specific menu item whose type is \'header\' with default style applied'],
-    ['loading', 'Slot for customizing the loader'],
-    ['loading-format', 'Slot for customizing the loader with default style applied'],
 ];
 
 const events: [string, string][] = [
@@ -134,6 +121,60 @@ export const getContextMenuArgTypes = (): ArgTypes => ({
         name: 'invalid',
         type: { name: 'boolean' },
         description: 'Whether to apply invalid style or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    selected: {
+        name: 'selected',
+        type: { name: 'array' },
+        description: 'Array of selected indices.',
+        defaultValue: [],
+        table: {
+            type: {
+                summary: 'array',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '[]',
+            },
+        },
+        control: {
+            type: 'object',
+        },
+    },
+    multiSelectable: {
+        name: 'multiSelectable',
+        type: { name: 'boolean' },
+        description: 'Whether to select multiple items or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    showRadioIcon: {
+        name: 'showRadioIcon',
+        type: { name: 'boolean' },
+        description: 'Whether to show radio button icon or not.',
         defaultValue: false,
         table: {
             type: {

@@ -1,84 +1,63 @@
 <template>
     <div class="p-context-menu"
          :class="{[theme]: true, invalid}"
-         @keyup.esc="onEsc"
+         @keyup.esc="onClickEsc"
     >
-        <slot v-if="!alwaysShowMenu && menu.length === 0" name="no-data" v-bind="{...$props, uuid}">
-            <div key="no-data" class="context-item no-drag empty" :class="theme">
-                <slot name="no-data-format" v-bind="{...$props, uuid}">
-                    {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
-                </slot>
-            </div>
-        </slot>
+        <div v-if="!alwaysShowMenu && menu.length === 0" class="context-item empty" :class="theme">
+            <slot name="no-data-format" v-bind="{...$props, uuid}">
+                {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
+            </slot>
+        </div>
         <slot v-else name="menu" v-bind="{...$props, uuid}">
             <template v-for="(item, index) in menu">
-                <slot v-if="item.type === undefined || item.type === 'item'" name="item" v-bind="{...$props, uuid, id: `context-item-${index}-${uuid}`, item, index}">
-                    <slot :name="`item-${item.name}`" v-bind="{...$props, uuid, id: `context-item-${index}-${uuid}`, item, index}">
-                        <a :id="`context-item-${index}-${uuid}`"
-                           :key="`${item.name}-${index}`"
-                           :tabindex="index"
-                           class="context-item no-drag"
-                           :class="{ disabled: item.disabled, [theme]: true }"
-                           :href="item.disabled ? undefined : item.link"
-                           :target="item.target"
-                           @click.stop="menuClick(item.name, index, $event)"
-                           @keydown.up="onUpKey(index)"
-                           @keydown.down="onDownKey(index)"
-                           @keyup.enter="menuClick(item.name, index, $event)"
-                        >
-                            <slot name="item--format" v-bind="{...$props, uuid, item, index}">
-                                <slot :name="`item-${item.name}-format`" v-bind="{...$props, uuid, item, index}">
-                                    <span class="text" :class="{'with-icon': item.target === '_blank'}">
-                                        {{ item.label }}
-                                    </span>
-                                    <p-i v-if="item.target === '_blank'" class="external-link-icon" name="ic_external-link"
-                                         width="0.875rem" height="0.875rem"
-                                    />
-                                </slot>
-                            </slot>
-                        </a>
-                    </slot>
-                </slot>
-                <slot v-else-if="item.type==='info'" name="info">
-                    <slot name="info--format" />
-                </slot>
-                <slot v-else-if="item.type==='divider'" name="divider" v-bind="{...$props, uuid, item, index}">
-                    <slot :name="`divider-${item.name}`" v-bind="{...$props, uuid, item, index}">
-                        <div :key="index" class="context-divider"
-                             @click.stop
+                <a v-if="item.type === undefined || item.type === 'item'"
+                   :id="`context-item-${index}-${uuid}`"
+                   :key="`${item.name}-${index}`"
+                   :tabindex="index"
+                   class="context-item"
+                   :class="{ disabled: item.disabled, [theme]: true }"
+                   :href="item.disabled ? undefined : item.link"
+                   :target="item.target"
+                   @click.stop="onClickMenu(item.name, index, $event)"
+                   @keyup.enter="onClickMenu(item.name, index, $event)"
+                   @keydown.up="onKeyUp(index)"
+                   @keydown.down="onKeyDown(index)"
+                >
+                    <p-i v-if="showRadioIcon && !multiSelectable"
+                         :name="proxySelected.includes(index) ? 'ic_radio--checked' : 'ic_radio'"
+                         class="select-marker"
+                    />
+                    <p-i v-if="multiSelectable"
+                         :name="proxySelected.includes(index) ? 'ic_checkbox--checked' : 'ic_checkbox'"
+                         class="select-marker"
+                    />
+                    <slot name="item--format" v-bind="{...$props, uuid, item, index}">
+                        <span class="text" :class="{'with-icon': item.target === '_blank'}">
+                            {{ item.label }}
+                        </span>
+                        <p-i v-if="item.target === '_blank'" class="external-link-icon" name="ic_external-link"
+                             width="0.875rem" height="0.875rem"
                         />
                     </slot>
-                </slot>
-                <slot v-else-if="item.type==='header'" name="header" v-bind="{...$props, uuid, item, index}">
-                    <slot :name="`header-${item.name}`" v-bind="{...$props, uuid, item, key: index}">
-                        <div :key="index" class="context-content context-header no-drag"
-                             :class="theme"
-                             @click.stop
-                        >
-                            <slot name="header--format" v-bind="{...$props, uuid, item, index}">
-                                <slot :name="`header-${item.name}-format`" v-bind="{...$props, uuid, item, index}">
-                                    {{ item.label }}
-                                </slot>
-                            </slot>
-                        </div>
-                    </slot>
+                </a>
+                <div v-else-if="item.type==='divider'" :key="index" class="context-divider" />
+                <slot v-else-if="item.type==='header'" :name="`header-${item.name}`" v-bind="{...$props, uuid, item, key: index}">
+                    <div :key="index" class="context-header" :class="theme">
+                        {{ item.label }}
+                    </div>
                 </slot>
             </template>
         </slot>
 
-        <slot v-if="loading" name="loading" v-bind="{...$props, uuid}">
-            <div key="loading" class="loader">
-                <slot name="loading-format" v-bind="{...$props, uuid}">
-                    <p-lottie name="thin-spinner" auto :size="1" />
-                </slot>
-            </div>
-        </slot>
+        <div v-if="loading" class="loader">
+            <p-lottie name="thin-spinner" auto :size="1" />
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs, ComponentRenderProxy, getCurrentInstance,
 } from '@vue/composition-api';
 
 import PLottie from '@/foundation/lottie/PLottie.vue';
@@ -86,6 +65,8 @@ import PI from '@/foundation/icons/PI.vue';
 
 import { ContextMenuProps, CONTEXT_MENU_THEME } from '@/inputs/context-menu/type';
 import { i18n } from '@/translations';
+import { makeOptionalProxy } from '@/util/composition-helpers';
+
 
 export default defineComponent<ContextMenuProps>({
     name: 'PContextMenu',
@@ -115,44 +96,57 @@ export default defineComponent<ContextMenuProps>({
             type: Boolean,
             default: false,
         },
+        selected: {
+            type: Array,
+            default: () => [],
+        },
+        multiSelectable: {
+            type: Boolean,
+            default: false,
+        },
+        showRadioIcon: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: ContextMenuProps, { emit }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            proxySelected: makeOptionalProxy('selected', vm, props.selected),
         });
 
-        let focusedEl: HTMLElement|null = null;
+        let focusedItemEl: HTMLElement | null = null;
         const uuid = `${Math.random()}`.slice(2);
-        const menuClick = (itemName, index, event) => {
-            if (!props.menu[index].disabled) {
-                emit(`${itemName}:select`, index, event);
-                emit('select', itemName, index);
-            }
-        };
         const itemsIndex = computed<number[]>(() => {
-            const idxs: number[] = [];
-            for (let i = 0; i < Object.keys(props.menu).length; i++) {
-                if ((props.menu[i].type === undefined || props.menu[i].type === 'item')
-                    && !props.menu[i].disabled) idxs.push(i);
-            }
-            return idxs;
+            const indices: number[] = [];
+            props.menu.forEach((menuItem, i) => {
+                if ((!menuItem.type || menuItem.type === 'item') && !menuItem.disabled) {
+                    indices.push(i);
+                }
+            });
+            return indices;
         });
+
+        /* util */
         const focus = (position) => {
             const idx = position === -1 ? itemsIndex.value[itemsIndex.value.length - 1] : itemsIndex.value[position || 0];
             const el = document.getElementById(`context-item-${idx}-${uuid}`);
             if (el) {
                 el.focus();
-                focusedEl = el;
+                focusedItemEl = el;
                 emit('focus', idx);
             }
         };
         const blur = () => {
-            if (focusedEl) {
-                focusedEl.blur();
-                focusedEl = null;
+            if (focusedItemEl) {
+                focusedItemEl.blur();
+                focusedItemEl = null;
             }
             emit('blur');
         };
-        const onUpKey = (idx: number) => {
+
+        /* event */
+        const onKeyUp = (idx: number) => {
             const pos = itemsIndex.value.indexOf(idx);
             if (pos !== 0) {
                 focus(pos - 1);
@@ -161,7 +155,7 @@ export default defineComponent<ContextMenuProps>({
                 blur();
             }
         };
-        const onDownKey = (idx) => {
+        const onKeyDown = (idx) => {
             const pos = itemsIndex.value.indexOf(idx) + 1;
             if (pos !== itemsIndex.value.length) {
                 focus(pos);
@@ -170,19 +164,36 @@ export default defineComponent<ContextMenuProps>({
                 blur();
             }
         };
-        const onEsc = (e) => {
+        const onClickMenu = (itemName, index, event) => {
+            if (!props.menu[index].disabled) {
+                emit(`${itemName}:select`, index, event);
+                emit('select', itemName, index);
+
+                if (props.multiSelectable) {
+                    if (state.proxySelected.includes(index)) {
+                        const indexInSelectedList = state.proxySelected.indexOf(index);
+                        state.proxySelected.splice(indexInSelectedList, 1);
+                    } else {
+                        state.proxySelected.push(index);
+                    }
+                } else {
+                    state.proxySelected = [index];
+                }
+            }
+        };
+        const onClickEsc = (e) => {
             emit('keyup:esc', e);
             blur();
         };
 
         return {
             ...toRefs(state),
-            menuClick,
-            onDownKey,
-            onUpKey,
-            focus,
             uuid,
-            onEsc,
+            onClickMenu,
+            onKeyDown,
+            onKeyUp,
+            focus,
+            onClickEsc,
         };
     },
 });
@@ -199,6 +210,7 @@ export default defineComponent<ContextMenuProps>({
     overflow-y: auto;
     border-width: 1px;
     border-style: solid;
+    user-select: none;
 
     &.invalid {
         @apply border-alert;
@@ -239,9 +251,9 @@ export default defineComponent<ContextMenuProps>({
             flex-shrink: 0;
             margin-left: 0.25rem;
         }
-    }
-    .no-drag {
-        user-select: none;
+        .select-marker {
+            margin-right: 0.25rem;
+        }
     }
 
     .loader {
