@@ -1,3 +1,10 @@
+# [1.1.0-beta.116](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.115...v1.1.0-beta.116) (2021-07-30)
+
+
+### Features
+
+* add multi select option to context menu & delete unused slots ([#657](https://github.com/spaceone-dev/spaceone-design-system/issues/657)) ([14885bf](https://github.com/spaceone-dev/spaceone-design-system/commit/14885bf72d891b57ba1ae53ddc610b9bc77382f9))
+
 # [1.1.0-beta.115](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.114...v1.1.0-beta.115) (2021-07-26)
 
 
