@@ -98,7 +98,6 @@ class API {
 
     async refreshAccessToken(): Promise<void> {
         try {
-            console.log('refresh');
             const response = await this.refreshInstance.post(REFRESH_URL);
             this.setToken(response.data.access_token, response.data.refresh_token);
         } catch (e) {
