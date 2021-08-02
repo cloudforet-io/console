@@ -148,7 +148,6 @@ class API {
     }
 
     static getCurrentTime(): number {
-        console.log('time', Math.floor(Date.now() / 1000))
         return Math.floor(Date.now() / 1000);
     }
 
