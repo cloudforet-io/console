@@ -2,7 +2,6 @@ import axios, {
     AxiosError, AxiosInstance, AxiosRequestConfig
 } from 'axios';
 import jwt from 'jsonwebtoken';
-import createAuthRefreshInterceptor from 'axios-auth-refresh';
 import { MockInfo, SessionTimeoutCallback } from '@src/space-connector/type';
 
 const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
@@ -97,16 +96,36 @@ class API {
         return this.refreshToken;
     }
 
+    async refreshAccessToken(): Promise<void> {
+        try {
+            const response = await this.refreshInstance.post(REFRESH_URL);
+            this.setToken(response.data.access_token, response.data.refresh_token);
+        } catch (e) {
+            console.error(e);
+            this.flushToken();
+            this.sessionTimeoutCallback();
+            throw new Error('Failed to Refresh token');
+        }
+    }
+
+    async getActivatedToken() {
+        const isTokenValid = API.checkToken();
+        if (this.refreshToken) {
+            if (!isTokenValid) {
+                await this.refreshAccessToken();
+            }
+        }
+    }
+
     static checkToken(): boolean {
         const storedRefreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY) || undefined;
-        return (API.getTokenExpirationTime(storedRefreshToken) - API.getCurrentTime()) > 10;
+        return (API.getTokenExpirationTime(storedRefreshToken) - API.getCurrentTime()) > 100;
     }
 
     static getExpirationTime(): number {
         const storedRefreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY) || undefined;
         const expirationTime = API.getTokenExpirationTime(storedRefreshToken) - API.getCurrentTime();
         if (expirationTime < 0) return 0;
-
         return expirationTime;
     }
 
@@ -159,32 +178,14 @@ class API {
             if (!this.refreshToken) {
                 throw new Error('Session has expired.');
             }
-
             request.headers.Authorization = `Bearer ${this.refreshToken}`;
             return request;
         });
 
-        // Interceptor for auth refresh
-        const refreshAuthLogic = async (failedRequest: any): Promise<any> => {
-            try {
-                const response = await this.refreshInstance.post(REFRESH_URL);
-                this.setToken(response.data.access_token, response.data.refresh_token);
-                // eslint-disable-next-line no-param-reassign
-                failedRequest.response.config.headers.Authorization = `Bearer ${this.accessToken}`;
-                return response;
-            } catch (err) {
-                this.flushToken();
-                this.sessionTimeoutCallback();
-                throw err;
-            }
-        };
-
-        createAuthRefreshInterceptor(this.instance, refreshAuthLogic, { skipWhileRefreshing: false });
-
         // Axios response interceptor with error handling
         this.instance.interceptors.response.use(
-            (response) => response,
-            (error) => Promise.reject(new APIError(error))
+            response => response,
+            error => Promise.reject(new APIError(error))
         );
     }
 }

@@ -6,6 +6,8 @@ import { SessionTimeoutCallback, APIInfo, MockInfo } from '@src/space-connector/
 
 const API_REFLECTION_URL = '/api/reflection';
 
+const CHECK_TOKEN_TIME = 1000 * 30;
+
 export class SpaceConnector {
     private static instance: SpaceConnector;
 
@@ -15,6 +17,7 @@ export class SpaceConnector {
 
     constructor(endpoint: string, sessionTimeoutCallback: SessionTimeoutCallback = () => undefined, mockInfo: MockInfo) {
         this.api = new API(endpoint, sessionTimeoutCallback, mockInfo);
+        setInterval(() => this.api.getActivatedToken(), CHECK_TOKEN_TIME);
     }
 
     static async init(endpoint: string, sessionTimeoutCallback?: SessionTimeoutCallback, mockInfo: MockInfo = {}): Promise<void> {
@@ -37,10 +40,6 @@ export class SpaceConnector {
 
     static flushToken(): void {
         SpaceConnector.instance.api.flushToken();
-    }
-
-    static get refreshToken(): string|undefined {
-        return SpaceConnector.instance.api.getRefreshToken();
     }
 
     static get isTokenAlive(): boolean {
