@@ -118,10 +118,6 @@ class API {
             if (!isTokenValid) {
                 await this.refreshAccessToken();
             }
-        } else {
-            this.flushToken();
-            this.sessionTimeoutCallback();
-            throw new Error('Session has expired.');
         }
     }
 
