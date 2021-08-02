@@ -39,8 +39,8 @@ export class SpaceConnector {
         SpaceConnector.instance.api.flushToken();
     }
 
-    static get refreshToken(): string|undefined {
-        return SpaceConnector.instance.api.getRefreshToken();
+    static getActivatedToken(): Promise<void> {
+        return SpaceConnector.instance.api.getActivatedToken();
     }
 
     static get isTokenAlive(): boolean {
