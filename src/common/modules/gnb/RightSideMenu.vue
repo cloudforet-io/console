@@ -113,7 +113,7 @@ import vClickOutside from 'v-click-outside';
 import { Location } from 'vue-router';
 
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PAnchor, PI, PDivider } from '@spaceone/design-system';
@@ -226,8 +226,13 @@ export default {
             }
         };
 
-        /* Init */
-        store.dispatch('display/startCheckNotification');
+        onMounted(() => {
+            store.dispatch('display/startCheckNotification');
+        });
+
+        onUnmounted(() => {
+            store.dispatch('display/stopCheckNotification');
+        });
 
         return {
             ...toRefs(state),
