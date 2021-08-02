@@ -8,8 +8,6 @@ const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
 const REFRESH_URL = '/identity/token/refresh';
 
-const CHECK_TOKEN_TIME = 1000 * 30;
-
 export class APIError extends Error {
     status: number;
 
@@ -73,8 +71,6 @@ class API {
 
         this.loadToken();
         this.setAxiosInterceptors();
-
-        setInterval(() => this.getActivatedToken(), CHECK_TOKEN_TIME);
     }
 
     private loadToken(): void {
@@ -102,6 +98,7 @@ class API {
 
     async refreshAccessToken(): Promise<void> {
         try {
+            console.log('refresh');
             const response = await this.refreshInstance.post(REFRESH_URL);
             this.setToken(response.data.access_token, response.data.refresh_token);
         } catch (e) {
