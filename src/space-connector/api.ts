@@ -101,9 +101,9 @@ class API {
             const response = await this.refreshInstance.post(REFRESH_URL);
             this.setToken(response.data.access_token, response.data.refresh_token);
         } catch (e) {
-            console.error(e);
             this.flushToken();
             this.sessionTimeoutCallback();
+            console.error(e);
             throw new Error('Failed to Refresh token');
         }
     }
@@ -119,7 +119,7 @@ class API {
 
     static checkToken(): boolean {
         const storedRefreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY) || undefined;
-        return (API.getTokenExpirationTime(storedRefreshToken) - API.getCurrentTime()) > 100;
+        return (API.getTokenExpirationTime(storedRefreshToken) - API.getCurrentTime()) > 2000;
     }
 
     static getExpirationTime(): number {
