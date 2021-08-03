@@ -21,7 +21,7 @@
                 </div>
             </div>
             <div v-else class="view-all-text">
-                <p-anchor :to="{ name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME, params: { id: projectId } }"
+                <p-anchor :to="{ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME, params: { id: projectId } }"
                           :text="$t('MONITORING.ALERT.DASHBOARD.VIEW_ALL_OPEN_MAINTENANCE_WINDOW')"
                           :show-icon="false"
                           target="_self"

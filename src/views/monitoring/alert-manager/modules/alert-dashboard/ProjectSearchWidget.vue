@@ -120,7 +120,7 @@ export default {
         };
         const onClickProjectBox = (item) => {
             if (item.maintenance_window_count > 0) {
-                vm.$router.push({ name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME, params: { id: item.project_id } });
+                vm.$router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME, params: { id: item.project_id } });
             } else {
                 vm.$router.push({ name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME, params: { id: item.project_id } });
             }

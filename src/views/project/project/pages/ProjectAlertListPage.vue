@@ -3,6 +3,10 @@
         <alert-data-table
             :project-id="id"
             :alert-state="alertState"
+            :urgency="urgency"
+            :assigned="assigned"
+            :filters="filters"
+            keep-alive
             @update="onUpdateTable"
         />
     </div>
@@ -10,7 +14,8 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, getCurrentInstance,
+    ComponentRenderProxy,
+    getCurrentInstance,
     onActivated, reactive, toRefs,
 } from '@vue/composition-api';
 import AlertDataTable from '@/views/monitoring/alert-manager/modules/alert-list/AlertDataTable.vue';
@@ -19,7 +24,7 @@ import { AlertListPageUrlQuery, AlertListTableFilters } from '@/views/monitoring
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 
 export default {
-    name: 'ProjectAlert',
+    name: 'ProjectAlertListPage',
     components: {
         AlertDataTable,
     },
@@ -34,8 +39,9 @@ export default {
         const tagQueryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
         const state = reactive({
             alertState: vm.$route.query.state ?? ALERT_STATE_FILTER.OPEN,
-            urgency: vm.$route.query.state ?? ALERT_URGENCY.ALL,
-            assigned: vm.$route.query.state ?? ASSIGNED_STATE.ALL,
+            urgency: vm.$route.query.urgency ?? ALERT_URGENCY.ALL,
+            assigned: vm.$route.query.assigned ?? ASSIGNED_STATE.ALL,
+            filters: tagQueryHelper.filters,
         });
 
         /* util */
@@ -69,7 +75,10 @@ export default {
         };
 
         onActivated(() => {
-            state.alertState = vm.$route.query.state;
+            state.alertState = vm.$route.query.state ?? ALERT_STATE_FILTER.OPEN;
+            state.urgency = vm.$route.query.urgency ?? ALERT_URGENCY.ALL;
+            state.assigned = vm.$route.query.assigned ?? ASSIGNED_STATE.ALL;
+            state.filters = tagQueryHelper.setFiltersAsRawQueryString(vm.$route.query.filters).filters;
         });
 
         return {

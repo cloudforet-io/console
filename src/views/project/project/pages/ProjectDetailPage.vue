@@ -33,7 +33,7 @@
                                         outline
                                         @click="maintenanceWindowFormVisible = true"
                     >
-                        {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CREATE') }}
+                        {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CREATE') }}
                     </p-icon-text-button>
                 </div>
             </div>
@@ -205,10 +205,6 @@ export default {
                     label: i18n.t('PROJECT.DETAIL.TAB_NOTIFICATIONS'),
                 },
                 {
-                    name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME,
-                    label: i18n.t('PROJECT.DETAIL.TAB_MAINTENANCE_WINDOW'),
-                },
-                {
                     name: PROJECT_ROUTE.DETAIL.TAB.TAG._NAME,
                     label: i18n.t('PROJECT.DETAIL.TAB_TAG'),
                 },
@@ -267,7 +263,7 @@ export default {
 
         const urlQueryHelper = new QueryHelper();
         const onCreateMaintenanceWindow = (maintenanceWindowId: string) => {
-            singleItemTabState.activeTab = PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME;
+            singleItemTabState.activeTab = PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME;
             urlQueryHelper.setFilters([{ k: 'maintenance_window_id', v: maintenanceWindowId }]);
             vm.$router.replace({ name: singleItemTabState.activeTab, query: { filters: urlQueryHelper.rawQueryStrings } });
         };

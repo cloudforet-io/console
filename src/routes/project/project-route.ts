@@ -7,12 +7,12 @@ const ProjectDashboardPage = () => import(/* webpackChunkName: "ProjectDashboard
 const ProjectMemberPage = () => import(/* webpackChunkName: "ProjectMemberPage" */ '@/views/project/project/pages/ProjectMemberPage.vue');
 const ProjectAlertPage = () => import(/* webpackChunkName: "ProjectAlertPage" */ '@/views/project/project/pages/ProjectAlertPage.vue');
 const ProjectNotificationsPage = () => import(/* webpackChunkName: "ProjectNotificationsPage" */ '@/views/project/project/pages/ProjectNotificationsPage.vue');
-const ProjectMaintenanceWindowPage = () => import(/* webpackChunkName: "ProjectMaintenanceWindowPage" */ '@/views/project/project/pages/ProjectMaintenanceWindowPage.vue');
 const ProjectTagPage = () => import(/* webpackChunkName: "ProjectTagPage" */ '@/views/project/project/pages/ProjectTagPage.vue');
 const AddEventRulePage = () => import(/* webpackChunkName: "AddEventRulePage" */ '@/views/project/project/pages/AddEventRulePage.vue');
 const AddNotificationPage = () => import(/* webpackChunkName: "AddNotificationPage" */ '@/views/identity/user/pages/AddNotificationPage.vue');
 
-const ProjectAlert = () => import(/* webpackChunkName: "ProjectAlert" */ '@/views/project/project/modules/ProjectAlert.vue');
+const ProjectAlertListPage = () => import(/* webpackChunkName: "ProjectAlertListPage" */ '@/views/project/project/pages/ProjectAlertListPage.vue');
+const ProjectMaintenanceWindowPage = () => import(/* webpackChunkName: "ProjectMaintenanceWindowPage" */ '@/views/project/project/pages/ProjectMaintenanceWindowPage.vue');
 const ProjectWebhook = () => import(/* webpackChunkName: "ProjectWebhook" */ '@/views/project/project/modules/ProjectWebhook.vue');
 const ProjectSettings = () => import(/* webpackChunkName: "ProjectSettings" */ '@/views/project/project/modules/ProjectSettings.vue');
 
@@ -29,13 +29,13 @@ export const PROJECT_ROUTE = Object.freeze({
                 _NAME: 'projectAlert',
                 ALERT: { _NAME: 'projectAlertList' },
                 WEBHOOK: { _NAME: 'projectWebhook' },
+                MAINTENANCE_WINDOW: { _NAME: 'projectMaintenanceWindow' },
                 SETTINGS: { _NAME: 'projectSettings' },
             },
             NOTIFICATIONS: {
                 _NAME: 'projectNotifications',
                 ADD: { _NAME: 'addProjectNotification' },
             },
-            MAINTENANCE_WINDOW: { _NAME: 'projectMaintenanceWindow' },
             TAG: { _NAME: 'projectTag' },
         },
         EVENT_RULE: { _NAME: 'projectEventRule' },
@@ -90,7 +90,13 @@ export default {
                                     path: 'alert',
                                     name: PROJECT_ROUTE.DETAIL.TAB.ALERT.ALERT._NAME,
                                     props: true,
-                                    component: ProjectAlert,
+                                    component: ProjectAlertListPage,
+                                },
+                                {
+                                    path: 'maintenance-window',
+                                    name: PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME,
+                                    props: true,
+                                    component: ProjectMaintenanceWindowPage,
                                 },
                                 {
                                     path: 'webhook',
@@ -111,12 +117,6 @@ export default {
                             name: PROJECT_ROUTE.DETAIL.TAB.NOTIFICATIONS._NAME,
                             props: true,
                             component: ProjectNotificationsPage,
-                        },
-                        {
-                            path: 'maintenance-window',
-                            name: PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME,
-                            props: true,
-                            component: ProjectMaintenanceWindowPage,
                         },
                         {
                             path: 'tag',

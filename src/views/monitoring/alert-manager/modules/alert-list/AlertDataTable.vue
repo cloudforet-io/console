@@ -112,7 +112,7 @@
 </template>
 <script lang="ts">
 import {
-    computed, reactive, toRefs,
+    computed, onActivated, reactive, toRefs,
 } from '@vue/composition-api';
 import { capitalize } from 'lodash';
 import dayjs from 'dayjs';
@@ -189,6 +189,10 @@ export default {
             type: Array,
             default: () => [],
         },
+        keepAlive: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { root, emit }) {
         const tagQueryHelper = new ApiQueryHelper().setFilters(props.filters);
@@ -206,8 +210,8 @@ export default {
                     { name: 'assignee', label: 'Assignee' },
                     { name: 'resource.resource_type', label: 'Resource Name' },
                     { name: 'project_id', label: 'Project' },
-                    { name: 'created_at', label: 'Created', dataType: 'datetime' },
-                    { name: 'resolved_at', label: 'Resolved', dataType: 'datetime' },
+                    { name: 'created_at', label: 'Created Time', dataType: 'datetime' },
+                    { name: 'resolved_at', label: 'Resolved Time', dataType: 'datetime' },
                     { name: 'webhook_id', label: 'Webhook' },
                 ];
 
@@ -394,15 +398,27 @@ export default {
             await getAlerts();
         };
 
+        /* Init */
+        const initPage = () => {
+            (async () => {
+                state.tags = tagQueryHelper.setFilters(props.filters).queryTags;
+                updateBottomFilterQuery({
+                    state: props.alertState,
+                    urgency: props.urgency,
+                    assigned: props.assigned,
+                });
+                await getAlerts();
+            })();
+        };
 
-        (async () => {
-            updateBottomFilterQuery({
-                state: props.alertState,
-                urgency: props.urgency,
-                assigned: props.assigned,
-            });
-            await getAlerts();
-        })();
+        onActivated(() => {
+            initPage();
+        });
+
+
+        if (!props.keepAlive) {
+            initPage();
+        }
 
         return {
             ...toRefs(state),

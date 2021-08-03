@@ -1,6 +1,6 @@
 <template>
     <div>
-        <p-panel-top :title="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.TITLE')" use-total-count :total-count="totalCount" />
+        <p-panel-top :title="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.TITLE')" use-total-count :total-count="totalCount" />
 
         <p-toolbox-table :loading="loading" :fields="fields" :items="items"
                          searchable selectable sortable
@@ -20,12 +20,12 @@
                           :disabled="selectedItems.length !== 1 || selectedItemState === STATE.CLOSED"
                           @click="visibleUpdateModal = true"
                 >
-                    {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.UPDATE') }}
+                    {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.UPDATE') }}
                 </p-button>
                 <p-button style-type="primary-dark" :outline="true"
                           :disabled="!selectedItems.length || selectedItemState === STATE.CLOSED" @click="visibleCloseCheckModal = true"
                 >
-                    {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CLOSE') }}
+                    {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CLOSE') }}
                 </p-button>
             </template>
             <template #col-state-format="{value}">
@@ -51,8 +51,8 @@
         />
 
         <p-table-check-modal :visible.sync="visibleCloseCheckModal"
-                             :header-title="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CHECK_MODAL.TITLE_CLOSE')"
-                             :sub-title="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CHECK_MODAL.DESC_CLOSE')"
+                             :header-title="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CHECK_MODAL.TITLE_CLOSE')"
+                             :sub-title="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CHECK_MODAL.DESC_CLOSE')"
                              :fields="fields"
                              :items="selectedItems"
                              :loading="closeLoading"
@@ -202,7 +202,7 @@ export default {
         };
 
         watch(() => vm.$route.query, async (query) => {
-            if (vm.$route.name !== PROJECT_ROUTE.DETAIL.TAB.MAINTENANCE_WINDOW._NAME) return;
+            if (vm.$route.name !== PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME) return;
             tagQueryHandler.setFiltersAsRawQueryString(query.filters);
             state.queryTags = tagQueryHandler.queryTags;
             await getMaintenanceWindows();
@@ -216,10 +216,10 @@ export default {
                 });
                 state.visibleCloseCheckModal = false;
 
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ALT_S_CLOSE_MAINTENANCE_WINDOW'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_S_CLOSE_MAINTENANCE_WINDOW'), '', root);
                 await getMaintenanceWindows();
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ALT_E_CLOSE_MAINTENANCE_WINDOW'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_E_CLOSE_MAINTENANCE_WINDOW'), e, root);
                 console.error(e);
             } finally {
                 state.closeLoading = false;

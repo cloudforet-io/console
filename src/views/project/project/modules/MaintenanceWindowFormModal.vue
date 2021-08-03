@@ -1,7 +1,7 @@
 <template>
     <p-button-modal :header-title="editMode ?
-                        $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.UPDATE_TITLE')
-                        : $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.CREATE_TITLE')"
+                        $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.UPDATE_TITLE')
+                        : $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.CREATE_TITLE')"
                     :visible.sync="proxyVisible"
                     :loading="loading"
                     :disabled="showValidation && (!!titleInvalidText || isTimePeriodInvalid)"
@@ -9,9 +9,9 @@
     >
         <template #body>
             <p class="form-desc">
-                {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.DESC') }}
+                {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.DESC') }}
             </p>
-            <p-field-group :label="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.LABEL_TITLE')" required
+            <p-field-group :label="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.LABEL_TITLE')" required
                            :invalid="showValidation && !!titleInvalidText"
                            :invalid-text="titleInvalidText"
             >
@@ -19,10 +19,10 @@
                               block @input.once="onFirstInputTitle"
                 />
             </p-field-group>
-            <p-field-group class="schedule-field" :label="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.LABEL_SCHEDULE')"
+            <p-field-group class="schedule-field" :label="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.LABEL_SCHEDULE')"
                            required
                            :invalid="showValidation && isTimePeriodInvalid"
-                           :invalid-text="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.INVALID_TEXT')"
+                           :invalid-text="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.INVALID_TEXT')"
             >
                 <p-radio v-for="{name, label} in scheduleRadioItems" :key="name" v-model="selectedScheduleType"
                          :value="name"
@@ -42,13 +42,13 @@
                         <tbody>
                             <tr>
                                 <td>
-                                    <label>{{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.LABEL_TIMEZONE') }}</label>
+                                    <label>{{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.LABEL_TIMEZONE') }}</label>
                                 </td>
                                 <td>{{ timezone }}</td>
                             </tr>
                             <tr>
                                 <td>
-                                    <label for="start-time">{{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.LABEL_START_TIME') }}</label>
+                                    <label for="start-time">{{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.LABEL_START_TIME') }}</label>
                                 </td>
                                 <td class="time-selection-group">
                                     <input id="start-time" v-model="startTimeInput" type="datetime-local"
@@ -58,7 +58,7 @@
                             </tr>
                             <tr>
                                 <td>
-                                    <label for="end-time">{{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.LABEL_END_TIME') }}</label>
+                                    <label for="end-time">{{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.LABEL_END_TIME') }}</label>
                                 </td>
                                 <td class="time-selection-group">
                                     <input id="end-time" v-model="endTimeInput" type="datetime-local"
@@ -70,7 +70,7 @@
                     </table>
                 </div>
             </p-field-group>
-            <p-field-group class="period-field" :label="$t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.LABEL_TIME_PERIOD')" required>
+            <p-field-group class="period-field" :label="$t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.LABEL_TIME_PERIOD')" required>
                 <span v-if="selectedScheduleType === SCHEDULE_TYPE.startNow">
                     {{ timePeriod }}
                 </span>
@@ -83,7 +83,7 @@
             <p-button style-type="alert" size="lg" :outline="true"
                       @click="onClickClose(maintenanceWindowId)"
             >
-                {{ $t('PROJECT.DETAIL.MAINTENANCE_WINDOW.CLOSE_NOW') }}
+                {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CLOSE_NOW') }}
             </p-button>
         </template>
     </p-button-modal>
@@ -163,7 +163,7 @@ export default {
             loading: false,
             title: '',
             titleInvalidText: computed(() => {
-                if (state.title?.length === 0) return i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.REQUIRED');
+                if (state.title?.length === 0) return i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.REQUIRED');
                 return undefined;
             }),
             isTimePeriodInvalid: computed(() => {
@@ -175,19 +175,19 @@ export default {
             }),
             scheduleRadioItems: computed(() => {
                 const items = [
-                    { name: SCHEDULE_TYPE.startNow, label: i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.START_NOW') },
-                    { name: SCHEDULE_TYPE.startAtTime, label: i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.START_AT_TIME') },
+                    { name: SCHEDULE_TYPE.startNow, label: i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.START_NOW') },
+                    { name: SCHEDULE_TYPE.startAtTime, label: i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.START_AT_TIME') },
                 ];
                 if (props.editMode) items.splice(0, 1);
                 return items;
             }),
             selectedScheduleType: SCHEDULE_TYPE.startNow,
             durationItems: computed(() => [
-                { name: DURATION.m15, label: `15 ${i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.MINUTES')}` },
-                { name: DURATION.m30, label: `30 ${i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.MINUTES')}` },
-                { name: DURATION.h1, label: `1 ${i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.HOURS')}` },
-                { name: DURATION.h2, label: `2 ${i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.HOURS')}` },
-                { name: DURATION.h3, label: `3 ${i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.HOURS')}` },
+                { name: DURATION.m15, label: `15 ${i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.MINUTES')}` },
+                { name: DURATION.m30, label: `30 ${i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.MINUTES')}` },
+                { name: DURATION.h1, label: `1 ${i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.HOURS')}` },
+                { name: DURATION.h2, label: `2 ${i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.HOURS')}` },
+                { name: DURATION.h3, label: `3 ${i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.HOURS')}` },
             ]),
             selectedDuration: DURATION.m15,
             timezone: computed(() => store.state.user.timezone),
@@ -232,9 +232,9 @@ export default {
 
             const timePeriod = () => {
                 let period = '';
-                if (days !== 0) period = `${days} ${i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.DAYS')}`;
-                if (hours !== 0) period += ` ${hours} ${i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.HOURS')}`;
-                if (minutes !== 0) period += ` ${minutes} ${i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.FORM.MINUTES')}`;
+                if (days !== 0) period = `${days} ${i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.DAYS')}`;
+                if (hours !== 0) period += ` ${hours} ${i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.HOURS')}`;
+                if (minutes !== 0) period += ` ${minutes} ${i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.FORM.MINUTES')}`;
                 return period;
             };
             return timePeriod();
@@ -260,10 +260,10 @@ export default {
                     ...getTimeParams(),
                 });
 
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ALT_S_CREATE_MAINTENANCE_WINDOW'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_S_CREATE_MAINTENANCE_WINDOW'), '', root);
                 return res.maintenance_window_id;
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ALT_E_CREATE_MAINTENANCE_WINDOW'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_E_CREATE_MAINTENANCE_WINDOW'), e, root);
                 throw e;
             }
         };
@@ -278,10 +278,10 @@ export default {
                     ...getTimeParams(),
                 });
 
-                showSuccessMessage(i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ALT_S_UPDATE_MAINTENANCE_WINDOW'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_S_UPDATE_MAINTENANCE_WINDOW'), '', root);
                 return res.maintenance_window_id;
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.DETAIL.MAINTENANCE_WINDOW.ALT_E_UPDATE_MAINTENANCE_WINDOW'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_E_UPDATE_MAINTENANCE_WINDOW'), e, root);
                 throw e;
             }
         };
