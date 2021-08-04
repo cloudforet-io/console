@@ -112,7 +112,7 @@ class API {
     }
 
     async getActivatedToken() {
-        if (this.refreshToken && this.accessToken) {
+        if (this.accessToken) {
             const isTokenValid = API.checkToken();
             if (!isTokenValid) {
                 await this.refreshAccessToken();
@@ -178,10 +178,11 @@ class API {
 
         // Axios request interceptor to set the refresh token
         this.refreshInstance.interceptors.request.use((request) => {
-            if (!this.refreshToken) {
+            const storedRefreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY);
+            if (!storedRefreshToken) {
                 throw new Error('Session has expired.');
             }
-            request.headers.Authorization = `Bearer ${this.refreshToken}`;
+            request.headers.Authorization = `Bearer ${storedRefreshToken}`;
             return request;
         });
 
