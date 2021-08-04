@@ -96,21 +96,24 @@ class API {
         return this.refreshToken;
     }
 
-    async refreshAccessToken(): Promise<void> {
+    async refreshAccessToken(executeSessionTimeoutCallback: boolean = true): Promise<boolean> {
         try {
             const response = await this.refreshInstance.post(REFRESH_URL);
             this.setToken(response.data.access_token, response.data.refresh_token);
+            return true;
         } catch (e) {
-            console.error(e);
             this.flushToken();
-            this.sessionTimeoutCallback();
-            throw new Error('Failed to Refresh token');
+            if (executeSessionTimeoutCallback) {
+                this.sessionTimeoutCallback();
+                throw new Error('Failed to refresh token');
+            }
+            return false;
         }
     }
 
     async getActivatedToken() {
-        const isTokenValid = API.checkToken();
-        if (this.refreshToken) {
+        if (this.refreshToken && this.accessToken) {
+            const isTokenValid = API.checkToken();
             if (!isTokenValid) {
                 await this.refreshAccessToken();
             }
@@ -118,13 +121,13 @@ class API {
     }
 
     static checkToken(): boolean {
-        const storedRefreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY) || undefined;
-        return (API.getTokenExpirationTime(storedRefreshToken) - API.getCurrentTime()) > 100;
+        const storedAccessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY) || undefined;
+        return (API.getTokenExpirationTime(storedAccessToken) - API.getCurrentTime()) > 60;
     }
 
     static getExpirationTime(): number {
-        const storedRefreshToken = window.localStorage.getItem(REFRESH_TOKEN_KEY) || undefined;
-        const expirationTime = API.getTokenExpirationTime(storedRefreshToken) - API.getCurrentTime();
+        const storedAccessToken = window.localStorage.getItem(ACCESS_TOKEN_KEY) || undefined;
+        const expirationTime = API.getTokenExpirationTime(storedAccessToken) - API.getCurrentTime();
         if (expirationTime < 0) return 0;
         return expirationTime;
     }

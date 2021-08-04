@@ -42,6 +42,10 @@ export class SpaceConnector {
         SpaceConnector.instance.api.flushToken();
     }
 
+    static async refreshAccessToken(executeSessionTimeoutCallback: boolean): Promise<boolean> {
+        return await SpaceConnector.instance.api.refreshAccessToken(executeSessionTimeoutCallback);
+    }
+
     static get isTokenAlive(): boolean {
         return API.checkToken();
     }
