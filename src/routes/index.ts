@@ -3,6 +3,7 @@ import VueRouter, { RouteConfig } from 'vue-router';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { GTag } from '@/lib/gtag';
 import config from '@/lib/config';
+import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
 
 export class SpaceRouter {
     static router: VueRouter;
@@ -49,7 +50,8 @@ export class SpaceRouter {
                 }
                 next();
             } else if (!to.meta?.excludeAuth && !SpaceConnector.isTokenAlive) {
-                await SpaceRouter.router.push({ name: 'SignOut', query: { nextPath: to.fullPath, error: to.query.error } });
+                const res = await SpaceConnector.refreshAccessToken(false);
+                if (!res) await SpaceRouter.router.push({ name: 'SignOut', query: { nextPath: to.fullPath } });
                 next();
             } else {
                 next();
