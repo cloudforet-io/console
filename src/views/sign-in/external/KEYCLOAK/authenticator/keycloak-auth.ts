@@ -37,7 +37,7 @@ class KeycloakAuth extends Authenticator {
 
     static async signOut() {
         await super.signOut();
-        await KeycloakAuth.keycloak.logout();
+        // await KeycloakAuth.keycloak.logout();
     }
 
     private static async keycloakSignIn(auth) {
@@ -47,7 +47,8 @@ class KeycloakAuth extends Authenticator {
         }
         if (KeycloakAuth.keycloak.token && KeycloakAuth.keycloak.idToken && KeycloakAuth.keycloak.token !== '' && KeycloakAuth.keycloak.idToken !== '') {
             // eslint-disable-next-line camelcase
-            await super.signIn((KeycloakAuth.keycloak.tokenParsed as any).email, { access_token: KeycloakAuth.keycloak.token });
+            console.log(KeycloakAuth.keycloak.tokenParsed);
+            await super.signIn((KeycloakAuth.keycloak.tokenParsed as any).username, { access_token: KeycloakAuth.keycloak.token });
         }
     }
 
