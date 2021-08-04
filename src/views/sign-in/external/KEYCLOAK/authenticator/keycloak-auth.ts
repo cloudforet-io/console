@@ -48,7 +48,8 @@ class KeycloakAuth extends Authenticator {
         if (KeycloakAuth.keycloak.token && KeycloakAuth.keycloak.idToken && KeycloakAuth.keycloak.token !== '' && KeycloakAuth.keycloak.idToken !== '') {
             // eslint-disable-next-line camelcase
             console.log(KeycloakAuth.keycloak.tokenParsed);
-            await super.signIn((KeycloakAuth.keycloak.tokenParsed as any).username, { access_token: KeycloakAuth.keycloak.token });
+            await super.signIn((KeycloakAuth.keycloak.idTokenParsed as any).profile.username || (KeycloakAuth.keycloak.idTokenParsed as any).preferred_username,
+                { access_token: KeycloakAuth.keycloak.token });
         }
     }
 
