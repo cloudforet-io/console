@@ -25,7 +25,7 @@
                     >
                         <main class="main">
                             <portal-target name="top-notification" />
-                            <router-view />
+                            <router-view :key="$route.fullPath" />
                         </main>
                         <template #title>
                             <portal-target v-if="$store.state.display.sidebarType === SIDEBAR_TYPE.info" name="info-title" />
@@ -38,7 +38,7 @@
                     </p-sidebar>
                 </div>
             </template>
-            <router-view v-else />
+            <router-view v-else :key="$route.fullPath" />
             <p-icon-modal :visible="isExpired"
                           emoji
                           :header-title="$t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"

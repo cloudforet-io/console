@@ -13,7 +13,7 @@
             </aside>
         </template>
         <template #default>
-            <router-view />
+            <router-view :key="$route.fullPath" />
         </template>
     </vertical-page-layout>
 </template>

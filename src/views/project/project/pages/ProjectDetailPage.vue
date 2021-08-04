@@ -43,7 +43,7 @@
                    :class="[singleItemTabState.activeTab]"
                    @change="onChangeTab"
             >
-                <keep-alive><router-view /></keep-alive>
+                <keep-alive><router-view :key="$route.fullPath" /></keep-alive>
                 <template #extra="tab">
                     <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && counts[ALERT_STATE.TRIGGERED] !== 0" style-type="primary3">
                         {{ commaFormatter(counts[ALERT_STATE.TRIGGERED]) }}
