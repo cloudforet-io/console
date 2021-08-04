@@ -40,7 +40,7 @@
 import { isEmpty } from 'lodash';
 
 import {
-    toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy,
+    toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy, watch,
 } from '@vue/composition-api';
 
 import IDPWSignIn from '@/views/sign-in/local/template/ID_PW.vue';
@@ -49,6 +49,10 @@ import { store } from '@/store';
 import config from '@/lib/config';
 import SignInRightContainer from '@/views/sign-in/modules/SignInRightContainer.vue';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { SpaceRouter } from '@/routes';
+import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
+import { DASHBOARD_ROUTE } from '@/routes/dashboard/dashboard-route';
 
 
 export default {
@@ -128,6 +132,10 @@ export default {
         const onSignInError = () => {
             state.showErrorMessage = true;
         };
+
+        watch(() => SpaceConnector.isTokenAlive, async () => {
+            await SpaceRouter.router.push({ name: DASHBOARD_ROUTE._NAME });
+        }, { immediate: true });
 
         (async () => {
             if (vm.$route.query.error === 'error') {

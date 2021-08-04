@@ -73,6 +73,7 @@ import TopNotification from '@/common/components/TopNotification.vue';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { hideLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
+import {SpaceConnector} from "@spaceone/console-core-lib/space-connector";
 
 export default defineComponent({
     name: 'App',
@@ -94,10 +95,12 @@ export default defineComponent({
         });
 
         const goToSignIn = async () => {
-            const res: Location = {
-                name: 'SignOut',
-            };
-            await vm.$router.push(res);
+            if (!SpaceConnector.isTokenAlive) {
+                const res: Location = {
+                    name: 'SignOut',
+                };
+                await vm.$router.push(res);
+            } else state.isExpired = false;
         };
 
         watch([() => vm.$store.getters['user/hasPermission'], () => vm.$route], async ([hasPermission, route]) => {
