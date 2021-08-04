@@ -56,6 +56,43 @@ const filterToQueryTag = (filter: { k?: string; v: QueryStoreFilterValue; o?: Ra
         operator: datetimeRawQueryOperatorToQueryTagOperatorMap[filter.o as string] || filter.o || '' as OperatorType
     };
 };
+const filterToApiQueryFilter = (_filters: QueryStoreFilter[], timezone = 'UTC') => {
+    const filter: Filter[] = [];
+    const keyword: string[] = [];
+
+    _filters.forEach((f) => {
+        if (f.k) {
+            if (datetimeRawQueryOperatorToQueryTagOperatorMap[f.o as string]) {
+                /* datetime case */
+                setDatetimeToFilters(filter, f, timezone);
+            } else if (Array.isArray(f.v)) {
+                /* plural case */
+                if (rawQueryOperatorToPluralApiQueryOperatorMap[f.o || '']) {
+                    filter.push({ k: f.k, v: f.v, o: rawQueryOperatorToPluralApiQueryOperatorMap[f.o || ''] as FilterOperator });
+                } else {
+                    f.v.forEach((v) => {
+                        filter.push({ k: f.k as string, v, o: rawQueryOperatorToApiQueryOperatorMap[f.o || ''] });
+                    });
+                }
+            } else if (f.v === null || f.v === undefined) {
+                /* null case */
+                const op = f.o && f.o.startsWith('!') ? '!' : '=';
+                filter.push({ k: f.k, v: null, o: rawQueryOperatorToApiQueryOperatorMap[op] });
+            } else {
+                /* general case */
+                filter.push({ k: f.k, v: f.v, o: rawQueryOperatorToApiQueryOperatorMap[f.o || ''] });
+            }
+        } else if (f.v !== null && f.v !== undefined) {
+            /* keyword case */
+            if (Array.isArray(f.v)) keyword.push(...f.v.map((v) => (v !== null ? v.toString().trim() : '')));
+            else keyword.push(f.v.toString().trim());
+        }
+    });
+    return {
+        filter,
+        keyword
+    };
+};
 
 export class QueryHelper {
     private static timezone: ComputedRef<string> | undefined;
@@ -63,6 +100,8 @@ export class QueryHelper {
     private _keyMap: Record<string, KeyItem> = {};
 
     private _filters: QueryStoreFilter[] = [];
+
+    private _orFilters: QueryStoreFilter[] = [];
 
     static init(timezone: ComputedRef<string>) {
         QueryHelper.timezone = timezone;
@@ -140,13 +179,37 @@ export class QueryHelper {
         return this;
     }
 
+    setOrFilters(orFilters: Required<QueryStoreFilter>[]): this {
+        orFilters.forEach((f) => {
+            if (f.k === undefined || f.o === undefined || f.o === '') {
+                throw new Error('QueryHelper: orFilter must have key and operator');
+            }
+        });
+        this._orFilters = [...orFilters];
+        return this;
+    }
+
     addFilter(...filters: QueryStoreFilter[]): this {
         this._filters.push(...filters);
         return this;
     }
 
+    addOrFilter(...orFilters: Required<QueryStoreFilter>[]): this {
+        orFilters.forEach((f) => {
+            if (f.k === undefined || f.o === undefined || f.o === '') {
+                throw new Error('QueryHelper: orFilter must have key and operator');
+            }
+        });
+        this._orFilters.push(...orFilters);
+        return this;
+    }
+
     get filters(): QueryStoreFilter[] {
         return [...this._filters];
+    }
+
+    get orFilters(): QueryStoreFilter[] {
+        return [...this._orFilters];
     }
 
     get queryTags(): QueryTag[] {
@@ -183,40 +246,13 @@ export class QueryHelper {
         return JSON.stringify(this.rawQueries);
     }
 
-    get apiQuery(): Required<Pick<Query, 'filter'|'keyword'>> {
-        const filter: Filter[] = [];
-        const keyword: string[] = [];
+    get apiQuery(): Required<Pick<Query, 'filter'|'filter_or'|'keyword'>> {
+        const { filter, keyword } = filterToApiQueryFilter(this._filters, QueryHelper.timezone?.value);
+        const { filter: filterOr } = filterToApiQueryFilter(this._orFilters, QueryHelper.timezone?.value);
 
-        this._filters.forEach((f) => {
-            if (f.k) {
-                if (datetimeRawQueryOperatorToQueryTagOperatorMap[f.o as string]) {
-                    /* datetime case */
-                    setDatetimeToFilters(filter, f, QueryHelper.timezone?.value);
-                } else if (Array.isArray(f.v)) {
-                    /* plural case */
-                    if (rawQueryOperatorToPluralApiQueryOperatorMap[f.o || '']) {
-                        filter.push({ k: f.k, v: f.v, o: rawQueryOperatorToPluralApiQueryOperatorMap[f.o || ''] as FilterOperator });
-                    } else {
-                        f.v.forEach((v) => {
-                            filter.push({ k: f.k as string, v, o: rawQueryOperatorToApiQueryOperatorMap[f.o || ''] });
-                        });
-                    }
-                } else if (f.v === null || f.v === undefined) {
-                    /* null case */
-                    const op = f.o && f.o.startsWith('!') ? '!' : '=';
-                    filter.push({ k: f.k, v: null, o: rawQueryOperatorToApiQueryOperatorMap[op] });
-                } else {
-                    /* general case */
-                    filter.push({ k: f.k, v: f.v, o: rawQueryOperatorToApiQueryOperatorMap[f.o || ''] });
-                }
-            } else if (f.v !== null && f.v !== undefined) {
-                /* keyword case */
-                if (Array.isArray(f.v)) keyword.push(...f.v.map(v => (v !== null ? v.toString().trim() : '')));
-                else keyword.push(f.v.toString().trim());
-            }
-        });
         return {
             filter,
+            filter_or: filterOr,
             keyword: keyword.join(' ') || ''
         };
     }
