@@ -9,7 +9,7 @@
                     @confirm="confirm"
     >
         <template #body>
-            <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')">
+            <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')" required>
                 <template #default>
                     <div class="id-input-form">
                         <p-text-input v-model="formState.user_id"
@@ -19,7 +19,7 @@
                     </div>
                 </template>
             </p-field-group>
-            <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')" class="input-form">
+            <p-field-group :label="$t('IDENTITY.USER.FORM.NAME')" class="input-form" required>
                 <p-text-input v-model="formState.name" class="text-input" autocomplete="username" />
             </p-field-group>
             <p-field-group :label="$t('IDENTITY.USER.FORM.EMAIL')"
@@ -31,7 +31,7 @@
                     <p-text-input v-model="formState.email" :invalid="invalid" class="text-input" />
                 </template>
             </p-field-group>
-            <p-field-group :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')" class="input-form">
+            <p-field-group :label="$t('IDENTITY.USER.FORM.ASSIGN_DOMAIN_ROLE')" class="input-form" required>
                 <p-select-dropdown v-model="formState.domainRole"
                                    :items="formState.domainRoleItem"
                                    :disabled="formState.domainRoleItem.length < 2 || isSameId"

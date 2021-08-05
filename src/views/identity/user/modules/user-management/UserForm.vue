@@ -9,7 +9,9 @@
                     @confirm="confirm"
     >
         <template #body>
-            <p-box-tab v-model="formState.activeTab" :tabs="formState.tabs" style-type="gray" class="auth-type-tab">
+            <p-box-tab v-model="formState.activeTab" :tabs="formState.tabs" style-type="gray"
+                       class="auth-type-tab"
+            >
                 <p-field-group :label="$t('IDENTITY.USER.FORM.USER_ID')"
                                :required="true"
                                :invalid="validationState.isUserIdValid === false"
@@ -276,7 +278,9 @@ export default {
                     validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
                     return;
                 }
-                if (formState.activeTab === 'external') {
+                if (formState.activeTab === 'local') {
+                    checkEmailFormat(formState.user_id);
+                } else if (formState.activeTab === 'external') {
                     await checkOauth();
                 }
                 if (typeof validationState.isUserIdValid !== 'boolean') validationState.isUserIdValid = true;

@@ -10,6 +10,9 @@
             <p-field-group required :label="$t('COMMON.PROFILE.ID')" class="input-form">
                 <p-text-input v-model="userId" disabled class="text-input" />
             </p-field-group>
+            <p-field-group required :label="$t('COMMON.PROFILE.NAME')" class="input-form">
+                <p-text-input v-model="userName" class="text-input" />
+            </p-field-group>
             <p-field-group required :label="$t('COMMON.PROFILE.ROLE')" class="input-form">
                 <p-text-input v-model="userRole" disabled class="text-input" />
             </p-field-group>
@@ -133,6 +136,7 @@ export default {
 
         const state = reactive({
             userId: computed(() => store.state.user.userId),
+            userName: '' as string | undefined,
             isAdmin: computed(() => store.getters['user/isAdmin']).value,
             userRole: computed(() => {
                 const roleArray = store.getters['user/getRoleNames'];
@@ -245,6 +249,7 @@ export default {
             if (!validationState.isEmailValid || validationState.timezoneInvalidText) return;
 
             const userParam: UpdateUserRequest = {
+                name: state.userName,
                 email: state.email,
                 language: state.language,
                 timezone: state.formattedTimezone,
@@ -264,6 +269,7 @@ export default {
         const getProfile = async (id) => {
             try {
                 await store.dispatch('user/getUser', id);
+                state.userName = store.state.user.name;
                 state.email = store.state.user.email;
                 state.language = store.state.user.language;
                 state.timezone = store.state.user.timezone;
