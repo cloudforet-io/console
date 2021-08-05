@@ -25,7 +25,7 @@
                     >
                         <main class="main">
                             <portal-target name="top-notification" />
-                            <router-view :key="$route.fullPath" />
+                            <router-view />
                         </main>
                         <template #title>
                             <portal-target v-if="$store.state.display.sidebarType === SIDEBAR_TYPE.info" name="info-title" />
@@ -38,7 +38,7 @@
                     </p-sidebar>
                 </div>
             </template>
-            <router-view v-else :key="$route.fullPath" />
+            <router-view v-else />
             <p-icon-modal :visible="isExpired"
                           emoji
                           :header-title="$t('COMMON.SESSION_MODAL.SESSION_EXPIRED')"
@@ -73,7 +73,7 @@ import TopNotification from '@/common/components/TopNotification.vue';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { hideLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
-import {SpaceConnector} from "@spaceone/console-core-lib/space-connector";
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 export default defineComponent({
     name: 'App',
@@ -102,12 +102,6 @@ export default defineComponent({
                 await vm.$router.push(res);
             } else state.isExpired = false;
         };
-
-        watch([() => vm.$store.getters['user/hasPermission'], () => vm.$route], async ([hasPermission, route]) => {
-            if (!route.meta.excludeAuth && !hasPermission && vm.$route.name !== IDENTITY_ROUTE.USER.ACCOUNT._NAME) {
-                await vm.$router.replace({ name: IDENTITY_ROUTE.USER.ACCOUNT._NAME });
-            }
-        }, { immediate: true });
 
         watch(() => vm.$store.state.display.isDownloaded, async (after) => {
             if (after) {

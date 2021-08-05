@@ -15,7 +15,7 @@
                       :active-tab.sync="tabState.activeTab"
                       @change="onChangeTab"
         >
-            <keep-alive><router-view :key="$route.fullPath" /></keep-alive>
+            <keep-alive><router-view /></keep-alive>
         </p-button-tab>
     </div>
 </template>

@@ -3,7 +3,9 @@ import VueRouter, { RouteConfig } from 'vue-router';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { GTag } from '@/lib/gtag';
 import config from '@/lib/config';
-import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
+import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
+import { DASHBOARD_ROUTE } from '@/routes/dashboard/dashboard-route';
+import { ROOT_ROUTE } from '@/routes/routes';
 
 export class SpaceRouter {
     static router: VueRouter;
@@ -31,31 +33,26 @@ export class SpaceRouter {
 
         SpaceRouter.router.beforeEach(async (to, from, next) => {
             nextPath = to.fullPath;
+            const isTokenAlive = SpaceConnector.isTokenAlive;
+            let nextLocation;
 
-            if (to.meta && to.meta.excludeAuth) {
-                if (to.meta.isSignInPage) {
-                    if (SpaceConnector.isTokenAlive) {
-                        try {
-                            next({ path: to.meta.query.nextPath });
-                        } catch (e) {
-                            next('/');
-                        }
-                    }
-                }
-                next();
-            } else if (SpaceConnector.isTokenAlive) {
+            if (isTokenAlive) {
                 const isAdmin = SpaceRouter.router.app.$store.getters['user/isAdmin'];
-                if (to.meta && to.meta.isDomainOwnerOnly && !isAdmin) {
-                    next({ name: 'error' });
+                const hasPermission = SpaceRouter.router.app.$store.getters['user/hasPermission'];
+                if (to.meta?.isSignInPage) {
+                    nextLocation = { name: DASHBOARD_ROUTE._NAME };
+                } else if (to.meta?.isDomainOwnerOnly && !isAdmin) {
+                    nextLocation = { name: ROOT_ROUTE.ERROR._NAME };
+                } else if (!hasPermission) {
+                    if (to.name !== IDENTITY_ROUTE.USER.ACCOUNT._NAME) nextLocation = { name: IDENTITY_ROUTE.USER.ACCOUNT._NAME };
                 }
-                next();
-            } else if (!to.meta?.excludeAuth && !SpaceConnector.isTokenAlive) {
+            } else if (!to.meta?.excludeAuth) {
                 const res = await SpaceConnector.refreshAccessToken(false);
-                if (!res) await SpaceRouter.router.push({ name: 'SignOut', query: { nextPath: to.fullPath } });
-                next();
-            } else {
-                next();
+                if (!res) nextLocation = { name: ROOT_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
             }
+
+            console.log('router.beforeEach: ', to, from, isTokenAlive, nextLocation);
+            next(nextLocation);
         });
 
         SpaceRouter.router.afterEach((to, from) => {

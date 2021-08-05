@@ -30,17 +30,9 @@ export default {
     children: [
         {
             path: 'server',
-            meta: {
-                label: 'Server',
-            },
-            component: { template: '<router-view />' },
-            children: [
-                {
-                    path: '/',
-                    name: INVENTORY_ROUTE.SERVER._NAME,
-                    component: Server,
-                },
-            ],
+            meta: { label: 'Server' },
+            name: INVENTORY_ROUTE.SERVER._NAME,
+            component: Server,
         },
         {
             path: 'cloud-service',
@@ -79,19 +71,10 @@ export default {
                 },
                 {
                     path: ':provider/:group/:name',
+                    name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
                     props: true,
-                    meta: {
-                        label: 'Cloud Service',
-                    },
-                    component: { template: '<router-view />' },
-                    children: [
-                        {
-                            path: '/',
-                            name: INVENTORY_ROUTE.CLOUD_SERVICE.DETAIL._NAME,
-                            props: true,
-                            component: CloudServicePage,
-                        },
-                    ],
+                    meta: { label: 'Cloud Service' },
+                    component: CloudServicePage,
                 },
             ],
 

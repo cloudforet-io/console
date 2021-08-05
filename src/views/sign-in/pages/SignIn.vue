@@ -77,7 +77,7 @@ export default {
         },
     },
     beforeRouteEnter(to, from, next) {
-        if (from.meta.isSignInPage) {
+        if (from?.meta.isSignInPage) {
             next((vm) => {
                 vm.$router.replace({
                     query: { ...to.query, nextPath: from.query.nextPath },
@@ -119,10 +119,7 @@ export default {
         const onSignIn = async () => {
             state.showErrorMessage = false;
             try {
-                const hasPermission = vm.$store.getters['user/hasPermission'];
-                if (!hasPermission && vm.$route.name !== IDENTITY_ROUTE.USER.ACCOUNT._NAME) {
-                    await vm.$router.replace({ name: IDENTITY_ROUTE.USER.ACCOUNT._NAME });
-                } else await vm.$router.push(props.nextPath);
+                await vm.$router.push(props.nextPath);
             } catch (e) {
                 console.error(e);
                 state.showErrorMessage = true;
@@ -133,13 +130,9 @@ export default {
             state.showErrorMessage = true;
         };
 
-        watch(() => SpaceConnector.isTokenAlive, async () => {
-            await SpaceRouter.router.push({ name: DASHBOARD_ROUTE._NAME });
-        }, { immediate: true });
-
         (async () => {
             if (vm.$route.query.error === 'error') {
-                await onSignInError();
+                onSignInError();
                 await vm.$router.replace({ query: { ...vm.$route.query, error: null } });
             }
         })();

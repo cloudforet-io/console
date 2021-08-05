@@ -109,7 +109,7 @@
                 {{ $t('AUTOMATION.POWER_SCHEDULER.DETAILS.SAVE') }}
             </p-button>
         </div>
-        <router-view v-if="!isCreateMode && !isEditMode" :key="$route.fullPath" />
+        <router-view v-if="!isCreateMode && !isEditMode" />
         <resource-group-page :visible="resourceGroupVisible"
                              :resource-group="selectedItem ? selectedItem.resource_group : null"
                              :project-id="projectId"

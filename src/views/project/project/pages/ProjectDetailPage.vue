@@ -43,7 +43,7 @@
                    :class="[singleItemTabState.activeTab]"
                    @change="onChangeTab"
             >
-                <keep-alive><router-view :key="$route.fullPath" /></keep-alive>
+                <keep-alive><router-view /></keep-alive>
                 <template #extra="tab">
                     <p-badge v-if="tab.label === $t('PROJECT.DETAIL.TAB_ALERT') && counts[ALERT_STATE.TRIGGERED] !== 0" style-type="primary3">
                         {{ commaFormatter(counts[ALERT_STATE.TRIGGERED]) }}
@@ -257,7 +257,7 @@ export default {
         };
 
         const onChangeTab = (activeTab) => {
-            if (activeTab === vm.$router.currentRoute.name) return;
+            if (activeTab === vm.$route.name) return;
             vm.$router.replace({ name: activeTab });
         };
 
@@ -287,7 +287,7 @@ export default {
         }, { immediate: true });
 
         (async () => {
-            const exactRoute = vm.$router.currentRoute.matched.find(d => singleItemTabState.tabs.find(tab => tab.name === d.name));
+            const exactRoute = vm.$route.matched.find(d => singleItemTabState.tabs.find(tab => tab.name === d.name));
             singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
             await Promise.all([
                 // getPageNavigation(),
@@ -300,7 +300,7 @@ export default {
         })();
 
         watch(() => vm.$route.name, () => {
-            const exactRoute = vm.$router.currentRoute.matched.find(d => singleItemTabState.tabs.find(tab => tab.name === d.name));
+            const exactRoute = vm.$route.matched.find(d => singleItemTabState.tabs.find(tab => tab.name === d.name));
             singleItemTabState.activeTab = exactRoute?.name || PROJECT_ROUTE.DETAIL.TAB.SUMMARY._NAME;
         });
 

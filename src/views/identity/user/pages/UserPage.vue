@@ -52,7 +52,7 @@
             </div>
         </template>
         <template #default>
-            <router-view :key="$route.fullPath" />
+            <router-view />
         </template>
     </vertical-page-layout>
 </template>
