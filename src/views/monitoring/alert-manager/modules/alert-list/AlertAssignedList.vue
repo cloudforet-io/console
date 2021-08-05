@@ -1,10 +1,11 @@
 <template>
     <p-list-card
         v-if="totalCount > 0 && assignedVisible"
+        style-type="indigo400"
+        class="assigned-alert-list"
+        :loading="loading"
         :items="items"
         :hoverable="true"
-        class="assigned-alert-list"
-        style-type="indigo400"
         @click="onClickListItem"
     >
         <template #header>
@@ -30,7 +31,7 @@
 import { get } from 'lodash';
 
 import {
-    ComponentRenderProxy, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
@@ -44,7 +45,7 @@ import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { store } from '@/store';
 
 import dayjs from 'dayjs';
-
+import { ALERT_STATE } from '@/views/monitoring/alert-manager/lib/config';
 
 export default {
     name: 'AlertAssignedList',
@@ -56,30 +57,51 @@ export default {
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            loading: false,
             items: [],
             totalCount: 0,
             assignedVisible: true,
+            lastCheckedTime: computed(() => store.getters['settings/getItem']('last_checked_time', MONITORING_ROUTE.ALERT_MANAGER.ALERT._NAME)),
         });
 
         const assignedAlertApiQuery = new ApiQueryHelper()
             .setSort('created_at', true)
-            .setFilters([{ k: 'assignee', v: store.state.user.userId, o: '=' }]);
+            .setFilters([
+                { k: 'assignee', v: store.state.user.userId, o: '=' },
+                { k: 'state', v: [ALERT_STATE.TRIGGERED, ALERT_STATE.ACKNOWLEDGED], o: '=' },
+            ]);
+
         const getAssignedAlerts = async () => {
+            if (state.loading) return;
+            if (state.lastCheckedTime) assignedAlertApiQuery.setOrFilters([{ k: 'created_at', v: state.lastCheckedTime, o: '>=t' }, { k: 'acknowledged_at', v: state.lastCheckedTime, o: '>=t' }]);
+            state.loading = true;
             try {
-                const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({ query: assignedAlertApiQuery.data });
+                const { results, total_count } = await SpaceConnector.client.monitoring.alert.list({
+                    query: assignedAlertApiQuery.data,
+                });
+
                 state.items = results;
                 state.totalCount = total_count;
             } catch (e) {
                 state.items = [];
                 state.totalCount = 0;
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
 
         /* event */
         const onHideAlerts = () => {
             state.assignedVisible = false;
+            const lastCheckedTime = dayjs.utc().toISOString();
+            store.dispatch('settings/setItem', {
+                key: 'last_checked_time',
+                value: lastCheckedTime,
+                path: MONITORING_ROUTE.ALERT_MANAGER.ALERT._NAME,
+            });
         };
+
         const onClickListItem = (idx) => {
             const alertId = get(state.items[idx], 'alert_id');
             if (alertId) vm.$router.push({ name: MONITORING_ROUTE.ALERT_MANAGER.ALERT.DETAIL._NAME, params: { id: alertId } });

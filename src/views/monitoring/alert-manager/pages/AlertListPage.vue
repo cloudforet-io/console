@@ -3,7 +3,7 @@
         <p-breadcrumbs :routes="routeState.route" />
         <p-page-title :title="$t('MONITORING.ALERT.ALERT_LIST.ALERT')" />
         <div class="content-wrapper grid grid-cols-12 gap-4">
-            <!--            <alert-assigned-list class="col-span-12" />-->
+            <alert-assigned-list class="col-span-12" />
             <assigned-alert-info @select="onSelectAlertState" />
             <alert-data-table :alert-state="alertState"
                               :urgency="urgency"
@@ -27,7 +27,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 
-// import AlertAssignedList from '@/views/monitoring/alert-manager/modules/alert-list/AlertAssignedList.vue';
+import AlertAssignedList from '@/views/monitoring/alert-manager/modules/alert-list/AlertAssignedList.vue';
 import AlertDataTable from '@/views/monitoring/alert-manager/modules/alert-list/AlertDataTable.vue';
 import AssignedAlertInfo from '@/views/monitoring/alert-manager/modules/alert-list/AssignedAlertInfo.vue';
 
@@ -40,7 +40,7 @@ export default {
     name: 'AlertListPage',
     components: {
         AssignedAlertInfo,
-        // AlertAssignedList,
+        AlertAssignedList,
         AlertDataTable,
         PBreadcrumbs,
         PPageTitle,
