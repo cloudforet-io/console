@@ -1,32 +1,23 @@
 <template>
-    <div class="p-search" :class="{
-        disabled, focused: proxyIsFocused
-    }"
-    >
-        <slot name="icon" v-bind="slotBind">
-            <p-i v-if="!disableIcon && !proxyIsFocused && !value" class="left-icon" name="ic_search"
-                 color="inherit"
-            />
-        </slot>
-        <slot name="left" v-bind="slotBind" />
-        <slot name="default" v-bind="slotBind">
+    <div class="p-search" :class="{ focused: proxyIsFocused }">
+        <p-i v-if="!disableIcon && !proxyIsFocused && !value" class="left-icon" name="ic_search"
+             color="inherit"
+        />
+        <slot name="left" v-bind="{ value, placeholder: placeholderText }" />
+        <slot name="default" v-bind="{ value, placeholder: placeholderText }">
             <input v-focus.lazy="proxyIsFocused"
                    :value="value"
-                   :placeholder="placeholder || $t('COMPONENT.SEARCH.PLACEHOLDER')"
-                   :disabled="disabled"
+                   :placeholder="placeholderText"
                    v-on="inputListeners"
             >
         </slot>
-        <slot name="right" v-bind="slotBind">
+        <slot name="right" v-bind="{ value, placeholder: placeholderText }">
             <div class="right">
-                <slot name="right-delete" v-bind="slotBind">
-                    <span v-if="value" class="delete-btn" @click="onDelete">
-                        <p-i class="icon" name="ic_delete" height="1rem"
-                             width="1rem"
-                        />
-                    </span>
-                </slot>
-                <slot name="right-extra" v-bind="slotBind" />
+                <span v-if="value" class="delete-btn" @click="onDelete">
+                    <p-i class="icon" name="ic_delete" height="1rem"
+                         width="1rem"
+                    />
+                </span>
             </div>
         </slot>
     </div>
@@ -43,7 +34,7 @@ import { makeByPassListeners, makeOptionalProxy } from '@/util/composition-helpe
 import { SearchProps } from '@/inputs/search/search/type';
 import { i18n } from '@/translations';
 
-export default defineComponent({
+export default defineComponent<SearchProps>({
     name: 'PSearch',
     components: { PI },
     i18n,
@@ -62,14 +53,6 @@ export default defineComponent({
             type: String,
             default: undefined,
         },
-        focused: {
-            type: Boolean,
-            default: false,
-        },
-        disabled: {
-            type: Boolean,
-            default: false,
-        },
         disableIcon: {
             type: Boolean,
             default: false,
@@ -82,10 +65,15 @@ export default defineComponent({
     },
     setup(props: SearchProps, { emit, listeners }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const state: any = reactive({
-            proxyIsFocused: makeOptionalProxy('isFocused', vm, props.focused),
+        const state = reactive({
+            proxyIsFocused: makeOptionalProxy('isFocused', vm, false),
+            placeholderText: computed(() => {
+                if (typeof props.placeholder === 'undefined') return vm.$t('COMPONENT.SEARCH.PLACEHOLDER');
+                return props.placeholder;
+            }),
         });
 
+        /* event */
         const inputListeners = {
             ...listeners,
             input(e) {
@@ -106,26 +94,15 @@ export default defineComponent({
             },
         };
 
+        const onDelete = () => {
+            emit('delete', props.value);
+            emit('update:value', '');
+        };
 
         return {
             ...toRefs(state),
-            slotBind: computed(() => ({
-                ...props,
-                placeholder: props.placeholder || vm.$t('COMPONENT.SEARCH.PLACEHOLDER'),
-                isFocused: state.proxyIsFocused,
-                inputListeners,
-            })),
             inputListeners,
-            onDelete() {
-                emit('delete', props.value);
-                emit('update:value', '');
-            },
-            focus() {
-                state.proxyIsFocused = true;
-            },
-            blur() {
-                state.proxyIsFocused = false;
-            },
+            onDelete,
         };
     },
 });
@@ -137,9 +114,6 @@ export default defineComponent({
     height: 2rem;
     line-height: 2rem;
     min-width: 0;
-    &.disabled {
-        @apply border-gray-200 bg-gray-100;
-    }
     &.focused, &:focus-within {
         @apply border-secondary bg-blue-100;
     }

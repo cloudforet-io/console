@@ -37,42 +37,6 @@ export const getSearchArgTypes = (): ArgTypes => ({
             type: 'text',
         },
     },
-    focused: {
-        name: 'focused',
-        type: { name: 'boolean' },
-        description: 'Focused when mounted.',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: false,
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
-    disabled: {
-        name: 'disabled',
-        type: { name: 'boolean' },
-        description: 'Disable input.',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: false,
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
     disableIcon: {
         name: 'disableIcon',
         type: { name: 'boolean' },
@@ -125,20 +89,6 @@ export const getSearchArgTypes = (): ArgTypes => ({
         },
         control: null,
     },
-    icon: {
-        name: 'icon',
-        description: 'Slot for replace search icon.',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            category: 'slots',
-            defaultValue: {
-                summary: null,
-            },
-        },
-    },
     left: {
         name: 'left',
         description: 'Slot for insert something into left side of input element.',
@@ -171,35 +121,6 @@ export const getSearchArgTypes = (): ArgTypes => ({
     right: {
         name: 'right',
         description: 'Slot for replace right side of input element including delete button.',
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            category: 'slots',
-            defaultValue: {
-                summary: null,
-            },
-        },
-    },
-    'right-delete': {
-        name: 'right-delete',
-        description: `Slot for replace delete button.
-                      Don't forget to bind slot props.`,
-        defaultValue: null,
-        table: {
-            type: {
-                summary: null,
-            },
-            category: 'slots',
-            defaultValue: {
-                summary: null,
-            },
-        },
-    },
-    'right-extra': {
-        name: 'right-extra',
-        description: 'Slot for insert to right side of delete button.',
         defaultValue: null,
         table: {
             type: {
