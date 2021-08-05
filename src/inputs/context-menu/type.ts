@@ -30,7 +30,7 @@ export interface ContextMenuProps {
     loading?: boolean;
     alwaysShowMenu?: boolean;
     invalid?: boolean;
-    selected?: number[];
+    selected?: string[];
     multiSelectable?: boolean;
     showRadioIcon?: boolean;
 }

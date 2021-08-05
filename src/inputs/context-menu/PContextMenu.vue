@@ -9,6 +9,7 @@
             </slot>
         </div>
         <slot v-else name="menu" v-bind="{...$props, uuid}">
+            <slot name="top" />
             <template v-for="(item, index) in menu">
                 <a v-if="item.type === undefined || item.type === 'item'"
                    :id="`context-item-${index}-${uuid}`"
@@ -24,11 +25,11 @@
                    @keydown.down="onKeyDown(index)"
                 >
                     <p-i v-if="showRadioIcon && !multiSelectable"
-                         :name="proxySelected.includes(index) ? 'ic_radio--checked' : 'ic_radio'"
+                         :name="proxySelected.includes(item.name) ? 'ic_radio--checked' : 'ic_radio'"
                          class="select-marker"
                     />
                     <p-i v-if="multiSelectable"
-                         :name="proxySelected.includes(index) ? 'ic_checkbox--checked' : 'ic_checkbox'"
+                         :name="proxySelected.includes(item.name) ? 'ic_checkbox--checked' : 'ic_checkbox'"
                          class="select-marker"
                     />
                     <slot name="item--format" v-bind="{...$props, uuid, item, index}">
@@ -170,14 +171,14 @@ export default defineComponent<ContextMenuProps>({
                 emit('select', itemName, index);
 
                 if (props.multiSelectable) {
-                    if (state.proxySelected.includes(index)) {
-                        const indexInSelectedList = state.proxySelected.indexOf(index);
-                        state.proxySelected.splice(indexInSelectedList, 1);
+                    if (state.proxySelected.includes(itemName)) {
+                        const indexOfSelectedList = state.proxySelected.indexOf(itemName);
+                        state.proxySelected.splice(indexOfSelectedList, 1);
                     } else {
-                        state.proxySelected.push(index);
+                        state.proxySelected.push(itemName);
                     }
                 } else {
-                    state.proxySelected = [index];
+                    state.proxySelected = [itemName];
                 }
             }
         };

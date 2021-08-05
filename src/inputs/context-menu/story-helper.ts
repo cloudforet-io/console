@@ -2,6 +2,7 @@ import { ArgTypes } from '@storybook/addons';
 import { CONTEXT_MENU_THEME } from '@/inputs/context-menu/type';
 
 const slots: [string, string][] = [
+    ['top', 'This slot located at the top of the Context Menu. This is used in the PSearchDropdown component.'],
     ['no-data-format', '`no-data` slot with default style applied'],
     // eslint-disable-next-line max-len
     ['menu', 'This is a slot that allows you to customize a menu, and it is useful when you want to use only the functions of the context menu, but use it completely differently from the basic style.'],
@@ -138,7 +139,7 @@ export const getContextMenuArgTypes = (): ArgTypes => ({
     selected: {
         name: 'selected',
         type: { name: 'array' },
-        description: 'Array of selected indices.',
+        description: 'Array of selected item names.',
         defaultValue: [],
         table: {
             type: {
