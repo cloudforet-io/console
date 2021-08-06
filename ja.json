@@ -1167,6 +1167,7 @@
 				"NO_ALERT": "アラートがありません",
 				"OPEN": "発生",
 				"OPEN_ALERT": "発生したアラート",
+				"PROJECTS_HEALTHY": "すべてのプロジェクトが正常です。",
 				"PROJECT_HEALTH_BOARD": "プロジェクトヘルスボード",
 				"RESOLVED": "完了",
 				"SCHEDULE": "スケジュール",
