@@ -602,13 +602,15 @@
 			"SERVICE_SUMMARY_CLOUD_SERVICE": "클라우드 서비스 ",
 			"SERVICE_SUMMARY_PROJECT": "프로젝트 ",
 			"SERVICE_SUMMARY_SERVER": "서버 ",
+			"TOP_PROJECTS": {
+				"CREATE_PROJECT": "프로젝트 생성",
+				"NO_PROJECT": "프로젝트 없음",
+				"NO_PROJECT_HELP_TEXT": "분산되어 있는 리소스와 계정을 프로젝트로 그룹화해보세요."
+			},
 			"TOP_PROJECT_CLOUD_SERVICE": "클라우드 서비스 ",
 			"TOP_PROJECT_COMPUTE": "컴퓨트",
-			"TOP_PROJECT_CREATE_DASHBOARD": "대시보드를 만드세요! ",
-			"TOP_PROJECT_CREATE_GUIDE": "프로젝트를 만든 후 서비스 계정을 등록하세요. ",
 			"TOP_PROJECT_CREATE_PROJECT": "프로젝트 생성",
 			"TOP_PROJECT_DATABASE": "데이터베이스",
-			"TOP_PROJECT_GET_START": "시작하기 ",
 			"TOP_PROJECT_HELP": "프로젝트 단위로 클라우드 서비스 및 서버의 사용 순위를 보여 줍니다.",
 			"TOP_PROJECT_PROJECT": "프로젝트 ",
 			"TOP_PROJECT_PROJECT_GROUP": "프로젝트 그룹 ",

@@ -602,13 +602,15 @@
 			"SERVICE_SUMMARY_CLOUD_SERVICE": "クラウドサービス",
 			"SERVICE_SUMMARY_PROJECT": "プロジェクト",
 			"SERVICE_SUMMARY_SERVER": "サーバ",
+			"TOP_PROJECTS": {
+				"CREATE_PROJECT": "プロジェクト作成",
+				"NO_PROJECT": "",
+				"NO_PROJECT_HELP_TEXT": ""
+			},
 			"TOP_PROJECT_CLOUD_SERVICE": "クラウドサービス",
 			"TOP_PROJECT_COMPUTE": "コンピューティング",
-			"TOP_PROJECT_CREATE_DASHBOARD": "ダッシュボードを作成してください",
-			"TOP_PROJECT_CREATE_GUIDE": "プロジェクトを作成した後、サービスのアカウントを登録してください",
 			"TOP_PROJECT_CREATE_PROJECT": "プロジェクト作成",
 			"TOP_PROJECT_DATABASE": "データベース",
-			"TOP_PROJECT_GET_START": "始める",
 			"TOP_PROJECT_HELP": "プロジェクト単位でクラウドサービス及びサーバのランクを表示します",
 			"TOP_PROJECT_PROJECT": "プロジェクト",
 			"TOP_PROJECT_PROJECT_GROUP": "プロジェクトグループ",

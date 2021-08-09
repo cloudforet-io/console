@@ -602,13 +602,15 @@
 			"SERVICE_SUMMARY_CLOUD_SERVICE": "Cloud Services",
 			"SERVICE_SUMMARY_PROJECT": "Project",
 			"SERVICE_SUMMARY_SERVER": "Server",
+			"TOP_PROJECTS": {
+				"CREATE_PROJECT": "Create Project",
+				"NO_PROJECT": "No Project",
+				"NO_PROJECT_HELP_TEXT": "Getting started with grouping your scattered resource and accounts with your own project."
+			},
 			"TOP_PROJECT_CLOUD_SERVICE": "Cloud Service",
 			"TOP_PROJECT_COMPUTE": "Compute",
-			"TOP_PROJECT_CREATE_DASHBOARD": "Create your own dashboard!!",
-			"TOP_PROJECT_CREATE_GUIDE": "Create project group first then register Service Account.",
 			"TOP_PROJECT_CREATE_PROJECT": "Create Project",
 			"TOP_PROJECT_DATABASE": "Database",
-			"TOP_PROJECT_GET_START": "Get Started",
 			"TOP_PROJECT_HELP": "Check project ranking with most resources and services.",
 			"TOP_PROJECT_PROJECT": "Project",
 			"TOP_PROJECT_PROJECT_GROUP": "Project Group",
