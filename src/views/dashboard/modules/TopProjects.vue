@@ -20,23 +20,18 @@
                 </template>
                 <div ref="chartRef" class="chart" />
             </p-chart-loader>
-            <div v-if="!loading && chartData.length === 0"
-                 class="flex flex-col h-full justify-center items-center pt-16 pb-10"
+            <div v-if="!loading && data.length === 0"
+                 class="no-data-wrapper"
             >
-                <p class="text-2xl font-bold capitalize mb-4 text-primary text-center leading-tight">
-                    {{ $t('COMMON.WIDGETS.TOP_PROJECT_CREATE_DASHBOARD') }}
+                <p class="title">
+                    {{ $t('COMMON.WIDGETS.TOP_PROJECTS.NO_PROJECT') }}
                 </p>
-                <p class="text-primary1 text-sm capitalize mb-4 text-center leading-normal">
-                    {{ $t('COMMON.WIDGETS.TOP_PROJECT_CREATE_GUIDE') }}
+                <p class="text">
+                    {{ $t('COMMON.WIDGETS.TOP_PROJECTS.NO_PROJECT_HELP_TEXT') }}
                 </p>
-                <router-link to="/project" tag="div" class="">
-                    <p-icon-text-button name="ic_back" icon-direction="right"
-                                        size="lg" dir="down"
-                                        style-type="primary"
-                                        width="1.5rem" height="1.5rem"
-                                        class="get-started"
-                    >
-                        <span>{{ $t('COMMON.WIDGETS.TOP_PROJECT_GET_START') }}</span>
+                <router-link :to="{ name: PROJECT_ROUTE._NAME }">
+                    <p-icon-text-button name="ic_plus" style-type="primary1">
+                        <span>{{ $t('COMMON.WIDGETS.TOP_PROJECTS.CREATE_PROJECT') }}</span>
                     </p-icon-text-button>
                 </router-link>
             </div>
@@ -227,7 +222,20 @@ export default {
                 series.strokeOpacity = 0;
             };
 
-            chart.data = state.chartData;
+            if (!state.chartData.length) {
+                const emptyChartData = [] as ChartData[];
+                range(0, 5).forEach((d) => {
+                    emptyChartData.unshift({
+                        rank: `#${d + 1}`,
+                        server: 0,
+                        database: 0,
+                    });
+                });
+                chart.data = emptyChartData;
+                valueAxis.min = 1;
+            } else {
+                chart.data = state.chartData;
+            }
             createSeries('server', 'Server');
             createSeries('database', 'Database');
 
@@ -371,6 +379,25 @@ export default {
 }
 .contents-container {
     @apply pt-4 flex flex-col h-full;
+
+    .no-data-wrapper {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 1.25rem 0;
+
+        .title {
+            @apply text-primary2;
+            font-size: 0.875rem;
+            line-height: 1.5;
+        }
+        .text {
+            @apply text-gray-400;
+            font-size: 0.875rem;
+            line-height: 1.6;
+            padding-bottom: 0.5rem;
+        }
+    }
 }
 .chart {
     height: 13rem;
@@ -395,10 +422,5 @@ export default {
             }
         }
     }
-}
-.get-started {
-    padding-left: 1.2rem;
-    width: 100%;
-    max-width: 12rem;
 }
 </style>

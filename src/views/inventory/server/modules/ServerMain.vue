@@ -300,7 +300,7 @@ export default {
                     type: 'item',
                     disabled: !tableState.consoleLink || tableState.selectedItems.length > 1,
                     link: tableState.consoleLink,
-                    target: 'blank',
+                    target: '_blank',
                 },
             ]),
             collectModalVisible: false,
