@@ -22,7 +22,7 @@
                 <p-i v-if="alertUrgency === ALERT_URGENCY.HIGH" name="ic_alert" width="1em"
                      height="1em" class="mr-2"
                 />
-                <p-i v-if="alertUrgency === ALERT_URGENCY.LOW" name="ic_state_duplicated" width="1em"
+                <p-i v-if="alertUrgency === ALERT_URGENCY.LOW" name="ic_urgency_low" width="1em"
                      height="1em" class="mr-2"
                 />
                 <span class="capitalize">{{ alertUrgency.toLowerCase() }}</span>
@@ -81,8 +81,8 @@ const ALERT_STATE_LIST = Object.freeze([
 ]);
 
 const ALERT_URGENCY_LIST = Object.freeze([
-    { label: 'HIGH', name: 'HIGH' },
-    { label: 'LOW', name: 'LOW' },
+    { label: 'High', name: 'HIGH' },
+    { label: 'Low', name: 'LOW' },
 ]);
 
 interface PropsType {
