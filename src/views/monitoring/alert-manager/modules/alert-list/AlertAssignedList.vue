@@ -1,6 +1,6 @@
 <template>
     <p-list-card
-        v-if="totalCount > 0 && assignedVisible"
+        v-if="isVisible"
         style-type="indigo400"
         class="assigned-alert-list"
         :loading="loading"
@@ -62,6 +62,10 @@ export default {
             totalCount: 0,
             assignedVisible: true,
             lastCheckedTime: computed(() => store.getters['settings/getItem']('last_checked_time', MONITORING_ROUTE.ALERT_MANAGER.ALERT._NAME)),
+            isVisible: computed(() => {
+                if (state.totalCount && state.assignedVisible) return true;
+                return false;
+            }),
         });
 
         const assignedAlertApiQuery = new ApiQueryHelper()
