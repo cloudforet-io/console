@@ -43,7 +43,7 @@ export class SpaceRouter {
                     nextLocation = { name: DASHBOARD_ROUTE._NAME };
                 } else if (to.meta?.isDomainOwnerOnly && !isAdmin) {
                     nextLocation = { name: ROOT_ROUTE.ERROR._NAME };
-                } else if (!hasPermission) {
+                } else if (!hasPermission && to.name !== ROOT_ROUTE.SIGN_OUT._NAME) {
                     if (to.name !== IDENTITY_ROUTE.USER.ACCOUNT._NAME) nextLocation = { name: IDENTITY_ROUTE.USER.ACCOUNT._NAME };
                 }
             } else if (!to.meta?.excludeAuth) {
