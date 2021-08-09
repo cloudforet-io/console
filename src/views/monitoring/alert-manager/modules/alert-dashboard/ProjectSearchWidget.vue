@@ -26,6 +26,14 @@
                 </div>
             </div>
         </div>
+        <p-pane-layout class="project-healthy" v-if="totalCount === 0 && activatedProjects.length > 0">
+            <p-i name="smile-face"
+                 width="3rem"
+                 height="3rem"
+                 color="inherit"
+            />
+            <p>{{ $t('MONITORING.ALERT.DASHBOARD.PROJECTS_HEALTHY') }}</p>
+        </p-pane-layout>
     </div>
 </template>
 
@@ -35,7 +43,7 @@ import {
     computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PToolbox } from '@spaceone/design-system';
+import { PPaneLayout, PToolbox, PI } from '@spaceone/design-system';
 import ProjectAlertListItem from '@/views/monitoring/alert-manager/modules/alert-dashboard/ProjectAlertListItem.vue';
 import ProjectMaintenanceWindowListItem from '@/views/monitoring/alert-manager/modules/alert-dashboard/ProjectMaintenanceWindowListItem.vue';
 
@@ -52,6 +60,8 @@ export default {
     name: 'ProjectSearchWidget',
     components: {
         PToolbox,
+        PPaneLayout,
+        PI,
         ProjectAlertListItem,
         ProjectMaintenanceWindowListItem,
     },
@@ -200,6 +210,21 @@ export default {
                     }
                 }
             }
+        }
+    }
+
+    .project-healthy {
+        @apply bg-green-100 text-green-500 text-center;
+        padding: 3rem 0;
+        margin-top: 0.5rem;
+        .p-i-icon {
+            margin: 0 auto;
+        }
+        p {
+            margin-top: 0.5rem;
+            color: inherit;
+            font-size: 1rem;
+            line-height: 1.6;
         }
     }
 
