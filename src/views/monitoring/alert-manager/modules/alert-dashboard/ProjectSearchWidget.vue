@@ -26,7 +26,7 @@
                 </div>
             </div>
         </div>
-        <p-pane-layout class="project-healthy" v-if="totalCount === 0 && activatedProjects.length > 0">
+        <p-pane-layout v-if="isHealthy" class="project-healthy">
             <p-i name="smile-face"
                  width="3rem"
                  height="3rem"
@@ -79,6 +79,11 @@ export default {
             pageLimit: 12,
             items: [],
             tags: [],
+            loading: true,
+            isHealthy: computed(() => {
+                if (state.totalCount === 0 && props.activatedProjects.length > 0 && !state.loading) return true;
+                return false;
+            }),
         });
         const handlers = {
             keyItemSets: [{
@@ -120,6 +125,8 @@ export default {
                 state.totalCount = total_count;
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
 
