@@ -273,7 +273,7 @@ export default {
                     type: 'divider',
                 },
                 {
-                    name: 'link', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CONSOLE'), type: 'item', disabled: !tableState.consoleLink, link: tableState.consoleLink, target: 'blank',
+                    name: 'link', label: vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.CONSOLE'), type: 'item', disabled: !tableState.consoleLink, link: tableState.consoleLink, target: '_blank',
                 },
             ]),
             selectedAccountIds: computed(() => tableState.selectedItems.map(d => d?.service_account_id)),
