@@ -4,9 +4,16 @@
             {{ $t('IDENTITY.USER.NOTIFICATION.FORM.CHANNEL_NAME') }}
         </p>
         <div v-if="isEditMode" class="content">
-            <p-text-input v-model="dataForEdit"
-                          class="block"
-            />
+            <p-field-group
+                required
+                :invalid-text="nameInvalidText"
+                :invalid="isNameInvalid"
+                class="base-info-input"
+            >
+                <p-text-input v-model="dataForEdit" :invalid="isNameInvalid"
+                              class="block"
+                />
+            </p-field-group>
             <div class="button-group">
                 <p-button :outline="true" size="sm" class="cancel-button"
                           @click="cancelEdit"
@@ -37,10 +44,11 @@
 </template>
 
 <script lang="ts">
-import { PButton, PI, PTextInput } from '@spaceone/design-system';
-import { reactive, toRefs } from '@vue/composition-api';
+import { PButton, PI, PFieldGroup, PTextInput } from '@spaceone/design-system';
+import {computed, reactive, toRefs} from '@vue/composition-api';
 import { useNotificationItem } from '@/views/identity/user/modules/notification/notification-channel-item/hooks';
 import { EDIT_TYPE, PARAM_KEY_TYPE } from '@/views/identity/user/modules/notification/notification-channel-item/type';
+import {i18n} from "@/translations";
 
 
 export default {
@@ -48,6 +56,7 @@ export default {
     components: {
         PButton,
         PI,
+        PFieldGroup,
         PTextInput,
     },
     props: {
@@ -77,6 +86,18 @@ export default {
             isEditMode: false,
             dataForEdit: props.channelData?.name,
         });
+        const state = reactive({
+            nameInvalidText: computed(() => {
+                if (notificationItemState.dataForEdit !== undefined && notificationItemState.dataForEdit.length === 0) {
+                    return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
+                }
+                if (notificationItemState.dataForEdit !== undefined && notificationItemState.dataForEdit.length > 40) {
+                    return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_INVALID_TEXT');
+                }
+                return undefined;
+            }),
+            isNameInvalid: computed(() => !!state.nameInvalidText),
+        })
 
         const saveChangedName = async () => {
             if (props.projectId) await updateProjectChannel(PARAM_KEY_TYPE.NAME, notificationItemState.dataForEdit);
@@ -91,6 +112,7 @@ export default {
         return {
             EDIT_TYPE,
             ...toRefs(notificationItemState),
+            ...toRefs(state),
             onClickSave,
             cancelEdit,
             startEdit,
@@ -110,5 +132,8 @@ export default {
             @apply pointer-events-none;
         }
     }
+}
+.p-field-group::v-deep {
+    margin-bottom: 0;
 }
 </style>
