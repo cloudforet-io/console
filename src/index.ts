@@ -106,6 +106,7 @@ export { default as PPagination } from './navigation/pagination/pagination/PPagi
 export { default as PTextPagination } from './navigation/pagination/text-pagination/PTextPagination.vue';
 export { default as PRawData } from './data-display/raw-data/PRawData.vue';
 export { default as PAutocompleteSearch } from './inputs/search/autocomplete-search/PAutocompleteSearch.vue';
+export { default as PSearchDropdown } from './inputs/search/search-dropdown/PSearchDropdown.vue';
 export { default as PQuerySearch } from './inputs/search/query-search/PQuerySearch.vue';
 export { default as PQuerySearchGuide } from './inputs/search/query-search-guide/PQuerySearchGuide.vue';
 export { default as PQuerySearchTags } from './inputs/search/query-search-tags/PQuerySearchTags.vue';

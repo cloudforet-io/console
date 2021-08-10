@@ -1,0 +1,284 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
+import Fuse from 'fuse.js'
+
+import { makeOptionalProxy } from '@/util/composition-helpers';
+import PSearchDropdown from './PSearchDropdown.vue';
+import PButton from '@/inputs/buttons/button/PButton';
+import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
+
+import { getSearchDropdownArgTypes } from '@/inputs/search/search-dropdown/story-helper';
+import { getSearchDropdownMenu, getSearchDropdownMenuWithMultiTypes } from '@/inputs/search/search-dropdown/mock';
+
+
+<Meta title='Inputs/Search/Search Dropdown' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A182254',
+    },
+}} argTypes={getSearchDropdownArgTypes()}/>
+
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PSearchDropdown },
+    template: `
+        <p-search-dropdown
+            :menu="menu"
+            :loading="loading"
+            :placeholder="placeholder"
+            :disable-icon="disableIcon"
+            :disable-handler="disableHandler"
+            :exact-mode="exactMode"
+            :use-fixed-menu-style="useFixedMenuStyle"
+            :visible-menu.sync="proxyVisibleMenu"
+            :show-selected-list="showSelectedList"
+            :show-tag-box="showTagBox"
+            @search="onSearch"
+            @focus="onFocus"
+            @blur="onBlur"
+            @input="onInput"
+            @delete="onDelete"
+            @hide-menu="onHideMenu"
+            @show-menu="onShowMenu"
+            @focus-menu="onFocusMenu"
+            @select-menu="onSelectMenu"
+        >
+        </p-search-dropdown>
+    `,
+    setup(props) {
+        const vm = getCurrentInstance();
+        const state = reactive({
+            proxyVisibleMenu: makeOptionalProxy('visibleMenu', vm, props.visibleMenu)
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+});
+
+
+# Search Dropdown
+<br/>
+<br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic" args={{menu: getSearchDropdownMenu()}}>
+        {{
+            props: Object.keys(getSearchDropdownArgTypes()),
+            components: { PSearchDropdown },
+            template: `
+        <p-search-dropdown :menu="menu" use-fixed-menu-style />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## With Header
+
+<Canvas>
+    <Story name="With Header" args={{menu: getSearchDropdownMenuWithMultiTypes()}}>
+        {{
+            props: Object.keys(getSearchDropdownArgTypes()),
+            components: { PSearchDropdown, PButton },
+            template: `
+        <p-search-dropdown :menu="menu" use-fixed-menu-style />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Control Manually
+
+<Canvas>
+    <Story name="Control Manually" args={{menu: getSearchDropdownMenu()}}>
+        {{
+            props: Object.keys(getSearchDropdownArgTypes()),
+            components: { PSearchDropdown, PButton },
+            template: `
+        <div>
+            <p class="mb-4">To focus search and show menu, click the button <p-button style-type="primary" @click="focusMenu">Search</p-button></p>
+            <p class="mb-4">To hide menu, select menu item</p>
+            <p-search-dropdown :menu="menu"
+                v-model="proxyValue"
+                :visible-menu.sync="proxyVisibleMenu"
+                :is-focused.sync="proxyIsFocused"
+                use-fixed-menu-style
+                @select-menu="hideMenu"
+/>
+        </div>
+`,
+            setup() {
+                const state = reactive({
+                    proxyValue: '',
+                    proxyVisibleMenu: false,
+                    proxyIsFocused: false
+                })
+                const focusMenu = () => {
+                    state.proxyIsFocused = true;
+                    state.proxyVisibleMenu = true;
+                }
+                const hideMenu = () => {
+                    state.proxyVisibleMenu = false;
+                }
+                return {
+                    ...toRefs(state),
+                    focusMenu,
+                    hideMenu
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Using Handler
+
+<Canvas>
+    <Story name="Using Handler" args={{menu: getSearchDropdownMenuWithMultiTypes()}}>
+        {{
+            props: Object.keys(getSearchDropdownArgTypes()),
+            components: { PSearchDropdown, PButton },
+            template: `
+            <p-search-dropdown :menu="menu" :handler="simpleHandler" use-fixed-menu-style />
+`,
+            setup() {
+                const simpleHandler = (inputText, list) => {
+                    let results = [...list];
+                    const trimmed = inputText.trim();
+                    if (trimmed) {
+                        results = new Fuse(results, {
+                            keys: ['label'],
+                            distance: 100,
+                            threshold: 0.1,
+                            ignoreLocation: true,
+                        }).search(trimmed);
+                    }
+                    return { results };
+                }
+                return {
+                    simpleHandler
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Use Fixed Menu Style
+
+<Canvas>
+    <Story name="Use Fixed Menu Style" >
+        {{
+            components: { PSearchDropdown, PToggleButton },
+            template: `
+        <div class="bg-gray-100 p-8" style="height: 200px; overflow-y: auto; width: 90%;">
+            <div style="height: 500px;">
+                <p class="text-lg mb-5 leading-7" :class="useFixedMenuStyle ? 'text-gray-800' : 'text-gray-400'">
+                    Use Fixed Menu Style: <strong> {{useFixedMenuStyle ? 'On' : 'Off' }}</strong> <p-toggle-button :value="useFixedMenuStyle" @change="onChange" /> <br/>
+                    The menu's style position will be set 'fixed'.<br/>
+                    Therefore, the menu is placed on front, except for all other fixed elements with high z-index.<br/>
+                    When you scroll parent elements, the menu will be automatically hidden.
+                </p>
+                <p-search-dropdown v-if="show" :menu="menu" :use-fixed-menu-style="useFixedMenuStyle" />
+            </div>
+        </div>
+`,
+            setup() {
+                const state = reactive({
+                    menu: getSearchDropdownMenu(30, 50),
+                    useFixedMenuStyle: true,
+                    show: true
+                })
+                const onChange = () => {
+                    state.show = false;
+                    state.useFixedMenuStyle = !state.useFixedMenuStyle;
+                    setTimeout(() => {
+                        state.show = true;
+                    }, 300)
+                }
+                return {
+                    ...toRefs(state),
+                    onChange
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Radio Button Type
+
+<Canvas>
+    <Story name="Radio Button Type" args={{menu: getSearchDropdownMenu()}}>
+        {{
+            props: Object.keys(getSearchDropdownArgTypes()),
+            components: { PSearchDropdown },
+            template: `
+        <p-search-dropdown :menu="menu" type="radioButton" use-fixed-menu-style />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Checkbox Type
+
+<Canvas>
+    <Story name="Checkbox Type" args={{menu: getSearchDropdownMenu()}}>
+        {{
+            props: Object.keys(getSearchDropdownArgTypes()),
+            components: { PSearchDropdown },
+            template: `
+        <p-search-dropdown :menu="menu" type="checkbox" use-fixed-menu-style />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Checkbox With Selected List
+
+<Canvas>
+    <Story name="Checkbox With Selected List" args={{menu: getSearchDropdownMenu()}}>
+        {{
+            props: Object.keys(getSearchDropdownArgTypes()),
+            components: { PSearchDropdown },
+            template: `
+        <p-search-dropdown :menu="menu" type="checkbox" :show-selected-list="true" use-fixed-menu-style />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Playground
+
+<Canvas>
+    <Story name="playground" args={{menu: getSearchDropdownMenu()}}>
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="playground"/>
+

@@ -1,0 +1,501 @@
+<template>
+    <div class="p-search-dropdown">
+        <p-search ref="targetRef"
+                  v-model="proxyValue"
+                  :placeholder="proxyPlaceholder"
+                  :disable-icon="disableIcon || (type === SEARCH_DROPDOWN_TYPE.radioButton && !!proxySelected.length) || (type === SEARCH_DROPDOWN_TYPE.checkbox && proxyVisibleMenu)"
+                  :is-focused.sync="proxyIsFocused"
+                  v-on="searchListeners"
+        >
+            <template #left>
+                <p-tag v-if="type === SEARCH_DROPDOWN_TYPE.radioButton && proxySelected.length"
+                       :deletable="proxyVisibleMenu"
+                       @delete="onDeleteTag(0)"
+                >
+                    {{ menu.find(d => d.name === proxySelected[0]).label }}
+                </p-tag>
+            </template>
+            <template #right>
+                <p-i :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'" color="inherit" class="dropdown-button" />
+            </template>
+            <template v-for="(_, slot) of searchSlots" v-slot:[slot]="scope">
+                <slot :name="`search-${slot}`" v-bind="{...scope}" />
+            </template>
+        </p-search>
+        <p-context-menu v-if="proxyVisibleMenu"
+                        ref="menuRef"
+                        theme="secondary"
+                        :menu="bindingMenu"
+                        :loading="loading"
+                        :selected.sync="proxySelected"
+                        :multi-selectable="type === SEARCH_DROPDOWN_TYPE.checkbox"
+                        :show-radio-icon="type === SEARCH_DROPDOWN_TYPE.radioButton"
+                        :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"
+                        @select="onClickMenuItem"
+                        @keyup:up:end="focusSearch"
+                        @keyup:esc="focusSearch"
+                        @focus="onFocusMenuItem"
+        >
+            <template #top>
+                <div v-if="type === SEARCH_DROPDOWN_TYPE.checkbox && showSelectedList" class="selected-list-wrapper">
+                    <div>
+                        <b>{{ $t('COMPONENT.SEARCH_DROPDOWN.SELECTED_LIST') }}</b>
+                        <span>({{ proxySelected.length }} / {{ menu.length }})</span>
+                    </div>
+                    <p-button size="sm" style-type="primary-dark" :disabled="!proxySelected.length">
+                        {{ $t('COMPONENT.SEARCH_DROPDOWN.DONE') }}
+                    </p-button>
+                </div>
+            </template>
+            <template #item--format="{item}">
+                <span class="p-search-dropdown__item-label">
+                    <template v-for="(text, i) in item.label.split(searchRegex)">
+                        <span :key="`item-label--${text}-${i}`"
+                              :class="{ 'selected': type === SEARCH_DROPDOWN_TYPE.default && item.name === proxySelected[0] }"
+                        >
+                            <strong v-if="i !== 0">{{ getMatchText(item.label) }}</strong><span>{{ text }}</span>
+                        </span>
+                    </template>
+                </span>
+            </template>
+            <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
+                <slot :name="`menu-${slot}`" v-bind="scope" />
+            </template>
+        </p-context-menu>
+        <div v-if="type === SEARCH_DROPDOWN_TYPE.checkbox && proxySelected.length && showTagBox" class="p-search-dropdown__tag-box">
+            <p-tag v-for="(selectedName, index) in proxySelected" :key="`tag-box-${index}`" @delete="onDeleteTag(index)">
+                {{ menu.find(d => d.name === selectedName).label }}
+            </p-tag>
+        </div>
+    </div>
+</template>
+
+<script lang="ts">
+import {
+    ComponentRenderProxy,
+    computed, defineComponent, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
+} from '@vue/composition-api';
+import { reduce } from 'lodash';
+
+import { makeOptionalProxy } from '@/util/composition-helpers';
+import { ContextMenuFixedStyleProps, useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
+
+import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
+import PSearch from '@/inputs/search/search/PSearch.vue';
+import PI from '@/foundation/icons/PI.vue';
+import PTag from '@/data-display/tags/PTag.vue';
+import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
+import PButton from '@/inputs/buttons/button/PButton.vue';
+
+import {
+    AutocompleteHandler, SEARCH_DROPDOWN_TYPE,
+} from '@/inputs/search/search-dropdown/type';
+import { MenuItem } from '@/inputs/context-menu/type';
+
+
+interface SearchDropdownProps extends ContextMenuFixedStyleProps {
+    value: string;
+    placeholder?: string;
+    type?: SEARCH_DROPDOWN_TYPE;
+    disableIcon?: boolean;
+    isFocused?: boolean;
+    showSelectedList?: boolean;
+    showTagBox?: boolean;
+    menu: MenuItem[];
+    loading?: boolean;
+    handler?: AutocompleteHandler;
+    disableHandler?: boolean;
+    exactMode?: boolean;
+    selected?: string[];
+}
+
+export default defineComponent<SearchDropdownProps>({
+    name: 'PSearchDropdown',
+    components: {
+        PIconButton,
+        PSearch,
+        PContextMenu,
+        PI,
+        PTag,
+        PButton,
+    },
+    model: {
+        prop: 'value',
+        event: 'update:value',
+    },
+    props: {
+        /* search props */
+        value: {
+            type: String,
+            default: '',
+        },
+        placeholder: {
+            type: String,
+            default: undefined,
+        },
+        disableIcon: {
+            type: Boolean,
+            default: false,
+        },
+        isFocused: {
+            type: Boolean,
+            default: undefined,
+        },
+        /* context menu props */
+        menu: {
+            type: Array,
+            default: () => [],
+        },
+        loading: {
+            type: Boolean,
+            default: false,
+        },
+        selected: {
+            type: Array,
+            default: () => [],
+        },
+        /* context menu fixed style props */
+        visibleMenu: {
+            type: Boolean,
+            default: undefined,
+        },
+        useFixedMenuStyle: {
+            type: Boolean,
+            default: false,
+        },
+        /* extra props */
+        type: {
+            type: String,
+            default: SEARCH_DROPDOWN_TYPE.default,
+        },
+        handler: {
+            type: Function,
+            default: undefined,
+        },
+        disableHandler: {
+            type: Boolean,
+            default: false,
+        },
+        exactMode: {
+            type: Boolean,
+            default: true,
+        },
+        showSelectedList: {
+            type: Boolean,
+            default: false,
+        },
+        showTagBox: {
+            type: Boolean,
+            default: true,
+        },
+    },
+    setup(props: SearchDropdownProps, { emit, slots, listeners }) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+
+        const { state: contextMenuFixedStyleState } = useContextMenuFixedStyle(props);
+
+        const state = reactive({
+            menuRef: null,
+            proxyValue: makeOptionalProxy('value', vm, ''),
+            isAutoMode: computed(() => props.visibleMenu === undefined),
+            proxyIsFocused: makeOptionalProxy('isFocused', vm, false),
+            proxySelected: makeOptionalProxy('selected', vm, []),
+            proxyPlaceholder: makeOptionalProxy('placeholder', vm, ''),
+            filteredMenu: [] as MenuItem[],
+            bindingMenu: computed<MenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
+            searchableItems: computed<MenuItem[]>(() => props.menu.filter(d => d.type === undefined || d.type === 'item')),
+            searchRegex: computed(() => new RegExp(state.proxyValue || '', 'i')),
+            //
+            menuSlots: computed(() => reduce(slots, (res, d, name) => {
+                if (name.startsWith('menu-')) res[`${name.substring(5)}`] = d;
+                return res;
+            }, {})),
+            searchSlots: computed(() => reduce(slots, (res, d, name) => {
+                if (name.startsWith('search-')) res[`${name.substring(7)}`] = d;
+                return res;
+            }, {})),
+        });
+
+        /* util */
+        const defaultHandler = (inputText: string, list: MenuItem[]) => {
+            let results: MenuItem[] = [...list];
+            const trimmed = inputText.trim();
+            if (trimmed) {
+                const regex = new RegExp(inputText, 'i');
+                results = results.filter(d => regex.test(d.label as string));
+            }
+            return { results };
+        };
+
+        const filterMenu = async (val: string) => {
+            if (props.disableHandler) return;
+
+            let results: MenuItem[];
+            if (props.handler) {
+                let res = props.handler(val, state.searchableItems);
+                if (res instanceof Promise) res = await res;
+                results = res.results;
+            } else {
+                results = defaultHandler(val, state.searchableItems).results;
+            }
+
+            const filtered = props.menu.filter((item) => {
+                if (item.type && item.type !== 'item') return true;
+                return !!results.find(d => d.label === item.label);
+            });
+            if (filtered[filtered.length - 1]?.type === 'divider') filtered.pop();
+            state.filteredMenu = filtered;
+        };
+
+        const getMatchText = (text: string): string => {
+            const res = state.searchRegex.exec(text);
+            if (res) return res[0];
+            return '';
+        };
+
+
+        /* event util */
+        const focusSearch = () => {
+            state.proxyIsFocused = true;
+        };
+
+        const hideMenu = (mode?: string) => {
+            if (state.isAutoMode) contextMenuFixedStyleState.proxyVisibleMenu = false;
+
+            // placeholder
+            if (props.type === SEARCH_DROPDOWN_TYPE.radioButton && state.proxySelected.length) {
+                state.proxyPlaceholder = '';
+            } else {
+                state.proxyPlaceholder = undefined;
+            }
+
+            // value
+            if (props.type === SEARCH_DROPDOWN_TYPE.default && mode !== 'click' && state.proxySelected.length) {
+                state.proxyValue = props.menu.find(d => d.name === state.proxySelected[0])?.label;
+            }
+            if (props.type !== SEARCH_DROPDOWN_TYPE.default) {
+                state.proxyValue = '';
+            }
+
+            emit('hide-menu');
+        };
+
+        const showMenu = () => {
+            if (state.isAutoMode) contextMenuFixedStyleState.proxyVisibleMenu = true;
+            if (props.type === SEARCH_DROPDOWN_TYPE.default && state.proxySelected.length) {
+                // 기존 선택된 값이 있다면 해당 값을 placeholder 처리 & filter 초기화
+                state.proxyPlaceholder = props.menu.find(d => d.name === state.proxySelected[0])?.label;
+                state.proxyValue = '';
+                filterMenu('');
+            }
+            if (props.type === SEARCH_DROPDOWN_TYPE.checkbox && state.proxySelected.length) {
+                state.proxyPlaceholder = `${state.proxySelected.length} ${vm.$tc('COMPONENT.SEARCH_DROPDOWN.ITEMS_SELECTED', state.proxySelected.length)}`;
+            }
+            emit('show-menu');
+        };
+
+        const focusMenu = () => {
+            if (state.bindingMenu.length === 0) return;
+            if (state.menuRef) state.menuRef.focus();
+        };
+
+        const allFocusOut = () => {
+            state.proxyIsFocused = false;
+            hideMenu();
+        };
+
+
+        /* event */
+        const onFocusMenuItem = (idx: string) => {
+            emit('focus-menu', idx);
+        };
+
+        const onSearchFocus = () => {
+            filterMenu(state.proxyValue);
+            showMenu();
+        };
+
+        const onDeleteTag = (index) => {
+            state.proxySelected.splice(index, 1);
+        };
+
+        const onInput = (val: string, e) => {
+            if (!contextMenuFixedStyleState.proxyVisibleMenu) showMenu();
+
+            state.proxyValue = val;
+            emit('input', val, e);
+
+            filterMenu(val);
+        };
+
+        const onClickMenuItem = (name, idx) => {
+            if (props.type === SEARCH_DROPDOWN_TYPE.default || props.type === SEARCH_DROPDOWN_TYPE.radioButton) {
+                hideMenu('click');
+            }
+            if (props.type === SEARCH_DROPDOWN_TYPE.default) {
+                state.proxyValue = state.bindingMenu[idx]?.label ?? name;
+            } else {
+                state.proxyValue = '';
+            }
+
+            emit('select-menu', state.bindingMenu[idx]);
+        };
+
+        const onSearch = (val?: string) => {
+            const trimmed = val?.trim() ?? '';
+            const menuItem = state.filteredMenu.find(d => trimmed.toLowerCase() === d.label?.toLowerCase());
+            if (menuItem) {
+                emit('select-menu', menuItem);
+                state.proxyValue = menuItem.label;
+                if (props.type === SEARCH_DROPDOWN_TYPE.default) {
+                    state.proxySelected = [menuItem.name];
+                } else {
+                    state.proxySelected.push(menuItem.name);
+                }
+            } else if (props.type === SEARCH_DROPDOWN_TYPE.default) {
+                state.proxySelected = [];
+                state.proxyValue = '';
+            }
+
+            if (!menuItem && props.exactMode) {
+                state.proxyValue = '';
+                emit('search', '');
+            } else {
+                emit('search', trimmed);
+            }
+
+            vm.$nextTick(() => {
+                allFocusOut();
+            });
+        };
+
+        const onDelete = () => {
+            emit('search', '');
+            focusSearch();
+        };
+
+        const searchListeners = {
+            ...listeners,
+            keyup(e) {
+                if (e.key === 'ArrowDown' || e.key === 'Down') focusMenu();
+                else if (e.key === 'Escape' || e.key === 'Esc') allFocusOut();
+                emit('keyup', e);
+            },
+            focus(e) {
+                onSearchFocus();
+                emit('focus', e);
+            },
+            click(e: MouseEvent) {
+                e.stopPropagation();
+                showMenu();
+                emit('click', e);
+            },
+            delete(...args) {
+                onDelete();
+                emit('delete', ...args);
+            },
+            search: onSearch,
+            input: onInput,
+        };
+
+        const onWindowKeydown = (e: KeyboardEvent) => {
+            if (contextMenuFixedStyleState.proxyVisibleMenu && ['ArrowDown', 'ArrowUp'].includes(e.key)) {
+                e.preventDefault();
+            }
+        };
+        const forceHideMenu = () => {
+            hideMenu();
+        };
+        onMounted(() => {
+            window.addEventListener('click', forceHideMenu);
+            window.addEventListener('blur', forceHideMenu);
+            window.addEventListener('keydown', onWindowKeydown, false);
+        });
+        onUnmounted(() => {
+            window.removeEventListener('click', forceHideMenu);
+            window.removeEventListener('blur', forceHideMenu);
+            window.removeEventListener('keydown', onWindowKeydown, false);
+        });
+
+        watch(() => props.menu, (menu) => {
+            state.filteredMenu = menu;
+            filterMenu(state.proxyValue);
+        });
+
+        watch(() => state.proxySelected, (proxySelected) => {
+            if (proxySelected.length && contextMenuFixedStyleState.proxyVisibleMenu) {
+                if (props.type === SEARCH_DROPDOWN_TYPE.radioButton) {
+                    state.proxyPlaceholder = '';
+                } else if (props.type === SEARCH_DROPDOWN_TYPE.checkbox) {
+                    state.proxyPlaceholder = `${proxySelected.length} items selected`;
+                }
+            } else {
+                state.proxyPlaceholder = undefined;
+            }
+        });
+
+        return {
+            ...toRefs(state),
+            ...toRefs(contextMenuFixedStyleState),
+            SEARCH_DROPDOWN_TYPE,
+            getMatchText,
+            onClickMenuItem,
+            focusSearch,
+            onFocusMenuItem,
+            onSearchFocus,
+            onDeleteTag,
+            searchListeners,
+        };
+    },
+});
+</script>
+
+<style lang="postcss">
+.p-search-dropdown {
+    @apply w-full relative;
+    .p-search {
+        @apply text-sm font-normal;
+
+        &.focused {
+            .dropdown-button {
+                @apply text-secondary;
+            }
+        }
+    }
+    .p-context-menu {
+        @apply font-normal;
+        position: absolute;
+        margin-top: -1px;
+        z-index: 1000;
+        min-width: 100%;
+        width: 100%;
+
+        .context-header.secondary {
+            @apply text-secondary;
+        }
+        .selected-list-wrapper {
+            @apply border-b border-gray-200;
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin: 0.5rem;
+            padding-bottom: 0.5rem;
+        }
+        .p-search-dropdown__item-label {
+            flex-grow: 1;
+            .selected {
+                @apply text-secondary;
+                font-weight: bold;
+            }
+        }
+    }
+    .p-search-dropdown__tag-box {
+        @apply text-gray-900;
+        margin-top: 0.625rem;
+        .p-tag {
+            margin-bottom: 0.5rem;
+        }
+    }
+}
+</style>
