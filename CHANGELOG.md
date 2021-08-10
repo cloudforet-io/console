@@ -1,3 +1,15 @@
+# [1.1.0-beta.117](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.116...v1.1.0-beta.117) (2021-08-10)
+
+
+### Bug Fixes
+
+* change selected props from number to string & add top slot ([#659](https://github.com/spaceone-dev/spaceone-design-system/issues/659)) ([fa78949](https://github.com/spaceone-dev/spaceone-design-system/commit/fa789494334fa211dbcdc0d17785a29bd2251ef2))
+
+
+### Features
+
+* create PSearchDropdown  ([#660](https://github.com/spaceone-dev/spaceone-design-system/issues/660)) ([ef2bdca](https://github.com/spaceone-dev/spaceone-design-system/commit/ef2bdca0757c13fd2d493a12a80d13a69b509974))
+
 # [1.1.0-beta.116](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.115...v1.1.0-beta.116) (2021-07-30)
 
 
