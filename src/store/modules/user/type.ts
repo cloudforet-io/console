@@ -26,7 +26,7 @@ export interface UserState {
 
 export interface SignInRequest {
     domainId: string;
-    userId: string;
+    userId?: string;
     userType: UserType;
     credentials: any;
 }

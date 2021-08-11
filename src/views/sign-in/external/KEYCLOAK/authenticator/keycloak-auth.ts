@@ -26,6 +26,7 @@ class KeycloakAuth extends Authenticator {
             url: `https://${baseUrl}/auth`,
             realm,
             clientId,
+            'enable-cors': true,
         };
         KeycloakAuth.keycloak = Keycloak(initOptions);
     }
@@ -47,14 +48,14 @@ class KeycloakAuth extends Authenticator {
         }
         if (KeycloakAuth.keycloak.token && KeycloakAuth.keycloak.idToken && KeycloakAuth.keycloak.token !== '' && KeycloakAuth.keycloak.idToken !== '') {
             // eslint-disable-next-line camelcase
-            await super.signIn((KeycloakAuth.keycloak.idTokenParsed as any).email,
+            await super.signIn(
                 { access_token: KeycloakAuth.keycloak.token });
         }
     }
 
     static async signIn(onSignInCallback) {
         KeycloakAuth.init();
-        KeycloakAuth.keycloak.init({ onLoad: 'login-required', checkLoginIframe: false })
+        KeycloakAuth.keycloak.init({ onLoad: 'login-required' })
             .then(async (auth) => {
                 await KeycloakAuth.keycloakSignIn(auth);
                 await onSignInCallback();

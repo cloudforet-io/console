@@ -115,7 +115,7 @@ export default defineComponent({
                 password: state.password.trim(),
             };
             try {
-                await loadAuth().signIn(state.userId, credentials, props.isAdmin ? 'DOMAIN_OWNER' : 'USER');
+                await loadAuth().signIn(credentials, state.userId, props.isAdmin ? 'DOMAIN_OWNER' : 'USER');
                 context.emit('sign-in');
             } catch (e) {
                 context.emit('sign-in-error');

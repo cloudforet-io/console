@@ -23,13 +23,13 @@ class GoogleAuth extends Authenticator {
             if (!auth2 || !auth2.isSignedIn.get()) {
                 return;
             }
-            const userProfile = googleUser.getBasicProfile();
-            const userId = userProfile.getEmail();
+            // const userProfile = googleUser.getBasicProfile();
+            // const userId = userProfile.getEmail();
             const credentials = {
                 // eslint-disable-next-line camelcase
                 access_token: googleUser.getAuthResponse().access_token,
             };
-            await super.signIn(userId, credentials);
+            await super.signIn(credentials);
         } catch (e) {
             await GoogleAuth.signOut();
             throw new Error(e);

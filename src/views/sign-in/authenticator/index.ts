@@ -4,13 +4,13 @@ import { SpaceRouter } from '@/routes';
 
 
 abstract class Authenticator {
-    static async signIn(userId, credentials, userType?): Promise<void> {
+    static async signIn(credentials, userId?, userType?): Promise<void> {
         try {
             await store.dispatch('user/signIn', {
                 domainId: store.state.domain.domainId,
+                credentials,
                 userType: userType || 'USER',
                 userId,
-                credentials,
             });
         } catch (e) {
             throw new Error(e);
