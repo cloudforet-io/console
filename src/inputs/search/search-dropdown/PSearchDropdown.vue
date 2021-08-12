@@ -31,6 +31,7 @@
                         :multi-selectable="type === SEARCH_DROPDOWN_TYPE.checkbox"
                         :show-radio-icon="type === SEARCH_DROPDOWN_TYPE.radioButton"
                         :show-selected-list="showSelectedList"
+                        :show-select-all="showSelectAll"
                         :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"
                         @select="onClickMenuItem"
                         @keyup:up:end="focusSearch"
@@ -129,6 +130,10 @@ export default defineComponent<SearchDropdownProps>({
             default: () => [],
         },
         showSelectedList: {
+            type: Boolean,
+            default: false,
+        },
+        showSelectAll: {
             type: Boolean,
             default: false,
         },

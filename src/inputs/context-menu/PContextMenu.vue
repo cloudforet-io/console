@@ -11,7 +11,8 @@
         <slot v-else name="menu" v-bind="{...$props, uuid}">
             <div v-if="multiSelectable && showSelectedList" class="selected-list-wrapper">
                 <div>
-                    <b>{{ $t('COMPONENT.CONTEXT_MENU.SELECTED_LIST') }}</b> <span>({{ proxySelected.length }} / {{ menu.length }})</span>
+                    <b>{{ $t('COMPONENT.CONTEXT_MENU.SELECTED_LIST') }}</b>
+                    <span> ({{ proxySelected.length }} / {{ menu.length }})</span>
                 </div>
                 <p-button size="sm" style-type="primary-dark" :disabled="!proxySelected.length">
                     {{ $t('COMPONENT.CONTEXT_MENU.DONE') }}
