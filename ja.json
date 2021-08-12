@@ -1253,6 +1253,10 @@
 					"SEARCH_PLACEHOLDER": "メンバー検索",
 					"SHOW_RESPONDERS": "受信先を見る"
 				},
+				"STATUS_UPDATE": {
+					"NEW_UPDATE": "",
+					"STATUS_UPDATE": ""
+				},
 				"TIMELINE": {
 					"TIMELINE": "タイムライン"
 				}

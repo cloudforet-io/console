@@ -1253,6 +1253,10 @@
 					"SEARCH_PLACEHOLDER": "Search Member",
 					"SHOW_RESPONDERS": "show responders"
 				},
+				"STATUS_UPDATE": {
+					"NEW_UPDATE": "New Update",
+					"STATUS_UPDATE": "Status Update"
+				},
 				"TIMELINE": {
 					"TIMELINE": "Timeline"
 				}

@@ -1253,6 +1253,10 @@
 					"SEARCH_PLACEHOLDER": "구성원 검색",
 					"SHOW_RESPONDERS": "수신자 보기"
 				},
+				"STATUS_UPDATE": {
+					"NEW_UPDATE": "새로운 업데이트",
+					"STATUS_UPDATE": "상태 업데이트"
+				},
 				"TIMELINE": {
 					"TIMELINE": "타임라인"
 				}
