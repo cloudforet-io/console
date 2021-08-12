@@ -1183,17 +1183,14 @@
 				"ALT_S_DELETE_ALERT": "アラート削除に成功",
 				"DELETE_MODAL_DESC": "アラートを削除しますか？",
 				"DELETE_MODAL_TITLE": "アラート削除",
-				"EDIT_MODAL_TITLE": "アラート名を修正",
-				"EVENT_LIST": {
-					"COPY_ALL": "全てコピー",
-					"DATETIME": "日付",
-					"EVENT_DETAILS": "イベント詳細",
-					"EVENT_LIST": "イベントリスト",
-					"MORE": "もっと見る",
-					"NO_EVENT": "イベントがありません。",
-					"PLACEHOLDER": "タイプや日付でイベントを検索する",
-					"PUSHED_EVENT": ""
+				"DETAILS": {
+					"ADDITIONAL_INFO": "",
+					"DETAILS": "",
+					"RESOURCE_ID": "",
+					"RESOURCE_NAME": "",
+					"RESOURCE_TYPE": ""
 				},
+				"EDIT_MODAL_TITLE": "アラート名を修正",
 				"HEADER": {
 					"ALT_E_ASSIGN_MEMBER": "担当指定に失敗",
 					"ALT_E_UPDATE_ALERT": "アラート変更に失敗",
@@ -1243,6 +1240,16 @@
 				"PROJECT_DEPENDENCY": {
 					"NO_DATA": "プロジェクトデータなし",
 					"PROJECT_DEPENDENCY": "プロジェクト依存性"
+				},
+				"PUSHED_EVENT": {
+					"COPY_ALL": "全てコピー",
+					"DATETIME": "日付",
+					"EVENT_DETAILS": "イベント詳細",
+					"EVENT_LIST": "イベントリスト",
+					"MORE": "もっと見る",
+					"NO_EVENT": "イベントがありません。",
+					"PLACEHOLDER": "タイプや日付でイベントを検索する",
+					"PUSHED_EVENT": ""
 				},
 				"RESPONDER": {
 					"ADDITIONAL_RESPONDER": "追加受信先",

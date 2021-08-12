@@ -1183,17 +1183,14 @@
 				"ALT_S_DELETE_ALERT": "알람 삭제 성공",
 				"DELETE_MODAL_DESC": "알람을 삭제하시겠습니까?",
 				"DELETE_MODAL_TITLE": "알람 삭제",
-				"EDIT_MODAL_TITLE": "알림 이름 수정",
-				"EVENT_LIST": {
-					"COPY_ALL": "모두 복사",
-					"DATETIME": "날짜",
-					"EVENT_DETAILS": "이벤트 상세 설명",
-					"EVENT_LIST": "이벤트 목록",
-					"MORE": "더보기",
-					"NO_EVENT": "이벤트가 없습니다.",
-					"PLACEHOLDER": "타입이나 날짜로 이벤트를 검색하세요",
-					"PUSHED_EVENT": "발생한 이벤트"
+				"DETAILS": {
+					"ADDITIONAL_INFO": "추가 정보",
+					"DETAILS": "상세 정보",
+					"RESOURCE_ID": "리소스 ID",
+					"RESOURCE_NAME": "리소스 이름",
+					"RESOURCE_TYPE": "리소스 타입"
 				},
+				"EDIT_MODAL_TITLE": "알림 이름 수정",
 				"HEADER": {
 					"ALT_E_ASSIGN_MEMBER": "담당자 할당 실패",
 					"ALT_E_UPDATE_ALERT": "얼럿 변경 실패",
@@ -1243,6 +1240,16 @@
 				"PROJECT_DEPENDENCY": {
 					"NO_DATA": "연관된 프로젝트가 없습니다.",
 					"PROJECT_DEPENDENCY": "프로젝트 의존성"
+				},
+				"PUSHED_EVENT": {
+					"COPY_ALL": "모두 복사",
+					"DATETIME": "날짜",
+					"EVENT_DETAILS": "이벤트 상세 설명",
+					"EVENT_LIST": "이벤트 목록",
+					"MORE": "더보기",
+					"NO_EVENT": "이벤트가 없습니다.",
+					"PLACEHOLDER": "타입이나 날짜로 이벤트를 검색하세요",
+					"PUSHED_EVENT": "발생한 이벤트"
 				},
 				"RESPONDER": {
 					"ADDITIONAL_RESPONDER": "추가 수신인 ",

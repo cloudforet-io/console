@@ -1183,17 +1183,14 @@
 				"ALT_S_DELETE_ALERT": "Successfully Deleted Alert",
 				"DELETE_MODAL_DESC": "Are you sure you want to delete alert?",
 				"DELETE_MODAL_TITLE": "Delete Alert",
-				"EDIT_MODAL_TITLE": "Edit Alert Name",
-				"EVENT_LIST": {
-					"COPY_ALL": "Copy All",
-					"DATETIME": "DateTime",
-					"EVENT_DETAILS": "Event Details",
-					"EVENT_LIST": "Event List",
-					"MORE": "More",
-					"NO_EVENT": "No Event",
-					"PLACEHOLDER": "Search for events by type, or date",
-					"PUSHED_EVENT": "Pushed Event"
+				"DETAILS": {
+					"ADDITIONAL_INFO": "Additional Information",
+					"DETAILS": "Details",
+					"RESOURCE_ID": "Resource ID",
+					"RESOURCE_NAME": "Resource Name",
+					"RESOURCE_TYPE": "Resource Type"
 				},
+				"EDIT_MODAL_TITLE": "Edit Alert Name",
 				"HEADER": {
 					"ALT_E_ASSIGN_MEMBER": "Failed to Assign Member",
 					"ALT_E_UPDATE_ALERT": "Failed to Update Alert",
@@ -1243,6 +1240,16 @@
 				"PROJECT_DEPENDENCY": {
 					"NO_DATA": "No Dependencies",
 					"PROJECT_DEPENDENCY": "Project Dependency"
+				},
+				"PUSHED_EVENT": {
+					"COPY_ALL": "Copy All",
+					"DATETIME": "DateTime",
+					"EVENT_DETAILS": "Event Details",
+					"EVENT_LIST": "Event List",
+					"MORE": "More",
+					"NO_EVENT": "No Event",
+					"PLACEHOLDER": "Search for events by type, or date",
+					"PUSHED_EVENT": "Pushed Event"
 				},
 				"RESPONDER": {
 					"ADDITIONAL_RESPONDER": "Additional Responder",
