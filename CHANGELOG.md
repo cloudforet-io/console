@@ -1,3 +1,10 @@
+# [1.1.0-beta.118](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.117...v1.1.0-beta.118) (2021-08-12)
+
+
+### Features
+
+* add showSelectedList & showSelectAll to PContextMenu ([#662](https://github.com/spaceone-dev/spaceone-design-system/issues/662)) ([059f90a](https://github.com/spaceone-dev/spaceone-design-system/commit/059f90ac3e8b41d745d93a71ede40a40390c60e5))
+
 # [1.1.0-beta.117](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.116...v1.1.0-beta.117) (2021-08-10)
 
 
