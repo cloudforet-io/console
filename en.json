@@ -1261,8 +1261,12 @@
 					"SHOW_RESPONDERS": "show responders"
 				},
 				"STATUS_UPDATE": {
+					"ALT_E_UPDATE_STATUS": "Failed to Update Status",
+					"ALT_S_UPDATE_STATUS": "Successfully Updated Status",
 					"NEW_UPDATE": "New Update",
-					"STATUS_UPDATE": "Status Update"
+					"STATUS_UPDATE": "Status Update",
+					"UPDATE": "Update",
+					"UPDATE_NEW_STATUS": "Update New Status"
 				},
 				"TIMELINE": {
 					"TIMELINE": "Timeline"

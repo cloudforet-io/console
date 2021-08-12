@@ -1261,8 +1261,12 @@
 					"SHOW_RESPONDERS": "受信先を見る"
 				},
 				"STATUS_UPDATE": {
+					"ALT_E_UPDATE_STATUS": "",
+					"ALT_S_UPDATE_STATUS": "",
 					"NEW_UPDATE": "",
-					"STATUS_UPDATE": ""
+					"STATUS_UPDATE": "",
+					"UPDATE": "",
+					"UPDATE_NEW_STATUS": ""
 				},
 				"TIMELINE": {
 					"TIMELINE": "タイムライン"

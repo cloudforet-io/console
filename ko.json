@@ -1261,8 +1261,12 @@
 					"SHOW_RESPONDERS": "수신자 보기"
 				},
 				"STATUS_UPDATE": {
+					"ALT_E_UPDATE_STATUS": "상태 업데이트 실패",
+					"ALT_S_UPDATE_STATUS": "상태 업데이트 성공 ",
 					"NEW_UPDATE": "새로운 업데이트",
-					"STATUS_UPDATE": "상태 업데이트"
+					"STATUS_UPDATE": "상태 업데이트",
+					"UPDATE": "업데이트",
+					"UPDATE_NEW_STATUS": "새로운 상태 업데이트 "
 				},
 				"TIMELINE": {
 					"TIMELINE": "타임라인"
