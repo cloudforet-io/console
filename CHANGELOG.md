@@ -1,3 +1,10 @@
+# [1.1.0-beta.119](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.118...v1.1.0-beta.119) (2021-08-12)
+
+
+### Bug Fixes
+
+* add showSelectAll props to PSearchDropdown ([#663](https://github.com/spaceone-dev/spaceone-design-system/issues/663)) ([d5745dc](https://github.com/spaceone-dev/spaceone-design-system/commit/d5745dcf95cbc8249c9308ad32ab23d1318e4030))
+
 # [1.1.0-beta.118](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.117...v1.1.0-beta.118) (2021-08-12)
 
 
