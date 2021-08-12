@@ -28,19 +28,24 @@
                                    :alert-data="alertInfo"
                                    @update="getAlertData"
                 />
-                <alert-detail-resource-info v-if="!loading && alertInfo.resource" :id="id" :alert-data="alertInfo"
-                                            class="resource-info"
+<!--                <alert-detail-resource-info v-if="!loading && alertInfo.resource" :id="id" :alert-data="alertInfo"-->
+<!--                                            class="resource-info"-->
+<!--                />-->
+                <alert-detail-info-status-update v-if="!loading" :id="id"
+                                              :alert-data="alertInfo"
+                                              class="status-update"
+                                              @update="getAlertData"
                 />
-                <alert-detail-timeline v-if="!loading" :id="id" class="timeline" />
+                <alert-detail-timeline-and-event v-if="!loading" :id="id" class="timeline-and-event" />
             </div>
             <div class="grid col-span-4 right-wrapper">
                 <alert-detail-responder v-if="!loading" :id="id" class="responder"
                                         :alert-data="alertInfo"
                 />
+                <alert-detail-note v-if="!loading" :id="id" class="note" />
                 <alert-detail-project-dependency v-if="!loading" :id="id" :alert-data="alertInfo"
                                                  class="project-dependency"
                 />
-                <alert-detail-note v-if="!loading" :id="id" class="note" />
             </div>
         </section>
         <delete-modal :header-title="checkDeleteState.headerTitle"
@@ -71,7 +76,7 @@ import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue
 import AlertDetailHeader from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailHeader.vue';
 import AlertDetailInfo from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailInfo.vue';
 import AlertDetailResponder from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailResponder.vue';
-import AlertDetailTimeline from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailTimeline.vue';
+import AlertDetailTimelineAndEvent from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailTimelineAndEvent.vue';
 import AlertDetailNote from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailNote.vue';
 import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -82,15 +87,17 @@ import AlertDetailResourceInfo from '@/views/monitoring/alert-manager/modules/al
 import AlertDetailProjectDependency
     from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailProjectDependency.vue';
 import { i18n } from '@/translations';
+import AlertDetailInfoStatusUpdate
+    from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailInfoStatusUpdate.vue';
 
 export default {
     name: 'AlertDetailPage',
     components: {
+        AlertDetailInfoStatusUpdate,
         AlertDetailProjectDependency,
-        AlertDetailResourceInfo,
         AlertTitleEditModal,
         AlertDetailNote,
-        AlertDetailTimeline,
+        AlertDetailTimelineAndEvent,
         AlertDetailResponder,
         AlertDetailInfo,
         AlertDetailHeader,
@@ -222,10 +229,10 @@ export default {
             .info {
                 @apply col-span-12 row-start-2 row-end-2;
             }
-            .resource-info {
+            .status-update {
                 @apply col-span-12 row-start-3 row-end-3;
             }
-            .timeline {
+            .timeline-and-event {
                 @apply col-span-12 row-start-4 row-end-4;
                 max-height: none;
             }
@@ -241,7 +248,6 @@ export default {
             }
             .project-dependency {
                 @apply col-span-6 row-start-6 row-end-6;
-                min-height: 10rem;
             }
         }
     }
@@ -252,10 +258,10 @@ export default {
             .responder {
                 @apply row-start-5 row-end-5;
             }
-            .project-dependency {
+            .note {
                 @apply row-start-6 row-end-6 col-start-1;
             }
-            .note {
+            .project-dependency {
                 @apply row-start-7 row-end-7 col-start-1;
             }
         }

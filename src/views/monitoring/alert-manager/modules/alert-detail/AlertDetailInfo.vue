@@ -27,9 +27,6 @@
             <template #data-description>
                 <alert-detail-info-description :id="id" :alert-data="data" @update="$emit('update')" />
             </template>
-            <template #data-status_message>
-                <alert-detail-info-status-msg :id="id" :alert-data="data" @update="$emit('update')" />
-            </template>
             <template #data-rule="{value}">
                 <span v-if="Object.keys(value).length === 0">
                     --
@@ -65,7 +62,7 @@ import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { i18n } from '@/translations';
 import AlertDetailInfoProject from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailInfoProject.vue';
 import AlertDetailInfoStatusMsg
-    from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailInfoStatusMsg.vue';
+    from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailInfoStatusUpdate.vue';
 import AlertDetailInfoDescription
     from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailInfoDescription.vue';
 
@@ -76,7 +73,6 @@ interface Props {
 
 const EDIT_MODE = {
     DESCRIPTION: 'description',
-    STATUS_MSG: 'status_message',
 } as const;
 type EDIT_MODE = typeof EDIT_MODE[keyof typeof EDIT_MODE];
 
@@ -84,7 +80,6 @@ export default {
     name: 'AlertDetailInfo',
     components: {
         AlertDetailInfoDescription,
-        AlertDetailInfoStatusMsg,
         AlertDetailInfoProject,
         PPaneLayout,
         PDefinitionTable,
@@ -107,7 +102,6 @@ export default {
                 { name: 'description', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.DESC'), disableCopy: true },
                 { name: 'rule', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RULE'), disableCopy: true },
                 { name: 'severity', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.SEVERITY'), disableCopy: true },
-                { name: 'status_message', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.STATUS_DETAILS'), disableCopy: true },
                 { name: 'escalation_policy_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ESCALATION_POLICY') },
                 { name: 'project_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.PROJECT'), disableCopy: true },
                 { name: 'triggered_by', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY') },

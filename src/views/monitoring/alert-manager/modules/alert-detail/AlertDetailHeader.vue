@@ -2,14 +2,19 @@
     <p-pane-layout class="alert-detail-header">
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.STATE') }}</span>
-            <p-select-dropdown :items="ALERT_STATE_LIST"
-                               :selected="alertState"
-                               class="state-dropdown"
-                               :disabled="alertState === ALERT_STATE.ERROR"
-                               @select="changeAlertState"
-            >
-                <span class="capitalize">{{ alertState.toLowerCase() }}</span>
-            </p-select-dropdown>
+            <template v-if="alertState !== ALERT_STATE.ERROR">
+                <p-select-dropdown
+                    :items="ALERT_STATE_LIST"
+                    :selected="alertState"
+                    class="state-dropdown"
+                    @select="changeAlertState"
+                >
+                    <span class="capitalize" :class="{'text-alert': alertState === ALERT_STATE.TRIGGERED}">{{ alertState.toLowerCase() }}</span>
+                </p-select-dropdown>
+            </template>
+            <template v-else>
+                <p-badge style-type="alert" shape="square">{{ALERT_STATE.ERROR}}</p-badge>
+            </template>
         </p>
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.URGENCY') }}</span>
@@ -54,7 +59,7 @@
 
 <script lang="ts">
 import {
-    PButton, PPaneLayout, PSelectDropdown, PI,
+    PButton, PPaneLayout, PSelectDropdown, PI, PBadge,
 } from '@spaceone/design-system';
 import { reactive, toRefs, UnwrapRef } from '@vue/composition-api';
 import { AlertDataModel } from '@/views/monitoring/alert-manager/type';
@@ -109,6 +114,7 @@ export default {
         PSelectDropdown,
         PButton,
         PI,
+        PBadge,
     },
     props: {
         id: {

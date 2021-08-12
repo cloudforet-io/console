@@ -2,9 +2,9 @@
     <p-tab :tabs="tabState.tabs" :active-tab.sync="tabState.activeTab"
            class="alert-detail-timeline"
     >
-        <template #event-list>
-            <p-panel-top>{{ $t('MONITORING.ALERT.DETAIL.EVENT_LIST.EVENT_LIST') }}</p-panel-top>
-            <alert-detail-event-list :id="id" />
+        <template #pushed-event>
+            <p-panel-top>{{ $t('MONITORING.ALERT.DETAIL.EVENT_LIST.PUSHED_EVENT') }}</p-panel-top>
+            <alert-detail-pushed-event :id="id" />
         </template>
     </p-tab>
 </template>
@@ -15,13 +15,13 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive,
 } from '@vue/composition-api';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
-import AlertDetailEventList from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailEventList.vue';
+import AlertDetailPushedEvent from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailPushedEvent.vue';
 import { i18n } from '@/translations';
 
 export default {
-    name: 'AlertDetailTimeline',
+    name: 'AlertDetailTimelineAndEvent',
     components: {
-        AlertDetailEventList,
+        AlertDetailPushedEvent,
         PTab,
         PPanelTop,
     },
@@ -35,9 +35,9 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const tabState = reactive({
             tabs: computed(() => ([
-                { name: 'event-list', label: i18n.t('MONITORING.ALERT.DETAIL.EVENT_LIST.EVENT_LIST') },
+                { name: 'pushed-event', label: i18n.t('MONITORING.ALERT.DETAIL.EVENT_LIST.PUSHED_EVENT') },
             ] as TabItem[])),
-            activeTab: 'event-list',
+            activeTab: 'pushed-event',
         });
         return {
             tabState,

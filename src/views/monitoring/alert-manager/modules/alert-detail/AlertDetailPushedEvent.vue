@@ -43,7 +43,7 @@
         <p-button-modal
             v-if="modalVisible"
             :header-title="$t('MONITORING.ALERT.DETAIL.EVENT_LIST.EVENT_DETAILS')"
-            size="md"
+            size="lg"
             :visible.sync="modalVisible"
             @confirm="onClickConfirm"
         >
@@ -86,7 +86,7 @@ import { copyAnyData } from '@/lib/helper/copy-helper';
 const PAGE_SIZE = 10;
 
 export default {
-    name: 'AlertDetailEventList',
+    name: 'AlertDetailPushedEvent',
     components: {
         AlertDetailVerticalTimeline,
         PToolbox,
@@ -202,5 +202,15 @@ export default {
 }
 .content-wrapper {
     max-height: 20.68rem;
+}
+.p-button-modal::v-deep {
+    .modal-content {
+        .modal-body {
+            min-height: 32rem;
+        }
+    }
+}
+.code-block {
+    min-height: 100%;
 }
 </style>
