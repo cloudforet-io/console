@@ -1191,7 +1191,8 @@
 					"EVENT_LIST": "Event List",
 					"MORE": "More",
 					"NO_EVENT": "No Event",
-					"PLACEHOLDER": "Search for events by type, or date"
+					"PLACEHOLDER": "Search for events by type, or date",
+					"PUSHED_EVENT": "Pushed Event"
 				},
 				"HEADER": {
 					"ALT_E_ASSIGN_MEMBER": "Failed to Assign Member",
@@ -1241,7 +1242,7 @@
 				},
 				"PROJECT_DEPENDENCY": {
 					"NO_DATA": "No Dependencies",
-					"PROJECT_DEPENDENCY": "Project Dependencies"
+					"PROJECT_DEPENDENCY": "Project Dependency"
 				},
 				"RESPONDER": {
 					"ADDITIONAL_RESPONDER": "Additional Responder",

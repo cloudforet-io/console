@@ -1191,7 +1191,8 @@
 					"EVENT_LIST": "イベントリスト",
 					"MORE": "もっと見る",
 					"NO_EVENT": "イベントがありません。",
-					"PLACEHOLDER": "タイプや日付でイベントを検索する"
+					"PLACEHOLDER": "タイプや日付でイベントを検索する",
+					"PUSHED_EVENT": ""
 				},
 				"HEADER": {
 					"ALT_E_ASSIGN_MEMBER": "担当指定に失敗",

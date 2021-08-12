@@ -1191,7 +1191,8 @@
 					"EVENT_LIST": "이벤트 목록",
 					"MORE": "더보기",
 					"NO_EVENT": "이벤트가 없습니다.",
-					"PLACEHOLDER": "타입이나 날짜로 이벤트를 검색하세요"
+					"PLACEHOLDER": "타입이나 날짜로 이벤트를 검색하세요",
+					"PUSHED_EVENT": "발생한 이벤트"
 				},
 				"HEADER": {
 					"ALT_E_ASSIGN_MEMBER": "담당자 할당 실패",
