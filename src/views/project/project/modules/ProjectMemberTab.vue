@@ -40,8 +40,8 @@
             </template>
         </p-toolbox-table>
 
-        <s-project-member-add-modal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" :is-project-group="isProjectGroup"
-                                    :project-group-id="projectGroupId" @confirm="onAddMemberConfirm()"
+        <project-member-add-modal v-if="memberAddFormVisible" :visible.sync="memberAddFormVisible" :is-project-group="isProjectGroup"
+                                  :project-group-id="projectGroupId" @confirm="onAddMemberConfirm()"
         />
         <project-member-update-modal v-if="memberUpdateFormVisible" :visible.sync="memberUpdateFormVisible" :selected-member="memberTableState.selectedItems[0]"
                                      :is-project-group="isProjectGroup" :project-group-id="projectGroupId"
@@ -83,7 +83,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { TranslateResult } from 'vue-i18n';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
-import SProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
+import ProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
 import ProjectMemberUpdateModal from '@/views/project/project/modules/ProjectMemberUpdateModal.vue';
 import { Tags, TimeStamp } from '@/models';
 
@@ -114,7 +114,7 @@ export default {
         PSelectDropdown,
         PBadge,
         PTableCheckModal,
-        SProjectMemberAddModal,
+        ProjectMemberAddModal,
         ProjectMemberUpdateModal,
     },
     props: {
