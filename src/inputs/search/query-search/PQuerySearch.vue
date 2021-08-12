@@ -167,7 +167,7 @@ export default defineComponent({
             operator: '' as OperatorType,
             supportOperators: computed<OperatorType[]>(() => {
                 if (state.handlerResp.operators) return state.handlerResp.operators;
-                if (state.currentDataType === 'object' && state.rootKey?.operators) return state.rootKey.operators;
+                if (state.rootKey?.operators) return state.rootKey.operators;
                 if (supportOperatorMap[state.currentDataType]) return supportOperatorMap[state.currentDataType];
                 return operators;
             }),

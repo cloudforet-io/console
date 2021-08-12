@@ -29,7 +29,7 @@ export interface QueryItem {
 export type MenuType ='ROOT_KEY'|'KEY'|'VALUE'|'OPERATOR'
 
 export interface MenuItem<T> {
-    type: CONTEXT_MENU_TYPE;
+    type?: CONTEXT_MENU_TYPE;
     data?: T;
 }
 
@@ -37,14 +37,18 @@ export interface KeyMenuItem extends KeyItem, MenuItem<KeyItem> {}
 export interface ValueMenuItem extends ValueItem, MenuItem<ValueItem> {}
 
 export interface HandlerResponse {
-    results: Array<ValueItem|ValueMenuItem>;
+    results: Array<ValueMenuItem>;
     totalCount?: number;
     dataType?: KeyDataType;
     operators?: OperatorType[];
 }
-export type ValueHandler = (inputText: string, rootKey: KeyItem,
-                            dataType?: KeyDataType, subPath?: string,
-                            operator?: OperatorType) => Promise<HandlerResponse>|HandlerResponse;
+export interface ValueHandler {
+    (inputText: string,
+     rootKey: KeyItem,
+     dataType?: KeyDataType,
+     subPath?: string,
+     operator?: OperatorType): Promise<HandlerResponse>|HandlerResponse;
+}
 
 
 export interface ValueHandlerMap {
