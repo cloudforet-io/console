@@ -4,7 +4,6 @@
                   :value="searchText"
                   :placeholder="placeholder"
                   :disable-icon="!!selectedKey"
-                  :visible-menu.sync="visibleMenu"
                   :is-focused.sync="isFocused"
         >
             <template #left="scope">

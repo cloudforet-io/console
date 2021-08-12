@@ -33,6 +33,8 @@ export const Template = (args, { argTypes }) => ({
             :selected="selected"
             :multi-selectable="multiSelectable"
             :show-radio-icon="showRadioIcon"
+            :show-selected-list="showSelectedList"
+            :show-select-all="showSelectAll"
             @select="onSelect"
             @focus="onFocus"
             @blur="onBlur"
@@ -205,7 +207,7 @@ Each `MenuItem` has the following type to represent it:
             components: { PContextMenu },
             template: `
         <div>
-            <p-context-menu :menu="menu" :multi-selectable="true" :selected.sync="selected" />
+            <p-context-menu :menu="menu" :multi-selectable="true" :selected="selected" />
             <br/>
             <p>Selected: {{ selected }}</p>
         </div>
@@ -217,13 +219,50 @@ Each `MenuItem` has the following type to represent it:
 <br/>
 <br/>
 
+## Multi Selectable With 'Select All'
+
+<Canvas>
+    <Story name="Multi Selectable With Select All" args={{menu: menuItems}} height={'20rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <div>
+            <p-context-menu :menu="menu" :multi-selectable="true" :selected="selected" :show-select-all="true" />
+        </div>
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Multi Selectable With Selected List
+
+<Canvas>
+    <Story name="Multi Selectable With Selected List" args={{menu: menuItems}} height={'20rem'}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <div>
+            <p-context-menu :menu="menu" :multi-selectable="true" :selected="selected" :show-selected-list="true" />
+        </div>
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Slot Cases
 
-Context Menu have 3 types fot slots:
+Context Menu have 2 types fot slots:
 
 |Slot Type|Description|Slots|
 |-|-|-|
-|Additional space|A slot that located at the top of the Context Menu.|`top`|
 |Full replacement with style|A slot that replaces the inner area of the style of the entire corresponding slot area.|`no-data-format`, `item--format`|
 |Specific replacement|A slot that replaces the specific corresponding slot area.|`header-<item.name>`|
 
@@ -381,52 +420,6 @@ Context Menu have 3 types fot slots:
                 <h2 class="mb-4">Slot Props:</h2>
                 <p-context-menu :menu="menu" loading v-show="false">
                     <template #header-others="slotProps">
-                        <pre ref="slotPropsRef">{{slotProps}}</pre>
-                    </template>
-                </p-context-menu>
-                <p-raw-data :raw="slotPropsText" style="height: 10rem; overflow: scroll;"/>
-            </div>
-        </div>
-<!--<div>-->
-`,
-            setup() {
-                const state = reactive({
-                    slotPropsRef: null,
-                    slotPropsText: ''
-                })
-                watch(() => state.slotPropsRef, (slotPropsRef) => {
-                    if (slotPropsRef) state.slotPropsText = slotPropsRef.textContent
-                })
-                return {...toRefs((state))}
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
-### Top Slot
-
-<Canvas>
-    <Story name="Top Slot" args={{menu: menuItems}}>
-        {{
-            props: Object.keys(getContextMenuArgTypes()),
-            components: { PContextMenu, PRawData },
-            template: `
-        <div class="flex h-full flex-col">
-            <div class="mt-4">
-                <h2 class="mb-4">This is <strong>top</strong> slot</h2>
-                <p-context-menu :menu="menu">
-                    <template #top>
-                        Top Slot: used in PSearchDropdown!
-                    </template>
-                </p-context-menu>
-            </div>
-            <div class="mt-4">
-                <h2 class="mb-4">Slot Props:</h2>
-                <p-context-menu :menu="menu" loading v-show="false">
-                    <template #menu="slotProps">
                         <pre ref="slotPropsRef">{{slotProps}}</pre>
                     </template>
                 </p-context-menu>

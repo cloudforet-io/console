@@ -30,23 +30,13 @@
                         :selected.sync="proxySelected"
                         :multi-selectable="type === SEARCH_DROPDOWN_TYPE.checkbox"
                         :show-radio-icon="type === SEARCH_DROPDOWN_TYPE.radioButton"
+                        :show-selected-list="showSelectedList"
                         :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"
                         @select="onClickMenuItem"
                         @keyup:up:end="focusSearch"
                         @keyup:esc="focusSearch"
                         @focus="onFocusMenuItem"
         >
-            <template #top>
-                <div v-if="type === SEARCH_DROPDOWN_TYPE.checkbox && showSelectedList" class="selected-list-wrapper">
-                    <div>
-                        <b>{{ $t('COMPONENT.SEARCH_DROPDOWN.SELECTED_LIST') }}</b>
-                        <span>({{ proxySelected.length }} / {{ menu.length }})</span>
-                    </div>
-                    <p-button size="sm" style-type="primary-dark" :disabled="!proxySelected.length">
-                        {{ $t('COMPONENT.SEARCH_DROPDOWN.DONE') }}
-                    </p-button>
-                </div>
-            </template>
             <template #item--format="{item}">
                 <span class="p-search-dropdown__item-label">
                     <template v-for="(text, i) in item.label.split(searchRegex)">
@@ -78,7 +68,7 @@ import {
 import { reduce } from 'lodash';
 
 import { makeOptionalProxy } from '@/util/composition-helpers';
-import { ContextMenuFixedStyleProps, useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
+import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import PSearch from '@/inputs/search/search/PSearch.vue';
@@ -88,26 +78,10 @@ import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 
 import {
-    AutocompleteHandler, SEARCH_DROPDOWN_TYPE,
+    SEARCH_DROPDOWN_TYPE, SearchDropdownProps,
 } from '@/inputs/search/search-dropdown/type';
 import { MenuItem } from '@/inputs/context-menu/type';
 
-
-interface SearchDropdownProps extends ContextMenuFixedStyleProps {
-    value: string;
-    placeholder?: string;
-    type?: SEARCH_DROPDOWN_TYPE;
-    disableIcon?: boolean;
-    isFocused?: boolean;
-    showSelectedList?: boolean;
-    showTagBox?: boolean;
-    menu: MenuItem[];
-    loading?: boolean;
-    handler?: AutocompleteHandler;
-    disableHandler?: boolean;
-    exactMode?: boolean;
-    selected?: string[];
-}
 
 export default defineComponent<SearchDropdownProps>({
     name: 'PSearchDropdown',
@@ -154,6 +128,10 @@ export default defineComponent<SearchDropdownProps>({
             type: Array,
             default: () => [],
         },
+        showSelectedList: {
+            type: Boolean,
+            default: false,
+        },
         /* context menu fixed style props */
         visibleMenu: {
             type: Boolean,
@@ -179,10 +157,6 @@ export default defineComponent<SearchDropdownProps>({
         exactMode: {
             type: Boolean,
             default: true,
-        },
-        showSelectedList: {
-            type: Boolean,
-            default: false,
         },
         showTagBox: {
             type: Boolean,
@@ -472,15 +446,6 @@ export default defineComponent<SearchDropdownProps>({
 
         .context-header.secondary {
             @apply text-secondary;
-        }
-        .selected-list-wrapper {
-            @apply border-b border-gray-200;
-            display: flex;
-            justify-content: space-between;
-            font-size: 0.875rem;
-            line-height: 1.5;
-            margin: 0.5rem;
-            padding-bottom: 0.5rem;
         }
         .p-search-dropdown__item-label {
             flex-grow: 1;

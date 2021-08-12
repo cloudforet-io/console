@@ -78,24 +78,6 @@ const extraArgTypes: ArgTypes = {
             type: 'boolean',
         },
     },
-    showSelectedList: {
-        name: 'showSelectedList',
-        type: { name: 'boolean' },
-        description: 'Whether to show selected list in context menu.',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'false',
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
     showTagBox: {
         name: 'showTagBox',
         type: { name: 'boolean' },
@@ -196,6 +178,7 @@ const initContextMenuArgTypes = (): ArgTypes => {
         menu: contextMenuArgTypes.menu,
         loading: contextMenuArgTypes.loading,
         selected: contextMenuArgTypes.selected,
+        showSelectedList: contextMenuArgTypes.showSelectedList,
     };
     Object.keys(contextMenuArgTypes).forEach((k) => {
         const item = contextMenuArgTypes[k];

@@ -9,7 +9,20 @@
             </slot>
         </div>
         <slot v-else name="menu" v-bind="{...$props, uuid}">
-            <slot name="top" />
+            <div v-if="multiSelectable && showSelectedList" class="selected-list-wrapper">
+                <div>
+                    <b>{{ $t('COMPONENT.CONTEXT_MENU.SELECTED_LIST') }}</b> <span>({{ proxySelected.length }} / {{ menu.length }})</span>
+                </div>
+                <p-button size="sm" style-type="primary-dark" :disabled="!proxySelected.length">
+                    {{ $t('COMPONENT.CONTEXT_MENU.DONE') }}
+                </p-button>
+            </div>
+            <a v-if="multiSelectable && showSelectAll" class="context-item" @click="onClickSelectAll">
+                <p-i :name="isAllSelected ? 'ic_checkbox--checked' : 'ic_checkbox'"
+                     class="select-marker"
+                />
+                <span class="text italic">{{ $t('COMPONENT.CONTEXT_MENU.SELECT_ALL') }}</span>
+            </a>
             <template v-for="(item, index) in menu">
                 <a v-if="item.type === undefined || item.type === 'item'"
                    :id="`context-item-${index}-${uuid}`"
@@ -63,6 +76,7 @@ import {
 
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PI from '@/foundation/icons/PI.vue';
+import PButton from '@/inputs/buttons/button/PButton.vue';
 
 import { ContextMenuProps, CONTEXT_MENU_THEME } from '@/inputs/context-menu/type';
 import { i18n } from '@/translations';
@@ -71,7 +85,11 @@ import { makeOptionalProxy } from '@/util/composition-helpers';
 
 export default defineComponent<ContextMenuProps>({
     name: 'PContextMenu',
-    components: { PLottie, PI },
+    components: {
+        PLottie,
+        PI,
+        PButton,
+    },
     i18n,
     props: {
         menu: {
@@ -109,11 +127,23 @@ export default defineComponent<ContextMenuProps>({
             type: Boolean,
             default: false,
         },
+        showSelectedList: {
+            type: Boolean,
+            default: false,
+        },
+        showSelectAll: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: ContextMenuProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             proxySelected: makeOptionalProxy('selected', vm, props.selected),
+            isAllSelected: computed(() => {
+                const filteredMenu = props.menu.filter(d => !d.disabled);
+                return filteredMenu.length === state.proxySelected.length;
+            }),
         });
 
         let focusedItemEl: HTMLElement | null = null;
@@ -186,6 +216,14 @@ export default defineComponent<ContextMenuProps>({
             emit('keyup:esc', e);
             blur();
         };
+        const onClickSelectAll = () => {
+            if (state.isAllSelected) {
+                state.proxySelected = [];
+            } else {
+                const filteredMenu = props.menu.filter(d => !d.disabled);
+                state.proxySelected = filteredMenu.map(d => d.name);
+            }
+        };
 
         return {
             ...toRefs(state),
@@ -195,6 +233,7 @@ export default defineComponent<ContextMenuProps>({
             onKeyUp,
             focus,
             onClickEsc,
+            onClickSelectAll,
         };
     },
 });
@@ -217,6 +256,15 @@ export default defineComponent<ContextMenuProps>({
         @apply border-alert;
     }
 
+    .selected-list-wrapper {
+        @apply border-b border-gray-200;
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        margin: 0.5rem;
+        padding-bottom: 0.5rem;
+    }
     .context-header {
         margin-top: 0.875rem;
         margin-bottom: 0.25rem;
