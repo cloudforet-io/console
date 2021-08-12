@@ -1,3 +1,10 @@
+# [1.1.0-beta.120](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.119...v1.1.0-beta.120) (2021-08-12)
+
+
+### Bug Fixes
+
+* fix bug in PContextMenu ([#664](https://github.com/spaceone-dev/spaceone-design-system/issues/664)) ([b06d791](https://github.com/spaceone-dev/spaceone-design-system/commit/b06d79189f1bcf1d8c0affe9642ea0af1e3d555d))
+
 # [1.1.0-beta.119](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.118...v1.1.0-beta.119) (2021-08-12)
 
 
