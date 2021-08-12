@@ -273,6 +273,23 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+## Checkbox With 'Select All'
+
+<Canvas>
+    <Story name="Checkbox With Select All" args={{menu: getSearchDropdownMenu()}}>
+        {{
+            props: Object.keys(getSearchDropdownArgTypes()),
+            components: { PSearchDropdown },
+            template: `
+        <p-search-dropdown :menu="menu" type="checkbox" :show-select-all="true" use-fixed-menu-style />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 ## Playground
 
 <Canvas>

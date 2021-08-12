@@ -18,7 +18,7 @@
                     {{ $t('COMPONENT.CONTEXT_MENU.DONE') }}
                 </p-button>
             </div>
-            <a v-if="multiSelectable && showSelectAll" class="context-item" @click="onClickSelectAll">
+            <a v-if="multiSelectable && showSelectAll" class="context-item" @click.stop="onClickSelectAll">
                 <p-i :name="isAllSelected ? 'ic_checkbox--checked' : 'ic_checkbox'"
                      class="select-marker"
                 />
