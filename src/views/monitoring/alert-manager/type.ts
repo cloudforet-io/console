@@ -64,6 +64,7 @@ export interface AlertDataModel {
     acknowledged_at: TimeStamp;
     resolved_at: TimeStamp;
     escalated_at: TimeStamp;
+    additional_info: object;
 }
 
 export interface Event {

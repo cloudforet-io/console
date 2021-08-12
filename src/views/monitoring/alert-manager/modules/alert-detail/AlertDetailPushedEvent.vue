@@ -31,18 +31,18 @@
             </div>
         </template>
         <p-empty v-else>
-            {{ $t('MONITORING.ALERT.DETAIL.EVENT_LIST.NO_EVENT') }}
+            {{ $t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.NO_EVENT') }}
         </p-empty>
         <p-button v-if="itemList.length > 9" size="md"
                   style-type="primary-dark outline"
                   class="more-button"
                   @click="onClickMore"
         >
-            {{ $t('MONITORING.ALERT.DETAIL.EVENT_LIST.MORE') }}
+            {{ $t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.MORE') }}
         </p-button>
         <p-button-modal
             v-if="modalVisible"
-            :header-title="$t('MONITORING.ALERT.DETAIL.EVENT_LIST.EVENT_DETAILS')"
+            :header-title="$t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.EVENT_DETAILS')"
             size="lg"
             :visible.sync="modalVisible"
             @confirm="onClickConfirm"
@@ -60,7 +60,7 @@
                     <p-i name="ic_copy" width="1em" height="1em"
                          color="inherit transparent" class="mr-2"
                     />
-                    {{ $t('MONITORING.ALERT.DETAIL.EVENT_LIST.COPY_ALL') }}
+                    {{ $t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.COPY_ALL') }}
                 </p-button>
             </template>
         </p-button-modal>

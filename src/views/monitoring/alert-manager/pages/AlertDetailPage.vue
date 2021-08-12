@@ -28,15 +28,14 @@
                                    :alert-data="alertInfo"
                                    @update="getAlertData"
                 />
-<!--                <alert-detail-resource-info v-if="!loading && alertInfo.resource" :id="id" :alert-data="alertInfo"-->
-<!--                                            class="resource-info"-->
-<!--                />-->
                 <alert-detail-info-status-update v-if="!loading" :id="id"
-                                              :alert-data="alertInfo"
-                                              class="status-update"
-                                              @update="getAlertData"
+                                                 :alert-data="alertInfo"
+                                                 class="status-update"
+                                                 @update="getAlertData"
                 />
-                <alert-detail-timeline-and-event v-if="!loading" :id="id" class="timeline-and-event" />
+                <alert-detail-timeline-and-event v-if="!loading" :id="id" :alert-data="alertInfo"
+                                                 class="timeline-and-event"
+                />
             </div>
             <div class="grid col-span-4 right-wrapper">
                 <alert-detail-responder v-if="!loading" :id="id" class="responder"
