@@ -2,14 +2,13 @@ import { QuerySearchProps } from '@spaceone/design-system/dist/src/inputs/search
 import {
     makeDistinctValueHandler,
     makeEnumValueHandler,
-    makeReferenceValueHandler,
+    makeReferenceValueHandler
 } from '@src/component-util/query-search';
 import { DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { Filter } from '@src/space-connector/type';
 import { ConsoleDynamicField, ConsoleSearchSchema, Reference } from '@src/component-util/dynamic-layout/type';
 import { forEach } from 'lodash';
 import { EnumOptions } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
-
 
 interface ExcelDataField {
     key: string;
@@ -27,32 +26,37 @@ interface ExcelDataField {
  * @param resourceType
  */
 export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema[], resourceType: string, filters?: Filter[]): Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> => {
-    const res: Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> = { keyItemSets: [], valueHandlerMap: {} };
+    const querySearchProps: Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> = { keyItemSets: [], valueHandlerMap: {} };
 
-    res.keyItemSets = schema.map(s => ({
+    querySearchProps.keyItemSets = schema.map((s) => ({
         title: s.title,
         items: s.items.map((d) => {
+            let operators;
             if (d.enums) {
-                res.valueHandlerMap[d.key] = makeEnumValueHandler(d.enums);
+                querySearchProps.valueHandlerMap[d.key] = makeEnumValueHandler(d.enums);
+                operators = ['=', '!='];
             } else if (d.reference) {
-                res.valueHandlerMap[d.key] = makeReferenceValueHandler(
+                querySearchProps.valueHandlerMap[d.key] = makeReferenceValueHandler(
                     d.reference,
-                    d.data_type,
+                    d.data_type
                 );
+                operators = ['=', '!='];
             } else {
-                res.valueHandlerMap[d.key] = makeDistinctValueHandler(
+                querySearchProps.valueHandlerMap[d.key] = makeDistinctValueHandler(
                     resourceType,
                     d.key,
                     d.data_type,
-                    filters,
+                    filters
                 );
             }
 
-            return { label: d.name, name: d.key, dataType: d.data_type };
-        }),
+            return {
+                label: d.name, name: d.key, dataType: d.data_type, operators
+            };
+        })
     }));
 
-    return res;
+    return querySearchProps;
 };
 
 /**
@@ -64,7 +68,6 @@ export const getApiActionByLayoutType = (type: DynamicLayoutType): string => {
     if (['raw-table', 'table', 'query-search-table'].includes(type)) return 'getData';
     return 'get';
 };
-
 
 export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): ExcelDataField[] => fields.map((d) => {
     const res: ExcelDataField = { key: d.key, name: d.name };
@@ -102,5 +105,5 @@ export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): E
 export default {
     makeQuerySearchPropsWithSearchSchema,
     getApiActionByLayoutType,
-    dynamicFieldsToExcelDataFields,
-}
+    dynamicFieldsToExcelDataFields
+};
