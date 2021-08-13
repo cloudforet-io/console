@@ -14,12 +14,9 @@
                     <div id="chartRef" ref="chartRef" class="chart" />
                 </p-chart-loader>
                 <div v-if="!loading" class="circle-wrapper">
-                    <p class="circle" :style="{background: providers['aws'].color }" /><span>AWS</span>
-                    <p class="circle" :style="{background: providers['google_cloud'].color }" /><span>Google</span>
-                    <p class="circle" :style="{background: providers['azure'].color }" /><span>Azure</span>
-                    <!--                    <div v-for="(item) in chartState.providerList" :key="item.name">-->
-                    <!--                        <p class="circle" :style="{background: item.color}" /><span>{{ item.name }}</span>-->
-                    <!--                    </div>-->
+                    <div v-for="(item) in chartState.providerList" :key="item.name">
+                        <p class="circle" :style="{background: item.color}" /><span>{{ item.name }}</span>
+                    </div>
                 </div>
             </div>
             <div v-if="!loading && filteredData.length > 0" class="col-span-12 lg:col-span-3 resource-info-wrapper">
@@ -89,6 +86,11 @@ import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 
 am4core.useTheme(am4themesAnimated);
 
+interface Provider {
+    label: string;
+    color: string;
+}
+
 export default {
     name: 'ResourceMap',
     components: {
@@ -127,20 +129,10 @@ export default {
             registry: {},
             chartData: [] as object[],
             skeletons: range(5),
-            // providerList: [
-            //     {
-            //         name: 'aws',
-            //         color: props.providers.aws.color,
-            //     },
-            //     {
-            //         name: 'google_cloud',
-            //         color: props.providers.google_cloud.color,
-            //     },
-            //     {
-            //         name: 'azure',
-            //         color: props.providers.azure.color,
-            //     },
-            // ],
+            providerList: computed(() => Object.values(state.providers as Provider[]).map(d => ({
+                name: d.label,
+                color: d.color,
+            }))),
             marker: null,
         });
 
@@ -433,6 +425,7 @@ export default {
 
         .circle-wrapper {
             margin-top: 0.625rem;
+            display: inline-flex;
             .circle {
                 @apply inline-block;
                 margin-right: 0.25rem;
@@ -538,23 +531,6 @@ export default {
         >>> .tracker-bar {
             height: 0.25rem;
             margin-top: -0.25rem;
-        }
-        &.aws {
-            >>> .tracker-bar {
-                background-color: #f90;
-            }
-        }
-
-        &.google_cloud {
-            >>> .tracker-bar {
-                background-color: #4285f4;
-            }
-        }
-
-        &.azure {
-            >>> .tracker-bar {
-                background-color: #00bcf2;
-            }
         }
     }
 }
