@@ -470,7 +470,10 @@ export default defineComponent({
                     focus();
                     hideMenu();
                 }
-            } else emitSearch(selected.data as ValueItem);
+            } else {
+                if (!state.operator) state.operator = '=';
+                emitSearch(selected.data as ValueItem);
+            }
         };
 
 

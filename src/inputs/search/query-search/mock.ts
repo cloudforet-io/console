@@ -1,17 +1,13 @@
 import faker from 'faker';
 import { range } from 'lodash';
 import {
-    dataTypes,
     KeyItem, KeyItemSet,
-    operators,
     ValueHandler, ValueHandlerMap,
 } from '@/inputs/search/query-search/type';
 
 const getKeyItem = () => ({
     label: faker.random.word(),
     name: faker.random.uuid(),
-    dataType: faker.random.arrayElement([undefined, ...dataTypes]),
-    operators: faker.random.arrayElement([undefined, ...operators]),
 });
 export const getKeyItems = (length = 10) => range(length).map(() => getKeyItem());
 
