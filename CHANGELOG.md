@@ -1,3 +1,10 @@
+# [1.1.0-beta.121](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.120...v1.1.0-beta.121) (2021-08-13)
+
+
+### Features
+
+* add equal operator when user select specific item in query search ([#666](https://github.com/spaceone-dev/spaceone-design-system/issues/666)) ([f034c3b](https://github.com/spaceone-dev/spaceone-design-system/commit/f034c3bccf7f488a14933ce35aa2489a5d104c23))
+
 # [1.1.0-beta.120](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.119...v1.1.0-beta.120) (2021-08-12)
 
 
