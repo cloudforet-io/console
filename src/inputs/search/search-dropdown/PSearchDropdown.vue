@@ -12,7 +12,7 @@
                        :deletable="proxyVisibleMenu"
                        @delete="onDeleteTag(0)"
                 >
-                    {{ menu.find(d => d.name === proxySelected[0]).label }}
+                    {{ nameFormatter(proxySelected[0]) }}
                 </p-tag>
             </template>
             <template #right>
@@ -55,7 +55,7 @@
         </p-context-menu>
         <div v-if="type === SEARCH_DROPDOWN_TYPE.checkbox && proxySelected.length && showTagBox" class="p-search-dropdown__tag-box">
             <p-tag v-for="(selectedName, index) in proxySelected" :key="`tag-box-${index}`" @delete="onDeleteTag(index)">
-                {{ menu.find(d => d.name === selectedName).label }}
+                {{ nameFormatter(selectedName) }}
             </p-tag>
         </div>
     </div>
@@ -179,7 +179,7 @@ export default defineComponent<SearchDropdownProps>({
             isAutoMode: computed(() => props.visibleMenu === undefined),
             proxyIsFocused: makeOptionalProxy('isFocused', vm, false),
             proxySelected: makeOptionalProxy('selected', vm, []),
-            proxyPlaceholder: makeOptionalProxy('placeholder', vm, ''),
+            proxyPlaceholder: makeOptionalProxy('placeholder', vm, undefined),
             filteredMenu: [] as MenuItem[],
             bindingMenu: computed<MenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
             searchableItems: computed<MenuItem[]>(() => props.menu.filter(d => d.type === undefined || d.type === 'item')),
@@ -232,6 +232,8 @@ export default defineComponent<SearchDropdownProps>({
             return '';
         };
 
+        const nameFormatter = name => props.menu.find(d => d.name === name)?.label || name;
+
 
         /* event util */
         const focusSearch = () => {
@@ -242,7 +244,7 @@ export default defineComponent<SearchDropdownProps>({
             if (state.isAutoMode) contextMenuFixedStyleState.proxyVisibleMenu = false;
 
             // placeholder
-            if (props.type === SEARCH_DROPDOWN_TYPE.radioButton && state.proxySelected.length) {
+            if (props.type === SEARCH_DROPDOWN_TYPE.radioButton && (mode === 'click' || state.proxySelected.length)) {
                 state.proxyPlaceholder = '';
             } else {
                 state.proxyPlaceholder = undefined;
@@ -285,8 +287,8 @@ export default defineComponent<SearchDropdownProps>({
 
 
         /* event */
-        const onFocusMenuItem = (idx: string) => {
-            emit('focus-menu', idx);
+        const onFocusMenuItem = (index: string) => {
+            emit('focus-menu', index);
         };
 
         const onSearchFocus = () => {
@@ -296,6 +298,7 @@ export default defineComponent<SearchDropdownProps>({
 
         const onDeleteTag = (index) => {
             state.proxySelected.splice(index, 1);
+            emit('delete-tag', index);
         };
 
         const onInput = (val: string, e) => {
@@ -307,17 +310,17 @@ export default defineComponent<SearchDropdownProps>({
             filterMenu(val);
         };
 
-        const onClickMenuItem = (name, idx) => {
+        const onClickMenuItem = (name, index) => {
             if (props.type === SEARCH_DROPDOWN_TYPE.default || props.type === SEARCH_DROPDOWN_TYPE.radioButton) {
                 hideMenu('click');
             }
             if (props.type === SEARCH_DROPDOWN_TYPE.default) {
-                state.proxyValue = state.bindingMenu[idx]?.label ?? name;
+                state.proxyValue = state.bindingMenu[index]?.label ?? name;
             } else {
                 state.proxyValue = '';
             }
 
-            emit('select-menu', state.bindingMenu[idx]);
+            emit('select-menu', state.bindingMenu[index]);
         };
 
         const onSearch = (val?: string) => {
@@ -402,7 +405,7 @@ export default defineComponent<SearchDropdownProps>({
         });
 
         watch(() => state.proxySelected, (proxySelected) => {
-            if (proxySelected.length && contextMenuFixedStyleState.proxyVisibleMenu) {
+            if (proxySelected.length) { // && contextMenuFixedStyleState.proxyVisibleMenu
                 if (props.type === SEARCH_DROPDOWN_TYPE.radioButton) {
                     state.proxyPlaceholder = '';
                 } else if (props.type === SEARCH_DROPDOWN_TYPE.checkbox) {
@@ -417,6 +420,7 @@ export default defineComponent<SearchDropdownProps>({
             ...toRefs(state),
             ...toRefs(contextMenuFixedStyleState),
             SEARCH_DROPDOWN_TYPE,
+            nameFormatter,
             getMatchText,
             onClickMenuItem,
             focusSearch,
@@ -464,6 +468,7 @@ export default defineComponent<SearchDropdownProps>({
         @apply text-gray-900;
         margin-top: 0.625rem;
         .p-tag {
+            align-items: center;
             margin-bottom: 0.5rem;
         }
     }
