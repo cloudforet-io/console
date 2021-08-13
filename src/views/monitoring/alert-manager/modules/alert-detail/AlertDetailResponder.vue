@@ -26,50 +26,32 @@
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.ADDITIONAL_RESPONDER') }}
                 <span class="text-gray-500"> ({{ responderState.selectedMemberItems.length }})</span>
             </p>
-            <p-autocomplete-search v-model="responderState.search" :menu="responderState.allMemberItems"
-                                   class="autocomplete-search" @select-menu="onSelectMember" @hide-menu="addResponder"
-            >
-                <template #menu-item--format="{item, id}">
-                    <p-check-box :id="id" v-model="responderState.selectedMemberItems" class="tag-menu-item"
-                                 :value="item.name"
-                    >
-                        {{ item.label }}
-                    </p-check-box>
-                </template>
-                <template #menu-no-data-format>
-                    <div v-if="responderState.loading" class="fake-no-data" />
-                </template>
-            </p-autocomplete-search>
-            <div class="tag-box">
-                <p-tag v-for="(tag, i) in responderState.selectedMemberItems" :key="tag" @delete="onDeleteTag(i)">
-                    <template v-if="!responderState.loading">
-                        {{ tag ? responderNameFormatter(tag) : '' }}
-                    </template>
-                </p-tag>
-            </div>
+            <p-search-dropdown type="checkbox"
+                               :menu="responderState.allMemberItems"
+                               :selected="responderState.selectedMemberItems"
+                               @hide-menu="onHideMenu"
+                               @delete-tag="onDeleteTag"
+            />
         </article>
     </p-pane-layout>
 </template>
 
 <script lang="ts">
 import {
-    PAutocompleteSearch,
-    PBadge, PCheckBox, PCollapsibleList, PPaneLayout, PPanelTop, PTag,
+    PBadge, PCollapsibleList, PPaneLayout, PPanelTop, PSearchDropdown,
 } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { difference } from 'lodash';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
     AlertDataModel,
 } from '@/views/monitoring/alert-manager/type';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import ProjectChannelList from '@/views/monitoring/alert-manager/components/ProjectChannelList.vue';
 import { i18n } from '@/translations';
 import { store } from '@/store';
-import { UserState } from '@/store/modules/user/type';
 import VueI18n from 'vue-i18n';
 
 import TranslateResult = VueI18n.TranslateResult;
@@ -89,9 +71,7 @@ export default {
         PPanelTop,
         PCollapsibleList,
         PBadge,
-        PAutocompleteSearch,
-        PCheckBox,
-        PTag,
+        PSearchDropdown,
         ProjectChannelList,
     },
     props: {
@@ -104,8 +84,7 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props: PropsType, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+    setup(props: PropsType) {
         const state = reactive({
             items: computed(() => [
                 { title: i18n.t('MONITORING.ALERT.DETAIL.RESPONDER.LEVEL'), data: 'LV1' },
@@ -118,7 +97,6 @@ export default {
         });
 
         const responderState = reactive({
-            search: '',
             loading: true,
             allMember: [] as any[],
             allMemberItems: computed(() => {
@@ -172,31 +150,26 @@ export default {
             }
         };
 
-        const addResponderAPI = async (items) => {
-            await Promise.all(items.map((d) => {
-                SpaceConnector.client.monitoring.alert.addResponder({
+        const addResponder = async (userId) => {
+            try {
+                await SpaceConnector.client.monitoring.alert.addResponder({
                     alert_id: props.id,
                     resource_type: 'identity.User',
-                    resource_id: d,
+                    resource_id: userId,
                 });
-            }));
-        };
-
-        const addResponder = async () => {
-            try {
-                const originResponders = Object.fromEntries((
-                    Object.entries(props.alertData.responders).map(([key, { resource_id }]) => [key, resource_id])));
-                const targetItems = difference(responderState.selectedMemberItems, Object.values(originResponders));
-                await addResponderAPI(targetItems);
             } catch (e) {
                 console.error(e);
             }
         };
 
-        const onSelectMember = async (item: MenuItem) => {
-            responderState.search = '';
-            const idx = responderState.selectedMemberItems.findIndex(k => k === item.name);
-            if (idx === -1) responderState.selectedMemberItems.push(item.name);
+        const onHideMenu = () => {
+            const originResponders = Object.fromEntries((
+                Object.entries(props.alertData.responders).map(([key, { resource_id }]) => [key, resource_id])
+            ));
+            const targetItems = difference(responderState.selectedMemberItems, Object.values(originResponders));
+            targetItems.forEach((item) => {
+                addResponder(item);
+            });
         };
 
         const removeResponder = async (userID) => {
@@ -213,10 +186,6 @@ export default {
 
         const onDeleteTag = async (idx) => {
             await removeResponder(responderState.selectedMemberItems[idx]);
-            responderState.selectedMemberItems.splice(idx, 1);
-            vm.$nextTick(() => {
-                responderState.selectedMemberItems = [...responderState.selectedMemberItems];
-            });
         };
 
         const listEscalationPolicy = async () => {
@@ -239,9 +208,9 @@ export default {
         return {
             ...toRefs(state),
             responderState,
-            onSelectMember,
             addResponder,
             onDeleteTag,
+            onHideMenu,
             responderNameFormatter,
         };
     },

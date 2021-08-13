@@ -33,11 +33,11 @@
                            :invalid-text="validationState.timezoneInvalidText"
             >
                 <template #default="{invalid}">
-                    <p-autocomplete-search v-model="timezone" :menu="timezones"
-                                           disable-icon
-                                           :placeholder="$t('COMMON.PROFILE.TIMEZONE')"
-                                           exact-mode
-                                           :class="{invalid}"
+                    <p-search-dropdown v-model="timezone"
+                                       :class="{invalid}"
+                                       :menu="timezones"
+                                       :placeholder="$t('COMMON.PROFILE.TIMEZONE')"
+                                       disable-icon
                     />
                 </template>
             </p-field-group>
@@ -103,7 +103,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PPaneLayout, PButton, PBreadcrumbs, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle, PAutocompleteSearch,
+    PPaneLayout, PButton, PBreadcrumbs, PFieldGroup, PTextInput, PSelectDropdown, PPageTitle, PSearchDropdown,
 } from '@spaceone/design-system';
 
 import { map } from 'lodash';
@@ -123,7 +123,7 @@ export default {
         PTextInput,
         PFieldGroup,
         PPaneLayout,
-        PAutocompleteSearch,
+        PSearchDropdown,
     },
     props: {
         role: {
@@ -131,7 +131,7 @@ export default {
             default: '',
         },
     },
-    setup(props, { context, root, emit }) {
+    setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
@@ -322,7 +322,7 @@ export default {
 }
 .p-text-input::v-deep,
 .p-select-dropdown::v-deep,
-.p-autocomplete-search::v-deep {
+.p-search-dropdown::v-deep {
     width: 100%;
     max-width: 25rem;
     flex-shrink: 0;
@@ -333,7 +333,7 @@ export default {
         width: 100%;
     }
 }
-.p-autocomplete-search::v-deep {
+.p-search-dropdown::v-deep {
     &.invalid .p-search {
         @apply border-alert;
     }

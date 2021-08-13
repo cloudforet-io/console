@@ -19,10 +19,6 @@
                         <template #label-extra>
                             ({{ items.length }})
                         </template>
-                        <alert-select-dropdown :items="items" :selected.sync="selected"
-                                               :invalid="selectAlertInvalid"
-                                               @update:selected.once="showValidation = true"
-                        />
                     </p-field-group>
                 </section>
 

@@ -1,42 +1,30 @@
 <template>
     <fragment>
-        <p-autocomplete-search v-model="search" :menu="allMemberItems" :loading="loading"
-                               class="autocomplete-search" use-fixed-menu-style
-                               @select-menu="onSelectMember"
-        >
-            <template #menu-item--format="{item, id}">
-                <p-check-box :id="id" v-model="selectedMemberItems" class="tag-menu-item"
-                             :value="item.name"
-                >
-                    {{ item.label }}
-                </p-check-box>
-            </template>
-            <template #menu-no-data-format>
-                <div v-if="loading" class="fake-no-data" />
-            </template>
-        </p-autocomplete-search>
-        <div class="tag-box">
-            <p-tag v-for="(tag, i) in selectedMemberItems" :key="tag" @delete="onDeleteTag(i)">
-                {{ tag ? tag : '' }} ({{ userItem[tag].name }})
-            </p-tag>
-        </div>
+        <p-search-dropdown class="add-notification-member-group"
+                           type="checkbox"
+                           :loading="loading"
+                           :menu="allMemberItems"
+                           :selected="selectedMemberItems"
+                           use-fixed-menu-style
+        />
     </fragment>
 </template>
 
 <script lang="ts">
-import { PAutocompleteSearch, PCheckBox, PTag } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    PSearchDropdown,
+} from '@spaceone/design-system';
+import {
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { store } from '@/store';
 import { cloneDeep } from 'lodash';
 
 export default {
     name: 'AddNotificationMemberGroup',
     components: {
-        PAutocompleteSearch, PCheckBox, PTag,
+        PSearchDropdown,
     },
     props: {
         projectId: {
@@ -49,10 +37,7 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const state = reactive({
-            search: '',
             loading: true,
             allMember: [] as any[],
             allMemberItems: computed(() => {
@@ -75,30 +60,6 @@ export default {
                 users: state.selectedMemberItems,
             });
         };
-
-        const onSelectMember = (item: MenuItem) => {
-            state.search = '';
-            const idx = state.selectedMemberItems.findIndex(k => k === item.name);
-            if (idx === -1) state.selectedMemberItems.push(item.name);
-        };
-
-        const onDeleteTag = (idx) => {
-            state.selectedMemberItems.splice(idx, 1);
-            vm.$nextTick(() => {
-                state.selectedMemberItems = [...state.selectedMemberItems];
-            });
-        };
-
-
-        const nameFormatter = (userId) => {
-            const userName = state.userItem[userId].name;
-            if (userName) return `${userId} (${userName})`;
-            return userId;
-        };
-
-        watch(() => state.selectedMemberItems, () => {
-            emitChange();
-        });
 
         const removeDuplicatedElement = (duplicatedArr) => {
             const res = duplicatedArr.filter((item, i) => (
@@ -126,28 +87,23 @@ export default {
         (async () => {
             await Promise.all([store.dispatch('resource/user/load'), listProjectMember()]);
         })();
+
+        watch(() => state.selectedMemberItems, () => {
+            emitChange();
+        });
+
         return {
             ...toRefs(state),
-            onSelectMember,
-            onDeleteTag,
-            nameFormatter,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-.autocomplete-search {
+.add-notification-member-group {
     max-width: 30rem;
 }
 .tag-menu-item {
     @apply w-full;
-}
-.tag-box {
-    @apply text-gray-900;
-    margin-top: 0.625rem;
-    .p-tag {
-        margin-bottom: 0.5rem;
-    }
 }
 </style>

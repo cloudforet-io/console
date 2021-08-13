@@ -59,13 +59,23 @@
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.ASSIGNEE') }}
                 </p>
-                <search-or-select-user :multi-select="false" :selected-users.sync="formState.assignee" />
+                <p-search-dropdown class="user-search-dropdown"
+                                   type="radioButton"
+                                   :menu="userItems"
+                                   :selected="formState.assignee"
+                                   use-fixed-menu-style
+                />
             </div>
             <div class="form-box mobile-block">
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.RESPONDER') }}
                 </p>
-                <search-or-select-user :selected-users.sync="formState.responder" />
+                <p-search-dropdown class="user-search-dropdown"
+                                   type="checkbox"
+                                   :menu="userItems"
+                                   :selected="formState.responder"
+                                   use-fixed-menu-style
+                />
             </div>
             <div class="form-box additional-information">
                 <tags-input-group ref="tagsRef"
@@ -105,14 +115,14 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PToggleButton, PRadio, PIconTextButton, PCheckBox, PSelectDropdown,
+    PToggleButton, PRadio, PIconTextButton, PCheckBox, PSelectDropdown, PSearchDropdown,
 } from '@spaceone/design-system';
 
 import ProjectSelectDropdown from '@/common/modules/project-select-dropdown/ProjectSelectDropdown.vue';
-import SearchOrSelectUser from '@/common/modules/SearchOrSelectUser.vue';
 import TagsInputGroup from '@/common/components/tags-input-group/TagsInputGroup.vue';
 
 import { makeProxy } from '@spaceone/console-core-lib';
+import { store } from '@/store';
 
 
 const URGENCY = Object.freeze({
@@ -124,7 +134,6 @@ const URGENCY = Object.freeze({
 export default {
     name: 'EventRuleActionForm',
     components: {
-        SearchOrSelectUser,
         ProjectSelectDropdown,
         TagsInputGroup,
         PToggleButton,
@@ -132,6 +141,7 @@ export default {
         PIconTextButton,
         PCheckBox,
         PSelectDropdown,
+        PSearchDropdown,
     },
     props: {
         actions: {
@@ -145,6 +155,14 @@ export default {
     },
     setup(props, { emit }) {
         const state = reactive({
+            users: computed(() => store.state.resource.user.items),
+            userItems: computed(() => Object.keys(state.users).map((k) => {
+                const userName = state.users[k]?.name;
+                return {
+                    name: k,
+                    label: userName ? `${k} (${userName})` : k,
+                };
+            })),
             tagsRef: null as any,
             urgencyList: computed(() => ([
                 {
@@ -271,11 +289,16 @@ export default {
             @apply text-secondary;
             padding-right: 0.5rem;
         }
-        .project-select-dropdown, .search-or-select-user {
+        .project-select-dropdown, .user-search-dropdown {
             width: 60%;
         }
-        .additional-info-wrapper {
-
+        .user-search-dropdown::v-deep {
+            .p-tag {
+                .text {
+                    @apply truncate;
+                    max-width: 15rem;
+                }
+            }
         }
     }
 }
@@ -292,7 +315,7 @@ export default {
                 .p-radio {
                     display: none;
                 }
-                .p-select-dropdown {
+                .user-search-dropdown {
                     display: block;
                 }
             }
@@ -308,7 +331,7 @@ export default {
                 .label {
                     padding-bottom: 0.75rem;
                 }
-                .project-select-dropdown, .search-or-select-user {
+                .project-select-dropdown, .user-search-dropdown {
                     width: 100%;
                 }
             }
