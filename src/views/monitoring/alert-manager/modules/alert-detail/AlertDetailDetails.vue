@@ -1,6 +1,6 @@
 <template>
     <section>
-        <p-panel-top>{{ $t('MONITORING.ALERT.DETAIL.DETAILS.DETAILS') }}</p-panel-top>
+        <p-panel-top>{{ $t('PAGE_SCHEMA.BASE_INFO') }}</p-panel-top>
         <p-definition-table :fields="fields" :data="data"
                             :skeleton-rows="7"
                             block

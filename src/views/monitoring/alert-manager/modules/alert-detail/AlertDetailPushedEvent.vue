@@ -49,7 +49,7 @@
         >
             <template #body>
                 <div class="content-wrapper">
-                    <p-raw-data :item="selectedItem.raw_data" class="code-block" />
+                    <p-raw-data :item="selectedItem" class="code-block" folded />
                 </div>
             </template>
             <template #footer-extra>

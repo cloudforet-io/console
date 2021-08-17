@@ -83,9 +83,11 @@ export default {
             store.dispatch('display/hideSignInErrorMessage');
         };
         const goToAdminSignIn = () => {
+            hideErrorMessage();
             vm.$router.replace({ name: SIGN_IN_ROUTE.ADMIN._NAME });
         };
         const goToUserSignIn = () => {
+            hideErrorMessage();
             vm.$router.replace({ name: SIGN_IN_ROUTE._NAME });
         };
 
