@@ -17,13 +17,12 @@
         <sign-in-right-container
             :is-admin="true"
             :images="images"
-            :show-error-message.sync="showErrorMessage"
+            :show-error-message="showErrorMessage"
         >
             <template #input>
                 <i-d-p-w-sign-in class="local-sign-in-wrapper"
                                  :is-admin="true"
                                  @sign-in="onSignIn"
-                                 @sign-in-error="onSignInError"
                 />
             </template>
         </sign-in-right-container>
@@ -90,7 +89,7 @@ export default {
                 }
                 return undefined;
             }),
-            showErrorMessage: false,
+            showErrorMessage: computed(() => store.state.display.isSignInFailed),
             userId: '' as string | undefined,
             password: '',
         });
@@ -104,21 +103,16 @@ export default {
             passwordCheckInvalidText: '' as TranslateResult | string,
         });
         const onSignIn = async () => {
-            state.showErrorMessage = false;
             try {
                 await vm.$router.push(props.nextPath);
             } catch (e) {
                 console.error(e);
-                state.showErrorMessage = true;
+                await store.dispatch('display/showSignInErrorMessage');
             }
         };
 
-        const onSignInError = () => {
-            state.showErrorMessage = true;
-        };
-
         const hideErrorMessage = () => {
-            state.showErrorMessage = false;
+            store.dispatch('display/hideSignInErrorMessage');
         };
         const goToUserSignIn = () => {
             if (props.admin) vm.$router.replace({ name: SIGN_IN_ROUTE._NAME });
@@ -128,7 +122,6 @@ export default {
             ...toRefs(validationState),
             onSignIn,
             goToUserSignIn,
-            onSignInError,
             hideErrorMessage,
         };
     },

@@ -53,6 +53,7 @@ import {
 } from '@spaceone/design-system';
 import { ComponentRenderProxy, getCurrentInstance } from '@vue/composition-api';
 import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
+import {store} from "@/store";
 
 
 export default {
@@ -79,7 +80,7 @@ export default {
 
         /* event */
         const hideErrorMessage = () => {
-            emit('update:show-error-message', false);
+            store.dispatch('display/hideSignInErrorMessage');
         };
         const goToAdminSignIn = () => {
             vm.$router.replace({ name: SIGN_IN_ROUTE.ADMIN._NAME });

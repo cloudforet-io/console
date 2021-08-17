@@ -10,6 +10,7 @@ const state: DisplayState = {
     isInitialized: false,
     isDownloaded: false,
     uncheckedNotificationCount: 0,
+    isSignInFailed: false,
 };
 
 export default {

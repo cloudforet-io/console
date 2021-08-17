@@ -38,7 +38,6 @@ class KeycloakAuth extends Authenticator {
 
     static async signOut() {
         await super.signOut();
-        // await KeycloakAuth.keycloak.logout();
     }
 
     private static async keycloakSignIn(auth) {
@@ -62,6 +61,7 @@ class KeycloakAuth extends Authenticator {
             })
             .catch(async (e) => {
                 console.error(e);
+                await store.dispatch('display/showSignInErrorMessage');
                 await KeycloakAuth.onSignInFail();
             });
     }

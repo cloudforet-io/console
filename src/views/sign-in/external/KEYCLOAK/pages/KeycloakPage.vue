@@ -29,17 +29,13 @@ export default defineComponent({
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const onSignIn = async () => {
-            const hasPermission = vm.$store.getters['user/hasPermission'];
-            if (!hasPermission && vm.$route.name !== IDENTITY_ROUTE.USER.ACCOUNT._NAME) {
-                await vm.$router.replace({ name: IDENTITY_ROUTE.USER.ACCOUNT._NAME });
-            } else await vm.$router.push(props.nextPath);
+            await vm.$router.push(props.nextPath);
         };
 
         onMounted(async () => {
             await loadAuth('KEYCLOAK').signIn(onSignIn);
         });
-        return {
-        };
+
     },
 });
 </script>

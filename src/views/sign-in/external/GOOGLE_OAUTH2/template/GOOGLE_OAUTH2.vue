@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import {
-    defineComponent,onMounted,
+    defineComponent, onMounted,
 } from '@vue/composition-api';
 
 import { PButton } from '@spaceone/design-system';
@@ -30,7 +30,6 @@ export default defineComponent({
             try {
                 await loadAuth('GOOGLE_OAUTH2').signIn(onSignIn);
             } catch (e) {
-                context.emit('sign-in-error');
                 console.error(e);
             }
         });

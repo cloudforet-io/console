@@ -20,3 +20,7 @@ export const setIsDownloaded = (state: DisplayState, isDownloaded: boolean): voi
 export const setUncheckedNotificationCount = (state: DisplayState, count: number): void => {
     state.uncheckedNotificationCount = count;
 };
+
+export const setIsSignInFailed = (state: DisplayState, isSignInFailed: boolean): void => {
+    state.isSignInFailed = isSignInFailed;
+};

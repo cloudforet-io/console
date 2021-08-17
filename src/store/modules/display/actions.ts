@@ -37,6 +37,14 @@ export const finishDownloading = ({ commit }): void => {
     commit('setIsDownloaded', true);
 };
 
+export const showSignInErrorMessage = ({ commit }): void => {
+    commit('setIsSignInFailed', true);
+};
+
+export const hideSignInErrorMessage = ({ commit }): void => {
+    commit('setIsSignInFailed', false);
+};
+
 
 const fixedCheckNotificationFilter: QueryStoreFilter = { k: 'is_read', v: false, o: '=' };
 const checkNotificationQueryHelper = new ApiQueryHelper().setCountOnly();

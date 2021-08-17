@@ -54,6 +54,7 @@ import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
 import { TranslateResult } from 'vue-i18n';
 import { SpaceAuth } from '@/views/sign-in/local/authenticator/space-auth';
 import { loadAuth } from '@/views/sign-in/authenticator/loader';
+import {store} from "@/store";
 
 export default defineComponent({
     name: 'IDPWSignIn',
@@ -118,8 +119,8 @@ export default defineComponent({
                 await loadAuth().signIn(credentials, state.userId, props.isAdmin ? 'DOMAIN_OWNER' : 'USER');
                 context.emit('sign-in');
             } catch (e) {
-                context.emit('sign-in-error');
                 console.error(e);
+                await store.dispatch('display/showSignInErrorMessage');
             }
         };
 

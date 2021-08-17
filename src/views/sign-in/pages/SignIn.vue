@@ -17,19 +17,17 @@
         <sign-in-right-container
             :is-admin="false"
             :images="images"
-            :show-error-message.sync="showErrorMessage"
+            :show-error-message="showErrorMessage"
         >
             <template #input>
                 <i-d-p-w-sign-in class="id-pw-wrapper"
                                  @sign-in="onSignIn"
-                                 @sign-in-error="onSignInError"
                 />
                 <div v-if="component" class="btn-divider">
                     <span>{{ $t('COMMON.SIGN_IN.OR') }}</span>
                 </div>
                 <component :is="component" class="sign-in-template"
                            @sign-in="onSignIn"
-                           @sign-in-error="onSignInError"
                 />
             </template>
         </sign-in-right-container>
@@ -48,12 +46,6 @@ import SignInLeftContainer from '@/views/sign-in/modules/SignInLeftContainer.vue
 import { store } from '@/store';
 import config from '@/lib/config';
 import SignInRightContainer from '@/views/sign-in/modules/SignInRightContainer.vue';
-import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { SpaceRouter } from '@/routes';
-import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
-import { DASHBOARD_ROUTE } from '@/routes/dashboard/dashboard-route';
-
 
 export default {
     name: 'SignIn',
@@ -114,32 +106,20 @@ export default {
                 }
                 return undefined;
             }),
-            showErrorMessage: false,
+            showErrorMessage: computed(() => store.state.display.isSignInFailed),
+
         });
         const onSignIn = async () => {
-            state.showErrorMessage = false;
             try {
                 await vm.$router.push(props.nextPath);
             } catch (e) {
                 console.error(e);
-                state.showErrorMessage = true;
             }
         };
 
-        const onSignInError = () => {
-            state.showErrorMessage = true;
-        };
-
-        (async () => {
-            if (vm.$route.query.error === 'error') {
-                onSignInError();
-                await vm.$router.replace({ query: { ...vm.$route.query, error: null } });
-            }
-        })();
         return {
             ...toRefs(state),
             onSignIn,
-            onSignInError,
         };
     },
 };

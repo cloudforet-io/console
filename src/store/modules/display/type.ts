@@ -6,4 +6,5 @@ export interface DisplayState {
     isInitialized: boolean;
     isDownloaded: boolean;
     uncheckedNotificationCount: number;
+    isSignInFailed: boolean;
 }
