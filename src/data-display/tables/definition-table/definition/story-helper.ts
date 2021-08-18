@@ -103,6 +103,39 @@ export const getDefinitionArgTypes = (): ArgTypes => ({
             },
         },
     },
+    copyValue: {
+        name: 'copyValue',
+        type: { name: 'string, number' },
+        description: 'If the displayed data and the value to be copied are different, give the value to be copied.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'string, number',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: 'text',
+        },
+    },
+    copyValueFormatter: {
+        name: 'copyValueFormatter',
+        type: { name: 'function' },
+        description: 'Use it with the same purpose of `copyValue` props. Arguments are the same with the `formatter` props.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'function',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+    },
     /* slots */
     defaultSlot: {
         name: 'default',

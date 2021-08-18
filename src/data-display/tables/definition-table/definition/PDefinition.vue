@@ -12,6 +12,7 @@
                 </slot>
                 <p-copy-button v-else
                                width="0.8rem" height="0.8rem"
+                               :value="copyValueFormatter ? copyValueFormatter(data, $props) : copyValue"
                                auto-hide-icon
                 >
                     <slot name="default" v-bind="{name, label, data, value: displayData}">
@@ -60,6 +61,14 @@ export default defineComponent<DefinitionProps>({
         block: {
             type: Boolean,
             default: false,
+        },
+        copyValue: {
+            type: [String, Number],
+            default: undefined,
+        },
+        copyValueFormatter: {
+            type: Function,
+            default: undefined,
         },
     },
     setup(props: DefinitionProps) {

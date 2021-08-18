@@ -15,6 +15,8 @@
                               :disable-copy="disableCopy || item.disableCopy"
                               :formatter="item.formatter"
                               :block="block || item.block"
+                              :copy-value="item.copyValue"
+                              :copy-value-formatter="item.copyValueFormatter"
                 >
                     <template #default="scope">
                         <slot name="data" v-bind="{
@@ -108,6 +110,10 @@ export default defineComponent<DefinitionTableProps>({
             },
         },
         block: {
+            type: Boolean,
+            default: false,
+        },
+        copyRawData: {
             type: Boolean,
             default: false,
         },

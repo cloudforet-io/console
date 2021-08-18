@@ -1,5 +1,6 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import { reactive, toRefs } from '@vue/composition-api';
+import faker from 'faker'
 
 import PDefinitionTable from '@/data-display/tables/definition-table/PDefinitionTable';
 import PButton from '@/inputs/buttons/button/PButton';
@@ -305,6 +306,53 @@ fields: [
                         { label: 'Id', name: 'collector_id' },
                         { label: 'Name', name: 'name' },
                         { label: 'Provider', name: 'provider', disableCopy: true },
+                    ],
+                    data: {
+                        collector_id: 'collector-6746d641c98b',
+                        name: 'collector name',
+                        provider: 'aws',
+                    }
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Custom Copy Value
+
+You can customize the value to be copied by giving ```copyValue``` or ```copyValueFormatter``` properties to each field item. <br/>
+```copyValueFormatter``` has higher priority than ```copyValue```.<br/>
+
+<Canvas>
+    <Story name="Custom Copy Value">
+        {{
+            components: { PDefinitionTable },
+            template: `
+<div>
+    <p class="text-xl mb-4">Fields:</p>
+    <pre class="mb-4">
+    [
+        { label: 'Name', name: 'name', copyValueFormatter: () => data.collector_id },
+        { label: 'Provider', name: 'provider', copyValue: 'AWS' },
+    ]
+    </pre>
+    <p-definition-table
+        :fields="fields"
+        :data="data"
+    />
+</div>
+`,
+            setup() {
+                const state = reactive({
+                    fields: [
+                        { label: 'Name', name: 'name', copyValueFormatter: () => state.data.collector_id },
+                        { label: 'Provider', name: 'provider', copyValue: 'AWS' },
                     ],
                     data: {
                         collector_id: 'collector-6746d641c98b',

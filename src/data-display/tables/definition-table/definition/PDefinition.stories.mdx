@@ -28,6 +28,7 @@ export const Template = (args, { argTypes }) => ({
     :disable-copy="disableCopy"
     :formatter="formatter"
     :block="block"
+    :copy-value="copyValue"
 >
 </p-definition>`,
     setup(props) {
@@ -116,6 +117,54 @@ export const Template = (args, { argTypes }) => ({
 }}
     </Story>
 </Canvas>
+
+<br/>
+<br/>
+
+## Custom Copy Value
+
+<Canvas>
+    <Story name="Custom Copy Value">
+        {{
+            components:{ PDefinition },
+            template: `
+        <div>
+        <p class="mb-4">Copy Value: {{copyValue}}</p>
+        <p-definition
+            :label="label"
+            :data="data"
+            :copy-value="copyValue"
+        />
+        <p class="my-4">Copy Value Formatter:</p>
+        <pre class="mb-4">
+        (data) => {
+            return data + ' [' + copyValue + ']'
+        }
+        </pre>
+        <p-definition
+            :label="label"
+            :data="data"
+            :copy-value-formatter="copyValueFormatter"
+        />
+        </div>
+`,
+            setup() {
+                const copyValue = faker.random.uuid()
+                return {
+                    label: faker.lorem.sentence(5),
+                    data: faker.lorem.sentence(20),
+                    copyValue,
+                    copyValueFormatter: (data) => {
+                        return data + ' [' + copyValue + ']'
+                    }
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
 
 ## With Formatter
 
