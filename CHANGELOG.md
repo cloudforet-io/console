@@ -1,3 +1,10 @@
+# [1.1.0-beta.124](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.123...v1.1.0-beta.124) (2021-08-18)
+
+
+### Features
+
+* add customization of copy value in definition, definition table ([#670](https://github.com/spaceone-dev/spaceone-design-system/issues/670)) ([852a73b](https://github.com/spaceone-dev/spaceone-design-system/commit/852a73b9ea85c8c376474a622a4a64f6a8822b13))
+
 # [1.1.0-beta.123](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.122...v1.1.0-beta.123) (2021-08-18)
 
 
