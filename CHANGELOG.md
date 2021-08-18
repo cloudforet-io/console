@@ -1,3 +1,10 @@
+# [1.1.0-beta.123](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.122...v1.1.0-beta.123) (2021-08-18)
+
+
+### Bug Fixes
+
+* make position relative of definition table ([#668](https://github.com/spaceone-dev/spaceone-design-system/issues/668)) ([e4978b5](https://github.com/spaceone-dev/spaceone-design-system/commit/e4978b56d5073b532573e66d43bf68160efbdbdf))
+
 # [1.1.0-beta.122](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.121...v1.1.0-beta.122) (2021-08-13)
 
 
