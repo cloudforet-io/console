@@ -30509,6 +30509,27 @@
                                 </translations>
                             </concept_node>
                             <concept_node>
+                                <name>NOW_HAPPENING_MAINTENANCE</name>
+                                <definition_loaded>false</definition_loaded>
+                                <description></description>
+                                <comment></comment>
+                                <default_text></default_text>
+                                <translations>
+                                    <translation>
+                                        <language>en-US</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ja-JP</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                    <translation>
+                                        <language>ko-KR</language>
+                                        <approved>false</approved>
+                                    </translation>
+                                </translations>
+                            </concept_node>
+                            <concept_node>
                                 <name>PROJECT_ALERT_ACTIVATE</name>
                                 <definition_loaded>false</definition_loaded>
                                 <description/>
