@@ -265,6 +265,20 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+## UI Structure and CSS
+
+```css
+.p-definition
+    .key(style="width: 18rem;")
+        slot(name="key")
+    .value-wrapper(style="max-width: calc(100% - 18rem);")
+        .value
+            .p-copy-button
+                slot(name="default")
+        .extra
+```
+
+
 ## Playground
 <Canvas>
     <Story name="Playground" >

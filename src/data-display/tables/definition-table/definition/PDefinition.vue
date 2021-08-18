@@ -77,18 +77,21 @@ export default defineComponent<DefinitionProps>({
 
 <style lang="postcss">
 .p-definition {
-    @apply flex;
+    display: flex;
     .key {
         @apply font-bold;
         width: 18rem;
     }
     .value-wrapper {
-        @apply inline-flex items-center flex-grow cursor-text;
+        display: inline-flex;
+        align-items: center;
+        flex-grow: 1;
         flex-wrap: wrap;
         max-width: calc(100% - 18rem);
+        cursor: text;
 
         .p-copy-button {
-            @apply flex-shrink-0;
+            flex-shrink: 0;
         }
         .extra {
             flex-grow: 1;
@@ -96,12 +99,13 @@ export default defineComponent<DefinitionProps>({
             margin-left: 0.5rem;
         }
     }
+
     .key, .value-wrapper {
-        @apply py-2 px-4 text-sm;
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
         line-height: 1.45;
         cursor: unset;
     }
-
     &.block {
         display: flex;
         .value {

@@ -441,6 +441,24 @@ fields: [
 <br/>
 <br/>
 
+## UI Structure and CSS
+
+```css
+.p-definition-table(class=styleType style="position: relative; min-height: 11.25rem;")
+    .no-data(style="min-height: 11.25rem;")
+        slot(name="no-data")
+    table(style="table-layout: fixed;")
+        tbody
+            .p-definition(class="def-row")
+                slot(name="data")
+                    slot(name="data-{item.name}")
+                        slot(name="data-{index}")
+                slot(name="key")
+                slot(name="extra")
+    }
+    .loading-backdrop(style="position: absolute; top: 0; z-index: 1;")
+    .loading(style="position: absolute; top: 0; z-index: 2; max-height: 10rem;")
+```
 
 ## Playground
 <Canvas>
