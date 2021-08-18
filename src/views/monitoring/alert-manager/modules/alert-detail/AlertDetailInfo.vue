@@ -150,12 +150,13 @@ export default {
     line-height: 140%;
 }
 .p-definition-table::v-deep {
-    .def-row {
-        td {
-            &:first-child {
-                @apply capitalize;
-                max-width: 10rem;
-            }
+    .p-definition {
+        .key {
+            @apply capitalize;
+            width: 10rem;
+        }
+        .value-wrapper {
+            max-width: calc(100% - 10rem);
         }
     }
 }

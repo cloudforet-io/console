@@ -2,11 +2,11 @@
     <p-pane-layout class="alert-detail-status-update">
         <span class="content-title">{{ $t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.STATUS_UPDATE') }}</span>
         <p class="content-wrapper">
-            <span class="description">{{ status }}</span>
+            <span v-if="status" class="description">{{ status }}</span>
+            <p-empty v-else>
+                {{ $t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NO_UPDATE') }}
+            </p-empty>
             <button class="new-button" @click="openStatusUpdateModal">
-                <p-i name="ic_plus" width="1rem" height="1rem"
-                     color="inherit" class="new-icon"
-                />
                 {{ $t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NEW_UPDATE') }}
             </button>
         </p>
@@ -32,7 +32,7 @@
 
 <script lang="ts">
 import {
-    PButtonModal, PI, PPaneLayout, PTextarea, PFieldGroup,
+    PButtonModal, PPaneLayout, PTextarea, PFieldGroup, PEmpty,
 } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -43,10 +43,10 @@ export default {
     name: 'AlertDetailInfoStatusUpdate',
     components: {
         PPaneLayout,
-        PI,
         PButtonModal,
         PTextarea,
         PFieldGroup,
+        PEmpty,
     },
     props: {
         id: {

@@ -2,9 +2,6 @@
     <p v-if="!isEditMode" class="content-wrapper">
         <span class="description">{{ alertData.description }}&zwnj;</span>
         <button class="edit-btn" @click="startEdit(alertData.description)">
-            <p-i name="ic_edit" width="1rem" height="1rem"
-                 color="inherit" class="edit-icon"
-            />
             {{ $t('IDENTITY.USER.NOTIFICATION.EDIT') }}
         </button>
     </p>
@@ -29,8 +26,8 @@
 </template>
 
 <script lang="ts">
-import { PTextarea, PButton, PI } from '@spaceone/design-system';
-import { reactive, toRefs } from '@vue/composition-api';
+import { PTextarea, PButton } from '@spaceone/design-system';
+import { toRefs } from '@vue/composition-api';
 import { useAlertDetailItem } from '@/views/monitoring/alert-manager/modules/alert-detail/hooks';
 import { EDIT_MODE } from '@/views/monitoring/alert-manager/lib/config';
 
@@ -39,7 +36,6 @@ export default {
     components: {
         PTextarea,
         PButton,
-        PI,
     },
     props: {
         id: {

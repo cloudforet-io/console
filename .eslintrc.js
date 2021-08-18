@@ -33,15 +33,7 @@ module.exports = {
         tsx: "never"
       }
     ],
-    camelcase: ["error", {
-        properties: "never",
-        allow: [
-          "_id$",
-          "_at$",
-          "total_count",
-        ]
-      }
-    ],
+    camelcase: "off",
     "vue/max-attributes-per-line": [
       "error",
       {
@@ -87,7 +79,15 @@ module.exports = {
       "error",
       { allows: ["protected", "public"] }
     ],
-    "@typescript-eslint/camelcase": ["off"], // use eslint camelcase rule
+    "@typescript-eslint/camelcase": ["error", {
+        properties: "never",
+        allow: [
+          "_id$",
+          "_at$",
+          "total_count",
+        ]
+      }
+    ],
     "@typescript-eslint/no-empty-function": ["off"], // use eslint no-empty-function rule
     "@typescript-eslint/no-use-before-define": ["off"], // use eslint no-use-before-define rule
     "@typescript-eslint/ban-ts-ignore": ["off"],

@@ -86,7 +86,7 @@ export default {
 
         const state = reactive({
             data: undefined as any,
-            loading: true,
+            loading: false,
             totalCount: 0,
             timezone: computed(() => store.state.user.timezone),
             selectIndex: [] as number[],
@@ -239,7 +239,7 @@ export default {
         };
 
         watch(() => props.serverId, async (after, before) => {
-            if (after !== before) {
+            if (after !== before && !state.loading) {
                 await loadSchemaAndData();
             }
         }, { immediate: false });

@@ -185,45 +185,6 @@ interface ProjectItemResp {
 
 const DEFAULT_PAGE_SIZE = 15;
 const STORAGE_PREFIX = 'inventory/server';
-const serverStore = {
-    getItem<T>(name: string, type = 'string'): T {
-        const res = localStorage.getItem(`${STORAGE_PREFIX}/${name}`);
-        switch (type) {
-        case 'number': {
-            if (res) return Number(res) as unknown as T;
-            return undefined as unknown as T;
-        }
-        case 'object': {
-            try {
-                if (res) return JSON.parse(res) as unknown as T;
-            } catch (e) {}
-            return undefined as unknown as T;
-        }
-        default: return (res || undefined) as unknown as T;
-        }
-    },
-
-    setItem(name: string, data: any, type = 'string') {
-        let res;
-        switch (type) {
-        case 'number': {
-            res = Number(data);
-            break;
-        }
-        case 'object': {
-            try {
-                res = JSON.stringify(data);
-            } catch (e) {}
-            break;
-        }
-        default: {
-            res = data;
-            break;
-        }
-        }
-        localStorage.setItem(`${STORAGE_PREFIX}/${name}`, res);
-    },
-};
 
 export default {
     name: 'ServerMain',
@@ -322,7 +283,7 @@ export default {
         });
         const fetchOptionState = reactive({
             pageStart: 1,
-            pageLimit: serverStore.getItem<number>('pageLimit', 'number') || DEFAULT_PAGE_SIZE,
+            pageLimit: store.getters['settings/getItem']('pageLimit', STORAGE_PREFIX) || DEFAULT_PAGE_SIZE,
             sortDesc: true,
             sortBy: 'created_at',
             queryTags: [] as QueryTag[],
@@ -500,7 +461,11 @@ export default {
                 }
                 if (changed.pageLimit !== undefined) {
                     fetchOptionState.pageLimit = changed.pageLimit;
-                    serverStore.setItem('pageLimit', changed.pageLimit);
+                    store.dispatch('settings/setItem', {
+                        key: 'pageLimit',
+                        value: changed.pageLimit,
+                        path: STORAGE_PREFIX,
+                    });
                 }
                 if (changed.pageStart !== undefined) {
                     fetchOptionState.pageStart = changed.pageStart;
