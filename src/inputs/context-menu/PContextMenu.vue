@@ -143,7 +143,7 @@ export default defineComponent<ContextMenuProps>({
             proxySelected: makeOptionalProxy('selected', vm, props.selected),
             isAllSelected: computed(() => {
                 const filteredMenu = props.menu.filter(d => !d.disabled);
-                return filteredMenu.length === state.proxySelected.length;
+                return filteredMenu.length && filteredMenu.length === state.proxySelected.length;
             }),
         });
 

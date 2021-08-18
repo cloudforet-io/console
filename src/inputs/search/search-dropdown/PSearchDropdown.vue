@@ -176,7 +176,6 @@ export default defineComponent<SearchDropdownProps>({
         const state = reactive({
             menuRef: null,
             proxyValue: makeOptionalProxy('value', vm, ''),
-            isAutoMode: computed(() => props.visibleMenu === undefined),
             proxyIsFocused: makeOptionalProxy('isFocused', vm, false),
             proxySelected: makeOptionalProxy('selected', vm, []),
             proxyPlaceholder: makeOptionalProxy('placeholder', vm, undefined),
@@ -241,7 +240,7 @@ export default defineComponent<SearchDropdownProps>({
         };
 
         const hideMenu = (mode?: string) => {
-            if (state.isAutoMode) contextMenuFixedStyleState.proxyVisibleMenu = false;
+            contextMenuFixedStyleState.proxyVisibleMenu = false;
 
             // placeholder
             if (props.type === SEARCH_DROPDOWN_TYPE.radioButton && (mode === 'click' || state.proxySelected.length)) {
@@ -262,7 +261,7 @@ export default defineComponent<SearchDropdownProps>({
         };
 
         const showMenu = () => {
-            if (state.isAutoMode) contextMenuFixedStyleState.proxyVisibleMenu = true;
+            contextMenuFixedStyleState.proxyVisibleMenu = true;
             if (props.type === SEARCH_DROPDOWN_TYPE.default && state.proxySelected.length) {
                 // 기존 선택된 값이 있다면 해당 값을 placeholder 처리 & filter 초기화
                 state.proxyPlaceholder = props.menu.find(d => d.name === state.proxySelected[0])?.label;
