@@ -1264,6 +1264,7 @@
 					"ALT_E_UPDATE_STATUS": "상태 업데이트 실패",
 					"ALT_S_UPDATE_STATUS": "상태 업데이트 성공 ",
 					"NEW_UPDATE": "새로운 업데이트",
+					"NO_UPDATE": "업데이트가 없습니다.",
 					"STATUS_UPDATE": "상태 업데이트",
 					"UPDATE": "업데이트",
 					"UPDATE_NEW_STATUS": "새로운 상태 업데이트 "

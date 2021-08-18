@@ -1264,6 +1264,7 @@
 					"ALT_E_UPDATE_STATUS": "Failed to Update Status",
 					"ALT_S_UPDATE_STATUS": "Successfully Updated Status",
 					"NEW_UPDATE": "New Update",
+					"NO_UPDATE": "No Update",
 					"STATUS_UPDATE": "Status Update",
 					"UPDATE": "Update",
 					"UPDATE_NEW_STATUS": "Update New Status"
