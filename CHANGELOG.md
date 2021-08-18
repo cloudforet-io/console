@@ -1,3 +1,10 @@
+# [1.1.0-beta.125](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.124...v1.1.0-beta.125) (2021-08-18)
+
+
+### Bug Fixes
+
+* delete isAutoMode in PSearchDropdown & isAllSelected bug in PContextMenu ([#671](https://github.com/spaceone-dev/spaceone-design-system/issues/671)) ([a44fa73](https://github.com/spaceone-dev/spaceone-design-system/commit/a44fa73b70fec03093a390006d602536175e8908))
+
 # [1.1.0-beta.124](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.123...v1.1.0-beta.124) (2021-08-18)
 
 
