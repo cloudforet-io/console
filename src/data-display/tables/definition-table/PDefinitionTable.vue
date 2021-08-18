@@ -133,6 +133,7 @@ export default defineComponent<DefinitionTableProps>({
 
 <style lang="postcss">
 .p-definition-table {
+    position: relative;
     min-height: 11.25rem;
     .no-data {
         min-height: 11.25rem;
