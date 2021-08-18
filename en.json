@@ -798,6 +798,7 @@
 				"API_KEY": "API Key",
 				"API_TABLE_DESC": "Able to create API key up to 2.",
 				"ASSIGNED_ROLES": "Assigned Roles",
+				"CREATED_AT": "Created",
 				"CREATE_API_KEY": "Create API Key",
 				"DAYS": "days",
 				"DELETE": "Delete",

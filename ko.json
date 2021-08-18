@@ -798,6 +798,7 @@
 				"API_KEY": "API 키",
 				"API_TABLE_DESC": "API Key는 2개까지 생성할 수 있습니다. ",
 				"ASSIGNED_ROLES": "할당된 권한 ",
+				"CREATED_AT": "생성일",
 				"CREATE_API_KEY": "API Key 생성",
 				"DAYS": "일 전 ",
 				"DELETE": "삭제",
