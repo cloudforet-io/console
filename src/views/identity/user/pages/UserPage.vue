@@ -27,10 +27,14 @@
             <p-divider class="menu-divider" />
             <ul v-for="(item) in sidebarState.MenuList" :key="item.label"
                 class="menu-item"
-                :class="{'selected': item.label === sidebarState.selectedItem.label, 'hide': (item.userOnly && userState.isDomainOwner) || item.isAdminMenu}"
+                :class="{'selected': item.label === sidebarState.selectedItem.label,
+                         'hide': (item.userOnly && userState.isDomainOwner)
+                             || item.isAdminMenu
+                             || item.userOnly && !userState.hasPermission}"
                 @click="showPage(item)"
             >
-                <li v-if="!item.isAdminMenu">{{ item.label }}
+                <li v-if="!item.isAdminMenu">
+                    {{ item.label }}
                     <span v-if="item.beta" class="beta">beta</span>
                 </li>
             </ul>
@@ -110,6 +114,7 @@ export default {
             userName: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),
             userId: computed(() => store.state.user.userId),
+            hasPermission: computed((() => store.getters['user/hasPermission'])),
         });
         const sidebarState = reactive({
             showManagementPage: true,

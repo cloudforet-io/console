@@ -1,8 +1,6 @@
 import Keycloak from 'keycloak-js';
 import { store } from '@/store';
 import { Authenticator } from '@/views/sign-in/authenticator';
-import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
-import { SpaceRouter } from '@/routes';
 
 class KeycloakAuth extends Authenticator {
     private static keycloak: Keycloak.KeycloakInstance;
@@ -32,8 +30,10 @@ class KeycloakAuth extends Authenticator {
     }
 
     private static async onSignInFail() {
-        await SpaceRouter.router.replace({ name: SIGN_IN_ROUTE._NAME, query: { error: 'error' } });
+        // await SpaceRouter.router.replace({ name: SIGN_IN_ROUTE._NAME });
         await KeycloakAuth.keycloak.logout();
+        await super.signOut();
+        await store.dispatch('display/showSignInErrorMessage');
     }
 
     static async signOut() {
@@ -48,13 +48,14 @@ class KeycloakAuth extends Authenticator {
         if (KeycloakAuth.keycloak.token && KeycloakAuth.keycloak.idToken && KeycloakAuth.keycloak.token !== '' && KeycloakAuth.keycloak.idToken !== '') {
             // eslint-disable-next-line camelcase
             await super.signIn(
-                { access_token: KeycloakAuth.keycloak.token });
+                { access_token: KeycloakAuth.keycloak.token },
+            );
         }
     }
 
     static async signIn(onSignInCallback) {
         KeycloakAuth.init();
-        KeycloakAuth.keycloak.init({ onLoad: 'login-required' })
+        KeycloakAuth.keycloak.init({ onLoad: 'login-required', checkLoginIframe: false })
             .then(async (auth) => {
                 await KeycloakAuth.keycloakSignIn(auth);
                 await onSignInCallback();

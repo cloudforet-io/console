@@ -25,6 +25,9 @@
                     {{ data }} {{ $t('IDENTITY.USER.MAIN.DAYS') }}
                 </span>
             </template>
+            <template #data-created_at="{data}">
+                {{ iso8601Formatter(data, timezone) }}
+            </template>
         </p-definition-table>
     </div>
 </template>
@@ -40,6 +43,8 @@ import { calculateTime, userStateFormatter } from '@/views/identity/user/lib/hel
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 import { Tags } from '@/models';
+import { i18n } from '@/translations';
+import {iso8601Formatter} from "@spaceone/console-core-lib";
 // const arrayFormatter = value => ((value && Array.isArray(value) && value.length > 0) ? value.join(', ') : '');
 
 interface Timestamp {
@@ -88,15 +93,16 @@ export default {
             title: computed(() => vm.$t('IDENTITY.USER.ACCOUNT.BASE_INFORMATION')),
             loading: true,
             fields: computed(() => [
-                { name: 'user_id', label: vm.$t('IDENTITY.USER.MAIN.USER_ID') },
-                { name: 'name', label: vm.$t('IDENTITY.USER.MAIN.NAME') },
-                { name: 'state', label: vm.$t('IDENTITY.USER.MAIN.STATE') },
-                { name: 'user_type', label: vm.$t('IDENTITY.USER.MAIN.ACCESS_CONTROL') },
-                { name: 'email', label: vm.$t('IDENTITY.USER.MAIN.EMAIL') },
-                { name: 'last_accessed_at', label: vm.$t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
-                { name: 'domain_id', label: vm.$t('IDENTITY.USER.MAIN.DOMAIN_ID') },
-                { name: 'language', label: vm.$t('IDENTITY.USER.MAIN.LANGUAGE') },
-                { name: 'timezone', label: vm.$t('IDENTITY.USER.MAIN.TIMEZONE') },
+                { name: 'user_id', label: i18n.t('IDENTITY.USER.MAIN.USER_ID') },
+                { name: 'name', label: i18n.t('IDENTITY.USER.MAIN.NAME') },
+                { name: 'state', label: i18n.t('IDENTITY.USER.MAIN.STATE') },
+                { name: 'user_type', label: i18n.t('IDENTITY.USER.MAIN.ACCESS_CONTROL') },
+                { name: 'email', label: i18n.t('IDENTITY.USER.MAIN.EMAIL') },
+                { name: 'last_accessed_at', label: i18n.t('IDENTITY.USER.MAIN.LAST_ACTIVITY') },
+                { name: 'domain_id', label: i18n.t('IDENTITY.USER.MAIN.DOMAIN_ID') },
+                { name: 'language', label: i18n.t('IDENTITY.USER.MAIN.LANGUAGE') },
+                { name: 'timezone', label: i18n.t('IDENTITY.USER.MAIN.TIMEZONE') },
+                { name: 'created_at', label: i18n.t('IDENTITY.USER.MAIN.CREATED_AT') },
             ]),
             data: {} as UserDetailData,
         });
@@ -124,6 +130,7 @@ export default {
         return {
             ...toRefs(baseState),
             userStateFormatter,
+            iso8601Formatter,
         };
     },
 };

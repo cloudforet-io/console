@@ -54,7 +54,7 @@ import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
 import { TranslateResult } from 'vue-i18n';
 import { SpaceAuth } from '@/views/sign-in/local/authenticator/space-auth';
 import { loadAuth } from '@/views/sign-in/authenticator/loader';
-import {store} from "@/store";
+import { store } from '@/store';
 
 export default defineComponent({
     name: 'IDPWSignIn',
@@ -85,7 +85,7 @@ export default defineComponent({
             passwordCheckInvalidText: '' as TranslateResult | string,
         });
 
-        const checkUserId = async () => {
+        const checkUserId = () => {
             if (!state.userId) {
                 validationState.isIdValid = false;
                 validationState.idInvalidText = vm.$t('COMMON.SIGN_IN.USER_ID_REQUIRED');
@@ -96,6 +96,7 @@ export default defineComponent({
         };
 
         const checkPassword = async () => {
+            if (state.password.length === 1) await store.dispatch('display/hideSignInErrorMessage');
             if ((state.password.replace(/ /g, '').length !== state.password.length)
           || !state.password) {
                 validationState.isPasswordValid = false;
@@ -106,8 +107,9 @@ export default defineComponent({
             }
         };
 
+
         const signIn = async () => {
-            await checkUserId();
+            checkUserId();
             await checkPassword();
             if (!validationState.isIdValid || !validationState.isPasswordValid) {
                 return;
@@ -116,10 +118,12 @@ export default defineComponent({
                 password: state.password.trim(),
             };
             try {
-                await loadAuth().signIn(credentials, state.userId, props.isAdmin ? 'DOMAIN_OWNER' : 'USER');
+                await loadAuth().signIn(credentials, state.userId?.trim(), props.isAdmin ? 'DOMAIN_OWNER' : 'USER');
                 context.emit('sign-in');
+                await store.dispatch('display/hideSignInErrorMessage');
             } catch (e) {
                 console.error(e);
+                state.password = '';
                 await store.dispatch('display/showSignInErrorMessage');
             }
         };
