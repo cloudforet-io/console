@@ -188,8 +188,8 @@ class API {
 
         // Axios response interceptor with error handling
         this.instance.interceptors.response.use(
-            response => response,
-            error => Promise.reject(new APIError(error))
+            (response) => response,
+            (error) => Promise.reject(new APIError(error))
         );
     }
 }

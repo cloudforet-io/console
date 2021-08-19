@@ -1,12 +1,12 @@
 import {
     SearchKeyOptions,
     SearchSchema,
-    SearchDataType,
+    SearchDataType
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 
-
 export interface Reference {
+    // eslint-disable-next-line camelcase
     resource_type: string;
     // eslint-disable-next-line camelcase
     reference_key?: string;

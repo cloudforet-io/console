@@ -9,14 +9,13 @@ import {
 
 dayjs.extend(tz);
 
-
 // formatter
 export const timestampFormatter = (value, timezone) => {
     if (value && value.seconds) return DateTime.fromSeconds(Number(value.seconds)).setZone(timezone).toFormat('yyyy-LL-dd HH:mm:ss');
     return '';
 };
-export const iso8601Formatter = (time: string, timezone: string) => {
-    if (time) return dayjs.tz(dayjs(time), timezone).format('YYYY-MM-DD HH:mm:ss');
+export const iso8601Formatter = (time: string, timezone: string, format = 'YYYY-MM-DD HH:mm:ss') => {
+    if (time) return dayjs.tz(dayjs(time), timezone).format(format);
     return '';
 };
 export const durationFormatter = (createdAt: string, finishedAt: string, timezone: string) => {
@@ -29,16 +28,13 @@ export const durationFormatter = (createdAt: string, finishedAt: string, timezon
         const minutes = Math.floor((timeDiff % 3600) / 60);
         const seconds = Math.floor((timeDiff % 60) % 60);
 
-        const duration = () => {
-            let duration = '';
-            if (days !== 0) return duration = `${days}d ${hours}h`;
-            if (hours !== 0) return duration = ` ${hours}h ${minutes}m`;
-            if (minutes !== 0) return duration = `${minutes}m ${seconds}s`;
-            if (seconds !== 0) return duration = `${seconds}s`;
-            return duration;
-        };
+        let duration = '';
+        if (days !== 0) duration = `${days}d ${hours}h`;
+        else if (hours !== 0) duration = `${hours}h ${minutes}m`;
+        else if (minutes !== 0) duration = `${minutes}m ${seconds}s`;
+        else if (seconds !== 0) duration = `${seconds}s`;
 
-        return duration();
+        return duration;
     }
     return null;
 };
@@ -55,7 +51,6 @@ export const commaFormatter = (num) => {
     return num;
 };
 
-
 /** @function
  * @name isNotEmpty
  * @param value
@@ -67,7 +62,6 @@ export const isNotEmpty = (value): boolean => {
     return !isEmpty(value); // String, Object
 };
 
-
 export const tagsToObject = (tags: Array<{ key: string; value: string }>): Record<string, string> => {
     const tagsObject = {};
     tags.forEach((tag) => {
@@ -75,7 +69,6 @@ export const tagsToObject = (tags: Array<{ key: string; value: string }>): Recor
     });
     return tagsObject;
 };
-
 
 /**
  * make proxy computed that same name as props

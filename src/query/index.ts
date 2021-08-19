@@ -23,7 +23,6 @@ import { ComputedRef } from '@vue/composition-api';
 dayjs.extend(utc);
 dayjs.extend(tz);
 
-
 interface QueryTag extends Tag, QueryItem {}
 const filterToQueryTag = (filter: { k?: string; v: QueryStoreFilterValue; o?: RawQueryOperator }, keyMap: Record<string, KeyItem>): QueryTag | null => {
     if (filter.k === undefined || filter.k === null) {
@@ -109,7 +108,7 @@ export class QueryHelper {
 
     setKeyItemSets(keyItemSets: KeyItemSet[]): this {
         this._keyMap = {};
-        flatten(keyItemSets.map(d => d.items)).forEach((d) => {
+        flatten(keyItemSets.map((d) => d.items)).forEach((d) => {
             this._keyMap[d.name] = d;
         });
         return this;
@@ -239,7 +238,7 @@ export class QueryHelper {
     }
 
     get rawQueryStrings(): string[] {
-        return this.rawQueries.map(q => JSON.stringify(q));
+        return this.rawQueries.map((q) => JSON.stringify(q));
     }
 
     get rawQueryString(): string {

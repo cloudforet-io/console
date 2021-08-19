@@ -23,10 +23,14 @@
     "axios-auth-refresh": "^3.1.0",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
-    "luxon": "^1.27.0"
+    "luxon": "^1.27.0",
+    "dayjs": "^1.10.6",
+    "@vue/composition-api": "^0.6.7"
   },
   "peerDependencies": {
-    "@spaceone/design-system": ">= 1.1.0-beta.104"
+    "@spaceone/design-system": ">= 1.1.0-beta.104",
+    "@vue/composition-api": ">= 0.6.7",
+    "dayjs": ">= 1.10.6"
   },
   "devDependencies": {
     "@babel/cli": "^7.14.5",
@@ -43,7 +47,6 @@
     "@typescript-eslint/eslint-plugin": "^4.28.2",
     "@typescript-eslint/parser": "^4.28.2",
     "babel-plugin-module-resolver": "^4.1.0",
-    "dayjs": "^1.10.6",
     "eslint": "^7.30.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-import-resolver-typescript": "^2.4.0",
