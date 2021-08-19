@@ -110,6 +110,12 @@ import {
 import { makeProxy } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
+import {
+    checkDuplicateID,
+    checkEmailFormat, checkEmptyValue, checkMinLength,
+    checkOauth, checkOneLowerCase, checkOneNumber, checkOneUpperCase,
+    checkRequiredField, checkSamePassword, Validation,
+} from '@/views/identity/user/hooks/useValidations';
 
 interface AuthType {
     user_type: string;
@@ -205,133 +211,69 @@ export default {
             passwordCheckInvalidText: '' as TranslateResult | string,
         });
 
-        const setFormState = () => {
-            formState.user_id = '';
-            formState.name = '';
-            formState.email = '';
-            formState.domainRole = '';
-            formState.password = '';
-            formState.passwordCheck = '';
-        };
-        const setValidationState = () => {
-            validationState.isUserIdValid = undefined;
-            validationState.userIdInvalidText = '';
-            validationState.isEmailValid = undefined;
-            validationState.emailInvalidText = '';
-            validationState.isPasswordValid = undefined;
-            validationState.passwordInvalidText = '';
-            validationState.isPasswordCheckValid = undefined;
-            validationState.passwordCheckInvalidText = '';
-        };
-
-        watch(() => formState.activeTab, (after) => {
-            if (after) {
-                setFormState();
-                setValidationState();
-            }
-        }, { immediate: true });
-
-        const checkOauth = async () => {
-            try {
-                await SpaceConnector.client.identity.user.find({
-                    search: { user_id: formState.user_id },
-                    domain_id: store.state.domain.domainId,
-                });
-            } catch (e) {
-                validationState.isUserIdValid = false;
-                validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.USER_ID_NOT_EXIST');
-            }
-        };
-
-        const checkDuplicatedId = async () => {
-            try {
-                const res = await SpaceConnector.client.identity.user.get({ user_id: formState.user_id });
-                if (res) {
-                    validationState.isUserIdValid = false;
-                    validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.USER_ID_DUPLICATED');
-                } else {
-                    validationState.isUserIdValid = true;
-                    validationState.userIdInvalidText = '';
-                }
-            } catch (e) {
-                validationState.isUserIdValid = true;
-                validationState.userIdInvalidText = '';
-                if (e.code !== 'ERROR_NOT_FOUND') console.error(e);
-            }
-        };
-
-        const checkEmailFormat = (userId) => {
-            const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-            if (!regex.test(userId)) {
-                validationState.isUserIdValid = false;
-                validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.EMAIL_INVALID');
-            }
+        const executeSpecificIDValidation = async () => {
+            let res: Validation = { isValid: true, invalidText: '' };
+            if (formState.activeTab === 'local') res = await checkEmailFormat(formState.user_id);
+            else if (formState.activeTab === 'external') res = await checkOauth(formState.user_id);
+            return res;
         };
 
         const checkUserID = async () => {
-            validationState.isUserIdValid = undefined;
-            validationState.userIdInvalidText = '';
-            if (formState.user_id) {
-                await checkDuplicatedId();
-                if (formState.user_id.replace(/ /g, '').length !== formState.user_id.length) {
-                    validationState.isUserIdValid = false;
-                    validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
-                    return;
-                }
-                if (formState.activeTab === 'local') {
-                    checkEmailFormat(formState.user_id);
-                } else if (formState.activeTab === 'external') {
-                    await checkOauth();
-                }
-                if (typeof validationState.isUserIdValid !== 'boolean') validationState.isUserIdValid = true;
+            const validation: Validation[] = await Promise.all([
+                checkRequiredField(formState.user_id),
+                checkDuplicateID(formState.user_id),
+                checkEmptyValue(formState.user_id),
+                executeSpecificIDValidation()]);
+            console.log('validation', validation);
+            const invalidObj = validation.find(item => item.invalidText.length > 0);
+            console.log('invalidObj', invalidObj)
+            if (!invalidObj) {
+                validationState.isUserIdValid = true;
+                validationState.userIdInvalidText = '';
             } else {
-                validationState.isUserIdValid = false;
-                validationState.userIdInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
+                validationState.isUserIdValid = invalidObj.isValid;
+                validationState.userIdInvalidText = invalidObj.invalidText;
             }
         };
 
-        const checkPassword = (password) => {
+        const checkPassword = async (password) => {
             // password1
-            if (password.replace(/ /g, '').length !== password.length) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
-            } else if (password.length < 8) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 8 });
-            } else if (!password.match(/[a-z]/)) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
-            } else if (!password.match(/[A-Z]/)) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
-            } else if (!password.match(/[0-9]/)) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
-            } else {
+            const passwordValidation: Validation[] = await Promise.all([
+                checkEmptyValue(password),
+                checkMinLength(password, 8),
+                checkOneLowerCase(password),
+                checkOneUpperCase(password),
+                checkOneNumber(password),
+            ]);
+            const passwordInvalidObj = passwordValidation.find(item => item.invalidText.length > 0);
+            if (!passwordInvalidObj) {
                 validationState.isPasswordValid = true;
                 validationState.passwordInvalidText = '';
+            } else {
+                validationState.isPasswordValid = passwordInvalidObj.isValid;
+                validationState.passwordInvalidText = passwordInvalidObj.invalidText;
             }
 
             // password2
-            if (!formState.passwordCheck) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
-            }
-            if (password !== formState.passwordCheck) {
-                validationState.isPasswordCheckValid = false;
-                validationState.passwordCheckInvalidText = vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID');
-            } else {
+            const passwordCheckValidation: Validation[] = await Promise.all([
+                checkRequiredField(formState.passwordCheck),
+                checkSamePassword(formState.passwordCheck, password),
+            ]);
+            const passwordCheckInvalidObj = passwordCheckValidation.find(item => item.invalidText.length > 0);
+            if (!passwordCheckInvalidObj) {
                 validationState.isPasswordCheckValid = true;
                 validationState.passwordCheckInvalidText = '';
+            } else {
+                validationState.isPasswordCheckValid = passwordCheckInvalidObj.isValid;
+                validationState.passwordCheckInvalidText = passwordCheckInvalidObj.invalidText;
             }
         };
 
         const confirm = async () => {
             await checkUserID();
             if (!validationState.isUserIdValid) return;
-
             if (formState.activeTab === 'local') {
-                checkPassword(formState.password);
+                await checkPassword(formState.password);
                 if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
             }
             const data = {
@@ -375,6 +317,32 @@ export default {
         (async () => {
             await Promise.all([initAuthTypeList(), getRoleList()]);
         })();
+
+        const setFormState = () => {
+            formState.user_id = '';
+            formState.name = '';
+            formState.email = '';
+            formState.domainRole = '';
+            formState.password = '';
+            formState.passwordCheck = '';
+        };
+        const setValidationState = () => {
+            validationState.isUserIdValid = undefined;
+            validationState.userIdInvalidText = '';
+            validationState.isEmailValid = undefined;
+            validationState.emailInvalidText = '';
+            validationState.isPasswordValid = undefined;
+            validationState.passwordInvalidText = '';
+            validationState.isPasswordCheckValid = undefined;
+            validationState.passwordCheckInvalidText = '';
+        };
+
+        watch(() => formState.activeTab, (after) => {
+            if (after) {
+                setFormState();
+                setValidationState();
+            }
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

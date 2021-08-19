@@ -36,8 +36,6 @@ import {
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-// eslint-disable-next-line import/named
-import { notiChannelPhoneNumRegex } from '@/views/identity/user/lib/validations';
 import AddNotificationLevel from '@/views/identity/user/modules/notification/AddNotificationLevel.vue';
 import AddNotificationMemberGroup from '@/views/identity/user/modules/notification/AddNotificationMemberGroup.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
