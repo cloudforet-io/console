@@ -80,6 +80,7 @@ export default {
 
         /* event */
         const hideErrorMessage = () => {
+            if (vm.$route.query.error) vm.$router.replace({ query: { error: null } })
             store.dispatch('display/hideSignInErrorMessage');
         };
         const goToAdminSignIn = () => {

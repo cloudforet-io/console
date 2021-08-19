@@ -1,6 +1,8 @@
 import Keycloak from 'keycloak-js';
 import { store } from '@/store';
 import { Authenticator } from '@/views/sign-in/authenticator';
+import { SpaceRouter } from '@/routes';
+import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
 
 class KeycloakAuth extends Authenticator {
     private static keycloak: Keycloak.KeycloakInstance;
@@ -30,14 +32,15 @@ class KeycloakAuth extends Authenticator {
     }
 
     private static async onSignInFail() {
-        // await SpaceRouter.router.replace({ name: SIGN_IN_ROUTE._NAME });
-        await KeycloakAuth.keycloak.logout();
-        await super.signOut();
-        await store.dispatch('display/showSignInErrorMessage');
+        await SpaceRouter.router.replace({ name: SIGN_IN_ROUTE._NAME, query: { error: 'error' } });
+        if (KeycloakAuth.keycloak) await KeycloakAuth.keycloak.logout();
     }
 
     static async signOut() {
+        // TODO: logout({redirectUri: sign-out url})
+        // ex) await KeycloakAuth.keycloak.logout({redirectUri: `${BASE_URL}/sign-out` or `${BASE_URL}/sign-in`})
         await super.signOut();
+        if (KeycloakAuth.keycloak) await KeycloakAuth.keycloak.logout();
     }
 
     private static async keycloakSignIn(auth) {

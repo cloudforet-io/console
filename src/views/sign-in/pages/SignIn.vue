@@ -38,7 +38,7 @@
 import { isEmpty } from 'lodash';
 
 import {
-    toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy, watch,
+    toRefs, reactive, computed, getCurrentInstance, ComponentRenderProxy, watch, watchEffect,
 } from '@vue/composition-api';
 
 import IDPWSignIn from '@/views/sign-in/local/template/ID_PW.vue';
@@ -106,8 +106,7 @@ export default {
                 }
                 return undefined;
             }),
-            showErrorMessage: computed(() => store.state.display.isSignInFailed),
-
+            showErrorMessage: vm.$route.query.error === 'error' || computed(() => store.state.display.isSignInFailed),
         });
         const onSignIn = async () => {
             try {
@@ -117,9 +116,16 @@ export default {
             }
         };
 
+        watch(() => vm.$route.query.error, () => {
+            if (vm.$route.query.error) state.showErrorMessage = true;
+            else state.showErrorMessage = false;
+        });
+
+
         return {
             ...toRefs(state),
             onSignIn,
+
         };
     },
 };
