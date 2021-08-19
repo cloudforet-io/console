@@ -206,8 +206,9 @@ export default {
                 memberTableState.items = [];
                 memberTableState.totalCount = 0;
                 console.error(e);
+            } finally {
+                memberTableState.loading = false;
             }
-            memberTableState.loading = false;
         };
 
         const onChangeMemberTable = async (changed: any = {}) => {

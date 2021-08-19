@@ -31,7 +31,7 @@
             </div>
             <div class="form-box mobile-block">
                 <p class="label">
-                    {{ $t('PROJECT.EVENT_RULE.PROJECT_DEPENDENCIES') }}
+                    {{ $t('PROJECT.EVENT_RULE.PROJECT_DEPENDENCY') }}
                 </p>
                 <project-select-dropdown multi-selectable
                                          :selected-project-ids="actions.add_project_dependency || []"

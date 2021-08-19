@@ -100,7 +100,7 @@ export default {
             fields: computed(() => ([
                 { name: 'no_notification', label: i18n.t('PROJECT.EVENT_RULE.SNOOZED_NOTIFICATIONS') },
                 { name: 'change_project', label: i18n.t('PROJECT.EVENT_RULE.PROJECT_ROUTING') },
-                { name: 'add_project_dependency', label: i18n.t('PROJECT.EVENT_RULE.PROJECT_DEPENDENCIES') },
+                { name: 'add_project_dependency', label: i18n.t('PROJECT.EVENT_RULE.PROJECT_DEPENDENCY') },
                 { name: 'change_urgency', label: i18n.t('PROJECT.EVENT_RULE.URGENCY') },
                 { name: 'change_assignee', label: i18n.t('PROJECT.EVENT_RULE.ASSIGNEE') },
                 { name: 'add_responder', label: i18n.t('PROJECT.EVENT_RULE.RESPONDER') },
