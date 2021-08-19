@@ -92,6 +92,12 @@ import {
 import { makeProxy } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
+import {
+    checkEmailFormat,
+    checkEmptyValue,
+    checkMinLength, checkOneLowerCase, checkOneNumber, checkOneUpperCase, checkRequiredField, checkSamePassword,
+    Validation,
+} from '@/views/identity/user/hooks/useValidations';
 
 interface AuthType {
     label: string | null;
@@ -180,60 +186,50 @@ export default {
         });
 
         const checkEmail = async () => {
-            const regex = /\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/;
-            if (formState.email) {
-                if (!regex.test(formState.email)) {
-                    validationState.isEmailValid = false;
-                    validationState.emailInvalidText = vm.$t('IDENTITY.USER.FORM.EMAIL_INVALID');
-                } else {
-                    validationState.isEmailValid = true;
-                    validationState.emailInvalidText = '';
-                }
-            } else validationState.isEmailValid = true;
+            if (formState.email.trim().length > 0) {
+                const validation: Validation = await checkEmailFormat(formState.email);
+                validationState.isEmailValid = validation.isValid;
+                validationState.emailInvalidText = validation.invalidText;
+            } else {
+                validationState.isEmailValid = true;
+                validationState.emailInvalidText = '';
+            }
         };
 
-        const checkPassword = (password) => {
+        const checkPassword = async (password) => {
             // password1
-            if (formState.passwordCheck && (password.replace(/ /g, '').length !== password.length)) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.EMPTY_SPACE_INVALID');
-            } else if (password.length > 0 && password.length < 8) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.MIN_LENGTH_INVALID', { min: 8 });
-            } else if (password.length && !password.match(/[a-z]/)) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_LOWER_CASE_INVALID');
-            } else if (password.length && !password.match(/[A-Z]/)) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_UPPER_CASE_INVALID');
-            } else if (password.length && !password.match(/[0-9]/)) {
-                validationState.isPasswordValid = false;
-                validationState.passwordInvalidText = vm.$t('IDENTITY.USER.FORM.ONE_NUMBER_INVALID');
-            } else {
+            const passwordValidation: Validation[] = await Promise.all([
+                checkEmptyValue(password),
+                checkMinLength(password, 8),
+                checkOneLowerCase(password),
+                checkOneUpperCase(password),
+                checkOneNumber(password),
+            ]);
+            const passwordInvalidObj = passwordValidation.find(item => item.invalidText.length > 0);
+            if (!passwordInvalidObj) {
                 validationState.isPasswordValid = true;
                 validationState.passwordInvalidText = '';
+            } else {
+                validationState.isPasswordValid = passwordInvalidObj.isValid;
+                validationState.passwordInvalidText = passwordInvalidObj.invalidText;
             }
 
             // password2
-            // if (password && !formState.passwordCheck) {
-            //     validationState.isPasswordValid = false;
-            //     validationState.passwordCheckInvalidText = vm.$t('IDENTITY.USER.FORM.REQUIRED_FIELD');
-            // }
-            // else
-            if (password && password !== formState.passwordCheck) {
-                validationState.isPasswordCheckValid = false;
-                validationState.passwordCheckInvalidText = vm.$t('IDENTITY.USER.FORM.PASSWORD_CHECK_INVALID');
-            } else {
-                validationState.isPasswordCheckValid = true;
-                validationState.passwordCheckInvalidText = '';
-            }
+            const passwordCheckValidation: Validation = await checkSamePassword(formState.passwordCheck, password);
+            validationState.isPasswordCheckValid = passwordCheckValidation.isValid;
+            validationState.passwordCheckInvalidText = passwordCheckValidation.invalidText;
         };
 
         const confirm = async () => {
             await checkEmail();
             if (!validationState.isEmailValid) return;
             if (props.isAdmin && props.item.backend === 'LOCAL' && props.item.user_type !== 'API Only') {
-                checkPassword(formState.password);
+                if (formState.password || formState.passwordCheck) await checkPassword(formState.password);
+                else {
+                    validationState.isPasswordValid = true;
+                    validationState.isPasswordCheckValid = true;
+                }
+
                 if (!(validationState.isPasswordValid && validationState.isPasswordCheckValid)) return;
             }
             const data = {
@@ -251,26 +247,33 @@ export default {
             }
         };
 
+        /* Set(Initialize) Form */
         const getRoleList = async () => {
-            const res = await SpaceConnector.client.identity.role.list({
-                role_type: 'DOMAIN',
-            });
-            formState.domainRoleList = res.results.map(d => ({
-                type: 'item',
-                label: d.name,
-                name: d.role_id,
-            }));
+            try {
+                const res = await SpaceConnector.client.identity.role.list({
+                    role_type: 'DOMAIN',
+                });
+                formState.domainRoleList = res.results.map(d => ({
+                    type: 'item',
+                    label: d.name,
+                    name: d.role_id,
+                }));
+            } catch (e) {
+                console.error(e);
+            }
         };
 
         const setCurrentDomainId = async () => {
-            if (props.updateMode && formState.domainRoleList[0]) {
-                const res = await SpaceConnector.client.identity.roleBinding.list({
-                    resource_type: 'identity.User',
-                    resource_id: formState.user_id,
-                    role_type: 'DOMAIN',
-                });
-                if (res.total_count > 0) formState.domainRole = formState.domainRoleList[0].name;
-                else formState.domainRole = '';
+            if (formState.domainRoleList[0]) {
+                try {
+                    const res = await SpaceConnector.client.identity.roleBinding.list({
+                        resource_type: 'identity.User',
+                        resource_id: formState.user_id,
+                        role_type: 'DOMAIN',
+                    });
+                    if (res.total_count > 0) formState.domainRole = formState.domainRoleList[0].name;
+                    else formState.domainRole = '';
+                } catch (e) { console.error(e); }
             } else {
                 formState.domainRole = '';
             }
@@ -282,13 +285,17 @@ export default {
             else state.isSameId = false;
         };
 
-        (async () => {
+        const setForm = async () => {
             formState.user_id = props.item.user_id;
             formState.name = props.item.name;
             formState.email = props.item.email;
-            await checkIsSameId();
-            await Promise.all([getRoleList()]);
+            checkIsSameId();
             await setCurrentDomainId();
+        };
+
+        (async () => {
+            await getRoleList();
+            await setForm();
         })();
 
         return {

@@ -224,9 +224,7 @@ export default {
                 checkDuplicateID(formState.user_id),
                 checkEmptyValue(formState.user_id),
                 executeSpecificIDValidation()]);
-            console.log('validation', validation);
             const invalidObj = validation.find(item => item.invalidText.length > 0);
-            console.log('invalidObj', invalidObj)
             if (!invalidObj) {
                 validationState.isUserIdValid = true;
                 validationState.userIdInvalidText = '';
