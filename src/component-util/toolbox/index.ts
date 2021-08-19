@@ -1,6 +1,6 @@
 import { ApiQueryHelper } from '@src/space-connector/helper';
 import { Query } from '@src/space-connector/type';
-import {ToolboxOptions} from '@spaceone/design-system/dist/src/navigation/toolbox/type';
+import { ToolboxOptions } from '@spaceone/design-system/dist/src/navigation/toolbox/type';
 
 interface Options extends ToolboxOptions {
     sortDesc?: boolean;

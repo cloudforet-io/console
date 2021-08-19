@@ -9,7 +9,6 @@ export interface APIInfo {
     methods: Array<string>;
 }
 
-
 export type FilterOperator =
     | 'lt' | 'lte' | 'gt' | 'gte' | 'exists' | 'regex'
     | 'eq' | 'contain' | 'not' | 'not_contain'
@@ -22,7 +21,6 @@ export interface Filter {
     v: any;
     o: FilterOperator;
 }
-
 
 export interface Query {
     filter?: Array<Filter>;

@@ -43,7 +43,8 @@ export class SpaceConnector {
     }
 
     static async refreshAccessToken(executeSessionTimeoutCallback: boolean): Promise<boolean> {
-        return await SpaceConnector.instance.api.refreshAccessToken(executeSessionTimeoutCallback);
+        const res = await SpaceConnector.instance.api.refreshAccessToken(executeSessionTimeoutCallback);
+        return res;
     }
 
     static get isTokenAlive(): boolean {
@@ -86,12 +87,8 @@ export class SpaceConnector {
 
     protected APIHandler(path: string) {
         return async (params: object = {}, config?: AxiosRequestConfig): Promise<any> => {
-            try {
-                const response = await this.api.instance.post(path, params, config);
-                return response.data;
-            } catch (e) {
-                throw e;
-            }
+            const response = await this.api.instance.post(path, params, config);
+            return response.data;
         };
     }
 }
