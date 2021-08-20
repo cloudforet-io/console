@@ -10,7 +10,7 @@ import { loadAuth } from '@/views/sign-in/authenticator/loader';
 
 export default {
     name: 'KBSignIn',
-    setup(props, { emit }) {
+    setup(props, { context, emit }) {
         const onSignIn = () => {
             emit('sign-in');
         };
