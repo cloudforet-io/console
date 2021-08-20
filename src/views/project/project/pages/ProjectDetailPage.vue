@@ -38,6 +38,8 @@
                 </div>
             </div>
 
+            <maintenance-happening-list ref="maintenanceHappeningListRef" class="maintenance-happening-list" />
+
             <p-tab v-if="item"
                    :tabs="singleItemTabState.tabs" :active-tab.sync="singleItemTabState.activeTab"
                    :class="[singleItemTabState.activeTab]"
@@ -113,10 +115,13 @@ import { ProjectModel } from '@/views/project/project/type';
 import { commaFormatter } from '@spaceone/console-core-lib';
 
 import BetaMark from '@/common/components/marks/BetaMark.vue';
+import MaintenanceHappeningList from '@/views/project/project/modules/MaintenanceHappeningList.vue';
+import Vue from 'vue';
 
 export default {
     name: 'ProjectDetailPage',
     components: {
+        MaintenanceHappeningList,
         MaintenanceWindowFormModal,
         GeneralPageLayout,
         ProjectFormModal,
@@ -157,6 +162,7 @@ export default {
             counts: computed(() => ({
                 TRIGGERED: find(state.alertStateCounts, { state: ALERT_STATE.TRIGGERED })?.total || 0,
             })),
+            maintenanceHappeningListRef: null as null|Vue,
         });
 
         const forceRouteToProjectPage = () => {
@@ -266,6 +272,7 @@ export default {
             singleItemTabState.activeTab = PROJECT_ROUTE.DETAIL.TAB.ALERT.MAINTENANCE_WINDOW._NAME;
             urlQueryHelper.setFilters([{ k: 'maintenance_window_id', v: maintenanceWindowId }]);
             vm.$router.replace({ name: singleItemTabState.activeTab, query: { filters: urlQueryHelper.rawQueryStrings } });
+            if (state.maintenanceHappeningListRef) state.maintenanceHappeningListRef.reload();
         };
 
         const statAlerts = async () => {
@@ -374,14 +381,7 @@ export default {
     @apply ml-3 cursor-pointer;
 }
 
-.tab-bg {
-    @apply bg-white border border-gray-200 rounded-sm pb-8;
-}
-
-.toolbox-left {
-    @apply w-full flex pr-4 ;
-    .p-search {
-        @apply w-full;
-    }
+.maintenance-happening-list {
+    margin-bottom: 1.875rem;
 }
 </style>

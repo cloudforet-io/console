@@ -1,5 +1,6 @@
 import { TimeStamp } from '@/models';
 import { TreeItem, Tree } from '@spaceone/design-system/dist/src/data-display/tree/type';
+import { MAINTENANCE_WINDOW_STATE } from '@/views/project/project/lib/config';
 
 export type ItemType = 'PROJECT_GROUP'|'PROJECT'
 
@@ -64,3 +65,6 @@ export interface FavoriteButtonProps {
 }
 
 export type ProjectGroupTreeItem = Partial<ProjectTreeItem>
+
+
+export type MAINTENANCE_WINDOW_STATE = typeof MAINTENANCE_WINDOW_STATE[keyof typeof MAINTENANCE_WINDOW_STATE]

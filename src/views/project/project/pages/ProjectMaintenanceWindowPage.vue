@@ -17,20 +17,20 @@
         >
             <template #toolbox-left>
                 <p-button style-type="primary-dark" class="mr-4" :outline="true"
-                          :disabled="selectedItems.length !== 1 || selectedItemState === STATE.CLOSED"
+                          :disabled="selectedItems.length !== 1 || selectedItemState === MAINTENANCE_WINDOW_STATE.CLOSED"
                           @click="visibleUpdateModal = true"
                 >
                     {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.UPDATE') }}
                 </p-button>
                 <p-button style-type="primary-dark" :outline="true"
-                          :disabled="!selectedItems.length || selectedItemState === STATE.CLOSED" @click="visibleCloseCheckModal = true"
+                          :disabled="!selectedItems.length || selectedItemState === MAINTENANCE_WINDOW_STATE.CLOSED" @click="visibleCloseCheckModal = true"
                 >
                     {{ $t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.CLOSE') }}
                 </p-button>
             </template>
             <template #col-state-format="{value}">
-                <p-badge :style-type="STATE[value] === STATE.OPEN ? 'yellow200' : 'gray200'">
-                    {{ STATE[value] }}
+                <p-badge :style-type="MAINTENANCE_WINDOW_STATE[value] === MAINTENANCE_WINDOW_STATE.OPEN ? 'yellow200' : 'gray200'">
+                    {{ MAINTENANCE_WINDOW_STATE[value] }}
                 </p-badge>
             </template>
             <template #col-start_time-format="{value}">
@@ -90,14 +90,8 @@ import { store } from '@/store';
 import MaintenanceWindowFormModal from '@/views/project/project/modules/MaintenanceWindowFormModal.vue';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { PROJECT_ROUTE } from '@/routes/project/project-route';
+import { MAINTENANCE_WINDOW_STATE } from '@/views/project/project/lib/config';
 
-
-const STATE = Object.freeze({
-    NONE: 'None',
-    OPEN: 'Open',
-    CLOSED: 'Closed',
-} as const);
-type STATE = typeof STATE[keyof typeof STATE]
 
 const keyItemSets: KeyItemSet[] = [
     {
@@ -158,7 +152,7 @@ export default {
             timezone: computed(() => store.state.user.timezone),
             selectIndex: [] as number[],
             selectedItems: computed<any[]>(() => state.selectIndex.map(d => state.items[d])),
-            selectedItemState: computed(() => STATE[state.selectedItems[0]?.state]),
+            selectedItemState: computed(() => MAINTENANCE_WINDOW_STATE[state.selectedItems[0]?.state]),
             queryTags: tagQueryHandler.queryTags,
             visibleUpdateModal: false,
             visibleCloseCheckModal: false,
@@ -238,7 +232,7 @@ export default {
             onChange,
             iso8601Formatter,
             getMaintenanceWindows,
-            STATE,
+            MAINTENANCE_WINDOW_STATE,
             fields,
             keyItemSets,
             valueHandlerMap,
