@@ -1,3 +1,10 @@
+# [1.1.0-beta.126](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.125...v1.1.0-beta.126) (2021-08-20)
+
+
+### Bug Fixes
+
+* remove overflow hidden from card ([#672](https://github.com/spaceone-dev/spaceone-design-system/issues/672)) ([e4f3263](https://github.com/spaceone-dev/spaceone-design-system/commit/e4f3263e78fce15da1e519c4766baa54b09a170d))
+
 # [1.1.0-beta.125](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.124...v1.1.0-beta.125) (2021-08-18)
 
 
