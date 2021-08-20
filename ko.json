@@ -1795,6 +1795,7 @@
 			"EMPTY_PROJECT_MSG": "프로젝트가 없습니다. ",
 			"EMPTY_REQUEST_VALID_PERMISSION": "프로젝트 담당자 또는 도메인 어드민에게 요청하세요. ",
 			"FAVORITES": "즐겨찾기",
+			"LABEL_STATUS": "상태",
 			"MANAGE_PROJECT_GROUP_MEMBER": "프로젝트 그룹 구성원 관리",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "이름 ",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "프로젝트 그룹 이름 ",
@@ -1806,6 +1807,7 @@
 				"TITLE": "프로젝트 그룹 삭제 "
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "프로젝트 그룹 편집",
+			"MY_NEW_ALERT": "내게 지정된 얼럿",
 			"PLACE_HOLDER_EXAMPLE": "예) 프로젝트/프로젝트 그룹",
 			"PLACE_HOLDER_PROJECT": "프로젝트 ",
 			"PLACE_HOLDER_SHOW_MORE": "더보기",
@@ -1821,6 +1823,9 @@
 			"SERVICE_ACCOUNTS": "서비스 계정 ",
 			"SHOW_ALL": "모든 프로젝트 보기 ",
 			"SHOW_ALL_TOOLTIP": "프로젝트 그룹 하위의 모든 프로젝트 보기",
+			"STATUS_ALL": "모두",
+			"STATUS_ISSUE": "이슈",
+			"STATUS_MAINTENANCE": "유지 관리",
 			"TOP_NOTI_PERMISSION_REQUIRED_1": "프로젝트 그룹 / 프로젝트의 사용 권한이 필요합니다. ",
 			"TOP_NOTI_PERMISSION_REQUIRED_2": "프로젝트 담당자 또는 도메인 관리자에게 권한을 요청하세요."
 		}

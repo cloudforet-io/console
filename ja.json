@@ -1795,6 +1795,7 @@
 			"EMPTY_PROJECT_MSG": "プロジェクトがありません",
 			"EMPTY_REQUEST_VALID_PERMISSION": "プロジェクト担当者もしくはドメインアドミンに問い合わせください。",
 			"FAVORITES": "お気に入り",
+			"LABEL_STATUS": "",
 			"MANAGE_PROJECT_GROUP_MEMBER": "プロジェクトグループのメンバ管理",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "名前",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "プロジェクトグループ名",
@@ -1806,6 +1807,7 @@
 				"TITLE": "プロジェクトグループ削除"
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "プロジェクトグループ編集",
+			"MY_NEW_ALERT": "",
 			"PLACE_HOLDER_EXAMPLE": "例）プロジェクト/プロジェクトグループ",
 			"PLACE_HOLDER_PROJECT": "プロジェクト",
 			"PLACE_HOLDER_SHOW_MORE": "もっと見る",
@@ -1821,6 +1823,9 @@
 			"SERVICE_ACCOUNTS": "サービスアカウント",
 			"SHOW_ALL": "すべてのプロジェクトを見る",
 			"SHOW_ALL_TOOLTIP": "プロジェクトグループのすべてのサブプロジェクトを見る",
+			"STATUS_ALL": "",
+			"STATUS_ISSUE": "",
+			"STATUS_MAINTENANCE": "",
 			"TOP_NOTI_PERMISSION_REQUIRED_1": "プロジェクトグループとプロジェクトの操作を実行するアクセス許可が必要です",
 			"TOP_NOTI_PERMISSION_REQUIRED_2": "プロジェクト管理者/ドメイン管理者に使用許可を要求してください。"
 		}
