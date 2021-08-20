@@ -82,12 +82,12 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { AlertDataModel } from '@/views/monitoring/alert-manager/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import AlertTitleEditModal from '@/views/monitoring/alert-manager/modules/alert-detail/AlertTitleEditModal.vue';
-import AlertDetailResourceInfo from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailResourceInfo.vue';
 import AlertDetailProjectDependency
     from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailProjectDependency.vue';
 import { i18n } from '@/translations';
 import AlertDetailInfoStatusUpdate
     from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailInfoStatusUpdate.vue';
+import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 
 export default {
     name: 'AlertDetailPage',
@@ -158,6 +158,7 @@ export default {
                     alerts: [props.id],
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_S_DELETE_ALERT'), '', root);
+                await vm.$router.push({ name: MONITORING_ROUTE.ALERT_MANAGER.ALERT._NAME });
             } catch (e) {
                 console.error(e);
                 showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_E_DELETE_ALERT'), '', root);
