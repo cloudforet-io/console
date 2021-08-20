@@ -9,7 +9,17 @@ class KbAuth extends Authenticator {
     /*
 	  Sign-in 로직 작성
 	 KB SSO sign-in 후, 상속받은 spaceONE 자체 authenticator의 sign in 로직 수행
-	 super.signIn(user_id(로그인 한 user의 ID), { access_token: 리턴된 access token });
+
+      const clientIP = await SpaceConnector.client.identity.user.getIp();
+      const credentials = {
+          secureToken: zzzzz,
+          secureSessionId: xxx,
+          requestData: ?,
+          agentId: xxx,
+          clientIP: ?
+      };
+	 super.signIn(credentials);
+
 	 */
 
     /*
