@@ -1795,7 +1795,6 @@
 			"EMPTY_PROJECT_MSG": "Looks like you don't have any Project.",
 			"EMPTY_REQUEST_VALID_PERMISSION": "Please, Request valid permission to project Admin/Domain Administrator.",
 			"FAVORITES": "Favorites",
-			"LABEL_STATUS": "Status",
 			"MANAGE_PROJECT_GROUP_MEMBER": "Manage Project Group Member",
 			"MODAL_CREATE_PROJECT_GROUP_LABEL": "Name",
 			"MODAL_CREATE_PROJECT_GROUP_PLACEHOLDER": "Project Group Name",
@@ -1807,7 +1806,6 @@
 				"TITLE": "Delete Project Group "
 			},
 			"MODAL_UPDATE_PROJECT_GROUP_TITLE": "Update Project Group",
-			"MY_NEW_ALERT": "New alert assigned to me",
 			"PLACE_HOLDER_EXAMPLE": "e.g. project/project group",
 			"PLACE_HOLDER_PROJECT": "Project",
 			"PLACE_HOLDER_SHOW_MORE": "more",
@@ -1823,9 +1821,6 @@
 			"SERVICE_ACCOUNTS": "Service Accounts",
 			"SHOW_ALL": "Show all project",
 			"SHOW_ALL_TOOLTIP": "Show all projects of sub project groups",
-			"STATUS_ALL": "All",
-			"STATUS_ISSUE": "Issue",
-			"STATUS_MAINTENANCE": "Maintenance",
 			"TOP_NOTI_PERMISSION_REQUIRED_1": "Permission required for using Project groups & Projects. ",
 			"TOP_NOTI_PERMISSION_REQUIRED_2": "Please, Request valid permission to project Admin/Domain Administrator."
 		}
