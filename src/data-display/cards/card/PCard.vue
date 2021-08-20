@@ -40,12 +40,15 @@ export default defineComponent<CardProps>({
 
 <style lang="postcss">
 .p-card {
-    @apply overflow-hidden border rounded-lg;
     header {
+        @apply border rounded-t-lg;
         padding: 0.5rem 1rem;
+        border-color: inherit;
     }
     .body {
+        @apply border-b border-l border-r rounded-b-lg;
         padding: 0.75rem 0.875rem;
+        border-color: inherit;
     }
 
     @define-mixin style-type $bg-color, $border-color {
