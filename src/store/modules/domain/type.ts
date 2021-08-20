@@ -1,4 +1,4 @@
-export type ExtendedAuthType = 'GOOGLE_OAUTH2' | 'KEYCLOAK';
+export type ExtendedAuthType = 'GOOGLE_OAUTH2' | 'KEYCLOAK' | 'KB_SSO';
 
 export interface DomainState {
     domainId?: string;
