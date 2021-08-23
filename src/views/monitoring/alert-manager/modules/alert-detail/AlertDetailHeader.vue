@@ -4,21 +4,25 @@
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.STATE') }}</span>
             <template v-if="alertState !== ALERT_STATE.ERROR">
                 <p-select-dropdown
-                    :items="ALERT_STATE_LIST"
+                    :items="alertStateList"
                     :selected="alertState"
                     class="state-dropdown"
                     @select="changeAlertState"
                 >
-                    <span class="capitalize" :class="{'text-alert': alertState === ALERT_STATE.TRIGGERED}">{{ alertState.toLowerCase() }}</span>
+                    <span :class="{'text-alert': alertState === ALERT_STATE.TRIGGERED}">
+                        {{ alertStateList.find(d => d.name === alertState).label }}
+                    </span>
                 </p-select-dropdown>
             </template>
             <template v-else>
-                <p-badge style-type="alert" shape="square">{{ALERT_STATE.ERROR}}</p-badge>
+                <p-badge style-type="alert" shape="square">
+                    {{ ALERT_STATE.ERROR }}
+                </p-badge>
             </template>
         </p>
         <p class="content-wrapper">
             <span class="title">{{ $t('MONITORING.ALERT.DETAIL.HEADER.URGENCY') }}</span>
-            <p-select-dropdown :items="ALERT_URGENCY_LIST"
+            <p-select-dropdown :items="alertUrgencyList"
                                :selected="alertUrgency"
                                :disabled="alertState === ALERT_STATE.ERROR"
                                class="state-dropdown"
@@ -30,7 +34,7 @@
                 <p-i v-if="alertUrgency === ALERT_URGENCY.LOW" name="ic_urgency_low" width="1em"
                      height="1em" class="mr-2"
                 />
-                <span class="capitalize">{{ alertUrgency.toLowerCase() }}</span>
+                <span>{{ alertUrgencyList.find(d => d.name === alertUrgency).label }}</span>
             </p-select-dropdown>
         </p>
         <p class="content-wrapper">
@@ -61,13 +65,16 @@
 import {
     PButton, PPaneLayout, PSelectDropdown, PI, PBadge,
 } from '@spaceone/design-system';
-import { reactive, toRefs, UnwrapRef } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, UnwrapRef,
+} from '@vue/composition-api';
 import { AlertDataModel } from '@/views/monitoring/alert-manager/type';
 import AlertReassignModal from '@/views/monitoring/alert-manager/modules/alert-detail/AlertReassignModal.vue';
 import dayjs from 'dayjs';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ALERT_STATE, ALERT_URGENCY } from '@/views/monitoring/alert-manager/lib/config';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 
@@ -77,18 +84,9 @@ interface HeaderState {
     alertUrgency: ALERT_URGENCY;
     reassignModalVisible: boolean;
     duration: string;
+    alertStateList: MenuItem[];
+    alertUrgencyList: MenuItem[];
 }
-
-const ALERT_STATE_LIST = Object.freeze([
-    { label: 'Triggered', name: 'TRIGGERED' },
-    { label: 'Acknowledged', name: 'ACKNOWLEDGED' },
-    { label: 'Resolved', name: 'RESOLVED' },
-]);
-
-const ALERT_URGENCY_LIST = Object.freeze([
-    { label: 'High', name: 'HIGH' },
-    { label: 'Low', name: 'LOW' },
-]);
 
 interface PropsType {
     id: string;
@@ -132,6 +130,15 @@ export default {
             alertUrgency: props.alertData?.urgency,
             reassignModalVisible: false,
             duration: calculateTime(props.alertData?.created_at),
+            alertStateList: computed(() => ([
+                { name: ALERT_STATE.TRIGGERED, label: i18n.t('MONITORING.ALERT.DETAIL.HEADER.TRIGGERED') },
+                { name: ALERT_STATE.ACKNOWLEDGED, label: i18n.t('MONITORING.ALERT.DETAIL.HEADER.ACKNOWLEDGED') },
+                { name: ALERT_STATE.RESOLVED, label: i18n.t('MONITORING.ALERT.DETAIL.HEADER.RESOLVED') },
+            ])),
+            alertUrgencyList: computed(() => ([
+                { name: ALERT_URGENCY.HIGH, label: i18n.t('MONITORING.ALERT.DETAIL.HEADER.HIGH') },
+                { name: ALERT_URGENCY.LOW, label: i18n.t('MONITORING.ALERT.DETAIL.HEADER.LOW') },
+            ])),
         });
 
         const onClickReassign = () => {
@@ -174,8 +181,6 @@ export default {
             ...toRefs(state),
             ALERT_STATE,
             ALERT_URGENCY,
-            ALERT_STATE_LIST,
-            ALERT_URGENCY_LIST,
             onClickReassign,
             onConfirmReassign,
             changeAlertState,

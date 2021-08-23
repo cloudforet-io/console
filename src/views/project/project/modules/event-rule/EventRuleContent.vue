@@ -103,7 +103,7 @@ export default {
                 { name: 'add_project_dependency', label: i18n.t('PROJECT.EVENT_RULE.PROJECT_DEPENDENCY') },
                 { name: 'change_urgency', label: i18n.t('PROJECT.EVENT_RULE.URGENCY') },
                 { name: 'change_assignee', label: i18n.t('PROJECT.EVENT_RULE.ASSIGNEE') },
-                { name: 'add_responder', label: i18n.t('PROJECT.EVENT_RULE.RESPONDER') },
+                { name: 'add_responder', label: i18n.t('PROJECT.EVENT_RULE.ADDITIONAL_RESPONDER') },
                 { name: 'add_additional_info', label: i18n.t('PROJECT.EVENT_RULE.ADDITIONAL_INFORMATION') },
                 { name: 'stop_processing', label: i18n.t('PROJECT.EVENT_RULE.THEN_STOP_PROCESSING') },
             ])),

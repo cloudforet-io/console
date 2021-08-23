@@ -68,7 +68,7 @@
             </div>
             <div class="form-box mobile-block">
                 <p class="label">
-                    {{ $t('PROJECT.EVENT_RULE.RESPONDER') }}
+                    {{ $t('PROJECT.EVENT_RULE.ADDITIONAL_RESPONDER') }}
                 </p>
                 <p-search-dropdown class="user-search-dropdown"
                                    type="checkbox"
