@@ -4,23 +4,20 @@ import { Authenticator } from '@/views/sign-in/authenticator';
 import { SpaceRouter } from '@/routes';
 import { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
 
+const BASE_URL = window.location.origin;
+
 class KeycloakAuth extends Authenticator {
     private static keycloak: Keycloak.KeycloakInstance;
 
     private static init() {
+        /* keycloak init options */
         const authOptions = store.state.domain.authOptions;
         const issuer = authOptions.issuer;
         const parsedIssuer = issuer.split('/');
-
         const authIndex = parsedIssuer.indexOf('auth');
         const baseUrl = parsedIssuer[authIndex - 1];
-
         const realm = authOptions.realm;
-        // const realmIndex = parsedIssuer.indexOf('realms');
-        // const realm = parsedIssuer[realmIndex + 1];
-
         const clientId = authOptions.client_id;
-
 
         const initOptions = {
             url: `https://${baseUrl}/auth`,
@@ -32,15 +29,12 @@ class KeycloakAuth extends Authenticator {
     }
 
     private static async onSignInFail() {
-        await SpaceRouter.router.replace({ name: SIGN_IN_ROUTE._NAME, query: { error: 'error' } });
-        if (KeycloakAuth.keycloak) await KeycloakAuth.keycloak.logout();
+        if (KeycloakAuth.keycloak) await KeycloakAuth.keycloak.logout({ redirectUri: `${BASE_URL}/sign-in/?error=error` });
     }
 
     static async signOut() {
-        // TODO: logout({redirectUri: sign-out url})
-        // ex) await KeycloakAuth.keycloak.logout({redirectUri: `${BASE_URL}/sign-out` or `${BASE_URL}/sign-in`})
         await super.signOut();
-        if (KeycloakAuth.keycloak) await KeycloakAuth.keycloak.logout();
+        if (KeycloakAuth.keycloak) await KeycloakAuth.keycloak.logout({ redirectUri: `${BASE_URL}/sign-in` });
     }
 
     private static async keycloakSignIn(auth) {
@@ -65,7 +59,6 @@ class KeycloakAuth extends Authenticator {
             })
             .catch(async (e) => {
                 console.error(e);
-                await store.dispatch('display/showSignInErrorMessage');
                 await KeycloakAuth.onSignInFail();
             });
     }
