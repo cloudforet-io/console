@@ -1193,6 +1193,7 @@
 				},
 				"EDIT_MODAL_TITLE": "알림 이름 수정",
 				"HEADER": {
+					"ACKNOWLEDGED": "확인",
 					"ALT_E_ASSIGN_MEMBER": "담당자 할당 실패",
 					"ALT_E_UPDATE_ALERT": "얼럿 변경 실패",
 					"ALT_E_UPDATE_STATE": "상태 변경 실패",
@@ -1206,7 +1207,11 @@
 					"ASSIGN": "할당",
 					"ASSIGNED_TO": "담당자",
 					"DURATION": "지속 기간",
+					"HIGH": "높음",
+					"LOW": "낮음",
+					"RESOLVED": "완료",
 					"STATE": "상태",
+					"TRIGGERED": "생성",
 					"URGENCY": "긴급도"
 				},
 				"INFO": {
@@ -1722,6 +1727,7 @@
 		"EVENT_RULE": {
 			"ADD": "추가",
 			"ADDITIONAL_INFORMATION": "추가 정보",
+			"ADDITIONAL_RESPONDER": "추가 수신자",
 			"ADD_EVENT_RULE": "이벤트 규칙 추가",
 			"ALL": "모두를",
 			"ALT_E_CREATE_EVENT_RULE": "이벤트 규칙 생성 실패",
@@ -1759,7 +1765,6 @@
 			"PAUSE_NOTIFICATION": "알림 정지",
 			"PROJECT_DEPENDENCY": "프로젝트 의존성",
 			"PROJECT_ROUTING": "프로젝트 라우팅",
-			"RESPONDER": "수신자",
 			"SAVE": "저장",
 			"SNOOZED_NOTIFICATIONS": "알림 중지",
 			"THEN_STOP_PROCESSING": "이후 작업 실행하지 않기",

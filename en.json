@@ -1193,6 +1193,7 @@
 				},
 				"EDIT_MODAL_TITLE": "Edit Alert Name",
 				"HEADER": {
+					"ACKNOWLEDGED": "Acknowledged",
 					"ALT_E_ASSIGN_MEMBER": "Failed to Assign Member",
 					"ALT_E_UPDATE_ALERT": "Failed to Update Alert",
 					"ALT_E_UPDATE_STATE": "Failed to Update State",
@@ -1206,7 +1207,11 @@
 					"ASSIGN": "Assign",
 					"ASSIGNED_TO": "Assigned to",
 					"DURATION": "Duration",
+					"HIGH": "High",
+					"LOW": "Low",
+					"RESOLVED": "Resolved",
 					"STATE": "State",
+					"TRIGGERED": "Triggered",
 					"URGENCY": "Urgency"
 				},
 				"INFO": {
@@ -1722,6 +1727,7 @@
 		"EVENT_RULE": {
 			"ADD": "Add",
 			"ADDITIONAL_INFORMATION": "Additional Information",
+			"ADDITIONAL_RESPONDER": "Additional Responder",
 			"ADD_EVENT_RULE": "Add Event Rule",
 			"ALL": "All",
 			"ALT_E_CREATE_EVENT_RULE": "Failed to Create Event Rule",
@@ -1759,7 +1765,6 @@
 			"PAUSE_NOTIFICATION": "Pause Notifications",
 			"PROJECT_DEPENDENCY": "Project Dependency",
 			"PROJECT_ROUTING": "Project Routing",
-			"RESPONDER": "Responder",
 			"SAVE": "Save",
 			"SNOOZED_NOTIFICATIONS": "No Notifications",
 			"THEN_STOP_PROCESSING": "Then stop processing",

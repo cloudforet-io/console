@@ -1193,6 +1193,7 @@
 				},
 				"EDIT_MODAL_TITLE": "アラート名を修正",
 				"HEADER": {
+					"ACKNOWLEDGED": "確認",
 					"ALT_E_ASSIGN_MEMBER": "担当指定に失敗",
 					"ALT_E_UPDATE_ALERT": "アラート変更に失敗",
 					"ALT_E_UPDATE_STATE": "ステータス変更に失敗",
@@ -1206,7 +1207,11 @@
 					"ASSIGN": "指定",
 					"ASSIGNED_TO": "担当者",
 					"DURATION": "持続期間",
+					"HIGH": "高い",
+					"LOW": "低い",
+					"RESOLVED": "完了",
 					"STATE": "状態",
+					"TRIGGERED": "生成",
 					"URGENCY": "緊急度"
 				},
 				"INFO": {
@@ -1722,6 +1727,7 @@
 		"EVENT_RULE": {
 			"ADD": "追加",
 			"ADDITIONAL_INFORMATION": "追加情報",
+			"ADDITIONAL_RESPONDER": "追加受信先",
 			"ADD_EVENT_RULE": "イベントルール追加",
 			"ALL": "すべて",
 			"ALT_E_CREATE_EVENT_RULE": "イベントルール作成に失敗",
@@ -1759,7 +1765,6 @@
 			"PAUSE_NOTIFICATION": "通知停止",
 			"PROJECT_DEPENDENCY": "プロジェクト依存性",
 			"PROJECT_ROUTING": "プロジェクトルーティング",
-			"RESPONDER": "受信者",
 			"SAVE": "保存",
 			"SNOOZED_NOTIFICATIONS": "通知なし",
 			"THEN_STOP_PROCESSING": "その後、作業は停止する",
