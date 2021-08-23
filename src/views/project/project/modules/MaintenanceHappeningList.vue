@@ -1,7 +1,7 @@
 <template>
     <p-list-card v-if="visible && !loading && items.length !== 0"
                  :loading="loading" :items="items"
-                 style-type="red400"
+                 style-type="yellow500"
     >
         <template #header>
             <div class="header-wrapper" @click="onClickHeader">

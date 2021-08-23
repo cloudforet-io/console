@@ -57,6 +57,7 @@
                                                     style-type="primary-dark"
                                                     outline
                                                     name="ic_plus_bold"
+                                                    :disabled="!hasRootProjectPermission"
                                                     @click="openProjectGroupCreateForm"
                                 >
                                     {{ $t('PROJECT.LANDING.CREATE_GROUP') }}
@@ -234,6 +235,7 @@ export default {
             groupMemberCount: 0 as number|undefined,
             groupMemberPageVisible: false,
             isPermissionDenied: computed(() => state.groupMemberCount === undefined),
+            hasRootProjectPermission: computed(() => store.getters['user/hasDomainRole']),
         });
 
 
@@ -288,9 +290,8 @@ export default {
             store.dispatch('projectPage/openProjectCreateForm', storeState.selectedItem);
         };
 
-
         /* Member Count */
-        watch(() => storeState.groupId, async (groupId) => {
+        const getMemberCount = async (groupId: string) => {
             if (groupId) {
                 try {
                     const res = await SpaceConnector.client.identity.projectGroup.member.list({
@@ -303,6 +304,23 @@ export default {
                 }
             } else {
                 state.groupMemberCount = 0;
+            }
+        };
+
+
+        watch(() => storeState.groupId, async (groupId) => {
+            await getMemberCount(groupId);
+        });
+
+        // refresh permission info when get back from project group member page
+        watch(() => state.groupMemberPageVisible, async (visible) => {
+            if (storeState.groupId && !visible) {
+                await getMemberCount(storeState.groupId);
+                if (state.isPermissionDenied) {
+                    store.commit('projectPage/addPermissionInfo', {
+                        [storeState.groupId]: false,
+                    });
+                }
             }
         });
 

@@ -17,6 +17,7 @@
                                        name="ic_plus_thin" style-type="transparent" size="sm"
                                        color="inherit"
                                        class="ml-1"
+                                       :disabled="!hasRootProjectPermission"
                                        @click="openProjectGroupCreateForm()"
                         />
                     </template>
@@ -59,11 +60,6 @@
                     <template #data="{node}">
                         {{ node.data.name }}
                     </template>
-                    <template #toggle="{node}">
-                        <p-i v-if="node.loading" name="ic_working"
-                             width="1rem" height="1rem"
-                        />
-                    </template>
                     <template #toggle-right="{node}">
                         <favorite-button v-if="node.data.item_type === 'PROJECT_GROUP'"
                                          :item-id="node.data.id"
@@ -81,7 +77,7 @@
                         />
                     </template>
                     <template #right-extra="{node, path}">
-                        <p-icon-button v-if="treeEditMode && node.data.item_type !== 'PROJECT' && (permissionInfo[node.data.id] || node.data.has_permission)"
+                        <p-icon-button v-if="treeEditMode && node.data.item_type !== 'PROJECT' && permissionInfo[node.data.id]"
                                        name="ic_delete" class="group-delete-btn"
                                        size="sm"
                                        color="inherit"
@@ -89,6 +85,7 @@
                         />
                         <p-icon-button v-if="!treeEditMode && node.data.item_type !== 'PROJECT'" name="ic_plus" class="group-add-btn"
                                        size="sm"
+                                       :disabled="permissionInfo[node.data.id] !== true"
                                        @click.stop="openProjectGroupCreateForm({node, path})"
                         />
                     </template>
@@ -142,11 +139,11 @@ export default {
         const state = reactive({
             loading: false,
             rootNode: computed(() => store.state.projectPage.rootNode),
-            permissionInfo: {},
+            permissionInfo: computed(() => store.state.projectPage.permissionInfo),
             treeEditMode: computed(() => store.state.projectPage.treeEditMode),
             editOptions: computed(() => ({
                 disabled: !state.treeEditMode,
-                editStartValidator: item => !!(state.permissionInfo[item.data.id] || item.data.has_permission) || (item.data.item_type !== 'PROJECT'),
+                editStartValidator: item => (state.permissionInfo[item.data.id] || item.data.has_permission) && (item.data.item_type !== 'PROJECT'),
                 validator: text => (text && text.length > 2 && text.length < 40),
                 dataSetter(text, originData) {
                     return {
@@ -179,6 +176,7 @@ export default {
             dragParent: null as any,
             allProjectRoot: null as any,
             allProjectNode: computed(() => ([vm.$t('PROJECT.LANDING.ALL_PROJECT')])),
+            hasRootProjectPermission: computed(() => store.getters['user/hasDomainRole']),
         });
 
         const toggleOptions = {
@@ -221,27 +219,6 @@ export default {
             return state.rootNode.getAllItems();
         };
 
-        const permissionApiQueryHelper = new ApiQueryHelper();
-        const setPermissionInfo = async (ids: string[]) => {
-            const res = {};
-
-            try {
-                permissionApiQueryHelper.setOnly('project_group_id')
-                    .setFilters([{ k: 'project_group_id', v: ids }]);
-
-                const { results } = await SpaceConnector.client.identity.projectGroup.list({
-                    query: permissionApiQueryHelper.data,
-                    author_within: true,
-                });
-                results.forEach((d) => {
-                    res[d.project_group_id] = true;
-                });
-            } catch (e) {
-                console.error(e);
-            }
-
-            state.permissionInfo = res;
-        };
 
         const dataFetcher = async (node: any = {}, projectOnly = false): Promise<ProjectItemResp[]> => {
             try {
@@ -269,6 +246,11 @@ export default {
                     store.commit('projectPage/setHasProjectGroup', Array.isArray(items) ? !!items.length : false);
                 }
 
+                store.dispatch(
+                    'projectPage/addPermissionInfo',
+                    items.filter(d => d.item_type === 'PROJECT_GROUP')
+                        .map(d => d.id),
+                );
                 return items;
             } catch (e) {
                 console.error(e);
@@ -311,7 +293,6 @@ export default {
             const items = getAllCurrentItems();
             state.loading = true;
             if (treeEditMode) {
-                await setPermissionInfo(items.map(d => d.node.data.id));
                 await addProjectNodes(items);
             } else {
                 await removeProjectNodes(items);

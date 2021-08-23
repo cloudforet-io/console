@@ -2,6 +2,7 @@ import { Action } from 'vuex';
 import { ProjectPageState } from '@/views/project/project/store/type';
 import { ProjectGroupTreeItem, ProjectItemResp } from '@/views/project/project/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
 export const initRoot: Action<ProjectPageState, any> = ({ dispatch, commit }, root) => {
     commit('setRootNode', root);
@@ -75,6 +76,7 @@ export const createProjectGroup: Action<ProjectPageState, any> = async ({ state,
             }
         }
 
+        commit('addPermissionInfo', { [res.project_group_id]: true });
         commit('setHasProjectGroup', true);
     } catch (e) {
         throw new Error(e);
@@ -120,6 +122,65 @@ export const deleteProjectGroup: Action<ProjectPageState, any> = async ({ state,
         throw new Error(e);
     } finally {
         commit('setActionTargetItem', {});
+    }
+};
+
+const permissionApiQueryHelper = new ApiQueryHelper();
+const getPermissionInfo = async (ids: string[]): Promise<Record<string, boolean>> => {
+    const permissionInfo = {};
+
+    permissionApiQueryHelper.setOnly('project_group_id')
+        .setFilters([{ k: 'project_group_id', v: ids }]);
+
+    const { results } = await SpaceConnector.client.identity.projectGroup.list({
+        query: permissionApiQueryHelper.data,
+        author_within: true,
+    });
+
+    results.forEach((d) => {
+        permissionInfo[d.project_group_id] = true;
+    });
+
+    return permissionInfo;
+};
+
+let refreshPermissionInfoLoading;
+export const refreshPermissionInfo: Action<ProjectPageState, any> = async ({ commit, state }, ids?: string[]): Promise<void> => {
+    if (refreshPermissionInfoLoading) return;
+
+    const projectGroupIds = ids || Object.keys(state.permissionInfo);
+    if (!projectGroupIds.length) return;
+
+    refreshPermissionInfoLoading = true;
+
+    try {
+        const permissionInfo = await getPermissionInfo(projectGroupIds);
+
+        if (ids) commit('addPermissionInfo', permissionInfo);
+        else commit('setPermissionInfo', permissionInfo);
+    } catch (e) {
+        console.error(e);
+    } finally {
+        refreshPermissionInfoLoading = false;
+    }
+};
+
+let loadingAddPermissionInfo;
+export const addPermissionInfo: Action<ProjectPageState, any> = async ({ commit, state }, ids: string[]): Promise<void> => {
+    if (loadingAddPermissionInfo) return;
+
+    const projectGroupIds = ids.filter(id => state.permissionInfo[id] === undefined);
+    if (!projectGroupIds.length) return;
+
+    loadingAddPermissionInfo = true;
+
+    try {
+        const permissionInfo = await getPermissionInfo(projectGroupIds);
+        commit('addPermissionInfo', permissionInfo);
+    } catch (e) {
+        console.error(e);
+    } finally {
+        loadingAddPermissionInfo = false;
     }
 };
 

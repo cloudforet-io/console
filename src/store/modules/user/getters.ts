@@ -21,7 +21,7 @@ export const isAdmin = (state: UserState): boolean => {
 };
 export const languageLabel = (state: UserState): string => languages[state.language as string] || state.language;
 export const userTypeLabel = (state: UserState): string => userTypes[state.userType as string] || state.userType;
-export const getRoleNames = (state: UserState): Array<string> => {
+export const roleNames = (state: UserState): Array<string> => {
     const systemRoleNames: Array<string> = [];
     const domainRoleNames: Array<string> = [];
     const projectRoleNames: Array<string> = [];
@@ -49,4 +49,13 @@ export const getRoleNames = (state: UserState): Array<string> => {
     }
     return ['No Role'];
 };
+
+export const hasDomainRole = (state: UserState): boolean => {
+    if (state.roles) {
+        return state.roles.some(role => role.roleType === 'DOMAIN');
+    }
+
+    return false;
+};
+
 export const hasPermission = (state: UserState): boolean => !!state.roles?.length;

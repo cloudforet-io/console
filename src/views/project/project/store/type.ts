@@ -8,6 +8,7 @@ export interface ProjectPageState {
     rootNode?: ProjectTreeRoot|null;
     selectedItem: ProjectGroupTreeItem;
     treeEditMode: boolean;
+    permissionInfo: Record<string, boolean>;
 
     hasProjectGroup?: boolean;
     projectCount?: number;

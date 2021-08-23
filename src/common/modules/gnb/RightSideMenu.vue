@@ -159,7 +159,7 @@ export default {
             name: computed(() => store.state.user.name),
             email: computed(() => store.state.user.email),
             role: computed(() => {
-                const roleArray = store.getters['user/getRoleNames'];
+                const roleArray = store.getters['user/roleNames'];
                 return roleArray.join(', ');
             }),
             language: computed(() => store.getters['user/languageLabel']),

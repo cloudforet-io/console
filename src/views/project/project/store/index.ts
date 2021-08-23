@@ -11,6 +11,7 @@ const state: ProjectPageState = {
     rootNode: null,
     selectedItem: {},
     treeEditMode: false,
+    permissionInfo: {},
 
     hasProjectGroup: undefined,
     projectCount: undefined,

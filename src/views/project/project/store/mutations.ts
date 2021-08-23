@@ -30,6 +30,14 @@ export const setTreeEditMode: Mutation<ProjectPageState> = (state, treeEditMode:
     state.treeEditMode = treeEditMode;
 };
 
+export const setPermissionInfo: Mutation<ProjectPageState> = (state, permissionInfo: Record<string, boolean>) => {
+    state.permissionInfo = permissionInfo;
+};
+
+export const addPermissionInfo: Mutation<ProjectPageState> = (state, permissionInfo: Record<string, boolean>) => {
+    state.permissionInfo = { ...state.permissionInfo, ...permissionInfo };
+};
+
 export const setActionTargetItem: Mutation<ProjectPageState> = (state, actionTargetItem: ProjectGroupTreeItem = {}) => {
     state.actionTargetItem = actionTargetItem;
 };

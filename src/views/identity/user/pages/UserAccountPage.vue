@@ -139,7 +139,7 @@ export default {
             userName: '' as string | undefined,
             isAdmin: computed(() => store.getters['user/isAdmin']).value,
             userRole: computed(() => {
-                const roleArray = store.getters['user/getRoleNames'];
+                const roleArray = store.getters['user/roleNames'];
                 return roleArray.join(', ');
             }),
             userType: computed(() => store.state.user.backend) as unknown as string,
