@@ -1259,6 +1259,7 @@
 				},
 				"RESPONDER": {
 					"ADDITIONAL_RESPONDER": "追加受信先",
+					"COMPLETED": "",
 					"CURRENT": "現在",
 					"HIDE": "隠す",
 					"LEVEL": "レベル",

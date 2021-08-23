@@ -1259,6 +1259,7 @@
 				},
 				"RESPONDER": {
 					"ADDITIONAL_RESPONDER": "추가 수신인 ",
+					"COMPLETED": "완료됨",
 					"CURRENT": "현재",
 					"HIDE": "숨기기",
 					"LEVEL": "레벨",

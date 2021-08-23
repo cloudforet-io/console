@@ -1259,6 +1259,7 @@
 				},
 				"RESPONDER": {
 					"ADDITIONAL_RESPONDER": "Additional Responder",
+					"COMPLETED": "Completed",
 					"CURRENT": "Current",
 					"HIDE": "hide",
 					"LEVEL": "Level",
