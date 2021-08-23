@@ -117,6 +117,8 @@ class API {
             if (!isTokenValid) {
                 await this.refreshAccessToken();
             }
+        } else {
+            await this.refreshAccessToken();
         }
     }
 
