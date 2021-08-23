@@ -165,14 +165,14 @@ export const refreshPermissionInfo: Action<ProjectPageState, any> = async ({ com
     }
 };
 
-let loadingAddPermissionInfo;
+let addPermissionInfoLoading;
 export const addPermissionInfo: Action<ProjectPageState, any> = async ({ commit, state }, ids: string[]): Promise<void> => {
-    if (loadingAddPermissionInfo) return;
+    if (addPermissionInfoLoading) return;
 
     const projectGroupIds = ids.filter(id => state.permissionInfo[id] === undefined);
     if (!projectGroupIds.length) return;
 
-    loadingAddPermissionInfo = true;
+    addPermissionInfoLoading = true;
 
     try {
         const permissionInfo = await getPermissionInfo(projectGroupIds);
@@ -180,7 +180,7 @@ export const addPermissionInfo: Action<ProjectPageState, any> = async ({ commit,
     } catch (e) {
         console.error(e);
     } finally {
-        loadingAddPermissionInfo = false;
+        addPermissionInfoLoading = false;
     }
 };
 

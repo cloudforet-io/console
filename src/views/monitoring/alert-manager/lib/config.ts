@@ -1,4 +1,6 @@
-import { RouteQueryString } from '@/lib/router-query-string';
+import {
+    red, coral, yellow, blue, violet, gray,
+} from '@/styles/colors';
 
 export enum ACTION {
     create = 'create',
@@ -55,12 +57,12 @@ export const ALERT_URGENCY = Object.freeze({
 export type ALERT_URGENCY = typeof ALERT_URGENCY[keyof typeof ALERT_URGENCY];
 
 export const ALERT_SEVERITY = {
-    CRITICAL: 'CRITICAL',
-    ERROR: 'ERROR',
-    WARNING: 'WARNING',
-    INFO: 'INFO',
-    NOT_AVAILABLE: 'NOT AVAILABLE',
-    NONE: 'NONE',
+    CRITICAL: 'Critical',
+    ERROR: 'Error',
+    WARNING: 'Warning',
+    INFO: 'Info',
+    NOT_AVAILABLE: 'Not Available',
+    NONE: 'None',
 };
 export type ALERT_SEVERITY = typeof ALERT_SEVERITY[keyof typeof ALERT_SEVERITY];
 
@@ -79,3 +81,12 @@ export const ASSIGNED_STATE = Object.freeze({
     ASSIGNED_TO_ME: 'ASSIGNED_TO_ME',
 } as const);
 export type ASSIGNED_STATE = typeof ASSIGNED_STATE[keyof typeof ASSIGNED_STATE];
+
+export const ALERT_SEVERITY_COLORS: Record<keyof typeof ALERT_SEVERITY, string> = {
+    CRITICAL: red[600],
+    ERROR: coral[600],
+    WARNING: yellow[600],
+    INFO: blue[400],
+    NOT_AVAILABLE: violet[800],
+    NONE: gray[500],
+};

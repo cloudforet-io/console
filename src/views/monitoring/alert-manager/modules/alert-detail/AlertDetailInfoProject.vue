@@ -2,7 +2,7 @@
     <fragment>
         <p v-if="!isEditMode" class="content-wrapper">
             <span class="project">
-                <p-copy-button>
+                <p-copy-button :value="alertData.project_id">
                     <p-anchor :to="referenceRouter(
                                   alertData.project_id,
                                   { resource_type: 'identity.Project' })"

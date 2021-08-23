@@ -18,7 +18,7 @@
             </template>
         </p-page-title>
         <section class="detail-contents-wrapper">
-            <div class="grid col-span-8 left-wrapper">
+            <div class="left-wrapper">
                 <alert-detail-header v-if="!loading" :id="id" class="header"
                                      :alert-data="alertInfo"
                                      @confirm="getAlertData"
@@ -37,7 +37,7 @@
                                                  class="timeline-and-event"
                 />
             </div>
-            <div class="grid col-span-4 right-wrapper">
+            <div class="right-wrapper">
                 <alert-detail-responder v-if="!loading" :id="id" class="responder"
                                         :alert-data="alertInfo"
                 />
@@ -88,6 +88,7 @@ import { i18n } from '@/translations';
 import AlertDetailInfoStatusUpdate
     from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailInfoStatusUpdate.vue';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
+import { store } from '@/store';
 
 export default {
     name: 'AlertDetailPage',
@@ -177,7 +178,11 @@ export default {
         };
 
         (async () => {
-            await getAlertData();
+            await Promise.all([
+                store.dispatch('resource/webhook/load'),
+                store.dispatch('resource/user/load'),
+                getAlertData(),
+            ]);
         })();
 
         return {
@@ -212,11 +217,14 @@ export default {
     @apply grid grid-cols-12 gap-4 w-full;
     grid-auto-flow: row;
     grid-auto-rows: max-content;
+
     .left-wrapper {
-        @apply gap-4;
+        @apply grid col-span-8 gap-4;
+        grid-auto-rows: max-content;
     }
     .right-wrapper {
-        @apply gap-4;
+        @apply grid col-span-4 gap-4;
+        grid-auto-rows: max-content;
     }
 
     @screen tablet {

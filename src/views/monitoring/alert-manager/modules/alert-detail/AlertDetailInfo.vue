@@ -5,6 +5,19 @@
                             style-type="white"
                             block
         >
+            <template #data-description>
+                <alert-detail-info-description :id="id" :alert-data="data" @update="$emit('update')" />
+            </template>
+            <template #data-rule="{value}">
+                <span v-if="Object.keys(value).length === 0">
+                    --
+                </span>
+            </template>
+            <template #data-severity="{value}">
+                <p-badge outline :background-color="ALERT_SEVERITY_COLORS[value]">
+                    {{ ALERT_SEVERITY[value] || value }}
+                </p-badge>
+            </template>
             <template #data-escalation_policy_id>
                 <p-anchor :to="{ name: MONITORING_ROUTE.ALERT_MANAGER.ESCALATION_POLICY._NAME }" highlight>
                     {{ escalationPolicyName }}
@@ -12,6 +25,9 @@
             </template>
             <template #data-project_id>
                 <alert-detail-info-project :id="id" :alert-data="data" @update="$emit('update')" />
+            </template>
+            <template #data-triggered_by="{ value }">
+                {{ value ? triggeredByFormatter(value) : ' ' }}
             </template>
             <template #data-created_at>
                 {{ iso8601Formatter(data.created_at, timezone) }}
@@ -23,14 +39,6 @@
             <template #data-resolved_at>
                 <span v-if="data.resolved_at"> {{ iso8601Formatter(data.resolved_at, timezone) }}</span>
                 <span v-else>--</span>
-            </template>
-            <template #data-description>
-                <alert-detail-info-description :id="id" :alert-data="data" @update="$emit('update')" />
-            </template>
-            <template #data-rule="{value}">
-                <span v-if="Object.keys(value).length === 0">
-                    --
-                </span>
             </template>
             <template #data-additional_info="{value}">
                 <span v-if="Object.keys(value).length === 0">
@@ -48,7 +56,7 @@
 
 <script lang="ts">
 import {
-    PPaneLayout, PDefinitionTable, PAnchor,
+    PPaneLayout, PDefinitionTable, PAnchor, PBadge,
 } from '@spaceone/design-system';
 import {
     computed, reactive, toRefs,
@@ -61,10 +69,10 @@ import { AlertDataModel } from '@/views/monitoring/alert-manager/type';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { i18n } from '@/translations';
 import AlertDetailInfoProject from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailInfoProject.vue';
-import AlertDetailInfoStatusMsg
-    from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailInfoStatusUpdate.vue';
 import AlertDetailInfoDescription
     from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailInfoDescription.vue';
+import { triggeredByFormatter } from '@/views/monitoring/alert-manager/lib/helper';
+import { ALERT_SEVERITY, ALERT_SEVERITY_COLORS } from '@/views/monitoring/alert-manager/lib/config';
 
 interface Props {
     id: string;
@@ -84,6 +92,7 @@ export default {
         PPaneLayout,
         PDefinitionTable,
         PAnchor,
+        PBadge,
     },
     props: {
         id: {
@@ -101,9 +110,17 @@ export default {
                 { name: 'description', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.DESC'), disableCopy: true },
                 { name: 'rule', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.RULE'), disableCopy: true },
                 { name: 'severity', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.SEVERITY'), disableCopy: true },
-                { name: 'escalation_policy_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ESCALATION_POLICY') },
+                {
+                    name: 'escalation_policy_id',
+                    label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ESCALATION_POLICY'),
+                    copyValueFormatter: () => state.data.escalation_policy_id,
+                },
                 { name: 'project_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.PROJECT'), disableCopy: true },
-                { name: 'triggered_by', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY') },
+                {
+                    name: 'triggered_by',
+                    label: i18n.t('MONITORING.ALERT.DETAIL.INFO.TRIGGERED_BY'),
+                    copyValueFormatter: () => state.data.triggered_by,
+                },
                 { name: 'resource.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
             ],
             data: props.alertData || {},
@@ -136,6 +153,9 @@ export default {
             referenceRouter,
             EDIT_MODE,
             MONITORING_ROUTE,
+            triggeredByFormatter,
+            ALERT_SEVERITY,
+            ALERT_SEVERITY_COLORS,
         };
     },
 };

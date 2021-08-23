@@ -3,6 +3,13 @@
         <article class="responder-wrapper">
             <p-panel-top class="panel-title">
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.RESPONDER') }}
+                <template #extra>
+                    <div class="w-full text-right">
+                        <p-badge outline style-type="indigo">
+                            {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.COMPLETED') }}
+                        </p-badge>
+                    </div>
+                </template>
             </p-panel-top>
             <p-collapsible-list :items="escalationRuleItems" theme="card" multi-unfoldable
                                 :unfolded-indices="[alertData.escalation_step - 1]"
@@ -224,7 +231,8 @@ export default {
     padding: 0 1rem 2.5rem 1rem;
 }
 .panel-title {
-    @apply -ml-1;
+    margin-left: 0;
+    margin-right: 0;
 }
 .responder-info {
     display: inline-flex;
