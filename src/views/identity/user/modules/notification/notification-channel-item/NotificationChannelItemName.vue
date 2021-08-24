@@ -46,7 +46,7 @@
 <script lang="ts">
 import { PButton, PI, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import {computed, reactive, toRefs} from '@vue/composition-api';
-import { useNotificationItem } from '@/views/identity/user/modules/notification/notification-channel-item/hooks';
+import { useNotificationItem } from '@/views/identity/user/modules/notification/notification-channel-item/composables';
 import { EDIT_TYPE, PARAM_KEY_TYPE } from '@/views/identity/user/modules/notification/notification-channel-item/type';
 import {i18n} from "@/translations";
 

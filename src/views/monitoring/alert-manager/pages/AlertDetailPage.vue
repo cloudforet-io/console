@@ -69,7 +69,7 @@
 <script lang="ts">
 import { PBreadcrumbs, PIconButton, PPageTitle } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs,
 } from '@vue/composition-api';
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
 import AlertDetailHeader from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailHeader.vue';
@@ -89,6 +89,9 @@ import AlertDetailInfoStatusUpdate
     from '@/views/monitoring/alert-manager/modules/alert-detail/AlertDetailInfoStatusUpdate.vue';
 import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 import { store } from '@/store';
+import alertStoreModule from '@/views/monitoring/alert-manager/store';
+import { AlertStoreState } from '@/views/monitoring/alert-manager/store/type';
+import { registerServiceStore } from '@/common/composables/registerServiceStore';
 
 export default {
     name: 'AlertDetailPage',
@@ -115,6 +118,8 @@ export default {
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+        registerServiceStore<AlertStoreState>('alert', alertStoreModule);
+
         const state = reactive({
             alertInfo: {} as AlertDataModel,
             loading: true,

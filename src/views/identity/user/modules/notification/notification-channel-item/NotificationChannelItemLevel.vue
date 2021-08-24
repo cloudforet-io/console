@@ -63,7 +63,7 @@ import {
     PBadge, PButton, PI, PTextInput,
 } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
-import { useNotificationItem } from '@/views/identity/user/modules/notification/notification-channel-item/hooks';
+import { useNotificationItem } from '@/views/identity/user/modules/notification/notification-channel-item/composables';
 import {
     EDIT_TYPE,
     PARAM_KEY_TYPE,

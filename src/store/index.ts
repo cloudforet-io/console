@@ -7,6 +7,7 @@ import domain from './modules/domain';
 import resource from './modules/resource';
 import display from './modules/display';
 import file from './modules/file';
+import service from './modules/service';
 import plugins from './plugins';
 
 Vue.use(Vuex);
@@ -20,6 +21,7 @@ const store = new Vuex.Store({
         resource,
         display,
         file,
+        service,
     },
     plugins,
 });

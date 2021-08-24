@@ -115,7 +115,7 @@ import {
     checkEmailFormat, checkEmptyValue, checkMinLength,
     checkOauth, checkOneLowerCase, checkOneNumber, checkOneUpperCase,
     checkRequiredField, checkSamePassword, Validation,
-} from '@/views/identity/user/hooks/useValidations';
+} from '@/views/identity/user/composables/useValidations';
 
 interface AuthType {
     user_type: string;

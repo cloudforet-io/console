@@ -60,7 +60,7 @@ import {
     PButton, PAnchor, PButtonModal, PCopyButton,
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { useAlertDetailItem } from '@/views/monitoring/alert-manager/modules/alert-detail/hooks';
+import { useAlertDetailItem } from '@/views/monitoring/alert-manager/modules/alert-detail/composables';
 import { EDIT_MODE } from '@/views/monitoring/alert-manager/lib/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';

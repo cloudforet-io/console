@@ -28,7 +28,7 @@
 <script lang="ts">
 import { PTextarea, PButton } from '@spaceone/design-system';
 import { toRefs } from '@vue/composition-api';
-import { useAlertDetailItem } from '@/views/monitoring/alert-manager/modules/alert-detail/hooks';
+import { useAlertDetailItem } from '@/views/monitoring/alert-manager/modules/alert-detail/composables';
 import { EDIT_MODE } from '@/views/monitoring/alert-manager/lib/config';
 
 export default {
