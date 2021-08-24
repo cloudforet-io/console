@@ -78,7 +78,7 @@ module.exports = {
             'error',
             {
                 selector: 'variable',
-                format: ['camelCase']
+                format: ['camelCase', 'UPPER_CASE']
             }
         ],
         '@typescript-eslint/no-empty-function': ['off'], // use eslint no-empty-function rule
