@@ -198,7 +198,10 @@ export default {
 
                 series.columns.template.events.on('hit', (event) => {
                     const clickedData = event.target.dataItem.dataContext;
-                    emit('click-date', clickedData.date);
+                    emit('click-date', {
+                        type,
+                        date: clickedData.date,
+                    });
                 });
 
                 // tooltip

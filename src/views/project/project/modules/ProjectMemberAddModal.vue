@@ -30,6 +30,7 @@
                         :show-selected-list="true"
                         :show-tag-box="false"
                         :show-select-all="true"
+                        use-fixed-menu-style
                     />
                     <p-search-dropdown
                         v-show="activeTab !== FORM_MODE.INTERNAL_USER"
