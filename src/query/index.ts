@@ -16,7 +16,7 @@ import {
     datetimeRawQueryOperatorToQueryTagOperatorMap, rawQueryOperatorToApiQueryOperatorMap,
     rawQueryOperatorToPluralApiQueryOperatorMap
 } from '@src/query/config';
-import { setDatetimeToFilters } from '@src/query/helper';
+import { getDatetimeToFilters } from '@src/query/helper';
 import { flatten, forEach } from 'lodash';
 import { ComputedRef } from '@vue/composition-api';
 
@@ -56,14 +56,15 @@ const filterToQueryTag = (filter: { k?: string; v: QueryStoreFilterValue; o?: Ra
     };
 };
 const filterToApiQueryFilter = (_filters: QueryStoreFilter[], timezone = 'UTC') => {
-    const filter: Filter[] = [];
+    let filter: Filter[] = [];
     const keyword: string[] = [];
 
     _filters.forEach((f) => {
         if (f.k) {
             if (datetimeRawQueryOperatorToQueryTagOperatorMap[f.o as string]) {
                 /* datetime case */
-                setDatetimeToFilters(filter, f, timezone);
+                const datetimeFilters = getDatetimeToFilters(f, timezone);
+                if (datetimeFilters) filter = filter.concat(datetimeFilters);
             } else if (Array.isArray(f.v)) {
                 /* plural case */
                 if (rawQueryOperatorToPluralApiQueryOperatorMap[f.o || '']) {
