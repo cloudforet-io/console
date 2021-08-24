@@ -245,13 +245,13 @@ export class QueryHelper {
         return JSON.stringify(this.rawQueries);
     }
 
-    get apiQuery(): Required<Pick<Query, 'filter'|'filter_or'|'keyword'>> {
+    get apiQuery() {
         const { filter, keyword } = filterToApiQueryFilter(this._filters, QueryHelper.timezone?.value);
         const { filter: filterOr } = filterToApiQueryFilter(this._orFilters, QueryHelper.timezone?.value);
 
         return {
             filter,
-            filter_or: filterOr,
+            filterOr,
             keyword: keyword.join(' ') || ''
         };
     }
