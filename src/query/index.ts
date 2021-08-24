@@ -5,7 +5,7 @@ import {
     OperatorType,
     QueryItem
 } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
-import { Filter, FilterOperator, Query } from '@src/space-connector/type';
+import { Filter, FilterOperator } from '@src/space-connector/type';
 import {
     QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator
 } from '@src/query/type';
