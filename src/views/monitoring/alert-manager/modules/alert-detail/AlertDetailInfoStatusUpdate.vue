@@ -34,10 +34,11 @@
 import {
     PButtonModal, PPaneLayout, PTextarea, PFieldGroup, PEmpty,
 } from '@spaceone/design-system';
-import { reactive, toRefs } from '@vue/composition-api';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
+import { store } from '@/store';
 
 export default {
     name: 'AlertDetailInfoStatusUpdate',
@@ -61,8 +62,8 @@ export default {
     setup(props, { emit, root }) {
         const state = reactive({
             modalVisible: false,
-            status: '',
-            statusInput: props.alertData?.status_message,
+            status: computed(() => store.state.service.alert.alertData?.status_message),
+            statusInput: '',
             loading: true,
         });
         const openStatusUpdateModal = () => {
@@ -71,9 +72,11 @@ export default {
         const updateStatus = async () => {
             try {
                 state.loading = true;
-                await SpaceConnector.client.monitoring.alert.update({
-                    alert_id: props.id,
-                    status_message: state.statusInput,
+                await store.dispatch('service/alert/updateAlertData', {
+                    updateParams: {
+                        status_message: state.statusInput,
+                    },
+                    alertId: props.id,
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_S_UPDATE_STATUS'), '', root);
             } catch (e) {
@@ -87,15 +90,11 @@ export default {
         const onClickConfirm = async () => {
             await updateStatus();
             state.modalVisible = false;
-            emit('update');
         };
 
-        const init = () => {
-            state.status = props.alertData?.status_message;
-            state.statusInput = props.alertData?.status_message || '';
-        };
-
-        init();
+        (() => {
+            state.statusInput = store.state.service.alert.alertData?.status_message;
+        })();
 
         return {
             ...toRefs(state),

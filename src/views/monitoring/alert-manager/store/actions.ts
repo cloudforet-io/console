@@ -16,7 +16,7 @@ export const getAlertData = async ({ commit }, alertId: string): Promise<void|Er
 
 export const updateAlertData = async ({ commit }, params: UpdateAlertParams): Promise<void|Error> => {
     try {
-        const alert: AlertDataModel = await SpaceConnector.client.monitory.alert.update({
+        const alert: AlertDataModel = await SpaceConnector.client.monitoring.alert.update({
             ...params.updateParams,
             alert_id: params.alertId,
         });

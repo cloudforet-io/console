@@ -56,7 +56,6 @@
         <alert-reassign-modal
             :visible.sync="reassignModalVisible" :project-id="alertData.project_id"
             :alert-id="id"
-            @confirm="onConfirmReassign"
         />
     </p-pane-layout>
 </template>
@@ -77,6 +76,7 @@ import { ALERT_STATE, ALERT_URGENCY } from '@/views/monitoring/alert-manager/lib
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
+import { store } from '@/store';
 
 
 interface HeaderState {
@@ -125,11 +125,12 @@ export default {
         },
     },
     setup(props: PropsType, { emit, root }) {
-        const state: UnwrapRef<HeaderState> = reactive({
-            alertState: props.alertData?.state,
-            alertUrgency: props.alertData?.urgency,
+        const state = reactive({
+            alertInfo: computed(() => store.state.service.alert.alertData),
+            alertState: computed(() => state.alertInfo?.state),
+            alertUrgency: computed(() => state.alertInfo?.urgency),
             reassignModalVisible: false,
-            duration: calculateTime(props.alertData?.created_at),
+            duration: computed(() => calculateTime(state.alertInfo?.created_at)),
             alertStateList: computed(() => ([
                 { name: ALERT_STATE.TRIGGERED, label: i18n.t('MONITORING.ALERT.DETAIL.HEADER.TRIGGERED') },
                 { name: ALERT_STATE.ACKNOWLEDGED, label: i18n.t('MONITORING.ALERT.DETAIL.HEADER.ACKNOWLEDGED') },
@@ -145,16 +146,13 @@ export default {
             state.reassignModalVisible = true;
         };
 
-        const onConfirmReassign = () => {
-            emit('confirm');
-        };
-
         const changeAlertState = async (alertState: ALERT_STATE) => {
-            state.alertState = alertState;
             try {
-                await SpaceConnector.client.monitoring.alert.update({
-                    alert_id: props.id,
-                    state: state.alertState,
+                await store.dispatch('service/alert/updateAlertData', {
+                    updateParams: {
+                        state: alertState,
+                    },
+                    alertId: props.id,
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_STATE'), '', root);
             } catch (e) {
@@ -164,11 +162,12 @@ export default {
         };
 
         const changeAlertUrgency = async (alertUrgency: ALERT_URGENCY) => {
-            state.alertUrgency = alertUrgency;
             try {
-                await SpaceConnector.client.monitoring.alert.update({
-                    alert_id: props.id,
-                    urgency: state.alertUrgency,
+                await store.dispatch('service/alert/updateAlertData', {
+                    updateParams: {
+                        urgency: alertUrgency,
+                    },
+                    alertId: props.id,
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_URGENCY'), '', root);
             } catch (e) {
@@ -182,7 +181,6 @@ export default {
             ALERT_STATE,
             ALERT_URGENCY,
             onClickReassign,
-            onConfirmReassign,
             changeAlertState,
             changeAlertUrgency,
         };

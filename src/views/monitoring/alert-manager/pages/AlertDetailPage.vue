@@ -1,5 +1,5 @@
 <template>
-    <general-page-layout class="alert-detail-page">
+    <general-page-layout v-if="!loading" class="alert-detail-page">
         <p-breadcrumbs :routes="routeState.route" />
         <p-page-title :title="alertInfo.title" child class="page-title"
                       @goBack="$router.go(-1)"
@@ -19,30 +19,27 @@
         </p-page-title>
         <section class="detail-contents-wrapper">
             <div class="left-wrapper">
-                <alert-detail-header v-if="!loading" :id="id" class="header"
+                <alert-detail-header :id="id" class="header"
                                      :alert-data="alertInfo"
-                                     @confirm="getAlertData"
                 />
 
-                <alert-detail-info v-if="!loading" :id="id" class="info"
+                <alert-detail-info :id="id" class="info"
                                    :alert-data="alertInfo"
-                                   @update="getAlertData"
                 />
-                <alert-detail-info-status-update v-if="!loading" :id="id"
+                <alert-detail-info-status-update :id="id"
                                                  :alert-data="alertInfo"
                                                  class="status-update"
-                                                 @update="getAlertData"
                 />
-                <alert-detail-timeline-and-event v-if="!loading" :id="id" :alert-data="alertInfo"
+                <alert-detail-timeline-and-event :id="id" :alert-data="alertInfo"
                                                  class="timeline-and-event"
                 />
             </div>
             <div class="right-wrapper">
-                <alert-detail-responder v-if="!loading" :id="id" class="responder"
+                <alert-detail-responder :id="id" class="responder"
                                         :alert-data="alertInfo"
                 />
-                <alert-detail-note v-if="!loading" :id="id" class="note" />
-                <alert-detail-project-dependency v-if="!loading" :id="id" :alert-data="alertInfo"
+                <alert-detail-note :id="id" class="note" />
+                <alert-detail-project-dependency :id="id" :alert-data="alertInfo"
                                                  class="project-dependency"
                 />
             </div>
@@ -121,7 +118,7 @@ export default {
         registerServiceStore<AlertStoreState>('alert', alertStoreModule);
 
         const state = reactive({
-            alertInfo: {} as AlertDataModel,
+            alertInfo: computed(() => store.state.service.alert.alertData),
             loading: true,
             //
             alertTitleEditFormVisible: false,
@@ -139,20 +136,6 @@ export default {
             visible: false,
             headerTitle: i18n.t('MONITORING.ALERT.DETAIL.DELETE_MODAL_TITLE'),
         });
-
-        const getAlertData = async () => {
-            state.loading = true;
-            try {
-                const res = await SpaceConnector.client.monitoring.alert.get({
-                    // eslint-disable-next-line camelcase
-                    alert_id: props.id,
-                });
-                state.alertInfo = res;
-                state.loading = false;
-            } catch (e) {
-                console.error(e);
-            }
-        };
 
         const openAlertDeleteForm = () => {
             checkDeleteState.visible = true;
@@ -179,15 +162,21 @@ export default {
 
         const alertTitleEditConfirm = async () => {
             state.alertTitleEditFormVisible = false;
-            await getAlertData();
         };
 
         (async () => {
-            await Promise.all([
-                store.dispatch('resource/webhook/load'),
-                store.dispatch('resource/user/load'),
-                getAlertData(),
-            ]);
+            state.loading = true;
+            try {
+                await Promise.allSettled([
+                    store.dispatch('resource/webhook/load'),
+                    store.dispatch('resource/user/load'),
+                    store.dispatch('service/alert/getAlertData', props.id),
+                ]);
+            } catch (e) {
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
         })();
 
         return {
@@ -198,7 +187,6 @@ export default {
             alertDeleteConfirm,
             openAlertEditForm,
             alertTitleEditConfirm,
-            getAlertData,
         };
     },
 };

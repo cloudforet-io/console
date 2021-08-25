@@ -1,9 +1,12 @@
-import { ComponentRenderProxy, getCurrentInstance, reactive } from '@vue/composition-api';
+import {
+    ComponentRenderProxy, ComputedRef, getCurrentInstance, reactive,
+} from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { EDIT_MODE } from '@/views/monitoring/alert-manager/lib/config';
-import {cloneDeep} from "lodash";
+import { cloneDeep } from 'lodash';
+import { store } from '@/store';
 
 interface AlertDetailItemState {
 	isEditMode: boolean;
@@ -42,7 +45,6 @@ export const useAlertDetailItem = (obj: AlertDetailItemState) => {
 
     const getParams = (editMode: EDIT_MODE) => {
         const param = {} as ParamType;
-        param.alert_id = state.alertId;
         if (editMode === EDIT_MODE.DESCRIPTION) param.description = state.dataForUpdate;
         else if (editMode === EDIT_MODE.STATUS_MSG) param.status_message = state.dataForUpdate;
         else if (editMode === EDIT_MODE.PROJECT) param.project_id = state.dataForUpdate;
@@ -50,7 +52,10 @@ export const useAlertDetailItem = (obj: AlertDetailItemState) => {
     };
     const updateAlert = async (editMode: EDIT_MODE) => {
         try {
-            await SpaceConnector.client.monitoring.alert.update(getParams(editMode));
+            await store.dispatch('service/alert/updateAlertData', {
+                updateParams: getParams(editMode),
+                alertId: state.alertId,
+            });
             showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_S_UPDATE_DESCRIPTION'), '', vm.$root);
             state.isEditMode = false;
         } catch (e) {
@@ -61,7 +66,6 @@ export const useAlertDetailItem = (obj: AlertDetailItemState) => {
 
     const onClickSave = async (editMode: EDIT_MODE) => {
         await updateAlert(editMode);
-        vm.$emit('update');
     };
 
 

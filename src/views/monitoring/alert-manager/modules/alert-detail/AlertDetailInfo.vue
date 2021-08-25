@@ -123,7 +123,7 @@ export default {
                 },
                 { name: 'resource.name', label: i18n.t('MONITORING.ALERT.DETAIL.DETAILS.RESOURCE_NAME') },
             ],
-            data: props.alertData || {},
+            data: computed(() => store.state.service.alert.alertData) || {},
             escalationPolicyName: '',
             loading: true,
             timezone: computed(() => store.state.user.timezone),

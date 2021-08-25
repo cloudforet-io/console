@@ -63,7 +63,6 @@ export default {
     },
     setup(props, { emit, root }) {
         const state = reactive({
-            //
             modalLoading: false,
             proxyVisible: makeProxy('visible', props, emit),
             //
@@ -81,9 +80,11 @@ export default {
 
         const reassignMember = async () => {
             try {
-                await SpaceConnector.client.monitoring.alert.update({
-                    alert_id: props.alertId,
-                    assignee: state.selectedUserID,
+                await store.dispatch('service/alert/updateAlertData', {
+                    updateParams: {
+                        assignee: state.selectedUserID,
+                    },
+                    alertId: props.alertId,
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_ASSIGN_MEMBER'), '', root);
             } catch (e) {
@@ -96,9 +97,7 @@ export default {
 
         const onClickReassign = async () => {
             await reassignMember();
-            emit('confirm');
         };
-
 
         const assignApiQueryHelper = new ApiQueryHelper()
             .setPageStart(1).setPageLimit(15)
