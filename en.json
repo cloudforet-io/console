@@ -1244,7 +1244,7 @@
 					"NOTE": "Note"
 				},
 				"PROJECT_DEPENDENCY": {
-					"NO_DATA": "No Dependencies",
+					"NO_DATA": "No Dependency",
 					"PROJECT_DEPENDENCY": "Project Dependency"
 				},
 				"PUSHED_EVENT": {
@@ -1270,6 +1270,7 @@
 				"STATUS_UPDATE": {
 					"ALT_E_UPDATE_STATUS": "Failed to Update Status",
 					"ALT_S_UPDATE_STATUS": "Successfully Updated Status",
+					"NEW_STATUS": "New Status",
 					"NEW_UPDATE": "New Update",
 					"NO_UPDATE": "No Update",
 					"STATUS_UPDATE": "Status Update",
@@ -1631,6 +1632,7 @@
 				"ADD_MEMBER_BASE_INFO_HELP_TEXT": "Set selected member’s project role and labels.",
 				"ADD_MEMBER_MEMBER_HELP_TEXT_1": "Select project members to add from internal user.",
 				"ADD_MEMBER_MEMBER_HELP_TEXT_2": "*Root account only has a permission for user management.",
+				"ALREADY_EXISTING": "Already existing",
 				"ALS_S_ADD_MEMBER": "Successfully Added Member ",
 				"ALT_E_ADD_MEMBER": "Failed to Add Member",
 				"BASE_INFORMATION": "Base Information",
@@ -1640,7 +1642,7 @@
 				"LABEL_LABEL": "Label",
 				"LABEL_PLACEHOLDER": "ex. Developer",
 				"MEMBER": "Member",
-				"NO_ITEM": "No Item",
+				"NO_MEMBER": "No Member",
 				"NO_RESULTS_FOUND": "No Results Found",
 				"NO_RESULTS_FOUND_HELP_TEXT": "We can’t find any item matching your search.",
 				"PROJECT_ROLE_LABEL": "Project Role",
