@@ -220,6 +220,7 @@ export default {
             width: 100%;
             font-size: 0.875rem;
             .legend {
+                max-width: 10rem;
                 line-height: 1.8;
                 &.issue {
                     .circle {

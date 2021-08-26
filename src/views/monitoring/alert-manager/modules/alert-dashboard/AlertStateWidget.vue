@@ -337,34 +337,35 @@ export default {
         .p-balloon-tab::v-deep {
             @apply col-span-3;
 
+            &.desktop-balloon-tab {
+                .balloon-group {
+                    width: 100%;
+                    margin: 0;
+
+                    button {
+                        height: 4.375rem;
+                        padding: 1rem;
+                        margin: 0.375rem 0;
+
+                        &:first-child {
+                            margin-top: 0;
+                        }
+                        &:last-child {
+                            margin-bottom: 0;
+                        }
+                    }
+                    .tab-button {
+                        display: flex;
+                        align-items: center;
+                        .count {
+                            font-size: 1.25rem;
+                            margin-left: auto;
+                        }
+                    }
+                }
+            }
             &.tablet-balloon-tab {
                 display: none;
-            }
-            .balloon-group {
-                width: 100%;
-                margin: 0;
-
-                button {
-                    height: 4.375rem;
-                    padding: 1rem;
-                    margin: 0.375rem 0;
-
-                    &:first-child {
-                        margin-top: 0;
-                    }
-                    &:last-child {
-                        margin-bottom: 0;
-                    }
-                }
-
-                .tab-button {
-                    display: flex;
-                    align-items: center;
-                    .count {
-                        font-size: 1.25rem;
-                        margin-left: auto;
-                    }
-                }
             }
         }
 
@@ -402,6 +403,9 @@ export default {
                 .body {
                     max-height: 14.5rem;
                     overflow-y: auto;
+                }
+                .loader {
+                    max-height: 14.5rem;
                 }
                 &.no-data {
                     display: flex;

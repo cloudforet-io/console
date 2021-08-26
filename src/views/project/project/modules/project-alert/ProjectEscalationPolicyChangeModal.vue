@@ -26,6 +26,7 @@
                             :show-scope="false"
                             :show-validation="formState.showValidation"
                             :is-all-valid.sync="formState.isAllValid"
+                            :project-id="projectId"
                             @change="onChangeInputModel"
                         />
                     </template>

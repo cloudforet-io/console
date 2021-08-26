@@ -61,7 +61,7 @@
                                   :class="{'disabled': isEditMode}"
                                   @click="onClickEditButton(data.order)"
                             >
-                                <p-i name="ic_edit" width="0.75rem" height="0.75rem"
+                                <p-i name="ic_edit" width="1rem" height="1rem"
                                      color="inherit"
                                 />
                                 {{ $t('PROJECT.EVENT_RULE.EDIT') }}

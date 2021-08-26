@@ -3,7 +3,7 @@
         <div class="title">
             <span>{{ $t('COMMON.WIDGETS.ALL_SUMMARY.TITLE') }}</span>
         </div>
-        <p-balloon-tab v-model="activeTab" size="sm" style-type="peacock"
+        <p-balloon-tab v-model="activeTab" size="sm" style-type="primary"
                        :tabs="tabs" tail
         >
             <template #tab="{name}">
@@ -116,7 +116,7 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { gray, peacock } from '@/styles/colors';
+import { gray, primary1, primary2 } from '@/styles/colors';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
 import config from '@/lib/config';
@@ -292,7 +292,7 @@ export default {
             valueAxis.renderer.minGridDistance = 30;
             valueAxis.renderer.grid.template.strokeOpacity = 1;
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
-            valueAxis.renderer.labels.template.fill = am4core.color(peacock[500]);
+            valueAxis.renderer.labels.template.fill = am4core.color(primary1);
             valueAxis.tooltip.disabled = true;
             valueAxis.fontSize = 11;
             valueAxis.extraMax = 0.25;
@@ -301,7 +301,7 @@ export default {
             const series = chart.series.push(new am4charts.ColumnSeries());
             series.dataFields.valueY = 'count';
             series.dataFields.categoryX = 'date';
-            series.fill = am4core.color(peacock[500]);
+            series.fill = am4core.color(primary2);
             series.columns.template.width = am4core.percent(15);
             series.strokeWidth = 0;
             series.tooltipText = '{count}';
@@ -310,15 +310,15 @@ export default {
             series.tooltip.strokeWidth = 0;
             series.tooltip.dy = -5;
             series.tooltip.getFillFromObject = false;
-            series.tooltip.label.fill = am4core.color(peacock[600]);
-            series.tooltip.background.stroke = am4core.color(peacock[400]);
+            series.tooltip.label.fill = am4core.color(primary1);
+            series.tooltip.background.stroke = am4core.color(primary1);
 
             const bullet = series.bullets.push(new am4charts.LabelBullet());
             bullet.label.text = '{bulletText}';
             bullet.label.fontSize = 14;
             bullet.label.truncate = false;
             bullet.label.hideOversized = false;
-            bullet.label.fill = am4core.color(peacock[600]);
+            bullet.label.fill = am4core.color(primary2);
             bullet.label.dy = -10;
 
             chart.cursor = new am4charts.XYCursor();
@@ -593,7 +593,7 @@ export default {
         padding-left: 0.125rem;
     }
     .count {
-        @apply text-peacock-600;
+        @apply text-primary1;
         font-weight: bold;
     }
 

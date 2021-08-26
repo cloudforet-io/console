@@ -11,14 +11,14 @@
             </button>
         </p>
         <p-button-modal
-            :header-title="$t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NEW_UPDATE')"
+            :header-title="$t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.UPDATE_NEW_STATUS')"
             size="sm"
             :visible.sync="modalVisible"
             :disabled="statusInput.trim().length === 0"
             @confirm="onClickConfirm"
         >
             <template #body>
-                <p-field-group :label="$t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NEW_UPDATE')"
+                <p-field-group :label="$t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.NEW_STATUS')"
                                required
                 >
                     <template #default>

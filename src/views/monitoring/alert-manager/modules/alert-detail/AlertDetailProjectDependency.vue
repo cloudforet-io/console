@@ -5,7 +5,7 @@
         </p-panel-top>
         <p v-if="projectList.length === 0">
             <p-empty class="empty-message">
-                {{$t('MONITORING.ALERT.DETAIL.PROJECT_DEPENDENCY.NO_DATA')}}
+                {{ $t('MONITORING.ALERT.DETAIL.PROJECT_DEPENDENCY.NO_DATA') }}
             </p-empty>
         </p>
         <p v-for="(item, index) in projectList" v-else :key="`${item}-${index}`"

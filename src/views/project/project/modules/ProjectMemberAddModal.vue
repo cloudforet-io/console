@@ -84,25 +84,29 @@
                                 <p-button style-type="primary-dark"
                                           :outline="true"
                                           size="sm"
+                                          :disabled="!formState.users.length"
                                           @click="onClickDeleteAll"
                                 >
                                     {{ $t('PROJECT.DETAIL.MEMBER.DELETE_ALL') }}
                                 </p-button>
                             </div>
                         </template>
-                        <template #col-user_id-format="{ item }">
-                            <span v-if="activeTab === FORM_MODE.INTERNAL_USER">
-                                {{ internalItems.find(d => d.name === item).label }}
-                            </span>
-                            <span v-else-if="activeTab !== FORM_MODE.INTERNAL_USER && externalItems.length">
-                                {{ externalItems.find(d => d.name === item).label }}
-                            </span>
+                        <template #col-user_id-format="{ item, index }">
+                            <div class="td-wrapper">
+                                <span v-if="activeTab === FORM_MODE.INTERNAL_USER" class="text">
+                                    {{ internalItems.find(d => d.name === item).label }}
+                                </span>
+                                <span v-else-if="activeTab !== FORM_MODE.INTERNAL_USER && externalItems.length" class="text">
+                                    {{ externalItems.find(d => d.name === item).label }}
+                                </span>
+                                <p-icon-button class="delete-button"
+                                               name="ic_delete"
+                                               @click="onClickDelete(index)"
+                                />
+                            </div>
                         </template>
-                        <template #col-delete-format="{ index }">
-                            <p-icon-button class="delete-button"
-                                           name="ic_delete"
-                                           @click="onClickDelete(index)"
-                            />
+                        <template #no-data-format>
+                            {{ $t('PROJECT.DETAIL.MEMBER.NO_MEMBER') }}
                         </template>
                     </p-data-table>
                 </div>
@@ -129,29 +133,32 @@
                         <p-field-group
                             :label="$t('PROJECT.DETAIL.MEMBER.LABEL_LABEL')"
                             :help-text="$t('PROJECT.DETAIL.MEMBER.LABEL_HELP_TEXT')"
+                            :invalid="!isLabelValid"
+                            :invalid-text="labelInvalidText"
                         >
                             <div class="label-input-wrapper">
                                 <p-text-input v-model="labelText"
                                               :placeholder="$t('PROJECT.DETAIL.MEMBER.LABEL_PLACEHOLDER')"
+                                              :invalid="!isLabelValid"
                                               block
                                               @keyup.enter="onAddLabel"
                                 />
                                 <p-button style-type="gray900"
                                           :outline="true"
-                                          :disabled="!labelText.trim().length || formState.labels.length >= 5"
+                                          :disabled="!labelText.trim().length || formState.labels.length >= 5 || !isLabelValid"
                                           @click="onAddLabel"
                                 >
                                     {{ $t('PROJECT.DETAIL.MEMBER.ADD') }}
                                 </p-button>
                             </div>
-                            <p class="tag-wrapper">
-                                <p-tag v-for="(label, lIdx) in formState.labels" :key="`label-tag-${lIdx}`"
-                                       @delete="onDeleteLabel(lIdx)"
-                                >
-                                    {{ label }}
-                                </p-tag>
-                            </p>
                         </p-field-group>
+                        <p class="tag-wrapper">
+                            <p-tag v-for="(label, lIdx) in formState.labels" :key="`label-tag-${lIdx}`"
+                                   @delete="onDeleteLabel(lIdx)"
+                            >
+                                {{ label }}
+                            </p-tag>
+                        </p>
                     </div>
                 </div>
             </div>
@@ -268,7 +275,6 @@ export default {
             activeTab: FORM_MODE.INTERNAL_USER,
             fields: computed(() => [
                 { name: 'user_id', label: i18n.t('PROJECT.DETAIL.MEMBER.USER_ID'), type: 'item' },
-                { name: 'delete', label: '', type: 'item' },
             ]),
             projectRoles: [],
             internalItems: [] as MenuItem[],
@@ -280,6 +286,13 @@ export default {
             isFocused: false,
             visibleMenu: false,
             proxyVisible: makeProxy('visible', props, emit),
+            isLabelValid: computed(() => !state.labelInvalidText),
+            labelInvalidText: computed(() => {
+                if (formState.labels.includes(state.labelText)) {
+                    return i18n.t('PROJECT.DETAIL.MEMBER.ALREADY_EXISTING');
+                }
+                return '';
+            }),
             isAllValid: computed(() => formState.users.length > 0),
         });
 
@@ -408,6 +421,7 @@ export default {
             labelText = labelText.trim();
 
             if (!labelText) return;
+            if (!state.isLabelValid) return;
             if (!formState.labels.every(tag => tag !== labelText)) return;
             if (formState.labels.length >= 5) return;
 
@@ -490,9 +504,12 @@ export default {
                 margin: 1rem 0;
 
                 .search-prefix-tag {
-                    max-width: 7rem;
                     &.active {
                         @apply bg-blue-300;
+                    }
+                    .text {
+                        @apply truncate;
+                        max-width: 6.75rem;
                     }
                 }
                 .external-user-no-data {
@@ -525,9 +542,24 @@ export default {
                     }
                 }
             }
-            .p-data-table {
+            .p-data-table::v-deep {
                 height: 20.75rem;
 
+                .no-data {
+                    height: 6rem;
+                }
+                .td-wrapper {
+                    display: flex;
+                    align-items: center;
+                    justify-content: space-between;
+                    .text {
+                        display: flex;
+                        align-items: center;
+                        white-space: initial;
+                        max-width: 17rem;
+                        margin: 0.5rem 0;
+                    }
+                }
                 .delete-button-wrapper {
                     height: 100%;
                     text-align: right;
@@ -548,7 +580,6 @@ export default {
                 .label-input-wrapper {
                     display: flex;
                     gap: 0.5rem;
-                    margin-bottom: 1rem;
                 }
             }
         }

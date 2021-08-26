@@ -144,6 +144,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        projectId: {
+            type: String,
+            default: undefined,
+        },
         /* sync */
         isAllValid: {
             type: Boolean,
@@ -161,7 +165,7 @@ export default {
                 rules: [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }],
                 finish_condition: FINISH_CONDITION.acknowledged,
                 repeat_count: DEFAULT_REPEAT_COUNT,
-                project_id: undefined,
+                project_id: props.projectId,
             } as EscalationPolicyFormModel,
             showValidation: false,
             isNameValid: computed(() => !state.nameInvalidText),
@@ -212,7 +216,7 @@ export default {
                 state.inputModel.scope = SCOPE.global;
                 state.inputModel.rules = [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }];
                 state.inputModel.finish_condition = FINISH_CONDITION.acknowledged;
-                state.inputModel.project_id = undefined;
+                state.inputModel.project_id = props.projectId;
                 state.inputModel.repeat_count = DEFAULT_REPEAT_COUNT;
                 state.proxyIsAllValid = false;
             } else if (props.mode === ACTION.update && props.escalationPolicy) {

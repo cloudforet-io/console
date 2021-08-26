@@ -40,7 +40,7 @@
                         <div v-for="(activity, aIdx) in activity[projectId]" :key="`activity-${aIdx}`"
                              class="box-wrapper"
                         >
-                            <div class="box" :class="activity.status ? activity.status : 'empty'">
+                            <div class="box" :class="activity.status ? activity.status : 'empty'" @click="onClickBox(projectId, activity.date)">
                                 <top5-project-activity-tooltip
                                     :project-id="projectId"
                                     :status="activity.status"
@@ -61,7 +61,8 @@ import { capitalize, find } from 'lodash';
 import dayjs from 'dayjs';
 
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -74,6 +75,8 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 import { red, yellow } from '@/styles/colors';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { MONITORING_ROUTE } from '@/routes/monitoring/monitoring-route';
 
 
 const ACTIVITY = Object.freeze({
@@ -122,6 +125,7 @@ export default {
         },
     },
     setup() {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,
             projects: computed(() => store.state.resource.project.items),
@@ -209,6 +213,17 @@ export default {
         const onMouseLeave = () => {
             state.showTooltip = false;
         };
+        const urlQueryHelper = new QueryHelper();
+        const onClickBox = (projectId, date) => {
+            urlQueryHelper.setFilters([
+                { k: 'project_id', v: projectId, o: '=' },
+                { k: 'created_at', v: date.split(' ')[0], o: '=t' },
+            ]);
+            vm.$router.replace({
+                name: MONITORING_ROUTE.ALERT_MANAGER.ALERT._NAME,
+                query: { filters: urlQueryHelper.rawQueryStrings },
+            });
+        };
 
         watch(() => state.selectedPeriod, async () => {
             state.loading = true;
@@ -226,6 +241,7 @@ export default {
             projectNameFormatter,
             onMouseOver,
             onMouseLeave,
+            onClickBox,
         };
     },
 };

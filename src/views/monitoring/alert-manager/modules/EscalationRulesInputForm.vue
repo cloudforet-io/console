@@ -22,7 +22,11 @@
                 <p-badge outline style-type="gray">{{ idx + 1 }}</p-badge>
             </span>
             <span class="col-notification">
-                <p-select-dropdown v-model="rule.notification_level" :use-fixed-menu-style="inModal" :items="NOTIFICATION_LEVELS">
+                <p-select-dropdown v-model="rule.notification_level"
+                                   :use-fixed-menu-style="inModal"
+                                   :items="NOTIFICATION_LEVELS"
+                                   use-fixed-menu-style
+                >
                     <template #menu-item--format="{item}">
                         <p-radio v-model="rule.notification_level"
                                  :value="item.name"
