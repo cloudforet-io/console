@@ -298,7 +298,7 @@ export default {
     display: grid;
     row-gap: 0.5rem;
     column-gap: 0.5rem;
-    grid-template-columns: repeat(auto-fit, minmax(216px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
     margin-top: 1.125rem;
     gap: 0.5rem;
     overflow-y: hidden;

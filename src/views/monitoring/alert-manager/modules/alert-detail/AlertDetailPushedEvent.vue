@@ -53,15 +53,25 @@
                 </div>
             </template>
             <template #footer-extra>
-                <p-button
-                    style-type="gray-border"
-                    @click="onCopyClick"
-                >
-                    <p-i name="ic_copy" width="1em" height="1em"
-                         color="inherit transparent" class="mr-2"
-                    />
-                    {{ $t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.COPY_ALL') }}
-                </p-button>
+                <div class="footer-extra">
+                    <p-button
+                        style-type="gray-border"
+                        @click="onCopyClick"
+                    >
+                        <p-i name="ic_copy" width="1em" height="1em"
+                             color="inherit transparent" class="mr-2"
+                        />
+                        {{ $t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.COPY_ALL') }}
+                    </p-button>
+                    <transition name="fade">
+                        <div v-if="isAlertVisible" ref="alertRef" class="copy-button-alert">
+                            <p-i name="ic_state_active" color="white" width="1rem"
+                                 height="1rem"
+                            />
+                            <span>{{ $t('COMPONENT.COPY_BUTTON.COPIED') }}</span>
+                        </div>
+                    </transition>
+                </div>
             </template>
         </p-button-modal>
     </section>
@@ -116,6 +126,7 @@ export default {
             pageLimit: 10,
             selectedItem: {} as any,
             modalVisible: false,
+            isAlertVisible: false,
         });
 
         const searchQueryHelper = new QueryHelper();
@@ -155,6 +166,8 @@ export default {
         };
 
         const onCopyClick = () => {
+            state.isAlertVisible = true;
+            setTimeout(() => { state.isAlertVisible = false; }, 500);
             copyAnyData(state.selectedItem.raw_data);
         };
 
@@ -212,5 +225,23 @@ export default {
 }
 .code-block {
     min-height: 100%;
+}
+.copy-button-alert {
+    @apply inline-flex text-white rounded-md;
+    background-color: rgba(theme('colors.gray.900'), 0.88);
+    font-weight: 400;
+    font-size: 0.75rem;
+    line-height: 1.3;
+    width: auto;
+    padding: 0.25rem 0.5rem;
+    justify-content: center;
+    align-items: center;
+    margin-left: 1rem;
+    &.fade-enter-active, &.fade-leave-active {
+        transition: opacity 0.3s;
+    }
+    &.fade-enter, &.fade-leave-to {
+        opacity: 0;
+    }
 }
 </style>

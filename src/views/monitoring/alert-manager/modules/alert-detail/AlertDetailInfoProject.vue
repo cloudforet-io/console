@@ -21,6 +21,7 @@
         <div v-else class="content-wrapper">
             <project-select-dropdown :selected-project-ids="dataForUpdate ? [dataForUpdate] : []"
                                      @select="onSelectProject"
+                                     class="dropdown"
             />
             <div class="button-group ml-2">
                 <p-button :outline="true" size="sm" class="cancel-button"
@@ -132,5 +133,9 @@ export default {
 @import './styles/alertDetailItem.pcss';
 .modal-body {
     margin-top: 2rem;
+}
+.project-select-dropdown::v-deep {
+        max-width: 25rem;
+        flex-grow: 1;
 }
 </style>

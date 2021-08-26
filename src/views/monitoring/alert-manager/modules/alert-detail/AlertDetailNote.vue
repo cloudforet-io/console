@@ -12,7 +12,7 @@
             </p-collapsible-list>
         </article>
         <article class="add-note-wrapper">
-            <p-textarea v-model="noteInput" />
+            <p-textarea :value="noteInput" @input="changeNoteInput" />
             <p-button style-type="gray-border" size="md" class="add-btn"
                       :disabled="(noteInput.trim()).length === 0"
                       @click="createNote"
@@ -67,6 +67,9 @@ export default {
             userId: computed(() => store.state.user.userId),
         });
 
+        const changeNoteInput = (e) => {
+            state.noteInput = e.target?.value;
+        };
         const apiQuery = new ApiQueryHelper();
         const listNote = async () => {
             try {
@@ -110,6 +113,7 @@ export default {
 
         return {
             ...toRefs(state),
+            changeNoteInput,
             iso8601Formatter,
             createNote,
         };
