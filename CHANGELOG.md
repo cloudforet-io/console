@@ -1,3 +1,10 @@
+# [1.1.0-beta.127](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.126...v1.1.0-beta.127) (2021-08-26)
+
+
+### Bug Fixes
+
+* update Vue type declaration ([59774f4](https://github.com/spaceone-dev/spaceone-design-system/commit/59774f4aa095f5616341c256c4593db566bc00a9))
+
 # [1.1.0-beta.126](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.125...v1.1.0-beta.126) (2021-08-20)
 
 
