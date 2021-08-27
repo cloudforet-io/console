@@ -3,7 +3,7 @@ import VueI18n from 'vue-i18n';
 import velocity from 'velocity-animate';
 import SvgIcon from 'vue-svgicon';
 import VueCompositionApi from '@vue/composition-api';
-import Notifications from 'vue-notification';
+import Notifications, { NotificationOptions } from 'vue-notification';
 import Fragment from 'vue-fragment';
 import VTooltip from 'v-tooltip';
 import VueRouter from 'vue-router';
@@ -31,6 +31,14 @@ const SpaceoneDS: PluginObject<SpaceoneDSOptions> = {
     },
 };
 
+declare module 'vue/types/vue' {
+    interface Vue {
+        $notify: (options: NotificationOptions | string) => void;
+    }
+    interface VueConstructor {
+        notify: (options: NotificationOptions | string) => void;
+    }
+}
 
 export default SpaceoneDS;
 
