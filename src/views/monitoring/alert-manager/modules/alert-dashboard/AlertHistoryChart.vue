@@ -200,7 +200,6 @@ export default {
         /* api */
         const getDailyAlertHistory = async () => {
             try {
-                state.loading = true;
                 const { results } = await SpaceConnector.client.monitoring.dashboard.dailyAlertHistory({
                     start: props.currentDate.format('YYYY-MM-01'),
                     end: props.currentDate.add(1, 'month').format('YYYY-MM-01'),
@@ -211,8 +210,6 @@ export default {
             } catch (e) {
                 state.chartData = [];
                 console.error(e);
-            } finally {
-                state.loading = false;
             }
         };
 
@@ -222,9 +219,11 @@ export default {
             }
         });
 
-        watch([() => props.currentDate, () => props.activatedProjects], ([currentData, activatedProjects]) => {
+        watch([() => props.currentDate, () => props.activatedProjects], async ([currentData, activatedProjects]) => {
             if (activatedProjects.length) {
-                getDailyAlertHistory();
+                state.loading = true;
+                await getDailyAlertHistory();
+                state.loading = false;
             }
         }, { immediate: true });
 

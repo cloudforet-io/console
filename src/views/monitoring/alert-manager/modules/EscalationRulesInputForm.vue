@@ -23,7 +23,6 @@
             </span>
             <span class="col-notification">
                 <p-select-dropdown v-model="rule.notification_level"
-                                   :use-fixed-menu-style="inModal"
                                    :items="NOTIFICATION_LEVELS"
                                    use-fixed-menu-style
                 >
@@ -63,7 +62,10 @@
                     {{ $t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NOTIFICATION_LV') }}
                 </span>
                 <span class="input">
-                    <p-select-dropdown v-model="rule.notification_level" :items="MINIFIED_NOTIFICATION_LEVELS">
+                    <p-select-dropdown v-model="rule.notification_level"
+                                       :items="MINIFIED_NOTIFICATION_LEVELS"
+                                       use-fixed-menu-style
+                    >
                         <template #menu-item--format="{item}">
                             <p-radio v-model="rule.notification_level"
                                      :value="item.name"
@@ -202,10 +204,6 @@ export default {
         projectId: {
             type: String,
             default: undefined,
-        },
-        inModal: {
-            type: Boolean,
-            default: false,
         },
     },
     setup(props, { emit }) {

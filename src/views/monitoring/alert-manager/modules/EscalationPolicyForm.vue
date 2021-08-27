@@ -84,7 +84,6 @@
                 :rules.sync="inputModel.rules"
                 :repeat-count.sync="inputModel.repeat_count"
                 :project-id="inputModel.project_id"
-                :in-modal="inModal"
             />
         </p-field-group>
     </div>
@@ -139,10 +138,6 @@ export default {
         escalationPolicy: {
             type: Object,
             default: undefined,
-        },
-        inModal: {
-            type: Boolean,
-            default: false,
         },
         projectId: {
             type: String,

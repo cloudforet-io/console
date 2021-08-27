@@ -296,6 +296,8 @@ export default {
         watch(() => props.activatedProjects, async (activatedProjects) => {
             if (activatedProjects.length) {
                 await Promise.all([listAlerts(), statAlerts()]);
+            } else {
+                state.loading = false;
             }
         });
 

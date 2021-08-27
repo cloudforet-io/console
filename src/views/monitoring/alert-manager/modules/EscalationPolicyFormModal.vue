@@ -14,7 +14,6 @@
                 :mode="mode"
                 :escalation-policy="escalationPolicy"
                 :is-all-valid.sync="isAllValid"
-                in-modal
                 @change="onChangeInputModel"
             />
         </template>
