@@ -11,7 +11,6 @@ export enum ACTION {
 
 export const EDIT_MODE = {
     DESCRIPTION: 'description',
-    STATUS_MSG: 'status_message',
     PROJECT: 'project',
 } as const;
 export type EDIT_MODE = typeof EDIT_MODE[keyof typeof EDIT_MODE];

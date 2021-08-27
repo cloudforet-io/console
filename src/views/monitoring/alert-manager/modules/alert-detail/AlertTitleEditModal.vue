@@ -34,7 +34,8 @@ import {
 import { makeProxy } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { i18n } from '@/translations';
-import { showErrorMessage, showSuccessMessage } from '../../../../../lib/helper/notice-alert-helper';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { store } from '@/store';
 
 export default {
     name: 'AlertTitleEditModal',
@@ -84,10 +85,13 @@ export default {
 
         const updateAlertTitle = async () => {
             try {
+                console.log(props.id);
                 state.loading = true;
-                await SpaceConnector.client.monitoring.alert.update({
-                    alert_id: props.alertId,
-                    title: state.alertTitleInput,
+                await store.dispatch('service/alert/updateAlertData', {
+                    updateParams: {
+                        title: state.alertTitleInput,
+                    },
+                    alertId: props.alertId,
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_TITLE'), '', root);
             } catch (e) {

@@ -43,10 +43,16 @@ export const useAlertDetailItem = (obj: AlertDetailItemState) => {
         }
     };
 
+    const getMessage = (editMode: EDIT_MODE, isSuccessful: boolean) => {
+        if (isSuccessful) {
+            return editMode === EDIT_MODE.DESCRIPTION ? i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_S_UPDATE_DESCRIPTION') : i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_S_UPDATE_PROJECT');
+        }
+        return editMode === EDIT_MODE.PROJECT ? i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_E_UPDATE_DESCRIPTION') : i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_E_UPDATE_PROJECT');
+    };
+
     const getParams = (editMode: EDIT_MODE) => {
         const param = {} as ParamType;
         if (editMode === EDIT_MODE.DESCRIPTION) param.description = state.dataForUpdate;
-        else if (editMode === EDIT_MODE.STATUS_MSG) param.status_message = state.dataForUpdate;
         else if (editMode === EDIT_MODE.PROJECT) param.project_id = state.dataForUpdate;
         return param;
     };
@@ -56,11 +62,11 @@ export const useAlertDetailItem = (obj: AlertDetailItemState) => {
                 updateParams: getParams(editMode),
                 alertId: state.alertId,
             });
-            showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_S_UPDATE_DESCRIPTION'), '', vm.$root);
+            showSuccessMessage(getMessage(editMode, true), '', vm.$root);
             state.isEditMode = false;
         } catch (e) {
             console.error(e);
-            showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.INFO.ALT_E_UPDATE_DESCRIPTION'), e, vm.$root);
+            showErrorMessage(getMessage(editMode, false), e, vm.$root);
         }
     };
 

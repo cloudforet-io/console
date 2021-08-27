@@ -3,6 +3,7 @@
         class="alert-reassign-modal"
         header-title="Reassign to other member"
         size="md"
+        :disabled="!selectedUserID"
         :visible.sync="proxyVisible"
         :loading="modalLoading"
         @confirm="onClickReassign"
