@@ -1,3 +1,10 @@
+# [1.1.0-beta.128](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.127...v1.1.0-beta.128) (2021-08-27)
+
+
+### Bug Fixes
+
+* add type declaration of vue notify ([e4abf6a](https://github.com/spaceone-dev/spaceone-design-system/commit/e4abf6aae438a9f07c448689b72d08fa8d998973))
+
 # [1.1.0-beta.127](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.126...v1.1.0-beta.127) (2021-08-26)
 
 
