@@ -1,3 +1,10 @@
+# [1.1.0-beta.130](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.129...v1.1.0-beta.130) (2021-08-30)
+
+
+### Bug Fixes
+
+* fix minor bug in PSearchDropdown ([#676](https://github.com/spaceone-dev/spaceone-design-system/issues/676)) ([61a64dc](https://github.com/spaceone-dev/spaceone-design-system/commit/61a64dc266cc9b086a59c79f183965631e9c67ae))
+
 # [1.1.0-beta.129](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.128...v1.1.0-beta.129) (2021-08-30)
 
 
