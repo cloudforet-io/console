@@ -1,6 +1,6 @@
 import _, { get, toString } from 'lodash';
-;
-import colors from '@/styles/colors'
+import colors from '@/styles/colors';
+
 /** @function
  * @name copyTextToClipboard
  * @description copy given text to clipboard
@@ -17,10 +17,10 @@ export const copyTextToClipboard = (t) => {
 
 export const copyAnyData = (value) => {
     if (Array.isArray(value)) {
-        copyTextToClipboard(toString(value));
+        copyTextToClipboard(toString(value).trim());
     } else if (typeof value === 'object') {
-        copyTextToClipboard(JSON.stringify(value));
-    } else copyTextToClipboard(value || '');
+        copyTextToClipboard(JSON.stringify(value).trim());
+    } else copyTextToClipboard(value.trim() || '');
 };
 
 
