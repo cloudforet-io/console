@@ -14,7 +14,6 @@
             :header-title="$t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.UPDATE_NEW_STATUS')"
             size="sm"
             :visible.sync="modalVisible"
-            :disabled="statusInput.trim().length === 0"
             @confirm="onClickConfirm"
         >
             <template #body>
@@ -70,11 +69,13 @@ export default {
             state.modalVisible = true;
         };
         const updateStatus = async () => {
+            const isEmptyInput = state.statusInput.trim().length === 0;
             try {
                 state.loading = true;
                 await store.dispatch('service/alert/updateAlertData', {
                     updateParams: {
                         status_message: state.statusInput,
+                        reset_status_message: isEmptyInput,
                     },
                     alertId: props.id,
                 });

@@ -20,6 +20,7 @@ interface ParamType {
 	description?: string;
 	status_message?: string;
 	project_id?: string;
+	reset_description?: boolean;
 }
 
 export const useAlertDetailItem = (obj: AlertDetailItemState) => {
@@ -52,8 +53,12 @@ export const useAlertDetailItem = (obj: AlertDetailItemState) => {
 
     const getParams = (editMode: EDIT_MODE) => {
         const param = {} as ParamType;
-        if (editMode === EDIT_MODE.DESCRIPTION) param.description = state.dataForUpdate;
-        else if (editMode === EDIT_MODE.PROJECT) param.project_id = state.dataForUpdate;
+
+        if (editMode === EDIT_MODE.DESCRIPTION) {
+            const isEmptyInput = state.dataForUpdate.trim().length === 0;
+            param.description = state.dataForUpdate;
+            param.reset_description = isEmptyInput;
+        } else if (editMode === EDIT_MODE.PROJECT) param.project_id = state.dataForUpdate;
         return param;
     };
     const updateAlert = async (editMode: EDIT_MODE) => {
