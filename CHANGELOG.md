@@ -1,3 +1,10 @@
+# [1.1.0-beta.129](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.128...v1.1.0-beta.129) (2021-08-30)
+
+
+### Bug Fixes
+
+* trim value when copy text ([#675](https://github.com/spaceone-dev/spaceone-design-system/issues/675)) ([26a6c3b](https://github.com/spaceone-dev/spaceone-design-system/commit/26a6c3be155f73b2a4319405ee3bd358c1efe141))
+
 # [1.1.0-beta.128](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.127...v1.1.0-beta.128) (2021-08-27)
 
 
