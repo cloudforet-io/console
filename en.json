@@ -853,6 +853,7 @@
 				"ALT_S_ENABLE_USER_CHANNEL": "Successfully Enabled User Channel",
 				"AWS_SNS": "AWS SNS",
 				"CANNOT_EDIT_SLACK": "Slack Token is unable to edit.",
+				"CANNOT_EDIT_TOKEN": "Token is unable to edit.",
 				"CHANNEL_DELETE_MODAL_TITLE": "Are you sure you want to Delete Notifications Channel?",
 				"CHANNEL_INFO": "Channel Info.",
 				"CHANNEL_NAME": "Channel Name",

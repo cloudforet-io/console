@@ -853,6 +853,7 @@
 				"ALT_S_ENABLE_USER_CHANNEL": "사용자 채널 활성화 성공",
 				"AWS_SNS": "AWS SNS",
 				"CANNOT_EDIT_SLACK": "슬랙 토큰은 편집할 수 없습니다.",
+				"CANNOT_EDIT_TOKEN": "입력된 Token은 편집할 수 없습니다.",
 				"CHANNEL_DELETE_MODAL_TITLE": "이 알림 채널을 삭제하시겠습니까?",
 				"CHANNEL_INFO": "채널 정보",
 				"CHANNEL_NAME": "채널 이름",

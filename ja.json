@@ -853,6 +853,7 @@
 				"ALT_S_ENABLE_USER_CHANNEL": "ユーザーのチャンネルの有効化に成功",
 				"AWS_SNS": "AWS SNS",
 				"CANNOT_EDIT_SLACK": "スラックトークンは編集できません。",
+				"CANNOT_EDIT_TOKEN": "",
 				"CHANNEL_DELETE_MODAL_TITLE": "この通知チャネルを削除しますか？",
 				"CHANNEL_INFO": "チャンネル情報",
 				"CHANNEL_NAME": "チャンネル名",
