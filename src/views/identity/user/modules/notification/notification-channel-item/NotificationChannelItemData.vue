@@ -1,11 +1,10 @@
 <template>
     <li class="content-wrapper" :class="{'edit-mode': isEditMode}">
         <div class="content-title">
-            <span v-if="channelData.protocol_name === PROTOCOL_TYPE.SLACK">
-                Slack Channel <br>
-                Slack Token
+            <span v-if="channelData['secret_id'].length > 0">
+                Data
             </span>
-            <p v-for="(item, index) in keyList" :key="`channel-data-key-${index}`">
+            <p v-for="(item, index) in keyList" v-else :key="`channel-data-key-${index}`">
                 {{ item.replace(/\_/g, ' ') }}
             </p>
         </div>
@@ -48,7 +47,7 @@
                     </p-badge>
                 </div>
 
-                <span v-else-if="channelData.protocol_name === PROTOCOL_TYPE.SLACK">
+                <span v-else-if="channelData['secret_id'].length > 0">
                     ********* <br>
                     *********
                 </span>
@@ -58,8 +57,8 @@
                     </p>
                 </div>
             </div>
-            <p v-if="channelData.protocol_name === PROTOCOL_TYPE.SLACK">
-                <info-message :message="$t('IDENTITY.USER.NOTIFICATION.CANNOT_EDIT_SLACK')" />
+            <p v-if="channelData['secret_id'].length > 0">
+                <info-message :message="$t('IDENTITY.USER.NOTIFICATION.CANNOT_EDIT_TOKEN')" />
             </p>
             <button v-else class="edit-btn" :class="{'edit-disable':disableEdit}"
                     @click="startEdit(EDIT_TYPE.DATA, channelData.data)"

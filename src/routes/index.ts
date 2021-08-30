@@ -51,7 +51,7 @@ export class SpaceRouter {
                 if (!res) nextLocation = { name: ROOT_ROUTE.SIGN_OUT._NAME, query: { nextPath: to.fullPath } };
             }
 
-            console.log('router.beforeEach: ', to, from, isTokenAlive, nextLocation);
+            // console.log('router.beforeEach: ', to, from, isTokenAlive, nextLocation);
             next(nextLocation);
         });
 

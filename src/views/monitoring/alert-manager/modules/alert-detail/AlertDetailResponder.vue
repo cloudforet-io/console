@@ -5,7 +5,7 @@
                 {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.RESPONDER') }}
                 <template #extra>
                     <div class="w-full text-right">
-                        <p-badge outline style-type="indigo">
+                        <p-badge v-if="alertData.escalation_ttl === 0" outline style-type="indigo">
                             {{ $t('MONITORING.ALERT.DETAIL.RESPONDER.COMPLETED') }}
                         </p-badge>
                     </div>
