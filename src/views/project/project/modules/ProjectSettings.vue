@@ -18,8 +18,8 @@
                 {{ $t('PROJECT.DETAIL.ALERT.AUTO_RECOVERY') }}
             </div>
             <div class="content-wrapper">
-                <p-i v-if="isAutoRecovery" name="ic_automation" />
-                <span class="text">{{ isAutoRecovery ? $t('PROJECT.DETAIL.ALERT.AUTO_RESOLVE_ALERTS') : $t('PROJECT.DETAIL.ALERT.MANUAL_OPERATION') }}</span>
+                <p-i v-if="recoveryMode === RECOVERY_MODE.AUTO" name="ic_automation" />
+                <span class="text">{{ recoveryMode === RECOVERY_MODE.AUTO ? $t('PROJECT.DETAIL.ALERT.AUTO_RESOLVE_ALERTS') : $t('PROJECT.DETAIL.ALERT.MANUAL_OPERATION') }}</span>
             </div>
             <p-icon-button class="edit-button" name="ic_edit" @click="onClickUpdateAutoRecovery" />
         </section>
@@ -73,7 +73,7 @@
         <project-auto-recovery-update-modal
             :project-id="id"
             :visible.sync="updateAutoRecoveryModalVisible"
-            :selected-option="isAutoRecovery"
+            :selected-option="recoveryMode"
             @confirm="getProjectAlertConfig"
         />
         <project-escalation-policy-change-modal
@@ -124,6 +124,10 @@ const NOTIFICATION_URGENCY = Object.freeze({
     ALL: 'ALL',
     HIGH_ONLY: 'HIGH_ONLY',
 });
+const RECOVERY_MODE = Object.freeze({
+    MANUAL: 'MANUAL',
+    AUTO: 'AUTO',
+});
 
 export default {
     name: 'ProjectSettings',
@@ -161,7 +165,7 @@ export default {
             projectAlertConfig: {},
             escalationPolicy: {},
             notificationUrgency: computed(() => get(state.projectAlertConfig, 'options.notification_urgency')),
-            isAutoRecovery: computed(() => get(state.projectAlertConfig, 'options.auto_recovery')),
+            recoveryMode: computed(() => get(state.projectAlertConfig, 'options.recovery_mode')),
             escalationPolicyId: computed(() => get(state.projectAlertConfig, 'escalation_policy_info.escalation_policy_id')),
             eventRuleTotalCount: 0,
             //
@@ -245,6 +249,7 @@ export default {
         return {
             ...toRefs(state),
             NOTIFICATION_URGENCY,
+            RECOVERY_MODE,
             ACTION,
             SCOPE,
             getProjectAlertConfig,

@@ -10,7 +10,7 @@
             <div class="content-wrapper">
                 <p>{{ $t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_MODAL_HELP_TEXT') }}</p>
                 <p-select-card v-for="option in selectOptions" :key="option.name"
-                               v-model="isAutoRecovery"
+                               v-model="recoveryMode"
                                :value="option.name"
                                :label="option.label"
                                block
@@ -35,6 +35,11 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 
+const RECOVERY_MODE = Object.freeze({
+    MANUAL: 'MANUAL',
+    AUTO: 'AUTO',
+});
+type RECOVERY_MODE = typeof RECOVERY_MODE[keyof typeof RECOVERY_MODE];
 
 export default {
     name: 'ProjectAutoRecoveryUpdateModal',
@@ -61,15 +66,15 @@ export default {
             proxyVisible: makeProxy<boolean>('visible', props, emit),
             selectOptions: computed(() => ([
                 {
-                    name: true,
+                    name: RECOVERY_MODE.AUTO,
                     label: i18n.t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_YES'),
                 },
                 {
-                    name: false,
+                    name: RECOVERY_MODE.MANUAL,
                     label: i18n.t('PROJECT.DETAIL.ALERT.SET_AUTO_RECOVERY_NO'),
                 },
             ])),
-            isAutoRecovery: undefined,
+            recoveryMode: undefined as RECOVERY_MODE | undefined,
         });
 
         const onClickConfirm = async () => {
@@ -77,7 +82,7 @@ export default {
                 await SpaceConnector.client.monitoring.projectAlertConfig.update({
                     project_id: props.projectId,
                     options: {
-                        auto_recovery: state.isAutoRecovery,
+                        recovery_mode: state.recoveryMode,
                     },
                 });
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_AUTO_RECOVERY'), '', root);
@@ -91,7 +96,7 @@ export default {
         };
 
         watch([() => props.selectedOption, () => props.visible], ([selectedOption]) => {
-            state.isAutoRecovery = selectedOption;
+            state.recoveryMode = selectedOption;
         });
 
         return {
