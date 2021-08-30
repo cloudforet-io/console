@@ -16,7 +16,9 @@
                 </p-tag>
             </template>
             <template #right>
-                <p-i :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'" color="inherit" class="dropdown-button" />
+                <p-i :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'" color="inherit" class="dropdown-button"
+                     v-on="searchListeners"
+                />
             </template>
             <template v-for="(_, slot) of searchSlots" v-slot:[slot]="scope">
                 <slot :name="`search-${slot}`" v-bind="{...scope}" />
@@ -267,6 +269,8 @@ export default defineComponent<SearchDropdownProps>({
                 state.proxyPlaceholder = props.menu.find(d => d.name === state.proxySelected[0])?.label;
                 state.proxyValue = '';
                 filterMenu('');
+            } else {
+                filterMenu(state.proxyValue);
             }
             if (props.type === SEARCH_DROPDOWN_TYPE.checkbox && state.proxySelected.length) {
                 state.proxyPlaceholder = `${state.proxySelected.length} ${vm.$tc('COMPONENT.SEARCH_DROPDOWN.ITEMS_SELECTED', state.proxySelected.length)}`;
@@ -290,8 +294,7 @@ export default defineComponent<SearchDropdownProps>({
             emit('focus-menu', index);
         };
 
-        const onSearchFocus = () => {
-            filterMenu(state.proxyValue);
+        const onFocusSearchInput = () => {
             showMenu();
         };
 
@@ -363,7 +366,7 @@ export default defineComponent<SearchDropdownProps>({
                 emit('keyup', e);
             },
             focus(e) {
-                onSearchFocus();
+                onFocusSearchInput();
                 emit('focus', e);
             },
             click(e: MouseEvent) {
@@ -424,7 +427,6 @@ export default defineComponent<SearchDropdownProps>({
             onClickMenuItem,
             focusSearch,
             onFocusMenuItem,
-            onSearchFocus,
             onDeleteTag,
             searchListeners,
         };
