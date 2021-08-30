@@ -6,7 +6,7 @@
   <img width="245" src="https://user-images.githubusercontent.com/35549653/76694897-de236300-66bb-11ea-9ace-b9edde9c12da.png">  
   <p> <br>
 <img  alt="Version"  src="https://img.shields.io/badge/version-0.9-blue.svg?cacheSeconds=2592000"  />  
-<a  href="https://spaceone-dev.gitbook.io/user-guide/"  target="_blank">  
+<a  href="https://www.spaceone.org/docs/guides"  target="_blank">  
 <img  alt="Documentation"  src="https://img.shields.io/badge/documentation-yes-brightgreen.svg"  />  
 </a>  
 <a  href="https://www.apache.org/licenses/LICENSE-2.0"  target="_blank">  
