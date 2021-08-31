@@ -210,6 +210,7 @@ export default {
     @apply grid grid-cols-12 gap-4 w-full;
     grid-auto-flow: row;
     grid-auto-rows: max-content;
+    justify-content: center;
 
     .left-wrapper {
         @apply grid col-span-8 gap-4;
@@ -221,6 +222,7 @@ export default {
     }
 
     @screen tablet {
+        margin-top: 0;
         .left-wrapper {
             @apply row-start-1 row-end-1 col-span-12;
             .header {
@@ -232,6 +234,7 @@ export default {
             }
             .status-update {
                 @apply col-span-12 row-start-3 row-end-3;
+                overflow-x: auto;
             }
             .timeline-and-event {
                 @apply col-span-12 row-start-4 row-end-4;
@@ -256,6 +259,7 @@ export default {
     @screen mobile {
         .right-wrapper {
             @apply col-span-12;
+            margin-top: -4rem;
             .responder {
                 @apply row-start-5 row-end-5;
             }
