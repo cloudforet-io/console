@@ -1,6 +1,6 @@
 /* eslint-disable camelcase */
 
-import { TimeStamp } from '@/models';
+import { Tags, TimeStamp } from '@/models';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import {
     ALERT_SEVERITY, ALERT_STATE,
@@ -103,3 +103,16 @@ export interface AlertStateUpdateParams {
 }
 
 export type AlertListPageUrlQuery = Partial<Record<'state' | 'urgency' | 'assigned' | 'filters', RouteQueryString>>
+
+export interface ProjectMember {
+    created_at: TimeStamp;
+    domain_id?: string;
+    labels: string[];
+    project_group_info: object;
+    project_info?: object;
+    resource_id: string;
+    resource_type: string;
+    role_binding_id?: string;
+    role_info?: object;
+    tags: Tags;
+}

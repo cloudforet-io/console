@@ -40,7 +40,9 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { store } from '@/store';
+import { uniqBy } from 'lodash';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
+import { ProjectMember } from '@/views/monitoring/alert-manager/type';
 
 export default {
     name: 'AlertReassignModal',
@@ -114,7 +116,8 @@ export default {
                     query: assignApiQuery,
                     include_parent_member: true,
                 });
-                state.items = results.map(d => ({
+                const filteredResult = uniqBy(results, 'resource_id') as unknown as ProjectMember[];
+                state.items = filteredResult.map<ProjectMember>(d => ({
                     ...d,
                     user_id: d.resource_id,
                 }));
