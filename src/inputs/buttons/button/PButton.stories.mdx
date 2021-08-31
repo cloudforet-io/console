@@ -204,12 +204,6 @@ export const Template = (args, {argTypes})=>({
                 :block="block"
                 :fontWeight="fontWeight"
             >
-                <div v-if="loading" class="loading-btn">
-                    <p-lottie v-if="loading" class="spinner"
-                        name="thin-spinner" auto
-                        :size="1.5"
-                    />
-                </div>
                 {{$props.default}}
             </p-button>
         </div>`
@@ -371,12 +365,7 @@ export const Template = (args, {argTypes})=>({
                         :loading="true"
                     >
                         <div class="loading-btn">
-                            <p-lottie
-                                class="spinner"
-                                name="thin-spinner" auto
-                                :size="1.5"
-                            />
-                            <div>Loading</div>
+                            Loading
                         </div>
                     </p-button>
                 </div>`,
