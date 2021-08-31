@@ -52,19 +52,24 @@ export const checkNotification: Action<DisplayState, any> = async ({
     commit, state, rootState, rootGetters,
 }): Promise<void> => {
     try {
-        const currentTime = dayjs().format('YYYY-MM-DD HH:mm:ss');
+        const currentTime = dayjs();
 
         checkNotificationQueryHelper.setFilters([
             fixedCheckNotificationFilter,
-            { k: 'created_at', v: currentTime, o: '<=t' },
+            { k: 'created_at', v: currentTime.format('YYYY-MM-DD HH:mm:ss'), o: '<=t' },
             { k: 'user_id', v: rootState.user.userId, o: '=' },
         ]);
 
         const lastCheckedTime = rootGetters['settings/getItem']('last_checked_notification', '/gnb');
+        const minimumCheckTime = currentTime.subtract(7, 'day');
 
-        if (lastCheckedTime) {
+        if (lastCheckedTime && dayjs(lastCheckedTime).isAfter(minimumCheckTime)) {
             checkNotificationQueryHelper.addFilter(
                 { k: 'created_at', v: lastCheckedTime, o: '>t' },
+            );
+        } else {
+            checkNotificationQueryHelper.addFilter(
+                { k: 'created_at', v: minimumCheckTime.format('YYYY-MM-DD HH:mm:ss'), o: '>=t' },
             );
         }
 
