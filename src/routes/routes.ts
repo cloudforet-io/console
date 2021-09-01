@@ -3,7 +3,7 @@ import ErrorPage from '@/common/pages/ErrorPage.vue';
 import SignOut from '@/common/pages/SignOut.vue';
 
 // Routes
-import signInRoute, { SIGN_IN_ROUTE } from '@/routes/sign-in/sign-in-route';
+import signInRoute, { SIGN_IN_ROUTE, kbSSORoute } from '@/routes/sign-in/sign-in-route';
 import dashboardRoute from '@/routes/dashboard/dashboard-route';
 import identityRoute from '@/routes/identity/identity-route';
 import inventoryRoute from '@/routes/inventory/inventory-route';
@@ -35,6 +35,7 @@ export const routes: RouteConfig[] = [
         meta: { label: '', excludeAuth: true, isSignInPage: false },
     },
     signInRoute,
+    kbSSORoute,
     {
         path: '/',
         name: ROOT_ROUTE._NAME,

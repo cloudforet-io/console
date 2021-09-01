@@ -3,11 +3,13 @@ import { RouteConfig } from 'vue-router';
 const SignIn = () => import(/* webpackChunkName: "SignIn" */ '@/views/sign-in/pages/SignIn.vue');
 const DomainAdminSignIn = () => import(/* webpackChunkName: "DomainAdminSignIn" */ '@/views/sign-in/pages/DomainAdminSignIn.vue');
 const KeycloakPage = () => import(/* webpackChunkName: "KeycloakPage" */ '@/views/sign-in/external/KEYCLOAK/pages/KeycloakPage.vue');
+const KB_SSO = () => import(/* webpackChunkName: "KB_SSO" */ '@/views/sign-in/external/KB_SSO/pages/KB_SSOPage.vue');
 
 export const SIGN_IN_ROUTE = Object.freeze({
     _NAME: 'signIn',
     ADMIN: { _NAME: 'domainAdminSignIn' },
     KEYCLOAK: { _NAME: 'keycloak' },
+    KB: { _NAME: 'KB_SSO', _PATH: 'kbfg-sso' },
 });
 
 export default {
@@ -58,4 +60,20 @@ export default {
             }),
         },
     ],
+} as RouteConfig;
+
+export const kbSSORoute = {
+    path: '/checkauth.jsp',
+    name: SIGN_IN_ROUTE.KB._NAME,
+    meta: {
+        excludeAuth: true,
+        isSignInPage: true,
+    },
+    props: ({ query }) => ({
+        secureToken: query.secureToken,
+        secureSessionId: query.secureSessionId,
+        resultCode: query.resultCode,
+        nextPath: query.nextPath || '/',
+    }),
+    component: KB_SSO,
 } as RouteConfig;
