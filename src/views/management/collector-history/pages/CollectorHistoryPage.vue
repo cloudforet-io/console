@@ -330,15 +330,13 @@ export default {
         };
         const onClickDate = async (data) => {
             state.selectedStatus = data.type;
-            const dateIndex = state.tags.findIndex(d => d.key?.name === 'created_at');
-            if (dateIndex > -1) {
-                state.tags.splice(dateIndex, 1);
-            }
-            state.tags.push({
-                key: { label: 'Created Time', name: 'created_at', dataType: 'datetime' },
-                value: { label: data.date, name: data.date },
-                operator: '=',
-            });
+            state.tags = [
+                {
+                    key: { label: 'Created Time', name: 'created_at', dataType: 'datetime' },
+                    value: { label: data.date, name: data.date },
+                    operator: '=',
+                },
+            ];
             await onChange({ queryTags: state.tags });
         };
 
