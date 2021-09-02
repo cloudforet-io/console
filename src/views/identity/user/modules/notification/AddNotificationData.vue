@@ -178,10 +178,7 @@ export default {
     margin-top: 1.25rem;
 }
 .p-json-schema-form::v-deep {
-    .form-group {
-        margin-bottom: 0.75rem;
-    }
-    .form-control {
+    .json-schema-field-group {
         max-width: 30rem;
     }
 }

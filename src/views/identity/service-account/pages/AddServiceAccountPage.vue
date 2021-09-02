@@ -451,7 +451,7 @@ export default {
             margin-right: 0.5rem;
         }
     }
-    .p-pane-layout {
+    .p-pane-layout::v-deep {
         width: 100%;
         padding: 2rem 1rem;
         margin-bottom: 1rem;
@@ -480,28 +480,13 @@ export default {
                 @screen lg {
                     max-width: 50%;
                 }
-                width: 100%;
-                &.invalid {
-                    @apply border border-red-500;
-                }
             }
         }
         .secret-type-text {
             margin-right: 4.375rem;
         }
         .custom-schema-box {
-            @apply border border-gray-200;
-            border-radius: 0.125rem;
-            border-left-width: 0.25rem;
-            padding-left: 2rem;
-            padding-right: 2rem;
-            padding-bottom: 2rem;
-            margin-bottom: -2rem;
-            &.p-json-schema-form::v-deep {
-                .form-label {
-                    margin-top: 1.5rem;
-                }
-            }
+            padding: 2rem 2rem 0 2rem;
         }
         .p-text-editor {
             .CodeMirror {
