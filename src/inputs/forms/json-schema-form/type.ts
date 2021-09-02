@@ -1,10 +1,11 @@
-// import { JsonSchema } from '@/util/type';
-
 type JsonSchemaType = 'string'|'number'|'object'|'integer'|'array'|'null';
 export interface JsonSchema<T extends JsonSchemaType=JsonSchemaType> {
     type: T;
     title?: string;
     minLength?: number;
+    pattern?: string;
+    minimum?: number;
+    maximum?: number;
     examples?: any[];
     default?: any;
     properties?: {
@@ -23,7 +24,7 @@ export interface JsonSchemaFormProps {
 
 // ui schema
 export interface FieldOptions {
-    class?: string[];
+    class?: string[] | string;
     attrs?: object;
     props?: object;
     domProps?: object;
@@ -51,9 +52,8 @@ export interface UiSchema {
     errorHandler?: boolean;
 }
 
-
-export enum InputType {
-    string='string',
-    number='number',
-    integer='number',
-}
+export const INPUT_TYPE = Object.freeze({
+    string: 'text',
+    number: 'number',
+    integer: 'number',
+});
