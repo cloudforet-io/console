@@ -1,3 +1,10 @@
+# [1.1.0-beta.131](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.130...v1.1.0-beta.131) (2021-09-02)
+
+
+### Bug Fixes
+
+* refactor PJsonSchemaForm ([#678](https://github.com/spaceone-dev/spaceone-design-system/issues/678)) ([44ab88d](https://github.com/spaceone-dev/spaceone-design-system/commit/44ab88db5eaa361e4e4653e2637db202f71c4271))
+
 # [1.1.0-beta.130](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.129...v1.1.0-beta.130) (2021-08-30)
 
 
