@@ -30,6 +30,13 @@
             <template #col-resource_id-format="{ value }">
                 {{ memberTableState.users[value].name }}
             </template>
+            <template #col-assigned-format="{ value }">
+                <p-anchor :to="projectLinkFormatter(value)"
+                          target="_blank"
+                >
+                    {{ value.name }}
+                </p-anchor>
+            </template>
             <template #col-labels-format="{ value }">
                 <p v-if="value.length === 0" />
                 <p-badge v-for="(label, idx) in value" :key="idx" style-type="gray200"
@@ -63,15 +70,9 @@
 
 <script lang="ts">
 import {
-    PBadge,
-    PIconTextButton,
-    PPanelTop, PSelectDropdown,
-    PTableCheckModal,
-    PToolboxTable,
+    PBadge, PAnchor, PIconTextButton, PPanelTop, PSelectDropdown, PTableCheckModal, PToolboxTable,
 } from '@spaceone/design-system';
-import {
-    Options,
-} from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
+
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
@@ -82,32 +83,33 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 import { TranslateResult } from 'vue-i18n';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { referenceRouter } from '@/lib/reference/referenceRouter';
 
 import ProjectMemberAddModal from '@/views/project/project/modules/ProjectMemberAddModal.vue';
 import ProjectMemberUpdateModal from '@/views/project/project/modules/ProjectMemberUpdateModal.vue';
 import { Tags, TimeStamp } from '@/models';
 
+
 interface MemberItem {
     created_at?: TimeStamp;
     domain_id?: string;
     labels: string[];
-    // eslint-disable-next-line camelcase
+    project_info?: object;
     project_group_info?: object;
     resource_id?: string;
     resource_type?: string;
     role_binding_id?: string;
-    // eslint-disable-next-line camelcase
     role_info?: object;
     tags?: Tags;
 }
 interface MemberListApiResponse {
     results: MemberItem[];
-    // eslint-disable-next-line camelcase
     total_count: number;
 }
 export default {
     name: 'ProjectMemberTab',
     components: {
+        PAnchor,
         PToolboxTable,
         PPanelTop,
         PIconTextButton,
@@ -143,14 +145,14 @@ export default {
                 { label: 'User ID', name: 'user_id', type: 'item' },
                 { label: 'User Name', name: 'resource_id', type: 'item' },
                 { label: 'Role', name: 'role_info.name', type: 'item' },
+                {
+                    label: 'Assigned', name: 'assigned', type: 'item', sortable: false,
+                },
                 { label: 'Labels', name: 'labels', type: 'item' },
             ],
             items: [] as MemberItem[],
             loading: true,
             totalCount: 0,
-            options: {
-                searchText: '',
-            } as Partial<Options>,
             selectedItems: computed(() => memberTableState.selectIndex.map(i => memberTableState.items[i])),
             isSelected: computed(() => memberTableState.selectIndex.length > 0),
             dropdownMenu: computed(() => ([
@@ -158,10 +160,13 @@ export default {
                     type: 'item',
                     name: 'update',
                     label: vm.$t('IDENTITY.USER.MAIN.UPDATE'),
-                    disabled: memberTableState.selectIndex.length > 1 || !memberTableState.isSelected,
+                    disabled: memberTableState.selectIndex.length > 1 || !memberTableState.isSelected || !!memberTableState.selectedItems.find(d => !!d.project_group_info),
                 },
                 {
-                    type: 'item', name: 'delete', label: vm.$t('IDENTITY.USER.MAIN.DELETE'), disabled: !memberTableState.isSelected,
+                    type: 'item',
+                    name: 'delete',
+                    label: vm.$t('IDENTITY.USER.MAIN.DELETE'),
+                    disabled: !memberTableState.isSelected || !!memberTableState.selectedItems.find(d => !!d.project_group_info),
                 },
             ] as MenuItem[])),
         });
@@ -175,10 +180,19 @@ export default {
             memberUpdateFormVisible: false,
         });
 
+        /* util */
+        const projectLinkFormatter = (data) => {
+            if (data.project_id) {
+                return referenceRouter(data.project_id, { resource_type: 'identity.Project' });
+            }
+            return referenceRouter(data.project_group_id, { resource_type: 'identity.ProjectGroup' });
+        };
+
         const listMemberApi = async () => {
             const res = await SpaceConnector.client.identity.project.member.list({
                 project_id: props.projectId,
                 query: memberTableQuery.data,
+                include_parent_member: true,
             });
             return res;
         };
@@ -200,6 +214,7 @@ export default {
                 memberTableState.items = res.results.map(d => ({
                     ...d,
                     user_id: d.resource_id,
+                    assigned: d.project_group_info ? d.project_group_info : d.project_info,
                 }));
                 memberTableState.totalCount = res.total_count;
             } catch (e) {
@@ -310,8 +325,8 @@ export default {
 
 
         return {
-            memberTableState,
             ...toRefs(formState),
+            memberTableState,
             checkMemberDeleteState,
             openMemberAddForm,
             onAddMemberConfirm,
@@ -320,6 +335,7 @@ export default {
             memberDeleteConfirm,
             listMembers,
             onChangeMemberTable,
+            projectLinkFormatter,
         };
     },
 };

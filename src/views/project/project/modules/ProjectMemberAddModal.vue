@@ -48,6 +48,7 @@
                         :visible-menu.sync="visibleMenu"
                         :is-focused.sync="isFocused"
                         use-fixed-menu-style
+                        :class="{ 'hide-context-menu': !searchPrefix.length }"
                         @search="onSearchExternalUser"
                         @keydown.delete="onDeleteSearchPrefix"
                     >
@@ -61,7 +62,7 @@
                             </p-tag>
                         </template>
                         <template #menu-no-data-format>
-                            <div v-if="activeTab !== FORM_MODE.INTERNAL_USER" class="external-user-no-data">
+                            <div class="external-user-no-data">
                                 <div v-if="searchPrefix.length && !loading">
                                     <p class="title">
                                         <p-i name="ic_search" color="inherit" />
@@ -71,7 +72,6 @@
                                         {{ $t('PROJECT.DETAIL.MEMBER.NO_RESULTS_FOUND_HELP_TEXT') }}
                                     </p>
                                 </div>
-                                <span v-else class="search-help-text">{{ $t('PROJECT.DETAIL.MEMBER.ENTER_KEYWORD_TO_SEARCH') }}</span>
                             </div>
                         </template>
                     </p-search-dropdown>
@@ -96,8 +96,8 @@
                                 <span v-if="activeTab === FORM_MODE.INTERNAL_USER" class="text">
                                     {{ internalItems.find(d => d.name === item).label }}
                                 </span>
-                                <span v-else-if="activeTab !== FORM_MODE.INTERNAL_USER && externalItems.length" class="text">
-                                    {{ externalItems.find(d => d.name === item).label }}
+                                <span v-else-if="activeTab !== FORM_MODE.INTERNAL_USER" class="text">
+                                    {{ externalUserMap.find(d => d.name === item).label }}
                                 </span>
                                 <p-icon-button class="delete-button"
                                                name="ic_delete"
@@ -279,6 +279,7 @@ export default {
             projectRoles: [],
             internalItems: [] as MenuItem[],
             externalItems: [] as MenuItem[],
+            externalUserMap: [], // to match name and label of external users
             searchPrefix: '',
             searchText: '',
             labelText: '',
@@ -317,16 +318,16 @@ export default {
             state.externalItems = [];
             const memberIdList = state.members.map(d => d.resource_id);
             users.forEach((user) => {
-                const userName = state.users[user.user_id]?.name;
                 const singleItem = {
                     name: user.user_id,
-                    label: userName ? `${user.user_id} (${userName})` : user.user_id,
+                    label: user.name ? `${user.user_id} (${user.name})` : user.user_id,
                     disabled: false,
                 };
                 if (memberIdList.includes(user.user_id)) {
                     singleItem.disabled = true;
                 }
                 state.externalItems.push(singleItem);
+                state.externalUserMap.push(singleItem);
             });
         };
 
@@ -429,7 +430,7 @@ export default {
             state.labelText = '';
         };
         const onSearchExternalUser = (text) => {
-            if (text.length > 1) {
+            if (text.length) {
                 state.searchPrefix = text;
                 listExternalUser();
             } else {
@@ -437,7 +438,7 @@ export default {
             }
         };
         const onDeleteSearchPrefix = () => {
-            if (!state.searchText) {
+            if (!state.searchText && state.searchPrefix.length) {
                 state.searchPrefix = '';
                 listExternalUser();
             }
@@ -453,6 +454,7 @@ export default {
 
         watch(() => state.activeTab, () => {
             formState.users = [];
+            state.externalItems = [];
             state.searchPrefix = '';
         });
 
@@ -503,6 +505,11 @@ export default {
             .p-search-dropdown::v-deep {
                 margin: 1rem 0;
 
+                &.hide-context-menu {
+                    .p-context-menu {
+                        display: none;
+                    }
+                }
                 .search-prefix-tag {
                     &.active {
                         @apply bg-blue-300;
