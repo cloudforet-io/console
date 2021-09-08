@@ -1,5 +1,8 @@
 <template>
-    <div>
+    <div class="collector-schedules">
+        <p-panel-top use-total-count :total-count="totalCount">
+            {{ $t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_TITLE') }}
+        </p-panel-top>
         <p-toolbox-table :items="items"
                          :fields="tableState.fields"
                          sortable
@@ -87,7 +90,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PIconTextButton, PToolboxTable, PSelectDropdown, PTableCheckModal, PLottie,
+    PIconTextButton, PToolboxTable, PSelectDropdown, PTableCheckModal, PLottie, PPanelTop,
 } from '@spaceone/design-system';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -108,6 +111,7 @@ export default {
         PSelectDropdown,
         PToolboxTable,
         PIconTextButton,
+        PPanelTop,
         EditScheduleModal,
     },
     props: {
@@ -120,6 +124,7 @@ export default {
         const vm: any = getCurrentInstance();
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
+            totalCount: 0,
             items: [],
             selectIndex: [],
             editVisible: false,
@@ -152,10 +157,9 @@ export default {
             ] as DataTableField[],
             sortBy: '',
             sortDesc: '',
-            totalCount: 0,
             pageSize: 10,
             thisPage: 1,
-            allPage: computed(() => Math.ceil(tableState.totalCount / tableState.pageSize) || 1),
+            allPage: computed(() => Math.ceil(state.totalCount / tableState.pageSize) || 1),
         });
 
         const timezone = store.state.user.timezone || 'UTC';
@@ -198,7 +202,7 @@ export default {
         const listSchedules = debounce(async (): Promise<void> => {
             tableState.loading = true;
             state.selectIndex = [];
-            tableState.totalCount = 0;
+            state.totalCount = 0;
             try {
                 apiQuery.setSort(tableState.sortBy, tableState.sortDesc)
                     .setPage(getPageStart(tableState.thisPage, tableState.pageSize), tableState.pageSize);
@@ -208,7 +212,7 @@ export default {
                     query: apiQuery.data,
                 });
                 state.items = res.results;
-                tableState.totalCount = res.total_count;
+                state.totalCount = res.total_count;
             } catch (e) {
                 state.items = [];
                 console.error(e);
@@ -253,7 +257,12 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-.p-toolbox-table {
-    border-width: 0;
+.collector-schedules {
+    .p-panel-top {
+        margin-bottom: 0;
+    }
+    .p-toolbox-table {
+        border-width: 0;
+    }
 }
 </style>

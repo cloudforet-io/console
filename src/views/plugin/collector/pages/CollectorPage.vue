@@ -82,6 +82,9 @@
             <template #schedules>
                 <collector-schedules :collector="selectedItems[0]" />
             </template>
+            <!--            <template #collectionRule>-->
+            <!--                <collection-rule />-->
+            <!--            </template>-->
         </p-tab>
         <p-tab v-else-if="selectedItems.length > 1"
                :tabs="multiTabState.tabs" :active-tab.sync="multiTabState.activeTab"
@@ -192,6 +195,8 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
 import { MANAGEMENT_ROUTE } from '@/routes/management/management-route';
+import { i18n } from '@/translations';
+import CollectionRule from '@/views/plugin/collector/modules/CollectionRule.vue';
 
 const GeneralPageLayout = (): Component => import('@/common/components/layouts/GeneralPageLayout.vue') as Component;
 const TagsPanel = (): Component => import('@/common/modules/tags-panel/TagsPanel.vue') as Component;
@@ -223,6 +228,7 @@ export default {
         CollectorDetails,
         CollectorCredentials,
         CollectorSchedules,
+        // CollectionRule,
         TagsPanel,
     },
     setup() {
@@ -283,19 +289,19 @@ export default {
             // dropdown action
             dropdown: computed<MenuItem[]>(() => [
                 {
-                    name: 'update', label: vm.$t('PLUGIN.COLLECTOR.MAIN.UPDATE'), type: 'item', disabled: state.selectedIndexes.length > 1 || state.selectedIndexes.length === 0,
+                    name: 'update', label: i18n.t('PLUGIN.COLLECTOR.MAIN.UPDATE'), type: 'item', disabled: state.selectedIndexes.length > 1 || state.selectedIndexes.length === 0,
                 }, {
                     type: 'divider',
                 }, {
-                    name: 'enable', label: vm.$t('PLUGIN.COLLECTOR.MAIN.ENABLE'), type: 'item', disabled: state.selectedIndexes.length === 0,
+                    name: 'enable', label: i18n.t('PLUGIN.COLLECTOR.MAIN.ENABLE'), type: 'item', disabled: state.selectedIndexes.length === 0,
                 }, {
-                    name: 'disable', label: vm.$t('PLUGIN.COLLECTOR.MAIN.DISABLE'), type: 'item', disabled: state.selectedIndexes.length === 0,
+                    name: 'disable', label: i18n.t('PLUGIN.COLLECTOR.MAIN.DISABLE'), type: 'item', disabled: state.selectedIndexes.length === 0,
                 }, {
-                    name: 'delete', label: vm.$t('PLUGIN.COLLECTOR.MAIN.DELETE'), type: 'item', disabled: state.selectedIndexes.length === 0,
+                    name: 'delete', label: i18n.t('PLUGIN.COLLECTOR.MAIN.DELETE'), type: 'item', disabled: state.selectedIndexes.length === 0,
                 }, {
                     type: 'divider',
                 }, {
-                    name: 'collectData', label: vm.$t('PLUGIN.COLLECTOR.MAIN.COLLECT_DATA'), type: 'item', disabled: state.selectedIndexes.length > 1 || state.selectedIndexes.length === 0,
+                    name: 'collectData', label: i18n.t('PLUGIN.COLLECTOR.MAIN.COLLECT_DATA'), type: 'item', disabled: state.selectedIndexes.length > 1 || state.selectedIndexes.length === 0,
                 },
             ]),
             updateModalVisible: false,
@@ -303,8 +309,8 @@ export default {
         });
         const routeState = reactive({
             routes: computed(() => ([
-                { name: vm.$t('MENU.PLUGIN.PLUGIN'), path: '/plugin' },
-                { name: vm.$t('MENU.PLUGIN.COLLECTOR') },
+                { name: i18n.t('MENU.PLUGIN.PLUGIN'), path: '/plugin' },
+                { name: i18n.t('MENU.PLUGIN.COLLECTOR') },
             ])),
         });
         const checkModalState = reactive({
@@ -323,17 +329,18 @@ export default {
         // Tabs
         const singleTabState = reactive({
             tabs: computed<TabItem[]>(() => [
-                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.TAB_DETAILS'), name: 'details', keepAlive: true },
-                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.TAB_TAG'), name: 'tag', keepAlive: true },
-                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.TAB_CREDENTIALS'), name: 'credentials', keepAlive: true },
-                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.TAB_SCHEDULE'), name: 'schedules', keepAlive: true },
+                { label: i18n.t('PLUGIN.COLLECTOR.MAIN.TAB_DETAILS'), name: 'details', keepAlive: true },
+                { label: i18n.t('PLUGIN.COLLECTOR.MAIN.TAB_TAG'), name: 'tag', keepAlive: true },
+                { label: i18n.t('PLUGIN.COLLECTOR.MAIN.TAB_CREDENTIALS'), name: 'credentials', keepAlive: true },
+                { label: i18n.t('PLUGIN.COLLECTOR.MAIN.TAB_SCHEDULE'), name: 'schedules', keepAlive: true },
+                // { label: i18n.t('PLUGIN.COLLECTOR.MAIN.TAB_COLLECTION_RULE'), name: 'collectionRule', keepAlive: true },
             ]),
             activeTab: 'details',
         });
 
         const multiTabState = reactive({
             tabs: computed<TabItem[]>(() => [
-                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.TAB_SELECTED_DATA'), name: 'data', keepAlive: true },
+                { label: i18n.t('PLUGIN.COLLECTOR.MAIN.TAB_SELECTED_DATA'), name: 'data', keepAlive: true },
             ]),
             activeTab: 'data',
         });
@@ -408,23 +415,23 @@ export default {
                     await SpaceConnector.client.inventory.collector.enable({
                         collectors: state.selectedItems.map(d => d.collector_id),
                     });
-                    showSuccessMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_S_ENABLE_TITLE', state.selectedItems.length), '', vm.$root);
+                    showSuccessMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_S_ENABLE_TITLE', state.selectedItems.length), '', vm.$root);
                 } else if (checkModalState.mode === 'disable') {
                     await SpaceConnector.client.inventory.collector.disable({
                         collectors: state.selectedItems.map(d => d.collector_id),
                     });
-                    showSuccessMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DISABLE_TITLE', state.selectedItems.length), '', vm.$root);
+                    showSuccessMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DISABLE_TITLE', state.selectedItems.length), '', vm.$root);
                 } else if (checkModalState.mode === 'delete') {
                     await SpaceConnector.client.inventory.collector.delete({
                         collectors: state.selectedItems.map(d => d.collector_id),
                     });
-                    showSuccessMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DELETE_TITLE', state.selectedItems.length), '', vm.$root);
+                    showSuccessMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_S_DELETE_TITLE', state.selectedItems.length), '', vm.$root);
                 }
             } catch (e) {
                 console.error(e);
-                if (checkModalState.mode === 'enable') showErrorMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_E_ENABLE_TITLE', state.selectedItems.length), e, vm.$root);
-                else if (checkModalState.mode === 'disable') showErrorMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DISABLE_TITLE', state.selectedItems.length), e, vm.$root);
-                else if (checkModalState.mode === 'delete') showErrorMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DELETE_TITLE', state.selectedItems.length), e, vm.$root);
+                if (checkModalState.mode === 'enable') showErrorMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_ENABLE_TITLE', state.selectedItems.length), e, vm.$root);
+                else if (checkModalState.mode === 'disable') showErrorMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DISABLE_TITLE', state.selectedItems.length), e, vm.$root);
+                else if (checkModalState.mode === 'delete') showErrorMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DELETE_TITLE', state.selectedItems.length), e, vm.$root);
             } finally {
                 if (checkModalState.mode === 'delete') state.selectedIndexes = [];
                 checkModalState.visible = false;
@@ -436,22 +443,22 @@ export default {
         };
         const onClickEnable = (): void => {
             checkModalState.mode = 'enable';
-            checkModalState.title = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_ENABLE_TITLE', state.selectedItems.length);
-            checkModalState.subTitle = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_ENABLE_DESC', state.selectedItems.length);
+            checkModalState.title = i18n.tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_ENABLE_TITLE', state.selectedItems.length);
+            checkModalState.subTitle = i18n.tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_ENABLE_DESC', state.selectedItems.length);
             checkModalState.themeColor = 'safe';
             checkModalState.visible = true;
         };
         const onClickDisable = (): void => {
             checkModalState.mode = 'disable';
-            checkModalState.title = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_DISABLE_TITLE', state.selectedItems.length);
-            checkModalState.subTitle = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_DISABLE_DESC', state.selectedItems.length);
+            checkModalState.title = i18n.tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_DISABLE_TITLE', state.selectedItems.length);
+            checkModalState.subTitle = i18n.tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_DISABLE_DESC', state.selectedItems.length);
             checkModalState.themeColor = 'alert';
             checkModalState.visible = true;
         };
         const onClickDelete = (): void => {
             checkModalState.mode = 'delete';
-            checkModalState.title = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_DELETE_TITLE', state.selectedItems.length);
-            checkModalState.subTitle = vm.$tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_DELETE_DESC', state.selectedItems.length);
+            checkModalState.title = i18n.tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_DELETE_TITLE', state.selectedItems.length);
+            checkModalState.subTitle = i18n.tc('PLUGIN.COLLECTOR.MAIN.CHECK_MODAL_DELETE_DESC', state.selectedItems.length);
             checkModalState.themeColor = 'alert';
             checkModalState.visible = true;
         };
@@ -473,7 +480,7 @@ export default {
 
         const exportCollectorDataToExcel = async () => {
             try {
-                showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
+                showLoadingMessage(i18n.t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
                 await store.dispatch('file/downloadExcel', {
                     url: '/inventory/collector/list',
                     param: { query: getQuery() },

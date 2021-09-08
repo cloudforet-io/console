@@ -1,5 +1,8 @@
 <template>
-    <div>
+    <div class="collector-credentials">
+        <p-panel-top use-total-count :total-count="totalCount">
+            {{ $t('PLUGIN.COLLECTOR.MAIN.CREDENTIALS_TITLE') }}
+        </p-panel-top>
         <p-query-search-table :items="items"
                               :fields="fields"
                               :loading="loading"
@@ -15,13 +18,6 @@
                               use-cursor-loading
                               @change="onChange"
         >
-            <template #toolbox-left>
-                <p-panel-top use-total-count
-                             :total-count="totalCount"
-                >
-                    {{ $t('PLUGIN.COLLECTOR.MAIN.CREDENTIALS_TITLE') }}
-                </p-panel-top>
-            </template>
             <template #col-service_account-format="{ item }">
                 <router-link :to="referenceRouter(
                     item.service_account_id,
@@ -238,6 +234,11 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+.collector-credentials {
+    .p-panel-top {
+        margin-bottom: 0;
+    }
+}
 .p-toolbox-table {
     border-width: 0;
 }
@@ -250,11 +251,5 @@ export default {
             margin-right: 0.125rem;
         }
     }
-}
-.credential-btn {
-    float: right;
-}
-.p-panel-top {
-    margin: 0;
 }
 </style>

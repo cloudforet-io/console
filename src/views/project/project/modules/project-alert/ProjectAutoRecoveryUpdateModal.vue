@@ -57,7 +57,7 @@ export default {
             required: true,
         },
         selectedOption: {
-            type: Boolean,
+            type: String,
             default: undefined,
         },
     },

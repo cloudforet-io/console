@@ -255,7 +255,7 @@ export default {
                     { name: 'title', label: 'Title', width: '437px' },
                     { name: 'state', label: 'State' },
                     { name: 'urgency', label: 'Urgency' },
-                    { name: 'status_message', label: 'Status Details' },
+                    { name: 'status_message', label: 'Status Updates' },
                     { name: 'resource', label: 'Resource' },
                     { name: 'project_id', label: 'Project' },
                     { name: 'created_at', label: 'Created' },
