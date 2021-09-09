@@ -12,12 +12,13 @@
             <div v-if="multiSelectable && showSelectedList" class="selected-list-wrapper">
                 <div>
                     <b>{{ $t('COMPONENT.CONTEXT_MENU.SELECTED_LIST') }}</b>
-                    <span class="pl-2">({{ proxySelected.length }} / {{ menu.length }})</span>
+                    <span class="pl-2">({{ selectedCountInFilteredMenu }} / {{ menu.length }})</span>
                 </div>
                 <p-button size="sm" style-type="primary-dark" :disabled="!proxySelected.length">
                     {{ $t('COMPONENT.CONTEXT_MENU.DONE') }}
                 </p-button>
             </div>
+            <slot name="help-text" />
             <a v-if="multiSelectable && showSelectAll" class="context-item" @click.stop="onClickSelectAll">
                 <p-i :name="isAllSelected ? 'ic_checkbox--checked' : 'ic_checkbox'"
                      class="select-marker"
@@ -145,6 +146,7 @@ export default defineComponent<ContextMenuProps>({
                 const filteredMenu = props.menu.filter(d => !d.disabled);
                 return filteredMenu.length && filteredMenu.length === state.proxySelected.length;
             }),
+            selectedCountInFilteredMenu: computed(() => props.menu.filter(d => state.proxySelected.includes(d.name)).length),
         });
 
         let focusedItemEl: HTMLElement | null = null;

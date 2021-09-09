@@ -42,13 +42,12 @@
         >
             <template #item--format="{item}">
                 <span class="p-search-dropdown__item-label">
-                    <template v-for="(text, i) in item.label.split(searchRegex)">
-                        <span :key="`item-label--${text}-${i}`"
-                              :class="{ 'selected': type === SEARCH_DROPDOWN_TYPE.default && item.name === proxySelected[0] }"
-                        >
-                            <strong v-if="i !== 0">{{ getMatchText(item.label) }}</strong><span>{{ text }}</span>
-                        </span>
-                    </template>
+                    <span v-for="(text, i) in item.label.split(searchRegex)"
+                          :key="`item-label--${text}-${i}`"
+                          :class="{ 'selected': type === SEARCH_DROPDOWN_TYPE.default && item.name === proxySelected[0] }"
+                    >
+                        <strong v-if="i !== 0">{{ getMatchText(item.label) }}</strong><span>{{ text }}</span>
+                    </span>
                 </span>
             </template>
             <template v-for="(_, slot) of menuSlots" v-slot:[slot]="scope">
@@ -272,9 +271,6 @@ export default defineComponent<SearchDropdownProps>({
             } else {
                 filterMenu(state.proxyValue);
             }
-            if (props.type === SEARCH_DROPDOWN_TYPE.checkbox && state.proxySelected.length) {
-                state.proxyPlaceholder = `${state.proxySelected.length} ${vm.$tc('COMPONENT.SEARCH_DROPDOWN.ITEMS_SELECTED', state.proxySelected.length)}`;
-            }
             emit('show-menu');
         };
 
@@ -318,8 +314,6 @@ export default defineComponent<SearchDropdownProps>({
             }
             if (props.type === SEARCH_DROPDOWN_TYPE.default) {
                 state.proxyValue = state.bindingMenu[index]?.label ?? name;
-            } else {
-                state.proxyValue = '';
             }
 
             emit('select-menu', state.bindingMenu[index]);
@@ -333,7 +327,7 @@ export default defineComponent<SearchDropdownProps>({
                 state.proxyValue = menuItem.label;
                 if (props.type === SEARCH_DROPDOWN_TYPE.default) {
                     state.proxySelected = [menuItem.name];
-                } else {
+                } else if (!state.proxySelected.includes(menuItem.name)) {
                     state.proxySelected.push(menuItem.name);
                 }
             } else if (props.type === SEARCH_DROPDOWN_TYPE.default) {
@@ -410,8 +404,6 @@ export default defineComponent<SearchDropdownProps>({
             if (proxySelected.length) { // && contextMenuFixedStyleState.proxyVisibleMenu
                 if (props.type === SEARCH_DROPDOWN_TYPE.radioButton) {
                     state.proxyPlaceholder = '';
-                } else if (props.type === SEARCH_DROPDOWN_TYPE.checkbox) {
-                    state.proxyPlaceholder = `${proxySelected.length} items selected`;
                 }
             } else {
                 state.proxyPlaceholder = undefined;

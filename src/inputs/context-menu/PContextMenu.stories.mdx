@@ -259,12 +259,13 @@ Each `MenuItem` has the following type to represent it:
 
 ## Slot Cases
 
-Context Menu have 2 types fot slots:
+Context Menu have 3 types fot slots:
 
 |Slot Type|Description|Slots|
 |-|-|-|
 |Full replacement with style|A slot that replaces the inner area of the style of the entire corresponding slot area.|`no-data-format`, `item--format`|
 |Specific replacement|A slot that replaces the specific corresponding slot area.|`header-<item.name>`|
+|Additional|A slot for additional information.|`help-text`|
 
 <br/>
 
@@ -444,6 +445,32 @@ Context Menu have 2 types fot slots:
 
 <br/>
 <br/>
+
+
+### Help Text Slots
+
+<Canvas>
+    <Story name="Help Text Slots" args={{menu: menuItems}}>
+        {{
+            props: Object.keys(getContextMenuArgTypes()),
+            components: { PContextMenu },
+            template: `
+        <div class="flex h-full flex-col">
+            <div class="mt-4">
+                <p-context-menu :menu="menu">
+                    <template #help-text>This is help text slot.</template>
+                </p-context-menu>
+            </div>
+        </div>
+<!--<div>-->
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 
 ## Playground
 
