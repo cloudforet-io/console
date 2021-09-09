@@ -17,10 +17,7 @@
                         <span> ({{ formState.users.length }})</span>
                     </p>
                     <p class="text">
-                        {{ $t('PROJECT.DETAIL.MEMBER.ADD_MEMBER_MEMBER_HELP_TEXT_1') }}
-                    </p>
-                    <p class="comment">
-                        {{ $t('PROJECT.DETAIL.MEMBER.ADD_MEMBER_MEMBER_HELP_TEXT_2') }}
+                        {{ $t('PROJECT.DETAIL.MEMBER.MEMBER_HELP_TEXT', { user_type: activeTab }) }}
                     </p>
                     <p-search-dropdown
                         v-show="activeTab === FORM_MODE.INTERNAL_USER"
@@ -44,26 +41,19 @@
                         :show-select-all="true"
                         disable-handler
                         :exact-mode="false"
-                        :disable-icon="!!searchPrefix"
-                        :visible-menu.sync="visibleMenu"
-                        :is-focused.sync="isFocused"
                         use-fixed-menu-style
-                        :class="{ 'hide-context-menu': !searchPrefix.length }"
                         @search="onSearchExternalUser"
-                        @keydown.delete="onDeleteSearchPrefix"
+                        @focus="onFocusExternalUserSearch"
+                        @keydown.enter="onKeydownEnter"
                     >
-                        <template #search-left>
-                            <p-tag v-if="searchPrefix.length"
-                                   class="search-prefix-tag"
-                                   :deletable="false"
-                                   :class="{active: isFocused}"
-                            >
-                                <span>{{ searchPrefix }}</span>
-                            </p-tag>
+                        <template v-if="externalItems.length > 100" #menu-help-text>
+                            <div class="help-text">
+                                {{ $t('PROJECT.DETAIL.MEMBER.TOO_MANY_RESULTS') }}
+                            </div>
                         </template>
                         <template #menu-no-data-format>
                             <div class="external-user-no-data">
-                                <div v-if="searchPrefix.length && !loading">
+                                <div v-if="!loading">
                                     <p class="title">
                                         <p-i name="ic_search" color="inherit" />
                                         {{ $t('PROJECT.DETAIL.MEMBER.NO_RESULTS_FOUND') }}
@@ -85,7 +75,7 @@
                                           :outline="true"
                                           size="sm"
                                           :disabled="!formState.users.length"
-                                          @click="onClickDeleteAll"
+                                          @click="onClickDeleteAllUsers"
                                 >
                                     {{ $t('PROJECT.DETAIL.MEMBER.DELETE_ALL') }}
                                 </p-button>
@@ -96,13 +86,22 @@
                                 <span v-if="activeTab === FORM_MODE.INTERNAL_USER" class="text">
                                     {{ internalItems.find(d => d.name === item).label }}
                                 </span>
-                                <span v-else-if="activeTab !== FORM_MODE.INTERNAL_USER" class="text">
-                                    {{ externalUserMap.find(d => d.name === item).label }}
+                                <span v-else>
+                                    <template v-if="invalidUserList.includes(item)">
+                                        <p-badge outline style-type="alert">
+                                            {{ $t('PROJECT.DETAIL.MEMBER.INVALID') }}
+                                        </p-badge>
+                                        <span class="invalid text">{{ item }}</span>
+                                    </template>
+                                    <template v-else-if="existingUserList.includes(item)">
+                                        <p-badge outline style-type="alert">
+                                            {{ $t('PROJECT.DETAIL.MEMBER.EXISTING') }}
+                                        </p-badge>
+                                        <span class="invalid text">{{ item }}</span>
+                                    </template>
+                                    <span v-else class="text">{{ item }}</span>
                                 </span>
-                                <p-icon-button class="delete-button"
-                                               name="ic_delete"
-                                               @click="onClickDelete(index)"
-                                />
+                                <p-icon-button class="delete-button" name="ic_delete" @click="onClickDeleteUser(index)" />
                             </div>
                         </template>
                         <template #no-data-format>
@@ -115,7 +114,7 @@
                         {{ $t('PROJECT.DETAIL.MEMBER.BASE_INFORMATION') }}
                     </p>
                     <p class="text">
-                        {{ $t('PROJECT.DETAIL.MEMBER.ADD_MEMBER_BASE_INFO_HELP_TEXT') }}
+                        {{ $t('PROJECT.DETAIL.MEMBER.BASE_INFO_HELP_TEXT') }}
                     </p>
 
                     <div class="field-group-wrapper">
@@ -167,6 +166,7 @@
 </template>
 
 <script lang="ts">
+import { debounce } from 'lodash';
 import {
     makeProxy,
 } from '@spaceone/console-core-lib';
@@ -176,7 +176,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput, PButton, PBoxTab, PSearchDropdown, PDataTable, PIconButton, PRadio, PTag, PI,
+    PButtonModal, PFieldGroup, PTextInput, PButton, PBoxTab, PSearchDropdown, PDataTable, PIconButton, PRadio, PTag, PI, PBadge,
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
@@ -187,9 +187,9 @@ import { store } from '@/store';
 
 
 const FORM_MODE = Object.freeze({
-    INTERNAL_USER: 'INTERNAL_USER',
-    KEYCLOAK: 'KEYCLOAK',
-    GOOGLE_OAUTH2: 'GOOGLE_OAUTH2',
+    INTERNAL_USER: i18n.t('PROJECT.DETAIL.MEMBER.INTERNAL_USER'),
+    KEYCLOAK: i18n.t('PROJECT.DETAIL.MEMBER.KEYCLOAK'),
+    GOOGLE_OAUTH2: i18n.t('PROJECT.DETAIL.MEMBER.GOOGLE_OAUTH2'),
 });
 
 export default {
@@ -206,6 +206,7 @@ export default {
         PRadio,
         PTag,
         PI,
+        PBadge,
     },
     directives: {
         focus: {
@@ -241,11 +242,11 @@ export default {
     setup(props, { emit, root }) {
         const formState = reactive({
             projectRole: undefined,
-            users: [],
+            users: [] as string[],
             labels: [] as string[],
         });
         const state = reactive({
-            loading: false,
+            loading: true,
             projectId: computed(() => root.$route.params.id),
             authType: computed(() => store.state.domain.extendedAuthType),
             users: computed(() => store.state.resource.user.items),
@@ -256,18 +257,18 @@ export default {
                 const tabs = [
                     {
                         name: FORM_MODE.INTERNAL_USER,
-                        label: i18n.t('PROJECT.DETAIL.MEMBER.ADD_FROM_INTERNAL_USER'),
+                        label: i18n.t('PROJECT.DETAIL.MEMBER.ADD_FROM', { user_type: i18n.t('PROJECT.DETAIL.MEMBER.INTERNAL_USER') }),
                     },
                 ];
                 if (state.authType === 'GOOGLE_OAUTH2') {
                     // tabs.push({
                     //     name: FORM_MODE.GOOGLE_OAUTH2,
-                    //     label: i18n.t('PROJECT.DETAIL.MEMBER.ADD_FROM_GOOGLE_OAUTH2'),
+                    //     label: i18n.t('PROJECT.DETAIL.MEMBER.ADD_FROM', { user_type: i18n.t('PROJECT.DETAIL.MEMBER.GOOGLE_OAUTH2') }),
                     // });
                 } else if (state.authType === 'KEYCLOAK') {
                     tabs.push({
                         name: FORM_MODE.KEYCLOAK,
-                        label: i18n.t('PROJECT.DETAIL.MEMBER.ADD_FROM_KEYCLOAK'),
+                        label: i18n.t('PROJECT.DETAIL.MEMBER.ADD_FROM', { user_type: i18n.t('PROJECT.DETAIL.MEMBER.KEYCLOAK') }),
                     });
                 }
                 return tabs;
@@ -279,8 +280,8 @@ export default {
             projectRoles: [],
             internalItems: [] as MenuItem[],
             externalItems: [] as MenuItem[],
-            externalUserMap: [], // to match name and label of external users
-            searchPrefix: '',
+            invalidUserList: [],
+            existingUserList: [],
             searchText: '',
             labelText: '',
             totalCount: 0,
@@ -294,7 +295,13 @@ export default {
                 }
                 return '';
             }),
-            isAllValid: computed(() => formState.users.length > 0),
+            isAllValid: computed(() => {
+                const isInvalid = !!formState.users.filter(user => state.invalidUserList.includes(user)).length;
+                if (isInvalid) return false;
+                const isExisting = !!formState.users.filter(user => state.existingUserList.includes(user)).length;
+                if (isExisting) return false;
+                return formState.users.length > 0;
+            }),
         });
 
         /* util */
@@ -327,8 +334,24 @@ export default {
                     singleItem.disabled = true;
                 }
                 state.externalItems.push(singleItem);
-                state.externalUserMap.push(singleItem);
             });
+        };
+        const validateExternalUser = async (userId) => {
+            /* 1. check existing */
+            const memberIdList = state.members.map(d => d.resource_id);
+            if (memberIdList.includes(userId)) {
+                state.existingUserList.push(userId);
+                return;
+            }
+            /* 2. check invalid */
+            try {
+                const res = await SpaceConnector.client.identity.user.find({ search: { user_id: userId } });
+                if (!res.results.length) {
+                    state.invalidUserList.push(userId);
+                }
+            } catch (e) {
+                state.invalidUserList.push(userId);
+            }
         };
 
         /* api */
@@ -388,12 +411,12 @@ export default {
                 console.error(e);
             }
         };
-        const listExternalUser = async () => {
+        const listExternalUser = debounce(async () => {
             try {
                 state.loading = true;
                 const res = await SpaceConnector.client.identity.user.find({
                     search: {
-                        keyword: state.searchPrefix,
+                        keyword: state.searchText,
                     },
                 });
                 await setExternalMenuItems(res.results);
@@ -402,16 +425,14 @@ export default {
                 console.error(e);
             } finally {
                 state.loading = false;
-                state.visibleMenu = true;
-                state.isFocused = true;
             }
-        };
+        }, 300);
 
         /* event */
-        const onClickDeleteAll = () => {
+        const onClickDeleteAllUsers = () => {
             formState.users = [];
         };
-        const onClickDelete = (index) => {
+        const onClickDeleteUser = (index) => {
             formState.users.splice(index, 1);
         };
         const onDeleteLabel = (index) => {
@@ -431,17 +452,19 @@ export default {
         };
         const onSearchExternalUser = (text) => {
             if (text.length) {
-                state.searchPrefix = text;
                 listExternalUser();
             } else {
                 state.searchText = text;
             }
         };
-        const onDeleteSearchPrefix = () => {
-            if (!state.searchText && state.searchPrefix.length) {
-                state.searchPrefix = '';
-                listExternalUser();
+        const onKeydownEnter = () => {
+            if (state.searchText.trim().length && !formState.users.includes(state.searchText)) {
+                validateExternalUser(state.searchText);
+                formState.users.push(state.searchText);
             }
+        };
+        const onFocusExternalUserSearch = () => {
+            listExternalUser();
         };
 
         (async () => {
@@ -455,7 +478,9 @@ export default {
         watch(() => state.activeTab, () => {
             formState.users = [];
             state.externalItems = [];
-            state.searchPrefix = '';
+        });
+        watch(() => state.searchText, () => {
+            listExternalUser();
         });
 
         return {
@@ -463,12 +488,13 @@ export default {
             formState,
             FORM_MODE,
             addMember,
-            onClickDeleteAll,
-            onClickDelete,
+            onClickDeleteAllUsers,
+            onClickDeleteUser,
             onAddLabel,
             onDeleteLabel,
             onSearchExternalUser,
-            onDeleteSearchPrefix,
+            onKeydownEnter,
+            onFocusExternalUserSearch,
         };
     },
 };
@@ -494,30 +520,17 @@ export default {
             font-size: 0.875rem;
             line-height: 1.5;
         }
-        .comment {
-            @apply text-gray-500;
-            font-size: 0.75rem;
-            line-height: 1.5;
-        }
         .member-wrapper {
             @apply col-span-6;
 
             .p-search-dropdown::v-deep {
                 margin: 1rem 0;
 
-                &.hide-context-menu {
-                    .p-context-menu {
-                        display: none;
-                    }
-                }
-                .search-prefix-tag {
-                    &.active {
-                        @apply bg-blue-300;
-                    }
-                    .text {
-                        @apply truncate;
-                        max-width: 6.75rem;
-                    }
+                .help-text {
+                    @apply text-gray-400;
+                    font-size: 0.75rem;
+                    line-height: 1.3;
+                    padding: 0.25rem 0.5rem;
                 }
                 .external-user-no-data {
                     text-align: center;
@@ -537,11 +550,6 @@ export default {
                         font-size: 0.875rem;
                     }
                 }
-                .search-help-text {
-                    position: absolute;
-                    left: 0.5rem;
-                    top: 0.25rem;
-                }
                 .context-item {
                     &.empty {
                         height: 8rem;
@@ -560,11 +568,15 @@ export default {
                     align-items: center;
                     justify-content: space-between;
                     .text {
-                        display: flex;
+                        @apply truncate;
+                        max-width: 17.5rem;
+                        display: inline-block;
                         align-items: center;
-                        white-space: initial;
-                        max-width: 17rem;
-                        margin: 0.5rem 0;
+                        &.invalid {
+                            @apply text-alert;
+                            max-width: 14rem;
+                            padding-left: 0.5rem;
+                        }
                     }
                 }
                 .delete-button-wrapper {
