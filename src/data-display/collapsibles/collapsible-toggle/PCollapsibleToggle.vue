@@ -1,7 +1,6 @@
 <template>
     <span class="p-collapsible-toggle"
           @click="onClickToggle"
-          v-on="$listeners"
     >
         <span>
             <slot :is-collapsed="proxyIsCollapsed">
@@ -17,15 +16,15 @@
 
 <script lang="ts">
 import {
-    defineComponent, toRefs,
+    defineComponent, reactive, toRefs, ComponentRenderProxy, getCurrentInstance,
 } from '@vue/composition-api';
 
 import PI from '@/foundation/icons/PI.vue';
-import { CollapsibleProps, useCollapsible } from '@/hooks/collapsible';
+import { makeOptionalProxy } from '@/util/composition-helpers';
+import { CollapsibleToggleProps } from '@/data-display/collapsibles/collapsible-toggle/type';
 
-type Props = CollapsibleProps;
 
-export default defineComponent<Props>({
+export default defineComponent({
     name: 'PCollapsibleToggle',
     components: { PI },
     model: {
@@ -39,8 +38,17 @@ export default defineComponent<Props>({
             default: true,
         },
     },
-    setup(props: Props, context) {
-        const { state, onClickToggle } = useCollapsible(props, context);
+    setup(props: CollapsibleToggleProps) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
+        const state = reactive({
+            proxyIsCollapsed: makeOptionalProxy('isCollapsed', vm, props.isCollapsed),
+        });
+
+        /* event */
+        const onClickToggle = () => {
+            state.proxyIsCollapsed = !state.proxyIsCollapsed;
+        };
+
         return {
             ...toRefs(state),
             onClickToggle,

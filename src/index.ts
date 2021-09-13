@@ -55,7 +55,7 @@ export { default as PI } from './foundation/icons/PI.vue';
 export { default as PTextInput } from './inputs/input/PTextInput.vue';
 export { default as PLabel } from './inputs/forms/label/PLabel.vue';
 export { default as PSkeleton } from './feedbacks/loading/skeleton/PSkeleton.vue';
-export { default as PCollapsibleToggle } from './inputs/buttons/collapsible-toggle/PCollapsibleToggle.vue';
+export { default as PCollapsibleToggle } from './data-display/collapsibles/collapsible-toggle/PCollapsibleToggle.vue';
 
 export { default as PNoticeAlert } from './feedbacks/alert/notice/PNoticeAlert.vue';
 export { default as PToastAlert } from './feedbacks/alert/toast/PToastAlert.vue';

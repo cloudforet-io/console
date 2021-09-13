@@ -1,10 +1,43 @@
 import { ArgTypes } from '@storybook/addons';
 import faker from 'faker';
-import { argTypes as collapsibleArgTypes } from '@/hooks/collapsible/story-helper';
 
 
 export const argTypes: ArgTypes = {
-    ...collapsibleArgTypes,
+    /* props */
+    'v-model': {
+        name: 'v-model',
+        type: { name: 'boolean' },
+        description: 'Two way binding for `isCollapsed` props with `update:isCollapsed` event.',
+        defaultValue: '',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'model',
+            defaultValue: {
+                summary: '',
+            },
+        },
+        control: null,
+    },
+    isCollapsed: {
+        name: 'isCollapsed',
+        type: { name: 'boolean' },
+        description: 'Collapsed state of toggle button.',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'true',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     lineClamp: {
         name: 'lineClamp',
         type: { name: 'number' },
@@ -23,6 +56,7 @@ export const argTypes: ArgTypes = {
             type: 'number',
         },
     },
+    /* slot */
     defaultSlot: {
         name: 'default',
         type: { name: 'string' },
@@ -36,6 +70,21 @@ export const argTypes: ArgTypes = {
         },
         control: {
             type: 'text',
+        },
+    },
+    /* event */
+    onUpdateIsCollapsed: {
+        name: 'update:isCollapsed',
+        description: 'Event emitted when collapsed state changed. Works with `v-model` and `isCollapsed` props sync.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
         },
     },
 };

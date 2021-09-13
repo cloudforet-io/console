@@ -44,13 +44,13 @@ import {
     defineComponent, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
+import PCollapsiblePanel from '@/data-display/collapsibles/collapsible-panel/PCollapsiblePanel.vue';
+import PCollapsibleToggle from '@/data-display/collapsibles/collapsible-toggle/PCollapsibleToggle.vue';
 import { makeOptionalProxy } from '@/util/composition-helpers';
-import PCollapsibleToggle from '@/inputs/buttons/collapsible-toggle/PCollapsibleToggle.vue';
 import {
     COLLAPSIBLE_LIST_THEME,
     COLLAPSIBLE_LIST_TOGGLE_POSITION,
 } from '@/data-display/collapsibles/collapsible-list/config';
-import PCollapsiblePanel from '@/data-display/collapsibles/collapsible-panel/PCollapsiblePanel.vue';
 
 interface CollapsibleItem {
     title?: string;

@@ -14,18 +14,15 @@
 
 <script lang="ts">
 import {
-    defineComponent, onMounted, onUnmounted, onUpdated, reactive,
-    toRefs,
+    ComponentRenderProxy,
+    defineComponent, getCurrentInstance, onMounted, onUnmounted, onUpdated, reactive, toRefs,
 } from '@vue/composition-api';
 import { debounce } from 'lodash';
 
-import { CollapsibleProps, useCollapsible } from '@/hooks/collapsible';
+import PCollapsibleToggle from '@/data-display/collapsibles/collapsible-toggle/PCollapsibleToggle.vue';
+import { makeOptionalProxy } from '@/util/composition-helpers';
+import { CollapsiblePanelProps } from '@/data-display/collapsibles/collapsible-panel/type';
 
-import PCollapsibleToggle from '@/inputs/buttons/collapsible-toggle/PCollapsibleToggle.vue';
-
-interface Props extends CollapsibleProps {
-    lineClamp?: number;
-}
 
 export default defineComponent({
     name: 'PCollapsiblePanel',
@@ -46,13 +43,15 @@ export default defineComponent({
             default: 2,
         },
     },
-    setup(props: Props, context) {
-        const { state: collapsibleState } = useCollapsible(props, context);
+    setup(props: CollapsiblePanelProps) {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
+            proxyIsCollapsed: makeOptionalProxy('isCollapsed', vm, props.isCollapsed),
             fakeTextRef: null as null|HTMLElement,
             isOverflow: false,
         });
 
+        /* util */
         const checkTextOverflow = debounce(() => {
             if (!state.fakeTextRef) return;
             state.isOverflow = state.fakeTextRef.scrollHeight > state.fakeTextRef.clientHeight;
@@ -72,7 +71,6 @@ export default defineComponent({
         });
 
         return {
-            ...toRefs(collapsibleState),
             ...toRefs(state),
         };
     },

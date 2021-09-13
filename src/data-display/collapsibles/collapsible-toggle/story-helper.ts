@@ -1,6 +1,24 @@
 import { ArgTypes } from '@storybook/addons';
 
+
 export const argTypes: ArgTypes = {
+    /* props */
+    'v-model': {
+        name: 'v-model',
+        type: { name: 'boolean' },
+        description: 'Two way binding for `isCollapsed` props with `update:isCollapsed` event.',
+        defaultValue: '',
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'model',
+            defaultValue: {
+                summary: '',
+            },
+        },
+        control: null,
+    },
     isCollapsed: {
         name: 'isCollapsed',
         type: { name: 'boolean' },
@@ -19,22 +37,23 @@ export const argTypes: ArgTypes = {
             type: 'boolean',
         },
     },
-    'v-model': {
-        name: 'v-model',
-        type: { name: 'boolean' },
-        description: 'Two way binding for `isCollapsed` props with `update:isCollapsed` event.',
-        defaultValue: '',
+    /* slot */
+    defaultSlot: {
+        name: 'default',
+        type: { name: 'string' },
+        description: 'Slot for toggle button contents.',
+        defaultValue: 'Show',
         table: {
             type: {
-                summary: 'boolean',
+                summary: null,
             },
-            category: 'model',
-            defaultValue: {
-                summary: '',
-            },
+            category: 'slots',
         },
-        control: null,
+        control: {
+            type: 'text',
+        },
     },
+    /* event */
     onUpdateIsCollapsed: {
         name: 'update:isCollapsed',
         description: 'Event emitted when collapsed state changed. Works with `v-model` and `isCollapsed` props sync.',
