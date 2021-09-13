@@ -1,5 +1,5 @@
 import {
-    computed, reactive, toRefs, UnwrapRef,
+    computed, ComputedRef, reactive, toRefs, UnwrapRef,
 } from '@vue/composition-api';
 import { pull, remove } from 'lodash';
 
@@ -7,23 +7,26 @@ export interface SelectProps {
     value?: any;
     selected?: any | any[];
     disabled?: boolean;
-    predicate?: (value: any, current: any) => boolean;
+    predicate?: Predicate;
     multiSelectable?: boolean;
 }
 
+interface Predicate {
+    (value: any, current: any): boolean;
+}
 interface SelectStateArgs {
-    value?: any;
-    selected?: any | any[];
-    predicate?: (value: any, current: any) => boolean;
-    disabled?: boolean;
-    multiSelectable?: boolean;
+    value?: ComputedRef<any> | any;
+    selected?: ComputedRef<any | any[]> | any | any[];
+    predicate?: ComputedRef<Predicate|undefined> | Predicate;
+    disabled?: ComputedRef<boolean|undefined> | boolean;
+    multiSelectable?: ComputedRef<boolean|undefined> | boolean;
 }
 
 interface SelectState {
     isSelected: boolean;
 }
 
-const getSelectState = (state: SelectStateArgs) => reactive({
+const getSelectState = (state: UnwrapRef<SelectStateArgs>) => reactive({
     isSelected: computed<boolean>(() => {
         if (Array.isArray(state.selected)) {
             if (state.predicate) {
@@ -36,7 +39,7 @@ const getSelectState = (state: SelectStateArgs) => reactive({
         return state.selected === state.value;
     }),
 });
-const getSingleSelected = (state: SelectStateArgs, selectState: SelectState) => {
+const getSingleSelected = (state: UnwrapRef<SelectStateArgs>, selectState: SelectState) => {
     if (state.disabled) return undefined;
     if (selectState.isSelected) return undefined;
 
@@ -51,7 +54,7 @@ const getSingleSelected = (state: SelectStateArgs, selectState: SelectState) => 
 
     return result;
 };
-const getMultiSelected = (state: SelectStateArgs, selectState: SelectState) => {
+const getMultiSelected = (state: UnwrapRef<SelectStateArgs>, selectState: SelectState) => {
     if (state.disabled) return undefined;
 
     let result: any;
