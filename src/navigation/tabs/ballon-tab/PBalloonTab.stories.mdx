@@ -1,9 +1,9 @@
-import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
-import {getCurrentInstance, reactive, toRefs} from '@vue/composition-api';
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
 import faker from 'faker'
-import {range} from 'lodash'
+import { range } from 'lodash'
 
-import {makeOptionalProxy} from '@/util/composition-helpers';
+import { makeOptionalProxy } from '@/util/composition-helpers';
 
 import PBalloonTab from './PBalloonTab.vue';
 import { getBalloonTabArgTypes } from '@/navigation/tabs/ballon-tab/story-helper';
@@ -29,12 +29,11 @@ export const Template = (args, { argTypes }) => ({
     <p-balloon-tab
         :tabs="tabs"
         v-model="proxyActiveTab"
-        :keep-alive-all="keepAliveAll"
         :tail="tail"
         :size="size"
         :position="position"
         :stretch="stretch"
-        @update:activeTab="onUpdateActiveTab"
+        @update:active-tab="onUpdateActiveTab"
         @change="onChange"
     ></p-balloon-tab>
     `,

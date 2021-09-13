@@ -1,54 +1,47 @@
 import {
-    computed, reactive, SetupContext,
+    computed, reactive, toRefs, UnwrapRef, ComputedRef,
 } from '@vue/composition-api';
-import { TranslateResult } from 'vue-i18n';
+import { TabItem } from '@/navigation/tabs/tab/type';
 
-export interface TabItem {
-    name: string;
-    label?: string | TranslateResult;
-    keepAlive?: boolean;
+
+interface TabStateArgs {
+    tabs: ComputedRef<Array<string|TabItem>> | Array<string|TabItem>;
+    activeTab: ComputedRef<string> | string;
 }
 
-export interface TabProps {
-    activeTab: string;
-    tabs: Array<string|TabItem>;
-    keepAliveAll?: boolean;
+interface TabState {
+    tabItems: TabItem[];
+    keepAliveTabNames: string[];
+    nonKeepAliveTabNames: string[];
+    currentTabItem?: TabItem;
 }
 
-const getTabState = (props: TabProps) => {
+export const useTab = ({ tabs, activeTab }: TabStateArgs) => {
     const state = reactive({
-        tabItems: computed<Required<TabItem>[]>(() => props.tabs.map((value) => {
-            if (typeof value === 'string') {
+        tabs,
+        activeTab,
+    });
+    const tabState: UnwrapRef<TabState> = reactive({
+        tabItems: computed<Required<TabItem>[]>(() => state.tabs.map((tab) => {
+            if (typeof tab === 'string') {
                 return {
-                    name: value, label: value, keepAlive: false,
+                    name: tab,
+                    label: tab,
+                    keepAlive: false,
                 };
             }
             return {
-                name: value.name, label: value.label ?? value.name, keepAlive: !!value.keepAlive,
+                name: tab.name,
+                label: tab.label ?? tab.name,
+                keepAlive: !!tab.keepAlive,
             };
         })),
-        nonKeepTabNames: computed<string[]>(() => {
-            if (props.keepAliveAll) return [];
-            return state.tabItems.filter(tab => !tab.keepAlive).map(tab => tab.name);
-        }),
-        keepTabNames: computed<string[]>(() => {
-            const tabs = props.keepAliveAll ? state.tabItems : state.tabItems.filter(tab => tab.keepAlive);
-            return tabs.map(tab => tab.name);
-        }),
-        currentTabItem: computed<Required<TabItem>|undefined>(() => state.tabItems.find(tab => tab.name === state.proxyActiveTab)),
+        keepAliveTabNames: computed<string[]>(() => tabState.tabItems.filter(tabItem => tabItem.keepAlive).map(tabItem => tabItem.name)),
+        nonKeepAliveTabNames: computed<string[]>(() => tabState.tabItems.filter(tabItem => !tabItem.keepAlive).map(tabItem => tabItem.name)),
+        currentTabItem: computed<TabItem | undefined>(() => tabState.tabItems.find(tabItem => tabItem.name === state.activeTab)),
     });
-    return state;
-};
 
-export const useTab = (props: TabProps, context: SetupContext) => {
-    const state = getTabState(props);
-
-    const onClickTab = (tab: TabItem, idx: number) => {
-        if (state.proxyActiveTab !== tab.name) {
-            context.emit('update:activeTab', tab.name);
-            context.emit('change', tab.name, idx);
-        }
+    return {
+        ...toRefs(tabState),
     };
-
-    return { state, onClickTab };
 };

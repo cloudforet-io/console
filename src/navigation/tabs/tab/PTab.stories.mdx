@@ -2,11 +2,10 @@ import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import { reactive, getCurrentInstance, toRefs } from '@vue/composition-api';
 
 import { makeOptionalProxy } from '@/util/composition-helpers';
+import { getTabArgTypes, Inner } from '@/navigation/tabs/tab/story-helper';
 
 import PBadge from '@/data-display/badges/PBadge';
 import PTab from './PTab.vue';
-import { getTabArgTypes, Inner } from '@/navigation/tabs/tab/story-helper';
-
 
 
 <Meta title='navigation/Tabs/Tab' parameters={{
@@ -25,9 +24,8 @@ export const Template = (args, { argTypes }) => ({
         <p-tab
             :tabs="tabs"
             v-model="proxyActiveTab"
-            :keep-alive-all="keepAliveAll"
             :stretch="stretch"
-            @update:activeTab="onUpdateActiveTab"
+            @update:active-tab="onUpdateActiveTab"
             @change="onChange"
         >
             <div v-if="defaultSlot" v-html="defaultSlot"/>

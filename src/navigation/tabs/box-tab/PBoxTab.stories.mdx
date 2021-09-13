@@ -1,7 +1,7 @@
 import {Meta, Canvas, Story, ArgsTable} from '@storybook/addon-docs/blocks';
 import {getCurrentInstance, reactive, toRefs} from '@vue/composition-api';
 
-import {makeOptionalProxy} from '@/util/composition-helpers';
+import { makeOptionalProxy } from '@/util/composition-helpers';
 
 import PBoxTab from './PBoxTab.vue';
 import { getBoxTabArgTypes, Inner } from '@/navigation/tabs/box-tab/story-helper';
@@ -24,9 +24,8 @@ export const Template = (args, { argTypes }) => ({
         <p-box-tab
             :tabs="tabs"
             v-model="proxyActiveTab"
-            :keep-alive-all="keepAliveAll"
             :style-type="styleType"
-            @update:activeTab="onUpdateActiveTab"
+            @update:active-tab="onUpdateActiveTab"
             @change="onChange"
         >
             <div v-if="defaultSlot" v-html="defaultSlot"/>

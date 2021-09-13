@@ -1,10 +1,10 @@
 <template>
     <div class="p-box-tab" :class="styleType">
-        <div class="box-group" >
+        <div class="box-group">
             <button v-for="(tab, idx) in tabItems"
                     :key="tab.name"
                     :class="{ active: activeTab && activeTab === tab.name}"
-                    @click="onClickTab(tab, idx)"
+                    @click="handleClickTab(tab, idx)"
             >
                 <p-i v-show="activeTab && activeTab === tab.name" name="ic_check" color="inherit" />
                 <span>{{ tab.label }}</span>
@@ -13,27 +13,30 @@
         <div class="tab-pane">
             <slot />
             <keep-alive>
-                <slot v-if="keepTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+                <slot v-if="keepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
             </keep-alive>
-            <slot v-if="nonKeepTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+            <slot v-if="nonKeepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
         </div>
     </div>
 </template>
 
 <script lang="ts">
-import { TabProps, useTab } from '@/hooks/tab';
-import { defineComponent, toRefs } from '@vue/composition-api';
-import PI from '@/foundation/icons/PI.vue';
-import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';
+import { computed, defineComponent } from '@vue/composition-api';
 
-type Props = TabProps
+import PI from '@/foundation/icons/PI.vue';
+
+import { BoxTabProps } from '@/navigation/tabs/box-tab/type';
+import { BOX_TAB_STYLE_TYPE } from '@/navigation/tabs/box-tab/config';
+import { useTab } from '@/hooks/tab';
+import { TabItem } from '@/navigation/tabs/tab/type';
+
 
 export default defineComponent({
     name: 'PBoxTab',
     components: { PI },
     model: {
         prop: 'activeTab',
-        event: 'update:activeTab',
+        event: 'update:active-tab',
     },
     props: {
         /* tab item props */
@@ -45,10 +48,6 @@ export default defineComponent({
             type: String,
             default: '',
         },
-        keepAliveAll: {
-            type: Boolean,
-            default: false,
-        },
         /* box tab props */
         styleType: {
             type: String,
@@ -58,11 +57,31 @@ export default defineComponent({
             },
         },
     },
-    setup(props: Props, context) {
-        const { state, onClickTab } = useTab(props, context);
+    setup(props: BoxTabProps, { emit }) {
+        const {
+            tabItems,
+            keepAliveTabNames,
+            nonKeepAliveTabNames,
+            currentTabItem,
+        } = useTab({
+            tabs: computed(() => props.tabs),
+            activeTab: computed(() => props.activeTab),
+        });
+
+        /* event */
+        const handleClickTab = (tab: TabItem, idx: number) => {
+            if (props.activeTab !== tab.name) {
+                emit('update:active-tab', tab.name);
+                emit('change', tab.name, idx);
+            }
+        };
+
         return {
-            ...toRefs(state),
-            onClickTab,
+            tabItems,
+            keepAliveTabNames,
+            nonKeepAliveTabNames,
+            currentTabItem,
+            handleClickTab,
         };
     },
 });

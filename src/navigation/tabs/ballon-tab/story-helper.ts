@@ -1,9 +1,57 @@
 import { ArgTypes } from '@storybook/addons';
-import { getTabHookArgTypes, Inner } from '@/hooks/tab/story-helper';
 import { BALLOON_TAB_POSITION, BALLOON_TAB_SIZE, BALLOON_TAB_STYLE_TYPE } from '@/navigation/tabs/ballon-tab/config';
+import { reactive, toRefs } from '@vue/composition-api';
+import PButton from '@/inputs/buttons/button/PButton.vue';
 
 export const getBalloonTabArgTypes = (): ArgTypes => ({
-    ...getTabHookArgTypes(),
+    /* props */
+    tabs: {
+        name: 'tabs',
+        type: { name: 'array' },
+        description: `Tab items. 
+        It is array of \`string\` or array of 
+        \`{
+          name: string; 
+          label?: string; 
+          keepAlive?: boolean;
+        }\`
+        .`,
+        defaultValue: [
+            { name: 'detail', label: 'Detail' },
+            { name: 'info', label: 'Info' },
+            { name: 'tags', label: 'Tags' },
+        ],
+        table: {
+            type: {
+                summary: 'array',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '[]',
+            },
+        },
+        control: {
+            type: 'object',
+        },
+    },
+    activeTab: {
+        name: 'activeTab',
+        type: { name: 'string', required: true },
+        description: 'Active tab name. `sync` props.',
+        defaultValue: 'detail',
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: '""',
+            },
+        },
+        control: {
+            type: 'text',
+        },
+    },
     tail: {
         name: 'tail',
         type: { name: 'boolean' },
@@ -97,5 +145,36 @@ export const getBalloonTabArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    /* events */
+    onUpdateActiveTab: {
+        name: 'update:active-tab',
+        description: 'Event emitted when activated tab changed. Works with `v-model` and `activeTab` props sync.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
+    onChange: {
+        name: 'change',
+        description: `Event emitted when activated tab changed.
+        Two arguments will be given to the handler that bound to this event. 
+        Changed tab item's name(\`string\`) will be given as the first, 
+        and the index(\`number\`) will be given as the second argument.`,
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
 });
-export { Inner };

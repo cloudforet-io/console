@@ -23,8 +23,7 @@ export const Template = (args, { argTypes }) => ({
     <p-button-tab
         :tabs="tabs"
         v-model="proxyActiveTab"
-        :keep-alive-all="keepAliveAll"
-        @update:activeTab="onUpdateActiveTab"
+        @update:active-tab="onUpdateActiveTab"
         @change="onChange"
     >
         <div v-if="defaultSlot" v-html="defaultSlot"/>

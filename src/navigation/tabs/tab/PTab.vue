@@ -2,8 +2,8 @@
     <div class="p-tab">
         <ul class="tab-item-wrapper" :class="{stretch}">
             <li v-for="(tab, idx) in tabItems" :key="tab.name"
-                :class="{active: activeTab === tab.name, single: isSingle}"
-                @click="onClickTab(tab, idx)"
+                :class="{active: activeTab === tab.name, single: tabs.length === 1}"
+                @click="handleClickTab(tab, idx)"
             >
                 <span class="label">
                     {{ tab.label }}
@@ -16,9 +16,9 @@
         <div class="tab-pane">
             <slot />
             <keep-alive>
-                <slot v-if="keepTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+                <slot v-if="keepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
             </keep-alive>
-            <slot v-if="nonKeepTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+            <slot v-if="nonKeepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
         </div>
     </div>
 </template>
@@ -26,20 +26,17 @@
 <script lang="ts">
 import {
     computed, defineComponent,
-    toRefs,
 } from '@vue/composition-api';
 
-import { TabProps, useTab } from '@/hooks/tab';
+import { useTab } from '@/hooks/tab';
+import { TabItem, TabProps } from '@/navigation/tabs/tab/type';
 
-interface Props extends TabProps {
-    stretch?: boolean;
-}
 
-export default defineComponent<Props>({
+export default defineComponent<TabProps>({
     name: 'PTab',
     model: {
         prop: 'activeTab',
-        event: 'update:activeTab',
+        event: 'update:active-tab',
     },
     props: {
         /* tab item props */
@@ -57,13 +54,31 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props: Props, context) {
-        const { state, onClickTab } = useTab(props, context);
-        const isSingle = computed(() => props.tabs.length === 1);
+    setup(props: TabProps, { emit }) {
+        const {
+            tabItems,
+            keepAliveTabNames,
+            nonKeepAliveTabNames,
+            currentTabItem,
+        } = useTab({
+            tabs: computed(() => props.tabs),
+            activeTab: computed(() => props.activeTab),
+        });
+
+        /* event */
+        const handleClickTab = (tab: TabItem, idx: number) => {
+            if (props.activeTab !== tab.name) {
+                emit('update:active-tab', tab.name);
+                emit('change', tab.name, idx);
+            }
+        };
+
         return {
-            ...toRefs(state),
-            onClickTab,
-            isSingle,
+            tabItems,
+            keepAliveTabNames,
+            nonKeepAliveTabNames,
+            currentTabItem,
+            handleClickTab,
         };
     },
 });

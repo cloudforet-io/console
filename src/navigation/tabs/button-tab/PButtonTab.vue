@@ -6,9 +6,9 @@
                         ref="buttonRefs"
                         :key="tab.name"
                         :class="{ active: activeTab === tab.name}"
-                        @click="onClickTab(tab, idx)"
-                        @keydown.left="focusButton(idx, -1)"
-                        @keydown.right="focusButton(idx, 1)"
+                        @click="handleClickTab(tab, idx)"
+                        @keydown.left="handleKeydownLeft(idx)"
+                        @keydown.right="handleKeydownRight(idx)"
                 >
                     {{ tab.label }}
                 </button>
@@ -17,30 +17,29 @@
         <div class="tab-pane">
             <slot />
             <keep-alive>
-                <slot v-if="keepTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+                <slot v-if="keepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
             </keep-alive>
-            <slot v-if="nonKeepTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+            <slot v-if="nonKeepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
         </div>
     </div>
 </template>
 
 <script lang="ts">
+import {
+    computed, defineComponent, reactive, toRefs,
+} from '@vue/composition-api';
+import { useTab } from '@/hooks/tab';
+import { ButtonTabProps } from '@/navigation/tabs/button-tab/type';
+import { TabItem } from '@/navigation/tabs/tab/type';
 
-import { defineComponent, ref, toRefs } from '@vue/composition-api';
-import { TabProps, useTab } from '@/hooks/tab';
 
-interface Props extends TabProps {
-    styleType?: string;
-}
-
-export default defineComponent<Props>({
+export default defineComponent({
     name: 'PButtonTab',
     model: {
         prop: 'activeTab',
-        event: 'update:activeTab',
+        event: 'update:active-tab',
     },
     props: {
-        /* tab item props */
         tabs: {
             type: Array,
             default: () => [],
@@ -49,31 +48,54 @@ export default defineComponent<Props>({
             type: String,
             default: '',
         },
-        keepAliveAll: {
-            type: Boolean,
-            default: false,
-        },
     },
-    setup(props: Props, context) {
-        const { state, onClickTab } = useTab(props, context);
+    setup(props: ButtonTabProps, { emit }) {
+        const {
+            tabItems,
+            keepAliveTabNames,
+            nonKeepAliveTabNames,
+            currentTabItem,
+        } = useTab({
+            tabs: computed(() => props.tabs),
+            activeTab: computed(() => props.activeTab),
+        });
 
-        const buttonRefs = ref<HTMLElement[]|null>(null);
+        const state = reactive({
+            buttonRefs: null as HTMLElement[] | null,
+        });
 
+        /* event */
         const focusButton = (current: number, moveTo: 1|-1) => {
-            if (!buttonRefs.value) return;
-            let next = buttonRefs.value[current + moveTo];
+            if (!state.buttonRefs) return;
+            let next = state.buttonRefs[current + moveTo];
             if (!next) {
-                if (moveTo > 0) next = buttonRefs.value[0];
-                else next = buttonRefs.value[buttonRefs.value.length - 1];
+                if (moveTo > 0) next = state.buttonRefs[0];
+                else next = state.buttonRefs[state.buttonRefs.length - 1];
             }
-
             next.focus();
         };
+        const handleClickTab = (tab: TabItem, idx: number) => {
+            if (props.activeTab !== tab.name) {
+                emit('update:active-tab', tab.name);
+                emit('change', tab.name, idx);
+            }
+        };
+        const handleKeydownLeft = (current: number) => {
+            focusButton(current, -1);
+        };
+        const handleKeydownRight = (current: number) => {
+            focusButton(current, 1);
+        };
+
         return {
             ...toRefs(state),
-            onClickTab,
-            buttonRefs,
-            focusButton,
+            tabItems,
+            keepAliveTabNames,
+            nonKeepAliveTabNames,
+            currentTabItem,
+            handleClickTab,
+            handleKeydownLeft,
+            handleKeydownRight,
         };
     },
 });

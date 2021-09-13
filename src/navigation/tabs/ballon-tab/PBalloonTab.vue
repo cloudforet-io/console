@@ -8,7 +8,7 @@
                         active: activeTab === tab.name,
                         tail: tail && !isTabItemsOverTwoLines
                     }"
-                    @click="onClickTab(tab, idx)"
+                    @click="handleClickTab(tab, idx)"
             >
                 <slot name="tab" v-bind="tab">
                     {{ tab.label }}
@@ -18,34 +18,33 @@
         <div ref="paneRef" class="tab-pane">
             <slot />
             <keep-alive>
-                <slot v-if="keepTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+                <slot v-if="keepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
             </keep-alive>
-            <slot v-if="nonKeepTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
+            <slot v-if="nonKeepAliveTabNames.includes(activeTab)" :name="activeTab" v-bind="currentTabItem" />
         </div>
     </div>
 </template>
 
 <script lang="ts">
 import {
-    onMounted, onUnmounted,
-    onUpdated,
-    reactive, toRefs,
+    reactive, toRefs, computed, onMounted, onUnmounted, onUpdated,
 } from '@vue/composition-api';
 
 import screens from '@/styles/screens';
 
 import { useTab } from '@/hooks/tab';
 import {
-    BALLOON_TAB_POSITION,
-    BALLOON_TAB_SIZE,
-    BALLOON_TAB_STYLE_TYPE,
+    BALLOON_TAB_POSITION, BALLOON_TAB_SIZE, BALLOON_TAB_STYLE_TYPE,
 } from '@/navigation/tabs/ballon-tab/config';
+import { BalloonTabProps } from '@/navigation/tabs/ballon-tab/type';
+import { TabItem } from '@/navigation/tabs/tab/type';
+
 
 export default {
     name: 'PBalloonTab',
     model: {
         prop: 'activeTab',
-        event: 'update:activeTab',
+        event: 'update:active-tab',
     },
     props: {
         /* tab item props */
@@ -56,10 +55,6 @@ export default {
         activeTab: {
             type: String,
             default: '',
-        },
-        keepAliveAll: {
-            type: Boolean,
-            default: false,
         },
         /* balloon props */
         tail: {
@@ -92,8 +87,16 @@ export default {
             default: false,
         },
     },
-    setup(props, context) {
-        const { state: tabState, onClickTab } = useTab(props, context);
+    setup(props: BalloonTabProps, { emit }) {
+        const {
+            tabItems,
+            keepAliveTabNames,
+            nonKeepAliveTabNames,
+            currentTabItem,
+        } = useTab({
+            tabs: computed(() => props.tabs),
+            activeTab: computed(() => props.activeTab),
+        });
 
         const state = reactive({
             tabContainerRef: null as HTMLElement|null,
@@ -103,6 +106,7 @@ export default {
             tabPosition: props.position,
         });
 
+        /* util */
         const checkTabItemsOverflows = () => {
             if (!state.buttonRefs[0] || !state.paneRef) return;
 
@@ -119,7 +123,6 @@ export default {
 
             state.isTabItemsOverTwoLines = diff > 10;
         };
-
         const setPosition = () => {
             if (window.innerWidth < screens.mobile.max) {
                 state.tabPosition = BALLOON_TAB_POSITION.top;
@@ -127,11 +130,17 @@ export default {
                 state.tabPosition = props.position;
             }
         };
-
-
         const checkStyles = () => {
             checkTabItemsOverflows();
             setPosition();
+        };
+
+        /* event */
+        const handleClickTab = (tab: TabItem, idx: number) => {
+            if (props.activeTab !== tab.name) {
+                emit('update:active-tab', tab.name);
+                emit('change', tab.name, idx);
+            }
         };
 
         onUpdated(() => {
@@ -149,9 +158,12 @@ export default {
         });
 
         return {
-            ...toRefs(tabState),
             ...toRefs(state),
-            onClickTab,
+            tabItems,
+            keepAliveTabNames,
+            nonKeepAliveTabNames,
+            currentTabItem,
+            handleClickTab,
         };
     },
 };
