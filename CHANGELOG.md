@@ -1,3 +1,15 @@
+# [1.1.0-beta.134](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.133...v1.1.0-beta.134) (2021-09-13)
+
+
+### Bug Fixes
+
+* build error ([#687](https://github.com/spaceone-dev/spaceone-design-system/issues/687)) ([87bce4b](https://github.com/spaceone-dev/spaceone-design-system/commit/87bce4b02050a1e4ac7f593af3e89a1928183de4))
+
+
+### Features
+
+* add menuPosition props to select dropdown ([#686](https://github.com/spaceone-dev/spaceone-design-system/issues/686)) ([87481e4](https://github.com/spaceone-dev/spaceone-design-system/commit/87481e4aef6e7aa1810fc8b3086626d6b9cb40b5))
+
 # [1.1.0-beta.133](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.132...v1.1.0-beta.133) (2021-09-13)
 
 
