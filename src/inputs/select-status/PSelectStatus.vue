@@ -13,7 +13,7 @@
 
 <script lang="ts">
 import { SelectProps, useSelect } from '@/hooks/select';
-import { computed, defineComponent, toRefs } from '@vue/composition-api';
+import { computed, defineComponent } from '@vue/composition-api';
 import PStatus from '@/data-display/status/PStatus.vue';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 
@@ -70,13 +70,32 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props: Props, context) {
-        const { state, onClick } = useSelect(props, context);
+    setup(props: Props, { emit }) {
+        const {
+            isSelected,
+            getSelected,
+        } = useSelect({
+            value: computed(() => props.value),
+            selected: computed(() => props.selected),
+            predicate: computed(() => props.predicate),
+            multiSelectable: computed(() => props.multiSelectable),
+        });
         const withIcon = computed(() => props.icon || props.lottie);
+
+        /* event */
+        const onClick = () => {
+            const newSelected = getSelected();
+            if (props.multiSelectable) {
+                emit('change', newSelected, !isSelected.value);
+            } else {
+                emit('change', newSelected, true);
+            }
+        };
+
         return {
-            ...toRefs(state),
-            onClick,
+            isSelected,
             withIcon,
+            onClick,
         };
     },
 });

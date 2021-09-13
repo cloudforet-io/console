@@ -20,8 +20,7 @@
 
 <script lang="ts">
 import {
-    computed,
-    defineComponent, reactive, toRefs,
+    computed, defineComponent, reactive, toRefs,
 } from '@vue/composition-api';
 
 import PI from '@/foundation/icons/PI.vue';
@@ -93,18 +92,27 @@ export default defineComponent<Props>({
             default: '',
         },
     },
-    setup(props: Props, context) {
-        const { state: selectState, onClick } = useSelect(props, context);
+    setup(props: Props, { emit }) {
+        const {
+            isSelected,
+            getSelected,
+        } = useSelect({
+            value: computed(() => props.value),
+            selected: computed(() => props.selected),
+            predicate: computed(() => props.predicate),
+            disabled: computed(() => props.disabled),
+            multiSelectable: computed(() => props.multiSelectable),
+        });
 
         const state = reactive({
             markerIconName: computed(() => {
                 if (props.multiSelectable) {
                     if (props.disabled) return 'ic_checkbox--disabled';
-                    if (selectState.isSelected) return 'ic_checkbox--checked';
+                    if (isSelected.value) return 'ic_checkbox--checked';
                     return 'ic_checkbox';
                 }
                 if (props.disabled) return 'ic_radio--disabled';
-                if (selectState.isSelected) return 'ic_checkbox_circle--checked';
+                if (isSelected.value) return 'ic_checkbox_circle--checked';
                 return 'ic_radio';
             }),
             errorIcon: computed(() => {
@@ -114,10 +122,19 @@ export default defineComponent<Props>({
             }),
         });
 
+        /* event */
+        const onClick = () => {
+            const newSelected = getSelected();
+            if (props.multiSelectable) {
+                emit('change', newSelected, !isSelected.value);
+            } else {
+                emit('change', newSelected, true);
+            }
+        };
 
         return {
-            ...toRefs(selectState),
             ...toRefs(state),
+            isSelected,
             onClick,
         };
     },

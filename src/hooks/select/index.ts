@@ -1,5 +1,5 @@
 import {
-    computed, reactive, SetupContext, UnwrapRef,
+    computed, reactive, toRefs, UnwrapRef,
 } from '@vue/composition-api';
 import { pull, remove } from 'lodash';
 
@@ -11,96 +11,112 @@ export interface SelectProps {
     multiSelectable?: boolean;
 }
 
-type SelectState = UnwrapRef<{
+interface SelectStateArgs {
+    value?: any;
+    selected?: any | any[];
+    predicate?: (value: any, current: any) => boolean;
+    disabled?: boolean;
+    multiSelectable?: boolean;
+}
+
+interface SelectState {
     isSelected: boolean;
-}>
+}
 
-const getSelectState = (props: SelectProps) => {
-    const state: SelectState = reactive({
-        isSelected: computed<boolean>(() => {
-            if (Array.isArray(props.selected)) {
-                if (props.predicate) {
-                    const predicate = props.predicate;
-                    return !!props.selected.find(d => predicate(props.value, d));
-                }
-                return props.selected.includes(props.value);
+const getSelectState = (state: SelectStateArgs) => reactive({
+    isSelected: computed<boolean>(() => {
+        if (Array.isArray(state.selected)) {
+            if (state.predicate) {
+                const predicateFunc = state.predicate;
+                return !!state.selected.find(d => predicateFunc(state.value, d));
             }
-            if (props.predicate) {
-                return props.predicate(props.value, props.selected);
-            }
-            return props.selected === props.value;
-        }),
+            return state.selected.includes(state.value);
+        }
+        if (state.predicate) return state.predicate(state.value, state.selected);
+        return state.selected === state.value;
+    }),
+});
+const getSingleSelected = (state: SelectStateArgs, selectState: SelectState) => {
+    if (state.disabled) return undefined;
+    if (selectState.isSelected) return undefined;
+
+    let result: any;
+    if (Array.isArray(state.selected)) {
+        result = [state.value];
+    } else if (typeof state.selected === 'boolean') {
+        result = !state.selected;
+    } else {
+        result = state.value;
+    }
+
+    return result;
+};
+const getMultiSelected = (state: SelectStateArgs, selectState: SelectState) => {
+    if (state.disabled) return undefined;
+
+    let result: any;
+    if (Array.isArray(state.selected)) {
+        result = [...state.selected];
+        if (!selectState.isSelected) {
+            result.push(state.value);
+        } else if (state.predicate) {
+            const predicateFunc = state.predicate;
+            remove(result, d => predicateFunc(state.value, d));
+        } else {
+            pull(result, state.value);
+        }
+    } else if (typeof state.selected === 'boolean') {
+        result = !state.selected;
+    } else {
+        result = selectState.isSelected ? undefined : state.value;
+    }
+    return result;
+};
+
+
+export const useMultiSelect = ({
+    value, selected, predicate, disabled,
+}: SelectStateArgs) => {
+    const state = reactive({
+        value, selected, predicate, disabled,
     });
-
-    return state;
-};
-
-export const useMultiSelect = (props: SelectProps, context: SetupContext,
-    state: SelectState = getSelectState(props)) => {
-    const onClick = () => {
-        if (props.disabled) return;
-
-        let newResult: any;
-        if (Array.isArray(props.selected)) {
-            newResult = [...props.selected];
-            if (!state.isSelected) newResult.push(props.value);
-            else if (props.predicate) {
-                const predicate = props.predicate;
-                remove(newResult, d => predicate(props.value, d));
-            } else pull(newResult, props.value);
-        } else if (typeof props.selected === 'boolean') {
-            newResult = !props.selected;
-        } else {
-            newResult = state.isSelected ? undefined : props.value;
-        }
-
-        context.emit('change', newResult, !state.isSelected);
-    };
+    const selectState: UnwrapRef<SelectState> = getSelectState(state);
+    const getSelected = () => getMultiSelected(state, selectState);
 
     return {
-        state,
-        onClick,
+        ...toRefs(selectState),
+        getSelected,
     };
 };
 
 
-export const useSingleSelect = (props: SelectProps, context: SetupContext,
-    state: SelectState = getSelectState(props)) => {
-    const onClick = () => {
-        if (props.disabled) return;
-        if (state.isSelected) return;
-
-        let newResult: any;
-        if (Array.isArray(props.selected)) {
-            newResult = [props.value];
-        } else if (typeof props.selected === 'boolean') {
-            newResult = !props.selected;
-        } else {
-            newResult = props.value;
-        }
-
-        context.emit('change', newResult, true);
-    };
+export const useSingleSelect = ({
+    value, selected, predicate, disabled,
+}: SelectStateArgs) => {
+    const state = reactive({
+        value, selected, predicate, disabled,
+    });
+    const selectState: UnwrapRef<SelectState> = getSelectState(state);
+    const getSelected = () => getSingleSelected(state, selectState);
 
     return {
-        state,
-        onClick,
+        ...toRefs(selectState),
+        getSelected,
     };
 };
 
 
-export const useSelect = (props: SelectProps, context: SetupContext) => {
-    const state = getSelectState(props);
-    const { onClick: onSingleClick } = useSingleSelect(props, context, state);
-    const { onClick: onMultiClick } = useMultiSelect(props, context, state);
-
-    const onClick = () => {
-        if (props.multiSelectable) onMultiClick();
-        else onSingleClick();
-    };
+export const useSelect = ({
+    value, selected, predicate, disabled, multiSelectable,
+}: SelectStateArgs) => {
+    const state = reactive({
+        value, selected, predicate, disabled, multiSelectable,
+    });
+    const selectedState: UnwrapRef<SelectState> = getSelectState(state);
+    const getSelected = () => (state.multiSelectable ? getMultiSelected(state, selectedState) : getSingleSelected(state, selectedState));
 
     return {
-        state,
-        onClick,
+        ...toRefs(selectedState),
+        getSelected,
     };
 };

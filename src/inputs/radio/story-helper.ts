@@ -1,107 +1,180 @@
-import { argTypes as selectArgTypes } from '@/hooks/select/story-helper';
 import { ArgTypes } from '@storybook/addons';
 
-const getArgTypes = () => {
-    const argTypes: ArgTypes = {
-        ...selectArgTypes,
-        'v-model': {
-            name: 'v-model',
-            type: { name: 'any' },
-            description: 'Two way binding for `selected` props with `change` event.',
-            defaultValue: [],
-            table: {
-                type: {
-                    summary: 'any',
-                },
-                category: 'model',
-                defaultValue: {
-                    summary: '[]',
-                },
+export const argTypes: ArgTypes = {
+    /* props */
+    'v-model': {
+        name: 'v-model',
+        type: { name: 'any' },
+        description: 'Two way binding for `selected` props with `change` event.',
+        defaultValue: [],
+        table: {
+            type: {
+                summary: 'any',
             },
-            control: null,
-        },
-        invalid: {
-            name: 'invalid',
-            type: { name: 'boolean' },
-            description: 'Apply invalid style',
-            defaultValue: false,
-            table: {
-                type: {
-                    summary: 'boolean',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: false,
-                },
-            },
-            control: {
-                type: 'boolean',
+            category: 'model',
+            defaultValue: {
+                summary: '[]',
             },
         },
-        defaultSlot: {
-            name: 'default',
-            description: 'Slot for the additional selectable area that explains checkbox.',
-            defaultValue: 'click me!',
-            table: {
-                type: {
-                    summary: null,
-                },
-                defaultValue: {
-                    summary: null,
-                },
-                category: 'slots',
+        control: null,
+    },
+    value: {
+        name: 'value',
+        type: { name: 'any' },
+        description: 'The value to be compared for the \'selected\' props.',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'any',
             },
-            control: {
-                type: 'text',
-            },
-        },
-        radioIconSlot: {
-            name: 'radio-icon',
-            description: 'Slot for custom radio icon.',
-            defaultValue: null,
-            table: {
-                type: {
-                    summary: null,
-                },
-                defaultValue: {
-                    summary: null,
-                },
-                category: 'slots',
-            },
-            control: {
-                type: 'text',
+            category: 'props',
+            defaultValue: {
+                summary: 'true',
             },
         },
-        radioLeftSlot: {
-            name: 'radio-left',
-            description: 'Slot for left area of radio.',
-            defaultValue: null,
-            table: {
-                type: {
-                    summary: null,
-                },
-                defaultValue: {
-                    summary: null,
-                },
-                category: 'slots',
-            },
-            control: {
-                type: 'text',
-            },
+        control: {
+            type: 'object',
         },
-    };
-    delete argTypes.multiSelectable;
-
-    argTypes.selected = {
-        ...selectArgTypes.selected,
+    },
+    selected: {
+        name: 'selected',
+        type: { name: 'any, any[]' },
+        description: 'Selected value(s).',
         defaultValue: undefined,
         table: {
-            ...selectArgTypes.selected.table,
+            type: {
+                summary: 'any, any[]',
+            },
+            category: 'props',
             defaultValue: {
                 summary: 'undefined',
             },
         },
-    };
-    return argTypes;
+        control: {
+            type: 'object',
+        },
+    },
+    disabled: {
+        name: 'disabled',
+        type: { name: 'boolean' },
+        description: 'Whether to disable selection or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    predicate: {
+        name: 'predicate',
+        type: { name: 'func' },
+        description: `Function that predicate two arguments are the same or not.
+        It's useful when the props \`value\` is an object.`,
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'func',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: undefined,
+            },
+        },
+        control: null,
+    },
+    // radio props
+    invalid: {
+        name: 'invalid',
+        type: { name: 'boolean' },
+        description: 'Apply invalid style',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    /* slot */
+    defaultSlot: {
+        name: 'default',
+        description: 'Slot for the additional selectable area that explains checkbox.',
+        defaultValue: 'click me!',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text',
+        },
+    },
+    radioIconSlot: {
+        name: 'radio-icon',
+        description: 'Slot for custom radio icon.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text',
+        },
+    },
+    radioLeftSlot: {
+        name: 'radio-left',
+        description: 'Slot for left area of radio.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text',
+        },
+    },
+    /* event */
+    onChange: {
+        name: 'change',
+        description: `Event emitted when selected state changed. 
+        The first argument is the changed \`selected\` props.
+        And the second argument is passed as a boolean value whether or not it is selected.`,
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
 };
-export const argTypes = getArgTypes();

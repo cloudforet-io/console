@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { SelectProps, useSelect } from '@/hooks/select';
-import { defineComponent, toRefs } from '@vue/composition-api';
+import { computed, defineComponent } from '@vue/composition-api';
 import { SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
 
 interface Props extends SelectProps {
@@ -57,10 +57,29 @@ export default defineComponent<Props>({
             },
         },
     },
-    setup(props, context) {
-        const { state, onClick } = useSelect(props, context);
+    setup(props, { emit }) {
+        const {
+            isSelected,
+            getSelected,
+        } = useSelect({
+            value: computed(() => props.value),
+            selected: computed(() => props.selected),
+            predicate: computed(() => props.predicate),
+            multiSelectable: computed(() => props.multiSelectable),
+        });
+
+        /* event */
+        const onClick = () => {
+            const newSelected = getSelected();
+            if (props.multiSelectable) {
+                emit('change', newSelected, !isSelected.value);
+            } else {
+                emit('change', newSelected, true);
+            }
+        };
+
         return {
-            ...toRefs(state),
+            isSelected,
             onClick,
         };
     },

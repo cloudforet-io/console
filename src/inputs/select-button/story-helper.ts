@@ -1,79 +1,166 @@
-import { argTypes as selectArgTypes } from '@/hooks/select/story-helper';
 import { SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
 import { ArgTypes } from '@storybook/addons';
 
-const getArgTypes = (): ArgTypes => {
-    const argTypes: ArgTypes = {
-        ...selectArgTypes,
-        styleType: {
-            name: 'styleType',
-            type: { name: 'string' },
-            description: `Style type of select button. ${Object.values(SELECT_BUTTON_STYLE_TYPE)} are available.`,
-            defaultValue: SELECT_BUTTON_STYLE_TYPE.secondary,
-            table: {
-                type: {
-                    summary: 'string',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: SELECT_BUTTON_STYLE_TYPE.secondary,
-                },
+export const argTypes: ArgTypes = {
+    /* props */
+    'v-model': {
+        name: 'v-model',
+        type: { name: 'any' },
+        description: 'Two way binding for `selected` props with `change` event.',
+        defaultValue: [],
+        table: {
+            type: {
+                summary: 'any',
             },
-            control: {
-                type: 'select',
-                options: Object.values(SELECT_BUTTON_STYLE_TYPE),
+            category: 'model',
+            defaultValue: {
+                summary: '[]',
             },
         },
-        size: {
-            name: 'size',
-            type: { name: 'string' },
-            description: `Size of select button. ${Object.values(SELECT_BUTTON_SIZE)} are available.`,
-            defaultValue: SELECT_BUTTON_SIZE.md,
-            table: {
-                type: {
-                    summary: 'string',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: SELECT_BUTTON_SIZE.md,
-                },
+        control: null,
+    },
+    value: {
+        name: 'value',
+        type: { name: 'any' },
+        description: 'The value to be compared for the \'selected\' props.',
+        defaultValue: true,
+        table: {
+            type: {
+                summary: 'any',
             },
-            control: {
-                type: 'select',
-                options: Object.values(SELECT_BUTTON_SIZE),
+            category: 'props',
+            defaultValue: {
+                summary: 'true',
             },
         },
-        defaultSlot: {
-            name: 'default',
-            description: 'Slot for card contents.',
-            defaultValue: 'Click Me!',
-            table: {
-                type: {
-                    summary: null,
-                },
-                defaultValue: {
-                    summary: null,
-                },
-                category: 'slots',
-            },
-            control: {
-                type: 'text',
-            },
+        control: {
+            type: 'object',
         },
-    };
-
-    delete argTypes.disabled;
-
-    argTypes.selected = {
-        ...selectArgTypes.selected,
+    },
+    selected: {
+        name: 'selected',
+        type: { name: 'any, any[]' },
+        description: 'Selected value(s).',
         defaultValue: undefined,
         table: {
-            ...selectArgTypes.selected.table,
+            type: {
+                summary: 'any, any[]',
+            },
+            category: 'props',
             defaultValue: {
                 summary: 'undefined',
             },
         },
-    };
-    return argTypes;
+        control: {
+            type: 'object',
+        },
+    },
+    predicate: {
+        name: 'predicate',
+        type: { name: 'func' },
+        description: `Function that predicate two arguments are the same or not.
+        It's useful when the props \`value\` is an object.`,
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'func',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: undefined,
+            },
+        },
+        control: null,
+    },
+    multiSelectable: {
+        name: 'multiSelectable',
+        type: { name: 'boolean' },
+        description: 'Whether to allow multi select or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    styleType: {
+        name: 'styleType',
+        type: { name: 'string' },
+        description: `Style type of select button. ${Object.values(SELECT_BUTTON_STYLE_TYPE)} are available.`,
+        defaultValue: SELECT_BUTTON_STYLE_TYPE.secondary,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: SELECT_BUTTON_STYLE_TYPE.secondary,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(SELECT_BUTTON_STYLE_TYPE),
+        },
+    },
+    size: {
+        name: 'size',
+        type: { name: 'string' },
+        description: `Size of select button. ${Object.values(SELECT_BUTTON_SIZE)} are available.`,
+        defaultValue: SELECT_BUTTON_SIZE.md,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: SELECT_BUTTON_SIZE.md,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(SELECT_BUTTON_SIZE),
+        },
+    },
+    /* slot */
+    defaultSlot: {
+        name: 'default',
+        description: 'Slot for the additional selectable area that explains checkbox.',
+        defaultValue: 'click me!',
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'slots',
+        },
+        control: {
+            type: 'text',
+        },
+    },
+    /* event */
+    onChange: {
+        name: 'change',
+        description: `Event emitted when selected state changed. 
+        The first argument is the changed \`selected\` props.
+        And the second argument is passed as a boolean value whether or not it is selected.`,
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            defaultValue: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
 };
-export const argTypes = getArgTypes();

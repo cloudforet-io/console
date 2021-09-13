@@ -28,7 +28,7 @@
 
 <script lang="ts">
 import {
-    computed, toRefs, defineComponent,
+    computed, defineComponent,
 } from '@vue/composition-api';
 import PI from '@/foundation/icons/PI.vue';
 import { SelectProps, useSingleSelect } from '@/hooks/select';
@@ -67,18 +67,33 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props: Props, context) {
-        const { state, onClick } = useSingleSelect(props, context);
+    setup(props: Props, { emit }) {
+        const {
+            isSelected,
+            getSelected,
+        } = useSingleSelect({
+            value: computed(() => props.value),
+            selected: computed(() => props.selected),
+            predicate: computed(() => props.predicate),
+            disabled: computed(() => props.disabled),
+        });
 
         const iconName = computed(() => {
             if (props.disabled) return 'ic_radio--disabled';
-            if (state.isSelected) return 'ic_radio--checked';
+            if (isSelected.value) return 'ic_radio--checked';
             return 'ic_radio';
         });
+
+        /* event */
+        const onClick = () => {
+            const newSelected = getSelected();
+            emit('change', newSelected, true);
+        };
+
         return {
-            ...toRefs(state),
-            onClick,
+            isSelected,
             iconName,
+            onClick,
         };
     },
 });

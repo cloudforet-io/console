@@ -24,7 +24,7 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, toRefs,
+    computed, defineComponent,
 } from '@vue/composition-api';
 import PI from '@/foundation/icons/PI.vue';
 import { useMultiSelect, SelectProps } from '@/hooks/select';
@@ -64,18 +64,33 @@ export default defineComponent<CheckboxProps>({
             default: false,
         },
     },
-    setup(props: CheckboxProps, context) {
-        const { state, onClick } = useMultiSelect(props, context);
+    setup(props: CheckboxProps, { emit }) {
+        const {
+            isSelected,
+            getSelected,
+        } = useMultiSelect({
+            value: computed(() => props.value),
+            selected: computed(() => props.selected),
+            predicate: computed(() => props.predicate),
+            disabled: computed(() => props.disabled),
+        });
+
         const iconName = computed(() => {
             if (props.disabled) return 'ic_checkbox--disabled';
-            if (state.isSelected) return 'ic_checkbox--checked';
+            if (isSelected.value) return 'ic_checkbox--checked';
             return 'ic_checkbox';
         });
 
+        /* event */
+        const onClick = () => {
+            const newSelected = getSelected();
+            emit('change', newSelected, !isSelected.value);
+        };
+
         return {
-            ...toRefs(state),
-            onClick,
+            isSelected,
             iconName,
+            onClick,
         };
     },
 });
