@@ -1,3 +1,10 @@
+# [1.1.0-beta.133](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.132...v1.1.0-beta.133) (2021-09-13)
+
+
+### Bug Fixes
+
+* fix and refactor tab hook ([#682](https://github.com/spaceone-dev/spaceone-design-system/issues/682)) ([a3927ea](https://github.com/spaceone-dev/spaceone-design-system/commit/a3927eaa224d3fd0b26bc402f2ca3b40e522669e))
+
 # [1.1.0-beta.132](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.131...v1.1.0-beta.132) (2021-09-09)
 
 
