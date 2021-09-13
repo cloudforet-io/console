@@ -23,7 +23,7 @@ export const setDatetimeToFilters = (filters: Filter[], filter: QueryStoreFilter
     }
 };
 
-export const getDatetimeToFilters = (filter: QueryStoreFilter, timezone = 'UTC'): Filter[]|undefined => {
+export const convertDatetimeQueryStoreFilterToFilters = (filter: QueryStoreFilter, timezone = 'UTC'): Filter[]|undefined => {
     const f = filter as Required<QueryStoreFilter>;
     if (typeof f.v === 'string') {
         const time = dayjs.utc(dayjs.tz(f.v, timezone));
@@ -42,7 +42,7 @@ export const getDatetimeToFilters = (filter: QueryStoreFilter, timezone = 'UTC')
     if (Array.isArray(f.v)) {
         const newFilters: Filter[] = [];
         f.v.forEach((v) => {
-            const filtersByValue: Filter[]|undefined = getDatetimeToFilters({ k: f.k, v, o: f.o }, timezone);
+            const filtersByValue: Filter[]|undefined = convertDatetimeQueryStoreFilterToFilters({ k: f.k, v, o: f.o }, timezone);
             if (filtersByValue) {
                 newFilters.concat(filtersByValue);
             }
