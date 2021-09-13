@@ -5,7 +5,7 @@ import {
     OperatorType,
     QueryItem
 } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
-import { Filter, FilterOperator, Query } from '@src/space-connector/type';
+import { Filter, FilterOperator } from '@src/space-connector/type';
 import {
     QueryStoreFilter, QueryStoreFilterValue, RawQuery, RawQueryOperator
 } from '@src/query/type';
@@ -16,7 +16,7 @@ import {
     datetimeRawQueryOperatorToQueryTagOperatorMap, rawQueryOperatorToApiQueryOperatorMap,
     rawQueryOperatorToPluralApiQueryOperatorMap
 } from '@src/query/config';
-import { setDatetimeToFilters } from '@src/query/helper';
+import { convertDatetimeQueryStoreFilterToFilters } from '@src/query/helper';
 import { flatten, forEach } from 'lodash';
 import { ComputedRef } from '@vue/composition-api';
 
@@ -56,14 +56,15 @@ const filterToQueryTag = (filter: { k?: string; v: QueryStoreFilterValue; o?: Ra
     };
 };
 const filterToApiQueryFilter = (_filters: QueryStoreFilter[], timezone = 'UTC') => {
-    const filter: Filter[] = [];
+    let filter: Filter[] = [];
     const keyword: string[] = [];
 
     _filters.forEach((f) => {
         if (f.k) {
             if (datetimeRawQueryOperatorToQueryTagOperatorMap[f.o as string]) {
                 /* datetime case */
-                setDatetimeToFilters(filter, f, timezone);
+                const datetimeFilters = convertDatetimeQueryStoreFilterToFilters(f, timezone);
+                if (datetimeFilters) filter = filter.concat(datetimeFilters);
             } else if (Array.isArray(f.v)) {
                 /* plural case */
                 if (rawQueryOperatorToPluralApiQueryOperatorMap[f.o || '']) {
@@ -245,13 +246,13 @@ export class QueryHelper {
         return JSON.stringify(this.rawQueries);
     }
 
-    get apiQuery(): Required<Pick<Query, 'filter'|'filter_or'|'keyword'>> {
+    get apiQuery() {
         const { filter, keyword } = filterToApiQueryFilter(this._filters, QueryHelper.timezone?.value);
         const { filter: filterOr } = filterToApiQueryFilter(this._orFilters, QueryHelper.timezone?.value);
 
         return {
             filter,
-            filter_or: filterOr,
+            filterOr,
             keyword: keyword.join(' ') || ''
         };
     }

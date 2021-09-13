@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { QueryHelper } from '@src/query';
 import { Query } from '@src/space-connector/type';
 
@@ -6,12 +5,12 @@ class ApiQueryHelper extends QueryHelper {
     private _data: Query = {};
 
     get data(): Query {
-        const { filter, keyword, filter_or } = this.apiQuery;
+        const { filter, keyword, filterOr } = this.apiQuery;
 
         if (filter.length > 0) this._data.filter = filter;
         else delete this._data.filter;
 
-        if (filter_or.length > 0) this._data.filter_or = filter_or;
+        if (filterOr.length > 0) this._data.filter_or = filterOr;
         else delete this._data.filter_or;
 
         if (keyword) this._data.keyword = keyword;

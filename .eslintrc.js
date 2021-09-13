@@ -54,6 +54,7 @@ module.exports = {
         'import/prefer-default-export': 'off',
         'no-underscore-dangle': 'off',
         'max-classes-per-file': 'off',
+        camelcase: 'off',
         // typescript rules
         '@typescript-eslint/no-unused-vars': ['error'],
         '@typescript-eslint/explicit-member-accessibility': [
@@ -73,7 +74,13 @@ module.exports = {
             'error',
             { allows: ['protected', 'public'] }
         ],
-        '@typescript-eslint/camelcase': ['off'], // use eslint camelcase rule
+        '@typescript-eslint/naming-convention': [
+            'error',
+            {
+                selector: 'variable',
+                format: ['camelCase', 'UPPER_CASE']
+            }
+        ],
         '@typescript-eslint/no-empty-function': ['off'], // use eslint no-empty-function rule
         '@typescript-eslint/no-use-before-define': ['off'], // use eslint no-use-before-define rule
         '@typescript-eslint/ban-ts-ignore': ['off'],
