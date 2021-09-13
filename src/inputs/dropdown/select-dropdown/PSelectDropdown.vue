@@ -45,13 +45,14 @@
         </p-button>
         <p-context-menu v-show="proxyVisibleMenu"
                         ref="contextMenuRef"
+                        :class="menuPosition"
                         :menu="items"
                         :loading="loading"
                         :always-show-menu="alwaysShowMenu"
                         :invalid="invalid"
                         :style="{
                             ...contextMenuStyle,
-                            ...(buttonOnly && {width: 'auto'})
+                            ...(buttonOnly && {width: 'auto'}),
                         }"
                         @select="onSelectMenu"
         >
@@ -80,6 +81,7 @@ import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PI from '@/foundation/icons/PI.vue';
+import {CONTEXT_MENU_POSITION} from "@/inputs/dropdown/select-dropdown/type";
 
 
 interface SelectDropdownProps extends ContextMenuFixedStyleProps {
@@ -95,6 +97,7 @@ interface SelectDropdownProps extends ContextMenuFixedStyleProps {
     buttonStyleType?: BUTTON_STYLE;
     buttonIcon?: string;
 }
+
 
 export default defineComponent<SelectDropdownProps>({
     name: 'PSelectDropdown',
@@ -174,6 +177,11 @@ export default defineComponent<SelectDropdownProps>({
         buttonIcon: {
             type: String,
             default: undefined,
+        },
+        menuPosition: {
+            type: String,
+            default: CONTEXT_MENU_POSITION.RIGHT,
+            validator: (value: CONTEXT_MENU_POSITION) => Object.values(CONTEXT_MENU_POSITION).includes(value),
         },
     },
     setup(props: SelectDropdownProps, { emit, slots }) {
@@ -283,6 +291,13 @@ export default defineComponent<SelectDropdownProps>({
         z-index: 1000;
         min-width: 100%;
         width: auto;
+
+        &.left {
+            right: 0;
+        }
+        &.right {
+            right: unset;
+        }
     }
 
     &.button-only {

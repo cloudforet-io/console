@@ -4,6 +4,7 @@ import { getContextMenuFixedStyleArgTypes } from '@/hooks/context-menu-fixed-sty
 import { menuItems } from '@/inputs/context-menu/mock';
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
+import { CONTEXT_MENU_POSITION } from '@/inputs/dropdown/select-dropdown/type';
 
 export const getSelectDropdownArgTypes = (): ArgTypes => {
     const contextMenuArgTypes = getContextMenuArgTypes();
@@ -183,6 +184,25 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
             },
             control: {
                 type: 'text',
+            },
+        },
+        menuPosition: {
+            name: 'menuPosition',
+            type: { name: 'string' },
+            description: 'Position of Context menu',
+            defaultValue: CONTEXT_MENU_POSITION.RIGHT,
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: CONTEXT_MENU_POSITION.RIGHT,
+                },
+            },
+            control: {
+                type: 'select',
+                options: [...Object.values(CONTEXT_MENU_POSITION)],
             },
         },
         /* model */
