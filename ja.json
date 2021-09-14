@@ -1244,6 +1244,7 @@
 				},
 				"NOTE": {
 					"ADD_NOTE": "ノート追加",
+					"DELETE_MODAL_TITLE": "",
 					"NOTE": "ノート"
 				},
 				"PROJECT_DEPENDENCY": {

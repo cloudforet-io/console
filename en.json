@@ -1244,6 +1244,7 @@
 				},
 				"NOTE": {
 					"ADD_NOTE": "Add Note",
+					"DELETE_MODAL_TITLE": "Are you sure you want to delete selected item?",
 					"NOTE": "Note"
 				},
 				"PROJECT_DEPENDENCY": {

@@ -1244,6 +1244,7 @@
 				},
 				"NOTE": {
 					"ADD_NOTE": "노트 추가",
+					"DELETE_MODAL_TITLE": "선택한 노트를 삭제하시겠습니까?",
 					"NOTE": "노트"
 				},
 				"PROJECT_DEPENDENCY": {
