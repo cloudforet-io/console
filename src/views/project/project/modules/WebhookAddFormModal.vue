@@ -4,7 +4,7 @@
         size="md"
         :header-title="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_TITLE')"
         :visible.sync="proxyVisible"
-        :disabled="showValidation && (!isNameValid || !isSelectedWebhookType || !isSelectedVersion)"
+        :disabled="showValidation && (!isNameValid || !isSelectedWebhookType)"
         :loading="loading"
         @confirm="onClickConfirm"
     >
@@ -36,21 +36,9 @@
                         :value="item"
                         :label="item.name"
                         :disabled="loading"
-                        :invalid="showValidation && !isSelectedVersion"
-                        @click="onClickWebhookType(selectedWebhookType)"
+                        :invalid="showValidation"
                     />
                 </div>
-            </p-field-group>
-            <p-field-group
-                :label="$t('PROJECT.DETAIL.MODAL_CREATE_WEBHOOK_LABEL_VERSION')"
-                required
-            >
-                <p-select-dropdown v-model="version"
-                                   :items="versions"
-                                   :disabled="loading || !isSelectedVersion"
-                                   :placeholder="loading ? $t('PROJECT.DETAIL.MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER') : $t('COMPONENT.SELECT_DROPDOWN.SELECT')"
-                                   use-fixed-menu-style
-                />
             </p-field-group>
         </template>
     </p-button-modal>
@@ -89,7 +77,6 @@ export default {
         PFieldGroup,
         PTextInput,
         PSelectCard,
-        PSelectDropdown,
     },
     props: {
         visible: {
@@ -118,12 +105,6 @@ export default {
             isSelectedWebhookType: computed(() => {
                 if (Object.keys(state.selectedWebhookType).length === 0) return false;
                 return true;
-            }),
-            versions: [],
-            version: '',
-            isSelectedVersion: computed(() => {
-                if (state.version) return true;
-                return false;
             }),
             showValidation: false,
         });
@@ -154,28 +135,6 @@ export default {
                 console.error(e);
             }
         };
-        const getVersions = async (selectedPluginId) => {
-            state.loading = true;
-            state.versions = [];
-            try {
-                const { results } = await SpaceConnector.client.repository.plugin.getVersions({
-                    plugin_id: selectedPluginId,
-                });
-                results.forEach((value, index) => {
-                    if (index === 0) {
-                        state.versions.push({ type: 'item', label: `${value} (latest)`, name: value });
-                    } else {
-                        state.versions.push({ type: 'item', label: value, name: value });
-                    }
-                });
-                state.version = results[0];
-            } catch (e) {
-                state.versions = [];
-                console.error(e);
-            } finally {
-                state.loading = false;
-            }
-        };
         const createWebhook = async () => {
             state.loading = true;
             try {
@@ -183,7 +142,6 @@ export default {
                     name: state.webhookName,
                     plugin_info: {
                         plugin_id: state.selectedWebhookType?.plugin_id,
-                        version: state.version,
                         options: {},
                     },
                     project_id: props.projectId,
@@ -212,17 +170,11 @@ export default {
             await createWebhook();
             emit('confirm');
         };
-        const onClickWebhookType = async (selectedWebhookType) => {
-            state.version = '';
-            await getVersions(selectedWebhookType.plugin_id);
-        };
 
         /* init */
         const initInputModel = () => {
             state.webhookName = '';
             state.selectedWebhookType = {} as WebhookType;
-            state.versions = [];
-            state.version = '';
             state.disabled = false;
             state.showValidation = false;
         };
@@ -236,7 +188,6 @@ export default {
             ...toRefs(state),
             onClickConfirm,
             onFirstInputName,
-            onClickWebhookType,
         };
     },
 };

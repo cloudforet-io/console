@@ -21,28 +21,17 @@
                     :disabled="loading"
                 />
             </p-field-group>
-            <p-field-group
-                :label="$t('PROJECT.DETAIL.MODAL_UPDATE_WEBHOOK_LABEL_VERSION')"
-                required
-            >
-                <p-select-dropdown v-model="selectedVersion"
-                                   :items="versions"
-                                   :disabled="loading"
-                                   :placeholder="$t('PROJECT.DETAIL.MODAL_WEBHOOK_VERSION_LOADING_PLACEHOLDER')"
-                                   use-fixed-menu-style
-                />
-            </p-field-group>
         </template>
     </p-button-modal>
 </template>
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput, PSelectDropdown,
+    PButtonModal, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -56,7 +45,6 @@ export default {
         PButtonModal,
         PFieldGroup,
         PTextInput,
-        PSelectDropdown,
     },
     props: {
         selectedItem: {
@@ -74,8 +62,6 @@ export default {
             proxyVisible: makeProxy('visible', props, emit),
             webhookName: props.selectedItem[0].name,
             state: props.selectedItem[0].state,
-            versions: [],
-            selectedVersion: props.selectedItem[0].plugin_info.version,
             showValidation: false,
             nameInvalidText: computed(() => {
                 if (!state.showValidation) return undefined;
@@ -102,42 +88,6 @@ export default {
                 console.error(e);
             }
         };
-        const updateWebhookVersion = async () => {
-            const nowWebhookVersion = props.selectedItem[0].plugin_info.version;
-            const changedWebhookVersion = state.selectedVersion;
-            if (nowWebhookVersion === changedWebhookVersion) return;
-
-            try {
-                await SpaceConnector.client.monitoring.webhook.updatePlugin({
-                    // eslint-disable-next-line camelcase
-                    webhook_id: props.selectedItem[0].webhook_id,
-                    version: state.selectedVersion,
-                });
-            } catch (e) {
-                console.error(e);
-            }
-        };
-        const getVersions = async () => {
-            state.loading = true;
-            state.versions = [];
-            try {
-                const { results } = await SpaceConnector.client.repository.plugin.getVersions({
-                    plugin_id: props.selectedItem[0].plugin_info.plugin_id,
-                });
-                results.forEach((value, index) => {
-                    if (index === 0) {
-                        state.versions.push({ type: 'item', label: `${value} (latest)`, name: value });
-                    } else {
-                        state.versions.push({ type: 'item', label: value, name: value });
-                    }
-                });
-            } catch (e) {
-                state.versions = [];
-                console.error(e);
-            } finally {
-                state.loading = false;
-            }
-        };
 
         /* event */
         const onUpdateConfirm = async () => {
@@ -147,7 +97,6 @@ export default {
 
             try {
                 await updateWebhook();
-                await updateWebhookVersion();
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_WEBHOOK'), '', root);
                 state.proxyVisible = false;
             } catch (e) {
@@ -158,10 +107,6 @@ export default {
                 emit('confirm');
             }
         };
-
-        watch(() => props.visible, (after, before) => {
-            if (after) getVersions();
-        }, { immediate: true });
 
         return {
             ...toRefs(state),
