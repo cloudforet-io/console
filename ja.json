@@ -1398,6 +1398,7 @@
 				"ALT_E_GET_PLUGIN_TITLE": "プラグイン読み込みに失敗",
 				"ALT_E_GET_VERSION_TITLE": "バージョン取得に失敗",
 				"ALT_S_CREATE_TITLE": "コレクタ作成完了",
+				"AUTO_UPGRADE_LABEL": "",
 				"NAME_INVALID_DUPLICATED": "名前が重複しています",
 				"NAME_INVALID_MIN": "2文字以上を入力してください",
 				"NAME_LABEL": "名前",

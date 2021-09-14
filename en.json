@@ -1398,6 +1398,7 @@
 				"ALT_E_GET_PLUGIN_TITLE": "Failed to Get Plugin",
 				"ALT_E_GET_VERSION_TITLE": "Failed to Get Version",
 				"ALT_S_CREATE_TITLE": "Successfully Created Collector",
+				"AUTO_UPGRADE_LABEL": "Auto Upgrade",
 				"NAME_INVALID_DUPLICATED": "Name already registered.",
 				"NAME_INVALID_MIN": "Must be longer than 2 characters",
 				"NAME_LABEL": "Name",

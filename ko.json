@@ -1398,6 +1398,7 @@
 				"ALT_E_GET_PLUGIN_TITLE": "플러그인 가져오기 실패",
 				"ALT_E_GET_VERSION_TITLE": "버전 가져오기 실패",
 				"ALT_S_CREATE_TITLE": "컬렉터 생성 완료",
+				"AUTO_UPGRADE_LABEL": "자동 업그레이드",
 				"NAME_INVALID_DUPLICATED": "중복된 이름입니다.",
 				"NAME_INVALID_MIN": "2 자 이상 입력해주세요.",
 				"NAME_LABEL": "이름",
