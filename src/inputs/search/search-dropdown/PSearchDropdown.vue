@@ -172,7 +172,15 @@ export default defineComponent<SearchDropdownProps>({
     setup(props: SearchDropdownProps, { emit, slots, listeners }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        const { state: contextMenuFixedStyleState } = useContextMenuFixedStyle(props);
+        const {
+            proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
+        } = useContextMenuFixedStyle({
+            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
+            visibleMenu: computed(() => props.visibleMenu),
+        });
+        const contextMenuFixedStyleState = reactive({
+            proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
+        });
 
         const state = reactive({
             menuRef: null,

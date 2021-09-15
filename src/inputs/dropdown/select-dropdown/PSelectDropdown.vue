@@ -81,10 +81,10 @@ import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PI from '@/foundation/icons/PI.vue';
-import {CONTEXT_MENU_POSITION} from "@/inputs/dropdown/select-dropdown/type";
+import { CONTEXT_MENU_POSITION } from '@/inputs/dropdown/select-dropdown/type';
 
 
-interface SelectDropdownProps extends ContextMenuFixedStyleProps {
+interface SelectDropdownProps {
     items?: MenuItem[];
     selected?: string | number;
     invalid?: boolean;
@@ -96,6 +96,9 @@ interface SelectDropdownProps extends ContextMenuFixedStyleProps {
     buttonOnly?: boolean;
     buttonStyleType?: BUTTON_STYLE;
     buttonIcon?: string;
+    // context menu fixed style props
+    useFixedMenuStyle?: boolean;
+    visibleMenu?: boolean;
 }
 
 
@@ -187,7 +190,15 @@ export default defineComponent<SelectDropdownProps>({
     setup(props: SelectDropdownProps, { emit, slots }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        const { state: contextMenuFixedStyleState } = useContextMenuFixedStyle(props);
+        const {
+            proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
+        } = useContextMenuFixedStyle({
+            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
+            visibleMenu: computed(() => props.visibleMenu),
+        });
+        const contextMenuFixedStyleState = reactive({
+            proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
+        });
 
         const state = reactive({
             contextMenuRef: null as null|any,

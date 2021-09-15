@@ -1,6 +1,6 @@
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, onMounted, onUnmounted, reactive, watch,
+    computed, ComputedRef, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { throttle } from 'lodash';
 import { Vue } from 'vue/types/vue';
@@ -9,6 +9,11 @@ import { makeOptionalProxy } from '@/util/composition-helpers';
 export interface ContextMenuFixedStyleProps {
     useFixedMenuStyle?: boolean;
     visibleMenu?: boolean;
+}
+
+interface StateArgs {
+    useFixedMenuStyle?: ComputedRef<boolean|undefined> | boolean;
+    visibleMenu?: ComputedRef<boolean|undefined> | boolean;
 }
 
 const isScrollable = (ele: Element) => {
@@ -25,18 +30,20 @@ const getScrollableParent = (ele?: Element|null): Element => {
     return isScrollable(ele) ? ele : getScrollableParent(ele.parentElement);
 };
 
-export const useContextMenuFixedStyle = (
-    props: ContextMenuFixedStyleProps,
-) => {
+export const useContextMenuFixedStyle = ({ useFixedMenuStyle, visibleMenu }: StateArgs) => {
     const vm = getCurrentInstance() as ComponentRenderProxy;
     const state = reactive({
+        useFixedMenuStyle,
+        visibleMenu,
+    });
+    const contextMenuFixedStyleState = reactive({
         proxyVisibleMenu: makeOptionalProxy('visibleMenu', vm, false),
         targetRef: null as Vue|Element|null,
-        targetElement: computed<Element|null>(() => (state.targetRef as Vue)?.$el ?? state.targetRef),
+        targetElement: computed<Element|null>(() => (contextMenuFixedStyleState.targetRef as Vue)?.$el ?? contextMenuFixedStyleState.targetRef),
         contextMenuStyle: computed(() => {
-            if (!state.proxyVisibleMenu || !state.targetRef) return {};
+            if (!contextMenuFixedStyleState.proxyVisibleMenu || !contextMenuFixedStyleState.targetRef) return {};
 
-            const targetRects: DOMRect = state.targetElement?.getBoundingClientRect();
+            const targetRects: DOMRect = contextMenuFixedStyleState.targetElement?.getBoundingClientRect();
 
             const contextMenuStyle: Partial<CSSStyleDeclaration> = {
                 overflowY: 'auto',
@@ -44,7 +51,7 @@ export const useContextMenuFixedStyle = (
                 minHeight: '32px',
             };
 
-            if (props.useFixedMenuStyle) {
+            if (state.useFixedMenuStyle) {
                 contextMenuStyle.position = 'fixed';
                 contextMenuStyle.width = 'auto';
                 contextMenuStyle.minWidth = `${targetRects.width}px`;
@@ -54,12 +61,12 @@ export const useContextMenuFixedStyle = (
             if (window.innerHeight * 0.9 > (targetRects.bottom)) {
                 const height = window.innerHeight - targetRects.bottom - 12;
                 contextMenuStyle.maxHeight = `${height < 0 ? 0 : height}px`;
-                if (props.useFixedMenuStyle) contextMenuStyle.top = `${targetRects.bottom}px`;
+                if (state.useFixedMenuStyle) contextMenuStyle.top = `${targetRects.bottom}px`;
                 else contextMenuStyle.top = `${targetRects.height}px`;
             } else {
                 const height = targetRects.top - 12;
                 contextMenuStyle.maxHeight = `${height < 0 ? 0 : height}px`;
-                if (props.useFixedMenuStyle) contextMenuStyle.bottom = `${targetRects.top}px`;
+                if (state.useFixedMenuStyle) contextMenuStyle.bottom = `${targetRects.top}px`;
                 else contextMenuStyle.bottom = `${targetRects.height}px`;
             }
 
@@ -68,13 +75,12 @@ export const useContextMenuFixedStyle = (
     });
 
     const hideMenu = throttle(() => {
-        if (state.proxyVisibleMenu) state.proxyVisibleMenu = false;
+        if (contextMenuFixedStyleState.proxyVisibleMenu) contextMenuFixedStyleState.proxyVisibleMenu = false;
     }, 300);
 
-
-    if (props.useFixedMenuStyle) {
+    if (state.useFixedMenuStyle) {
         let scrollParent: Element|undefined;
-        watch(() => state.targetElement, (targetElement) => {
+        watch(() => contextMenuFixedStyleState.targetElement, (targetElement) => {
             if (targetElement) {
                 scrollParent = getScrollableParent(targetElement.parentElement);
                 if (scrollParent) {
@@ -96,6 +102,6 @@ export const useContextMenuFixedStyle = (
 
 
     return {
-        state,
+        ...toRefs(contextMenuFixedStyleState),
     };
 };

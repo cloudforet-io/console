@@ -1,6 +1,5 @@
 import { camelCase } from 'lodash';
 import { ArgTypes } from '@storybook/addons';
-import { getContextMenuFixedStyleArgTypes } from '@/hooks/context-menu-fixed-style/story-helper';
 import { menuItems } from '@/inputs/context-menu/mock';
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
@@ -18,7 +17,44 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
         }
     });
     return {
-        ...getContextMenuFixedStyleArgTypes(),
+        /* context menu fixed style props */
+        useFixedMenuStyle: {
+            name: 'useFixedMenuStyle',
+            type: { name: 'boolean' },
+            description: 'Whether to use position fixed style on menu or not. ',
+            defaultValue: false,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'false',
+                },
+            },
+            control: {
+                type: 'boolean',
+            },
+        },
+        visibleMenu: {
+            name: 'visibleMenu',
+            type: { name: 'boolean' },
+            description: 'Whether to show the menu or not. Automatically determined if no value is given. `sync` props.',
+            defaultValue: undefined,
+            table: {
+                type: {
+                    summary: 'boolean',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'undefined',
+                },
+            },
+            control: {
+                type: null,
+            },
+        },
+        //
         invalid: contextMenuArgTypes.invalid,
         loading: contextMenuArgTypes.loading,
         alwaysShowMenu: contextMenuArgTypes.alwaysShowMenu,

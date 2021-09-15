@@ -52,7 +52,7 @@ import {
 import { MenuItem } from '@/inputs/context-menu/type';
 
 
-interface AutocompleteSearchProps extends ContextMenuFixedStyleProps {
+interface AutocompleteSearchProps {
     value: string;
     placeholder?: string;
     focused?: boolean;
@@ -64,6 +64,9 @@ interface AutocompleteSearchProps extends ContextMenuFixedStyleProps {
     handler?: AutocompleteHandler;
     disableHandler?: boolean;
     exactMode?: boolean;
+    // context menu fixed style props
+    useFixedMenuStyle?: boolean;
+    visibleMenu?: boolean;
 }
 
 const fuseOptions = {
@@ -146,7 +149,15 @@ export default defineComponent<AutocompleteSearchProps>({
     setup(props: AutocompleteSearchProps, { emit, slots, listeners }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
-        const { state: contextMenuFixedStyleState } = useContextMenuFixedStyle(props);
+        const {
+            proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
+        } = useContextMenuFixedStyle({
+            useFixedMenuStyle: computed(() => props.useFixedMenuStyle),
+            visibleMenu: computed(() => props.visibleMenu),
+        });
+        const contextMenuFixedStyleState = reactive({
+            proxyVisibleMenu, targetRef, targetElement, contextMenuStyle,
+        });
 
         const state = reactive({
             menuRef: null,
@@ -270,7 +281,7 @@ export default defineComponent<AutocompleteSearchProps>({
             return res;
         }, {}));
 
-        const onInput = async (val: string, e) => {
+        const onInput = (val: string, e) => {
             if (!contextMenuFixedStyleState.proxyVisibleMenu) showMenu();
 
             state.proxyValue = val;

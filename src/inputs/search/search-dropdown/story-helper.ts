@@ -1,10 +1,11 @@
 import { getSearchArgTypes } from '@/inputs/search/search/story-helper';
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
 import { ArgTypes } from '@storybook/addons';
-import { getContextMenuFixedStyleArgTypes } from '@/hooks/context-menu-fixed-style/story-helper';
 import { SEARCH_DROPDOWN_TYPE } from '@/inputs/search/search-dropdown/type';
 
+
 const extraArgTypes: ArgTypes = {
+    /* props */
     type: {
         name: 'type',
         type: { name: 'string' },
@@ -94,6 +95,43 @@ const extraArgTypes: ArgTypes = {
         },
         control: {
             type: 'boolean',
+        },
+    },
+    // context menu fixed style props
+    useFixedMenuStyle: {
+        name: 'useFixedMenuStyle',
+        type: { name: 'boolean' },
+        description: 'Whether to use position fixed style on menu or not. ',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    visibleMenu: {
+        name: 'visibleMenu',
+        type: { name: 'boolean' },
+        description: 'Whether to show the menu or not. Automatically determined if no value is given. `sync` props.',
+        defaultValue: undefined,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'undefined',
+            },
+        },
+        control: {
+            type: null,
         },
     },
     /* events */
@@ -194,5 +232,4 @@ export const getSearchDropdownArgTypes = (): ArgTypes => ({
     ...extraArgTypes,
     ...initSearchArgTypes(),
     ...initContextMenuArgTypes(),
-    ...getContextMenuFixedStyleArgTypes(),
 });
