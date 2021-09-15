@@ -1,3 +1,10 @@
+# [1.1.0-beta.135](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.134...v1.1.0-beta.135) (2021-09-15)
+
+
+### Bug Fixes
+
+* change update:active-tab to [@update](https://github.com/update):activeTab ([#689](https://github.com/spaceone-dev/spaceone-design-system/issues/689)) ([278b032](https://github.com/spaceone-dev/spaceone-design-system/commit/278b032de03dbcd9fff00941cbe478d419d79416))
+
 # [1.1.0-beta.134](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.133...v1.1.0-beta.134) (2021-09-13)
 
 
