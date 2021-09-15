@@ -3,9 +3,6 @@
     flex-direction: row;
     min-height: 2.5rem;
     align-items: center;
-    &.edit-mode {
-        @apply bg-blue-100;
-    }
     .content-title {
         @apply text-gray-600;
         min-width: 10.5rem;
@@ -45,6 +42,13 @@
         margin-left: 0.5rem;
         .cancel-button {
             margin-right: 0.5rem;
+        }
+    }
+    &.edit-mode {
+        @apply bg-blue-100;
+        .content-title {
+            @apply flex flex-col;
+            gap: 0.5rem;
         }
     }
 }

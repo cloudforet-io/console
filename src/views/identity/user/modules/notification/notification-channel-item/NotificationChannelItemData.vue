@@ -1,24 +1,25 @@
 <template>
     <li class="content-wrapper" :class="{'edit-mode': isEditMode}">
-        <div class="content-title">
-            <span v-if="channelData['secret_id'].length > 0">
-                Data
-            </span>
-            <p v-for="(item, index) in keyList" v-else :key="`channel-data-key-${index}`">
+        <div v-if="isEditMode" class="content-title">
+            <p v-for="(item, index) in keyListForEdit" :key="`channel-data-key-${index}`">
+                {{ item.replace(/\_/g, ' ') }}
+            </p>
+        </div>
+        <div v-else class="content-title">
+            <p v-for="(item, index) in keyListForRead" :key="`channel-data-key-${index}`">
                 {{ item.replace(/\_/g, ' ') }}
             </p>
         </div>
         <div v-if="isEditMode" class="content">
             <div class="left-section">
-                <p v-if="keyList.includes('users')">
+                <p v-if="keyListForEdit.includes('users')">
                     <add-notification-member-group :users="channelData.data.users" :project-id="projectId" @change="onChangeUser" />
                 </p>
                 <div v-else>
-                    <p v-for="(value, key) in dataForEdit" :key="`channel-editable-data-value-${key}`">
-                        <p-text-input v-model="dataForEdit[key]"
-                                      class="block"
-                        />
-                    </p>
+                    <p-json-schema-form
+                        :model.sync="dataForEdit" :schema="schema" :is-valid.sync="isSchemaDataValid"
+                        class="schema-form"
+                    />
                 </div>
             </div>
             <div class="button-group">
@@ -30,6 +31,7 @@
                 <p-button
                     style-type="primary"
                     size="sm"
+                    :disabled="!isDataValid"
                     @click="onClickSave"
                 >
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SAVE_CHANGES') }}
@@ -38,7 +40,7 @@
         </div>
         <div v-else class="content">
             <div class="left-section">
-                <div v-if="keyList.includes('users')">
+                <div v-if="keyListForRead.includes('users')">
                     <p-badge v-for="(item, index) in dataForEdit.users" :key="`users-${index}`"
                              style-type="gray200" shape="square"
                              class="mr-2 rounded"
@@ -46,11 +48,11 @@
                         {{ item }} ({{ userItem[item].name }})
                     </p-badge>
                 </div>
-
-                <span v-else-if="channelData['secret_id'].length > 0">
-                    ********* <br>
-                    *********
-                </span>
+                <div v-if="channelData['secret_id'].length > 0" class="inline">
+                    <p v-for="(item, index) in keyListForRead" :key="`channel-secret-data-key-${index}`">
+                        *********
+                    </p>
+                </div>
                 <div v-else>
                     <p v-for="(item, index) in valueList" :key="`channel-data-value-${index}`">
                         {{ item }}
@@ -74,7 +76,7 @@
 
 <script lang="ts">
 import {
-    PBadge, PButton, PI, PTextInput,
+    PBadge, PButton, PI, PJsonSchemaForm, PTextInput,
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { cloneDeep } from 'lodash';
@@ -96,6 +98,7 @@ export default {
         PI,
         PTextInput,
         PBadge,
+        PJsonSchemaForm,
         AddNotificationMemberGroup,
         InfoMessage,
     },
@@ -127,9 +130,18 @@ export default {
             dataForEdit: cloneDeep(props.channelData?.data),
         });
         const state = reactive({
-            keyList: computed(() => Object.keys(notificationItemState.dataForEdit)),
+            keyListForEdit: computed(() => Object.keys(props.channelData?.schema.properties).sort()),
+            keyListForRead: computed(() => Object.keys(notificationItemState.dataForEdit).sort()),
             valueList: computed(() => Object.values(notificationItemState.dataForEdit)),
+            dataList: computed(() => notificationItemState.dataForEdit),
+
             userItem: computed(() => store.state.resource.user.items),
+            schema: props.channelData?.schema,
+            isSchemaDataValid: false,
+            isJsonSchema: computed(() => Object.keys(state.schema).length !== 0),
+            // isInputNotEmpty: computed(() => Object.keys(notificationItemState.dataForEdit).length !== 0),
+            isInputValid: computed(() => state.isSchemaDataValid),
+            isDataValid: computed(() => state.isJsonSchema && state.isInputValid),
         });
 
         const saveChangedData = async () => {
@@ -170,6 +182,19 @@ export default {
         &:active {
             @apply pointer-events-none;
         }
+    }
+}
+.p-json-schema-form::v-deep {
+    &.schema-form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+    .label-box {
+        display: none;
+    }
+    .json-schema-field-group {
+        margin-bottom: 0;
     }
 }
 </style>

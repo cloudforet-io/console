@@ -193,6 +193,7 @@ export default {
         };
 
         const injectProtocolName = (channel: ChannelItem) => (state.protocolResp as any).find(i => i.protocol_id === channel.protocol_id).name;
+        const injectProtocolSchema = (channel: ChannelItem) => (state.protocolResp as any).find(i => i.protocol_id === channel.protocol_id).plugin_info.metadata.data.schema;
 
         const channelApiQuery = new ApiQueryHelper();
         const listUserChannel = async () => {
@@ -206,6 +207,7 @@ export default {
                     ...d,
                     // eslint-disable-next-line camelcase
                     protocol_name: injectProtocolName(d),
+                    schema: injectProtocolSchema(d),
                 }));
             } catch (e) {
                 state.channelList = [];
@@ -226,6 +228,7 @@ export default {
                     ...d,
                     // eslint-disable-next-line camelcase
                     protocol_name: injectProtocolName(d),
+                    schema: injectProtocolSchema(d),
                 }));
             } catch (e) {
                 state.channelList = [];
