@@ -47,7 +47,12 @@
                     <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_VERSION_LABEL')"
                                    :required="true"
                     >
-                        <p-select-dropdown v-model="inputModel.version" :items="versions" use-fixed-menu-style />
+                        <p-select-dropdown v-model="inputModel.version" :items="versions" :disabled="inputModel.isAutoUpgrade"
+                                           use-fixed-menu-style
+                        />
+                    </p-field-group>
+                    <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL')" :required="true">
+                        <p-toggle-button :value="inputModel.isAutoUpgrade" @change="onChangeAutoUpgrade" />
                     </p-field-group>
                 </div>
             </div>
@@ -74,14 +79,14 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PSelectDropdown, PLazyImg, PFieldGroup, PButton, PTextInput,
+    PButtonModal, PSelectDropdown, PLazyImg, PFieldGroup, PButton, PTextInput, PToggleButton,
 } from '@spaceone/design-system';
 
 import { makeProxy } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { CollectorPluginModel, CollectorUpdateParameter } from '@/views/plugin/collector/type';
+import { CollectorPluginModel, CollectorUpdateParameter, UPGRADE_MODE } from '@/views/plugin/collector/type';
 import { store } from '@/store';
 
 
@@ -99,6 +104,7 @@ export default {
         PFieldGroup,
         PTextInput,
         PSelectDropdown,
+        PToggleButton,
     },
     props: {
         // sync prop
@@ -134,6 +140,7 @@ export default {
                 name: '',
                 priority: 10,
                 version: '',
+                isAutoUpgrade: true,
             },
             nameInvalidText: computed(() => {
                 if (formState.inputModel.name.length < 2) {
@@ -167,6 +174,7 @@ export default {
                 formState.inputModel.name = res.name;
                 formState.inputModel.priority = Number(res.priority);
                 formState.inputModel.version = res.plugin_info.version;
+                formState.inputModel.isAutoUpgrade = res.plugin_info.upgrade_mode === UPGRADE_MODE.AUTO;
             } catch (e) {
                 console.error(e);
                 showErrorMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_TITLE'), e, vm.$root);
@@ -198,6 +206,10 @@ export default {
             }
         };
 
+        /* event */
+        const onChangeAutoUpgrade = () => {
+            formState.inputModel.isAutoUpgrade = !formState.inputModel.isAutoUpgrade;
+        };
         const onClickReset = (): void => {
             if (state.loading) return;
             formState.showValidation = false;
@@ -210,14 +222,21 @@ export default {
             if (formState.isValid) {
                 state.loading = true;
 
-                const newPluginInfo = cloneDeep(state.pluginInfo);
-                newPluginInfo.version = formState.inputModel.version;
                 state.collectorUpdateParam = {
                     collector_id: props.collectorId,
                     name: formState.inputModel.name,
-                    plugin_info: newPluginInfo,
                     priority: formState.inputModel.priority,
+                    plugin_info: {
+                        plugin_id: state.pluginInfo.plugin_id,
+                        provider: state.pluginInfo.provider,
+                        upgrade_mode: formState.inputModel.isAutoUpgrade ? UPGRADE_MODE.AUTO : UPGRADE_MODE.MANUAL,
+                    },
                 };
+
+                if (!formState.inputModel.isAutoUpgrade) {
+                    state.collectorUpdateParam.plugin_info.upgrade_mode = UPGRADE_MODE.MANUAL;
+                    state.collectorUpdateParam.plugin_info.version = formState.inputModel.version;
+                }
 
                 try {
                     await SpaceConnector.client.inventory.collector.update({
@@ -263,6 +282,7 @@ export default {
             ...toRefs(formState),
             onClickReset,
             onClickConfirm,
+            onChangeAutoUpgrade,
         };
     },
 };

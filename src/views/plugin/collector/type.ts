@@ -12,6 +12,11 @@ export enum COLLECTOR_STATE {
     disabled = 'DISABLED'
 }
 
+export const UPGRADE_MODE = Object.freeze({
+    AUTO: 'AUTO',
+    MANUAL: 'MANUAL',
+});
+
 export interface FilterFormat {
     name: string;
     type: string;

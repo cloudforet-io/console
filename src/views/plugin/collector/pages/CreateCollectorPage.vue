@@ -44,7 +44,10 @@
                                        :invalid="!isVersionValid"
                                        :required="true"
                         >
-                            <p-select-dropdown v-model="inputModel.version" :items="versions" />
+                            <p-select-dropdown v-model="inputModel.version" :items="versions" :disabled="isAutoUpgrade" />
+                        </p-field-group>
+                        <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL')" :required="true">
+                            <p-toggle-button :value="isAutoUpgrade" @change="onChangeAutoUpgrade" />
                         </p-field-group>
                     </div>
                 </div>
@@ -70,7 +73,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PProgressWizard, PSelectDropdown, PLazyImg, PBreadcrumbs, PFieldGroup, PTextInput, PPageTitle,
+    PProgressWizard, PSelectDropdown, PLazyImg, PBreadcrumbs, PFieldGroup, PTextInput, PPageTitle, PToggleButton,
 } from '@spaceone/design-system';
 
 import GeneralPageLayout from '@/common/components/layouts/GeneralPageLayout.vue';
@@ -80,6 +83,8 @@ import ConfirmCredentials from '@/views/plugin/collector/modules/ConfirmCredenti
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
+import { UPGRADE_MODE } from '@/views/plugin/collector/type';
+
 
 export default {
     name: 'CreateCollectorPage',
@@ -94,6 +99,7 @@ export default {
         PPageTitle,
         PBreadcrumbs,
         PLazyImg,
+        PToggleButton,
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -142,6 +148,7 @@ export default {
             isVersionValid: computed(() => !(formState.inputModel.version.length === 0)),
             isConfValid: computed(() => formState.isNameValid && formState.isPriorityValid && formState.isVersionValid),
             isTagsValid: true,
+            isAutoUpgrade: true,
         });
         const routeState = reactive({
             routes: computed(() => ([
@@ -221,6 +228,9 @@ export default {
         };
 
         /* event */
+        const onChangeAutoUpgrade = () => {
+            formState.isAutoUpgrade = !formState.isAutoUpgrade;
+        };
         const onClickBackButton = () => {
             vm.$router.push({ name: PLUGIN_ROUTE.COLLECTOR.CREATE._NAME });
         };
@@ -239,10 +249,16 @@ export default {
                 tags: state.tags,
                 plugin_info: {
                     plugin_id: state.pluginId,
-                    version: formState.inputModel.version,
                     provider: state.provider,
+                    upgrade_mode: UPGRADE_MODE.AUTO,
                 },
-            };
+            } as any;
+
+            if (!formState.isAutoUpgrade) {
+                params.plugin_info.upgrade_mode = UPGRADE_MODE.MANUAL;
+                params.plugin_info.version = formState.inputModel.version;
+            }
+
             try {
                 await SpaceConnector.client.inventory.collector.create(params);
                 showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_S_CREATE_TITLE'), '', vm.$root);
@@ -270,6 +286,7 @@ export default {
             onClickCancel,
             onClickConfirm,
             onClickBackButton,
+            onChangeAutoUpgrade,
         };
     },
 };
