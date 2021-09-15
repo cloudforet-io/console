@@ -1,7 +1,7 @@
 import Vue from 'vue';
 import VueCompositionApi from '@vue/composition-api';
 import { store } from '@/store';
-import { SpaceRouter } from '@/routes';
+import { SpaceRouter } from '@/router';
 import directive from '@/directives';
 import { i18n } from '@/translations';
 import Fragment from 'vue-fragment';

@@ -66,14 +66,15 @@ import {
     PNoticeAlert, PToastAlert, PIconModal, PSidebar, PLottie,
 } from '@spaceone/design-system';
 
-import GNB from '@/common/modules/gnb/GNB.vue';
+import GNB from '@/common/modules/navigations/gnb/GNB.vue';
 import { Location } from 'vue-router';
 
-import TopNotification from '@/common/components/TopNotification.vue';
+import TopNotification from '@/common/modules/portals/TopNotification.vue';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { hideLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
+import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { AUTH_ROUTE } from '@/services/auth/routes';
 
 export default defineComponent({
     name: 'App',
@@ -97,7 +98,7 @@ export default defineComponent({
         const goToSignIn = async () => {
             if (!SpaceConnector.isTokenAlive) {
                 const res: Location = {
-                    name: 'SignOut',
+                    name: AUTH_ROUTE.SIGN_OUT._NAME,
                 };
                 await vm.$router.push(res);
             } else state.isExpired = false;

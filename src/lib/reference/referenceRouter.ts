@@ -3,11 +3,11 @@ import { concat } from 'lodash';
 import { Location } from 'vue-router';
 import { Reference, ReferenceType } from '@/lib/reference/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { INVENTORY_ROUTE } from '@/routes/inventory/inventory-route';
-import { PLUGIN_ROUTE } from '@/routes/plugin/plugin-route';
-import { PROJECT_ROUTE } from '@/routes/project/project-route';
-import { AUTOMATION_ROUTE } from '@/routes/automation/automation-route';
-import { IDENTITY_ROUTE } from '@/routes/identity/identity-route';
+import { INVENTORY_ROUTE } from '@/services/inventory/routes';
+import { PLUGIN_ROUTE } from '@/services/plugin/routes';
+import { PROJECT_ROUTE } from '@/services/project/routes';
+import { AUTOMATION_ROUTE } from '@/services/automation/routes';
+import { IDENTITY_ROUTE } from '@/services/identity/routes';
 
 interface LinkFormatter {
     (baseUrl: string, data: string, reference: Reference, query: Location['query']): Location;

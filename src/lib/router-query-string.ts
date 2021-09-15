@@ -1,6 +1,6 @@
 import { forEach } from 'lodash';
 import { Location } from 'vue-router';
-import { SpaceRouter } from '@/routes';
+import { SpaceRouter } from '@/router';
 
 
 export type RouteQueryString = string | (string | null)[] | null | undefined;

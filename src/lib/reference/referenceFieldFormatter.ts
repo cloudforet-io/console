@@ -3,7 +3,7 @@ import { Reference, ReferenceType } from '@/lib/reference/type';
 import { DynamicFieldProps } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
-import { SpaceRouter } from '@/routes';
+import { SpaceRouter } from '@/router';
 
 interface FieldFormatter {
     (data: string, reference: Reference): Partial<DynamicFieldProps>;

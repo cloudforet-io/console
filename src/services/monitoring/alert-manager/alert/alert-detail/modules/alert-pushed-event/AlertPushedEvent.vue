@@ -1,0 +1,247 @@
+<template>
+    <section class="event-list-wrapper">
+        <p-toolbox
+            search-type="plain"
+            :total-count="totalCount"
+            :page-size-changeable="false"
+            :pagination-visible="false"
+            class="mb-4"
+            @change="onChange"
+            @refresh="onChange()"
+        />
+        <template v-if="itemList.length > 0">
+            <div v-for="(item, idx) in itemList" :key="item.event_id">
+                <alert-vertical-timeline
+                    :key="item.event_id" :item="item" :timezone="timezone"
+                    :event-type="item.event_type"
+                    class="timeline"
+                >
+                    <template #timeline-detail>
+                        <div class="list-item" @click="onOpenModal(item)">
+                            <span class="severity">[{{ item.severity }}]</span> {{ item.title }}
+                            <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                                 color="inherit"
+                            />
+                            <p class="desc">
+                                {{ item.description }}
+                            </p>
+                        </div>
+                    </template>
+                </alert-vertical-timeline>
+            </div>
+        </template>
+        <p-empty v-else>
+            {{ $t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.NO_EVENT') }}
+        </p-empty>
+        <p-button v-if="itemList.length > 9" size="md"
+                  style-type="primary-dark outline"
+                  class="more-button"
+                  @click="onClickMore"
+        >
+            {{ $t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.MORE') }}
+        </p-button>
+        <p-button-modal
+            v-if="modalVisible"
+            :header-title="$t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.EVENT_DETAILS')"
+            size="lg"
+            :visible.sync="modalVisible"
+            @confirm="onClickConfirm"
+        >
+            <template #body>
+                <div class="content-wrapper">
+                    <p-raw-data :item="selectedItem" class="code-block" folded />
+                </div>
+            </template>
+            <template #footer-extra>
+                <div class="footer-extra">
+                    <p-button
+                        style-type="gray-border"
+                        @click="onCopyClick"
+                    >
+                        <p-i name="ic_copy" width="1em" height="1em"
+                             color="inherit transparent" class="mr-2"
+                        />
+                        {{ $t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.COPY_ALL') }}
+                    </p-button>
+                    <transition name="fade">
+                        <div v-if="isAlertVisible" ref="alertRef" class="copy-button-alert">
+                            <p-i name="ic_state_active" color="white" width="1rem"
+                                 height="1rem"
+                            />
+                            <span>{{ $t('COMPONENT.COPY_BUTTON.COPIED') }}</span>
+                        </div>
+                    </transition>
+                </div>
+            </template>
+        </p-button-modal>
+    </section>
+</template>
+
+<script lang="ts">
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import {
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+} from '@vue/composition-api';
+import { store } from '@/store';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import AlertVerticalTimeline
+    from '@/services/monitoring/alert-manager/alert/alert-detail/modules/alert-pushed-event/modules/AlertVerticalTimeline.vue';
+import { Event } from '@/services/monitoring/alert-manager/type';
+import {
+    PButton, PButtonModal, PI, PRawData, PToolbox, PEmpty,
+} from '@spaceone/design-system';
+import { copyAnyData } from '@/lib/helper/copy-helper';
+
+const PAGE_SIZE = 10;
+
+export default {
+    name: 'AlertPushedEvent',
+    components: {
+        AlertVerticalTimeline,
+        PToolbox,
+        PButton,
+        PButtonModal,
+        PRawData,
+        PI,
+        PEmpty,
+    },
+    props: {
+        id: {
+            type: String,
+            default: '',
+        },
+    },
+    setup(props) {
+        const eventListApiQueryHelper = new ApiQueryHelper()
+            .setSort('created_at', true)
+            .setPage(1, 10);
+        let eventListApiQuery = eventListApiQueryHelper.data;
+
+        const state = reactive({
+            itemList: [] as Event[],
+            timezone: computed(() => store.state.user.timezone),
+            totalCount: 0,
+            thisPage: 1,
+            pageLimit: 10,
+            selectedItem: {} as any,
+            modalVisible: false,
+            isAlertVisible: false,
+        });
+
+        const searchQueryHelper = new QueryHelper();
+
+        const listEvent = async () => {
+            eventListApiQueryHelper.setFilters([...searchQueryHelper.filters]);
+            if (props.id) eventListApiQueryHelper.addFilter({ k: 'alert_id', v: props.id, o: '=' });
+            eventListApiQuery = eventListApiQueryHelper.data;
+            const { results, total_count } = await SpaceConnector.client.monitoring.event.list({ query: eventListApiQuery });
+            state.itemList = results;
+            state.totalCount = total_count;
+        };
+
+        const onChange = async (options: any = {}) => {
+            if (options.searchText !== undefined) {
+                eventListApiQueryHelper.setPageStart(1);
+                eventListApiQueryHelper.setPageLimit(10);
+                searchQueryHelper.setFilters([{ v: options.searchText }]);
+            }
+            await listEvent();
+        };
+
+        const onClickMore = async () => {
+            state.thisPage += 1;
+            state.pageLimit = state.thisPage * PAGE_SIZE;
+            eventListApiQueryHelper.setPageLimit(state.pageLimit);
+            await listEvent();
+        };
+
+        const onOpenModal = (item) => {
+            state.modalVisible = true;
+            state.selectedItem = item;
+        };
+
+        const onClickConfirm = () => {
+            state.modalVisible = false;
+        };
+
+        const onCopyClick = () => {
+            state.isAlertVisible = true;
+            setTimeout(() => { state.isAlertVisible = false; }, 500);
+            copyAnyData(state.selectedItem.raw_data);
+        };
+
+        (async () => {
+            await listEvent();
+        })();
+
+        return {
+            ...toRefs(state),
+            onChange,
+            onClickMore,
+            onOpenModal,
+            onClickConfirm,
+            onCopyClick,
+        };
+    },
+};
+</script>
+
+<style lang="postcss" scoped>
+.event-list-wrapper {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+    padding-bottom: 2.5rem;
+}
+.list-item {
+    &:hover {
+        @apply text-blue-500 cursor-pointer underline;
+        .desc {
+            @apply text-blue-500;
+        }
+    }
+    .desc {
+        @apply text-gray-500;
+    }
+
+}
+.severity {
+    @apply font-bold capitalize;
+}
+.more-button {
+    display: flex;
+    width: 100%;
+    margin-top: 1.5rem;
+}
+.content-wrapper {
+    max-height: 20.68rem;
+}
+.p-button-modal::v-deep {
+    .modal-content {
+        .modal-body {
+            min-height: 32rem;
+        }
+    }
+}
+.code-block {
+    min-height: 100%;
+}
+.copy-button-alert {
+    @apply inline-flex text-white rounded-md;
+    background-color: rgba(theme('colors.gray.900'), 0.88);
+    font-weight: 400;
+    font-size: 0.75rem;
+    line-height: 1.3;
+    width: auto;
+    padding: 0.25rem 0.5rem;
+    justify-content: center;
+    align-items: center;
+    margin-left: 1rem;
+    &.fade-enter-active, &.fade-leave-active {
+        transition: opacity 0.3s;
+    }
+    &.fade-enter, &.fade-leave-to {
+        opacity: 0;
+    }
+}
+</style>

@@ -1,14 +1,14 @@
 import config from '@/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
-import { SpaceRouter } from '@/routes';
+import { SpaceRouter } from '@/router';
 import { GTag } from '@/lib/gtag';
 import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { computed } from '@vue/composition-api';
 import { initLanguageAndFonts } from '@/lib/site-initializer/locales';
-import { routes } from '@/routes/routes';
-import { rootDomainRoutes } from '@/routes/root-domain-routes';
+import { serviceRoutes } from '@/router/service-routes';
+import { rootDomainServiceRoutes } from '@/router/root-domain-service-routes';
 
 
 const initConfig = async () => {
@@ -56,9 +56,9 @@ const initAmchartsLicense = () => {
 
 const initRouter = () => {
     if (store.state.domain.name === 'root') {
-        SpaceRouter.init(rootDomainRoutes);
+        SpaceRouter.init(rootDomainServiceRoutes);
     } else {
-        SpaceRouter.init(routes);
+        SpaceRouter.init(serviceRoutes);
     }
 };
 
