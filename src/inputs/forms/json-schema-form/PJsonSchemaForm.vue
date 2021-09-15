@@ -6,12 +6,13 @@
         :ui-schema="uiSchema"
         :options="options"
         :components="customComponents"
+        @change="onChangeModel"
         @validated="onValidated"
     />
 </template>
 
 <script lang="ts">
-import { flatMap, sortBy } from 'lodash';
+import { flatMap, sortBy, isEmpty } from 'lodash';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -85,10 +86,20 @@ export default {
         const onValidated = (isValid) => {
             emit('update:isValid', isValid);
         };
+        const onChangeModel = (model) => {
+            Object.entries(model).forEach(([key, value]) => {
+                const isRequired = !!(props.schema.required?.includes(key));
+                if (!isRequired && !value) {
+                    const newModel = { ...model };
+                    newModel[key] = undefined;
+                    emit('update:model', newModel);
+                }
+            });
+        };
 
         watch(() => props.schema, async (schema) => {
             if (schema && schema.properties) {
-                setDefaultInputModel(schema);
+                if (!props.model || isEmpty(props.model)) setDefaultInputModel(schema);
                 generateUiSchema(schema);
             }
         }, { immediate: true });
@@ -96,6 +107,7 @@ export default {
         return {
             ...toRefs(state),
             onValidated,
+            onChangeModel,
         };
     },
 };

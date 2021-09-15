@@ -28,6 +28,7 @@ const defaultSchema = {
             title: 'string (not-required, placeholder)',
             type: 'string',
             examples: ['type string'],
+            pattern: '^[0-9\\-]{1,5}$',
         },
         //
         required_number: {
@@ -80,7 +81,7 @@ export const jsonDefaultCase = () => ({
     template: `
     <div style="width: 50rem">
         <p-json-schema-form :model.sync="model" 
-                            :schema="schema" 
+                            :schema="schema"
                             :is-valid.sync="isValid"
         />
         <pre>{{ model }}</pre>

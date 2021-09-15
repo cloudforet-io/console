@@ -109,7 +109,7 @@ export const getFormUiSchema = (schema: JsonSchema): Record<string, UiSchema>[] 
         child.input = getInputUiSchema(key, value, isRequired); // TODO: need to add select, radio, etc
 
         /* 2. set error UI schema */
-        if (schema.required?.includes(key)) {
+        if (isRequired) {
             child.error = getErrorContainerUiSchema(key, value);
         }
 
