@@ -5,9 +5,22 @@
         </p-panel-top>
         <article class="note-wrapper">
             <p-collapsible-list :items="noteList" toggle-position="contents" :line-clamp="2">
-                <template #title="{title, index}">
-                    <span class="author">{{ title }}</span>
-                    <span class="date">{{ iso8601Formatter(noteList[index].created_at, timezone) }}</span>
+                <template #title="{data, title, index}">
+                    <div class="title-wrapper">
+                        <p>
+                            <span class="author">{{ title }}</span>
+                            <span class="date">{{ iso8601Formatter(noteList[index].created_at, timezone) }}</span>
+                        </p>
+                        <p-select-dropdown button-only button-icon="ic_more" :items="menuItems"
+                                           :menu-position="'left'"
+                                           @select="handleSelect(data.note_id)"
+                        />
+                    </div>
+                </template>
+                <template #default="{data}">
+                    <p class="note-content">
+                        {{ data.note }}
+                    </p>
                 </template>
             </p-collapsible-list>
         </article>
@@ -20,12 +33,17 @@
                 {{ $t('MONITORING.ALERT.DETAIL.NOTE.ADD_NOTE') }}
             </p-button>
         </article>
+        <delete-modal :header-title="checkDeleteState.headerTitle"
+                      :visible.sync="checkDeleteState.visible"
+                      :disabled="checkDeleteState.loading"
+                      @confirm="deleteNote"
+        />
     </p-pane-layout>
 </template>
 
 <script lang="ts">
 import {
-    PButton, PCollapsibleList, PPaneLayout, PPanelTop, PTextarea,
+    PButton, PCollapsibleList, PPaneLayout, PPanelTop, PTextarea, PSelectDropdown,
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { TimeStamp } from '@/models';
@@ -33,6 +51,8 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { store } from '@/store';
+import { i18n } from '@/translations';
+import DeleteModal from '@/common/modules/delete-modal/DeleteModal.vue';
 
 interface NoteModel {
     note_id: string;
@@ -51,6 +71,8 @@ export default {
         PTextarea,
         PButton,
         PCollapsibleList,
+        PSelectDropdown,
+        DeleteModal,
     },
     props: {
         id: {
@@ -65,7 +87,14 @@ export default {
             loading: true,
             timezone: computed(() => store.state.user.timezone),
             userId: computed(() => store.state.user.userId),
+            menuItems: [
+                {
+                    label: 'Delete', name: 'delete',
+                },
+            ],
+            selectedNoteIdForDelete: '',
         });
+
 
         const changeNoteInput = (e) => {
             state.noteInput = e.target?.value;
@@ -80,7 +109,10 @@ export default {
                 });
                 state.noteList = res.results.map(d => ({
                     title: d.created_by,
-                    data: d.note,
+                    data: {
+                        note: d.note,
+                        note_id: d.note_id,
+                    },
                     ...d,
                 }));
             } catch (e) {
@@ -106,6 +138,36 @@ export default {
             }
         };
 
+        const checkDeleteState = reactive({
+            headerTitle: i18n.t('MONITORING.ALERT.DETAIL.NOTE.DELETE_MODAL_TITLE'),
+            visible: false,
+            loading: false,
+        });
+
+        const openDeleteModal = () => {
+            checkDeleteState.visible = true;
+        };
+
+        const handleSelect = (noteId) => {
+            state.selectedNoteIdForDelete = noteId;
+            openDeleteModal();
+        };
+
+        const deleteNote = async () => {
+            checkDeleteState.loading = true;
+            try {
+                await SpaceConnector.client.monitoring.note.delete({
+                    note_id: state.selectedNoteIdForDelete,
+                });
+            } catch (e) {
+                console.error(e);
+            } finally {
+                checkDeleteState.loading = false;
+                checkDeleteState.visible = false;
+                await listNote();
+            }
+        };
+
         (async () => {
             await listNote();
         })();
@@ -113,9 +175,13 @@ export default {
 
         return {
             ...toRefs(state),
+            checkDeleteState,
             changeNoteInput,
             iso8601Formatter,
             createNote,
+            handleSelect,
+            deleteNote,
+            openDeleteModal,
         };
     },
 };
@@ -130,6 +196,11 @@ export default {
 .note-wrapper {
     @apply flex flex-col;
     margin-top: 0.5rem;
+    .title-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
     .author {
         @apply text-blue-900 font-bold;
         font-size: 0.875rem;

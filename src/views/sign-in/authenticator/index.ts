@@ -1,10 +1,11 @@
 import { store } from '@/store';
-import VueRouter from 'vue-router';
 import { SpaceRouter } from '@/routes';
+
+type UserType = 'USER' | 'DOMAIN_OWNER' | 'API_USER';
 
 
 abstract class Authenticator {
-    static async signIn(credentials, userId?, userType?): Promise<void> {
+    static async signIn(credentials: Record<string, any>, userId?: string, userType?: UserType): Promise<void> {
         try {
             await store.dispatch('user/signIn', {
                 domainId: store.state.domain.domainId,
