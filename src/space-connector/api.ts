@@ -105,7 +105,6 @@ class API {
             this.flushToken();
             if (executeSessionTimeoutCallback) {
                 this.sessionTimeoutCallback();
-                throw new Error('Failed to refresh token');
             }
             return false;
         }
