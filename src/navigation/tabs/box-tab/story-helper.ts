@@ -91,7 +91,7 @@ export const getBoxTabArgTypes = (): ArgTypes => ({
     },
     /* events */
     onUpdateActiveTab: {
-        name: 'update:active-tab',
+        name: 'update:activeTab',
         description: 'Event emitted when activated tab changed. Works with `v-model` and `activeTab` props sync.',
         defaultValue: null,
         table: {

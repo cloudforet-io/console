@@ -37,7 +37,7 @@ export default defineComponent({
     name: 'PButtonTab',
     model: {
         prop: 'activeTab',
-        event: 'update:active-tab',
+        event: 'update:activeTab',
     },
     props: {
         tabs: {
@@ -76,7 +76,7 @@ export default defineComponent({
         };
         const handleClickTab = (tab: TabItem, idx: number) => {
             if (props.activeTab !== tab.name) {
-                emit('update:active-tab', tab.name);
+                emit('update:activeTab', tab.name);
                 emit('change', tab.name, idx);
             }
         };

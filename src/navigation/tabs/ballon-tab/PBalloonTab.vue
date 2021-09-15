@@ -44,7 +44,7 @@ export default {
     name: 'PBalloonTab',
     model: {
         prop: 'activeTab',
-        event: 'update:active-tab',
+        event: 'update:activeTab',
     },
     props: {
         /* tab item props */
@@ -138,7 +138,7 @@ export default {
         /* event */
         const handleClickTab = (tab: TabItem, idx: number) => {
             if (props.activeTab !== tab.name) {
-                emit('update:active-tab', tab.name);
+                emit('update:activeTab', tab.name);
                 emit('change', tab.name, idx);
             }
         };
