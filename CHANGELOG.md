@@ -1,3 +1,10 @@
+# [1.1.0-beta.136](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.135...v1.1.0-beta.136) (2021-09-15)
+
+
+### Bug Fixes
+
+* check pattern only when there's a value (optional case) ([#690](https://github.com/spaceone-dev/spaceone-design-system/issues/690)) ([7a4b8f2](https://github.com/spaceone-dev/spaceone-design-system/commit/7a4b8f24c8972c04e34a2fd322886f664377e848))
+
 # [1.1.0-beta.135](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.134...v1.1.0-beta.135) (2021-09-15)
 
 
