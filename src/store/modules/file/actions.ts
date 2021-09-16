@@ -80,9 +80,9 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
         if (typeof res === 'string') { // defensive code for case of unexpected response from the server. will be removed
             commit('setDownloadSource', config.get('CONSOLE_API.ENDPOINT') + res);
         } else {
-            dispatch('display/startDownloading');
+            dispatch('display/startDownloading', {},{ root: true });
             const { headers, data } = await axios.get(config.get('CONSOLE_API.ENDPOINT') + res.file_link, { responseType: 'blob' });
-            dispatch('display/finishDownloading');
+            dispatch('display/finishDownloading', {}, { root: true });
             const blob = new Blob([data], {
                 type: headers['content-type'],
             });
