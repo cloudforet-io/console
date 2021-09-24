@@ -393,7 +393,6 @@ export default {
             });
         };
         const listExternalUser = debounce(async () => {
-            if (!state.externalItems && !state.searchText) return;
             try {
                 state.loading = true;
                 const { results } = await SpaceConnector.client.identity.user.find({
@@ -409,7 +408,7 @@ export default {
                 state.loading = false;
             }
         }, 300);
-        const getExternalUser = async (userId) => {
+        const getExternalUser = async (userId: string) => {
             try {
                 const { results } = await SpaceConnector.client.identity.user.find({
                     search: {
@@ -433,10 +432,13 @@ export default {
             await getExternalUser(user.name);
             await checkUserID();
         };
-        const onSearchExternalUser = async (userId) => {
-            state.selectedItems = [userId];
-            await getExternalUser(userId);
-            await checkUserID();
+        const onSearchExternalUser = async (userId: string) => {
+            const trimmedUserId = userId.trim();
+            if (trimmedUserId) {
+                state.selectedItems = [trimmedUserId];
+                await getExternalUser(trimmedUserId);
+                await checkUserID();
+            }
         };
         const onDeleteSelectedExternalUser = () => {
             setFormState();
@@ -454,8 +456,12 @@ export default {
                 state.selectedItems = [];
             }
         }, { immediate: true });
-        watch(() => state.searchText, () => {
-            listExternalUser();
+        watch(() => state.searchText, (searchText) => {
+            if (!searchText.trim().length) {
+                state.externalItems = [];
+            } else {
+                listExternalUser();
+            }
         });
 
         return {
