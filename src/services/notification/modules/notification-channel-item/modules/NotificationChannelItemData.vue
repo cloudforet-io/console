@@ -1,21 +1,26 @@
 <template>
     <li class="content-wrapper" :class="{'edit-mode': isEditMode}">
+        <!-- Edit Mode of Left section(Key) -->
         <div v-if="isEditMode" class="content-title">
             <p v-for="(item, index) in keyListForEdit" :key="`channel-data-key-${index}`">
                 {{ item.replace(/\_/g, ' ') }}
             </p>
         </div>
+
+        <!-- Read Mode of Left section(Key) -->
         <div v-else class="content-title">
             <p v-for="(item, index) in keyListForRead" :key="`channel-data-key-${index}`">
                 {{ item.replace(/\_/g, ' ') }}
             </p>
         </div>
+
+        <!-- Edit Mode of Content -->
         <div v-if="isEditMode" class="content">
             <div class="left-section">
-                <p v-if="keyListForEdit.includes('users')">
+                <p v-if="isSpaceOneUserProtocol">
                     <add-notification-member-group :users="channelData.data.users" :project-id="projectId" @change="onChangeUser" />
                 </p>
-                <div v-else>
+                <div>
                     <p-json-schema-form
                         :model.sync="dataForEdit" :schema="schema" :is-valid.sync="isSchemaDataValid"
                         class="schema-form"
@@ -31,16 +36,18 @@
                 <p-button
                     style-type="primary"
                     size="sm"
-                    :disabled="!isDataValid"
+                    :disabled="!isSpaceOneUserProtocol && !isDataValid"
                     @click="onClickSave"
                 >
                     {{ $t('IDENTITY.USER.NOTIFICATION.FORM.SAVE_CHANGES') }}
                 </p-button>
             </div>
         </div>
+
+        <!-- Read Mode of Content -->
         <div v-else class="content">
             <div class="left-section">
-                <div v-if="keyListForRead.includes('users')">
+                <div v-if="isSpaceOneUserProtocol">
                     <p-badge v-for="(item, index) in dataForEdit.users" :key="`users-${index}`"
                              style-type="gray200" shape="square"
                              class="mr-2 rounded"
@@ -48,18 +55,18 @@
                         {{ item }} ({{ userItem[item].name }})
                     </p-badge>
                 </div>
-                <div v-if="channelData['secret_id'].length > 0" class="inline">
+                <div v-else-if="isSecretData" class="inline">
                     <p v-for="(item, index) in keyListForRead" :key="`channel-secret-data-key-${index}`">
                         *********
                     </p>
                 </div>
                 <div v-else>
-                    <p v-for="(item, index) in valueList" :key="`channel-data-value-${index}`">
+                    <p v-for="(item, index) in Object.values(valueList)" :key="`channel-data-value-${index}`">
                         {{ item }}
                     </p>
                 </div>
             </div>
-            <p v-if="channelData['secret_id'].length > 0">
+            <p v-if="isSecretData">
                 <info-message :message="$t('IDENTITY.USER.NOTIFICATION.CANNOT_EDIT_TOKEN')" />
             </p>
             <button v-else class="edit-btn" :class="{'edit-disable':disableEdit}"
@@ -76,7 +83,7 @@
 
 <script lang="ts">
 import {
-    PBadge, PButton, PI, PJsonSchemaForm, PTextInput,
+    PBadge, PButton, PI, PJsonSchemaForm,
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { cloneDeep } from 'lodash';
@@ -96,7 +103,6 @@ export default {
     components: {
         PButton,
         PI,
-        PTextInput,
         PBadge,
         PJsonSchemaForm,
         AddNotificationMemberGroup,
@@ -130,23 +136,42 @@ export default {
             dataForEdit: cloneDeep(props.channelData?.data),
         });
         const state = reactive({
-            keyListForEdit: computed(() => Object.keys(props.channelData?.schema.properties).sort()),
-            keyListForRead: computed(() => Object.keys(notificationItemState.dataForEdit).sort()),
-            valueList: computed(() => Object.values(notificationItemState.dataForEdit)),
-            dataList: computed(() => notificationItemState.dataForEdit),
-
+            keyListForEdit: [],
+            keyListForRead: [],
+            valueList: [],
+            //
             userItem: computed(() => store.state.resource.user.items),
             schema: props.channelData?.schema,
+            isSecretData: computed(() => props.channelData?.secret_id.length > 0),
+            isSpaceOneUserProtocol: computed(() => state.keyListForEdit.includes('users')),
+            //
             isSchemaDataValid: false,
             isJsonSchema: computed(() => Object.keys(state.schema).length !== 0),
-            // isInputNotEmpty: computed(() => Object.keys(notificationItemState.dataForEdit).length !== 0),
             isInputValid: computed(() => state.isSchemaDataValid),
             isDataValid: computed(() => state.isJsonSchema && state.isInputValid),
         });
 
+        const setKeyListForEdit = () => {
+            const hasSchema = !!Object.keys(props.channelData.schema).length;
+            if (hasSchema) state.keyListForEdit = computed(() => Object.keys(props.channelData.schema.properties).sort());
+            else state.keyListForEdit = computed(() => Object.keys(props.channelData?.data).sort());
+        };
+
+        const setKeyListForRead = () => {
+            if (props.channelData.secret_id) state.keyListForRead = computed(() => Object.keys(props.channelData.schema.properties).sort());
+            else state.keyListForRead = computed(() => Object.keys(props.channelData?.data).sort());
+        };
+
+        const setValueList = () => {
+            Object.keys(notificationItemState.dataForEdit).sort().forEach((key) => {
+                state.valueList[key] = notificationItemState.dataForEdit[key];
+            });
+        };
+
         const saveChangedData = async () => {
             if (props.projectId) await updateProjectChannel(PARAM_KEY_TYPE.DATA, notificationItemState.dataForEdit);
             else await updateUserChannel(PARAM_KEY_TYPE.DATA, notificationItemState.dataForEdit);
+            setValueList();
         };
 
         const onClickSave = async () => {
@@ -157,6 +182,10 @@ export default {
         const onChangeUser = (value) => {
             notificationItemState.dataForEdit.users = value.users;
         };
+
+        (async () => {
+            await Promise.all([setKeyListForEdit(), setKeyListForRead(), setValueList()]);
+        })();
 
         return {
             EDIT_TYPE,
@@ -195,6 +224,11 @@ export default {
     }
     .json-schema-field-group {
         margin-bottom: 0;
+    }
+}
+.p-field-group::v-deep {
+    .label-box {
+        display: none;
     }
 }
 </style>

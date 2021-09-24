@@ -1,18 +1,32 @@
 /* eslint-disable camelcase */
 import { Tags, TimeStamp } from '@/models';
+import VueI18n from 'vue-i18n';
+import { Location } from 'vue-router';
+
+import TranslateResult = VueI18n.TranslateResult;
 
 type ProtocolType = 'INTERNAL' | 'EXTERNAL';
 
+type MetadataDataType = 'PLAIN_TEXT' | 'SECRET';
+
 interface Capability {
-	data_type: string;
+	data_type?: string;
 	supported_schema: string[];
 }
 
+interface Metadata {
+	data?: {
+		schema: object;
+	};
+	data_type: MetadataDataType;
+}
 interface PluginInfo {
 	plugin_id: string;
 	version: string;
 	options: object;
-	metadata: object;
+	secret_id?: string;
+	upgrade_mode?: string;
+	metadata: Metadata;
 }
 
 export interface ProtocolItem {
@@ -25,6 +39,14 @@ export interface ProtocolItem {
 	state: string;
 	tags: Tags;
 	created_at: TimeStamp;
+}
+
+export interface EnrichedProtocolItem extends ProtocolItem {
+	label: TranslateResult;
+	link: Partial<Location>;
+	protocolType: string;
+	tags: Tags;
+	icon: any;
 }
 
 export interface ChannelItem {

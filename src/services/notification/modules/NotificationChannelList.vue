@@ -80,7 +80,7 @@ import NotificationChannelItem from '@/services/notification/modules/notificatio
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';
-import { ChannelItem, ProtocolItem } from '@/services/identity/user/type';
+import { ChannelItem, EnrichedProtocolItem, ProtocolItem } from '@/services/identity/user/type';
 import { PROTOCOL_TYPE } from '@/services/notification/modules/notification-channel-item/type';
 
 export default {
@@ -144,6 +144,32 @@ export default {
             return results[0]?.tags?.icon || '';
         };
 
+        const enrichProtocol = async (protocolResp) => {
+            const enrichedProtocolList: EnrichedProtocolItem[] = await Promise.all(protocolResp.map(async d => ({
+                label: computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name })).value,
+                link: {
+                    name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD._NAME,
+                    params: {
+                        protocol: d.name.replace(/(\s*)/g, ''),
+                        protocolId: d.protocol_id,
+                        userId: encodeURIComponent(state.userId),
+                    },
+                    query: {
+                        protocolLabel: encodeURIComponent(d.name),
+                        projectId: props.projectId ? props.projectId : undefined,
+                        // eslint-disable-next-line camelcase
+                        supported_schema: d.capability.supported_schema,
+                        protocolType: d.protocol_type,
+                    },
+                },
+                protocolType: d.protocol_type,
+                tags: d.tags,
+                icon: await getIcon(d?.plugin_info?.plugin_id || '') || '',
+                name: d.name,
+            })));
+            return enrichedProtocolList;
+        };
+
         const apiQuery = new ApiQueryHelper();
         const listProtocol = async () => {
             try {
@@ -161,28 +187,7 @@ export default {
                     });
                 }
                 state.protocolResp = res.results;
-                state.protocolList = await Promise.all(res.results.map(async d => ({
-                    label: computed(() => vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ADD_CHANNEL', { type: d.name })).value,
-                    link: {
-                        name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD._NAME,
-                        params: {
-                            protocol: d.name.replace(/(\s*)/g, ''),
-                            protocolId: d.protocol_id,
-                            userId: encodeURIComponent(state.userId),
-                        },
-                        query: {
-                            protocolLabel: encodeURIComponent(d.name),
-                            projectId: props.projectId ? props.projectId : undefined,
-                            // eslint-disable-next-line camelcase
-                            supported_schema: d.capability.supported_schema,
-                            protocolType: d.protocol_type,
-                        },
-                    },
-                    protocolType: d.protocol_type,
-                    tags: d.tags,
-                    icon: await getIcon(d?.plugin_info?.plugin_id || '') || '',
-                    name: d.name,
-                })));
+                state.protocolList = await enrichProtocol(res.results);
             } catch (e) {
                 state.protocolList = [];
                 state.protocolResp = [];
@@ -192,8 +197,16 @@ export default {
             }
         };
 
-        const injectProtocolName = (channel: ChannelItem) => (state.protocolResp as any).find(i => i.protocol_id === channel.protocol_id).name;
-        const injectProtocolSchema = (channel: ChannelItem) => (state.protocolResp as any).find(i => i.protocol_id === channel.protocol_id).plugin_info.metadata.data.schema;
+        const injectProtocolName = (channel: ChannelItem) => {
+            const protocolInfoOfChannel = (state.protocolResp as ProtocolItem[])?.find(i => i.protocol_id === channel.protocol_id);
+            if (protocolInfoOfChannel) return protocolInfoOfChannel?.name;
+            return channel.name;
+        };
+        const injectProtocolSchema = (channel: ChannelItem) => {
+            const protocolInfoOfChannel = (state.protocolResp as ProtocolItem[]).find(i => i.protocol_id === channel.protocol_id);
+            if (protocolInfoOfChannel?.plugin_info.metadata.data === undefined) return {};
+            return protocolInfoOfChannel.plugin_info.metadata.data.schema;
+        };
 
         const channelApiQuery = new ApiQueryHelper();
         const listUserChannel = async () => {
@@ -205,7 +218,6 @@ export default {
                 });
                 state.channelList = res.results.map(d => ({
                     ...d,
-                    // eslint-disable-next-line camelcase
                     protocol_name: injectProtocolName(d),
                     schema: injectProtocolSchema(d),
                 }));
@@ -226,7 +238,6 @@ export default {
                 });
                 state.channelList = res.results.map(d => ({
                     ...d,
-                    // eslint-disable-next-line camelcase
                     protocol_name: injectProtocolName(d),
                     schema: injectProtocolSchema(d),
                 }));
@@ -247,15 +258,16 @@ export default {
             await listChannel();
         };
 
-        onActivated(async () => {
-            await listChannel();
-        });
-
         (async () => {
             await listProtocol();
             await store.dispatch('resource/user/load');
             await listChannel();
         })();
+
+        onActivated(async () => {
+            await listProtocol();
+            await listChannel();
+        });
 
         return {
             ...toRefs(state),
