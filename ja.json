@@ -722,6 +722,7 @@
 			},
 			"FORM": {
 				"ADD_TITLE": "ユーザー追加",
+				"ALREADY_EXISTS": "",
 				"ASSIGN_DOMAIN_ROLE": "ドメイン·ロールの割り当てる",
 				"CHECK_USER_ID": "ユーザ名を確認",
 				"DOMAIN_ADMIN": "ドメイン管理者",

@@ -722,6 +722,7 @@
 			},
 			"FORM": {
 				"ADD_TITLE": "사용자 추가",
+				"ALREADY_EXISTS": "은 이미 존재합니다.",
 				"ASSIGN_DOMAIN_ROLE": "도메인 권한 할당 ",
 				"CHECK_USER_ID": "아이디 확인",
 				"DOMAIN_ADMIN": "도메인 관리자 ",
