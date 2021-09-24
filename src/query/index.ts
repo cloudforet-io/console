@@ -252,7 +252,7 @@ export class QueryHelper {
 
         return {
             filter,
-            filter_or: filterOr,
+            filterOr,
             keyword: keyword.join(' ') || ''
         };
     }
