@@ -99,7 +99,7 @@
                                         </p-badge>
                                         <span class="invalid text">{{ item }}</span>
                                     </template>
-                                    <span v-else class="text">{{ item }}</span>
+                                    <span v-else class="text">{{ externalItemsLabelMap[item] }}</span>
                                 </span>
                                 <p-icon-button class="delete-button" name="ic_delete" @click="onClickDeleteUser(index)" />
                             </div>
@@ -246,11 +246,10 @@ export default {
             labels: [] as string[],
         });
         const state = reactive({
-            loading: true,
+            loading: false,
             projectId: computed(() => root.$route.params.id),
             authType: computed(() => store.state.domain.extendedAuthType),
             users: computed(() => store.state.resource.user.items),
-            externalUsers: [],
             members: [] as any,
             //
             tabs: computed(() => {
@@ -280,6 +279,7 @@ export default {
             projectRoles: [],
             internalItems: [] as MenuItem[],
             externalItems: [] as MenuItem[],
+            externalItemsLabelMap: {},
             invalidUserList: [],
             existingUserList: [],
             searchText: '',
@@ -334,6 +334,7 @@ export default {
                     singleItem.disabled = true;
                 }
                 state.externalItems.push(singleItem);
+                state.externalItemsLabelMap[user.user_id] = user.name ? `${user.user_id} (${user.name})` : user.user_id;
             });
         };
         const validateExternalUser = async (userId) => {
@@ -412,6 +413,7 @@ export default {
             }
         };
         const listExternalUser = debounce(async () => {
+            if (!state.externalItems.length && !state.searchText.length) return;
             try {
                 state.loading = true;
                 const res = await SpaceConnector.client.identity.user.find({

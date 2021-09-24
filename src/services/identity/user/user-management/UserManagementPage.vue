@@ -664,8 +664,11 @@ export default {
         };
 
         const init = async () => {
-            await store.dispatch('resource/project/load');
-            await store.dispatch('resource/projectGroup/load');
+            await Promise.all([
+                store.dispatch('resource/project/load'),
+                store.dispatch('resource/projectGroup/load'),
+                store.dispatch('resource/user/load'),
+            ]);
             await getUsers();
         };
         init();

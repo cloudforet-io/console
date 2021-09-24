@@ -20,7 +20,43 @@
                                :valid-text="validationState.userIdValidText"
                 >
                     <template #default="{invalid}">
-                        <div class="id-input-form">
+                        <div v-if="formState.activeTab === 'external'">
+                            <p-search-dropdown
+                                v-model="searchText"
+                                :class="{invalid}"
+                                type="radioButton"
+                                :menu="externalItems"
+                                :selected.sync="selectedItems"
+                                :loading="loading"
+                                disable-handler
+                                :exact-mode="false"
+                                use-fixed-menu-style
+                                @select-menu="onSelectExternalUser"
+                                @delete-tag="onDeleteSelectedExternalUser"
+                                @search="onSearchExternalUser"
+                            >
+                                <template #menu-help-text>
+                                    <div class="help-text">
+                                        <span v-if="externalItems.length > 100">{{ $t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
+                                        <span v-if="Object.keys(users).includes(searchText)">{{ searchText }}{{ $t('IDENTITY.USER.FORM.ALREADY_EXISTS') }}</span>
+                                    </div>
+                                </template>
+                                <template #menu-no-data-format>
+                                    <div class="external-user-no-data">
+                                        <div v-if="!loading">
+                                            <p class="title">
+                                                <p-i name="ic_search" color="inherit" />
+                                                {{ $t('IDENTITY.USER.FORM.NO_RESULTS_FOUND') }}
+                                            </p>
+                                            <p class="help-text">
+                                                {{ $t('IDENTITY.USER.FORM.NO_RESULTS_FOUND_HELP_TEXT') }}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </template>
+                            </p-search-dropdown>
+                        </div>
+                        <div v-else class="id-input-form">
                             <p-text-input v-model="formState.user_id"
                                           v-focus
                                           :placeholder="$t('IDENTITY.USER.FORM.NAME_PLACEHOLDER')"
@@ -100,11 +136,11 @@
 import { TranslateResult } from 'vue-i18n';
 
 import {
-    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy, watch,
+    reactive, toRefs, computed, watch,
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PSelectDropdown, PFieldGroup, PButton, PTextInput, PBoxTab,
+    PButtonModal, PSelectDropdown, PFieldGroup, PButton, PTextInput, PBoxTab, PSearchDropdown, PI,
 } from '@spaceone/design-system';
 
 import { makeProxy } from '@spaceone/console-core-lib';
@@ -116,6 +152,9 @@ import {
     checkOauth, checkOneLowerCase, checkOneNumber, checkOneUpperCase,
     checkRequiredField, checkSamePassword, Validation,
 } from '@/services/identity/user/lib/user-form-validations';
+import { debounce } from 'lodash';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { i18n } from '@/translations';
 
 interface AuthType {
     user_type: string;
@@ -146,6 +185,8 @@ export default {
         PSelectDropdown,
         PButton,
         PBoxTab,
+        PSearchDropdown,
+        PI,
     },
     directives: {
         focus: {
@@ -173,11 +214,15 @@ export default {
         },
     },
     setup(props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             isSameId: false,
+            // external user
+            loading: false,
+            users: computed(() => store.state.resource.user.items),
+            searchText: '',
+            externalItems: [] as MenuItem[],
+            selectedItems: [] as string[],
         });
         const formState = reactive({
             tabs: [
@@ -190,7 +235,7 @@ export default {
             email: '',
             domainRole: '',
             domainRoleItem: computed(() => [
-                { type: 'item', label: vm.$t('IDENTITY.USER.FORM.NOT_SELECT_ROLE'), name: '' },
+                { type: 'item', label: i18n.t('IDENTITY.USER.FORM.NOT_SELECT_ROLE'), name: '' },
                 ...formState.domainRoleList,
             ]),
             domainRoleList: [] as any[],
@@ -200,7 +245,7 @@ export default {
         const validationState = reactive({
             isUserIdValid: undefined as undefined | boolean,
             userIdInvalidText: '' as TranslateResult | string,
-            userIdValidText: computed(() => vm.$t('IDENTITY.USER.FORM.NAME_VALID')),
+            userIdValidText: computed(() => i18n.t('IDENTITY.USER.FORM.NAME_VALID')),
             //
             isEmailValid: undefined as undefined | boolean,
             emailInvalidText: '' as TranslateResult | string,
@@ -211,6 +256,26 @@ export default {
             passwordCheckInvalidText: '' as TranslateResult | string,
         });
 
+        /* util */
+        const setFormState = () => {
+            formState.user_id = '';
+            formState.name = '';
+            formState.email = '';
+            formState.domainRole = '';
+            formState.password = '';
+            formState.passwordCheck = '';
+        };
+        const setValidationState = () => {
+            validationState.isUserIdValid = undefined;
+            validationState.userIdInvalidText = '';
+            validationState.isEmailValid = undefined;
+            validationState.emailInvalidText = '';
+            validationState.isPasswordValid = undefined;
+            validationState.passwordInvalidText = '';
+            validationState.isPasswordCheckValid = undefined;
+            validationState.passwordCheckInvalidText = '';
+        };
+
         const executeSpecificIDValidation = async () => {
             let res: Validation = { isValid: true, invalidText: '' };
             if (formState.activeTab === 'local') res = await checkEmailFormat(formState.user_id);
@@ -219,6 +284,7 @@ export default {
         };
 
         const checkUserID = async () => {
+            console.log('check user id');
             const validation: Validation[] = await Promise.all([
                 checkRequiredField(formState.user_id),
                 checkDuplicateID(formState.user_id),
@@ -302,45 +368,95 @@ export default {
         };
 
         const getRoleList = async () => {
-            const res = await SpaceConnector.client.identity.role.list({
+            const { results } = await SpaceConnector.client.identity.role.list({
                 role_type: 'DOMAIN',
             });
-            formState.domainRoleList = res.results.map(d => ({
+            formState.domainRoleList = results.map(d => ({
                 type: 'item',
                 label: d.name,
                 name: d.role_id,
             }));
         };
 
+        const setExternalMenuItems = (users) => {
+            state.externalItems = [];
+            users.forEach((user) => {
+                const singleItem = {
+                    name: user.user_id,
+                    label: user.name ? `${user.user_id} (${user.name})` : user.user_id,
+                    disabled: false,
+                };
+                if (state.users[user.user_id]) {
+                    singleItem.disabled = true;
+                }
+                state.externalItems.push(singleItem);
+            });
+        };
+        const listExternalUser = debounce(async () => {
+            if (!state.externalItems && !state.searchText) return;
+            try {
+                state.loading = true;
+                const { results } = await SpaceConnector.client.identity.user.find({
+                    search: {
+                        keyword: state.searchText,
+                    },
+                });
+                await setExternalMenuItems(results);
+            } catch (e) {
+                state.externalItems = [];
+                console.error(e);
+            } finally {
+                state.loading = false;
+            }
+        }, 300);
+        const getExternalUser = async (userId) => {
+            try {
+                const { results } = await SpaceConnector.client.identity.user.find({
+                    search: {
+                        user_id: userId,
+                    },
+                });
+                if (results.length) {
+                    const selectedExternalUser = results[0];
+                    formState.user_id = selectedExternalUser.user_id;
+                    formState.name = selectedExternalUser.name;
+                    formState.email = selectedExternalUser.email;
+                }
+            } catch (e) {
+                formState.user_id = userId;
+                formState.name = '';
+                formState.email = '';
+                console.error(e);
+            }
+        };
+        const onSelectExternalUser = async (user) => {
+            await getExternalUser(user.name);
+            await checkUserID();
+        };
+        const onSearchExternalUser = async (userId) => {
+            state.selectedItems = [userId];
+            await getExternalUser(userId);
+            await checkUserID();
+        };
+        const onDeleteSelectedExternalUser = () => {
+            setFormState();
+            setValidationState();
+        };
+
         (async () => {
             await Promise.all([initAuthTypeList(), getRoleList()]);
         })();
-
-        const setFormState = () => {
-            formState.user_id = '';
-            formState.name = '';
-            formState.email = '';
-            formState.domainRole = '';
-            formState.password = '';
-            formState.passwordCheck = '';
-        };
-        const setValidationState = () => {
-            validationState.isUserIdValid = undefined;
-            validationState.userIdInvalidText = '';
-            validationState.isEmailValid = undefined;
-            validationState.emailInvalidText = '';
-            validationState.isPasswordValid = undefined;
-            validationState.passwordInvalidText = '';
-            validationState.isPasswordCheckValid = undefined;
-            validationState.passwordCheckInvalidText = '';
-        };
 
         watch(() => formState.activeTab, (after) => {
             if (after) {
                 setFormState();
                 setValidationState();
+                state.selectedItems = [];
             }
         }, { immediate: true });
+        watch(() => state.searchText, () => {
+            listExternalUser();
+        });
 
         return {
             ...toRefs(state),
@@ -348,6 +464,9 @@ export default {
             validationState,
             confirm,
             checkUserID,
+            onSelectExternalUser,
+            onDeleteSelectedExternalUser,
+            onSearchExternalUser,
         };
     },
 };
@@ -357,6 +476,41 @@ export default {
 .user-form-modal {
     .auth-type-tab {
         margin-bottom: 1.5rem;
+    }
+
+    .p-search-dropdown {
+        width: 25rem;
+
+        &.invalid {
+            .p-search {
+                @apply border-alert;
+            }
+        }
+        .help-text {
+            @apply text-gray-400;
+            font-size: 0.75rem;
+            line-height: 1.3;
+            padding: 0.25rem 0.5rem;
+        }
+
+        .external-user-no-data {
+            text-align: center;
+            padding: 1.75rem 0;
+            margin: auto;
+
+            .title {
+                @apply text-primary2;
+                font-size: 1.125rem;
+                font-weight: bold;
+                line-height: 1.55;
+                opacity: 0.7;
+                padding-bottom: 0.625rem;
+            }
+            .help-text {
+                @apply text-gray-400;
+                font-size: 0.875rem;
+            }
+        }
     }
     .id-input-form {
         max-width: 32rem;
