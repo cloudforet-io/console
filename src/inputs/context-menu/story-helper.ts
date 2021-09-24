@@ -7,6 +7,7 @@ const slots: [string, string][] = [
     ['menu', 'This is a slot that allows you to customize a menu, and it is useful when you want to use only the functions of the context menu, but use it completely differently from the basic style.'],
     ['item--format', 'Slot used when customizing all menu items whose type is \'item\' with default style applied'],
     ['header-<item.name>', 'Slot used when customizing a specific menu item whose type is \'header\''],
+    ['help-text', 'Slot used when you want to put additional information on the top'],
 ];
 
 const events: [string, string][] = [
