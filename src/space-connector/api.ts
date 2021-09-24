@@ -1,5 +1,5 @@
 import axios, {
-    AxiosError, AxiosInstance, AxiosRequestConfig
+    AxiosError, AxiosInstance, AxiosRequestConfig,
 } from 'axios';
 import jwt from 'jsonwebtoken';
 import { MockInfo, SessionTimeoutCallback } from '@src/space-connector/type';
@@ -55,8 +55,8 @@ class API {
 
     private defaultAxiosConfig: AxiosRequestConfig = {
         headers: {
-            'Content-Type': 'application/json'
-        }
+            'Content-Type': 'application/json',
+        },
     };
 
     private mockInfo: MockInfo = {};
@@ -96,7 +96,7 @@ class API {
         return this.refreshToken;
     }
 
-    async refreshAccessToken(executeSessionTimeoutCallback: boolean = true): Promise<boolean> {
+    async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean> {
         try {
             const response = await this.refreshInstance.post(REFRESH_URL);
             this.setToken(response.data.access_token, response.data.refresh_token);
@@ -189,8 +189,8 @@ class API {
 
         // Axios response interceptor with error handling
         this.instance.interceptors.response.use(
-            (response) => response,
-            (error) => Promise.reject(new APIError(error))
+            response => response,
+            error => Promise.reject(new APIError(error)),
         );
     }
 }

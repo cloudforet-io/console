@@ -1,4 +1,4 @@
-import { OperatorType } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
+import { OperatorType } from '@src/component-util/query-search/type';
 
 export type RawQueryOperator = OperatorType | '<t' | '<=t' | '>t' | '>=t' | '=t'
 
