@@ -38,7 +38,6 @@
                                 <template #menu-help-text>
                                     <div class="help-text">
                                         <span v-if="externalItems.length > 100">{{ $t('IDENTITY.USER.FORM.TOO_MANY_RESULTS') }}</span>
-                                        <span v-if="Object.keys(users).includes(searchText)">{{ searchText }}{{ $t('IDENTITY.USER.FORM.ALREADY_EXISTS') }}</span>
                                     </div>
                                 </template>
                                 <template #menu-no-data-format>
@@ -387,6 +386,7 @@ export default {
                     disabled: false,
                 };
                 if (state.users[user.user_id]) {
+                    singleItem.label = `(${i18n.t('IDENTITY.USER.FORM.ALREADY_EXISTS')}) ${singleItem.label}`;
                     singleItem.disabled = true;
                 }
                 state.externalItems.push(singleItem);
@@ -418,8 +418,14 @@ export default {
                 if (results.length) {
                     const selectedExternalUser = results[0];
                     formState.user_id = selectedExternalUser.user_id;
-                    formState.name = selectedExternalUser.name;
-                    formState.email = selectedExternalUser.email;
+
+                    if (state.users[userId]) {
+                        formState.name = '';
+                        formState.email = '';
+                    } else {
+                        formState.name = selectedExternalUser.name;
+                        formState.email = selectedExternalUser.email;
+                    }
                 }
             } catch (e) {
                 formState.user_id = userId;
@@ -498,7 +504,6 @@ export default {
             line-height: 1.3;
             padding: 0.25rem 0.5rem;
         }
-
         .external-user-no-data {
             text-align: center;
             padding: 1.75rem 0;
@@ -515,6 +520,12 @@ export default {
             .help-text {
                 @apply text-gray-400;
                 font-size: 0.875rem;
+            }
+        }
+        .p-context-menu {
+            .p-search-dropdown__item-label {
+                @apply truncate;
+                width: 100%;
             }
         }
     }
