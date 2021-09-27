@@ -204,7 +204,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import {
     dynamicFieldsToExcelDataFields,
     makeQuerySearchPropsWithSearchSchema,
-} from '@spaceone/console-core-lib/component-util/dynamic-layout';
+} from '@/lib/component-util/dynamic-layout';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';

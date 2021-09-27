@@ -164,7 +164,7 @@ import { replaceUrlQuery } from '@/lib/router-query-string';
 import {
     dynamicFieldsToExcelDataFields,
     makeQuerySearchPropsWithSearchSchema,
-} from '@spaceone/console-core-lib/component-util/dynamic-layout';
+} from '@/lib/component-util/dynamic-layout';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { showErrorMessage, showLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';

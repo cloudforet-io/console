@@ -171,7 +171,7 @@ import {
     showErrorMessage, showSuccessMessage, showLoadingMessage,
 } from '@/lib/helper/notice-alert-helper';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { dynamicFieldsToExcelDataFields } from '@spaceone/console-core-lib/component-util/dynamic-layout';
+import { dynamicFieldsToExcelDataFields } from '@/lib/component-util/dynamic-layout';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { store } from '@/store';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';

@@ -48,7 +48,7 @@ import {
     dynamicFieldsToExcelDataFields,
     getApiActionByLayoutType,
     makeQuerySearchPropsWithSearchSchema,
-} from '@spaceone/console-core-lib/component-util/dynamic-layout';
+} from '@/lib/component-util/dynamic-layout';
 import { store } from '@/store';
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';

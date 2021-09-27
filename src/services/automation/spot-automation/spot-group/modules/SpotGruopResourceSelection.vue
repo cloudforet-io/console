@@ -43,7 +43,7 @@ import {
 import { Reference } from '@/lib/reference/type';
 import { referenceFieldFormatter } from '@/lib/reference/referenceFieldFormatter';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { makeQuerySearchPropsWithSearchSchema } from '@spaceone/console-core-lib/component-util/dynamic-layout';
+import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-util/dynamic-layout';
 import { QueryTag } from '@spaceone/design-system/dist/src/inputs/search/query-search-tags/type';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/design-system/dist/src/inputs/search/query-search/type';
 import { SpotGroupResourceCategory } from '@/services/automation/spot-automation/type';

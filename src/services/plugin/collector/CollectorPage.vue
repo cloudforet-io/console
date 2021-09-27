@@ -188,7 +188,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { showErrorMessage, showSuccessMessage, showLoadingMessage } from '@/lib/helper/notice-alert-helper';
-import { makeQuerySearchPropsWithSearchSchema } from '@spaceone/console-core-lib/component-util/dynamic-layout';
+import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-util/dynamic-layout';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { store } from '@/store';
 import { QueryHelper } from '@spaceone/console-core-lib/query';

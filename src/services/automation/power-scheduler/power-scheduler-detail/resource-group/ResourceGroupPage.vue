@@ -149,7 +149,7 @@ import { makeProxy } from '@spaceone/console-core-lib';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { makeQuerySearchPropsWithSearchSchema } from '@spaceone/console-core-lib/component-util/dynamic-layout';
+import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-util/dynamic-layout';
 import {
     forEach, camelCase, findIndex, map,
 } from 'lodash';
