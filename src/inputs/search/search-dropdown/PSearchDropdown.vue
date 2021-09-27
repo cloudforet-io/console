@@ -5,11 +5,13 @@
                   :placeholder="proxyPlaceholder"
                   :disable-icon="disableIcon || (type === SEARCH_DROPDOWN_TYPE.radioButton && !!proxySelected.length) || (type === SEARCH_DROPDOWN_TYPE.checkbox && proxyVisibleMenu)"
                   :is-focused.sync="proxyIsFocused"
+                  @keydown.delete="onDeleteSearchText"
                   v-on="searchListeners"
         >
             <template #left>
                 <p-tag v-if="type === SEARCH_DROPDOWN_TYPE.radioButton && proxySelected.length"
-                       :deletable="proxyVisibleMenu"
+                       :deletable="false"
+                       :activated="proxyVisibleMenu"
                        @delete="onDeleteTag(0)"
                 >
                     {{ nameFormatter(proxySelected[0]) }}
@@ -307,6 +309,13 @@ export default defineComponent<SearchDropdownProps>({
             emit('delete-tag', index);
         };
 
+        const onDeleteSearchText = (e) => {
+            if (!e.target.value.length) {
+                state.proxySelected.splice(0, 1);
+                emit('delete-tag', 0);
+            }
+        };
+
         const onInput = (val: string, e) => {
             if (!contextMenuFixedStyleState.proxyVisibleMenu) showMenu();
 
@@ -428,6 +437,7 @@ export default defineComponent<SearchDropdownProps>({
             focusSearch,
             onFocusMenuItem,
             onDeleteTag,
+            onDeleteSearchText,
             searchListeners,
         };
     },
