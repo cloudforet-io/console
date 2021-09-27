@@ -9,6 +9,7 @@ import { computed } from '@vue/composition-api';
 import { initLanguageAndFonts } from '@/lib/site-initializer/locales';
 import { serviceRoutes } from '@/router/service-routes';
 import { rootDomainServiceRoutes } from '@/router/root-domain-service-routes';
+import { errorRoutes } from '@/router/error-routes';
 
 
 const initConfig = async () => {
@@ -22,7 +23,7 @@ const initApiClient = async () => {
     }, { endpoint: config.get('MOCK.ENDPOINT'), all: config.get('MOCK.ALL') });
 };
 
-const initDomain = async () => {
+const initDomain = async (): Promise<string|undefined> => {
     let domainName;
     if (config.get('DOMAIN_NAME_REF') === 'hostname') {
         const { hostname } = window.location;
@@ -30,7 +31,14 @@ const initDomain = async () => {
     } else {
         domainName = config.get('DOMAIN_NAME');
     }
-    await store.dispatch('domain/load', domainName);
+
+    try {
+        await store.dispatch('domain/load', domainName);
+        return store.state.domain.name;
+    } catch (e) {
+        console.error(e);
+        return undefined;
+    }
 };
 
 const initGtag = () => {
@@ -54,8 +62,10 @@ const initAmchartsLicense = () => {
     }
 };
 
-const initRouter = () => {
-    if (store.state.domain.name === 'root') {
+const initRouter = (domainName?: string) => {
+    if (!domainName) {
+        SpaceRouter.init(errorRoutes);
+    } else if (domainName === 'root') {
         SpaceRouter.init(rootDomainServiceRoutes);
     } else {
         SpaceRouter.init(serviceRoutes);
@@ -71,12 +81,18 @@ const init = async () => {
     /* Init SpaceONE Console */
     await initConfig();
     await initApiClient();
-    await initDomain();
-    initRouter();
-    await initLanguageAndFonts();
-    initQueryHelper();
-    initGtag();
-    initAmchartsLicense();
+    const domainName = await initDomain();
+
+    if (domainName) {
+        initRouter(domainName);
+        await initLanguageAndFonts();
+        initQueryHelper();
+        initGtag();
+        initAmchartsLicense();
+    } else {
+        initRouter();
+        throw new Error('Site initialization failed: No matched domain');
+    }
 };
 
 

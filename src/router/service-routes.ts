@@ -14,11 +14,11 @@ import projectRoute from '@/services/project/routes';
 import managementRoute from '@/services/management/routes';
 import automationRoute from '@/services/automation/routes';
 import monitoringRoute from '@/services/monitoring/routes';
+import { ERROR_ROUTE, errorRoutes } from '@/router/error-routes';
 
 
 export const ROOT_ROUTE = Object.freeze({
     _NAME: 'root',
-    ERROR: { _NAME: 'error' },
 });
 
 export const serviceRoutes: RouteConfig[] = [
@@ -39,14 +39,5 @@ export const serviceRoutes: RouteConfig[] = [
             monitoringRoute,
         ],
     },
-    {
-        path: '/error-page',
-        name: ROOT_ROUTE.ERROR._NAME,
-        meta: { excludeAuth: true },
-        component: ErrorPage,
-    },
-    {
-        path: '*',
-        component: ErrorPage,
-    },
+    ...errorRoutes,
 ];

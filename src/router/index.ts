@@ -5,8 +5,8 @@ import { GTag } from '@/lib/gtag';
 import config from '@/lib/config';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import { DASHBOARD_ROUTE } from '@/services/dashboard/routes';
-import { ROOT_ROUTE } from '@/router/service-routes';
 import { AUTH_ROUTE } from '@/services/auth/routes';
+import { ERROR_ROUTE } from '@/router/error-routes';
 
 export class SpaceRouter {
     static router: VueRouter;
@@ -43,7 +43,7 @@ export class SpaceRouter {
                 if (to.meta?.isSignInPage) {
                     nextLocation = { name: DASHBOARD_ROUTE._NAME };
                 } else if (to.meta?.isDomainOwnerOnly && !isAdmin) {
-                    nextLocation = { name: ROOT_ROUTE.ERROR._NAME };
+                    nextLocation = { name: ERROR_ROUTE._NAME };
                 } else if (!hasPermission && to.name !== AUTH_ROUTE.SIGN_OUT._NAME) {
                     if (to.name !== IDENTITY_ROUTE.USER.ACCOUNT._NAME) nextLocation = { name: IDENTITY_ROUTE.USER.ACCOUNT._NAME };
                 }
