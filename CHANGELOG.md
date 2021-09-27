@@ -1,3 +1,10 @@
+# [1.1.0-beta.137](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.136...v1.1.0-beta.137) (2021-09-27)
+
+
+### Bug Fixes
+
+* enable tags to be deleted (radiobutton type) ([#692](https://github.com/spaceone-dev/spaceone-design-system/issues/692)) ([d020e3c](https://github.com/spaceone-dev/spaceone-design-system/commit/d020e3c5bc6f4bcfd58db3ccad38a7f3dc1af591))
+
 # [1.1.0-beta.136](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.135...v1.1.0-beta.136) (2021-09-15)
 
 
