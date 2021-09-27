@@ -722,7 +722,7 @@
 			},
 			"FORM": {
 				"ADD_TITLE": "Add User",
-				"ALREADY_EXISTS": "already exists.",
+				"ALREADY_EXISTS": "Already exists",
 				"ASSIGN_DOMAIN_ROLE": "Assign Domain Role",
 				"CHECK_USER_ID": "Check ID",
 				"DOMAIN_ADMIN": "Domain Admin",
