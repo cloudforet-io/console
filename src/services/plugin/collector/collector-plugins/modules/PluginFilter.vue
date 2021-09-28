@@ -42,7 +42,7 @@ import {
     PSearch, PRadio, PCheckBox, PDivider,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 
 export default {
     name: 'PluginFilter',
@@ -104,9 +104,9 @@ export default {
     .rows {
         margin-top: 1.25rem;
         .sidebar-divider {
-          @apply w-full;
-          margin-top: 0.5625rem;
-          margin-bottom: .75rem;
+            @apply w-full;
+            margin-top: 0.5625rem;
+            margin-bottom: 0.75rem;
         }
     }
     .back-btn {

@@ -52,7 +52,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { i18n } from '@/translations';
 
 import { computed, reactive, toRefs } from '@vue/composition-api';
@@ -61,7 +60,7 @@ import {
     PIconTextButton, PRadio, PSelectDropdown, PTextInput, PIconButton, PDivider,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 
 
 const CONDITIONS_POLICY = Object.freeze({

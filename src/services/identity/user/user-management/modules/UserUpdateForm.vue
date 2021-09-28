@@ -78,24 +78,21 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { TranslateResult } from 'vue-i18n';
 
 import {
-    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy, watch,
+    reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PSelectDropdown, PFieldGroup, PButton, PTextInput, PI,
+    PButtonModal, PSelectDropdown, PFieldGroup, PTextInput,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
 import {
-    checkEmailFormat,
-    checkEmptyValue,
-    checkMinLength, checkOneLowerCase, checkOneNumber, checkOneUpperCase, checkRequiredField, checkSamePassword,
+    checkEmailFormat, checkEmptyValue, checkMinLength, checkOneLowerCase, checkOneNumber, checkOneUpperCase, checkSamePassword,
     Validation,
 } from '@/services/identity/user/lib/user-form-validations';
 

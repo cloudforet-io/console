@@ -5,15 +5,15 @@
                           @goBack="proxyVisible = false"
             />
             <spot-group-schedule-policy-settings v-if="spotGroup"
-                                      :resource-id="resourceId"
-                                      :origin-on-demand="spotGroup.options.min_ondemand"
-                                      @change="onChangeSchedulePolicy"
+                                                 :resource-id="resourceId"
+                                                 :origin-on-demand="spotGroup.options.min_ondemand"
+                                                 @change="onChangeSchedulePolicy"
             />
             <spot-group-instance-type-selection v-if="spotGroup"
-                                     :resource-id="resourceId"
-                                     :resource-type="resourceType"
-                                     :origin-candidates="spotGroup.options.candidate_types"
-                                     @change="onChangeInstanceType"
+                                                :resource-id="resourceId"
+                                                :resource-type="resourceType"
+                                                :origin-candidates="spotGroup.options.candidate_types"
+                                                @change="onChangeInstanceType"
             />
 
             <div v-if="spotGroup || !loading" class="button-group">
@@ -44,19 +44,21 @@
 </template>
 
 <script lang="ts">
-import SpotGroupSchedulePolicySettings from '@/services/automation/spot-automation/spot-group/modules/SpotGroupSchedulePolicySettings.vue';
-import SpotGroupInstanceTypeSelection from '@/services/automation/spot-automation/spot-group/modules/SpotGroupInstanceTypeSelection.vue';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import OverlayPageLayout from '@/common/modules/page-layouts/OverlayPageLayout.vue';
+
 import { PButton, PPageTitle } from '@spaceone/design-system';
+import SpotGroupSchedulePolicySettings from '@/services/automation/spot-automation/spot-group/modules/SpotGroupSchedulePolicySettings.vue';
+import SpotGroupInstanceTypeSelection from '@/services/automation/spot-automation/spot-group/modules/SpotGroupInstanceTypeSelection.vue';
+import OverlayPageLayout from '@/common/modules/page-layouts/OverlayPageLayout.vue';
 import SpotGroupCheckModal from '@/services/automation/spot-automation/spot-group/modules/SpotGroupCheckModal.vue';
+
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { SETTINGS_TYPE } from '@/services/automation/spot-automation/lib/config';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { i18n } from '@/translations';
-import { makeProxy } from '@spaceone/console-core-lib';
 
 interface Props {
     spotGroupId: string;
@@ -109,7 +111,6 @@ export default {
             state.loading = true;
             try {
                 state.spotGroup = await SpaceConnector.client.spotAutomation.spotGroup.get({
-                    // eslint-disable-next-line camelcase
                     spot_group_id: props.spotGroupId,
                 });
             } catch (e) {
@@ -131,17 +132,14 @@ export default {
         const onCheckConfirm = async () => {
             try {
                 const options: any = {
-                    // eslint-disable-next-line camelcase
                     min_ondemand: {
                         type: state.onDemandType,
                         value: state.onDemand,
                     },
-                    // eslint-disable-next-line camelcase
                     candidate_types: state.recommendTypes,
                 };
 
                 await SpaceConnector.client.spotAutomation.spotGroup.update({
-                    // eslint-disable-next-line camelcase
                     spot_group_id: props.spotGroupId,
                     options,
                 });

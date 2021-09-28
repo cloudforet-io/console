@@ -41,11 +41,9 @@ import {
     PI, PCheckBox, PTab,
 } from '@spaceone/design-system';
 import {
-    computed, onMounted, onUnmounted,
-    reactive,
-    toRefs, watch,
+    computed, reactive, toRefs, watch, onMounted, onUnmounted,
 } from '@vue/composition-api';
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { store } from '@/store';
 
 interface Props {

@@ -24,19 +24,19 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
-    reactive, toRefs, ComponentRenderProxy, getCurrentInstance,
+    reactive, toRefs,
 } from '@vue/composition-api';
 
 import { PButtonModal } from '@spaceone/design-system';
 import EscalationPolicyForm from '@/services/monitoring/alert-manager/escalation-policy/modules/EscalationPolicyForm.vue';
 
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { EscalationPolicyFormModel } from '@/services/monitoring/alert-manager/type';
 import { ACTION, SCOPE } from '@/services/monitoring/alert-manager/lib/config';
+import { i18n } from '@/translations';
 
 
 export default {
@@ -60,7 +60,6 @@ export default {
         },
     },
     setup(props, { emit, root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             inputModel: {} as EscalationPolicyFormModel,
@@ -71,10 +70,10 @@ export default {
         const createEscalationPolicy = async () => {
             try {
                 await SpaceConnector.client.monitoring.escalationPolicy.create(state.inputModel);
-                showSuccessMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_CREATE_POLICY'), '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_CREATE_POLICY'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_CREATE_POLICY'), e, root);
+                showErrorMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_CREATE_POLICY'), e, root);
             } finally {
                 state.proxyVisible = false;
             }
@@ -88,10 +87,10 @@ export default {
                     repeat_count: state.inputModel.repeat_count,
                     finish_condition: state.inputModel.finish_condition,
                 });
-                showSuccessMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_UPDATE_POLICY'), '', root);
+                showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_UPDATE_POLICY'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_UPDATE_POLICY'), e, root);
+                showErrorMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_UPDATE_POLICY'), e, root);
             } finally {
                 state.proxyVisible = false;
             }

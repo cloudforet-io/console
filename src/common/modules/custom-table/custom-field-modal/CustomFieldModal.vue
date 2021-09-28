@@ -76,23 +76,26 @@
 </template>
 
 <script lang="ts">
-import {
-    PButton,
-    PButtonModal, PCheckBox, PDataLoader, PSearch,
-} from '@spaceone/design-system';
+import draggable from 'vuedraggable';
 import { camelCase, unionBy, uniq } from 'lodash';
+
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { makeProxy } from '@spaceone/console-core-lib';
+
+import {
+    PButton, PButtonModal, PCheckBox, PDataLoader, PSearch,
+} from '@spaceone/design-system';
+
+import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
+import SelectTagColumns from '@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue';
+
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
-import draggable from 'vuedraggable';
-import ColumnItem from '@/common/modules/custom-table/custom-field-modal/modules/ColumnItem.vue';
 import { TAGS_OPTIONS, TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
-import SelectTagColumns from '@/common/modules/custom-table/custom-field-modal/modules/SelectTagColumns.vue';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
 interface Props {
@@ -146,7 +149,6 @@ export default {
             availableColumns: [] as DynamicField[],
             currentColumns: [] as DynamicField[],
             allColumns: [] as DynamicField[],
-            // eslint-disable-next-line camelcase
             defaultColumns: computed<DynamicField[]>(() => state.availableColumns.filter(d => !d.options?.is_optional)),
             selectedColumnMap: {} as SelectedColumnMap,
             selectedColumns: computed<DynamicField[]>({
@@ -216,12 +218,10 @@ export default {
         const getColumns = async (includeOptionalFields = false) => {
             try {
                 const options: any = {
-                    // eslint-disable-next-line camelcase
                     include_optional_fields: includeOptionalFields,
                 };
                 const { provider, cloudServiceGroup, cloudServiceType } = props.options;
                 if (provider)options.provider = provider;
-                // eslint-disable-next-line camelcase
                 if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
                 if (cloudServiceType) options.cloud_service_type = cloudServiceType;
 
@@ -269,7 +269,6 @@ export default {
             const options: any = {};
             const { provider, cloudServiceGroup, cloudServiceType } = props.options;
             if (provider) options.provider = provider;
-            // eslint-disable-next-line camelcase
             if (cloudServiceGroup) options.cloud_service_group = cloudServiceGroup;
             if (cloudServiceType) options.cloud_service_type = cloudServiceType;
 

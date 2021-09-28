@@ -19,12 +19,11 @@
 </template>
 
 <script lang="ts">
-
-import { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { PCheckBox, PI } from '@spaceone/design-system';
-import { makeProxy } from '@spaceone/console-core-lib';
 import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
+import { DynamicField } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type/field-schema';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 
 interface Props {
     item: DynamicField[];

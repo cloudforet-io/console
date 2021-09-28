@@ -53,10 +53,9 @@ import {
     PFieldGroup, PI, PIconTextButton, PTextInput,
 } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
-import { makeProxy } from '@spaceone/console-core-lib';
 import SpotGroupAddSection from '@/services/automation/spot-automation/spot-group/components/SpotGroupAddSection.vue';
 import { spotGroupNameRegex } from '@/services/automation/spot-automation/lib/validations';
 

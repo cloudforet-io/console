@@ -90,7 +90,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { cloneDeep } from 'lodash';
 
 import {
@@ -107,7 +106,7 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 import { EscalationPolicyFormModel } from '@/services/monitoring/alert-manager/type';
 import { ACTION, FINISH_CONDITION, SCOPE } from '@/services/monitoring/alert-manager/lib/config';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { PROJECT_ROUTE } from '@/services/project/routes';
 import { store } from '@/store';
 import { i18n } from '@/translations';

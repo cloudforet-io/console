@@ -27,15 +27,17 @@
 
 <script lang="ts">
 import {
-    PAutocompleteSearch, PCheckBox, PTag,
-} from '@spaceone/design-system';
-import {
     ComponentRenderProxy,
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
+
+import {
+    PAutocompleteSearch, PCheckBox, PTag,
+} from '@spaceone/design-system';
+
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { makeProxy } from '@spaceone/console-core-lib';
+import { TAGS_PREFIX } from '@/common/modules/custom-table/custom-field-modal/config';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 
 interface Props {
     selectedKeys: string[];

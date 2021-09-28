@@ -63,7 +63,7 @@ import { PButtonModal, PTextList } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SETTINGS_TYPE } from '@/services/automation/spot-automation/lib/config';
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 

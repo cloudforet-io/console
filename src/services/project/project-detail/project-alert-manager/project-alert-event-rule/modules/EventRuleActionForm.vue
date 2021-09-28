@@ -107,7 +107,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { i18n } from '@/translations';
 
 import {
@@ -121,7 +120,7 @@ import {
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { store } from '@/store';
 
 

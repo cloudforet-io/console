@@ -80,9 +80,9 @@ import {
     PIconModal, PI, PPaneLayout, PDivider, PCollapsibleToggle, PRawData, PIconTextButton, PAnchor,
 } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import yaml from 'js-yaml';
-import { APIKeyItem } from '@/services/identity/user/user-api-key/modules/APIKeyTable.vue';
+
 
 enum FileType {
     JSON = 'json',

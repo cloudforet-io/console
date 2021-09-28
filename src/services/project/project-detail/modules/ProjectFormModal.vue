@@ -35,10 +35,11 @@ import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import VueI18n from 'vue-i18n';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -83,11 +84,11 @@ export default {
                 let invalidText = '' as TranslateResult;
                 if (typeof state.projectName === 'string') {
                     if ((state.projectName.trim()).length === 0) {
-                        invalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_REQUIRED');
+                        invalidText = i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_REQUIRED');
                     } else if (state.projectName.length > 40) {
-                        invalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_LENGTH');
+                        invalidText = i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_LENGTH');
                     } else if (state.projectNames.includes(state.projectName)) {
-                        invalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_DUPLICATED');
+                        invalidText = i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_DUPLICATED');
                     }
                 }
                 return invalidText;
@@ -118,9 +119,9 @@ export default {
             try {
                 await SpaceConnector.client.identity.project.create(params);
                 await store.dispatch('resource/project/load');
-                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '', vm.$root);
+                showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'), e, vm.$root);
+                showErrorMessage(i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'), e, vm.$root);
                 throw new Error(e);
             }
         };
@@ -131,9 +132,9 @@ export default {
                     ...params,
                     project_id: props.project?.project_id || vm.$router.currentRoute.params.id,
                 });
-                showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '', vm.$root);
+                showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'), e, vm.$root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'), e, vm.$root);
                 throw new Error(e);
             }
         };

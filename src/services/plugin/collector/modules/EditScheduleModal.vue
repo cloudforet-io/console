@@ -103,9 +103,10 @@ import { ScheduleAddParameter, ScheduleUpdateParameter } from '@/services/plugin
 import { TranslateResult } from 'vue-i18n';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { store } from '@/store';
 import { timezoneList } from '@/store/modules/user/config';
+import { i18n } from '@/translations';
 
 
 interface ScheduleHours {
@@ -187,17 +188,17 @@ export default {
             })),
             scheduleTypes: computed(() => {
                 const result: ScheduleType = {
-                    hourly: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_HOURLY_LABEL'),
+                    hourly: i18n.t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_HOURLY_LABEL'),
                 };
                 if (props.supportedSchedules && props.supportedSchedules.includes('interval')) {
-                    result.interval = vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_LABEL');
+                    result.interval = i18n.t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_LABEL');
                 }
                 return result;
             }),
             intervalTimeTypes: computed(() => [
-                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_SECOND'), name: 'seconds', type: 'item' },
-                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_MINUTE'), name: 'minutes', type: 'item' },
-                { label: vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_HOUR'), name: 'hours', type: 'item' },
+                { label: i18n.t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_SECOND'), name: 'seconds', type: 'item' },
+                { label: i18n.t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_MINUTE'), name: 'minutes', type: 'item' },
+                { label: i18n.t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_HOUR'), name: 'hours', type: 'item' },
             ]),
             isAllHours: computed(() => size(formState.selectedHours) === 24),
             sizeof: computed(() => size(formState.selectedHours)),
@@ -215,14 +216,14 @@ export default {
             }),
             invalidText: computed(() => {
                 if (formState.scheduleType === 'hourly' && size(formState.selectedHours) === 0) {
-                    return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_HOURLY_INVALID_REQUIRED');
+                    return i18n.t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_HOURLY_INVALID_REQUIRED');
                 } if (formState.scheduleType === 'interval') {
                     if (!formState.intervalTimeInSeconds) {
-                        return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_INVALID_REQUIRED');
+                        return i18n.t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_INVALID_REQUIRED');
                     } if (formState.intervalTimeInSeconds < INTERVAL_MIN_SECONDS) {
-                        return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_INVALID_MIN');
+                        return i18n.t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_INVALID_MIN');
                     } if (formState.intervalTimeInSeconds > INTERVAL_MAX_SECONDS) {
-                        return vm.$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_INVALID_MAX');
+                        return i18n.t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_INTERVAL_INVALID_MAX');
                     }
                 }
                 return '';
@@ -297,10 +298,10 @@ export default {
                 await SpaceConnector.client.inventory.collector.schedule.add(params);
 
                 emit('success');
-                showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_S_ADD_SCHEDULE_TITLE'), '', vm.$root);
+                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_ADD_SCHEDULE_TITLE'), '', vm.$root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_E_ADD_SCHEDULE_TITLE'), e, vm.$root);
+                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_ADD_SCHEDULE_TITLE'), e, vm.$root);
             }
         };
         const updateSchedule = async () => {
@@ -320,10 +321,10 @@ export default {
                 await SpaceConnector.client.inventory.collector.schedule.update(params);
 
                 emit('success');
-                showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '', vm.$root);
+                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '', vm.$root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'), e, vm.$root);
+                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'), e, vm.$root);
             }
         };
 

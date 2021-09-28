@@ -61,7 +61,7 @@ import {
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { PROJECT_ROUTE } from '@/services/project/routes';
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 import { i18n } from '@/translations';

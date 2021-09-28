@@ -27,22 +27,18 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 
-import { ProjectGroup } from '@/services/project/type';
-
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { makeProxy } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import VueI18n from 'vue-i18n';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -61,8 +57,6 @@ export default {
         },
     },
     setup(props, { root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         const state = reactive({
             proxyVisible: computed({
                 get() { return store.state.projectPage.projectGroupFormVisible; },
@@ -76,11 +70,11 @@ export default {
                 let invalidText = '' as TranslateResult;
                 if (typeof state.projectGroupName === 'string') {
                     if (state.projectGroupName.length === 0) {
-                        invalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_REQUIRED');
+                        invalidText = i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_REQUIRED');
                     } else if (state.projectGroupName.length > 40) {
-                        invalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_LENGTH');
+                        invalidText = i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_LENGTH');
                     } else if (state.projectGroupNames.includes(state.projectGroupName)) {
-                        invalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_DUPLICATED');
+                        invalidText = i18n.t('PROJECT.DETAIL.MODAL_VALIDATION_DUPLICATED');
                     }
                 }
                 return invalidText;
@@ -117,9 +111,9 @@ export default {
             try {
                 await store.dispatch('projectPage/createProjectGroup', item);
                 await store.dispatch('resource/projectGroup/load');
-                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '', root);
             } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'), e, root);
+                showErrorMessage(i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'), e, root);
                 throw new Error(e);
             }
         };
@@ -127,9 +121,9 @@ export default {
         const updateProjectGroup = async (item) => {
             try {
                 await store.dispatch('projectPage/updateProjectGroup', item);
-                showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', root);
+                showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', root);
             } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e, root);
+                showErrorMessage(i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e, root);
                 throw new Error(e);
             }
         };

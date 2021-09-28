@@ -132,7 +132,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -145,8 +144,8 @@ import {
     DynamicLayoutFieldHandler,
 } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type';
 
-import { makeProxy } from '@spaceone/console-core-lib';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { makeQuerySearchPropsWithSearchSchema } from '@/lib/component-util/dynamic-layout';

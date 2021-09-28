@@ -50,6 +50,8 @@
 </template>
 
 <script lang="ts">
+import { get } from 'lodash';
+
 import {
     toRefs, reactive, computed, SetupContext, watch, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
@@ -58,13 +60,12 @@ import {
     PButtonModal, PFieldGroup, PTextInput, PLazyImg,
 } from '@spaceone/design-system';
 
-import { get } from 'lodash';
-import { makeProxy } from '@spaceone/console-core-lib';
-
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { TimeStamp } from '@/models';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 
 interface SecretModel {
     secret_id: string;
@@ -206,10 +207,10 @@ export default {
             state.loading = true;
             try {
                 await collectorApi(getCollectParams());
-                showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_S_COLLECT_START_TITLE'), '', vm.$root);
+                showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_COLLECT_START_TITLE'), '', vm.$root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_E_COLLECT_TITLE'), e, vm.$root);
+                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_COLLECT_TITLE'), e, vm.$root);
             } finally {
                 state.proxyVisible = false;
             }

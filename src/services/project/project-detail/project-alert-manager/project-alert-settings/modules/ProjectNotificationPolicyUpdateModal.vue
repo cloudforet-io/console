@@ -23,14 +23,13 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
     PButtonModal, PSelectCard,
 } from '@spaceone/design-system';
 
 import { reactive, toRefs, watch } from '@vue/composition-api';
 
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';

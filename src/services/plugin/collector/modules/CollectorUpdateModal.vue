@@ -82,12 +82,13 @@ import {
     PButtonModal, PSelectDropdown, PLazyImg, PFieldGroup, PButton, PTextInput, PToggleButton,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { store } from '@/store';
 import { CollectorPluginModel, CollectorUpdateParameter, UPGRADE_MODE } from '@/services/plugin/collector/type';
+import { store } from '@/store';
+import { i18n } from '@/translations';
 
 
 interface Props {
@@ -144,18 +145,18 @@ export default {
             },
             nameInvalidText: computed(() => {
                 if (formState.inputModel.name.length < 2) {
-                    return vm.$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_NAME_INVALID');
+                    return i18n.t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_NAME_INVALID');
                 } if (state.collectorNames.includes(formState.inputModel.name)) {
-                    return vm.$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_NAME_DUPLICATED');
+                    return i18n.t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_NAME_DUPLICATED');
                 }
                 return '';
             }),
             isNameValid: computed(() => !(formState.inputModel.name.length < 2 || state.collectorNames.includes(formState.inputModel.name))),
             priorityInvalidText: computed(() => {
                 if (formState.inputModel.priority < 1) {
-                    return vm.$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_PRIORITY_MIN');
+                    return i18n.t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_PRIORITY_MIN');
                 } if (formState.inputModel.priority > 10) {
-                    return vm.$t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_PRIORITY_MAX');
+                    return i18n.t('PLUGIN.COLLECTOR.MAIN.UPDATE_MODAL_PRIORITY_MAX');
                 }
                 return '';
             }),
@@ -177,7 +178,7 @@ export default {
                 formState.inputModel.isAutoUpgrade = res.plugin_info.upgrade_mode === UPGRADE_MODE.AUTO;
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_TITLE'), e, vm.$root);
+                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_TITLE'), e, vm.$root);
             }
         };
 
@@ -202,7 +203,7 @@ export default {
                 });
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_VERSION_TITLE'), e, vm.$root);
+                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_VERSION_TITLE'), e, vm.$root);
             }
         };
 
@@ -243,9 +244,9 @@ export default {
                         collector_id: props.collectorId,
                         ...state.collectorUpdateParam,
                     });
-                    showSuccessMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_TITLE'), '', vm.$root);
+                    showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_TITLE'), '', vm.$root);
                 } catch (e) {
-                    showErrorMessage(vm.$t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_TITLE'), e, vm.$root);
+                    showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_TITLE'), e, vm.$root);
                 } finally {
                     state.loading = false;
                     state.proxyVisible = false;

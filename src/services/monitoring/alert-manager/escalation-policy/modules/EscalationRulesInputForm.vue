@@ -142,7 +142,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { reactive, toRefs, watch } from '@vue/composition-api';
 
 import {
@@ -153,7 +152,7 @@ import ProjectChannelList from '@/services/monitoring/alert-manager/alert/alert-
 
 import { PROJECT_ROUTE } from '@/services/project/routes';
 import { SCOPE } from '@/services/monitoring/alert-manager/lib/config';
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 

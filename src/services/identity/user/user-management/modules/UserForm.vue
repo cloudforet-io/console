@@ -131,7 +131,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { TranslateResult } from 'vue-i18n';
 
 import {
@@ -142,7 +141,7 @@ import {
     PButtonModal, PSelectDropdown, PFieldGroup, PButton, PTextInput, PBoxTab, PSearchDropdown, PI,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
 import {
@@ -154,6 +153,7 @@ import {
 import { debounce } from 'lodash';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { i18n } from '@/translations';
+
 
 interface AuthType {
     user_type: string;

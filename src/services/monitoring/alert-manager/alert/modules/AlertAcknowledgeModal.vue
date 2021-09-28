@@ -21,7 +21,7 @@
 <script lang="ts">
 import { reactive, toRefs, watch } from '@vue/composition-api';
 import { PButtonModal, PCheckBox } from '@spaceone/design-system';
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ALERT_STATE } from '@/services/monitoring/alert-manager/lib/config';

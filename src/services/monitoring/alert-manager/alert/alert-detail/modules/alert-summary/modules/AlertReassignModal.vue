@@ -30,19 +30,22 @@
 </template>
 
 <script lang="ts">
-import { PButtonModal, PToolboxTable } from '@spaceone/design-system';
+import { uniqBy } from 'lodash';
+
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
-import { makeProxy } from '@spaceone/console-core-lib';
+
+import { PButtonModal, PToolboxTable } from '@spaceone/design-system';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { store } from '@/store';
-import { uniqBy } from 'lodash';
 import { getApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 import { ProjectMember } from '@/services/monitoring/alert-manager/type';
+
 
 export default {
     name: 'AlertReassignModal',
@@ -145,7 +148,3 @@ export default {
     },
 };
 </script>
-
-<style lang="postcss" scoped>
-
-</style>

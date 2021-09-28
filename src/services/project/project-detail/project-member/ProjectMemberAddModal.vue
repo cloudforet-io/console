@@ -167,9 +167,6 @@
 
 <script lang="ts">
 import { debounce } from 'lodash';
-import {
-    makeProxy,
-} from '@spaceone/console-core-lib';
 
 import {
     reactive, toRefs, computed, watch,
@@ -182,6 +179,7 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { i18n } from '@/translations';
 import { store } from '@/store';
 

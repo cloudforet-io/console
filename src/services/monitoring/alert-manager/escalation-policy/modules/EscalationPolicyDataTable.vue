@@ -48,12 +48,13 @@ import {
 } from '@spaceone/design-system';
 
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { alertStateBadgeStyleTypeFormatter, alertScopeBadgeStyleTypeFormatter } from '@/services/monitoring/alert-manager/lib/helper';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
 
 export default {
     name: 'EscalationPolicyDataTable',

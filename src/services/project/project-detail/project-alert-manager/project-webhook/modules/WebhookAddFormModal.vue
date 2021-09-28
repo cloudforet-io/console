@@ -50,17 +50,14 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButtonModal,
-    PFieldGroup,
-    PTextInput,
-    PSelectCard, PSelectDropdown,
+    PButtonModal, PFieldGroup, PTextInput, PSelectCard,
 } from '@spaceone/design-system';
 
-import { makeProxy } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { store } from '@/store';
 import { i18n } from '@/translations';
 
 interface WebhookType {

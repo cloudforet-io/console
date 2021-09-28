@@ -29,13 +29,13 @@
 <script lang="ts">
 import { PButtonModal, PFieldGroup, PTextInput } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
-import { makeProxy } from '@spaceone/console-core-lib';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { i18n } from '@/translations';
+import { makeProxy } from '@/lib/helper/composition-helpers';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { i18n } from '@/translations';
 import { store } from '@/store';
+
 
 export default {
     name: 'AlertTitleEditModal',
@@ -66,7 +66,6 @@ export default {
         },
     },
     setup(props, { emit, root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,
             proxyVisible: makeProxy('visible', props, emit),
@@ -113,7 +112,3 @@ export default {
     },
 };
 </script>
-
-<style lang="postcss" scoped>
-
-</style>
