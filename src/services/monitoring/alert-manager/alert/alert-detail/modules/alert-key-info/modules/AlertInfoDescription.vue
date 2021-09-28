@@ -11,7 +11,7 @@
             <p-button :outline="true" class="text-button"
                       size="sm" @click="cancelEdit(alertData.description)"
             >
-                {{$t('MONITORING.ALERT.DETAIL.INFO.CANCEL')}}
+                {{ $t('MONITORING.ALERT.DETAIL.INFO.CANCEL') }}
             </p-button>
             <p-button
                 style-type="primary"
@@ -74,4 +74,7 @@ export default {
 
 <style lang="postcss" scoped>
 @import '../styles/alertInfoItem.pcss';
+.description {
+    white-space: pre-wrap;
+}
 </style>
