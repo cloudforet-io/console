@@ -198,14 +198,11 @@ export default {
     }
 }
 .select-card-wrapper {
-    @apply flex;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0.5rem;
     .p-select-card::v-deep {
-        flex-basis: 25%;
         height: 9.0625rem;
-        margin-left: 0.5rem;
-        &:first-child {
-            @apply ml-0;
-        }
     }
 }
 .p-select-dropdown {
@@ -219,14 +216,12 @@ export default {
         }
     }
     .select-card-wrapper {
-        @apply flex-col;
+        grid-template-columns: auto;
+        gap: 1rem;
         .p-select-card::v-deep {
             @apply flex items-center p-0 border-none;
+            height: auto;
             min-height: auto;
-            margin: 0.5rem 0;
-            &:first-child {
-                margin-top: 0;
-            }
             .marker {
                 position: static;
             }
