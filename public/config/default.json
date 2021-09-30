@@ -5,6 +5,7 @@
   "GTAG_ID": "DISABLED",
   "DOMAIN_NAME": null,
   "DOMAIN_NAME_REF": "hostname",
+  "ADMIN_DOMAIN": "root",
   "AMCHARTS_LICENSE": {
     "ENABLED": false,
     "CHARTS": "",

@@ -8,7 +8,7 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { computed } from '@vue/composition-api';
 import { initLanguageAndFonts } from '@/lib/site-initializer/locales';
 import { serviceRoutes } from '@/router/service-routes';
-import { rootDomainServiceRoutes } from '@/router/root-domain-service-routes';
+import { adminDomainServiceRoutes } from '@/router/admin-domain-service-routes';
 import { errorRoutes } from '@/router/error-routes';
 
 
@@ -65,8 +65,8 @@ const initAmchartsLicense = () => {
 const initRouter = (domainName?: string) => {
     if (!domainName) {
         SpaceRouter.init(errorRoutes);
-    } else if (domainName === 'root') {
-        SpaceRouter.init(rootDomainServiceRoutes);
+    } else if (domainName === config.get('ADMIN_DOMAIN')) {
+        SpaceRouter.init(adminDomainServiceRoutes);
     } else {
         SpaceRouter.init(serviceRoutes);
     }

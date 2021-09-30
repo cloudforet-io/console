@@ -9,7 +9,7 @@ const ROOT_DOMAIN_ROUTE = Object.freeze({
     DASHBOARD: { _NAME: 'dashboard' },
 });
 
-export const rootDomainServiceRoutes: RouteConfig[] = [
+export const adminDomainServiceRoutes: RouteConfig[] = [
     ...authRoutes,
     {
         path: '/',
