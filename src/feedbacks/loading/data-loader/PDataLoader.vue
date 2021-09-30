@@ -1,31 +1,36 @@
 <template>
     <div class="p-data-loader">
-        <transition-group name="fade-in" tag="div" class="data-loader-container">
-            <div v-if="showLoader" key="loader" class="loader-wrapper">
-                <slot name="loader">
-                    <div class="loader-backdrop" />
-                    <template v-if="loaderType === LOADER_TYPES.spinner">
-                        <p-lottie name="thin-spinner" :size="spinnerSize"
-                                  auto class="loader spinner"
-                        />
-                    </template>
-                    <template v-else-if="loaderType === LOADER_TYPES.skeleton">
-                        <p-skeleton class="loader" />
-                    </template>
-                </slot>
-            </div>
-
-            <div v-if="isEmpty" key="no-data" class="no-data-wrapper">
+        <div class="data-loader-container">
+            <div v-if="!disableEmptyCase && isEmpty" key="no-data" class="no-data-wrapper">
                 <slot name="no-data">
                     {{ $t('COMPONENT.DATA_LOADER.NO_DATA') }}
                 </slot>
             </div>
 
-
             <div v-else key="data" class="data-wrapper">
                 <slot />
             </div>
-        </transition-group>
+
+            <transition name="fade-in">
+                <div v-if="showLoader" key="loader" class="loader-wrapper"
+                     :class="{'no-empty-case': disableEmptyCase && isEmpty}"
+                >
+                    <div class="loader-backdrop" />
+                    <div class="loader">
+                        <slot name="loader">
+                            <template v-if="loaderType === LOADER_TYPES.spinner">
+                                <p-lottie name="thin-spinner" :size="spinnerSize"
+                                          auto class="spinner"
+                                />
+                            </template>
+                            <template v-else-if="loaderType === LOADER_TYPES.skeleton">
+                                <p-skeleton class="skeleton" />
+                            </template>
+                        </slot>
+                    </div>
+                </div>
+            </transition>
+        </div>
     </div>
 </template>
 
@@ -87,7 +92,6 @@ export default defineComponent({
     setup(props: Props) {
         const state = reactive({
             isEmpty: computed(() => {
-                if (props.disableEmptyCase) return false;
                 if (!props.data) return false;
                 if (Array.isArray(props.data)) return props.data.length === 0;
                 return isEmpty(props.data);
@@ -145,6 +149,9 @@ export default defineComponent({
     }
     .loader-wrapper {
         @apply absolute w-full h-full overflow-hidden;
+        &.no-empty-case {
+            @apply static;
+        }
         top: 0;
         z-index: 1;
         .loader-backdrop {
@@ -156,8 +163,11 @@ export default defineComponent({
             @apply absolute flex w-full h-full justify-center items-center;
             top: 0;
             z-index: 1;
-            &.spinner {
+            .spinner {
                 max-height: 16.875rem;
+            }
+            .skeleton {
+                height: 100%;
             }
         }
     }

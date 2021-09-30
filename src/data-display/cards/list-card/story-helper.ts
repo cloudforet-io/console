@@ -1,11 +1,13 @@
 import { ArgTypes } from '@storybook/addons';
 import faker from 'faker';
 import { range } from 'lodash';
-import { argTypes as cardArgTypes } from '@/data-display/cards/card/story-helper';
+import { getCardArgTypes } from '@/data-display/cards/card/story-helper';
+import { getDataLoaderArgTypes } from '@/feedbacks/loading/data-loader/story-helper';
 
-const getArgTypes = () => {
+export const getListCardArgTypes = () => {
+    const dataLoaderArgTypes = getDataLoaderArgTypes();
     const argTypes: ArgTypes = {
-        ...cardArgTypes,
+        ...getCardArgTypes(),
         items: {
             name: 'items',
             type: { name: 'array' },
@@ -61,7 +63,7 @@ const getArgTypes = () => {
             },
         },
         itemSlot: {
-            name: 'itemSlot',
+            name: 'item',
             description: 'Slot for list item.',
             defaultValue: null,
             table: {
@@ -77,11 +79,14 @@ const getArgTypes = () => {
                 type: 'text',
             },
         },
+
     };
 
-    delete argTypes.defaultSLot;
+    argTypes.disableEmptyCase = dataLoaderArgTypes.disableEmptyCase;
+    argTypes.loaderSlot = dataLoaderArgTypes.loaderSlot;
+    argTypes.noDataSlot = dataLoaderArgTypes.noDataSlot;
+
+    delete argTypes.defaultSlot;
 
     return argTypes;
 };
-
-export const argTypes: ArgTypes = getArgTypes();

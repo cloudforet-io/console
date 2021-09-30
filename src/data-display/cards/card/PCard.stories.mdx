@@ -3,8 +3,8 @@ import { reactive, toRefs } from '@vue/composition-api';
 
 import PCard from './PCard.vue';
 import PI from '@/foundation/icons/PI.vue'
-import { argTypes } from '@/data-display/cards/card/story-helper';
 import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
+import { getCardArgTypes } from '@/data-display/cards/card/story-helper';
 
 
 <Meta title='Data Display/Cards/Card' parameters={{
@@ -12,7 +12,7 @@ import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
     }
-}} argTypes={argTypes}/>
+}} argTypes={getCardArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({

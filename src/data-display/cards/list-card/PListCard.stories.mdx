@@ -1,13 +1,16 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+import { reactive, toRefs } from '@vue/composition-api';
 import faker from 'faker'
 import {range} from 'lodash'
 import dayjs from 'dayjs';
 
 import PListCard from './PListCard.vue';
 import PI from '@/foundation/icons/PI.vue';
+import PIconTextButton from '@/inputs/buttons/icon-text-button/PIconTextButton';
 import PBadge from '@/data-display/badges/PBadge';
-import { argTypes } from '@/data-display/cards/list-card/story-helper';
 import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
+import { getListCardArgTypes } from '@/data-display/cards/list-card/story-helper';
+
 
 
 <Meta title='Data Display/Cards/List Card' parameters={{
@@ -15,7 +18,7 @@ import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
     }
-}} argTypes={argTypes}/>
+}} argTypes={getListCardArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({
@@ -132,10 +135,10 @@ If you give ```false``` to ```header``` props and don't give ```header``` slot, 
 <br/>
 <br/>
 
-## Slots
+## Customize with Slots
 
 <Canvas>
-    <Story name="Slots">
+    <Story name="Customize with Slots">
         {{
             components: { PListCard, PI, PBadge },
             template: `
@@ -177,6 +180,105 @@ If you give ```false``` to ```header``` props and don't give ```header``` slot, 
                             date: dayjs(faker.date.past('2021')).format('MM/DD hh:mm')
                         }, undefined]),
                     }))
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Customize Loader
+
+<Canvas>
+    <Story name="Customize Loader">
+        {{
+            components: { PListCard, PIconTextButton },
+            template: `
+    <div class="h-full w-full overflow p-8" style="height: 200px;">
+         <p-icon-text-button
+                class="mb-4" name="ic_refresh"
+                @click="updateItems"
+        >
+             Refresh
+        </p-icon-text-button>
+        <p-list-card
+            header="Customize Loader of List Card"
+            :items="items"
+            :loading="loading"
+        >
+            <template #loader><div class="leading-6">Loading...</div></template>
+        </p-list-card>
+    </div>
+    `,
+            setup() {
+                const state = reactive({
+                    loading: true,
+                    items: []
+                })
+                const updateItems = () => {
+                    state.loading = true;
+                    setTimeout(() => {
+                        state.items =range(faker.random.number({ min: 0, max: 3 }))
+                            .map(() => faker.lorem.sentence(8))
+                        state.loading = false
+                    }, 300)
+                }
+                updateItems()
+                return {
+                    ...toRefs(state),
+                    updateItems
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Customize Loader and Empty Case
+
+<Canvas>
+    <Story name="Customize Loader and Empty Case">
+        {{
+            components: { PListCard, PIconTextButton },
+            template: `
+    <div class="h-full w-full overflow p-8" style="height: 200px;">
+         <p-icon-text-button
+                class="mb-4" name="ic_refresh"
+                @click="updateItems"
+        >
+             Refresh
+        </p-icon-text-button>
+        <p-list-card
+            header="Customize No Data Case of List Card"
+            :items="items"
+            :loading="loading"
+        >
+            <template #loader><div class="leading-6">Loading...</div></template>
+            <template #no-data><div class="leading-6">EMPTY ㅠㅠ</div></template>
+        </p-list-card>
+    </div>
+<!--<div>-->
+    `,
+            setup() {
+                const state = reactive({
+                    loading: true,
+                    items: []
+                })
+                const updateItems = () => {
+                    state.loading = true;
+                    setTimeout(() => {
+                        state.items = []
+                        state.loading = false
+                    }, 300)
+                }
+                updateItems()
+                return {
+                    ...toRefs(state),
+                    updateItems
                 }
             }
         }}

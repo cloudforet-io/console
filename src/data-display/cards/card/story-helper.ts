@@ -1,7 +1,7 @@
 import { ArgTypes } from '@storybook/addons';
 import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
 
-export const argTypes: ArgTypes = {
+export const getCardArgTypes = (): ArgTypes => ({
     header: {
         name: 'header',
         type: { name: 'string, boolean' },
@@ -73,4 +73,4 @@ export const argTypes: ArgTypes = {
             type: 'text',
         },
     },
-};
+});

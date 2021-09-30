@@ -5,7 +5,7 @@
                 {{ header }}
             </slot>
         </header>
-        <div class="body">
+        <div class="body" :class="{ 'no-header': !header.length && !$scopedSlots.header }">
             <slot />
         </div>
     </div>
@@ -49,6 +49,10 @@ export default defineComponent<CardProps>({
         @apply border-b border-l border-r rounded-b-lg;
         padding: 0.75rem 0.875rem;
         border-color: inherit;
+        &.no-header {
+            @apply border rounded-t-lg;
+            border-color: inherit;
+        }
     }
 
     @define-mixin style-type $bg-color, $border-color {

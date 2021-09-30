@@ -5,7 +5,15 @@
         <template v-if="$scopedSlots.header" #header>
             <slot name="header" />
         </template>
-        <p-data-loader :data="items" :loading="loading" :spinner-size="1.5">
+        <p-data-loader :data="items" :loading="loading" :spinner-size="1.5"
+                       :disable-empty-case="disableEmptyCase"
+        >
+            <template #loader>
+                <slot name="loader" />
+            </template>
+            <template #no-data>
+                <slot name="no-data" />
+            </template>
             <ul>
                 <li v-for="(item, index) in items" :key="`${contextKey}-${index}`"
                     @click="$emit('click', index)"
@@ -32,6 +40,7 @@ import { CardProps } from '@/data-display/cards/card/type';
 interface Props extends CardProps {
     items: any[];
     loading?: boolean;
+    disableEmptyCase?: boolean;
     hoverable?: boolean;
 }
 
@@ -58,6 +67,10 @@ export default defineComponent<Props>({
             default: () => [],
         },
         loading: {
+            type: Boolean,
+            default: false,
+        },
+        disableEmptyCase: {
             type: Boolean,
             default: false,
         },
