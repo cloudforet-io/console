@@ -1,3 +1,10 @@
+# [1.1.0-beta.138](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.137...v1.1.0-beta.138) (2021-09-30)
+
+
+### Bug Fixes
+
+* data loader transition bug & connect slots of list card to data loaders' ([#693](https://github.com/spaceone-dev/spaceone-design-system/issues/693)) ([214c657](https://github.com/spaceone-dev/spaceone-design-system/commit/214c6574bb1b6f920f031731868669feedf12e2d))
+
 # [1.1.0-beta.137](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.136...v1.1.0-beta.137) (2021-09-27)
 
 
