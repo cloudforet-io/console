@@ -348,9 +348,9 @@ export default {
                 password: formState.password || '',
             };
             if (formState.domainRoleList.length > 0) {
-                emit('confirm', data, formState.domainRoleList[0].name, formState.domainRole);
+                emit('confirm', data, formState.domainRole);
             } else {
-                emit('confirm', data, null, null);
+                emit('confirm', data, null);
             }
         };
 

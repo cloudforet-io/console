@@ -578,13 +578,14 @@ export default {
                 throw e;
             }
         };
-        const addUser = async (item, roleId, role) => {
+        const addUser = async (item, roleId) => {
             try {
                 await SpaceConnector.client.identity.user.create({
                     ...item,
                 });
-                if (role.length > 0 || role !== '') await bindRole(item.user_id, roleId);
-                // else return;
+                if (roleId.length > 0 || roleId !== '') {
+                    await bindRole(item.user_id, roleId);
+                }
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '', root);
             } catch (e) {
                 showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'), e, root);
@@ -593,18 +594,18 @@ export default {
                 userFormState.visible = false;
             }
         };
-        const updateUser = async (item, roleId, role) => {
+        const updateUser = async (item, roleId) => {
             try {
                 await SpaceConnector.client.identity.user.update({
                     ...item,
                 });
-                if (role && role !== userFormState.roleOfSelectedUser) {
+                if (roleId && roleId !== userFormState.roleOfSelectedUser) {
                     await bindRole(item.user_id, roleId);
-                    userFormState.roleOfSelectedUser = role;
+                    userFormState.roleOfSelectedUser = roleId;
                 }
-                if (role === '' && userFormState.roleOfSelectedUser !== '') {
+                if (roleId === '' && userFormState.roleOfSelectedUser !== '') {
                     await unbindRole(item.user_id, roleId);
-                    userFormState.roleOfSelectedUser = role;
+                    userFormState.roleOfSelectedUser = roleId;
                 }
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', root);
             } catch (e) {
@@ -615,11 +616,11 @@ export default {
                 userFormState.visible = false;
             }
         };
-        const userFormConfirm = async (item, roleId, role) => {
+        const userFormConfirm = async (item, roleId) => {
             if (userFormState.updateMode) {
-                await updateUser(item, roleId, role);
+                await updateUser(item, roleId);
             } else {
-                await addUser(item, roleId, role);
+                await addUser(item, roleId);
             }
             await getUsers();
         };
