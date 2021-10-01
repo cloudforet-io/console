@@ -8,6 +8,7 @@
             :filters="filters"
             keep-alive
             @update="onUpdateTable"
+            @change-list="onChangeList"
         />
     </div>
 </template>
@@ -22,6 +23,7 @@ import AlertDataTable from '@/services/monitoring/alert-manager/alert/modules/Al
 import { ALERT_STATE_FILTER, ALERT_URGENCY, ASSIGNED_STATE } from '@/services/monitoring/alert-manager/lib/config';
 import { AlertListPageUrlQuery, AlertListTableFilters } from '@/services/monitoring/alert-manager/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { store } from '@/store';
 
 export default {
     name: 'ProjectAlertListPage',
@@ -74,6 +76,10 @@ export default {
             replaceAlertListPageUrlQuery(query);
         };
 
+        const onChangeList = () => {
+            store.dispatch('service/projectDetail/getAlertCounts');
+        };
+
         onActivated(() => {
             state.alertState = vm.$route.query.state ?? ALERT_STATE_FILTER.OPEN;
             state.urgency = vm.$route.query.urgency ?? ALERT_URGENCY.ALL;
@@ -84,6 +90,7 @@ export default {
         return {
             ...toRefs(state),
             onUpdateTable,
+            onChangeList,
         };
     },
 };

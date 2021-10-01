@@ -100,13 +100,13 @@ import {
     computed, getCurrentInstance, onActivated, reactive, toRefs, watch, watchEffect,
 } from '@vue/composition-api';
 
-import ProjectEscalationPolicy from '@/services/project/project-detail/project-alert-manager/project-alert-settings/modules/ProjectEscalationPolicy.vue';
+import ProjectEscalationPolicy from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectEscalationPolicy.vue';
 import ProjectNotificationPolicyUpdateModal
-    from '@/services/project/project-detail/project-alert-manager/project-alert-settings/modules/ProjectNotificationPolicyUpdateModal.vue';
+    from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectNotificationPolicyUpdateModal.vue';
 import ProjectAutoRecoveryUpdateModal
-    from '@/services/project/project-detail/project-alert-manager/project-alert-settings/modules/ProjectAutoRecoveryUpdateModal.vue';
+    from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectAutoRecoveryUpdateModal.vue';
 import ProjectEscalationPolicyChangeModal
-    from '@/services/project/project-detail/project-alert-manager/project-alert-settings/modules/ProjectEscalationPolicyChangeModal.vue';
+    from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectEscalationPolicyChangeModal.vue';
 import EscalationPolicyFormModal from '@/services/monitoring/alert-manager/escalation-policy/modules/EscalationPolicyFormModal.vue';
 
 import {

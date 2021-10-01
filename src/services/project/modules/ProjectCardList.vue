@@ -180,12 +180,12 @@ export default {
             hoveredProjectId: '',
             hoveredGroupId: '',
             isAll: computed(() => !state.groupId),
-            groupId: computed(() => store.getters['projectPage/groupId']),
-            searchText: computed(() => store.state.projectPage.searchText),
-            noProjectGroup: computed(() => !store.state.projectPage.hasProjectGroup),
+            groupId: computed(() => store.getters['service/project/groupId']),
+            searchText: computed(() => store.state.service.project.searchText),
+            noProjectGroup: computed(() => !store.state.service.project.hasProjectGroup),
             projectFormVisible: computed({
-                get() { return store.state.projectPage.projectFormVisible; },
-                set(val) { store.commit('projectPage/setProjectFormVisible', val); },
+                get() { return store.state.service.project.projectFormVisible; },
+                set(val) { store.commit('service/project/setProjectFormVisible', val); },
             }),
         });
 
@@ -276,7 +276,7 @@ export default {
                 else res = await listProjectApi(getParams(id, text), { cancelToken: listProjectToken.token });
                 state.items = res.results;
                 state.totalCount = res.total_count;
-                store.commit('projectPage/setProjectCount', state.totalCount);
+                store.commit('service/project/setProjectCount', state.totalCount);
                 state.loading = false;
                 listProjectToken = undefined;
                 await getCardSummary(res.results);
@@ -285,7 +285,7 @@ export default {
                     state.items = [];
                     state.totalCount = 0;
                     state.loading = false;
-                    store.commit('projectPage/setProjectCount', 0);
+                    store.commit('service/project/setProjectCount', 0);
                     console.error(e);
                 }
             }
@@ -335,7 +335,7 @@ export default {
 
 
         /* Init */
-        watch([() => store.state.projectPage.isInitiated, () => state.groupId, () => state.searchText], async ([isInitiated, groupId, searchText]) => {
+        watch([() => store.state.service.project.isInitiated, () => state.groupId, () => state.searchText], async ([isInitiated, groupId, searchText]) => {
             if (isInitiated) await listProjects(groupId, searchText);
         }, { immediate: true });
 

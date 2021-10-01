@@ -32,8 +32,8 @@ import {
     PButton,
 } from '@spaceone/design-system';
 
-import EventRuleActionForm from '@/services/project/project-detail/project-alert-manager/project-alert-event-rule/modules/EventRuleActionForm.vue';
-import EventRuleConditionForm from '@/services/project/project-detail/project-alert-manager/project-alert-event-rule/modules/EventRuleConditionForm.vue';
+import EventRuleActionForm from '@/services/project/project-detail/project-alert/project-alert-event-rule/modules/EventRuleActionForm.vue';
+import EventRuleConditionForm from '@/services/project/project-detail/project-alert/project-alert-event-rule/modules/EventRuleConditionForm.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';

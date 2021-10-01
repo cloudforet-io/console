@@ -31,21 +31,21 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             proxyVisible: computed({
-                get() { return store.state.projectPage.projectGroupDeleteCheckModalVisible; },
-                set(val) { store.commit('projectPage/setProjectGroupDeleteCheckModalVisible', val); },
+                get() { return store.state.service.project.projectGroupDeleteCheckModalVisible; },
+                set(val) { store.commit('service/project/setProjectGroupDeleteCheckModalVisible', val); },
             }),
-            groupId: computed((() => store.getters['projectPage/actionTargetNodeData']?.id)),
+            groupId: computed((() => store.getters['service/project/actionTargetNodeData']?.id)),
         });
 
         const deleteProjectGroup = async () => {
             try {
-                await store.dispatch('projectPage/deleteProjectGroup');
+                await store.dispatch('service/project/deleteProjectGroup');
                 // await store.dispatch('favorite/projectGroup/removeItem', { id: state.groupId });
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_DELETE_PROJECT_GROUP'), '', vm.$root);
             } catch (e) {
                 showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_DELETE_PROJECT_GROUP', { action: vm.$t('PROJECT.LANDING.MODAL_DELETE_PROJECT_GROUP.TITLE') }), e, vm.$root);
             } finally {
-                store.commit('projectPage/setProjectGroupDeleteCheckModalVisible', false);
+                store.commit('service/project/setProjectGroupDeleteCheckModalVisible', false);
             }
         };
         return {

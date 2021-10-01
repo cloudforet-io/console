@@ -119,8 +119,8 @@ import {
 
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import EventRuleContent from '@/services/project/project-detail/project-alert-manager/project-alert-event-rule/modules/EventRuleContent.vue';
-import EventRuleForm from '@/services/project/project-detail/project-alert-manager/project-alert-event-rule/modules/EventRuleForm.vue';
+import EventRuleContent from '@/services/project/project-detail/project-alert/project-alert-event-rule/modules/EventRuleContent.vue';
+import EventRuleForm from '@/services/project/project-detail/project-alert/project-alert-event-rule/modules/EventRuleForm.vue';
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';

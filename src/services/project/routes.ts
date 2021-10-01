@@ -5,16 +5,16 @@ const ProjectDetailPage = () => import(/* webpackChunkName: "ProjectDetailPage" 
 
 const ProjectDashboardPage = () => import(/* webpackChunkName: "ProjectDashboardPage" */ '@/services/project/project-detail/project-summary/ProjectSummaryPage.vue');
 const ProjectMemberPage = () => import(/* webpackChunkName: "ProjectMemberPage" */ '@/services/project/project-detail/project-member/ProjectMemberPage.vue');
-const ProjectAlertManagerPage = () => import(/* webpackChunkName: "ProjectAlertManagerPage" */ '@/services/project/project-detail/project-alert-manager/ProjectAlertManagerPage.vue');
+const ProjectAlertPage = () => import(/* webpackChunkName: "ProjectAlertPage" */ '@/services/project/project-detail/project-alert/ProjectAlertPage.vue');
 const ProjectNotificationsPage = () => import(/* webpackChunkName: "ProjectNotificationsPage" */ '@/services/project/project-detail/project-notification/ProjectNotificationPage.vue');
 const ProjectTagPage = () => import(/* webpackChunkName: "ProjectTagPage" */ '@/services/project/project-detail/project-tag/ProjectTagPage.vue');
-const ProjectAlertEventRulePage = () => import(/* webpackChunkName: "ProjectAlertEventRulePage" */ '@/services/project/project-detail/project-alert-manager/project-alert-event-rule/ProjectAlertEventRulePage.vue');
+const ProjectAlertEventRulePage = () => import(/* webpackChunkName: "ProjectAlertEventRulePage" */ '@/services/project/project-detail/project-alert/project-alert-event-rule/ProjectAlertEventRulePage.vue');
 const AddNotificationPage = () => import(/* webpackChunkName: "AddNotificationPage" */ '@/services/notification/notification-add/NotificationAddPage.vue');
 
-const ProjectAlertListPage = () => import(/* webpackChunkName: "ProjectAlertListPage" */ '@/services/project/project-detail/project-alert-manager/project-alert/ProjectAlertPage.vue');
-const ProjectMaintenanceWindowPage = () => import(/* webpackChunkName: "ProjectMaintenanceWindowPage" */ '@/services/project/project-detail/project-alert-manager/project-maintenance-window/ProjectMaintenanceWindowPage.vue');
-const ProjectWebhookPage = () => import(/* webpackChunkName: "ProjectWebhookPage" */ '@/services/project/project-detail/project-alert-manager/project-webhook/ProjectWebhookPage.vue');
-const ProjectAlertSettingsPage = () => import(/* webpackChunkName: "ProjectAlertSettingsPage" */ '@/services/project/project-detail/project-alert-manager/project-alert-settings/ProjectAlertSettingsPage.vue');
+const ProjectAlertListPage = () => import(/* webpackChunkName: "ProjectAlertListPage" */ '@/services/project/project-detail/project-alert/project-alert-list/ProjectAlertListPage.vue');
+const ProjectMaintenanceWindowPage = () => import(/* webpackChunkName: "ProjectMaintenanceWindowPage" */ '@/services/project/project-detail/project-alert/project-maintenance-window/ProjectMaintenanceWindowPage.vue');
+const ProjectWebhookPage = () => import(/* webpackChunkName: "ProjectWebhookPage" */ '@/services/project/project-detail/project-alert/project-webhook/ProjectWebhookPage.vue');
+const ProjectAlertSettingsPage = () => import(/* webpackChunkName: "ProjectAlertSettingsPage" */ '@/services/project/project-detail/project-alert/project-alert-settings/ProjectAlertSettingsPage.vue');
 
 
 export const PROJECT_ROUTE = Object.freeze({
@@ -84,7 +84,7 @@ export default {
                             name: PROJECT_ROUTE.DETAIL.TAB.ALERT._NAME,
                             redirect: 'alert/alert',
                             props: true,
-                            component: ProjectAlertManagerPage,
+                            component: ProjectAlertPage,
                             children: [
                                 {
                                     path: 'alert',

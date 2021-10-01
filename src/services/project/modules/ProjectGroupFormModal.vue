@@ -59,11 +59,11 @@ export default {
     setup(props, { root }) {
         const state = reactive({
             proxyVisible: computed({
-                get() { return store.state.projectPage.projectGroupFormVisible; },
-                set(val) { store.commit('projectPage/setProjectGroupFormVisible', val); },
+                get() { return store.state.service.project.projectGroupFormVisible; },
+                set(val) { store.commit('service/project/setProjectGroupFormVisible', val); },
             }),
-            updateMode: computed(() => store.state.projectPage.projectGroupFormUpdateMode),
-            currentGroupId: computed(() => store.getters['projectPage/actionTargetNodeData']?.id),
+            updateMode: computed(() => store.state.service.project.projectGroupFormUpdateMode),
+            currentGroupId: computed(() => store.getters['service/project/actionTargetNodeData']?.id),
             projectGroupNames: [] as string[],
             projectGroupName: undefined as undefined | string,
             projectGroupNameInvalidText: computed(() => {
@@ -109,7 +109,7 @@ export default {
 
         const createProjectGroup = async (item) => {
             try {
-                await store.dispatch('projectPage/createProjectGroup', item);
+                await store.dispatch('service/project/createProjectGroup', item);
                 await store.dispatch('resource/projectGroup/load');
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '', root);
             } catch (e) {
@@ -120,7 +120,7 @@ export default {
 
         const updateProjectGroup = async (item) => {
             try {
-                await store.dispatch('projectPage/updateProjectGroup', item);
+                await store.dispatch('service/project/updateProjectGroup', item);
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', root);
             } catch (e) {
                 showErrorMessage(i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e, root);
@@ -144,7 +144,7 @@ export default {
             else await updateProjectGroup(item);
 
             state.loading = false;
-            store.commit('projectPage/setProjectGroupFormVisible', false);
+            store.commit('service/project/setProjectGroupFormVisible', false);
         };
 
         watch(() => state.currentGroupId, async (after) => {

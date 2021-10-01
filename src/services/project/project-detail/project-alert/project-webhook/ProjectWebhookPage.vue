@@ -140,8 +140,8 @@ import {
     PSelectDropdown,
     PTableCheckModal,
 } from '@spaceone/design-system';
-import WebhookAddFormModal from '@/services/project/project-detail/project-alert-manager/project-webhook/modules/WebhookAddFormModal.vue';
-import WebhookUpdateFormModal from '@/services/project/project-detail/project-alert-manager/project-webhook/modules/WebhookUpdateFormModal.vue';
+import WebhookAddFormModal from '@/services/project/project-detail/project-alert/project-webhook/modules/WebhookAddFormModal.vue';
+import WebhookUpdateFormModal from '@/services/project/project-detail/project-alert/project-webhook/modules/WebhookUpdateFormModal.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
