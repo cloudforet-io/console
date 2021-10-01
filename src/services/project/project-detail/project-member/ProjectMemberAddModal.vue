@@ -17,7 +17,7 @@
                         <span> ({{ formState.users.length }})</span>
                     </p>
                     <p class="text">
-                        {{ $t('PROJECT.DETAIL.MEMBER.MEMBER_HELP_TEXT', { user_type: activeTab }) }}
+                        {{ $t('PROJECT.DETAIL.MEMBER.MEMBER_HELP_TEXT') }}
                     </p>
                     <p-search-dropdown
                         v-show="activeTab === FORM_MODE.INTERNAL_USER"
@@ -515,6 +515,7 @@ export default {
         .title {
             font-size: 1.375rem;
             line-height: 1.45;
+            padding-bottom: 0.25rem;
         }
         .text {
             font-size: 0.875rem;
