@@ -1,3 +1,10 @@
+# [1.1.0-beta.141](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.140...v1.1.0-beta.141) (2021-10-01)
+
+
+### Reverts
+
+* Revert "fix: add white space pre-line to collapsible panel (#694)" (#696) ([3d681f6](https://github.com/spaceone-dev/spaceone-design-system/commit/3d681f6a1f7f834be160802459fa2c86dc491872)), closes [#694](https://github.com/spaceone-dev/spaceone-design-system/issues/694) [#696](https://github.com/spaceone-dev/spaceone-design-system/issues/696)
+
 # [1.1.0-beta.140](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.139...v1.1.0-beta.140) (2021-10-01)
 
 
