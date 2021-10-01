@@ -86,7 +86,6 @@ export default defineComponent({
         font-size: 0.75rem;
         line-height: 1.5;
         word-break: break-word;
-        white-space: pre-line;
         z-index: 0;
         .text {
             &.collapsed, &.fake {
