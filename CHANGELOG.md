@@ -1,3 +1,10 @@
+# [1.1.0-beta.140](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.139...v1.1.0-beta.140) (2021-10-01)
+
+
+### Bug Fixes
+
+* set PDataLoader height ([#695](https://github.com/spaceone-dev/spaceone-design-system/issues/695)) ([8391386](https://github.com/spaceone-dev/spaceone-design-system/commit/8391386b29c9b6b49a05c6c788d78ff418a43188))
+
 # [1.1.0-beta.139](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.138...v1.1.0-beta.139) (2021-10-01)
 
 
