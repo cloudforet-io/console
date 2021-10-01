@@ -70,4 +70,8 @@ spec:
 {{- toYaml .Values.global.frontend.volumes | nindent 8 }}
 {{- end }}
 
+{{- if .Values.pod.spec }}
+{{- toYaml .Values.pod.spec | nindent 6 }}
+{{- end }}
+
 {{- end }}
