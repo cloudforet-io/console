@@ -1,3 +1,10 @@
+# [1.1.0-beta.139](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.138...v1.1.0-beta.139) (2021-10-01)
+
+
+### Bug Fixes
+
+* add white space pre-line to collapsible panel ([#694](https://github.com/spaceone-dev/spaceone-design-system/issues/694)) ([b87493f](https://github.com/spaceone-dev/spaceone-design-system/commit/b87493f264fb92b4253e071f8e55ef1baccbd0d5))
+
 # [1.1.0-beta.138](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.137...v1.1.0-beta.138) (2021-09-30)
 
 
