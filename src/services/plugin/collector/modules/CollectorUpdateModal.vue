@@ -52,7 +52,7 @@
                         />
                     </p-field-group>
                     <p-field-group :label="$t('PLUGIN.COLLECTOR.CREATE.AUTO_UPGRADE_LABEL')" :required="true">
-                        <p-toggle-button :value="inputModel.isAutoUpgrade" @change="onChangeAutoUpgrade" />
+                        <p-toggle-button :value="inputModel.isAutoUpgrade" sync @change="onChangeAutoUpgrade" />
                     </p-field-group>
                 </div>
             </div>

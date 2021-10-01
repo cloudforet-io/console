@@ -150,7 +150,7 @@ export default {
                     description: state.description,
                 });
                 showSuccessMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_S_CREATE'), '', root);
-                emit('refresh');
+                emit('confirm');
             } catch (e) {
                 showErrorMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_CREATE'), e, root);
                 throw e;

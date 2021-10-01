@@ -107,7 +107,7 @@
                 </template>
             </p-toolbox-table>
         </div>
-        <alert-form-modal :visible.sync="visibleAlertFormModal" :project-id="projectId" @refresh="getAlerts()" />
+        <alert-form-modal :visible.sync="visibleAlertFormModal" :project-id="projectId" @confirm="onAlertFormConfirm" />
     </fragment>
 </template>
 <script lang="ts">
@@ -398,6 +398,11 @@ export default {
             await getAlerts();
         };
 
+        const onAlertFormConfirm = () => {
+            emit('change-list');
+            getAlerts();
+        };
+
         /* Init */
         const initPage = () => {
             (async () => {
@@ -435,6 +440,7 @@ export default {
             onChange,
             onExportToExcel,
             onUpdateBottomFilters,
+            onAlertFormConfirm,
             iso8601Formatter,
             alertDurationFormatter,
             commaFormatter,

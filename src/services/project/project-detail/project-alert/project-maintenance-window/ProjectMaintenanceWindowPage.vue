@@ -90,7 +90,7 @@ import { store } from '@/store';
 import MaintenanceWindowFormModal from '@/services/project/project-detail/modules/MaintenanceWindowFormModal.vue';
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { PROJECT_ROUTE } from '@/services/project/routes';
-import { MAINTENANCE_WINDOW_STATE } from '@/services/project/project-detail/project-alert-manager/project-maintenance-window/lib/config';
+import { MAINTENANCE_WINDOW_STATE } from '@/services/project/project-detail/project-alert/project-maintenance-window/lib/config';
 
 
 const keyItemSets: KeyItemSet[] = [

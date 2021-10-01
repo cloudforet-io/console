@@ -1,6 +1,6 @@
 import { TimeStamp } from '@/models';
 import { TreeItem, Tree } from '@spaceone/design-system/dist/src/data-display/tree/type';
-import { MAINTENANCE_WINDOW_STATE } from '@/services/project/project-detail/project-alert-manager/project-maintenance-window/lib/config';
+import { MAINTENANCE_WINDOW_STATE } from '@/services/project/project-detail/project-alert/project-maintenance-window/lib/config';
 
 export type ItemType = 'PROJECT_GROUP'|'PROJECT'
 

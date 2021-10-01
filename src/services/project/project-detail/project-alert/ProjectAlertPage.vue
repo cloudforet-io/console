@@ -39,7 +39,7 @@ import { store } from '@/store';
 
 
 export default {
-    name: 'ProjectAlertManagerPage',
+    name: 'ProjectAlertPage',
     components: {
         PButtonTab,
         PButton,

@@ -135,8 +135,8 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            groupId: computed(() => store.getters['projectPage/groupId']),
-            groupName: computed(() => store.getters['projectPage/groupName']),
+            groupId: computed(() => store.getters['service/project/groupId']),
+            groupName: computed(() => store.getters['service/project/groupName']),
             searchText: '' as string,
             trimmedValue: computed<string>(() => (typeof state.searchText === 'string' ? state.searchText.trim() : '')),
             regex: computed(() => {
@@ -264,11 +264,11 @@ export default {
             if (!val) val = '';
 
             if (state.groupId !== groupId) {
-                store.dispatch('projectPage/selectNode', groupId);
+                store.dispatch('service/project/selectNode', groupId);
             }
 
-            if (store.state['projectPage/searchText'] !== val) {
-                store.commit('projectPage/setSearchText', val);
+            if (store.state['service/project/searchText'] !== val) {
+                store.commit('service/project/setSearchText', val);
             }
 
             if (hide) hideMenu();
@@ -313,7 +313,7 @@ export default {
 
         if (vm.$route.query.search) {
             state.searchText = vm.$route.query.search as string;
-            store.commit('projectPage/setSearchText', vm.$route.query.search as string);
+            store.commit('service/project/setSearchText', vm.$route.query.search as string);
         }
 
 

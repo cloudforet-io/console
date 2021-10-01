@@ -102,8 +102,8 @@
                     <project-group-delete-check-modal v-if="storeState.projectGroupDeleteCheckModalVisible" />
 
                     <project-group-member v-if="groupMemberPageVisible && storeState.groupId"
-                                               :group-id="storeState.groupId"
-                                               @close="groupMemberPageVisible = false"
+                                          :group-id="storeState.groupId"
+                                          @close="groupMemberPageVisible = false"
                     />
                 </div>
             </template>
@@ -141,6 +141,7 @@ import ProjectPageStoreModule from '@/services/project/store';
 import { ProjectPageState } from '@/services/project/store/type';
 import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
 import ProjectGroupDeleteCheckModal from '@/services/project/modules/ProjectGroupDeleteCheckModal.vue';
+import { registerServiceStore } from '@/common/composables/register-service-store';
 
 
 export default {
@@ -166,46 +167,31 @@ export default {
     setup() {
         const vm: ComponentRenderProxy = getCurrentInstance() as ComponentRenderProxy;
 
-        /* Ready ProjectGroupPage Store */
-        const registerStore = () => {
-            if (!store.hasModule('projectPage')) {
-                store.registerModule<ProjectPageState>('projectPage', ProjectPageStoreModule);
+        registerServiceStore<ProjectPageState>('project', ProjectPageStoreModule);
+
+        /* Query String */
+        store.subscribe(({ type, payload }) => {
+            if (type === 'service/project/setSelectedItem') {
+                vm.$router.replace({
+                    query: {
+                        // eslint-disable-next-line camelcase
+                        select_pg: payload.node?.data.id || null,
+                    },
+                }).catch(() => {});
             }
-
-            /* Query String */
-            store.subscribe(({ type, payload }) => {
-                if (type === 'projectPage/setSelectedItem') {
-                    vm.$router.replace({
-                        query: {
-                            // eslint-disable-next-line camelcase
-                            select_pg: payload.node?.data.id || null,
-                        },
-                    }).catch(() => {});
-                }
-            });
-        };
-
-        registerStore();
-
-        // unregister when leave page
-        onUnmounted(() => {
-            store.unregisterModule('projectPage');
         });
 
-        // this is for hot reloading
-        onMounted(() => { registerStore(); });
-
         const storeState = reactive({
-            groupId: computed(() => store.getters['projectPage/groupId']),
-            groupName: computed(() => store.getters['projectPage/groupName']),
-            searchText: computed(() => store.state.projectPage.searchText),
-            selectedItem: computed(() => store.state.projectPage.selectedItem),
-            selectedNodeData: computed(() => store.getters['projectPage/selectedNodeData']),
-            parentGroups: computed(() => store.getters['projectPage/parentGroups']),
-            hasProjectGroup: computed(() => store.state.projectPage.hasProjectGroup),
-            projectCount: computed(() => store.state.projectPage.projectCount),
-            projectGroupFormVisible: computed(() => store.state.projectPage.projectGroupFormVisible),
-            projectGroupDeleteCheckModalVisible: computed(() => store.state.projectPage.projectGroupDeleteCheckModalVisible),
+            groupId: computed(() => store.getters['service/project/groupId']),
+            groupName: computed(() => store.getters['service/project/groupName']),
+            searchText: computed(() => store.state.service.project.searchText),
+            selectedItem: computed(() => store.state.service.project.selectedItem),
+            selectedNodeData: computed(() => store.getters['service/project/selectedNodeData']),
+            parentGroups: computed(() => store.getters['service/project/parentGroups']),
+            hasProjectGroup: computed(() => store.state.service.project.hasProjectGroup),
+            projectCount: computed(() => store.state.service.project.projectCount),
+            projectGroupFormVisible: computed(() => store.state.service.project.projectGroupFormVisible),
+            projectGroupDeleteCheckModalVisible: computed(() => store.state.service.project.projectGroupDeleteCheckModalVisible),
         });
 
         const state = reactive({
@@ -249,7 +235,7 @@ export default {
             if (item.resourceType === 'identity.ProjectGroup') {
                 e.preventDefault();
                 if (storeState.groupId !== item.id) {
-                    await store.dispatch('projectPage/selectNode', item.id);
+                    await store.dispatch('service/project/selectNode', item.id);
                 }
             }
         };
@@ -257,17 +243,17 @@ export default {
 
         /* Navigation */
         const onProjectGroupNavClick = async (item: {name: string; data: ProjectGroup}) => {
-            if (item.data) await store.dispatch('projectPage/selectNode', item.data.id);
+            if (item.data) await store.dispatch('service/project/selectNode', item.data.id);
         };
 
 
         /* Handling Forms */
         const openProjectGroupDeleteCheckModal = () => {
-            store.dispatch('projectPage/openProjectGroupDeleteCheckModal', storeState.selectedItem);
+            store.dispatch('service/project/openProjectGroupDeleteCheckModal', storeState.selectedItem);
         };
 
         const openProjectGroupUpdateForm = () => {
-            store.dispatch('projectPage/openProjectGroupUpdateForm', storeState.selectedItem);
+            store.dispatch('service/project/openProjectGroupUpdateForm', storeState.selectedItem);
         };
 
         const onSelectSettingDropdown = (name) => {
@@ -279,7 +265,7 @@ export default {
         };
 
         const openProjectGroupCreateForm = () => {
-            store.dispatch('projectPage/openProjectGroupCreateForm');
+            store.dispatch('service/project/openProjectGroupCreateForm');
         };
 
         const openProjectGroupMemberPage = () => {
@@ -287,7 +273,7 @@ export default {
         };
 
         const openProjectForm = () => {
-            store.dispatch('projectPage/openProjectCreateForm', storeState.selectedItem);
+            store.dispatch('service/project/openProjectCreateForm', storeState.selectedItem);
         };
 
         /* Member Count */
@@ -317,7 +303,7 @@ export default {
             if (storeState.groupId && !visible) {
                 await getMemberCount(storeState.groupId);
                 if (state.isPermissionDenied) {
-                    store.commit('projectPage/addPermissionInfo', {
+                    store.commit('service/project/addPermissionInfo', {
                         [storeState.groupId]: false,
                     });
                 }

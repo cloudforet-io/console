@@ -138,9 +138,9 @@ export default {
 
         const state = reactive({
             loading: false,
-            rootNode: computed(() => store.state.projectPage.rootNode),
-            permissionInfo: computed(() => store.state.projectPage.permissionInfo),
-            treeEditMode: computed(() => store.state.projectPage.treeEditMode),
+            rootNode: computed(() => store.state.service.project.rootNode),
+            permissionInfo: computed(() => store.state.service.project.permissionInfo),
+            treeEditMode: computed(() => store.state.service.project.treeEditMode),
             editOptions: computed(() => ({
                 disabled: !state.treeEditMode,
                 editStartValidator: item => (state.permissionInfo[item.data.id] || item.data.has_permission) && (item.data.item_type !== 'PROJECT'),
@@ -199,19 +199,19 @@ export default {
         });
 
         const openProjectGroupDeleteCheckModal = (item) => {
-            store.dispatch('projectPage/openProjectGroupDeleteCheckModal', item);
+            store.dispatch('service/project/openProjectGroupDeleteCheckModal', item);
         };
 
         const openProjectGroupCreateForm = (item = {}) => {
-            store.dispatch('projectPage/openProjectGroupCreateForm', item);
+            store.dispatch('service/project/openProjectGroupCreateForm', item);
         };
 
         const startTreeEdit = () => {
-            store.commit('projectPage/setTreeEditMode', true);
+            store.commit('service/project/setTreeEditMode', true);
         };
 
         const finishTreeEdit = () => {
-            store.commit('projectPage/setTreeEditMode', false);
+            store.commit('service/project/setTreeEditMode', false);
         };
 
         const getAllCurrentItems = (): {path: number[]; node: any}[] => {
@@ -243,11 +243,11 @@ export default {
                 const { items } = await SpaceConnector.client.identity.project.tree(params);
 
                 if (!node.data) {
-                    store.commit('projectPage/setHasProjectGroup', Array.isArray(items) ? !!items.length : false);
+                    store.commit('service/project/setHasProjectGroup', Array.isArray(items) ? !!items.length : false);
                 }
 
                 store.dispatch(
-                    'projectPage/addPermissionInfo',
+                    'service/project/addPermissionInfo',
                     items.filter(d => d.item_type === 'PROJECT_GROUP')
                         .map(d => d.id),
                 );
@@ -349,8 +349,8 @@ export default {
                 await SpaceConnector.client.identity.project.update(params);
 
                 // this is for refresh project list cards
-                if (store.getters['projectPage/groupId'] === state.dragParent?.data.id || store.getters['projectPage/groupId'] === parent.data.id) {
-                    store.commit('projectPage/setSelectedItem', { ...store.state.projectPage.selectedItem });
+                if (store.getters['service/project/groupId'] === state.dragParent?.data.id || store.getters['service/project/groupId'] === parent.data.id) {
+                    store.commit('service/project/setSelectedItem', { ...store.state.service.project.selectedItem });
                 }
 
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT'), '', vm.$root);
@@ -382,16 +382,16 @@ export default {
         };
 
         const onChangeSelect = (selected) => {
-            store.commit('projectPage/setSelectedItem', selected[0] || {});
+            store.commit('service/project/setSelectedItem', selected[0] || {});
         };
 
         const onAllProjectChangeSelect = (selected) => {
-            if (selected.length > 0 && store.getters['projectPage/groupId'] && state.rootNode) {
+            if (selected.length > 0 && store.getters['service/project/groupId'] && state.rootNode) {
                 state.rootNode.resetSelect();
             }
         };
 
-        watch(() => store.getters['projectPage/groupId'], (data) => {
+        watch(() => store.getters['service/project/groupId'], (data) => {
             if (!state.allProjectRoot) return;
             if (data) {
                 state.allProjectRoot.resetSelect();
@@ -403,7 +403,7 @@ export default {
 
         /* Init */
         const onTreeInit = (root) => {
-            store.dispatch('projectPage/initRoot', root);
+            store.dispatch('service/project/initRoot', root);
         };
 
         const onAllProjectTreeInit = (root) => {
@@ -412,11 +412,11 @@ export default {
 
         watch([() => state.rootNode, () => state.allProjectRoot], async ([rootNode, allProjectRoot]) => {
             if (rootNode && allProjectRoot) {
-                if (store.state.projectPage.isInitiated) return;
+                if (store.state.service.project.isInitiated) return;
 
                 state.loading = true;
                 if (props.initGroupId) {
-                    const res = await store.dispatch('projectPage/selectNode', props.initGroupId);
+                    const res = await store.dispatch('service/project/selectNode', props.initGroupId);
                     if (!res) {
                         allProjectRoot.changeSelectState(state.allProjectNode, [0]);
                         await rootNode.fetchData();
@@ -425,7 +425,7 @@ export default {
                     allProjectRoot.changeSelectState(state.allProjectNode, [0]);
                     await rootNode.fetchData();
                 }
-                store.commit('projectPage/setIsInitiated', true);
+                store.commit('service/project/setIsInitiated', true);
                 state.loading = false;
             }
         }, { immediate: true });

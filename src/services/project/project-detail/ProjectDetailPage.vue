@@ -117,6 +117,9 @@ import { commaFormatter } from '@spaceone/console-core-lib';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import MaintenanceHappeningList from '@/services/project/project-detail/modules/MaintenanceHappeningList.vue';
 import Vue from 'vue';
+import { registerServiceStore } from '@/common/composables/register-service-store';
+import { ProjectDetailState } from '@/services/project/project-detail/store/type';
+import ProjectDetailStoreModule from '@/services/project/project-detail/store';
 
 export default {
     name: 'ProjectDetailPage',
@@ -139,10 +142,14 @@ export default {
     },
     setup(props, { root }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+
+        registerServiceStore<ProjectDetailState>('projectDetail', ProjectDetailStoreModule);
+        store.commit('service/projectDetail/setProjectId', vm.$route.params.id);
+
         const state = reactive({
             loading: true,
             item: null as null|ProjectModel,
-            projectId: computed(() => root.$route.params.id),
+            projectId: computed(() => store.state.service.projectDetail.projectId),
             projectName: computed(() => state.item?.name || ''),
             projectGroupId: computed(() => state.item?.project_group_info?.project_group_id || ''),
             projectGroupName: computed(() => state.item?.project_group_info?.name || ''),
@@ -158,9 +165,8 @@ export default {
             ]),
             users: computed(() => store.state.resource.user.items),
             maintenanceWindowFormVisible: false,
-            alertStateCounts: [],
             counts: computed(() => ({
-                TRIGGERED: find(state.alertStateCounts, { state: ALERT_STATE.TRIGGERED })?.total || 0,
+                TRIGGERED: find(store.state.service.projectDetail.alertCounts, { state: ALERT_STATE.TRIGGERED })?.total || 0,
             })),
             maintenanceHappeningListRef: null as null|Vue,
         });
@@ -275,18 +281,6 @@ export default {
             if (state.maintenanceHappeningListRef) state.maintenanceHappeningListRef.reload();
         };
 
-        const statAlerts = async () => {
-            try {
-                const { results } = await SpaceConnector.client.monitoring.dashboard.alertCountByState({
-                    project_id: state.projectId,
-                });
-                state.alertStateCounts = results;
-            } catch (e) {
-                state.alertStateCounts = [];
-                console.error(e);
-            }
-        };
-
         /** Init */
         watch(() => state.projectId, async (projectId) => {
             if (projectId) await getProject(projectId);
@@ -302,7 +296,7 @@ export default {
                 store.dispatch('favorite/project/load'),
                 store.dispatch('resource/user/load'),
                 store.dispatch('resource/provider/load'),
-                statAlerts(),
+                store.dispatch('service/projectDetail/getAlertCounts'),
             ]);
         })();
 
@@ -322,7 +316,6 @@ export default {
             onProjectFormComplete,
             onChangeTab,
             onCreateMaintenanceWindow,
-            statAlerts,
             ALERT_STATE,
             commaFormatter,
         };

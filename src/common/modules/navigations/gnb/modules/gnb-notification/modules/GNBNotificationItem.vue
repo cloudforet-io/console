@@ -149,6 +149,7 @@ export default {
         }
         .contents {
             opacity: 0.8;
+            white-space: pre-line;
 
             &.link {
                 @apply text-blue-800;
