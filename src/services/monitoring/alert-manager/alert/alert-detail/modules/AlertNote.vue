@@ -18,9 +18,7 @@
                     </div>
                 </template>
                 <template #default="{data}">
-                    <p class="note-content">
-                        {{ data.note }}
-                    </p>
+                    <span class="note-content">{{ data.note }}</span>
                 </template>
             </p-collapsible-list>
         </article>
@@ -200,6 +198,9 @@ export default {
         display: flex;
         align-items: center;
         justify-content: space-between;
+    }
+    .note-content {
+        white-space: pre-line;
     }
     .author {
         @apply text-blue-900 font-bold;
