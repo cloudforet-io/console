@@ -115,5 +115,8 @@ export default defineComponent<Props>({
             @apply border-b-0 rounded-b-lg;
         }
     }
+    .p-data-loader {
+        height: 100%;
+    }
 }
 </style>
