@@ -160,13 +160,22 @@ export default {
                     type: 'item',
                     name: 'update',
                     label: vm.$t('IDENTITY.USER.MAIN.UPDATE'),
-                    disabled: memberTableState.selectIndex.length > 1 || !memberTableState.isSelected || !!memberTableState.selectedItems.find(d => !!d.project_group_info),
+                    disabled: memberTableState.selectIndex.length !== 1 || (
+                        props.isProjectGroup
+                            ? props.projectGroupId !== memberTableState.selectedItems[0]?.project_group_info?.project_group_id
+                            : !!memberTableState.selectedItems[0]?.project_group_info
+                    ),
                 },
                 {
                     type: 'item',
                     name: 'delete',
                     label: vm.$t('IDENTITY.USER.MAIN.DELETE'),
-                    disabled: !memberTableState.isSelected || !!memberTableState.selectedItems.find(d => !!d.project_group_info),
+                    disabled: !memberTableState.selectedItems.length
+                        || (
+                            props.isProjectGroup
+                                ? !!memberTableState.selectedItems.find(d => props.projectGroupId !== d.project_group_info?.project_group_id)
+                                : !!memberTableState.selectedItems.find(d => !!d.project_group_info)
+                        ),
                 },
             ] as MenuItem[])),
         });
