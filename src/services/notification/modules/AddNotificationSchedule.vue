@@ -28,6 +28,7 @@
                                    :items="startTimeList"
                                    :invalid="!isScheduleValid"
                                    class="dropdown"
+                                   use-fixed-menu-style
                                    @select="onSelectStartHour"
                 />
                 <span class="text">{{ $t('IDENTITY.USER.NOTIFICATION.FORM.TO') }}</span>
@@ -35,6 +36,7 @@
                                    :items="endTimeList"
                                    :invalid="!isScheduleValid"
                                    class="dropdown"
+                                   use-fixed-menu-style
                                    @select="onSelectEndHour"
                 />
                 <span class="timezone-text">{{ $t('COMMON.PROFILE.TIMEZONE') }}: {{ timezone }}</span>
@@ -82,6 +84,11 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const timezoneForFormatter = computed(() => store.state.user.timezone).value;
 
+        const checkInvalidByHour = (startHour: number, endHour: number) => {
+            if (startHour === 0 && endHour === 0) return true;
+            return startHour !== endHour;
+        };
+
         const state = reactive({
             scheduleMode: computed(() => [{
                 label: vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALL_TIME'), value: false,
@@ -105,7 +112,8 @@ export default {
                 end_hour: timezoneToUtcFormatter(18, timezoneForFormatter),
             },
             timezone: computed(() => store.state.user.timezone),
-            isScheduleValid: computed(() => (state.proxySchedule.start_hour !== state.proxySchedule.end_hour) || !state.proxyIsScheduled),
+            // isScheduleValid: computed(() => (state.proxySchedule.start_hour !== state.proxySchedule.end_hour) || !state.proxyIsScheduled),
+            isScheduleValid: computed(() => checkInvalidByHour(state.proxySchedule.start_hour, state.proxySchedule.end_hour) || !state.proxyIsScheduled),
         });
 
         const emitChange = () => {
