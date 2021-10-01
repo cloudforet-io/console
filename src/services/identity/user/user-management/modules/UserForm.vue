@@ -20,7 +20,7 @@
                                :valid-text="validationState.userIdValidText"
                 >
                     <template #default="{invalid}">
-                        <div v-if="formState.activeTab === 'external'">
+                        <div v-if="formState.activeTab === 'external' && supportFind">
                             <p-search-dropdown
                                 v-model="searchText"
                                 :class="{invalid}"
@@ -218,6 +218,7 @@ export default {
             isSameId: false,
             // external user
             loading: false,
+            supportFind: computed(() => !!store.state.domain.authOptions?.support_find),
             users: computed(() => store.state.resource.user.items),
             searchText: '',
             externalItems: [] as MenuItem[],
@@ -283,7 +284,6 @@ export default {
         };
 
         const checkUserID = async () => {
-            console.log('check user id');
             const validation: Validation[] = await Promise.all([
                 checkRequiredField(formState.user_id),
                 checkDuplicateID(formState.user_id),

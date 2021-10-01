@@ -283,7 +283,7 @@ export default {
         @apply grid;
         display: grid;
         gap: 0.125rem;
-        height: 6.75rem;
+        max-height: 6.75rem;
 
         .table-row {
             @apply grid grid-cols-12;
