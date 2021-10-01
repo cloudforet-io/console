@@ -1655,7 +1655,7 @@
 				"LABEL_LABEL": "Label",
 				"LABEL_PLACEHOLDER": "ex. Developer",
 				"MEMBER": "Member",
-				"MEMBER_HELP_TEXT": "Select project members to add from {user_type}.",
+				"MEMBER_HELP_TEXT": "Select project members.",
 				"NO_MEMBER": "No Member",
 				"NO_RESULTS_FOUND": "No Results Found",
 				"NO_RESULTS_FOUND_HELP_TEXT": "We can’t find any item matching your search.",
