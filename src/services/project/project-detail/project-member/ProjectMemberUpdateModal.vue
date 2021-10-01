@@ -240,7 +240,7 @@ export default {
                 user_id: state.userId,
                 labels,
             });
-            showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_ADD_MEMBER'), '', root);
+            showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_UPDATE_MEMBER'), '', root);
         };
 
         const editProjectGroupMember = async (labels) => {
@@ -250,7 +250,7 @@ export default {
                 user_id: state.userId,
                 labels,
             });
-            showSuccessMessage('Successfully modified project group member', '', root);
+            showSuccessMessage(vm.$t('PROJECT.DETAIL.ALT_S_UPDATE_GROUP_MEMBER'), '', root);
         };
 
         const confirm = async () => {
@@ -264,7 +264,8 @@ export default {
                     if (props.isProjectGroup) await editProjectGroupMember(labels);
                     else await editProjectMember(labels);
                 } catch (e) {
-                    showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_ADD_MEMBER'), e, root);
+                    if (props.isProjectGroup) showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_UPDATE_GROUP_MEMBER'), e, root);
+                    else showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'), e, root);
                 } finally {
                     emit('confirm');
                     proxyVisible.value = false;

@@ -19,7 +19,7 @@
                                @mouseenter="link ? changeLinkMouseEnterState(true) : undefined"
                                @mouseleave="link ? changeLinkMouseEnterState(false) : undefined"
                     >
-                        {{ contents }}
+                        <span>{{ contents }}</span>
                     </component>
                 </p-collapsible-panel>
                 <div class="datetime">
