@@ -18,23 +18,23 @@
                         {{ userId }}
                     </span>
                 </p>
-                <p-field-group
-                    :label="$t('PROJECT.DETAIL.PROJECT_ROLE')"
-                    :required="true"
-                    :invalid="validationState.isProjectRoleValid === false"
-                    :invalid-text="validationState.projectRoleCheckInvalidText"
-                    class="dropdown"
-                >
-                    <template #default="{invalid}">
-                        <p-select-dropdown v-model="projectRole"
-                                           :items="projectRoleList"
-                                           :disabled="projectRoleList.length < 1"
-                                           use-fixed-menu-style
-                        >
-                            {{ $t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_ROLE') }}
-                        </p-select-dropdown>
-                    </template>
-                </p-field-group>
+<!--                <p-field-group-->
+<!--                    :label="$t('PROJECT.DETAIL.PROJECT_ROLE')"-->
+<!--                    :required="true"-->
+<!--                    :invalid="validationState.isProjectRoleValid === false"-->
+<!--                    :invalid-text="validationState.projectRoleCheckInvalidText"-->
+<!--                    class="dropdown"-->
+<!--                >-->
+<!--                    <template #default="{invalid}">-->
+<!--                        <p-select-dropdown v-model="projectRole"-->
+<!--                                           :items="projectRoleList"-->
+<!--                                           :disabled="projectRoleList.length < 1"-->
+<!--                                           use-fixed-menu-style-->
+<!--                        >-->
+<!--                            {{ $t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_ROLE') }}-->
+<!--                        </p-select-dropdown>-->
+<!--                    </template>-->
+<!--                </p-field-group>-->
                 <div class="label-text-wrapper">
                     <span class="label-text">
                         {{ $t('PROJECT.DETAIL.PROJECT_MEMBER_LABEL') }}
@@ -185,8 +185,8 @@ export default {
             userId: '',
         });
         const validationState = reactive({
-            isProjectRoleValid: undefined as undefined | boolean,
-            projectRoleCheckInvalidText: '' as TranslateResult | string,
+            // isProjectRoleValid: undefined as undefined | boolean,
+            // projectRoleCheckInvalidText: '' as TranslateResult | string,
             isLabelValid: undefined as undefined | boolean,
             labelInvalidText: '' as TranslateResult | string,
         });
@@ -196,27 +196,27 @@ export default {
         const proxyVisible = makeProxy('visible', props, emit);
         const projectId = root.$route.params.id;
 
-        const getRoleList = async () => {
-            const res = await SpaceConnector.client.identity.role.list({
-                // eslint-disable-next-line camelcase
-                role_type: 'PROJECT',
-            });
-            state.projectRoleList = res.results.map(d => ({
-                type: 'item',
-                label: d.name,
-                name: d.role_id,
-            }));
-        };
+        // const getRoleList = async () => {
+        //     const res = await SpaceConnector.client.identity.role.list({
+        //         // eslint-disable-next-line camelcase
+        //         role_type: 'PROJECT',
+        //     });
+        //     state.projectRoleList = res.results.map(d => ({
+        //         type: 'item',
+        //         label: d.name,
+        //         name: d.role_id,
+        //     }));
+        // };
 
-        const checkProjectRole = async () => {
-            if (state.projectRole === '') {
-                validationState.isProjectRoleValid = false;
-                validationState.projectRoleCheckInvalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_ROLE');
-            } else {
-                validationState.isProjectRoleValid = true;
-                validationState.projectRoleCheckInvalidText = '';
-            }
-        };
+        // const checkProjectRole = async () => {
+        //     if (state.projectRole === '') {
+        //         validationState.isProjectRoleValid = false;
+        //         validationState.projectRoleCheckInvalidText = vm.$t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_ROLE');
+        //     } else {
+        //         validationState.isProjectRoleValid = true;
+        //         validationState.projectRoleCheckInvalidText = '';
+        //     }
+        // };
 
         const addMemberLabel = () => {
             formState.labelTagTools.addTag(state.memberLabel);
@@ -256,10 +256,10 @@ export default {
         const confirm = async () => {
             const labels = formState.labelTagTools.tags;
 
-            await checkProjectRole();
+            // await checkProjectRole();
             await checkLabel();
 
-            if (validationState.isProjectRoleValid && validationState.isLabelValid) {
+            if (validationState.isLabelValid) {
                 try {
                     if (props.isProjectGroup) await editProjectGroupMember(labels);
                     else await editProjectMember(labels);
@@ -288,7 +288,7 @@ export default {
 
 
         (async () => {
-            await getRoleList();
+            // await getRoleList();
             await Promise.all([setCurrentProjectRole(), setCurrentUserIdAndLabel()]);
         })();
 

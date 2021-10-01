@@ -62,16 +62,7 @@
                     </div>
                 </div>
                 <!--list-->
-                <p-empty v-if="!loading && !items.length">
-                    <div>
-                        <p-i name="ic_alert" color="inherit transparent" />
-                        <p class="text">
-                            {{ $t('MONITORING.ALERT.DASHBOARD.NO_ALERT') }}
-                        </p>
-                    </div>
-                </p-empty>
-                <p-list-card v-else
-                             :items="items"
+                <p-list-card :items="items"
                              :loading="loading"
                              :hoverable="true"
                 >
@@ -91,6 +82,14 @@
                     <template #item="{item, index}">
                         <alert-list-item :item="item" :show-project-link="true" />
                     </template>
+                    <template #no-data>
+                        <div>
+                            <p-i name="ic_alert" color="inherit transparent" />
+                            <p class="text">
+                                {{ $t('MONITORING.ALERT.DASHBOARD.NO_ALERT') }}
+                            </p>
+                        </div>
+                    </template>
                 </p-list-card>
             </div>
         </div>
@@ -98,7 +97,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { find, sum } from 'lodash';
 
 import {
@@ -106,7 +104,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PBalloonTab, PListCard, PSelectStatus, PTextPagination, PSelectButton, PCheckBox, PIconButton, PEmpty, PI,
+    PBalloonTab, PListCard, PSelectStatus, PTextPagination, PSelectButton, PCheckBox, PIconButton, PI,
 } from '@spaceone/design-system';
 
 import AlertListItem from '@/services/monitoring/alert-manager/modules/AlertListItem.vue';
@@ -150,7 +148,6 @@ export default {
         PSelectButton,
         PCheckBox,
         PIconButton,
-        PEmpty,
         PI,
     },
     props: {
@@ -403,6 +400,10 @@ export default {
                     display: none;
                 }
                 .body {
+                    @apply border rounded-t-lg;
+                    border-color: inherit;
+                    width: 100%;
+                    height: 100%;
                     max-height: 14.5rem;
                     overflow-y: auto;
                 }
@@ -480,6 +481,7 @@ export default {
                         }
                     }
                     .body {
+                        @apply border-t-0 rounded-t-none;
                         max-height: 21.875rem;
                     }
                 }
