@@ -28,13 +28,11 @@ export const durationFormatter = (createdAt: string, finishedAt: string, timezon
         const minutes = Math.floor((timeDiff % 3600) / 60);
         const seconds = Math.floor((timeDiff % 60) % 60);
 
-        let duration = '';
-        if (days !== 0) duration = `${days}d ${hours}h`;
-        else if (hours !== 0) duration = `${hours}h ${minutes}m`;
-        else if (minutes !== 0) duration = `${minutes}m ${seconds}s`;
-        else if (seconds !== 0) duration = `${seconds}s`;
-
-        return duration;
+        if (timeDiff < 0) return 'now';
+        if (days !== 0) return `${days}d ${hours}h`;
+        if (hours !== 0) return ` ${hours}h ${minutes}m`;
+        if (minutes !== 0) return `${minutes}m ${seconds}s`;
+        if (seconds !== 0) return `${seconds}s`;
     }
     return null;
 };
