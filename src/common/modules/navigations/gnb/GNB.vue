@@ -98,6 +98,7 @@ import { i18n } from '@/translations';
 import config from '@/lib/config';
 import BetaMark from '@/common/components/marks/BetaMark.vue';
 import NewMark from '@/common/components/marks/NewMark.vue';
+import { BILLING_ROUTE } from '@/services/billing/routes';
 
 
 const PARENT_CATEGORY = {
@@ -105,6 +106,7 @@ const PARENT_CATEGORY = {
     inventory: 'inventory',
     identity: 'identity',
     monitoring: 'monitoring',
+    billing: 'billing',
     automation: 'automation',
     plugin: 'plugin',
     management: 'management',
@@ -201,6 +203,19 @@ export default {
                             to: { name: MONITORING_ROUTE.ALERT_MANAGER._NAME },
                             isBeta: true,
                             show: true,
+                        },
+                    ],
+                },
+                {
+                    name: PARENT_CATEGORY.billing,
+                    label: i18n.t('MENU.BILLING.BILLING'),
+                    to: { name: BILLING_ROUTE._NAME },
+                    subMenuList: [
+                        {
+                            label: i18n.t('MENU.BILLING.COST_MANAGEMENT'),
+                            to: { name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME },
+                            show: true,
+                            // isNew: true,
                         },
                     ],
                 },

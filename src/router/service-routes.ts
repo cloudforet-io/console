@@ -14,6 +14,7 @@ import projectRoute from '@/services/project/routes';
 import managementRoute from '@/services/management/routes';
 import automationRoute from '@/services/automation/routes';
 import monitoringRoute from '@/services/monitoring/routes';
+import billingRoute from '@/services/billing/routes';
 import { ERROR_ROUTE, errorRoutes } from '@/router/error-routes';
 
 
@@ -37,6 +38,7 @@ export const serviceRoutes: RouteConfig[] = [
             managementRoute,
             automationRoute,
             monitoringRoute,
+            billingRoute,
         ],
     },
     ...errorRoutes,
