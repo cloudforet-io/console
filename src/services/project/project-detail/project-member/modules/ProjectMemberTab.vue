@@ -8,6 +8,7 @@
                          :select-index.sync="memberTableState.selectIndex"
                          :loading="memberTableState.loading"
                          :total-count="memberTableState.totalCount"
+                         :search-text="memberTableState.searchText"
                          @change="onChangeMemberTable"
                          @refresh="onChangeMemberTable()"
         >
@@ -85,8 +86,8 @@ import { TranslateResult } from 'vue-i18n';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 
-import ProjectMemberAddModal from '@/services/project/project-detail/project-member/ProjectMemberAddModal.vue';
-import ProjectMemberUpdateModal from '@/services/project/project-detail/project-member/ProjectMemberUpdateModal.vue';
+import ProjectMemberAddModal from '@/services/project/project-detail/project-member/modules/ProjectMemberAddModal.vue';
+import ProjectMemberUpdateModal from '@/services/project/project-detail/project-member/modules/ProjectMemberUpdateModal.vue';
 import { Tags, TimeStamp } from '@/models';
 
 
@@ -132,14 +133,19 @@ export default {
             type: String,
             default: '',
         },
+        filters: {
+            type: Array,
+            default: () => [],
+        },
     },
-    setup(props, { root }) {
+    setup(props, { root, emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         // List api Handler for query search table
-        const memberTableQuery = new ApiQueryHelper().setPageLimit(15);
+        const memberTableQuery = new ApiQueryHelper().setPageLimit(15).setFilters(props.filters);
         const memberTableState = reactive({
             users: computed(() => vm.$store.state.resource.user.items),
+            searchText: memberTableQuery.filters.map(d => d.v).join(' ') || '',
             selectIndex: [] as number[],
             fields: [
                 { label: 'User ID', name: 'user_id', type: 'item' },
@@ -246,7 +252,9 @@ export default {
                 memberTableQuery.setPageStart(changed.pageStart);
             }
             if (changed.searchText !== undefined) {
-                memberTableQuery.setFilters([{ v: changed.searchText }]);
+                const filters = [{ v: changed.searchText }];
+                memberTableQuery.setFilters(filters);
+                emit('update-filters', filters);
             }
             await listMembers();
         };
@@ -293,9 +301,9 @@ export default {
 
         const onSelectDropdown = (name) => {
             switch (name) {
-            case 'delete': memberDeleteClick(); break;
-            case 'update': openMemberUpdateForm(); break;
-            default: break;
+                case 'delete': memberDeleteClick(); break;
+                case 'update': openMemberUpdateForm(); break;
+                default: break;
             }
         };
 

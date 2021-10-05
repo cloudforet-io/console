@@ -126,7 +126,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    reactive, toRefs, ComponentRenderProxy, computed, getCurrentInstance,
+    reactive, toRefs, ComponentRenderProxy, computed, getCurrentInstance, onActivated,
 } from '@vue/composition-api';
 
 import {
@@ -416,6 +416,10 @@ export default {
             await store.dispatch('resource/plugin/load');
             await listWebhooks();
         })();
+
+        onActivated(() => {
+            replaceUrlQuery('filters', webhookListApiQueryHelper.rawQueryStrings);
+        });
 
         return {
             ...toRefs(state),

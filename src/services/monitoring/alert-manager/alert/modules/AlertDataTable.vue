@@ -102,8 +102,8 @@
                 <template #col-webhook_id-format="{ value }">
                     {{ value ? (webhooks[value] ? webhooks[value].label : value) : ' ' }}
                 </template>
-                <template #col-triggered_by-format="{ value }">
-                    {{ value ? triggeredByFormatter(value) : ' ' }}
+                <template #col-triggered_by-format="{ value, item }">
+                    <alert-triggered-by :value="value" :project-id="item.project_id" disable-link />
                 </template>
             </p-toolbox-table>
         </div>
@@ -149,7 +149,8 @@ import {
 import {
     AlertBottomFilters, AlertListTableFilters,
 } from '@/services/monitoring/alert-manager/type';
-import { alertStateBadgeStyleTypeFormatter, triggeredByFormatter } from '@/services/monitoring/alert-manager/lib/helper';
+import { alertStateBadgeStyleTypeFormatter } from '@/services/monitoring/alert-manager/lib/helper';
+import AlertTriggeredBy from '@/services/monitoring/alert-manager/alert/modules/AlertTriggeredBy.vue';
 
 
 const DATE_TIME_FORMAT = 'YYYY-MM-DDTHH:mm:ss';
@@ -161,6 +162,7 @@ export default {
         AlertFormModal,
         AlertTableBottomFilters,
         AlertActions,
+        AlertTriggeredBy,
         PToolboxTable,
         PIconTextButton,
         PPanelTop,
@@ -444,7 +446,6 @@ export default {
             iso8601Formatter,
             alertDurationFormatter,
             commaFormatter,
-            triggeredByFormatter,
         };
     },
 };

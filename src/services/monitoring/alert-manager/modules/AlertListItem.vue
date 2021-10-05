@@ -17,7 +17,7 @@
                          style-type="primary2"
                          class="member-name"
                 >
-                    {{ users[item.assignee] ? users[item.assignee].label : item.assignee }}
+                    {{ users[item.assignee] ? users[item.assignee].name : item.assignee }}
                 </p-badge>
             </div>
             <div class="right-part">

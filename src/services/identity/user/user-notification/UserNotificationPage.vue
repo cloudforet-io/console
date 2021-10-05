@@ -17,7 +17,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import NotificationChannelList from '@/services/notification/modules/NotificationChannelList.vue';
-import {store} from "../../../../store";
+import { store } from '@/store';
 
 export default {
     name: 'NotificationPage',
@@ -31,7 +31,7 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             isAdmin: computed(() => store.getters['user/isAdmin']).value,
-        })
+        });
         const routeState = reactive({
             userRoutes: computed(() => ([
                 { name: vm.$t('IDENTITY.USER.MAIN.MY_ACCOUNT'), path: '/identity/user/account' },

@@ -27,7 +27,7 @@
                 <alert-info-project :id="id" :alert-data="data" @update="$emit('update')" />
             </template>
             <template #data-triggered_by="{ value }">
-                {{ value ? triggeredByFormatter(value) : ' ' }}
+                <alert-triggered-by :value="value" :project-id="data.project_id" disable-link />
             </template>
             <template #data-created_at>
                 {{ iso8601Formatter(data.created_at, timezone) }}
@@ -71,8 +71,8 @@ import { i18n } from '@/translations';
 import AlertInfoProject from '@/services/monitoring/alert-manager/alert/alert-detail/modules/alert-key-info/modules/AlertInfoProject.vue';
 import AlertInfoDescription
     from '@/services/monitoring/alert-manager/alert/alert-detail/modules/alert-key-info/modules/AlertInfoDescription.vue';
-import { triggeredByFormatter } from '@/services/monitoring/alert-manager/lib/helper';
 import { ALERT_SEVERITY, ALERT_SEVERITY_COLORS } from '@/services/monitoring/alert-manager/lib/config';
+import AlertTriggeredBy from '@/services/monitoring/alert-manager/alert/modules/AlertTriggeredBy.vue';
 
 interface Props {
     id: string;
@@ -87,6 +87,7 @@ type EDIT_MODE = typeof EDIT_MODE[keyof typeof EDIT_MODE];
 export default {
     name: 'AlertKeyInfo',
     components: {
+        AlertTriggeredBy,
         AlertInfoDescription,
         AlertInfoProject,
         PPaneLayout,
@@ -153,7 +154,6 @@ export default {
             referenceRouter,
             EDIT_MODE,
             MONITORING_ROUTE,
-            triggeredByFormatter,
             ALERT_SEVERITY,
             ALERT_SEVERITY_COLORS,
         };

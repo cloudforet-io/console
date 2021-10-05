@@ -134,7 +134,7 @@ import ProjectCardList from '@/services/project/modules/ProjectCardList.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { FavoriteItem } from '@/store/modules/favorite/type';
 import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
-import ProjectGroupMember from '@/services/project/project-detail/project-member/ProjectGroupMember.vue';
+import ProjectGroupMember from '@/services/project/project-detail/project-member/modules/ProjectGroupMember.vue';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 import { store } from '@/store';
 import ProjectPageStoreModule from '@/services/project/store';

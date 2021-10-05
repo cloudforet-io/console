@@ -20,27 +20,27 @@
         <section class="detail-contents-wrapper">
             <div class="left-wrapper">
                 <alert-summary :id="id" class="header"
-                                     :alert-data="alertInfo"
+                               :alert-data="alertInfo"
                 />
 
                 <alert-key-info :id="id" class="info"
-                                   :alert-data="alertInfo"
+                                :alert-data="alertInfo"
                 />
                 <alert-status-update :id="id"
-                                                 :alert-data="alertInfo"
-                                                 class="status-update"
+                                     :alert-data="alertInfo"
+                                     class="status-update"
                 />
                 <alert-timeline-and-event :id="id" :alert-data="alertInfo"
-                                                 class="timeline-and-event"
+                                          class="timeline-and-event"
                 />
             </div>
             <div class="right-wrapper">
                 <alert-responder :id="id" class="responder"
-                                        :alert-data="alertInfo"
+                                 :alert-data="alertInfo"
                 />
                 <alert-note :id="id" class="note" />
                 <alert-project-dependency :id="id" :alert-data="alertInfo"
-                                                 class="project-dependency"
+                                          class="project-dependency"
                 />
             </div>
         </section>
@@ -66,7 +66,7 @@
 <script lang="ts">
 import { PBreadcrumbs, PIconButton, PPageTitle } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import AlertSummary from '@/services/monitoring/alert-manager/alert/alert-detail/modules/alert-summary/AlertSummary.vue';
@@ -76,7 +76,6 @@ import AlertTimelineAndEvent from '@/services/monitoring/alert-manager/alert/ale
 import AlertNote from '@/services/monitoring/alert-manager/alert/alert-detail/modules/AlertNote.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { AlertDataModel } from '@/services/monitoring/alert-manager/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import AlertTitleEditModal from '@/services/monitoring/alert-manager/alert/alert-detail/modules/AlertTitleEditModal.vue';
 import AlertProjectDependency

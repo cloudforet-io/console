@@ -24,7 +24,7 @@
 <script lang="ts">
 import FNB from '@/common/modules/navigations/FNB.vue';
 import { PPaneLayout, PIconButton } from '@spaceone/design-system';
-import ProjectMemberTab from '@/services/project/project-detail/project-member/ProjectMemberTab.vue';
+import ProjectMemberTab from '@/services/project/project-detail/project-member/modules/ProjectMemberTab.vue';
 
 export default {
     name: 'ProjectGroupMember',
