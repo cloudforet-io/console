@@ -294,6 +294,14 @@
 			}
 		}
 	},
+	"BILLING": {
+		"COST_MANAGEMENT": {
+			"MAIN": {
+				"BUDGET": "",
+				"COST_ANALYSIS": ""
+			}
+		}
+	},
 	"COMMON": {
 		"COLLECT_MODAL": {
 			"ALT_E_COLLECT_DATA": "データ収集に失敗",
@@ -1041,6 +1049,12 @@
 			"POWER_SCHEDULER": "パワースケジューラ",
 			"SPOT_AUTOMATION": "スポット自動化",
 			"SPOT_GROUP": "スポットグループ"
+		},
+		"BILLING": {
+			"BILLING": "",
+			"BUDGET": "",
+			"COST_ANALYSIS": "",
+			"COST_MANAGEMENT": ""
 		},
 		"DASHBOARD": {
 			"DASHBOARD": "ダッシュボード"

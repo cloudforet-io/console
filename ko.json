@@ -294,6 +294,14 @@
 			}
 		}
 	},
+	"BILLING": {
+		"COST_MANAGEMENT": {
+			"MAIN": {
+				"BUDGET": "예산",
+				"COST_ANALYSIS": "비용 분석"
+			}
+		}
+	},
 	"COMMON": {
 		"COLLECT_MODAL": {
 			"ALT_E_COLLECT_DATA": "데이터 수집 실패",
@@ -1041,6 +1049,12 @@
 			"POWER_SCHEDULER": "파워 스케줄러",
 			"SPOT_AUTOMATION": "스팟 자동화",
 			"SPOT_GROUP": "스팟그룹"
+		},
+		"BILLING": {
+			"BILLING": "비용",
+			"BUDGET": "예산",
+			"COST_ANALYSIS": "비용 분석",
+			"COST_MANAGEMENT": "비용 관리"
 		},
 		"DASHBOARD": {
 			"DASHBOARD": "대시보드 "

@@ -294,6 +294,14 @@
 			}
 		}
 	},
+	"BILLING": {
+		"COST_MANAGEMENT": {
+			"MAIN": {
+				"BUDGET": "Budget",
+				"COST_ANALYSIS": "Cost Analysis"
+			}
+		}
+	},
 	"COMMON": {
 		"COLLECT_MODAL": {
 			"ALT_E_COLLECT_DATA": "Failed to Collect Data",
@@ -1041,6 +1049,12 @@
 			"POWER_SCHEDULER": "Power Scheduler",
 			"SPOT_AUTOMATION": "Spot Automation",
 			"SPOT_GROUP": "Spot Group"
+		},
+		"BILLING": {
+			"BILLING": "Billing",
+			"BUDGET": "Budget",
+			"COST_ANALYSIS": "Cost Analysis",
+			"COST_MANAGEMENT": "Cost Management"
 		},
 		"DASHBOARD": {
 			"DASHBOARD": "Dashboard"
