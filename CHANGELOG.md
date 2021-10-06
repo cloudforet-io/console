@@ -1,3 +1,10 @@
+# [1.1.0-beta.142](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.141...v1.1.0-beta.142) (2021-10-06)
+
+
+### Features
+
+* update css in breadcrumbs, vertical layout ([#697](https://github.com/spaceone-dev/spaceone-design-system/issues/697)) ([a7e4e69](https://github.com/spaceone-dev/spaceone-design-system/commit/a7e4e69fa1092b1da72675a5db64b6d0eaa83f9a))
+
 # [1.1.0-beta.141](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.140...v1.1.0-beta.141) (2021-10-01)
 
 
