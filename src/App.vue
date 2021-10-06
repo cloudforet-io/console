@@ -129,7 +129,7 @@ export default defineComponent({
 
 <style lang="postcss">
 #app {
-    @apply bg-white;
+    @apply bg-gray-100;
     display: flex;
     flex-direction: column;
     overflow-y: hidden;
