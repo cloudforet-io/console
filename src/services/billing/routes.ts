@@ -1,4 +1,5 @@
 import { RouteConfig } from 'vue-router';
+import BudgetDetailPage from '@/services/billing/cost-management/budget/budget-detail/BudgetDetailPage.vue';
 
 const CostManagementPage = () => import(/* webpackChunkName: "CostManagementPage" */ '@/services/billing/cost-management/CostManagementPage.vue');
 
@@ -11,7 +12,10 @@ export const BILLING_ROUTE = Object.freeze({
     COST_MANAGEMENT: {
         _NAME: 'costManagement',
         COST_ANALYSIS: { _NAME: 'costAnalysis' },
-        BUDGET: { _NAME: 'budget' },
+        BUDGET: {
+            _NAME: 'budget',
+            DETAIL: { _NAME: 'budgetDetail' },
+        },
     },
 });
 
@@ -45,6 +49,12 @@ export default {
                             component: BudgetPage,
                         },
                     ],
+                },
+                {
+                    path: 'budget/:id',
+                    name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
+                    props: true,
+                    component: BudgetDetailPage,
                 },
             ],
         },
