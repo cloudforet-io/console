@@ -106,7 +106,7 @@ export default defineComponent<Props>({
     }
 
     .arrow-icon {
-        @apply text-gray-200;
+        @apply text-gray-300;
         margin-left: 0.25rem;
         margin-right: 0.25rem;
     }

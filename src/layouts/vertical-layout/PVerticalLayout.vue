@@ -179,6 +179,7 @@ export default {
     margin: unset;
 }
 .sidebar-container {
+    @apply bg-white;
     &.transition {
         transition: width 0.2s;
     }
