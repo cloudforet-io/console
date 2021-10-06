@@ -1,7 +1,9 @@
 <template>
-    <p-pane-layout class="budget-summary-chart-wrapper">
+    <p-pane-layout class="budget-alert-wrapper">
         <div class="card-header">
-            Budget Summary
+            <span class="title">Budget Alert</span>
+            <p-icon-button name="ic_trashcan" />
+            <p-icon-button name="ic_setting" />
         </div>
         <div class="card-body">
             body
@@ -9,20 +11,20 @@
     </p-pane-layout>
 </template>
 
-<script lang="ts">
-import { PPaneLayout } from '@spaceone/design-system';
+<script>
+import { PPaneLayout, PIconButton } from '@spaceone/design-system';
 
 export default {
-    name: 'BudgetDetailSummaryChart',
+    name: 'BudgetDetailAlert',
     components: {
         PPaneLayout,
+        PIconButton,
     },
-
 };
 </script>
 
 <style lang="postcss" scoped>
-.budget-summary-chart-wrapper {
+.budget-alert-wrapper {
     @apply flex flex-col;
     min-width: 100%;
     min-height: 100%;
@@ -34,5 +36,8 @@ export default {
     min-height: 4rem;
     font-size: 1.5rem;
     line-height: 135%;
+    .title {
+        margin-right: 0.5rem;
+    }
 }
 </style>

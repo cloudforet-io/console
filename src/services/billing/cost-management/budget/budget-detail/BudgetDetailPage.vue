@@ -5,9 +5,9 @@
                       @goBack="$router.go(-1)"
         />
         <div class="content">
-            <budget-detail-summary />
-            <budget-detail-summary-chart />
-            <div>budget-alert</div>
+            <budget-detail-summary class="summary" />
+            <budget-detail-summary-chart class="summary-chart" />
+            <budget-detail-alert class="alert" />
         </div>
     </general-page-layout>
 </template>
@@ -20,11 +20,14 @@ import BudgetDetailSummary
     from '@/services/billing/cost-management/budget/budget-detail/modules/BudgetDetailSummary.vue';
 import BudgetDetailSummaryChart
     from '@/services/billing/cost-management/budget/budget-detail/modules/BudgetDetailSummaryChart.vue';
+import BudgetDetailAlert
+    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-alert/BudgetDetailAlert.vue';
 
 
 export default {
     name: 'BudgetDetailPage',
     components: {
+        BudgetDetailAlert,
         GeneralPageLayout,
         PBreadcrumbs,
         PPageTitle,
@@ -50,6 +53,16 @@ export default {
 
 <style lang="postcss" scoped>
 .content {
-
+    @apply flex flex-col;
+    gap: 1rem;
+    .summary {
+        flex-grow: 1;
+    }
+    .summary-chart {
+        flex-grow: 2;
+    }
+    .alert {
+        flex-grow: 1;
+    }
 }
 </style>
