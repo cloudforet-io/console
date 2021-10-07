@@ -5,7 +5,7 @@
                       @goBack="$router.go(-1)"
         />
         <div class="content">
-            <budget-detail-summary class="summary" />
+            <budget-detail-info class="summary" />
             <budget-detail-summary-chart class="summary-chart" />
             <budget-detail-alert class="alert" />
         </div>
@@ -16,12 +16,12 @@
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
 import { computed, reactive } from '@vue/composition-api';
-import BudgetDetailSummary
-    from '@/services/billing/cost-management/budget/budget-detail/modules/BudgetDetailSummary.vue';
+import BudgetDetailInfo
+    from '@/services/billing/cost-management/budget/budget-detail/modules/BudgetDetailInfo.vue';
 import BudgetDetailSummaryChart
-    from '@/services/billing/cost-management/budget/budget-detail/modules/BudgetDetailSummaryChart.vue';
+    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-summary/BudgetSummaryChart.vue';
 import BudgetDetailAlert
-    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-alert/BudgetDetailAlert.vue';
+    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-alert/BudgetAlert.vue';
 
 
 export default {
@@ -31,7 +31,7 @@ export default {
         GeneralPageLayout,
         PBreadcrumbs,
         PPageTitle,
-        BudgetDetailSummary,
+        BudgetDetailInfo,
         BudgetDetailSummaryChart,
     },
     setup() {

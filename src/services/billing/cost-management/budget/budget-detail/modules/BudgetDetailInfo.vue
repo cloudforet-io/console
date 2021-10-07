@@ -73,7 +73,7 @@ export default {
     }
     .summary-content {
         margin-top: 0.5rem;
-        font-size: 1rem;
+        font-size: 0.875rem;
         line-height: 120%;
         &.cost-type {
             @apply flex justify-between;

@@ -24,10 +24,9 @@
                         {{ Object.keys(value)[0] }} : {{ Object.values(value)[0] }}
                     </p>
                 </div>
-                <p v-else-if="index === Object.values(items).findIndex(d => d.protocol_type === 'Slack')">
-                    <!-- masking token -->
-                    Slack Channel: ******,
-                    Slack Token: ******
+                <p v-else-if="item.secret_id.length > 0">
+                    <!-- masking secret data -->
+                    data: *******
                 </p>
                 <p v-else>
                     {{ Object.keys(item.data)[0] }} : {{ Object.values(item.data)[0] }}
