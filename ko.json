@@ -296,6 +296,55 @@
 	},
 	"BILLING": {
 		"COST_MANAGEMENT": {
+			"BUDGET": {
+				"ALT_E_CREATE_BUDGET": "예산 생성 실패",
+				"ALT_E_DELETE_BUDGET": "예산 삭제 실패",
+				"ALT_E_UPDATE_BUDGET": "예산 수정 실패",
+				"ALT_S_CREATE_BUDGET": "예산 생성 성공",
+				"ALT_S_DELETE_BUDGET": "예산 삭제 성공",
+				"ALT_S_UPDATE_BUDGET": "예산 수정 성공",
+				"FORM": {
+					"AMOUNT_PLAN": {
+						"AMOUNT_PLANNING": "",
+						"AUTO_FILL": "",
+						"LABEL_BUGDET_TOTAL": "",
+						"LABEL_END_MONTH": "",
+						"LABEL_LAST_MONTH": "",
+						"LABEL_START_MONTH": "",
+						"MONTHLY_PLAN": "",
+						"MONTHLY_PLAN_DESC": "",
+						"TOTAL_AMOUNT": "",
+						"TOTAL_AMOUNT_DESC": ""
+					},
+					"BASE_INFO": {
+						"ACCOUNT": "",
+						"ALL": "",
+						"BASE_INFORMATION": "",
+						"LABEL_COST_TYPE": "",
+						"LABEL_CURRENCY": "",
+						"LABEL_NAME": "",
+						"LABEL_TARGET": "",
+						"PRODUCT": "",
+						"PROJECT": "",
+						"PROJECT_GROUP": "",
+						"PROVIDER": "",
+						"REGION": ""
+					},
+					"CANCEL": "취소",
+					"CONFIRM": "확인",
+					"CREATE_BUDGET": "",
+					"UPDATE_BUDGET": ""
+				},
+				"MAIN": {
+					"AMOUNT_SPENT": "",
+					"BUDGET": "",
+					"COST_TYPE": "",
+					"CREATE_BUDGET": "",
+					"MONTHLY": "",
+					"TOTAL": "",
+					"TOTAL_BUDGET": ""
+				}
+			},
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "누적",
 				"CHART_TYPE": "차트 유형",
