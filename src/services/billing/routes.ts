@@ -6,6 +6,8 @@ const CostManagementPage = () => import(/* webpackChunkName: "CostManagementPage
 const CostDashboardPage = () => import(/* webpackChunkName: "CostDashboardPage" */ '@/services/billing/cost-management/dashboard/CostDashboardPage.vue');
 const CostAnalysisPage = () => import(/* webpackChunkName: "CostAnalysisPage" */ '@/services/billing/cost-management/cost-analysis/CostAnalysisPage.vue');
 const BudgetPage = () => import(/* webpackChunkName: "BudgetPage" */ '@/services/billing/cost-management/budget/BudgetPage.vue');
+const BudgetCreatePage = () => import(/* webpackChunkName: "BudgetCreatePage" */ '@/services/billing/cost-management/budget/budget-create/BudgetCreatePage.vue');
+const BudgetUpdatePage = () => import(/* webpackChunkName: "BudgetUpdatePage" */ '@/services/billing/cost-management/budget/budget-update/BudgetUpdatePage.vue');
 
 
 export const BILLING_ROUTE = Object.freeze({
@@ -17,6 +19,8 @@ export const BILLING_ROUTE = Object.freeze({
         BUDGET: {
             _NAME: 'budget',
             DETAIL: { _NAME: 'budgetDetail' },
+            CREATE: { _NAME: 'budgetCreate' },
+            UPDATE: { _NAME: 'budgetUpdate' },
         },
     },
 });
@@ -63,6 +67,18 @@ export default {
                     name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
                     props: true,
                     component: BudgetDetailPage,
+                },
+                {
+                    path: 'budget/create',
+                    name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.CREATE._NAME,
+                    props: true,
+                    component: BudgetCreatePage,
+                },
+                {
+                    path: 'budget/update/:budgetId',
+                    name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.UPDATE._NAME,
+                    props: true,
+                    component: BudgetUpdatePage,
                 },
             ],
         },
