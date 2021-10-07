@@ -3,6 +3,7 @@ import BudgetDetailPage from '@/services/billing/cost-management/budget/budget-d
 
 const CostManagementPage = () => import(/* webpackChunkName: "CostManagementPage" */ '@/services/billing/cost-management/CostManagementPage.vue');
 
+const CostDashboardPage = () => import(/* webpackChunkName: "CostDashboardPage" */ '@/services/billing/cost-management/dashboard/CostDashboardPage.vue');
 const CostAnalysisPage = () => import(/* webpackChunkName: "CostAnalysisPage" */ '@/services/billing/cost-management/cost-analysis/CostAnalysisPage.vue');
 const BudgetPage = () => import(/* webpackChunkName: "BudgetPage" */ '@/services/billing/cost-management/budget/BudgetPage.vue');
 
@@ -11,6 +12,7 @@ export const BILLING_ROUTE = Object.freeze({
     _NAME: 'billing',
     COST_MANAGEMENT: {
         _NAME: 'costManagement',
+        DASHBOARD: { _NAME: 'costDashboard' },
         COST_ANALYSIS: { _NAME: 'costAnalysis' },
         BUDGET: {
             _NAME: 'budget',
@@ -38,6 +40,12 @@ export default {
                     redirect: 'cost-analysis',
                     component: CostManagementPage,
                     children: [
+                        {
+                            path: 'dashboard/:id',
+                            name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
+                            props: true,
+                            component: CostDashboardPage,
+                        },
                         {
                             path: 'cost-analysis',
                             name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
