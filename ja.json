@@ -296,6 +296,25 @@
 	},
 	"BILLING": {
 		"COST_MANAGEMENT": {
+			"COST_ANALYSIS": {
+				"ACCUMULATED": "",
+				"CHART_TYPE": "",
+				"CLEAR_ALL": "",
+				"COLUMN": "",
+				"DAILY": "",
+				"DONUT": "",
+				"FILTER": "",
+				"GRANULARITY": "",
+				"GROUP_BY": "",
+				"HIDE_ALL": "",
+				"LINE": "",
+				"MONTHLY": "",
+				"PROJECT": "",
+				"SAVE": "",
+				"STACKED_COLUMN": "",
+				"STACKED_LINE": "",
+				"YEARLY": ""
+			},
 			"MAIN": {
 				"BUDGET": "",
 				"COST_ANALYSIS": ""

@@ -296,6 +296,25 @@
 	},
 	"BILLING": {
 		"COST_MANAGEMENT": {
+			"COST_ANALYSIS": {
+				"ACCUMULATED": "누적",
+				"CHART_TYPE": "차트 유형",
+				"CLEAR_ALL": "모두 지우기",
+				"COLUMN": "컬럼",
+				"DAILY": "일",
+				"DONUT": "도넛",
+				"FILTER": "필터",
+				"GRANULARITY": "",
+				"GROUP_BY": "",
+				"HIDE_ALL": "모두 숨기기",
+				"LINE": "라인",
+				"MONTHLY": "월",
+				"PROJECT": "프로젝트",
+				"SAVE": "저장",
+				"STACKED_COLUMN": "누적 컬럼",
+				"STACKED_LINE": "누적 라인",
+				"YEARLY": "년"
+			},
 			"MAIN": {
 				"BUDGET": "예산",
 				"COST_ANALYSIS": "비용 분석"

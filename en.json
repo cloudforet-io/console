@@ -296,6 +296,25 @@
 	},
 	"BILLING": {
 		"COST_MANAGEMENT": {
+			"COST_ANALYSIS": {
+				"ACCUMULATED": "Accumulated",
+				"CHART_TYPE": "Chart Type",
+				"CLEAR_ALL": "Clear all",
+				"COLUMN": "Column",
+				"DAILY": "Daily",
+				"DONUT": "Donut",
+				"FILTER": "Filter",
+				"GRANULARITY": "Granularity",
+				"GROUP_BY": "Group By",
+				"HIDE_ALL": "Hide all",
+				"LINE": "Line",
+				"MONTHLY": "Monthly",
+				"PROJECT": "Project",
+				"SAVE": "Save",
+				"STACKED_COLUMN": "Stacked Column",
+				"STACKED_LINE": "Stacked Line",
+				"YEARLY": "Yearly"
+			},
 			"MAIN": {
 				"BUDGET": "Budget",
 				"COST_ANALYSIS": "Cost Analysis"
