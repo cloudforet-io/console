@@ -176,7 +176,7 @@ export default {
 
 <style lang="postcss" scoped>
 .alert-history-widget {
-    @apply border border-gray-200 rounded-md;
+    @apply bg-white border border-gray-200 rounded-md;
     padding: 1rem;
     column-gap: 1rem;
 

@@ -455,8 +455,10 @@ export default {
     @apply col-span-12;
     .p-toolbox-table::v-deep {
         @apply overflow-hidden rounded-l;
-        .panel-top-wrapper {
+        .top-wrapper {
             @apply bg-white;
+        }
+        .panel-top-wrapper {
             .p-panel-top {
                 margin-top: 1.5rem;
             }

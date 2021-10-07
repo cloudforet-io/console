@@ -267,7 +267,7 @@ export default {
 <style lang="postcss" scoped>
 .escalation-policy-page {
     .table-wrapper {
-        @apply border border-gray-200 rounded-md;
+        @apply bg-white border border-gray-200 rounded-md;
     }
     .p-toolbox::v-deep {
         padding: 1.5rem 1rem 0.5rem;

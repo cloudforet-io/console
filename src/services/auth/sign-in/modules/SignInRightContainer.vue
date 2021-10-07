@@ -103,6 +103,7 @@ export default {
 
 <style lang="postcss" scoped>
 .sign-in-right-container {
+    @apply bg-white;
     display: flex;
     flex-direction: column;
     flex-grow: 1;
