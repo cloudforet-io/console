@@ -317,7 +317,8 @@
 			},
 			"MAIN": {
 				"BUDGET": "",
-				"COST_ANALYSIS": ""
+				"COST_ANALYSIS": "",
+				"DASHBOARD": ""
 			}
 		}
 	},
@@ -1073,7 +1074,8 @@
 			"BILLING": "",
 			"BUDGET": "",
 			"COST_ANALYSIS": "",
-			"COST_MANAGEMENT": ""
+			"COST_MANAGEMENT": "",
+			"DASHBOARD": ""
 		},
 		"DASHBOARD": {
 			"DASHBOARD": "ダッシュボード"

@@ -317,7 +317,8 @@
 			},
 			"MAIN": {
 				"BUDGET": "Budget",
-				"COST_ANALYSIS": "Cost Analysis"
+				"COST_ANALYSIS": "Cost Analysis",
+				"DASHBOARD": "Dashboard"
 			}
 		}
 	},
@@ -1073,7 +1074,8 @@
 			"BILLING": "Billing",
 			"BUDGET": "Budget",
 			"COST_ANALYSIS": "Cost Analysis",
-			"COST_MANAGEMENT": "Cost Management"
+			"COST_MANAGEMENT": "Cost Management",
+			"DASHBOARD": "Dashboard"
 		},
 		"DASHBOARD": {
 			"DASHBOARD": "Dashboard"
