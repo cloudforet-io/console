@@ -3,7 +3,7 @@
 // @ts-ignore
 import icon from 'vue-svgicon'
 icon.register({
-  'ic_calendar v1': {
+  'ic_calendar': {
     width: 16,
     height: 16,
     viewBox: '0 0 16 16',
