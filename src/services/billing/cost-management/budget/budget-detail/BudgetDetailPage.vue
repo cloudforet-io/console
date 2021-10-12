@@ -15,8 +15,8 @@
         </section>
         <section class="content">
             <budget-detail-info class="summary" />
-            <budget-detail-summary-chart class="summary-chart" />
-            <budget-detail-alert class="alert" />
+            <budget-summary class="summary" />
+            <budget-notifications class="alert" />
         </section>
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
@@ -31,22 +31,22 @@ import { PBreadcrumbs, PPageTitle, PIconButton } from '@spaceone/design-system';
 import { computed, reactive } from '@vue/composition-api';
 import BudgetDetailInfo
     from '@/services/billing/cost-management/budget/budget-detail/modules/BudgetDetailInfo.vue';
-import BudgetDetailSummaryChart
-    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-summary/BudgetSummaryChart.vue';
-import BudgetDetailAlert
-    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-alert/BudgetAlert.vue';
+import BudgetSummary
+    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-summary/BudgetSummary.vue';
+import BudgetNotifications
+    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-alert/BudgetNotifications.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 export default {
     name: 'BudgetDetailPage',
     components: {
-        BudgetDetailAlert,
         GeneralPageLayout,
         PBreadcrumbs,
         PPageTitle,
         PIconButton,
         BudgetDetailInfo,
-        BudgetDetailSummaryChart,
+        BudgetSummary,
+        BudgetNotifications,
         DeleteModal,
     },
     setup() {

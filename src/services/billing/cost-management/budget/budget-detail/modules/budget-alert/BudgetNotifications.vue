@@ -3,7 +3,6 @@
         <section class="card-header">
             <span class="title">Budget Alert</span>
             <p-icon-button name="ic_trashcan" @click="handleDelete" />
-            <p-icon-button name="ic_setting" />
         </section>
         <section v-if="hasBudgetAlert" class="card-body">
             <article class="alert-condition">
@@ -34,6 +33,9 @@
                         <span>% of budget > 90%</span>
                     </li>
                 </ul>
+                <p-button style-type="gray900 outline" outline @click="handleSetAlert">
+                    Set
+                </p-button>
             </article>
             <article class="noti-channel">
                 <span class="sub-title">Notifications Channel</span>
@@ -45,7 +47,7 @@
                                   highlight
                         />
                     </span>
-                    <budget-alert-noti-channel class="mt-2" />
+                    <budget-notifications-channel class="mt-2" />
                 </p>
             </article>
         </section>
@@ -55,7 +57,7 @@
                     Set budget alert if you want to send notifications when the cost exceeds the budget
                 </span> <br>
                 <p-button style-type="gray900 outline" outline @click="handleSetAlert">
-                    Set Budget Alert
+                    Set
                 </p-button>
             </p>
         </section>
@@ -74,19 +76,19 @@
 import {
     PPaneLayout, PIconButton, PI, PAnchor, PButton,
 } from '@spaceone/design-system';
-import BudgetAlertNotiChannel
-    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-alert/BudgetAlertNotiChannel.vue';
+import BudgetNotificationsChannel
+    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-alert/BudgetNotificationsChannel.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 import { i18n } from '@/translations';
 import BudgetAlertModal
-    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-alert/BudgetAlertModal.vue';
+    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-alert/BudgetNotificationsModal.vue';
 
 export default {
-    name: 'BudgetDetailAlert',
+    name: 'BudgetNotifications',
     components: {
         BudgetAlertModal,
-        BudgetAlertNotiChannel,
+        BudgetNotificationsChannel,
         PPaneLayout,
         PIconButton,
         PI,
@@ -96,7 +98,7 @@ export default {
     },
     setup() {
         const state = reactive({
-            hasBudgetAlert: false,
+            hasBudgetAlert: true,
             budgetAlertModalVisible: false,
         });
 

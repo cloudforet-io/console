@@ -95,7 +95,7 @@ interface Condition {
 }
 
 export default {
-    name: 'BudgetAlertModal',
+    name: 'BudgetNotificationsModal',
     components: {
         PButtonModal,
         PAnchor,
@@ -179,7 +179,7 @@ export default {
 };
 </script>
 
-<style lang="postcss">
+<style lang="postcss" scoped>
 .anchor {
     @apply block;
     margin-top: 0.25rem;

@@ -39,7 +39,7 @@ import { store } from '@/store';
 import { ChannelItem } from '@/services/identity/user/type';
 
 export default {
-    name: 'BudgetAlertNotiChannel',
+    name: 'BudgetNotificationsChannel',
     components: {
         PDataTable,
     },
