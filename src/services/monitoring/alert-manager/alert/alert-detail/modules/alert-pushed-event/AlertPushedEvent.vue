@@ -11,9 +11,11 @@
         />
         <template v-if="itemList.length > 0">
             <div v-for="(item, idx) in itemList" :key="item.event_id">
+
                 <alert-vertical-timeline
                     :key="item.event_id" :item="item" :timezone="timezone"
                     :event-type="item.event_type"
+                    :is-last-item="idx===itemList.length-1"
                     class="timeline"
                 >
                     <template #timeline-detail>

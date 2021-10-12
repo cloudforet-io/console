@@ -1,7 +1,7 @@
 <template>
     <div class="timeline-wrapper">
         <ul class="timeline-list">
-            <li class="timeline-item" :class="eventType">
+            <li class="timeline-item" :class="[eventType, {'no-border': isLastItem}]">
                 <div class="timestamp">
                     {{ item.created_at ? iso8601Formatter(item.created_at, timezone) : '' }}
                 </div>
@@ -33,6 +33,10 @@ export default {
         eventType: {
             type: String,
             default: undefined,
+        },
+        isLastItem: {
+            type: Boolean,
+            default: false,
         },
     },
     setup() {
@@ -86,6 +90,9 @@ export default {
                 @mixin circle-style;
                 @apply border-4 border-green-300 bg-green-500;
             }
+        }
+        &.no-border {
+            @apply border-white;
         }
     }
 }
