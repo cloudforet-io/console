@@ -358,8 +358,13 @@
 				"HIDE_ALL": "Hide all",
 				"LINE": "Line",
 				"MONTHLY": "Monthly",
+				"PRIVACY": "Privacy",
+				"PRIVATE": "Private (only me)",
 				"PROJECT": "Project",
+				"PUBLIC": "Public",
+				"QUERY_NAME": "Query Name",
 				"SAVE": "Save",
+				"SAVE_QUERY": "Save Query",
 				"STACKED_COLUMN": "Stacked Column",
 				"STACKED_LINE": "Stacked Line",
 				"YEARLY": "Yearly"

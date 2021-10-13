@@ -358,8 +358,13 @@
 				"HIDE_ALL": "",
 				"LINE": "",
 				"MONTHLY": "",
+				"PRIVACY": "",
+				"PRIVATE": "",
 				"PROJECT": "",
+				"PUBLIC": "",
+				"QUERY_NAME": "",
 				"SAVE": "",
+				"SAVE_QUERY": "",
 				"STACKED_COLUMN": "",
 				"STACKED_LINE": "",
 				"YEARLY": ""

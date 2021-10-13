@@ -358,8 +358,13 @@
 				"HIDE_ALL": "모두 숨기기",
 				"LINE": "라인",
 				"MONTHLY": "월",
+				"PRIVACY": "공개 여부",
+				"PRIVATE": "비공개 (나만 보기)",
 				"PROJECT": "프로젝트",
+				"PUBLIC": "공개",
+				"QUERY_NAME": "쿼리 명",
 				"SAVE": "저장",
+				"SAVE_QUERY": "쿼리 저장",
 				"STACKED_COLUMN": "누적 컬럼",
 				"STACKED_LINE": "누적 라인",
 				"YEARLY": "년"
