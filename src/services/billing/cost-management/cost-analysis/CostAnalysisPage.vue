@@ -15,7 +15,7 @@
                             <p-icon-text-button name="ic_download" style-type="gray-border" class="mr-4">
                                 PDF
                             </p-icon-text-button>
-                            <p-button style-type="gray-border">
+                            <p-button style-type="gray-border" @click="handleClickSave">
                                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}
                             </p-button>
                         </div>
@@ -57,8 +57,10 @@
         <section class="chart-section">
             <cost-analysis-chart />
         </section>
-        <section class="table-section">
-        </section>
+        <section class="table-section" />
+        <save-query-form-modal :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_QUERY')" :visible.sync="saveQueryFormVisible"
+                               @confirm="handleFormSave"
+        />
     </div>
 </template>
 
@@ -73,6 +75,7 @@ import {
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import CostAnalysisChart from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisChart.vue';
+import SaveQueryFormModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue';
 
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { BILLING_ROUTE } from '@/services/billing/routes';
@@ -92,11 +95,13 @@ export default {
         PSelectDropdown,
         PSelectButton,
         PIconTextButton,
+        SaveQueryFormModal,
     },
     setup() {
         const state = reactive({
             title: 'Sample Title',
             widgetId: '',
+            saveQueryFormVisible: false,
         });
         const filterState = reactive({
             granularityItems: computed<MenuItem[]>(() => ([
@@ -176,11 +181,21 @@ export default {
             console.log('refresh!');
         };
 
+        const handleClickSave = () => {
+            state.saveQueryFormVisible = true;
+        };
+
+        const handleFormSave = () => {
+            console.log('save');
+        }
+
         return {
             ...toRefs(state),
             filterState,
             routeState,
             handleClickRefresh,
+            handleClickSave,
+            handleFormSave,
         };
     },
 };
