@@ -2,15 +2,21 @@
     <div class="cost-analysis-page">
         <p-breadcrumbs :routes="routeState.route" />
         <section class="title-section">
-            <p-icon-button name="ic_list" class="list-button" />
+            <p-select-dropdown :items="sampleQueryItems" button-only button-icon="ic_list"
+                               class="list-button"
+            >
+                <template #menu-item--format="{item}">
+                    <span>{{ item.label }}</span>
+                    <div v-if="item.name !== 'default'" class="button-wrapper">
+                        <p-icon-button name="ic_trashcan" size="sm" @click.stop="handleClickDeleteQuery" />
+                        <p-icon-button name="ic_edit-text" size="sm" @click.stop="handleClickEditQuery" />
+                    </div>
+                </template>
+            </p-select-dropdown>
             <p-page-title :title="title">
                 <template #extra>
                     <div class="title-extra-wrapper">
                         <span />
-                        <!--                        <favorite-button :item-id="widgetId"-->
-                        <!--                                         favorite-type="billing"-->
-                        <!--                                         resource-type="billing.CostManagement"-->
-                        <!--                        />-->
                         <div class="button-wrapper">
                             <p-icon-text-button name="ic_download" style-type="gray-border" class="mr-4">
                                 PDF
@@ -23,11 +29,15 @@
                 </template>
             </p-page-title>
         </section>
-        <section class="filter-section">
+        <section class="query-section">
             <div class="left-part">
                 <div class="filter-item">
                     <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY') }}</b>
-                    <p-select-dropdown v-model="filterState.selectedGranularity" :items="filterState.granularityItems" without-outline />
+                    <p-select-dropdown :selected="filterState.selectedGranularity"
+                                       :items="filterState.granularityItems"
+                                       without-outline
+                                       @select="handleSelectGranularity"
+                    />
                 </div>
                 <div class="filter-item">
                     <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHART_TYPE') }}</b>
@@ -51,13 +61,31 @@
             </div>
         </section>
         <section class="group-by-section">
-            <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}</b>
-            <p-select-button v-model="filterState.selectedGroupBy" multi-selectable />
+            <b class="mr-3">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}</b>
+            <div class="button-wrapper">
+                <p-select-button v-for="groupByItem in filterState.groupByItems"
+                                 :key="groupByItem.name"
+                                 class="group-by-button"
+                                 :value="groupByItem"
+                                 :selected="filterState.selectedGroupByItems"
+                                 multi-selectable
+                                 size="sm"
+                                 @change="handleSelectGroupByItems"
+                >
+                    {{ groupByItem.label }}
+                </p-select-button>
+            </div>
+            <component :is="filterState.moreGroupBy.length ? 'p-icon-button' : 'p-icon-text-button'"
+                       name="ic_setting" style-type="gray900" outline
+                       size="sm"
+                       @click="handleClickMore"
+            >
+                <template v-if="!filterState.moreGroupBy.length">
+                    More
+                </template>
+            </component>
         </section>
-        <section class="chart-section">
-            <cost-analysis-chart />
-        </section>
-        <section class="table-section" />
+        <cost-analysis-chart :group-by-items="filterState.selectedGroupBy" :chart-type="filterState.selectedChartType" />
         <save-query-form-modal :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_QUERY')" :visible.sync="saveQueryFormVisible"
                                @confirm="handleFormSave"
         />
@@ -67,27 +95,33 @@
 <script lang="ts">
 import dayjs from 'dayjs';
 
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 
 import {
     PBreadcrumbs, PPageTitle, PButton, PIconButton, PSelectDropdown, PSelectButton, PIconTextButton,
 } from '@spaceone/design-system';
 
-import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import CostAnalysisChart from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisChart.vue';
 import SaveQueryFormModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue';
 
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { i18n } from '@/translations';
-import { CHART_TYPE, CURRENCY, GRANULARITY } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import {
+    CHART_TYPE, CURRENCY, GRANULARITY, GROUP_BY,
+} from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { registerServiceStore } from '@/common/composables/register-service-store';
+import { CostAnalysisStoreState, GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
+import costAnalysisStoreModule from '@/services/billing/cost-management/cost-analysis/store';
+import { store } from '@/store';
 
 
 export default {
     name: 'CostAnalysisPage',
     components: {
         CostAnalysisChart,
-        FavoriteButton,
         PBreadcrumbs,
         PPageTitle,
         PButton,
@@ -98,12 +132,25 @@ export default {
         SaveQueryFormModal,
     },
     setup() {
+        registerServiceStore<CostAnalysisStoreState>('costAnalysis', costAnalysisStoreModule);
+
         const state = reactive({
-            title: 'Sample Title',
+            title: 'Cost Analysis',
             widgetId: '',
+            sampleQueryItems: [
+                { name: 'label', label: 'Saved Query', type: 'header' },
+                { name: 'default', label: 'Cost Analysis', type: 'item' },
+                { name: 'x1', label: 'public widget', type: 'item' },
+                { name: 'x2', label: 'A private widget', type: 'item' },
+            ],
             saveQueryFormVisible: false,
         });
         const filterState = reactive({
+            selectedGranularity: computed(() => store.state.service.costAnalysis.selectedGranularity),
+            selectedGroupByItems: computed(() => store.state.service.costAnalysis.selectedGroupByItems),
+            selectedChartType: CHART_TYPE.STACKED_COLUMN,
+            selectedCurrency: CURRENCY.USD,
+            //
             granularityItems: computed<MenuItem[]>(() => ([
                 {
                     type: 'item',
@@ -158,13 +205,18 @@ export default {
                 { type: 'item', name: CURRENCY.KRW, label: '$KRW' },
                 { type: 'item', name: CURRENCY.JPY, label: '¥JPY' },
             ])),
-            groupByItems: '',
-            //
-            selectedGranularity: GRANULARITY.DAILY,
-            selectedChartType: CHART_TYPE.COLUMN,
-            selectedCurrency: CURRENCY.USD,
-            selectedGroupBy: computed(() => ([
-            ])),
+            groupByItems: [
+                { name: GROUP_BY.PROJECT, label: 'Project' },
+                { name: GROUP_BY.SERVICE_ACCOUNT, label: 'Service Account' },
+                { name: GROUP_BY.PRODUCT, label: 'Product' },
+                { name: GROUP_BY.REGION, label: 'Region' },
+                { name: GROUP_BY.PROVIDER, label: 'Provider' },
+                { name: GROUP_BY.TYPE, label: 'Type' },
+                { name: GROUP_BY.RESOURCE_ID, label: 'Resource ID' },
+                { name: GROUP_BY.CURRENCY, label: 'Currency' },
+                { name: GROUP_BY.ACCOUNT, label: 'Account' },
+            ],
+            moreGroupBy: [],
             startDate: dayjs.utc().startOf('month'),
             endDate: dayjs.utc(),
         });
@@ -177,25 +229,52 @@ export default {
         });
 
         /* event */
+        const handleSelectGranularity = (granularity: string) => {
+            store.dispatch('service/costAnalysis/updateSelectedGranularity', granularity);
+        };
+        const handleSelectGroupByItems = (items: Array<GroupByItem>) => {
+            store.dispatch('service/costAnalysis/updateSelectedGroupByItems', items);
+        };
         const handleClickRefresh = () => {
             console.log('refresh!');
+        };
+        const handleClickMore = () => {
+            console.log('more!');
+        };
+        const handleClickDeleteQuery = () => {
+            console.log('delete query');
+        };
+        const handleClickEditQuery = () => {
+            console.log('edit query');
         };
 
         const handleClickSave = () => {
             state.saveQueryFormVisible = true;
         };
-
         const handleFormSave = () => {
             console.log('save');
-        }
+        };
+
+        watch(() => filterState.selectedGranularity, (selectedGranularity) => {
+            if (selectedGranularity === GRANULARITY.ACCUMULATED) {
+                filterState.selectedChartType = CHART_TYPE.DONUT;
+            } else {
+                filterState.selectedChartType = CHART_TYPE.STACKED_COLUMN;
+            }
+        });
 
         return {
             ...toRefs(state),
             filterState,
             routeState,
+            handleSelectGranularity,
+            handleSelectGroupByItems,
             handleClickRefresh,
             handleClickSave,
             handleFormSave,
+            handleClickMore,
+            handleClickDeleteQuery,
+            handleClickEditQuery,
         };
     },
 };
@@ -206,8 +285,16 @@ export default {
     .title-section {
         display: flex;
 
-        .list-button {
+        .list-button::v-deep {
+            @apply bg-transparent;
             margin-right: 0.5rem;
+            .p-context-menu {
+                min-width: 22rem;
+                .menu-item-wrapper {
+                    display: flex;
+                    justify-content: space-between;
+                }
+            }
         }
         .title-extra-wrapper {
             width: 100%;
@@ -220,7 +307,7 @@ export default {
             }
         }
     }
-    .filter-section {
+    .query-section {
         display: flex;
         justify-content: space-between;
         font-size: 0.875rem;
@@ -239,21 +326,21 @@ export default {
             display: flex;
             align-items: center;
         }
-        .left-part, .right-part {
-            .filter-item {
-                display: flex;
-                align-items: center;
-                padding-right: 0.5rem;
-                &:after {
-                    @apply bg-gray-300;
-                    display: inline-block;
-                    position: relative;
-                    content: '';
-                    width: 1px;
-                    height: 1rem;
-                    &:last-child {
-                        display: none;
-                    }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-right: 0.5rem;
+            &::after {
+                @apply bg-gray-300;
+                display: inline-block;
+                position: relative;
+                content: '';
+                width: 1px;
+                height: 1rem;
+            }
+            &:last-child {
+                &::after {
+                    display: none;
                 }
             }
         }
@@ -263,14 +350,33 @@ export default {
     }
     .group-by-section {
         @apply bg-white rounded-md border border-gray-200;
+        display: flex;
+        align-items: center;
         font-size: 0.875rem;
         padding: 1rem;
         margin-bottom: 1rem;
+
+        .button-wrapper {
+            &::after {
+                @apply bg-gray-500;
+                display: inline-block;
+                position: relative;
+                content: '';
+                top: 0.25rem;
+                width: 1px;
+                height: 1rem;
+                margin: 0 0.625rem;
+            }
+            .group-by-button {
+                margin-left: 0.375rem;
+                &:first-of-type {
+                    margin-left: 0;
+                }
+            }
+        }
     }
-    .chart-section {
+    .cost-analysis-chart {
         margin-bottom: 1rem;
-    }
-    .table-section {
     }
 }
 </style>
