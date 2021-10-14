@@ -164,8 +164,7 @@ export default {
             showValidation: false,
             isNameValid: computed(() => !state.nameInvalidText),
             nameInvalidText: computed(() => {
-                // if (!state.showValidation) return undefined;
-                if (state.inputModel.name === undefined) return undefined;
+                if (typeof state.inputModel.name === 'undefined') return undefined;
                 if (!state.inputModel.name) {
                     return i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.NAME_REQUIRED');
                 }
@@ -206,7 +205,7 @@ export default {
         /* util */
         const initInputModel = () => {
             if (props.mode === ACTION.create) {
-                state.inputModel.name = '';
+                state.inputModel.name = undefined;
                 state.inputModel.scope = SCOPE.global;
                 state.inputModel.rules = [{ notification_level: DEFAULT_NOTIFICATION_LEVEL, escalate_minutes: undefined }];
                 state.inputModel.finish_condition = FINISH_CONDITION.acknowledged;
