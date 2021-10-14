@@ -15,7 +15,7 @@
                             <p-icon-text-button name="ic_download" style-type="gray-border" class="mr-4">
                                 PDF
                             </p-icon-text-button>
-                            <p-button style-type="gray-border" @click="openSaveQueryForm">
+                            <p-button style-type="gray-border" @click="handleClickSave">
                                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}
                             </p-button>
                         </div>
@@ -58,7 +58,9 @@
             <cost-analysis-chart />
         </section>
         <section class="table-section" />
-        <save-query-form-modal :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_QUERY')" :visible.sync="saveQueryFormVisible" />
+        <save-query-form-modal :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_QUERY')" :visible.sync="saveQueryFormVisible"
+                               @confirm="handleFormSave"
+        />
     </div>
 </template>
 
@@ -179,17 +181,21 @@ export default {
             console.log('refresh!');
         };
 
-        const openSaveQueryForm = () => {
-            console.log('click event');
+        const handleClickSave = () => {
             state.saveQueryFormVisible = true;
         };
+
+        const handleFormSave = () => {
+            console.log('save');
+        }
 
         return {
             ...toRefs(state),
             filterState,
             routeState,
             handleClickRefresh,
-            openSaveQueryForm,
+            handleClickSave,
+            handleFormSave,
         };
     },
 };

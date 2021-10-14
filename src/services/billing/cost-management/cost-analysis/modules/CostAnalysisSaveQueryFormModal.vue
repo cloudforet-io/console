@@ -5,7 +5,7 @@
         fade
         backdrop
         :visible.sync="proxyVisible"
-        @confirm="confirm"
+        @confirm="handleFormConfirm"
     >
         <template #body>
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.QUERY_NAME')"
@@ -16,10 +16,20 @@
                 </template>
             </p-field-group>
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PRIVACY')" required>
-                <p-radio v-for="radioValue in radioValues" v-model="selected" :value="radioValue.value"
-:key="radioValue.value">
-                    {{$t(radioValue.type)}}
-                </p-radio>
+                <div class="privacy-radio-list">
+                    <p-radio v-for="privacy in privacyList" :key="privacy.value" v-model="selected"
+                             :value="privacy.value"
+                    >
+                        <div class="privacy-radio-content-wrapper">
+                            <template>
+                                <p-i v-if="privacy.value === PRIVACY.PRIVATE" name="ic_private"
+                                     height="1.3rem"
+                                />
+                            </template>
+                            <span>{{ privacy.label }}</span>
+                        </div>
+                    </p-radio>
+                </div>
             </p-field-group>
         </template>
     </p-button-modal>
@@ -30,7 +40,9 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
-import { PButtonModal, PFieldGroup, PTextInput, PRadio } from '@spaceone/design-system';
+import {
+    PButtonModal, PFieldGroup, PTextInput, PRadio, PI,
+} from '@spaceone/design-system';
 
 import VueI18n from 'vue-i18n';
 import { store } from '@/store';
@@ -40,6 +52,11 @@ import { i18n } from '@/translations';
 
 import TranslateResult = VueI18n.TranslateResult;
 
+enum PRIVACY {
+    PUBLIC = 'public',
+    PRIVATE = 'private',
+}
+
 export default {
     name: 'CostAnalysisSaveQueryFormModal',
     components: {
@@ -47,6 +64,7 @@ export default {
         PFieldGroup,
         PButtonModal,
         PRadio,
+        PI,
     },
     props: {
         visible: {
@@ -64,16 +82,31 @@ export default {
             queryName: '',
             proxyVisible: makeProxy('visible', props, emit),
             selected: 'private',
-            radioValues: [{ value: 'public', type: 'BILLING.COST_MANAGEMENT.COST_ANALYSIS.PUBLIC' }, { value: 'private', type: 'BILLING.COST_MANAGEMENT.COST_ANALYSIS.PRIVATE' }],
+            privacyList: computed(() => ([
+                { value: 'public', label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PUBLIC') },
+                { value: 'private', label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PRIVATE') },
+            ])),
         });
-        const confirm = () => {
+        const handleFormConfirm = () => {
             state.proxyVisible = false;
             showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_S_UPDATE_STATUS'), '', root);
+            emit('confirm');
         };
         return {
             ...toRefs(state),
-            confirm,
+            handleFormConfirm,
+            PRIVACY,
         };
     },
 };
 </script>
+<style lang="postcss" scoped>
+.privacy-radio-list {
+    @apply inline-flex justify-between;
+    gap: 1rem;
+}
+.privacy-radio-content-wrapper {
+    @apply inline-flex items-center;
+    margin-left: 0.3rem;
+}
+</style>
