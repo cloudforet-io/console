@@ -13,51 +13,53 @@
         <!-- KB Domain Tab -->
         <div v-if="domainList.length > 0" class="domain-tab">
             <ul>
-                <li v-for="(item, index) in domainList" :key="index">
-                    <p-button :class="{ 'active': item.domain_id === extraParams.domainId }"
+                <li v-for="(domain) in domainList" :key="domain.domain_id">
+                    <p-button :class="{ 'active': domain.domain_id === selectedDomainId }"
                               class="btn"
-                              @click="switchDomain(item)"
+                              @click="switchDomain(domain)"
                     >
-                        {{ item.name }}
+                        {{ domain.name }}
                     </p-button>
                 </li>
             </ul>
         </div>
 
         <!-- If you want to reload when the state is changed, bind key with reactive state. -->
-        <div :key="extraParams.domainId" class="contents-wrapper">
-            <!-- Give extra parameter objects for api requests in widgets. -->
-            <div class="col-span-12 lg:col-span-9
+        <p-data-loader :loading="loading" disable-empty-case>
+            <div :key="selectedDomainId" class="contents-wrapper">
+                <!-- Give extra parameter objects for api requests in widgets. -->
+                <div class="col-span-12 lg:col-span-9
                         widget-wrapper"
-            >
-                <all-summary class="col-span-12" :extra-params="extraParams" />
-                <resource-map class="col-span-12" :extra-params="extraParams" />
-                <personal-health-dashboard class="col-span-12" :extra-params="extraParams" />
-                <trusted-advisor class="col-span-12" :extra-params="extraParams" />
-                <top-projects class="col-span-12" :extra-params="extraParams" />
-            </div>
-            <div class="col-span-12 lg:col-span-3
+                >
+                    <all-summary class="col-span-12" :extra-params="extraParams" />
+                    <resource-map class="col-span-12" :extra-params="extraParams" />
+                    <personal-health-dashboard class="col-span-12" :extra-params="extraParams" />
+                    <trusted-advisor class="col-span-12" :extra-params="extraParams" />
+                    <top-projects class="col-span-12" :extra-params="extraParams" />
+                </div>
+                <div class="col-span-12 lg:col-span-3
                     widget-wrapper"
-            >
-                <div class="col-span-12 sm:col-span-6 lg:col-span-12
-                        widget-wrapper"
                 >
-                    <favorites-widget class="hidden lg:block col-span-12"
-                                      :project="project" :cloud-service="cloudService" :extra-params="extraParams"
-                    />
-                    <daily-updates class="col-span-12 daily-updates"
-                                   :providers="providers" :extra-params="extraParams"
-                    />
-                </div>
-                <div class="col-span-12 sm:col-span-6 lg:col-span-12
+                    <div class="col-span-12 sm:col-span-6 lg:col-span-12
                         widget-wrapper"
-                >
-                    <service-accounts class="col-span-12" :providers="providers" :extra-params="extraParams" />
-                    <collector-progress class="col-span-12 collector-progress" :extra-params="extraParams" />
-                    <cloud-services class="col-span-12 cloud-services" :more-info="true" :extra-params="extraParams" />
+                    >
+                        <favorites-widget class="hidden lg:block col-span-12"
+                                          :project="project" :cloud-service="cloudService" :extra-params="extraParams"
+                        />
+                        <daily-updates class="col-span-12 daily-updates"
+                                       :providers="providers" :extra-params="extraParams"
+                        />
+                    </div>
+                    <div class="col-span-12 sm:col-span-6 lg:col-span-12
+                        widget-wrapper"
+                    >
+                        <service-accounts class="col-span-12" :providers="providers" :extra-params="extraParams" />
+                        <collector-progress class="col-span-12 collector-progress" :extra-params="extraParams" />
+                        <cloud-services class="col-span-12 cloud-services" :more-info="true" :extra-params="extraParams" />
+                    </div>
                 </div>
             </div>
-        </div>
+        </p-data-loader>
     </general-page-layout>
 </template>
 
@@ -66,7 +68,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
-import { PButton } from '@spaceone/design-system';
+import { PButton, PDataLoader } from '@spaceone/design-system';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
@@ -82,11 +84,15 @@ import ServiceAccounts from '@/services/dashboard/modules/ServiceAccounts.vue';
 import CollectorProgress from '@/services/dashboard/modules/CollectingProgress.vue';
 import CloudServices from '@/services/inventory/cloud-service/modules/CloudServices.vue';
 
+interface ExtraParams {
+    domain_id?: string;
+}
 
 export default {
     name: 'TotalDashboardPage',
     components: {
         PButton,
+        PDataLoader,
         GeneralPageLayout,
         AllSummary,
         ResourceMap,
@@ -102,8 +108,14 @@ export default {
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            extraParams: computed(() => vm.$store.state.domain),
+            loading: false,
             domainList: [],
+            selectedDomainId: '',
+            extraParams: computed<ExtraParams>(() => {
+                const params: ExtraParams = {};
+                if (state.selectedDomainId) params.domain_id = state.selectedDomainId;
+                return params;
+            }),
             providers: computed(() => vm.$store.state.resource.provider.items),
             project: computed(() => [...vm.$store.getters['favorite/projectGroup/sortedItems'], ...vm.$store.getters['favorite/project/sortedItems']]),
             cloudService: computed(() => vm.$store.getters['favorite/cloudServiceType/sortedItems']),
@@ -111,16 +123,21 @@ export default {
         });
 
         const getDomainList = async (): Promise<void> => {
+            if (state.loading) return;
+
+            state.loading = true;
             try {
                 const { results } = await SpaceConnector.client.identity.domain.list();
                 state.domainList = results;
             } catch (e) {
                 console.error(e);
+            } finally {
+                state.loading = false;
             }
         };
 
-        const switchDomain = (domain) => {
-            vm.$store.dispatch('domain/load', domain.name);
+        const switchDomain = (domain?) => {
+            state.selectedDomainId = domain?.domain_id;
         };
 
         /** Init */
@@ -137,6 +154,7 @@ export default {
                 vm.$store.dispatch('favorite/cloudServiceType/load'),
                 getDomainList(),
             ]);
+            switchDomain(state.domainList[0]);
         })();
 
         return {
@@ -213,9 +231,9 @@ export default {
             background-color: #e9e9e9;
         }
         &.active {
+            @apply bg-primary;
             font-weight: 700;
             color: #fff;
-            @apply bg-primary;
         }
     }
 }
