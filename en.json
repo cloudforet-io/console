@@ -363,6 +363,7 @@
 				"MODAL_VALIDATION_LENGTH": "Must be longer than 40 characters.",
 				"MODAL_VALIDATION_REQUIRED": "Required field",
 				"MONTHLY": "Monthly",
+				"MY_QUERY": "My Query",
 				"PRIVATE": "Private (only me)",
 				"PROJECT": "Project",
 				"PUBLIC": "Public",
