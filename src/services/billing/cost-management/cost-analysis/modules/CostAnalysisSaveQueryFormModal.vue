@@ -5,20 +5,27 @@
         fade
         backdrop
         :visible.sync="proxyVisible"
+        :disabled="!isAllValid"
         @confirm="handleFormConfirm"
     >
         <template #body>
-            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.QUERY_NAME')"
+            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LABEL_QUERY_NAME')"
+                           :invalid="!isQueryNameValid"
+                           :invalid-text="queryNameInvalidText"
                            required
             >
                 <template #default>
-                    <p-text-input v-model="queryName" class="block w-full" placeholder="My Query" />
+                    <p-text-input v-model="queryName" class="block w-full" :placeholder="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MY_QUERY')"
+                                  :invalid="!isQueryNameValid"
+                    />
                 </template>
             </p-field-group>
-            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PRIVACY')" required>
+            <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LABEL_PRIVACY')" required>
                 <div class="privacy-radio-list">
-                    <p-radio v-for="privacy in privacyList" :key="privacy.value" v-model="selected"
+                    <p-radio v-for="privacy in privacyList" :key="privacy.value"
                              :value="privacy.value"
+                             v-model="selected"
+                             @change="handleChangePrivacy(privacy.value)"
                     >
                         <div class="privacy-radio-content-wrapper">
                             <template>
@@ -52,10 +59,10 @@ import { i18n } from '@/translations';
 
 import TranslateResult = VueI18n.TranslateResult;
 
-enum PRIVACY {
-    PUBLIC = 'public',
-    PRIVATE = 'private',
-}
+const PRIVACY = Object.freeze({
+    PUBLIC: 'public',
+    PRIVATE: 'private',
+});
 
 export default {
     name: 'CostAnalysisSaveQueryFormModal',
@@ -79,22 +86,46 @@ export default {
 
     setup(props, { root, emit }) {
         const state = reactive({
-            queryName: '',
+            queryName: undefined as undefined | string,
             proxyVisible: makeProxy('visible', props, emit),
-            selected: 'private',
+            selected: PRIVACY.PRIVATE,
             privacyList: computed(() => ([
-                { value: 'public', label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PUBLIC') },
-                { value: 'private', label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PRIVATE') },
+                { value: PRIVACY.PUBLIC, label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PUBLIC') },
+                { value: PRIVACY.PRIVATE, label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.PRIVATE') },
             ])),
+            queryNameInvalidText: computed(() => {
+                if (typeof state.queryName === 'undefined') return undefined;
+                if (state.queryName.length === 0) {
+                    return i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MODAL_VALIDATION_REQUIRED');
+                }
+                if (state.queryName.length > 40) {
+                    return i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MODAL_VALIDATION_LENGTH');
+                }
+                return undefined;
+            }),
+            isQueryNameValid: computed(() => {
+                return !state.queryNameInvalidText;
+            }),
+            isAllValid: computed(() => !!state.isQueryNameValid),
         });
         const handleFormConfirm = () => {
+            if (!state.isAllValid) return;
+
             state.proxyVisible = false;
-            showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_S_UPDATE_STATUS'), '', root);
+            state.queryName = undefined;
             emit('confirm');
         };
+
+        // event
+
+        const handleChangePrivacy = (value) => {
+            state.selected = value;
+        };
+
         return {
             ...toRefs(state),
             handleFormConfirm,
+            handleChangePrivacy,
             PRIVACY,
         };
     },
