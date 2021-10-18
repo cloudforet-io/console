@@ -30,9 +30,7 @@ export const useColumnChart = ({
         data, valueOptions, categoryOptions, chartContainer,
     });
 
-    const legends = state.categoryOptions.legends;
-    const chart = drawColumnChart(state.data, chartContainer, legends);
-
+    const chart = drawColumnChart(state.data, state.chartContainer, state.valueOptions, state.categoryOptions);
     createCursor(chart);
 
     return {
@@ -47,8 +45,8 @@ export const useStackedColumnChart = ({
         data, valueOptions, categoryOptions, chartContainer,
     });
 
-    const legends = state.categoryOptions.legends;
-    const chart = drawStackedColumnChart(state.data, state.chartContainer, legends);
+    const chart = drawStackedColumnChart(state.data, state.chartContainer, state.valueOptions, state.categoryOptions);
+    createCursor(chart);
 
     return {
         chart,
@@ -62,8 +60,8 @@ export const useLineChart = ({
         data, valueOptions, categoryOptions, chartContainer,
     });
 
-    const legends = state.categoryOptions.legends;
-    const chart = drawLineChart(state.data, state.chartContainer, legends);
+    const chart = drawLineChart(state.data, state.chartContainer, state.valueOptions, state.categoryOptions);
+    createCursor(chart);
 
     return {
         chart,
@@ -77,8 +75,8 @@ export const useStackedLineChart = ({
         data, valueOptions, categoryOptions, chartContainer,
     });
 
-    const legends = state.categoryOptions.legends;
-    const chart = drawStackedLineChart(state.data, state.chartContainer, legends);
+    const chart = drawStackedLineChart(state.data, state.chartContainer, state.valueOptions, state.categoryOptions);
+    createCursor(chart);
 
     return {
         chart,
@@ -92,8 +90,7 @@ export const usePieChart = ({
         data, valueOptions, categoryOptions, chartContainer,
     });
 
-    const legends = state.categoryOptions.legends;
-    const chart = drawPieChart(state.data, state.chartContainer, legends);
+    const chart = drawPieChart(state.data, state.chartContainer);
 
     return {
         chart,

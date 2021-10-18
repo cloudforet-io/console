@@ -4,7 +4,6 @@ import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
-import { DrawChartType } from '@/common/composables/dynamic-chart/type';
 
 am4core.useTheme(am4themes_animated);
 am4core.options.autoSetClassName = true;
@@ -67,7 +66,7 @@ const createSeries = (chart) => {
 };
 
 
-export const drawPieChart: DrawChartType = (data, chartContainer, legends) => {
+export const drawPieChart = (data, chartContainer) => {
     const chart = am4core.create(chartContainer, am4charts.PieChart);
     if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
     chart.paddingLeft = -5;

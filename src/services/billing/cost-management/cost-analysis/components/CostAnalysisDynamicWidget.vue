@@ -9,17 +9,24 @@ import {
 import {
     useColumnChart, useLineChart, usePieChart, useStackedColumnChart, useStackedLineChart,
 } from '@/common/composables/dynamic-chart';
-import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
-import { store } from '@/store';
+import { CHART_TYPE, GRANULARITY } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { ChartType, Granularity } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { ChartData, DynamicChartStateArgs, Legend } from '@/common/composables/dynamic-chart/type';
+import * as am4core from '@amcharts/amcharts4/core';
+
+
+interface Props {
+    chartType: ChartType;
+    chartData: ChartData[];
+    legends: Legend[];
+    granularity: Granularity;
+}
+type DateUnit = 'day' | 'month' | 'year';
 
 
 export default {
     name: 'CostAnalysisColumnChart',
     props: {
-        // name: {
-        //     type: String,
-        //     default: '',
-        // },
         chartType: {
             type: String,
             default: CHART_TYPE.STACKED_COLUMN,
@@ -35,41 +42,73 @@ export default {
             type: Array,
             default: () => ([]),
         },
+        granularity: {
+            type: String,
+            default: GRANULARITY.DAILY,
+            validator(value: any) {
+                return Object.values(GRANULARITY).includes(value);
+            },
+        },
+        // period: {
+        //     type: Object,
+        //     default: () => ({
+        //         start: dayjs.utc().startOf('month'),
+        //         end: dayjs.utc(),
+        //     }),
+        // },
     },
-    setup(props) {
+    setup(props: Props) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
-            chartRegistry: {},
-            granularity: computed(() => store.state.service.costAnalysis.selectedGranularity),
         });
 
         /* util */
+        const getUnit = () => {
+            // todo: granularity 가 accumulated 면 period 에 따라 unit 지정
+            let unit: DateUnit;
+            if (props.granularity === GRANULARITY.ACCUMULATED) {
+                unit = 'day';
+            } else if (props.granularity === GRANULARITY.MONTHLY) {
+                unit = 'month';
+            } else if (props.granularity === GRANULARITY.YEARLY) {
+                unit = 'year';
+            } else {
+                unit = 'day';
+            }
+
+            return unit;
+        };
         const drawChart = (ctx) => {
-            const params = {
+            const params: DynamicChartStateArgs = {
                 data: computed(() => props.chartData),
                 valueOptions: {},
                 categoryOptions: {
-                    path: 'date',
                     legends: computed(() => props.legends),
+                    path: 'date',
+                    timeUnit: getUnit(),
                 },
                 chartContainer: ctx,
             };
 
             if (props.chartType === CHART_TYPE.STACKED_COLUMN) {
-                useStackedColumnChart(params);
+                const { chart } = useStackedColumnChart(params);
+                chart.scrollbarX = new am4core.Scrollbar();
             } else if (props.chartType === CHART_TYPE.COLUMN) {
-                useColumnChart(params);
+                const { chart } = useColumnChart(params);
+                chart.scrollbarX = new am4core.Scrollbar();
             } else if (props.chartType === CHART_TYPE.LINE) {
-                useLineChart(params);
+                const { chart } = useLineChart(params);
+                chart.scrollbarX = new am4core.Scrollbar();
             } else if (props.chartType === CHART_TYPE.STACKED_LINE) {
-                useStackedLineChart(params);
+                const { chart } = useStackedLineChart(params);
+                chart.scrollbarX = new am4core.Scrollbar();
             } else if (props.chartType === CHART_TYPE.DONUT) {
                 usePieChart(params);
             }
         };
 
-        watch([() => state.chartRef, () => props.chartData, () => props.chartType], ([ctx, chartData]) => {
-            if (ctx && chartData.length > 0) {
+        watch([() => state.chartRef, () => props.chartData], ([ctx, chartData]) => {
+            if (ctx && (chartData as ChartData[]).length > 0) {
                 drawChart(ctx);
             }
         }, { immediate: false });

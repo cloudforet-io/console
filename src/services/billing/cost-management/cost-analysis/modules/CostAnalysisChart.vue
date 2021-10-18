@@ -4,6 +4,7 @@
             <cost-analysis-dynamic-widget :chart-type="chartType"
                                           :chart-data="chartData"
                                           :legends="legends"
+                                          :granularity="selectedGranularity"
             />
         </section>
         <section class="query-section">

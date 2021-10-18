@@ -10,16 +10,19 @@ am4core.options.autoSetClassName = true;
 am4core.options.classNamePrefix = 'CostAnalysisChart';
 
 
-const createDateAxis = (chart) => {
+const createCategoryAxis = (chart, categoryOptions) => {
     chart.dateFormatter.inputDateFormat = 'yyyy-MM-dd';
 
+    const timeUnit = categoryOptions.timeUnit || 'day';
     const dateAxis = chart.xAxes.push(new am4charts.DateAxis());
     dateAxis.startLocation = 0.1;
     dateAxis.baseInterval = {
-        timeUnit: 'day',
+        timeUnit,
         count: 1,
     };
     dateAxis.dateFormats.setKey('day', 'M/d');
+    dateAxis.dateFormats.setKey('month', 'MMM YYYY');
+    dateAxis.dateFormats.setKey('year', 'YYYY');
     dateAxis.renderer.minGridDistance = 50;
     dateAxis.fontSize = 12;
     dateAxis.renderer.grid.template.strokeOpacity = 1;
@@ -28,7 +31,6 @@ const createDateAxis = (chart) => {
     dateAxis.renderer.labels.template.fill = am4core.color(gray[900]);
     dateAxis.renderer.cellStartLocation = 0.1;
     dateAxis.renderer.cellEndLocation = 0.9;
-
     dateAxis.tooltip.label.fontSize = 12;
 
     // only in stacked column
@@ -66,17 +68,17 @@ const createSeries = (chart, legend) => {
 };
 
 
-export const drawStackedColumnChart = (data, chartContainer, legends) => {
+export const drawStackedColumnChart = (data, chartContainer, valueOptions, categoryOptions) => {
     const chart = am4core.create(chartContainer, am4charts.XYChart);
-    chart.scrollbarX = new am4core.Scrollbar();
     if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
     chart.paddingLeft = -5;
     chart.paddingBottom = -10;
     chart.data = data;
 
-    createDateAxis(chart);
+    createCategoryAxis(chart, categoryOptions);
     createValueAxis(chart);
-    legends.forEach((d) => {
+
+    categoryOptions.legends.forEach((d) => {
         createSeries(chart, d);
     });
 
