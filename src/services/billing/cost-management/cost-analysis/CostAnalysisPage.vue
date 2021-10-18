@@ -9,7 +9,7 @@
                     <span>{{ item.label }}</span>
                     <div v-if="item.name !== 'default'" class="button-wrapper">
                         <p-icon-button name="ic_trashcan" size="sm" @click.stop="handleClickDeleteQuery" />
-                        <p-icon-button name="ic_edit-text" size="sm" @click.stop="handleClickEditQuery" />
+                        <p-icon-button name="ic_edit-text" size="sm" @click.stop="handleClickEditQuery(item.label)" />
                     </div>
                 </template>
             </p-select-dropdown>
@@ -21,7 +21,7 @@
                             <p-icon-text-button name="ic_download" style-type="gray-border" class="mr-4">
                                 PDF
                             </p-icon-text-button>
-                            <p-button style-type="gray-border" @click="handleClickSave">
+                            <p-button style-type="gray-border" @click="handleClickSaveQuery">
                                 {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}
                             </p-button>
                         </div>
@@ -86,8 +86,8 @@
             </component>
         </section>
         <cost-analysis-chart :group-by-items="filterState.selectedGroupBy" :chart-type="filterState.selectedChartType" />
-        <save-query-form-modal :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_QUERY')" :visible.sync="saveQueryFormVisible"
-                               @confirm="handleFormSave"
+        <save-query-form-modal :header-title="saveQueryFormTitle" :visible.sync="saveQueryFormVisible"
+                               @confirm="handleFormSave" :query-name="selectedQueryName"
         />
     </div>
 </template>
@@ -109,6 +109,7 @@ import SaveQueryFormModal from '@/services/billing/cost-management/cost-analysis
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { i18n } from '@/translations';
+import { TranslateResult } from 'vue-i18n';
 import {
     CHART_TYPE, CURRENCY, GRANULARITY, GROUP_BY,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
@@ -144,6 +145,8 @@ export default {
                 { name: 'x2', label: 'A private widget', type: 'item' },
             ],
             saveQueryFormVisible: false,
+            saveQueryFormTitle: '' as string | TranslateResult,
+            selectedQueryName: '',
         });
         const filterState = reactive({
             selectedGranularity: computed(() => store.state.service.costAnalysis.selectedGranularity),
@@ -244,15 +247,18 @@ export default {
         const handleClickDeleteQuery = () => {
             console.log('delete query');
         };
-        const handleClickEditQuery = () => {
-            console.log('edit query');
-        };
-
-        const handleClickSave = () => {
+        const handleClickEditQuery = (myQuery) => {
+            state.saveQueryFormTitle = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.EDIT_QUERY');
+            state.selectedQueryName = myQuery;
             state.saveQueryFormVisible = true;
         };
-        const handleFormSave = () => {
-            console.log('save');
+        const handleClickSaveQuery = () => {
+            state.saveQueryFormTitle = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_QUERY');
+            state.saveQueryFormVisible = true;
+        };
+        const handleFormSave = (requestType) => {
+            if (requestType === 'save') console.log('save');
+            else console.log('edit');
         };
 
         watch(() => filterState.selectedGranularity, (selectedGranularity) => {
@@ -263,6 +269,10 @@ export default {
             }
         });
 
+        watch(() => state.saveQueryFormVisible, () => {
+            if (state.saveQueryFormVisible === false) state.selectedQueryName = '';
+        });
+
         return {
             ...toRefs(state),
             filterState,
@@ -270,11 +280,11 @@ export default {
             handleSelectGranularity,
             handleSelectGroupByItems,
             handleClickRefresh,
-            handleClickSave,
             handleFormSave,
             handleClickMore,
             handleClickDeleteQuery,
             handleClickEditQuery,
+            handleClickSaveQuery,
         };
     },
 };
