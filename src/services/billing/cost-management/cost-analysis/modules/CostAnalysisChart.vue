@@ -1,17 +1,9 @@
 <template>
     <div class="cost-analysis-chart">
         <section class="chart-section">
-            <cost-analysis-column-chart v-if="chartType === CHART_TYPE.COLUMN || chartType === CHART_TYPE.STACKED_COLUMN"
-                                        :chart-data="chartData"
-                                        :legend-ref="legendRef"
-                                        :is-stacked="isStacked"
-                                        :categories="categories"
-            />
-            <cost-analysis-line-chart v-if="chartType === CHART_TYPE.LINE || chartType === CHART_TYPE.STACKED_LINE"
-                                      :chart-data="chartData"
-                                      :legend-ref="legendRef"
-                                      :is-stacked="isStacked"
-                                      :categories="categories"
+            <cost-analysis-dynamic-widget :chart-type="chartType"
+                                          :chart-data="chartData"
+                                          :legends="legends"
             />
         </section>
         <section class="query-section">
@@ -48,7 +40,7 @@
                 </div>
             </div>
             <div class="legend-wrapper">
-                <div ref="legendRef" class="legend" />
+                <div class="legend" />
             </div>
         </section>
     </div>
@@ -66,8 +58,7 @@ import {
     PButton, PIconButton, PSelectDropdown,
 } from '@spaceone/design-system';
 
-import CostAnalysisColumnChart from '@/services/billing/cost-management/cost-analysis/components/CostAnalysisColumnChart.vue';
-import CostAnalysisLineChart from '@/services/billing/cost-management/cost-analysis/components/CostAnalysisLineChart.vue';
+import CostAnalysisDynamicWidget from '@/services/billing/cost-management/cost-analysis/components/CostAnalysisDynamicWidget.vue';
 
 import {
     CHART_TYPE,
@@ -80,8 +71,7 @@ dayjs.extend(isSameOrBefore);
 export default {
     name: 'CostAnalysisChart',
     components: {
-        CostAnalysisColumnChart,
-        CostAnalysisLineChart,
+        CostAnalysisDynamicWidget,
         PButton,
         PIconButton,
         PSelectDropdown,
@@ -101,9 +91,8 @@ export default {
             filters: [],
             chartData: [] as any,
             chartRef: null as HTMLElement | null,
-            legendRef: null as HTMLElement | null,
             chartRegistry: {},
-            categories: computed(() => {
+            legends: computed(() => {
                 if (state.selectedGroupByItems.length) {
                     return [
                         { name: 'seoul', label: 'Seoul' },
@@ -116,7 +105,6 @@ export default {
                 }
                 return [{ name: 'total_cost', label: 'Total Cost' }];
             }),
-            isStacked: computed(() => props.chartType === CHART_TYPE.STACKED_COLUMN || props.chartType === CHART_TYPE.STACKED_LINE),
         });
 
         /* util */

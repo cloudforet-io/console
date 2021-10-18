@@ -6,7 +6,6 @@ import { Action } from 'vuex';
 export const getChartData: Action<CostAnalysisStoreState, any> = async ({ commit }): Promise<void|Error> => {
     try {
         const chartData = []; // todo: get new chart data
-        console.log('get chart data!');
         commit('setChartData', chartData);
     } catch (e) {
         console.error(e);
@@ -17,7 +16,6 @@ export const getChartData: Action<CostAnalysisStoreState, any> = async ({ commit
 export const updateSelectedGranularity: Action<CostAnalysisStoreState, any> = async ({ commit }, granularity: string): Promise<void|Error> => {
     try {
         const chartData = []; // todo: get new chart data
-        console.log('update selectedGranularity', granularity);
         commit('setSelectedGranularity', granularity);
         commit('setChartData', chartData);
     } catch (e) {
@@ -29,7 +27,6 @@ export const updateSelectedGranularity: Action<CostAnalysisStoreState, any> = as
 export const updateSelectedGroupByItems: Action<CostAnalysisStoreState, any> = async ({ commit }, groupByItems: Array<GroupByItem>): Promise<void|Error> => {
     try {
         const chartData = []; // todo: get new chart data
-        console.log('update selectedGroupByItems', groupByItems);
         commit('setSelectedGroupByItems', groupByItems);
         commit('setChartData', chartData);
     } catch (e) {
