@@ -10,36 +10,23 @@
 import { PDataTable } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
-const tempData = [
-    {
-
-        date: '2021-08', limit: 100, usd_cost: 120,
-    },
-    {
-        date: '2021-07', limit: 100, usd_cost: 88,
-    },
-    {
-        date: '2021-06', limit: 120, usd_cost: 50,
-    },
-    {
-        date: '2021-05', limit: 100, usd_cost: 70,
-    },
-    {
-        date: '2021-04', limit: 100, usd_cost: 90,
-    },
-];
-
 export default {
     name: 'BudgetDetailSummaryTable',
     components: {
         PDataTable,
     },
-    setup() {
+    props: {
+        chartData: {
+            type: Array,
+            default: () => ([]),
+        },
+    },
+    setup(props) {
         const getBudgetData = () => {
             const headerData = {
-                date: '', limit: 'Budgeted', usd_cost: 'Actual Cost', ratio: 'current vs budget.',
+                date: '', limit: 'Budgeted', usd_cost: 'Actual Cost', ratio: 'Current vs. Budgeted',
             };
-            const budgetDataWithRatio = tempData.map((d) => {
+            const budgetDataWithRatio = props.chartData.map((d) => {
                 const ratio = Math.round((d.usd_cost / d.limit) * 100);
                 return {
                     ...d, ratio,

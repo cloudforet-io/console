@@ -8,34 +8,44 @@
             <article class="alert-condition">
                 <span class="sub-title">Alert Condition</span>
                 <span class="content-desc">
-                    Any of the following are met
+                    Any of the following are met, <br>
+                    a notification will be sent immediately.
                 </span>
                 <ul class="content">
                     <li>
                         <span class="bullet">•</span>
-                        <p-i name="ic_urgency_low" width="0.875em" height="0.875em"
-                             class="icon"
-                        />
+                        <p-badge style-type="gray" outline
+                                 class="icon"
+                        >
+                            Warning
+                        </p-badge>
                         <span>Actual cost > $1,000</span>
                     </li>
                     <li>
                         <span class="bullet">•</span>
-                        <p-i name="ic_alert" width="0.875em" height="0.875em"
-                             class="icon"
-                        />
+                        <p-badge style-type="gray" outline
+                                 class="icon"
+                        >
+                            Warning
+                        </p-badge>
                         <span>Actual cost > $2,000</span>
                     </li>
                     <li>
                         <span class="bullet">•</span>
-                        <p-i name="ic_alert" width="0.875em" height="0.875em"
-                             class="icon"
-                        />
+                        <p-badge style-type="alert" outline
+                                 class="icon"
+                        >
+                            Critical
+                        </p-badge>
                         <span>% of budget > 90%</span>
                     </li>
                 </ul>
-                <p-button style-type="gray900 outline" outline @click="handleSetAlert">
+                <p-icon-text-button name="ic_setting" style-type="gray900 outline" outline
+                                    class="mt-4"
+                                    @click="handleSetAlert"
+                >
                     Set
-                </p-button>
+                </p-icon-text-button>
             </article>
             <article class="noti-channel">
                 <span class="sub-title">Notifications Channel</span>
@@ -56,9 +66,12 @@
                 <span class="content-desc no-alert">
                     Set budget alert if you want to send notifications when the cost exceeds the budget
                 </span> <br>
-                <p-button style-type="gray900 outline" outline @click="handleSetAlert">
+                <p-icon-text-button name="ic_setting" style-type="gray900 outline" outline
+                                    class="mt-4"
+                                    @click="handleSetAlert"
+                >
                     Set
-                </p-button>
+                </p-icon-text-button>
             </p>
         </section>
         <delete-modal :header-title="checkDeleteState.headerTitle"
@@ -74,7 +87,7 @@
 
 <script>
 import {
-    PPaneLayout, PIconButton, PI, PAnchor, PButton,
+    PPaneLayout, PIconButton, PI, PAnchor, PIconTextButton, PBadge,
 } from '@spaceone/design-system';
 import BudgetNotificationsChannel
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-alert/BudgetNotificationsChannel.vue';
@@ -91,9 +104,10 @@ export default {
         BudgetNotificationsChannel,
         PPaneLayout,
         PIconButton,
+        PIconTextButton,
         PI,
         PAnchor,
-        PButton,
+        PBadge,
         DeleteModal,
     },
     setup() {
@@ -193,6 +207,8 @@ export default {
         align-items: center;
         font-size: 0.875rem;
         line-height: 160%;
+        margin-bottom: 0.5rem;
+        white-space: nowrap;
     }
     .alert-condition {
         grid-column: 1 / 3;

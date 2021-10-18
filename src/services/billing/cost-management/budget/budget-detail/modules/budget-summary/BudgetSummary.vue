@@ -3,8 +3,8 @@
         <div class="card-header">
             Budget Summary
         </div>
-        <budget-summary-chart />
-        <budget-summary-table />
+        <budget-summary-chart :chart-data="tempData" />
+        <budget-summary-table :chart-data="tempData" />
     </p-pane-layout>
 </template>
 
@@ -14,6 +14,8 @@ import BudgetSummaryChart
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-summary/BudgetSummaryChart.vue';
 import BudgetSummaryTable
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-summary/BudgetSummaryTable.vue';
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
+import dayjs from 'dayjs';
 
 export default {
     name: 'BudgetSummary',
@@ -22,7 +24,34 @@ export default {
         BudgetSummaryChart,
         BudgetSummaryTable,
     },
+    setup() {
+        const { i18nDayjs } = useI18nDayjs();
 
+        // const dayjs = i18nDayjs.value;
+        const now = dayjs.utc().startOf('month');
+
+        const tempData = [
+            {
+                date: now.format('YYYY-MM'), limit: 100, usd_cost: 120,
+            },
+            {
+                date: now.add(-1, 'month').format('YYYY-MM'), limit: 100, usd_cost: 88,
+            },
+            {
+                date: now.add(-2, 'month').format('YYYY-MM'), limit: 120, usd_cost: 50,
+            },
+            {
+                date: now.add(-3, 'month').format('YYYY-MM'), limit: 100, usd_cost: 70,
+            },
+            {
+                date: now.add(-4, 'month').format('YYYY-MM'), limit: 100, usd_cost: 90,
+            },
+        ];
+
+        return {
+            tempData,
+        };
+    },
 };
 </script>
 
