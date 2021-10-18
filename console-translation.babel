@@ -6376,7 +6376,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>LABEL_PRIVACY</name>
+                                        <name>LABEL_QUERY_NAME</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
@@ -6397,7 +6397,7 @@
                                         </translations>
                                     </concept_node>
                                     <concept_node>
-                                        <name>LABEL_QUERY_NAME</name>
+                                        <name>LABEL_VISIBILITY</name>
                                         <definition_loaded>false</definition_loaded>
                                         <description/>
                                         <comment/>
