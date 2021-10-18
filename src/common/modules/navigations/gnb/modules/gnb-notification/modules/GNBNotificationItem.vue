@@ -32,7 +32,7 @@
 
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import dayjs, { Dayjs } from 'dayjs';
+import { Dayjs } from 'dayjs';
 
 import {
     PCollapsiblePanel, PI, PAnchor,
@@ -40,10 +40,11 @@ import {
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 import NewMark from '@/common/components/marks/NewMark.vue';
 import GNBNotificationDateHeader from '@/common/modules/navigations/gnb/modules/gnb-notification/modules/GNBNotificationDateHeader.vue';
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
+import { i18n } from '@/translations';
 
 const NOTIFICATION_TYPE_ICONS = {
     INFO: '',
@@ -72,14 +73,14 @@ export default {
         },
     },
     setup(props) {
+        const { i18nDayjs } = useI18nDayjs();
+
         const dataHeaderFormatter = (time: string, timezone: string) => {
             if (!time) return '';
 
+            const dayjs = i18nDayjs.value;
             const occurredTime: Dayjs = dayjs.tz(dayjs(time), timezone);
             const now: Dayjs = dayjs.tz(dayjs(), timezone);
-
-            // const diff = Math.ceil(now.diff(occurredTime, 'day', true));
-            // if (diff > 7) return '';
 
             if (occurredTime.isSame(now, 'day')) {
                 return i18n.t('COMMON.GNB.NOTIFICATION.TODAY');
@@ -89,6 +90,7 @@ export default {
             }
             return occurredTime.from(now);
         };
+
 
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),

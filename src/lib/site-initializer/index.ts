@@ -6,10 +6,11 @@ import { GTag } from '@/lib/gtag';
 import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { computed } from '@vue/composition-api';
-import { initLanguageAndFonts } from '@/lib/site-initializer/locales';
 import { serviceRoutes } from '@/router/service-routes';
 import { adminDomainServiceRoutes } from '@/router/admin-domain-service-routes';
 import { errorRoutes } from '@/router/error-routes';
+import { initDayjs } from '@/lib/site-initializer/dayjs';
+import { initI18n } from '@/translations';
 
 
 const initConfig = async () => {
@@ -72,6 +73,7 @@ const initRouter = (domainName?: string) => {
     }
 };
 
+
 const removeInitializer = () => {
     const el = document.getElementById('site-loader-wrapper');
     if (el?.parentElement) el.parentElement.removeChild(el);
@@ -85,7 +87,8 @@ const init = async () => {
 
     if (domainName) {
         initRouter(domainName);
-        await initLanguageAndFonts();
+        initI18n(store);
+        initDayjs();
         initQueryHelper();
         initGtag();
         initAmchartsLicense();

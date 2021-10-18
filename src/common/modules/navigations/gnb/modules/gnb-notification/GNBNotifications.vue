@@ -71,7 +71,7 @@ export default {
         GNBNotificationDateHeader,
         GNBNotificationItem,
         PSkeleton,
-        PIconButton,
+        // PIconButton,
         // PSelectDropdown,
     },
     setup(props, { root, refs }) {
