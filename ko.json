@@ -347,9 +347,12 @@
 			},
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "누적",
+				"ALT_E_DELETE_QUERY": "쿼리 삭제 실패",
+				"ALT_S_DELETE_QUERY": "쿼리 삭제 성공",
 				"ALT_S_EDITED_QUERY": "쿼리 편집 성공",
 				"ALT_S_SAVED_QUERY": "위젯으로 쿼리 저장 성공",
 				"CHART_TYPE": "차트 유형",
+				"CHECK_DELETE_MODAL_DESC": "쿼리를 삭제하시겠습니까?",
 				"CLEAR_ALL": "모두 지우기",
 				"COLUMN": "컬럼",
 				"DAILY": "일",

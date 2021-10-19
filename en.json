@@ -347,9 +347,12 @@
 			},
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "Accumulated",
+				"ALT_E_DELETE_QUERY": "Failed to Delete Query",
+				"ALT_S_DELETE_QUERY": "Successfully Deleted Query",
 				"ALT_S_EDITED_QUERY": "Successfully Edited The Query",
 				"ALT_S_SAVED_QUERY": "Successfully Saved The Query As Widget",
 				"CHART_TYPE": "Chart Type",
+				"CHECK_DELETE_MODAL_DESC": "Are you sure you want to delete the query?",
 				"CLEAR_ALL": "Clear all",
 				"COLUMN": "Column",
 				"DAILY": "Daily",

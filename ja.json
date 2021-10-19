@@ -347,9 +347,12 @@
 			},
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "",
+				"ALT_E_DELETE_QUERY": "",
+				"ALT_S_DELETE_QUERY": "",
 				"ALT_S_EDITED_QUERY": "",
 				"ALT_S_SAVED_QUERY": "",
 				"CHART_TYPE": "",
+				"CHECK_DELETE_MODAL_DESC": "",
 				"CLEAR_ALL": "",
 				"COLUMN": "",
 				"DAILY": "",
@@ -477,7 +480,7 @@
 			}
 		},
 		"HANDBOOK_BUTTON": {
-			"DONT_DISPLAY": " 再び開かない",
+			"DONT_DISPLAY": " 再び開かない",
 			"HANDBOOK": "Handbook"
 		},
 		"INFO_BUTTON": {
