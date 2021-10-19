@@ -16,7 +16,7 @@ import {
 import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
-import {i18n} from "@/translations";
+import { i18n } from '@/translations';
 
 export default {
     name: 'ManageNotificationPage',

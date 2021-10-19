@@ -11,10 +11,8 @@
                     </span>
                 </template>
                 <div class="card-body">
-                    <div class="left-part">
-                    </div>
-                    <div class="right-part">
-                    </div>
+                    <div class="left-part" />
+                    <div class="right-part" />
                 </div>
             </p-card>
         </div>

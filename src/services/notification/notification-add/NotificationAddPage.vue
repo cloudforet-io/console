@@ -111,7 +111,6 @@ export default {
         });
 
 
-
         const routeState = reactive({
             userRoutes: computed(() => [
                 { name: vm.$t('MENU.IDENTITY.IDENTITY'), path: '/identity' },

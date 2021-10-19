@@ -17,8 +17,8 @@
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIMEZONE_LABEL')">
                 <p-select-dropdown v-model="formState.timezone" :items="timezones"
                                    class="timezone"
-                                   @select="changeTimezone"
                                    use-fixed-menu-style
+                                   @select="changeTimezone"
                 />
             </p-field-group>
             <p-field-group :label="$t('PLUGIN.COLLECTOR.MAIN.SCHEDULE_EDIT_MODAL_TIME_LABEL')"

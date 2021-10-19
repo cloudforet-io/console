@@ -3,7 +3,7 @@
 import jwt from 'jsonwebtoken';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    UserState, SignInRequest, UpdateUserRequest, UserRole
+    UserState, SignInRequest, UpdateUserRequest, UserRole,
 } from './type';
 
 const getDomainOwnerInfo = async (ownerId: string): Promise<UserState> => {
@@ -110,7 +110,7 @@ const getUserRoleBindings = async (userId: string): Promise<Array<UserRole>> => 
 export const signIn = async ({ commit, state }, signInRequest: SignInRequest): Promise<void> => {
     const response = await SpaceConnector.client.identity.token.issue({
         domain_id: signInRequest.domainId,
-        user_id: signInRequest.userId || null, //user_id 비어있을 수 있음
+        user_id: signInRequest.userId || null, // user_id 비어있을 수 있음
         user_type: signInRequest.userType,
         credentials: signInRequest.credentials,
     }, { skipAuthRefresh: true });

@@ -1,7 +1,7 @@
 <template>
     <spot-group-add-section :title="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SCHEDULE_POLICY.LABEL')"
-                 :empty-text="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SELECT_RESOURCE')"
-                 :is-empty="!resourceId"
+                            :empty-text="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SELECT_RESOURCE')"
+                            :is-empty="!resourceId"
     >
         <template #default>
             <div class="spot-group-schedule-policy-settings">

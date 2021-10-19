@@ -94,7 +94,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 import { AUTOMATION_ROUTE } from '@/services/automation/routes';
-import {SpaceRouter} from '@/router';
+import { SpaceRouter } from '@/router';
 
 
 interface Props {

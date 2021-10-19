@@ -39,12 +39,11 @@ export default defineComponent({
 
         onMounted(async () => {
             const param = {
-                secureToken : props.secureToken,
-                secureSessionId : props.secureSessionId,
-            }
+                secureToken: props.secureToken,
+                secureSessionId: props.secureSessionId,
+            };
             await loadAuth('KB_SSO').signIn(onSignIn, param);
         });
-
     },
 });
 </script>

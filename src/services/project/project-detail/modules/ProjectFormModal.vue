@@ -100,7 +100,7 @@ export default {
                 return false;
             }),
             showValidation: false,
-            loading: false
+            loading: false,
         });
 
 

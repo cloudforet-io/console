@@ -53,7 +53,7 @@ import {
 } from '@spaceone/design-system';
 import { ComponentRenderProxy, getCurrentInstance } from '@vue/composition-api';
 import { AUTH_ROUTE } from '@/services/auth/routes';
-import {store} from "@/store";
+import { store } from '@/store';
 
 
 export default {
@@ -80,7 +80,7 @@ export default {
 
         /* event */
         const hideErrorMessage = () => {
-            if (vm.$route.query.error) vm.$router.replace({ query: { error: null } })
+            if (vm.$route.query.error) vm.$router.replace({ query: { error: null } });
             store.dispatch('display/hideSignInErrorMessage');
         };
         const goToAdminSignIn = () => {

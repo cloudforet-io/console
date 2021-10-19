@@ -1,5 +1,5 @@
 module.exports = {
-  browserslist: [
-    "defaults"
-  ]
-}
+    browserslist: [
+        'defaults',
+    ],
+};

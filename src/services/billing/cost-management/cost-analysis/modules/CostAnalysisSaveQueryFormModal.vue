@@ -23,8 +23,8 @@
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LABEL_VISIBILITY')" required>
                 <div class="visibility-radio-list">
                     <p-radio v-for="visibility in visibilityList" :key="visibility.value"
-                             :value="visibility.value"
                              v-model="formState.selectedVisibility"
+                             :value="visibility.value"
                              @change="handleChangeVisibility(visibility.value)"
                     >
                         <div class="visibility-radio-content-wrapper">
@@ -129,7 +129,7 @@ export default {
             if (after) {
                 formState.queryName = after;
                 state.showValidation = true;
-            };
+            }
         });
 
         const handleFormConfirm = () => {

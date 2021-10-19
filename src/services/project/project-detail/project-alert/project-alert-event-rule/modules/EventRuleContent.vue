@@ -109,12 +109,10 @@ export default {
             ])),
             items: [] as any,
             projects: computed(() => store.state.resource.project.items),
-            conditions: computed(() => {
-                return {
-                    ANY: i18n.t('PROJECT.EVENT_RULE.ANY'),
-                    ALL: i18n.t('PROJECT.EVENT_RULE.ALL'),
-                }
-            })
+            conditions: computed(() => ({
+                ANY: i18n.t('PROJECT.EVENT_RULE.ANY'),
+                ALL: i18n.t('PROJECT.EVENT_RULE.ALL'),
+            })),
         });
 
         const getData = () => {

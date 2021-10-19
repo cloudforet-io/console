@@ -29,6 +29,6 @@ export interface ParamType {
 export const PROTOCOL_TYPE = {
     AWS_SNS: 'AWS SNS',
     SLACK: 'Slack',
-    VOICE_CALL: 'Voice Call'
+    VOICE_CALL: 'Voice Call',
 } as const;
 export type PROTOCOL_TYPE = typeof PROTOCOL_TYPE[keyof typeof PROTOCOL_TYPE];

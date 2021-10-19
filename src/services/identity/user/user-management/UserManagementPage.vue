@@ -331,7 +331,7 @@ export default {
                 { name: 'state', label: 'State' },
                 { name: 'user_type', label: 'Access Control' },
                 { name: 'api_key_count', label: 'API Key' },
-                { name: 'role_name', label: 'Role'},
+                { name: 'role_name', label: 'Role' },
                 { name: 'backend', label: 'Auth Type' },
                 { name: 'last_accessed_at', label: 'Last Activity' },
                 { name: 'timezone', label: 'Timezone' },

@@ -20,8 +20,8 @@
         </p>
         <div v-else class="content-wrapper">
             <project-select-dropdown :selected-project-ids="dataForUpdate ? [dataForUpdate] : []"
-                                     @select="onSelectProject"
                                      class="dropdown"
+                                     @select="onSelectProject"
             />
             <div class="button-group ml-2">
                 <p-button :outline="true" size="sm" class="cancel-button"
@@ -50,7 +50,9 @@
             @confirm="onClickSave(EDIT_MODE.PROJECT)"
         >
             <template #body>
-                <p class="modal-body">{{ $t('MONITORING.ALERT.DETAIL.INFO.CHANGE_PROJECT_MODAL_DESC') }}</p>
+                <p class="modal-body">
+                    {{ $t('MONITORING.ALERT.DETAIL.INFO.CHANGE_PROJECT_MODAL_DESC') }}
+                </p>
             </template>
         </p-button-modal>
     </fragment>

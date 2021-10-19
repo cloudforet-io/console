@@ -91,7 +91,7 @@ export default {
         readonly: {
             type: Boolean,
             default: false,
-        }
+        },
     },
     setup(props, { emit }) {
         const state = reactive({

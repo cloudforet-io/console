@@ -44,11 +44,13 @@
 </template>
 
 <script lang="ts">
-import { PButton, PI, PFieldGroup, PTextInput } from '@spaceone/design-system';
-import {computed, reactive, toRefs} from '@vue/composition-api';
+import {
+    PButton, PI, PFieldGroup, PTextInput,
+} from '@spaceone/design-system';
+import { computed, reactive, toRefs } from '@vue/composition-api';
 import { useNotificationItem } from '@/services/notification/modules/notification-channel-item/composables';
 import { EDIT_TYPE, PARAM_KEY_TYPE } from '@/services/notification/modules/notification-channel-item/type';
-import {i18n} from "@/translations";
+import { i18n } from '@/translations';
 
 
 export default {
@@ -97,7 +99,7 @@ export default {
                 return undefined;
             }),
             isNameInvalid: computed(() => !!state.nameInvalidText),
-        })
+        });
 
         const saveChangedName = async () => {
             if (props.projectId) await updateProjectChannel(PARAM_KEY_TYPE.NAME, notificationItemState.dataForEdit);

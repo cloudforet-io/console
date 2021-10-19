@@ -87,7 +87,7 @@
         </section>
         <cost-analysis-chart :group-by-items="filterState.selectedGroupBy" :chart-type="filterState.selectedChartType" />
         <save-query-form-modal :header-title="saveQueryFormTitle" :visible.sync="saveQueryFormVisible"
-                               @confirm="handleSaveQueryConfirm" :query-name="selectedQueryName"
+                               :query-name="selectedQueryName" @confirm="handleSaveQueryConfirm"
         />
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"

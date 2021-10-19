@@ -21,7 +21,9 @@
                 </p-check-box>
             </div>
         </article>
-        <p v-if="!isTopicValid" class="invalid-text">Required</p>
+        <p v-if="!isTopicValid" class="invalid-text">
+            Required
+        </p>
     </div>
 </template>
 

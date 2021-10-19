@@ -44,7 +44,6 @@ export default defineComponent({
         onMounted(async () => {
             await loadAuth('KEYCLOAK').signIn(onSignIn);
         });
-
     },
 });
 </script>

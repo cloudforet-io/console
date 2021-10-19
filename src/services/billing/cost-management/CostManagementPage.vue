@@ -6,13 +6,13 @@
                     {{ $t('INVENTORY.CLOUD_SERVICE.MAIN.FAVORITES') }} <span class="count">({{ favoriteItems.length }})</span>
                 </p>
                 <p-divider class="sidebar-divider" />
-<!--                <favorite-list :items="favoriteItems" class="favorite-list" @delete="onFavoriteDelete">-->
-<!--                    <template #icon="{item}">-->
-<!--                        <p-i name="ic_private" class="private-icon"-->
-<!--                             width="1rem" height="1rem"-->
-<!--                        />-->
-<!--                    </template>-->
-<!--                </favorite-list>-->
+                <!--                <favorite-list :items="favoriteItems" class="favorite-list" @delete="onFavoriteDelete">-->
+                <!--                    <template #icon="{item}">-->
+                <!--                        <p-i name="ic_private" class="private-icon"-->
+                <!--                             width="1rem" height="1rem"-->
+                <!--                        />-->
+                <!--                    </template>-->
+                <!--                </favorite-list>-->
                 <p class="sidebar-title">
                     {{ $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD') }}
                     <p-icon-button name="ic_plus" class="add-button"

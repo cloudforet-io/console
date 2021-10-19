@@ -1,11 +1,11 @@
 <template>
     <spot-group-add-section :title="$t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.LABEL')"
-                 :empty-text="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SELECT_RESOURCE')"
-                 :is-empty="!resourceId"
+                            :empty-text="$t('AUTOMATION.SPOT_AUTOMATION.ADD.SELECT_RESOURCE')"
+                            :is-empty="!resourceId"
     >
         <div class="table-container">
             <div class="optimized-wrapper">
-                <div class="optimized-checkbox" v-if="!errored">
+                <div v-if="!errored" class="optimized-checkbox">
                     <p-i name="ic_checkbox_peacock400--checked" width="1.25rem" height="1.25rem" /> :
                     <span class="desc"> {{ $t('AUTOMATION.SPOT_AUTOMATION.ADD.INSTANCE_TYPE.DESC') }}</span>
                 </div>
@@ -48,7 +48,8 @@
                                         <template #icon>
                                             <p-i v-if="checkedTypes[size] && checkedTypes[size].includes(type)"
                                                  class="cursor-pointer"
-                                                 name="ic_checkbox_peacock400--checked" width="1.25rem" />
+                                                 name="ic_checkbox_peacock400--checked" width="1.25rem"
+                                            />
                                         </template>
                                     </p-check-box>
                                 </td>

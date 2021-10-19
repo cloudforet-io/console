@@ -17,10 +17,10 @@
                         N/A
                     </span>
                     <span v-if="cardData.instanceState === INSTANCE_STATE.healthy" class="text" :class="cardData.instanceState">
-                        {{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.HEALTHY')}}
+                        {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.HEALTHY') }}
                     </span>
                     <span v-if="cardData.instanceState === INSTANCE_STATE.unhealthy" class="text" :class="cardData.instanceState">
-                        {{$t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.UNHEALTHY')}}
+                        {{ $t('AUTOMATION.SPOT_AUTOMATION.LIST.CARD.UNHEALTHY') }}
                     </span>
                 </span>
             </div>

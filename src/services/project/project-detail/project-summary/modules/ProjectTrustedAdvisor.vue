@@ -66,7 +66,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { green, red, yellow } from '@/styles/colors';
 import { store } from '@/store';
-import {INVENTORY_ROUTE} from "@/services/inventory/routes";
+import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 
 
 const TRUSTED_ADVISER = 'TrustedAdvisor';

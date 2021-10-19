@@ -4,7 +4,7 @@
             <slot />
         </div>
         <div class="fnb">
-            <FNB />
+            <f-n-b />
         </div>
     </div>
 </template>

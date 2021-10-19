@@ -2,7 +2,7 @@ import { FavoriteItem, FavoriteState } from '@/store/modules/favorite/type';
 import { Getter } from 'vuex';
 import { sortBy } from 'lodash';
 
-export const items: Getter<FavoriteState, any> = (state: FavoriteState, getters, rootState): FavoriteItem[] =>  {
+export const items: Getter<FavoriteState, any> = (state: FavoriteState, getters, rootState): FavoriteItem[] => {
     const resourceItems = rootState.resource.projectGroup.items;
     return state.items.map((d) => {
         const resource = resourceItems[d.id];

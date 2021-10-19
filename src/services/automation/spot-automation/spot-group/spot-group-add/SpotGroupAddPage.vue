@@ -16,8 +16,8 @@
         />
 
         <spot-group-instance-type-selection :resource-id="selectedResource ? selectedResource.cloud_service_id : ''"
-                                 :resource-type="selectedResourceType"
-                                 @change="onChangeInstanceType"
+                                            :resource-type="selectedResourceType"
+                                            @change="onChangeInstanceType"
         />
 
         <div class="button-group">

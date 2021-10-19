@@ -18,23 +18,23 @@
                         {{ userId }}
                     </span>
                 </p>
-<!--                <p-field-group-->
-<!--                    :label="$t('PROJECT.DETAIL.PROJECT_ROLE')"-->
-<!--                    :required="true"-->
-<!--                    :invalid="validationState.isProjectRoleValid === false"-->
-<!--                    :invalid-text="validationState.projectRoleCheckInvalidText"-->
-<!--                    class="dropdown"-->
-<!--                >-->
-<!--                    <template #default="{invalid}">-->
-<!--                        <p-select-dropdown v-model="projectRole"-->
-<!--                                           :items="projectRoleList"-->
-<!--                                           :disabled="projectRoleList.length < 1"-->
-<!--                                           use-fixed-menu-style-->
-<!--                        >-->
-<!--                            {{ $t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_ROLE') }}-->
-<!--                        </p-select-dropdown>-->
-<!--                    </template>-->
-<!--                </p-field-group>-->
+                <!--                <p-field-group-->
+                <!--                    :label="$t('PROJECT.DETAIL.PROJECT_ROLE')"-->
+                <!--                    :required="true"-->
+                <!--                    :invalid="validationState.isProjectRoleValid === false"-->
+                <!--                    :invalid-text="validationState.projectRoleCheckInvalidText"-->
+                <!--                    class="dropdown"-->
+                <!--                >-->
+                <!--                    <template #default="{invalid}">-->
+                <!--                        <p-select-dropdown v-model="projectRole"-->
+                <!--                                           :items="projectRoleList"-->
+                <!--                                           :disabled="projectRoleList.length < 1"-->
+                <!--                                           use-fixed-menu-style-->
+                <!--                        >-->
+                <!--                            {{ $t('PROJECT.DETAIL.MODAL_VALIDATION_SELECT_ROLE') }}-->
+                <!--                        </p-select-dropdown>-->
+                <!--                    </template>-->
+                <!--                </p-field-group>-->
                 <div class="label-text-wrapper">
                     <span class="label-text">
                         {{ $t('PROJECT.DETAIL.PROJECT_MEMBER_LABEL') }}

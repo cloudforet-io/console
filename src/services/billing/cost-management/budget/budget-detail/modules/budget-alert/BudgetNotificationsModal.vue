@@ -173,7 +173,7 @@ export default {
             handleConfirm,
             handleDeleteCondition,
             NOTIFICATION_UNIT,
-            NOTIFICATION_TYPE
+            NOTIFICATION_TYPE,
         };
     },
 };

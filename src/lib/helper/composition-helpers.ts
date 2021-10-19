@@ -9,7 +9,7 @@ import {
  * @param emit
  * @return {Ref<*>}
  */
-export const makeProxy = <T = any>(name: string, props: any = null, emit: any = null): Ref<T> => {
+export function makeProxy<T = any>(name: string, props: any = null, emit: any = null): Ref<T> {
     let newProps = props;
     let newEmit = emit;
     if (!newProps && !newEmit) {
@@ -31,4 +31,4 @@ export const makeProxy = <T = any>(name: string, props: any = null, emit: any = 
             }
         },
     });
-};
+}

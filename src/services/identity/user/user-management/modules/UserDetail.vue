@@ -44,7 +44,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 import { Tags } from '@/models';
 import { i18n } from '@/translations';
-import {iso8601Formatter} from "@spaceone/console-core-lib";
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 // const arrayFormatter = value => ((value && Array.isArray(value) && value.length > 0) ? value.join(', ') : '');
 
 interface Timestamp {

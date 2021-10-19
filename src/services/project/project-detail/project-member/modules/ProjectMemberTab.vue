@@ -301,9 +301,9 @@ export default {
 
         const onSelectDropdown = (name) => {
             switch (name) {
-                case 'delete': memberDeleteClick(); break;
-                case 'update': openMemberUpdateForm(); break;
-                default: break;
+            case 'delete': memberDeleteClick(); break;
+            case 'update': openMemberUpdateForm(); break;
+            default: break;
             }
         };
 
