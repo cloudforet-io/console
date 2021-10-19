@@ -87,11 +87,11 @@
         </section>
         <cost-analysis-chart :group-by-items="filterState.selectedGroupBy" :chart-type="filterState.selectedChartType" />
         <save-query-form-modal :header-title="saveQueryFormTitle" :visible.sync="saveQueryFormVisible"
-                               @confirm="querySaveConfirm" :query-name="selectedQueryName"
+                               @confirm="handleSaveQueryConfirm" :query-name="selectedQueryName"
         />
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
-                      @confirm="deleteQueryConfirm"
+                      @confirm="handleDeleteQueryConfirm"
         />
     </div>
 </template>
@@ -271,11 +271,11 @@ export default {
             state.saveQueryFormTitle = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_QUERY');
             state.saveQueryFormVisible = true;
         };
-        const querySaveConfirm = (requestType) => {
+        const handleSaveQueryConfirm = (requestType) => {
             if (requestType === 'save') console.log('save');
             else console.log('edit');
         };
-        const deleteQueryConfirm = () => {
+        const handleDeleteQueryConfirm = () => {
             console.log('delete confirm');
             checkDeleteState.visible = false;
             showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '', vm.$root);
@@ -301,12 +301,12 @@ export default {
             handleSelectGranularity,
             handleSelectGroupByItems,
             handleClickRefresh,
-            querySaveConfirm,
             handleClickMore,
             handleClickDeleteQuery,
             handleClickEditQuery,
             handleClickSaveQuery,
-            deleteQueryConfirm,
+            handleSaveQueryConfirm,
+            handleDeleteQueryConfirm,
         };
     },
 };
