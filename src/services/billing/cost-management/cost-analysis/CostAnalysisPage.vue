@@ -87,7 +87,11 @@
         </section>
         <cost-analysis-chart :group-by-items="filterState.selectedGroupBy" :chart-type="filterState.selectedChartType" />
         <save-query-form-modal :header-title="saveQueryFormTitle" :visible.sync="saveQueryFormVisible"
-                               @confirm="handleFormSave" :query-name="selectedQueryName"
+                               @confirm="querySaveConfirm" :query-name="selectedQueryName"
+        />
+        <delete-modal :header-title="checkDeleteState.headerTitle"
+                      :visible.sync="checkDeleteState.visible"
+                      @confirm="deleteQueryConfirm"
         />
     </div>
 </template>
@@ -96,7 +100,8 @@
 import dayjs from 'dayjs';
 
 import {
-    computed, reactive, toRefs, watch,
+    ComponentRenderProxy,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -105,6 +110,7 @@ import {
 
 import CostAnalysisChart from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisChart.vue';
 import SaveQueryFormModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue';
+import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { BILLING_ROUTE } from '@/services/billing/routes';
@@ -116,6 +122,7 @@ import {
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import { CostAnalysisStoreState, GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import costAnalysisStoreModule from '@/services/billing/cost-management/cost-analysis/store';
+import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { store } from '@/store';
 
 
@@ -131,8 +138,10 @@ export default {
         PSelectButton,
         PIconTextButton,
         SaveQueryFormModal,
+        DeleteModal,
     },
     setup() {
+        const vm = getCurrentInstance() as ComponentRenderProxy;
         registerServiceStore<CostAnalysisStoreState>('costAnalysis', costAnalysisStoreModule);
 
         const state = reactive({
@@ -231,6 +240,11 @@ export default {
             ]),
         });
 
+        const checkDeleteState = reactive({
+            visible: false,
+            headerTitle: computed(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHECK_DELETE_MODAL_DESC')),
+        });
+
         /* event */
         const handleSelectGranularity = (granularity: string) => {
             store.dispatch('service/costAnalysis/updateSelectedGranularity', granularity);
@@ -246,6 +260,7 @@ export default {
         };
         const handleClickDeleteQuery = () => {
             console.log('delete query');
+            checkDeleteState.visible = true;
         };
         const handleClickEditQuery = (myQuery) => {
             state.saveQueryFormTitle = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.EDIT_QUERY');
@@ -256,9 +271,14 @@ export default {
             state.saveQueryFormTitle = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_QUERY');
             state.saveQueryFormVisible = true;
         };
-        const handleFormSave = (requestType) => {
+        const querySaveConfirm = (requestType) => {
             if (requestType === 'save') console.log('save');
             else console.log('edit');
+        };
+        const deleteQueryConfirm = () => {
+            console.log('delete confirm');
+            checkDeleteState.visible = false;
+            showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '', vm.$root);
         };
 
         watch(() => filterState.selectedGranularity, (selectedGranularity) => {
@@ -277,14 +297,16 @@ export default {
             ...toRefs(state),
             filterState,
             routeState,
+            checkDeleteState,
             handleSelectGranularity,
             handleSelectGroupByItems,
             handleClickRefresh,
-            handleFormSave,
+            querySaveConfirm,
             handleClickMore,
             handleClickDeleteQuery,
             handleClickEditQuery,
             handleClickSaveQuery,
+            deleteQueryConfirm,
         };
     },
 };
