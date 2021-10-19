@@ -3,8 +3,8 @@
         <div class="card-header">
             Budget Summary
         </div>
-        <budget-summary-chart :chart-data="tempData" />
-        <budget-summary-table :chart-data="tempData" />
+        <budget-summary-chart :chart-data="tempData" :legends="legends" />
+        <budget-summary-table :chart-data="tempData" :legends="legends" />
     </p-pane-layout>
 </template>
 
@@ -48,8 +48,15 @@ export default {
             },
         ];
 
+        const legends = [
+            {
+                name: 'usd_cost', label: 'Actual Cost',
+            },
+        ];
+
         return {
             tempData,
+            legends,
         };
     },
 };

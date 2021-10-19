@@ -40,7 +40,7 @@
                         <span>% of budget > 90%</span>
                     </li>
                 </ul>
-                <p-icon-text-button name="ic_setting" style-type="gray900 outline" outline
+                <p-icon-text-button name="ic_setting" style-type="gray900" outline
                                     class="mt-4"
                                     @click="handleSetAlert"
                 >
@@ -66,7 +66,7 @@
                 <span class="content-desc no-alert">
                     Set budget alert if you want to send notifications when the cost exceeds the budget
                 </span> <br>
-                <p-icon-text-button name="ic_setting" style-type="gray900 outline" outline
+                <p-icon-text-button name="ic_setting" style-type="gray900" outline
                                     class="mt-4"
                                     @click="handleSetAlert"
                 >

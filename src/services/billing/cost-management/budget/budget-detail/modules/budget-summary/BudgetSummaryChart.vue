@@ -7,10 +7,15 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
-    useStackedColumnChart,
+    useColumnChart,
 } from '@/common/composables/dynamic-chart';
 import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
-import { store } from '@/store';
+import * as am4core from '@amcharts/amcharts4/core';
+import * as am4charts from '@amcharts/amcharts4/charts';
+import am4themes_animated from '@amcharts/amcharts4/themes/animated';
+import {secondary1} from "@/styles/colors";
+
+type DateUnit = 'day' | 'month' | 'year';
 
 export default {
     name: 'BudgetSummaryChart',
@@ -44,14 +49,15 @@ export default {
                 categoryOptions: {
                     path: 'date',
                     legends: computed(() => props.legends),
+                    timeUnit: 'month' as DateUnit,
                 },
                 chartContainer: ctx,
             };
-            if (props.chartType === CHART_TYPE.STACKED_COLUMN) {
-                useStackedColumnChart(params);
-            }
+            const { chart } = useColumnChart(params);
+
+            return chart;
         };
-        watch([() => state.chartRef, () => props.chartData, () => props.chartType], ([ctx, chartData]) => {
+        watch([() => state.chartRef, () => props.chartData], ([ctx, chartData]) => {
             if (ctx && chartData.length > 0) {
                 drawChart(ctx);
             }
