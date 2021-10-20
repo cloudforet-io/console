@@ -1,10 +1,12 @@
 <template>
     <div class="cost-analysis-chart">
         <section class="chart-section">
-            <cost-analysis-dynamic-widget :chart-type="chartType"
+            <cost-analysis-dynamic-widget :chart.sync="chart"
+                                          :chart-type="chartType"
                                           :chart-data="chartData"
                                           :legends="legends"
                                           :granularity="selectedGranularity"
+                                          :period="selectedPeriod"
             />
         </section>
         <section class="query-section">
@@ -34,14 +36,22 @@
                 <div class="button-wrapper">
                     <p-button style-type="gray-border"
                               size="sm" font-weight="normal"
-                              @click="handleClickHideAll"
+                              @click="handleClickHideAllLegends"
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.HIDE_ALL') }}
                     </p-button>
                 </div>
             </div>
             <div class="legend-wrapper">
-                <div class="legend" />
+                <div v-for="(legend, idx) in legends" :key="`legend-${legend.name}`"
+                     class="legend"
+                     @click="handleClickLegend(idx)"
+                >
+                    <p-status :text="legend.label"
+                              :icon-color="legend.disabled ? DISABLED_COLOR : CUSTOM_COLORS[idx]"
+                              :text-color="legend.disabled ? DISABLED_COLOR : null"
+                    />
+                </div>
             </div>
         </section>
     </div>
@@ -49,25 +59,27 @@
 
 <script lang="ts">
 import { random } from 'lodash';
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import dayjs from 'dayjs';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
-    PButton, PIconButton, PSelectDropdown,
+    PButton, PIconButton, PSelectDropdown, PStatus,
 } from '@spaceone/design-system';
 
-import CostAnalysisDynamicWidget from '@/services/billing/cost-management/cost-analysis/components/CostAnalysisDynamicWidget.vue';
+import CostAnalysisDynamicWidget
+    from '@/services/billing/cost-management/cost-analysis/components/CostAnalysisDynamicWidget.vue';
 
-import {
-    CHART_TYPE,
-} from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { store } from '@/store';
+import { gray } from '@/styles/colors';
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
+import { Legend } from '@/common/composables/dynamic-chart/type';
+import { CUSTOM_COLORS, hideAllSeries, toggleSeries } from '@/common/composables/dynamic-chart';
+import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 
-dayjs.extend(isSameOrBefore);
 
+const DISABLED_COLOR = gray[300];
 
 export default {
     name: 'CostAnalysisChart',
@@ -76,6 +88,7 @@ export default {
         PButton,
         PIconButton,
         PSelectDropdown,
+        PStatus,
     },
     props: {
         chartType: {
@@ -84,61 +97,95 @@ export default {
         },
     },
     setup(props) {
+        const { i18nDayjs } = useI18nDayjs();
+        const dayjs = i18nDayjs.value;
+
         const state = reactive({
             selectedGranularity: computed(() => store.state.service.costAnalysis.selectedGranularity),
             selectedGroupByItems: computed(() => store.state.service.costAnalysis.selectedGroupByItems),
             selectedGroupBy: undefined,
+            selectedPeriod: {
+                start: dayjs().startOf('month'),
+                end: dayjs(),
+            },
             //
+            chart: null as XYChart | PieChart | null,
             filters: [],
             chartData: [] as any,
-            chartRef: null as HTMLElement | null,
-            chartRegistry: {},
-            legends: computed(() => {
-                if (state.selectedGroupByItems.length) {
-                    return [
-                        { name: 'seoul', label: 'Seoul' },
-                        { name: 'tokyo', label: 'Tokyo' },
-                        { name: 'virginia', label: 'Virginia' },
-                        { name: 'california', label: 'California' },
-                        { name: 'frankfurt', label: 'Frankfurt' },
-                        { name: 'stockholm', label: 'Stockholm' },
-                    ];
-                }
-                return [{ name: 'total_cost', label: 'Total Cost' }];
-            }),
+            legends: [] as Legend[],
         });
 
         /* util */
         const getSampleChartData = () => {
-            let now = dayjs.utc().startOf('month');
-            const today = dayjs.utc(); // dayjs.utc().endOf('month');
-            const chartData: any = [];
-
-            while (now.isSameOrBefore(today, 'day')) {
-                if (state.selectedGroupByItems.length) {
-                    chartData.push({
-                        date: now.format('YYYY-MM-DD'),
+            let chartData: any;
+            if (state.selectedGroupByItems.length) {
+                chartData = [
+                    {
+                        date: '2021-10-02',
                         seoul: random(10, 100),
                         tokyo: random(10, 100),
                         virginia: random(10, 100),
                         california: random(10, 100),
                         frankfurt: random(10, 100),
                         stockholm: random(10, 100),
-                    });
-                } else {
-                    chartData.push({
-                        date: now.format('YYYY-MM-DD'),
+                    },
+                    {
+                        date: '2021-10-03',
+                        seoul: random(10, 100),
+                        tokyo: random(10, 100),
+                        virginia: random(10, 100),
+                        california: random(10, 100),
+                        frankfurt: random(10, 100),
+                        stockholm: random(10, 100),
+                    },
+                    {
+                        date: '2021-10-15',
+                        seoul: random(10, 100),
+                        tokyo: random(10, 100),
+                        virginia: random(10, 100),
+                        california: random(10, 100),
+                        frankfurt: random(10, 100),
+                        stockholm: random(10, 100),
+                    },
+                ];
+                state.legends = [
+                    { name: 'seoul', label: 'Seoul', disabled: false },
+                    { name: 'tokyo', label: 'Tokyo', disabled: false },
+                    { name: 'virginia', label: 'Virginia', disabled: false },
+                    { name: 'california', label: 'California', disabled: false },
+                    { name: 'frankfurt', label: 'Frankfurt', disabled: false },
+                    { name: 'stockholm', label: 'Stockholm', disabled: false },
+                ];
+            } else {
+                chartData = [
+                    {
+                        date: '2021-10-02',
                         total_cost: random(10, 100),
-                    });
-                }
-                now = now.add(1, 'day');
+                    },
+                    {
+                        date: '2021-10-03',
+                        total_cost: random(10, 100),
+                    },
+                    {
+                        date: '2021-10-15',
+                        total_cost: random(10, 100),
+                    },
+                ];
+                state.legends = [{ name: 'total_cost', label: 'Total Cost', disabled: false }];
             }
             state.chartData = chartData;
         };
 
         /* event */
-        const handleClickHideAll = () => {
-            console.log('hide all');
+        const handleClickLegend = (index) => {
+            toggleSeries(state.chart as XYChart | PieChart, index);
+            state.legends[index].disabled = !state.legends[index]?.disabled;
+        };
+        const handleClickHideAllLegends = () => {
+            hideAllSeries(state.chart as XYChart | PieChart);
+            state.legends.forEach((d) => {
+                d.disabled = true;
+            });
         };
 
         watch(() => state.selectedGroupByItems, (after, before) => {
@@ -161,8 +208,10 @@ export default {
 
         return {
             ...toRefs(state),
-            CHART_TYPE,
-            handleClickHideAll,
+            DISABLED_COLOR,
+            CUSTOM_COLORS,
+            handleClickLegend,
+            handleClickHideAllLegends,
         };
     },
 };
@@ -212,8 +261,22 @@ export default {
         .legend-wrapper {
             height: 16.75rem;
             overflow-y: auto;
+            padding: 0.5rem 0;
+
             .legend {
-                height: 100%;
+                height: 25px;
+                display: flex;
+                align-items: center;
+                font-size: 0.875rem;
+                cursor: pointer;
+                padding: 0 1rem;
+
+                &:hover {
+                    @apply bg-gray-100;
+                }
+                &.disabled {
+                    @apply text-gray-300;
+                }
             }
         }
     }

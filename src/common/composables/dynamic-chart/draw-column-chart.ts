@@ -1,13 +1,7 @@
 import * as am4core from '@amcharts/amcharts4/core';
-// eslint-disable-next-line @typescript-eslint/camelcase
-import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
-
-am4core.useTheme(am4themes_animated);
-am4core.options.autoSetClassName = true;
-am4core.options.classNamePrefix = 'CostAnalysisChart';
 
 
 const createCategoryAxis = (chart, categoryOptions) => {

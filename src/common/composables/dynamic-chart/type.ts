@@ -1,6 +1,7 @@
 import { TranslateResult } from 'vue-i18n';
 import { ComputedRef } from '@vue/composition-api';
-import * as am4charts from '@amcharts/amcharts4/charts';
+import { TimeUnit } from '@amcharts/amcharts4/core';
+
 
 export interface ChartData {
     [key: string]: any;
@@ -8,12 +9,14 @@ export interface ChartData {
 export interface Legend {
     name: string;
     label: string | TranslateResult;
+    disabled?: boolean;
 }
+
 
 interface CategoryOptions {
     legends: ComputedRef<Legend[]>;
     path: string;
-    timeUnit?: 'day' | 'month' | 'year';
+    timeUnit?: TimeUnit;
 }
 
 // interface ValueOptions {

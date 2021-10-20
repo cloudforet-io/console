@@ -1,38 +1,29 @@
 import * as am4core from '@amcharts/amcharts4/core';
-// eslint-disable-next-line @typescript-eslint/camelcase
-import am4themes_animated from '@amcharts/amcharts4/themes/animated';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
-
-am4core.useTheme(am4themes_animated);
-am4core.options.autoSetClassName = true;
-am4core.options.classNamePrefix = 'CostAnalysisChart';
 
 
 const convertChartData = (data) => {
     // todo: 도넛 차트의 경우, accumulated 는 조회기간의 합을, daily, monthly, yearly 는 조회기간의 마지막 일/월/년 값을 보여준다.
     const convertedData = [{
-        category: 'Lithuania',
+        category: 'seoul',
         value: 501.9,
     }, {
-        category: 'Czechia',
+        category: 'tokyo',
         value: 301.9,
     }, {
-        category: 'Ireland',
+        category: 'virginia',
         value: 201.1,
     }, {
-        category: 'Germany',
+        category: 'california',
         value: 165.8,
     }, {
-        category: 'Australia',
+        category: 'frankfurt',
         value: 139.9,
     }, {
-        category: 'Austria',
+        category: 'stockholm',
         value: 128.3,
-    }, {
-        category: 'UK',
-        value: 99,
     }];
 
     return convertedData;
@@ -53,11 +44,13 @@ const createValueAxis = (chart) => {
 
 const createSeries = (chart) => {
     const series = chart.series.push(new am4charts.PieSeries());
+    series.name = chart.label;
     series.dataFields.value = 'value';
     series.dataFields.category = 'category';
     series.slices.template.stroke = am4core.color('white');
     series.slices.template.strokeOpacity = 1;
 
+    series.labels.template.bent = true;
     series.slices.template.togglable = false;
     series.slices.template.clickable = false;
     series.tooltip.disabled = true;
