@@ -11,4 +11,3 @@ export const useI18nDayjs = () => ({
         return dayjs;
     }),
 });
-dayjs.locale();
