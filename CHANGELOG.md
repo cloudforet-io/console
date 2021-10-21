@@ -1,3 +1,10 @@
+# [1.1.0-beta.146](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.145...v1.1.0-beta.146) (2021-10-21)
+
+
+### Bug Fixes
+
+* fix radius of selectableItem ([#701](https://github.com/spaceone-dev/spaceone-design-system/issues/701)) ([603bc44](https://github.com/spaceone-dev/spaceone-design-system/commit/603bc4431a83ded9979c365dbf28e981a06eebad))
+
 # [1.1.0-beta.145](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.144...v1.1.0-beta.145) (2021-10-21)
 
 
