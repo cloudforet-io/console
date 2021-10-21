@@ -138,6 +138,7 @@ export default {
     }
 }
 .item-container {
+    @apply rounded;
     &.default {
         @mixin item-theme transparent, theme('colors.gray.100'), theme('colors.secondary'), theme('colors.blue.200');
     }
@@ -148,7 +149,6 @@ export default {
             padding: 0.5rem 1rem;
         }
     }
-
     &.disabled {
         cursor: unset;
         opacity: 0.5;
