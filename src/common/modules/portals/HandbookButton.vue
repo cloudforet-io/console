@@ -2,7 +2,7 @@
     <fragment>
         <span style-type="primary"
               class="handbook-button"
-              @click="$store.dispatch('display/showHandbook')"
+              @click="handleHandbookButton"
         >
             <p-i name="ic_help"
                  width="0.875rem" height="0.875rem"
@@ -87,6 +87,11 @@ export default {
             if (val) store.dispatch('display/hideSidebar');
         };
 
+        const handleHandbookButton = () => {
+            if (store.state.display.visibleSidebar) store.dispatch('display/hideSidebar');
+            else store.dispatch('display/showHandbook');
+        };
+
         onMounted(() => {
             if (!state.noMore && !store.state.display.visibleSidebar) {
                 store.dispatch('display/showHandbook');
@@ -100,6 +105,7 @@ export default {
         return {
             ...toRefs(state),
             onChangeNoMore,
+            handleHandbookButton,
         };
     },
 };
