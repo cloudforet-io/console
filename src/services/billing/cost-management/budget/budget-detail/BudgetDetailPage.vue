@@ -34,7 +34,7 @@ import BudgetDetailInfo
 import BudgetSummary
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-summary/BudgetSummary.vue';
 import BudgetNotifications
-    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-alert/BudgetNotifications.vue';
+    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-notifications/BudgetNotifications.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 export default {

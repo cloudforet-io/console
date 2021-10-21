@@ -90,12 +90,12 @@ import {
     PPaneLayout, PIconButton, PI, PAnchor, PIconTextButton, PBadge,
 } from '@spaceone/design-system';
 import BudgetNotificationsChannel
-    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-alert/BudgetNotificationsChannel.vue';
+    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-notifications/BudgetNotificationsChannel.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { reactive, toRefs } from '@vue/composition-api';
 import { i18n } from '@/translations';
 import BudgetAlertModal
-    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-alert/BudgetNotificationsModal.vue';
+    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-notifications/BudgetNotificationsModal.vue';
 
 export default {
     name: 'BudgetNotifications',
@@ -211,10 +211,10 @@ export default {
         white-space: nowrap;
     }
     .alert-condition {
-        grid-column: 1 / 3;
+        grid-column: 1 / 4;
     }
     .noti-channel {
-        grid-column: 4 / 12;
+        grid-column: 5 / 12;
     }
     &.no-alert {
         display: flex;
