@@ -243,7 +243,7 @@ export default {
     margin-bottom: 1.2rem;
 }
 .body-container {
-    @apply bg-primary4 border border-gray-200 rounded-sm flex flex-col;
+    @apply bg-primary4 border border-gray-200 rounded-lg flex flex-col;
 }
 .tree-container {
     @apply overflow-auto flex-grow px-2 py-4;

@@ -42,8 +42,7 @@ export default defineComponent({
 
 <style lang="postcss" scoped>
 #g-sign-in-btn {
-    @apply border border-gray-900;
-    border-radius: 2px;
+    @apply border border-gray-900 rounded-sm;
     box-shadow: none;
     overflow: hidden;
     >>> .abcRioButtonIcon {

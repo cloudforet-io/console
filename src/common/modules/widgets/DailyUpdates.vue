@@ -487,12 +487,11 @@ export default {
 }
 
 .card-wrapper {
-    @apply overflow-hidden whitespace-no-wrap w-full;
+    @apply overflow-hidden whitespace-no-wrap w-full rounded-md;
     .daily-update-card {
         @apply flex items-center w-full content-between overflow-hidden;
         padding-left: 1rem;
         height: 4rem;
-        border-radius: 0.25rem;
 
         .daily-service {
             @apply text-xs truncate flex-shrink-0;
@@ -512,9 +511,8 @@ export default {
             width: 24%;
             max-width: 6.5rem;
             &:hover {
-                @apply bg-blue-100 cursor-pointer underline text-blue-500;
+                @apply bg-blue-100 cursor-pointer underline text-blue-500 rounded-md;
                 opacity: 0.75;
-                border-radius: 0.25rem;
             }
         }
         .daily-deleted-count {
@@ -524,9 +522,8 @@ export default {
             width: 24%;
             max-width: 6.5rem;
             &:hover {
-                @apply bg-blue-100 cursor-pointer underline text-red-500;
+                @apply bg-blue-100 cursor-pointer underline text-red-500 rounded-md;
                 opacity: 0.75;
-                border-radius: 0.25rem;
             }
         }
         .p-i-icon, .service-img {
@@ -543,9 +540,8 @@ export default {
 }
 
 .card-wrapper .daily-update-card-alert {
-    @apply flex items-center w-full content-between border;
+    @apply flex items-center w-full content-between border rounded-md;
     flex-wrap: wrap;
-    border-radius: 0.25rem;
     overflow: hidden;
     border-color: rgba(theme('colors.yellow.500'), 0.75);
     background: linear-gradient(90deg, rgba(theme('colors.yellow.100'), 0.75) 23.96%, rgba(theme('colors.yellow.300'), 0.75) 49.48%, rgba(theme('colors.yellow.100'), 0.75) 74.48%);

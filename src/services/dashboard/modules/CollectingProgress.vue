@@ -210,10 +210,9 @@ export default {
     }
 }
 .widget-layout::v-deep {
-    @apply border border-gray-100;
+    @apply border border-gray-100 rounded-lg;
     position: relative;
     min-height: 18.75rem;
-    border-radius: 0.375rem;
 }
 
 .no-data-wrapper {
@@ -234,7 +233,7 @@ export default {
     }
 }
 .card {
-    border-radius: 0.25rem;
+    @apply rounded-md;
     padding: 0.75rem 1rem;
     &:nth-child(odd) {
         @apply bg-primary4;

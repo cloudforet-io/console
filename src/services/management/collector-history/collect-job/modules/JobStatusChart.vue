@@ -148,7 +148,7 @@ export default {
 
 <style lang="postcss" scoped>
 .job-status-chart {
-    border-radius: 0.375rem;
+    @apply rounded-lg;
     padding: 1rem;
 
     .status-wrapper {
@@ -171,9 +171,8 @@ export default {
     }
 
     .chart-wrapper {
-        @apply bg-blue-100;
+        @apply bg-blue-100 rounded-lg;
         font-size: 0.875rem;
-        border-radius: 0.375rem;
         padding: 1rem 1.5rem;
 
         .label-wrapper {

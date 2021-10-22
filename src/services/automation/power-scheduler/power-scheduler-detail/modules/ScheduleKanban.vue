@@ -413,8 +413,7 @@ export default {
         column-gap: 0.5rem;
         grid-template-columns: repeat(auto-fit, minmax(11.75rem, 1fr));
         .resource-group-box {
-            @apply border border-violet-200 bg-white box-border;
-            border-radius: 2px;
+            @apply border border-violet-200 bg-white box-border rounded-sm;
             box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
             .resource-group-header {
                 @apply bg-violet-100;
@@ -428,8 +427,7 @@ export default {
                     font-size: 0.875rem;
                 }
                 .header-decorator {
-                    @apply inline-block bg-primary3 text-primary;
-                    border-radius: 2px;
+                    @apply inline-block bg-primary3 text-primary rounded-sm;
                     padding: 0.2rem 0.5rem;
                     margin-left: 0.5rem;
                     font-size: 0.75rem;
@@ -457,15 +455,13 @@ export default {
                 .kanban-guide-wrapper {
                     @apply flex-col;
                     #kanban-guide-card {
-                        @apply bg-blue-100 m-auto;
+                        @apply bg-blue-100 m-auto rounded-md;
                         height: 3.25rem;
-                        border-radius: 0.25rem;
                         z-index: 1;
                     }
                     #kanban-guide-square {
-                        @apply bg-blue-300;
+                        @apply bg-blue-300 rounded-md;
                         opacity: 0.4;
-                        border-radius: 0.25rem;
                         width: 2rem;
                         height: 2rem;
                         z-index: 2;
@@ -486,9 +482,8 @@ export default {
                 .resource-group-item {
                     @apply w-full block;
                     .add-resource-group {
-                        @apply border border-dashed border-gray-200 flex items-center w-full justify-center text-xs cursor-pointer content-between p-2 overflow-hidden leading-normal;
+                        @apply border border-dashed border-gray-200 flex items-center w-full justify-center text-xs cursor-pointer content-between p-2 overflow-hidden leading-normal rounded-md;
                         height: 3.25rem;
-                        border-radius: 0.25rem;
                         margin-bottom: 0.5rem;
                         &:hover {
                             @apply border-blue-500 border border-solid bg-blue-100;
@@ -498,9 +493,8 @@ export default {
                         }
                     }
                     .resource {
-                        @apply border border-gray-300 flex items-center w-full content-between p-2 overflow-hidden leading-normal whitespace-no-wrap;
+                        @apply border border-gray-300 flex items-center w-full content-between p-2 overflow-hidden leading-normal whitespace-no-wrap rounded-md;
                         height: 3.25rem;
-                        border-radius: 0.25rem;
                         margin-bottom: 0.5rem;
                         line-height: 1.5;
                         position: relative;

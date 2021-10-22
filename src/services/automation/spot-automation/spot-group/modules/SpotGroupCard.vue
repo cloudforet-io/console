@@ -135,9 +135,8 @@ export default {
 
 <style lang="postcss" scoped>
 .card-wrapper {
-    @apply border border-white;
+    @apply border border-white rounded;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
-    border-radius: 0.25rem;
     border-width: 1px;
     &:hover {
         @apply bg-blue-100 border-blue-500;

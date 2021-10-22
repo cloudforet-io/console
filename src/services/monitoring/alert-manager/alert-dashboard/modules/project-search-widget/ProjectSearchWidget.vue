@@ -167,7 +167,7 @@ export default {
 .project-search-widget {
     .p-toolbox::v-deep {
         .p-search {
-            border-radius: 0.25rem;
+            @apply rounded-md;
         }
     }
 

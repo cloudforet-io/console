@@ -377,12 +377,11 @@ export default {
     .box-wrapper {
         padding-bottom: 1.25rem;
         .box {
-            @apply border border-gray-200;
+            @apply border border-gray-200 rounded-lg;
             position: relative;
             display: flex;
             height: 7.25rem;
             cursor: pointer;
-            border-radius: 0.375rem;
             padding-left: 1rem;
 
             @screen lg {

@@ -261,10 +261,9 @@ export default {
 
 <style lang="postcss">
 .p-metric-chart {
-    @apply bg-white;
+    @apply bg-white rounded-lg;
     position: relative;
     box-shadow: 0 2px 4px rgba(theme('colors.black'), 0.06);
-    border-radius: 0.375rem;
     padding: 1.25rem;
 
     .chart {
@@ -281,7 +280,7 @@ export default {
     }
 
     .tooltip-wrapper {
-        @apply bg-white border border-gray-300;
+        @apply bg-white border border-gray-300 rounded-lg;
         position: absolute;
         visibility: hidden;
         width: calc(100% - 1rem);
@@ -292,7 +291,6 @@ export default {
         line-height: 1.2;
         opacity: 0;
         z-index: 1;
-        border-radius: 0.375rem;
         padding: 0.75rem 0;
 
         &.tooltip-visible {

@@ -428,12 +428,11 @@ export default {
             grid-template-rows: auto;
 
             .time-block {
-                @apply bg-white border border-gray-300;
+                @apply bg-white border border-gray-300 rounded-sm;
                 display: inline-block;
                 height: 2rem;
                 line-height: 2rem;
                 text-align: center;
-                border-radius: 2px;
                 font-size: 0.875rem;
                 cursor: pointer;
                 &:hover {

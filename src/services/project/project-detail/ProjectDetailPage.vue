@@ -363,7 +363,7 @@ export default {
     }
 }
 .p-tab::v-deep {
-    border-radius: 0.375rem;
+    @apply rounded-lg;
     margin: auto;
     .extra {
         display: flex;

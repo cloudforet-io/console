@@ -534,10 +534,9 @@ export default {
 }
 
 .project-item {
-    @apply bg-white border border-gray-200;
+    @apply bg-white border border-gray-200 rounded-lg;
     height: 12.25rem;
     filter: drop-shadow(0 2px 4px rgba(theme('colors.black'), 0.06));
-    border-radius: 0.25rem;
     padding: 2rem 4rem 2rem 1.5rem;
 }
 

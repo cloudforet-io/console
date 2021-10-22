@@ -357,18 +357,17 @@ export default {
             }
         }
         .sub-menu-wrapper {
-            @apply bg-white border border-gray-200;
+            @apply bg-white border border-gray-200 rounded-sm;
             position: absolute;
             top: 2.5rem;
             left: -1.125rem;
             min-width: 10rem;
             box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
-            border-radius: 0.125rem;
             padding: 0.5rem;
             margin: 3px 0;
 
             .sub-menu {
-                @apply text-gray-900;
+                @apply text-gray-900 rounded;
                 position: relative;
                 width: 100%;
                 height: 2rem;
@@ -377,7 +376,6 @@ export default {
                 text-decoration: none;
                 white-space: nowrap;
                 cursor: pointer;
-                border-radius: 0.25rem;
                 padding: 0.5rem;
                 &:hover, &:focus {
                     @apply bg-primary4 text-primary;

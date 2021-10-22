@@ -403,7 +403,7 @@ export default {
     height: 13rem;
 }
 .p-data-table::v-deep {
-    border-radius: 0.125rem;
+    @apply rounded-sm;
     margin-top: 0.5rem;
     th {
         @apply bg-gray-100 text-gray-400;

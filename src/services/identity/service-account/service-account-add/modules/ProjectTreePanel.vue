@@ -277,7 +277,7 @@ export default {
 }
 
 .body-container {
-    @apply relative border border-gray-200 bg-primary4 rounded-sm flex flex-col w-full;
+    @apply relative border border-gray-200 bg-primary4 rounded-lg flex flex-col w-full;
 }
 .tree-container {
     @apply overflow-auto flex-grow px-2 py-4 w-full;

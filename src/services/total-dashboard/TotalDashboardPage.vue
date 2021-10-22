@@ -215,6 +215,7 @@ export default {
         }
     }
     .btn {
+        @apply rounded-md;
         overflow: hidden;
         display: block;
         width: 100%;
@@ -226,7 +227,6 @@ export default {
         font-size: 1rem;
         color: #444;
         background-color: #eee;
-        border-radius: 0.25rem;
         &:hover {
             background-color: #e9e9e9;
         }

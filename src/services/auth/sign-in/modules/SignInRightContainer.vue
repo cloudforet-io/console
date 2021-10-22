@@ -149,12 +149,11 @@ export default {
             margin-bottom: 3rem;
         }
         .error-msg-box {
-            @apply bg-red-100 text-red-500;
+            @apply bg-red-100 text-red-500 rounded;
             display: flex;
             justify-content: space-between;
             width: 100%;
             height: 2.25rem;
-            border-radius: 0.125rem;
             padding: 0.5rem;
             margin-top: -2.75rem;
 

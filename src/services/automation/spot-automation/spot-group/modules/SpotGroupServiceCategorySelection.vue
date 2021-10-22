@@ -127,10 +127,9 @@ export default {
 
 <style lang="postcss" scoped>
 .resource-type-wrapper {
-    @apply bg-white border-gray-200 text-gray-900;
+    @apply bg-white border-gray-200 text-gray-900 rounded-md;
     position: relative;
     border-width: 1px;
-    border-radius: 4px;
     min-width: 7.375rem;
     max-width: 16.5rem;
     padding: 2rem 0.5rem;

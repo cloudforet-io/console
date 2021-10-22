@@ -118,10 +118,9 @@ export default {
 
 <style lang="postcss" scoped>
 .escalation-policy-project-tree {
-    @apply border border-gray-200 bg-gray-100;
+    @apply border border-gray-200 bg-gray-100 rounded-md;
     max-height: 15rem;
     overflow-y: auto;
-    border-radius: 0.25rem;
     margin-top: 0.5rem;
 }
 </style>

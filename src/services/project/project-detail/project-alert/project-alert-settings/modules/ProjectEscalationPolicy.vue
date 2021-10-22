@@ -182,9 +182,8 @@ export default {
     }
 
     .escalation-rules-wrapper {
-        @apply bg-gray-100;
+        @apply bg-gray-100 rounded-lg;
         box-sizing: border-box;
-        border-radius: 0.375rem;
         padding: 1rem;
 
         .rule-wrapper {

@@ -520,8 +520,7 @@ export default {
         line-height: 1.2;
     }
     &:hover {
-        @apply bg-blue-100 cursor-pointer underline;
-        border-radius: 0.125rem;
+        @apply bg-blue-100 cursor-pointer underline rounded-sm;
     }
     .progress-bar {
         padding: 0;

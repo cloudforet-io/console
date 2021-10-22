@@ -384,7 +384,7 @@ export default {
     }
 
     >>> .power-scheduler-list {
-        @apply border border-gray-200 rounded;
+        @apply border border-gray-200 rounded-lg;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
 
         &:hover {

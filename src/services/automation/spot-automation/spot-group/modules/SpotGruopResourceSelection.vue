@@ -291,13 +291,12 @@ export default {
 
 <style lang="postcss" scoped>
 .select-item {
-    @apply border border-secondary text-secondary;
+    @apply border border-secondary text-secondary rounded-md;
     padding: 0.75rem 1rem;
     font-size: 0.875rem;
     line-height: 1.4;
     width: fit-content;
     margin: 1.125rem 0 1.5rem;
-    border-radius: 4px;
 }
 .field-group {
     margin-bottom: 0;

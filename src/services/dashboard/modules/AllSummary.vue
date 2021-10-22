@@ -774,10 +774,9 @@ export default {
     margin-top: 1rem;
 
     .content-wrapper {
-        @apply bg-white;
+        @apply bg-white rounded-lg;
         position: relative;
         height: 27.5rem;
-        border-radius: 0.375rem;
         padding: 1.25rem 1.5rem;
 
         @screen md {
@@ -805,13 +804,12 @@ export default {
                 right: 0.5rem;
                 top: 0;
                 .p-button {
-                    @apply border border-gray-200 text-gray-300;
+                    @apply border border-gray-200 text-gray-300 rounded-sm;
                     height: 1.25rem;
                     min-width: 2rem;
                     line-height: 1.25rem;
                     font-size: 0.75rem;
                     font-weight: normal;
-                    border-radius: 0.125rem;
                     padding: 0.25rem;
                     margin-left: 0.25rem;
                     &.selected {

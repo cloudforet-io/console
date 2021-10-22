@@ -579,13 +579,12 @@ export default {
             right: 0.5rem;
             top: 0;
             .date-button {
-                @apply border border-gray-200 text-gray-300;
+                @apply border border-gray-200 text-gray-300 rounded-sm;
                 height: 1.25rem;
                 min-width: 2rem;
                 line-height: 1.25rem;
                 font-size: 0.75rem;
                 font-weight: normal;
-                border-radius: 0.125rem;
                 padding: 0.25rem;
                 margin-left: 0.25rem;
                 &.selected {
@@ -650,9 +649,9 @@ export default {
             text-align: right;
         }
         .p-data-table::v-deep {
+            @apply rounded-sm;
             height: auto;
             text-align: right;
-            border-radius: 0.125rem;
             margin-top: 0.5rem;
             .table-container {
                 min-height: 5rem;

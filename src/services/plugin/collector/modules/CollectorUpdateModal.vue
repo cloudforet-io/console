@@ -295,13 +295,12 @@ export default {
         @apply flex;
         padding: 0 2rem 3rem 2rem;
         .p-text-input {
-            @apply text-gray-900;
+            @apply text-gray-900 rounded-sm;
             width: 100%;
             max-width: 19rem;
             appearance: none;
             font-size: 0.875rem;
             line-height: 1.5;
-            border-radius: 0.125rem;
             padding-left: 0.5rem;
             padding-right: 0.5rem;
         }

@@ -374,9 +374,9 @@ export default {
         }
 
         .add-button {
+            @apply rounded-md;
             position: absolute;
             right: 0;
-            border-radius: 0.25rem;
         }
     }
 

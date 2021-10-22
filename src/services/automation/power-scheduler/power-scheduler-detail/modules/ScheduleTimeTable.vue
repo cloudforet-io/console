@@ -824,8 +824,7 @@ export default {
                             @apply border-l-0;
                         }
                         &.routine, &.selected-routine {
-                            @apply bg-point-violet;
-                            border-radius: 0.125rem;
+                            @apply bg-point-violet rounded-sm;
                             &.selected-one-time-run {
                                 @apply bg-point-violet;
                             }
@@ -841,6 +840,7 @@ export default {
                             }
                         }
                         &.one-time-run, &.selected-one-time-run {
+                            @apply rounded-sm;
                             background:
                                 repeating-linear-gradient(
                                     45deg,
@@ -849,10 +849,9 @@ export default {
                                     theme('colors.point-violet') 3px,
                                     theme('colors.point-violet') 6px
                                 );
-                            border-radius: 0.125rem;
                         }
                         &.one-time-stop, &.selected-one-time-stop {
-                            border-radius: 0.125rem;
+                            @apply rounded-sm;
                             &:not(.routine) {
                                 @apply bg-transparent;
                             }
@@ -866,7 +865,7 @@ export default {
                     }
                 }
                 .help-block {
-                    @apply border-dashed border-secondary text-secondary;
+                    @apply border-dashed border-secondary text-secondary rounded-sm;
                     position: absolute;
                     display: table;
                     width: calc(100% / 7 * 5);
@@ -874,7 +873,6 @@ export default {
                     top: 12rem;
                     left: calc(100% / 7);
                     border-width: 2px;
-                    border-radius: 2px;
                     opacity: 0.75;
                     .help-text {
                         display: table-cell;
@@ -955,11 +953,11 @@ export default {
                     }
                 }
                 .legend-icon {
+                    @apply rounded-sm;
                     position: relative;
                     display: inline-block;
                     width: 0.75rem;
                     height: 0.75rem;
-                    border-radius: 2px;
                     margin-right: 0.5rem;
                 }
                 .edit-button {

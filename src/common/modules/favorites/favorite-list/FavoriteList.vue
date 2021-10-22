@@ -127,9 +127,8 @@ export default {
     }
 }
 .item {
-    @apply pl-1 flex items-center;
+    @apply pl-1 flex items-center rounded;
     height: 2rem;
-    border-radius: 2px;
     cursor: pointer;
     &.hovered {
         @apply bg-secondary2 text-secondary;

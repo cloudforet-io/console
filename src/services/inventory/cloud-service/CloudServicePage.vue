@@ -836,10 +836,9 @@ export default {
     gap: 1rem;
 }
 .cloud-service-type-item {
-    @apply px-6 bg-white border border-gray-200;
+    @apply px-6 bg-white border border-gray-200 rounded-lg;
     height: 6rem;
     filter: drop-shadow(0 2px 4px rgba(theme('colors.black'), 0.06));
-    border-radius: 4px;
     .favorite-btn {
         @apply ml-2;
         flex-shrink: 0;
@@ -857,8 +856,7 @@ export default {
     .item-wrapper {
         @apply flex w-full h-full items-center;
         .icon {
-            @apply overflow-hidden flex-shrink-0;
-            border-radius: 4px;
+            @apply overflow-hidden flex-shrink-0 rounded-md;
         }
         .text-content {
             @apply ml-4 flex-grow overflow-hidden;

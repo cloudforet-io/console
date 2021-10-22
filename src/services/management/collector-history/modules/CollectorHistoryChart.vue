@@ -271,9 +271,8 @@ export default {
 
 <style lang="postcss">
 .collector-history-chart {
-    @apply bg-white border border-gray-200;
+    @apply bg-white border border-gray-200 rounded-lg;
     height: 14rem;
-    border-radius: 0.375rem;
     padding: 1rem;
 
     .top-part {

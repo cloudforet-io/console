@@ -12,11 +12,11 @@ export default {
 
 <style lang="postcss" scoped>
 .balloon {
+    @apply rounded-md;
     position: relative;
     width: 40px;
     height: 26px;
     background: linear-gradient(90deg, rgba(102, 56, 182, 0.8) 0%, rgba(0, 128, 251, 0.8) 100%);
-    border-radius: 4px;
     left: -0.5rem;
 }
 .balloon::after {

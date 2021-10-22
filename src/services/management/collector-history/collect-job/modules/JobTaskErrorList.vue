@@ -98,9 +98,8 @@ export default {
         @apply text-gray-500;
     }
     .error-message {
-        @apply bg-gray-100;
+        @apply bg-gray-100 rounded-lg;
         white-space: pre-wrap;
-        border-radius: 0.375rem;
         padding: 0.5rem 0.75rem;
         margin: 0.75rem 0;
     }

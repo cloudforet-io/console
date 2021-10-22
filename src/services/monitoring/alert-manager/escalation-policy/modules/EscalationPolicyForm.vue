@@ -275,7 +275,7 @@ export default {
     }
     .p-text-input {
         .input-container {
-            border-radius: 0.25rem;
+            @apply rounded-md;
         }
     }
     .p-radio {

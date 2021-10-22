@@ -400,7 +400,7 @@ export default {
     grid-template-columns: repeat(auto-fill, minmax(18.75rem, 1fr));
     grid-auto-rows: 11.25rem;
     .project-card-container {
-        @apply bg-white border border-gray-200 overflow-visible rounded cursor-pointer;
+        @apply bg-white border border-gray-200 overflow-visible rounded-lg cursor-pointer;
         box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
         &:hover {
             @apply border-l border-gray-200 bg-blue-100;

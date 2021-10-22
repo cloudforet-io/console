@@ -278,9 +278,8 @@ export default {
     }
 
     .section {
-        @apply border border-gray-200 col-span-12;
+        @apply border border-gray-200 col-span-12 rounded-lg;
         position: relative;
-        border-radius: 0.375rem;
         box-sizing: border-box;
         line-height: 1.8;
         padding: 1.5rem 1rem;
@@ -309,9 +308,8 @@ export default {
         &.notification-policy-wrapper, &.auto-recovery-wrapper, &.event-rule-wrapper {
             @apply col-span-4;
             .content-wrapper {
-                @apply bg-gray-100;
+                @apply bg-gray-100 rounded-lg;
                 text-align: center;
-                border-radius: 0.375rem;
                 padding: 0.875rem;
                 margin: auto 0;
 

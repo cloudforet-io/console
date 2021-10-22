@@ -420,13 +420,12 @@ export default {
             top: 0;
             margin-top: 0.125rem;
             .date-button {
-                @apply border border-gray-200 text-gray-300;
+                @apply border border-gray-200 text-gray-300 rounded-sm;
                 min-width: auto;
                 height: 1.25rem;
                 line-height: 1.6;
                 font-size: 0.75rem;
                 font-weight: normal;
-                border-radius: 0.125rem;
                 padding: 0 0.5rem;
                 margin-left: 0.375rem;
                 &.selected {
@@ -482,8 +481,8 @@ export default {
     }
     .table-section {
         .p-data-table::v-deep {
+            @apply rounded-sm;
             min-height: 6.25rem;
-            border-radius: 0.125rem;
             th {
                 @apply bg-gray-100 text-gray-400;
                 height: 1.5rem;

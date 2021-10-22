@@ -822,11 +822,10 @@ export default {
 }
 
 .sidebar-list-item {
-    @apply truncate;
+    @apply truncate rounded;
     height: 2rem;
     margin: 0 0.75rem;
     padding: 0.375rem 1rem;
-    border-radius: 0.125rem;
     font-size: 0.875rem;
     line-height: 140%;
     &:hover {

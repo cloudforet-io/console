@@ -294,10 +294,9 @@ export default {
             @mixin legend-theme theme('colors.green.100'), theme('colors.green.500');
         }
         .box {
-            @apply border;
+            @apply border rounded-sm;
             width: 10px;
             height: 10px;
-            border-radius: 0.125rem;
             margin-right: 0.375rem;
         }
         .text {

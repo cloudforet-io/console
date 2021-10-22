@@ -201,11 +201,10 @@ export default {
 
 <style lang="postcss" scoped>
 .spot-group-composition-chart {
-    @apply bg-secondary2;
+    @apply bg-secondary2 rounded-lg;
     width: 100%;
     height: auto;
     font-size: 0.875rem;
-    border-radius: 0.375rem;
     padding: 1rem;
 
     &.long {

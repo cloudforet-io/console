@@ -383,8 +383,7 @@ export default {
         justify-content: space-between;
     }
     .collector-history-table {
-        @apply bg-white border border-gray-200;
-        border-radius: 0.375rem;
+        @apply bg-white border border-gray-200 rounded-lg;
         margin-top: 1rem;
 
         .status-wrapper {

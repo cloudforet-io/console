@@ -324,14 +324,13 @@ export default {
     }
 }
 .channel-item {
-    @apply border border-gray-300;
+    @apply border border-gray-300 rounded-lg;
     display: flex;
     flex-direction: column;
     place-content: center;
     align-items: center;
     height: 8.625rem;
     min-height: 8.625rem;
-    border-radius: 0.375rem;
     .text {
         @apply text-primaryDark font-bold;
         text-align: center;

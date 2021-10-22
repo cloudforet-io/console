@@ -36,8 +36,7 @@ export default {
 
 <style lang="postcss" scoped>
 .widget-layout {
-    @apply border-0;
-    border-radius: 0.375rem;
+    @apply border-0 rounded-lg;
     display: inline-flex;
     flex-direction: column;
     width: 100%;
