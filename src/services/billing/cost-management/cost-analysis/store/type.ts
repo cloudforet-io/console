@@ -13,7 +13,9 @@ export interface GroupByItem {
 }
 
 export interface CostAnalysisStoreState {
+    selectedChartType: ChartType;
     selectedGranularity: string;
     selectedGroupByItems: Array<GroupByItem>;
+    selectedDates: Array<string>;
     chartData: Array<ChartData>;
 }

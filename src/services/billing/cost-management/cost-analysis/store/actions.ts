@@ -1,41 +1,61 @@
-import { CostAnalysisStoreState, GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { ChartData, CostAnalysisStoreState } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { Action } from 'vuex';
+import { random } from 'lodash';
 
 
-export const getChartData: Action<CostAnalysisStoreState, any> = async ({ commit }): Promise<void|Error> => {
+export const getChartData: Action<CostAnalysisStoreState, any> = async ({ commit, state }): Promise<void|Error> => {
     try {
-        const chartData = []; // todo: get new chart data
+        let chartData: Array<ChartData>;
+        if (state.selectedGroupByItems.length) {
+            chartData = [
+                {
+                    date: '2021-10-02',
+                    seoul: random(10, 100),
+                    tokyo: random(10, 100),
+                    virginia: random(10, 100),
+                    california: random(10, 100),
+                    frankfurt: random(10, 100),
+                    stockholm: random(10, 100),
+                },
+                {
+                    date: '2021-10-03',
+                    seoul: random(10, 100),
+                    tokyo: random(10, 100),
+                    virginia: random(10, 100),
+                    california: random(10, 100),
+                    frankfurt: random(10, 100),
+                    stockholm: random(10, 100),
+                },
+                {
+                    date: '2021-10-15',
+                    seoul: random(10, 100),
+                    tokyo: random(10, 100),
+                    virginia: random(10, 100),
+                    california: random(10, 100),
+                    frankfurt: random(10, 100),
+                    stockholm: random(10, 100),
+                },
+            ];
+        } else {
+            chartData = [
+                {
+                    date: '2021-10-02',
+                    total_cost: random(10, 100),
+                },
+                {
+                    date: '2021-10-03',
+                    total_cost: random(10, 100),
+                },
+                {
+                    date: '2021-10-15',
+                    total_cost: random(10, 100),
+                },
+            ];
+        }
         commit('setChartData', chartData);
     } catch (e) {
         console.error(e);
         commit('setChartData', []);
     }
 };
-
-export const updateSelectedGranularity: Action<CostAnalysisStoreState, any> = async ({ commit }, granularity: string): Promise<void|Error> => {
-    try {
-        const chartData = []; // todo: get new chart data
-        commit('setSelectedGranularity', granularity);
-        commit('setChartData', chartData);
-    } catch (e) {
-        console.error(e);
-        commit('setChartData', []);
-    }
-};
-
-export const updateSelectedGroupByItems: Action<CostAnalysisStoreState, any> = async ({ commit }, groupByItems: Array<GroupByItem>): Promise<void|Error> => {
-    try {
-        const chartData = []; // todo: get new chart data
-        commit('setSelectedGroupByItems', groupByItems);
-        commit('setChartData', chartData);
-    } catch (e) {
-        console.error(e);
-        commit('setChartData', []);
-    }
-};
-
-// export const updateGroupBy
-// export const update filter
-// export const updateDate
-// export const updateCurrency

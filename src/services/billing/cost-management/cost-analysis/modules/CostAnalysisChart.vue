@@ -2,11 +2,11 @@
     <div class="cost-analysis-chart">
         <section class="chart-section">
             <cost-analysis-dynamic-widget :chart.sync="chart"
-                                          :chart-type="chartType"
+                                          :chart-type="selectedChartType"
                                           :chart-data="chartData"
-                                          :legends="legends"
                                           :granularity="selectedGranularity"
-                                          :period="selectedPeriod"
+                                          :legends="legends"
+                                          :period="period"
             />
         </section>
         <section class="query-section">
@@ -73,10 +73,10 @@ import CostAnalysisDynamicWidget
 import { store } from '@/store';
 import { gray } from '@/styles/colors';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
-import { Legend } from '@/common/composables/dynamic-chart/type';
 import { CUSTOM_COLORS, hideAllSeries, toggleSeries } from '@/common/composables/dynamic-chart';
-import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { Legend } from '@/common/composables/dynamic-chart/type';
 import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
+import dayjs from 'dayjs';
 
 
 const DISABLED_COLOR = gray[300];
@@ -90,64 +90,29 @@ export default {
         PSelectDropdown,
         PStatus,
     },
-    props: {
-        chartType: {
-            type: String,
-            default: '',
-        },
-    },
-    setup(props) {
-        const { i18nDayjs } = useI18nDayjs();
-        const dayjs = i18nDayjs.value;
-
+    setup() {
         const state = reactive({
             selectedGranularity: computed(() => store.state.service.costAnalysis.selectedGranularity),
             selectedGroupByItems: computed(() => store.state.service.costAnalysis.selectedGroupByItems),
+            selectedChartType: computed(() => store.state.service.costAnalysis.selectedChartType),
+            chartData: computed(() => store.state.service.costAnalysis.chartData),
+            period: computed(() => {
+                const selectedDates = store.state.service.costAnalysis.selectedDates;
+                return {
+                    start: dayjs(selectedDates[0]),
+                    end: dayjs(selectedDates[1]),
+                };
+            }),
             selectedGroupBy: undefined,
-            selectedPeriod: {
-                start: dayjs().startOf('month'),
-                end: dayjs(),
-            },
             //
             chart: null as XYChart | PieChart | null,
             filters: [],
-            chartData: [] as any,
             legends: [] as Legend[],
         });
 
         /* util */
-        const getSampleChartData = () => {
-            let chartData: any;
+        const setSampleLegends = () => {
             if (state.selectedGroupByItems.length) {
-                chartData = [
-                    {
-                        date: '2021-10-02',
-                        seoul: random(10, 100),
-                        tokyo: random(10, 100),
-                        virginia: random(10, 100),
-                        california: random(10, 100),
-                        frankfurt: random(10, 100),
-                        stockholm: random(10, 100),
-                    },
-                    {
-                        date: '2021-10-03',
-                        seoul: random(10, 100),
-                        tokyo: random(10, 100),
-                        virginia: random(10, 100),
-                        california: random(10, 100),
-                        frankfurt: random(10, 100),
-                        stockholm: random(10, 100),
-                    },
-                    {
-                        date: '2021-10-15',
-                        seoul: random(10, 100),
-                        tokyo: random(10, 100),
-                        virginia: random(10, 100),
-                        california: random(10, 100),
-                        frankfurt: random(10, 100),
-                        stockholm: random(10, 100),
-                    },
-                ];
                 state.legends = [
                     { name: 'seoul', label: 'Seoul', disabled: false },
                     { name: 'tokyo', label: 'Tokyo', disabled: false },
@@ -157,23 +122,8 @@ export default {
                     { name: 'stockholm', label: 'Stockholm', disabled: false },
                 ];
             } else {
-                chartData = [
-                    {
-                        date: '2021-10-02',
-                        total_cost: random(10, 100),
-                    },
-                    {
-                        date: '2021-10-03',
-                        total_cost: random(10, 100),
-                    },
-                    {
-                        date: '2021-10-15',
-                        total_cost: random(10, 100),
-                    },
-                ];
                 state.legends = [{ name: 'total_cost', label: 'Total Cost', disabled: false }];
             }
-            state.chartData = chartData;
         };
 
         /* event */
@@ -198,13 +148,8 @@ export default {
             }
         });
 
-        watch(() => state.selectedGroupBy, () => {
-            getSampleChartData();
-        }, { immediate: false });
-
-        watch([() => state.selectedGranularity, () => props.chartType], () => {
-            getSampleChartData();
-        }, { immediate: true });
+        // todo get temp legends
+        setSampleLegends();
 
         return {
             ...toRefs(state),
