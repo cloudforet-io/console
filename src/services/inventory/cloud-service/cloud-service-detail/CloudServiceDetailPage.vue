@@ -96,7 +96,7 @@
                         />
                     </template>
                     <template #member>
-                        <cloud-service-admin :cloud-service-ids="tableState.selectedCloudServiceIds" />
+                        <cloud-service-admin :cloud-service-project-id="tableState.selectedItems[0].project_id" />
                     </template>
                     <template #history>
                         <cloud-service-history :cloud-service-id="tableState.selectedCloudServiceIds[0]" />
@@ -121,9 +121,6 @@
                                           :field-handler="fieldHandler"
                                           class="selected-data-tab"
                         />
-                    </template>
-                    <template #member>
-                        <cloud-service-admin :cloud-service-ids="tableState.selectedCloudServiceIds" />
                     </template>
                     <template #monitoring>
                         <monitoring :resource-type="monitoringState.resourceType"
@@ -668,7 +665,6 @@ export default {
         const multiItemTabState = reactive({
             tabs: computed(() => ([
                 { name: 'data', label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_SELECTED_DATA') },
-                { name: 'member', label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MEMBER') },
                 { name: 'monitoring', label: vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.TAB_MONITORING') },
             ])),
             activeTab: 'data',

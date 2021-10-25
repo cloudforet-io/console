@@ -57,7 +57,7 @@
                 />
             </template>
             <template #member>
-                <server-member :server-ids="tableState.selectedServerIds" />
+                <server-member :server-project-id="tableState.selectedItems[0].project_id" />
             </template>
             <template #history>
                 <server-history :server-id="tableState.selectedServerIds[0]" />
@@ -82,9 +82,6 @@
                                   :field-handler="fieldHandler"
                                   class="selected-data-tab"
                 />
-            </template>
-            <template #member>
-                <server-member :server-ids="tableState.selectedServerIds" />
             </template>
             <template #monitoring>
                 <monitoring :resource-type="monitoringState.resourceType"
@@ -326,8 +323,6 @@ export default {
             tabs: computed(() => [
                 {
                     name: 'data', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_SELECTED_DATA') as string, type: 'item',
-                }, {
-                    name: 'member', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_MEMBER') as string, type: 'item',
                 }, {
                     name: 'monitoring', label: vm.$t('INVENTORY.SERVER.MAIN.TAB_MONITORING') as string, type: 'item',
                 },

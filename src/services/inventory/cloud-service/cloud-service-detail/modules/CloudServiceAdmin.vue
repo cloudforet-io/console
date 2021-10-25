@@ -49,9 +49,9 @@ export default {
         PPanelTop, PBadge, PSearchTable,
     },
     props: {
-        cloudServiceIds: {
-            type: Array,
-            default: () => [],
+        cloudServiceProjectId: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props) {
@@ -82,16 +82,19 @@ export default {
                 state.options.pageStart,
                 state.options.pageLimit,
             )
-            .setFilters([{ v: state.options.searchText }])
+            .setFilters([
+                { v: state.options.searchText },
+            ])
             .data;
 
-        const api = SpaceConnector.client.inventory.cloudService.member.list;
+        const api = SpaceConnector.client.identity.project.member.list;
         const listAdmin = async () => {
             state.loading = true;
 
             try {
                 const res = await api({
-                    cloud_services: props.cloudServiceIds,
+                    include_parent_member: true,
+                    project_id: props.cloudServiceProjectId,
                     query: getQuery(),
                 });
                 state.items = res.results.map(d => ({
@@ -101,6 +104,7 @@ export default {
                 state.totalCount = res.total_count;
             } catch (e) {
                 console.error(e);
+                state.items = [];
             } finally {
                 state.loading = false;
             }
@@ -117,7 +121,7 @@ export default {
                 await store.dispatch('file/downloadExcel', {
                     url: '/inventory/cloud-service/member/list',
                     param: {
-                        cloud_services: props.cloudServiceIds,
+                        cloud_services: props.cloudServiceProjectId,
                         query: getQuery(),
                     },
                     fields: [
@@ -133,8 +137,10 @@ export default {
             }
         };
 
-        watch(() => props.cloudServiceIds, (after, before) => {
-            if (after !== before) listAdmin();
+        watch(() => props.cloudServiceProjectId, (after, before) => {
+            if (!after) {
+                state.items = [];
+            } else if (after !== before) listAdmin();
         }, { immediate: true });
 
         return {

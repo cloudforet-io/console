@@ -48,9 +48,9 @@ export default {
         PPanelTop, PBadge, PSearchTable,
     },
     props: {
-        serverIds: {
-            type: Array,
-            default: () => [],
+        serverProjectId: {
+            type: String,
+            default: undefined,
         },
     },
     setup(props) {
@@ -81,16 +81,19 @@ export default {
                 state.options.pageStart,
                 state.options.pageLimit,
             )
-            .setFilters([{ v: state.options.searchText }])
+            .setFilters([
+                { v: state.options.searchText },
+            ])
             .data;
 
-        const api = SpaceConnector.client.inventory.server.member.list;
+        const api = SpaceConnector.client.identity.project.member.list;
         const listAdmin = async () => {
             state.loading = true;
 
             try {
                 const res = await api({
-                    servers: props.serverIds,
+                    include_parent_member: true,
+                    project_id: props.serverProjectId,
                     query: getQuery(),
                 });
                 state.items = res.results.map(d => ({
@@ -100,6 +103,7 @@ export default {
                 state.totalCount = res.total_count;
             } catch (e) {
                 console.error(e);
+                state.items = [];
             } finally {
                 state.loading = false;
             }
@@ -114,9 +118,9 @@ export default {
             try {
                 showLoadingMessage(vm.$t('COMMON.EXCEL.ALT_L_READY_FOR_FILE_DOWNLOAD'), '', vm.$root);
                 await store.dispatch('file/downloadExcel', {
-                    url: '/inventory/server/member/list',
+                    url: '/identity/project/member/list',
                     param: {
-                        servers: props.serverIds,
+                        include_parent_member: true,
                         query: getQuery(),
                     },
                     fields: [
@@ -132,8 +136,10 @@ export default {
             }
         };
 
-        watch(() => props.serverIds, (after, before) => {
-            if (after !== before) listAdmin();
+        watch(() => props.serverProjectId, (after, before) => {
+            if (!after) {
+                state.items = [];
+            } else if (after !== before) listAdmin();
         }, { immediate: true });
 
         return {
