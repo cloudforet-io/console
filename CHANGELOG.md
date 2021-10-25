@@ -1,3 +1,10 @@
+# [1.1.0-beta.148](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.147...v1.1.0-beta.148) (2021-10-25)
+
+
+### Bug Fixes
+
+* fix time formatting bug in range mode ([#704](https://github.com/spaceone-dev/spaceone-design-system/issues/704)) ([7956f4d](https://github.com/spaceone-dev/spaceone-design-system/commit/7956f4d6351061bd6e5f5860f612786838bbc7c1))
+
 # [1.1.0-beta.147](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.146...v1.1.0-beta.147) (2021-10-25)
 
 
