@@ -4,6 +4,7 @@ import { makeOptionalProxy } from '@/util/composition-helpers';
 import PDatetimePicker from './PDatetimePicker.vue';
 import { i18n } from '@/translations';
 import { argTypes } from '@/inputs/datetime-picker/story-helper';
+import dayjs from 'dayjs';
 
 
 <Meta title='Inputs/Datetime Picker' parameters={{
@@ -189,8 +190,22 @@ export const Template = (args, { argTypes }) => ({
             components: { PDatetimePicker },
             i18n,
             template: `
-        <p-datetime-picker mode="range" />
+<div>
+    <p-datetime-picker mode="range" :selected-dates.sync="selectedDates" />
+    <p>{{ selectedDates }}</p>
+</div>
 `,
+            setup() {
+                const state = reactive({
+                    selectedDates: [
+                        dayjs.utc().startOf('month').format(),
+                        dayjs.utc().format(),
+                    ],
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
         }}
     </Story>
 </Canvas>

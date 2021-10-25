@@ -95,10 +95,10 @@ export default {
         });
 
         /* event */
-        const handleChangeInput = (selectedDates, dateString: string) => {
-            const dateStringList = dateString.split(', ');
-            state.proxySelectedDates = dateStringList.map((d) => {
-                const timezoneDate = dayjs.utc(d).utcOffset(state.offsetHours, true);
+        const handleChangeInput = (selectedDates: Date[]) => {
+            state.proxySelectedDates = selectedDates.map((d) => {
+                const dateString = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
+                const timezoneDate = dayjs.utc(dateString).utcOffset(state.offsetHours, true);
                 return timezoneDate.format();
             });
         };
@@ -117,9 +117,9 @@ export default {
                 let defaultDate;
                 if (state.proxySelectedDates.length) {
                     if (props.timezone === 'UTC') {
-                        defaultDate = dayjs.utc(state.proxySelectedDates[0]).format('YYYY-MM-DD HH:mm');
+                        defaultDate = state.proxySelectedDates.map(d => dayjs.utc(d).format('YYYY-MM-DD HH:mm'));
                     } else {
-                        defaultDate = dayjs(state.proxySelectedDates[0]).tz(props.timezone).format('YYYY-MM-DD HH:mm');
+                        defaultDate = state.proxySelectedDates.map(d => dayjs(d).tz(props.timezone).format('YYYY-MM-DD HH:mm'));
                     }
                 }
                 state.datePicker = Flatpickr(datePickerRef, {
