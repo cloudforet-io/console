@@ -16,6 +16,7 @@
                 </span>
                 <p-collapsible-toggle v-if="togglePosition === COLLAPSIBLE_LIST_TOGGLE_POSITION.title"
                                       :is-collapsed="!proxyUnfoldedIndices.includes(idx)"
+                                      :toggle-type="toggleType"
                                       @update:isCollapsed="onUpdateCollapsed(idx, ...arguments)"
                 />
             </p>
@@ -51,6 +52,7 @@ import {
     COLLAPSIBLE_LIST_THEME,
     COLLAPSIBLE_LIST_TOGGLE_POSITION,
 } from '@/data-display/collapsibles/collapsible-list/config';
+import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsibles/collapsible-toggle/type';
 
 interface CollapsibleItem {
     title?: string;
@@ -63,6 +65,7 @@ interface Props {
     lineClamp?: number;
     multiUnfoldable?: boolean;
     togglePosition?: COLLAPSIBLE_LIST_TOGGLE_POSITION;
+    toggleType?: COLLAPSIBLE_TOGGLE_TYPE;
     theme?: COLLAPSIBLE_LIST_THEME;
 }
 export default defineComponent<Props>({
@@ -94,6 +97,13 @@ export default defineComponent<Props>({
             default: COLLAPSIBLE_LIST_TOGGLE_POSITION.title,
             validator(position: any) {
                 return Object.values(COLLAPSIBLE_LIST_TOGGLE_POSITION).includes(position);
+            },
+        },
+        toggleType: {
+            type: String,
+            default: COLLAPSIBLE_TOGGLE_TYPE.text,
+            validator(type: any) {
+                return Object.values(COLLAPSIBLE_TOGGLE_TYPE).includes(type);
             },
         },
         theme: {

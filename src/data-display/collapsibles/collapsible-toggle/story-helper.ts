@@ -1,4 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
+import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsibles/collapsible-toggle/type';
 
 
 export const argTypes: ArgTypes = {
@@ -35,6 +36,25 @@ export const argTypes: ArgTypes = {
         },
         control: {
             type: 'boolean',
+        },
+    },
+    toggleType: {
+        name: 'toggleType',
+        type: { name: 'string' },
+        description: 'type of toggle button.',
+        defaultValue: COLLAPSIBLE_TOGGLE_TYPE.text,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: COLLAPSIBLE_TOGGLE_TYPE.text,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(COLLAPSIBLE_TOGGLE_TYPE),
         },
     },
     /* slot */

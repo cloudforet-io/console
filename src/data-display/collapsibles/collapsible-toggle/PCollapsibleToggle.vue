@@ -1,15 +1,21 @@
 <template>
-    <span class="p-collapsible-toggle"
-          @click="onClickToggle"
-    >
-        <span>
-            <slot :is-collapsed="proxyIsCollapsed">
-                {{ proxyIsCollapsed ? $t('COMPONENT.COLLAPSIBLE_TOGGLE.SHOW_MORE') : $t('COMPONENT.COLLAPSIBLE_TOGGLE.HIDE') }}
-            </slot>
+    <span class="p-collapsible-toggle">
+        <span v-if="toggleType === COLLAPSIBLE_TOGGLE_TYPE.text" @click="handleToggle">
+            <span>
+                <slot :is-collapsed="proxyIsCollapsed">
+                    {{ proxyIsCollapsed ? $t('COMPONENT.COLLAPSIBLE_TOGGLE.SHOW_MORE') : $t('COMPONENT.COLLAPSIBLE_TOGGLE.HIDE') }}
+                </slot>
+            </span>
+            <p-i width="0.875rem" height="0.875rem"
+                 :name="proxyIsCollapsed ? 'ic_arrow_bottom' : 'ic_arrow_top'"
+                 color="inherit"
+            />
         </span>
-        <p-i width="0.875rem" height="0.875rem"
-             :name="proxyIsCollapsed ? 'ic_arrow_bottom' : 'ic_arrow_top'"
-             color="inherit"
+        <p-toggle-button
+            v-else-if="toggleType === COLLAPSIBLE_TOGGLE_TYPE.switch"
+            :value="!proxyIsCollapsed"
+            :sync="true"
+            @change="handleToggle"
         />
     </span>
 </template>
@@ -21,12 +27,15 @@ import {
 
 import PI from '@/foundation/icons/PI.vue';
 import { makeOptionalProxy } from '@/util/composition-helpers';
-import { CollapsibleToggleProps } from '@/data-display/collapsibles/collapsible-toggle/type';
+import {
+    CollapsibleToggleProps,
+    COLLAPSIBLE_TOGGLE_TYPE,
+} from '@/data-display/collapsibles/collapsible-toggle/type';
+import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton.vue';
 
-
-export default defineComponent({
+export default defineComponent<CollapsibleToggleProps>({
     name: 'PCollapsibleToggle',
-    components: { PI },
+    components: { PToggleButton, PI },
     model: {
         prop: 'isCollapsed',
         event: 'update:isCollapsed',
@@ -37,6 +46,13 @@ export default defineComponent({
             type: Boolean,
             default: true,
         },
+        toggleType: {
+            type: String,
+            default: COLLAPSIBLE_TOGGLE_TYPE.text,
+            validator(type: any) {
+                return Object.values(COLLAPSIBLE_TOGGLE_TYPE).includes(type);
+            },
+        },
     },
     setup(props: CollapsibleToggleProps) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -45,13 +61,14 @@ export default defineComponent({
         });
 
         /* event */
-        const onClickToggle = () => {
+        const handleToggle = () => {
             state.proxyIsCollapsed = !state.proxyIsCollapsed;
         };
 
         return {
             ...toRefs(state),
-            onClickToggle,
+            handleToggle,
+            COLLAPSIBLE_TOGGLE_TYPE,
         };
     },
 });
