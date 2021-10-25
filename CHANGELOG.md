@@ -1,3 +1,15 @@
+# [1.1.0-beta.149](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.148...v1.1.0-beta.149) (2021-10-25)
+
+
+### Bug Fixes
+
+* fix type in toggleButton ([#705](https://github.com/spaceone-dev/spaceone-design-system/issues/705)) ([ffda839](https://github.com/spaceone-dev/spaceone-design-system/commit/ffda8396e75e3233c8c4a0e23933e62fda518bb9))
+
+
+### Features
+
+* add toggleType props to collapsible list ([#703](https://github.com/spaceone-dev/spaceone-design-system/issues/703)) ([6a1836c](https://github.com/spaceone-dev/spaceone-design-system/commit/6a1836c992e9dae929152317fa2480b378cba5e6))
+
 # [1.1.0-beta.148](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.147...v1.1.0-beta.148) (2021-10-25)
 
 
