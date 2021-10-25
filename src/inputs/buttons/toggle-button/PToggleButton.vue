@@ -43,7 +43,7 @@ export default defineComponent<ToggleButtonProps>({
         theme: {
             type: String,
             default: TOGGLE_BUTTON_THEME.secondary,
-            validator(theme: string) {
+            validator(theme: TOGGLE_BUTTON_THEME) {
                 return Object.values(TOGGLE_BUTTON_THEME).includes(theme);
             },
         },
