@@ -1,3 +1,11 @@
+# [1.1.0-beta.151](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.150...v1.1.0-beta.151) (2021-10-26)
+
+
+### Features
+
+* add file uploader component ([#708](https://github.com/spaceone-dev/spaceone-design-system/issues/708)) ([5ac7abb](https://github.com/spaceone-dev/spaceone-design-system/commit/5ac7abb9ad9134ff7262f38cd57644c205cad75b))
+* add packages ([#710](https://github.com/spaceone-dev/spaceone-design-system/issues/710)) ([b723332](https://github.com/spaceone-dev/spaceone-design-system/commit/b7233321e39b10aedc2baab82a130dd3b1054168))
+
 # [1.1.0-beta.150](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.149...v1.1.0-beta.150) (2021-10-26)
 
 
