@@ -1,7 +1,7 @@
 import { ArgTypes } from '@storybook/addons';
 import faker from 'faker';
 
-const getArgTypes = (): ArgTypes => ({
+export const getTextareaArgTypes = (): ArgTypes => ({
     value: {
         name: 'value',
         type: { name: 'string, number' },
@@ -155,5 +155,3 @@ const getArgTypes = (): ArgTypes => ({
         },
     },
 });
-
-export const argTypes: ArgTypes = getArgTypes();

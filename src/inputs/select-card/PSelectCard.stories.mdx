@@ -4,8 +4,8 @@ import {
 } from '@vue/composition-api';
 import { range } from 'lodash'
 import { makeOptionalProxy } from '@/util/composition-helpers';
-import { getAllAvailableIcons } from '@/foundation/icons/helper';
-import { argTypes } from '@/inputs/select-card/story-helper';
+import { getAllAvailableIcons } from '@/foundation/icons/story-helper';
+import { getSelectCardArgTypes } from '@/inputs/select-card/story-helper';
 import PSelectCard from './PSelectCard.vue';
 import { peacock } from '@/styles/colors'
 
@@ -14,7 +14,7 @@ import { peacock } from '@/styles/colors'
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=13512%3A300523'
     }
-}} argTypes={argTypes}/>
+}} argTypes={getSelectCardArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({

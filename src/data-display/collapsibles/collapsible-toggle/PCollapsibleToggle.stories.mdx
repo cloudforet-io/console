@@ -5,7 +5,7 @@ import { makeOptionalProxy } from '@/util/composition-helpers';
 import { i18n } from '@/translations';
 
 import PCollapsibleToggle from './PCollapsibleToggle.vue';
-import { argTypes } from '@/data-display/collapsibles/collapsible-toggle/story-helper';
+import { getCollapsibleToggleArgTypes } from '@/data-display/collapsibles/collapsible-toggle/story-helper';
 
 
 <Meta title='Data Display/Collapsibles/Collapsible Toggle' parameters={{
@@ -13,7 +13,7 @@ import { argTypes } from '@/data-display/collapsibles/collapsible-toggle/story-h
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
     }
-}} argTypes={argTypes} />
+}} argTypes={getCollapsibleToggleArgTypes()} />
 
 
 export const Template = (args, { argTypes }) => ({

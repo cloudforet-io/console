@@ -1,7 +1,7 @@
 import { SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
 import { ArgTypes } from '@storybook/addons';
 
-export const argTypes: ArgTypes = {
+export const getSelectButtonArgTypes = (): ArgTypes => ({
     /* props */
     'v-model': {
         name: 'v-model',
@@ -163,4 +163,4 @@ export const argTypes: ArgTypes = {
             category: 'events',
         },
     },
-};
+});

@@ -9,7 +9,7 @@ import {
 import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsibles/collapsible-toggle/type';
 
 
-export const argTypes: ArgTypes = {
+export const getCollapsibleListArgTypes = (): ArgTypes => ({
     /* props */
     items: {
         name: 'items',
@@ -202,4 +202,4 @@ export const argTypes: ArgTypes = {
             category: 'events',
         },
     },
-};
+});

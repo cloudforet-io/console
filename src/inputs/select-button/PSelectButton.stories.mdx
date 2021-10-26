@@ -5,7 +5,7 @@ import {
 } from '@vue/composition-api';
 import { range } from 'lodash'
 import { makeOptionalProxy } from '@/util/composition-helpers';
-import { argTypes } from '@/inputs/select-button/story-helper';
+import { getSelectButtonArgTypes } from '@/inputs/select-button/story-helper';
 import PSelectButton from './PSelectButton.vue';
 import { SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-button/config';
 
@@ -14,7 +14,7 @@ import { SELECT_BUTTON_SIZE, SELECT_BUTTON_STYLE_TYPE } from '@/inputs/select-bu
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=13512%3A300523'
     }
-}} argTypes={argTypes}/>
+}} argTypes={getSelectButtonArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({

@@ -1,7 +1,7 @@
 import { ArgTypes } from '@storybook/addons';
 import { ANIMATION_TYPE } from '@/foundation/icons/config';
 
-export const argTypes: ArgTypes = {
+export const getSelectStatusArgTypes = (): ArgTypes => ({
     /* props */
     'v-model': {
         name: 'v-model',
@@ -199,4 +199,4 @@ export const argTypes: ArgTypes = {
             category: 'events',
         },
     },
-};
+});

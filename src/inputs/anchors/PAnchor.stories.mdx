@@ -1,6 +1,6 @@
 import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PAnchor from './PAnchor.vue';
-import { argTypes, router } from '@/inputs/anchors/story-helper';
+import { getAnchorsArgTypes, router } from '@/inputs/anchors/story-helper';
 
 
 <Meta title='Inputs / Anchor' parameters={{
@@ -8,7 +8,7 @@ import { argTypes, router } from '@/inputs/anchors/story-helper';
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=7050%3A551812'
     }
-}} argTypes={argTypes}/>
+}} argTypes={getAnchorsArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({

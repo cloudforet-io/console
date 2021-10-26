@@ -6,7 +6,7 @@ import { makeOptionalProxy } from '@/util/composition-helpers';
 import { i18n } from '@/translations';
 
 import PCollapsiblePanel from './PCollapsiblePanel.vue';
-import { argTypes } from '@/data-display/collapsibles/collapsible-panel/story-helper';
+import { getCollapsiblePanelArgTypes } from '@/data-display/collapsibles/collapsible-panel/story-helper';
 
 
 <Meta title='Data Display/Collapsibles/Collapsible Panel' parameters={{
@@ -14,7 +14,7 @@ import { argTypes } from '@/data-display/collapsibles/collapsible-panel/story-he
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
     }
-}} argTypes={argTypes} />
+}} argTypes={getCollapsiblePanelArgTypes()} />
 
 
 export const Template = (args, { argTypes }) => ({

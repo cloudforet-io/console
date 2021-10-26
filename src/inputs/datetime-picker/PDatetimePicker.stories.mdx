@@ -3,7 +3,7 @@ import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 import PDatetimePicker from './PDatetimePicker.vue';
 import { i18n } from '@/translations';
-import { argTypes } from '@/inputs/datetime-picker/story-helper';
+import { getDatetimePickerArtTypes } from '@/inputs/datetime-picker/story-helper';
 import dayjs from 'dayjs';
 
 
@@ -12,7 +12,7 @@ import dayjs from 'dayjs';
         type: 'figma',
         url: 'https://www.figma.com/file/adutzilcHKkGuDjayFO7YS/Console-Basic?node-id=18277%3A382149'
     }
-}} argTypes={argTypes}/>
+}} argTypes={getDatetimePickerArtTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({

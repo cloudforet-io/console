@@ -2,7 +2,7 @@ import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
 import PCheckBox from './PCheckBox.vue';
 import { getCurrentInstance, reactive, toRefs } from '@vue/composition-api';
 import { makeOptionalProxy } from '@/util/composition-helpers';
-import {argTypes} from '@/inputs/checkbox/story-helper';
+import { getCheckboxArgTypes } from '@/inputs/checkbox/story-helper';
 
 
 <Meta title='Inputs/Checkbox' parameters={{
@@ -10,7 +10,7 @@ import {argTypes} from '@/inputs/checkbox/story-helper';
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=6169%3A162064'
     }
-}} argTypes={argTypes}/>
+}} argTypes={getCheckboxArgTypes()}/>
 
 
 export const Template = (args, { argTypes }) => ({

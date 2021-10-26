@@ -1,7 +1,7 @@
 import { ArgTypes } from '@storybook/addons';
 import VueRouter from 'vue-router';
 
-export const argTypes: ArgTypes = {
+export const getAnchorsArgTypes = (): ArgTypes => ({
     text: {
         name: 'text',
         type: { name: 'string' },
@@ -170,7 +170,7 @@ export const argTypes: ArgTypes = {
             category: 'slots',
         },
     },
-};
+});
 
 export const router = new VueRouter({
     routes: [

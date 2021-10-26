@@ -6,7 +6,7 @@ import { makeOptionalProxy } from '@/util/composition-helpers';
 
 import PFieldGroup from '@/inputs/forms/field-group/PFieldGroup';
 import PTextarea from './PTextarea.vue';
-import { argTypes } from '@/inputs/textarea/story-helper';
+import { getTextareaArgTypes } from '@/inputs/textarea/story-helper';
 
 
 <Meta title='Inputs/Textarea' parameters={{
@@ -14,7 +14,7 @@ import { argTypes } from '@/inputs/textarea/story-helper';
         type: 'figma',
         url: 'https://www.figma.com/file/wq4wSowBcADBuUrMEZLz6i/SpaceONE-Console-Design?node-id=2104%3A1508'
     }
-}}  argTypes={argTypes} />
+}}  argTypes={getTextareaArgTypes()} />
 
 
 export const Template = (args, { argTypes }) => ({

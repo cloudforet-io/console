@@ -1,7 +1,7 @@
 import { ArgTypes } from '@storybook/addons';
 import { FLATPICKR_MODE, STYLE_TYPE } from '@/inputs/datetime-picker/type';
 
-export const argTypes: ArgTypes = {
+export const getDatetimePickerArtTypes = (): ArgTypes => ({
     selectedDates: {
         name: 'selectedDates',
         type: { name: 'array' },
@@ -136,4 +136,4 @@ export const argTypes: ArgTypes = {
         },
         control: null,
     },
-};
+});

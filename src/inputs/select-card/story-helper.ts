@@ -1,6 +1,6 @@
 import { ArgTypes } from '@storybook/addons';
 
-export const argTypes: ArgTypes = {
+export const getSelectCardArgTypes = (): ArgTypes => ({
     /* props */
     value: {
         name: 'value',
@@ -236,4 +236,4 @@ export const argTypes: ArgTypes = {
             category: 'events',
         },
     },
-};
+});

@@ -1,6 +1,6 @@
 import { ArgTypes } from '@storybook/addons';
 
-export const argTypes: ArgTypes = {
+export const getRadioArgTypes = (): ArgTypes => ({
     /* props */
     'v-model': {
         name: 'v-model',
@@ -177,4 +177,4 @@ export const argTypes: ArgTypes = {
             category: 'events',
         },
     },
-};
+});

@@ -2,7 +2,7 @@ import { ArgTypes } from '@storybook/addons';
 import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsibles/collapsible-toggle/type';
 
 
-export const argTypes: ArgTypes = {
+export const getCollapsibleToggleArgTypes = (): ArgTypes => ({
     /* props */
     'v-model': {
         name: 'v-model',
@@ -88,4 +88,4 @@ export const argTypes: ArgTypes = {
             category: 'events',
         },
     },
-};
+});

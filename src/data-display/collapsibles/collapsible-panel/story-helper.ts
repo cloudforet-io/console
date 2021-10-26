@@ -2,7 +2,7 @@ import { ArgTypes } from '@storybook/addons';
 import faker from 'faker';
 
 
-export const argTypes: ArgTypes = {
+export const getCollapsiblePanelArgTypes = (): ArgTypes => ({
     /* props */
     'v-model': {
         name: 'v-model',
@@ -87,4 +87,4 @@ export const argTypes: ArgTypes = {
             category: 'events',
         },
     },
-};
+});
