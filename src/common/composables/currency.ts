@@ -1,7 +1,7 @@
 import { convert as cashifyConvert } from 'cashify';
 import currencyjs, { Options as CurrencyOptions } from 'currency.js';
 import {
-    computed, ComputedRef, isRef, reactive, Ref, toRefs, watch,
+    computed, ComputedRef, reactive, Ref, toRefs, watch,
 } from '@vue/composition-api';
 
 
@@ -89,12 +89,12 @@ type Currency = 'USD'|'KRW'|'JPY'
  *
  */
 export const useCurrency = (
-    money: Money|Ref<Money>|ComputedRef<Money>,
+    _money: Money,
     currency: ComputedRef<string>|Ref<string>,
     options: Partial<CashifyOptions> = {},
 ) => {
     const state = reactive({
-        money: isRef(money) ? money.value : money,
+        money: _money,
         currency: (options.base ?? currency.value) as Currency,
         convertOptions: {
             base: 'USD',
@@ -142,12 +142,12 @@ export const useCurrency = (
         };
     };
 
-    const { convertedMoney, formattedMoney } = toRefs(state);
+    const { convertedMoney, formattedMoney, money } = toRefs(state);
 
     return {
         convertedMoney,
         formattedMoney,
-        money: computed(() => state.money),
+        money,
         setMoney,
         setRates,
     };
