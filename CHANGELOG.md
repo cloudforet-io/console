@@ -1,3 +1,15 @@
+# [1.1.0-beta.150](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.149...v1.1.0-beta.150) (2021-10-26)
+
+
+### Features
+
+* add file uploader ([#706](https://github.com/spaceone-dev/spaceone-design-system/issues/706)) ([9437486](https://github.com/spaceone-dev/spaceone-design-system/commit/9437486864551e297ac4fb978c7b954e2badb257))
+
+
+### Reverts
+
+* Revert "feat: add file uploader (#706)" (#707) ([bb4440a](https://github.com/spaceone-dev/spaceone-design-system/commit/bb4440a46708cd7733616b2662a8e077bf213b10)), closes [#706](https://github.com/spaceone-dev/spaceone-design-system/issues/706) [#707](https://github.com/spaceone-dev/spaceone-design-system/issues/707)
+
 # [1.1.0-beta.149](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.148...v1.1.0-beta.149) (2021-10-25)
 
 
