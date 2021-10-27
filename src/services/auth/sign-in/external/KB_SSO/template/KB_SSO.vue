@@ -29,13 +29,11 @@ export default defineComponent({
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const openKBSSO = async () => {
             try {
-                window.location.href = '/checkauth.jsp?secureToken=zzzzzz&secureSessionId=xxxx&resultCode=200OK';
-                // axios.get('http://kbpkiapc.kbstar.com:9080/api/v1/sso/checkserver')
-                // .then(function(res) {
-                //     console.log(res.data)
-                // }, function() {
-                //     console.log('failed')
-                // })
+                // window.location.href = '/checkauth.jsp?secureToken=zzzzzz&secureSessionId=xxxx&resultCode=200OK';
+                const authOptions =  vm.$store.state.domain.authOptions;
+                const formData = new FormData();
+                formData.append('agentId', authOptions.agent_id);
+                await axios.post(authOptions.authorization_endpoint, formData);
             } catch (e) {
                 emit('sign-in-error');
                 console.error(e);
