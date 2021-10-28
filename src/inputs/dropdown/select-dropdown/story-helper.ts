@@ -3,7 +3,7 @@ import { ArgTypes } from '@storybook/addons';
 import { menuItems } from '@/inputs/context-menu/mock';
 import { getContextMenuArgTypes } from '@/inputs/context-menu/story-helper';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
-import { CONTEXT_MENU_POSITION } from '@/inputs/dropdown/select-dropdown/type';
+import { SELECT_DROPDOWN_TYPE, CONTEXT_MENU_POSITION } from '@/inputs/dropdown/select-dropdown/type';
 
 export const getSelectDropdownArgTypes = (): ArgTypes => {
     const contextMenuArgTypes = getContextMenuArgTypes();
@@ -148,28 +148,10 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
                 type: 'text',
             },
         },
-        buttonOnly: {
-            name: 'buttonOnly',
-            type: { name: 'boolean' },
-            description: 'Whether to only use icon button or not.',
-            defaultValue: false,
-            table: {
-                type: {
-                    summary: 'boolean',
-                },
-                category: 'props',
-                defaultValue: {
-                    summary: 'false',
-                },
-            },
-            control: {
-                type: 'boolean',
-            },
-        },
         withoutOutline: {
             name: 'withoutOutline',
             type: { name: 'boolean' },
-            description: 'Whether to show outline or not.',
+            description: 'Whether to show outline or not. Useful when `type` props is `default`.',
             defaultValue: false,
             table: {
                 type: {
@@ -184,19 +166,38 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
                 type: 'boolean',
             },
         },
-        buttonStyleType: {
-            name: 'buttonStyleType',
+        type: {
+            name: 'type',
             type: { name: 'string' },
-            description: `Button style. Useful when \`buttonOnly\` props is \`true\`. \n${
-                ['undefined', ...Object.values(BUTTON_STYLE)].map(d => `\`${d}\``)} are available.`,
-            defaultValue: undefined,
+            description: `Select dropdown Types. ${
+                [...Object.values(SELECT_DROPDOWN_TYPE)].map(d => `\`${d}\``)} are available.`,
+            defaultValue: SELECT_DROPDOWN_TYPE.DEFAULT,
             table: {
                 type: {
                     summary: 'string',
                 },
                 category: 'props',
                 defaultValue: {
-                    summary: 'undefined',
+                    summary: 'default',
+                },
+            },
+            control: {
+                type: 'select',
+                options: [undefined, ...Object.values(SELECT_DROPDOWN_TYPE)],
+            },
+        },
+        buttonStyleType: {
+            name: 'buttonStyleType',
+            type: { name: 'string' },
+            description: 'Button style types. Useful when `type` props is `button` or `outline-button`,`buttonStyleType` props can be applied.',
+            defaultValue: 'primary-dark',
+            table: {
+                type: {
+                    summary: 'string',
+                },
+                category: 'props',
+                defaultValue: {
+                    summary: 'primary-dark',
                 },
             },
             control: {
@@ -207,7 +208,7 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
         buttonIcon: {
             name: 'buttonIcon',
             type: { name: 'string' },
-            description: 'Icons for dropdown right button. Useful when `buttonOnly` props is `true`.',
+            description: 'Icons for dropdown right button. Useful when `type` props is `icon-button`.',
             defaultValue: undefined,
             table: {
                 type: {

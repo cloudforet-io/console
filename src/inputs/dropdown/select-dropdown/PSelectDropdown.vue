@@ -1,14 +1,14 @@
 <template>
     <div v-click-outside="onClickOutside" class="p-select-dropdown"
          :class="{
-             'button-only': buttonOnly,
+             [type] : true,
              invalid,
              disabled,
              active: proxyVisibleMenu,
              ['without-outline']: withoutOutline
          }"
     >
-        <p-icon-button v-if="buttonOnly"
+        <p-icon-button v-if="type === SELECT_DROPDOWN_TYPE.ICON_BUTTON"
                        ref="targetRef"
                        :name="buttonIcon || (proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom')"
                        :activated="proxyVisibleMenu"
@@ -23,7 +23,8 @@
                   :disabled="disabled"
                   :tabindex="0"
                   class="dropdown-button"
-                  :style-type="buttonStyleType"
+                  :style-type="isButtonType ? buttonStyleType : undefined"
+                  :outline="type === SELECT_DROPDOWN_TYPE.OUTLINE_BUTTON"
                   @click="onClick"
                   @keydown.down="onPressDownKey"
         >
@@ -36,11 +37,22 @@
                     }}
                 </slot>
             </span>
-            <p-i :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
+
+            <p-i v-if="type === SELECT_DROPDOWN_TYPE.DEFAULT"
+                 :name="proxyVisibleMenu ? 'ic_arrow_top' : 'ic_arrow_bottom'"
                  :activated="proxyVisibleMenu"
                  :disabled="disabled"
                  color="inherit"
                  class="dropdown-icon"
+            />
+            <p-i v-else
+                 :name="proxyVisibleMenu ? 'ic_tree_arrow--opened' : 'ic_tree_arrow--opened'"
+                 :activated="proxyVisibleMenu"
+                 :disabled="disabled"
+                 color="inherit"
+                 class="dropdown-icon"
+                 width="1rem"
+                 height="1rem"
             />
         </p-button>
         <p-context-menu v-show="proxyVisibleMenu"
@@ -52,7 +64,7 @@
                         :invalid="invalid"
                         :style="{
                             ...contextMenuStyle,
-                            ...(buttonOnly && {width: 'auto'}),
+                            ...(type === SELECT_DROPDOWN_TYPE.ICON_BUTTON && {width: 'auto'}),
                         }"
                         @select="onSelectMenu"
         >
@@ -68,21 +80,25 @@ import { groupBy, reduce } from 'lodash';
 import vClickOutside from 'v-click-outside';
 
 import {
-    computed, toRefs, reactive, defineComponent, getCurrentInstance, ComponentRenderProxy,
+    ComponentRenderProxy,
+    computed,
+    defineComponent,
+    getCurrentInstance,
+    reactive,
+    toRefs,
 } from '@vue/composition-api';
 
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 
-import { useContextMenuFixedStyle, ContextMenuFixedStyleProps } from '@/hooks/context-menu-fixed-style';
+import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 
 import { MenuItem } from '@/inputs/context-menu/type';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PI from '@/foundation/icons/PI.vue';
-import { CONTEXT_MENU_POSITION } from '@/inputs/dropdown/select-dropdown/type';
-
+import { SELECT_DROPDOWN_TYPE, CONTEXT_MENU_POSITION } from '@/inputs/dropdown/select-dropdown/type';
 
 interface SelectDropdownProps {
     items?: MenuItem[];
@@ -93,7 +109,7 @@ interface SelectDropdownProps {
     alwaysShowMenu?: boolean;
     indexMode?: boolean;
     placeholder?: string;
-    buttonOnly?: boolean;
+    type?: SELECT_DROPDOWN_TYPE;
     buttonStyleType?: BUTTON_STYLE;
     buttonIcon?: string;
     // context menu fixed style props
@@ -161,17 +177,18 @@ export default defineComponent<SelectDropdownProps>({
             type: String,
             default: '',
         },
-        buttonOnly: {
-            type: Boolean,
-            default: false,
-        },
         withoutOutline: {
             type: Boolean,
             default: false,
         },
+        type: {
+            type: String,
+            default: SELECT_DROPDOWN_TYPE.DEFAULT,
+            validator: (value: SELECT_DROPDOWN_TYPE) => Object.values(SELECT_DROPDOWN_TYPE).includes(value),
+        },
         buttonStyleType: {
             type: String,
-            default: undefined,
+            default: BUTTON_STYLE['primary-dark'],
             validator: (value: any) => {
                 if (value === undefined) return true;
                 return Object.values(BUTTON_STYLE).includes(value);
@@ -223,6 +240,10 @@ export default defineComponent<SelectDropdownProps>({
                 }
                 return res;
             }, {})),
+            isButtonType: computed(() => {
+                if (props.type === SELECT_DROPDOWN_TYPE.OUTLINE_BUTTON || props.type === SELECT_DROPDOWN_TYPE.BUTTON) return true;
+                return false;
+            }),
         });
 
 
@@ -260,6 +281,7 @@ export default defineComponent<SelectDropdownProps>({
             onSelectMenu,
             onClick,
             onPressDownKey,
+            SELECT_DROPDOWN_TYPE,
         };
     },
 });
@@ -267,12 +289,13 @@ export default defineComponent<SelectDropdownProps>({
 
 <style lang="postcss">
 .p-select-dropdown {
-    @apply bg-white;
+    @apply bg-white text-gray-900;
     position: relative;
     display: inline-block;
     min-width: 6.5rem;
+
     .dropdown-button {
-        @apply border-gray-300 text-gray-900 rounded;
+        @apply rounded;
         min-width: unset;
         width: 100%;
         display: inline-flex;
@@ -296,6 +319,28 @@ export default defineComponent<SelectDropdownProps>({
             outline: none;
         }
     }
+
+    &.default {
+        .dropdown-button {
+            @apply border-gray-300;
+        }
+    }
+
+    &.icon-button {
+        min-width: unset;
+    }
+
+    &.without-outline {
+        min-width: unset;
+        .dropdown-button {
+            @apply border-transparent;
+            padding-left: 0;
+            &:focus, &:active {
+                @apply border-transparent;
+            }
+        }
+    }
+
     .p-context-menu {
         position: absolute;
         margin-top: -1px;
@@ -311,21 +356,6 @@ export default defineComponent<SelectDropdownProps>({
         }
     }
 
-    &.button-only {
-        min-width: unset;
-    }
-
-    &.without-outline {
-        min-width: unset;
-        .dropdown-button {
-            @apply border-transparent;
-            padding-left: 0;
-            &:focus, &:active {
-                @apply border-transparent;
-            }
-        }
-    }
-
     /* disabled */
     &.disabled {
         .dropdown-button {
@@ -335,6 +365,16 @@ export default defineComponent<SelectDropdownProps>({
         &.without-outline {
             .dropdown-button {
                 @apply bg-transparent;
+            }
+        }
+        &.button {
+            .dropdown-button {
+                @apply bg-gray-200 text-gray-400;
+            }
+        }
+        &.outline-button {
+            .dropdown-button {
+                @apply bg-transparent text-gray-300 border-gray-300;
             }
         }
     }
@@ -351,26 +391,67 @@ export default defineComponent<SelectDropdownProps>({
 
     /* active */
     &:not(.invalid):not(.disabled):not(.without-outline).active {
-        .dropdown-button {
-            @apply border-secondary text-secondary;
+        &.default {
+            .dropdown-button {
+                @apply border-secondary text-secondary bg-white;
+            }
+        }
+        &.button {
+            .dropdown-button {
+                @apply border-secondary text-white bg-secondary;
+                .dropdown-icon {
+                    transform: rotate(180deg);
+                }
+            }
+        }
+        &.outline-button {
+            .dropdown-button {
+                @apply border-secondary text-secondary bg-transparent;
+                .dropdown-icon {
+                    transform: rotate(180deg);
+                }
+            }
         }
     }
 
     /* hover */
     &:not(.invalid):not(.disabled):not(.active):not(.without-outline) {
-        .dropdown-button {
-            @media (hover: hover) {
-                &:not(.active):not(.disabled):hover {
-                    @apply border-gray-900;
+        &.default {
+            .dropdown-button {
+                @media (hover: hover) {
+                    &:not(.active):not(.disabled):hover {
+                        @apply border-gray-900;
+                    }
+                }
+            }
+        }
+        &.button {
+            .dropdown-button {
+                @media (hover: hover) {
+                    &:not(.active):not(.disabled):hover {
+                        @apply bg-secondary text-white;
+                    }
+                }
+            }
+        }
+        &.outline-button {
+            .dropdown-button {
+                @media (hover: hover) {
+                    &:not(.active):not(.disabled):hover {
+                        @apply bg-transparent text-secondary border-secondary;
+                    }
                 }
             }
         }
     }
+
     &:not(.disabled):not(.active).without-outline {
-        .dropdown-button {
-            @media (hover: hover) {
-                &:not(.active):not(.disabled):hover {
-                    @apply text-secondary;
+        &.default {
+            .dropdown-button {
+                @media (hover: hover) {
+                    &:not(.active):not(.disabled):hover {
+                        @apply text-secondary;
+                    }
                 }
             }
         }

@@ -1,19 +1,19 @@
 export enum BUTTON_STYLE {
-    primary = 'primary',
     'primary-dark' = 'primary-dark',
+    primary = 'primary',
     primary1 = 'primary1',
     primary2 = 'primary2',
-    secondary = 'secondary',
     'secondary-dark' = 'secondary-dark',
+    secondary = 'secondary',
     secondary1 = 'secondary1',
     gray = 'gray',
     gray900 = 'gray900',
-    'gray-border' = 'gray-border',
-    'gray900-hover' = 'gray900-hover',
-    'gray900-border' = 'gray900-border',
     alert = 'alert',
     safe = 'safe',
-    transparent = 'transparent'
+    'gray-border' = 'gray-border',
+    transparent = 'transparent',
+    // 'gray900-hover' = 'gray900-hover',
+    // 'gray900-border' = 'gray900-border'
 }
 
 export enum BUTTON_SIZE {

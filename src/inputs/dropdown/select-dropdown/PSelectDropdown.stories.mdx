@@ -9,6 +9,8 @@ import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
 
 import {getSelectDropdownArgTypes} from '@/inputs/dropdown/select-dropdown/story-helper';
 import {menuItems} from '@/inputs/context-menu/mock';
+import { BUTTON_STYLE } from '@/inputs/buttons/button/type.ts';
+import { SELECT_DROPDOWN_TYPE, CONTEXT_MENU_POSITION } from '@/inputs/dropdown/select-dropdown/type';
 
 <Meta title='Inputs/Select Dropdown' parameters={{
     design: {
@@ -35,8 +37,8 @@ export const Template = (args, { argTypes }) => ({
             :disabled="disabled"
             :index-mode="indexMode"
             :placeholder="placeholder"
-            :button-only="buttonOnly"
             :without-outline="withoutOutline"
+            :type="type"
             :button-style-type="buttonStyleType"
             :button-icon="buttonIcon"
             :menu-position="menuPosition"
@@ -63,7 +65,7 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-## Basic
+## Default
 
 <Canvas>
     <Story name="Basic">
@@ -136,51 +138,6 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-## Button Only
-
-<Canvas>
-    <Story name="Button Only">
-        {{
-            i18n,
-            components: { PSelectDropdown },
-            template: `
-<table style="border-collapse: separate; border-spacing: 16px;">
-    <thead>
-        <tr>
-            <th>icon / variations</th>
-            <th>default</th>
-            <th>disabled</th>
-            <th>invalid</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <th>default</th>
-            <td><p-select-dropdown :items="menuItems" button-only /></td>
-            <td><p-select-dropdown :items="menuItems" button-only disabled /></td>
-            <td><p-select-dropdown :items="menuItems" button-only invalid /></td>
-        </tr>
-        <tr>
-            <th>custom</th>
-            <td><p-select-dropdown :items="menuItems" button-only button-icon="ic_setting" /></td>
-            <td><p-select-dropdown :items="menuItems" button-only button-icon="ic_setting" disabled /></td>
-            <td><p-select-dropdown :items="menuItems" button-only button-icon="ic_setting" invalid /></td>
-        </tr>
-    </tbody>
-</table>
-    `,
-            setup() {
-                return {
-                    menuItems
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
 ## Without Outline
 
 <Canvas>
@@ -217,6 +174,104 @@ export const Template = (args, { argTypes }) => ({
             setup() {
                 return {
                     menuItems
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Button Type
+
+<Canvas>
+    <Story name="Button Type">
+        {{
+            i18n,
+            components: { PSelectDropdown },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-select-dropdown v-for="buttonStyle in buttonStyles" :key="buttonStyle" :items="menuItems" :type="SELECT_DROPDOWN_TYPE.BUTTON" :button-style-type="buttonStyle" style="margin: 0.5rem;"></p-select-dropdown>
+    </div>
+    `,
+            setup() {
+                return {
+                    menuItems,
+                    buttonStyles: Object.values(BUTTON_STYLE),
+                    SELECT_DROPDOWN_TYPE,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Outline Button Type
+
+<Canvas>
+    <Story name="Outline Button Type">
+        {{
+            i18n,
+            components: { PSelectDropdown },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-select-dropdown v-for="buttonStyle in buttonStyles" :key="buttonStyle" :items="menuItems" :type="SELECT_DROPDOWN_TYPE.OUTLINE_BUTTON" :button-style-type="buttonStyle" style="margin: 0.5rem;"></p-select-dropdown>
+    </div>
+    `,
+            setup() {
+                return {
+                    menuItems,
+                    buttonStyles: Object.values(BUTTON_STYLE),
+                    SELECT_DROPDOWN_TYPE,
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Icon Button Type
+
+<Canvas>
+    <Story name="Icon Button Type">
+        {{
+            i18n,
+            components: { PSelectDropdown },
+            template: `
+<table style="border-collapse: separate; border-spacing: 16px;">
+    <thead>
+        <tr>
+            <th>icon / variations</th>
+            <th>default</th>
+            <th>disabled</th>
+            <th>invalid</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <th>default</th>
+            <td><p-select-dropdown :items="menuItems" :type="SELECT_DROPDOWN_TYPE.ICON_BUTTON" /></td>
+            <td><p-select-dropdown :items="menuItems" :type="SELECT_DROPDOWN_TYPE.ICON_BUTTON" disabled /></td>
+            <td><p-select-dropdown :items="menuItems" :type="SELECT_DROPDOWN_TYPE.ICON_BUTTON" invalid /></td>
+        </tr>
+        <tr>
+            <th>custom</th>
+            <td><p-select-dropdown :items="menuItems" :type="SELECT_DROPDOWN_TYPE.ICON_BUTTON" button-icon="ic_setting" /></td>
+            <td><p-select-dropdown :items="menuItems" :type="SELECT_DROPDOWN_TYPE.ICON_BUTTON" button-icon="ic_setting" disabled /></td>
+            <td><p-select-dropdown :items="menuItems" :type="SELECT_DROPDOWN_TYPE.ICON_BUTTON" button-icon="ic_setting" invalid /></td>
+        </tr>
+    </tbody>
+</table>
+    `,
+            setup() {
+                return {
+                    menuItems,
+                    SELECT_DROPDOWN_TYPE,
                 }
             }
         }}

@@ -357,12 +357,12 @@ export default defineComponent<ContextMenuProps>({
     }
 
     &.secondary {
-        @mixin context-menu-theme theme('colors.white'), theme('colors.secondary'), theme('colors.secondary'),
+        @mixin context-menu-theme theme('colors.white'), theme('colors.secondary'), theme('colors.gray.900'),
             theme('colors.gray.900'), theme('colors.blue.200'), theme('colors.gray.900'),
             theme('colors.secondary2'), theme('colors.secondary'), theme('colors.gray.300');
     }
     &.gray900 {
-        @mixin context-menu-theme theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.400'),
+        @mixin context-menu-theme theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.900'),
             theme('colors.gray.900'), theme('colors.gray.100'), theme('colors.gray.900'),
             theme('colors.white'), theme('colors.gray.900'), theme('colors.gray.300');
     }
