@@ -63,12 +63,6 @@ export default {
                     ],
                 },
                 {
-                    path: 'budget/:id',
-                    name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
-                    props: true,
-                    component: BudgetDetailPage,
-                },
-                {
                     path: 'budget/create',
                     name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.CREATE._NAME,
                     props: true,
@@ -79,6 +73,12 @@ export default {
                     name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.UPDATE._NAME,
                     props: true,
                     component: BudgetUpdatePage,
+                },
+                {
+                    path: 'budget/:id',
+                    name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
+                    props: true,
+                    component: BudgetDetailPage,
                 },
             ],
         },
