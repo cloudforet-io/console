@@ -10,7 +10,6 @@ import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
 import {getSelectDropdownArgTypes} from '@/inputs/dropdown/select-dropdown/story-helper';
 import {menuItems} from '@/inputs/context-menu/mock';
 import { BUTTON_STYLE } from '@/inputs/buttons/button/type.ts';
-import { SELECT_DROPDOWN_TYPE, CONTEXT_MENU_POSITION } from '@/inputs/dropdown/select-dropdown/type';
 
 <Meta title='Inputs/Select Dropdown' parameters={{
     design: {
@@ -192,14 +191,13 @@ export const Template = (args, { argTypes }) => ({
             components: { PSelectDropdown },
             template: `
     <div class="h-full w-full overflow p-8">
-        <p-select-dropdown v-for="buttonStyle in buttonStyles" :key="buttonStyle" :items="menuItems" :type="SELECT_DROPDOWN_TYPE.BUTTON" :button-style-type="buttonStyle" style="margin: 0.5rem;"></p-select-dropdown>
+        <p-select-dropdown v-for="buttonStyle in buttonStyles" :key="buttonStyle" :items="menuItems" type="button" :button-style-type="buttonStyle" style="margin: 0.5rem;"></p-select-dropdown>
     </div>
     `,
             setup() {
                 return {
                     menuItems,
                     buttonStyles: Object.values(BUTTON_STYLE),
-                    SELECT_DROPDOWN_TYPE,
                 }
             }
         }}
@@ -218,14 +216,13 @@ export const Template = (args, { argTypes }) => ({
             components: { PSelectDropdown },
             template: `
     <div class="h-full w-full overflow p-8">
-        <p-select-dropdown v-for="buttonStyle in buttonStyles" :key="buttonStyle" :items="menuItems" :type="SELECT_DROPDOWN_TYPE.OUTLINE_BUTTON" :button-style-type="buttonStyle" style="margin: 0.5rem;"></p-select-dropdown>
+        <p-select-dropdown v-for="buttonStyle in buttonStyles" :key="buttonStyle" :items="menuItems" type="outline-button" :button-style-type="buttonStyle" style="margin: 0.5rem;"></p-select-dropdown>
     </div>
     `,
             setup() {
                 return {
                     menuItems,
                     buttonStyles: Object.values(BUTTON_STYLE),
-                    SELECT_DROPDOWN_TYPE,
                 }
             }
         }}
@@ -255,15 +252,15 @@ export const Template = (args, { argTypes }) => ({
     <tbody>
         <tr>
             <th>default</th>
-            <td><p-select-dropdown :items="menuItems" :type="SELECT_DROPDOWN_TYPE.ICON_BUTTON" /></td>
-            <td><p-select-dropdown :items="menuItems" :type="SELECT_DROPDOWN_TYPE.ICON_BUTTON" disabled /></td>
-            <td><p-select-dropdown :items="menuItems" :type="SELECT_DROPDOWN_TYPE.ICON_BUTTON" invalid /></td>
+            <td><p-select-dropdown :items="menuItems" type="icon-button" /></td>
+            <td><p-select-dropdown :items="menuItems" type="icon-button" disabled /></td>
+            <td><p-select-dropdown :items="menuItems" type="icon-button" invalid /></td>
         </tr>
         <tr>
             <th>custom</th>
-            <td><p-select-dropdown :items="menuItems" :type="SELECT_DROPDOWN_TYPE.ICON_BUTTON" button-icon="ic_setting" /></td>
-            <td><p-select-dropdown :items="menuItems" :type="SELECT_DROPDOWN_TYPE.ICON_BUTTON" button-icon="ic_setting" disabled /></td>
-            <td><p-select-dropdown :items="menuItems" :type="SELECT_DROPDOWN_TYPE.ICON_BUTTON" button-icon="ic_setting" invalid /></td>
+            <td><p-select-dropdown :items="menuItems" type="icon-button" button-icon="ic_setting" /></td>
+            <td><p-select-dropdown :items="menuItems" type="icon-button" button-icon="ic_setting" disabled /></td>
+            <td><p-select-dropdown :items="menuItems" type="icon-button" button-icon="ic_setting" invalid /></td>
         </tr>
     </tbody>
 </table>
@@ -271,7 +268,6 @@ export const Template = (args, { argTypes }) => ({
             setup() {
                 return {
                     menuItems,
-                    SELECT_DROPDOWN_TYPE,
                 }
             }
         }}
