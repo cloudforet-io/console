@@ -1,3 +1,10 @@
+# [1.1.0-beta.153](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.152...v1.1.0-beta.153) (2021-10-28)
+
+
+### Bug Fixes
+
+* change radius pure css(px) to tailwind css ([#713](https://github.com/spaceone-dev/spaceone-design-system/issues/713)) ([8860320](https://github.com/spaceone-dev/spaceone-design-system/commit/88603206a7e88a9e28eb89272cb0fa76223054d6))
+
 # [1.1.0-beta.152](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.151...v1.1.0-beta.152) (2021-10-28)
 
 
