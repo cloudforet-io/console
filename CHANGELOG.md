@@ -1,3 +1,10 @@
+# [1.1.0-beta.155](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.154...v1.1.0-beta.155) (2021-10-28)
+
+
+### Bug Fixes
+
+* change minor things in storybook ([#714](https://github.com/spaceone-dev/spaceone-design-system/issues/714)) ([bbe47dc](https://github.com/spaceone-dev/spaceone-design-system/commit/bbe47dc9b72e7a597d3da5995e724600e3cbf0c4))
+
 # [1.1.0-beta.154](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.153...v1.1.0-beta.154) (2021-10-28)
 
 
