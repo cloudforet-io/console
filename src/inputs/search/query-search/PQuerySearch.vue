@@ -87,7 +87,7 @@ import {
     QuerySearchProps,
     ValueHandler,
     ValueItem,
-    ValueMenuItem, MenuType, QueryItem, KeyDataType, dataTypes,
+    ValueMenuItem, MenuType, QueryItem, KeyDataType, dataTypes, MenuItem,
 } from '@/inputs/search/query-search/type';
 
 /* Configs, Helpers */
@@ -455,24 +455,23 @@ export default defineComponent({
             focus();
         };
 
-        const onMenuSelect = async (value: string, idx: number) => {
-            const selected = state.menu[idx];
-
+        const onMenuSelect = async (item: KeyMenuItem|ValueMenuItem) => {
             if (state.menuType === 'ROOT_KEY' || state.menuType === 'KEY') {
                 hideMenu();
-                updateSelectedKey(selected.data as KeyItem);
+                updateSelectedKey(item.data as KeyItem);
                 clearAll();
                 focus();
                 await showMenu(true);
             } else if (state.menuType === 'OPERATOR') {
-                if (state.supportOperators.includes(value)) {
-                    updateOperator(value as OperatorType);
+                const operator = item.name as OperatorType;
+                if (state.supportOperators.includes(operator)) {
+                    updateOperator(operator);
                     focus();
                     hideMenu();
                 }
             } else {
                 if (!state.operator) state.operator = '=';
-                emitSearch(selected.data as ValueItem);
+                emitSearch(item.data as ValueItem);
             }
         };
 

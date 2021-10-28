@@ -298,9 +298,10 @@ export default defineComponent<AutocompleteSearchProps>({
             emit('select-menu', item);
         };
 
-        const onClickMenuItem = (name, idx) => {
-            state.proxyValue = state.bindingMenu[idx]?.label ?? name;
-            emitSelectMenu(state.bindingMenu[idx]);
+        const onClickMenuItem = (item: MenuItem) => {
+            const name = item.name;
+            state.proxyValue = item.label ?? name;
+            emitSelectMenu(item);
             hideMenu();
         };
 

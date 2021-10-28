@@ -26,12 +26,14 @@ export const Template = (args, { argTypes }) => ({
         <p-search-dropdown
             :menu="menu"
             :loading="loading"
+            :type="type"
             :placeholder="placeholder"
             :disable-icon="disableIcon"
             :disable-handler="disableHandler"
             :exact-mode="exactMode"
             :use-fixed-menu-style="useFixedMenuStyle"
             :visible-menu.sync="proxyVisibleMenu"
+            :selected.sync="proxySelected"
             :show-selected-list="showSelectedList"
             :show-select-all="showSelectAll"
             :show-tag-box="showTagBox"
@@ -50,7 +52,8 @@ export const Template = (args, { argTypes }) => ({
     setup(props) {
         const vm = getCurrentInstance();
         const state = reactive({
-            proxyVisibleMenu: makeOptionalProxy('visibleMenu', vm, props.visibleMenu)
+            proxyVisibleMenu: makeOptionalProxy('visibleMenu', vm, props.visibleMenu),
+            proxySelected: makeOptionalProxy('selected', vm, props.selected),
         })
         return {
             ...toRefs(state)

@@ -34,17 +34,17 @@
                    :class="{ disabled: item.disabled, [theme]: true }"
                    :href="item.disabled ? undefined : item.link"
                    :target="item.target"
-                   @click.stop="onClickMenu(item.name, index, $event)"
-                   @keyup.enter="onClickMenu(item.name, index, $event)"
+                   @click.stop="onClickMenu(item, index, $event)"
+                   @keyup.enter="onClickMenu(item, index, $event)"
                    @keydown.up="onKeyUp(index)"
                    @keydown.down="onKeyDown(index)"
                 >
                     <p-i v-if="showRadioIcon && !multiSelectable"
-                         :name="proxySelected.includes(item.name) ? 'ic_radio--checked' : 'ic_radio'"
+                         :name="selectedNames.includes(item.name) ? 'ic_radio--checked' : 'ic_radio'"
                          class="select-marker"
                     />
                     <p-i v-if="multiSelectable"
-                         :name="proxySelected.includes(item.name) ? 'ic_checkbox--checked' : 'ic_checkbox'"
+                         :name="selectedNames.includes(item.name) ? 'ic_checkbox--checked' : 'ic_checkbox'"
                          class="select-marker"
                     />
                     <slot name="item--format" v-bind="{...$props, uuid, item, index}">
@@ -142,11 +142,12 @@ export default defineComponent<ContextMenuProps>({
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             proxySelected: makeOptionalProxy('selected', vm, props.selected),
+            selectedNames: computed(() => state.proxySelected.map(item => item.name)),
             isAllSelected: computed(() => {
                 const filteredMenu = props.menu.filter(d => !d.disabled);
                 return filteredMenu.length && filteredMenu.length === state.proxySelected.length;
             }),
-            selectedCountInFilteredMenu: computed(() => props.menu.filter(d => state.proxySelected.includes(d.name)).length),
+            selectedCountInFilteredMenu: computed(() => props.menu.filter(d => state.selectedNames.includes(d.name)).length),
         });
 
         let focusedItemEl: HTMLElement | null = null;
@@ -198,20 +199,20 @@ export default defineComponent<ContextMenuProps>({
                 blur();
             }
         };
-        const onClickMenu = (itemName, index, event) => {
+        const onClickMenu = (item, index, event) => {
             if (!props.menu[index].disabled) {
-                emit(`${itemName}:select`, index, event);
-                emit('select', itemName, index);
+                emit(`${item.name}:select`, index, event);
+                emit('select', item, index);
 
                 if (props.multiSelectable) {
-                    if (state.proxySelected.includes(itemName)) {
-                        const indexOfSelectedList = state.proxySelected.indexOf(itemName);
+                    if (state.selectedNames.includes(item.name)) {
+                        const indexOfSelectedList = state.selectedNames.indexOf(item.name);
                         state.proxySelected.splice(indexOfSelectedList, 1);
                     } else {
-                        state.proxySelected.push(itemName);
+                        state.proxySelected.push(item);
                     }
                 } else {
-                    state.proxySelected = [itemName];
+                    state.proxySelected = [item];
                 }
             }
         };
@@ -223,8 +224,7 @@ export default defineComponent<ContextMenuProps>({
             if (state.isAllSelected) {
                 state.proxySelected = [];
             } else {
-                const filteredMenu = props.menu.filter(d => !d.disabled);
-                state.proxySelected = filteredMenu.map(d => d.name);
+                state.proxySelected = props.menu.filter(d => !d.disabled);
             }
         };
 

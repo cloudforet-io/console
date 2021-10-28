@@ -139,7 +139,7 @@ export const getContextMenuArgTypes = (): ArgTypes => ({
     selected: {
         name: 'selected',
         type: { name: 'array' },
-        description: 'Array of selected item names.',
+        description: 'Array of selected menu item.',
         defaultValue: [],
         table: {
             type: {
