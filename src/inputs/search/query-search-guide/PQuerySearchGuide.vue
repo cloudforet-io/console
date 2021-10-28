@@ -165,15 +165,13 @@ export default {
     margin-right: 0.6875rem;
 }
 .help-search-img {
-    @apply border border-gray-200;
+    @apply border border-gray-200 rounded-sm;
     margin-top: 0.625rem;
     margin-bottom: 2.5rem;
     padding: 2px;
-    border-radius: 2px;
 }
 .search-operator-table {
-    @apply border border-gray-200;
-    border-radius: 2px;
+    @apply border border-gray-200 rounded-sm;
     width: 21rem;
     height: 14rem;
     margin-top: 0.625rem;

@@ -81,10 +81,9 @@ export default {
     }
 }
 .tooltip-btn {
-    @apply text-primary4;
+    @apply text-primary4 rounded-sm;
     display: inline-block;
     padding: 0;
-    border-radius: 2px;
     border: 0;
     min-width: 32px;
     line-height: 1;

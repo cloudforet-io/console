@@ -91,8 +91,7 @@ export default {
     }
 
     .card-item {
-        @apply bg-white border border-gray-200;
-        border-radius: 2px;
+        @apply bg-white border border-gray-200 rounded-sm;
         cursor: pointer;
         &:hover {
             @apply border-l border-secondary;

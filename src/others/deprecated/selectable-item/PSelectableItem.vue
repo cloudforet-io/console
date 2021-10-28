@@ -109,10 +109,10 @@ export default {
     min-height: 3rem;
     height: 100%;
     .bar {
+        @apply rounded-tl-sm rounded-bl-sm;
         position: absolute;
         left: 0;
         top: 0;
-        border-radius: 2px 0 0 2px;
         width: 4px;
         height: 100%;
         background-color: currentColor;
