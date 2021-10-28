@@ -1,3 +1,10 @@
+# [1.1.0-beta.154](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.153...v1.1.0-beta.154) (2021-10-28)
+
+
+### Bug Fixes
+
+* change context menu, search dropdown's selected prop spec ([#712](https://github.com/spaceone-dev/spaceone-design-system/issues/712)) ([94215ec](https://github.com/spaceone-dev/spaceone-design-system/commit/94215ec4bd2936ab8652329c07cc415b89c8efb6))
+
 # [1.1.0-beta.153](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.152...v1.1.0-beta.153) (2021-10-28)
 
 
