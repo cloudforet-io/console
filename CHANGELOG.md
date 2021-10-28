@@ -1,3 +1,10 @@
+# [1.1.0-beta.152](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.151...v1.1.0-beta.152) (2021-10-28)
+
+
+### Features
+
+* add select dropdown types ([#711](https://github.com/spaceone-dev/spaceone-design-system/issues/711)) ([b58cfa9](https://github.com/spaceone-dev/spaceone-design-system/commit/b58cfa9195e45236ac537f174728a7a32d90de59))
+
 # [1.1.0-beta.151](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.150...v1.1.0-beta.151) (2021-10-26)
 
 
