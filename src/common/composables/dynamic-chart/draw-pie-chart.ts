@@ -29,19 +29,6 @@ const convertChartData = (data) => {
     return convertedData;
 };
 
-const createValueAxis = (chart) => {
-    const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
-    valueAxis.renderer.minWidth = 20;
-    valueAxis.fontSize = 12;
-    valueAxis.extraMax = 0.01;
-    valueAxis.renderer.grid.template.strokeOpacity = 1;
-    valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
-    valueAxis.renderer.labels.template.fill = am4core.color(gray[900]);
-    valueAxis.tooltip.label.fontSize = 12;
-
-    return valueAxis;
-};
-
 const createSeries = (chart) => {
     const series = chart.series.push(new am4charts.PieSeries());
     series.name = chart.label;
@@ -49,11 +36,18 @@ const createSeries = (chart) => {
     series.dataFields.category = 'category';
     series.slices.template.stroke = am4core.color('white');
     series.slices.template.strokeOpacity = 1;
-
+    series.labels.template.text = '{category}';
+    series.labels.template.fontSize = 12;
+    series.labels.template.fill = am4core.color(gray[900]);
     series.labels.template.bent = true;
+
     series.slices.template.togglable = false;
     series.slices.template.clickable = false;
-    series.tooltip.disabled = true;
+    series.slices.template.tooltipText = '{category}: [bold]{value} ({value.percent.formatNumber(\'#.0\')}%)[/]';
+    series.tooltip.label.fontSize = 10;
+
+    const slice = series.slices.template;
+    slice.states.getKey('hover').properties.scale = 1;
 
     return series;
 };

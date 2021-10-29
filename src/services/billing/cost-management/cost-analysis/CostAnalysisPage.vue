@@ -32,6 +32,7 @@
         <cost-analysis-query-filter />
         <cost-analysis-group-by-filter />
         <cost-analysis-chart />
+        <cost-analysis-data-table />
         <save-query-form-modal :header-title="saveQueryFormTitle" :visible.sync="saveQueryFormVisible"
                                :query-name="selectedQueryName" @confirm="handleSaveQueryConfirm"
         />
@@ -57,6 +58,7 @@ import {
 import CostAnalysisChart from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisChart.vue';
 import CostAnalysisQueryFilter from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisQueryFilter.vue';
 import CostAnalysisGroupByFilter from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisGroupByFilter.vue';
+import CostAnalysisDataTable from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisDataTable.vue';
 import SaveQueryFormModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
@@ -73,6 +75,7 @@ import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-
 export default {
     name: 'CostAnalysisPage',
     components: {
+        CostAnalysisDataTable,
         CostAnalysisGroupByFilter,
         CostAnalysisChart,
         CostAnalysisQueryFilter,
