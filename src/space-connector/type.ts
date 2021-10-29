@@ -2,9 +2,39 @@ export interface SessionTimeoutCallback {
     (): void;
 }
 
+export type ResponseCode = 'APIError' | 'NotFoundError' | 'BadRequestError' | 'AuthenticationError' | 'AuthorizationError'
+
+export interface Response<T> {
+    code: ResponseCode | string;
+    message: string;
+    result: T;
+}
+
 export interface APIInfo {
     path: string;
     methods: Array<string>;
+}
+
+export interface ErrorModel {
+    message: string;
+    code: string;
+}
+
+export interface ServerError {
+    status: string;
+    error: ErrorModel;
+    statusText: string;
+}
+
+export interface AxiosPostResponse {
+    access_token: string;
+    refresh_token: string;
+    apis: APIInfo[];
+}
+
+export interface ServerResponse<T> {
+    results: T
+    total_count: number
 }
 
 export type FilterOperator =
