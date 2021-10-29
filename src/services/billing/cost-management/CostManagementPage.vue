@@ -43,7 +43,7 @@
                                            button-style-type="transparent"
                                            use-fixed-menu-style
                                            menu-position="right"
-                                           button-only
+                                           type="icon-button"
                                            button-icon="ic_more"
                         />
                     </li>

@@ -3,7 +3,7 @@
         <div class="top-wrapper">
             <span class="title">{{ $t('COMMON.GNB.NOTIFICATION.TITLE') }}</span>
             <!--            <p-select-dropdown class="more-button" :items="moreMenuItems"-->
-            <!--                               button-only button-icon="ic_more"-->
+            <!--                               type="icon-button" button-icon="ic_more"-->
             <!--            />-->
             <!--            <router-link :to="{name: IDENTITY_ROUTE.USER.NOTIFICATION._NAME}"-->
             <!--                         class="inline-flex"-->

@@ -2,7 +2,7 @@
     <div class="cost-analysis-page">
         <p-breadcrumbs :routes="routeState.route" />
         <section class="title-section">
-            <p-select-dropdown :items="sampleQueryItems" button-only button-icon="ic_list"
+            <p-select-dropdown :items="sampleQueryItems" type="icon-button" button-icon="ic_list"
                                class="list-button"
             >
                 <template #menu-item--format="{item}">

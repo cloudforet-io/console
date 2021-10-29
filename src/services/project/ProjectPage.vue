@@ -64,7 +64,7 @@
                                 </p-icon-text-button>
                                 <p-select-dropdown v-if="storeState.groupId && !isPermissionDenied"
                                                    :items="settingMenu"
-                                                   button-only
+                                                   type="icon-button"
                                                    button-icon="ic_setting"
                                                    @select="onSelectSettingDropdown"
                                 />

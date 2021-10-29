@@ -11,7 +11,7 @@
                             <span class="author">{{ title }}</span>
                             <span class="date">{{ iso8601Formatter(noteList[index].created_at, timezone) }}</span>
                         </p>
-                        <p-select-dropdown button-only button-icon="ic_more" :items="menuItems"
+                        <p-select-dropdown type="icon-button" button-icon="ic_more" :items="menuItems"
                                            :menu-position="'left'"
                                            @select="handleSelect(data.note_id)"
                         />
