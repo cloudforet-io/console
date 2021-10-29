@@ -143,10 +143,10 @@ export default defineComponent<ContextMenuProps>({
         const state = reactive({
             proxySelected: makeOptionalProxy('selected', vm, props.selected),
             selectedNames: computed(() => state.proxySelected.map(item => item.name)),
-            isAllSelected: computed(() => {
-                const filteredMenu = props.menu.filter(d => !d.disabled);
-                return filteredMenu.length && filteredMenu.length === state.proxySelected.length;
-            }),
+            selectableMenuItems: computed(() => props.menu.filter(d => !d.disabled)),
+            isAllSelected: computed(() => state.selectableMenuItems.length
+                    && state.selectableMenuItems.length === state.proxySelected.length
+                && state.proxySelected.every(item => state.selectableMenuItems.find(selected => selected.name === item.name))),
             selectedCountInFilteredMenu: computed(() => props.menu.filter(d => state.selectedNames.includes(d.name)).length),
         });
 
@@ -224,7 +224,7 @@ export default defineComponent<ContextMenuProps>({
             if (state.isAllSelected) {
                 state.proxySelected = [];
             } else {
-                state.proxySelected = props.menu.filter(d => !d.disabled);
+                state.proxySelected = state.selectableMenuItems;
             }
         };
 
