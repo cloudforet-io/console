@@ -1,6 +1,11 @@
 <template>
     <div class="kbSSO-wrapper">
-        <form id="myForm" @submit.prevent="openKBSSO">
+        <form :action="authOptions.authorization_endpoint" method="post">
+          <input 
+            type="hidden"
+            id="agentId"
+            name="agentId"
+            :value="authOptions.agent_id">
             <p-button
                 style-type="primary1 outline"
                 size="lg"
@@ -13,12 +18,10 @@
 </template>
 
 <script lang="ts">
-import axios from 'axios';
 import {
-    ComponentRenderProxy, defineComponent, getCurrentInstance,
+    ComponentRenderProxy, defineComponent, getCurrentInstance, computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { PButton } from '@spaceone/design-system';
-import { loadAuth } from '@/services/auth/authenticator/loader';
 
 export default defineComponent({
     name: 'KBSignIn',
@@ -27,21 +30,12 @@ export default defineComponent({
     },
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
-        const openKBSSO = async () => {
-            try {
-                // window.location.href = '/checkauth.jsp?secureToken=zzzzzz&secureSessionId=xxxx&resultCode=200OK';
-                const authOptions =  vm.$store.state.domain.authOptions;
-                const formData = new FormData();
-                formData.append('agentId', authOptions.agent_id);
-                await axios.post(authOptions.authorization_endpoint, formData);
-            } catch (e) {
-                emit('sign-in-error');
-                console.error(e);
-            }
-        };
+        const state = reactive({
+          authOptions: computed(() => vm.$store.state.domain.authOptions),
+      });
 
         return {
-            openKBSSO
+          ...toRefs(state),
         };
     },
 });
