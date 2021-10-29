@@ -48,11 +48,11 @@
         <div v-else class="content">
             <div class="left-section">
                 <div v-if="isSpaceOneUserProtocol">
-                    <p-badge v-for="(item, index) in dataForEdit.users" :key="`users-${index}`"
+                    <p-badge v-for="(userId, index) in dataForEdit.users" :key="`users-${index}`"
                              style-type="gray200" shape="square"
                              class="mr-2 rounded"
                     >
-                        {{ item }} ({{ userItem[item].name }})
+                        {{ userItems[userId] ? userItems[userId].label : userId }}
                     </p-badge>
                 </div>
                 <div v-else-if="isSecretData" class="inline">
@@ -140,7 +140,7 @@ export default {
             keyListForRead: [],
             valueList: [],
             //
-            userItem: computed(() => store.state.resource.user.items),
+            userItems: computed(() => store.state.resource.user.items),
             schema: props.channelData?.schema,
             isSecretData: computed(() => props.channelData?.secret_id.length > 0),
             isSpaceOneUserProtocol: computed(() => state.keyListForEdit.includes('users')),

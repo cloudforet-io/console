@@ -23,7 +23,7 @@
                         v-show="activeTab === FORM_MODE.INTERNAL_USER"
                         type="checkbox"
                         :menu="internalItems"
-                        :selected.sync="formState.users"
+                        :selected.sync="formState.userItems"
                         :show-selected-list="true"
                         :show-tag-box="false"
                         :show-select-all="true"
@@ -35,7 +35,7 @@
                         type="checkbox"
                         :loading="loading"
                         :menu="externalItems"
-                        :selected.sync="formState.users"
+                        :selected.sync="formState.userItems"
                         :show-selected-list="true"
                         :show-tag-box="false"
                         :show-select-all="true"
@@ -240,8 +240,9 @@ export default {
     setup(props, { emit, root }) {
         const formState = reactive({
             projectRole: undefined,
-            users: [] as string[],
             labels: [] as string[],
+            userItems: [] as MenuItem[],
+            users: computed(() => formState.userItems.map(item => item.name)),
         });
         const state = reactive({
             loading: false,
@@ -430,10 +431,10 @@ export default {
 
         /* event */
         const onClickDeleteAllUsers = () => {
-            formState.users = [];
+            formState.userItems = [];
         };
         const onClickDeleteUser = (index) => {
-            formState.users.splice(index, 1);
+            formState.userItems.splice(index, 1);
         };
         const onDeleteLabel = (index) => {
             formState.labels.splice(index, 1);
@@ -460,7 +461,7 @@ export default {
         const onKeydownEnter = () => {
             if (state.searchText.trim().length && !formState.users.includes(state.searchText)) {
                 validateExternalUser(state.searchText);
-                formState.users.push(state.searchText);
+                formState.userItems.push({ name: state.searchText, label: state.searchText });
             }
         };
         const onFocusExternalUserSearch = () => {
@@ -476,7 +477,7 @@ export default {
         })();
 
         watch(() => state.activeTab, () => {
-            formState.users = [];
+            formState.userItems = [];
             state.externalItems = [];
         });
         watch(() => state.searchText, () => {

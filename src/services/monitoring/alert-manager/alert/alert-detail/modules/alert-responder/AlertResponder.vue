@@ -35,7 +35,7 @@
             </p>
             <p-search-dropdown type="checkbox"
                                :menu="responderState.allMemberItems"
-                               :selected="responderState.selectedMemberItems"
+                               :selected.sync="responderState.selectedMemberItems"
                                @hide-menu="onHideMenu"
                                @delete-tag="onDeleteTag"
             />
@@ -47,6 +47,7 @@
 import {
     PBadge, PCollapsibleList, PPaneLayout, PPanelTop, PSearchDropdown,
 } from '@spaceone/design-system';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
@@ -62,6 +63,7 @@ import { store } from '@/store';
 import VueI18n from 'vue-i18n';
 
 import TranslateResult = VueI18n.TranslateResult;
+
 
 interface PropsType {
     id?: string;
@@ -117,7 +119,8 @@ export default {
                     };
                 });
             }),
-            selectedMemberItems: props.alertData.responders.map(d => d.resource_id),
+            selectedMemberItems: props.alertData.responders.map(d => ({ name: d.resource_id, label: d.resource_id })) as MenuItem[],
+            selectedResourceIds: computed<string[]>(() => responderState.selectedMemberItems.map(d => d.name)),
             userItem: computed(() => store.state.resource.user.items),
         });
 
@@ -157,7 +160,7 @@ export default {
             }
         };
 
-        const addResponder = async (userId) => {
+        const addResponder = async (userId: string) => {
             try {
                 await SpaceConnector.client.monitoring.alert.addResponder({
                     alert_id: props.id,
@@ -173,13 +176,13 @@ export default {
             const originResponders = Object.fromEntries((
                 Object.entries(props.alertData.responders).map(([key, { resource_id }]) => [key, resource_id])
             ));
-            const targetItems = difference(responderState.selectedMemberItems, Object.values(originResponders));
+            const targetItems = difference(responderState.selectedResourceIds, Object.values(originResponders));
             targetItems.forEach((item) => {
                 addResponder(item);
             });
         };
 
-        const removeResponder = async (userID) => {
+        const removeResponder = async (userID: string) => {
             try {
                 await SpaceConnector.client.monitoring.alert.removeResponder({
                     alert_id: props.id,
@@ -191,8 +194,8 @@ export default {
             }
         };
 
-        const onDeleteTag = async (idx) => {
-            await removeResponder(responderState.selectedMemberItems[idx]);
+        const onDeleteTag = async (item) => {
+            await removeResponder(item.name);
         };
 
         const listEscalationPolicy = async () => {

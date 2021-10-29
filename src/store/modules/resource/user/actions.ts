@@ -13,7 +13,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
 
         response.results.forEach((userInfo: any): void => {
             users[userInfo.user_id] = {
-                label: `${userInfo.user_id} (${userInfo.name})`,
+                label: userInfo.name ? `${userInfo.user_id} (${userInfo.name})` : userInfo.user_id,
                 name: userInfo.name,
             };
         });

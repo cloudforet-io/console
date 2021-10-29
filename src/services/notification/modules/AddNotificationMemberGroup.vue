@@ -1,13 +1,11 @@
 <template>
-    <fragment>
-        <p-search-dropdown class="add-notification-member-group"
-                           type="checkbox"
-                           :loading="loading"
-                           :menu="allMemberItems"
-                           :selected="selectedMemberItems"
-                           use-fixed-menu-style
-        />
-    </fragment>
+    <p-search-dropdown class="add-notification-member-group"
+                       type="checkbox"
+                       :loading="loading"
+                       :menu="allMemberItems"
+                       :selected.sync="selectedMemberItems"
+                       use-fixed-menu-style
+    />
 </template>
 
 <script lang="ts">
@@ -19,7 +17,6 @@ import {
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
-import { cloneDeep } from 'lodash';
 
 export default {
     name: 'AddNotificationMemberGroup',
@@ -41,23 +38,20 @@ export default {
             loading: true,
             allMember: [] as any[],
             allMemberItems: computed(() => {
-                const userItems = state.userItem;
-                return state.allMember.map((d) => {
-                    const userName = userItems[d.resource_id]?.name;
-                    return {
-                        name: d.resource_id,
-                        label: userName ? `${d.resource_id} (${userName})` : d.resource_id,
-                        type: 'item',
-                    };
-                });
+                const userItems = state.userItems;
+                return state.allMember.map(d => ({
+                    name: d.resource_id,
+                    label: userItems[d.resource_id]?.label,
+                    type: 'item',
+                }));
             }),
-            selectedMemberItems: cloneDeep(props.users) || [],
-            userItem: computed(() => store.state.resource.user.items),
+            selectedMemberItems: props.users.map(d => ({ name: d, label: d })),
+            userItems: computed(() => store.state.resource.user.items),
         });
 
         const emitChange = () => {
             emit('change', {
-                users: state.selectedMemberItems,
+                users: state.selectedMemberItems.map(d => d.name),
             });
         };
 

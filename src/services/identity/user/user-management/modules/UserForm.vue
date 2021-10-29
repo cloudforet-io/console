@@ -222,7 +222,7 @@ export default {
             users: computed(() => store.state.resource.user.items),
             searchText: '',
             externalItems: [] as MenuItem[],
-            selectedItems: [] as string[],
+            selectedItems: [] as MenuItem[],
         });
         const formState = reactive({
             tabs: [
@@ -434,14 +434,14 @@ export default {
                 console.error(e);
             }
         };
-        const onSelectExternalUser = async (user) => {
-            await getExternalUser(user.name);
+        const onSelectExternalUser = async (userItem) => {
+            await getExternalUser(userItem.name);
             await checkUserID();
         };
         const onSearchExternalUser = async (userId: string) => {
             const trimmedUserId = userId.trim();
             if (trimmedUserId) {
-                state.selectedItems = [trimmedUserId];
+                state.selectedItems = [{ name: trimmedUserId, label: trimmedUserId }];
                 await getExternalUser(trimmedUserId);
                 await checkUserID();
             }

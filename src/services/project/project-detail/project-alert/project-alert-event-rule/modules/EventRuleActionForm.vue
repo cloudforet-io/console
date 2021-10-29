@@ -62,7 +62,7 @@
                 <p-search-dropdown class="user-search-dropdown"
                                    type="radioButton"
                                    :menu="userItems"
-                                   :selected="formState.assignee"
+                                   :selected.sync="formState.selectedAssignee"
                                    use-fixed-menu-style
                 />
             </div>
@@ -73,7 +73,7 @@
                 <p-search-dropdown class="user-search-dropdown"
                                    type="checkbox"
                                    :menu="userItems"
-                                   :selected="formState.responder"
+                                   :selected.sync="formState.selectedResponder"
                                    use-fixed-menu-style
                 />
             </div>
@@ -116,10 +116,11 @@ import {
 import {
     PToggleButton, PRadio, PIconTextButton, PCheckBox, PSelectDropdown, PSearchDropdown,
 } from '@spaceone/design-system';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
-import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 
+import TagsInputGroup from '@/common/components/forms/tags-input-group/TagsInputGroup.vue';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { store } from '@/store';
 
@@ -155,13 +156,10 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             users: computed(() => store.state.resource.user.items),
-            userItems: computed(() => Object.keys(state.users).map((k) => {
-                const userName = state.users[k]?.name;
-                return {
-                    name: k,
-                    label: userName ? `${k} (${userName})` : k,
-                };
-            })),
+            userItems: computed(() => Object.keys(state.users).map(k => ({
+                name: k,
+                label: state.users[k]?.label || k,
+            }))),
             tagsRef: null as any,
             urgencyList: computed(() => ([
                 {
@@ -184,6 +182,14 @@ export default {
             selectedUrgency: URGENCY.NO_SET,
             assignee: [] as string[],
             responder: [],
+            selectedAssignee: computed<MenuItem[]>({
+                get() { return formState.assignee.map(d => ({ name: d, label: d })); },
+                set(val) { formState.assignee = val.map(item => item.name); },
+            }),
+            selectedResponder: computed<MenuItem[]>({
+                get() { return formState.responder.map(d => ({ name: d, label: d })); },
+                set(val) { formState.responder = val.map(item => item.name); },
+            }),
         });
 
         /* util */
