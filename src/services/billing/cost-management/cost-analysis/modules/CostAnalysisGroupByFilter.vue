@@ -47,7 +47,7 @@ export default {
     },
     setup() {
         const state = reactive({
-            selectedGroupByItems: computed(() => store.state.service.costAnalysis.selectedGroupByItems),
+            selectedGroupByItems: computed(() => store.state.service.costAnalysis.groupByItems),
             groupByItems: [
                 { name: GROUP_BY.PROJECT, label: 'Project' },
                 { name: GROUP_BY.SERVICE_ACCOUNT, label: 'Service Account' },
@@ -64,8 +64,7 @@ export default {
 
         /* event */
         const handleSelectGroupByItems = async (items: Array<GroupByItem>) => {
-            store.commit('service/costAnalysis/setSelectedGroupByItems', items);
-            await store.dispatch('service/costAnalysis/getChartData');
+            store.commit('service/costAnalysis/setGroupByItems', items);
         };
         const handleClickMore = () => {
             console.log('more!');

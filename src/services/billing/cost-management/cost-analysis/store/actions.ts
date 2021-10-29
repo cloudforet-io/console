@@ -7,7 +7,7 @@ import { random } from 'lodash';
 export const getChartData: Action<CostAnalysisStoreState, any> = async ({ commit, state }): Promise<void|Error> => {
     try {
         let chartData: Array<ChartData>;
-        if (state.selectedGroupByItems.length) {
+        if (state.groupByItems.length) {
             chartData = [
                 {
                     date: '2021-10-02',

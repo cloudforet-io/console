@@ -27,10 +27,11 @@
                                    @update:selectedDates="handleSelectedDates"
                 />
             </div>
-            <p-select-dropdown v-model="selectedCurrency"
-                               class="filter-item"
+            <p-select-dropdown class="filter-item"
                                :items="currencyItems"
+                               :selected="selectedCurrency"
                                without-outline
+                               @select="handleSelectCurrency"
             />
             <p-icon-button class="filter-item" name="ic_refresh" @click="handleClickRefresh" />
         </div>
@@ -65,9 +66,9 @@ export default {
     setup() {
         const state = reactive({
             timezone: computed(() => store.state.user.timezone),
-            selectedGranularity: computed(() => store.state.service.costAnalysis.selectedGranularity),
-            selectedChartType: computed(() => store.state.service.costAnalysis.selectedChartType),
-            selectedCurrency: CURRENCY.USD,
+            selectedGranularity: computed(() => store.state.service.costAnalysis.granularity),
+            selectedChartType: computed(() => store.state.service.costAnalysis.chartType),
+            selectedCurrency: computed(() => store.state.service.costAnalysis.currency),
             selectedDates: computed(() => store.state.service.costAnalysis.selectedDates),
             //
             granularityItems: computed<MenuItem[]>(() => ([
@@ -134,17 +135,20 @@ export default {
             } else {
                 chartType = CHART_TYPE.STACKED_COLUMN;
             }
-            store.commit('service/costAnalysis/setSelectedChartType', chartType);
-            store.commit('service/costAnalysis/setSelectedGranularity', granularity);
+            store.commit('service/costAnalysis/setChartType', chartType);
+            store.commit('service/costAnalysis/setGranularity', granularity);
             await store.dispatch('service/costAnalysis/getChartData');
         };
         const handleSelectChartType = async (chartType: ChartType) => {
-            store.commit('service/costAnalysis/setSelectedChartType', chartType);
+            store.commit('service/costAnalysis/setChartType', chartType);
             await store.dispatch('service/costAnalysis/getChartData');
         };
         const handleSelectedDates = async (selectedDates: Array<string>) => {
             store.commit('service/costAnalysis/setSelectedDates', selectedDates);
             await store.dispatch('service/costAnalysis/getChartData');
+        };
+        const handleSelectCurrency = async (currency: string) => {
+            store.commit('service/costAnalysis/setCurrency', currency);
         };
         const handleClickRefresh = async () => {
             await store.dispatch('service/costAnalysis/getChartData');
@@ -166,6 +170,7 @@ export default {
             handleSelectGranularity,
             handleSelectChartType,
             handleSelectedDates,
+            handleSelectCurrency,
             handleClickRefresh,
         };
     },

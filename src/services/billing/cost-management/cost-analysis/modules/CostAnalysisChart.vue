@@ -28,9 +28,10 @@
             <!--legend-->
             <div class="title-wrapper">
                 <p-select-dropdown v-if="selectedGroupByItems.length"
-                                   v-model="selectedGroupBy"
                                    :items="selectedGroupByItems"
+                                   :selected="selectedGroupByItem ? selectedGroupByItem.name : undefined"
                                    without-outline
+                                   @select="handleSelectGroupByItem"
                 />
                 <span v-else class="title">Total Cost</span>
                 <div class="button-wrapper">
@@ -58,7 +59,8 @@
 </template>
 
 <script lang="ts">
-import { random } from 'lodash';
+import dayjs from 'dayjs';
+
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
@@ -72,11 +74,10 @@ import CostAnalysisDynamicWidget
 
 import { store } from '@/store';
 import { gray } from '@/styles/colors';
-import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import { CUSTOM_COLORS, hideAllSeries, toggleSeries } from '@/common/composables/dynamic-chart';
 import { Legend } from '@/common/composables/dynamic-chart/type';
 import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
-import dayjs from 'dayjs';
+import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 
 
 const DISABLED_COLOR = gray[300];
@@ -92,9 +93,10 @@ export default {
     },
     setup() {
         const state = reactive({
-            selectedGranularity: computed(() => store.state.service.costAnalysis.selectedGranularity),
-            selectedGroupByItems: computed(() => store.state.service.costAnalysis.selectedGroupByItems),
-            selectedChartType: computed(() => store.state.service.costAnalysis.selectedChartType),
+            selectedGranularity: computed(() => store.state.service.costAnalysis.granularity),
+            selectedGroupByItems: computed(() => store.state.service.costAnalysis.groupByItems),
+            selectedGroupByItem: computed(() => store.state.service.costAnalysis.groupByItem),
+            selectedChartType: computed(() => store.state.service.costAnalysis.chartType),
             chartData: computed(() => store.state.service.costAnalysis.chartData),
             period: computed(() => {
                 const selectedDates = store.state.service.costAnalysis.selectedDates;
@@ -103,7 +105,6 @@ export default {
                     end: dayjs(selectedDates[1]),
                 };
             }),
-            selectedGroupBy: undefined,
             //
             chart: null as XYChart | PieChart | null,
             filters: [],
@@ -137,15 +138,18 @@ export default {
                 d.disabled = true;
             });
         };
+        const handleSelectGroupByItem = async (groupByItem?: GroupByItem) => {
+            store.commit('service/costAnalysis/setGroupByItem', groupByItem);
+            await store.dispatch('service/costAnalysis/getChartData');
+        };
 
         watch(() => state.selectedGroupByItems, (after, before) => {
-            if (!before.length && after.length) {
-                state.selectedGroupBy = after[0].name;
-            } else if (!after.length) {
-                state.selectedGroupBy = undefined;
-            } else if (!after.filter(d => d.name === state.selectedGroupBy).length) {
-                state.selectedGroupBy = after[0].name;
+            if (!after.length) {
+                handleSelectGroupByItem(undefined);
+            } else if ((!before.length && after.length) || !after.filter(d => d.name === state.selectedGroupByItem.name).length) {
+                handleSelectGroupByItem(after[0]);
             }
+            setSampleLegends();
         });
 
         // todo get temp legends
@@ -157,6 +161,7 @@ export default {
             CUSTOM_COLORS,
             handleClickLegend,
             handleClickHideAllLegends,
+            handleSelectGroupByItem,
         };
     },
 };
