@@ -1,3 +1,10 @@
+# [1.1.0-beta.156](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.155...v1.1.0-beta.156) (2021-10-29)
+
+
+### Bug Fixes
+
+* all selected bug fix of context menu ([#715](https://github.com/spaceone-dev/spaceone-design-system/issues/715)) ([c9fb0c2](https://github.com/spaceone-dev/spaceone-design-system/commit/c9fb0c2c6e74bbfd2898ed9510659cc41005b2e9))
+
 # [1.1.0-beta.155](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.154...v1.1.0-beta.155) (2021-10-28)
 
 
