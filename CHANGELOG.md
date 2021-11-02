@@ -1,3 +1,10 @@
+# [1.1.0-beta.158](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.157...v1.1.0-beta.158) (2021-11-02)
+
+
+### Bug Fixes
+
+* add toggleOptions.removeChildrenOnFold in Tree ([#723](https://github.com/spaceone-dev/spaceone-design-system/issues/723)) ([ad08db5](https://github.com/spaceone-dev/spaceone-design-system/commit/ad08db5d8ac215dac9c9cb01c8f37d11fcc2b079))
+
 # [1.1.0-beta.157](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.156...v1.1.0-beta.157) (2021-11-02)
 
 
