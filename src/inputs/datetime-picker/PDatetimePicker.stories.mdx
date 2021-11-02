@@ -221,8 +221,19 @@ export const Template = (args, { argTypes }) => ({
             components: { PDatetimePicker },
             i18n,
             template: `
-        <p-datetime-picker mode="time" />
+<div>
+    <p-datetime-picker mode="time" :selected-dates.sync="selectedDates" />
+    <p>{{ selectedDates }}</p>
+</div>
 `,
+            setup() {
+                const state = reactive({
+                    selectedDates: [],
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
         }}
     </Story>
 </Canvas>

@@ -3,7 +3,7 @@
          :class="{
              [mode] : true,
              [styleType] : true,
-             open : visibleMenu,
+             open : visiblePicker,
          }"
     >
         <div class="input-sizer">
@@ -95,34 +95,36 @@ export default {
             proxySelectedDates: makeOptionalProxy<string[]>('selectedDates', vm, props.selectedDates),
             placeholder: computed(() => {
                 if (props.mode === FLATPICKR_MODE.time) {
-                    // return vm.$t('DATETIME_PICKER.SELECT_TIME');
-                    return 'Select Time';
+                    return vm.$t('COMPONENT.DATETIME_PICKER.SELECT_TIME');
                 }
-                // return vm.$t('DATETIME_PICKER.SELECT_DATE');
-                return 'Select Date';
+                return vm.$t('COMPONENT.DATETIME_PICKER.SELECT_DATE');
             }),
             offsetHours: computed(() => (dayjs().tz(props.timezone).utcOffset()) / 60),
-            visibleMenu: false,
+            visiblePicker: false,
         });
 
         /* event */
-        const handleChangeInput = (selectedDates: Date[], dateStr, instance) => {
-            state.proxySelectedDates = selectedDates.map((d) => {
-                const dateString = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
-                const timezoneDate = dayjs.utc(dateString).utcOffset(state.offsetHours, true);
-                return timezoneDate.format();
-            });
-
+        const handleUpdateValue = (selectedDates, dateString, instance) => {
             /* resize input */
             const inputSizer = instance.element.childNodes[0];
-            inputSizer.dataset.value = dateStr;
+            inputSizer.dataset.value = dateString;
             inputSizer.style.minWidth = 'auto';
         };
-        const handleOpenMenu = () => {
-            state.visibleMenu = true;
+        const handleClosePicker = (selectedDates: Date[]) => {
+            if (props.mode !== FLATPICKR_MODE.range || (props.mode === FLATPICKR_MODE.range && selectedDates.length === 2)) {
+                state.proxySelectedDates = selectedDates.map((d) => {
+                    const dateString = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
+                    const timezoneDate = dayjs.utc(dateString).utcOffset(state.offsetHours, true);
+                    return timezoneDate.format();
+                });
+            } else {
+                state.proxySelectedDates = props.selectedDates;
+                if (state.datePicker) state.datePicker.setDate(props.selectedDates);
+            }
+            state.visiblePicker = false;
         };
-        const handleCloseMenu = () => {
-            state.visibleMenu = false;
+        const handleOpenPicker = () => {
+            state.visiblePicker = true;
         };
 
         /* util */
@@ -136,9 +138,9 @@ export default {
                     locale: {
                         rangeSeparator: ' ~ ',
                     },
-                    onValueUpdate: handleChangeInput,
-                    onOpen: handleOpenMenu,
-                    onClose: handleCloseMenu,
+                    onValueUpdate: handleUpdateValue,
+                    onOpen: handleOpenPicker,
+                    onClose: handleClosePicker,
                 });
             } else {
                 let defaultDate;
@@ -162,9 +164,9 @@ export default {
                     locale: {
                         rangeSeparator: ' ~ ',
                     },
-                    onValueUpdate: handleChangeInput,
-                    onOpen: handleOpenMenu,
-                    onClose: handleCloseMenu,
+                    onValueUpdate: handleUpdateValue,
+                    onOpen: handleOpenPicker,
+                    onClose: handleClosePicker,
                 });
             }
         };
