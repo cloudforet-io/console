@@ -1,7 +1,7 @@
 const CONTEXT_MENU_TYPE = {
     divider: 'divider',
     header: 'header',
-    item: 'item',
+    item: 'item'
 } as const;
 type CONTEXT_MENU_TYPE = typeof CONTEXT_MENU_TYPE[keyof typeof CONTEXT_MENU_TYPE];
 
@@ -49,7 +49,6 @@ export interface ValueHandler {
      subPath?: string,
      operator?: OperatorType): Promise<HandlerResponse>|HandlerResponse;
 }
-
 
 export interface ValueHandlerMap {
     [key: string]: ValueHandler|undefined;

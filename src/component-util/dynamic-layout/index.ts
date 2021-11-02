@@ -2,7 +2,7 @@ import { QuerySearchProps } from '@spaceone/design-system/dist/src/inputs/search
 import {
     makeDistinctValueHandler,
     makeEnumValueHandler,
-    makeReferenceValueHandler,
+    makeReferenceValueHandler
 } from '@src/component-util/query-search';
 import { DynamicLayoutType } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-layout/type/layout-schema';
 import { Filter } from '@src/space-connector/type';
@@ -28,7 +28,7 @@ interface ExcelDataField {
 export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema[], resourceType: string, filters?: Filter[]): Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> => {
     const querySearchProps: Pick<QuerySearchProps, 'keyItemSets'|'valueHandlerMap'> = { keyItemSets: [], valueHandlerMap: {} };
 
-    querySearchProps.keyItemSets = schema.map(s => ({
+    querySearchProps.keyItemSets = schema.map((s) => ({
         title: s.title,
         items: s.items.map((d) => {
             let operators;
@@ -38,7 +38,7 @@ export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema
             } else if (d.reference) {
                 querySearchProps.valueHandlerMap[d.key] = makeReferenceValueHandler(
                     d.reference,
-                    d.data_type,
+                    d.data_type
                 );
                 operators = ['=', '!='];
             } else {
@@ -46,14 +46,14 @@ export const makeQuerySearchPropsWithSearchSchema = (schema: ConsoleSearchSchema
                     resourceType,
                     d.key,
                     d.data_type,
-                    filters,
+                    filters
                 );
             }
 
             return {
-                label: d.name, name: d.key, dataType: d.data_type, operators,
+                label: d.name, name: d.key, dataType: d.data_type, operators
             };
-        }),
+        })
     }));
 
     return querySearchProps;
@@ -105,5 +105,5 @@ export const dynamicFieldsToExcelDataFields = (fields: ConsoleDynamicField[]): E
 export default {
     makeQuerySearchPropsWithSearchSchema,
     getApiActionByLayoutType,
-    dynamicFieldsToExcelDataFields,
+    dynamicFieldsToExcelDataFields
 };

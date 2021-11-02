@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 
 import {
-    computed, getCurrentInstance, Ref,
+    computed, getCurrentInstance, Ref
 } from '@vue/composition-api';
 
 dayjs.extend(tz);
@@ -95,6 +95,6 @@ export const makeProxy = <T = any>(name: string, props: any = null, emit: any = 
             } else {
                 newEmit(val);
             }
-        },
+        }
     });
 };

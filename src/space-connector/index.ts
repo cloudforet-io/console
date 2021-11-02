@@ -1,5 +1,5 @@
 import { camelCase } from 'lodash';
-import { AxiosRequestConfig, AxiosResponse } from 'axios';
+import { AxiosRequestConfig } from 'axios';
 
 import API from '@src/space-connector/api';
 import {

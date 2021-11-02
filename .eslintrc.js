@@ -55,6 +55,7 @@ module.exports = {
         'no-underscore-dangle': 'off',
         'max-classes-per-file': 'off',
         camelcase: 'off',
+        'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/*.spec.ts'] }],
         // typescript rules
         '@typescript-eslint/no-unused-vars': ['error'],
         '@typescript-eslint/explicit-member-accessibility': [
