@@ -4,7 +4,7 @@ import axios, {
 import jwt from 'jsonwebtoken';
 import {
     AxiosPostResponse,
-    MockInfo, ServerError, ServerResponse, SessionTimeoutCallback
+    MockInfo, SessionTimeoutCallback
 } from '@src/space-connector/type';
 import {
     APIError, AuthenticationError,
@@ -76,7 +76,7 @@ class API {
 
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean> {
         try {
-            const response: AxiosResponse<AxiosPostResponse> = await this.refreshInstance.post(REFRESH_URL);
+            const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
             this.setToken(response.data.access_token, response.data.refresh_token);
             return true;
         } catch (e) {
