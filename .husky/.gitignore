@@ -9,7 +9,6 @@ post-rewrite
 post-update
 pre-applypatch
 pre-auto-gc
-pre-commit
 pre-rebase
 pre-receive
 push-to-checkout
