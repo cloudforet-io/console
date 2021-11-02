@@ -106,7 +106,6 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper();
         const apiQuery = new ApiQueryHelper();
 

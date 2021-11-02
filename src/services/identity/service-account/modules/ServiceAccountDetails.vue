@@ -62,7 +62,7 @@ export default {
             await getDetails(accountId);
         };
 
-        watch(() => props.serviceAccountId, async (after, before) => {
+        watch(() => props.serviceAccountId, async (after) => {
             if (after) {
                 await getDetailSchema(props.selectedProvider);
             } else {

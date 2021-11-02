@@ -1,5 +1,4 @@
 import { ChartData, CostAnalysisStoreState } from '@/services/billing/cost-management/cost-analysis/store/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { Action } from 'vuex';
 import { random } from 'lodash';
 

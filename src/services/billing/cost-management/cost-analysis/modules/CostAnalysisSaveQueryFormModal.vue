@@ -51,12 +51,8 @@ import {
     PButtonModal, PFieldGroup, PTextInput, PRadio, PI,
 } from '@spaceone/design-system';
 
-import VueI18n from 'vue-i18n';
-import { store } from '@/store';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { i18n } from '@/translations';
-
-import TranslateResult = VueI18n.TranslateResult;
 
 const VISIBILITY = Object.freeze({
     PUBLIC: 'public',
@@ -91,7 +87,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props, { root, emit }) {
+    setup(props, { emit }) {
         const formState = reactive({
             queryName: undefined as undefined | string,
             selectedVisibility: VISIBILITY.PRIVATE,

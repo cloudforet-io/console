@@ -20,7 +20,12 @@
                     >
                         {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CLEAR_ALL') }}
                     </p-button>
-                    <p-icon-button name="ic_plus" style-type="gray900" size="sm" />
+                    <p-icon-button
+                        name="ic_plus"
+                        style-type="gray900"
+                        size="sm"
+                        @click="handleClickSelectFilter"
+                    />
                 </div>
             </div>
             <div class="filter-wrapper" />
@@ -55,6 +60,10 @@
                 </div>
             </div>
         </section>
+        <cost-analysis-select-filter-modal
+            :visible.sync="selectFilterModalState.visible"
+            @confirm="handleSelectFilterModalConfirm"
+        />
     </div>
 </template>
 
@@ -71,6 +80,8 @@ import {
 
 import CostAnalysisDynamicWidget
     from '@/services/billing/cost-management/cost-analysis/components/CostAnalysisDynamicWidget.vue';
+import CostAnalysisSelectFilterModal
+    from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSelectFilterModal.vue';
 
 import { store } from '@/store';
 import { gray } from '@/styles/colors';
@@ -79,13 +90,13 @@ import { Legend } from '@/common/composables/dynamic-chart/type';
 import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 
-
 const DISABLED_COLOR = gray[300];
 
 export default {
     name: 'CostAnalysisChart',
     components: {
         CostAnalysisDynamicWidget,
+        CostAnalysisSelectFilterModal,
         PButton,
         PIconButton,
         PSelectDropdown,
@@ -109,6 +120,10 @@ export default {
             chart: null as XYChart | PieChart | null,
             filters: [],
             legends: [] as Legend[],
+        });
+
+        const selectFilterModalState = reactive({
+            visible: false,
         });
 
         /* util */
@@ -142,6 +157,12 @@ export default {
             store.commit('service/costAnalysis/setGroupByItem', groupByItem);
             await store.dispatch('service/costAnalysis/getChartData');
         };
+        const handleClickSelectFilter = () => {
+            selectFilterModalState.visible = true;
+        };
+        const handleSelectFilterModalConfirm = () => {
+            console.log('Select Filter Modal Confirm');
+        };
 
         watch(() => state.selectedGroupByItems, (after, before) => {
             if (!after.length) {
@@ -162,6 +183,9 @@ export default {
             handleClickLegend,
             handleClickHideAllLegends,
             handleSelectGroupByItem,
+            handleClickSelectFilter,
+            selectFilterModalState,
+            handleSelectFilterModalConfirm,
         };
     },
 };

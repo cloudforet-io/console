@@ -6,11 +6,8 @@
 
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
-
 import { PToolboxTable } from '@spaceone/design-system';
-
 import { store } from '@/store';
-import { i18n } from '@/translations';
 
 
 export default {
