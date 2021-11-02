@@ -67,7 +67,7 @@ export default {
             }),
         });
 
-        watch(() => props.visible, (after, before) => {
+        watch(() => props.visible, (after) => {
             if (after) {
                 vm.$store.dispatch('display/showInfo');
             } else {

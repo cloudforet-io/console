@@ -9,6 +9,7 @@ import display from './modules/display';
 import file from './modules/file';
 import service from './modules/service';
 import plugins from './plugins';
+import error from './modules/error';
 
 Vue.use(Vuex);
 
@@ -22,6 +23,7 @@ const store = new Vuex.Store({
         display,
         file,
         service,
+        error,
     },
     plugins,
 });

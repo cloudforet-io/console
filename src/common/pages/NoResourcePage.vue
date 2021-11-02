@@ -48,7 +48,7 @@ export default {
     },
     props: {
     },
-    setup(props, context) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             resourceRoute: computed(() => vm.$route.matched[1]),

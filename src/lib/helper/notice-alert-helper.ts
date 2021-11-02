@@ -1,3 +1,5 @@
+import Vue from 'vue';
+
 /** * @function
  *   @name showErrorMessage
  *   @param error
@@ -8,8 +10,8 @@ export const showErrorMessage = (errorTitle, error, root) => {
     let errorMsg = '';
     if (error.message) errorMsg = error.message;
     else if (error.response) { errorMsg = error.response.data.error.message; } else { errorMsg = error; }
-    if (root) {
-        root.$notify({
+    if (Vue) {
+        Vue.notify({
             group: 'toastTopCenter',
             type: 'alert',
             title: errorTitle,

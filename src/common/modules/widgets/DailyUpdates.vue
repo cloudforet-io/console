@@ -176,7 +176,6 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state: UnwrapRef<State> = reactive({
             serverData: [],
             cloudServiceData: [],

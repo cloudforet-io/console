@@ -120,6 +120,8 @@ import Vue from 'vue';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import { ProjectDetailState } from '@/services/project/project-detail/store/type';
 import ProjectDetailStoreModule from '@/services/project/project-detail/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { NoResourceError } from '@/common/composables/error/error';
 
 export default {
     name: 'ProjectDetailPage',
@@ -190,7 +192,8 @@ export default {
                 state.item = resp;
             } catch (e) {
                 state.item = null;
-                forceRouteToProjectPage();
+                await ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE._NAME }));
+                // forceRouteToProjectPage();
             } finally {
                 state.loading = false;
             }
@@ -284,7 +287,7 @@ export default {
         /** Init */
         watch(() => state.projectId, async (projectId) => {
             if (projectId) await getProject(projectId);
-            else forceRouteToProjectPage();
+            // else forceRouteToProjectPage();
         }, { immediate: true });
 
         (async () => {

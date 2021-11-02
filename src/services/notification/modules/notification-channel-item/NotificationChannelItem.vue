@@ -53,10 +53,10 @@
 
 <script lang="ts">
 import {
-    PBadge, PDivider, PI, PIconButton, PPaneLayout, PTag, PToggleButton, PButton, PTextInput,
+    PDivider, PIconButton, PPaneLayout, PToggleButton,
 } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
+    reactive, toRefs,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -116,7 +116,6 @@ export default {
         },
     },
     setup(props, { emit, root }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             isActivated: props.channelData?.state === STATE_TYPE.ENABLED,
             userChannelId: props.channelData?.user_channel_id,

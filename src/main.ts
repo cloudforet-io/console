@@ -9,6 +9,7 @@ import VTooltip from 'v-tooltip';
 import SpaceDesignSystem from '@spaceone/design-system';
 import PortalVue from 'portal-vue';
 import { siteInit } from '@/lib/site-initializer';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 import App from './App.vue';
 
 import '@/styles/style.pcss';
@@ -26,9 +27,10 @@ directive(Vue);
 
 Vue.use(SpaceDesignSystem);
 
+Vue.config.errorHandler = error => ErrorHandler.handleError(error);
+
 (async () => {
     await siteInit();
-
 
     new Vue({
         el: '#app',

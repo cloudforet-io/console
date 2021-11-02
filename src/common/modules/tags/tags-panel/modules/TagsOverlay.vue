@@ -157,7 +157,7 @@ export default {
             emit('update');
         };
 
-        watch(() => props.tags, (tags) => {
+        watch(() => props.tags, () => {
             state.newTags = { ...props.tags };
             if (state.tagsRef) state.tagsRef.init();
         });

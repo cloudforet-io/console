@@ -51,6 +51,7 @@ import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface NoteModel {
     note_id: string;
@@ -129,7 +130,7 @@ export default {
                     note: state.noteInput,
                 });
             } catch (e) {
-                console.error(e);
+                await ErrorHandler.handleError(e);
             } finally {
                 state.noteInput = '';
                 await listNote();

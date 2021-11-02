@@ -122,6 +122,7 @@ import { gray, primary, primary1 } from '@/styles/colors';
 import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import config from '@/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 am4core.useTheme(am4themesAnimated);
 
@@ -436,7 +437,7 @@ export default {
                     state.count.billing = commaFormatter(numberFormatter(count));
                 }
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const getCount = async (type) => {
@@ -457,7 +458,7 @@ export default {
                     state.count[type] = count;
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const getTrend = async (type) => {
@@ -497,7 +498,7 @@ export default {
                 }
                 setChartData(data);
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
         const getApiParameter = (type) => {
@@ -580,7 +581,7 @@ export default {
                 });
                 state.summaryData = summaryData;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }
@@ -620,7 +621,7 @@ export default {
                 });
                 state.summaryData = summaryData;
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
             }

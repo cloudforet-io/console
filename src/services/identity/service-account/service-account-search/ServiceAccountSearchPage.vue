@@ -4,9 +4,11 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy,
+    ComponentRenderProxy, getCurrentInstance,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { NoSearchResourceError } from '@/common/composables/error/error';
 
 const DEFAULT_URL = '/identity/service-account';
 const ERROR_URL = '/identity/service-account/no-resource';
@@ -30,13 +32,14 @@ export default {
                     search: vm.$props.id,
                 });
                 if (result.url === DEFAULT_URL) {
-                    vm.$router.push(ERROR_URL);
+                    // vm.$router.push(ERROR_URL);
+                    await ErrorHandler.handleError(new NoSearchResourceError(ERROR_URL));
                 } else {
                     link = `${result.url}&filters=["${vm.$props.id}"]`;
                     vm.$router.push(link);
                 }
             } catch (e) {
-                vm.$router.push(ERROR_URL);
+                await ErrorHandler.handleError(new NoSearchResourceError(ERROR_URL));
             }
         });
     },

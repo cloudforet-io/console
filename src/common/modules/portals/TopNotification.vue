@@ -21,7 +21,7 @@ export default {
             default: 'dark',
         },
     },
-    setup(props, { emit }) {
+    setup() {
         const state = reactive({
             visible: true,
         });

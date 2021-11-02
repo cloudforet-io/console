@@ -184,15 +184,15 @@ export default {
             }
         };
 
-        const autoScroll = (el: HTMLElement) => {
-            if (state.treeRef.$el) {
-                const offsetBottom = el.offsetTop + el.offsetHeight;
-                const scrollBottom = state.treeRef.$el.scrollTop + state.treeRef.$el.offsetHeight;
-                if (offsetBottom > scrollBottom) {
-                    state.treeRef.$el.scrollTop = offsetBottom - state.treeRef.$el.offsetHeight;
-                }
-            }
-        };
+        // const autoScroll = (el: HTMLElement) => {
+        //     if (state.treeRef.$el) {
+        //         const offsetBottom = el.offsetTop + el.offsetHeight;
+        //         const scrollBottom = state.treeRef.$el.scrollTop + state.treeRef.$el.offsetHeight;
+        //         if (offsetBottom > scrollBottom) {
+        //             state.treeRef.$el.scrollTop = offsetBottom - state.treeRef.$el.offsetHeight;
+        //         }
+        //     }
+        // };
 
         watch([() => props.visible, () => state.root], async ([visible, root]) => {
             if (visible && root) {
