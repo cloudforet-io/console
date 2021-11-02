@@ -1,8 +1,10 @@
 import { camelCase } from 'lodash';
-import { AxiosRequestConfig } from 'axios';
+import { AxiosRequestConfig, AxiosResponse } from 'axios';
 
 import API from '@src/space-connector/api';
-import { SessionTimeoutCallback, APIInfo, MockInfo } from '@src/space-connector/type';
+import {
+    SessionTimeoutCallback, APIInfo, MockInfo, AxiosPostResponse
+} from '@src/space-connector/type';
 
 const API_REFLECTION_URL = '/api/reflection';
 
@@ -60,11 +62,12 @@ export class SpaceConnector {
 
     protected async loadAPI(): Promise<void> {
         try {
-            const response = await this.api.instance.post(API_REFLECTION_URL);
+            const response: AxiosPostResponse = await this.api.instance.post(API_REFLECTION_URL);
             response.data.apis.forEach((apiInfo: APIInfo) => {
                 this.bindAPIHandler(apiInfo);
             });
         } catch (e) {
+            // @ts-ignore
             throw new Error(`SpaceONE Client LoadAPI Error: ${e.message}`);
         }
     }
@@ -90,7 +93,7 @@ export class SpaceConnector {
 
     protected APIHandler(path: string) {
         return async (params: object = {}, config?: AxiosRequestConfig): Promise<any> => {
-            const response = await this.api.instance.post(path, params, config);
+            const response: AxiosPostResponse = await this.api.instance.post(path, params, config);
             return response.data;
         };
     }

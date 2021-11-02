@@ -1,10 +1,52 @@
+import {AxiosResponse} from "axios";
+
 export interface SessionTimeoutCallback {
     (): void;
+}
+
+export const RESPONSE = {
+    API_ERROR: 'APIError',
+    BAD_REQUEST_ERROR: 'BadRequestError',
+    NOT_FOUND_ERROR: 'NotFoundError',
+    AUTHENTICATION_ERROR: 'AuthenticationError',
+    AUTHORIZATION_ERROR: 'AuthorizationError'
+} as const;
+
+export type RESPONSE = typeof RESPONSE[keyof typeof RESPONSE];
+
+export interface Response<T> {
+    code: RESPONSE | string;
+    message: string;
+    result: T;
 }
 
 export interface APIInfo {
     path: string;
     methods: Array<string>;
+}
+
+interface ErrorModel {
+    message: string;
+    code: string;
+}
+
+export interface ServerError {
+    status: string;
+    error: ErrorModel;
+    statusText: string;
+}
+
+interface PostResponse {
+    access_token: string;
+    refresh_token: string;
+    apis: APIInfo[];
+}
+
+export type AxiosPostResponse = AxiosResponse<PostResponse>;
+
+export interface ServerListResponse<T> {
+    results: T[];
+    total_count: number;
 }
 
 export type FilterOperator =

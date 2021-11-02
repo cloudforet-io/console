@@ -1,42 +1,20 @@
 import axios, {
-    AxiosError, AxiosInstance, AxiosRequestConfig,
+    AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse
 } from 'axios';
 import jwt from 'jsonwebtoken';
-import { MockInfo, SessionTimeoutCallback } from '@src/space-connector/type';
+import {
+    AxiosPostResponse,
+    MockInfo, SessionTimeoutCallback
+} from '@src/space-connector/type';
+import {
+    APIError, AuthenticationError,
+    AuthorizationError, BadRequestError,
+    NotFoundError
+} from '@src/space-connector/error';
 
 const ACCESS_TOKEN_KEY = 'spaceConnector/accessToken';
 const REFRESH_TOKEN_KEY = 'spaceConnector/refreshToken';
 const REFRESH_URL = '/identity/token/refresh';
-
-export class APIError extends Error {
-    status: number;
-
-    code: string;
-
-    axiosError: AxiosError;
-
-    constructor(axiosError: AxiosError) {
-        super();
-
-        this.name = 'APIError';
-        this.status = 500;
-        this.code = 'ERROR_UNKNOWN';
-        this.axiosError = axiosError;
-
-        if (axiosError.response) {
-            this.status = axiosError.response.status;
-
-            if (axiosError.response.data.error) {
-                this.message = axiosError.response.data.error.message;
-                this.code = axiosError.response.data.error.code;
-            } else {
-                this.message = axiosError.response.statusText;
-            }
-        } else {
-            this.message = axiosError.message;
-        }
-    }
-}
 
 const setMockMode = (request: AxiosRequestConfig, mockEndpoint?: string) => {
     if (mockEndpoint) request.baseURL = mockEndpoint;
@@ -55,8 +33,8 @@ class API {
 
     private defaultAxiosConfig: AxiosRequestConfig = {
         headers: {
-            'Content-Type': 'application/json',
-        },
+            'Content-Type': 'application/json'
+        }
     };
 
     private mockInfo: MockInfo = {};
@@ -98,7 +76,7 @@ class API {
 
     async refreshAccessToken(executeSessionTimeoutCallback = true): Promise<boolean> {
         try {
-            const response = await this.refreshInstance.post(REFRESH_URL);
+            const response: AxiosPostResponse = await this.refreshInstance.post(REFRESH_URL);
             this.setToken(response.data.access_token, response.data.refresh_token);
             return true;
         } catch (e) {
@@ -163,12 +141,33 @@ class API {
         return this.defaultAxiosConfig;
     }
 
+    private handleRequestError = (error: AxiosError) => {
+        switch (error.response?.status) {
+        case 400: {
+            throw new BadRequestError(error);
+        }
+        case 401: {
+            throw new AuthenticationError(error);
+        }
+        case 403: {
+            throw new AuthorizationError(error);
+        }
+        case 404: {
+            throw new NotFoundError(error);
+        }
+        default: {
+            throw new APIError(error);
+        }
+        }
+    }
+
     private setAxiosInterceptors(): void {
         // Axios request interceptor
-        this.instance.interceptors.request.use((request) => {
+        this.instance.interceptors.request.use((request: AxiosRequestConfig) => {
+            if (!request.headers) request.headers = {};
+
             // Set the access token
             request.headers.Authorization = `Bearer ${this.accessToken}`;
-
             // Set mock mode
             if (request.headers.MOCK_MODE) {
                 setMockMode(request, this.mockInfo.endpoint);
@@ -183,14 +182,18 @@ class API {
             if (!storedRefreshToken) {
                 throw new Error('Session has expired.');
             }
+            if (!request.headers) request.headers = {};
+
             request.headers.Authorization = `Bearer ${storedRefreshToken}`;
             return request;
         });
 
+
+
         // Axios response interceptor with error handling
         this.instance.interceptors.response.use(
-            response => response,
-            error => Promise.reject(new APIError(error)),
+            (response: AxiosResponse) => response,
+            (error) => Promise.reject(this.handleRequestError(error))
         );
     }
 }
