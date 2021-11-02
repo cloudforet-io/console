@@ -75,13 +75,13 @@ import {
 } from '@spaceone/console-core-lib';
 
 import {
-    ComponentRenderProxy, computed,
+    ComponentRenderProxy,
     getCurrentInstance,
     reactive, ref, Ref, toRefs,
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PTag, PSearchTable, PSelectDropdown, PFieldGroup, PTextInput, PButton, PI,
+    PButtonModal, PTag, PTextInput, PButton, PI,
 } from '@spaceone/design-system';
 
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -135,8 +135,6 @@ export default {
     components: {
         PButtonModal,
         PTag,
-        PSelectDropdown,
-        PFieldGroup,
         PTextInput,
         PButton,
         PI,

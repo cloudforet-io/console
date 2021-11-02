@@ -224,9 +224,6 @@ export default {
     }
     .p-tree::v-deep {
         padding: 0.25rem;
-        .tree-node .node.selected {
-
-        }
     }
 
     .tag-box {

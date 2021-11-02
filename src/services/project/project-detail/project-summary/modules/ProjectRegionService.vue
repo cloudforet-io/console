@@ -42,12 +42,11 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import { range, orderBy } from 'lodash';
 import bytes from 'bytes';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import am4themes_animated from '@amcharts/amcharts4/themes/animated';
+import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 
 import {
     PChartLoader, PSkeleton,
@@ -69,7 +68,7 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import config from '@/lib/config';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 
-am4core.useTheme(am4themes_animated);
+am4core.useTheme(am4themesAnimated);
 
 interface Data {
     provider: string;

@@ -31,7 +31,7 @@
 
 <script lang="ts">
 import {
-    PFieldGroup, PPaneLayout, PSelectDropdown, PTextInput, PJsonSchemaForm, PTag,
+    PFieldGroup, PTextInput, PJsonSchemaForm,
 } from '@spaceone/design-system';
 import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
@@ -59,10 +59,8 @@ export default {
     components: {
         AddNotificationLevel,
         AddNotificationMemberGroup,
-        PPaneLayout,
         PFieldGroup,
         PTextInput,
-        PSelectDropdown,
         PJsonSchemaForm,
     },
     props: {

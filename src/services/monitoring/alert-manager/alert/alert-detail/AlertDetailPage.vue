@@ -269,8 +269,6 @@ export default {
                 @apply row-start-7 row-end-7 col-start-1;
             }
         }
-
     }
-
 }
 </style>

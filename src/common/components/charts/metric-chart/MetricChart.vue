@@ -55,7 +55,7 @@ import { get } from 'lodash';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import am4themes_animated from '@amcharts/amcharts4/themes/animated';
+import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import { PChartLoader, PLottie, PSkeleton } from '@spaceone/design-system';
 
 import { reactive, toRefs, watch } from '@vue/composition-api';
@@ -65,7 +65,7 @@ import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
 
-am4core.useTheme(am4themes_animated);
+am4core.useTheme(am4themesAnimated);
 am4core.options.autoSetClassName = true;
 am4core.options.classNamePrefix = 'MetricChart';
 

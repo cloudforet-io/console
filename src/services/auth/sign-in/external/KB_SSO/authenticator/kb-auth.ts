@@ -20,7 +20,7 @@ class KbAuth extends Authenticator {
                 secureSessionId: query.secureSessionId,
                 requestData: 'id,name',
                 agentId: store.state.domain.authOptions.agent_id,
-                clientIP: clientIP,
+                clientIP,
             };
 
             await super.signIn(credentials);

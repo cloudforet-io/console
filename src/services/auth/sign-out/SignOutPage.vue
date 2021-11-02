@@ -15,7 +15,7 @@ export default {
             default: false,
         },
     },
-    beforeRouteEnter(to, from, next) {
+    beforeRouteEnter(to) {
         (async () => {
             try {
                 const authType = store.state.domain.extendedAuthType;

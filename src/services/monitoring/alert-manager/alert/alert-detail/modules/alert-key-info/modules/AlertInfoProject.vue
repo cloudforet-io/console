@@ -137,7 +137,7 @@ export default {
     margin-top: 2rem;
 }
 .project-select-dropdown::v-deep {
-        max-width: 25rem;
-        flex-grow: 1;
+    max-width: 25rem;
+    flex-grow: 1;
 }
 </style>

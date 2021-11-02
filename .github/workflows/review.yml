@@ -5,19 +5,46 @@ on:
   pull_request:
     branches:
       - master
-  workflow_dispatch:
+
+
 jobs:
   review:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Build
-      run: |
-        echo "Dummy build job ..."
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
 
-    - name: Test
-      id: test
-      run: |
-        echo "Running test ... None"
-        # fail test or pass test
+      - name: Setup Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '12'
+
+      - name: Cache dependencies
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: node_modules
+          key: ${{ runner.os }}-node-modules-${{ hashFiles('package-lock.json') }}
+
+      - name: Install dependencies
+        if: steps.node-cache.outputs.cache-hit != 'true'
+        run: npm install
+
+
+      - name: Lint
+        run: |
+          npm run lint
+
+
+      - name: Unit Test
+        run: |
+          npm run test:unit
+
+
+      - name: Build
+        run: |
+          npm run build
+

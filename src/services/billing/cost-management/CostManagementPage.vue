@@ -67,7 +67,7 @@
 import { TranslateResult } from 'vue-i18n';
 
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 
 
@@ -75,7 +75,6 @@ import {
     PDivider, PI, PSelectDropdown, PIconButton,
 } from '@spaceone/design-system';
 
-import FavoriteList from '@/common/modules/favorites/favorite-list/FavoriteList.vue';
 import VerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
 
@@ -117,7 +116,6 @@ export default {
     components: {
         VerticalPageLayout,
         SidebarTitle,
-        FavoriteList,
         PDivider,
         PI,
         PSelectDropdown,

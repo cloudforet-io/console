@@ -384,11 +384,11 @@ export default {
         left: -16px;
         top: -16px;
         box-shadow: 0 2px 4px rgba(theme('colors.black'), 0.2);
-        transition: all .2s;
+        transition: all 0.2s;
         &.dragging, &:hover {
             @apply bg-blue-100;
             transform: scale(1.1);
-            transition: all .2s;
+            transition: all 0.2s;
         }
     }
     .line {

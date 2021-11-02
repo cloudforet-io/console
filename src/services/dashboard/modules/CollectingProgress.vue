@@ -251,6 +251,7 @@ export default {
             line-height: 1.4;
             vertical-align: top;
             font-size: 0.875rem;
+
             @media screen and (width < 576px) {
                 max-width: initial;
             }

@@ -700,7 +700,6 @@ export default {
 .management-wrapper {
     @apply mx-0;
     max-width: 100%;
-
 }
 
 .left-toolbox-item {

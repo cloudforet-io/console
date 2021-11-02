@@ -20,34 +20,34 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .page-information {
-        @apply flex flex-row;
-        margin-top: -1rem;
-        margin-bottom: 0.625rem;
-        font-size: 0.75rem;
-        line-height: 0.8;
-        #circle1 {
-            @apply bg-gray-300 rounded-sm;
-            margin-left: 1rem;
-            width: 0.625rem;
-            height: 0.625rem;
-            opacity: 0.5;
-        }
-        #circle3 {
-            @apply bg-primary1 rounded-sm;
-            width: 0.625rem;
-            height: 0.625rem;
-        }
-        #circle5 {
-            @apply bg-primary-dark rounded-sm;
-            width: 0.625rem;
-            height: 0.625rem;
-        }
-        .text {
-            margin-left: 0.125rem;
-            margin-right: 0.5rem;
-            font-size: 0.625rem;
-        }
+.page-information {
+    @apply flex flex-row;
+    margin-top: -1rem;
+    margin-bottom: 0.625rem;
+    font-size: 0.75rem;
+    line-height: 0.8;
+    #circle1 {
+        @apply bg-gray-300 rounded-sm;
+        margin-left: 1rem;
+        width: 0.625rem;
+        height: 0.625rem;
+        opacity: 0.5;
     }
+    #circle3 {
+        @apply bg-primary1 rounded-sm;
+        width: 0.625rem;
+        height: 0.625rem;
+    }
+    #circle5 {
+        @apply bg-primary-dark rounded-sm;
+        width: 0.625rem;
+        height: 0.625rem;
+    }
+    .text {
+        margin-left: 0.125rem;
+        margin-right: 0.5rem;
+        font-size: 0.625rem;
+    }
+}
 
 </style>

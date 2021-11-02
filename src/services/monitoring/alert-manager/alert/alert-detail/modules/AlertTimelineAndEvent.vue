@@ -15,7 +15,7 @@
 <script lang="ts">
 import { PPanelTop, PTab } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive,
+    computed, reactive,
 } from '@vue/composition-api';
 import { TabItem } from '@spaceone/design-system/dist/src/navigation/tabs/tab/type';
 import AlertPushedEvent from '@/services/monitoring/alert-manager/alert/alert-detail/modules/alert-pushed-event/AlertPushedEvent.vue';
@@ -40,8 +40,7 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+    setup() {
         const tabState = reactive({
             tabs: computed(() => ([
                 { name: 'pushed-event', label: i18n.t('MONITORING.ALERT.DETAIL.PUSHED_EVENT.PUSHED_EVENT') },
@@ -57,6 +56,3 @@ export default {
 
 
 </script>
-
-<style lang="postcss" scoped>
-</style>

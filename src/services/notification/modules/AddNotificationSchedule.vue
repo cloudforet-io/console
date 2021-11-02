@@ -50,7 +50,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import {
-    PRadio, PSelectButton, PSelectDropdown, PFieldGroup,
+    PRadio, PSelectButton, PSelectDropdown,
 } from '@spaceone/design-system';
 import InfoMessage from '@/common/components/guidance/InfoMessage.vue';
 import { range } from 'lodash';
@@ -68,7 +68,6 @@ export default {
         PSelectButton,
         InfoMessage,
         PSelectDropdown,
-        PFieldGroup,
     },
     props: {
         isScheduled: {

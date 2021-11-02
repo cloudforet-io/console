@@ -73,14 +73,14 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    .heatmap-line {
-        line-height: 1.2;
-    }
-    .circle {
-        @apply rounded-sm;
-        width: 0.5rem;
-        height: 0.5rem;
-        margin-left: 0.5rem;
-        margin-top: 0.5rem;
-    }
+.heatmap-line {
+    line-height: 1.2;
+}
+.circle {
+    @apply rounded-sm;
+    width: 0.5rem;
+    height: 0.5rem;
+    margin-left: 0.5rem;
+    margin-top: 0.5rem;
+}
 </style>

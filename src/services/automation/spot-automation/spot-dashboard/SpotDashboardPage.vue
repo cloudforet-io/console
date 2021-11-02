@@ -588,22 +588,22 @@ export default {
 }
 
 .no-project {
-  display: flex;
-  flex-direction: column;
-  .no-project-text {
-    @apply text-primary2;
-    font-size: 1rem;
-    line-height: 160%;
-    margin-top: 0.5rem;
-    margin-bottom: 1rem;
-  }
-  .no-project-btn {
-    @apply rounded;
-    height: 2rem;
-    width: 8.187rem;
-    align-self: center;
-    padding: 1rem;
-  }
+    display: flex;
+    flex-direction: column;
+    .no-project-text {
+        @apply text-primary2;
+        font-size: 1rem;
+        line-height: 160%;
+        margin-top: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    .no-project-btn {
+        @apply rounded;
+        height: 2rem;
+        width: 8.187rem;
+        align-self: center;
+        padding: 1rem;
+    }
 }
 
 </style>

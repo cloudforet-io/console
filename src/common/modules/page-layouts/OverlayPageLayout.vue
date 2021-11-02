@@ -31,8 +31,6 @@ export default {
     position: fixed;
     display: flex;
     width: 100%;
-//height: 100%;
-//top: 0;
     height: calc(100vh - $(gnb-height));
     top: $gnb-height;
     left: 0;
@@ -42,17 +40,6 @@ export default {
 
     /* transition: opacity 0.3s ease; */
     max-width: 100vw;
-    //&::before {
-    //    content: '';
-    //    display: block;
-    //    position: fixed;
-    //    top: 0;
-    //    height: $(gnb-height);
-    //    left: 0;
-    //    width: 100vw;
-    //    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
-    //    pointer-events: none;
-    //}
 }
 
 /* transition */

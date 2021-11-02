@@ -93,7 +93,6 @@ import BudgetNotificationsChannel
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-notifications/BudgetNotificationsChannel.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 import { reactive, toRefs } from '@vue/composition-api';
-import { i18n } from '@/translations';
 import BudgetAlertModal
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-notifications/BudgetNotificationsModal.vue';
 
@@ -105,7 +104,6 @@ export default {
         PPaneLayout,
         PIconButton,
         PIconTextButton,
-        PI,
         PAnchor,
         PBadge,
         DeleteModal,

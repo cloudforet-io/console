@@ -204,7 +204,6 @@ export default {
     .desc {
         @apply text-gray-500;
     }
-
 }
 .severity {
     @apply font-bold capitalize;

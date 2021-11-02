@@ -91,13 +91,12 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
     find, forEach, range, size,
 } from 'lodash';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import am4themes_animated from '@amcharts/amcharts4/themes/animated';
+import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
@@ -116,7 +115,7 @@ import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import config from '@/lib/config';
 
-am4core.useTheme(am4themes_animated);
+am4core.useTheme(am4themesAnimated);
 
 enum STATUS {
     error = 'error',
@@ -124,10 +123,13 @@ enum STATUS {
     ok = 'ok',
 }
 enum CATEGORY {
+    // eslint-disable-next-line @typescript-eslint/camelcase
     cost_optimizing,
     performance,
     security,
+    // eslint-disable-next-line @typescript-eslint/camelcase
     fault_tolerance,
+    // eslint-disable-next-line @typescript-eslint/camelcase
     service_limits,
 }
 

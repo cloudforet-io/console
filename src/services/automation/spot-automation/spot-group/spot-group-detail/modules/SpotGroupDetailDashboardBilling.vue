@@ -39,7 +39,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase */
 import {
     forEach, range, find,
 } from 'lodash';

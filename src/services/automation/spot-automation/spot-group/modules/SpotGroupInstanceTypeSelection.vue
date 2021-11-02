@@ -311,7 +311,7 @@ export default {
     @apply text-gray-700;
     font-size: 0.75rem;
     .p-i-icon {
-        margin-bottom: .2rem;
+        margin-bottom: 0.2rem;
     }
 }
 .toggle-wrapper {
@@ -330,11 +330,11 @@ export default {
 }
 .table-container {
     position: relative;
-    display:inline-block;
+    display: inline-block;
     max-width: 100%;
 }
 .table-wrapper {
-    display:inline-block;
+    display: inline-block;
     max-width: 100%;
     overflow: auto;
     margin-top: 1.5rem;
@@ -395,7 +395,6 @@ table {
 }
 .invalid-cover {
     @apply absolute w-full h-full overflow-hidden border border-alert;
-    //background-color: rgba(theme('colors.red.100'), 0.3);
     pointer-events: none;
     top: 0;
     z-index: 1;
@@ -421,11 +420,11 @@ table {
         th {
             &[scope=col] {
                 &:first-child {
-                    box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.08);
+                    box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08);
                 }
             }
             &[scope=row] {
-                box-shadow: 2px 0px 4px rgba(0, 0, 0, 0.08);
+                box-shadow: 2px 0 4px rgba(0, 0, 0, 0.08);
             }
         }
     }

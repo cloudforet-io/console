@@ -4,6 +4,7 @@ const UserAccountPage = () => import(/* webpackChunkName: "UserAccountPage" */ '
 const UserAPIKeyPage = () => import(/* webpackChunkName: "UserAPIKeyPage" */ '@/services/identity/user/user-api-key/UserAPIKeyPage.vue');
 const UserNotificationPage = () => import(/* webpackChunkName: "UserNotificationPage" */ '@/services/identity/user/user-notification/UserNotificationPage.vue');
 const NotificationAddPage = () => import(/* webpackChunkName: "NotificationAddPage" */ '@/services/notification/notification-add/NotificationAddPage.vue');
+// eslint-disable-next-line max-len
 const ManageUserNotificationPage = () => import(/* webpackChunkName: "ManageUserNotificationPage" */ '@/services/identity/user/user-management/manage-user-notification/ManageUserNotificationPage.vue');
 const UserManagementPage = () => import(/* webpackChunkName: "UserManagementPage" */ '@/services/identity/user/user-management/UserManagementPage.vue');
 const UserPage = () => import(/* webpackChunkName: "User" */ '@/services/identity/user/UserPage.vue');

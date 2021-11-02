@@ -29,7 +29,7 @@ export const checkDuplicateID = async (userID: string) => {
     };
     const { total_count } = await SpaceConnector.client.identity.user.list({ user_id: userID });
     if (total_count > 0) {
-    	validation.isValid = false;
+        validation.isValid = false;
         validation.invalidText = i18n.t('IDENTITY.USER.FORM.USER_ID_DUPLICATED');
     }
     return validation;
@@ -46,7 +46,7 @@ export const checkOauth = async (userID: string) => {
             domain_id: store.state.domain.domainId,
         });
     } catch (e) {
-    	validation.isValid = false;
+        validation.isValid = false;
         validation.invalidText = i18n.t('IDENTITY.USER.FORM.USER_ID_NOT_EXIST');
     }
     return validation;

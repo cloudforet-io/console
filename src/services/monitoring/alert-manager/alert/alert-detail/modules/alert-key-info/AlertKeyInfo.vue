@@ -177,12 +177,12 @@ export default {
         }
         .value-wrapper {
             max-width: calc(100% - 10rem);
+
             @screen tablet {
                 max-width: none;
             }
         }
     }
 }
-
 
 </style>

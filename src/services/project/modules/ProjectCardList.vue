@@ -511,6 +511,5 @@ export default {
             }
         }
     }
-
 }
 </style>

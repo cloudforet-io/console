@@ -1,6 +1,6 @@
 import { RouteConfig } from 'vue-router';
 
-import SignOutPage from '@/services/auth/sign-out/SignOutPage.vue';
+const SignOutPage = () => import(/* webpackChunkName: "SignOutPage" */ '@/services/auth/sign-out/SignOutPage.vue');
 
 const SignInPage = () => import(/* webpackChunkName: "SignInPage" */ '@/services/auth/sign-in/SignInPage.vue');
 const DomainAdminSignInPage = () => import(/* webpackChunkName: "DomainAdminSignInPage" */ '@/services/auth/sign-in/DomainAdminSignInPage.vue');

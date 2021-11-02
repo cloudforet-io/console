@@ -12,11 +12,8 @@ interface ExcelPayload {
     url: string;
     param: any;
     fields: ExcelDataField[];
-    // eslint-disable-next-line camelcase
     sheet_name?: string;
-    // eslint-disable-next-line camelcase
     header_message?: HeaderMessage;
-    // eslint-disable-next-line camelcase
     file_name_prefix?: string;
 }
 
@@ -25,7 +22,7 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
         let params;
         if (Array.isArray(payload)) {
             params = payload.map(({
-                // eslint-disable-next-line camelcase
+                // eslint-disable-next-line @typescript-eslint/camelcase
                 url, param, fields, sheet_name, file_name_prefix, header_message,
             }) => ({
                 source: {
@@ -34,7 +31,7 @@ export const downloadExcel: Action<FileState, any> = async ({ commit, rootState,
                 },
                 template: {
                     options: {
-                        fileType: 'xlsx', // will be deprecated
+                        fileType: 'xlsx', // will be deprecated»
                         timezone: rootState.user.timezone,
                         // eslint-disable-next-line camelcase
                         sheet_name,

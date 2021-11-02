@@ -92,8 +92,9 @@ module.exports = {
         '@typescript-eslint/no-use-before-define': ['off'], // use eslint no-use-before-define rule
         '@typescript-eslint/ban-ts-ignore': ['off'],
         '@typescript-eslint/explicit-function-return-type': ['off'],
+        '@typescript-eslint/no-explicit-any': ['off']
     },
-
+    ignorePatterns: ['src/assets/**', '**/node_modules/**'],
     parserOptions: {
         parser: '@typescript-eslint/parser',
         sourceType: 'module',

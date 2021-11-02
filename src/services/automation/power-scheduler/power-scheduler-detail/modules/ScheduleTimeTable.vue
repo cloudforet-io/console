@@ -772,7 +772,8 @@ export default {
                 }
                 .weekday-row {
                     @apply border-b border-gray-200;
-                    /*display: flex;*/
+
+                    /* display: flex; */
                     width: 100%;
                     height: 3rem;
                     cursor: default;

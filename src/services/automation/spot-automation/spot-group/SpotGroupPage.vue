@@ -62,7 +62,7 @@ import {
     ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
-    PBreadcrumbs, PPageTitle, PDivider, PToolbox, PIconTextButton, PDataLoader, PLottie, PCheckBox,
+    PBreadcrumbs, PPageTitle, PDivider, PToolbox, PIconTextButton, PDataLoader, PCheckBox,
 } from '@spaceone/design-system';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
@@ -199,7 +199,6 @@ export default {
         PToolbox,
         PIconTextButton,
         PDataLoader,
-        PLottie,
         PCheckBox,
     },
     setup() {
@@ -463,7 +462,7 @@ export default {
 .show-favorite {
     font-size: 0.875rem;
     line-height: 200%;
-    margin-left: .125rem;
+    margin-left: 0.125rem;
 }
 .cost-instance-info {
     @apply text-gray-900;

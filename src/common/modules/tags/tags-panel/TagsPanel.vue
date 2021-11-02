@@ -144,14 +144,14 @@ export default {
 
 /* transition */
 .slide-up-enter-active {
-  transition: all 0.3s ease;
+    transition: all 0.3s ease;
 }
 .slide-up-leave-active {
-  transition: all 0.3s ease-out;
+    transition: all 0.3s ease-out;
 }
 .slide-up-enter, .slide-up-leave-to {
-  transform: translateY(100px);
-  opacity: 0;
+    transform: translateY(100px);
+    opacity: 0;
 }
 
 .p-data-table {

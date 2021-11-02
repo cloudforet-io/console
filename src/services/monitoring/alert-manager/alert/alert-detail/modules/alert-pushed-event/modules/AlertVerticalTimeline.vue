@@ -69,25 +69,29 @@ export default {
         padding-left: 1rem;
         padding-bottom: 1.5rem;
         min-height: 3.25rem;
-        &:before {
+        &::before {
             @mixin circle-style;
+
             @apply border-4 border-primary3 bg-primary;
         }
         &.ALERT {
-            &:before {
+            &::before {
                 @mixin circle-style;
+
                 @apply border-4 border-red-200 bg-red-400;
             }
         }
         &.ERROR {
-            &:before {
+            &::before {
                 @mixin circle-style;
+
                 @apply border-4 border-red-500 bg-red-200;
             }
         }
         &.RECOVERY {
-            &:before {
+            &::before {
                 @mixin circle-style;
+
                 @apply border-4 border-green-300 bg-green-500;
             }
         }

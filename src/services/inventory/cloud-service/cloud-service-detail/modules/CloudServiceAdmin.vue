@@ -153,7 +153,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-    >>> .p-search-table {
-        border-width: 0;
-    }
+>>> .p-search-table {
+    border-width: 0;
+}
 </style>

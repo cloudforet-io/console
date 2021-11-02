@@ -628,7 +628,7 @@ export default {
     padding: 0.5rem 0.5rem 0.5rem 0.25rem;
     margin: 0 0.75rem;
     &:first-of-type {
-        margin-top: -.69rem;
+        margin-top: -0.69rem;
     }
     &:last-of-type {
         @apply border-b-0;

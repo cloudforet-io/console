@@ -34,7 +34,7 @@ export default defineComponent({
             });
         } else next();
     },
-    setup(props, context) {
+    setup(props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const onSignIn = async () => {
@@ -47,7 +47,3 @@ export default defineComponent({
     },
 });
 </script>
-
-<style scoped>
-
-</style>

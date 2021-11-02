@@ -1,11 +1,12 @@
 <template>
     <div class="kbSSO-wrapper">
         <form :action="authOptions.authorization_endpoint" method="post">
-          <input 
-            type="hidden"
-            id="agentId"
-            name="agentId"
-            :value="authOptions.agent_id">
+            <input
+                id="agentId"
+                type="hidden"
+                name="agentId"
+                :value="authOptions.agent_id"
+            >
             <p-button
                 style-type="primary1 outline"
                 size="lg"
@@ -31,11 +32,11 @@ export default defineComponent({
     setup(props, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-          authOptions: computed(() => vm.$store.state.domain.authOptions),
-      });
+            authOptions: computed(() => vm.$store.state.domain.authOptions),
+        });
 
         return {
-          ...toRefs(state),
+            ...toRefs(state),
         };
     },
 });

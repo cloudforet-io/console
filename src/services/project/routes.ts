@@ -8,10 +8,12 @@ const ProjectMemberPage = () => import(/* webpackChunkName: "ProjectMemberPage" 
 const ProjectAlertPage = () => import(/* webpackChunkName: "ProjectAlertPage" */ '@/services/project/project-detail/project-alert/ProjectAlertPage.vue');
 const ProjectNotificationsPage = () => import(/* webpackChunkName: "ProjectNotificationsPage" */ '@/services/project/project-detail/project-notification/ProjectNotificationPage.vue');
 const ProjectTagPage = () => import(/* webpackChunkName: "ProjectTagPage" */ '@/services/project/project-detail/project-tag/ProjectTagPage.vue');
+// eslint-disable-next-line max-len
 const ProjectAlertEventRulePage = () => import(/* webpackChunkName: "ProjectAlertEventRulePage" */ '@/services/project/project-detail/project-alert/project-alert-event-rule/ProjectAlertEventRulePage.vue');
 const AddNotificationPage = () => import(/* webpackChunkName: "AddNotificationPage" */ '@/services/notification/notification-add/NotificationAddPage.vue');
 
 const ProjectAlertListPage = () => import(/* webpackChunkName: "ProjectAlertListPage" */ '@/services/project/project-detail/project-alert/project-alert-list/ProjectAlertListPage.vue');
+// eslint-disable-next-line max-len
 const ProjectMaintenanceWindowPage = () => import(/* webpackChunkName: "ProjectMaintenanceWindowPage" */ '@/services/project/project-detail/project-alert/project-maintenance-window/ProjectMaintenanceWindowPage.vue');
 const ProjectWebhookPage = () => import(/* webpackChunkName: "ProjectWebhookPage" */ '@/services/project/project-detail/project-alert/project-webhook/ProjectWebhookPage.vue');
 const ProjectAlertSettingsPage = () => import(/* webpackChunkName: "ProjectAlertSettingsPage" */ '@/services/project/project-detail/project-alert/project-alert-settings/ProjectAlertSettingsPage.vue');
