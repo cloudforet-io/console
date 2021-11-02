@@ -88,17 +88,17 @@ export default {
         };
 
         const handleHandbookButton = () => {
-            if (store.state.display.visibleSidebar) store.dispatch('display/hideSidebar');
+            if (store.getters['display/isHandbookVisible']) store.dispatch('display/hideSidebar');
             else store.dispatch('display/showHandbook');
         };
 
         onMounted(() => {
-            if (!state.noMore && !store.state.display.visibleSidebar) {
+            if (!state.noMore && !store.getters['display/isHandbookVisible']) {
                 store.dispatch('display/showHandbook');
             }
         });
         onUnmounted(() => {
-            if (store.state.display.visibleSidebar) {
+            if (store.getters['display/isHandbookVisible']) {
                 store.dispatch('display/hideSidebar');
             }
         });
