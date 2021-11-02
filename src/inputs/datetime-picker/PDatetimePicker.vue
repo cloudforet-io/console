@@ -1,12 +1,22 @@
 <template>
-    <div ref="datePickerRef" class="p-datetime-picker">
-        <input type="text"
-               :placeholder="placeholder"
-               data-input
-        >
+    <div ref="datePickerRef" class="p-datetime-picker"
+         :class="{
+             [mode] : true,
+             [styleType] : true,
+             open : visibleMenu,
+         }"
+    >
+        <div class="input-sizer">
+            <input type="text"
+                   :placeholder="placeholder"
+                   data-input
+            >
+        </div>
         <p-i :name="mode === FLATPICKR_MODE.time ? 'ic_clock' : 'ic_calendar'"
              color="inherit"
              data-toggle
+             width="1.25rem"
+             height="1.25rem"
         />
     </div>
 </template>
@@ -92,15 +102,27 @@ export default {
                 return 'Select Date';
             }),
             offsetHours: computed(() => (dayjs().tz(props.timezone).utcOffset()) / 60),
+            visibleMenu: false,
         });
 
         /* event */
-        const handleChangeInput = (selectedDates: Date[]) => {
+        const handleChangeInput = (selectedDates: Date[], dateStr, instance) => {
             state.proxySelectedDates = selectedDates.map((d) => {
                 const dateString = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
                 const timezoneDate = dayjs.utc(dateString).utcOffset(state.offsetHours, true);
                 return timezoneDate.format();
             });
+
+            /* resize input */
+            const inputSizer = instance.element.childNodes[0];
+            inputSizer.dataset.value = dateStr;
+            inputSizer.style.minWidth = 'auto';
+        };
+        const handleOpenMenu = () => {
+            state.visibleMenu = true;
+        };
+        const handleCloseMenu = () => {
+            state.visibleMenu = false;
         };
 
         /* util */
@@ -111,7 +133,12 @@ export default {
                     dateFormat: 'H:i',
                     enableTime: true,
                     wrap: true,
+                    locale: {
+                        rangeSeparator: ' ~ ',
+                    },
                     onValueUpdate: handleChangeInput,
+                    onOpen: handleOpenMenu,
+                    onClose: handleCloseMenu,
                 });
             } else {
                 let defaultDate;
@@ -127,12 +154,17 @@ export default {
                     defaultDate,
                     altInput: true,
                     altFormat: props.enableTime ? 'Y/m/d H:i' : 'Y/m/d',
-                    dateFormat: 'Y-m-d H:i',
+                    dateFormat: props.enableTime ? 'Y/m/d H:i' : 'Y/m/d',
                     enableTime: props.enableTime,
                     minDate: props.minDate,
                     maxDate: props.maxDate,
                     wrap: true,
+                    locale: {
+                        rangeSeparator: ' ~ ',
+                    },
                     onValueUpdate: handleChangeInput,
+                    onOpen: handleOpenMenu,
+                    onClose: handleCloseMenu,
                 });
             }
         };
@@ -150,25 +182,248 @@ export default {
     },
 };
 </script>
-
 <style lang="postcss">
 @import 'flatpickr/dist/flatpickr.css';
-
 .p-datetime-picker {
-    @apply bg-white border border-gray-300 rounded text-gray-dark;
-    display: flex;
+    @apply overflow-hidden bg-white border border-gray-300 rounded text-gray-dark rounded;
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
     width: 13.375rem;
     height: 2rem;
-    cursor: pointer;
-
-    &:hover, &:focus {
-        @apply border-secondary;
+    padding-right: 0.5rem;
+    font-size: 0.875rem;
+    letter-spacing: -0.01rem;
+    &:hover,
+    &.open,
+    &:focus-within {
+        @apply text-secondary border-secondary;
+        cursor: pointer;
     }
-
-    input {
-        @apply rounded;
+    .input-sizer {
         width: 100%;
         height: 100%;
     }
+    input {
+        width: 100%;
+        height: 100%;
+        padding-top: 0.5rem;
+        padding-bottom: 0.5rem;
+        padding-left: 0.5rem;
+        cursor: pointer;
+        &::placeholder {
+            @apply text-gray-300;
+        }
+        &:focus {
+            outline: none;
+        }
+    }
+    .p-i-icon {
+        flex-shrink: 0;
+        margin-left: 0.5rem;
+    }
+    &.time {
+        width: 8rem;
+    }
+    &.text:not(.open.time) {
+        @apply border-0;
+        width: auto;
+        padding-right: 0;
+        .input-sizer {
+            display: inline-block;
+            position: relative;
+            min-width: 5.125rem;
+            width: fit-content;
+            &::after {
+                content: attr(data-value) ' ';
+                visibility: hidden;
+            }
+            input {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                padding-left: 0;
+            }
+        }
+    }
+}
+.flatpickr-calendar {
+    width: 15rem;
+    margin-top: -0.125rem;
+    &.open {
+        @apply overflow-hidden border-secondary;
+        box-shadow: none;
+        border-width: 0.0625rem;
+        border-style: solid;
+    }
+    &:not(.hasTime) {
+        min-height: 16.375rem;
+    }
+    &.hasTime {
+        .numInputWrapper span {
+            @apply border-gray-200 bg-blue-100;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            width: 0.75rem;
+            padding: 0;
+            &:hover {
+                @apply bg-blue-100;
+            }
+            &.arrowUp::after {
+                border-style: solid;
+                border-width: 0 0.125rem 0.25rem 0.125rem;
+                top: 40%;
+            }
+            &.arrowDown::after {
+                border-style: solid;
+                border-width: 0.25rem 0.125rem 0 0.125rem;
+            }
+        }
+        input:hover,
+        .numInputWrapper:hover,
+        .flatpickr-am-pm:hover {
+            @apply bg-blue-100;
+            cursor: pointer;
+        }
+        input:focus,
+        .numInputWrapper:focus,
+        .flatpickr-am-pm:focus {
+            @apply bg-blue-200;
+            cursor: pointer;
+        }
+    }
+    &.hasTime.noCalendar {
+        width: 8rem;
+        .flatpickr-time {
+            border-top: none;
+            .numInputWrapper {
+                width: calc((100% - 0.25rem - 2.5rem) / 2);
+            }
+            .flatpickr-time-separator {
+                width: 0.25rem;
+            }
+            .flatpickr-am-pm {
+                width: 2.5rem;
+            }
+        }
+    }
+    &::before, &::after {
+        display: none;
+    }
+}
+.flatpickr-months {
+    position: relative;
+    padding: 0.5rem 0.5rem 0.25rem;
+    .flatpickr-month {
+        @apply text-gray-900;
+    }
+    .flatpickr-prev-month,
+    .flatpickr-next-month {
+        padding: 0;
+        margin: 0.5rem;
+        display: flex;
+        align-items: center;
+    }
+    .flatpickr-current-month {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0;
+        font-size: 1rem;
+        .flatpickr-monthDropdown-months {
+            padding: 0;
+            margin: 0 0.5rem 0 0;
+            &:hover {
+                @apply bg-transparent;
+            }
+            input {
+                margin: 0 0.5rem 0 0;
+            }
+        }
+        .numInputWrapper {
+            padding: 0;
+            &:hover {
+                @apply bg-transparent;
+            }
+            .cur-year {
+                padding: 0 1rem 0 0;
+            }
+        }
+    }
+}
+.flatpickr-innerContainer {
+    padding: 0 0.5rem 0.5rem;
+    .flatpickr-rContainer {
+        width: 100%;
+        .flatpickr-weekday {
+            @apply text-gray-400 font-bold;
+            font-size: 0.625rem;
+        }
+        .flatpickr-days {
+            width: 100%;
+            .dayContainer {
+                min-width: 100%;
+                max-width: 100%;
+            }
+        }
+    }
+}
+.flatpickr-day {
+    @apply text-gray-700;
+    width: 2rem;
+    height: 2rem;
+    margin-top: 0.25rem;
+    font-size: 0.75rem;
+    line-height: 2rem;
+    &:hover:not(.selected):not(.today):not(.prevMonthDay):not(.nextMonthDay):not(.inRange):not(.startRange):not(.endRange):not(.flatpickr-disabled) {
+        @apply text-blue-500 bg-blue-100 border-blue-100;
+    }
+    &.today:not(.flatpickr-disabled):not(.today) {
+        @apply border-gray-400;
+    }
+    &.inRange,
+    &.prevMonthDay.inRange,
+    &.nextMonthDay.inRange,
+    &.today.inRange,
+    &.prevMonthDay.today.inRange,
+    &.nextMonthDay.today.inRange,
+    &:hover,
+    &:focus,
+    &.prevMonthDay:focus,
+    &.nextMonthDay:focus {
+        @apply bg-blue-200 border-blue-200;
+        box-shadow: none;
+    }
+    &.selected,
+    &.startRange,
+    &.endRange,
+    &.selected.inRange,
+    &.startRange.inRange,
+    &.endRange.inRange,
+    &.selected:focus,
+    &.startRange:focus,
+    &.endRange:focus,
+    &.selected:hover,
+    &.startRange:hover,
+    &.endRange:hover,
+    &.selected.prevMonthDay,
+    &.startRange.prevMonthDay,
+    &.endRange.prevMonthDay,
+    &.selected.nextMonthDay,
+    &.startRange.nextMonthDay,
+    &.endRange.nextMonthDay {
+        @apply bg-blue-500 border-blue-500 text-white;
+    }
+    &.selected.startRange + .endRange:not(:nth-child(7n+1)),
+    &.startRange.startRange + .endRange:not(:nth-child(7n+1)),
+    &.endRange.startRange + .endRange:not(:nth-child(7n+1)) {
+        box-shadow: none;
+    }
+}
+.rangeMode .flatpickr-day {
+    margin-top: 0.25rem;
 }
 </style>
