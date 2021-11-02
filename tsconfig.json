@@ -32,13 +32,13 @@
     ]
   },
   "include": [
-    "src/**/*.ts",
-    "src/**/*.tsx",
-    "src/**/*.vue",
-    "tests/**/*.ts"
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.vue"
   ],
   "exclude": [
     "node_modules",
-    "src/**/*.stories.ts"
+    "src/assets",
+    "**/*.stories.ts"
   ]
 }

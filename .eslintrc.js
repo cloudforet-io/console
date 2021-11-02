@@ -94,7 +94,7 @@ module.exports = {
         '@typescript-eslint/explicit-function-return-type': ['off'],
         '@typescript-eslint/no-explicit-any': ['off']
     },
-    ignorePatterns: ['src/assets/**', '**/node_modules/**'],
+    ignorePatterns: ['src/assets/**', '**/node_modules/**', 'translations/language-pack/**', 'public/lottie.js'],
     parserOptions: {
         parser: '@typescript-eslint/parser',
         sourceType: 'module',
