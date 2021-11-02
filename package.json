@@ -48,7 +48,7 @@
     "cm": "cz",
     "prepare": "husky install",
     "tsc-alias": "tsc-alias -p tsconfig.build.json",
-    "semantic-release": "SKIP_PREPARE_COMMIT_MSG=1 SKIP_COMMIT_MSG=1 semantic-release"
+    "semantic-release": "$SKIP_PRE_PUSH=1 SKIP_PREPARE_COMMIT_MSG=1 SKIP_COMMIT_MSG=1 semantic-release"
   },
   "dependencies": {
     "@babel/runtime": "^7.12.5",

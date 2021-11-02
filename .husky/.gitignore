@@ -1,1 +1,17 @@
 _
+applypatch-msg
+post-applypatch
+post-checkout
+post-commit
+post-merge
+post-receive
+post-rewrite
+post-update
+pre-applypatch
+pre-auto-gc
+pre-commit
+pre-rebase
+pre-receive
+push-to-checkout
+sendemail-validate
+update
