@@ -15,8 +15,6 @@
 </template>
 
 <script lang="ts">
-/* eslint-disable camelcase,vue/prop-name-casing,@typescript-eslint/camelcase */
-
 import {
     computed, onMounted, reactive, toRefs, watch,
 } from '@vue/composition-api';

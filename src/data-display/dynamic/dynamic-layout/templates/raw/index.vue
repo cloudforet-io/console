@@ -44,7 +44,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props: RawDynamicLayoutProps, { emit }) {
+    setup(props: RawDynamicLayoutProps) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({

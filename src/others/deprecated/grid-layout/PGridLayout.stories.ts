@@ -8,7 +8,7 @@ export default {
 export const defaultCase = () => ({
     components: { PGridLayout },
     template: '<div style="width: 100vw"><PGridLayout card-min-width="5rem" card-height="10rem" :items="items" /></div>',
-    setup(props, context) {
+    setup() {
         return {
             items: ['1', '2', '3', '4', '5'],
         };
@@ -27,7 +27,7 @@ export const cardMinMaxCase = () => ({
         <h1>Apply card max width</h1>
         <PGridLayout card-min-width="5rem" card-max-width="8rem" card-height="5rem" :items="items" />
     </div>`,
-    setup(props, context) {
+    setup() {
         return {
             items: ['1', '2', '3', '4', '5'],
         };
@@ -46,7 +46,7 @@ export const CustomStyleCase = () => ({
         <h1>Style by contents</h1>
         <PGridLayout card-min-width="5rem" card-height="5rem" :items="items" :card-style="contentsCardStyle" />
     </div>`,
-    setup(props, context) {
+    setup() {
         return {
             items: [{
                 color: 'red',
@@ -67,7 +67,7 @@ export const CustomStyleCase = () => ({
                 color: 'orange',
                 data: 'c',
             }],
-            defaultCardStyle(item, index) {
+            defaultCardStyle() {
                 return {
                     border: '#181b1e 1px',
                     'background-color': 'rgba(10, 10, 10, 0.3)',
@@ -75,10 +75,10 @@ export const CustomStyleCase = () => ({
             },
             indexCardStyle(item, index) {
                 return {
-                    'background-color': index % 2 == 0 ? 'rgba(191,1,16,0.4)' : 'rgba(10, 10, 10, 0.3)',
+                    'background-color': index % 2 === 0 ? 'rgba(191,1,16,0.4)' : 'rgba(10, 10, 10, 0.3)',
                 };
             },
-            contentsCardStyle(item, index) {
+            contentsCardStyle(item) {
                 return {
                     'background-color': item.color,
                 };
@@ -108,7 +108,7 @@ export const CustomClassCase = () => ({
         <h1>Style by contents</h1>
         <PGridLayout card-min-width="5rem" card-height="5rem" :items="items" :card-class="contentsCard" />
     </div>`,
-    setup(props, context) {
+    setup() {
         return {
             items: [{
                 size: 'xs',
@@ -126,16 +126,16 @@ export const CustomClassCase = () => ({
                 size: '2xl',
                 data: 'b',
             }],
-            defaultCard(item, index) {
+            defaultCard() {
                 return { 'px-4': true, 'text-lg': true };
             },
-            defaultArrayCard(item, index) {
+            defaultArrayCard() {
                 return ['px-4', 'text-lg'];
             },
             indexCard(item, index) {
                 return index % 2 === 0 ? ['text-xs'] : ['text-lg'];
             },
-            contentsCard(item, index) {
+            contentsCard(item) {
                 return [`text-${item.size}`];
             },
         };
@@ -147,7 +147,7 @@ export const overflowSampleCase = () => ({
     template: `<div style="width: 28rem">
         <PGridLayout card-min-width="5rem" card-height="10rem" :items="items" :card-style="defaultCardStyle" style="overflow-y: scroll; height: 20rem;" />
     </div>`,
-    setup(props, context) {
+    setup() {
         return {
             items: ['1', '2', '3', '4', '5', '1', '2', '3', '4', '5'],
         };

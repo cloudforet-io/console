@@ -72,7 +72,7 @@
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { sizeMapping } from '@/feedbacks/modals/type';
 import {
-    computed, onMounted, onUnmounted, reactive, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { makeProxy } from '@/util/composition-helpers';
 import { ButtonModalProps } from '@/feedbacks/modals/button-modal/type';

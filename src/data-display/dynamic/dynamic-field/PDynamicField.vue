@@ -14,7 +14,7 @@
                 />
             </template>
             <template v-if="!options.delimiter" #delimiter>
-                <br/>
+                <br>
             </template>
         </p-text-list>
         <component :is="component"
@@ -75,7 +75,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props: DynamicFieldProps, { emit }) {
+    setup(props: DynamicFieldProps) {
         const state = reactive<any>({
             component: null,
             nextHandler: props.handler,

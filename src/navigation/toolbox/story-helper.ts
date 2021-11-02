@@ -457,4 +457,3 @@ export const getToolboxArgTypes = (): ArgTypes => ({
         },
     },
 });
-

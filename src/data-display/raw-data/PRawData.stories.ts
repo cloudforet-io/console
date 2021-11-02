@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import PRawData from '@/data-display/raw-data/PRawData.vue';
 import { boolean, withKnobs } from '@storybook/addon-knobs';
 
@@ -74,7 +73,7 @@ export const objectInput = () => ({
                             :loading="loading"
                             class="w-full px-4"/>
             </div>`,
-    setup(props) {
+    setup() {
         return {
             code: rawDataValue,
         };
@@ -96,7 +95,7 @@ export const stringInput = () => ({
                             :loading="loading"
                             class="w-full px-4"/>
             </div>`,
-    setup(props) {
+    setup() {
         return {
             code: JSON.stringify(rawDataValue, undefined, 4),
         };

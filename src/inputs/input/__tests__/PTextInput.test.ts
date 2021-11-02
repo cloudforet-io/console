@@ -1,12 +1,11 @@
-import { shallowMount } from '@vue/test-utils';
+import { mount } from '@vue/test-utils';
 import PTextInput from '../PTextInput.vue';
 
 describe('text-input', () => {
-    let wrapper;
-    beforeEach(() => {
-        wrapper = shallowMount(PTextInput);
-    });
-    test('1', () => {
-        expect(wrapper.vm.msg).toBe('Hello Jest!');
+    it('renders span', () => {
+        const wrapper = mount(PTextInput);
+
+        const span = wrapper.find('span');
+        expect(span.exists()).toBe(true);
     });
 });

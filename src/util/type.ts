@@ -5,7 +5,6 @@ export interface Timestamp {
     nanos?: number;
 }
 
-export type Computed<T> = Readonly<Ref<Readonly<T>>>
 export type JsonSchemaType = 'string'|'number'|'object'|'integer'|'array'|'null';
 
 export interface JsonSchema<T extends JsonSchemaType=JsonSchemaType> {
@@ -82,7 +81,6 @@ export class JsonSchemaObjectType implements JsonSchema<'object'> {
     constructor(
         public properties: any = {},
         public required: string[] = [],
-        public $async = false,
     ) { }
 
     addStringProperty(name: string, label: string, required?: boolean, placeHolder?: string, extra?: any) {

@@ -78,7 +78,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props: SimpleTableDynamicLayoutProps, { emit }) {
+    setup(props: SimpleTableDynamicLayoutProps) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
@@ -92,7 +92,6 @@ export default {
                     name: ds.key,
                     label: ds.name,
                     sortable: typeof ds.options?.sortable === 'boolean' ? ds.options.sortable : true,
-                    // eslint-disable-next-line camelcase
                     sortKey: ds.options?.sort_key,
                     width: ds.options?.width,
                 }));

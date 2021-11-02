@@ -44,7 +44,7 @@ export const defaultCase = () => ({
         <div style="width: 80vw;">
             <p-selectable-item v-bind="$props"></p-selectable-item>
         </div>`,
-    setup(props, context) {
+    setup() {
         return {
         };
     },
@@ -94,7 +94,7 @@ export const usingSlots = () => ({
         
         
         </div>`,
-    setup(props, context) {
+    setup() {
         return {
         };
     },

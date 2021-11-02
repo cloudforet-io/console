@@ -44,7 +44,7 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import { reactive, toRefs } from '@vue/composition-api';
 
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PI from '@/foundation/icons/PI.vue';

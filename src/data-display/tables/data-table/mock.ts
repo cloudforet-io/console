@@ -19,4 +19,4 @@ export const getLongUsers = (min = 7, max = 15) => range(faker.random.number({ m
     name: faker.lorem.sentence(15),
     phone: faker.lorem.sentence(15),
     email: faker.lorem.sentence(15),
-}))
+}));

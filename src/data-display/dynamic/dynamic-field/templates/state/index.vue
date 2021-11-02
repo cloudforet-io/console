@@ -7,7 +7,6 @@ import { StateDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/tem
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
 import { getColor } from '@/util/helpers';
 import { TranslateResult } from 'vue-i18n';
-import { ComponentRenderProxy, getCurrentInstance } from '@vue/composition-api';
 
 export default {
     name: 'PDynamicFieldState',

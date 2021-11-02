@@ -72,10 +72,22 @@ export default {
             type: String,
             default: 'primary',
         },
-        headerTitle: String,
-        subTitle: String,
-        fields: Array,
-        items: Array,
+        headerTitle: {
+            type: String,
+            default: undefined,
+        },
+        subTitle: {
+            type: String,
+            default: undefined,
+        },
+        fields: {
+            type: Array,
+            default: undefined,
+        },
+        items: {
+            type: Array,
+            default: undefined,
+        },
         loading: {
             type: Boolean,
             default: false,

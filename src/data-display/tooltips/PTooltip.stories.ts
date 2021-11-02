@@ -1,4 +1,6 @@
-import { object, select, text, withKnobs } from '@storybook/addon-knobs';
+import {
+    object, select, text, withKnobs,
+} from '@storybook/addon-knobs';
 import Tooltip from '@/data-display/tooltips/PTooltip.vue';
 import { PLACEMENTS } from '@/data-display/tooltips/type';
 

@@ -51,7 +51,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props: MarkdownDynamicLayoutProps, { emit }) {
+    setup(props: MarkdownDynamicLayoutProps) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),

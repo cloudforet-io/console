@@ -1,4 +1,6 @@
-import { number, boolean, text, withKnobs } from '@storybook/addon-knobs';
+import {
+    number, boolean, text, withKnobs,
+} from '@storybook/addon-knobs';
 import PPageTitle from '@/data-display/titles/page-title/PPageTitle.vue';
 import { action } from '@storybook/addon-actions';
 
@@ -43,7 +45,7 @@ export const pageTitle = () => ({
             default: number('Selected Count', 2),
         },
     },
-    setup(props, context) {
+    setup() {
         return {
             goBack: action('goBack'),
         };
@@ -65,7 +67,7 @@ export const childMode = () => ({
             default: boolean('child', true),
         },
     },
-    setup(props, context) {
+    setup() {
         return {
             goBack: action('goBack'),
         };
@@ -92,7 +94,7 @@ export const selectedCount = () => ({
             default: number('Selected Count', 2),
         },
     },
-    setup(props, context) {
+    setup() {
         return {
         };
     },

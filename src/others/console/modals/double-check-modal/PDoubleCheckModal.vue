@@ -78,8 +78,14 @@ export default {
             type: String,
             default: 'alert',
         },
-        headerTitle: String,
-        subTitle: String,
+        headerTitle: {
+            type: String,
+            default: undefined,
+        },
+        subTitle: {
+            type: String,
+            default: undefined,
+        },
         verificationText: {
             type: String,
             required: true,

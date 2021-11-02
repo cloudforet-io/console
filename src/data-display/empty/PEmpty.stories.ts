@@ -14,7 +14,7 @@ const actions = {};
 export const noItems = () => ({
     components: { PEmpty },
     template: '<p-empty>No Items</p-empty>',
-    setup(props, context) {
+    setup() {
         return {
             ...actions,
         };

@@ -18,7 +18,7 @@ lottieFileNames.forEach((d) => {
 
 
 fs.writeFile(`${destPath}names.js`, `
-    export const names = [${lottieFileNames ? lottieFileNames.map(d => `'${d.slice(0, d.length - 5)}'`) : ''}];
+export const names = [\n    ${lottieFileNames ? lottieFileNames.map(d => `'${d.slice(0, d.length - 5)}',`).join('\n    ') : ''}\n];
 `, (e) => {
     if (e) console.error('Failed to write names.js', e);
     else console.log('Succeed to write names.js');

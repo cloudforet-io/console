@@ -87,7 +87,7 @@ export const defaultCase = () => ({
                              v-on="actions"
             ></p-selectable-list>
         </div>`,
-    setup(props, context) {
+    setup() {
         const state = reactive({
             items,
             selectedIndexes: [],
@@ -117,7 +117,7 @@ export const extraSlot = () => ({
                 </template>
             </p-selectable-list>
         </div>`,
-    setup(props, context) {
+    setup() {
         const state = reactive({
             items,
             selectedIndexes: [],

@@ -23,7 +23,9 @@
                 </div>
             </div>
             <slot v-if="subTitle" name="sub-title">
-                <p class="sub-title"> {{ subTitle }}</p>
+                <p class="sub-title">
+                    {{ subTitle }}
+                </p>
             </slot>
         </slot>
         <div class="widget-contents">
@@ -69,7 +71,6 @@ export default {
 
 <style lang="postcss" scoped>
 .widget-layout {
-    /*@apply border border-gray-100;*/
     display: inline-flex;
     flex-direction: column;
     width: 100%;

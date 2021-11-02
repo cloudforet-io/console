@@ -605,7 +605,6 @@ export default defineComponent<Props>({
 .p-tree {
     @apply w-full;
 
-    .tree-children.tree-root {}
     .tree-branch {
         &.tree-placeholder {
             .tree-node-back .tree-node {

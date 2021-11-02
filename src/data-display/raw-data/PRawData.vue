@@ -6,7 +6,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, watch, onMounted, toRefs,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import PTextEditor from '@/inputs/text-editor/PTextEditor.vue';
 
@@ -33,7 +33,7 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup(props) {
         const state = reactive({
             // proxyCode: undefined,
             editor: null,

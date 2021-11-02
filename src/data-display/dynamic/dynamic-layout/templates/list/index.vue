@@ -28,7 +28,6 @@ import {
 } from '@/data-display/dynamic/dynamic-layout/templates/list/type';
 import { makeByPassListeners } from '@/util/composition-helpers';
 import { DynamicLayout } from '@/data-display/dynamic/dynamic-layout/type/layout-schema';
-import { DynamicLayoutTypeOptions, DynamicLayoutFetchOptions } from '@/data-display/dynamic/dynamic-layout/type';
 
 export default {
     name: 'PDynamicLayoutList',

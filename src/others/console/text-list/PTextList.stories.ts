@@ -40,7 +40,7 @@ export const defaultCase = () => ({
     <div style="width: 80vw;">
         <PTextList v-bind="$props"></PTextList>
     </div>`,
-    setup(props, context) {
+    setup() {
         const state = reactive({});
 
         return {
@@ -76,12 +76,12 @@ export const linkFormatter = () => ({
     <div style="width: 80vw;">
         <PTextList v-bind="$props" :linkFormatter="linkFormatter"></PTextList>
     </div>`,
-    setup(props, context) {
+    setup() {
         const state = reactive({});
 
         return {
             ...toRefs(state),
-            linkFormatter(d, i) {
+            linkFormatter(d) {
                 return d;
             },
         };
@@ -119,7 +119,7 @@ export const objectArray = () => ({
     <div style="width: 80vw;">
         <PTextList v-bind="$props"></PTextList>
     </div>`,
-    setup(props, context) {
+    setup() {
         const state = reactive({});
 
         return {
@@ -173,7 +173,7 @@ export const defaultSlot = () => ({
             </template>
         </PTextList>
     </div>`,
-    setup(props, context) {
+    setup() {
         const state = reactive({});
 
         return {

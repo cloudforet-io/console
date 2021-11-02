@@ -1,5 +1,3 @@
-import { Button } from '@/inputs/buttons/button/type';
-
 export enum sizeMapping {
     sm = 'modal-sm',
     md = '',

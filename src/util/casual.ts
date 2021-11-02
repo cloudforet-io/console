@@ -42,6 +42,7 @@ export function dictOf<T=any>(times, generator, ...args): T {
 
 interface ProviderInterface {
     make_id(name: string): string;
+    // eslint-disable-next-line @typescript-eslint/camelcase
     ip_list(): Array<string | undefined>;
     label(): string;
     labels(): Array<string | undefined>;
@@ -51,6 +52,7 @@ interface ProviderInterface {
     };
     cidr(): string;
     nanos(): number;
+    // eslint-disable-next-line @typescript-eslint/camelcase
     security_group_name(): string;
     tags(): object;
     defaultImg(): string;

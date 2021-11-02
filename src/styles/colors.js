@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { colors } = require('tailwindcss/defaultTheme');
+// const { colors } = require('tailwindcss/defaultTheme');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const { kebabCase, forEach } = require('lodash');
 

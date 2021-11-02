@@ -18,14 +18,9 @@
 </template>
 
 <script lang="ts">
-import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs,
-} from '@vue/composition-api';
-import { get, map, forEach } from 'lodash';
-import {
-    RawTableDynamicLayoutProps,
-} from '@/data-display/dynamic/dynamic-layout/templates/raw-table/type';
+import { computed, reactive, toRefs } from '@vue/composition-api';
+import { get, map } from 'lodash';
+import { RawTableDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/raw-table/type';
 import PDynamicLayoutTable from '@/data-display/dynamic/dynamic-layout/templates/table/index.vue';
 
 
@@ -65,8 +60,7 @@ export default {
             fields: computed(() => {
                 if (state.rootData[0]) {
                     const firstItem = state.rootData[0];
-                    const res = map(firstItem, (d, k) => ({ key: k, name: k }));
-                    return res;
+                    return map(firstItem, (d, k) => ({ key: k, name: k }));
                 }
                 return [];
             }),

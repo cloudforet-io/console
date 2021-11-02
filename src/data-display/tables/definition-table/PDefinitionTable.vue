@@ -118,7 +118,7 @@ export default defineComponent<DefinitionTableProps>({
             default: false,
         },
     },
-    setup(props: DefinitionTableProps, { emit, slots }) {
+    setup(props: DefinitionTableProps) {
         const state = reactive({
             contextKey: Math.floor(Math.random() * Date.now()),
             isNoData: computed(() => every(state.items, def => !def.data)),
@@ -195,7 +195,9 @@ export default defineComponent<DefinitionTableProps>({
     }
     &.white {
         @mixin style-type theme('colors.white'), theme('colors.white'), theme('colors.gray.300'), theme('colors.white');
+
         @apply rounded-lg border border-gray-200;
+
         table {
             tr {
                 @apply border-b;

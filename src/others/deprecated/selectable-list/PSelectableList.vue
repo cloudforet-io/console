@@ -38,16 +38,16 @@
 </template>
 
 <script lang="ts">
-import { get, indexOf, findIndex } from 'lodash';
+import { get, findIndex } from 'lodash';
 import {
     ComponentRenderProxy,
     getCurrentInstance,
-    reactive, toRefs,
+    reactive,
 } from '@vue/composition-api';
 import { SelectableListProps, MapperKeyType } from '@/others/deprecated/selectable-list/type';
 import PSelectableItem from '@/others/deprecated/selectable-item/PSelectableItem.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
-import { makeOptionalProxy, makeProxy } from '@/util/composition-helpers';
+import { makeOptionalProxy } from '@/util/composition-helpers';
 import PEmpty from '@/data-display/empty/PEmpty.vue';
 import { themes } from '@/others/deprecated/selectable-item/config';
 

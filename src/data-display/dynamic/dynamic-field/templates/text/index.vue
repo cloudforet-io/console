@@ -2,7 +2,6 @@
 import PAnchor from '@/inputs/anchors/PAnchor.vue';
 import { TextOptions } from '@/data-display/dynamic/dynamic-field/type/field-schema';
 import { TextDynamicFieldProps } from '@/data-display/dynamic/dynamic-field/templates/text/type';
-import { ComponentRenderProxy, getCurrentInstance } from '@vue/composition-api';
 import { TranslateResult } from 'vue-i18n';
 
 export default {
@@ -32,8 +31,6 @@ export default {
         },
     },
     render(h, { props, data }: {props: TextDynamicFieldProps; data: any}) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
-
         let text: TranslateResult;
         if (props.data === null || props.data === undefined) {
             text = props.options.default === undefined ? '' : props.options.default;

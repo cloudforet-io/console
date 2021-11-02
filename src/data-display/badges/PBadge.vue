@@ -132,5 +132,4 @@ export default {
 @mixin badge-without-outline yellow200, theme('colors.yellow.200'), theme('colors.gray.900');
 @mixin badge-without-outline red100, theme('colors.red.100'), theme('colors.red.500');
 
-
 </style>

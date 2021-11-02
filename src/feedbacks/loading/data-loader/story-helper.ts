@@ -25,7 +25,7 @@ export const getDataLoaderArgTypes = (): ArgTypes => ({
         name: 'data',
         type: { name: 'object' },
         description: 'Data to display',
-        defaultValue: range(15).map(d => faker.lorem.lines()),
+        defaultValue: range(15).map(() => faker.lorem.lines()),
         table: {
             type: {
                 summary: 'object, array',

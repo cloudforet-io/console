@@ -2,7 +2,7 @@
   "compilerOptions": {
     "experimentalDecorators": true,
     "target": "es2018",
-    "module": "CommonJS",
+    "module": "esnext",
     "strict": true,
     "jsx": "preserve",
     "importHelpers": true,

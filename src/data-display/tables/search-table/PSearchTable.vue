@@ -36,7 +36,7 @@
 import PToolboxTable from '@/data-display/tables/toolbox-table/PToolboxTable.vue';
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    getCurrentInstance, reactive,
 } from '@vue/composition-api';
 import { Options, SearchTableProps } from '@/data-display/tables/search-table/type';
 import { makeOptionalProxy } from '@/util/composition-helpers';
