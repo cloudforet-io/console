@@ -77,7 +77,7 @@ export default [
         ],
     },
     {
-        path: '/checkauth.jsp',
+        path: '/kbsso/checkauth.jsp',
         name: AUTH_ROUTE.SIGN_IN.KB._NAME,
         meta: {
             excludeAuth: true,
