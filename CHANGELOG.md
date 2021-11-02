@@ -1,3 +1,10 @@
+# [1.1.0-beta.157](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.156...v1.1.0-beta.157) (2021-11-02)
+
+
+### Bug Fixes
+
+* update props only when 2 dates are selected (range mode) ([#719](https://github.com/spaceone-dev/spaceone-design-system/issues/719)) ([780acf5](https://github.com/spaceone-dev/spaceone-design-system/commit/780acf5d4e9921eef93b40bec2175957d70a4a0c))
+
 # [1.1.0-beta.156](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.155...v1.1.0-beta.156) (2021-10-29)
 
 
