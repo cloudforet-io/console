@@ -230,6 +230,7 @@ export default {
     &.text:not(.open.time) {
         @apply border-0;
         width: auto;
+        max-width: 18rem;
         padding-right: 0;
         .input-sizer {
             display: inline-block;
@@ -254,16 +255,29 @@ export default {
 .flatpickr-calendar {
     width: 15rem;
     margin-top: -0.125rem;
+    &:not(.hasTime) {
+        min-height: 16.375rem;
+    }
+    &::before, &::after {
+        display: none;
+    }
     &.open {
         @apply overflow-hidden border-secondary;
         box-shadow: none;
         border-width: 0.0625rem;
         border-style: solid;
     }
-    &:not(.hasTime) {
-        min-height: 16.375rem;
-    }
     &.hasTime {
+        input, .numInputWrapper, .flatpickr-am-pm {
+            &:hover {
+                @apply bg-blue-100;
+                cursor: pointer;
+            }
+            &:focus {
+                @apply bg-blue-200;
+                cursor: pointer;
+            }
+        }
         .numInputWrapper span {
             @apply border-gray-200 bg-blue-100;
             display: flex;
@@ -284,36 +298,21 @@ export default {
                 border-width: 0.25rem 0.125rem 0 0.125rem;
             }
         }
-        input:hover,
-        .numInputWrapper:hover,
-        .flatpickr-am-pm:hover {
-            @apply bg-blue-100;
-            cursor: pointer;
-        }
-        input:focus,
-        .numInputWrapper:focus,
-        .flatpickr-am-pm:focus {
-            @apply bg-blue-200;
-            cursor: pointer;
-        }
-    }
-    &.hasTime.noCalendar {
-        width: 8rem;
-        .flatpickr-time {
-            border-top: none;
-            .numInputWrapper {
-                width: calc((100% - 0.25rem - 2.5rem) / 2);
-            }
-            .flatpickr-time-separator {
-                width: 0.25rem;
-            }
-            .flatpickr-am-pm {
-                width: 2.5rem;
+        &.noCalendar {
+            width: 8rem;
+            .flatpickr-time {
+                border-top: none;
+                .numInputWrapper {
+                    width: calc((100% - 0.25rem - 2.5rem) / 2);
+                }
+                .flatpickr-time-separator {
+                    width: 0.25rem;
+                }
+                .flatpickr-am-pm {
+                    width: 2.5rem;
+                }
             }
         }
-    }
-    &::before, &::after {
-        display: none;
     }
 }
 .flatpickr-months {
@@ -322,12 +321,11 @@ export default {
     .flatpickr-month {
         @apply text-gray-900;
     }
-    .flatpickr-prev-month,
-    .flatpickr-next-month {
-        padding: 0;
-        margin: 0.5rem;
+    .flatpickr-prev-month, .flatpickr-next-month {
         display: flex;
         align-items: center;
+        padding: 0;
+        margin: 0.5rem;
     }
     .flatpickr-current-month {
         display: flex;
@@ -386,43 +384,26 @@ export default {
     &.today:not(.flatpickr-disabled):not(.today) {
         @apply border-gray-400;
     }
-    &.inRange,
-    &.prevMonthDay.inRange,
-    &.nextMonthDay.inRange,
-    &.today.inRange,
-    &.prevMonthDay.today.inRange,
-    &.nextMonthDay.today.inRange,
-    &:hover,
-    &:focus,
-    &.prevMonthDay:focus,
-    &.nextMonthDay:focus {
+    &.inRange {
         @apply bg-blue-200 border-blue-200;
         box-shadow: none;
+        &.prevMonthDay, &.nextMonthDay, &.today {
+            @apply bg-blue-200 border-blue-200;
+            box-shadow: none;
+        }
     }
-    &.selected,
-    &.startRange,
-    &.endRange,
-    &.selected.inRange,
-    &.startRange.inRange,
-    &.endRange.inRange,
-    &.selected:focus,
-    &.startRange:focus,
-    &.endRange:focus,
-    &.selected:hover,
-    &.startRange:hover,
-    &.endRange:hover,
-    &.selected.prevMonthDay,
-    &.startRange.prevMonthDay,
-    &.endRange.prevMonthDay,
-    &.selected.nextMonthDay,
-    &.startRange.nextMonthDay,
-    &.endRange.nextMonthDay {
+    &.selected, &.startRange, &.endRange {
         @apply bg-blue-500 border-blue-500 text-white;
+        &.inRange, &:focus, &:hover, &.prevMonthDay, &.nextMonthDay {
+            @apply bg-blue-500 border-blue-500 text-white;
+        }
     }
-    &.selected.startRange + .endRange:not(:nth-child(7n+1)),
-    &.startRange.startRange + .endRange:not(:nth-child(7n+1)),
-    &.endRange.startRange + .endRange:not(:nth-child(7n+1)) {
-        box-shadow: none;
+    &.startRange {
+        &.selected, &.startRange, &.endRange {
+            & + .endRange:not(:nth-child(7n+1)) {
+                box-shadow: none;
+            }
+        }
     }
 }
 .rangeMode .flatpickr-day {
