@@ -337,12 +337,14 @@ Options for expanding and folding.
 |disabled|Whether to globally hide toggle button or not. Higher priority than validator.|
 |validator|Whether to hide each node's toggle button or not.|
 |toggleOnNodeClick|Whether to trigger toggle on node click or only trigger when the toggle button is clicked exactly.|
+|removeChildrenOnFold|When the node is folded, Whether to remove children or not. If it is true, data fetcher will be called every time the node is unfolded.|
 
 ```typescript
 interface ToggleOptions<T=any> {
     disabled?: boolean;
     validator?: (node: TreeNode<T>) => boolean;
     toggleOnNodeClick?: boolean;
+    removeChildrenOnFold?: boolean;
 }
 ```
 

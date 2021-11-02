@@ -340,18 +340,18 @@ export default defineComponent<Props>({
 
         const onNodeFoldedChange = async (node: TreeNode, path: number[], folded?: boolean) => {
             if (folded) {
-                if (props.dataFetcher) {
+                if (props.toggleOptions.removeChildrenOnFold) {
                     node.children = [];
 
-                    state.selectedItems = state.selectedItems.filter(({ node: selectedNode, path: selectedPath }) => {
-                        const isChildOfToggledNode = selectedPath.length > path.length && path.every((d, i) => selectedPath[i] === d);
-                        if (isChildOfToggledNode) selectedNode.$nodeBackClass = '';
-                        return !isChildOfToggledNode;
-                    });
+                    if (props.dataFetcher) {
+                        state.selectedItems = state.selectedItems.filter(({ node: selectedNode, path: selectedPath }) => {
+                            const isChildOfToggledNode = selectedPath.length > path.length && path.every((d, i) => selectedPath[i] === d);
+                            if (isChildOfToggledNode) selectedNode.$nodeBackClass = '';
+                            return !isChildOfToggledNode;
+                        });
+                    }
                 }
-            } else {
-                await fetchData(node);
-            }
+            } else if (props.toggleOptions.removeChildrenOnFold || !node.children.length) await fetchData(node);
         };
 
         const onToggle = async (node: TreeNode, path: number[], tree: HeTree) => {

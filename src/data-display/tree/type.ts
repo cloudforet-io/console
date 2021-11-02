@@ -19,6 +19,7 @@ export interface ToggleOptions<T=any> {
     disabled?: boolean;
     validator?: (node: TreeNode<T>) => boolean;
     toggleOnNodeClick?: boolean;
+    removeChildrenOnFold?: boolean;
 }
 
 export interface SelectOptions<T=any> {
