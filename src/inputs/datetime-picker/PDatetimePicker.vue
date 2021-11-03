@@ -93,6 +93,7 @@ export default {
             datePickerRef: null as null | HTMLElement,
             datePicker: null as null | Instance,
             proxySelectedDates: makeOptionalProxy<string[]>('selectedDates', vm, props.selectedDates),
+            dateString: '',
             placeholder: computed(() => {
                 if (props.mode === FLATPICKR_MODE.time) {
                     return vm.$t('COMPONENT.DATETIME_PICKER.SELECT_TIME');
@@ -103,25 +104,37 @@ export default {
             visiblePicker: false,
         });
 
-        /* event */
-        const handleUpdateValue = (selectedDates, dateString, instance) => {
-            /* resize input */
+        /* util */
+        const resizeInputWidth = (dateString, instance) => {
             const inputSizer = instance.element.childNodes[0];
             inputSizer.dataset.value = dateString;
             inputSizer.style.minWidth = 'auto';
         };
-        const handleClosePicker = (selectedDates: Date[]) => {
+
+        /* event */
+        const handleReady = (selectedDates, dateString, instance) => {
+            if (selectedDates.length) {
+                state.dateString = dateString;
+                resizeInputWidth(dateString, instance);
+            }
+        };
+        const handleUpdateValue = (selectedDates, dateString, instance) => {
+            resizeInputWidth(dateString, instance);
+        };
+        const handleClosePicker = (selectedDates: Date[], dateStr, instance) => {
             if (props.mode !== FLATPICKR_MODE.range || (props.mode === FLATPICKR_MODE.range && selectedDates.length === 2)) {
                 state.proxySelectedDates = selectedDates.map((d) => {
                     const dateString = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
                     const timezoneDate = dayjs.utc(dateString).utcOffset(state.offsetHours, true);
                     return timezoneDate.format();
                 });
+                state.dateString = dateStr;
             } else {
                 state.proxySelectedDates = props.selectedDates;
                 if (state.datePicker) state.datePicker.setDate(props.selectedDates);
             }
             state.visiblePicker = false;
+            resizeInputWidth(state.dateString, instance);
         };
         const handleOpenPicker = () => {
             state.visiblePicker = true;
@@ -138,6 +151,7 @@ export default {
                     locale: {
                         rangeSeparator: ' ~ ',
                     },
+                    onReady: handleReady,
                     onValueUpdate: handleUpdateValue,
                     onOpen: handleOpenPicker,
                     onClose: handleClosePicker,
@@ -164,6 +178,7 @@ export default {
                     locale: {
                         rangeSeparator: ' ~ ',
                     },
+                    onReady: handleReady,
                     onValueUpdate: handleUpdateValue,
                     onOpen: handleOpenPicker,
                     onClose: handleClosePicker,
