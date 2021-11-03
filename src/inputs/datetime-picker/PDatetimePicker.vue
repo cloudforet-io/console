@@ -243,7 +243,7 @@ export default {
         width: 8rem;
     }
     &.text:not(.open.time) {
-        @apply border-0;
+        @apply border-0 bg-transparent;
         width: auto;
         max-width: 18rem;
         padding-right: 0;
@@ -257,6 +257,7 @@ export default {
                 visibility: hidden;
             }
             input {
+                @apply bg-transparent;
                 position: absolute;
                 top: 0;
                 left: 0;

@@ -53,22 +53,10 @@ import {
     COLLAPSIBLE_LIST_TOGGLE_POSITION,
 } from '@/data-display/collapsibles/collapsible-list/config';
 import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsibles/collapsible-toggle/type';
+import { CollapsibleItem, CollapsibleListProps } from '@/data-display/collapsibles/collapsible-list/type';
 
-interface CollapsibleItem {
-    title?: string;
-    data: string;
-}
 
-interface Props {
-    items: Array<CollapsibleItem|string>;
-    unfoldedIndices?: number[];
-    lineClamp?: number;
-    multiUnfoldable?: boolean;
-    togglePosition?: COLLAPSIBLE_LIST_TOGGLE_POSITION;
-    toggleType?: COLLAPSIBLE_TOGGLE_TYPE;
-    theme?: COLLAPSIBLE_LIST_THEME;
-}
-export default defineComponent<Props>({
+export default defineComponent<CollapsibleListProps>({
     name: 'PCollapsibleList',
     components: { PCollapsiblePanel, PCollapsibleToggle },
     model: {
@@ -114,7 +102,7 @@ export default defineComponent<Props>({
             },
         },
     },
-    setup(props: Props) {
+    setup(props: CollapsibleListProps) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             proxyUnfoldedIndices: makeOptionalProxy<number[]>('unfoldedIndices', vm, props.unfoldedIndices || []),
