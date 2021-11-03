@@ -1,3 +1,10 @@
+# [1.1.0-beta.159](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.158...v1.1.0-beta.159) (2021-11-03)
+
+
+### Bug Fixes
+
+* add handleReady event ([#722](https://github.com/spaceone-dev/spaceone-design-system/issues/722)) ([4af99d0](https://github.com/spaceone-dev/spaceone-design-system/commit/4af99d0b435ef6de399101cebd0d578452c8d5f3))
+
 # [1.1.0-beta.158](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.157...v1.1.0-beta.158) (2021-11-02)
 
 
