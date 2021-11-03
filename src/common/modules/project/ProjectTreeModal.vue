@@ -109,6 +109,7 @@ export default {
 
         const toggleOptions = {
             validator: node => node.data.has_child || node.children.length > 0,
+            removeChildrenOnFold: true,
         };
 
         const selectOptions = {
