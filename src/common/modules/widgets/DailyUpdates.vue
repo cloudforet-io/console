@@ -94,7 +94,7 @@ import { find, range } from 'lodash';
 import dayjs from 'dayjs';
 
 import {
-    ComponentRenderProxy, getCurrentInstance, reactive, toRefs, UnwrapRef,
+    reactive, toRefs, UnwrapRef,
 } from '@vue/composition-api';
 import { PLazyImg, PSkeleton, PI } from '@spaceone/design-system';
 
@@ -386,10 +386,10 @@ export default {
             await Promise.all([getServerData(), getCloudServiceData()]);
             if (props.projectId) {
                 const dataForFilter = await setProjectDashboardData() as any[];
-                await getAlertData(dataForFilter);
+                getAlertData(dataForFilter);
             } else {
                 const dataForFilter = await setDashboardData() as any[];
-                await getAlertData(dataForFilter);
+                getAlertData(dataForFilter);
             }
             state.loading = false;
         };

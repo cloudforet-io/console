@@ -63,7 +63,7 @@
 <script lang="ts">
 /* eslint-disable camelcase */
 import {
-    reactive, toRefs, computed, watch, getCurrentInstance, ComponentRenderProxy,
+    reactive, toRefs, computed, watch,
 } from '@vue/composition-api';
 
 import {

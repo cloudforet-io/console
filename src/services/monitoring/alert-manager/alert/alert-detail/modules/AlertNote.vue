@@ -130,7 +130,7 @@ export default {
                     note: state.noteInput,
                 });
             } catch (e) {
-                await ErrorHandler.handleError(e);
+                ErrorHandler.handleError(e);
             } finally {
                 state.noteInput = '';
                 await listNote();

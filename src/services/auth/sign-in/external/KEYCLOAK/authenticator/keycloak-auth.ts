@@ -40,7 +40,7 @@ class KeycloakAuth extends Authenticator {
             await KeycloakAuth.onSignInFail();
             return;
         }
-        if (KeycloakAuth.keycloak.token && KeycloakAuth.keycloak.idToken && KeycloakAuth.keycloak.token !== '' && KeycloakAuth.keycloak.idToken !== '') {
+        if (KeycloakAuth.keycloak.token && KeycloakAuth.keycloak.idToken) {
             // eslint-disable-next-line camelcase
             await super.signIn(
                 { access_token: KeycloakAuth.keycloak.token },

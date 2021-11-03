@@ -354,7 +354,7 @@ export default {
         const listAll = debounce(async (): Promise<void> => {
             state.metricChartDataList = [];
 
-            await setAvailableResources();
+            setAvailableResources();
 
             state.metricsLoading = true;
             if (props.selectedMetrics && props.selectedMetrics.length > 0) {
@@ -366,7 +366,7 @@ export default {
 
             if (state.metrics.length === 0) return;
 
-            await initMetricChartData();
+            initMetricChartData();
             await listMetricCharts();
         }, 300);
 
@@ -374,7 +374,7 @@ export default {
         /* event */
         const loadMoreMetricCharts = async () => {
             const start = state.metricChartDataList.length;
-            await initMetricChartData(start);
+            initMetricChartData(start);
             await listMetricCharts(start);
         };
 

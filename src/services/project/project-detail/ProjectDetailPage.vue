@@ -192,7 +192,7 @@ export default {
                 state.item = resp;
             } catch (e) {
                 state.item = null;
-                await ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE._NAME }));
+                ErrorHandler.handleError(new NoResourceError({ name: PROJECT_ROUTE._NAME }));
                 // forceRouteToProjectPage();
             } finally {
                 state.loading = false;

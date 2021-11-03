@@ -420,7 +420,7 @@ export default {
                         keyword: state.searchText,
                     },
                 });
-                await setExternalMenuItems(res.results);
+                setExternalMenuItems(res.results);
             } catch (e) {
                 state.externalItems = [];
                 console.error(e);
@@ -473,7 +473,7 @@ export default {
         })();
         (async () => {
             await listMember();
-            await setInternalMenuItems();
+            setInternalMenuItems();
         })();
 
         watch(() => state.activeTab, () => {

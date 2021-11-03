@@ -80,7 +80,6 @@ import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.
 
 import { i18n } from '@/translations';
 import { BILLING_ROUTE } from '@/services/billing/routes';
-import { FavoriteItem } from '@/store/modules/favorite/type';
 
 interface MenuItem {
     routeName?: string;

@@ -12,38 +12,48 @@ import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 
 
 export default class ErrorHandler {
-    static async handleError(error) {
-        if (isInstanceOfAPIError(error)) {
+    static handleError(error) {
+        switch (error) {
+        case isInstanceOfAPIError(error):
             console.error(error);
-        }
+            break;
 
-        if (isInstanceOfNotFoundError(error)) {
+        case isInstanceOfNotFoundError(error):
             showErrorMessage('관리자에게 문의하세요.', error, '');
-        }
+            break;
 
-        if (isInstanceOfBadRequestError(error)) {
+        case isInstanceOfBadRequestError(error):
             showErrorMessage('Bad Request Error', error, '');
-        }
+            break;
 
-        if (isInstanceOfAuthenticationError(error)) {
-            const isTokenAlive = SpaceConnector.isTokenAlive;
-            if (!isTokenAlive && !SpaceRouter.router.currentRoute.meta.excludeAuth) {
-                const res = await SpaceConnector.refreshAccessToken(false);
-                if (!res) await store.dispatch('error/showSessionExpiredError');
+        case isInstanceOfAuthenticationError(error):
+            {
+                const isTokenAlive = SpaceConnector.isTokenAlive;
+                if (!isTokenAlive && !SpaceRouter.router.currentRoute.meta.excludeAuth) {
+                    (async () => {
+                        const res = await SpaceConnector.refreshAccessToken(false);
+                        if (!res) store.dispatch('error/showSessionExpiredError');
+                    })();
+                }
             }
-        }
+            break;
 
-        if (isInstanceOfAuthorizationError(error)) {
-            await store.dispatch('error/showAuthorizationError');
-        }
+        case isInstanceOfAuthorizationError(error):
+            store.dispatch('error/showAuthorizationError');
+            break;
 
-        if (isInstanceOfNoResourceError(error)) {
+        case isInstanceOfNoResourceError(error):
             showErrorMessage('No Resource', 'No Resource', '');
-            await SpaceRouter.router.push(error.redirectUrl);
-        }
+            SpaceRouter.router.push(error.redirectUrl);
+            break;
 
-        if (isInstanceOfNoSearchResourceError(error)) {
-            await SpaceRouter.router.push(error.redirectUrl);
+        case isInstanceOfNoSearchResourceError(error):
+            SpaceRouter.router.push(error.redirectUrl);
+            break;
+
+        default:
+            console.error(error);
+            break;
         }
     }
 }

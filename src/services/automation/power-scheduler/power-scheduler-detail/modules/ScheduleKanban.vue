@@ -37,7 +37,7 @@
                     <p-i v-if="column.title > 5 && (isCreateMode || isEditMode)" name="ic_delete" width="1.5rem"
                          color="inherit"
                          class="header-button"
-                         @click="deleteColumn(column.title, column)"
+                         @click="deleteColumn(column.title)"
                     />
                 </div>
                 <div class="resource-item-wrapper">

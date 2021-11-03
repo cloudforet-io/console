@@ -69,7 +69,6 @@
 
 <script lang="ts">
 import { PAnchor, PRawData } from '@spaceone/design-system';
-import { reactive } from '@vue/composition-api';
 
 const githubLink = 'https://github.com/spaceone-dev/spacectl';
 const codeBlock = {
