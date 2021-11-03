@@ -1,3 +1,10 @@
+# [1.1.0-beta.160](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.159...v1.1.0-beta.160) (2021-11-03)
+
+
+### Bug Fixes
+
+* remove always show menu from context menu and usages ([#728](https://github.com/spaceone-dev/spaceone-design-system/issues/728)) ([94ad65d](https://github.com/spaceone-dev/spaceone-design-system/commit/94ad65d8c6e69d1760494fc997e8db19fc9c3113))
+
 # [1.1.0-beta.159](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.158...v1.1.0-beta.159) (2021-11-03)
 
 
