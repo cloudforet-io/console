@@ -284,7 +284,7 @@ ${vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.BILLING.TOOLTIP_SAVING_COST')}: <stro
         })();
 
         watch([() => state.data, () => state.chartRef], ([chartData, chartCtx]) => {
-            if (state.data.length > 0 && chartCtx) {
+            if ((chartData as ChartData[]).length && chartCtx) {
                 drawChart(chartCtx);
             }
         }, { immediate: false });

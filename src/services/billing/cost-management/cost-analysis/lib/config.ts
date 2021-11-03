@@ -19,14 +19,14 @@ export const CURRENCY = Object.freeze({
     JPY: 'JPY',
 });
 
-export const GROUP_BY = Object.freeze({
-    PROJECT: 'PROJECT',
-    SERVICE_ACCOUNT: 'SERVICE_ACCOUNT',
-    PRODUCT: 'PRODUCT',
-    REGION: 'REGION',
-    PROVIDER: 'PROVIDER',
-    TYPE: 'TYPE',
-    RESOURCE_ID: 'RESOURCE_ID',
-    CURRENCY: 'CURRENCY',
-    ACCOUNT: 'ACCOUNT',
+export const GROUP_BY_ITEM = Object.freeze({
+    PROJECT: 'project',
+    SERVICE_ACCOUNT: 'service_account',
+    PRODUCT: 'product',
+    REGION: 'region',
+    PROVIDER: 'provider',
+    TYPE: 'type',
+    RESOURCE_ID: 'resource_id',
+    CURRENCY: 'currency',
+    ACCOUNT: 'account',
 });

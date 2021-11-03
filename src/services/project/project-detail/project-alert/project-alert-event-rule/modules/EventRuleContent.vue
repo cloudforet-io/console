@@ -57,7 +57,7 @@
                                 </p>
                             </td>
                             <td v-else-if="item.name === 'add_additional_info'">
-                                <p v-for="(info, index) in Object.entries(items[item.name])" :key="`${info}-${index}`">
+                                <p v-for="(info, infoIdx) in Object.entries(items[item.name])" :key="`${info}-${infoIdx}`">
                                     <span class="font-bold">{{ info[0] }}</span>: {{ info[1] }}
                                 </p>
                             </td>

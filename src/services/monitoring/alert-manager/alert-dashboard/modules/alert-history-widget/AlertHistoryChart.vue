@@ -202,7 +202,6 @@ export default {
                 const { results } = await SpaceConnector.client.monitoring.dashboard.dailyAlertHistory({
                     start: props.currentDate.format('YYYY-MM-01'),
                     end: props.currentDate.add(1, 'month').format('YYYY-MM-01'),
-                    // eslint-disable-next-line camelcase
                     activated_projects: props.activatedProjects,
                 });
                 state.chartData = initChartData(results);
@@ -217,8 +216,12 @@ export default {
                 drawChart(chartContext);
             }
         });
-
-        watch([() => props.currentDate, () => props.activatedProjects], async ([currentData, activatedProjects]) => {
+        watch(() => props.currentDate, async () => {
+            state.loading = true;
+            await getDailyAlertHistory();
+            state.loading = false;
+        });
+        watch(() => props.activatedProjects, async (activatedProjects) => {
             if (activatedProjects.length) {
                 state.loading = true;
                 await getDailyAlertHistory();

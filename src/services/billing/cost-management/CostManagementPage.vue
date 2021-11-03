@@ -80,6 +80,7 @@ import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.
 
 import { i18n } from '@/translations';
 import { BILLING_ROUTE } from '@/services/billing/routes';
+import { store } from '@/store';
 
 interface MenuItem {
     routeName?: string;
@@ -163,6 +164,14 @@ export default {
 
         const onFavoriteDelete = () => {
         };
+
+        (async () => {
+            await Promise.all([
+                store.dispatch('resource/serviceAccount/load'),
+                store.dispatch('resource/region/load'),
+                store.dispatch('resource/provider/load'),
+            ]);
+        })();
 
         return {
             ...toRefs(state),

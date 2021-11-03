@@ -33,7 +33,7 @@ import {
     PIconButton, PSelectButton, PIconTextButton,
 } from '@spaceone/design-system';
 
-import { GROUP_BY } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { GROUP_BY_ITEM } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { store } from '@/store';
 
@@ -49,15 +49,15 @@ export default {
         const state = reactive({
             selectedGroupByItems: computed(() => store.state.service.costAnalysis.groupByItems),
             groupByItems: [
-                { name: GROUP_BY.PROJECT, label: 'Project' },
-                { name: GROUP_BY.SERVICE_ACCOUNT, label: 'Service Account' },
-                { name: GROUP_BY.PRODUCT, label: 'Product' },
-                { name: GROUP_BY.REGION, label: 'Region' },
-                { name: GROUP_BY.PROVIDER, label: 'Provider' },
-                { name: GROUP_BY.TYPE, label: 'Type' },
-                { name: GROUP_BY.RESOURCE_ID, label: 'Resource ID' },
-                { name: GROUP_BY.CURRENCY, label: 'Currency' },
-                { name: GROUP_BY.ACCOUNT, label: 'Account' },
+                { name: GROUP_BY_ITEM.PROJECT, label: 'Project' },
+                { name: GROUP_BY_ITEM.SERVICE_ACCOUNT, label: 'Service Account' },
+                { name: GROUP_BY_ITEM.PRODUCT, label: 'Product' },
+                { name: GROUP_BY_ITEM.REGION, label: 'Region' },
+                { name: GROUP_BY_ITEM.PROVIDER, label: 'Provider' },
+                { name: GROUP_BY_ITEM.TYPE, label: 'Type' },
+                { name: GROUP_BY_ITEM.RESOURCE_ID, label: 'Resource ID' },
+                { name: GROUP_BY_ITEM.CURRENCY, label: 'Currency' },
+                { name: GROUP_BY_ITEM.ACCOUNT, label: 'Account' },
             ],
             moreGroupBy: [],
         });

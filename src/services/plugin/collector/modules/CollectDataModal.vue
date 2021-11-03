@@ -135,16 +135,6 @@ interface Props {
     collectorId: string;
 }
 
-const map = {
-    key: 'key',
-    label: 'name',
-    required: 'is_required',
-    placeholder: 'example',
-    type: 'type',
-    default: 'default',
-    menu: 'enums',
-};
-
 export default {
     name: 'CollectDataModal',
     components: {

@@ -4,30 +4,28 @@ import { gray } from '@/styles/colors';
 import config from '@/lib/config';
 
 
-const convertChartData = (data) => {
-    // todo: 도넛 차트의 경우, accumulated 는 조회기간의 합을, daily, monthly, yearly 는 조회기간의 마지막 일/월/년 값을 보여준다.
-    const convertedData = [{
-        category: 'seoul',
-        value: 501.9,
-    }, {
-        category: 'tokyo',
-        value: 301.9,
-    }, {
-        category: 'virginia',
-        value: 201.1,
-    }, {
-        category: 'california',
-        value: 165.8,
-    }, {
-        category: 'frankfurt',
-        value: 139.9,
-    }, {
-        category: 'stockholm',
-        value: 128.3,
-    }];
-
-    return convertedData;
-};
+// const convertChartData = () => {
+//     // todo: 도넛 차트의 경우, accumulated 는 조회기간의 합을, daily, monthly, yearly 는 조회기간의 마지막 일/월/년 값을 보여준다.
+//     return [{
+//         category: 'seoul',
+//         value: 501.9,
+//     }, {
+//         category: 'tokyo',
+//         value: 301.9,
+//     }, {
+//         category: 'virginia',
+//         value: 201.1,
+//     }, {
+//         category: 'california',
+//         value: 165.8,
+//     }, {
+//         category: 'frankfurt',
+//         value: 139.9,
+//     }, {
+//         category: 'stockholm',
+//         value: 128.3,
+//     }];
+// };
 
 const createSeries = (chart) => {
     const series = chart.series.push(new am4charts.PieSeries());
@@ -58,7 +56,7 @@ export const drawPieChart = (data, chartContainer) => {
     if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
     chart.paddingLeft = -5;
     chart.paddingBottom = -10;
-    chart.data = convertChartData(data);
+    // chart.data = convertChartData();
     chart.responsive.enabled = true;
     chart.innerRadius = am4core.percent(57);
 

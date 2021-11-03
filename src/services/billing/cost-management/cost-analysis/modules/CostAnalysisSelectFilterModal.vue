@@ -12,18 +12,16 @@
                 <div class="left-select-filter-section">
                     <p-collapsible-list
                         class="collapsible-list-section"
-                        :items="Object.keys(SELECT_FILTER_TYPE)"
+                        :items="filterItems"
                         toggle-type="switch"
                         :multi-unfoldable="true"
+                        :unfolded-indices.sync="unfoldedIndices"
                     >
-                        <template #title="{data}">
-                            {{ SELECT_FILTER_TYPE[data] }}
-                        </template>
                         <template #default="{data}">
                             <p-search-dropdown
                                 class="search-dropdown-item"
-                                :menu="filterMenuState[data].filterItems"
-                                :selected="filterMenuState[data].selectedItems"
+                                :menu="data.menuItems"
+                                :selected.sync="data.selectedItems"
                                 type="checkbox"
                                 :show-selected-list="true"
                                 use-fixed-menu-style
@@ -47,14 +45,14 @@
                                                  :is-collapsed="moreFilterIsCollapsed"
                                                  @update:isCollapsed="handleUpdateCollapsed"
                             >
-                                <p-autocomplete-search
-                                    class="search-dropdown"
-                                    :menu="filterMenuState.moreFilter.filterItems"
-                                    :selected="filterMenuState.moreFilter.selectedItems"
-                                    type="checkbox"
-                                    :show-selected-list="true"
-                                    use-fixed-menu-style
-                                />
+                                <!--                                <p-autocomplete-search-->
+                                <!--                                    class="search-dropdown"-->
+                                <!--                                    :menu="filterMenuState.moreFilter.filterItems"-->
+                                <!--                                    :selected="filterMenuState.moreFilter.selectedItems"-->
+                                <!--                                    type="checkbox"-->
+                                <!--                                    :show-selected-list="true"-->
+                                <!--                                    use-fixed-menu-style-->
+                                <!--                                />-->
                             </p-collapsible-panel>
                         </div>
                     </div>
@@ -78,35 +76,43 @@
 </template>
 
 <script lang="ts">
+import { flatten } from 'lodash';
+
 import {
-    computed, reactive, toRefs,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
 import {
     PButtonModal,
     PCollapsibleList,
     PSearchDropdown,
     PCollapsibleToggle,
     PCollapsiblePanel,
-    PAutocompleteSearch,
+    // PAutocompleteSearch,
     PTag,
 } from '@spaceone/design-system';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+
 import { makeProxy } from '@/lib/helper/composition-helpers';
+import { GROUP_BY_ITEM } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { store } from '@/store';
 
-const SELECT_FILTER_TYPE = Object.freeze({
-    project: 'Project',
-    serviceAccount: 'Service Account',
-    provider: 'Provider',
-    resourceId: 'Resource ID',
-    product: 'Product',
-    region: 'Region',
-    account: 'Account',
-    type: 'Type',
-    tag: 'Tag',
+
+const FILTER_ITEM = Object.freeze({
+    ...GROUP_BY_ITEM,
+    TAG: 'tag',
 });
+type FILTER_ITEM = typeof FILTER_ITEM[keyof typeof FILTER_ITEM]
 
-interface SelectedTag {
-    label?: string;
-    key?: typeof SELECT_FILTER_TYPE | null;
+interface FilterData {
+    menuItems: MenuItem[];
+    selectedItems: MenuItem[];
+}
+
+interface FilterItem {
+    name: FILTER_ITEM;
+    title: string;
+    data: FilterData;
 }
 
 export default {
@@ -117,7 +123,7 @@ export default {
         PSearchDropdown,
         PCollapsibleToggle,
         PCollapsiblePanel,
-        PAutocompleteSearch,
+        // PAutocompleteSearch,
         PTag,
     },
     props: {
@@ -125,59 +131,27 @@ export default {
             type: Boolean,
             default: false,
         },
-        headerTitle: {
-            type: String,
-            default: '',
-        },
     },
     setup(props, { emit }) {
-        const filterMenuState = reactive({
-            project: {
-                filterItems: [],
-                selectedItems: [],
-            },
-            serviceAccount: {
-                filterItems: [],
-                selectedItems: [],
-            },
-            provider: {
-                filterItems: [],
-                selectedItems: [],
-            },
-            resourceId: {
-                filterItems: [],
-                selectedItems: [],
-            },
-            product: {
-                filterItems: [],
-                selectedItems: [],
-            },
-            region: {
-                filterItems: [],
-                selectedItems: [],
-            },
-            account: {
-                filterItems: [],
-                selectedItems: [],
-            },
-            type: {
-                filterItems: [],
-                selectedItems: [],
-            },
-            tag: {
-                filterItems: [],
-                selectedItems: [],
-            },
-            moreFilter: {
-                filterItems: [],
-                selectedItems: [],
-            },
-        });
-
         const state = reactive({
+            serviceAccounts: computed(() => store.state.resource.serviceAccount.items),
+            //
             proxyVisible: makeProxy('visible', props, emit),
             moreFilterIsCollapsed: false,
-            selectedFilterTags: computed<SelectedTag[]>(() => filterMenuState.project.selectedItems), // combine all selectedFilterTags
+            selectedFilterTags: computed<MenuItem[]>(() => flatten(state.filterItems.map(d => d.data.selectedItems))),
+            filterItems: [
+                { name: FILTER_ITEM.PROJECT, title: 'Project', data: { menuItems: [], selectedItems: [] } },
+                { name: FILTER_ITEM.SERVICE_ACCOUNT, title: 'Service Account', data: { menuItems: [], selectedItems: [] } },
+                { name: FILTER_ITEM.PRODUCT, title: 'Product', data: { menuItems: [], selectedItems: [] } },
+                { name: FILTER_ITEM.REGION, title: 'Region', data: { menuItems: [], selectedItems: [] } },
+                { name: FILTER_ITEM.PROVIDER, title: 'Provider', data: { menuItems: [], selectedItems: [] } },
+                { name: FILTER_ITEM.TYPE, title: 'Type', data: { menuItems: [], selectedItems: [] } },
+                { name: FILTER_ITEM.RESOURCE_ID, title: 'Resource ID', data: { menuItems: [], selectedItems: [] } },
+                { name: FILTER_ITEM.CURRENCY, title: 'Currency', data: { menuItems: [], selectedItems: [] } },
+                { name: FILTER_ITEM.ACCOUNT, title: 'Account', data: { menuItems: [], selectedItems: [] } },
+                { name: FILTER_ITEM.TAG, title: 'Tag', data: { menuItems: [], selectedItems: [] } },
+            ] as FilterItem[],
+            unfoldedIndices: [] as number[],
         });
 
         const handleFormConfirm = () => {
@@ -197,14 +171,29 @@ export default {
         const handleDeleteSelectedTag = () => {
             console.log('delete tag');
         };
+
+        const getMenuItems = (filterName) => {
+            if (filterName === FILTER_ITEM.SERVICE_ACCOUNT) {
+                const filterItem = state.filterItems.find(d => d.name === FILTER_ITEM.SERVICE_ACCOUNT);
+                if (filterItem) filterItem.data.menuItems = Object.values(state.serviceAccounts);
+            }
+        };
+
+        watch(() => state.unfoldedIndices, (unfoldedIndices) => {
+            unfoldedIndices.forEach((idx) => {
+                const selectedFilterItem = state.filterItems[idx];
+                if (!selectedFilterItem.data.menuItems.length) {
+                    getMenuItems(selectedFilterItem.name);
+                }
+            });
+        });
+
         return {
             ...toRefs(state),
             handleFormConfirm,
             handleClearAll,
             handleUpdateCollapsed,
             handleDeleteSelectedTag,
-            filterMenuState,
-            SELECT_FILTER_TYPE,
         };
     },
 };
