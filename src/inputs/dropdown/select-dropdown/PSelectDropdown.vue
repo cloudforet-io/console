@@ -60,7 +60,6 @@
                         :class="menuPosition"
                         :menu="items"
                         :loading="loading"
-                        :always-show-menu="alwaysShowMenu"
                         :invalid="invalid"
                         :style="{
                             ...contextMenuStyle,
@@ -106,7 +105,6 @@ interface SelectDropdownProps {
     invalid?: boolean;
     disabled?: boolean;
     loading?: boolean;
-    alwaysShowMenu?: boolean;
     indexMode?: boolean;
     placeholder?: string;
     type?: SELECT_DROPDOWN_TYPE;
@@ -149,10 +147,6 @@ export default defineComponent<SelectDropdownProps>({
             default: false,
         },
         loading: {
-            type: Boolean,
-            default: false,
-        },
-        alwaysShowMenu: {
             type: Boolean,
             default: false,
         },

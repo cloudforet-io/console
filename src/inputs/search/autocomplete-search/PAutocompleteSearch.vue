@@ -18,7 +18,6 @@
                         theme="secondary"
                         :menu="bindingMenu"
                         :loading="loading"
-                        :always-show-menu="alwaysShowMenu"
                         :style="{...contextMenuStyle, maxWidth: contextMenuStyle.minWidth, width: contextMenuStyle.minWidth}"
                         @select="onClickMenuItem"
                         @keyup:up:end="focusSearch"
@@ -115,10 +114,6 @@ export default defineComponent<AutocompleteSearchProps>({
             default: () => [],
         },
         loading: {
-            type: Boolean,
-            default: false,
-        },
-        alwaysShowMenu: {
             type: Boolean,
             default: false,
         },

@@ -57,7 +57,6 @@ export const getSelectDropdownArgTypes = (): ArgTypes => {
         //
         invalid: contextMenuArgTypes.invalid,
         loading: contextMenuArgTypes.loading,
-        alwaysShowMenu: contextMenuArgTypes.alwaysShowMenu,
         items: {
             name: 'items',
             type: { name: 'array' },

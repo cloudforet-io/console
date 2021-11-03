@@ -28,7 +28,6 @@ export interface ContextMenuProps {
     menu: MenuItem[];
     theme?: keyof typeof CONTEXT_MENU_THEME;
     loading?: boolean;
-    alwaysShowMenu?: boolean;
     invalid?: boolean;
     selected?: string[];
     multiSelectable?: boolean;

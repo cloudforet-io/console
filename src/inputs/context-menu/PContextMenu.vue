@@ -3,7 +3,7 @@
          :class="{[theme]: true, invalid}"
          @keyup.esc="onClickEsc"
     >
-        <div v-if="!alwaysShowMenu && menu.length === 0" class="context-item empty" :class="theme">
+        <div v-if="menu.length === 0" class="context-item empty" :class="theme">
             <slot name="no-data-format" v-bind="{...$props, uuid}">
                 {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
             </slot>
@@ -106,10 +106,6 @@ export default defineComponent<ContextMenuProps>({
             },
         },
         loading: {
-            type: Boolean,
-            default: false,
-        },
-        alwaysShowMenu: {
             type: Boolean,
             default: false,
         },

@@ -176,7 +176,6 @@ const initContextMenuArgTypes = (): ArgTypes => {
     const argTypes: ArgTypes = {
         menu: contextMenuArgTypes.menu,
         loading: contextMenuArgTypes.loading,
-        alwaysShowMenu: contextMenuArgTypes.alwaysShowMenu,
     };
     Object.keys(contextMenuArgTypes).forEach((k) => {
         const item = contextMenuArgTypes[k];

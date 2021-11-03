@@ -100,24 +100,6 @@ export const getContextMenuArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
-    alwaysShowMenu: {
-        name: 'alwaysShowMenu',
-        type: { name: 'boolean' },
-        description: 'Show menu always even if there is no menu to show.',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'false',
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
     invalid: {
         name: 'invalid',
         type: { name: 'boolean' },
