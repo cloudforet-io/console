@@ -97,7 +97,7 @@ import { get } from 'lodash';
 
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, onActivated, reactive, toRefs, watch, watchEffect,
+    computed, getCurrentInstance, onActivated, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import ProjectEscalationPolicy from '@/services/project/project-detail/project-alert/project-alert-settings/modules/ProjectEscalationPolicy.vue';

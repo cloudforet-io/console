@@ -72,7 +72,6 @@ import { Location } from 'vue-router';
 import TopNotification from '@/common/modules/portals/TopNotification.vue';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { hideLoadingMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { AUTH_ROUTE } from '@/services/auth/routes';
 

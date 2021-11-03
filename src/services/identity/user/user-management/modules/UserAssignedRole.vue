@@ -109,8 +109,6 @@ export default {
             return link.href;
         };
 
-        const getArrayWithNotDuplicatedItem = array => [...new Set(array)];
-
         const getUserDetailData = async (userId) => {
             baseState.loading = true;
             try {

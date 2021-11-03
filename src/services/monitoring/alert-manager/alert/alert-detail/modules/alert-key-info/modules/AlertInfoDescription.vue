@@ -47,7 +47,7 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props, { emit }) {
+    setup(props) {
         const {
             state: alertDetailItemState,
             cancelEdit,

@@ -1,7 +1,7 @@
 import { Getter } from 'vuex';
 import { ProjectPageState } from '@/services/project/store/type';
 import { reverse } from 'lodash';
-import { ProjectGroup, ProjectItemResp, ProjectTreeItem } from '@/services/project/type';
+import { ProjectGroup, ProjectItemResp } from '@/services/project/type';
 
 
 export const selectedNodeData: Getter<ProjectPageState, any> = (state): ProjectItemResp|undefined => (state.selectedItem.node ? state.selectedItem.node.data : undefined);

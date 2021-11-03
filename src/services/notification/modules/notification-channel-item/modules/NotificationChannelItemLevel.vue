@@ -60,9 +60,9 @@
 
 <script lang="ts">
 import {
-    PBadge, PButton, PI, PTextInput,
+    PBadge, PButton, PI,
 } from '@spaceone/design-system';
-import { reactive, toRefs } from '@vue/composition-api';
+import { toRefs } from '@vue/composition-api';
 import { useNotificationItem } from '@/services/notification/modules/notification-channel-item/composables';
 import {
     EDIT_TYPE,

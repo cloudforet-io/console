@@ -116,7 +116,6 @@ export default {
         },
     },
     setup(props) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
         const querySearchHandlers = {
             keyItemSets: [{
                 title: 'Properties',

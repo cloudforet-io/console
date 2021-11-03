@@ -55,7 +55,7 @@ export class SpaceRouter {
             next(nextLocation);
         });
 
-        SpaceRouter.router.afterEach((to, from) => {
+        SpaceRouter.router.afterEach((to) => {
             if (config.get('GTAG_ID') !== 'DISABLED') GTag.setPageView(to);
         });
 

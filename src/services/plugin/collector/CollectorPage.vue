@@ -196,7 +196,6 @@ import { FILE_NAME_PREFIX } from '@/lib/excel-export';
 import { PLUGIN_ROUTE } from '@/services/plugin/routes';
 import { MANAGEMENT_ROUTE } from '@/services/management/routes';
 import { i18n } from '@/translations';
-import CollectionRule from '@/services/plugin/collector/modules/CollectionRule.vue';
 
 const GeneralPageLayout = (): Component => import('@/common/modules/page-layouts/GeneralPageLayout.vue') as Component;
 const TagsPanel = (): Component => import('@/common/modules/tags/tags-panel/TagsPanel.vue') as Component;

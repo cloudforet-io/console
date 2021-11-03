@@ -1,5 +1,4 @@
 import {
-    EDIT_TYPE,
     PARAM_KEY_TYPE,
     ParamType,
 } from '@/services/notification/modules/notification-channel-item/type';

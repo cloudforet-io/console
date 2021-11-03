@@ -75,7 +75,7 @@ class GoogleAuth extends Authenticator {
 
     private static getAuth2 = (clientId: string): Promise<any> => new Promise(((resolve, reject) => {
         if (!gapi.auth2) {
-            gapi.load('auth2', (resp) => {
+            gapi.load('auth2', () => {
                 gapi.auth2.init({
                     // eslint-disable-next-line camelcase
                     client_id: clientId,
@@ -94,7 +94,7 @@ class GoogleAuth extends Authenticator {
     }));
 
     private static disconnectGoogleSession = (auth2): Promise<void> => new Promise(((resolve, reject) => {
-        auth2.signOut().then((resp) => {
+        auth2.signOut().then(() => {
             auth2.disconnect();
             resolve();
         }).catch(() => {

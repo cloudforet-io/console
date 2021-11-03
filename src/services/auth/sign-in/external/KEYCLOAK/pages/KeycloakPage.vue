@@ -8,7 +8,6 @@ import {
 } from '@vue/composition-api';
 import { PButton } from '@spaceone/design-system';
 import { loadAuth } from '@/services/auth/authenticator/loader';
-import { IDENTITY_ROUTE } from '@/services/identity/routes';
 
 export default defineComponent({
     name: 'KeycloakPage',

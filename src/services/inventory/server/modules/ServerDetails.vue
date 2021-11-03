@@ -226,14 +226,14 @@ export default {
             return {};
         };
 
-        const loadSchemaAndData = async (forceLoadData = true) => {
+        const loadSchemaAndData = async () => {
             state.loading = true;
             await getSchema();
             await getData();
             state.loading = false;
         };
 
-        const onChangeTab = async (tab, idx) => {
+        const onChangeTab = async (tab) => {
             state.activeTab = tab;
             await loadSchemaAndData();
         };

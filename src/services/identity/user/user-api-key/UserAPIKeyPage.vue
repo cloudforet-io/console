@@ -67,7 +67,7 @@ export default {
         PDataTable,
         PPageTitle,
     },
-    setup(props) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: true,

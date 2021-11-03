@@ -89,8 +89,6 @@ export default {
         PRawData,
     },
     setup() {
-        const state = reactive({
-        });
         return {
             githubLink,
             codeBlock,

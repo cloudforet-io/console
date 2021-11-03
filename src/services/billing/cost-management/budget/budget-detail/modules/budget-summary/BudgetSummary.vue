@@ -2,9 +2,6 @@
     <p-pane-layout class="budget-summary-wrapper">
         <div class="card-header">
             Budget Summary
-            <p-select-dropdown :items="menuItems"
-                               @select="handleSelect()"
-            />
         </div>
         <budget-summary-chart :chart-data="tempData" :legends="legends" />
         <budget-summary-table :chart-data="tempData" :legends="legends" />
@@ -12,19 +9,17 @@
 </template>
 
 <script lang="ts">
-import { PPaneLayout, PSelectDropdown } from '@spaceone/design-system';
+import { PPaneLayout } from '@spaceone/design-system';
 import BudgetSummaryChart
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-summary/BudgetSummaryChart.vue';
 import BudgetSummaryTable
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-summary/BudgetSummaryTable.vue';
-import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import dayjs from 'dayjs';
 
 export default {
     name: 'BudgetSummary',
     components: {
         PPaneLayout,
-        PSelectDropdown,
         BudgetSummaryChart,
         BudgetSummaryTable,
     },

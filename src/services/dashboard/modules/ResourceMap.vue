@@ -65,8 +65,7 @@ import * as am4maps from '@amcharts/amcharts4/maps';
 import am4geodataWorldLow from '@amcharts/amcharts4-geodata/worldLow';
 import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, onUnmounted,
+    computed, onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 

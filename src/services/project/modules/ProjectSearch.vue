@@ -248,7 +248,7 @@ export default {
         const showMenu = () => { state.visibleMenu = true; };
         const hideMenu = () => { state.visibleMenu = false; };
 
-        const onInput = debounce(async (e?) => {
+        const onInput = debounce(async () => {
             if (!state.visibleMenu) showMenu();
             await listItems();
         }, 300);

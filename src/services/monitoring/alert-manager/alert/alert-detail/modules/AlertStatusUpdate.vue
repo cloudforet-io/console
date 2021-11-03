@@ -34,7 +34,6 @@ import {
     PButtonModal, PPaneLayout, PTextarea, PFieldGroup, PEmpty,
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { store } from '@/store';
@@ -58,7 +57,7 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { root }) {
         const state = reactive({
             modalVisible: false,
             status: computed(() => store.state.service.alert.alertData?.status_message),

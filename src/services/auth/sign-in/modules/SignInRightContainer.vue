@@ -75,7 +75,7 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit }) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         /* event */

@@ -162,7 +162,7 @@ export default {
             }
         };
 
-        const onFavoriteDelete = (item: FavoriteItem) => {
+        const onFavoriteDelete = () => {
         };
 
         return {

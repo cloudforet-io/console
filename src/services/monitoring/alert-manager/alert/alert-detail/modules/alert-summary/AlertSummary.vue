@@ -65,13 +65,12 @@ import {
     PButton, PPaneLayout, PSelectDropdown, PI, PBadge,
 } from '@spaceone/design-system';
 import {
-    computed, reactive, toRefs, UnwrapRef,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { AlertDataModel } from '@/services/monitoring/alert-manager/type';
 import AlertReassignModal from '@/services/monitoring/alert-manager/alert/alert-detail/modules/alert-summary/modules/AlertReassignModal.vue';
 import dayjs from 'dayjs';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ALERT_STATE, ALERT_URGENCY } from '@/services/monitoring/alert-manager/lib/config';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
@@ -124,7 +123,7 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props: PropsType, { emit, root }) {
+    setup(props: PropsType, { root }) {
         const state = reactive({
             alertInfo: computed(() => store.state.service.alert.alertData),
             alertState: computed(() => state.alertInfo?.state),

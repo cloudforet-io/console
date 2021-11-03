@@ -63,7 +63,6 @@ import AddNotificationData from '@/services/notification/notification-add/module
 import AddNotificationTopic from '@/services/notification/modules/AddNotificationTopic.vue';
 import AddNotificationSchedule from '@/services/notification/modules/AddNotificationSchedule.vue';
 import VueI18n from 'vue-i18n';
-import { store } from '@/store';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 

@@ -105,7 +105,7 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props: Props) {
+    setup() {
         const state = reactive({
             fields: [
                 { name: 'description', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.DESC'), disableCopy: true },

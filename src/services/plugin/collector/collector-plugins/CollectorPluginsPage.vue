@@ -181,7 +181,7 @@ export default {
         PluginFilter,
         PIconTextButton,
     },
-    setup(props, { root }) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             loading: false,

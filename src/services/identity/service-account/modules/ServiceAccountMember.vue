@@ -34,7 +34,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PSearchTable, PPanelTop, PTextList, PBadge,
+    PSearchTable, PPanelTop, PBadge,
 } from '@spaceone/design-system';
 import { SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 

@@ -45,7 +45,7 @@
 import { PAnchor, PLazyImg, PPaneLayout } from '@spaceone/design-system';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import {
-    computed, onActivated, reactive, toRefs, watch,
+    computed, onActivated, reactive, toRefs,
 } from '@vue/composition-api';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { store } from '@/store';

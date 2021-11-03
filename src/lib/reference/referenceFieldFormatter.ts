@@ -39,7 +39,7 @@ const formatterMap: FormatterMap = {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },
     }),
-    'inventory.Region': (data, reference) => ({
+    'inventory.Region': data => ({
         data: store.state.resource.region.items[data]?.label || data,
     }),
     'inventory.CloudService': (data, reference) => ({
@@ -47,7 +47,7 @@ const formatterMap: FormatterMap = {
             link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,
         },
     }),
-    'secret.Secret': (data, reference) => ({
+    'secret.Secret': data => ({
         data: store.state.resource.secret.items[data]?.label || data,
     }),
 };

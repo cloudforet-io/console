@@ -114,7 +114,7 @@
 <script lang="ts">
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
 

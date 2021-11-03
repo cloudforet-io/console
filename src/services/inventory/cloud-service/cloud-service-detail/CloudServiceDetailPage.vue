@@ -354,7 +354,7 @@ export default {
         const tableState = reactive({
             schema: null as null|DynamicLayout,
             items: [],
-            selectedItems: computed(() => typeOptionState.selectIndex.map((d, i) => tableState.items[d])),
+            selectedItems: computed(() => typeOptionState.selectIndex.map(d => tableState.items[d])),
             consoleLink: computed(() => get(tableState.selectedItems[0], 'reference.external_link')),
             dropdown: computed(() => ([
                 {

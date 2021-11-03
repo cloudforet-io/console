@@ -57,7 +57,7 @@ export default {
 
         const removeDuplicatedElement = (duplicatedArr) => {
             const res = duplicatedArr.filter((item, i) => (
-                duplicatedArr.findIndex((item2, j) => item.resource_id === item2.resource_id) === i
+                duplicatedArr.findIndex(item2 => item.resource_id === item2.resource_id) === i
             ));
             return res;
         };

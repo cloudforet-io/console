@@ -27,7 +27,7 @@ export default defineComponent({
         PButton,
         KeycloakPage,
     },
-    setup(props, context) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             keycloakVisible: false,

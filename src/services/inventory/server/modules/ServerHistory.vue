@@ -33,7 +33,6 @@ import {
 import {
     PTextList, PBadge, PPanelTop, PSearchTable,
 } from '@spaceone/design-system';
-import { Options, SearchTableListeners } from '@spaceone/design-system/dist/src/data-display/tables/search-table/type';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';

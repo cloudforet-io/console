@@ -206,7 +206,7 @@ export default {
             });
         };
 
-        const deleteColumn = (index, item) => {
+        const deleteColumn = (index) => {
             const deleteIndex = parseInt(index);
             if (state.columns[deleteIndex - 1] === undefined) state.columns.pop();
             state.columns.splice(deleteIndex - 1, 1);

@@ -185,7 +185,7 @@ export default {
         GeneralPageLayout,
         PSearchGridLayout,
     },
-    setup(props, context) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const queryHelper = new QueryHelper().setFiltersAsRawQueryString(vm.$route.query.filters);
 

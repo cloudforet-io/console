@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy, getCurrentInstance,
+    ComponentRenderProxy,
 } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';

@@ -75,7 +75,6 @@ import {
 } from '@vue/composition-api';
 import { assetUrlConverter } from '@/lib/helper/asset-helper';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
-import { PROJECT_ROUTE } from '@/services/project/routes';
 import NotificationChannelItem from '@/services/notification/modules/notification-channel-item/NotificationChannelItem.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';

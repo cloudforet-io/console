@@ -182,7 +182,7 @@ import {
 
 import {
     PPageTitle, PPagination, PLazyImg, PCheckBox,
-    PIconTextButton, PBreadcrumbs, PRadio, PI, PDivider, PToolbox, PDataLoader,
+    PIconTextButton, PBreadcrumbs, PRadio, PDivider, PToolbox, PDataLoader,
 } from '@spaceone/design-system';
 
 import PVerticalPageLayout from '@/common/modules/page-layouts/VerticalPageLayout.vue';
@@ -338,10 +338,10 @@ export default {
                 console.error(e);
             }
         };
-        const onClickService = async (region, res, isSelected) => {
+        const onClickService = async (region, res) => {
             filterState.serviceFilter = res;
         };
-        const onClickRegion = async (val, isSelected) => {
+        const onClickRegion = async (val) => {
             filterState.regionFilter = val;
         };
 

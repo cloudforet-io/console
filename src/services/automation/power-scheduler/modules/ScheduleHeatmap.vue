@@ -1,8 +1,8 @@
 <template>
     <div class="mt-4">
         <div v-for="(color, index) in scheduleHeatMapColor" :key="index" class="heatmap-line">
-            <span v-for="(num, index) in 7" :key="num">
-                <span class="circle inline-block" :class="`${color[index]}`" />
+            <span v-for="(num, idx) in 7" :key="num">
+                <span class="circle inline-block" :class="`${color[idx]}`" />
             </span>
         </div>
     </div>

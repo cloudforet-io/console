@@ -57,10 +57,10 @@
 </template>
 <script lang="ts">
 import {
-    PBadge, PButton, PDataTable, PPanelTop, PTag,
+    PBadge, PButton, PDataTable, PPanelTop,
 } from '@spaceone/design-system';
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';

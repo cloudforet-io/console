@@ -164,7 +164,7 @@ export default {
             default: () => [],
         },
     },
-    setup(props, { emit }) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             items: undefined,

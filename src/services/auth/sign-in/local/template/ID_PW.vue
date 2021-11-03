@@ -52,7 +52,6 @@ import {
 import { PButton, PTextInput, PFieldGroup } from '@spaceone/design-system';
 
 import { TranslateResult } from 'vue-i18n';
-import { SpaceAuth } from '@/services/auth/sign-in/local/authenticator/space-auth';
 import { loadAuth } from '@/services/auth/authenticator/loader';
 import { store } from '@/store';
 

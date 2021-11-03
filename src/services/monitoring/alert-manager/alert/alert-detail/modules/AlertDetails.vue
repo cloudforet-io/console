@@ -36,8 +36,6 @@ import {
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { i18n } from '@/translations';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { AlertDataModel } from '@/services/monitoring/alert-manager/type';
 import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { map } from 'lodash';
 import { store } from '@/store';
@@ -58,7 +56,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props: Props) {
+    setup() {
         const state = reactive({
             fields: computed(() => [
                 { name: 'alert_id', label: i18n.t('MONITORING.ALERT.DETAIL.INFO.ALERT_ID') },

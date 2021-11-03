@@ -1,7 +1,6 @@
 import {
-    ComponentRenderProxy, ComputedRef, getCurrentInstance, reactive,
+    ComponentRenderProxy, getCurrentInstance, reactive,
 } from '@vue/composition-api';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { i18n } from '@/translations';
 import { EDIT_MODE } from '@/services/monitoring/alert-manager/lib/config';

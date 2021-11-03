@@ -66,15 +66,12 @@
 
 <script lang="ts">
 import {
-    PButtonModal, PFieldGroup, PTextInput, PAnchor, PIconTextButton, PSelectDropdown, PIconButton,
+    PButtonModal, PTextInput, PAnchor, PIconTextButton, PSelectDropdown, PIconButton,
 } from '@spaceone/design-system';
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/helper/composition-helpers';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-import { i18n } from '@/translations';
-import { store } from '@/store';
 
 const NOTIFICATION_UNIT = Object.freeze({
     PERCENT: 'PERCENT',
@@ -110,7 +107,7 @@ export default {
             default: false,
         },
     },
-    setup(props, { emit, root }) {
+    setup(props, { emit }) {
         const state = reactive({
             loading: true,
             proxyVisible: makeProxy('visible', props, emit),

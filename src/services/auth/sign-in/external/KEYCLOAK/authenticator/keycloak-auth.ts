@@ -1,8 +1,6 @@
 import Keycloak from 'keycloak-js';
 import { store } from '@/store';
 import { Authenticator } from '@/services/auth/authenticator';
-import { SpaceRouter } from '@/router';
-import { AUTH_ROUTE } from '@/services/auth/routes';
 
 const BASE_URL = window.location.origin;
 

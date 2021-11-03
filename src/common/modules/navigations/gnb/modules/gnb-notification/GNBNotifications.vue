@@ -51,7 +51,7 @@ import {
     computed, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import {
-    PIconButton, PSkeleton,
+    PSkeleton,
 } from '@spaceone/design-system';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
@@ -71,10 +71,8 @@ export default {
         GNBNotificationDateHeader,
         GNBNotificationItem,
         PSkeleton,
-        // PIconButton,
-        // PSelectDropdown,
     },
-    setup(props, { root, refs }) {
+    setup(props, { root }) {
         const state = reactive({
             containerRef: null as Element|null,
             notificationItemRefs: [] as Vue[],

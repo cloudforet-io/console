@@ -4,7 +4,7 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';

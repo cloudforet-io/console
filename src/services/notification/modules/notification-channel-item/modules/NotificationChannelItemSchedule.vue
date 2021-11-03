@@ -41,13 +41,12 @@
 
 <script lang="ts">
 import {
-    PBadge, PButton, PI, PTextInput,
+    PButton, PI,
 } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { useNotificationItem } from '@/services/notification/modules/notification-channel-item/composables';
 import {
     EDIT_TYPE,
-    PARAM_KEY_TYPE,
     PROTOCOL_TYPE,
 } from '@/services/notification/modules/notification-channel-item/type';
 import { utcToTimezoneFormatter } from '@/services/identity/user/lib/helper';

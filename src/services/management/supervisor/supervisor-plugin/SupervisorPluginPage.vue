@@ -110,7 +110,6 @@ import {
 import { replaceUrlQuery } from '@/lib/router-query-string';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { getPageStart } from '@spaceone/console-core-lib/component-util/pagination';
 import { pluginStateFormatter } from '@/services/identity/user/lib/helper';
 
 enum STATE {

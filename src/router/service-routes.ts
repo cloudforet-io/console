@@ -1,9 +1,5 @@
 import { RouteConfig } from 'vue-router';
 
-// Views
-import ErrorPage from '@/common/pages/ErrorPage.vue';
-
-
 // Routes
 import authRoutes from '@/services/auth/routes';
 import dashboardRoute, { DASHBOARD_ROUTE } from '@/services/dashboard/routes';
@@ -15,7 +11,7 @@ import managementRoute from '@/services/management/routes';
 import automationRoute from '@/services/automation/routes';
 import monitoringRoute from '@/services/monitoring/routes';
 import billingRoute from '@/services/billing/routes';
-import { ERROR_ROUTE, errorRoutes } from '@/router/error-routes';
+import { errorRoutes } from '@/router/error-routes';
 
 
 export const ROOT_ROUTE = Object.freeze({

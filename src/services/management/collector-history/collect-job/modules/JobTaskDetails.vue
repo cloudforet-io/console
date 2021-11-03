@@ -32,7 +32,7 @@ export default {
             required: true,
         },
     },
-    setup(props: Props) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             tabs: computed(() => [

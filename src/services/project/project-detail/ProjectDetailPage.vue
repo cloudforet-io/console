@@ -173,14 +173,14 @@ export default {
             maintenanceHappeningListRef: null as null|Vue,
         });
 
-        const forceRouteToProjectPage = () => {
-            showErrorMessage(
-                i18n.t('PROJECT.DETAIL.ALT_E_PROJECT_INVALID_TITLE'),
-                i18n.t('PROJECT.DETAIL.ALT_E_PROJECT_INVALID_DESC'),
-                root,
-            );
-            vm.$router.push({ name: PROJECT_ROUTE._NAME });
-        };
+        // const forceRouteToProjectPage = () => {
+        //     showErrorMessage(
+        //         i18n.t('PROJECT.DETAIL.ALT_E_PROJECT_INVALID_TITLE'),
+        //         i18n.t('PROJECT.DETAIL.ALT_E_PROJECT_INVALID_DESC'),
+        //         root,
+        //     );
+        //     vm.$router.push({ name: PROJECT_ROUTE._NAME });
+        // };
 
         /* api */
         const getProject = async (id) => {

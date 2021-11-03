@@ -115,7 +115,7 @@ export default {
             default: false,
         },
     },
-    setup(props) {
+    setup() {
         return {
             INSTANCE_STATE,
         };

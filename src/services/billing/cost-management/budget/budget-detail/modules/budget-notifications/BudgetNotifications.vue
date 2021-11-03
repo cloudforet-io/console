@@ -87,7 +87,7 @@
 
 <script>
 import {
-    PPaneLayout, PIconButton, PI, PAnchor, PIconTextButton, PBadge,
+    PPaneLayout, PIconButton, PAnchor, PIconTextButton, PBadge,
 } from '@spaceone/design-system';
 import BudgetNotificationsChannel
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-notifications/BudgetNotificationsChannel.vue';

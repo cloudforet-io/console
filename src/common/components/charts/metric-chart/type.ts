@@ -1,6 +1,3 @@
-import { Timestamp } from '@spaceone/design-system/dist/src/util/type';
-
-
 interface MonitoringResourceType {
     id: string;
     name?: string;

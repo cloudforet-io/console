@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts">
-import { find, get } from 'lodash';
+import { find } from 'lodash';
 import { Location } from 'vue-router';
 
 import {

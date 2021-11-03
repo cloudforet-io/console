@@ -1,5 +1,5 @@
 import { Action } from 'vuex';
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
