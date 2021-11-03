@@ -87,7 +87,7 @@ import {
     QuerySearchProps,
     ValueHandler,
     ValueItem,
-    ValueMenuItem, MenuType, QueryItem, KeyDataType, dataTypes, MenuItem,
+    ValueMenuItem, MenuType, QueryItem, KeyDataType, OPERATOR,
 } from '@/inputs/search/query-search/type';
 
 /* Configs, Helpers */
@@ -164,7 +164,7 @@ export default defineComponent({
             subPath: computed<string|undefined>(() => state.selectedKeys.slice(1).map(d => d.name).join('.') || undefined),
             selectedKey: computed<KeyItem|null>(() => state.selectedKeys[state.selectedKeys.length - 1] || null),
             rootKey: computed<KeyItem|null>(() => state.selectedKeys[0] || null),
-            operator: '' as OperatorType,
+            operator: OPERATOR.contain as OperatorType,
             supportOperators: computed<OperatorType[]>(() => {
                 if (state.handlerResp.operators) return state.handlerResp.operators;
                 if (state.rootKey?.operators) return state.rootKey.operators;
@@ -230,7 +230,7 @@ export default defineComponent({
 
         const clearAll = () => {
             state.searchText = '';
-            state.operator = '';
+            state.operator = OPERATOR.contain;
         };
 
 
@@ -285,7 +285,7 @@ export default defineComponent({
         const updateOperator = (operator?: OperatorType) => {
             if (operator === undefined) {
                 if (state.operator.length === 2) state.operator = state.operator.substring(0, 1) as OperatorType;
-                else state.operator = '';
+                else state.operator = OPERATOR.contain;
             } else {
                 state.operator = operator;
             }
@@ -470,7 +470,7 @@ export default defineComponent({
                     hideMenu();
                 }
             } else {
-                if (!state.operator) state.operator = '=';
+                if (!state.operator) state.operator = OPERATOR.equal;
                 emitSearch(item.data as ValueItem);
             }
         };

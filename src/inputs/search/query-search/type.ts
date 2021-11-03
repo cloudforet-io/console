@@ -5,8 +5,20 @@ export const dataTypes = ['string', 'integer', 'float', 'boolean', 'datetime', '
 export type KeyDataType = typeof dataTypes[number];
 
 
-export const operators = ['', '!', '>', '>=', '<', '<=', '=', '!=', '$'] as const;
-export type OperatorType = typeof operators[number];
+export const OPERATOR = Object.freeze({
+    contain: '',
+    notContain: '!',
+    greater: '>',
+    greaterEqual: '>=',
+    less: '<',
+    lessEqual: '<=',
+    equal: '=',
+    notEqual: '!=',
+    regex: '$',
+} as const);
+
+export const operators = Object.values(OPERATOR);
+export type OperatorType = typeof OPERATOR[keyof typeof OPERATOR];
 
 export interface ValueItem {
     label: string;
