@@ -18,6 +18,7 @@
 
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_COST_TYPE')"
                            required
+                           class="cost-type"
             >
                 <p-radio v-for="(costTypeLabel, costTypeKey) in costTypeItems" :key="costTypeKey"
                          v-model="selectedCostType" :value="costTypeKey"
@@ -94,3 +95,33 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.p-panel-top {
+    margin-bottom: 0.5rem;
+}
+.p-field-group {
+    width: 30rem;
+    .p-text-input {
+        width: 100%;
+    }
+    .p-radio {
+        margin-right: 1rem;
+    }
+}
+
+@screen mobile {
+    .p-field-group {
+        width: 100%;
+    }
+    .cost-type::v-deep {
+        display: flex;
+        flex-wrap: wrap;
+        .label-box {
+            width: 100%;
+        }
+        .p-radio {
+            margin-bottom: 0.25rem;
+        }
+    }
+}
+</style>

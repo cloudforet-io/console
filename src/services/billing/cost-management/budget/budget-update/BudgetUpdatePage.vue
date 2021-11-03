@@ -1,6 +1,7 @@
 <template>
     <general-page-layout>
         <p-breadcrumbs :routes="routeState.routes" />
+        <p-page-title :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.UPDATE_BUDGET')" child @goBack="$router.go(-1)" />
         <budget-form :budget-id="budgetId" @confirm="handleFormConfirm" />
     </general-page-layout>
 </template>

@@ -1,6 +1,7 @@
 <template>
     <general-page-layout>
         <p-breadcrumbs :routes="routeState.routes" />
+        <p-page-title :title="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CREATE_BUDGET')" child @goBack="$router.go(-1)" />
         <budget-form @confirm="handleFormConfirm" />
     </general-page-layout>
 </template>
@@ -9,7 +10,7 @@
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
-import { PBreadcrumbs } from '@spaceone/design-system';
+import { PBreadcrumbs, PPageTitle } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
 import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.vue';
@@ -23,6 +24,7 @@ export default {
         BudgetForm,
         GeneralPageLayout,
         PBreadcrumbs,
+        PPageTitle,
     },
     setup() {
         const state = reactive({
