@@ -342,6 +342,9 @@ export default {
         align-items: center;
         padding: 0;
         margin: 0.5rem;
+        &:hover svg {
+            fill: theme('colors.secondary');
+        }
     }
     .flatpickr-current-month {
         display: flex;
