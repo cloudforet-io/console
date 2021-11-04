@@ -1,3 +1,10 @@
+# [1.1.0-beta.162](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.161...v1.1.0-beta.162) (2021-11-04)
+
+
+### Bug Fixes
+
+* delete z-index to escape stacking context ([#730](https://github.com/spaceone-dev/spaceone-design-system/issues/730)) ([37678d4](https://github.com/spaceone-dev/spaceone-design-system/commit/37678d403c1e40c6725884fb8b6e8a6f3cda1bbc))
+
 # [1.1.0-beta.161](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.160...v1.1.0-beta.161) (2021-11-04)
 
 
