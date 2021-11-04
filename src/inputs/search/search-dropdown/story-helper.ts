@@ -97,6 +97,24 @@ const extraArgTypes: ArgTypes = {
             type: 'boolean',
         },
     },
+    strictSelectMode: {
+        name: 'strictSelectMode',
+        type: { name: 'boolean' },
+        description: 'Determines whether all items received as `selected` prop are considered selected, or selected only when they match the names of menu items.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     // context menu fixed style props
     useFixedMenuStyle: {
         name: 'useFixedMenuStyle',

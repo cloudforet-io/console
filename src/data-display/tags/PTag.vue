@@ -111,7 +111,7 @@ export default defineComponent<Props>({
     }
     .text {
         font-size: 0.75rem;
-        line-height: 1.3;
+        line-height: 1.4;
         white-space: normal;
         word-break: break-word;
         max-width: 100%;

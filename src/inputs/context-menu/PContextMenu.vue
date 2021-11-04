@@ -3,12 +3,12 @@
          :class="{[theme]: true, invalid}"
          @keyup.esc="onClickEsc"
     >
-        <div v-if="menu.length === 0" class="context-item empty" :class="theme">
+        <div v-show="menu.length === 0" class="context-item empty" :class="theme">
             <slot name="no-data-format" v-bind="{...$props, uuid}">
                 {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
             </slot>
         </div>
-        <slot v-else name="menu" v-bind="{...$props, uuid}">
+        <slot v-show="menu.length > 0" name="menu" v-bind="{...$props, uuid}">
             <div v-if="multiSelectable && showSelectedList" class="selected-list-wrapper">
                 <div>
                     <b>{{ $t('COMPONENT.CONTEXT_MENU.SELECTED_LIST') }}</b>
@@ -28,7 +28,7 @@
             <template v-for="(item, index) in menu">
                 <a v-if="item.type === undefined || item.type === 'item'"
                    :id="`context-item-${index}-${uuid}`"
-                   :key="`${item.name}-${index}`"
+                   :key="`${item.name}-${index}-${uuid}`"
                    :tabindex="index"
                    class="context-item"
                    :class="{ disabled: item.disabled, [theme]: true }"
@@ -144,10 +144,13 @@ export default defineComponent<ContextMenuProps>({
                     && state.selectableMenuItems.length === state.proxySelected.length
                 && state.proxySelected.every(item => state.selectableMenuItems.find(selected => selected.name === item.name))),
             selectedCountInFilteredMenu: computed(() => props.menu.filter(d => state.selectedNames.includes(d.name)).length),
+            uuid: computed(() => {
+                const menu = props.menu;
+                return `${Math.random()}`.slice(2);
+            }),
         });
 
         let focusedItemEl: HTMLElement | null = null;
-        const uuid = `${Math.random()}`.slice(2);
         const itemsIndex = computed<number[]>(() => {
             const indices: number[] = [];
             props.menu.forEach((menuItem, i) => {
@@ -161,7 +164,7 @@ export default defineComponent<ContextMenuProps>({
         /* util */
         const focus = (position) => {
             const idx = position === -1 ? itemsIndex.value[itemsIndex.value.length - 1] : itemsIndex.value[position || 0];
-            const el = document.getElementById(`context-item-${idx}-${uuid}`);
+            const el = document.getElementById(`context-item-${idx}-${state.uuid}`);
             if (el) {
                 el.focus();
                 focusedItemEl = el;
@@ -204,8 +207,9 @@ export default defineComponent<ContextMenuProps>({
                     if (state.selectedNames.includes(item.name)) {
                         const indexOfSelectedList = state.selectedNames.indexOf(item.name);
                         state.proxySelected.splice(indexOfSelectedList, 1);
+                        state.proxySelected = [...state.proxySelected];
                     } else {
-                        state.proxySelected.push(item);
+                        state.proxySelected = [...state.proxySelected, item];
                     }
                 } else {
                     state.proxySelected = [item];
@@ -226,7 +230,6 @@ export default defineComponent<ContextMenuProps>({
 
         return {
             ...toRefs(state),
-            uuid,
             onClickMenu,
             onKeyDown,
             onKeyUp,
@@ -300,6 +303,7 @@ export default defineComponent<ContextMenuProps>({
             margin-left: 0.25rem;
         }
         .select-marker {
+            flex-shrink: 0;
             margin-right: 0.25rem;
         }
     }

@@ -4,13 +4,15 @@
              color="inherit"
         />
         <slot name="left" v-bind="{ value, placeholder: placeholderText }" />
-        <slot name="default" v-bind="{ value, placeholder: placeholderText }">
-            <input v-focus.lazy="proxyIsFocused"
-                   :value="value"
-                   :placeholder="placeholderText"
-                   v-on="inputListeners"
-            >
-        </slot>
+        <span class="input-wrapper">
+            <slot name="default" v-bind="{ value, placeholder: placeholderText }">
+                <input v-focus.lazy="proxyIsFocused"
+                       :value="value"
+                       :placeholder="placeholderText"
+                       v-on="inputListeners"
+                >
+            </slot>
+        </span>
         <slot name="right" v-bind="{ value, placeholder: placeholderText }">
             <div class="right">
                 <span v-if="value" class="delete-btn" @click="onDelete">
@@ -120,8 +122,12 @@ export default defineComponent<SearchProps>({
     &:hover {
         @apply border-secondary;
     }
+    .input-wrapper {
+        display: flex;
+        flex-grow: 1;
+    }
     input {
-        @apply border-0 bg-transparent flex-grow;
+        @apply border-0 bg-transparent w-full;
         color: inherit;
         font-size: 0.875rem;
         appearance: none;

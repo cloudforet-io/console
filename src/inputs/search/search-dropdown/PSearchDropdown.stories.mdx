@@ -37,6 +37,7 @@ export const Template = (args, { argTypes }) => ({
             :show-selected-list="showSelectedList"
             :show-select-all="showSelectAll"
             :show-tag-box="showTagBox"
+            :strict-select-mode="strictSelectMode"
             @search="onSearch"
             @focus="onFocus"
             @blur="onBlur"
@@ -100,77 +101,42 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
-## Control Manually
-
-<Canvas>
-    <Story name="Control Manually" args={{menu: getSearchDropdownMenu()}}>
-        {{
-            props: Object.keys(getSearchDropdownArgTypes()),
-            components: { PSearchDropdown, PButton },
-            template: `
-        <div>
-            <p class="mb-4">To focus search and show menu, click the button <p-button style-type="primary" @click="focusMenu">Search</p-button></p>
-            <p class="mb-4">To hide menu, select menu item</p>
-            <p-search-dropdown :menu="menu"
-                v-model="proxyValue"
-                :visible-menu.sync="proxyVisibleMenu"
-                :is-focused.sync="proxyIsFocused"
-                use-fixed-menu-style
-                @select-menu="hideMenu"
-/>
-        </div>
-`,
-            setup() {
-                const state = reactive({
-                    proxyValue: '',
-                    proxyVisibleMenu: false,
-                    proxyIsFocused: false
-                })
-                const focusMenu = () => {
-                    state.proxyIsFocused = true;
-                    state.proxyVisibleMenu = true;
-                }
-                const hideMenu = () => {
-                    state.proxyVisibleMenu = false;
-                }
-                return {
-                    ...toRefs(state),
-                    focusMenu,
-                    hideMenu
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
 ## Using Handler
 
 <Canvas>
-    <Story name="Using Handler" args={{menu: getSearchDropdownMenuWithMultiTypes()}}>
+    <Story name="Using Handler" >
         {{
-            props: Object.keys(getSearchDropdownArgTypes()),
             components: { PSearchDropdown, PButton },
             template: `
-            <p-search-dropdown :menu="menu" :handler="simpleHandler" use-fixed-menu-style />
+            <p-search-dropdown :menu="menu" :loading="loading" :handler="simpleHandler" use-fixed-menu-style />
 `,
             setup() {
-                const simpleHandler = (inputText, list) => {
-                    let results = [...list];
-                    const trimmed = inputText.trim();
-                    if (trimmed) {
-                        results = new Fuse(results, {
-                            keys: ['label'],
-                            distance: 100,
-                            threshold: 0.1,
-                            ignoreLocation: true,
-                        }).search(trimmed);
-                    }
-                    return { results };
+                const state = reactive({
+                    loading: false,
+                    menu: getSearchDropdownMenuWithMultiTypes()
+                })
+                const simpleHandler = async (inputText, list) => {
+                    state.loading = true;
+                    const results = await new Promise(resolve => {
+                        setTimeout(() => {
+                            let results = [...list];
+                            const trimmed = inputText.trim();
+                            if (trimmed) {
+                                results = new Fuse(results, {
+                                    keys: ['label'],
+                                    distance: 100,
+                                    threshold: 0.1,
+                                    ignoreLocation: true,
+                                }).search(trimmed);
+                            }
+                            resolve(results)
+                        }, 500)
+                    })
+                    state.loading = false;
+                    return { results }
                 }
                 return {
+                    ...toRefs(state),
                     simpleHandler
                 }
             }
@@ -286,6 +252,79 @@ export const Template = (args, { argTypes }) => ({
             template: `
         <p-search-dropdown :menu="menu" type="checkbox" :show-select-all="true" use-fixed-menu-style />
 `,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Strict Select Mode
+
+<Canvas>
+    <Story name="Strict Select Mode">
+        {{
+            components: { PSearchDropdown, PToggleButton },
+            template: `
+    <div>
+        <p class="mb-2">
+            Use Strict Select Mode: <strong> {{strictSelectMode ? 'On' : 'Off' }}</strong> <p-toggle-button :value="strictSelectMode" @change="onChange" />
+        </p>
+        <div class=m-4>
+            <p class="m-2">default type</p>
+            <p-search-dropdown
+                :key="strictSelectMode ? 'strict-default' : 'default-default'"
+                :menu="menu"
+                :selected="defaultSelected"
+                :strict-select-mode="strictSelectMode"
+                use-fixed-menu-style
+            />
+        </div>
+        <div class=m-4>
+            <p class="m-2">radioButton type</p>
+            <p-search-dropdown
+                :key="strictSelectMode ? 'strict-radio' : 'default-radio'"
+                :menu="menu"
+                type="radioButton"
+                :selected="radioSelected"
+                :strict-select-mode="strictSelectMode"
+                use-fixed-menu-style
+            />
+        </div>
+        <div class=m-4>
+            <p class="m-2">checkbox type</p>
+            <p-search-dropdown
+                :key="strictSelectMode ? 'strict-checkbox' : 'default-checkbox'"
+                :menu="menu"
+                type="checkbox"
+                :selected="checkboxSelected"
+                :strict-select-mode="strictSelectMode"
+                use-fixed-menu-style
+            />
+        </div>
+    </div>
+`,
+            setup() {
+                const existItem = {name: 'exist in menu items', label: 'This item is exist in menu items'}
+                const notExistItem = {name: 'not in menu items', label: 'This item is not in menu items'}
+                const state = reactive({
+                    menu: [...getSearchDropdownMenu(), existItem],
+                    defaultSelected: [notExistItem],
+                    radioSelected: [notExistItem],
+                    checkboxSelected: [notExistItem, existItem],
+                    strictSelectMode: false
+                })
+                const onChange = () => {
+                    state.checkboxSelected = [notExistItem, existItem];
+                    state.defaultSelected = [notExistItem]
+                    state.radioSelected = [notExistItem]
+                    state.strictSelectMode = !state.strictSelectMode
+                }
+                return {
+                    ...toRefs(state),
+                    onChange
+                }
+            }
         }}
     </Story>
 </Canvas>
