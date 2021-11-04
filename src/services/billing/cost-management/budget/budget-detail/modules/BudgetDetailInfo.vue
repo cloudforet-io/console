@@ -37,11 +37,13 @@
 
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import cloneDeep from 'lodash/cloneDeep';
 import { PPaneLayout, PAnchor } from '@spaceone/design-system';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 import { BudgetData, CostType } from '@/services/billing/cost-management/budget/type';
+
+const getKeyOfCostType = (costType: Record<CostType, string[]>) => Object.keys(costType).filter(k => (costType[k] !== null))[0];
+const getValueOfCostType = (costType: Record<CostType, string[]>, costTypeKey: string) => costType[costTypeKey];
 
 export default {
     name: 'BudgetDetailSummary',
@@ -53,21 +55,11 @@ export default {
         const state = reactive({
             projects: computed(() => store.state.resource.project.items),
             budgetData: computed<BudgetData>(() => store.state.service.budget.budgetData),
-            costTypeKey: '',
-            costTypeValue: [],
+            costTypeKey: computed(() => getKeyOfCostType(state.budgetData.cost_types)),
+            costTypeValue: computed(() => getValueOfCostType(state.budgetData.cost_types, state.costTypeKey)),
         });
 
-        const getKeyOfCostType = (costType: Record<CostType, string[]>) => Object.keys(costType).filter(k => (costType[k] !== null))[0];
 
-        const getCostTypeData = () => {
-            const costType = cloneDeep(state.budgetData.cost_types);
-            state.costTypeKey = getKeyOfCostType(costType);
-            state.costTypeValue = costType[state.costTypeKey];
-        };
-
-        (() => {
-            getCostTypeData();
-        })();
         return {
             ...toRefs(state),
             referenceRouter,
