@@ -41,7 +41,7 @@
     </p-button-modal>
 </template>
 <script lang="ts">
-import { reactive, computed, toRefs } from '@vue/composition-api';
+import { reactive, toRefs } from '@vue/composition-api';
 import PButtonModal from '@/feedbacks/modals/button-modal/PButtonModal.vue';
 import { makeProxy } from '@/util/composition-helpers';
 import PTextInput from '@/inputs/input/PTextInput.vue';

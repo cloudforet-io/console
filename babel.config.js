@@ -10,7 +10,7 @@ module.exports = {
                     useBuiltIns: 'usage',
                     shippedProposals: true,
                     corejs: { version: 3.6, proposals: true },
-                }]
+                }],
             ],
         },
     },

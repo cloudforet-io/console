@@ -1,7 +1,6 @@
-/* eslint-disable @typescript-eslint/no-var-requires */
-const path = require('path');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const webpackBundleAnalyzer = require('webpack-bundle-analyzer');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const postcssConfig = require('./postcss.config');
 
 

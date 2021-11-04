@@ -19,7 +19,7 @@ export interface DataTableFieldType {
 export type DataTableField = string | DataTableFieldType
 
 export interface DataTableProps {
-    loading: boolean;
+    loading?: boolean;
     fields: DataTableField[];
     items: any[];
     sortable?: boolean;

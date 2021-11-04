@@ -34,4 +34,5 @@ export interface ContextMenuProps {
     showRadioIcon?: boolean;
     showSelectedList?: boolean;
     showSelectAll?: boolean;
+    strictSelectMode?: boolean;
 }

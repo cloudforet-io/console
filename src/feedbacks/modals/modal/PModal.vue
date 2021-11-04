@@ -13,27 +13,6 @@ import { computed } from '@vue/composition-api';
 import { ModalProps, sizeMapping } from '@/feedbacks/modals/type';
 
 
-const setup = (props, { emit }) => {
-    const dialogClassObject = computed(() => [
-        { scrollable: props.scrollable },
-        props.size,
-    ]);
-    const hide = () => {
-        if (props.visible) { emit('update:visible', false); }
-    };
-
-    return {
-        dialogClassObject,
-        show() {
-            if (!props.visible) { emit('update:visible', true); }
-        },
-        hide,
-        toggle() {
-            emit('update:visible', !props.visible);
-        },
-    };
-};
-
 export default {
     name: 'PModal',
     props: {

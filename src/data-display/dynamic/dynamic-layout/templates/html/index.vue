@@ -16,7 +16,7 @@
 <script lang="ts">
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { get } from 'lodash';
 import { HtmlDynamicLayoutProps } from '@/data-display/dynamic/dynamic-layout/templates/html/type';
@@ -57,7 +57,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props: HtmlDynamicLayoutProps, { emit }) {
+    setup(props: HtmlDynamicLayoutProps) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             layoutName: computed(() => (props.options.translation_id ? vm.$t(props.options.translation_id) : props.name)),

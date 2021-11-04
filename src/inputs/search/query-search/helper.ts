@@ -81,7 +81,7 @@ export const getValueMenuForm = (resp: HandlerResponse, selectedKeys: KeyItem[],
     ];
 };
 
-export const getOperatorMenuForm = (items: ValueItem[], operator: OperatorType): ValueMenuItem[] => items.map(d => ({ ...d, type: 'item', data: d }));
+export const getOperatorMenuForm = (items: ValueItem[]): ValueMenuItem[] => items.map(d => ({ ...d, type: 'item', data: d }));
 
 export const findKey = (val: string, items: KeyItem[]): KeyItem|undefined => {
     const value = val.toLowerCase();

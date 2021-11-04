@@ -5,6 +5,7 @@ import PContextMenu from './PContextMenu.vue';
 import PEmpty from '@/data-display/empty/PEmpty';
 import PI from '@/foundation/icons/PI.vue';
 import PRawData from '@/data-display/raw-data/PRawData';
+import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
 
 import {CONTEXT_MENU_THEME} from '@/inputs/context-menu/type';
 
@@ -34,6 +35,7 @@ export const Template = (args, { argTypes }) => ({
             :show-radio-icon="showRadioIcon"
             :show-selected-list="showSelectedList"
             :show-select-all="showSelectAll"
+            :strict-select-mode="strictSelectMode"
             @select="onSelect"
             @focus="onFocus"
             @blur="onBlur"
@@ -470,6 +472,72 @@ Context Menu have 3 types fot slots:
 <br/>
 <br/>
 
+## Strict Select Mode
+
+<Canvas>
+    <Story name="Strict Select Mode">
+        {{
+            components: { PContextMenu, PToggleButton },
+            template: `
+    <div>
+        <p class="mb-2">
+            Use Strict Select Mode: <strong> {{strictSelectMode ? 'On' : 'Off' }}</strong> <p-toggle-button :value="strictSelectMode" @change="onChange" />
+        </p>
+        <div class="m-4">
+            <p class="m-2 font-bold">multiSelectable: false, showRadioIcon: true</p>
+            <div class="m-2">
+                <p class="mb-2">Selected:</p>
+                <pre class="p-2 text-xs bg-gray-100 leading-3">{{singleSelected}}</pre>
+            </div>
+            <p-context-menu
+                :key="strictSelectMode ? 'strict-radio' : 'default-radio'"
+                :menu="menu"
+                :selected.sync="singleSelected"
+                :strict-select-mode="strictSelectMode"
+                show-radio-icon
+            />
+        </div>
+        <div class="m-4">
+            <p class="m-2 font-bold">multiSelectable: true</p>
+            <div class="m-2">
+                <p class="mb-2">Selected:</p>
+                <pre class="p-2 text-xs bg-gray-100 leading-3">{{multiSelected}}</pre>
+            </div>
+            <p-context-menu
+                :key="strictSelectMode ? 'strict-checkbox' : 'default-checkbox'"
+                :menu="menu"
+                :selected.sync="multiSelected"
+                :strict-select-mode="strictSelectMode"
+                multi-selectable
+            />
+        </div>
+    </div>
+`,
+            setup() {
+                const existItem = {name: 'exist in menu items', label: 'This item is exist in menu items'}
+                const notExistItem = {name: 'not in menu items', label: 'This item is not in menu items'}
+                const state = reactive({
+                    menu: [...menuItems, existItem],
+                    singleSelected: [notExistItem],
+                    multiSelected: [notExistItem, existItem],
+                    strictSelectMode: false
+                })
+                const onChange = () => {
+                    state.singleSelected = [notExistItem]
+                    state.multiSelected = [notExistItem, existItem];
+                    state.strictSelectMode = !state.strictSelectMode
+                }
+                return {
+                    ...toRefs(state),
+                    onChange
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
 
 ## Playground
 

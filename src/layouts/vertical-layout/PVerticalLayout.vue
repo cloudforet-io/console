@@ -69,7 +69,7 @@ export default {
             default: 500,
         },
     },
-    setup(props, context) {
+    setup(props) {
         const state = reactive({
             width: props.initWidth,
             resizing: false,

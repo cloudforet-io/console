@@ -1,7 +1,7 @@
 import faker from 'faker';
 import { range } from 'lodash';
 import {
-    KeyItem, KeyItemSet,
+    KeyItemSet,
     ValueHandler, ValueHandlerMap,
 } from '@/inputs/search/query-search/type';
 
@@ -18,9 +18,9 @@ export const getKeyItemSet = (length = 10) => ({
 
 export const getKeyItemSets = (itemLength = 10, setLength = 3) => range(setLength).map(() => getKeyItemSet(itemLength));
 
-export const getValueItems = (length = 20) => range(length).map(d => ({ label: faker.random.word(), name: faker.random.uuid() }));
+export const getValueItems = (length = 20) => range(length).map(() => ({ label: faker.random.word(), name: faker.random.uuid() }));
 
-export const getValueHandler = (items = getValueItems()): ValueHandler => (inputText: string, rootKey: KeyItem) => {
+export const getValueHandler = (items = getValueItems()): ValueHandler => (inputText: string) => {
     let results = items;
     if (inputText) {
         const regex = new RegExp(inputText, 'i');

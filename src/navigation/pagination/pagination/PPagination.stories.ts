@@ -32,7 +32,7 @@ export const pagination = () => ({
             default: number('totalCount', 100, { min: 1 }),
         },
     },
-    setup(props, context) {
+    setup() {
         const state = reactive({
             thisPage: 1,
             pageSize: 15,

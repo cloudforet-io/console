@@ -8,7 +8,7 @@ const getMenuItem = () => ({
     // disabled: faker.random.boolean(),
 });
 
-export const getSearchDropdownMenu = (min = 10, max = 30) => range(faker.random.number({ min: 10, max: 30 })).map(() => getMenuItem());
+export const getSearchDropdownMenu = (min = 10, max = 30) => range(faker.random.number({ min, max })).map(() => getMenuItem());
 export const getSearchDropdownMenuWithMultiTypes = () => range(30).map((i) => {
     const result = getMenuItem();
 

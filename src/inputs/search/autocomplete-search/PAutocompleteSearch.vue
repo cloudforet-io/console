@@ -40,7 +40,7 @@ import Fuse from 'fuse.js';
 import { reduce } from 'lodash';
 
 import { makeByPassListeners, makeOptionalProxy } from '@/util/composition-helpers';
-import { ContextMenuFixedStyleProps, useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
+import { useContextMenuFixedStyle } from '@/hooks/context-menu-fixed-style';
 
 import PContextMenu from '@/inputs/context-menu/PContextMenu.vue';
 import PSearch from '@/inputs/search/search/PSearch.vue';

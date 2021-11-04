@@ -32,7 +32,7 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, onMounted, onUnmounted, reactive, toRefs, watch,
+    computed, defineComponent, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import Vue from 'vue';
 
@@ -65,7 +65,7 @@ export default defineComponent<Props>({
             default: false,
         },
     },
-    setup(props: Props, { emit, slots }) {
+    setup(props: Props, { emit }) {
         const state = reactive({
             click: false,
             isAlertVisible: false,

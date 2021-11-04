@@ -9,6 +9,7 @@
                 {{ item || '' }}
             </slot>
             <slot v-if="i < displayItems.length - 1" name="delimiter" v-bind="{...$props, index: i, item, value: item || ''}">
+                <!-- eslint-disable -->
                 <span class="delimiter" v-html="delimiter" />
             </slot>
         </component>
@@ -58,7 +59,7 @@ export default {
     setup(props: TextListProps) {
         const state = reactive({
             component: computed(() => (props.link ? PAnchor : (props.tag || 'span'))),
-            displayItems: computed(() => props.items.reduce((res, item, i) => {
+            displayItems: computed(() => props.items.reduce((res, item) => {
                 let data;
                 if (typeof item === 'object' && props.subKey) {
                     data = get(item, props.subKey, '');

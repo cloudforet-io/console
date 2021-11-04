@@ -33,6 +33,7 @@
                         theme="secondary"
                         :menu="bindingMenu"
                         :loading="loading"
+                        :strict-select-mode="strictSelectMode"
                         :selected.sync="proxySelected"
                         :multi-selectable="type === SEARCH_DROPDOWN_TYPE.checkbox"
                         :show-radio-icon="type === SEARCH_DROPDOWN_TYPE.radioButton"
@@ -87,12 +88,6 @@ import {
     SEARCH_DROPDOWN_TYPE, SearchDropdownProps,
 } from '@/inputs/search/search-dropdown/type';
 import { MenuItem } from '@/inputs/context-menu/type';
-
-const filterSelectedItems = (selected: MenuItem[], menu: MenuItem[]) => {
-    const filtered = selected.filter(d => menu.find(item => item.name === d.name));
-    if (filtered.length === selected.length) return selected;
-    return filtered;
-};
 
 export default defineComponent<SearchDropdownProps>({
     name: 'PSearchDropdown',
@@ -457,16 +452,14 @@ export default defineComponent<SearchDropdownProps>({
         watch(() => state.proxySelected, (proxySelected) => {
             if (!proxySelected.length) {
                 state.proxyPlaceholder = undefined;
+                if (props.type === SEARCH_DROPDOWN_TYPE.default) state.proxyValue = '';
                 return;
-            }
-
-            if (props.strictSelectMode) {
-                state.proxySelected = filterSelectedItems(proxySelected, props.menu);
             }
 
             if (props.type === SEARCH_DROPDOWN_TYPE.default) {
                 const item = state.proxySelected[0];
                 if (item) state.proxyValue = item.label ?? item.name ?? '';
+                else state.proxyValue = '';
             } else if (props.type === SEARCH_DROPDOWN_TYPE.radioButton && state.proxyPlaceholder !== '') {
                 state.proxyPlaceholder = '';
             }

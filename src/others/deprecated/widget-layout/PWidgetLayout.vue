@@ -1,5 +1,5 @@
 <template>
-    <p-pane-layout class="widget-layout">
+    <p-pane-layout class="p-widget-layout">
         <slot name="top">
             <div class="top">
                 <slot name="title">
@@ -38,9 +38,6 @@
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import PI from '@/foundation/icons/PI.vue';
 import PTooltipButton from '@/others/deprecated/tooltip-button/PTooltipButton.vue';
-import {
-    WidgetLayoutPropsType,
-} from '@/others/deprecated/widget-layout/type';
 
 export default {
     name: 'PWidgetLayout',
@@ -63,14 +60,14 @@ export default {
             default: '',
         },
     },
-    setup(props: WidgetLayoutPropsType) {
+    setup() {
         return {};
     },
 };
 </script>
 
-<style lang="postcss" scoped>
-.widget-layout {
+<style lang="postcss">
+.p-widget-layout {
     display: inline-flex;
     flex-direction: column;
     width: 100%;

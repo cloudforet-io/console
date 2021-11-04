@@ -1,4 +1,4 @@
-import { select, text } from '@storybook/addon-knobs';
+import { text } from '@storybook/addon-knobs';
 import { action } from '@storybook/addon-actions';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import { ref } from '@vue/composition-api';
@@ -48,7 +48,7 @@ export const modal = () => ({
         },
 
     },
-    setup(props, context) {
+    setup() {
         const visible = ref(false);
         return {
             visible,

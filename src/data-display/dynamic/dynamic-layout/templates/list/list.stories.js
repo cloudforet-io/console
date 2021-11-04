@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import {
     toRefs, reactive,
 } from '@vue/composition-api';
@@ -374,7 +373,7 @@ export const defaultCase = () => ({
                         @fetch="onFetch" 
                         @select="onSelect"/>
     </div>`,
-    setup(props, context) {
+    setup() {
         const state = reactive({});
 
         return {

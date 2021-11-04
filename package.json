@@ -41,7 +41,7 @@
     "lottie": "node build/lottie.js",
     "css": "node build/css.js",
     "analyze": "NODE_ENV=production VUE_APP_ANALYZE_MOD=true vue-cli-service build",
-    "eslint": "eslint --max-warnings 68 --ext .js,.vue,.ts src",
+    "eslint": "eslint --ext .js,.vue,.ts .",
     "stylelint": "stylelint \"src/**/*.{css,vue,pcss,scss}\"",
     "lint": "npm run eslint && npm run stylelint",
     "test": "jest",

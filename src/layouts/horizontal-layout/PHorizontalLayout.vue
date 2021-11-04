@@ -31,7 +31,6 @@ import PI from '@/foundation/icons/PI.vue';
 import {
     reactive, toRefs,
 } from '@vue/composition-api';
-import { throttle } from 'lodash';
 
 export default {
     name: 'PHorizontalLayout',

@@ -266,14 +266,9 @@ export default defineComponent<DataTableProps>({
             copyTargetElement: computed<HTMLCollection>(() => state.table?.children[1]?.children || []),
             showLoading: true,
             showHeader: props.items && props.items.length > 0 && props.fields.length > 0,
-            showNoData: computed(() => {
-                if (state.showHeader && (
-                    !props.items || !Array.isArray(props.items) || props.items.length === 0
-                )) {
-                    return true;
-                }
-                return false;
-            }),
+            showNoData: computed(() => state.showHeader && (
+                !props.items || !Array.isArray(props.items) || props.items.length === 0
+            )),
             contextKey: Math.floor(Math.random() * Date.now()),
         });
 
@@ -331,7 +326,7 @@ export default defineComponent<DataTableProps>({
             proxyState.selectIndex = [index];
         };
 
-        const onTheadClick = (field, index, event) => {
+        const onTheadClick = (field) => {
             if (props.sortable && field.sortable) {
                 const clickedKey = field.sortKey || field.name;
                 let sortBy = proxyState.sortBy;
@@ -384,20 +379,18 @@ export default defineComponent<DataTableProps>({
         };
 
 
-        watch(() => proxyState.selectIndex, () => {
-            if (props.items && props.items.length && props.items.length === (proxyState.selectIndex as any[]).length) {
-                state.allState = true;
-            } else {
-                state.allState = false;
-            }
+        watch(() => proxyState.selectIndex, (selectIndex) => {
+            state.allState = !!(props.items
+                && props.items.length
+                && props.items.length === selectIndex.length);
         }, { immediate: true });
 
         watch(() => props.loading, (value) => {
-            if (typeof value !== 'boolean') {
-                state.showHeader = true;
-                state.showLoading = false;
-                return;
-            }
+            // if (typeof value !== 'boolean') {
+            //     state.showHeader = true;
+            //     state.showLoading = false;
+            //     return;
+            // }
 
             if (props.useCursorLoading && value) {
                 document.body.style.cursor = 'progress';

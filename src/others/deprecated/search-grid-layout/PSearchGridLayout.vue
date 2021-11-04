@@ -53,7 +53,7 @@ import PQuerySearch from '@/inputs/search/query-search/PQuerySearch.vue';
 import PQuerySearchTags from '@/inputs/search/query-search-tags/PQuerySearchTags.vue';
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import { forEach } from 'lodash';
 import { QueryItem } from '@/inputs/search/query-search/type';
@@ -126,7 +126,7 @@ export default {
             default: () => [24, 36, 48],
         },
     },
-    setup(props: SearchGridLayoutProps, { slots, emit, listeners }) {
+    setup(props: SearchGridLayoutProps, { slots, emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const proxyState = reactive({

@@ -1,7 +1,7 @@
 import faker from 'faker';
 import { range } from 'lodash';
 
-export const getHandler = items => async (inputText, keyItem) => {
+export const getHandler = items => async (inputText) => {
     const allItems = items.map(d => ({ name: d, label: d }));
     let res = [...allItems];
     const regex = RegExp(inputText, 'i');
@@ -19,7 +19,7 @@ export const getHandler = items => async (inputText, keyItem) => {
 };
 
 export const getValueHandlerMap = () => ({
-    id: getHandler(range(10).map((d, i) => faker.random.uuid())),
+    id: getHandler(range(10).map(() => faker.random.uuid())),
     name: getHandler(range(10).map(() => faker.name.findName())),
     group: getHandler(range(10).map(() => faker.name.jobArea())),
 });

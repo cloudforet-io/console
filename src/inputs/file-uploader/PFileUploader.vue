@@ -60,7 +60,7 @@ export default {
         });
 
         const serverOption = {
-            process: (fieldName, file, metadata, load, error, progress, abort, transfer, options) => {
+            process: (fieldName, file, metadata, load, error, progress, abort) => {
                 const formData = new FormData();
                 formData.append(fieldName, file, file.name);
 

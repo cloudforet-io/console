@@ -39,12 +39,12 @@
                    @keydown.up="onKeyUp(index)"
                    @keydown.down="onKeyDown(index)"
                 >
-                    <p-i v-if="showRadioIcon && !multiSelectable"
-                         :name="selectedNames.includes(item.name) ? 'ic_radio--checked' : 'ic_radio'"
-                         class="select-marker"
-                    />
                     <p-i v-if="multiSelectable"
                          :name="selectedNames.includes(item.name) ? 'ic_checkbox--checked' : 'ic_checkbox'"
+                         class="select-marker"
+                    />
+                    <p-i v-else-if="showRadioIcon"
+                         :name="selectedNames.includes(item.name) ? 'ic_radio--checked' : 'ic_radio'"
                          class="select-marker"
                     />
                     <slot name="item--format" v-bind="{...$props, uuid, item, index}">
@@ -73,17 +73,22 @@
 
 <script lang="ts">
 import {
-    computed, defineComponent, reactive, toRefs, ComponentRenderProxy, getCurrentInstance,
+    computed, defineComponent, reactive, toRefs, ComponentRenderProxy, getCurrentInstance, watch,
 } from '@vue/composition-api';
 
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PI from '@/foundation/icons/PI.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 
-import { ContextMenuProps, CONTEXT_MENU_THEME } from '@/inputs/context-menu/type';
+import { ContextMenuProps, CONTEXT_MENU_THEME, MenuItem } from '@/inputs/context-menu/type';
 import { i18n } from '@/translations';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 
+const filterSelectedItems = (selected: MenuItem[], menu: MenuItem[]) => {
+    const filtered = selected.filter(d => menu.find(item => item.name === d.name));
+    if (filtered.length === selected.length) return selected;
+    return filtered;
+};
 
 export default defineComponent<ContextMenuProps>({
     name: 'PContextMenu',
@@ -133,6 +138,10 @@ export default defineComponent<ContextMenuProps>({
             type: Boolean,
             default: false,
         },
+        strictSelectMode: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props: ContextMenuProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -145,6 +154,8 @@ export default defineComponent<ContextMenuProps>({
                 && state.proxySelected.every(item => state.selectableMenuItems.find(selected => selected.name === item.name))),
             selectedCountInFilteredMenu: computed(() => props.menu.filter(d => state.selectedNames.includes(d.name)).length),
             uuid: computed(() => {
+                // CAUTION: Do not delete code belows. This is for detecting menu changes.
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const menu = props.menu;
                 return `${Math.random()}`.slice(2);
             }),
@@ -227,6 +238,14 @@ export default defineComponent<ContextMenuProps>({
                 state.proxySelected = state.selectableMenuItems;
             }
         };
+
+        watch(() => state.proxySelected, (proxySelected) => {
+            if (!proxySelected.length) return;
+
+            if (props.strictSelectMode) {
+                state.proxySelected = filterSelectedItems(proxySelected, state.selectableMenuItems);
+            }
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

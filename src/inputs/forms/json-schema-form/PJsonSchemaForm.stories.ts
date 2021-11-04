@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import PJsonSchemaForm from '@/inputs/forms/json-schema-form/PJsonSchemaForm.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 import {
@@ -86,7 +85,7 @@ export const jsonDefaultCase = () => ({
         />
         <pre>{{ model }}</pre>
     </div>`,
-    setup(props, context) {
+    setup() {
         const state = reactive({
             schema: defaultSchema,
             model: {},

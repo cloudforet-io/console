@@ -65,7 +65,7 @@ export default {
             default: undefined,
         },
     },
-    setup(props: ItemDynamicLayoutProps, { emit }) {
+    setup(props: ItemDynamicLayoutProps) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
@@ -73,7 +73,7 @@ export default {
             fields: computed<DefinitionField[]>(() => {
                 if (!props.options.fields) return [];
                 const locale = vm.$i18n.locale;
-                return props.options.fields.map((d, i) => {
+                return props.options.fields.map((d) => {
                     const res = {
                         label: d.options?.translation_id ? vm.$t(d.options.translation_id as string, locale) : d.name,
                         name: d.key,

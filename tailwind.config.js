@@ -5,6 +5,7 @@ const plugin = require('tailwindcss/plugin');
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const defaultTheme = require('tailwindcss/defaultTheme');
 const colors = require('./src/styles/colors').tailwindColors;
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const screens = require('./src/styles/screens');
 
 const rawSize = Array(32)

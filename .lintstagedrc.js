@@ -1,4 +1,4 @@
 module.exports = {
-    "src/**/*.{ts,tsx,js,vue}": ["eslint --fix --max-warnings 68"],
+    "src/**/*.{ts,tsx,js,vue}": ["eslint --fix"],
     "src/**/*.{css,vue,pcss,scss}": ["stylelint --fix"]
 }

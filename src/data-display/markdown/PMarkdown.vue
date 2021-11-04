@@ -1,4 +1,5 @@
 <template>
+    <!-- eslint-disable -->
     <div class="p-markdown" v-html="md" />
 </template>
 

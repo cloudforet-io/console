@@ -67,7 +67,7 @@ export default {
             default: '',
         },
     },
-    setup(props: GridLayoutProps, context) {
+    setup(props: GridLayoutProps) {
         const state = reactive({
             containerStyle: computed(() => ({
                 display: 'grid',

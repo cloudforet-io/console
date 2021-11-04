@@ -32,7 +32,7 @@ export const defaultCase = () => ({
             <canvas ref="chartRef" style="height: 100%; width: 100%;" />
         </p-chart-loader>
     </div>`,
-    setup(props, context) {
+    setup(props) {
         const state = reactive({
             chartRef: null,
         });

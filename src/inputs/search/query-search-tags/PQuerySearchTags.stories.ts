@@ -38,7 +38,7 @@ export const querySearchTags = () => ({
                               v-on="actions"
             ></PQuerySearchTags>
         </div>`,
-    setup(props, context) {
+    setup() {
         const state = reactive({
             tags: [
                 { key: { label: 'ID', name: 'id' }, value: { label: 'Hello', name: 'hello' }, operator: '' },
@@ -103,7 +103,7 @@ export const slotCase = () => ({
                 </template>
             </PQuerySearchTags>
         </div>`,
-    setup(props, context) {
+    setup() {
         const state = reactive({
             tags: [
                 { key: { label: 'ID', name: 'id' }, value: { label: 'Hello', name: 'hello' }, operator: '' },

@@ -28,7 +28,7 @@
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import {
     ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs,
+    computed, getCurrentInstance, reactive,
 } from '@vue/composition-api';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 

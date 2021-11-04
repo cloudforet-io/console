@@ -1,7 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
 import { BALLOON_TAB_POSITION, BALLOON_TAB_SIZE, BALLOON_TAB_STYLE_TYPE } from '@/navigation/tabs/ballon-tab/config';
-import { reactive, toRefs } from '@vue/composition-api';
-import PButton from '@/inputs/buttons/button/PButton.vue';
 
 export const getBalloonTabArgTypes = (): ArgTypes => ({
     /* props */

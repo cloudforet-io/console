@@ -56,8 +56,8 @@ export default {
         theme: {
             type: String,
             default: 'primary-dark',
-            validator(theme) {
-                return ['primary-dark', 'transparent'];
+            validator(theme: any) {
+                return ['primary-dark', 'transparent'].includes(theme);
             },
         },
     },
