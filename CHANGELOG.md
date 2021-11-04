@@ -1,3 +1,10 @@
+# [1.1.0-beta.161](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.160...v1.1.0-beta.161) (2021-11-04)
+
+
+### Bug Fixes
+
+* update search dropdown interactions and add strict select mode ([#727](https://github.com/spaceone-dev/spaceone-design-system/issues/727)) ([6d13920](https://github.com/spaceone-dev/spaceone-design-system/commit/6d1392030adc52904faacd03e48d1adb98f7bf85))
+
 # [1.1.0-beta.160](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.159...v1.1.0-beta.160) (2021-11-03)
 
 
