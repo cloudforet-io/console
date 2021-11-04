@@ -1,3 +1,10 @@
+# [1.1.0-beta.163](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.162...v1.1.0-beta.163) (2021-11-04)
+
+
+### Bug Fixes
+
+* add strict select mode to context menu ([#729](https://github.com/spaceone-dev/spaceone-design-system/issues/729)) ([108c01f](https://github.com/spaceone-dev/spaceone-design-system/commit/108c01f6954a5326bea7360b97d8b463880689a3))
+
 # [1.1.0-beta.162](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.161...v1.1.0-beta.162) (2021-11-04)
 
 
