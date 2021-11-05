@@ -33,6 +33,76 @@ export const IDENTITY_ROUTE = Object.freeze({
     },
 });
 
+export const userRoute = {
+    path: 'user',
+    meta: {
+        label: 'User',
+    },
+    component: { template: '<router-view />' },
+    children: [
+        {
+            path: '/',
+            name: IDENTITY_ROUTE.USER._NAME,
+            component: UserPage,
+            children: [
+                {
+                    path: 'user-management',
+                    name: IDENTITY_ROUTE.USER.MANAGEMENT._NAME,
+                    component: UserManagementPage,
+                },
+                {
+                    path: 'account',
+                    name: IDENTITY_ROUTE.USER.ACCOUNT._NAME,
+                    component: UserAccountPage,
+                },
+                {
+                    path: 'api-key',
+                    name: IDENTITY_ROUTE.USER.API_KEY._NAME,
+                    component: UserAPIKeyPage,
+                },
+                {
+                    path: 'notification',
+                    name: IDENTITY_ROUTE.USER.NOTIFICATION._NAME,
+                    component: UserNotificationPage,
+                },
+            ],
+        },
+        // TO BE
+        // pages outside of vertical page layout
+        // {
+        //     path: 'user-management/notification/:userId',
+        //     name: IDENTITY_ROUTE.USER.MANAGEMENT._NAME,
+        //     component: ManageUserNotificationPage,
+        // },
+        // {
+        //     path: 'user-management/notification/:userId/:protocol/:protocolId',
+        //     name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD._NAME,
+        //     component: NotificationAddPage,
+        //     props: true,
+        // },
+        // {
+        //     path: 'notification/:protocol/:protocolId',
+        //     name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD._NAME,
+        //     component: NotificationAddPage,
+        //     props: true,
+        // },
+
+        // AS IS
+        {
+            path: 'notification/:userId',
+            name: IDENTITY_ROUTE.USER.NOTIFICATION.MANAGE._NAME,
+            component: ManageUserNotificationPage,
+            props: true,
+        },
+        {
+            path: 'notification/:protocol/:protocolId/:userId',
+            name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD._NAME,
+            component: NotificationAddPage,
+            props: true,
+        },
+    ],
+} as RouteConfig;
+
 export default {
     path: 'identity',
     name: IDENTITY_ROUTE._NAME,
@@ -76,74 +146,6 @@ export default {
                 },
             ],
         },
-        {
-            path: 'user',
-            meta: {
-                label: 'User',
-            },
-            component: { template: '<router-view />' },
-            children: [
-                {
-                    path: '/',
-                    name: IDENTITY_ROUTE.USER._NAME,
-                    component: UserPage,
-                    children: [
-                        {
-                            path: 'user-management',
-                            name: IDENTITY_ROUTE.USER.MANAGEMENT._NAME,
-                            component: UserManagementPage,
-                        },
-                        {
-                            path: 'account',
-                            name: IDENTITY_ROUTE.USER.ACCOUNT._NAME,
-                            component: UserAccountPage,
-                        },
-                        {
-                            path: 'api-key',
-                            name: IDENTITY_ROUTE.USER.API_KEY._NAME,
-                            component: UserAPIKeyPage,
-                        },
-                        {
-                            path: 'notification',
-                            name: IDENTITY_ROUTE.USER.NOTIFICATION._NAME,
-                            component: UserNotificationPage,
-                        },
-                    ],
-                },
-                // TO BE
-                // pages outside of vertical page layout
-                // {
-                //     path: 'user-management/notification/:userId',
-                //     name: IDENTITY_ROUTE.USER.MANAGEMENT._NAME,
-                //     component: ManageUserNotificationPage,
-                // },
-                // {
-                //     path: 'user-management/notification/:userId/:protocol/:protocolId',
-                //     name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD._NAME,
-                //     component: NotificationAddPage,
-                //     props: true,
-                // },
-                // {
-                //     path: 'notification/:protocol/:protocolId',
-                //     name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD._NAME,
-                //     component: NotificationAddPage,
-                //     props: true,
-                // },
-
-                // AS IS
-                {
-                    path: 'notification/:userId',
-                    name: IDENTITY_ROUTE.USER.NOTIFICATION.MANAGE._NAME,
-                    component: ManageUserNotificationPage,
-                    props: true,
-                },
-                {
-                    path: 'notification/:protocol/:protocolId/:userId',
-                    name: IDENTITY_ROUTE.USER.NOTIFICATION.ADD._NAME,
-                    component: NotificationAddPage,
-                    props: true,
-                },
-            ],
-        },
+        userRoute,
     ],
 } as RouteConfig;

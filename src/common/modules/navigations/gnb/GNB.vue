@@ -25,12 +25,12 @@
                 <div v-if="menu.show !== false"
                      class="menu-button mr-4 lg:mr-8"
                      :class="[{
-                         opened: menu.subMenuList.length > 0 && openedMenu === menu.name,
+                         opened: menu.subMenuList && menu.subMenuList.length > 0 && openedMenu === menu.name,
                          selected: menu.name === selectedMenu,
                      }]"
                      @click.stop="toggleMenu(menu.name)"
                 >
-                    <span v-if="menu.subMenuList.length > 0">
+                    <span v-if="menu.subMenuList && menu.subMenuList.length > 0">
                         <span>{{ menu.label }}</span>
                         <p-i class="arrow-button"
                              :name="openedMenu === menu.name ? 'ic_arrow_top_sm' : 'ic_arrow_bottom_sm'"
@@ -44,7 +44,7 @@
                     >
                         <span>{{ menu.label }}</span>
                     </component>
-                    <div v-if="openedMenu === menu.name && menu.subMenuList.length > 0"
+                    <div v-if="openedMenu === menu.name && menu.subMenuList && menu.subMenuList.length > 0"
                          v-click-outside="hideMenu"
                          class="sub-menu-wrapper"
                     >
@@ -74,7 +74,7 @@
 import vClickOutside from 'v-click-outside';
 import { TranslateResult } from 'vue-i18n';
 import { includes, isEmpty } from 'lodash';
-import { Location } from 'vue-router';
+import VueRouter, { Location } from 'vue-router';
 
 import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
@@ -111,22 +111,33 @@ const PARENT_CATEGORY = {
 };
 type PARENT_CATEGORY = typeof PARENT_CATEGORY[keyof typeof PARENT_CATEGORY]
 
-interface SubMenu {
+interface Menu {
+    name?: PARENT_CATEGORY;
     label: TranslateResult;
-    to: Location['query'];
-    show: boolean;
+    to: Location;
+    show?: boolean;
     isNew?: boolean;
     isBeta?: boolean;
-}
-interface Menu {
-    name: PARENT_CATEGORY;
-    label: TranslateResult;
-    to: Location['query'];
-    show?: boolean;
-    subMenuList: SubMenu[];
+    subMenuList?: Menu[];
 }
 
 const ALLOWED_MENUS_FOR_ALL_USERS = ['support', 'account', 'notifications'];
+
+const filterMenuByRoute = (menuList: Menu[], router: VueRouter): Menu[] => menuList.reduce((results, _menu) => {
+    const menu = { ..._menu };
+    if (menu.subMenuList) {
+        menu.subMenuList = filterMenuByRoute(menu.subMenuList, router);
+        if (menu.subMenuList.length) {
+            results.push(menu);
+            return results;
+        }
+    }
+
+    const link = router.resolve(menu.to);
+    if (link?.href !== '/') results.push(menu);
+
+    return results;
+}, [] as Menu[]);
 
 export default {
     name: 'GNB',
@@ -142,6 +153,7 @@ export default {
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
+
         const state = reactive({
             images: computed(() => {
                 const domainImage = config.get('DOMAIN_IMAGE');
@@ -162,7 +174,7 @@ export default {
             isAdmin: computed((() => store.getters['user/isAdmin'])),
             hasPermission: computed((() => store.getters['user/hasPermission'])),
             dashboardLink: computed(() => (state.hasPermission ? { name: DASHBOARD_ROUTE._NAME } : {})),
-            menuList: computed<Menu[]>(() => [
+            allMenuList: computed<Menu[]>(() => [
                 {
                     name: PARENT_CATEGORY.project,
                     label: i18n.t('MENU.PROJECT.PROJECT'),
@@ -243,6 +255,7 @@ export default {
                     ],
                 },
             ]),
+            menuList: computed<Menu[]>(() => filterMenuByRoute(state.allMenuList, vm.$router)),
             selectedMenu: computed(() => {
                 const pathRegex = vm.$route.path.match(/\/(\w+)/);
                 return pathRegex ? pathRegex[1] : null;
