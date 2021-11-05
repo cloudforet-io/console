@@ -1,89 +1,50 @@
 <template>
-    <div class="gnb" :class="{'disabled': !hasPermission}">
+    <div class="gnb">
         <div class="left-part">
             <div class="site-map-wrapper">
                 <site-map :menu-list="menuList" :visible.sync="showSiteMap" :disabled="!hasPermission" />
             </div>
-            <component :is="hasPermission ? 'router-link' : 'div'"
-                       class="inline-block" :to="dashboardLink"
-            >
-                <div class="logo-wrapper mr-4 lg:mr-10">
-                    <template v-if="images">
-                        <img class="logo-character" :src="images.ciLogo">
-                        <img class="logo-text" :src="images.ciText">
-                    </template>
-                    <template v-else>
-                        <img class="logo-character" src="@/assets/images/brand/brand_logo.png">
-                        <img class="logo-text" src="@/assets/images/brand/SpaceONE_logoTypeA.svg">
-                    </template>
-                </div>
-            </component>
-            <div v-for="(menu, idx) in menuList"
-                 :key="idx"
-                 class="menu-wrapper"
-            >
-                <div v-if="menu.show !== false"
-                     class="menu-button mr-4 lg:mr-8"
-                     :class="[{
-                         opened: menu.subMenuList && menu.subMenuList.length > 0 && openedMenu === menu.name,
-                         selected: menu.name === selectedMenu,
-                     }]"
-                     @click.stop="toggleMenu(menu.name)"
-                >
-                    <span v-if="menu.subMenuList && menu.subMenuList.length > 0">
-                        <span>{{ menu.label }}</span>
-                        <p-i class="arrow-button"
-                             :name="openedMenu === menu.name ? 'ic_arrow_top_sm' : 'ic_arrow_bottom_sm'"
-                             width="0.5rem" height="0.5rem"
-                             color="inherit transparent"
-                        />
-                    </span>
-                    <component :is="hasPermission ? 'router-link' : 'span'"
-                               v-else
-                               :to="menu.to" class="block"
-                    >
-                        <span>{{ menu.label }}</span>
-                    </component>
-                    <div v-if="openedMenu === menu.name && menu.subMenuList && menu.subMenuList.length > 0"
-                         v-click-outside="hideMenu"
-                         class="sub-menu-wrapper"
-                    >
-                        <template v-for="(subMenu, index) in menu.subMenuList" @click.native="hideMenu">
-                            <router-link v-if="subMenu.show" :key="index" :to="subMenu.to">
-                                <div class="sub-menu">
-                                    <span>{{ subMenu.label }}</span>
-                                    <beta-mark v-if="subMenu.isBeta" />
-                                    <new-mark v-if="subMenu.isNew" />
-                                </div>
-                            </router-link>
-                        </template>
-                    </div>
-                </div>
-            </div>
-        </div>
 
-        <right-side-menu class="right-part"
-                         :opened-menu="openedMenu"
-                         @toggle-menu="toggleMenu"
-                         @hide-menu="hideMenu"
-        />
+            <g-n-b-logo :to="dashboardLink" />
+
+            <g-n-b-menu v-for="(menu, idx) in menuList"
+                        :key="idx"
+                        :show="menu.show"
+                        :name="menu.name"
+                        :label="menu.label"
+                        :to="menu.to"
+                        :sub-menu-list="menu.subMenuList"
+                        :has-permission="hasPermission"
+                        :is-opened="openedMenu === menu.name"
+                        :is-selected="selectedMenu === menu.name"
+                        class="mr-4 lg:mr-8"
+                        @toggle="toggleMenu"
+                        @hide="hideMenu"
+            />
+
+            <right-side-menu class="right-part"
+                             :opened-menu="openedMenu"
+                             @toggle-menu="toggleMenu"
+                             @hide-menu="hideMenu"
+            />
+        </div>
     </div>
 </template>
 
 <script lang="ts">
 import vClickOutside from 'v-click-outside';
 import { TranslateResult } from 'vue-i18n';
-import { includes, isEmpty } from 'lodash';
+import { includes } from 'lodash';
 import VueRouter, { Location } from 'vue-router';
 
 import {
     reactive, toRefs, computed, getCurrentInstance, ComponentRenderProxy,
 } from '@vue/composition-api';
 
-import { PI } from '@spaceone/design-system';
-
 import SiteMap from '@/common/modules/navigations/gnb/modules/SiteMap.vue';
 import RightSideMenu from '@/common/modules/navigations/gnb/modules/RightSideMenu.vue';
+import GNBMenu from '@/common/modules/navigations/gnb/modules/gnb-menu/GNBMenu.vue';
+import GNBLogo from '@/common/modules/navigations/gnb/modules/GNBLogo.vue';
 
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import { PLUGIN_ROUTE } from '@/services/plugin/routes';
@@ -93,11 +54,9 @@ import { AUTOMATION_ROUTE } from '@/services/automation/routes';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import { PROJECT_ROUTE } from '@/services/project/routes';
 import { MONITORING_ROUTE } from '@/services/monitoring/routes';
+
 import { store } from '@/store';
 import { i18n } from '@/translations';
-import config from '@/lib/config';
-import BetaMark from '@/common/components/marks/BetaMark.vue';
-import NewMark from '@/common/components/marks/NewMark.vue';
 
 
 const PARENT_CATEGORY = {
@@ -142,11 +101,10 @@ const filterMenuByRoute = (menuList: Menu[], router: VueRouter): Menu[] => menuL
 export default {
     name: 'GNB',
     components: {
-        NewMark,
-        BetaMark,
+        GNBLogo,
+        GNBMenu,
         SiteMap,
         RightSideMenu,
-        PI,
     },
     directives: {
         clickOutside: vClickOutside.directive,
@@ -155,25 +113,14 @@ export default {
         const vm = getCurrentInstance() as ComponentRenderProxy;
 
         const state = reactive({
-            images: computed(() => {
-                const domainImage = config.get('DOMAIN_IMAGE');
-                if (!isEmpty(domainImage)) {
-                    return {
-                        ciLogo: config.get('DOMAIN_IMAGE.CI_LOGO'),
-                        ciText: config.get('DOMAIN_IMAGE.CI_TEXT'),
-                        signIn: config.get('DOMAIN_IMAGE.SIGN_IN'),
-                    };
-                }
-                return undefined;
-            }),
-            openedMenu: null,
+            openedMenu: '',
             showSiteMap: false,
             showPowerScheduler: computed(() => store.state.user.powerSchedulerState),
             showSpotAutomation: computed(() => store.state.user.spotAutomationState),
             showAutomation: computed(() => state.showPowerScheduler || state.showSpotAutomation),
             isAdmin: computed((() => store.getters['user/isAdmin'])),
             hasPermission: computed((() => store.getters['user/hasPermission'])),
-            dashboardLink: computed(() => (state.hasPermission ? { name: DASHBOARD_ROUTE._NAME } : {})),
+            dashboardLink: computed(() => (state.hasPermission ? { name: DASHBOARD_ROUTE._NAME } : undefined)),
             allMenuList: computed<Menu[]>(() => [
                 {
                     name: PARENT_CATEGORY.project,
@@ -264,13 +211,13 @@ export default {
 
         /* event */
         const hideMenu = () => {
-            state.openedMenu = null;
+            state.openedMenu = '';
         };
-        const toggleMenu = (menu) => {
-            if (state.openedMenu === menu) {
+        const toggleMenu = (menuName: string) => {
+            if (state.openedMenu === menuName) {
                 hideMenu();
-            } else if (state.hasPermission || includes(ALLOWED_MENUS_FOR_ALL_USERS, menu)) {
-                state.openedMenu = menu;
+            } else if (state.hasPermission || includes(ALLOWED_MENUS_FOR_ALL_USERS, menuName)) {
+                state.openedMenu = menuName;
                 state.showSiteMap = false;
             }
         };
@@ -298,109 +245,12 @@ export default {
             display: inline-block;
             margin: 0 1rem;
         }
-        .logo-wrapper {
-            display: inline-block;
-            .logo-character {
-                display: inline-block;
-                width: 1.875rem;
-                height: 1.875rem;
-            }
-            .logo-text {
-                display: none;
-                height: 0.875rem;
-                margin-left: 0.5rem;
-
-                @screen lg {
-                    display: inline-block;
-                }
-            }
-        }
     }
     .right-part {
         position: absolute;
         display: inline-flex;
         right: 0;
         padding-right: 1.5rem;
-    }
-    .menu-wrapper {
-        position: relative;
-        display: inline-block;
-
-        @screen tablet {
-            display: none;
-        }
-
-        .menu-button {
-            @apply text-gray-900;
-            font-size: 0.875rem;
-            cursor: pointer;
-            text-decoration: none;
-            text-transform: capitalize;
-            opacity: 0.5;
-
-            &.opened {
-                @apply text-primary;
-                opacity: 1;
-            }
-            &.selected {
-                opacity: 1;
-            }
-            &:hover {
-                @apply text-primary;
-                opacity: 1;
-            }
-
-            .arrow-button {
-                margin-left: 0.25rem;
-            }
-        }
-        .sub-menu-wrapper {
-            @apply bg-white border border-gray-200;
-            position: absolute;
-            top: 2.5rem;
-            left: -1.125rem;
-            min-width: 10rem;
-            box-shadow: 0 0 0.875rem rgba(0, 0, 0, 0.1);
-            border-radius: 0.125rem;
-            padding: 0.5rem;
-            margin: 3px 0;
-
-            .sub-menu {
-                @apply text-gray-900;
-                position: relative;
-                width: 100%;
-                height: 2rem;
-                font-size: 0.875rem;
-                line-height: 1rem;
-                text-decoration: none;
-                white-space: nowrap;
-                cursor: pointer;
-                border-radius: 0.25rem;
-                padding: 0.5rem;
-                &:hover, &:focus {
-                    @apply bg-primary4 text-primary;
-                }
-                &:active {
-                    @apply bg-white;
-                }
-            }
-        }
-    }
-
-    &.disabled {
-        .menu-button {
-            @apply text-gray-900;
-            cursor: not-allowed;
-            opacity: 0.2;
-
-            &.selected {
-                opacity: 0.2;
-            }
-            &:hover {
-                @apply text-gray-900;
-                opacity: 0.2;
-            }
-        }
     }
 }
 </style>
