@@ -139,7 +139,6 @@ export default {
                 showErrorMessage(
                     SpaceRouter.router.app.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_PROJECT_INVALID_TITLE'),
                     SpaceRouter.router.app.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_PROJECT_INVALID_DESC'),
-                    SpaceRouter.router.app.$root,
                 );
                 next({
                     name: AUTOMATION_ROUTE.POWER_SCHEDULER._NAME,
@@ -245,7 +244,6 @@ export default {
                     showErrorMessage(
                         vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_SCHEDULE_INVALID_TITLE'),
                         vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_SCHEDULE_INVALID_DESC'),
-                        root,
                     );
                 }
             } else {
@@ -256,7 +254,6 @@ export default {
                         showErrorMessage(
                             vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_SCHEDULE_INVALID_TITLE'),
                             vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_SCHEDULE_INVALID_DESC'),
-                            root,
                         );
                     }
                 } else state.selectedIndexes = [idx];

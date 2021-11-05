@@ -73,7 +73,7 @@ export default {
                 showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_CREATE_POLICY'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_CREATE_POLICY'), e, root);
+                showErrorMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_CREATE_POLICY'), e);
             } finally {
                 state.proxyVisible = false;
             }
@@ -90,7 +90,7 @@ export default {
                 showSuccessMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_S_UPDATE_POLICY'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_UPDATE_POLICY'), e, root);
+                showErrorMessage(i18n.t('MONITORING.ALERT.ESCALATION_POLICY.FORM.ALT_E_UPDATE_POLICY'), e);
             } finally {
                 state.proxyVisible = false;
             }

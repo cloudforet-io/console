@@ -83,7 +83,7 @@ export default {
             categoryAxis.renderer.minGridDistance = 30;
 
             /* Create value axis */
-            const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+            // const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
 
             /* Create series - Column */
             const columnSeries = chart.series.push(new am4charts.ColumnSeries());

@@ -274,7 +274,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.ALT_S_RECOVERY_TITLE'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.ALT_E_RECOVERY_TITLE'), e, vm.$root);
+                showErrorMessage(vm.$t('MANAGEMENT.SUPERVISOR_PLUGIN.MAIN.ALT_E_RECOVERY_TITLE'), e);
             }
         };
 

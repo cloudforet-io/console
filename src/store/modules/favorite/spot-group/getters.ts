@@ -2,7 +2,7 @@ import { FavoriteItem, FavoriteState } from '@/store/modules/favorite/type';
 import { Getter } from 'vuex';
 import { sortBy } from 'lodash';
 
-export const items: Getter<FavoriteState, any> = (state: FavoriteState, getters, rootState): FavoriteItem[] => {
+export const items: Getter<FavoriteState, any> = (state: FavoriteState, rootState): FavoriteItem[] => {
     const resourceItems = rootState.resource.spotGroup.items;
     return state.items.map((d) => {
         const resource = resourceItems[d.id];
@@ -21,6 +21,6 @@ export const itemMap: Getter<FavoriteState, {}> = (state: FavoriteState, getters
     return res;
 };
 
-export const sortedItems: Getter<FavoriteState, any> = (state: FavoriteState, getters, rootState): FavoriteItem[] => sortBy(
+export const sortedItems: Getter<FavoriteState, any> = (state: FavoriteState, getters): FavoriteItem[] => sortBy(
     getters.items, d => d.name,
 );

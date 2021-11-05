@@ -50,7 +50,7 @@ export const useNotificationItem = (obj: NotificationItemState) => {
             vm.$emit('edit', undefined);
         } catch (e) {
             console.error(e);
-            showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_USER_CHANNEL'), e, vm.$root);
+            showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_USER_CHANNEL'), e);
         }
     };
 
@@ -70,7 +70,7 @@ export const useNotificationItem = (obj: NotificationItemState) => {
             vm.$emit('edit', undefined);
         } catch (e) {
             console.error(e);
-            showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'), e, vm.$root);
+            showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_PROJECT_CHANNEL'), e);
         }
     };
 

@@ -4,11 +4,11 @@ import { ProjectGroupTreeItem, ProjectItemResp } from '@/services/project/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
-export const initRoot: Action<ProjectPageState, any> = ({ dispatch, commit }, root) => {
+export const initRoot: Action<ProjectPageState, any> = ({ commit }, root) => {
     commit('setRootNode', root);
 };
 
-export const selectNode: Action<ProjectPageState, any> = async ({ state, commit, dispatch }, groupId?: string) => {
+export const selectNode: Action<ProjectPageState, any> = async ({ state }, groupId?: string) => {
     if (!groupId) {
         if (state.rootNode) {
             state.rootNode.resetSelect();
@@ -40,13 +40,13 @@ export const openProjectGroupCreateForm: Action<ProjectPageState, any> = ({ comm
     commit('setProjectGroupFormVisible', true);
 };
 
-export const openProjectGroupUpdateForm: Action<ProjectPageState, any> = ({ state, commit }, target: ProjectGroupTreeItem = {}) => {
+export const openProjectGroupUpdateForm: Action<ProjectPageState, any> = ({ commit }, target: ProjectGroupTreeItem = {}) => {
     commit('setActionTargetItem', target);
     commit('setProjectGroupFormUpdateMode', true);
     commit('setProjectGroupFormVisible', true);
 };
 
-export const openProjectGroupDeleteCheckModal: Action<ProjectPageState, any> = ({ state, commit }, target: ProjectGroupTreeItem = {}) => {
+export const openProjectGroupDeleteCheckModal: Action<ProjectPageState, any> = ({ commit }, target: ProjectGroupTreeItem = {}) => {
     commit('setActionTargetItem', target);
     commit('setProjectGroupDeleteCheckModalVisible', true);
 };

@@ -439,7 +439,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_DELETE_ACCOUNT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_DELETE_ACCOUNT'), e, vm.$root);
+                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_DELETE_ACCOUNT'), e);
             } finally {
                 doubleCheckModalState.visible = false;
                 await listServiceAccountData();
@@ -473,7 +473,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_RELEASE_PROJECT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_RELEASE_PROJECT'), e, vm.$root);
+                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_RELEASE_PROJECT'), e);
             } finally {
                 await listServiceAccountData();
             }
@@ -492,7 +492,7 @@ export default {
                     });
                     showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_S_CHANGE_PROJECT'), '', vm.$root);
                 } catch (e) {
-                    showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_CHANGE_PROJECT'), e, vm.$root);
+                    showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.MAIN.ALT_E_CHANGE_PROJECT'), e);
                 } finally {
                     await store.dispatch('resource/project/load');
                     await listServiceAccountData();

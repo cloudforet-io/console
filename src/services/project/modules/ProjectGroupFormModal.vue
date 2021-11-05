@@ -113,7 +113,7 @@ export default {
                 await store.dispatch('resource/projectGroup/load');
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT_GROUP'), '', root);
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'), e, root);
+                showErrorMessage(i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT_GROUP'), e);
                 throw new Error(e);
             }
         };
@@ -123,7 +123,7 @@ export default {
                 await store.dispatch('service/project/updateProjectGroup', item);
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', root);
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e, root);
+                showErrorMessage(i18n.t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e);
                 throw new Error(e);
             }
         };

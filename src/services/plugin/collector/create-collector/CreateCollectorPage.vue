@@ -194,7 +194,7 @@ export default {
                 state.supportedSchema = res.capability.supported_schema;
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_GET_PLUGIN_TITLE'), e, vm.$root);
+                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_GET_PLUGIN_TITLE'), e);
             } finally {
                 state.loading = false;
             }
@@ -223,7 +223,7 @@ export default {
                 formState.inputModel.version = res.results[0];
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'), e, vm.$root);
+                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_GET_VERSION_TITLE'), e);
             }
         };
 
@@ -265,7 +265,7 @@ export default {
                 await vm.$router.push({ name: PLUGIN_ROUTE._NAME });
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_CREATE_TITLE'), e, vm.$root);
+                showErrorMessage(vm.$t('PLUGIN.COLLECTOR.CREATE.ALT_E_CREATE_TITLE'), e);
             } finally {
                 tabState.loading = false;
             }

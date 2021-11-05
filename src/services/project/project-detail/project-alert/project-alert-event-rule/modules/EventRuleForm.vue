@@ -152,7 +152,7 @@ export default {
                 showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_CREATE_EVENT_RULE'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_CREATE_EVENT_RULE'), e, root);
+                showErrorMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_CREATE_EVENT_RULE'), e);
             }
         };
         const updateEventRule = async () => {
@@ -167,7 +167,7 @@ export default {
                 showSuccessMessage(i18n.t('PROJECT.EVENT_RULE.ALT_S_UPDATE_EVENT_RULE'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_UPDATE_EVENT_RULE'), e, root);
+                showErrorMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_UPDATE_EVENT_RULE'), e);
             }
         };
 

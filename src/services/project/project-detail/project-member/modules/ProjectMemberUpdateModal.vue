@@ -262,8 +262,8 @@ export default {
                     if (props.isProjectGroup) await editProjectGroupMember(labels);
                     else await editProjectMember(labels);
                 } catch (e) {
-                    if (props.isProjectGroup) showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_UPDATE_GROUP_MEMBER'), e, root);
-                    else showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'), e, root);
+                    if (props.isProjectGroup) showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_UPDATE_GROUP_MEMBER'), e);
+                    else showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_UPDATE_MEMBER'), e);
                 } finally {
                     emit('confirm');
                     proxyVisible.value = false;

@@ -262,7 +262,7 @@ export default {
                 await listEventRule();
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_DELETE_EVENT_RULE'), '', root);
+                showErrorMessage(i18n.t('PROJECT.EVENT_RULE.ALT_E_DELETE_EVENT_RULE'), e);
             } finally {
                 checkDeleteState.visible = false;
                 state.selectedOrder = undefined;

@@ -136,7 +136,7 @@ export default {
         const onSave = async () => {
             if (!state.isTagsValid) return;
             if (!api.value) {
-                showErrorMessage(vm.$t('COMMON.TAGS.ALT_E_UPDATE'), new Error(), vm.$root);
+                showErrorMessage(vm.$t('COMMON.TAGS.ALT_E_UPDATE'), new Error());
                 return;
             }
 
@@ -149,7 +149,7 @@ export default {
                 showSuccessMessage(vm.$t('COMMON.TAGS.ALT_S_UPDATE'), '', vm.$root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('COMMON.TAGS.ALT_E_UPDATE'), e, vm.$root);
+                showErrorMessage(vm.$t('COMMON.TAGS.ALT_E_UPDATE'), e);
             } finally {
                 state.loading = false;
             }

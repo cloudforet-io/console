@@ -347,7 +347,7 @@ export default {
                 });
                 state.serviceAccountId = res.service_account_id;
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'), e, vm.$root);
+                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'), e);
                 console.error(e);
             }
         };
@@ -379,7 +379,7 @@ export default {
                         await createSecretWithJson(json);
                     } catch (e) {
                         console.error(e);
-                        showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'), e, vm.$root);
+                        showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'), e);
                         await deleteServiceAccount();
                         return;
                     }
@@ -388,7 +388,7 @@ export default {
                 vm.$router.back();
                 showSuccessMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_S_CREATE_ACCOUNT_TITLE'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'), e, vm.$root);
+                showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'), e);
                 await deleteServiceAccount();
             }
         };
@@ -396,7 +396,7 @@ export default {
         const onClickSave = async () => {
             if (!formState.isValid) {
                 showErrorMessage(vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_TITLE'),
-                    vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'), vm.$root);
+                    vm.$t('IDENTITY.SERVICE_ACCOUNT.ADD.ALT_E_CREATE_ACCOUNT_FORM_INVALID'));
                 return;
             }
             if (formState.isTagsValid) {

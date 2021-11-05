@@ -16,7 +16,7 @@ type FormatterMap = Record<ReferenceType, FieldFormatter>
  *
  */
 const formatterMap: FormatterMap = {
-    'identity.Provider': data => store.getters['resource/provider/fieldItems'],
+    'identity.Provider': () => store.getters['resource/provider/fieldItems'],
     'inventory.Server': (data, reference) => ({
         data,
         link: SpaceRouter.router.resolve(referenceRouter(data, reference)).href,

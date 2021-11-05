@@ -625,7 +625,7 @@ export default {
                     await api(params);
                     showSuccessMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_S_CHANGE_PROJECT'), '', root);
                 } catch (e) {
-                    showErrorMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_E_CHANGE_PROJECT'), e, root);
+                    showErrorMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_E_CHANGE_PROJECT'), e);
                 } finally {
                     await store.dispatch('resource/project/load');
                     const { items, totalCount } = await getCloudServiceTableData();
@@ -638,7 +638,7 @@ export default {
                     await api(params);
                     showSuccessMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_S_RELEASE_PROJECT_TITLE'), '', root);
                 } catch (e) {
-                    showErrorMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_E_RELEASE_PROJECT_TITLE'), e, root);
+                    showErrorMessage(vm.$t('INVENTORY.CLOUD_SERVICE.PAGE.ALT_E_RELEASE_PROJECT_TITLE'), e);
                 } finally {
                     const { items, totalCount } = await getCloudServiceTableData();
                     tableState.items = items;
@@ -707,7 +707,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('INVENTORY.CLOUD_SERVICE.MAIN.ALT_S_CHECK_MODAL', { action: checkTableModalState.title }), '', root);
             } catch (e) {
-                showErrorMessage(vm.$t('INVENTORY.CLOUD_SERVICE.MAIN.ALT_E_CHECK_MODAL', { action: checkTableModalState.title }), e, root);
+                showErrorMessage(vm.$t('INVENTORY.CLOUD_SERVICE.MAIN.ALT_E_CHECK_MODAL', { action: checkTableModalState.title }), e);
             } finally {
                 typeOptionState.selectIndex = [];
                 resetCheckTableModalState();

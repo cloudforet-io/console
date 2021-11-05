@@ -165,7 +165,7 @@ export default {
                 state.changedEscalationPolicyId = res.escalation_policy_id;
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_ESCALATION_POLICY'), e, root);
+                showErrorMessage(vm.$t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_ESCALATION_POLICY'), e);
             }
         };
         const updateEscalationPolicy = async () => {
@@ -195,7 +195,7 @@ export default {
                 showSuccessMessage(vm.$t('PROJECT.DETAIL.ALERT.ALT_S_CHANGE_ESCALATION_POLICY'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_ESCALATION_POLICY'), e, root);
+                showErrorMessage(vm.$t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_ESCALATION_POLICY'), e);
             } finally {
                 state.proxyVisible = false;
             }

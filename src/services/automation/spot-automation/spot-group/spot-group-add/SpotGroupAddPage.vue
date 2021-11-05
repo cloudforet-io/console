@@ -180,7 +180,7 @@ export default {
                 await vm.$router.push({ name: AUTOMATION_ROUTE.SPOT_AUTOMATION.SPOT_GROUP._NAME });
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.ALT_E_CREATE_SPOT_GROUP'), e, vm.$root);
+                showErrorMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.ADD.ALT_E_CREATE_SPOT_GROUP'), e);
             } finally {
                 state.loading = false;
                 state.visibleCheckModal = false;

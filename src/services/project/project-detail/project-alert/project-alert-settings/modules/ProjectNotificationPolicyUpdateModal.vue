@@ -77,7 +77,7 @@ export default {
                 emit('confirm');
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_NOTIFICATION_POLICY'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_NOTIFICATION_POLICY'), e);
             } finally {
                 state.proxyVisible = false;
             }

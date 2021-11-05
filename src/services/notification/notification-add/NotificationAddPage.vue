@@ -139,7 +139,7 @@ export default {
                 showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_USER_CHANNEL'), '', context.root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_USER_CHANNEL'), e, context.root);
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_USER_CHANNEL'), e);
             }
         };
 
@@ -160,7 +160,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_S_CREATE_PROJECT_CHANNEL'), '', context.root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_PROJECT_CHANNEL'), e, context.root);
+                showErrorMessage(vm.$t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_CREATE_PROJECT_CHANNEL'), e);
             }
         };
 

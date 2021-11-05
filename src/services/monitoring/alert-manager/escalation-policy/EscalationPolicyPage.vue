@@ -201,7 +201,7 @@ export default {
                 await listEscalationPolicies();
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_E_SET_AS_DEFAULT'), e, root);
+                showErrorMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_E_SET_AS_DEFAULT'), e);
             }
         };
         const deleteEscalationPolicy = async () => {
@@ -213,7 +213,7 @@ export default {
                 await listEscalationPolicies();
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_E_DELETE_POLICY'), e, root);
+                showErrorMessage(vm.$t('MONITORING.ALERT.ESCALATION_POLICY.ALT_E_DELETE_POLICY'), e);
             } finally {
                 state.deleteModalVisible = false;
             }

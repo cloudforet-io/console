@@ -177,7 +177,6 @@ export default {
         //     showErrorMessage(
         //         i18n.t('PROJECT.DETAIL.ALT_E_PROJECT_INVALID_TITLE'),
         //         i18n.t('PROJECT.DETAIL.ALT_E_PROJECT_INVALID_DESC'),
-        //         root,
         //     );
         //     vm.$router.push({ name: PROJECT_ROUTE._NAME });
         // };
@@ -256,7 +255,7 @@ export default {
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_PROJECT'), '', root);
                 vm.$router.go(-1);
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_DELETE_PROJECT'), e);
             } finally {
                 formState.modalLoading = false;
                 formState.projectDeleteFormVisible = false;

@@ -81,7 +81,7 @@ export default {
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_S_UPDATE_STATUS'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_E_UPDATE_STATUS'), e, root);
+                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.STATUS_UPDATE.ALT_E_UPDATE_STATUS'), e);
             } finally {
                 state.loading = false;
             }

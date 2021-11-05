@@ -29,7 +29,7 @@ export default defineComponent({
     components: {
         PButton,
     },
-    setup(props, { emit }) {
+    setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             authOptions: computed(() => vm.$store.state.domain.authOptions),

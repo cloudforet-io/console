@@ -231,7 +231,7 @@ export default {
                 await listSchedules();
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DELETE_SCHEDULE_TITLE', 1), e, vm.$root);
+                showErrorMessage(vm.$tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DELETE_SCHEDULE_TITLE', 1), e);
             } finally {
                 state.deleteVisible = false;
             }

@@ -462,7 +462,7 @@ export default {
             } catch (e) {
                 console.error(e);
                 if (props.mode !== 'CREATE') {
-                    showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_EDIT_SCHEDULER'), e, root);
+                    showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_EDIT_SCHEDULER'), e);
                 }
             }
         };

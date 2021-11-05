@@ -328,7 +328,7 @@ export default {
                 if (props.isProjectGroup) await deleteProjectGroupMember(items);
                 else await deleteProjectMember(items);
             } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'), e, root);
+                showErrorMessage(vm.$t('PROJECT.DETAIL.ALT_E_DELETE_MEMBER'), e);
             } finally {
                 checkMemberDeleteState.visible = false;
                 await listMembers();

@@ -121,7 +121,7 @@ export default {
                 await store.dispatch('resource/project/load');
                 showSuccessMessage(i18n.t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'), e, vm.$root);
+                showErrorMessage(i18n.t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'), e);
                 throw new Error(e);
             }
         };
@@ -134,7 +134,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_UPDATE_PROJECT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'), e, vm.$root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_PROJECT'), e);
                 throw new Error(e);
             }
         };

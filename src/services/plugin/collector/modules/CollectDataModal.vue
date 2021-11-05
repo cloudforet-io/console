@@ -200,7 +200,7 @@ export default {
                 showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_COLLECT_START_TITLE'), '', vm.$root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_COLLECT_TITLE'), e, vm.$root);
+                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_COLLECT_TITLE'), e);
             } finally {
                 state.proxyVisible = false;
             }

@@ -184,7 +184,7 @@ export default {
                 emit('refresh');
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_DELETE'), e, root);
+                showErrorMessage(i18n.t('MONITORING.ALERT.ALERT_LIST.ALT_E_DELETE'), e);
             } finally {
                 state.closeLoading = false;
             }

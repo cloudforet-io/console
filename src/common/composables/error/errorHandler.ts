@@ -19,11 +19,11 @@ export default class ErrorHandler {
             break;
 
         case isInstanceOfNotFoundError(error):
-            showErrorMessage('관리자에게 문의하세요.', error, '');
+            showErrorMessage('관리자에게 문의하세요.', error);
             break;
 
         case isInstanceOfBadRequestError(error):
-            showErrorMessage('Bad Request Error', error, '');
+            showErrorMessage('Bad Request Error', error);
             break;
 
         case isInstanceOfAuthenticationError(error):
@@ -43,7 +43,7 @@ export default class ErrorHandler {
             break;
 
         case isInstanceOfNoResourceError(error):
-            showErrorMessage('No Resource', 'No Resource', '');
+            showErrorMessage('No Resource', 'No Resource');
             SpaceRouter.router.push(error.redirectUrl);
             break;
 

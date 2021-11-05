@@ -588,7 +588,7 @@ export default {
                 }
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ADD_USER'), '', root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'), e, root);
+                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_ADD_USER'), e);
             } finally {
                 state.selectedIndex = [];
                 userFormState.visible = false;
@@ -609,7 +609,7 @@ export default {
                 }
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_UPDATE_USER'), '', root);
             } catch (e) {
-                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e, root);
+                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_UPDATE_USER'), e);
             } finally {
                 await getUsers();
                 state.selectedIndex = [];
@@ -629,7 +629,7 @@ export default {
                 await SpaceConnector.client.identity.user.delete(getUsersParam(items));
                 showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DELETE_USER', state.selectedIndex.length), '', root);
             } catch (e) {
-                showErrorMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', state.selectedIndex.length), e, root);
+                showErrorMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_E_DELETE_USER', state.selectedIndex.length), e);
             } finally {
                 state.selectedIndex = [];
                 await getUsers();
@@ -641,7 +641,7 @@ export default {
                 await SpaceConnector.client.identity.user.enable(getUsersParam(items));
                 showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_ENABLE', state.selectedIndex.length), '', root);
             } catch (e) {
-                showErrorMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_E_ENABLE', state.selectedIndex.length), e, root);
+                showErrorMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_E_ENABLE', state.selectedIndex.length), e);
             } finally {
                 await getUsers();
                 modalState.visible = false;
@@ -652,7 +652,7 @@ export default {
                 await SpaceConnector.client.identity.user.disable(getUsersParam(items));
                 showSuccessMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_S_DISABLE', state.selectedIndex.length), '', root);
             } catch (e) {
-                showErrorMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_E_DISABLE', state.selectedIndex.length), e, root);
+                showErrorMessage(vm.$tc('IDENTITY.USER.MAIN.ALT_E_DISABLE', state.selectedIndex.length), e);
             } finally {
                 await getUsers();
                 modalState.visible = false;

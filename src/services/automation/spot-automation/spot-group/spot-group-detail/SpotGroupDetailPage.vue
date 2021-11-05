@@ -184,7 +184,7 @@ export default {
                 showSuccessMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.ALT_S_DELETE_SPOT_GROUP'), '', root);
                 vm.$router.go(-1);
             } catch (e) {
-                showErrorMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.ALT_E_DELETE_SPOT_GROUP'), e, root);
+                showErrorMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.ALT_E_DELETE_SPOT_GROUP'), e);
             } finally {
                 formState.spotGroupDeleteModalVisible = false;
             }
@@ -203,7 +203,7 @@ export default {
                 formState.spotGroupEditFormVisible = false;
                 showSuccessMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.EDIT.ALT_S_EDIT_SPOT_GROUP'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.EDIT.ALT_E_EDIT_SPOT_GROUP'), e, vm.$root);
+                showErrorMessage(vm.$t('AUTOMATION.SPOT_AUTOMATION.DETAIL.EDIT.ALT_E_EDIT_SPOT_GROUP'), e);
                 throw new Error(e);
             }
         };

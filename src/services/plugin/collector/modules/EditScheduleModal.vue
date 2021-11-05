@@ -301,7 +301,7 @@ export default {
                 showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_ADD_SCHEDULE_TITLE'), '', vm.$root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_ADD_SCHEDULE_TITLE'), e, vm.$root);
+                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_ADD_SCHEDULE_TITLE'), e);
             }
         };
         const updateSchedule = async () => {
@@ -324,7 +324,7 @@ export default {
                 showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_SCHEDULE_TITLE'), '', vm.$root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'), e, vm.$root);
+                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'), e);
             }
         };
 

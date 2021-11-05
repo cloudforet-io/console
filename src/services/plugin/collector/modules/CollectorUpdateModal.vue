@@ -178,7 +178,7 @@ export default {
                 formState.inputModel.isAutoUpgrade = res.plugin_info.upgrade_mode === UPGRADE_MODE.AUTO;
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_TITLE'), e, vm.$root);
+                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_TITLE'), e);
             }
         };
 
@@ -203,7 +203,7 @@ export default {
                 });
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_VERSION_TITLE'), e, vm.$root);
+                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_GET_VERSION_TITLE'), e);
             }
         };
 
@@ -246,7 +246,7 @@ export default {
                     });
                     showSuccessMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_S_UPDATE_TITLE'), '', vm.$root);
                 } catch (e) {
-                    showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_TITLE'), e, vm.$root);
+                    showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_TITLE'), e);
                 } finally {
                     state.loading = false;
                     state.proxyVisible = false;

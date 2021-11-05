@@ -88,7 +88,7 @@ export default {
                 emit('confirm');
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_AUTO_RECOVERY'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.ALT_E_CHANGE_AUTO_RECOVERY'), e);
             } finally {
                 state.proxyVisible = false;
             }

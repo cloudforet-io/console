@@ -149,7 +149,7 @@ export default {
                 await vm.$router.push({ name: MONITORING_ROUTE.ALERT_MANAGER.ALERT._NAME });
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_E_DELETE_ALERT'), '', root);
+                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.ALT_E_DELETE_ALERT'), e);
             } finally {
                 checkDeleteState.visible = false;
             }

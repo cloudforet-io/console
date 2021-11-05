@@ -11,12 +11,12 @@
         </div>
         <div class="filter filter-urgency">
             <span class="filter-label">{{ $t('MONITORING.ALERT.ALERT_LIST.URGENCY') }}</span>
-            <p-select-status v-for="(urgency, idx) in urgencyList" :key="idx"
+            <p-select-status v-for="(urgencyItem, idx) in urgencyList" :key="idx"
                              v-model="selectedUrgency"
-                             :value="urgency.name"
+                             :value="urgencyItem.name"
                              class="mr-2"
             >
-                {{ urgency.label }}
+                {{ urgencyItem.label }}
             </p-select-status>
         </div>
         <div class="filter filter-assigned">

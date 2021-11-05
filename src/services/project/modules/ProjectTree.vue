@@ -310,7 +310,7 @@ export default {
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', vm.$root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e, vm.$root);
+                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e);
             }
         };
 
@@ -331,7 +331,7 @@ export default {
                 await SpaceConnector.client.identity.projectGroup.update(params);
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT_GROUP'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e, vm.$root);
+                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT_GROUP'), e);
             }
         };
 
@@ -354,7 +354,7 @@ export default {
 
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_UPDATE_PROJECT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT'), e, vm.$root);
+                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_UPDATE_PROJECT'), e);
             }
         };
 

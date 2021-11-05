@@ -119,7 +119,7 @@ export default {
                 emit('edit', undefined);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'), e, root);
+                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'), e);
             }
         };
         const setProjectChannelSchedule = async () => {
@@ -134,7 +134,7 @@ export default {
                 emit('edit', undefined);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'), e, root);
+                showErrorMessage(i18n.t('PLUGIN.COLLECTOR.MAIN.ALT_E_UPDATE_SCHEDULE_TITLE'), e);
             }
         };
 

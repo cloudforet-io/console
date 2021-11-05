@@ -72,7 +72,7 @@ export default {
         GNBNotificationItem,
         PSkeleton,
     },
-    setup(props, { root }) {
+    setup() {
         const state = reactive({
             containerRef: null as Element|null,
             notificationItemRefs: [] as Vue[],
@@ -125,7 +125,7 @@ export default {
                 setReadNotifications(results);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'), e, root);
+                showErrorMessage(i18n.t('COMMON.GNB.NOTIFICATION.ALT_E_LIST_NOTIFICATION'), e);
             } finally {
                 state.loading = false;
             }

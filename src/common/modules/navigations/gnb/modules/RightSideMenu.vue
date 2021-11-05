@@ -223,7 +223,7 @@ export default {
                 });
                 emit('hide-menu');
             } catch (e) {
-                showErrorMessage(vm.$t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'), e, root);
+                showErrorMessage(vm.$t('COMMON.GNB.ACCOUNT.ALT_E_UPDATE'), e);
             }
         };
 

@@ -387,7 +387,7 @@ export default {
                 }
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALS_S_ADD_MEMBER'), '', root);
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALT_E_ADD_MEMBER'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.MEMBER.ALT_E_ADD_MEMBER'), e);
             } finally {
                 emit('confirm');
                 state.proxyVisible = false;

@@ -427,7 +427,7 @@ export default {
                     await api(params);
                     showSuccessMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_S_CHANGE_PROJECT_TITLE'), '', context.root);
                 } catch (e) {
-                    showErrorMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_E_CHANGE_PROJECT_TITLE'), e, context.root);
+                    showErrorMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_E_CHANGE_PROJECT_TITLE'), e);
                 } finally {
                     await store.dispatch('resource/project/load');
                     await listServerData();
@@ -438,7 +438,7 @@ export default {
                     await api(params);
                     showSuccessMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_S_RELEASE_PROJECT_TITLE'), '', context.root);
                 } catch (e) {
-                    showErrorMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_E_RELEASE_PROJECT_TITLE'), e, context.root);
+                    showErrorMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_E_RELEASE_PROJECT_TITLE'), e);
                 } finally {
                     await listServerData();
                 }
@@ -510,7 +510,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_S_CHECK_MODAL', { action: checkTableModalState.title }), '', context.root);
             } catch (e) {
-                showErrorMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_E_CHECK_MODAL', { action: checkTableModalState.title }), e, context.root);
+                showErrorMessage(vm.$t('INVENTORY.SERVER.MAIN.ALT_E_CHECK_MODAL', { action: checkTableModalState.title }), e);
             } finally {
                 typeOptionState.selectIndex = [];
                 resetCheckTableModalState();

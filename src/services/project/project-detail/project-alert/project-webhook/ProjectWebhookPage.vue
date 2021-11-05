@@ -308,7 +308,7 @@ export default {
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ENABLE_WEBHOOK'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_ENABLE_WEBHOOK'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_ENABLE_WEBHOOK'), e);
             } finally {
                 state.selectedIndex = [];
                 await listWebhooks();
@@ -324,7 +324,7 @@ export default {
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DISABLE_WEBHOOK'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_DISABLE_WEBHOOK'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_DISABLE_WEBHOOK'), e);
             } finally {
                 state.selectedIndex = [];
                 await listWebhooks();
@@ -339,7 +339,7 @@ export default {
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_DELETE_WEBHOOK'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_DELETE_WEBHOOK'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_DELETE_WEBHOOK'), e);
             } finally {
                 await listWebhooks();
                 formState.deleteModalVisible = false;

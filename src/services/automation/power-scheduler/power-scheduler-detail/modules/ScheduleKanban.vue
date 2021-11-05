@@ -288,7 +288,7 @@ export default {
                 }
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_EDIT_RESOURCE_GROUP'), e, root);
+                showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_EDIT_RESOURCE_GROUP'), e);
             } finally {
                 state.isEditMode = false;
             }

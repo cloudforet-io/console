@@ -171,7 +171,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('COMMON.COLLECT_MODAL.ALT_S_COLLECT_DATA'), '', context.root);
             } catch (e) {
-                showErrorMessage(vm.$t('COMMON.COLLECT_MODAL.ALT_E_COLLECT_DATA'), e, context.root);
+                showErrorMessage(vm.$t('COMMON.COLLECT_MODAL.ALT_E_COLLECT_DATA'), e);
             } finally {
                 state.proxyVisible = false;
             }

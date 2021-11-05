@@ -92,7 +92,7 @@ export default {
             } catch (e) {
                 state.isActivated = false;
                 console.error(e);
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_ACTIVATE_ALERT'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_ACTIVATE_ALERT'), e);
             }
         };
 

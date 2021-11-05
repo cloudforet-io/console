@@ -217,7 +217,7 @@ export default {
                 state.visible = true;
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.API_KEY.ALT_E_CREATE_SCHEDULER'), e, vm.$root);
+                showErrorMessage(vm.$t('IDENTITY.USER.API_KEY.ALT_E_CREATE_SCHEDULER'), e);
             } finally {
                 modalState.loading = false;
                 hideLoadingMessage(vm.$root);
@@ -237,7 +237,7 @@ export default {
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ENABLE_API_KEY'), '', vm.$root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ENABLE_API_KEY'), '', vm.$root);
+                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_ENABLE_API_KEY'), e);
             } finally {
                 await listAPIKey(state.user);
                 checkModalState.visible = false;
@@ -252,7 +252,7 @@ export default {
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_DISABLE_API_KEY'), '', vm.$root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_DISABLE_API_KEY'), '', vm.$root);
+                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_DISABLE_API_KEY'), e);
             } finally {
                 await listAPIKey(state.user);
                 checkModalState.visible = false;
@@ -267,7 +267,7 @@ export default {
                 showSuccessMessage(vm.$t('IDENTITY.USER.MAIN.ALT_S_DELETE_API_KEY'), '', vm.$root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_DELETE_API_KEY'), '', vm.$root);
+                showErrorMessage(vm.$t('IDENTITY.USER.MAIN.ALT_E_DELETE_API_KEY'), e);
             } finally {
                 state.selectedIndex = [];
                 await listAPIKey(state.user);

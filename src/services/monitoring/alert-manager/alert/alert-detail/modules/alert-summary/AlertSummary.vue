@@ -156,7 +156,7 @@ export default {
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_STATE'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_STATE'), e, root);
+                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_STATE'), e);
             }
         };
 
@@ -171,7 +171,7 @@ export default {
                 showSuccessMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_S_UPDATE_URGENCY'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_URGENCY'), e, root);
+                showErrorMessage(i18n.t('MONITORING.ALERT.DETAIL.HEADER.ALT_E_UPDATE_URGENCY'), e);
             }
         };
 

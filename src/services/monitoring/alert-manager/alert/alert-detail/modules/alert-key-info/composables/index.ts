@@ -70,7 +70,7 @@ export const useAlertInfoItem = (obj: AlertDetailItemState) => {
             state.isEditMode = false;
         } catch (e) {
             console.error(e);
-            showErrorMessage(getMessage(editMode, false), e, vm.$root);
+            showErrorMessage(getMessage(editMode, false), e);
         }
     };
 

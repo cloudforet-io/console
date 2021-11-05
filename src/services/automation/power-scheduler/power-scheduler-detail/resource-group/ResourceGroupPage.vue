@@ -530,7 +530,7 @@ export default {
                 });
                 formState.resourceGroup = res;
             } catch (e) {
-                showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.ALT_E_ID_INVALID_TITLE'), vm.$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.ALT_E_ID_INVALID_DESC'), vm.$root);
+                showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.ALT_E_ID_INVALID_TITLE'), vm.$t('AUTOMATION.POWER_SCHEDULER.RESOURCE.ALT_E_ID_INVALID_DESC'));
                 await vm.$router.replace({
                     name: AUTOMATION_ROUTE.POWER_SCHEDULER.ADD._NAME,
                     params: {

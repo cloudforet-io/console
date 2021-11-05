@@ -285,7 +285,7 @@ export default {
                 state.proxyVisible = false;
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_E_UPDATE_COL'), e, root);
+                showErrorMessage(i18n.t('COMMON.CUSTOM_FIELD_MODAL.ALT_E_UPDATE_COL'), e);
             } finally {
                 state.loading = false;
             }

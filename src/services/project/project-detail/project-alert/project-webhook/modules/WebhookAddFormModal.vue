@@ -145,7 +145,7 @@ export default {
                 });
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALT_S_ADD_WEBHOOK'), '', root);
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_ADD_WEBHOOK'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_ADD_WEBHOOK'), e);
             } finally {
                 state.loading = false;
                 state.proxyVisible = false;

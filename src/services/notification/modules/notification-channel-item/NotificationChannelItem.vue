@@ -136,7 +136,7 @@ export default {
                 showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_ENABLE_PROJECT_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_ENABLE_PROJECT_CHANNEL'), e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_ENABLE_PROJECT_CHANNEL'), e);
             }
         };
 
@@ -149,7 +149,7 @@ export default {
                 showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_ENABLE_USER_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_ENABLE_USER_CHANNEL'), e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_ENABLE_USER_CHANNEL'), e);
             }
         };
 
@@ -167,7 +167,7 @@ export default {
                 showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DISABLE_PROJECT_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DISABLE_PROJECT_CHANNEL'), e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DISABLE_PROJECT_CHANNEL'), e);
             }
         };
 
@@ -180,7 +180,7 @@ export default {
                 showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DISABLE_USER_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DISABLE_USER_CHANNEL'), e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DISABLE_USER_CHANNEL'), e);
             }
         };
 
@@ -211,7 +211,7 @@ export default {
                 showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DELETE_PROJECT_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DELETE_PROJECT_CHANNEL'), e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DELETE_PROJECT_CHANNEL'), e);
             } finally {
                 checkDeleteState.visible = false;
                 emit('confirm');
@@ -226,7 +226,7 @@ export default {
                 showSuccessMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_S_DELETE_USER_CHANNEL'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DELETE_USER_CHANNEL'), e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.ALT_E_DELETE_USER_CHANNEL'), e);
             } finally {
                 checkDeleteState.visible = false;
                 emit('confirm');

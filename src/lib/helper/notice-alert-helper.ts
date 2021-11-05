@@ -6,7 +6,7 @@ import Vue from 'vue';
  *   @param root
  *   @returns
  */
-export const showErrorMessage = (errorTitle, error, root) => {
+export const showErrorMessage = (errorTitle, error) => {
     let errorMsg = '';
     if (error.message) errorMsg = error.message;
     else if (error.response) { errorMsg = error.response.data.error.message; } else { errorMsg = error; }

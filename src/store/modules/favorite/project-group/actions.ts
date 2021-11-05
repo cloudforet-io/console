@@ -38,7 +38,7 @@ export const removeItem = async ({ commit, state, rootState }, favoriteItem: Par
     }
 };
 
-export const load = async ({ commit, state, rootState }): Promise<void|Error> => {
+export const load = async ({ commit, rootState }): Promise<void|Error> => {
     const response = await SpaceConnector.client.config.userConfig.list({
         query: {
             filter: [{

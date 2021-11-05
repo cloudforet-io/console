@@ -112,7 +112,7 @@ export default {
                 emit('edit', undefined);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e);
             }
         };
         const setProjectChannelSubscription = async () => {
@@ -127,7 +127,7 @@ export default {
                 emit('edit', undefined);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e, root);
+                showErrorMessage(i18n.t('IDENTITY.USER.NOTIFICATION.FORM.ALT_E_UPDATE_TOPIC'), e);
             }
         };
         const onChangeTopic = (value) => {

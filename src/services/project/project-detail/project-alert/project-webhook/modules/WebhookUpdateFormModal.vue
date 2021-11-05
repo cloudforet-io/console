@@ -101,7 +101,7 @@ export default {
                 state.proxyVisible = false;
             } catch (e) {
                 console.error(e);
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_WEBHOOK'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALT_E_UPDATE_WEBHOOK'), e);
             } finally {
                 state.loading = false;
                 emit('confirm');

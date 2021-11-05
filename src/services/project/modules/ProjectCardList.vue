@@ -326,7 +326,7 @@ export default {
                 });
                 showSuccessMessage(vm.$t('PROJECT.LANDING.ALT_S_CREATE_PROJECT'), '', vm.$root);
             } catch (e) {
-                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'), e, vm.$root);
+                showErrorMessage(vm.$t('PROJECT.LANDING.ALT_E_CREATE_PROJECT'), e);
             } finally {
                 state.projectFormVisible = false;
                 await listProjects(state.groupId, state.searchText);

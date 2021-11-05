@@ -213,7 +213,7 @@ export default {
                 showSuccessMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_S_CLOSE_MAINTENANCE_WINDOW'), '', root);
                 await getMaintenanceWindows();
             } catch (e) {
-                showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_E_CLOSE_MAINTENANCE_WINDOW'), e, root);
+                showErrorMessage(i18n.t('PROJECT.DETAIL.ALERT.MAINTENANCE_WINDOW.ALT_E_CLOSE_MAINTENANCE_WINDOW'), e);
                 console.error(e);
             } finally {
                 state.closeLoading = false;

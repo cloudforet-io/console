@@ -80,7 +80,7 @@ export default defineComponent({
             }
         };
 
-        const drawChart = (ctx, isLoading = false) => {
+        const drawChart = (ctx) => {
             const createChart = () => {
                 disposeChart(ctx);
                 state.chartRegistry[ctx] = am4core.create(ctx, am4charts.PieChart);
@@ -147,9 +147,9 @@ export default defineComponent({
         // draw loader chart or data chart
         watch([() => state.loading, () => state.loaderRef, () => state.chartRef], ([loading, loaderCtx, chartCtx]) => {
             if (loading && loaderCtx) {
-                drawChart(loaderCtx, true);
+                drawChart(loaderCtx);
             } else if (!loading && chartCtx) {
-                drawChart(chartCtx, false);
+                drawChart(chartCtx);
             }
         }, { immediate: true });
 

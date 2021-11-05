@@ -428,9 +428,9 @@ export default {
                 }
             } catch (e) {
                 console.error(e);
-                if (checkModalState.mode === 'enable') showErrorMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_ENABLE_TITLE', state.selectedItems.length), e, vm.$root);
-                else if (checkModalState.mode === 'disable') showErrorMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DISABLE_TITLE', state.selectedItems.length), e, vm.$root);
-                else if (checkModalState.mode === 'delete') showErrorMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DELETE_TITLE', state.selectedItems.length), e, vm.$root);
+                if (checkModalState.mode === 'enable') showErrorMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_ENABLE_TITLE', state.selectedItems.length), e);
+                else if (checkModalState.mode === 'disable') showErrorMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DISABLE_TITLE', state.selectedItems.length), e);
+                else if (checkModalState.mode === 'delete') showErrorMessage(i18n.tc('PLUGIN.COLLECTOR.MAIN.ALT_E_DELETE_TITLE', state.selectedItems.length), e);
             } finally {
                 if (checkModalState.mode === 'delete') state.selectedIndexes = [];
                 checkModalState.visible = false;

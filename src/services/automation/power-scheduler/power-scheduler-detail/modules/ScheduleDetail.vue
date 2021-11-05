@@ -287,7 +287,7 @@ export default {
                 showSuccessMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_S_EDIT_NAME'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_EDIT_NAME'), e, root);
+                showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_EDIT_NAME'), e);
             } finally {
                 nameEditState.visible = false;
                 nameEditState.loading = false;
@@ -307,7 +307,7 @@ export default {
                 showSuccessMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_S_DELETE_SCHEDULER'), '', root);
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_DELETE_SCHEDULER'), e, root);
+                showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_DELETE_SCHEDULER'), e);
             } finally {
                 checkDeleteState.visible = false;
                 emit('delete');
@@ -361,7 +361,7 @@ export default {
                 return res.schedule_id;
             } catch (e) {
                 console.error(e);
-                showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_CREATE_SCHEDULER'), e, root);
+                showErrorMessage(vm.$t('AUTOMATION.POWER_SCHEDULER.DETAILS.ALT_E_CREATE_SCHEDULER'), e);
             } finally {
                 state.createLoading = false;
             }
