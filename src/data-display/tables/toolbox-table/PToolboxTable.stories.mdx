@@ -9,7 +9,6 @@ import PSelectStatus from '@/inputs/select-status/PSelectStatus';
 import PToolboxTable from './PToolboxTable.vue';
 import { getToolboxTableArgTypes } from '@/data-display/tables/toolbox-table/story-helper';
 import { getUserFields, getUsers } from '@/data-display/tables/data-table/mock';
-import { TOOLBOX_TABLE_STYLE_TYPE } from '@/data-display/tables/toolbox-table/config';
 
 
 <Meta title='Data Display/Tables/Toolbox Table' parameters={{
@@ -126,38 +125,6 @@ This component is merged component of [Toolbox component](?path=/docs/navigation
 <br/>
 <br/>
 
-## Style Types
-
-<Canvas>
-    <Story name="Style Types">
-        {{
-            components: { PToolboxTable },
-            template: `
-    <div>
-        <div>
-            <p class="mb-4 text-xl font-bold">Default</p>
-            <p-toolbox-table :fields="fields" :items="items"></p-toolbox-table>
-        </div>
-        <div class="mt-4">
-            <p class="mb-4 text-xl font-bold">Style Type: {{TOOLBOX_TABLE_STYLE_TYPE.lightGray}}</p>
-            <p-toolbox-table :fields="fields" :items="items" :style-type="TOOLBOX_TABLE_STYLE_TYPE.lightGray"></p-toolbox-table>
-        </div>
-    </div>
-    `,
-            setup() {
-                return {
-                    fields: getUserFields(),
-                    items: getUsers(7, 7),
-                    TOOLBOX_TABLE_STYLE_TYPE
-                }
-            }
-        }}
-    </Story>
-</Canvas>
-
-<br/>
-<br/>
-
 ## Slots
 
 <Canvas>
@@ -184,7 +151,7 @@ This component is merged component of [Toolbox component](?path=/docs/navigation
         </div>
         <div class="mt-4">
             <p class="mb-4 text-xl font-bold">Slot: toolbox-bottom</p>
-            <p-toolbox-table :fields="fields" :items="items" style-type="light-gray">
+            <p-toolbox-table :fields="fields" :items="items">
             <template #toolbox-bottom>
                 <div class="p-4">
                     <strong class="mr-4">Select: </strong>

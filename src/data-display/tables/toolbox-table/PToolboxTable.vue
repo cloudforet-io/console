@@ -1,5 +1,5 @@
 <template>
-    <p-pane-layout class="p-toolbox-table" :class="styleType">
+    <p-pane-layout class="p-toolbox-table">
         <div class="top-wrapper">
             <slot name="toolbox-top" />
             <p-toolbox :pagination-visible="paginationVisible"
@@ -76,7 +76,6 @@ import PToolbox from '@/navigation/toolbox/PToolbox.vue';
 import PPaneLayout from '@/layouts/pane-layout/PPaneLayout.vue';
 import { SEARCH_TYPES } from '@/navigation/toolbox/config';
 import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
-import { TOOLBOX_TABLE_STYLE_TYPE } from '@/data-display/tables/toolbox-table/config';
 import { ToolboxOptions } from '@/navigation/toolbox/type';
 import { ToolboxTableOptions, ToolboxTableProps } from '@/data-display/tables/toolbox-table/type';
 
@@ -244,14 +243,6 @@ export default defineComponent<ToolboxTableProps>({
             type: String,
             default: 'UTC',
         },
-        /* toolbox table props */
-        styleType: {
-            type: String,
-            default: undefined,
-            validator(styleType: any) {
-                return styleType === undefined || Object.values(TOOLBOX_TABLE_STYLE_TYPE).includes(styleType);
-            },
-        },
     },
     setup(props: ToolboxTableProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
@@ -329,22 +320,6 @@ export default defineComponent<ToolboxTableProps>({
     }
     .toolbox-left {
         display: flex;
-    }
-
-    /* style types */
-    @define-mixin style-type $bg-color, $border-color {
-        .top-wrapper {
-            background-color: $bg-color;
-        }
-        .p-toolbox {
-            border-top-width: 1px;
-            border-bottom-width: 1px;
-            border-color: $border-color;
-        }
-    }
-
-    &.light-gray {
-        @mixin style-type theme('colors.gray.100'), theme('colors.gray.200');
     }
 }
 </style>
