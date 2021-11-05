@@ -348,6 +348,8 @@
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "누적",
 				"ALT_E_DELETE_QUERY": "쿼리 삭제 실패",
+				"ALT_E_EDITED_QUERY": "쿼리 편집 실패",
+				"ALT_E_SAVED_QUERY": "쿼리 저장 실패",
 				"ALT_S_DELETE_QUERY": "쿼리 삭제 성공",
 				"ALT_S_EDITED_QUERY": "쿼리 편집 성공",
 				"ALT_S_SAVED_QUERY": "위젯으로 쿼리 저장 성공",

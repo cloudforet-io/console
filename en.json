@@ -348,6 +348,8 @@
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "Accumulated",
 				"ALT_E_DELETE_QUERY": "Failed to Delete Query",
+				"ALT_E_EDITED_QUERY": "Failed to Edit Query",
+				"ALT_E_SAVED_QUERY": "Failed to Save Query",
 				"ALT_S_DELETE_QUERY": "Successfully Deleted Query",
 				"ALT_S_EDITED_QUERY": "Successfully Edited The Query",
 				"ALT_S_SAVED_QUERY": "Successfully Saved The Query As Widget",

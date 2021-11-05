@@ -348,6 +348,8 @@
 			"COST_ANALYSIS": {
 				"ACCUMULATED": "",
 				"ALT_E_DELETE_QUERY": "",
+				"ALT_E_EDITED_QUERY": "",
+				"ALT_E_SAVED_QUERY": "",
 				"ALT_S_DELETE_QUERY": "",
 				"ALT_S_EDITED_QUERY": "",
 				"ALT_S_SAVED_QUERY": "",
