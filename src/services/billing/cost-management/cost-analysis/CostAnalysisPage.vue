@@ -2,39 +2,45 @@
     <div class="cost-analysis-page">
         <p-breadcrumbs :routes="routeState.route" />
         <section class="title-section">
-            <p-select-dropdown :items="sampleQueryItems" type="icon-button" button-icon="ic_list"
+            <p-select-dropdown :items="queryItems" type="icon-button" button-icon="ic_list"
                                class="list-button"
             >
                 <template #menu-item--format="{item}">
-                    <span>{{ item.label }}</span>
+                    <div class="dropdown-item-modal">
+                        <p-i v-if="item.scope === QUERY_VISIBILITY_TYPE.PRIVATE" name="ic_security" width="1rem"
+                             height="1rem"
+                        />
+                        <span>{{ item.label }}</span>
+                    </div>
                     <div v-if="item.name !== 'default'" class="button-wrapper">
-                        <p-icon-button name="ic_trashcan" size="sm" @click.stop="handleClickDeleteQuery" />
-                        <p-icon-button name="ic_edit-text" size="sm" @click.stop="handleClickEditQuery(item.label)" />
+                        <p-icon-button name="ic_trashcan" size="sm" @click.stop="handleClickDeleteQuery(item.cost_query_set_id)" />
+                        <p-icon-button name="ic_edit-text" size="sm" @click.stop="handleClickEditQuery(item)" />
                     </div>
                 </template>
             </p-select-dropdown>
             <p-page-title :title="title">
-                <!--                <template #extra>-->
-                <!--                    <div class="title-extra-wrapper">-->
-                <!--                        <span />-->
-                <!--                        <div class="button-wrapper">-->
-                <!--                            <p-icon-text-button name="ic_download" style-type="gray-border" class="mr-4">-->
-                <!--                                PDF-->
-                <!--                            </p-icon-text-button>-->
-                <!--                            <p-button style-type="gray-border" @click="handleClickSaveQuery">-->
-                <!--                                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}-->
-                <!--                            </p-button>-->
-                <!--                        </div>-->
-                <!--                    </div>-->
-                <!--                </template>-->
+                <template #extra>
+                    <div class="title-extra-wrapper">
+                        <span />
+                        <div class="button-wrapper">
+                            <p-icon-text-button name="ic_download" style-type="gray-border" class="mr-4">
+                                PDF
+                            </p-icon-text-button>
+                            <p-button style-type="gray-border" @click="handleClickSaveQuery">
+                                {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE') }}
+                            </p-button>
+                        </div>
+                    </div>
+                </template>
             </p-page-title>
         </section>
         <cost-analysis-query-filter />
         <cost-analysis-group-by-filter />
         <cost-analysis-chart />
         <cost-analysis-data-table />
-        <save-query-form-modal :header-title="saveQueryFormTitle" :visible.sync="saveQueryFormVisible"
-                               :query-name="selectedQueryName" @confirm="handleSaveQueryConfirm"
+        <save-query-form-modal :header-title="saveQueryFormState.title" :visible.sync="saveQueryFormState.visible"
+                               :selected-query="saveQueryFormState.selectedQuery" :request-type="saveQueryFormState.requestType"
+                               :list-cost-query-set="listCostQuerySet"
         />
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
@@ -52,7 +58,7 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PBreadcrumbs, PPageTitle, PIconButton, PSelectDropdown,
+    PBreadcrumbs, PPageTitle, PIconButton, PSelectDropdown, PI, PIconTextButton, PButton,
 } from '@spaceone/design-system';
 
 import CostAnalysisChart from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisChart.vue';
@@ -63,14 +69,21 @@ import SaveQueryFormModal from '@/services/billing/cost-management/cost-analysis
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import { BILLING_ROUTE } from '@/services/billing/routes';
+import {
+    QUERY_VISIBILITY_TYPE,
+    REQUEST_TYPE,
+    CostQuerySetModel,
+} from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { i18n } from '@/translations';
 import { registerServiceStore } from '@/common/composables/register-service-store';
 import {
     CostAnalysisStoreState,
 } from '@/services/billing/cost-management/cost-analysis/store/type';
 import costAnalysisStoreModule from '@/services/billing/cost-management/cost-analysis/store';
-import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
-
+import { showSuccessMessage, showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 export default {
     name: 'CostAnalysisPage',
@@ -83,6 +96,9 @@ export default {
         PPageTitle,
         PIconButton,
         PSelectDropdown,
+        PI,
+        PIconTextButton,
+        PButton,
         SaveQueryFormModal,
         DeleteModal,
     },
@@ -92,16 +108,17 @@ export default {
 
         const state = reactive({
             title: 'Cost Analysis',
-            sampleQueryItems: [
-                { name: 'label', label: 'Saved Query', type: 'header' },
-                { name: 'default', label: 'Cost Analysis', type: 'item' },
-                { name: 'x1', label: 'public widget', type: 'item' },
-                { name: 'x2', label: 'A private widget', type: 'item' },
-            ],
-            saveQueryFormVisible: false,
-            saveQueryFormTitle: '' as string | TranslateResult,
-            selectedQueryName: '',
+            queryItems: [] as MenuItem[],
+            itemIdForDeleteQuery: '',
         });
+
+        const saveQueryFormState = reactive({
+            visible: false,
+            title: '' as string | TranslateResult,
+            selectedQuery: {},
+            requestType: REQUEST_TYPE.SAVE as REQUEST_TYPE,
+        });
+
         const routeState = reactive({
             route: computed(() => [
                 { name: i18n.t('MENU.BILLING.BILLING'), to: { name: BILLING_ROUTE._NAME } },
@@ -115,42 +132,68 @@ export default {
             headerTitle: computed(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHECK_DELETE_MODAL_DESC')),
         });
 
+        const listCostQuerySet = async () => {
+            try {
+                const { results } = await SpaceConnector.client.costAnalysis.costQuerySet.list();
+                state.queryItems = [
+                    { name: 'label', label: 'Saved Query', type: 'header' },
+                    ...results.map((item: CostQuerySetModel) => ({
+                        ...item,
+                        label: item.name,
+                        type: 'item',
+                    })),
+                ];
+            } catch (e) {
+                state.queryItems = [];
+                ErrorHandler.handleError(e);
+            }
+        };
+        (() => { listCostQuerySet(); })();
+
         /* event */
-        const handleClickDeleteQuery = () => {
+        const handleClickDeleteQuery = (id) => {
+            state.itemIdForDeleteQuery = id;
             checkDeleteState.visible = true;
         };
-        const handleClickEditQuery = (myQuery) => {
-            state.saveQueryFormTitle = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.EDIT_QUERY');
-            state.selectedQueryName = myQuery;
-            state.saveQueryFormVisible = true;
+        const handleClickEditQuery = (queryItem) => {
+            saveQueryFormState.title = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.EDIT_QUERY');
+            saveQueryFormState.requestType = REQUEST_TYPE.EDIT;
+            saveQueryFormState.selectedQuery = queryItem;
+            saveQueryFormState.visible = true;
         };
         const handleClickSaveQuery = () => {
-            state.saveQueryFormTitle = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_QUERY');
-            state.saveQueryFormVisible = true;
-        };
-        const handleSaveQueryConfirm = (requestType) => {
-            if (requestType === 'save') console.log('save');
-            else console.log('edit');
-        };
-        const handleDeleteQueryConfirm = () => {
-            console.log('delete confirm');
-            checkDeleteState.visible = false;
-            showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '', vm.$root);
+            saveQueryFormState.title = i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SAVE_QUERY');
+            saveQueryFormState.requestType = REQUEST_TYPE.SAVE;
+            saveQueryFormState.visible = true;
         };
 
-        watch(() => state.saveQueryFormVisible, () => {
-            if (state.saveQueryFormVisible === false) state.selectedQueryName = '';
+        const handleDeleteQueryConfirm = async () => {
+            checkDeleteState.visible = false;
+            try {
+                await SpaceConnector.client.costAnalysis.costQuerySet.delete({ cost_query_set_id: state.itemIdForDeleteQuery });
+                await listCostQuerySet();
+                showSuccessMessage(vm.$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '', vm.$root);
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                showErrorMessage(vm.$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'), e);
+            }
+        };
+
+        watch(() => saveQueryFormState.visible, () => {
+            if (saveQueryFormState.visible === false) saveQueryFormState.selectedQuery = {};
         });
 
         return {
             ...toRefs(state),
             routeState,
             checkDeleteState,
+            saveQueryFormState,
             handleClickDeleteQuery,
             handleClickEditQuery,
             handleClickSaveQuery,
-            handleSaveQueryConfirm,
             handleDeleteQueryConfirm,
+            listCostQuerySet,
+            QUERY_VISIBILITY_TYPE,
         };
     },
 };
@@ -161,6 +204,9 @@ export default {
     .title-section {
         display: flex;
 
+        .dropdown-item-modal {
+            @apply flex items-center flex-wrap gap-1;
+        }
         .list-button::v-deep {
             @apply bg-transparent;
             margin-right: 0.5rem;

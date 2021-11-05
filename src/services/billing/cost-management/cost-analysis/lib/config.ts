@@ -30,3 +30,24 @@ export const GROUP_BY_ITEM = Object.freeze({
     CURRENCY: 'currency',
     ACCOUNT: 'account',
 });
+
+export const REQUEST_TYPE = Object.freeze({
+    SAVE: 'SAVE',
+    EDIT: 'EDIT',
+});
+
+export type REQUEST_TYPE = typeof REQUEST_TYPE[keyof typeof REQUEST_TYPE];
+
+export const QUERY_VISIBILITY_TYPE = Object.freeze({
+    PUBLIC: 'PUBLIC',
+    PRIVATE: 'PRIVATE',
+});
+
+export type QUERY_VISIBILITY_TYPE = typeof QUERY_VISIBILITY_TYPE[keyof typeof QUERY_VISIBILITY_TYPE];
+
+export interface CostQuerySetModel {
+    cost_query_set_id: string;
+    name: string;
+    scope: QUERY_VISIBILITY_TYPE;
+    option?: object;
+}
