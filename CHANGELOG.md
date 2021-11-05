@@ -1,3 +1,10 @@
+# [1.1.0-beta.165](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.164...v1.1.0-beta.165) (2021-11-05)
+
+
+### Features
+
+* delete styleType props in ToolboxTable ([#734](https://github.com/spaceone-dev/spaceone-design-system/issues/734)) ([f9fb1b0](https://github.com/spaceone-dev/spaceone-design-system/commit/f9fb1b068c6bc960248f13e89d857b67e8e704d5))
+
 # [1.1.0-beta.164](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.163...v1.1.0-beta.164) (2021-11-04)
 
 
