@@ -1,3 +1,10 @@
+# [1.1.0-beta.167](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.166...v1.1.0-beta.167) (2021-11-08)
+
+
+### Features
+
+* update assets & add icon ([#736](https://github.com/spaceone-dev/spaceone-design-system/issues/736)) ([bc25711](https://github.com/spaceone-dev/spaceone-design-system/commit/bc25711ad07a8abe6bbfa5f5f3686f31fddcd874))
+
 # [1.1.0-beta.166](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.165...v1.1.0-beta.166) (2021-11-08)
 
 
