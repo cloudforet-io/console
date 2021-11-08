@@ -1,21 +1,18 @@
 <template>
     <div class="project-select-dropdown">
-        <p-select-dropdown :loading="loading"
+        <p-search-dropdown :loading="loading"
                            :visible-menu.sync="visibleMenu"
-                           always-show-menu
+                           :is-focused.sync="isFocused"
+                           :type="multiSelectable ? 'checkbox' : 'radioButton'"
+                           show-tag-box
+                           :exact-mode="false"
                            use-fixed-menu-style
                            :invalid="invalid"
                            :disabled="readonly"
                            :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
+                           :selected.sync="selectedProjectItems"
+                           @delete-tag="handleDeleteTag"
         >
-            <div v-if="!multiSelectable && selectedItem" class="tag-wrapper">
-                <p-tag :activated="visibleMenu"
-                       :deletable="!readonly"
-                       @delete="onDeleteTag(selectedItem.node, selectedItem.path)"
-                >
-                    {{ selectedItem.node.data.name }}
-                </p-tag>
-            </div>
             <template #menu-menu>
                 <p-tree :edit-options="{disabled: true}"
                         :drag-options="{disabled: true}"
@@ -43,31 +40,31 @@
                     </template>
                 </p-tree>
             </template>
-        </p-select-dropdown>
-        <div v-if="multiSelectable && selectedItems.length" class="tag-box">
-            <p-tag v-for="({node, path}, idx) in selectedItems" :key="`tag-${idx}`"
-                   @delete="onDeleteTag(node, path)"
-            >
-                {{ node.data.name }}
-            </p-tag>
-        </div>
+        </p-search-dropdown>
     </div>
 </template>
 
 <script lang="ts">
 import {
-    PCheckBox, PI, PRadio, PSelectDropdown, PTag, PTree,
-} from '@spaceone/design-system';
-import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
+
+import {
+    PCheckBox, PI, PRadio, PSearchDropdown, PSelectDropdown, PTag, PTree,
+} from '@spaceone/design-system';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+
 import { ProjectGroup } from '@/services/identity/service-account/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ProjectTreeRoot } from '@/services/project/type';
+import { ProjectItemResp, ProjectTreeItem, ProjectTreeRoot } from '@/services/project/type';
+
+import { store } from '@/store';
+import { ResourceMap } from '@/store/modules/resource/type';
 
 export default {
     name: 'ProjectSelectDropdown',
     components: {
+        PSearchDropdown,
         PSelectDropdown,
         PTag,
         PTree,
@@ -96,9 +93,22 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             root: null as ProjectTreeRoot|null,
-            selectedItems: [] as any[],
-            selectedItem: computed(() => state.selectedItems[0]),
-            selectedProjects: computed<string[]>(() => state.selectedItems.map(d => d.node.data)),
+            selectedItems: [] as ProjectTreeItem[],
+            selectedItem: computed<ProjectTreeItem>(() => state.selectedItems[0]),
+            selectedProjects: computed<ProjectItemResp[]>(() => state.selectedItems.map(d => d.node.data)),
+            _selectedProjectIds: [...props.selectedProjectIds] as string[],
+            selectedProjectItems: computed<MenuItem[]>({
+                get() {
+                    const projects: ResourceMap = store.state.resource.project.items;
+                    return state._selectedProjectIds.map(id => ({
+                        name: id,
+                        label: projects[id]?.label,
+                    }));
+                },
+                set(val) {
+                    state._selectedProjectIds = val.map(d => d.name);
+                },
+            }),
             selectComponent: computed(() => {
                 if (props.multiSelectable) return PCheckBox;
                 return PRadio;
@@ -111,6 +121,7 @@ export default {
                 },
             })),
             visibleMenu: false,
+            isFocused: false,
         });
 
         const predicate = (current, data) => current?.id === data.id;
@@ -178,9 +189,18 @@ export default {
             }
         };
 
-        const onChangeSelect = (selected) => {
+        const onChangeSelect = (selected: ProjectTreeItem[]) => {
+            if (state.selectedItems === selected) return;
+
             state.selectedItems = selected;
-            if (!props.multiSelectable) state.visibleMenu = false;
+            state._selectedProjectIds = state.selectedProjects.map(d => d.id);
+
+            if (!props.multiSelectable) {
+                if (state.visibleMenu) state.visibleMenu = false;
+                if (state.isFocused) state.isFocused = false;
+            }
+
+            emit('update:selectedProjectIds', state._selectedProjectIds);
             emit('select', state.selectedProjects);
         };
 
@@ -188,7 +208,8 @@ export default {
             if (state.root) state.root.changeSelectState(node, path, value);
         };
 
-        const onDeleteTag = (node, path) => {
+        const handleDeleteTag = (_, index: number) => {
+            const { node, path } = state.selectedItems[index];
             if (state.root) state.root.changeSelectState(node, path, false);
         };
 
@@ -203,7 +224,7 @@ export default {
             onTreeInit,
             onChangeSelect,
             changeSelectState,
-            onDeleteTag,
+            handleDeleteTag,
         };
     },
 };

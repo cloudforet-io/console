@@ -272,7 +272,7 @@ export default {
         };
 
         const setCurrentProjectRole = async () => {
-            if (props.selectedMember.role_info?.name === state.projectRoleList[0].label) {
+            if (props.selectedMember.role_info?.name === state.projectRoleList[0]?.label) {
                 state.projectRole = state.projectRoleList[0].name;
             } else {
                 state.projectRole = '';
