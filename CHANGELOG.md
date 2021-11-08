@@ -1,3 +1,10 @@
+# [1.1.0-beta.166](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.165...v1.1.0-beta.166) (2021-11-08)
+
+
+### Bug Fixes
+
+* make changes normally reflected in states of tree and search dropdown ([#733](https://github.com/spaceone-dev/spaceone-design-system/issues/733)) ([d6b7cf3](https://github.com/spaceone-dev/spaceone-design-system/commit/d6b7cf3b4a82f0076fa878563a5348d83573d17e))
+
 # [1.1.0-beta.165](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.164...v1.1.0-beta.165) (2021-11-05)
 
 
