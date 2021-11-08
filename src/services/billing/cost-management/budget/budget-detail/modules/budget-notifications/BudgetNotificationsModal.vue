@@ -1,8 +1,8 @@
 <template>
     <p-button-modal
-        :header-title="'Set Budget Alert'"
+        :header-title="'Set Budget Notifications'"
         centered
-        size="lg"
+        size="md"
         fade
         :scrollable="false"
         backdrop
@@ -10,7 +10,7 @@
         @confirm="handleConfirm"
     >
         <template #body>
-            When <b>any</b> of the following conditions are met, a notification will be sent immediately to the set immediately.<br>
+            When <b>any</b> of the following conditions are met, a notification will be sent immediately.<br>
             <p-anchor class="anchor"
                       :text="'Set Notifications'"
                       :href="'/'"
@@ -20,7 +20,7 @@
                                 style-type="gray900"
                                 @click="handleAddCondition"
             >
-                Add Alert Condition
+                Add Condition
             </p-icon-text-button>
             <section class="condition-wrapper">
                 <p v-if="conditions.length > 0" class="condition-header">
@@ -72,6 +72,8 @@ import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
 import { makeProxy } from '@/lib/helper/composition-helpers';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { store } from '@/store';
 
 const NOTIFICATION_UNIT = Object.freeze({
     PERCENT: 'PERCENT',
@@ -111,7 +113,7 @@ export default {
         const state = reactive({
             loading: true,
             proxyVisible: makeProxy('visible', props, emit),
-            conditions: [] as Condition[],
+            conditions: store.state.service.budget.budgetData.notifications as Condition[],
             units: computed(() => ([
                 {
                     name: NOTIFICATION_UNIT.ACTUAL_COST,
@@ -151,10 +153,12 @@ export default {
 
         const setBudgetAlert = async () => {
             try {
-                // TODO: set budget alert API
-                console.log('set budget alert');
+                await store.dispatch('service/budget/updateBudgetNotifications', {
+                    budgetId: 'budget-df7f905dbc8f',
+                    notifications: state.conditions,
+                });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

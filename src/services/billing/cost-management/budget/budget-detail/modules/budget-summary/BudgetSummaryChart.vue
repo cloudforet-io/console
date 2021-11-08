@@ -83,7 +83,7 @@ export default {
             categoryAxis.renderer.minGridDistance = 30;
 
             /* Create value axis */
-            // const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+            chart.yAxes.push(new am4charts.ValueAxis());
 
             /* Create series - Column */
             const columnSeries = chart.series.push(new am4charts.ColumnSeries());
@@ -96,6 +96,7 @@ export default {
             columnSeries.columns.template.propertyFields.stroke = 'stroke';
             columnSeries.columns.template.propertyFields.strokeWidth = 'strokeWidth';
             columnSeries.columns.template.propertyFields.strokeDasharray = 'columnDash';
+            columnSeries.columns.template.with = am4core.percent(20);
             columnSeries.tooltip.label.textAlign = 'middle';
 
             /* Create series - Line */
@@ -122,9 +123,9 @@ export default {
             bullet.fill = am4core.color(gray[400]); // tooltips grab fill from parent by default
             bullet.tooltipText = '[#fff font-size: 15px]{name} in {categoryX}:\n[/][#fff font-size: 20px]{valueY}[/] [#fff]{additional}[/]';
             const circle = bullet.createChild(am4core.Circle);
-            circle.radius = 4;
+            circle.radius = 5;
             circle.fill = am4core.color('#fff');
-            circle.strokeWidth = 2;
+            circle.strokeWidth = 1.5;
             chart.data = tempData;
         };
 

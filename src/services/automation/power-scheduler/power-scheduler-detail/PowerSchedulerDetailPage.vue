@@ -150,7 +150,7 @@ export default {
             next();
         })();
     },
-    setup(props: Props, { root }) {
+    setup(props: Props) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         if (!props.projectId) vm.$router.push('/error-page');
 

@@ -1,12 +1,12 @@
 <template>
     <p-pane-layout class="budget-alert-wrapper">
         <section class="card-header">
-            <span class="title">Budget Alert</span>
+            <span class="title">Budget Notifications</span>
             <p-icon-button name="ic_trashcan" @click="handleDelete" />
         </section>
         <section v-if="hasBudgetAlert" class="card-body">
             <article class="alert-condition">
-                <span class="sub-title">Alert Condition</span>
+                <span class="sub-title">Condition</span>
                 <span class="content-desc">
                     Any of the following are met, <br>
                     a notification will be sent immediately.
@@ -76,6 +76,7 @@
         </section>
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
+                      :loading="checkDeleteState.loading"
                       @confirm="handleDeleteForm"
         />
         <budget-alert-modal v-if="budgetAlertModalVisible"
@@ -85,16 +86,20 @@
     </p-pane-layout>
 </template>
 
-<script>
+<script lang="ts">
 import {
     PPaneLayout, PIconButton, PAnchor, PIconTextButton, PBadge,
 } from '@spaceone/design-system';
 import BudgetNotificationsChannel
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-notifications/BudgetNotificationsChannel.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
-import { reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs,
+} from '@vue/composition-api';
 import BudgetAlertModal
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-notifications/BudgetNotificationsModal.vue';
+import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'BudgetNotifications',
@@ -110,25 +115,29 @@ export default {
     },
     setup() {
         const state = reactive({
-            hasBudgetAlert: true,
+            hasBudgetAlert: computed(() => (store.state.service.budget.budgetData.notifications.length > 0)),
             budgetAlertModalVisible: false,
         });
 
         const checkDeleteState = reactive({
             visible: false,
             headerTitle: 'Are you sure you want to delete the budget alert?',
-            // loading: true,
+            loading: true,
         });
         const handleDelete = () => {
             checkDeleteState.visible = true;
         };
         const handleDeleteForm = async () => {
             try {
-                // TODO: Delete Budget Alert API
-                console.log('Successfully deleted budget alert');
+                checkDeleteState.loading = true;
+                await store.dispatch('service/budget/updateBudgetNotifications', {
+                    budgetId: 'budget-df7f905dbc8f',
+                    notifications: [],
+                });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
+                checkDeleteState.loading = false;
                 checkDeleteState.visible = false;
             }
         };
