@@ -6,13 +6,14 @@ import * as mutations from './mutations';
 
 const state: CostAnalysisStoreState = {
     chartType: CHART_TYPE.STACKED_COLUMN,
-    granularity: GRANULARITY.DAILY,
+    granularity: GRANULARITY.ACCUMULATED,
     groupByItems: [],
-    groupByItem: undefined,
+    groupBy: undefined,
     selectedDates: [],
     currency: CURRENCY.USD,
     chartData: [],
     legends: [],
+    filters: [],
 };
 
 export default {

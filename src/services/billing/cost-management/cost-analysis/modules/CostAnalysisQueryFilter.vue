@@ -137,21 +137,21 @@ export default {
             }
             store.commit('service/costAnalysis/setChartType', chartType);
             store.commit('service/costAnalysis/setGranularity', granularity);
-            await store.dispatch('service/costAnalysis/getChartData');
+            await store.dispatch('service/costAnalysis/listChartData');
         };
         const handleSelectChartType = async (chartType: ChartType) => {
             store.commit('service/costAnalysis/setChartType', chartType);
-            await store.dispatch('service/costAnalysis/getChartData');
+            await store.dispatch('service/costAnalysis/listChartData');
         };
         const handleSelectedDates = async (selectedDates: Array<string>) => {
             store.commit('service/costAnalysis/setSelectedDates', selectedDates);
-            await store.dispatch('service/costAnalysis/getChartData');
+            await store.dispatch('service/costAnalysis/listChartData');
         };
         const handleSelectCurrency = async (currency: string) => {
             store.commit('service/costAnalysis/setCurrency', currency);
         };
         const handleClickRefresh = async () => {
-            await store.dispatch('service/costAnalysis/getChartData');
+            await store.dispatch('service/costAnalysis/listChartData');
         };
 
         const initSelectedDates = () => {
@@ -162,7 +162,7 @@ export default {
         };
         (async () => {
             initSelectedDates();
-            await store.dispatch('service/costAnalysis/getChartData');
+            await store.dispatch('service/costAnalysis/listChartData');
         })();
 
         return {

@@ -20,10 +20,10 @@ export const CURRENCY = Object.freeze({
 });
 
 export const GROUP_BY_ITEM = Object.freeze({
-    PROJECT: 'project',
-    SERVICE_ACCOUNT: 'service_account',
+    PROJECT: 'project_id',
+    SERVICE_ACCOUNT: 'service_account_id',
     PRODUCT: 'product',
-    REGION: 'region',
+    REGION: 'region_code',
     PROVIDER: 'provider',
     TYPE: 'type',
     RESOURCE_ID: 'resource_id',

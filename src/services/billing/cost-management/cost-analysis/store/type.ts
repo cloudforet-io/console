@@ -16,11 +16,12 @@ export interface GroupByItem {
 
 export interface CostAnalysisStoreState {
     chartType: ChartType;
-    granularity: string;
+    granularity: Granularity;
     groupByItems: Array<GroupByItem>;
-    groupByItem?: GroupByItem;
+    groupBy?: string;
     selectedDates: Array<string>;
     currency: Currency;
     chartData: Array<ChartData>;
     legends: Array<Legend>;
+    filters: Array<any>; // todo
 }

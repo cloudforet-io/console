@@ -47,7 +47,7 @@ export default {
     },
     setup() {
         const state = reactive({
-            selectedGroupByItems: computed(() => store.state.service.costAnalysis.groupByItems),
+            selectedGroupByItems: computed<Array<GroupByItem>>(() => store.state.service.costAnalysis.groupByItems),
             groupByItems: [
                 { name: GROUP_BY_ITEM.PROJECT, label: 'Project' },
                 { name: GROUP_BY_ITEM.SERVICE_ACCOUNT, label: 'Service Account' },

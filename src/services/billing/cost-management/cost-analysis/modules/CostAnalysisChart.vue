@@ -34,7 +34,7 @@
             <div class="title-wrapper">
                 <p-select-dropdown v-if="selectedGroupByItems.length"
                                    :items="selectedGroupByItems"
-                                   :selected="selectedGroupByItem ? selectedGroupByItem.name : undefined"
+                                   :selected="selectedGroupBy"
                                    without-outline
                                    @select="handleSelectGroupByItem"
                 />
@@ -54,7 +54,7 @@
                      @click="handleClickLegend(idx)"
                 >
                     <p-status :text="legend.label"
-                              :icon-color="legend.disabled ? DISABLED_COLOR : CUSTOM_COLORS[idx]"
+                              :icon-color="legend.disabled ? DISABLED_COLOR : CUSTOM_COLORS[idx % CUSTOM_COLORS.length]"
                               :text-color="legend.disabled ? DISABLED_COLOR : null"
                     />
                 </div>
@@ -86,9 +86,9 @@ import CostAnalysisSelectFilterModal
 import { store } from '@/store';
 import { gray } from '@/styles/colors';
 import { CUSTOM_COLORS, hideAllSeries, toggleSeries } from '@/common/composables/dynamic-chart';
-import { Legend } from '@/common/composables/dynamic-chart/type';
 import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
-import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { ChartType, Granularity, GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { ChartData, Legend } from '@/common/composables/dynamic-chart/type';
 
 const DISABLED_COLOR = gray[300];
 
@@ -104,11 +104,12 @@ export default {
     },
     setup() {
         const state = reactive({
-            selectedGranularity: computed(() => store.state.service.costAnalysis.granularity),
-            selectedGroupByItems: computed(() => store.state.service.costAnalysis.groupByItems),
-            selectedGroupByItem: computed(() => store.state.service.costAnalysis.groupByItem),
-            selectedChartType: computed(() => store.state.service.costAnalysis.chartType),
-            chartData: computed(() => store.state.service.costAnalysis.chartData),
+            selectedGranularity: computed<Granularity>(() => store.state.service.costAnalysis.granularity),
+            selectedGroupByItems: computed<Array<GroupByItem>>(() => store.state.service.costAnalysis.groupByItems),
+            selectedGroupBy: computed<string>(() => store.state.service.costAnalysis.groupBy),
+            selectedChartType: computed<ChartType>(() => store.state.service.costAnalysis.chartType),
+            legends: computed<Legend>(() => store.state.service.costAnalysis.legends),
+            chartData: computed<ChartData>(() => store.state.service.costAnalysis.chartData),
             period: computed(() => {
                 const selectedDates = store.state.service.costAnalysis.selectedDates;
                 return {
@@ -119,28 +120,12 @@ export default {
             //
             chart: null as XYChart | PieChart | null,
             filters: [],
-            legends: [] as Legend[],
+            colors: computed(() => state.chart?.colors),
         });
 
         const selectFilterModalState = reactive({
             visible: false,
         });
-
-        /* util */
-        const setSampleLegends = () => {
-            if (state.selectedGroupByItems.length) {
-                state.legends = [
-                    { name: 'seoul', label: 'Seoul', disabled: false },
-                    { name: 'tokyo', label: 'Tokyo', disabled: false },
-                    { name: 'virginia', label: 'Virginia', disabled: false },
-                    { name: 'california', label: 'California', disabled: false },
-                    { name: 'frankfurt', label: 'Frankfurt', disabled: false },
-                    { name: 'stockholm', label: 'Stockholm', disabled: false },
-                ];
-            } else {
-                state.legends = [{ name: 'total_cost', label: 'Total Cost', disabled: false }];
-            }
-        };
 
         /* event */
         const handleClickLegend = (index) => {
@@ -153,9 +138,9 @@ export default {
                 d.disabled = true;
             });
         };
-        const handleSelectGroupByItem = async (groupByItem?: GroupByItem) => {
-            store.commit('service/costAnalysis/setGroupByItem', groupByItem);
-            await store.dispatch('service/costAnalysis/getChartData');
+        const handleSelectGroupByItem = async (groupBy?: string) => {
+            store.commit('service/costAnalysis/setGroupBy', groupBy);
+            await store.dispatch('service/costAnalysis/listChartData');
         };
         const handleClickSelectFilter = () => {
             selectFilterModalState.visible = true;
@@ -167,14 +152,10 @@ export default {
         watch(() => state.selectedGroupByItems, (after, before) => {
             if (!after.length) {
                 handleSelectGroupByItem(undefined);
-            } else if ((!before.length && after.length) || !after.filter(d => d.name === state.selectedGroupByItem.name).length) {
-                handleSelectGroupByItem(after[0]);
+            } else if ((!before.length && after.length) || !after.filter(d => d.name === state.selectedGroupBy).length) {
+                handleSelectGroupByItem(after[0].name);
             }
-            setSampleLegends();
         });
-
-        // todo get temp legends
-        setSampleLegends();
 
         return {
             ...toRefs(state),
