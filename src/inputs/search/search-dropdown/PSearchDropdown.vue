@@ -325,6 +325,7 @@ export default defineComponent<SearchDropdownProps>({
 
         const onDeleteTag = (item: MenuItem, index: number) => {
             state.proxySelected.splice(index, 1);
+            state.proxySelected = [...state.proxySelected];
             emit('delete-tag', item, index);
         };
 

@@ -185,7 +185,7 @@ export default defineComponent<Props>({
                 const idx = state.selectedItems.findIndex(d => d.path.toString() === path.toString());
                 if (idx === -1) {
                     if (value) {
-                        state.selectedItems.push({ node, path });
+                        state.selectedItems = [...state.selectedItems, { node, path }];
                         node.$nodeBackClass = 'selected';
                     }
                 } else {
