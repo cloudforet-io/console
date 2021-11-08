@@ -132,7 +132,7 @@ export default {
 
 <style lang="postcss" scoped>
 .alert-table-bottom-filters {
-    @apply flex justify-between border-gray-200;
+    @apply flex justify-between;
     padding: 0.75rem 1rem;
     .filter {
         @apply flex items-center;

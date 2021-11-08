@@ -2,7 +2,6 @@
     <fragment>
         <div class="alert-data-table">
             <p-toolbox-table
-                style-type="light-gray"
                 searchable
                 selectable
                 sortable
@@ -464,6 +463,10 @@ export default {
             }
         }
         .p-toolbox {
+            @apply border-gray-200;
+            border-style: solid;
+            border-top-width: 1px;
+            border-bottom-width: 1px;
             .p-dropdown-menu-button {
                 @apply bg-white;
             }
