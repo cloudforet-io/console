@@ -30,18 +30,18 @@
                 </p>
                 <template v-for="(condition, idx) of conditions">
                     <article :key="`condition-${idx}`" class="condition-input-wrapper">
-                        <p-select-dropdown v-model="condition.notification_unit"
+                        <p-select-dropdown v-model="condition.unit"
                                            class="condition"
                                            :items="units"
                                            use-fixed-menu-style
                         />
                         <p-text-input v-model="condition.threshold"
                                       class="condition"
-                                      :placeholder="condition.notification_unit === NOTIFICATION_UNIT.ACTUAL_COST
+                                      :placeholder="condition.unit === NOTIFICATION_UNIT.ACTUAL_COST
                                           ? '$1000' : '50'"
                         >
                             <template #right-extra>
-                                <span v-if="condition.notification_unit === NOTIFICATION_UNIT.PERCENT" class="text-gray-400">%</span>
+                                <span v-if="condition.unit === NOTIFICATION_UNIT.PERCENT" class="text-gray-400">%</span>
                             </template>
                         </p-text-input>
                         <p-select-dropdown v-model="condition.notification_type"
@@ -88,7 +88,7 @@ const NOTIFICATION_TYPE = {
 type NotificationType = keyof typeof NOTIFICATION_TYPE;
 
 interface Condition {
-    notification_unit?: NotificationUnit;
+    unit?: NotificationUnit;
     threshold?: number | null;
     notification_type?: NotificationType;
 }
@@ -139,7 +139,7 @@ export default {
 
         const handleAddCondition = () => {
             state.conditions.push({
-                notification_unit: 'ACTUAL_COST',
+                unit: 'ACTUAL_COST',
                 threshold: null,
                 notification_type: 'WARNING',
             });

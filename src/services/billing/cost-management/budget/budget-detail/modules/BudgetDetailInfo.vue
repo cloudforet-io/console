@@ -28,8 +28,15 @@
                 <span class="text-gray-900 font-normal">{{ costTypeKey }}</span>
             </span>
             <p class="summary-content cost-type">
-                <span v-for="item in costTypeValue" :key="item" class="cost-type-content">{{ item }}</span>
-                <span class="view-all">View all</span>
+                <span class="cost-type-content">{{ processedCostTypeValue }}</span>
+                <span ref="buttonRef" class="view-all" @click="handleClickViewAll">View all</span>
+                <budget-cost-type-balloon v-if="balloonVisible"
+                                          class="cost-type-balloon"
+                                          :balloon-width="balloonWidth"
+                                          :balloon-visible.sync="balloonVisible"
+                                          :cost-type-key="costTypeKey"
+                                          :cost-type-value="costTypeValue"
+                />
             </p>
         </p-pane-layout>
     </section>
@@ -41,13 +48,16 @@ import { PPaneLayout, PAnchor } from '@spaceone/design-system';
 import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 import { BudgetData, CostType } from '@/services/billing/cost-management/budget/type';
+import BudgetCostTypeBalloon
+    from '@/services/billing/cost-management/budget/budget-detail/modules/BudgetCostTypeBalloon.vue';
 
-const getKeyOfCostType = (costType: Record<CostType, string[]>) => Object.keys(costType).filter(k => (costType[k] !== null))[0];
-const getValueOfCostType = (costType: Record<CostType, string[]>, costTypeKey: string) => costType[costTypeKey];
+const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter(k => (costType[k] !== null))[0];
+const getValueOfCostType = (costType: Record<CostType, string[]|null>, costTypeKey: string) => costType[costTypeKey];
 
 export default {
     name: 'BudgetDetailSummary',
     components: {
+        BudgetCostTypeBalloon,
         PPaneLayout,
         PAnchor,
     },
@@ -57,12 +67,24 @@ export default {
             budgetData: computed<BudgetData>(() => store.state.service.budget.budgetData),
             costTypeKey: computed(() => getKeyOfCostType(state.budgetData.cost_types)),
             costTypeValue: computed(() => getValueOfCostType(state.budgetData.cost_types, state.costTypeKey)),
+            processedCostTypeValue: computed(() => state.costTypeValue.join(', ')),
+            buttonRef: null as HTMLElement | null,
+            balloonWidth: 0,
+            balloonVisible: false,
         });
+
+        const handleClickViewAll = () => {
+            const rect = state.buttonRef.getBoundingClientRect();
+            const width = rect.width;
+            state.balloonWidth = width;
+            state.balloonVisible = true;
+        };
 
 
         return {
             ...toRefs(state),
             referenceRouter,
+            handleClickViewAll,
         };
     },
 };
@@ -87,13 +109,14 @@ export default {
         line-height: 120%;
         &.cost-type {
             @apply flex justify-between;
+            position: relative;
             .cost-type-content {
                 @apply truncate;
                 font-size: 0.875rem;
                 line-height: 130%;
             }
             .view-all {
-                @apply text-blue-600;
+                @apply text-blue-600 cursor-pointer;
                 font-size: 0.875rem;
                 margin-left: 0.5rem;
                 flex-shrink: 0;
