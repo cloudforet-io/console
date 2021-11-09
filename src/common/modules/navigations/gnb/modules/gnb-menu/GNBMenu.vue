@@ -1,7 +1,6 @@
 <template>
-    <div class="gnb-menu" :class="{disabled: !hasPermission}">
-        <div v-if="show"
-             class="menu-button"
+    <div v-if="show" class="gnb-menu" :class="{disabled: !hasPermission}">
+        <div class="menu-button"
              :class="[{
                  opened: subMenuList.length > 0 && isOpened,
                  selected: isSelected,
