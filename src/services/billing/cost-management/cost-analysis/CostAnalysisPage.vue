@@ -6,15 +6,17 @@
                                class="list-button"
             >
                 <template #menu-item--format="{item}">
-                    <div class="dropdown-item-modal">
-                        <p-i v-if="item.scope === QUERY_VISIBILITY_TYPE.PRIVATE" name="ic_security" width="1rem"
-                             height="1rem"
-                        />
-                        <span>{{ item.label }}</span>
-                    </div>
-                    <div v-if="item.name !== 'default'" class="button-wrapper">
-                        <p-icon-button name="ic_trashcan" size="sm" @click.stop="handleClickDeleteQuery(item.cost_query_set_id)" />
-                        <p-icon-button name="ic_edit-text" size="sm" @click.stop="handleClickEditQuery(item)" />
+                    <div class="query-item-wrapper" @click="handleClickQueryItem(item.cost_query_set_id)">
+                        <div class="dropdown-item-modal">
+                            <p-i v-if="item.scope === QUERY_VISIBILITY_TYPE.PRIVATE" name="ic_security" width="1rem"
+                                 height="1rem"
+                            />
+                            <span>{{ item.label }}</span>
+                        </div>
+                        <div v-if="item.name !== 'default'" class="button-wrapper">
+                            <p-icon-button name="ic_trashcan" size="sm" @click.stop="handleClickDeleteQuery(item.cost_query_set_id)" />
+                            <p-icon-button name="ic_edit-text" size="sm" @click.stop="handleClickEditQuery(item)" />
+                        </div>
                     </div>
                 </template>
             </p-select-dropdown>
@@ -84,6 +86,7 @@ import { showSuccessMessage, showErrorMessage } from '@/lib/helper/notice-alert-
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { store } from '@/store';
 
 export default {
     name: 'CostAnalysisPage',
@@ -179,6 +182,10 @@ export default {
             }
         };
 
+        const handleClickQueryItem = async (queryItemId) => {
+            await store.dispatch('service/costAnalysis/getSelectedQueryItem', queryItemId);
+        };
+
         watch(() => saveQueryFormState.visible, () => {
             if (saveQueryFormState.visible === false) saveQueryFormState.selectedQuery = {};
         });
@@ -192,6 +199,7 @@ export default {
             handleClickEditQuery,
             handleClickSaveQuery,
             handleDeleteQueryConfirm,
+            handleClickQueryItem,
             listCostQuerySet,
             QUERY_VISIBILITY_TYPE,
         };
@@ -217,6 +225,10 @@ export default {
                     justify-content: space-between;
                 }
             }
+        }
+        .query-item-wrapper {
+            @apply flex justify-between;
+            width: 100%;
         }
         .title-extra-wrapper {
             width: 100%;

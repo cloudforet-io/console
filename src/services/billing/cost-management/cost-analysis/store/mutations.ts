@@ -35,3 +35,7 @@ export const setChartData: Mutation<CostAnalysisStoreState> = (state, chartData:
 export const setLegends: Mutation<CostAnalysisStoreState> = (state, legends: Array<Legend>) => {
     state.legends = legends;
 };
+
+export const setFilters: Mutation<CostAnalysisStoreState> = (state, filters: Array<any>) => {
+    state.filters = filters;
+};

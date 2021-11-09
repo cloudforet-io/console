@@ -62,6 +62,7 @@ import { i18n } from '@/translations';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { store } from '@/store';
 
 interface Props {
     listCostQuerySet: () => void;
@@ -149,9 +150,21 @@ export default {
 
         const saveQuery = async () => {
             try {
+                const {
+                    granularity, chartType, selectedDates,
+                    currency, groupByItems, filters,
+                } = store.state.service.costAnalysis;
                 await SpaceConnector.client.costAnalysis.costQuerySet.create({
                     name: formState.queryName,
-                    options: {},
+                    options: {
+                        granularity,
+                        chart_type: chartType,
+                        start: selectedDates[0],
+                        end: selectedDates[1],
+                        currency,
+                        group_by: groupByItems,
+                        filter: filters,
+                    },
                 });
                 await props.listCostQuerySet();
                 showSuccessMessage(vm.$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '', vm.$root);
@@ -199,7 +212,6 @@ export default {
         const handleFirstQueryNameInput = () => {
             state.showValidation = true;
         };
-
         return {
             ...toRefs(state),
             formState,

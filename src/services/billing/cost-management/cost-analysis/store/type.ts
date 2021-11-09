@@ -1,4 +1,6 @@
-import { CHART_TYPE, CURRENCY, GRANULARITY } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import {
+    CHART_TYPE, CURRENCY, GRANULARITY,
+} from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { Legend } from '@/common/composables/dynamic-chart/type';
 
 export interface ChartData {
@@ -24,4 +26,14 @@ export interface CostAnalysisStoreState {
     chartData: Array<ChartData>;
     legends: Array<Legend>;
     filters: Array<any>; // todo
+}
+
+export interface GetQueryItemOptionsModel {
+    chart_type: ChartType;
+    currency: Currency;
+    start: string;
+    end: string;
+    filter: Array<any>;
+    granularity: Granularity;
+    group_by: Array<GroupByItem>;
 }

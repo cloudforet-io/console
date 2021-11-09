@@ -107,3 +107,17 @@ export const getTableData: Action<CostAnalysisStoreState, any> = async ({ commit
         ErrorHandler.handleError(e);
     }
 };
+
+export const getSelectedQueryItem: Action<CostAnalysisStoreState, any> = async ({ commit, state }, queryItemId): Promise<void|Error> => {
+    try {
+        const { options } = await SpaceConnector.client.costAnalysis.costQuerySet.get({ cost_query_set_id: queryItemId });
+        commit('setChartType', options.chart_type);
+        commit('setGranularity', options.granularity);
+        commit('setGroupByItems', options.group_by);
+        commit('setSelectedDates', [options.start, options.end]);
+        commit('setCurrency', options.currency);
+        commit('setFilters', options.filter);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
