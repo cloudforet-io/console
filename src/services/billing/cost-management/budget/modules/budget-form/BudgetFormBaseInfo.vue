@@ -13,7 +13,7 @@
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_TARGET')"
                            required
             >
-                <project-select-dropdown :selected-project-ids="selectedTargets" />
+                <project-select-dropdown :selected-project-ids.sync="selectedTargets" />
             </p-field-group>
 
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_COST_TYPE')"
@@ -25,6 +25,12 @@
                 >
                     {{ costTypeLabel }}
                 </p-radio>
+                <p-search-dropdown v-if="selectedCostType !== 'all'"
+                                   :handler="resourceMenuHandler"
+                                   :loading="resourceMenuLoading"
+                                   type="checkbox"
+                                   :selected.sync="selectedResources"
+                />
             </p-field-group>
         </div>
     </p-pane-layout>
@@ -32,23 +38,34 @@
 
 <script lang="ts">
 import {
-    computed,
-    reactive, toRefs,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
+
 import {
-    PFieldGroup, PPaneLayout, PPanelTop, PRadio, PTextInput,
+    PFieldGroup, PPaneLayout, PPanelTop, PRadio, PSearchDropdown, PTextInput,
 } from '@spaceone/design-system';
+import {
+    SearchDropdownMenuItem, AutocompleteHandler,
+} from '@spaceone/design-system/dist/src/inputs/search/search-dropdown/type';
+
+import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { i18n } from '@/translations';
 import { TranslateResult } from 'vue-i18n';
-import { BudgetCostType, BudgetTarget } from '@/services/billing/cost-management/budget/type';
-import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
-import { store } from '@/store';
+import { BudgetCostType } from '@/services/billing/cost-management/budget/type';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import axios, { CancelTokenSource } from 'axios';
 
 
-type BudgetTargetItems = Record<BudgetTarget, TranslateResult>
 type BudgetCostTypes = Record<BudgetCostType, TranslateResult>
 
+const COST_TYPE_TO_RESOURCE_TYPE: Record<Exclude<BudgetCostType, 'all'>, string> = {
+    provider: 'identity.Provider',
+    region: 'inventory.Region',
+    account: 'identity.ServiceAccount',
+    product: 'inventory.CloudServiceType',
+};
 
 export default {
     name: 'BudgetFormBaseInfo',
@@ -59,6 +76,7 @@ export default {
         PFieldGroup,
         PTextInput,
         PRadio,
+        PSearchDropdown,
     },
     props: {
         budgetId: {
@@ -69,12 +87,8 @@ export default {
     setup() {
         const state = reactive({
             name: '',
-            selectedTargets: [],
+            selectedTargets: [] as string[],
             selectedCostType: 'all' as BudgetCostType,
-            targetItems: computed<BudgetTargetItems>(() => ({
-                PROJECT: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PROJECT'),
-                PROJECT_GROUP: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PROJECT_GROUP'),
-            })),
             costTypeItems: computed<BudgetCostTypes>(() => ({
                 all: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ALL'),
                 provider: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PROVIDER'),
@@ -82,15 +96,61 @@ export default {
                 account: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ACCOUNT'),
                 product: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PRODUCT'),
             })),
+            selectedResources: [] as SearchDropdownMenuItem[],
+            resourceMenuLoading: false,
         });
 
-        /* Init */
-        (async () => {
-            await store.dispatch('resource/project/load');
-        })();
+
+        let resourceToken: CancelTokenSource | undefined;
+        const getResources = async (inputText: string, resourceType): Promise<{name: string; key: string}[]|void> => {
+            if (resourceToken) {
+                resourceToken.cancel('Next request has been called.');
+                resourceToken = undefined;
+            }
+
+            resourceToken = axios.CancelToken.source();
+
+            try {
+                const { results } = await SpaceConnector.client.addOns.autocomplete.resource({
+                    resource_type: resourceType,
+                    search: inputText,
+                    options: {
+                        limit: 10,
+                    },
+                }, {
+                    cancelToken: resourceToken.token,
+                });
+                resourceToken = undefined;
+
+                return results;
+            } catch (e) {
+                if (!axios.isCancel(e.axiosError)) {
+                    ErrorHandler.handleError(e);
+                }
+
+                return undefined;
+            }
+        };
+
+        const resourceMenuHandler: AutocompleteHandler = async (value: string) => {
+            const resourceType = COST_TYPE_TO_RESOURCE_TYPE[state.selectedCostType];
+            if (!resourceType) return { results: [] };
+
+            state.resourceMenuLoading = true;
+            const results = await getResources(value, resourceType);
+            state.resourceMenuLoading = false;
+
+            return { results: results ? results.map(d => ({ name: d.key, label: d.name })) : [] };
+        };
+
+        watch(() => state.selectedCostType, () => {
+            state.selectedResources = [];
+        });
+
 
         return {
             ...toRefs(state),
+            resourceMenuHandler,
         };
     },
 };

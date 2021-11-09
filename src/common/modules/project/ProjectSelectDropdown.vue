@@ -13,6 +13,9 @@
                            :selected.sync="selectedProjectItems"
                            @delete-tag="handleDeleteTag"
         >
+            <template #menu-no-data-format>
+                <div />
+            </template>
             <template #menu-menu>
                 <p-tree :edit-options="{disabled: true}"
                         :drag-options="{disabled: true}"
