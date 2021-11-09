@@ -1,3 +1,10 @@
+# [1.1.0-beta.170](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.169...v1.1.0-beta.170) (2021-11-09)
+
+
+### Bug Fixes
+
+* fix not working handler bug in search dropdown ([#739](https://github.com/spaceone-dev/spaceone-design-system/issues/739)) ([94e77ce](https://github.com/spaceone-dev/spaceone-design-system/commit/94e77cecd004c39a210bdb3bb5d6cc49d543067c))
+
 # [1.1.0-beta.169](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.168...v1.1.0-beta.169) (2021-11-09)
 
 
