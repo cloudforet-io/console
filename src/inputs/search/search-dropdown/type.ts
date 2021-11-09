@@ -15,7 +15,7 @@ export const SEARCH_DROPDOWN_TYPE = Object.freeze({
 
 export type SEARCH_DROPDOWN_TYPE = typeof SEARCH_DROPDOWN_TYPE[keyof typeof SEARCH_DROPDOWN_TYPE];
 
-export type SearchDropdownSelectedItem = MenuItem;
+export type SearchDropdownMenuItem = MenuItem;
 
 export interface SearchDropdownProps extends ContextMenuFixedStyleProps {
     /* search props */
@@ -26,7 +26,7 @@ export interface SearchDropdownProps extends ContextMenuFixedStyleProps {
     /* context menu props */
     menu: MenuItem[];
     loading?: boolean;
-    selected?: SearchDropdownSelectedItem[];
+    selected?: SearchDropdownMenuItem[];
     showSelectedList?: boolean;
     /* extra props */
     type?: SEARCH_DROPDOWN_TYPE;

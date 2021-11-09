@@ -85,7 +85,7 @@ import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PButton from '@/inputs/buttons/button/PButton.vue';
 
 import {
-    SEARCH_DROPDOWN_TYPE, SearchDropdownProps, SearchDropdownSelectedItem,
+    SEARCH_DROPDOWN_TYPE, SearchDropdownProps, SearchDropdownMenuItem,
 } from '@/inputs/search/search-dropdown/type';
 
 export default defineComponent<SearchDropdownProps>({
@@ -195,9 +195,9 @@ export default defineComponent<SearchDropdownProps>({
             proxyIsFocused: makeOptionalProxy('isFocused', vm, false),
             proxySelected: makeOptionalProxy('selected', vm, []),
             proxyPlaceholder: makeOptionalProxy('placeholder', vm, undefined),
-            filteredMenu: [] as SearchDropdownSelectedItem[],
-            bindingMenu: computed<SearchDropdownSelectedItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
-            searchableItems: computed<SearchDropdownSelectedItem[]>(() => props.menu.filter(d => d.type === undefined || d.type === 'item')),
+            filteredMenu: [] as SearchDropdownMenuItem[],
+            bindingMenu: computed<SearchDropdownMenuItem[]>(() => (props.disableHandler ? props.menu : state.filteredMenu)),
+            searchableItems: computed<SearchDropdownMenuItem[]>(() => props.menu.filter(d => d.type === undefined || d.type === 'item')),
             searchRegex: computed(() => new RegExp(state.proxyValue || '', 'i')),
             selectedNames: computed(() => state.proxySelected.map(item => item.name)),
             //
@@ -212,8 +212,8 @@ export default defineComponent<SearchDropdownProps>({
         });
 
         /* util */
-        const defaultHandler = (inputText: string, list: SearchDropdownSelectedItem[]) => {
-            let results: SearchDropdownSelectedItem[] = [...list];
+        const defaultHandler = (inputText: string, list: SearchDropdownMenuItem[]) => {
+            let results: SearchDropdownMenuItem[] = [...list];
             const trimmed = inputText.trim();
             if (trimmed) {
                 const regex = new RegExp(inputText, 'i');
@@ -225,7 +225,7 @@ export default defineComponent<SearchDropdownProps>({
         const filterMenu = async (val: string) => {
             if (props.disableHandler) return;
 
-            let results: SearchDropdownSelectedItem[];
+            let results: SearchDropdownMenuItem[];
             if (props.handler) {
                 let res = props.handler(val, state.searchableItems);
                 if (res instanceof Promise) res = await res;
@@ -289,7 +289,7 @@ export default defineComponent<SearchDropdownProps>({
                 )
             ) {
                 // If there is an existing selected item, the value will be placeholder & filter will be initialized
-                const selectedItem = state.proxySelected[0] as SearchDropdownSelectedItem;
+                const selectedItem = state.proxySelected[0] as SearchDropdownMenuItem;
                 state.proxyPlaceholder = selectedItem.label ?? selectedItem.name ?? '';
                 state.proxyValue = '';
                 filterMenu('');
@@ -322,7 +322,7 @@ export default defineComponent<SearchDropdownProps>({
             showMenu();
         };
 
-        const onDeleteTag = (item: SearchDropdownSelectedItem, index: number) => {
+        const onDeleteTag = (item: SearchDropdownMenuItem, index: number) => {
             state.proxySelected.splice(index, 1);
             state.proxySelected = [...state.proxySelected];
             emit('delete-tag', item, index);
@@ -351,7 +351,7 @@ export default defineComponent<SearchDropdownProps>({
             filterMenu(val);
         };
 
-        const handleSelectMenuItem = (item: SearchDropdownSelectedItem) => {
+        const handleSelectMenuItem = (item: SearchDropdownMenuItem) => {
             if (props.type === SEARCH_DROPDOWN_TYPE.default || props.type === SEARCH_DROPDOWN_TYPE.radioButton) {
                 hideMenu('click');
             }
