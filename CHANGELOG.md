@@ -1,3 +1,10 @@
+# [1.1.0-beta.171](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.170...v1.1.0-beta.171) (2021-11-09)
+
+
+### Bug Fixes
+
+* change logo text ([#740](https://github.com/spaceone-dev/spaceone-design-system/issues/740)) ([f7c3595](https://github.com/spaceone-dev/spaceone-design-system/commit/f7c3595b613a62a5183ef3a04c2c30c74e982292))
+
 # [1.1.0-beta.170](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.169...v1.1.0-beta.170) (2021-11-09)
 
 
