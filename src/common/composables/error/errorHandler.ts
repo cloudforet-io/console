@@ -9,6 +9,7 @@ import {
 } from '@spaceone/console-core-lib/space-connector/error';
 import { isInstanceOfNoResourceError, isInstanceOfNoSearchResourceError } from '@/common/composables/error/error';
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
+import { TranslateResult } from 'vue-i18n';
 
 
 export default class ErrorHandler {
@@ -20,10 +21,6 @@ export default class ErrorHandler {
 
         case isInstanceOfNotFoundError(error):
             showErrorMessage('관리자에게 문의하세요.', error);
-            break;
-
-        case isInstanceOfBadRequestError(error):
-            showErrorMessage('Bad Request Error', error);
             break;
 
         case isInstanceOfAuthenticationError(error):
@@ -55,5 +52,11 @@ export default class ErrorHandler {
             console.error(error);
             break;
         }
+    }
+
+    static handleRequestError(error, i18nKey: TranslateResult) {
+        if (isInstanceOfBadRequestError(error) && i18nKey) showErrorMessage(i18nKey, error);
+        else if (isInstanceOfAPIError(error)) showErrorMessage('Something is Wrong! Please contact the administrator.', error);
+        else console.error(error);
     }
 }
