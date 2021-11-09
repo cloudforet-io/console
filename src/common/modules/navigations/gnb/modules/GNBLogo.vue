@@ -3,7 +3,7 @@
         <component :is="to ? 'router-link' : 'div'"
                    class="inline-block" :to="to"
         >
-            <div class="logo-wrapper mr-4 lg:mr-10">
+            <div class="logo-wrapper">
                 <template v-if="images">
                     <img class="logo-character" :src="images.ciLogo">
                     <img class="logo-text" :src="images.ciText">
@@ -61,16 +61,16 @@ export default {
         display: inline-block;
         .logo-character {
             display: inline-block;
-            width: 1.875rem;
-            height: 1.875rem;
+            width: 1.75rem;
+            height: 1.75rem;
         }
         .logo-text {
-            display: none;
-            height: 0.875rem;
-            margin-left: 0.5rem;
+            display: inline-block;
+            height: 1rem;
+            margin-left: 0.25rem;
 
-            @screen lg {
-                display: inline-block;
+            @screen mobile {
+                display: none;
             }
         }
     }

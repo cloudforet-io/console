@@ -111,6 +111,11 @@ export default {
 .gnb-menu {
     position: relative;
     display: inline-block;
+    margin-left: 2rem;
+
+    @screen laptop {
+        margin-left: 1rem;
+    }
 
     @screen tablet {
         display: none;
@@ -121,36 +126,21 @@ export default {
         cursor: pointer;
         text-decoration: none;
         text-transform: capitalize;
-        opacity: 0.5;
 
-        &.opened {
-            @apply text-primary;
-            opacity: 1;
+        &.opened, &:hover {
+            @apply text-secondary;
         }
-        &.selected {
-            opacity: 1;
-        }
-        &:hover {
-            @apply text-primary;
-            opacity: 1;
-        }
-
         .arrow-button {
-            margin-left: 0.25rem;
+            margin-left: 0.125rem;
         }
     }
     &.disabled {
         .menu-button {
-            @apply text-gray-900;
+            @apply text-gray-300;
             cursor: not-allowed;
-            opacity: 0.2;
 
-            &.selected {
-                opacity: 0.2;
-            }
             &:hover {
-                @apply text-gray-900;
-                opacity: 0.2;
+                @apply text-gray-300;
             }
         }
     }

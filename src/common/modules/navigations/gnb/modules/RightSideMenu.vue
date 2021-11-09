@@ -255,28 +255,25 @@ export default {
 .right-side-menu {
     .menu-wrapper {
         position: relative;
+        margin-left: 1.5rem;
+
+        @screen laptop {
+            margin-left: 0.75rem;
+        }
+        &:first-of-type {
+            margin-left: 0;
+        }
         .menu-button {
-            @apply text-gray-900;
+            @apply text-gray-500;
             cursor: pointer;
 
-            &.opacity {
-                opacity: 0.5;
-            }
             &.opened {
-                @apply text-primary;
-                opacity: 1;
-            }
-            &.code, &.notifications {
-                margin-right: 1.5rem;
-                &:not(.opened):not(:hover) {
-                    @apply text-gray-500;
-                }
+                @apply text-secondary;
             }
 
             @media (hover: hover) {
                 &:hover {
-                    @apply text-primary;
-                    opacity: 1;
+                    @apply text-secondary;
                 }
             }
 
@@ -284,7 +281,6 @@ export default {
                 margin-right: 0.5rem;
             }
             &.account {
-                margin-left: 1.5rem;
 
                 .menu-icon {
                     width: 2rem;
@@ -292,7 +288,7 @@ export default {
                     overflow: hidden;
                     background-size: cover;
                     box-shadow: inset 0 0 0 2px theme('colors.gray.200');
-                    margin-top: 0.5rem;
+                    margin-top: 0.625rem;
                     border-radius: 0.625rem;
 
                     &.admin {
@@ -339,16 +335,20 @@ export default {
                 cursor: pointer;
                 padding: 0.5rem;
                 &:hover, &:focus {
-                    @apply bg-primary4 text-primary;
+                    @apply bg-secondary2 text-secondary;
                 }
                 &:active {
                     @apply bg-white;
+                }
+                &.p-anchor::v-deep:hover .text {
+                    text-decoration: none;
                 }
             }
             .info-wrapper {
                 padding: 1rem 0.5rem 0.5rem 0.5rem;
                 .info-row {
                     position: relative;
+                    width: 100%;
                     line-height: 1.5rem;
                     font-size: 0.75rem;
 
@@ -361,7 +361,7 @@ export default {
                         display: inline-flex;
                         cursor: pointer;
                         &:hover, &:focus {
-                            @apply bg-primary4 text-primary rounded-sm;
+                            @apply bg-secondary-2 text-secondary rounded-sm;
                         }
                         .p-i-icon {
                             display: inline-block;

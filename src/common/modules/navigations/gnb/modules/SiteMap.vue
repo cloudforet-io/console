@@ -1,7 +1,7 @@
 <template>
     <div class="sitemap-container" :class="{'disabled': disabled}">
         <div class="sitemap-button" :class="visible ? 'visible' : ''" @click="toggleMenu">
-            <p-i class="sitemap-icon" :name="visible ? 'ic_delete' : 'ic_gnb_service_2'"
+            <p-i class="sitemap-icon" :name="visible ? 'ic_delete' : 'ic_gnb_menu'"
                  color="inherit"
                  width="2rem" height="2rem"
             />
@@ -125,20 +125,15 @@ export default {
 <style lang="postcss" scoped>
 .sitemap-container {
     .sitemap-button {
+        @apply text-gray-900;
         position: relative;
         cursor: pointer;
         text-decoration: none;
-        opacity: 0.5;
-        &:hover {
-            @apply text-primary;
-            opacity: 1;
+        &:hover, &.visible {
+            @apply text-secondary;
             .sitemap-icon {
-                @apply bg-primary4;
+                @apply bg-blue-200;
             }
-        }
-        &.visible {
-            @apply text-primary;
-            opacity: 1;
         }
         .sitemap-icon {
             @apply rounded-full;
@@ -165,11 +160,11 @@ export default {
             display: block;
             font-size: 0.875rem;
             &:hover {
-                @apply text-primary;
-                transition: all ease 0.3s;
+                @apply text-secondary;
+                transition: color ease 0.4s;
                 &.menu .p-i-icon {
-                    @apply text-primary;
-                    transition: all ease 0.3s;
+                    @apply text-secondary;
+                    transition: color ease 0.4s;
                 }
             }
             &.menu {
@@ -187,8 +182,8 @@ export default {
                 line-height: 1.75rem;
                 padding-left: 3.5rem;
                 &:hover {
-                    @apply text-primary;
-                    transition: all ease 0.3s;
+                    @apply text-secondary;
+                    transition: color ease 0.4s;
                 }
             }
         }

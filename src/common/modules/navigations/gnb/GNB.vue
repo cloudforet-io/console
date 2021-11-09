@@ -17,7 +17,6 @@
                         :has-permission="hasPermission"
                         :is-opened="openedMenu === menu.name"
                         :is-selected="selectedMenu === menu.name"
-                        class="mr-4 lg:mr-8"
                         @toggle="toggleMenu"
                         @hide="hideMenu"
             />
@@ -253,12 +252,29 @@ export default {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.12);
 
     .left-part, .right-part {
-        line-height: 3rem;
+        line-height: $gnb-height;
     }
     .left-part {
+        padding-left: 1.5rem;
+
+        @screen tablet {
+            padding-left: 0;
+        }
+
+        @screen mobile {
+            padding-left: 0;
+        }
         .site-map-wrapper {
-            display: inline-block;
-            margin: 0 1rem;
+            display: none;
+            margin: 0 0.75rem;
+
+            @screen tablet {
+                display: inline-block;
+            }
+
+            @screen mobile {
+                display: inline-block;
+            }
         }
     }
     .right-part {
