@@ -1,3 +1,10 @@
+# [1.1.0-beta.168](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.167...v1.1.0-beta.168) (2021-11-09)
+
+
+### Bug Fixes
+
+* add SearchDropdownSelectedItem type ([#737](https://github.com/spaceone-dev/spaceone-design-system/issues/737)) ([975a382](https://github.com/spaceone-dev/spaceone-design-system/commit/975a382b69469c9bf56cef3248f203923a223e77))
+
 # [1.1.0-beta.167](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.166...v1.1.0-beta.167) (2021-11-08)
 
 
