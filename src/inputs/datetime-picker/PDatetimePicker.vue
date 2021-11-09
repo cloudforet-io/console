@@ -100,7 +100,6 @@ export default {
                 }
                 return vm.$t('COMPONENT.DATETIME_PICKER.SELECT_DATE');
             }),
-            offsetHours: computed(() => (dayjs().tz(props.timezone).utcOffset()) / 60),
             visiblePicker: false,
         });
 
@@ -125,8 +124,7 @@ export default {
             if (props.mode !== FLATPICKR_MODE.range || (props.mode === FLATPICKR_MODE.range && selectedDates.length === 2)) {
                 state.proxySelectedDates = selectedDates.map((d) => {
                     const dateString = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
-                    const timezoneDate = dayjs.utc(dateString).utcOffset(state.offsetHours, true);
-                    return timezoneDate.format();
+                    return dayjs.tz(dateString, props.timezone).format();
                 });
                 state.dateString = dateStr;
             } else {
@@ -159,11 +157,7 @@ export default {
             } else {
                 let defaultDate;
                 if (state.proxySelectedDates.length) {
-                    if (props.timezone === 'UTC') {
-                        defaultDate = state.proxySelectedDates.map(d => dayjs.utc(d).format('YYYY-MM-DD HH:mm'));
-                    } else {
-                        defaultDate = state.proxySelectedDates.map(d => dayjs(d).tz(props.timezone).format('YYYY-MM-DD HH:mm'));
-                    }
+                    defaultDate = state.proxySelectedDates.map(d => dayjs(d).tz(props.timezone).format('YYYY-MM-DD HH:mm'));
                 }
                 state.datePicker = Flatpickr(datePickerRef, {
                     mode: props.mode,
@@ -191,6 +185,9 @@ export default {
                 createDatePicker(datePickerRef);
             }
         });
+        watch(() => props.selectedDates, () => {
+            createDatePicker(state.datePickerRef as HTMLElement);
+        }, { immediate: false });
 
         return {
             ...toRefs(state),

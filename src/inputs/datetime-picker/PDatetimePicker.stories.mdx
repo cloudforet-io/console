@@ -97,23 +97,20 @@ export const Template = (args, { argTypes }) => ({
     <p>UTC</p>
     <p>{{ selectedUTCDates }}</p>
     <p-datetime-picker :enable-time="true" timezone="UTC" :selected-dates.sync="selectedUTCDates" />
-    <p>{{ selectedUTCDates }}</p>
     <br/><br/>
     <p>Asia/Seoul (GMT+9)</p>
     <p>{{ selectedSeoulDates }}</p>
     <p-datetime-picker :enable-time="true" timezone="Asia/Seoul" :selected-dates.sync="selectedSeoulDates" />
-    <p>{{ selectedSeoulDates }}</p>
     <br/><br/>
     <p>America/New_York (GMT-4)</p>
     <p>{{ selectedNewYorkDates }}</p>
     <p-datetime-picker :enable-time="true" timezone="America/New_York" :selected-dates.sync="selectedNewYorkDates" />
-    <p>{{ selectedNewYorkDates }}</p>
 </div>
 `,
             setup() {
                 const state = reactive({
-                    selectedUTCDates: ['2021-10-01T10:00:00Z'],
-                    selectedSeoulDates: ['2021-10-01T10:00:00+09:00'],
+                    selectedUTCDates: ['2021-10-01T00:00:00+09:00'],
+                    selectedSeoulDates: ['2021-10-01T10:00:00Z'],
                     selectedNewYorkDates: ['2021-10-01T10:00:00-04:00'],
                 });
                 return {
