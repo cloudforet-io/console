@@ -225,21 +225,20 @@ export default defineComponent<SearchDropdownProps>({
         const filterMenu = async (val: string) => {
             if (props.disableHandler) return;
 
-            let results: SearchDropdownMenuItem[];
             if (props.handler) {
                 let res = props.handler(val, state.searchableItems);
                 if (res instanceof Promise) res = await res;
-                results = res.results;
+                state.filteredMenu = res.results;
             } else {
-                results = defaultHandler(val, state.searchableItems).results;
-            }
+                const results = defaultHandler(val, state.searchableItems).results;
 
-            const filtered = props.menu.filter((item) => {
-                if (item.type && item.type !== 'item') return true;
-                return !!results.find(d => d.label === item.label);
-            });
-            if (filtered[filtered.length - 1]?.type === 'divider') filtered.pop();
-            state.filteredMenu = filtered;
+                const filtered = props.menu.filter((item) => {
+                    if (item.type && item.type !== 'item') return true;
+                    return !!results.find(d => d.label === item.label);
+                });
+                if (filtered[filtered.length - 1]?.type === 'divider') filtered.pop();
+                state.filteredMenu = filtered;
+            }
         };
 
         const getMatchText = (text: string): string => {

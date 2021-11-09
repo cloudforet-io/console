@@ -108,18 +108,18 @@ export const Template = (args, { argTypes }) => ({
         {{
             components: { PSearchDropdown, PButton },
             template: `
-            <p-search-dropdown :menu="menu" :loading="loading" :handler="simpleHandler" use-fixed-menu-style />
+            <p-search-dropdown :loading="loading" :handler="simpleHandler" use-fixed-menu-style />
 `,
             setup() {
                 const state = reactive({
                     loading: false,
-                    menu: getSearchDropdownMenuWithMultiTypes()
                 })
-                const simpleHandler = async (inputText, list) => {
+                const menu = getSearchDropdownMenuWithMultiTypes()
+                const simpleHandler = async (inputText) => {
                     state.loading = true;
                     const results = await new Promise(resolve => {
                         setTimeout(() => {
-                            let results = [...list];
+                            let results = [...menu];
                             const trimmed = inputText.trim();
                             if (trimmed) {
                                 results = new Fuse(results, {
