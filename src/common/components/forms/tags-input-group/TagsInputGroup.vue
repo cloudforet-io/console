@@ -31,7 +31,7 @@
                                           :disabled="disabled"
                                           @blur="$emit('blur:key')"
                                           @focus="$emit('focus:key')"
-                                          @input="validateKey"
+                                          @input="handleInputKey"
                             />
                         </template>
                     </p-field-group>
@@ -46,7 +46,7 @@
                                       :disabled="disabled"
                                       @blur="$emit('blur:value')"
                                       @focus="$emit('focus:value')"
-                                      @input="validateValue(d.value, idx)"
+                                      @input="handleInputValue(d.value, idx)"
                         />
                     </p-field-group>
                     <p-icon-button name="ic_delete" :disabled="disabled" @click="deletePair(idx)" />
@@ -60,7 +60,7 @@
 import { some } from 'lodash';
 
 import {
-    toRefs, reactive, getCurrentInstance, ComponentRenderProxy, computed, watch,
+    toRefs, reactive, getCurrentInstance, ComponentRenderProxy, computed, watch, ref,
 } from '@vue/composition-api';
 
 import {
@@ -130,6 +130,11 @@ export default {
             isAllValid: computed(() => state.validations.every(d => d.key.isValid && d.value.isValid)),
         });
 
+        const setTags = (tags: object) => {
+            state._tags = tags;
+            emit('update:tags', tags);
+        };
+
         /* util */
         const validateKey = () => {
             const keys = state.items.map(d => d.key);
@@ -157,7 +162,6 @@ export default {
             });
 
             state.validations = [...state.validations];
-            emit('update:tags', arrayToDict(state.items));
         };
         const validateValue = (value, idx) => {
             const validation: ValidationData = {
@@ -171,7 +175,6 @@ export default {
             state.validations[idx].value = validation;
 
             state.validations = [...state.validations];
-            emit('update:tags', arrayToDict(state.items));
         };
         const addPair = () => {
             const pair: TagItem = { key: '', value: '' };
@@ -188,6 +191,7 @@ export default {
             state.validations.splice(idx, 1);
 
             validateKey();
+            setTags(arrayToDict(state.items));
         };
 
         const initValidations = () => {
@@ -201,6 +205,16 @@ export default {
             state.items.forEach((d, i) => {
                 validateValue(d.value, i);
             });
+        };
+
+        const handleInputKey = () => {
+            validateKey();
+            setTags(arrayToDict(state.items));
+        };
+
+        const handleInputValue = (value, idx) => {
+            validateValue(value, idx);
+            setTags(arrayToDict(state.items));
         };
 
         watch(() => state.isAllValid, (after) => {
@@ -220,7 +234,10 @@ export default {
             });
         };
 
-        init();
+        watch(() => props.tags, (tags) => {
+            if (tags !== state._tags) init();
+        }, { immediate: true });
+
 
         return {
             ...toRefs(state),
@@ -228,6 +245,8 @@ export default {
             deletePair,
             validateKey,
             validateValue,
+            handleInputKey,
+            handleInputValue,
             init,
         };
     },

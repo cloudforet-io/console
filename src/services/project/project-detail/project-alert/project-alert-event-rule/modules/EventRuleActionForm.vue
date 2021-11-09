@@ -25,17 +25,14 @@
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.PROJECT_ROUTING') }}
                 </p>
-                <project-select-dropdown :selected-project-ids="actions.change_project ? [actions.change_project] : []"
-                                         @select="onSelectProjectRouting"
-                />
+                <project-select-dropdown :selected-project-ids.sync="routingProjects" />
             </div>
             <div class="form-box mobile-block">
                 <p class="label">
                     {{ $t('PROJECT.EVENT_RULE.PROJECT_DEPENDENCY') }}
                 </p>
                 <project-select-dropdown multi-selectable
-                                         :selected-project-ids="actions.add_project_dependency || []"
-                                         @select="onSelectProjectDependencies"
+                                         :selected-project-ids.sync="dependentProjects"
                 />
             </div>
             <div class="form-box urgency">
@@ -45,14 +42,13 @@
                 <div>
                     <p-radio v-for="(urgency, uIdx) in urgencyList"
                              :key="`urgency-${uIdx}`"
-                             v-model="formState.selectedUrgency"
+                             v-model="selectedUrgency"
                              :value="urgency.name"
                              class="mr-4"
-                             @change="onChangeUrgency"
                     >
                         {{ urgency.label }}
                     </p-radio>
-                    <p-select-dropdown v-model="formState.selectedUrgency" :items="urgencyList" />
+                    <p-select-dropdown v-model="selectedUrgency" :items="urgencyList" />
                 </div>
             </div>
             <div class="form-box mobile-block">
@@ -62,7 +58,7 @@
                 <p-search-dropdown class="user-search-dropdown"
                                    type="radioButton"
                                    :menu="userItems"
-                                   :selected.sync="formState.selectedAssignee"
+                                   :selected.sync="selectedAssignee"
                                    use-fixed-menu-style
                 />
             </div>
@@ -73,14 +69,13 @@
                 <p-search-dropdown class="user-search-dropdown"
                                    type="checkbox"
                                    :menu="userItems"
-                                   :selected.sync="formState.selectedResponder"
+                                   :selected.sync="selectedResponder"
                                    use-fixed-menu-style
                 />
             </div>
             <div class="form-box additional-information">
-                <tags-input-group ref="tagsRef"
-                                  show-header
-                                  :tags.sync="actions.add_additional_info"
+                <tags-input-group show-header
+                                  :tags.sync="additionalInfoTags"
                 >
                     <template #addButton="{addPair}">
                         <div class="top-part">
@@ -110,7 +105,7 @@
 import { i18n } from '@/translations';
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
 
 import {
@@ -160,7 +155,6 @@ export default {
                 name: k,
                 label: state.users[k]?.label || k,
             }))),
-            tagsRef: null as any,
             urgencyList: computed(() => ([
                 {
                     name: URGENCY.NO_SET,
@@ -177,74 +171,91 @@ export default {
             ])),
             proxyActions: makeProxy('actions', props, emit),
             proxyOptions: makeProxy('options', props, emit),
-        });
-        const formState = reactive({
-            selectedUrgency: URGENCY.NO_SET,
-            assignee: [] as string[],
-            responder: [],
+            routingProjects: computed<string[]>({
+                get() { return props.actions.change_project ? [props.actions.change_project] : []; },
+                set(projectIds) {
+                    state.proxyActions = {
+                        ...state.proxyActions,
+                        change_project: projectIds[0],
+                    };
+                },
+            }),
+            dependentProjects: computed<string[]>({
+                get() { return props.actions.add_project_dependency || []; },
+                set(projectIds) {
+                    state.proxyOptions = {
+                        ...state.proxyOptions,
+                        add_project_dependency: projectIds,
+                    };
+                },
+            }),
+            selectedUrgency: computed({
+                get() {
+                    if (props.actions.change_urgency) {
+                        return props.actions.change_urgency;
+                    }
+                    return URGENCY.NO_SET;
+                },
+                set(changeUrgency) {
+                    state.proxyActions = {
+                        ...state.proxyActions,
+                        change_urgency: changeUrgency !== URGENCY.NO_SET ? changeUrgency : undefined,
+                    };
+                },
+            }),
             selectedAssignee: computed<MenuItem[]>({
-                get() { return formState.assignee.map(d => ({ name: d, label: d })); },
-                set(val) { formState.assignee = val.map(item => item.name); },
+                get() {
+                    const assignee: string = props.actions.change_assignee;
+                    return assignee ? [{ name: assignee, label: assignee }] : [];
+                },
+                set(items) {
+                    state.proxyActions = {
+                        ...state.proxyActions,
+                        change_assignee: items[0]?.name,
+                    };
+                },
             }),
             selectedResponder: computed<MenuItem[]>({
-                get() { return formState.responder.map(d => ({ name: d, label: d })); },
-                set(val) { formState.responder = val.map(item => item.name); },
+                get() {
+                    return props.actions.add_responder.map(d => ({
+                        name: d.resource_id,
+                        label: d.resource_id,
+                    }));
+                },
+                set(items) {
+                    state.proxyActions = {
+                        ...state.proxyActions,
+                        add_responder: items.map(item => ({
+                            resource_type: 'identity.User',
+                            resource_id: item.name,
+                        })),
+                    };
+                },
+            }),
+            additionalInfoTags: computed({
+                get() { return props.actions.add_additional_info; },
+                set(tags) {
+                    state.proxyActions = {
+                        ...state.proxyActions,
+                        add_additional_info: tags,
+                    };
+                },
             }),
         });
 
-        /* util */
-        const initActionsData = (actions) => {
-            if (actions.change_urgency) {
-                formState.selectedUrgency = actions.change_urgency;
-            } else {
-                formState.selectedUrgency = URGENCY.NO_SET;
-            }
-            if (actions.change_assignee) formState.assignee = [actions.change_assignee];
-            formState.responder = actions.add_responder.map(d => d.resource_id);
-            state.tagsRef.init();
-        };
 
         /* event */
         const onToggleChange = ({ value }) => {
-            state.proxyActions.no_notification = value;
-        };
-        const onChangeUrgency = () => {
-            if (formState.selectedUrgency === URGENCY.NO_SET) {
-                state.proxyActions.change_urgency = undefined;
-            } else {
-                state.proxyActions.change_urgency = formState.selectedUrgency;
-            }
-        };
-        const onSelectProjectRouting = (selected) => {
-            state.proxyActions.change_project = selected[0]?.id;
-        };
-        const onSelectProjectDependencies = (selected) => {
-            state.proxyActions.add_project_dependency = selected.map(d => d.id);
+            state.proxyActions = {
+                ...state.proxyActions,
+                no_notification: value,
+            };
         };
 
-        watch(() => formState.assignee, (assignee) => {
-            state.proxyActions.change_assignee = assignee[0];
-        });
-
-        watch(() => formState.responder, (responder) => {
-            state.proxyActions.add_responder = responder.map(d => ({ resource_type: 'identity.User', resource_id: d }));
-        });
-
-        watch(() => props.actions, (actions) => {
-            initActionsData(actions);
-        });
-
-        watch(() => props.options, (options) => {
-            state.proxyOptions = options;
-        });
 
         return {
             ...toRefs(state),
-            formState,
             onToggleChange,
-            onChangeUrgency,
-            onSelectProjectRouting,
-            onSelectProjectDependencies,
         };
     },
 };
