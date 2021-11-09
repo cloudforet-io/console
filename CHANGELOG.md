@@ -1,3 +1,10 @@
+# [1.1.0-beta.172](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.171...v1.1.0-beta.172) (2021-11-09)
+
+
+### Bug Fixes
+
+* create picker when selectedDates props are changed & set timezone more easily ([#741](https://github.com/spaceone-dev/spaceone-design-system/issues/741)) ([78eed78](https://github.com/spaceone-dev/spaceone-design-system/commit/78eed7848a787d7a2a71aaa6d2aad7fe3178e33a))
+
 # [1.1.0-beta.171](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.170...v1.1.0-beta.171) (2021-11-09)
 
 
