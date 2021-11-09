@@ -85,28 +85,24 @@ export default {
     z-index: 1;
 }
 
-.cost-type-balloon::before {
-    content: "";
-    position: absolute;
-    left: calc(100% + 1px);
-    top: 23%;
-    width: 0;
-    height: 0;
-    border-top: 0.75rem solid transparent;
-    border-left: 13px solid theme('colors.gray.200');
-    border-bottom: 0.75rem solid transparent;
-}
-
+.cost-type-balloon::before,
 .cost-type-balloon::after {
     content: "";
     position: absolute;
-    left: 100%;
-    top: 23%;
+    top: calc(23% - 0.0625rem);
+    left: calc(100% + 0.0625rem);
     width: 0;
     height: 0;
-    border-top: 0.75rem solid transparent;
-    border-left: 0.75rem solid theme('colors.white');
-    border-bottom: 0.75rem solid transparent;
+    border-width: 0.8125rem 0 0.8125rem 0.8125rem;
+    border-style: solid;
+    border-color: transparent transparent transparent theme('colors.gray.200');
+}
+
+.cost-type-balloon::after {
+    top: 23%;
+    left: 100%;
+    border-width: 0.75rem 0 0.75rem 0.75rem;
+    border-color: transparent transparent transparent theme('colors.white');
 }
 
 .header {
@@ -127,5 +123,4 @@ export default {
     margin-top: 0.75rem;
     margin-bottom: 1rem;
 }
-
 </style>

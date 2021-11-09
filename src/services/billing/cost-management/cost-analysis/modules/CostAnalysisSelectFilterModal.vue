@@ -213,7 +213,7 @@ export default {
             padding: 0.5rem;
             .collapsible-list-section {
                 @apply flex flex-wrap flex-col gap-1;
-                >>> .collapsible-item {
+                ::v-deep .collapsible-item {
                     @apply bg-white rounded-none;
                     padding: 0 1rem;
                     > .p-collapsible-panel {
@@ -221,9 +221,6 @@ export default {
                             @apply rounded-lg bg-blue-100;
                             padding: 0.75rem;
                             margin-top: 0.25rem;
-                            .p-tag {
-                                margin-bottom: 0;
-                            }
                         }
                     }
                 }
@@ -246,7 +243,7 @@ export default {
                             line-height: 1.25;
                         }
                     }
-                    >>> .p-collapsible-panel {
+                    ::v-deep .p-collapsible-panel {
                         @apply bg-blue-100 rounded-lg;
                         padding: 0.75rem;
                         margin-top: 0.25rem;
@@ -256,16 +253,20 @@ export default {
             }
 
             .selected-filter-section {
+                @apply rounded-lg border-gray-200 border-solid;
                 min-height: 11rem;
-                border: 1px solid #e5e5e8;
+                border-width: 1px;
                 box-sizing: border-box;
-                border-radius: 6px;
                 display: flex;
                 flex-direction: column;
                 flex-wrap: wrap;
                 gap: 1rem;
                 align-items: flex-start;
                 padding: 1rem;
+
+                .selected-tags-wrapper .p-tag {
+                    margin-bottom: 0.5rem;
+                }
             }
         }
     }
