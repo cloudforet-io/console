@@ -1,3 +1,10 @@
+# [1.1.0-beta.169](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.168...v1.1.0-beta.169) (2021-11-09)
+
+
+### Bug Fixes
+
+* update type name of SearchDropdownMenuItem ([#738](https://github.com/spaceone-dev/spaceone-design-system/issues/738)) ([86d2136](https://github.com/spaceone-dev/spaceone-design-system/commit/86d2136154326a48e5f63feaae8f53796c00241f))
+
 # [1.1.0-beta.168](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.167...v1.1.0-beta.168) (2021-11-09)
 
 
