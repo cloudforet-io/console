@@ -9,6 +9,7 @@
                              :selected="selectedGroupByItems"
                              multi-selectable
                              size="sm"
+                             :predicate="predicate"
                              @change="handleSelectGroupByItems"
             >
                 {{ groupByItem.label }}
@@ -62,6 +63,9 @@ export default {
             moreGroupBy: [],
         });
 
+        /* util */
+        const predicate = (current, data) => Object.keys(current).every(key => current[key] === data[key]);
+
         /* event */
         const handleSelectGroupByItems = async (items: Array<GroupByItem>) => {
             store.commit('service/costAnalysis/setGroupByItems', items);
@@ -74,6 +78,7 @@ export default {
             ...toRefs(state),
             handleSelectGroupByItems,
             handleClickMore,
+            predicate,
         };
     },
 };
