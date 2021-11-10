@@ -301,7 +301,7 @@ export default {
                         background: url('~@/assets/icons/root-account.svg') no-repeat center center;
                     }
                     &.opened {
-                        box-shadow: inset 0 0 0 2px theme('colors.primary');
+                        box-shadow: inset 0 0 0 2px theme('colors.secondary');
                     }
                 }
             }

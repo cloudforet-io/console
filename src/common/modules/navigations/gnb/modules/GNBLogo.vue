@@ -10,7 +10,7 @@
                 </template>
                 <template v-else>
                     <img class="logo-character" src="@/assets/images/brand/brand_logo.png">
-                    <img class="logo-text" src="@/assets/images/brand/SpaceONE_logoTypeA.svg">
+                    <img class="logo-text" src="@/assets/images/brand/SpaceONE_logoTypeA v1.9.svg">
                 </template>
             </div>
         </component>
