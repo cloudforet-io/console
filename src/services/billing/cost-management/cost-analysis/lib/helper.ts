@@ -24,3 +24,9 @@ export const getTimeUnit = (granularity: Granularity, start: Dayjs, end: Dayjs):
     if (end.diff(start, 'year') < 2) return 'month';
     return 'year';
 };
+
+export const getInitialDates = (): Array<string> => {
+    const start = dayjs.utc().startOf('month').format();
+    const end = dayjs.utc().startOf('date').format();
+    return [start, end];
+};

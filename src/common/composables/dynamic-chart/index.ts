@@ -27,7 +27,8 @@ export const CUSTOM_COLORS = [
 ];
 const customColorTheme = (target) => {
     if (target instanceof am4core.ColorSet) {
-        target.list = CUSTOM_COLORS.map(d => am4core.color(d));
+        target.list = Array(5).fill(CUSTOM_COLORS.map(d => am4core.color(d))).flat();
+        // target.list = CUSTOM_COLORS.map(d => am4core.color(d));
     }
 };
 

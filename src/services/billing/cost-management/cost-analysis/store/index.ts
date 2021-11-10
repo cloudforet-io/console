@@ -11,8 +11,6 @@ const state: CostAnalysisStoreState = {
     groupBy: undefined,
     selectedDates: [],
     currency: CURRENCY.USD,
-    chartData: [],
-    legends: [],
     filters: [],
 };
 

@@ -1,8 +1,8 @@
 import { Mutation } from 'vuex';
 import {
-    ChartData, ChartType, CostAnalysisStoreState, Currency, GroupByItem,
+    ChartType, CostAnalysisStoreState, Currency, GroupByItem,
 } from '@/services/billing/cost-management/cost-analysis/store/type';
-import { Legend } from '@/common/composables/dynamic-chart/type';
+
 
 export const setChartType: Mutation<CostAnalysisStoreState> = (state, chartType: ChartType) => {
     state.chartType = chartType;
@@ -26,14 +26,6 @@ export const setSelectedDates: Mutation<CostAnalysisStoreState> = (state, select
 
 export const setCurrency: Mutation<CostAnalysisStoreState> = (state, currency: Currency) => {
     state.currency = currency;
-};
-
-export const setChartData: Mutation<CostAnalysisStoreState> = (state, chartData: Array<ChartData>) => {
-    state.chartData = chartData;
-};
-
-export const setLegends: Mutation<CostAnalysisStoreState> = (state, legends: Array<Legend>) => {
-    state.legends = legends;
 };
 
 export const setFilters: Mutation<CostAnalysisStoreState> = (state, filters: Array<any>) => {

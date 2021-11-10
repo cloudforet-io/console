@@ -5,7 +5,6 @@
 <script lang="ts">
 import { Dayjs } from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
-import { TimeUnit } from '@amcharts/amcharts4/core';
 
 import {
     computed, reactive, toRefs, watch,
@@ -18,6 +17,7 @@ import { ChartType, Granularity } from '@/services/billing/cost-management/cost-
 import { ChartData, DynamicChartStateArgs, Legend } from '@/common/composables/dynamic-chart/type';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
+import { getTimeUnit } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 
 
 interface Period {
@@ -91,28 +91,8 @@ export default {
             }
             return chartData;
         };
-        const getTimeUnit = () => {
-            let unit: TimeUnit;
-            if (props.granularity === GRANULARITY.ACCUMULATED) {
-                if (props.period.end.diff(props.period.start, 'month') < 2) {
-                    unit = 'day';
-                } else if (props.period.end.diff(props.period.start, 'year') < 2) {
-                    unit = 'month';
-                } else {
-                    unit = 'year';
-                }
-            } else if (props.granularity === GRANULARITY.MONTHLY) {
-                unit = 'month';
-            } else if (props.granularity === GRANULARITY.YEARLY) {
-                unit = 'year';
-            } else {
-                unit = 'day';
-            }
-
-            return unit;
-        };
         const drawChart = (ctx) => {
-            const timeUnit = getTimeUnit();
+            const timeUnit = getTimeUnit(props.granularity, props.period.start, props.period.end);
             const convertedChartData = convertChartDataWithPeriod(timeUnit);
             const params: DynamicChartStateArgs = {
                 data: convertedChartData,

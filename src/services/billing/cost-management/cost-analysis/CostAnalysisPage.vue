@@ -190,6 +190,14 @@ export default {
             if (saveQueryFormState.visible === false) saveQueryFormState.selectedQuery = {};
         });
 
+        (async () => {
+            await Promise.all([
+                store.dispatch('resource/project/load'),
+                store.dispatch('resource/provider/load'),
+                store.dispatch('resource/region/load'),
+            ]);
+        })();
+
         return {
             ...toRefs(state),
             routeState,

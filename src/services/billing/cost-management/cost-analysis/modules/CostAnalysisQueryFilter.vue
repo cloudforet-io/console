@@ -4,7 +4,7 @@
             <div class="filter-item">
                 <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY') }}</b>
                 <p-select-dropdown :items="granularityItems"
-                                   :selected="selectedGranularity"
+                                   :selected="granularity"
                                    without-outline
                                    @select="handleSelectGranularity"
                 />
@@ -12,16 +12,16 @@
             <div class="filter-item">
                 <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHART_TYPE') }}</b>
                 <p-select-dropdown :items="chartTypeItems"
-                                   :selected="selectedChartType"
+                                   :selected="chartType"
                                    without-outline
                                    @select="handleSelectChartType"
                 />
             </div>
         </div>
         <div class="right-part">
+            <span class="timezone-text">UTC</span>
             <div class="filter-item">
                 <p-datetime-picker :selected-dates="selectedDates"
-                                   :timezone="timezone"
                                    style-type="text"
                                    mode="range"
                                    @update:selectedDates="handleSelectedDates"
@@ -29,7 +29,7 @@
             </div>
             <p-select-dropdown class="filter-item"
                                :items="currencyItems"
-                               :selected="selectedCurrency"
+                               :selected="currency"
                                without-outline
                                @select="handleSelectCurrency"
             />
@@ -39,8 +39,6 @@
 </template>
 
 <script lang="ts">
-import dayjs from 'dayjs';
-
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
@@ -49,6 +47,7 @@ import {
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import { ChartType } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { getInitialDates } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import {
     CHART_TYPE, CURRENCY, GRANULARITY,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
@@ -65,10 +64,9 @@ export default {
     },
     setup() {
         const state = reactive({
-            timezone: computed(() => store.state.user.timezone),
-            selectedGranularity: computed(() => store.state.service.costAnalysis.granularity),
-            selectedChartType: computed(() => store.state.service.costAnalysis.chartType),
-            selectedCurrency: computed(() => store.state.service.costAnalysis.currency),
+            granularity: computed(() => store.state.service.costAnalysis.granularity),
+            chartType: computed(() => store.state.service.costAnalysis.chartType),
+            currency: computed(() => store.state.service.costAnalysis.currency),
             selectedDates: computed(() => store.state.service.costAnalysis.selectedDates),
             //
             granularityItems: computed<MenuItem[]>(() => ([
@@ -137,32 +135,26 @@ export default {
             }
             store.commit('service/costAnalysis/setChartType', chartType);
             store.commit('service/costAnalysis/setGranularity', granularity);
-            await store.dispatch('service/costAnalysis/listChartData');
         };
         const handleSelectChartType = async (chartType: ChartType) => {
             store.commit('service/costAnalysis/setChartType', chartType);
-            await store.dispatch('service/costAnalysis/listChartData');
         };
         const handleSelectedDates = async (selectedDates: Array<string>) => {
             store.commit('service/costAnalysis/setSelectedDates', selectedDates);
-            await store.dispatch('service/costAnalysis/listChartData');
         };
         const handleSelectCurrency = async (currency: string) => {
             store.commit('service/costAnalysis/setCurrency', currency);
         };
         const handleClickRefresh = async () => {
-            await store.dispatch('service/costAnalysis/listChartData');
+            // todo
         };
 
         const initSelectedDates = () => {
-            const offsetHours = dayjs().tz(state.timezone).utcOffset() / 60;
-            const startDate = dayjs.utc().startOf('month').utcOffset(offsetHours, true).format();
-            const endDate = dayjs.utc().utcOffset(offsetHours, true).format();
-            store.commit('service/costAnalysis/setSelectedDates', [startDate, endDate]);
+            const initialDates = getInitialDates();
+            store.commit('service/costAnalysis/setSelectedDates', initialDates);
         };
         (async () => {
             initSelectedDates();
-            await store.dispatch('service/costAnalysis/listChartData');
         })();
 
         return {
@@ -196,6 +188,13 @@ export default {
     .right-part {
         display: flex;
         align-items: center;
+        .timezone-text {
+            @apply text-gray-400;
+            font-size: 0.875rem;
+            font-weight: bold;
+            line-height: 1.5;
+            padding-right: 0.5rem;
+        }
     }
     .filter-item {
         display: flex;
