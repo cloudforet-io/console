@@ -96,7 +96,7 @@ export default {
             columnSeries.columns.template.propertyFields.stroke = 'stroke';
             columnSeries.columns.template.propertyFields.strokeWidth = 'strokeWidth';
             columnSeries.columns.template.propertyFields.strokeDasharray = 'columnDash';
-            columnSeries.columns.template.with = am4core.percent(20);
+            columnSeries.columns.template.width = am4core.percent(10);
             columnSeries.tooltip.label.textAlign = 'middle';
 
             /* Create series - Line */

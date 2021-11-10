@@ -58,7 +58,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.budget-summary-chart-wrapper {
+.budget-summary-wrapper {
     @apply flex flex-col;
     min-width: 100%;
     min-height: 100%;

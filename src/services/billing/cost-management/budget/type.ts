@@ -16,14 +16,24 @@ export type CostType = 'provider' | 'region_code' | 'account' | 'product'
 
 type BudgetTimeUnit = 'MONTHLY' | 'YEARLY' | 'TOTAL'
 
-type BudgetNotificationsUnit = 'PERCENT' | 'ACTUAL_COST';
+export const BUDGET_NOTIFICATIONS_UNIT = Object.freeze({
+    PERCENT: 'PERCENT',
+    ACTUAL_COST: 'ACTUAL_COST',
+} as const);
 
-type BudgetNotificationsType = 'CRITICAL' | 'WARNING';
+export type BUDGET_NOTIFICATIONS_UNIT = typeof BUDGET_NOTIFICATIONS_UNIT[keyof typeof BUDGET_NOTIFICATIONS_UNIT];
+
+export const BUDGET_NOTIFICATIONS_TYPE = Object.freeze({
+    CRITICAL: 'CRITICAL',
+    WARNING: 'WARNING',
+} as const);
+
+export type BUDGET_NOTIFICATIONS_TYPE = typeof BUDGET_NOTIFICATIONS_TYPE[keyof typeof BUDGET_NOTIFICATIONS_TYPE];
 
 export interface BudgetNotifications {
 	threshold: number;
-	unit: BudgetNotificationsUnit;
-	notification_type: BudgetNotificationsType;
+	unit: BUDGET_NOTIFICATIONS_UNIT;
+	notification_type: BUDGET_NOTIFICATIONS_TYPE;
 }
 
 export interface BudgetData {
@@ -33,7 +43,7 @@ export interface BudgetData {
 	project_group_id?: string;
 	limit: number;
 	planned_limits: BudgetPlannedLimit[];
-	total_usd_cost: number;
+	total_usage_usd_cost: number;
 	monthly_costs?: BudgetMonthlyCost[];
 	cost_types: Record<CostType, string[]>;
 	time_unit: BudgetTimeUnit;

@@ -17,6 +17,7 @@
             <budget-detail-info v-if="!loading" class="summary" />
             <budget-summary v-if="!loading" class="summary" />
             <budget-notifications v-if="!loading" class="alert" />
+            <budget-billing-admin v-if="!loading" class="budget" />
         </section>
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
@@ -30,7 +31,7 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 import { PBreadcrumbs, PPageTitle, PIconButton } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import BudgetDetailInfo
-    from '@/services/billing/cost-management/budget/budget-detail/modules/BudgetDetailInfo.vue';
+    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-info/BudgetDetailInfo.vue';
 import BudgetSummary
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-summary/BudgetSummary.vue';
 import BudgetNotifications
@@ -41,6 +42,8 @@ import BudgetStoreModule from '@/services/billing/cost-management/budget/store';
 import { BudgetStoreState } from '@/services/billing/cost-management/budget/store/type';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import BudgetBillingAdmin
+    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-admin/BudgetBillingAdmin.vue';
 
 export default {
     name: 'BudgetDetailPage',
@@ -52,6 +55,7 @@ export default {
         BudgetDetailInfo,
         BudgetSummary,
         BudgetNotifications,
+        BudgetBillingAdmin,
         DeleteModal,
     },
     setup() {

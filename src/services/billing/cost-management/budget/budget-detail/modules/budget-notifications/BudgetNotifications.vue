@@ -12,32 +12,15 @@
                     a notification will be sent immediately.
                 </span>
                 <ul class="content">
-                    <li>
+                    <li v-for="item in notifications" :key="item.id">
                         <span class="bullet">•</span>
-                        <p-badge style-type="gray" outline
-                                 class="icon"
+                        <p-badge :style-type="item.notification_type === BUDGET_NOTIFICATIONS_TYPE.WARNING ? 'gray'
+                            : 'alert'" outline class="icon"
                         >
-                            Warning
+                            {{ item.notification_type === 'WARNING' ? 'Warning' : 'Critical' }}
                         </p-badge>
-                        <span>Actual cost > $1,000</span>
-                    </li>
-                    <li>
-                        <span class="bullet">•</span>
-                        <p-badge style-type="gray" outline
-                                 class="icon"
-                        >
-                            Warning
-                        </p-badge>
-                        <span>Actual cost > $2,000</span>
-                    </li>
-                    <li>
-                        <span class="bullet">•</span>
-                        <p-badge style-type="alert" outline
-                                 class="icon"
-                        >
-                            Critical
-                        </p-badge>
-                        <span>% of budget > 90%</span>
+                        <span v-if="item.unit !== BUDGET_NOTIFICATIONS_UNIT.PERCENT">Actual Cost > ${{ commaFormatter(item.threshold) }}</span>
+                        <span v-else>% of budget > {{ item.threshold }}%</span>
                     </li>
                 </ul>
                 <p-icon-text-button name="ic_setting" style-type="gray900" outline
@@ -98,8 +81,11 @@ import {
 } from '@vue/composition-api';
 import BudgetAlertModal
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-notifications/BudgetNotificationsModal.vue';
+import { BUDGET_NOTIFICATIONS_TYPE, BUDGET_NOTIFICATIONS_UNIT } from '@/services/billing/cost-management/budget/type';
 import { store } from '@/store';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { getUUID } from '@/lib/component-util/getUUID';
+import { commaFormatter } from '@spaceone/console-core-lib';
 
 export default {
     name: 'BudgetNotifications',
@@ -116,8 +102,10 @@ export default {
     setup() {
         const state = reactive({
             hasBudgetAlert: computed(() => (store.state.service.budget.budgetData.notifications.length > 0)),
+            notifications: computed(() => store.state.service.budget.budgetData.notifications.map(d => ({ ...d, id: getUUID() }))),
             budgetAlertModalVisible: false,
         });
+
 
         const checkDeleteState = reactive({
             visible: false,
@@ -157,6 +145,9 @@ export default {
             handleDeleteForm,
             handleSetAlert,
             handleBudgetAlert,
+            commaFormatter,
+            BUDGET_NOTIFICATIONS_UNIT,
+            BUDGET_NOTIFICATIONS_TYPE,
         };
     },
 };

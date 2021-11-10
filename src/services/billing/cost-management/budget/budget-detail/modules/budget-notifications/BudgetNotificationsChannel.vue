@@ -34,9 +34,11 @@
 import { PDataTable } from '@spaceone/design-system';
 import { utcToTimezoneFormatter } from '@/services/identity/user/lib/helper';
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { i18n } from '@/translations';
 import { store } from '@/store';
 import { ChannelItem } from '@/services/identity/user/type';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 export default {
     name: 'BudgetNotificationsChannel',
@@ -47,14 +49,40 @@ export default {
         const state = reactive({
             loading: false,
             fields: computed(() => [
-                { name: 'protocol_type', label: i18n.t('IDENTITY.USER.NOTIFICATION.TYPE') },
-                { name: 'name', label: i18n.t('IDENTITY.USER.NOTIFICATION.CHANNEL_NAME') },
-                { name: 'data', label: i18n.t('IDENTITY.USER.NOTIFICATION.CHANNEL_INFO') },
-                { name: 'schedule', label: i18n.t('IDENTITY.USER.NOTIFICATION.FORM.SCHEDULE') },
+                { name: 'protocol_type', label: 'Channel' },
+                { name: 'name', label: 'Channel Name' },
+                { name: 'data', label: 'Details' },
+                { name: 'notification_level', label: 'Notifications Level' },
             ]),
             items: [] as ChannelItem[],
             timezone: computed(() => store.state.user.timezone),
         });
+
+        const apiQueryHelper = new ApiQueryHelper();
+        apiQueryHelper.setFilters([
+            { k: 'is_subscribe', v: false, o: '=' },
+        ])
+            .setOrFilters([{ k: 'subscriptions', v: 'monitoring.Alert', o: '=' }]);
+
+        const listNotificationsChannel = async () => {
+            state.loading = true;
+            try {
+                const { results } = await SpaceConnector.client.notification.projectChannel.list({
+                    query: apiQueryHelper.data,
+                });
+                state.items = results;
+            } catch (e) {
+                state.items = [];
+                ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        (async () => {
+            await listNotificationsChannel();
+        })();
+
         return {
             ...toRefs(state),
             utcToTimezoneFormatter,

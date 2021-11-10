@@ -6,7 +6,7 @@
                 <span class="font-normal">(Period)</span>
             </span>
             <p class="summary-content">
-                <b>${{ budgetData.total_usd_cost }}</b> ({{ budgetData.start }} ~ {{ budgetData.end }})
+                <b>${{ budgetData.total_usage_usd_cost }}</b> ({{ budgetData.start }} ~ {{ budgetData.end }})
             </p>
         </p-pane-layout>
         <p-pane-layout class="summary-card">
@@ -49,7 +49,7 @@ import { referenceRouter } from '@/lib/reference/referenceRouter';
 import { store } from '@/store';
 import { BudgetData, CostType } from '@/services/billing/cost-management/budget/type';
 import BudgetCostTypeBalloon
-    from '@/services/billing/cost-management/budget/budget-detail/modules/BudgetCostTypeBalloon.vue';
+    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-info/BudgetCostTypeBalloon.vue';
 
 const getKeyOfCostType = (costType: Record<CostType, string[]|null>) => Object.keys(costType).filter(k => (costType[k] !== null))[0];
 const getValueOfCostType = (costType: Record<CostType, string[]|null>, costTypeKey: string) => costType[costTypeKey];
