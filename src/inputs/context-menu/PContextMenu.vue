@@ -3,11 +3,6 @@
          :class="{[theme]: true, invalid}"
          @keyup.esc="onClickEsc"
     >
-        <div v-show="menu.length === 0" class="context-item empty" :class="theme">
-            <slot name="no-data-format" v-bind="{...$props, uuid}">
-                {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
-            </slot>
-        </div>
         <slot v-show="menu.length > 0" name="menu" v-bind="{...$props, uuid}">
             <div v-if="multiSelectable && showSelectedList" class="selected-list-wrapper">
                 <div>
@@ -64,7 +59,11 @@
                 </slot>
             </template>
         </slot>
-
+        <div v-show="menu.length === 0" class="context-item empty" :class="theme">
+            <slot name="no-data-format" v-bind="{...$props, uuid}">
+                {{ $t('COMPONENT.CONTEXT_MENU.NO_ITEM') }}
+            </slot>
+        </div>
         <div v-if="loading" class="loader">
             <p-lottie name="thin-spinner" auto :size="1" />
         </div>
