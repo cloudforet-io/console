@@ -142,6 +142,8 @@ class API {
     }
 
     private handleRequestError = (error: AxiosError) => {
+        console.log(error.response);
+        console.log(error.response?.status);
         switch (error.response?.status) {
         case 400: {
             throw new BadRequestError(error);

@@ -1,6 +1,6 @@
 /* eslint-disable no-mixed-spaces-and-tabs */
 /* eslint-disable no-tabs */
-import { AxiosError, AxiosRequestConfig } from 'axios';
+import { AxiosError } from 'axios';
 import { RESPONSE } from '@src/space-connector/type';
 
 export class APIError extends Error {
@@ -10,15 +10,12 @@ export class APIError extends Error {
 
 	axiosError?: AxiosError;
 
-	axiosRequest?: AxiosRequestConfig;
-
 	constructor(axiosError: AxiosError) {
 	    super();
 	    this.name = RESPONSE.API_ERROR;
 	    this.status = 500;
 	    this.code = 'ERROR_UNKNOWN';
 	    this.axiosError = axiosError;
-	    this.axiosRequest = axiosError.request;
 
 	    if (axiosError.response) {
 	        this.status = axiosError.response.status;
