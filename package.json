@@ -25,7 +25,7 @@
     "@vue/composition-api": "^0.6.7",
     "@vvo/tzdb": "^6.4.1",
     "animated-number-vue": "^1.0.0",
-    "axios": "^0.21.2",
+    "axios": "^0.21.1",
     "axios-auth-refresh": "^2.2.3",
     "babel-preset-vue": "^2.0.2",
     "bytes": "^3.1.0",
