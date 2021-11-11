@@ -3,10 +3,6 @@ import { DateTime } from 'luxon';
 import dayjs from 'dayjs';
 import tz from 'dayjs/plugin/timezone';
 
-import {
-    computed, getCurrentInstance, Ref
-} from '@vue/composition-api';
-
 dayjs.extend(tz);
 
 // formatter
