@@ -1,3 +1,10 @@
+# [1.1.0-beta.173](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.172...v1.1.0-beta.173) (2021-11-11)
+
+
+### Bug Fixes
+
+* add name property to collapsibleItem ([#742](https://github.com/spaceone-dev/spaceone-design-system/issues/742)) ([7cfa225](https://github.com/spaceone-dev/spaceone-design-system/commit/7cfa22541475d515e7de436083afe487acf177d5))
+
 # [1.1.0-beta.172](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.171...v1.1.0-beta.172) (2021-11-09)
 
 
