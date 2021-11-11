@@ -12,7 +12,7 @@
     "lint": "eslint --ext .js,.ts src",
     "lint:fix": "eslint --fix --ext .js,.ts src",
     "test": "cross-env mocha --require ts-node/register -r tsconfig-paths/register src/**/*.spec.ts",
-    "semantic-release": "SKIP_PREPARE_COMMIT_MSG=1 SKIP_COMMIT_MSG=1 cp -r dist/. . && rimraf src && semantic-release"
+    "semantic-release": "$SKIP_PRE_COMMIT=1 SKIP_COMMIT_MSG=1 cp -r dist/. . && rimraf src && semantic-release"
   },
   "repository": {
     "type": "git",
