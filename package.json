@@ -22,11 +22,11 @@
   "license": "Apache-2.0",
   "homepage": "https://github.com/spaceone-dev/console-core-lib#readme",
   "dependencies": {
-    "@spaceone/design-system": "^1.1.0-beta.136",
-    "@vue/composition-api": "^0.6.7",
-    "axios": "^0.21.1",
+    "@spaceone/design-system": ">= 1.1.0-beta.104",
+    "@vue/composition-api": ">= 0.6.7",
+    "axios": "^0.21.2",
     "axios-auth-refresh": "^3.1.0",
-    "dayjs": "^1.10.6",
+    "dayjs": ">= 1.10.6",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.21",
     "luxon": "^1.27.0"
