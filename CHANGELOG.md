@@ -1,3 +1,10 @@
+# [1.1.0-beta.175](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.174...v1.1.0-beta.175) (2021-11-11)
+
+
+### Bug Fixes
+
+* do not close modal when click reset button ([#744](https://github.com/spaceone-dev/spaceone-design-system/issues/744)) ([b0c43cf](https://github.com/spaceone-dev/spaceone-design-system/commit/b0c43cfe53399efb99f23b8f31ce119d14d14b80))
+
 # [1.1.0-beta.174](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.173...v1.1.0-beta.174) (2021-11-11)
 
 
