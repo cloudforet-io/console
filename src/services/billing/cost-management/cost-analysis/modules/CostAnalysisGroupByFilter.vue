@@ -24,6 +24,10 @@
                 More
             </template>
         </component>
+        <cost-analysis-set-more-modal :header-title="setMoreModalState.headerTitle"
+                                      :visible.sync="setMoreModalState.visible"
+                                      @confirm="handleSetMoreModalConfirm"
+        />
     </div>
 </template>
 
@@ -37,7 +41,9 @@ import {
 import { GROUP_BY_ITEM } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { store } from '@/store';
-
+import { i18n } from '@/translations';
+import CostAnalysisSetMoreModal
+    from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetMoreModal.vue';
 
 export default {
     name: 'CostAnalysisGroupByFilter',
@@ -45,6 +51,7 @@ export default {
         PSelectButton,
         PIconButton,
         PIconTextButton,
+        CostAnalysisSetMoreModal,
     },
     setup() {
         const state = reactive({
@@ -63,6 +70,11 @@ export default {
             moreGroupBy: [],
         });
 
+        const setMoreModalState = reactive({
+            visible: false,
+            headerTitle: computed(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SET_MORE')),
+        });
+
         /* util */
         const predicate = (current, data) => Object.keys(current).every(key => current[key] === data[key]);
 
@@ -70,14 +82,21 @@ export default {
         const handleSelectGroupByItems = async (items: Array<GroupByItem>) => {
             store.commit('service/costAnalysis/setGroupByItems', items);
         };
+
         const handleClickMore = () => {
-            console.log('more!');
+            setMoreModalState.visible = true;
+        };
+
+        const handleSetMoreModalConfirm = () => {
+            setMoreModalState.visible = false;
         };
 
         return {
             ...toRefs(state),
-            handleSelectGroupByItems,
+            setMoreModalState,
             handleClickMore,
+            handleSelectGroupByItems,
+            handleSetMoreModalConfirm,
             predicate,
         };
     },
