@@ -178,7 +178,6 @@ export default {
         const onResetClick = () => {
             if (props.loading) return;
             emit('return');
-            state.proxyVisible = false;
         };
         const onCancelClick = () => {
             if (props.loading) return;
