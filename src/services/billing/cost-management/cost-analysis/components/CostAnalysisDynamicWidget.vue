@@ -12,12 +12,12 @@ import {
 import {
     useColumnChart, useLineChart, usePieChart, useStackedColumnChart, useStackedLineChart,
 } from '@/common/composables/dynamic-chart';
-import { CHART_TYPE, GRANULARITY } from '@/services/billing/cost-management/cost-analysis/lib/config';
-import { ChartType, Granularity } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { ChartData, DynamicChartStateArgs, Legend } from '@/common/composables/dynamic-chart/type';
+
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 import { getTimeUnit } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { CHART_TYPE, GRANULARITY } from '@/services/billing/cost-management/cost-analysis/lib/config';
 
 
 interface Period {
@@ -26,10 +26,10 @@ interface Period {
 }
 interface Props {
     chart: XYChart | PieChart;
-    chartType: ChartType;
+    chartType: CHART_TYPE;
     chartData: ChartData[];
     legends: Legend[];
-    granularity: Granularity;
+    granularity: GRANULARITY;
     period: Period;
 }
 

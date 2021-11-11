@@ -45,9 +45,9 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 
-import { Granularity, GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { getConvertedGranularity, getTimeUnit } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { GROUP_BY_ITEM } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
 
@@ -67,7 +67,7 @@ interface Value {
 
 interface RawTableData {
     [key: string]: any;
-    values: Array<Value>;
+    values: Value[];
 }
 
 export default {
@@ -89,15 +89,15 @@ export default {
         });
         const tableState = reactive({
             loading: true,
-            fields: [] as Array<DataTableField>,
-            items: [] as Array<CostAnalysisItem>,
+            fields: [] as DataTableField[],
+            items: [] as CostAnalysisItem[],
             totalCount: 0,
         });
 
         /* util */
-        const setTableFields = (granularity: Granularity, groupByItems: Array<GroupByItem>) => {
+        const setTableFields = (granularity: GRANULARITY, groupByItems: GroupByItem[]) => {
             /* get group by fields (ex. Provider, Region) */
-            const groupByFields: Array<DataTableField> = [...groupByItems];
+            const groupByFields: DataTableField[] = [...groupByItems];
             if (!groupByItems.length) {
                 groupByFields.push({
                     name: 'total_cost', label: ' ', sortable: false,
@@ -105,7 +105,7 @@ export default {
             }
 
             /* get date fields (ex. 11/1, 11/2) */
-            const dateFields: Array<DataTableField> = [];
+            const dateFields: DataTableField[] = [];
             const start = dayjs(state.selectedDates[0]);
             const end = dayjs(state.selectedDates[1]);
             const timeUnit = getTimeUnit(granularity, start, end);
@@ -132,8 +132,8 @@ export default {
 
             tableState.fields = groupByFields.concat(dateFields);
         };
-        const getTableDataFromRawData = (rawData: Array<RawTableData>, groupByItems: Array<GroupByItem>): Array<TableData> => {
-            const tableData: Array<TableData> = [];
+        const getTableDataFromRawData = (rawData: RawTableData[], groupByItems: GroupByItem[]): TableData[] => {
+            const tableData: TableData[] = [];
             rawData.forEach((eachRawData) => {
                 const rowData: TableData = {};
 

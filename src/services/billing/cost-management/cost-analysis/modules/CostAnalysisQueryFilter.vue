@@ -46,8 +46,6 @@ import {
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
-import { ChartType } from '@/services/billing/cost-management/cost-analysis/store/type';
-import { getInitialDates } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import {
     CHART_TYPE, CURRENCY, GRANULARITY,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
@@ -127,7 +125,7 @@ export default {
 
         /* event */
         const handleSelectGranularity = async (granularity: string) => {
-            let chartType: ChartType;
+            let chartType: CHART_TYPE;
             if (granularity === GRANULARITY.ACCUMULATED) {
                 chartType = CHART_TYPE.DONUT;
             } else {
@@ -136,10 +134,10 @@ export default {
             store.commit('service/costAnalysis/setChartType', chartType);
             store.commit('service/costAnalysis/setGranularity', granularity);
         };
-        const handleSelectChartType = async (chartType: ChartType) => {
+        const handleSelectChartType = async (chartType: CHART_TYPE) => {
             store.commit('service/costAnalysis/setChartType', chartType);
         };
-        const handleSelectedDates = async (selectedDates: Array<string>) => {
+        const handleSelectedDates = async (selectedDates: string[]) => {
             store.commit('service/costAnalysis/setSelectedDates', selectedDates);
         };
         const handleSelectCurrency = async (currency: string) => {
@@ -148,14 +146,6 @@ export default {
         const handleClickRefresh = async () => {
             // todo
         };
-
-        const initSelectedDates = () => {
-            const initialDates = getInitialDates();
-            store.commit('service/costAnalysis/setSelectedDates', initialDates);
-        };
-        (async () => {
-            initSelectedDates();
-        })();
 
         return {
             ...toRefs(state),

@@ -1,10 +1,11 @@
 import { Mutation } from 'vuex';
 import {
-    ChartType, CostAnalysisStoreState, Currency, GroupByItem,
+    CostAnalysisStoreState, GroupByItem,
 } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { CHART_TYPE, CURRENCY } from '@/services/billing/cost-management/cost-analysis/lib/config';
 
 
-export const setChartType: Mutation<CostAnalysisStoreState> = (state, chartType: ChartType) => {
+export const setChartType: Mutation<CostAnalysisStoreState> = (state, chartType: CHART_TYPE) => {
     state.chartType = chartType;
 };
 
@@ -24,7 +25,7 @@ export const setSelectedDates: Mutation<CostAnalysisStoreState> = (state, select
     state.selectedDates = selectedDates;
 };
 
-export const setCurrency: Mutation<CostAnalysisStoreState> = (state, currency: Currency) => {
+export const setCurrency: Mutation<CostAnalysisStoreState> = (state, currency: CURRENCY) => {
     state.currency = currency;
 };
 

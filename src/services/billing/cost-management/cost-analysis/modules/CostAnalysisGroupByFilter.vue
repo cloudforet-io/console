@@ -38,12 +38,13 @@ import {
     PIconButton, PSelectButton, PIconTextButton,
 } from '@spaceone/design-system';
 
+import CostAnalysisSetMoreModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetMoreModal.vue';
+
 import { GROUP_BY_ITEM } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { store } from '@/store';
 import { i18n } from '@/translations';
-import CostAnalysisSetMoreModal
-    from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetMoreModal.vue';
+
 
 export default {
     name: 'CostAnalysisGroupByFilter',
@@ -55,7 +56,7 @@ export default {
     },
     setup() {
         const state = reactive({
-            selectedGroupByItems: computed<Array<GroupByItem>>(() => store.state.service.costAnalysis.groupByItems),
+            selectedGroupByItems: computed<GroupByItem[]>(() => store.state.service.costAnalysis.groupByItems),
             groupByItems: [
                 { name: GROUP_BY_ITEM.PROJECT, label: 'Project' },
                 { name: GROUP_BY_ITEM.SERVICE_ACCOUNT, label: 'Service Account' },
@@ -63,8 +64,7 @@ export default {
                 { name: GROUP_BY_ITEM.REGION, label: 'Region' },
                 { name: GROUP_BY_ITEM.PROVIDER, label: 'Provider' },
                 { name: GROUP_BY_ITEM.TYPE, label: 'Type' },
-                { name: GROUP_BY_ITEM.RESOURCE_ID, label: 'Resource ID' },
-                { name: GROUP_BY_ITEM.CURRENCY, label: 'Currency' },
+                { name: GROUP_BY_ITEM.RESOURCE, label: 'Resource' },
                 { name: GROUP_BY_ITEM.ACCOUNT, label: 'Account' },
             ],
             moreGroupBy: [],
@@ -79,7 +79,7 @@ export default {
         const predicate = (current, data) => Object.keys(current).every(key => current[key] === data[key]);
 
         /* event */
-        const handleSelectGroupByItems = async (items: Array<GroupByItem>) => {
+        const handleSelectGroupByItems = async (items: GroupByItem[]) => {
             store.commit('service/costAnalysis/setGroupByItems', items);
         };
 

@@ -62,6 +62,7 @@
         </section>
         <cost-analysis-select-filter-modal
             :visible.sync="selectFilterModalState.visible"
+            :selected-filter-items="[]"
             @confirm="handleSelectFilterModalConfirm"
         />
     </div>
@@ -89,8 +90,9 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { CUSTOM_COLORS, hideAllSeries, toggleSeries } from '@/common/composables/dynamic-chart';
 import { ChartData, Legend } from '@/common/composables/dynamic-chart/type';
-import { ChartType, Granularity, GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { getConvertedGranularity } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { CHART_TYPE, GRANULARITY } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { gray } from '@/styles/colors';
 import { store } from '@/store';
 
@@ -101,7 +103,7 @@ interface Value {
 }
 interface RawChartData {
     date: string;
-    values: Array<Value>;
+    values: Value[];
 }
 
 const DISABLED_COLOR = gray[300];
@@ -118,15 +120,15 @@ export default {
     },
     setup() {
         const state = reactive({
-            granularity: computed<Granularity>(() => store.state.service.costAnalysis.granularity),
-            groupByItems: computed<Array<GroupByItem>>(() => store.state.service.costAnalysis.groupByItems),
+            granularity: computed<GRANULARITY>(() => store.state.service.costAnalysis.granularity),
+            groupByItems: computed<GroupByItem[]>(() => store.state.service.costAnalysis.groupByItems),
             groupBy: computed<string>(() => store.state.service.costAnalysis.groupBy),
-            chartType: computed<ChartType>(() => store.state.service.costAnalysis.chartType),
-            selectedDates: computed<Array<string>>(() => store.state.service.costAnalysis.selectedDates),
-            filters: computed<Array<string>>(() => store.state.service.costAnalysis.filters),
+            chartType: computed<CHART_TYPE>(() => store.state.service.costAnalysis.chartType),
+            selectedDates: computed<string[]>(() => store.state.service.costAnalysis.selectedDates),
+            filters: computed<string[]>(() => store.state.service.costAnalysis.filters),
             loading: true,
-            legends: [] as Array<Legend>,
-            chartData: [] as Array<ChartData>,
+            legends: [] as Legend[],
+            chartData: [] as ChartData[],
             period: computed(() => {
                 const selectedDates = store.state.service.costAnalysis.selectedDates;
                 return {
@@ -143,8 +145,8 @@ export default {
         });
 
         /* util */
-        const getChartDataFromRawData = (rawData: Array<RawChartData>, groupBy?: string): { chartData: Array<ChartData>; groupByValues: Set<string>} => {
-            const chartData: Array<ChartData> = [];
+        const getChartDataFromRawData = (rawData: RawChartData[], groupBy?: string): { chartData: ChartData[]; groupByValues: Set<string>} => {
+            const chartData: ChartData[] = [];
             const groupByValues = new Set<string>();
 
             rawData.forEach((d) => {
@@ -164,8 +166,8 @@ export default {
 
             return { chartData, groupByValues };
         };
-        const getLegendsFromGroupByValues = (groupByValues: Set<string>, groupBy?: string): Array<Legend> => {
-            let legends: Array<Legend>;
+        const getLegendsFromGroupByValues = (groupByValues: Set<string>, groupBy?: string): Legend[] => {
+            let legends: Legend[];
             if (groupBy) {
                 // todo project_id, service account_id, region_code 일 경우 label formatting 해야 함
                 legends = [...groupByValues].map(d => ({
@@ -178,7 +180,7 @@ export default {
             }
             return legends;
         };
-        const convertChartDataAndLegends = (rawData: Array<RawChartData>, groupBy?: string): { chartData: Array<ChartData>; legends: Array<Legend> } => {
+        const convertChartDataAndLegends = (rawData: RawChartData[], groupBy?: string): { chartData: ChartData[]; legends: Legend[] } => {
             const { chartData, groupByValues } = getChartDataFromRawData(rawData, groupBy);
             const legends = getLegendsFromGroupByValues(groupByValues, groupBy);
 
