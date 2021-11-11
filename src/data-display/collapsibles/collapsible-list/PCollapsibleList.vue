@@ -1,6 +1,6 @@
 <template>
     <div class="p-collapsible-list" :class="theme">
-        <div v-for="(item, idx) in collapsibleItems" :key="`${contextKey}-${idx}`"
+        <div v-for="(item, idx) in collapsibleItems" :key="`${contextKey}-${item.name || idx}`"
              class="collapsible-item"
         >
             <p class="top-wrapper">
@@ -9,6 +9,7 @@
                           v-bind="{
                               data: item.data,
                               title: item.title,
+                              name: item.name,
                               index: idx,
                               isCollapsed: !proxyUnfoldedIndices.includes(idx)
                           }"
@@ -28,6 +29,7 @@
                 <slot v-bind="{
                     data: item.data,
                     title: item.title,
+                    name: item.name,
                     index: idx,
                     isCollapsed: !proxyUnfoldedIndices.includes(idx)
                 }"

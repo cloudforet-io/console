@@ -2,6 +2,7 @@ import { COLLAPSIBLE_LIST_THEME, COLLAPSIBLE_LIST_TOGGLE_POSITION } from '@/data
 import { COLLAPSIBLE_TOGGLE_TYPE } from '@/data-display/collapsibles/collapsible-toggle/type';
 
 export interface CollapsibleItem {
+    name?: string;
     title?: string;
     data: string;
 }
