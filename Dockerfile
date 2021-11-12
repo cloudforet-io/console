@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:16
 
 ENV PORT 80
 ENV BUILD_PATH /tmp/spaceone/build
