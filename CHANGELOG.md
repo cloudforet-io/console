@@ -1,3 +1,10 @@
+# [1.1.0-beta.178](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.177...v1.1.0-beta.178) (2021-11-12)
+
+
+### Bug Fixes
+
+* remove old label and export new label ([#749](https://github.com/spaceone-dev/spaceone-design-system/issues/749)) ([a262420](https://github.com/spaceone-dev/spaceone-design-system/commit/a262420243f46366ed8fd0b5770a8dc8c0efc2b9))
+
 # [1.1.0-beta.177](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.176...v1.1.0-beta.177) (2021-11-12)
 
 
