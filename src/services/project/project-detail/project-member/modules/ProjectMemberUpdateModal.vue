@@ -72,7 +72,7 @@
 <script lang="ts">
 import {
     makeProxy,
-} from '@spaceone/console-core-lib';
+} from '@/lib/helper/composition-helpers';
 
 import {
     ComponentRenderProxy,

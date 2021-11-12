@@ -98,7 +98,8 @@ import {
 } from '@vue/composition-api';
 import dayjs from 'dayjs';
 
-import { makeProxy, iso8601Formatter } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';

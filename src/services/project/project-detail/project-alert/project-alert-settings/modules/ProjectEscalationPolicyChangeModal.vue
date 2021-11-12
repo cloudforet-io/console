@@ -49,7 +49,8 @@ import {
 import EscalationPolicyDataTable from '@/services/monitoring/alert-manager/escalation-policy/modules/EscalationPolicyDataTable.vue';
 import EscalationPolicyForm from '@/services/monitoring/alert-manager/escalation-policy/modules/EscalationPolicyForm.vue';
 
-import { makeProxy, iso8601Formatter } from '@spaceone/console-core-lib';
+import { makeProxy } from '@/lib/helper/composition-helpers';
+import { iso8601Formatter } from '@spaceone/console-core-lib';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
