@@ -1,13 +1,13 @@
 <template>
     <div class="p-field-group">
         <div class="label-box">
-            <label v-if="label || $scopedSlots.label" class="form-label" @click="$emit('click-label')">
+            <p-label v-if="label || $scopedSlots.label" class="form-label" @click="$emit('click-label')">
                 <slot name="label">
                     {{ label }}
                 </slot>
                 <span v-if="!required" class="optional-mark">({{ $t('COMPONENT.FIELD_GROUP.OPTIONAL') }})</span>
                 <slot name="label-extra" />
-            </label>
+            </p-label>
         </div>
         <small v-if="$scopedSlots.help || helpText" class="help-msg">
             <slot name="help">{{ helpText }}</slot>
@@ -28,9 +28,11 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
+import PLabel from '@/data-display/label/PLabel.vue';
 
 export default defineComponent({
     name: 'PFieldGroup',
+    components: { PLabel },
     props: {
         label: {
             type: String,
@@ -70,15 +72,6 @@ export default defineComponent({
     .label-box {
         display: flex;
         align-items: center;
-    }
-    .form-label {
-        @apply text-gray-900;
-        display: inline-block;
-        font-size: 0.875rem;
-        font-weight: bold;
-        letter-spacing: 0;
-        line-height: 1.4rem;
-        margin-bottom: 0.25rem;
     }
     .optional-mark {
         @apply text-gray-500;

@@ -1,0 +1,63 @@
+import { Meta, Canvas, Story, ArgsTable } from '@storybook/addon-docs/blocks';
+
+import PLabel from './PLabel.vue';
+
+import { getLabelArgTypes } from '@/data-display/label/story-helper';
+
+
+<Meta title='Data Display/Label' parameters={{
+    design: {
+        type: 'figma',
+        url: 'https://www.figma.com/file/IS6P8y1Wn2nfBC4jGlSiya/Components?node-id=10%3A193199'
+    }
+}} component={PLabel} argTypes={getLabelArgTypes()}
+/>
+
+export const Template = (args, { argTypes }) => ({
+    props: Object.keys(argTypes),
+    components: { PLabel },
+    template: `
+    <div class="h-full w-full overflow p-8">
+        <p-label :label="label">
+            <template v-if="defaultSlot"><span v-html="defaultSlot"/></template>
+        </p-label>
+    </div>
+    `,
+    setup() {
+        return {}
+    }
+});
+
+
+# Label
+<br/>
+<br/>
+
+
+<Canvas>
+    <Story name="Basic">
+        {{
+            components: { PLabel },
+            template: `
+    <div class="h-full w-full overflow p-8">
+        <p-label>Label</p-label>
+    </div>
+    `,
+            setup() {
+                return {}
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+
+<Canvas>
+    <Story name="Playground">
+        {Template.bind({})}
+    </Story>
+</Canvas>
+
+<ArgsTable story="Playground"/>
