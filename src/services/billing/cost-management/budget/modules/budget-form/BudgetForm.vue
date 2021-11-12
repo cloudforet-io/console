@@ -1,7 +1,7 @@
 <template>
     <div>
         <budget-form-base-info :budget-id="budgetId" @change="handleChangeBaseInfo" />
-        <budget-form-amount-planning :budget-id="budgetId" @change="handleChangeAmountPlanning" />
+        <budget-form-amount-plan :budget-id="budgetId" @change="handleChangeAmountPlanning" />
     </div>
 </template>
 
@@ -11,12 +11,15 @@ import {
 } from '@vue/composition-api';
 
 import BudgetFormBaseInfo from '@/services/billing/cost-management/budget/modules/budget-form/BudgetFormBaseInfo.vue';
-import BudgetFormAmountPlanning
-    from '@/services/billing/cost-management/budget/modules/budget-form/BudgetFormAmountPlanning.vue';
+import BudgetFormAmountPlan
+    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlan.vue';
 
 export default {
-    name: 'BudgetForm',
-    components: { BudgetFormAmountPlanning, BudgetFormBaseInfo },
+    name: 'AmountPlanning',
+    components: {
+        BudgetFormAmountPlan,
+        BudgetFormBaseInfo,
+    },
     props: {
         budgetId: {
             type: String,

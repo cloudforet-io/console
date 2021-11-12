@@ -1,0 +1,38 @@
+<template>
+    <div class="last-months-cost">
+        <label>Last 3 Months Cost</label>
+        <span v-for="({month, cost}, index) in data" :key="index" class="data">
+            {{ month }}: ${{ cost }}
+        </span>
+    </div>
+</template>
+
+<script lang="ts">
+export default {
+    name: 'LastMonthsCost',
+    props: {
+        data: {
+            type: Array,
+            default: () => [],
+        },
+    },
+};
+</script>
+
+<style lang="postcss" scoped>
+.last-months-cost {
+    @apply text-gray-400 text-xs;
+    label {
+        @apply font-bold;
+    }
+    .data {
+        @apply border-r border-gray-200;
+        display: inline-flex;
+        padding: 0 0.5rem;
+        align-items: center;
+        &:last-of-type {
+            @apply border-0;
+        }
+    }
+}
+</style>

@@ -14,7 +14,7 @@ interface BudgetMonthlyCost {
 
 export type CostType = 'provider' | 'region_code' | 'account' | 'product'
 
-type BudgetTimeUnit = 'MONTHLY' | 'YEARLY' | 'TOTAL'
+export type BudgetTimeUnit = 'MONTHLY' | 'YEARLY' | 'TOTAL'
 
 export const BUDGET_NOTIFICATIONS_UNIT = Object.freeze({
     PERCENT: 'PERCENT',
