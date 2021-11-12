@@ -1,4 +1,4 @@
-FROM node:12
+FROM node:16
 
 ENV PORT 80
 ENV BUILD_PATH /tmp/spaceone/build
@@ -14,7 +14,7 @@ RUN mkdir -p ${BUILD_PATH} \
     && apt-get update && apt-get install -y nginx \
     && rm -f /etc/nginx/sites-enabled/default \
     && mkdir -p ${BUILD_PATH} && mkdir -p ${LOG_PATH}/nginx
-    
+
 COPY pkg/nginx.conf ${NGINX_CONF_PATH}/spaceone_console.conf
 COPY public ${BUILD_PATH}/public
 COPY package.json package-lock.json *.js ${BUILD_PATH}/
