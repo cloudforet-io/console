@@ -1,16 +1,18 @@
 ---
 name: Design updates request
 about: Request to apply design changes
-title: '[Component name] update / new'
-labels: design update + high / medium / low
+title: '[Component name] update or new'
+labels: design update
 assignees: ''
 
 ---
 
 **problem**
 
-**solutione**
+**solution**
 
-**additional link**
+**Figma / Jira link**
 
-**addtional description**
+**Additional description**
+
+Add priority (high / medium / low) label!
