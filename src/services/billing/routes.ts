@@ -3,7 +3,7 @@ import BudgetDetailPage from '@/services/billing/cost-management/budget/budget-d
 
 const CostManagementPage = () => import(/* webpackChunkName: "CostManagementPage" */ '@/services/billing/cost-management/CostManagementPage.vue');
 
-const CostDashboardPage = () => import(/* webpackChunkName: "CostDashboardPage" */ '@/services/billing/cost-management/dashboard/CostDashboardPage.vue');
+const CostDashboardPage = () => import(/* webpackChunkName: "CostDashboardPage" */ '@/services/billing/cost-management/cost-dashboard/CostDashboardPage.vue');
 const CostAnalysisPage = () => import(/* webpackChunkName: "CostAnalysisPage" */ '@/services/billing/cost-management/cost-analysis/CostAnalysisPage.vue');
 const BudgetPage = () => import(/* webpackChunkName: "BudgetPage" */ '@/services/billing/cost-management/budget/BudgetPage.vue');
 const BudgetCreatePage = () => import(/* webpackChunkName: "BudgetCreatePage" */ '@/services/billing/cost-management/budget/budget-create/BudgetCreatePage.vue');
@@ -45,7 +45,7 @@ export default {
                     component: CostManagementPage,
                     children: [
                         {
-                            path: 'dashboard/:id',
+                            path: 'dashboard/:dashboardId',
                             name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
                             props: true,
                             component: CostDashboardPage,

@@ -56,7 +56,7 @@
             </div>
         </div>
         <div style="height: 50rem; background-color: #fff;">
-            {{ id }} 대쉬보드으~
+            {{ dashboardId }} 대쉬보드으~
         </div>
     </div>
 </template>
@@ -105,7 +105,7 @@ export default {
         PTag,
     },
     props: {
-        id: {
+        dashboardId: {
             type: String,
             default: undefined,
         },
@@ -121,7 +121,7 @@ export default {
             route: computed(() => [
                 { name: i18n.t('MENU.BILLING.BILLING'), to: { name: BILLING_ROUTE._NAME } },
                 { name: i18n.t('MENU.BILLING.COST_MANAGEMENT'), to: { name: BILLING_ROUTE.COST_MANAGEMENT._NAME } },
-                { name: props.id },
+                { name: props.dashboardId },
             ]),
         });
 
