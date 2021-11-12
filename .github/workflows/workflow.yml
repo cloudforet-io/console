@@ -15,23 +15,26 @@ jobs:
         with:
           submodules: true
       - name: Setup Node.js
-        uses: actions/setup-node@v1
+        uses: actions/setup-node@v2
         with:
           node-version: 16
       - name: Cache node modules
         id: node-cache
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
             path: node_modules
             key: $ {{ runner.OS }}-build-${{ hashFiles('**/package-lock.json') }}
             restore-keys: |
               $ {{ runner.OS }}-build-
               $ {{ runner.OS }}-
+
       - name: Install dependencies
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm install
+
       - name: Build
         run: npm run build
+
       - name: Release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
