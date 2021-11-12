@@ -1,3 +1,10 @@
+# [1.1.0-beta.177](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.176...v1.1.0-beta.177) (2021-11-12)
+
+
+### Bug Fixes
+
+* update label component ([#747](https://github.com/spaceone-dev/spaceone-design-system/issues/747)) ([5dda602](https://github.com/spaceone-dev/spaceone-design-system/commit/5dda602c5a3d565206fee5758ba62d3682437a73))
+
 # [1.1.0-beta.176](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.175...v1.1.0-beta.176) (2021-11-12)
 
 
