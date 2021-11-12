@@ -4,6 +4,7 @@
 
 <script lang="ts">
 import {
+    onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 import * as am4core from '@amcharts/amcharts4/core';
@@ -134,6 +135,11 @@ export default {
                 drawChart(chartContext);
             }
         }, { immediate: false });
+
+        onUnmounted(() => {
+            if (state.chart) state.chart.dispose();
+        });
+
         return {
             ...toRefs(state),
         };
