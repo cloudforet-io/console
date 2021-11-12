@@ -2,7 +2,7 @@
 name: Design updates request
 about: Request to apply design changes
 title: '[Component name] Update or New'
-labels: design update
+labels: Design Update
 assignees: ''
 
 ---
@@ -11,7 +11,7 @@ assignees: ''
 
 **Solution**
 
-**Figma / Jira link**
+**Figma / Jira Link**
 
 **Additional Description**
 
