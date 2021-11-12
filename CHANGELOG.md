@@ -1,3 +1,10 @@
+# [1.1.0-beta.176](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.175...v1.1.0-beta.176) (2021-11-12)
+
+
+### Features
+
+* update node-sass, sass-loader, postcss version ([#745](https://github.com/spaceone-dev/spaceone-design-system/issues/745)) ([a626171](https://github.com/spaceone-dev/spaceone-design-system/commit/a626171047d0ca12d1fb1da11bc3768c63594a2d))
+
 # [1.1.0-beta.175](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.174...v1.1.0-beta.175) (2021-11-11)
 
 
