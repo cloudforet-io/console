@@ -53,7 +53,7 @@ export { default as PEmpty } from './data-display/empty/PEmpty.vue';
 export { default as PDivider } from './layouts/divider/PDivider.vue';
 export { default as PI } from './foundation/icons/PI.vue';
 export { default as PTextInput } from './inputs/input/PTextInput.vue';
-export { default as PLabel } from './inputs/forms/label/PLabel.vue';
+export { default as PLabel } from './data-display/label/PLabel.vue';
 export { default as PSkeleton } from './feedbacks/loading/skeleton/PSkeleton.vue';
 export { default as PCollapsibleToggle } from './data-display/collapsibles/collapsible-toggle/PCollapsibleToggle.vue';
 
