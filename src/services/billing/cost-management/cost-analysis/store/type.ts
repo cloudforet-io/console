@@ -18,14 +18,3 @@ export interface CostAnalysisStoreState {
     currency: CURRENCY;
     filters: Array<any>; // todo
 }
-
-interface FilterData {
-    menuItems?: MenuItem[];
-    selectedItems: MenuItem[];
-}
-
-export interface FilterItem {
-    name: FILTER_ITEM;
-    title: string;
-    data: FilterData;
-}
