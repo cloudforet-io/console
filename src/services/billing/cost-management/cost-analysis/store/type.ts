@@ -1,7 +1,6 @@
 import {
-    CHART_TYPE, CURRENCY, GRANULARITY, FILTER_ITEM,
+    CHART_TYPE, CURRENCY, GRANULARITY, FilterItem, FILTER_ITEM,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 
 export interface GroupByItem {
@@ -16,5 +15,5 @@ export interface CostAnalysisStoreState {
     groupBy?: string;
     selectedDates: string[];
     currency: CURRENCY;
-    filters: Array<any>; // todo
+    filters: Record<FILTER_ITEM, FilterItem[]>;
 }

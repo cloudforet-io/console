@@ -46,7 +46,9 @@ import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
-import { getConvertedGranularity, getTimeUnit } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import {
+    getConvertedFilter, getConvertedGranularity, getTimeUnit,
+} from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
@@ -86,6 +88,7 @@ export default {
             currency: computed(() => store.state.service.costAnalysis.currency),
             selectedDates: computed(() => store.state.service.costAnalysis.selectedDates),
             groupByItems: computed(() => store.state.service.costAnalysis.groupByItems),
+            filters: computed(() => store.state.service.costAnalysis.filters),
         });
         const tableState = reactive({
             loading: true,
@@ -162,10 +165,11 @@ export default {
         const listCostAnalysisTableData = async () => {
             try {
                 const granularity = getConvertedGranularity(state.selectedDates, state.granularity);
+                const convertedFilters = getConvertedFilter(state.filters);
+                costApiQueryHelper.setFilters(convertedFilters);
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity,
                     group_by: state.groupByItems.map(d => d.name),
-                    filter: [],
                     start: state.selectedDates[0],
                     end: state.selectedDates[1],
                     pivot_type: 'TABLE',
@@ -189,12 +193,14 @@ export default {
             // await getTableData();
         };
 
-        watch([() => state.granularity, () => state.groupByItems, () => state.selectedDates], async () => {
+        watch([() => state.granularity, () => state.groupByItems, () => state.selectedDates, () => state.filters], async () => {
             tableState.loading = true;
-            await listCostAnalysisTableData();
-            await setTableFields(state.granularity, state.groupByItems);
+            await Promise.all([
+                listCostAnalysisTableData(),
+                setTableFields(state.granularity, state.groupByItems),
+            ]);
             tableState.loading = false;
-        }, { immediate: true });
+        }, { immediate: true, deep: true });
 
         return {
             ...toRefs(state),

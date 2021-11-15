@@ -24,6 +24,7 @@ export default {
         (async () => {
             await Promise.all([
                 store.dispatch('resource/serviceAccount/load'),
+                store.dispatch('resource/project/load'),
                 store.dispatch('resource/region/load'),
                 store.dispatch('resource/provider/load'),
             ]);

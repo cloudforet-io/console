@@ -60,7 +60,7 @@
 import { some } from 'lodash';
 
 import {
-    toRefs, reactive, getCurrentInstance, ComponentRenderProxy, computed, watch, ref,
+    toRefs, reactive, getCurrentInstance, ComponentRenderProxy, computed, watch,
 } from '@vue/composition-api';
 
 import {

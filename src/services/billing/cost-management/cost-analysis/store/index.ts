@@ -12,7 +12,7 @@ const state: CostAnalysisStoreState = {
     groupBy: undefined,
     selectedDates: getInitialDates(),
     currency: CURRENCY.USD,
-    filters: [],
+    filters: {},
 };
 
 export default {

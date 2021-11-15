@@ -47,8 +47,9 @@
 
 <script lang="ts">
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, toRefs,
 } from '@vue/composition-api';
+
 import {
     PButtonModal,
     PSearchDropdown,
@@ -84,7 +85,7 @@ export default {
             default: '',
         },
     },
-    setup(props, { root, emit }) {
+    setup(props, { emit }) {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
             checkBoxValue: '',

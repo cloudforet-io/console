@@ -2,7 +2,9 @@ import { Mutation } from 'vuex';
 import {
     CostAnalysisStoreState, GroupByItem,
 } from '@/services/billing/cost-management/cost-analysis/store/type';
-import { CHART_TYPE, CURRENCY } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import {
+    CHART_TYPE, CURRENCY, FILTER_ITEM, FilterItem,
+} from '@/services/billing/cost-management/cost-analysis/lib/config';
 
 
 export const setChartType: Mutation<CostAnalysisStoreState> = (state, chartType: CHART_TYPE) => {
@@ -29,6 +31,6 @@ export const setCurrency: Mutation<CostAnalysisStoreState> = (state, currency: C
     state.currency = currency;
 };
 
-export const setFilters: Mutation<CostAnalysisStoreState> = (state, filters: Array<any>) => {
+export const setFilters: Mutation<CostAnalysisStoreState> = (state, filters: Record<FILTER_ITEM, FilterItem[]>) => {
     state.filters = filters;
 };

@@ -4,7 +4,6 @@ import { TimeUnit } from '@amcharts/amcharts4/core';
 
 
 export interface ChartData {
-    date: string;
     [key: string]: any;
 }
 export interface Legend {

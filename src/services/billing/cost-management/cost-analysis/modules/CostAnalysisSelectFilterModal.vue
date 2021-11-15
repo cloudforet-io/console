@@ -1,5 +1,6 @@
 <template>
     <p-button-modal
+        v-if="visible"
         class="select-filter-modal-container"
         :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SELECT_FILTER')"
         :visible.sync="proxyVisible"
@@ -22,7 +23,7 @@
                                 <cost-analysis-filter-item
                                     v-if="!isCollapsed"
                                     :type="name"
-                                    :selected.sync="selectedMap[name]"
+                                    :selected.sync="selectedItemsMap[name]"
                                 />
                             </keep-alive>
                         </template>
@@ -34,7 +35,7 @@
                             {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SELECTED_FILTER') }} ({{ selectedItemsLength }})
                         </div>
                         <div class="selected-tags-wrapper">
-                            <template v-for="([filterName, selectedItems], idx) in Object.entries(selectedMap)">
+                            <template v-for="([filterName, selectedItems], idx) in Object.entries(selectedItemsMap)">
                                 <p-tag v-for="(item, itemIdx) in selectedItems" :key="`selected-tag-${idx}-${item.name}`"
                                        @delete="handleDeleteTag(filterName, itemIdx)"
                                 >
@@ -53,7 +54,7 @@
 </template>
 
 <script lang="ts">
-import { sum } from 'lodash';
+import { sum, cloneDeep } from 'lodash';
 
 import {
     computed, reactive, toRefs, watch,
@@ -65,10 +66,10 @@ import {
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import CostAnalysisFilterItem from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisFilterItem.vue';
-import { CollapsibleItem } from '@spaceone/design-system/dist/src/data-display/collapsibles/collapsible-list/type';
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
-import { FILTER_ITEM } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { FILTER_MAP } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { store } from '@/store';
 
 
 export default {
@@ -84,61 +85,72 @@ export default {
             type: Boolean,
             default: false,
         },
-        // selectedFilterItems: {
-        //     type: Object,
-        //     default: () => ({}),
-        // },
     },
     setup(props, { emit }) {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
-            filterItems: [
-                { name: FILTER_ITEM.PROJECT, title: 'Project' },
-                { name: FILTER_ITEM.SERVICE_ACCOUNT, title: 'Service Account' },
-                { name: FILTER_ITEM.PRODUCT, title: 'Product' },
-                { name: FILTER_ITEM.REGION, title: 'Region' },
-                { name: FILTER_ITEM.PROVIDER, title: 'Provider' },
-                { name: FILTER_ITEM.TYPE, title: 'Type' },
-                { name: FILTER_ITEM.RESOURCE, title: 'Resource' },
-                { name: FILTER_ITEM.ACCOUNT, title: 'Account' },
-                { name: FILTER_ITEM.TAG, title: 'Tag' },
-                { name: FILTER_ITEM.ADDITIONAL_FIELD, title: 'Additional Field' },
-            ] as CollapsibleItem[],
-            selectedMap: {} as Record<FILTER_ITEM, MenuItem[]>,
+            filters: computed(() => store.state.service.costAnalysis.filters),
+            filterItems: computed(() => Object.values(FILTER_MAP).map(item => ({
+                name: item.name,
+                title: item.label,
+            }))),
+            selectedItemsMap: {} as Record<string, MenuItem[]>,
             selectedItemsLength: computed<number>(() => {
-                const selectedValues = Object.values(state.selectedMap);
+                const selectedValues = Object.values(state.selectedItemsMap);
                 return sum(selectedValues.map(v => v.length));
             }),
             unfoldedIndices: [] as number[],
             menuLoading: false,
         });
 
+        /* util */
+        const init = () => {
+            const unfoldedIndices: number[] = [];
+            state.selectedItemsMap = cloneDeep(state.filters);
+            state.filterItems.forEach((item, idx) => {
+                if (Object.keys(state.filters).includes(item.name)) {
+                    unfoldedIndices.push(idx);
+                }
+            });
+            state.unfoldedIndices = unfoldedIndices;
+        };
+
         /* event */
         const handleDeleteTag = (filterName: string, itemIdx: number) => {
-            const selectedItems = [...state.selectedMap[filterName]];
-            selectedItems.splice(itemIdx, 1);
-            state.selectedMap[filterName] = selectedItems;
+            const _selectedItemsMap = cloneDeep(state.selectedItemsMap);
+            const _selectedItems = [..._selectedItemsMap[filterName]];
+            _selectedItems.splice(itemIdx, 1);
+            if (_selectedItems.length) {
+                _selectedItemsMap[filterName] = _selectedItems;
+            } else {
+                delete _selectedItemsMap[filterName];
+            }
+            state.selectedItemsMap = _selectedItemsMap;
         };
         const handleFormConfirm = () => {
             state.proxyVisible = false;
-            emit('confirm');
+            store.commit('service/costAnalysis/setFilters', state.selectedItemsMap);
         };
         const handleClearAll = () => {
-            state.selectedMap = {};
+            state.selectedItemsMap = {};
             state.unfoldedIndices = [];
         };
 
         watch(() => state.unfoldedIndices, (after, before) => {
             if (after.length < before.length) {
+                const _selectedItemsMap = cloneDeep(state.selectedItemsMap);
                 const deletedIndex: number = before.filter(idx => !after.includes(idx))[0];
                 const deletedFilterName = state.filterItems[deletedIndex].name;
-                state.selectedMap[deletedFilterName] = [];
+                delete _selectedItemsMap[deletedFilterName];
+                state.selectedItemsMap = _selectedItemsMap;
             }
+        });
+        watch(() => props.visible, (after) => {
+            if (after) init();
         });
 
         return {
             ...toRefs(state),
-            FILTER_ITEM,
             handleFormConfirm,
             handleClearAll,
             handleDeleteTag,
