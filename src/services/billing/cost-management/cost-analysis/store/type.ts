@@ -1,5 +1,5 @@
 import {
-    CHART_TYPE, CURRENCY, GRANULARITY, FilterItem, FILTER_ITEM,
+    CHART_TYPE, CURRENCY, GRANULARITY, FilterItem, FILTER_ITEM, CostQuerySetModel,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
 
 
@@ -16,4 +16,6 @@ export interface CostAnalysisStoreState {
     selectedDates: string[];
     currency: CURRENCY;
     filters: Record<FILTER_ITEM, FilterItem[]>;
+    selectedQueryId: string|undefined;
+    costQueryList: CostQuerySetModel[];
 }

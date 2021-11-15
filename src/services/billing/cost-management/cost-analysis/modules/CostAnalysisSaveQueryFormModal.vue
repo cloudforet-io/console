@@ -45,8 +45,7 @@
 
 <script lang="ts">
 import {
-    ComponentRenderProxy,
-    computed, getCurrentInstance, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
@@ -59,13 +58,11 @@ import {
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { i18n } from '@/translations';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { showErrorMessage, showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 
 interface Props {
-    listCostQuerySet: () => void;
     visible: boolean;
     headerTitle: string;
     selectedQuery: CostQuerySetModel;
@@ -101,13 +98,8 @@ export default {
                 return Object.values(REQUEST_TYPE).includes(type);
             },
         },
-        listCostQuerySet: {
-            type: Function,
-            default: undefined,
-        },
     },
-    setup(props: Props, { emit }) {
-        const vm = getCurrentInstance() as ComponentRenderProxy;
+    setup(props: Props, { emit, root }) {
         const formState = reactive({
             queryName: undefined as undefined | string,
             selectedVisibility: QUERY_VISIBILITY_TYPE.PRIVATE,
@@ -150,49 +142,24 @@ export default {
 
         const saveQuery = async () => {
             try {
-                const {
-                    granularity, chartType, selectedDates,
-                    currency, groupByItems, filters,
-                } = store.state.service.costAnalysis;
-                await SpaceConnector.client.costAnalysis.costQuerySet.create({
-                    name: formState.queryName,
-                    options: {
-                        granularity,
-                        chart_type: chartType,
-                        start: selectedDates[0],
-                        end: selectedDates[1],
-                        currency,
-                        group_by: groupByItems,
-                        filter: filters,
-                    },
-                });
-                await props.listCostQuerySet();
-                showSuccessMessage(vm.$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '', vm.$root);
+                const updatedQuery = await store.dispatch('service/costAnalysis/saveQuery', formState.queryName);
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '', root);
+                emit('confirm', { updatedQuery, requestType: REQUEST_TYPE.SAVE });
             } catch (e) {
-                ErrorHandler.handleError(e);
-                showErrorMessage(vm.$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
             }
         };
 
         const editQuery = async () => {
             try {
-                if (props.selectedQuery?.name !== formState.queryName) {
-                    await SpaceConnector.client.costAnalysis.costQuerySet.update({
-                        cost_query_set_id: props.selectedQuery?.cost_query_set_id,
-                        name: formState.queryName,
-                    });
-                }
-                if (props.selectedQuery?.scope !== formState.selectedVisibility) {
-                    await SpaceConnector.client.costAnalysis.costQuerySet.changeScope({
-                        cost_query_set_id: props.selectedQuery?.cost_query_set_id,
-                        scope: formState.selectedVisibility,
-                    });
-                }
-                await props.listCostQuerySet();
-                showSuccessMessage(vm.$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_EDITED_QUERY'), '', vm.$root);
+                const updatedQuery = await store.dispatch('service/costAnalysis/editQuery', {
+                    selectedQuery: props.selectedQuery, formState,
+                });
+                if (!updatedQuery) return;
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_EDITED_QUERY'), '', root);
+                emit('confirm', { updatedQuery, requestType: REQUEST_TYPE.EDIT });
             } catch (e) {
-                ErrorHandler.handleError(e);
-                showErrorMessage(vm.$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_EDITED_QUERY'), e);
+                ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_EDITED_QUERY'));
             }
         };
 

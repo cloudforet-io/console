@@ -3,7 +3,7 @@ import {
     CostAnalysisStoreState, GroupByItem,
 } from '@/services/billing/cost-management/cost-analysis/store/type';
 import {
-    CHART_TYPE, CURRENCY, FILTER_ITEM, FilterItem,
+    CHART_TYPE, CURRENCY, FILTER_ITEM, FilterItem, CostQuerySetModel,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
 
 
@@ -33,4 +33,12 @@ export const setCurrency: Mutation<CostAnalysisStoreState> = (state, currency: C
 
 export const setFilters: Mutation<CostAnalysisStoreState> = (state, filters: Record<FILTER_ITEM, FilterItem[]>) => {
     state.filters = filters;
+};
+
+export const setSelectedQueryId: Mutation<CostAnalysisStoreState> = (state, selectedQueryId: string) => {
+    state.selectedQueryId = selectedQueryId;
+};
+
+export const setCostQueryList: Mutation<CostAnalysisStoreState> = (state, costQueryList: CostQuerySetModel[]) => {
+    state.costQueryList = costQueryList;
 };

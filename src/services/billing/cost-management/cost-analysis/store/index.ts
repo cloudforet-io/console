@@ -13,6 +13,8 @@ const state: CostAnalysisStoreState = {
     selectedDates: getInitialDates(),
     currency: CURRENCY.USD,
     filters: {},
+    selectedQueryId: undefined,
+    costQueryList: [],
 };
 
 export default {
