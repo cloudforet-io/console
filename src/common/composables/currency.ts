@@ -1,38 +1,25 @@
-import { convert as cashifyConvert } from 'cashify';
 import currencyjs, { Options as CurrencyOptions } from 'currency.js';
+import { convert as cashifyConvert } from 'cashify';
 import {
     computed, ComputedRef, reactive, Ref, toRefs, watch,
 } from '@vue/composition-api';
 
 
 import { Options as CashifyOptions } from 'cashify/dist/lib/options';
+import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { Currency, CurrencyRates } from '@/store/modules/display/type';
 
 
-/** cashify library: https://www.npmjs.com/package/cashify */
 /** currency library: https://www.npmjs.com/package/currency.js */
-
-
-const CURRENCY_SYMBOL: Record<Currency, string> = Object.freeze({
-    USD: '$',
-    KRW: '₩',
-    JPY: '¥',
-});
-
-const DEFAULT_RATES: Record<Currency, number> = Object.freeze({
-    USD: 1,
-    KRW: 1185,
-    JPY: 114,
-});
 
 
 type Money = number|number[]
 type Formatted = string|number|Array<string|number>
-type Currency = 'USD'|'KRW'|'JPY'
 
 /**
- * @param money
+ * @param _money
  * @param currency
- * @param options
+ * @param rates
  * @example
  <template>
      <div>
@@ -53,19 +40,18 @@ type Currency = 'USD'|'KRW'|'JPY'
 
  const setup = () => {
     const {
-        money, formattedMoney, convertedMoney, setRates, setMoney,
-    } = useCurrency([100, 200, 300], computed(() => store.getters['settings/getItem']('currency', '/common')), { RATES });
+        money, formattedMoney, convertedMoney, setMoney,
+    } = useCurrency(
+        [100, 200, 300],
+        computed(() => store.state.display.currency),
+        computed(() => store.state.display.currencyRates)
+    );
 
     const state = reactive({
         money,
         formattedMoney,
         convertedMoney,
     })
-
-    const getRates = async () => {
-        const rates = await SpaceConnector.client.xxx.xxx.get();
-        setRates(rates);
-    }
 
     const getMoney = async () => {
         const { results } = await SpaceConnector.client.xxx.xxx.list();
@@ -79,7 +65,7 @@ type Currency = 'USD'|'KRW'|'JPY'
     };
 
     (async () => {
-        await Promise.allSettled(getRates(), getMoney());
+        await getMoney();
     })();
 
     return {
@@ -91,22 +77,22 @@ type Currency = 'USD'|'KRW'|'JPY'
 export const useCurrency = (
     _money: Money,
     currency: ComputedRef<string>|Ref<string>,
-    options: Partial<CashifyOptions> = {},
+    rates: ComputedRef<CurrencyRates>|Ref<string>,
 ) => {
     const state = reactive({
         money: _money,
-        currency: (options.base ?? currency.value) as Currency,
+        currency: currency.value as Currency,
         convertOptions: {
             base: 'USD',
-            rates: options.rates ?? DEFAULT_RATES,
+            rates: rates.value,
             from: 'USD',
-            to: options.base ?? currency.value,
+            to: currency.value,
         } as CashifyOptions,
         convertedMoney: computed<Money>(() => {
             if (Array.isArray(state.money)) {
-                return state.money.map(d => cashifyConvert(d, state.convertOptions));
+                return state.money.map(d => currencyjs(cashifyConvert(d, state.convertOptions)));
             }
-            return cashifyConvert(state.money, state.convertOptions);
+            return currencyjs(cashifyConvert(state.money, state.convertOptions));
         }),
         currencyOptions: computed<CurrencyOptions>(() => {
             if (CURRENCY_SYMBOL[state.currency]) return { symbol: CURRENCY_SYMBOL[state.currency] };
@@ -118,29 +104,32 @@ export const useCurrency = (
             }
             return currencyjs(state.convertedMoney, state.currencyOptions).format();
         }),
+        symbol: computed<CURRENCY_SYMBOL>(() => CURRENCY_SYMBOL[state.currency] ?? CURRENCY_SYMBOL.USD),
     });
 
-    watch(() => currency, (updatedCurrency) => {
-        if (updatedCurrency !== state.currency) {
+    watch([() => currency, () => rates], (updated) => {
+        const updatedCurrency = updated[0];
+        const updatedRates = updated[1];
+        if (!updatedCurrency || !updatedRates) return;
+
+        const options = {
+            ...state.convertOptions,
+            rates: updatedRates,
+            to: updatedCurrency,
+        };
+
+        if (state.currency !== updatedCurrency) {
+            state.convertOptions.from = state.currency;
             state.currency = updatedCurrency;
-            state.convertOptions = {
-                ...state.convertOptions,
-                from: state.currency,
-                to: updatedCurrency,
-            };
         }
+
+        state.convertOptions = options;
     });
 
     const setMoney = (_value: Money) => {
         state.money = _value;
     };
 
-    const setRates = (rates: Record<string, number>) => {
-        state.convertOptions = {
-            ...state.convertOptions,
-            rates: { ...state.convertOptions.rates, ...rates },
-        };
-    };
 
     const { convertedMoney, formattedMoney, money } = toRefs(state);
 
@@ -149,6 +138,5 @@ export const useCurrency = (
         formattedMoney,
         money,
         setMoney,
-        setRates,
     };
 };

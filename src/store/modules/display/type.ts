@@ -7,4 +7,10 @@ export interface DisplayState {
     isDownloaded: boolean;
     uncheckedNotificationCount: number;
     isSignInFailed: boolean;
+    currency: Currency;
+    currencyRates: CurrencyRates;
 }
+
+export type Currency = 'USD'|'KRW'|'JPY'
+
+export type CurrencyRates = Record<string, number>
