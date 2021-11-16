@@ -4,32 +4,8 @@ import { gray } from '@/styles/colors';
 import config from '@/lib/config';
 
 
-// const convertChartData = () => {
-//     // todo: 도넛 차트의 경우, accumulated 는 조회기간의 합을, daily, monthly, yearly 는 조회기간의 마지막 일/월/년 값을 보여준다.
-//     return [{
-//         category: 'seoul',
-//         value: 501.9,
-//     }, {
-//         category: 'tokyo',
-//         value: 301.9,
-//     }, {
-//         category: 'virginia',
-//         value: 201.1,
-//     }, {
-//         category: 'california',
-//         value: 165.8,
-//     }, {
-//         category: 'frankfurt',
-//         value: 139.9,
-//     }, {
-//         category: 'stockholm',
-//         value: 128.3,
-//     }];
-// };
-
 const createSeries = (chart) => {
     const series = chart.series.push(new am4charts.PieSeries());
-    series.name = chart.label;
     series.dataFields.value = 'value';
     series.dataFields.category = 'category';
     series.slices.template.stroke = am4core.color('white');
@@ -50,13 +26,12 @@ const createSeries = (chart) => {
     return series;
 };
 
-
 export const drawPieChart = (data, chartContainer) => {
     const chart = am4core.create(chartContainer, am4charts.PieChart);
     if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
     chart.paddingLeft = -5;
     chart.paddingBottom = -10;
-    // chart.data = convertChartData();
+    chart.data = data;
     chart.responsive.enabled = true;
     chart.innerRadius = am4core.percent(57);
 
