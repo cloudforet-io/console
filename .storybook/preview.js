@@ -1,7 +1,7 @@
 import "@/styles/style.pcss";
 
-import '@storybook/addon-console';
 import { withDesign } from 'storybook-addon-designs';
+
 import VueCompositionApi from '@vue/composition-api';
 import Notifications from 'vue-notification';
 
@@ -56,13 +56,18 @@ Object.keys(tailwindConfig.theme.screens).forEach(k => {
     }
 })
 
+
+
 export const decorators = [
     withDesign,
-    () => ({
-        i18n,
-        router: new VueRouter(),
-        template: '<story/>',
-    })
+    (story, { globals: { locale } }) => {
+        i18n.locale = locale;
+        return {
+            i18n,
+            router: new VueRouter(),
+            template: '<story/>',
+        }
+    }
 ]
 
 export const parameters = {
@@ -86,3 +91,19 @@ export const parameters = {
     },
     actions: { argTypesRegex: "^on[A-Z].*" },
 }
+
+export const globalTypes = {
+    locale: {
+        name: 'locale',
+        description: 'Internationalization locale',
+        defaultValue: 'en',
+        toolbar: {
+            icon: 'globe',
+            items: [
+                { value: 'en', right: '🇺🇸', title: 'English' },
+                { value: 'ko', right: '🇰🇷', title: '한국어' },
+                { value: 'jp', right: '🇯🇵', title: '日本語' },
+            ],
+        },
+    },
+};
