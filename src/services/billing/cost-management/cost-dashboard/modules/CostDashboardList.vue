@@ -17,16 +17,16 @@
                 :class="{'selected': item.dashboard_id === dashboardIdFromRoute}"
                 @click="showPage(item.routeName, item.dashboard_id)"
             >
-                <p-i v-if="item.scope === 'PRIVATE'" name="ic_private" class="private-icon"
-                     width="1rem"
-                     height="1rem"
-                />
                 <!--                <p-i name="ic_bookmark" width="0.625rem" height="0.625rem"-->
                 <!--                     class="favorite-icon"-->
                 <!--                />-->
                 <span class="title">
                     {{ item.name }}
                 </span>
+                <p-i v-if="item.scope === 'PRIVATE'" name="ic_private" class="private-icon"
+                     width="1rem"
+                     height="1rem"
+                />
                 <p-i v-if="item.default_layout_id" name="ic_home" class="home-icon"
                      width="1rem" height="1rem"
                 />
