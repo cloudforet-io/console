@@ -362,6 +362,8 @@
 				"DONUT": "Donut",
 				"EDIT_QUERY": "Edit Query",
 				"FILTER": "Filter",
+				"FILTER_MODAL_HELP_TEXT_1": "No selected filters.",
+				"FILTER_MODAL_HELP_TEXT_2": "Select filters from the list.",
 				"GRANULARITY": "Granularity",
 				"GROUP_BY": "Group By",
 				"HIDE_ALL": "Hide all",

@@ -362,6 +362,8 @@
 				"DONUT": "도넛",
 				"EDIT_QUERY": "쿼리 편집",
 				"FILTER": "필터",
+				"FILTER_MODAL_HELP_TEXT_1": "선택된 필터가 없습니다.",
+				"FILTER_MODAL_HELP_TEXT_2": "리스트에서 필터를 선택해주세요.",
 				"GRANULARITY": "",
 				"GROUP_BY": "",
 				"HIDE_ALL": "모두 숨기기",
