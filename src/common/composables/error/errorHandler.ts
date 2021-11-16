@@ -1,7 +1,6 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { SpaceRouter } from '@/router';
 import { store } from '@/store';
-
 import {
     isInstanceOfAPIError, isInstanceOfAuthenticationError, isInstanceOfAuthorizationError,
     isInstanceOfBadRequestError,
@@ -14,43 +13,27 @@ import { TranslateResult } from 'vue-i18n';
 
 export default class ErrorHandler {
     static handleError(error) {
-        switch (error) {
-        case isInstanceOfAPIError(error):
+        if (isInstanceOfAPIError(error)) {
             console.error(error);
-            break;
-
-        case isInstanceOfNotFoundError(error):
+        } else if (isInstanceOfNotFoundError(error)) {
             showErrorMessage('관리자에게 문의하세요.', error);
-            break;
-
-        case isInstanceOfAuthenticationError(error):
-            {
-                const isTokenAlive = SpaceConnector.isTokenAlive;
-                if (!isTokenAlive && !SpaceRouter.router.currentRoute.meta.excludeAuth) {
-                    (async () => {
-                        const res = await SpaceConnector.refreshAccessToken(false);
-                        if (!res) store.dispatch('error/showSessionExpiredError');
-                    })();
-                }
+        } else if (isInstanceOfAuthenticationError(error)) {
+            const isTokenAlive = SpaceConnector.isTokenAlive;
+            if (!isTokenAlive && !SpaceRouter.router.currentRoute.meta.excludeAuth) {
+                (async () => {
+                    const res = await SpaceConnector.refreshAccessToken(false);
+                    if (!res) store.dispatch('error/showSessionExpiredError');
+                })();
             }
-            break;
-
-        case isInstanceOfAuthorizationError(error):
+        } else if (isInstanceOfAuthorizationError(error)) {
             store.dispatch('error/showAuthorizationError');
-            break;
-
-        case isInstanceOfNoResourceError(error):
+        } else if (isInstanceOfNoResourceError(error)) {
             showErrorMessage('No Resource', 'No Resource');
             SpaceRouter.router.push(error.redirectUrl);
-            break;
-
-        case isInstanceOfNoSearchResourceError(error):
+        } else if (isInstanceOfNoSearchResourceError(error)) {
             SpaceRouter.router.push(error.redirectUrl);
-            break;
-
-        default:
+        } else {
             console.error(error);
-            break;
         }
     }
 
