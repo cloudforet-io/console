@@ -1,27 +1,12 @@
 import { Action } from 'vuex';
 
 import {
-    CHART_TYPE, CostQuerySetModel, CURRENCY, GRANULARITY,
+    CHART_TYPE, CostQuerySetModel, CURRENCY, GRANULARITY, CostQuerySetOption,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { CostAnalysisStoreState } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { getInitialDates } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-
-
-export const getSelectedQueryItem: Action<CostAnalysisStoreState, any> = async ({ commit }, queryItemId): Promise<void|Error> => {
-    try {
-        const { options } = await SpaceConnector.client.costAnalysis.costQuerySet.get({ cost_query_set_id: queryItemId });
-        commit('setChartType', options.chart_type);
-        commit('setGranularity', options.granularity);
-        commit('setGroupByItems', options.group_by);
-        commit('setSelectedDates', [options.start, options.end]);
-        commit('setCurrency', options.currency);
-        commit('setFilters', options.filter);
-    } catch (e) {
-        ErrorHandler.handleError(e);
-    }
-};
 
 export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = ({ commit }): void => {
     commit('setChartType', CHART_TYPE.STACKED_COLUMN);
@@ -32,6 +17,21 @@ export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = (
     commit('setCurrency', CURRENCY.USD);
     commit('setFilters', []);
     commit('setSelectedQueryId', undefined);
+};
+
+interface SetQueryOptionsParam {
+    queryId: string;
+    options: CostQuerySetOption;
+}
+
+export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit }, { queryId, options }: SetQueryOptionsParam): void => {
+    commit('setChartType', options.chart_type);
+    commit('setGranularity', options.granularity);
+    commit('setGroupByItems', options.group_by);
+    commit('setSelectedDates', [options.start, options.end]);
+    commit('setCurrency', options.currency);
+    commit('setFilters', options.filter);
+    commit('setSelectedQueryId', queryId);
 };
 
 export const listCostQueryList: Action<CostAnalysisStoreState, any> = async ({ commit }): Promise<void|Error> => {

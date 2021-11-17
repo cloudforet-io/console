@@ -109,6 +109,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { store } from '@/store';
+import { SpaceRouter } from '@/router';
 
 export interface SaveQueryEmitParam {
     updatedQuery: CostQuerySetModel;
@@ -131,6 +132,12 @@ export default {
         PButton,
         SaveQueryFormModal,
         DeleteModal,
+    },
+    props: {
+        querySetId: {
+            type: String,
+            default: undefined,
+        },
     },
     setup(props, { root }) {
         registerServiceStore<CostAnalysisStoreState>('costAnalysis', costAnalysisStoreModule);
@@ -203,19 +210,29 @@ export default {
                 await SpaceConnector.client.costAnalysis.costQuerySet.delete({ cost_query_set_id: state.itemIdForDeleteQuery });
                 await store.dispatch('service/costAnalysis/listCostQueryList');
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '', root);
-                if (state.selectedQueryId === state.itemIdForDeleteQuery) initSelectedQueryOptions();
+                if (state.selectedQueryId === state.itemIdForDeleteQuery) {
+                    await SpaceRouter.router.push({ name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME });
+                    initSelectedQueryOptions();
+                }
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));
             }
         };
 
-        const handleClickQueryItem = async (queryItem) => {
+        const handleClickQueryItem = async (queryItem: Required<MenuItem>) => {
+            if (queryItem.name !== props.querySetId) {
+                await SpaceRouter.router.replace({
+                    name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    params: { querySetId: queryItem.name },
+                });
+            }
             await store.commit('service/costAnalysis/setSelectedQueryId', queryItem.name);
             if (!queryItem.name) {
                 initSelectedQueryOptions();
                 return;
             }
-            await store.dispatch('service/costAnalysis/getSelectedQueryItem', queryItem.name);
+            const { options } = getQueryWithKey(queryItem.name);
+            await store.dispatch('service/costAnalysis/setQueryOptions', { queryId: queryItem.name, options });
             state.title = queryItem.label;
         };
 
@@ -227,6 +244,12 @@ export default {
             }
             state.title = updatedQuery.name;
             store.dispatch('service/costAnalysis/listCostQueryList');
+            if (requestType === REQUEST_TYPE.SAVE) {
+                SpaceRouter.router.replace({
+                    name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                    params: { querySetId: updatedQuery.cost_query_set_id },
+                });
+            }
         };
 
         const handleSaveQueryOption = async () => {
@@ -247,6 +270,7 @@ export default {
                         filter: filters,
                     },
                 });
+                await store.dispatch('service/costAnalysis/listCostQueryList');
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_SAVED_QUERY'), '', root);
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_SAVED_QUERY'));
@@ -257,9 +281,19 @@ export default {
             if (saveQueryFormState.visible === false) saveQueryFormState.selectedQuery = {};
         });
 
-        (() => {
-            store.dispatch('service/costAnalysis/listCostQueryList');
+        (async () => {
             initSelectedQueryOptions();
+            await store.dispatch('service/costAnalysis/listCostQueryList');
+            if (props.querySetId) {
+                const { name, options } = getQueryWithKey(props.querySetId);
+                if (!name) {
+                    initSelectedQueryOptions();
+                    await SpaceRouter.router.replace({ name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME });
+                } else {
+                    await store.dispatch('service/costAnalysis/setQueryOptions', { queryId: props.querySetId, options });
+                    state.title = name;
+                }
+            }
         })();
 
         return {

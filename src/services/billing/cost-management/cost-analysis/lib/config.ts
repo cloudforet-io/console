@@ -71,9 +71,19 @@ export const QUERY_VISIBILITY_TYPE = Object.freeze({
 
 export type QUERY_VISIBILITY_TYPE = typeof QUERY_VISIBILITY_TYPE[keyof typeof QUERY_VISIBILITY_TYPE];
 
+export interface CostQuerySetOption {
+    chart_type: CHART_TYPE;
+    group_by: GROUP_BY_ITEM[];
+    granularity: GRANULARITY;
+    currency: CURRENCY;
+    start: string;
+    end: string;
+    filter: FILTER_ITEM[];
+}
+
 export interface CostQuerySetModel {
     cost_query_set_id: string;
     name: string;
     scope: QUERY_VISIBILITY_TYPE;
-    option?: object;
+    options?: CostQuerySetOption;
 }

@@ -51,8 +51,9 @@ export default {
                             component: CostDashboardPage,
                         },
                         {
-                            path: 'cost-analysis',
+                            path: 'cost-analysis/:querySetId?',
                             name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                            props: true,
                             component: CostAnalysisPage,
                         },
                         {
