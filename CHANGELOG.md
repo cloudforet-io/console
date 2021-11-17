@@ -1,3 +1,10 @@
+# [1.1.0-beta.179](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.178...v1.1.0-beta.179) (2021-11-17)
+
+
+### Bug Fixes
+
+* add year&month selection and separate mode prop to scope&selectMode props ([#751](https://github.com/spaceone-dev/spaceone-design-system/issues/751)) ([cfe17d9](https://github.com/spaceone-dev/spaceone-design-system/commit/cfe17d9facad09ebeb1ac438dcb70ea5065e7a4c))
+
 # [1.1.0-beta.178](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.177...v1.1.0-beta.178) (2021-11-12)
 
 
