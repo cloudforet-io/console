@@ -53,8 +53,8 @@ module.exports = {
         'import/no-extraneous-dependencies': [
             'error',
             {
-                devDependencies: true,
-            },
+                "devDependencies": true,
+            }
         ],
         'import/prefer-default-export': ['off'],
         'no-new': ['off'],

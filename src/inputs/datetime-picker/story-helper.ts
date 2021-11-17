@@ -1,5 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
-import { FLATPICKR_MODE, STYLE_TYPE } from '@/inputs/datetime-picker/type';
+import { DATA_TYPE, SELECT_MODE, STYLE_TYPE } from '@/inputs/datetime-picker/type';
 
 export const getDatetimePickerArtTypes = (): ArgTypes => ({
     selectedDates: {
@@ -51,44 +51,6 @@ export const getDatetimePickerArtTypes = (): ArgTypes => ({
             },
         },
     },
-    /* [Flatpickr] */
-    mode: {
-        name: 'mode',
-        type: { name: 'string' },
-        description: '<b>[Flatpickr]</b> Mode of datetime picker(according to Flatpickr\'s spec)',
-        defaultValue: 'single',
-        table: {
-            type: {
-                summary: 'string',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'single',
-            },
-        },
-        control: {
-            type: 'select',
-            options: Object.keys(FLATPICKR_MODE),
-        },
-    },
-    enableTime: {
-        name: 'enableTime',
-        type: { name: 'boolean' },
-        description: '<b>[Flatpickr]</b> Whether to show time picker or not.',
-        defaultValue: false,
-        table: {
-            type: {
-                summary: 'boolean',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: 'false',
-            },
-        },
-        control: {
-            type: 'boolean',
-        },
-    },
     minDate: {
         name: 'minDate',
         type: { name: 'string' },
@@ -117,6 +79,44 @@ export const getDatetimePickerArtTypes = (): ArgTypes => ({
             defaultValue: {
                 summary: 'undefined',
             },
+        },
+    },
+    selectMode: {
+        name: 'selectMode',
+        type: { name: 'string' },
+        description: 'Select mode of datetime picker.',
+        defaultValue: SELECT_MODE.single,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: SELECT_MODE.single,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(SELECT_MODE),
+        },
+    },
+    dataType: {
+        name: 'dataType',
+        type: { name: 'string' },
+        description: 'data types of datetime picker.',
+        defaultValue: DATA_TYPE.yearToDate,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: DATA_TYPE.yearToDate,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(DATA_TYPE),
         },
     },
     //

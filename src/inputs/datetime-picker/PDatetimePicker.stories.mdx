@@ -15,36 +15,38 @@ import dayjs from 'dayjs';
 }} argTypes={getDatetimePickerArtTypes()}/>
 
 
-export const Template = (args, { argTypes }) => ({
-    props: Object.keys(argTypes),
-    components: { PDatetimePicker },
-    i18n,
-    template: `
+export const Template = (args, { argTypes }) => {
+    return {
+        props: Object.keys(argTypes),
+        components: { PDatetimePicker },
+        i18n,
+        template: `
     <div class="h-full overflow p-8">
-        <p>mode: {{ mode }}</p><br>
+        <p>select mode: {{ selectMode }}</p><br>
         <p-datetime-picker
             :selected-dates.sync="proxySelectedDates"
             :style-type="styleType"
             :timezone="timezone"
-            :mode="mode"
-            :enable-time="enableTime"
             :min-date="minDate"
             :max-date="maxDate"
+            :select-mode="selectMode"
+            :data-type="dataType"
         />
         <br>
         <p>Selected Dates: {{ proxySelectedDates }}</p>
     </div>
     `,
-    setup(props) {
-        const vm = getCurrentInstance();
-        const state = reactive({
-            proxySelectedDates: makeOptionalProxy('selectedDates', vm, props.selectedDates),
-        });
-        return {
-            ...toRefs(state),
+        setup(props) {
+            const vm = getCurrentInstance();
+            const state = reactive({
+                proxySelectedDates: makeOptionalProxy('selectedDates', vm, props.selectedDates),
+            });
+            return {
+                ...toRefs(state),
+            }
         }
     }
-});
+};
 
 
 
@@ -52,17 +54,30 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+It has three select modes and four data types. <br/>
+Depending on the data type, some select modes may not work. <br/>
+Please refer to the table below. <br/>
+<br/>
+
+| dataType\selectMode | single | multiple | range |
+| :-: | :-: | :-: | :-: |
+| yearToMonth | O | X | X |
+| yearToDate | O | O | O |
+| yearToTime | O | O | O |
+| time | O | X | X |
+
+
 
 ## Default
 <Canvas>
     <Story name="Default Datetime Picker">
-        {{
+        {() => ({
             components: { PDatetimePicker },
             i18n,
             template: `
         <p-datetime-picker />
 `,
-        }}
+        })}
     </Story>
 </Canvas>
 
@@ -76,7 +91,7 @@ export const Template = (args, { argTypes }) => ({
             components: { PDatetimePicker },
             i18n,
             template: `
-        <p-datetime-picker :enable-time="true" />
+        <p-datetime-picker data-type="yearToTime" />
 `,
         }}
     </Story>
@@ -96,15 +111,15 @@ export const Template = (args, { argTypes }) => ({
 <div>
     <p>UTC</p>
     <p>{{ selectedUTCDates }}</p>
-    <p-datetime-picker :enable-time="true" timezone="UTC" :selected-dates.sync="selectedUTCDates" />
+    <p-datetime-picker data-type="yearToTime" timezone="UTC" :selected-dates.sync="selectedUTCDates" />
     <br/><br/>
     <p>Asia/Seoul (GMT+9)</p>
     <p>{{ selectedSeoulDates }}</p>
-    <p-datetime-picker :enable-time="true" timezone="Asia/Seoul" :selected-dates.sync="selectedSeoulDates" />
+    <p-datetime-picker data-type="yearToTime" timezone="Asia/Seoul" :selected-dates.sync="selectedSeoulDates" />
     <br/><br/>
     <p>America/New_York (GMT-4)</p>
     <p>{{ selectedNewYorkDates }}</p>
-    <p-datetime-picker :enable-time="true" timezone="America/New_York" :selected-dates.sync="selectedNewYorkDates" />
+    <p-datetime-picker data-type="yearToTime" timezone="America/New_York" :selected-dates.sync="selectedNewYorkDates" />
 </div>
 `,
             setup() {
@@ -153,7 +168,7 @@ export const Template = (args, { argTypes }) => ({
             components: { PDatetimePicker },
             i18n,
             template: `
-        <p-datetime-picker style-type="text" mode="range" :selected-dates.sync="selectedDates" />
+        <p-datetime-picker style-type="text" select-mode="range" :selected-dates.sync="selectedDates" />
 `,
             setup() {
                 const state = reactive({
@@ -171,14 +186,14 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 
 
-## Multiple Mode
+## Multiple Selection Mode
 <Canvas>
-    <Story name="Multiple Mode Datetime Picker">
+    <Story name="Multiple Selection Mode Datetime Picker">
         {{
             components: { PDatetimePicker },
             i18n,
             template: `
-        <p-datetime-picker mode="multiple" />
+        <p-datetime-picker select-mode="multiple" />
 `,
         }}
     </Story>
@@ -188,15 +203,15 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 
 
-## Range Mode
+## Range Selection Mode
 <Canvas>
-    <Story name="Range Mode Datetime Picker">
+    <Story name="Range Selection Mode Datetime Picker">
         {{
             components: { PDatetimePicker },
             i18n,
             template: `
 <div>
-    <p-datetime-picker mode="range" :selected-dates.sync="selectedDates" />
+    <p-datetime-picker select-mode="range" :selected-dates.sync="selectedDates" />
     <p>{{ selectedDates }}</p>
 </div>
 `,
@@ -219,15 +234,15 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 
 
-## Time Mode
+## Time Only Selection
 <Canvas>
-    <Story name="Time Mode Datetime Picker">
+    <Story name="Time Only Selection">
         {{
             components: { PDatetimePicker },
             i18n,
             template: `
 <div>
-    <p-datetime-picker mode="time" :selected-dates.sync="selectedDates" />
+    <p-datetime-picker data-type="time" :selected-dates.sync="selectedDates" />
     <p>{{ selectedDates }}</p>
 </div>
 `,
@@ -246,6 +261,32 @@ export const Template = (args, { argTypes }) => ({
 <br/>
 <br/>
 
+## Year and Month Selection
+<Canvas>
+    <Story name="Year and Month Selection">
+        {{
+            components: { PDatetimePicker },
+            i18n,
+            template: `
+<div>
+    <p-datetime-picker data-type="yearToMonth" :selected-dates.sync="selectedDates" />
+    <p>{{ selectedDates }}</p>
+</div>
+`,
+            setup() {
+                const state = reactive({
+                    selectedDates: [],
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
 
 
 ## Playground

@@ -8,6 +8,9 @@ import Vue from 'vue';
 
 Vue.use(VueI18n);
 
+export const supportLanguages = ['en', 'ko', 'jp'] as const;
+export type SupportLanguage = typeof supportLanguages[number];
+
 // simple recursive remove keys with empty value
 const removeEmpty = (obj: object | any): LocaleMessageObject => Object.keys(obj)
     .filter((k: string) => obj[k] !== null && obj[k] !== undefined && obj[k] !== '') // Remove undef. and null and empty.string.
@@ -18,7 +21,7 @@ const removeEmpty = (obj: object | any): LocaleMessageObject => Object.keys(obj)
         {},
     );
 
-export const messages = {
+export const messages: Record<SupportLanguage, any> = {
     en: removeEmpty({ COMPONENT: en }),
     ko: removeEmpty({ COMPONENT: ko }),
     jp: removeEmpty({ COMPONENT: ja }),

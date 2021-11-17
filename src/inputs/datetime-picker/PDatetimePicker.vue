@@ -1,9 +1,9 @@
 <template>
     <div ref="datePickerRef" class="p-datetime-picker"
          :class="{
-             [mode] : true,
              [styleType] : true,
              open : visiblePicker,
+             'time-type': dataType === DATA_TYPE.time
          }"
     >
         <div class="input-sizer">
@@ -12,7 +12,7 @@
                    data-input
             >
         </div>
-        <p-i :name="mode === FLATPICKR_MODE.time ? 'ic_clock' : 'ic_calendar'"
+        <p-i :name="dataType === DATA_TYPE.time ? 'ic_clock' : 'ic_calendar'"
              color="inherit"
              data-toggle
              width="1.25rem"
@@ -23,6 +23,7 @@
 
 <script lang="ts">
 import Flatpickr from 'flatpickr';
+import monthSelectPlugin from 'flatpickr/dist/plugins/monthSelect';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
 import tz from 'dayjs/plugin/timezone';
@@ -32,8 +33,14 @@ import {
 } from '@vue/composition-api';
 
 import PI from '@/foundation/icons/PI.vue';
-import { DatetimePicker, FLATPICKR_MODE, STYLE_TYPE } from '@/inputs/datetime-picker/type';
+import {
+    DatetimePickerProps, DATA_TYPE, SELECT_MODE, STYLE_TYPE,
+} from '@/inputs/datetime-picker/type';
+
 import { makeOptionalProxy } from '@/util/composition-helpers';
+
+import { i18n } from '@/translations';
+import { getLocaleFile } from '@/translations/vendors/flatpickr';
 
 import Instance = Flatpickr.Instance;
 
@@ -45,8 +52,17 @@ dayjs.extend(tz);
  * https://flatpickr.js.org/
  */
 
+const FLATPICKR_MODE = Object.freeze({
+    single: 'single',
+    multiple: 'multiple',
+    range: 'range',
+    time: 'time',
+} as const);
+type FLATPICKR_MODE = typeof FLATPICKR_MODE[keyof typeof FLATPICKR_MODE]
+
 export default {
     name: 'PDatetimePicker',
+    i18n,
     components: {
         PI,
     },
@@ -62,21 +78,11 @@ export default {
         styleType: {
             type: String,
             default: STYLE_TYPE.default,
-            validator: value => Object.values(STYLE_TYPE).includes(value as string),
+            validator: styleType => Object.values(STYLE_TYPE).includes(styleType as string),
         },
         timezone: {
             type: String,
             default: 'UTC',
-        },
-        /* Flatpickr */
-        mode: {
-            type: String,
-            default: FLATPICKR_MODE.single,
-            validator: value => Object.values(FLATPICKR_MODE).includes(value as string),
-        },
-        enableTime: {
-            type: Boolean,
-            default: false,
         },
         minDate: {
             type: [String, Date],
@@ -86,8 +92,18 @@ export default {
             type: [String, Date],
             default: undefined,
         },
+        selectMode: {
+            type: String,
+            default: SELECT_MODE.single,
+            validator: (selectMode: any) => Object.values(SELECT_MODE).includes(selectMode),
+        },
+        dataType: {
+            type: String,
+            default: DATA_TYPE.yearToDate,
+            validator: (dataType: any) => Object.values(DATA_TYPE).includes(dataType),
+        },
     },
-    setup(props: DatetimePicker) {
+    setup(props: DatetimePickerProps) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             datePickerRef: null as null | HTMLElement,
@@ -95,12 +111,31 @@ export default {
             proxySelectedDates: makeOptionalProxy<string[]>('selectedDates', vm, props.selectedDates),
             dateString: '',
             placeholder: computed(() => {
-                if (props.mode === FLATPICKR_MODE.time) {
+                if (props.dataType === DATA_TYPE.time) {
                     return vm.$t('COMPONENT.DATETIME_PICKER.SELECT_TIME');
                 }
                 return vm.$t('COMPONENT.DATETIME_PICKER.SELECT_DATE');
             }),
             visiblePicker: false,
+            plugins: computed(() => (props.dataType === DATA_TYPE.yearToMonth ? [
+                monthSelectPlugin({
+                    shorthand: false,
+                    dateFormat: 'Y/m/d',
+                    altFormat: 'Y/m/d',
+                    theme: 'light',
+                }),
+            ] : [])),
+            localeFile: computed(() => {
+                const localeFile = getLocaleFile(i18n.locale);
+                if (localeFile) return { ...localeFile, rangeSeparator: ' ~ ' };
+                return { rangeSeparator: ' ~ ' };
+            }),
+            mode: computed<FLATPICKR_MODE>(() => {
+                if (props.dataType === DATA_TYPE.time) return FLATPICKR_MODE.time;
+                if (props.dataType === DATA_TYPE.yearToMonth) return FLATPICKR_MODE.single;
+                return props.selectMode as FLATPICKR_MODE;
+            }),
+            enableTime: computed(() => props.dataType === DATA_TYPE.time || props.dataType === DATA_TYPE.yearToTime),
         });
 
         /* util */
@@ -111,7 +146,12 @@ export default {
         };
 
         /* event */
-        const handleReady = (selectedDates, dateString, instance) => {
+        const handleReady = (selectedDates, dateString, instance: Flatpickr.Instance) => {
+            const calendarContainer = instance.calendarContainer;
+            if (calendarContainer) {
+                calendarContainer.classList.add('p-datetime-picker-calendar');
+            }
+
             if (selectedDates.length) {
                 state.dateString = dateString;
                 resizeInputWidth(dateString, instance);
@@ -121,7 +161,7 @@ export default {
             resizeInputWidth(dateString, instance);
         };
         const handleClosePicker = (selectedDates: Date[], dateStr, instance) => {
-            if (props.mode !== FLATPICKR_MODE.range || (props.mode === FLATPICKR_MODE.range && selectedDates.length === 2)) {
+            if (props.selectMode !== SELECT_MODE.range || (props.selectMode === SELECT_MODE.range && selectedDates.length === 2)) {
                 state.proxySelectedDates = selectedDates.map((d) => {
                     const dateString = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}`;
                     return dayjs.tz(dateString, props.timezone).format();
@@ -140,15 +180,13 @@ export default {
 
         /* util */
         const createDatePicker = (datePickerRef: HTMLElement) => {
-            if (props.mode === FLATPICKR_MODE.time) {
+            if (props.dataType === DATA_TYPE.time) {
                 state.datePicker = Flatpickr(datePickerRef, {
-                    mode: props.mode,
+                    mode: state.mode,
                     dateFormat: 'H:i',
                     enableTime: true,
                     wrap: true,
-                    locale: {
-                        rangeSeparator: ' ~ ',
-                    },
+                    locale: state.localeFile,
                     onReady: handleReady,
                     onValueUpdate: handleUpdateValue,
                     onOpen: handleOpenPicker,
@@ -160,22 +198,21 @@ export default {
                     defaultDate = state.proxySelectedDates.map(d => dayjs(d).tz(props.timezone).format('YYYY-MM-DD HH:mm'));
                 }
                 state.datePicker = Flatpickr(datePickerRef, {
-                    mode: props.mode,
+                    mode: state.mode,
                     defaultDate,
                     altInput: true,
-                    altFormat: props.enableTime ? 'Y/m/d H:i' : 'Y/m/d',
-                    dateFormat: props.enableTime ? 'Y/m/d H:i' : 'Y/m/d',
-                    enableTime: props.enableTime,
+                    altFormat: state.enableTime ? 'Y/m/d H:i' : 'Y/m/d',
+                    dateFormat: state.enableTime ? 'Y/m/d H:i' : 'Y/m/d',
+                    enableTime: state.enableTime,
                     minDate: props.minDate,
                     maxDate: props.maxDate,
                     wrap: true,
-                    locale: {
-                        rangeSeparator: ' ~ ',
-                    },
+                    locale: state.localeFile,
                     onReady: handleReady,
                     onValueUpdate: handleUpdateValue,
                     onOpen: handleOpenPicker,
                     onClose: handleClosePicker,
+                    plugins: state.plugins,
                 });
             }
         };
@@ -191,13 +228,14 @@ export default {
 
         return {
             ...toRefs(state),
-            FLATPICKR_MODE,
+            DATA_TYPE,
         };
     },
 };
 </script>
 <style lang="postcss">
 @import 'flatpickr/dist/flatpickr.css';
+@import 'flatpickr/dist/plugins/monthSelect/style.css';
 .p-datetime-picker {
     @apply overflow-hidden bg-white border border-gray-300 rounded text-gray-dark rounded;
     display: inline-flex;
@@ -236,7 +274,7 @@ export default {
         flex-shrink: 0;
         margin-left: 0.5rem;
     }
-    &.time {
+    &.time-type {
         width: 8rem;
     }
     &.text:not(.open.time) {
@@ -265,163 +303,171 @@ export default {
         }
     }
 }
-.flatpickr-calendar {
-    width: 15rem;
-    margin-top: -0.125rem;
-    &:not(.hasTime) {
-        min-height: 16.375rem;
-    }
-    &::before, &::after {
-        display: none;
-    }
-    &.open {
-        @apply overflow-hidden border-secondary;
-        box-shadow: none;
-        border-width: 0.0625rem;
-        border-style: solid;
-    }
-    &.hasTime {
-        input, .numInputWrapper, .flatpickr-am-pm {
-            &:hover {
-                @apply bg-blue-100;
-                cursor: pointer;
+
+.p-datetime-picker-calendar {
+    .flatpickr-calendar {
+        width: 15rem;
+        margin-top: -0.125rem;
+        &:not(.hasTime) {
+            min-height: 16.375rem;
+        }
+        &::before, &::after {
+            display: none;
+        }
+        &.open {
+            @apply overflow-hidden border-secondary;
+            box-shadow: none;
+            border-width: 0.0625rem;
+            border-style: solid;
+        }
+        &.hasTime {
+            input, .numInputWrapper, .flatpickr-am-pm {
+                &:hover {
+                    @apply bg-blue-100;
+                    cursor: pointer;
+                }
+                &:focus {
+                    @apply bg-blue-200;
+                    cursor: pointer;
+                }
             }
-            &:focus {
-                @apply bg-blue-200;
-                cursor: pointer;
+            .numInputWrapper span {
+                @apply border-gray-200 bg-blue-100;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                width: 0.75rem;
+                padding: 0;
+                &:hover {
+                    @apply bg-blue-100;
+                }
+                &.arrowUp::after {
+                    border-style: solid;
+                    border-width: 0 0.125rem 0.25rem 0.125rem;
+                    top: 40%;
+                }
+                &.arrowDown::after {
+                    border-style: solid;
+                    border-width: 0.25rem 0.125rem 0 0.125rem;
+                }
+            }
+            &.noCalendar {
+                width: 8rem;
+                .flatpickr-time {
+                    border-top: none;
+                    .numInputWrapper {
+                        width: calc((100% - 0.25rem - 2.5rem) / 2);
+                    }
+                    .flatpickr-time-separator {
+                        width: 0.25rem;
+                    }
+                    .flatpickr-am-pm {
+                        width: 2.5rem;
+                    }
+                }
             }
         }
-        .numInputWrapper span {
-            @apply border-gray-200 bg-blue-100;
+    }
+    .flatpickr-months {
+        position: relative;
+        padding: 0.5rem 0.5rem 0.25rem;
+        .flatpickr-month {
+            @apply text-gray-900;
+        }
+        .flatpickr-prev-month, .flatpickr-next-month {
             display: flex;
-            justify-content: center;
             align-items: center;
-            width: 0.75rem;
             padding: 0;
-            &:hover {
-                @apply bg-blue-100;
-            }
-            &.arrowUp::after {
-                border-style: solid;
-                border-width: 0 0.125rem 0.25rem 0.125rem;
-                top: 40%;
-            }
-            &.arrowDown::after {
-                border-style: solid;
-                border-width: 0.25rem 0.125rem 0 0.125rem;
+            margin: 0.5rem;
+            &:hover svg {
+                fill: theme('colors.secondary');
             }
         }
-        &.noCalendar {
-            width: 8rem;
-            .flatpickr-time {
-                border-top: none;
-                .numInputWrapper {
-                    width: calc((100% - 0.25rem - 2.5rem) / 2);
-                }
-                .flatpickr-time-separator {
-                    width: 0.25rem;
-                }
-                .flatpickr-am-pm {
-                    width: 2.5rem;
-                }
-            }
-        }
-    }
-}
-.flatpickr-months {
-    position: relative;
-    padding: 0.5rem 0.5rem 0.25rem;
-    .flatpickr-month {
-        @apply text-gray-900;
-    }
-    .flatpickr-prev-month, .flatpickr-next-month {
-        display: flex;
-        align-items: center;
-        padding: 0;
-        margin: 0.5rem;
-        &:hover svg {
-            fill: theme('colors.secondary');
-        }
-    }
-    .flatpickr-current-month {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        padding: 0;
-        font-size: 1rem;
-        .flatpickr-monthDropdown-months {
+        .flatpickr-current-month {
+            display: flex;
+            align-items: center;
+            justify-content: center;
             padding: 0;
-            margin: 0 0.5rem 0 0;
-            &:hover {
-                @apply bg-transparent;
-            }
-            input {
+            font-size: 1rem;
+            .flatpickr-monthDropdown-months {
+                padding: 0;
                 margin: 0 0.5rem 0 0;
+                &:hover {
+                    @apply bg-transparent;
+                }
+                input {
+                    margin: 0 0.5rem 0 0;
+                }
             }
-        }
-        .numInputWrapper {
-            padding: 0;
-            &:hover {
-                @apply bg-transparent;
-            }
-            .cur-year {
-                padding: 0 1rem 0 0;
+            .numInputWrapper {
+                padding: 0;
+                &:hover {
+                    @apply bg-transparent;
+                }
+                .cur-year {
+                    padding: 0 1rem 0 0;
+                }
             }
         }
     }
-}
-.flatpickr-innerContainer {
-    padding: 0 0.5rem 0.5rem;
-    .flatpickr-rContainer {
-        width: 100%;
-        .flatpickr-weekday {
-            @apply text-gray-400 font-bold;
-            font-size: 0.625rem;
-        }
-        .flatpickr-days {
+    .flatpickr-innerContainer {
+        padding: 0 0.5rem 0.5rem;
+        .flatpickr-rContainer {
             width: 100%;
-            .dayContainer {
-                min-width: 100%;
-                max-width: 100%;
+            .flatpickr-weekday {
+                @apply text-gray-400 font-bold;
+                font-size: 0.625rem;
+            }
+            .flatpickr-days {
+                width: 100%;
+                .dayContainer {
+                    min-width: 100%;
+                    max-width: 100%;
+                }
             }
         }
     }
-}
-.flatpickr-day {
-    @apply text-gray-700;
-    width: 2rem;
-    height: 2rem;
-    margin-top: 0.25rem;
-    font-size: 0.75rem;
-    line-height: 2rem;
-    &:hover:not(.selected):not(.today):not(.prevMonthDay):not(.nextMonthDay):not(.inRange):not(.startRange):not(.endRange):not(.flatpickr-disabled) {
-        @apply text-blue-500 bg-blue-100 border-blue-100;
-    }
-    &.today:not(.flatpickr-disabled):not(.today) {
-        @apply border-gray-400;
-    }
-    &.inRange {
-        @apply bg-blue-200 border-blue-200;
-        box-shadow: none;
-        &.prevMonthDay, &.nextMonthDay, &.today {
+    .flatpickr-day {
+        @apply text-gray-700;
+        width: 2rem;
+        height: 2rem;
+        margin-top: 0.25rem;
+        font-size: 0.75rem;
+        line-height: 2rem;
+        &:hover:not(.selected):not(.today):not(.prevMonthDay):not(.nextMonthDay):not(.inRange):not(.startRange):not(.endRange):not(.flatpickr-disabled) {
+            @apply text-blue-500 bg-blue-100 border-blue-100;
+        }
+        &.today:not(.flatpickr-disabled):not(.today) {
+            @apply border-gray-400;
+        }
+        &.inRange {
             @apply bg-blue-200 border-blue-200;
             box-shadow: none;
-        }
-    }
-    &.selected, &.startRange, &.endRange {
-        @apply bg-blue-500 border-blue-500 text-white;
-        &.inRange, &:focus, &:hover, &.prevMonthDay, &.nextMonthDay {
-            @apply bg-blue-500 border-blue-500 text-white;
-        }
-    }
-    &.startRange {
-        &.selected, &.startRange, &.endRange {
-            & + .endRange:not(:nth-child(7n+1)) {
+            &.prevMonthDay, &.nextMonthDay, &.today {
+                @apply bg-blue-200 border-blue-200;
                 box-shadow: none;
             }
         }
+        &.selected, &.startRange, &.endRange {
+            @apply bg-blue-500 border-blue-500 text-white;
+            &.inRange, &:focus, &:hover, &.prevMonthDay, &.nextMonthDay {
+                @apply bg-blue-500 border-blue-500 text-white;
+            }
+        }
+        &.startRange {
+            &.selected, &.startRange, &.endRange {
+                & + .endRange:not(:nth-child(7n+1)) {
+                    box-shadow: none;
+                }
+            }
+        }
+    }
+
+    .flatpickr-monthSelect-month {
+        margin: 0;
     }
 }
+
 .rangeMode .flatpickr-day {
     margin-top: 0.25rem;
 }
