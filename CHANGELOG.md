@@ -1,3 +1,10 @@
+# [1.1.0-beta.180](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.179...v1.1.0-beta.180) (2021-11-18)
+
+
+### Features
+
+* add height, gradient, border-radius props to progress bar ([#753](https://github.com/spaceone-dev/spaceone-design-system/issues/753)) ([a75c542](https://github.com/spaceone-dev/spaceone-design-system/commit/a75c5420e94395190b9af9a451b67a6e4697675d))
+
 # [1.1.0-beta.179](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.178...v1.1.0-beta.179) (2021-11-17)
 
 
