@@ -1,3 +1,10 @@
+# [1.1.0-beta.181](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.180...v1.1.0-beta.181) (2021-11-18)
+
+
+### Features
+
+* remove height props in progress bar ([#754](https://github.com/spaceone-dev/spaceone-design-system/issues/754)) ([07ed49b](https://github.com/spaceone-dev/spaceone-design-system/commit/07ed49b33711190f2bfe6926c2de55c775373c7c))
+
 # [1.1.0-beta.180](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.179...v1.1.0-beta.180) (2021-11-18)
 
 
