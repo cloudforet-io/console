@@ -32,7 +32,7 @@ export const getConvertedFilter = (filters: Record<FILTER_ITEM, FilterItem[]>): 
     return result;
 };
 
-export const getConvertedSelectedDates = (granularity: GRANULARITY, chartType: CHART_TYPE, selectedDates: string[]): string[] => {
+export const getConvertedSelectedDates = (granularity: GRANULARITY, chartType: CHART_TYPE, selectedDates: string[]): [string, string] => {
     let start = selectedDates[0];
     if (chartType === CHART_TYPE.DONUT && granularity !== GRANULARITY.ACCUMULATED) {
         if (granularity === GRANULARITY.DAILY) {

@@ -158,7 +158,7 @@ export const usePieChart = ({
         data, valueOptions, categoryOptions, chartContainer,
     });
 
-    const chart = drawPieChart(state.data, state.chartContainer);
+    const chart = drawPieChart(state.data, state.chartContainer, state.valueOptions, state.categoryOptions);
 
     return {
         chart,

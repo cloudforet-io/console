@@ -15,19 +15,19 @@
                 {{ groupByItem.label }}
             </p-select-button>
         </div>
-        <component :is="moreGroupBy.length ? 'p-icon-button' : 'p-icon-text-button'"
-                   name="ic_setting" style-type="gray900" outline
-                   size="sm"
-                   @click="handleClickMore"
-        >
-            <template v-if="!moreGroupBy.length">
-                More
-            </template>
-        </component>
-        <cost-analysis-set-more-modal :header-title="setMoreModalState.headerTitle"
-                                      :visible.sync="setMoreModalState.visible"
-                                      @confirm="handleSetMoreModalConfirm"
-        />
+        <!--        <component :is="moreGroupBy.length ? 'p-icon-button' : 'p-icon-text-button'"-->
+        <!--                   name="ic_setting" style-type="gray900" outline-->
+        <!--                   size="sm"-->
+        <!--                   @click="handleClickMore"-->
+        <!--        >-->
+        <!--            <template v-if="!moreGroupBy.length">-->
+        <!--                More-->
+        <!--            </template>-->
+        <!--        </component>-->
+        <!--        <cost-analysis-set-more-modal :header-title="setMoreModalState.headerTitle"-->
+        <!--                                      :visible.sync="setMoreModalState.visible"-->
+        <!--                                      @confirm="handleSetMoreModalConfirm"-->
+        <!--        />-->
     </div>
 </template>
 
@@ -35,10 +35,10 @@
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PIconButton, PSelectButton, PIconTextButton,
+    PSelectButton,
 } from '@spaceone/design-system';
 
-import CostAnalysisSetMoreModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetMoreModal.vue';
+// import CostAnalysisSetMoreModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetMoreModal.vue';
 
 import { GROUP_BY_ITEM } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
@@ -50,9 +50,9 @@ export default {
     name: 'CostAnalysisGroupByFilter',
     components: {
         PSelectButton,
-        PIconButton,
-        PIconTextButton,
-        CostAnalysisSetMoreModal,
+        // PIconButton,
+        // PIconTextButton,
+        // CostAnalysisSetMoreModal,
     },
     setup() {
         const state = reactive({
@@ -113,16 +113,6 @@ export default {
     margin-bottom: 1rem;
 
     .button-wrapper {
-        &::after {
-            @apply bg-gray-500;
-            display: inline-block;
-            position: relative;
-            content: '';
-            top: 0.25rem;
-            width: 1px;
-            height: 1rem;
-            margin: 0 0.625rem;
-        }
         .group-by-button {
             margin-left: 0.375rem;
             &:first-of-type {

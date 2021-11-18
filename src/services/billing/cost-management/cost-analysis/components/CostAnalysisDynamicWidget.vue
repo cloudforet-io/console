@@ -9,8 +9,7 @@
 
 <script lang="ts">
 import { cloneDeep } from 'lodash';
-import dayjs, { Dayjs } from 'dayjs';
-import * as am4core from '@amcharts/amcharts4/core';
+import { Dayjs } from 'dayjs';
 
 import {
     computed, reactive, toRefs, watch,
@@ -98,53 +97,44 @@ export default {
         });
 
         /* util */
-        const convertXYChartDataWithPeriod = (timeUnit: TimeUnit): ChartData[] => {
-            const chartData = [] as ChartData[];
-            let now = props.period.start.clone();
+        const getAccumulatedData = (chartData: ChartData[], period: Period, timeUnit: TimeUnit): ChartData[] => {
+            const accumulatedChartData = [] as ChartData[];
+            let now = period.start.clone();
             let accumulatedData: Record<string, number> = {};
-            while (now.isSameOrBefore(props.period.end, timeUnit)) {
+            while (now.isSameOrBefore(period.end, timeUnit)) {
                 let eachChartData: ChartData = {};
                 // eslint-disable-next-line no-loop-func
-                const existData: ChartData | undefined = props.chartData.find(d => now.isSame(d.date, timeUnit));
-                if (props.granularity === GRANULARITY.ACCUMULATED) { /* calculate cumulative value */
-                    accumulatedData = mergePrevChartDataAndCurrChartData(accumulatedData, existData);
-                    eachChartData = {
-                        date: now.format('YYYY-MM-DD'),
-                        ...accumulatedData,
-                    };
-                } else if (existData) {
-                    eachChartData = existData;
-                } else {
-                    eachChartData = {
-                        date: now.format('YYYY-MM-DD'),
-                    };
-                }
-
-                /* blur the last day/month/year */
-                const today = dayjs.utc();
-                if (now.isSame(props.period.end, timeUnit)) {
-                    eachChartData.fillOpacity = 0.5;
-                } else {
-                    eachChartData.fillOpacity = 1;
-                }
-
-                chartData.push(eachChartData);
+                const existData = chartData.find(d => now.isSame(d.date, timeUnit));
+                accumulatedData = mergePrevChartDataAndCurrChartData(accumulatedData, existData);
+                eachChartData = {
+                    date: now.toDate(),
+                    ...accumulatedData,
+                };
+                accumulatedChartData.push(eachChartData);
                 now = now.add(1, timeUnit);
             }
-            return chartData;
+            return accumulatedChartData;
         };
-        const convertPieChartDataWithLabel = chartData => chartData.map(d => ({
-            category: props.legends.find(l => l.name === d.category)?.label || d.category,
-            value: d.value,
-        }));
+        const fillDefaultDataOfLastDay = (chartData: ChartData[], period: Period, timeUnit: TimeUnit): ChartData[] => {
+            const convertedChartData = [...chartData];
+            const dataOfLastDate = chartData.find(d => period.end.isSame(d.date, timeUnit));
+            if (!dataOfLastDate) {
+                convertedChartData.push({
+                    date: period.end.toDate(),
+                });
+            }
+            return convertedChartData;
+        };
 
         const drawChart = (chartContext) => {
             const timeUnit = getTimeUnit(props.granularity, props.period.start, props.period.end);
             let chartData = cloneDeep(props.chartData);
-            if (props.chartType === CHART_TYPE.DONUT) {
-                chartData = convertPieChartDataWithLabel(chartData);
-            } else {
-                chartData = convertXYChartDataWithPeriod(timeUnit);
+            if (props.chartType !== CHART_TYPE.DONUT) {
+                if (props.granularity === GRANULARITY.ACCUMULATED) {
+                    chartData = getAccumulatedData(props.chartData, props.period, timeUnit);
+                } else {
+                    chartData = fillDefaultDataOfLastDay(props.chartData, props.period, timeUnit);
+                }
             }
             const params: DynamicChartStateArgs = {
                 data: chartData,
@@ -169,12 +159,7 @@ export default {
             } else if (props.chartType === CHART_TYPE.DONUT) {
                 ({ chart } = usePieChart(params));
             }
-
             state.proxyChart = chart;
-
-            if (props.chartType !== CHART_TYPE.DONUT) {
-                chart.scrollbarX = new am4core.Scrollbar();
-            }
         };
 
         watch([() => state.chartRef, () => props.loading], async ([chartContext, loading]) => {

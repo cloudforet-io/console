@@ -84,7 +84,7 @@
 </template>
 
 <script lang="ts">
-import dayjs, { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 import { cloneDeep, sum } from 'lodash';
 import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 

@@ -34,7 +34,7 @@
                         <div class="title">
                             {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SELECTED_FILTER') }} ({{ selectedItemsLength }})
                         </div>
-                        <div class="selected-tags-wrapper">
+                        <div v-if="selectedItemsLength" class="selected-tags-wrapper">
                             <template v-for="([filterName, selectedItems], idx) in Object.entries(selectedItemsMap)">
                                 <p-tag v-for="(item, itemIdx) in selectedItems" :key="`selected-tag-${idx}-${item.name}`"
                                        @delete="handleDeleteTag(filterName, itemIdx)"
@@ -42,6 +42,10 @@
                                     <b>{{ filterItems.find(d => d.name === filterName).title }}: </b>{{ item.label }}
                                 </p-tag>
                             </template>
+                        </div>
+                        <div v-else class="no-item-wrapper">
+                            <p>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTER_MODAL_HELP_TEXT_1') }}</p>
+                            <p>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.FILTER_MODAL_HELP_TEXT_2') }}</p>
                         </div>
                     </div>
                 </div>
@@ -54,7 +58,7 @@
 </template>
 
 <script lang="ts">
-import { sum, cloneDeep } from 'lodash';
+import { sum } from 'lodash';
 
 import {
     computed, reactive, toRefs, watch,
@@ -68,7 +72,7 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import CostAnalysisFilterItem from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisFilterItem.vue';
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
-import { FILTER_MAP } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { FILTER_ITEM, FILTER_MAP, FilterItem } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { store } from '@/store';
 
 
@@ -89,15 +93,15 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
-            filters: computed(() => store.state.service.costAnalysis.filters),
+            filters: computed<Record<FILTER_ITEM, FilterItem[]>>(() => store.state.service.costAnalysis.filters),
             filterItems: computed(() => Object.values(FILTER_MAP).map(item => ({
                 name: item.name,
                 title: item.label,
             }))),
-            selectedItemsMap: {} as Record<string, MenuItem[]>,
+            selectedItemsMap: {} as Record<FILTER_ITEM, FilterItem[]>,
             selectedItemsLength: computed<number>(() => {
                 const selectedValues = Object.values(state.selectedItemsMap);
-                return sum(selectedValues.map(v => v.length));
+                return sum(selectedValues.map(v => v?.length || 0));
             }),
             unfoldedIndices: [] as number[],
             menuLoading: false,
@@ -106,9 +110,9 @@ export default {
         /* util */
         const init = () => {
             const unfoldedIndices: number[] = [];
-            state.selectedItemsMap = cloneDeep(state.filters);
+            state.selectedItemsMap = { ...state.filters };
             state.filterItems.forEach((item, idx) => {
-                if (Object.keys(state.filters).includes(item.name)) {
+                if (state.filters[item.name]?.length) {
                     unfoldedIndices.push(idx);
                 }
             });
@@ -117,13 +121,13 @@ export default {
 
         /* event */
         const handleDeleteTag = (filterName: string, itemIdx: number) => {
-            const _selectedItemsMap = cloneDeep(state.selectedItemsMap);
+            const _selectedItemsMap = { ...state.selectedItemsMap };
             const _selectedItems = [..._selectedItemsMap[filterName]];
             _selectedItems.splice(itemIdx, 1);
             if (_selectedItems.length) {
                 _selectedItemsMap[filterName] = _selectedItems;
             } else {
-                delete _selectedItemsMap[filterName];
+                _selectedItemsMap[filterName] = undefined;
             }
             state.selectedItemsMap = _selectedItemsMap;
         };
@@ -138,10 +142,10 @@ export default {
 
         watch(() => state.unfoldedIndices, (after, before) => {
             if (after.length < before.length) {
-                const _selectedItemsMap = cloneDeep(state.selectedItemsMap);
+                const _selectedItemsMap = { ...state.selectedItemsMap };
                 const deletedIndex: number = before.filter(idx => !after.includes(idx))[0];
                 const deletedFilterName = state.filterItems[deletedIndex].name;
-                delete _selectedItemsMap[deletedFilterName];
+                _selectedItemsMap[deletedFilterName] = undefined;
                 state.selectedItemsMap = _selectedItemsMap;
             }
         });
@@ -203,6 +207,11 @@ export default {
 
                 .selected-tags-wrapper .p-tag {
                     margin-bottom: 0.5rem;
+                }
+                .no-item-wrapper {
+                    @apply text-gray-300;
+                    font-size: 0.875rem;
+                    line-height: 1.6;
                 }
             }
         }

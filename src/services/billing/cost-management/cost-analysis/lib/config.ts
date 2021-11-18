@@ -53,8 +53,8 @@ export const FILTER_MAP: Record<FILTER_ITEM, FilterItem> = Object.freeze({
     TYPE: { name: FILTER_ITEM.TYPE, label: 'Type' },
     RESOURCE: { name: FILTER_ITEM.RESOURCE, label: 'Resource' },
     ACCOUNT: { name: FILTER_ITEM.ACCOUNT, label: 'Account' },
-    TAG: { name: FILTER_ITEM.TAG, label: 'Tag' },
-    ADDITIONAL_FIELD: { name: FILTER_ITEM.ADDITIONAL_FIELD, label: 'Additional Field' },
+    // TAG: { name: FILTER_ITEM.TAG, label: 'Tag' },
+    // ADDITIONAL_FIELD: { name: FILTER_ITEM.ADDITIONAL_FIELD, label: 'Additional Field' },
 });
 
 export const REQUEST_TYPE = Object.freeze({
