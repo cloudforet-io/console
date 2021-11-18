@@ -94,6 +94,7 @@ export default {
     .tracker-bar {
         @apply bg-primary rounded-sm;
         width: 0;
+        max-width: 100%;
         overflow: hidden;
         transition: width 0.5s linear;
         height: 0.375rem;
