@@ -1,7 +1,7 @@
 <template>
     <div class="progress-bar">
         <label v-if="label" class="label">{{ label }}</label>
-        <div ref="backgroundBar" class="background-bar" :style="{'height': height}" />
+        <div ref="backgroundBar" class="background-bar" />
         <transition appear @before-appear="beforeEnter" @after-appear="enter">
             <div ref="progressBar" class="tracker-bar" :style="progressBarStyle" />
         </transition>
@@ -13,6 +13,7 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { ProgressBarProps } from '@/data-display/progress-bar/type';
+
 
 export default {
     name: 'PProgressBar',
@@ -29,26 +30,20 @@ export default {
             type: String,
             default: undefined,
         },
-        height: {
-            type: String,
-            default: '0.875rem',
-        },
         gradient: {
             type: Object,
             default: undefined,
         },
     },
     setup(props: ProgressBarProps) {
-        const linearGradientProperty = computed(() => `linear-gradient(90deg, ${props.gradient?.startColor} ${props.gradient?.gradientPoint}%, ${props.gradient?.endColor} 100%)`);
+        const linearGradientProperty = `linear-gradient(90deg, ${props.gradient?.startColor} ${props.gradient?.gradientPoint}%, ${props.gradient?.endColor} 100%)`;
         const defaultTrackerBarColor = 'rgba(theme(\'colors.primary\'))';
 
         const state = reactive({
             progressBar: null as HTMLElement | null,
             progressBarStyle: computed(() => ({
-                height: props.height,
                 background: props.gradient ? linearGradientProperty
                     : (props.color ?? defaultTrackerBarColor),
-                'margin-top': `-${props.height}`,
             })),
         });
 
@@ -93,6 +88,7 @@ export default {
         @apply bg-gray-100 rounded-sm;
         width: 100%;
         overflow: hidden;
+        height: 0.375rem;
     }
 
     .tracker-bar {
@@ -100,6 +96,8 @@ export default {
         width: 0;
         overflow: hidden;
         transition: width 0.5s linear;
+        height: 0.375rem;
+        margin-top: -0.375rem;
     }
 }
 </style>

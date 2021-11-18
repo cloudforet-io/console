@@ -55,24 +55,6 @@ export const getProgressBarArgTypes = (): ArgTypes => ({
             type: 'color',
         },
     },
-    height: {
-        name: 'height',
-        type: { name: 'string' },
-        description: 'Height of progress bar',
-        defaultValue: '0.875rem',
-        table: {
-            type: {
-                summary: 'string',
-            },
-            category: 'props',
-            defaultValue: {
-                summary: '0.875rem',
-            },
-        },
-        control: {
-            type: 'text',
-        },
-    },
     gradient: {
         name: 'gradient',
         type: { name: 'object' },
