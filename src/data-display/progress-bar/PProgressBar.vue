@@ -1,15 +1,17 @@
 <template>
     <div class="progress-bar">
         <label v-if="label" class="label">{{ label }}</label>
-        <div ref="backgroundBar" class="background-bar" />
+        <div ref="backgroundBar" class="background-bar" :style="{'height': height}" />
         <transition appear @before-appear="beforeEnter" @after-appear="enter">
-            <div ref="progressBar" class="tracker-bar" :style="{'background-color': color}" />
+            <div ref="progressBar" class="tracker-bar" :style="progressBarStyle" />
         </transition>
     </div>
 </template>
 
 <script lang="ts">
-import { reactive, toRefs, watch } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import { ProgressBarProps } from '@/data-display/progress-bar/type';
 
 export default {
@@ -25,12 +27,29 @@ export default {
         },
         color: {
             type: String,
-            default: 'rgba(theme(\'colors.primary1\')',
+            default: undefined,
+        },
+        height: {
+            type: String,
+            default: '0.875rem',
+        },
+        gradient: {
+            type: Object,
+            default: undefined,
         },
     },
     setup(props: ProgressBarProps) {
+        const linearGradientProperty = computed(() => `linear-gradient(90deg, ${props.gradient?.startColor} ${props.gradient?.gradientPoint}%, ${props.gradient?.endColor} 100%)`);
+        const defaultTrackerBarColor = 'rgba(theme(\'colors.primary\'))';
+
         const state = reactive({
             progressBar: null as HTMLElement | null,
+            progressBarStyle: computed(() => ({
+                height: props.height,
+                background: props.gradient ? linearGradientProperty
+                    : (props.color ?? defaultTrackerBarColor),
+                'margin-top': `-${props.height}`,
+            })),
         });
 
         const beforeEnter = (element) => {
@@ -73,17 +92,14 @@ export default {
     .background-bar {
         @apply bg-gray-100 rounded-sm;
         width: 100%;
-        height: 0.375rem;
         overflow: hidden;
     }
 
     .tracker-bar {
         @apply bg-primary rounded-sm;
-        height: 0.375rem;
         width: 0;
         overflow: hidden;
         transition: width 0.5s linear;
-        margin-top: -0.375rem;
     }
 }
 </style>
