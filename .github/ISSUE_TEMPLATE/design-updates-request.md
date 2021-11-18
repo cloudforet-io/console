@@ -16,3 +16,6 @@ assignees: ''
 **Additional Description**
 
 Add priority (high / medium / low) label :)
+- high: bug, error, critical issues
+- medium: scheduled job according to the roadmap
+- low: improvement
