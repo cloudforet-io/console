@@ -67,7 +67,6 @@ import {
 import {
     PButtonModal, PCollapsibleList, PTag,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import CostAnalysisFilterItem from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisFilterItem.vue';
 

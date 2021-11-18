@@ -92,7 +92,8 @@ module.exports = {
         '@typescript-eslint/no-use-before-define': ['off'], // use eslint no-use-before-define rule
         '@typescript-eslint/ban-ts-ignore': ['off'],
         '@typescript-eslint/explicit-function-return-type': ['off'],
-        '@typescript-eslint/no-explicit-any': ['off']
+        '@typescript-eslint/no-explicit-any': ['off'],
+        '@typescript-eslint/no-unused-vars': ['error']
     },
     ignorePatterns: ['src/assets/**', '**/node_modules/**', 'translations/language-pack/**', 'public/lottie.js'],
     parserOptions: {
