@@ -1,3 +1,10 @@
+# [1.1.0-beta.182](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.181...v1.1.0-beta.182) (2021-11-18)
+
+
+### Bug Fixes
+
+* max height of tracker bar ([#755](https://github.com/spaceone-dev/spaceone-design-system/issues/755)) ([633bfe8](https://github.com/spaceone-dev/spaceone-design-system/commit/633bfe8cde0109b70191fab2ca9983343d9d944f))
+
 # [1.1.0-beta.181](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.180...v1.1.0-beta.181) (2021-11-18)
 
 
