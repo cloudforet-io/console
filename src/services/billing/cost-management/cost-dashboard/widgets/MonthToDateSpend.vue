@@ -34,7 +34,7 @@
 </template>
 
 <script lang="ts">
-import CardWidgetLayout from '@/services/billing/cost-management/cost-dashboard/modules/SimpleCardWidget.vue';
+import CardWidgetLayout from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardSimpleCardWidget.vue';
 import { CURRENCY } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { PI } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
@@ -70,6 +70,12 @@ export default {
     }
     &.alert {
         @apply text-alert;
+    }
+}
+.cost-trend-wrapper {
+    @apply flex;
+    .rate {
+        flex-basis: 50%;
     }
 }
 .cost {
