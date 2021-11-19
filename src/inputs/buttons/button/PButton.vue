@@ -40,7 +40,7 @@ export default {
     }) {
         const tag = props.href ? 'a' : 'button';
 
-        const childrenEl: VNode[] = [...children];
+        const childrenEl: VNode[] = children ? [...children] : [];
         if (props.loading) {
             childrenEl.splice(0, 0, h(PLottie, {
                 class: 'spinner',
