@@ -1,5 +1,5 @@
 <template>
-    <div class="p-search" :class="{ focused: proxyIsFocused }">
+    <div class="p-search" :class="{ focused: proxyIsFocused, invalid }">
         <p-i v-if="!disableIcon && !proxyIsFocused && !value" class="left-icon" name="ic_search"
              color="inherit"
         />
@@ -56,6 +56,10 @@ export default defineComponent<SearchProps>({
             default: undefined,
         },
         disableIcon: {
+            type: Boolean,
+            default: false,
+        },
+        invalid: {
             type: Boolean,
             default: false,
         },
@@ -116,10 +120,13 @@ export default defineComponent<SearchProps>({
     height: 2rem;
     line-height: 2rem;
     min-width: 0;
+    &.invalid {
+        @apply border-alert;
+    }
     &.focused, &:focus-within {
         @apply border-secondary bg-blue-100;
     }
-    &:hover {
+    &:hover:not(.invalid) {
         @apply border-secondary;
     }
     .input-wrapper {

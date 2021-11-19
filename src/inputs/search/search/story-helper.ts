@@ -73,6 +73,25 @@ export const getSearchArgTypes = (): ArgTypes => ({
             type: 'boolean',
         },
     },
+    invalid: {
+        name: 'invalid',
+        type: { name: 'boolean' },
+        description: 'Whether to apply invalid style or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: 'false',
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
+    /* model */
     'v-model': {
         name: 'v-model',
         type: { name: 'string' },
@@ -89,6 +108,7 @@ export const getSearchArgTypes = (): ArgTypes => ({
         },
         control: null,
     },
+    /* slots */
     left: {
         name: 'left',
         description: 'Slot for insert something into left side of input element.',

@@ -38,6 +38,7 @@ export const Template = (args, { argTypes }) => ({
             :show-select-all="showSelectAll"
             :show-tag-box="showTagBox"
             :strict-select-mode="strictSelectMode"
+            :invalid="invalid"
             @search="onSearch"
             @focus="onFocus"
             @blur="onBlur"
@@ -190,6 +191,24 @@ export const Template = (args, { argTypes }) => ({
 
 <br/>
 <br/>
+
+## Invalid
+
+<Canvas>
+    <Story name="Invalid" args={{menu: getSearchDropdownMenu()}}>
+        {{
+            props: Object.keys(getSearchDropdownArgTypes()),
+            components: { PSearchDropdown },
+            template: `
+        <p-search-dropdown :menu="menu" invalid use-fixed-menu-style />
+`,
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 
 ## Radio Button Type
 

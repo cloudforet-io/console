@@ -6,6 +6,7 @@
                   :disable-icon="disableIcon || proxyVisibleMenu ||
                       (type === SEARCH_DROPDOWN_TYPE.radioButton && !!proxySelected.length)"
                   :is-focused.sync="proxyIsFocused"
+                  :invalid="invalid"
                   @delete="onDeleteSearchText"
                   @click.native.stop="handleClick"
                   v-on="searchListeners"
@@ -119,6 +120,10 @@ export default defineComponent<SearchDropdownProps>({
         isFocused: {
             type: Boolean,
             default: undefined,
+        },
+        invalid: {
+            type: Boolean,
+            default: false,
         },
         /* context menu props */
         menu: {

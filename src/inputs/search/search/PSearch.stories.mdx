@@ -15,7 +15,7 @@ export const Template = (args, { argTypes }) => ({
     props: Object.keys(argTypes),
     components: { PSearch },
     template: `
-        <p-search v-model="_value"
+        <p-search v-model="proxyValue"
                   :placeholder="placeholder"
                   :disable-icon="disableIcon"
                   :is-focused="isFocused"
@@ -29,7 +29,7 @@ export const Template = (args, { argTypes }) => ({
     `,
     setup(props) {
         const state = reactive({
-            _value: props.value
+            proxyValue: props.value
         })
         return {
             ...toRefs(state)
@@ -41,6 +41,55 @@ export const Template = (args, { argTypes }) => ({
 # Search
 <br/>
 <br/>
+
+## Basic
+
+<Canvas>
+    <Story name="Basic" >
+{{
+    components: { PSearch },
+    template: `
+        <p-search v-model="proxyValue"/>
+    `,
+    setup(props) {
+        const state = reactive({
+            proxyValue: props.value
+        })
+        return {
+            ...toRefs(state)
+        }
+    }
+}}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Invalid
+
+<Canvas>
+    <Story name="Invalid" >
+        {{
+            components: { PSearch },
+            template: `
+        <p-search v-model="proxyValue" invalid/>
+    `,
+            setup(props) {
+                const state = reactive({
+                    proxyValue: props.value
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
 
 ## Playground
 

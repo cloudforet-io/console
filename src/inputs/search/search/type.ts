@@ -3,6 +3,7 @@ export interface SearchProps {
     placeholder?: string;
     disableIcon?: boolean;
     isFocused?: boolean; // sync
+    invalid?: boolean;
 }
 
 export interface InputListeners {
