@@ -120,8 +120,8 @@ export default {
             plugins: computed(() => (props.dataType === DATA_TYPE.yearToMonth ? [
                 monthSelectPlugin({
                     shorthand: false,
-                    dateFormat: 'Y/m/d',
-                    altFormat: 'Y/m/d',
+                    dateFormat: 'F Y',
+                    altFormat: 'F Y',
                     theme: 'light',
                 }),
             ] : [])),
