@@ -4,13 +4,13 @@
                        :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_START_MONTH')"
                        required
         >
-            <p-datetime-picker />
+            <p-datetime-picker data-type="yearToMonth" />
         </p-field-group>
         <p-field-group class="period-select"
                        :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_END_MONTH')"
                        required
         >
-            <p-datetime-picker />
+            <p-datetime-picker data-type="yearToMonth" />
         </p-field-group>
     </div>
 </template>

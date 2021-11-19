@@ -1,6 +1,6 @@
 <template>
     <div class="budget-form-amount-plan-last-months-cost">
-        <label>Last 3 Months Cost</label>
+        <label>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_LAST_MONTH') }}</label>
         <span v-for="({month, cost}, index) in data" :key="index" class="data">
             {{ month }}: ${{ cost }}
         </span>

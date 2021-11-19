@@ -49,5 +49,8 @@ export default {
 <style lang="postcss" scoped>
 .budget-form-amount-plan-month-input {
     display: inline-block;
+    .p-text-input {
+        width: 100%;
+    }
 }
 </style>

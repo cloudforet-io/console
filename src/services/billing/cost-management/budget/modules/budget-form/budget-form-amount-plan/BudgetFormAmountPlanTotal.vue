@@ -1,6 +1,6 @@
 <template>
     <div class="budget-form-amount-plan-total">
-        <p-field-group required label="Total Budgeted Amount">
+        <p-field-group required :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_BUDGET_TOTAL')">
             <template #right-extra>
                 ($USD)
             </template>

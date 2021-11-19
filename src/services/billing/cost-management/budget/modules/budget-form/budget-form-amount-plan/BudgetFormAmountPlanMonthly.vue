@@ -3,12 +3,12 @@
         <div class="header">
             <div class="title">
                 <p>
-                    <p-label>Monthly Budget Planning</p-label> ($USD)
+                    <p-label>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-label> ($USD)
                 </p>
                 <budget-form-amount-plan-last-months-cost :data="lastMonthsCost" />
             </div>
             <p-button style-type="gray-border" size="lg" :outline="true">
-                Auto-fill budget
+                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL') }}
             </p-button>
         </div>
         <p-divider class="my-6" />
@@ -72,6 +72,7 @@ export default {
     }
     .input-wrapper {
         @apply grid grid-cols-4 gap-4;
+        overflow: hidden;
     }
 }
 </style>
