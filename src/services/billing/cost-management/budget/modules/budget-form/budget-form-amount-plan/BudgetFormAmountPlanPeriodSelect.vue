@@ -1,5 +1,5 @@
 <template>
-    <div class="amount-plan-period-select">
+    <div class="budget-form-amount-plan-period-select">
         <p-field-group class="period-select"
                        :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.LABEL_START_MONTH')"
                        required
@@ -23,7 +23,7 @@ import {
 import { PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
 
 export default {
-    name: 'AmountPlanPeriodSelect',
+    name: 'BudgetFormAmountPlanPeriodSelect',
     components: {
         PFieldGroup,
         PDatetimePicker,
@@ -39,7 +39,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.amount-plan-period-select {
+.budget-form-amount-plan-period-select {
     .period-select {
         display: inline-block;
         margin-right: 1rem;

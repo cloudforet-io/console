@@ -1,5 +1,5 @@
 <template>
-    <div class="last-months-cost">
+    <div class="budget-form-amount-plan-last-months-cost">
         <label>Last 3 Months Cost</label>
         <span v-for="({month, cost}, index) in data" :key="index" class="data">
             {{ month }}: ${{ cost }}
@@ -9,7 +9,7 @@
 
 <script lang="ts">
 export default {
-    name: 'LastMonthsCost',
+    name: 'BudgetFormAmountPlanLastMonthsCost',
     props: {
         data: {
             type: Array,
@@ -20,7 +20,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.last-months-cost {
+.budget-form-amount-plan-last-months-cost {
     @apply text-gray-400 text-xs;
     label {
         @apply font-bold;

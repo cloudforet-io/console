@@ -1,5 +1,5 @@
 <template>
-    <div class="amount-plan-unit-select">
+    <div class="budget-form-amount-plan-unit-select">
         <p-select-card v-for="({title, desc, unit}) in plans"
                        :key="unit"
                        :value="unit"
@@ -38,7 +38,7 @@ interface Plan {
 }
 
 export default {
-    name: 'AmountPlanUnitSelect',
+    name: 'BudgetFormAmountPlanUnitSelect',
     components: {
         PSelectCard,
         PLabel,
@@ -84,7 +84,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.amount-plan-unit-select {
+.budget-form-amount-plan-unit-select {
     .p-select-card {
         max-width: 336px;
         margin-right: 0.5rem;

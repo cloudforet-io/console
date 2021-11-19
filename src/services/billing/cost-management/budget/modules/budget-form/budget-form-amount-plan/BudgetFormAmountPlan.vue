@@ -4,10 +4,10 @@
             {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AMOUNT_PLANNING') }}
         </p-panel-top>
         <div class="p-4">
-            <amount-plan-period-select class="mb-2" />
-            <amount-plan-unit-select class="mb-6" :selected-unit.sync="timeUnit" />
-            <amount-plan-monthly v-if="timeUnit === 'MONTHLY'" />
-            <amount-plan-total v-else />
+            <budget-form-amount-plan-period-select class="mb-2" />
+            <budget-form-amount-plan-unit-select class="mb-6" :selected-unit.sync="timeUnit" />
+            <budget-form-amount-plan-monthly v-if="timeUnit === 'MONTHLY'" />
+            <budget-form-amount-plan-total v-else />
         </div>
     </p-pane-layout>
 </template>
@@ -19,24 +19,24 @@ import {
 
 import { PPaneLayout, PPanelTop } from '@spaceone/design-system';
 
-import AmountPlanPeriodSelect
-    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/AmountPlanPeriodSelect.vue';
-import AmountPlanUnitSelect
-    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/AmountPlanUnitSelect.vue';
-import AmountPlanMonthly
-    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/amount-plan-monthly/AmountPlanMonthly.vue';
+import BudgetFormAmountPlanPeriodSelect
+    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanPeriodSelect.vue';
+import BudgetFormAmountPlanUnitSelect
+    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanUnitSelect.vue';
+import BudgetFormAmountPlanMonthly
+    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthly.vue';
 
 import { BudgetTimeUnit } from '@/services/billing/cost-management/budget/type';
-import AmountPlanTotal
-    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/AmountPlanTotal.vue';
+import BudgetFormAmountPlanTotal
+    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanTotal.vue';
 
 export default {
     name: 'BudgetFormAmountPlan',
     components: {
-        AmountPlanTotal,
-        AmountPlanMonthly,
-        AmountPlanUnitSelect,
-        AmountPlanPeriodSelect,
+        BudgetFormAmountPlanTotal,
+        BudgetFormAmountPlanMonthly,
+        BudgetFormAmountPlanUnitSelect,
+        BudgetFormAmountPlanPeriodSelect,
         PPaneLayout,
         PPanelTop,
     },

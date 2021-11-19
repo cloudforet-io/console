@@ -15,7 +15,7 @@ import BudgetFormAmountPlan
     from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlan.vue';
 
 export default {
-    name: 'AmountPlanning',
+    name: 'BudgetForm',
     components: {
         BudgetFormAmountPlan,
         BudgetFormBaseInfo,

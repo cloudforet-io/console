@@ -1,11 +1,11 @@
 <template>
-    <div class="amount-plan-monthly">
+    <div class="budget-form-amount-plan-monthly">
         <div class="header">
             <div class="title">
                 <p>
                     <p-label>Monthly Budget Planning</p-label> ($USD)
                 </p>
-                <last-months-cost :data="lastMonthsCost" />
+                <budget-form-amount-plan-last-months-cost :data="lastMonthsCost" />
             </div>
             <p-button style-type="gray-border" size="lg" :outline="true">
                 Auto-fill budget
@@ -13,10 +13,10 @@
         </div>
         <p-divider class="my-6" />
         <div class="input-wrapper">
-            <monthly-amount-input v-for="(month, index) in months" :key="month"
-                                  class="input"
-                                  :month="month"
-                                  :is-month-to-date="index === 0"
+            <budget-form-amount-plan-month-input v-for="(month, index) in months" :key="month"
+                                                 class="input"
+                                                 :month="month"
+                                                 :is-month-to-date="index === 0"
             />
         </div>
     </div>
@@ -29,16 +29,16 @@ import {
 } from '@vue/composition-api';
 
 import { PButton, PDivider, PLabel } from '@spaceone/design-system';
-import MonthlyAmountInput
-    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/amount-plan-monthly/MonthlyAmountInput.vue';
-import LastMonthsCost
-    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/LastMonthsCost.vue';
+import BudgetFormAmountPlanMonthInput
+    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthInput.vue';
+import BudgetFormAmountPlanLastMonthsCost
+    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
 
 export default {
-    name: 'AmountPlanMonthly',
+    name: 'BudgetFormAmountPlanMonthly',
     components: {
-        LastMonthsCost,
-        MonthlyAmountInput,
+        BudgetFormAmountPlanLastMonthsCost,
+        BudgetFormAmountPlanMonthInput,
         PLabel,
         PButton,
         PDivider,
@@ -61,7 +61,7 @@ export default {
 };
 </script>
 <style lang="postcss" scoped>
-.amount-plan-monthly {
+.budget-form-amount-plan-monthly {
     .header {
         display: flex;
         margin-bottom: 0.5rem;

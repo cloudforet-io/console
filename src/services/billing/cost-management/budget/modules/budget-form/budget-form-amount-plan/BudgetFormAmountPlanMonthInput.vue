@@ -1,5 +1,5 @@
 <template>
-    <p-field-group required :label="month" class="monthly-amount-input">
+    <p-field-group required :label="month" class="budget-form-amount-plan-month-input">
         <template v-if="isMonthToDate" #label-extra>
             <span>(MTD)</span>
         </template>
@@ -19,7 +19,7 @@ import {
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 
 export default {
-    name: 'BudgetPlanMonthlyAmount',
+    name: 'BudgetFormAmountPlanMonthInput',
     components: {
         PFieldGroup,
         PTextInput,
@@ -47,7 +47,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.monthly-amount-input {
+.budget-form-amount-plan-month-input {
     display: inline-block;
 }
 </style>

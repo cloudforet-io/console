@@ -1,5 +1,5 @@
 <template>
-    <div class="amount-plan-total">
+    <div class="budget-form-amount-plan-total">
         <p-field-group required label="Total Budgeted Amount">
             <template #right-extra>
                 ($USD)
@@ -10,7 +10,7 @@
                 </template>
             </p-text-input>
         </p-field-group>
-        <last-months-cost :data="lastMonthsCost" />
+        <budget-form-amount-plan-last-months-cost :data="lastMonthsCost" />
     </div>
 </template>
 
@@ -22,13 +22,13 @@ import {
 
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 
-import LastMonthsCost
-    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/LastMonthsCost.vue';
+import BudgetFormAmountPlanLastMonthsCost
+    from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
 
 export default {
-    name: 'AmountPlanTotal',
+    name: 'BudgetFormAmountPlanTotal',
     components: {
-        LastMonthsCost,
+        BudgetFormAmountPlanLastMonthsCost,
         PFieldGroup,
         PTextInput,
     },
