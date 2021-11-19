@@ -5432,7 +5432,7 @@
                                                         </translations>
                                                     </concept_node>
                                                     <concept_node>
-                                                        <name>LABEL_BUGDET_TOTAL</name>
+                                                        <name>LABEL_BUDGET_TOTAL</name>
                                                         <definition_loaded>false</definition_loaded>
                                                         <description></description>
                                                         <comment></comment>

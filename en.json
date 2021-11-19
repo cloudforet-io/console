@@ -307,7 +307,7 @@
 					"AMOUNT_PLAN": {
 						"AMOUNT_PLANNING": "Amount Planning",
 						"AUTO_FILL": "Auto-fill budget",
-						"LABEL_BUGDET_TOTAL": "Total Budgeted Amount",
+						"LABEL_BUDGET_TOTAL": "Total Budgeted Amount",
 						"LABEL_END_MONTH": "End Month",
 						"LABEL_LAST_MONTH": "Last 3 Month Cost",
 						"LABEL_START_MONTH": "Start Month",
