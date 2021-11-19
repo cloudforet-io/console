@@ -59,14 +59,14 @@ export default defineComponent<SearchProps>({
             type: Boolean,
             default: false,
         },
+        invalid: {
+            type: Boolean,
+            default: false,
+        },
         /** sync */
         isFocused: {
             type: Boolean,
             default: undefined,
-        },
-        invalid: {
-            type: Boolean,
-            default: false,
         },
     },
     setup(props: SearchProps, { emit, listeners }) {

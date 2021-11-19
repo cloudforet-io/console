@@ -194,10 +194,8 @@ const extraArgTypes: ArgTypes = {
 };
 
 const initSearchArgTypes = (): ArgTypes => {
+    const argTypes: ArgTypes = {};
     const searchArgTypes = getSearchArgTypes();
-    const argTypes: ArgTypes = {
-        invalid: searchArgTypes.invalid,
-    };
     Object.keys(searchArgTypes).forEach((k) => {
         const item = searchArgTypes[k];
         if (item.table?.category === 'slots') {

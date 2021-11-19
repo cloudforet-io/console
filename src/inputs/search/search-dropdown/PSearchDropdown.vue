@@ -121,6 +121,10 @@ export default defineComponent<SearchDropdownProps>({
             type: Boolean,
             default: undefined,
         },
+        invalid: {
+            type: Boolean,
+            default: false,
+        },
         /* context menu props */
         menu: {
             type: Array,
@@ -148,10 +152,6 @@ export default defineComponent<SearchDropdownProps>({
             default: undefined,
         },
         useFixedMenuStyle: {
-            type: Boolean,
-            default: false,
-        },
-        invalid: {
             type: Boolean,
             default: false,
         },
