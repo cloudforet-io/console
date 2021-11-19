@@ -1,5 +1,13 @@
 <template>
-    <div ref="chartRef" class="chart" />
+    <cost-dashboard-card-widget-layout
+        title="Service Account Cost Insight"
+        :data-range="15"
+        :widget-link="widgetLink"
+    >
+        <template #default>
+            <div ref="chartRef" class="chart" />
+        </template>
+    </cost-dashboard-card-widget-layout>
 </template>
 
 <script lang="ts">
@@ -11,6 +19,9 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import config from '@/lib/config';
 import { TreeMap } from '@amcharts/amcharts4/charts';
+import CostDashboardCardWidgetLayout
+    from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardCardWidgetLayout.vue';
+import { IDENTITY_ROUTE } from '@/services/identity/routes';
 
 am4core.useTheme(am4themesAnimated);
 
@@ -34,8 +45,15 @@ const tempMapData = [{
 const categoryKey = 'name';
 const valueName = 'value';
 
+const widgetLink = {
+    name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME,
+    params: {},
+    query: {},
+};
+
 export default {
     name: 'ServiceAccountCostInsight',
+    components: { CostDashboardCardWidgetLayout },
     setup() {
         const state = reactive({
             chartRef: null as HTMLElement | null,
@@ -77,6 +95,7 @@ export default {
 
         return {
             ...toRefs(state),
+            widgetLink,
         };
     },
 };
