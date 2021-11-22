@@ -31,15 +31,17 @@
                         <span class="ml-1">{{ node.data.name }}</span>
                     </template>
                     <template #toggle-right="{node, path}">
-                        <p-i v-if="node.data.item_type === 'PROJECT_GROUP'" name="ic_tree_project-group" class="project-group-icon"
-                             width="1rem" height="1rem" color="inherit transparent"
-                        />
-                        <component :is="selectComponent"
-                                   v-else
-                                   :selected="selectedProjects" :value="node.data"
-                                   :predicate="predicate"
-                                   @change="changeSelectState(node, path, ...arguments)"
-                        />
+                        <span>
+                            <component :is="selectComponent"
+                                       :selected="selectedProjects" :value="node.data"
+                                       :predicate="predicate"
+                                       class="mr-1"
+                                       @change="changeSelectState(node, path, ...arguments)"
+                            />
+                            <p-i :name="node.data.item_type === 'PROJECT_GROUP' ? 'ic_tree_project-group' : 'ic_tree_project'"
+                                 width="1rem" height="1rem" color="inherit transparent"
+                            />
+                        </span>
                     </template>
                 </p-tree>
             </template>
@@ -92,6 +94,10 @@ export default {
             type: Boolean,
             default: false,
         },
+        projectGroupSelectable: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
@@ -102,7 +108,10 @@ export default {
             _selectedProjectIds: [...props.selectedProjectIds] as string[],
             selectedProjectItems: computed<MenuItem[]>({
                 get() {
-                    const projects: ResourceMap = store.state.resource.project.items;
+                    const projects: ResourceMap = {
+                        ...store.state.resource.project.items,
+                        ...store.state.resource.projectGroup.items,
+                    };
                     return state._selectedProjectIds.map(id => ({
                         name: id,
                         label: projects[id]?.label,
@@ -120,7 +129,7 @@ export default {
             selectOptions: computed(() => ({
                 multiSelectable: props.multiSelectable,
                 validator({ data }) {
-                    return data.item_type === 'PROJECT';
+                    return props.projectGroupSelectable ? true : data.item_type === 'PROJECT';
                 },
             })),
             visibleMenu: false,
