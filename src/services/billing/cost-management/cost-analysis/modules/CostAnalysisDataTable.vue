@@ -86,7 +86,7 @@ export default {
             //
             granularity: computed(() => store.state.service.costAnalysis.granularity),
             currency: computed(() => store.state.service.costAnalysis.currency),
-            selectedDates: computed(() => store.state.service.costAnalysis.selectedDates),
+            period: computed(() => store.state.service.costAnalysis.period),
             groupByItems: computed(() => store.state.service.costAnalysis.groupByItems),
             filters: computed(() => store.state.service.costAnalysis.filters),
         });
@@ -109,8 +109,8 @@ export default {
 
             /* get date fields (ex. 11/1, 11/2) */
             const dateFields: DataTableField[] = [];
-            const start = dayjs(state.selectedDates[0]);
-            const end = dayjs(state.selectedDates[1]);
+            const start = dayjs(state.period.start);
+            const end = dayjs(state.period.end);
             const timeUnit = getTimeUnit(granularity, start, end);
 
             let nameDateFormat = 'YYYY-MM-DD';
@@ -164,14 +164,14 @@ export default {
             .setSort('total_count', true);
         const listCostAnalysisTableData = async () => {
             try {
-                const granularity = getConvertedGranularity(state.selectedDates, state.granularity);
+                const granularity = getConvertedGranularity(state.period, state.granularity);
                 const convertedFilters = getConvertedFilter(state.filters);
                 costApiQueryHelper.setFilters(convertedFilters);
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity,
                     group_by: state.groupByItems.map(d => d.name),
-                    start: state.selectedDates[0],
-                    end: state.selectedDates[1],
+                    start: state.period.start,
+                    end: state.period.end,
                     pivot_type: 'TABLE',
                     ...costApiQueryHelper.data,
                 });
@@ -193,7 +193,7 @@ export default {
             // await getTableData();
         };
 
-        watch([() => state.granularity, () => state.groupByItems, () => state.selectedDates, () => state.filters], async () => {
+        watch([() => state.granularity, () => state.groupByItems, () => state.period, () => state.filters], async () => {
             tableState.loading = true;
             await Promise.all([
                 listCostAnalysisTableData(),

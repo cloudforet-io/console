@@ -1,7 +1,7 @@
 import { Action } from 'vuex';
 
 import {
-    CHART_TYPE, CostQuerySetModel, CURRENCY, GRANULARITY, CostQuerySetOption,
+    CHART_TYPE, CostQuerySetModel, GRANULARITY, CostQuerySetOption,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { CostAnalysisStoreState } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -13,8 +13,7 @@ export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = (
     commit('setGranularity', GRANULARITY.ACCUMULATED);
     commit('setGroupByItems', []);
     commit('setGroupBy', undefined);
-    commit('setSelectedDates', getInitialDates());
-    commit('setCurrency', CURRENCY.USD);
+    commit('setPeriod', getInitialDates());
     commit('setFilters', []);
     commit('setSelectedQueryId', undefined);
 };
@@ -28,8 +27,7 @@ export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit },
     commit('setChartType', options.chart_type);
     commit('setGranularity', options.granularity);
     commit('setGroupByItems', options.group_by);
-    commit('setSelectedDates', [options.start, options.end]);
-    commit('setCurrency', options.currency);
+    commit('setPeriod', { start: options.period.start, end: options.period.end });
     commit('setFilters', options.filter);
     commit('setSelectedQueryId', queryId);
 };
@@ -47,17 +45,15 @@ export const listCostQueryList: Action<CostAnalysisStoreState, any> = async ({ c
 export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, commit }, name): Promise<CostQuerySetModel|Error> => {
     try {
         const {
-            granularity, chartType, selectedDates,
-            currency, groupByItems, filters,
+            granularity, chartType, period,
+            groupByItems, filters,
         } = state;
         const updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.create({
             name,
             options: {
                 granularity,
                 chart_type: chartType,
-                start: selectedDates[0],
-                end: selectedDates[1],
-                currency,
+                period,
                 group_by: groupByItems,
                 filter: filters,
             },

@@ -1,15 +1,15 @@
 import dayjs, { Dayjs } from 'dayjs';
 import {
-    CHART_TYPE, FILTER_ITEM, FilterItem, GRANULARITY,
+    CHART_TYPE, FILTER_ITEM, FilterItem, GRANULARITY, Period,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { TimeUnit } from '@amcharts/amcharts4/core';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import { ChartData } from '@/common/composables/dynamic-chart/type';
 
 
-export const getConvertedGranularity = (selectedDates: string[], granularity: GRANULARITY): GRANULARITY => {
-    const start = dayjs(selectedDates[0]);
-    const end = dayjs(selectedDates[1]);
+export const getConvertedGranularity = (period: Period, granularity: GRANULARITY): GRANULARITY => {
+    const start = dayjs(period.start);
+    const end = dayjs(period.end);
 
     if (granularity !== GRANULARITY.ACCUMULATED) return granularity;
     if (end.diff(start, 'month') < 2) return GRANULARITY.DAILY;
@@ -32,19 +32,19 @@ export const getConvertedFilter = (filters: Record<FILTER_ITEM, FilterItem[]>): 
     return result;
 };
 
-export const getConvertedSelectedDates = (granularity: GRANULARITY, chartType: CHART_TYPE, selectedDates: string[]): [string, string] => {
-    let start = selectedDates[0];
+export const getConvertedPeriod = (granularity: GRANULARITY, chartType: CHART_TYPE, period: Period): Period => {
+    let start = period.start;
     if (chartType === CHART_TYPE.DONUT && granularity !== GRANULARITY.ACCUMULATED) {
         if (granularity === GRANULARITY.DAILY) {
-            start = selectedDates[1];
+            start = period.end;
         } else if (granularity === GRANULARITY.MONTHLY) {
-            start = dayjs.utc(selectedDates[1]).startOf('month').format();
+            start = dayjs.utc(period.end).startOf('month').format();
         } else {
-            start = dayjs.utc(selectedDates[1]).startOf('year').format();
+            start = dayjs.utc(period.end).startOf('year').format();
         }
     }
-    const end = dayjs.utc(selectedDates[1]).add(1, 'day').format();
-    return [start, end];
+    const end = dayjs.utc(period.end).add(1, 'day').format();
+    return { start, end };
 };
 
 export const getTimeUnit = (granularity: GRANULARITY, start: Dayjs, end: Dayjs): TimeUnit => {
@@ -58,10 +58,10 @@ export const getTimeUnit = (granularity: GRANULARITY, start: Dayjs, end: Dayjs):
     return 'year';
 };
 
-export const getInitialDates = (): string[] => {
+export const getInitialDates = (): Period => {
     const start = dayjs.utc().startOf('month').format();
     const end = dayjs.utc().startOf('date').format();
-    return [start, end];
+    return { start, end };
 };
 
 export const mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: ChartData): ChartData => {

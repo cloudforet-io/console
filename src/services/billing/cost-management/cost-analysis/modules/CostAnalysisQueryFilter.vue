@@ -21,18 +21,18 @@
         <div class="right-part">
             <span class="timezone-text">UTC</span>
             <div class="filter-item">
-                <p-datetime-picker :selected-dates="selectedDates"
+                <p-datetime-picker :selected-dates="[period.start, period.end]"
                                    style-type="text"
-                                   mode="range"
+                                   select-mode="range"
                                    @update:selectedDates="handleSelectedDates"
                 />
             </div>
-            <p-select-dropdown class="filter-item"
-                               :items="currencyItems"
-                               :selected="currency"
-                               without-outline
-                               @select="handleSelectCurrency"
-            />
+            <!--            <p-select-dropdown class="filter-item"-->
+            <!--                               :items="currencyItems"-->
+            <!--                               :selected="currency"-->
+            <!--                               without-outline-->
+            <!--                               @select="handleSelectCurrency"-->
+            <!--            />-->
             <p-icon-button class="filter-item" name="ic_refresh" @click="handleClickRefresh" />
         </div>
     </div>
@@ -64,8 +64,7 @@ export default {
         const state = reactive({
             granularity: computed(() => store.state.service.costAnalysis.granularity),
             chartType: computed(() => store.state.service.costAnalysis.chartType),
-            currency: computed(() => store.state.service.costAnalysis.currency),
-            selectedDates: computed(() => store.state.service.costAnalysis.selectedDates),
+            period: computed(() => store.state.service.costAnalysis.period),
             //
             granularityItems: computed<MenuItem[]>(() => ([
                 {
@@ -138,7 +137,7 @@ export default {
             store.commit('service/costAnalysis/setChartType', chartType);
         };
         const handleSelectedDates = async (selectedDates: string[]) => {
-            store.commit('service/costAnalysis/setSelectedDates', selectedDates);
+            store.commit('service/costAnalysis/setPeriod', { start: selectedDates[0], end: selectedDates[1] });
         };
         const handleSelectCurrency = async (currency: string) => {
             store.commit('service/costAnalysis/setCurrency', currency);

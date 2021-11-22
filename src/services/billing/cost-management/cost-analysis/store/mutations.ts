@@ -3,7 +3,7 @@ import {
     CostAnalysisStoreState, GroupByItem,
 } from '@/services/billing/cost-management/cost-analysis/store/type';
 import {
-    CHART_TYPE, CURRENCY, FILTER_ITEM, FilterItem, CostQuerySetModel,
+    CHART_TYPE, FILTER_ITEM, FilterItem, CostQuerySetModel, Period,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
 
 
@@ -23,12 +23,8 @@ export const setGroupBy: Mutation<CostAnalysisStoreState> = (state, groupBy?: st
     state.groupBy = groupBy;
 };
 
-export const setSelectedDates: Mutation<CostAnalysisStoreState> = (state, selectedDates: Array<string>) => {
-    state.selectedDates = selectedDates;
-};
-
-export const setCurrency: Mutation<CostAnalysisStoreState> = (state, currency: CURRENCY) => {
-    state.currency = currency;
+export const setPeriod: Mutation<CostAnalysisStoreState> = (state, period: Period) => {
+    state.period = period;
 };
 
 export const setFilters: Mutation<CostAnalysisStoreState> = (state, filters: Record<FILTER_ITEM, FilterItem[]>) => {

@@ -71,13 +71,16 @@ export const QUERY_VISIBILITY_TYPE = Object.freeze({
 
 export type QUERY_VISIBILITY_TYPE = typeof QUERY_VISIBILITY_TYPE[keyof typeof QUERY_VISIBILITY_TYPE];
 
+export interface Period {
+    start?: string;
+    end?: string;
+}
+
 export interface CostQuerySetOption {
     chart_type: CHART_TYPE;
     group_by: GROUP_BY_ITEM[];
     granularity: GRANULARITY;
-    currency: CURRENCY;
-    start: string;
-    end: string;
+    period: Period;
     filter: FILTER_ITEM[];
 }
 

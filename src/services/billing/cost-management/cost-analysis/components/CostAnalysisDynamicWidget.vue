@@ -9,7 +9,7 @@
 
 <script lang="ts">
 import { cloneDeep } from 'lodash';
-import { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
 
 import {
     computed, reactive, toRefs, watch,
@@ -30,14 +30,9 @@ import {
     getTimeUnit,
     mergePrevChartDataAndCurrChartData,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { CHART_TYPE, GRANULARITY } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { CHART_TYPE, GRANULARITY, Period } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { TimeUnit } from '@amcharts/amcharts4/core';
 
-
-interface Period {
-    start: Dayjs;
-    end: Dayjs;
-}
 interface Props {
     loading: boolean;
     chart: XYChart | PieChart;
@@ -99,9 +94,9 @@ export default {
         /* util */
         const getAccumulatedData = (chartData: ChartData[], period: Period, timeUnit: TimeUnit): ChartData[] => {
             const accumulatedChartData = [] as ChartData[];
-            let now = period.start.clone();
+            let now = dayjs(period.start).clone();
             let accumulatedData: Record<string, number> = {};
-            while (now.isSameOrBefore(period.end, timeUnit)) {
+            while (now.isSameOrBefore(dayjs(period.end), timeUnit)) {
                 let eachChartData: ChartData = {};
                 // eslint-disable-next-line no-loop-func
                 const existData = chartData.find(d => now.isSame(d.date, timeUnit));
@@ -117,17 +112,17 @@ export default {
         };
         const fillDefaultDataOfLastDay = (chartData: ChartData[], period: Period, timeUnit: TimeUnit): ChartData[] => {
             const convertedChartData = [...chartData];
-            const dataOfLastDate = chartData.find(d => period.end.isSame(d.date, timeUnit));
+            const dataOfLastDate = chartData.find(d => dayjs(period.end).isSame(d.date, timeUnit));
             if (!dataOfLastDate) {
                 convertedChartData.push({
-                    date: period.end.toDate(),
+                    date: dayjs(period.end).toDate(),
                 });
             }
             return convertedChartData;
         };
 
         const drawChart = (chartContext) => {
-            const timeUnit = getTimeUnit(props.granularity, props.period.start, props.period.end);
+            const timeUnit = getTimeUnit(props.granularity, dayjs(props.period.start), dayjs(props.period.end));
             let chartData = cloneDeep(props.chartData);
             if (props.chartType !== CHART_TYPE.DONUT) {
                 if (props.granularity === GRANULARITY.ACCUMULATED) {

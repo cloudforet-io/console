@@ -1,4 +1,4 @@
-import { CHART_TYPE, CURRENCY, GRANULARITY } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { CHART_TYPE, GRANULARITY } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { CostAnalysisStoreState } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { getInitialDates } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import * as actions from './actions';
@@ -10,8 +10,7 @@ const state: CostAnalysisStoreState = {
     granularity: GRANULARITY.ACCUMULATED,
     groupByItems: [],
     groupBy: undefined,
-    selectedDates: getInitialDates(),
-    currency: CURRENCY.USD,
+    period: getInitialDates(),
     filters: {},
     selectedQueryId: undefined,
     costQueryList: [],

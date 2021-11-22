@@ -108,7 +108,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { CUSTOM_COLORS, hideAllSeries, toggleSeries } from '@/common/composables/dynamic-chart';
 import { ChartData, Legend } from '@/common/composables/dynamic-chart/type';
 import {
-    getConvertedFilter, getConvertedGranularity, getConvertedSelectedDates,
+    getConvertedFilter, getConvertedGranularity, getConvertedPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import {
     CHART_TYPE, FILTER_MAP, GRANULARITY, GROUP_BY_ITEM,
@@ -151,7 +151,7 @@ export default {
             groupByItems: computed(() => store.state.service.costAnalysis.groupByItems),
             groupBy: computed(() => store.state.service.costAnalysis.groupBy),
             chartType: computed(() => store.state.service.costAnalysis.chartType),
-            selectedDates: computed(() => store.state.service.costAnalysis.selectedDates),
+            period: computed(() => store.state.service.costAnalysis.period),
             filters: computed(() => store.state.service.costAnalysis.filters),
             filtersLength: computed<number>(() => {
                 const selectedValues = Object.values(state.filters);
@@ -161,21 +161,14 @@ export default {
             loading: true,
             legends: [] as Legend[],
             chartData: [] as ChartData[],
-            period: computed(() => {
-                const selectedDates = store.state.service.costAnalysis.selectedDates;
-                return {
-                    start: dayjs(selectedDates[0]),
-                    end: dayjs(selectedDates[1]),
-                };
-            }),
             donutPeriodText: computed(() => {
                 if (state.chartType !== CHART_TYPE.DONUT) return '';
                 if (state.granularity === GRANULARITY.DAILY) {
-                    return `${dayjs.utc(state.selectedDates[1]).format('YYYY/MM/DD')} (${i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DAILY')})`;
+                    return `${dayjs.utc(state.period.start).format('YYYY/MM/DD')} (${i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DAILY')})`;
                 } if (state.granularity === GRANULARITY.MONTHLY) {
-                    return `${dayjs.utc(state.selectedDates[1]).format('MMM YYYY')} (${i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY')})`;
+                    return `${dayjs.utc(state.period.end).format('MMM YYYY')} (${i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.MONTHLY')})`;
                 }
-                return `${dayjs.utc(state.selectedDates[1]).format('YYYY')} (${i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY')})`;
+                return `${dayjs.utc(state.period.end).format('YYYY')} (${i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.YEARLY')})`;
             }),
             chart: null as XYChart | PieChart | null,
         });
@@ -274,20 +267,20 @@ export default {
         const listCostAnalysisChartData = async () => {
             costApiQueryHelper.setFilters(getConvertedFilter(state.filters));
             let _granularity: GRANULARITY;
-            const _selectedDates = getConvertedSelectedDates(state.granularity, state.chartType, state.selectedDates);
+            const _period = getConvertedPeriod(state.granularity, state.chartType, state.period);
             const _groupBy = state.groupBy ? [state.groupBy] : [];
             if (state.chartType === CHART_TYPE.DONUT) {
                 _granularity = GRANULARITY.ACCUMULATED;
             } else {
-                _granularity = getConvertedGranularity(state.selectedDates, state.granularity);
+                _granularity = getConvertedGranularity(state.period, state.granularity);
             }
 
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: _granularity,
                     group_by: _groupBy,
-                    start: _selectedDates[0],
-                    end: _selectedDates[1],
+                    start: _period.start,
+                    end: _period.end,
                     pivot_type: 'CHART',
                     ...costApiQueryHelper.data,
                 });
@@ -352,7 +345,7 @@ export default {
                 handleSelectGroupByItem(after[0].name);
             }
         });
-        watch([() => state.chartType, () => state.granularity, () => state.selectedDates, () => state.groupBy, () => state.filters], () => {
+        watch([() => state.chartType, () => state.granularity, () => state.period, () => state.groupBy, () => state.filters], () => {
             refreshChart();
         }, { immediate: true, deep: true });
 

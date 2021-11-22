@@ -100,9 +100,7 @@ import {
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { i18n } from '@/translations';
 import { registerServiceStore } from '@/common/composables/register-service-store';
-import {
-    CostAnalysisStoreState,
-} from '@/services/billing/cost-management/cost-analysis/store/type';
+import { CostAnalysisStoreState } from '@/services/billing/cost-management/cost-analysis/store/type';
 import costAnalysisStoreModule from '@/services/billing/cost-management/cost-analysis/store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -255,17 +253,15 @@ export default {
         const handleSaveQueryOption = async () => {
             try {
                 const {
-                    granularity, chartType, selectedDates,
-                    currency, groupByItems, filters,
+                    granularity, chartType,
+                    period, groupByItems, filters,
                 } = store.state.service.costAnalysis;
                 await SpaceConnector.client.costAnalysis.costQuerySet.update({
                     cost_query_set_id: state.selectedQueryId,
                     options: {
                         granularity,
                         chart_type: chartType,
-                        start: selectedDates[0],
-                        end: selectedDates[1],
-                        currency,
+                        period,
                         group_by: groupByItems,
                         filter: filters,
                     },
