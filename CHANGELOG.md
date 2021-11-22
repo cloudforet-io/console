@@ -1,3 +1,10 @@
+# [1.1.0-beta.185](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.184...v1.1.0-beta.185) (2021-11-22)
+
+
+### Features
+
+* 'yearToDate' data type styling ([#759](https://github.com/spaceone-dev/spaceone-design-system/issues/759)) ([6d29261](https://github.com/spaceone-dev/spaceone-design-system/commit/6d29261277e3bf3a75b2a02b43156514a4217ba2))
+
 # [1.1.0-beta.184](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.183...v1.1.0-beta.184) (2021-11-19)
 
 
