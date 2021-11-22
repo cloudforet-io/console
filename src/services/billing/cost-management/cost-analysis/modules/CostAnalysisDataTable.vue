@@ -42,7 +42,6 @@ import { DataTableField } from '@spaceone/design-system/dist/src/data-display/ta
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
@@ -52,6 +51,7 @@ import {
 import { GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
+import { getTableDataFromRawData } from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
 
 
 interface CostAnalysisItem {
@@ -135,28 +135,6 @@ export default {
 
             tableState.fields = groupByFields.concat(dateFields);
         };
-        const getTableDataFromRawData = (rawData: RawTableData[], groupByItems: GroupByItem[]): TableData[] => {
-            const tableData: TableData[] = [];
-            rawData.forEach((eachRawData) => {
-                const rowData: TableData = {};
-
-                /* extract group by data (ex. { provider: 'aws', region_code: 'us-west-1' }) */
-                if (groupByItems.length) {
-                    groupByItems.forEach((item) => {
-                        rowData[item.name] = eachRawData[item.name];
-                    });
-                } else {
-                    rowData.total_cost = 'Total Cost';
-                }
-
-                /* extract data per each date (ex. { 2021-11-01: '29.4K', 2021-11-02: '8,962' } ) */
-                eachRawData.values.forEach((value) => {
-                    rowData[value.date] = commaFormatter(numberFormatter(value.usd_cost));
-                });
-                tableData.push(rowData);
-            });
-            return tableData;
-        };
 
         /* api */
         const costApiQueryHelper = new ApiQueryHelper()
@@ -190,7 +168,7 @@ export default {
             await listCostAnalysisTableData();
         };
         const handleRefresh = async () => {
-            // await getTableData();
+            await listCostAnalysisTableData();
         };
 
         watch([() => state.granularity, () => state.groupByItems, () => state.period, () => state.filters], async () => {

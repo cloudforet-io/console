@@ -25,10 +25,10 @@ export const CUSTOM_COLORS = [
     blue[500], blue[700], coral[500], coral[700], yellow[500], yellow[700],
     green[500], green[700], peacock[500], peacock[700], red[500], red[700],
 ];
-const customColorTheme = (target) => {
+export const DISABLED_COLOR = gray[300];
+export const customColorTheme = (target) => {
     if (target instanceof am4core.ColorSet) {
         target.list = Array(5).fill(CUSTOM_COLORS.map(d => am4core.color(d))).flat();
-        // target.list = CUSTOM_COLORS.map(d => am4core.color(d));
     }
 };
 

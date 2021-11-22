@@ -26,10 +26,8 @@ import { ChartData, DynamicChartStateArgs, Legend } from '@/common/composables/d
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
-import {
-    getTimeUnit,
-    mergePrevChartDataAndCurrChartData,
-} from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { getTimeUnit } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { mergePrevChartDataAndCurrChartData } from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
 import { CHART_TYPE, GRANULARITY, Period } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { TimeUnit } from '@amcharts/amcharts4/core';
 

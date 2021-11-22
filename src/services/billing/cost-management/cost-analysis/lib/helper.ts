@@ -4,7 +4,6 @@ import {
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { TimeUnit } from '@amcharts/amcharts4/core';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { ChartData } from '@/common/composables/dynamic-chart/type';
 
 
 export const getConvertedGranularity = (period: Period, granularity: GRANULARITY): GRANULARITY => {
@@ -62,19 +61,4 @@ export const getInitialDates = (): Period => {
     const start = dayjs.utc().startOf('month').format();
     const end = dayjs.utc().startOf('date').format();
     return { start, end };
-};
-
-export const mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: ChartData): ChartData => {
-    const mergedData: Record<string, number> = {};
-    Object.keys({ ...prevData, ...currData }).forEach((k) => {
-        const prevValue = prevData[k] || 0;
-        if (k !== 'date') {
-            if (currData && currData[k]) {
-                mergedData[k] = currData[k] + prevValue;
-            } else {
-                mergedData[k] = prevValue;
-            }
-        }
-    });
-    return mergedData;
 };

@@ -23,9 +23,8 @@ const createCategoryAxis = (chart, categoryOptions) => {
     dateAxis.renderer.minGridDistance = 30;
     dateAxis.fontSize = 12;
     dateAxis.renderer.grid.template.strokeOpacity = 1;
-    dateAxis.renderer.grid.template.stroke = am4core.color(gray[500]);
     dateAxis.renderer.grid.template.location = 0;
-    dateAxis.renderer.labels.template.fill = am4core.color(gray[900]);
+    dateAxis.renderer.labels.template.fill = am4core.color(gray[400]);
     dateAxis.tooltip.label.fontSize = 12;
     dateAxis.renderer.grid.template.strokeOpacity = 0;
 
@@ -52,11 +51,14 @@ const createValueAxis = (chart) => {
     valueAxis.extraMax = 0.01;
     valueAxis.renderer.grid.template.strokeOpacity = 1;
     valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
-    valueAxis.renderer.labels.template.fill = am4core.color(gray[900]);
+    valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
     valueAxis.tooltip.label.fontSize = 12;
 
     valueAxis.renderer.labels.template.adapter.add('text', (text, target) => {
-        if (target.dataItem && target.dataItem.value) return commaFormatter(numberFormatter(target.dataItem.value));
+        if (target.dataItem) {
+            // if (target.dataItem.value === 0) return '($USD) 0';
+            if (target.dataItem.value) return commaFormatter(numberFormatter(target.dataItem.value));
+        }
         return text;
     });
 

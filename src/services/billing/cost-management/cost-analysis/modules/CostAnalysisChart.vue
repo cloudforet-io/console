@@ -105,33 +105,22 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { CUSTOM_COLORS, hideAllSeries, toggleSeries } from '@/common/composables/dynamic-chart';
+import {
+    CUSTOM_COLORS, DISABLED_COLOR, hideAllSeries, toggleSeries,
+} from '@/common/composables/dynamic-chart';
 import { ChartData, Legend } from '@/common/composables/dynamic-chart/type';
 import {
     getConvertedFilter, getConvertedGranularity, getConvertedPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import {
-    CHART_TYPE, FILTER_MAP, GRANULARITY, GROUP_BY_ITEM,
+    CHART_TYPE, FILTER_MAP, GRANULARITY,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
-import { gray } from '@/styles/colors';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+import {
+    getPieChartDataAndLegends, getXYChartDataAndLegends,
+} from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
 
-
-interface Value {
-    usd_cost: number;
-    [key: string]: any;
-}
-interface XYChartRawData {
-    date: string;
-    values: Value[];
-}
-interface PieChartRawData {
-    usd_cost: number;
-    [key: string]: any;
-}
-
-const DISABLED_COLOR = gray[300];
 
 export default {
     name: 'CostAnalysisChart',
@@ -176,91 +165,6 @@ export default {
         const selectFilterModalState = reactive({
             visible: false,
         });
-
-        /* util */
-        const getLegendsFromGroupByNames = (groupByNames: string[], groupBy?: GROUP_BY_ITEM): Legend[] => {
-            let legends: Legend[] = [];
-            if (groupBy) {
-                const _providers = store.state.resource.provider.items;
-                const _serviceAccounts = store.state.resource.serviceAccount.items;
-                const _projects = store.state.resource.project.items;
-                const _regions = store.state.resource.region.items;
-                groupByNames.forEach((d) => {
-                    let _label = d;
-                    if (groupBy === GROUP_BY_ITEM.PROJECT) {
-                        _label = _projects[d]?.label || d;
-                    } else if (groupBy === GROUP_BY_ITEM.SERVICE_ACCOUNT) {
-                        _label = _serviceAccounts[d]?.label || d;
-                    } else if (groupBy === GROUP_BY_ITEM.REGION) {
-                        _label = _regions[d]?.name || d;
-                    } else if (groupBy === GROUP_BY_ITEM.PROVIDER) {
-                        _label = _providers[d]?.label || d;
-                    }
-                    legends.push({
-                        name: d as string,
-                        label: _label as string,
-                        disabled: false,
-                    });
-                });
-            } else {
-                legends = [{ name: 'total_cost', label: 'Total Cost', disabled: false }];
-            }
-            return legends;
-        };
-        const getXYChartDataAndLegends = (rawData: XYChartRawData[], groupBy?: GROUP_BY_ITEM): { chartData: ChartData[]; legends: Legend[] } => {
-            const chartData: ChartData[] = [];
-            const groupByNameSet = new Set<string>();
-
-            rawData.forEach((d) => {
-                const eachChartData: ChartData = { date: d.date };
-                if (groupBy) {
-                    d.values.forEach((value) => {
-                        let groupByName = value[groupBy];
-                        if (!groupByName) groupByName = `No ${groupBy}`;
-                        eachChartData[groupByName] = value.usd_cost;
-                        groupByNameSet.add(groupByName);
-                    });
-                } else {
-                    d.values.forEach((value) => {
-                        eachChartData.total_cost = value.usd_cost;
-                    });
-                }
-                chartData.push(eachChartData);
-            });
-
-            const groupByNames = [...groupByNameSet];
-            return {
-                chartData,
-                legends: getLegendsFromGroupByNames(groupByNames, groupBy),
-            };
-        };
-        const getPieChartDataAndLegends = (rawData: PieChartRawData[], groupBy?: GROUP_BY_ITEM): { chartData: ChartData[]; legends: Legend[] } => {
-            let chartData: ChartData[] = [];
-            const groupByNameSet = new Set<string>();
-
-            if (groupBy) {
-                rawData.forEach((d) => {
-                    let groupByName = d[groupBy];
-                    if (!groupByName) groupByName = `No ${groupBy}`;
-                    chartData.push({
-                        category: groupByName,
-                        value: d.usd_cost,
-                    });
-                    groupByNameSet.add(groupByName);
-                });
-            } else {
-                chartData = [{
-                    category: 'Total Cost',
-                    value: rawData[0]?.usd_cost || 0,
-                }];
-            }
-
-            const groupByNames = [...groupByNameSet];
-            return {
-                chartData,
-                legends: getLegendsFromGroupByNames(groupByNames, groupBy),
-            };
-        };
 
         /* api */
         const costApiQueryHelper = new ApiQueryHelper();
