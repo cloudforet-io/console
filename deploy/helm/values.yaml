@@ -122,3 +122,14 @@ ingress:
       alb.ingress.kubernetes.io/target-type: instance # Your console and console-api should be NodePort for this configuration.
       alb.ingress.kubernetes.io/certificate-arn: arn:aws:acm:... # This should be replaced with your cert arn.
 
+####################################
+# pod spec (append more pod spec)
+# example nodeSelect
+#
+# pod:
+#   spec:
+#     nodeSelector:
+#       application: my-node-group
+####################################
+pod:
+    spec: {}
