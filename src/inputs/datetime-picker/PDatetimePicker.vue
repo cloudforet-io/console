@@ -235,7 +235,6 @@ export default {
 </script>
 <style lang="postcss">
 @import 'flatpickr/dist/flatpickr.css';
-@import 'flatpickr/dist/plugins/monthSelect/style.css';
 .p-datetime-picker {
     @apply overflow-hidden bg-white border border-gray-300 rounded text-gray-dark rounded;
     display: inline-flex;
@@ -305,10 +304,10 @@ export default {
 }
 
 .p-datetime-picker-calendar {
-    .flatpickr-calendar {
-        width: 15rem;
+    &.flatpickr-calendar {
         margin-top: -0.125rem;
-        &:not(.hasTime) {
+        &:not(.hasTime):not(.flatpickr-monthSelect-theme-light) {
+            width: 15rem;
             min-height: 16.375rem;
         }
         &::before, &::after {
@@ -366,6 +365,9 @@ export default {
                     }
                 }
             }
+        }
+        &.flatpickr-monthSelect-theme-light {
+            width: 23.375rem;
         }
     }
     .flatpickr-months {
@@ -462,9 +464,27 @@ export default {
             }
         }
     }
-
-    .flatpickr-monthSelect-month {
-        margin: 0;
+    .flatpickr-monthSelect-months {
+        display: grid;
+        grid: repeat(4, 2rem) / repeat(3, 1fr);
+        gap: 0.25rem 0.5rem;
+        .flatpickr-monthSelect-month {
+            @apply border border-gray-300 rounded-md;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 0.875rem;
+            &:hover, :focus {
+                @apply bg-blue-200;
+            }
+            &.selected {
+                @apply border-secondary bg-secondary text-white;
+            }
+            &.disabled {
+                @apply text-gray-300;
+            }
+        }
     }
 }
 
