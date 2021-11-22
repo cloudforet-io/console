@@ -56,7 +56,7 @@
             </div>
         </div>
         <div style="height: 50rem; background-color: #fff;">
-            {{ dashboardId }} 대쉬보드으~
+            <product-cost-trend />
         </div>
     </div>
 </template>
@@ -69,6 +69,8 @@ import {
     PBreadcrumbs, PIconButton, PIconTextButton, PPageTitle, PSelectDropdown, PTag,
 } from '@spaceone/design-system';
 import { BILLING_ROUTE } from '@/services/billing/routes';
+
+import ProductCostTrend from '@/services/billing/cost-management/cost-dashboard/widgets/ProductCostTrend.vue';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -103,6 +105,7 @@ export default {
         PIconTextButton,
         PSelectDropdown,
         PTag,
+        ProductCostTrend,
     },
     props: {
         dashboardId: {
