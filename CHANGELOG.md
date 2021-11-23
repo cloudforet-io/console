@@ -1,3 +1,10 @@
+# [1.1.0-beta.186](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.185...v1.1.0-beta.186) (2021-11-23)
+
+
+### Features
+
+* add size props to PCard ([#762](https://github.com/spaceone-dev/spaceone-design-system/issues/762)) ([8f3824e](https://github.com/spaceone-dev/spaceone-design-system/commit/8f3824e47e94659315a52cb0690f531da0ba6c22))
+
 # [1.1.0-beta.185](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.184...v1.1.0-beta.185) (2021-11-22)
 
 
