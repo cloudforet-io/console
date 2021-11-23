@@ -1,5 +1,5 @@
 <template>
-    <div class="product-cost-trend">
+    <cost-dashboard-card-widget-layout title="Cost Trend by Project" class="product-cost-trend">
         <p-chart-loader :loading="chartLoading" class="chart-wrapper">
             <template #loader>
                 <p-skeleton height="100%" />
@@ -14,63 +14,61 @@
                                    :show-page-number="false"
                 />
             </div>
-            <p-data-table :fields="fields"
-                          :items="items.slice(thisPage * pageSize - 8, thisPage * pageSize)"
-                          :total-count="totalCount"
-                          disable-hover
-            >
-                <template #col-product-format="{value, index}">
-                    <span class="toggle-button" @click="handleClickLegend(index)">
-                        <p-status :text="(index + ((thisPage - 1) * pageSize) + 1).toString()"
-                                  :icon-color="getStatusIconColor(index)"
-                                  :text-color="getStatusTextColor(index)"
-                        />
-                    </span>
-                    {{ value ? value : '--' }}
-                </template>
-            </p-data-table>
-            <div class="table-pagination-wrapper">
-                <p-text-pagination :all-page="allPage"
-                                   :this-page.sync="thisPage"
-                />
-            </div>
+            <cost-dashboard-data-table :fields="fields"
+                                       :items="items"
+                                       :loading="tableLoading"
+                                       :this-page.sync="thisPage"
+                                       :page-size="8"
+                                       :chart="chart"
+                                       :legends="legends"
+                                       show-legend
+                                       @toggle-legend="handleToggleLegend"
+            />
         </div>
-    </div>
+    </cost-dashboard-card-widget-layout>
 </template>
 
 <script lang="ts">
 import { range } from 'lodash';
 import dayjs from 'dayjs';
+import * as am4core from '@amcharts/amcharts4/core';
+import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
+import { XYChart } from '@amcharts/amcharts4/charts';
 
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import {
-    PChartLoader, PDataTable, PSkeleton, PTextPagination, PStatus,
+    PChartLoader, PSkeleton, PTextPagination,
 } from '@spaceone/design-system';
 
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import { GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import {
+    FilterItem, FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM,
+} from '@/services/billing/cost-management/cost-analysis/lib/config';
+
+import CostDashboardCardWidgetLayout
+    from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardCardWidgetLayout.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
+
 import {
     getTableDataFromRawData, getXYChartDataAndLegends,
 } from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import * as am4core from '@amcharts/amcharts4/core';
-import * as am4charts from '@amcharts/amcharts4/charts';
-import config from '@/lib/config';
-import { gray } from '@/styles/colors';
-import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import {
-    customColorTheme, toggleSeries, CUSTOM_COLORS, DISABLED_COLOR,
+    customColorTheme, CUSTOM_COLORS, DISABLED_COLOR,
 } from '@/common/composables/dynamic-chart';
-import { XYChart } from '@amcharts/amcharts4/charts';
-import { Legend } from '@/common/composables/dynamic-chart/type';
+import { ChartData, Legend } from '@/common/composables/dynamic-chart/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { gray } from '@/styles/colors';
+import config from '@/lib/config';
+import CostDashboardDataTable
+    from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardDataTable.vue';
 
 am4core.useTheme(customColorTheme);
 am4core.useTheme(am4themesAnimated);
@@ -84,25 +82,26 @@ interface TableItem {
 export default {
     name: 'ProductCostTrend',
     components: {
+        CostDashboardDataTable,
+        CostDashboardCardWidgetLayout,
         PChartLoader,
         PSkeleton,
-        PDataTable,
         PTextPagination,
-        PStatus,
     },
     props: {},
     setup() {
         const state = reactive({
-            filters: [],
+            filters: {} as Record<FILTER_ITEM, FilterItem[]>,
             top15ProductNames: [],
             //
             chartLoading: false,
             chartRegistry: {},
             chart: null as XYChart | null,
             chartRef: null as HTMLElement | null,
-            chartData: [],
+            chartData: [] as ChartData[],
             legends: [] as Legend[],
             //
+            tableLoading: true,
             items: [] as TableItem[],
             fields: computed<DataTableField[]>(() => {
                 const fields = [{ name: GROUP_BY_ITEM.PRODUCT, label: 'Product' }];
@@ -114,8 +113,6 @@ export default {
                 return fields;
             }),
             totalCount: 15,
-            allPage: computed(() => Math.ceil(state.totalCount / state.pageSize)),
-            pageSize: 8,
             thisPage: 1,
             allMonthPage: 2,
             thisMonthPage: 2,
@@ -208,24 +205,13 @@ export default {
 
             return chart;
         };
-        const getStatusIconColor = (index) => {
-            const convertedIndex = index + ((state.thisPage - 1) * state.pageSize);
-            const legend = state.legends[convertedIndex];
-            if (legend?.disabled) return DISABLED_COLOR;
-            return CUSTOM_COLORS[convertedIndex];
-        };
-        const getStatusTextColor = (index) => {
-            const convertedIndex = index + ((state.thisPage - 1) * state.pageSize);
-            const legend = state.legends[convertedIndex];
-            if (legend?.disabled) return DISABLED_COLOR;
-            return null;
-        };
 
         /* api */
         const costApiQueryHelper = new ApiQueryHelper();
         const getCostTableData = async () => {
             costApiQueryHelper.setFilters(getConvertedFilter(state.filters));
             try {
+                state.tableLoading = true;
                 const thisMonth = dayjs.utc();
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
@@ -243,6 +229,8 @@ export default {
                 state.top15ProductNames = results.map(d => d.product);
             } catch (e) {
                 ErrorHandler.handleError(e);
+            } finally {
+                state.tableLoading = false;
             }
         };
         const getCostChartData = async (top15ProductNames) => {
@@ -251,7 +239,7 @@ export default {
                 {
                     k: GROUP_BY_ITEM.PRODUCT,
                     v: top15ProductNames,
-                    o: '',
+                    o: '=',
                 },
             ]);
             try {
@@ -273,10 +261,8 @@ export default {
         };
 
         /* event */
-        const handleClickLegend = (index) => {
-            const convertedIndex = index + ((state.thisPage - 1) * state.pageSize);
-            toggleSeries(state.chart as XYChart, convertedIndex);
-            state.legends[convertedIndex].disabled = !state.legends[convertedIndex]?.disabled;
+        const handleToggleLegend = (index) => {
+            state.legends[index].disabled = !state.legends[index]?.disabled;
         };
 
         (() => {
@@ -289,7 +275,7 @@ export default {
             }
         });
         watch([() => state.chartRef, () => state.chartData], ([chartContext, chartData]) => {
-            if (chartContext && chartData.length) {
+            if (chartContext && (chartData as ChartData[]).length) {
                 state.chart = drawChart(chartContext, chartData, state.legends);
             }
         }, { immediate: false });
@@ -298,37 +284,27 @@ export default {
             ...toRefs(state),
             CUSTOM_COLORS,
             DISABLED_COLOR,
-            handleClickLegend,
-            getStatusIconColor,
-            getStatusTextColor,
+            handleToggleLegend,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-.product-cost-trend {
-    @apply grid grid-cols-12;
-    .chart-wrapper {
-        @apply col-span-6;
-        .chart {
-            height: 100%;
+.product-cost-trend::v-deep {
+    .card-body {
+        @apply grid grid-cols-12;
+        .chart-wrapper {
+            @apply col-span-6;
+            .chart {
+                height: 100%;
+            }
         }
-    }
-    .table-wrapper {
-        @apply col-span-6;
-        display: grid;
-        .month-pagination-wrapper {
-            display: flex;
-            align-items: center;
-        }
-        .table-pagination-wrapper {
-            text-align: center;
-            font-size: 0.875rem;
-        }
-        .p-data-table {
-            .toggle-button {
-                cursor: pointer;
+        .table-wrapper {
+            @apply col-span-6;
+            .month-pagination-wrapper {
+                display: flex;
+                align-items: center;
             }
         }
     }

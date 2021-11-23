@@ -15,7 +15,7 @@ import { drawPieChart } from '@/common/composables/dynamic-chart/draw-pie-chart'
 import {
     blue, coral, gray, green, indigo, peacock, violet, yellow, red,
 } from '@/styles/colors';
-import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
+import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
 
 
 export const CUSTOM_COLORS = [
@@ -38,8 +38,8 @@ am4core.options.autoSetClassName = true;
 am4core.options.classNamePrefix = 'CostAnalysisChart';
 
 
-type ToggleSeries = (chart: XYChart | PieChart, index: number) => void;
-type HideAllSeries = (chart: XYChart | PieChart) => void;
+type ToggleSeries = (chart: XYChart | PieChart | TreeMap, index: number) => void;
+type HideAllSeries = (chart: XYChart | PieChart | TreeMap) => void;
 
 export const toggleSeries: ToggleSeries = (chart, index) => {
     if (chart instanceof PieChart) {

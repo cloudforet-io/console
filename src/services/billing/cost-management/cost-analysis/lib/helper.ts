@@ -24,7 +24,7 @@ export const getConvertedFilter = (filters: Record<FILTER_ITEM, FilterItem[]>): 
             result.push({
                 k: filterName,
                 v: filterValues,
-                o: '',
+                o: '=',
             });
         }
     });
