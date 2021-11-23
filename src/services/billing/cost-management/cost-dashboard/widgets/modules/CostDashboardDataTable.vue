@@ -6,14 +6,26 @@
                       :loading="loading"
                       disable-hover
         >
-            <template v-if="showLegend" #col-product-format="{value, index}">
-                <span class="toggle-button" @click="handleClickLegend(index)">
-                    <p-status :text="getStatusText(index)"
-                              :icon-color="getStatusIconColor(index)"
-                              :text-color="getStatusTextColor(index)"
-                    />
-                </span>
-                {{ value ? value : '--' }}
+            <template v-for="(field, fIdx) in fields" v-slot:[`col-${field.name}-format`]="{value, index}">
+                <div :key="`${field.name}-${index}-${value}`">
+                    <template v-if="fIdx === 0">
+                        <p-status v-if="showLegend"
+                                  class="toggle-button"
+                                  :text="getStatusText(index)"
+                                  :icon-color="getStatusIconColor(index)"
+                                  :text-color="getStatusTextColor(index)"
+                                  @click="handleClickLegend(index)"
+                        />
+                    </template>
+                    {{ value }}
+                    <!--                    <template v-else>-->
+                    <!--                        <span v-if="value.isRaised" :class="{raised: value.isRaised}">-->
+                    <!--                            <span>{{ value.value }}</span>-->
+                    <!--                            <p-i name="ic_bold-arrow-up" width="0.75rem" />-->
+                    <!--                        </span>-->
+                    <!--                        <span>{{ value.value }}</span>-->
+                    <!--                    </template>-->
+                </div>
             </template>
         </p-data-table>
         <div class="table-pagination-wrapper">
@@ -27,7 +39,9 @@
 <script lang="ts">
 import { PieChart, TreeMap, XYChart } from '@amcharts/amcharts4/charts';
 
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs,
+} from '@vue/composition-api';
 
 import {
     PDataTable, PTextPagination, PStatus,
@@ -36,6 +50,10 @@ import {
 import { CUSTOM_COLORS, DISABLED_COLOR, toggleSeries } from '@/common/composables/dynamic-chart';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 
+
+// interface Item {
+//     [key: string]: number | string;
+// }
 
 export default {
     name: 'CostDashboardDataTable',
@@ -77,9 +95,14 @@ export default {
             type: Array,
             default: undefined,
         },
+        // showSharpRises: {
+        //     type: Boolean,
+        //     default: false,
+        // },
     },
     setup(props, { emit }) {
         const state = reactive({
+            // convertedItems: [] as Item[],
             slicedItems: computed(() => {
                 const startIndex = state.proxyThisPage * props.pageSize - props.pageSize;
                 const endIndex = state.proxyThisPage * props.pageSize;
@@ -107,6 +130,34 @@ export default {
             if (legend?.disabled) return DISABLED_COLOR;
             return null;
         };
+        // const getConvertedItems = (items) => {
+        //     const convertedItems: Item[] = [];
+        //     items.forEach((item) => {
+        //         const convertedItem: Item = {};
+        //         Object.entries(item).forEach(([k, v]) => {
+        //             const date = dayjs.utc(k);
+        //             if (date.isValid()) {
+        //                 const pastDate = date.subtract(1, 'month').format('YYYY-MM');
+        //                 const pastValue = item[pastDate] || undefined;
+        //                 let isRaised = false;
+        //                 const value: number = v as number;
+        //                 if (value && pastValue && pastValue * 1.5 < value) {
+        //                     isRaised = true;
+        //                 }
+        //                 convertedItem[k] = {
+        //                     value: commaFormatter(numberFormatter(value)),
+        //                     isRaised,
+        //                 };
+        //             } else {
+        //                 convertedItem[k] = {
+        //                     value: v,
+        //                 };
+        //             }
+        //         });
+        //         convertedItems.push(convertedItem);
+        //     });
+        //     return convertedItems;
+        // };
 
         /* event */
         const handleClickLegend = (index) => {
@@ -114,6 +165,12 @@ export default {
             toggleSeries(props.chart as XYChart | PieChart | TreeMap, convertedIndex);
             emit('toggle-legend', convertedIndex);
         };
+
+        // watch([() => props.showSharpRises, () => props.items], ([showSharpRises, items]) => {
+        //     if (showSharpRises && items.length) {
+        //         state.convertedItems = getConvertedItems(items);
+        //     }
+        // }, { immediate: true });
 
         return {
             ...toRefs(state),
@@ -135,6 +192,9 @@ export default {
     .p-data-table {
         .toggle-button {
             cursor: pointer;
+        }
+        .raised {
+            @apply text-alert;
         }
     }
 }

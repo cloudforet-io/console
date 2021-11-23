@@ -1,5 +1,5 @@
 <template>
-    <cost-dashboard-card-widget-layout title="Cost Trend by Project" class="product-cost-trend">
+    <cost-dashboard-card-widget-layout title="Cost Trend by Project" class="cost-trend-by-project">
         <p-chart-loader :loading="chartLoading" class="chart-wrapper">
             <template #loader>
                 <p-skeleton height="100%" />
@@ -7,18 +7,11 @@
             <div ref="chartRef" class="chart" />
         </p-chart-loader>
         <div class="table-wrapper">
-            <div class="month-pagination-wrapper">
-                <span>Month</span>
-                <p-text-pagination :all-page="allMonthPage"
-                                   :this-page.sync="thisMonthPage"
-                                   :show-page-number="false"
-                />
-            </div>
             <cost-dashboard-data-table :fields="fields"
                                        :items="items"
                                        :loading="tableLoading"
                                        :this-page.sync="thisPage"
-                                       :page-size="8"
+                                       :page-size="5"
                                        :chart="chart"
                                        :legends="legends"
                                        show-legend
@@ -29,72 +22,64 @@
 </template>
 
 <script lang="ts">
-import { range } from 'lodash';
 import dayjs from 'dayjs';
+import { range } from 'lodash';
+import { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
-import { XYChart } from '@amcharts/amcharts4/charts';
 
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch, onUnmounted,
 } from '@vue/composition-api';
 
 import {
-    PChartLoader, PSkeleton, PTextPagination,
+    PChartLoader, PSkeleton,
 } from '@spaceone/design-system';
-
-import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import {
-    FilterItem, FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM,
-} from '@/services/billing/cost-management/cost-analysis/lib/config';
 
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardCardWidgetLayout.vue';
-
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
-
-import {
-    getTableDataFromRawData, getXYChartDataAndLegends,
-} from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
-import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import {
-    customColorTheme, CUSTOM_COLORS, DISABLED_COLOR,
-} from '@/common/composables/dynamic-chart';
-import { ChartData, Legend } from '@/common/composables/dynamic-chart/type';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { gray } from '@/styles/colors';
-import config from '@/lib/config';
 import CostDashboardDataTable
     from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardDataTable.vue';
 
-am4core.useTheme(customColorTheme);
-am4core.useTheme(am4themesAnimated);
+import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
+
+import {
+    FILTER_ITEM, FilterItem, GRANULARITY, GROUP_BY_ITEM,
+} from '@/services/billing/cost-management/cost-analysis/lib/config';
+
+import { ChartData, Legend } from '@/common/composables/dynamic-chart/type';
+import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
+import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import {
+    getTableDataFromRawData, getXYChartDataAndLegends,
+} from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
+import { gray } from '@/styles/colors';
+import config from '@/lib/config';
 
 
 interface TableItem {
-    product: string;
+    project: string;
     [key: string]: string | number;
 }
 
 export default {
-    name: 'ProductCostTrend',
+    name: 'CostTrendByProject',
     components: {
-        CostDashboardDataTable,
         CostDashboardCardWidgetLayout,
+        CostDashboardDataTable,
         PChartLoader,
         PSkeleton,
-        PTextPagination,
     },
     props: {},
     setup() {
         const state = reactive({
             filters: {} as Record<FILTER_ITEM, FilterItem[]>,
-            top15ProductNames: [],
+            top15ProjectIds: [],
             //
-            chartLoading: false,
+            chartLoading: true,
             chartRegistry: {},
             chart: null as XYChart | null,
             chartRef: null as HTMLElement | null,
@@ -104,9 +89,9 @@ export default {
             tableLoading: true,
             items: [] as TableItem[],
             fields: computed<DataTableField[]>(() => {
-                const fields = [{ name: GROUP_BY_ITEM.PRODUCT, label: 'Product' }];
+                const fields = [{ name: GROUP_BY_ITEM.PROJECT, label: 'Project' }];
                 const fiveMonthsAgo = dayjs.utc().subtract(5, 'month');
-                range(state.thisMonthPage * 3 - 3, state.thisMonthPage * 3).forEach((d) => {
+                range(6).forEach((d) => {
                     const date = fiveMonthsAgo.add(d, 'month');
                     fields.push({ name: date.format('YYYY-MM'), label: date.format('MMM') });
                 });
@@ -114,10 +99,6 @@ export default {
             }),
             totalCount: 15,
             thisPage: 1,
-            allMonthPage: 2,
-            thisMonthPage: 2,
-            // prevThreeMonths: computed(() => range(3, 6).map(d => dayjs.utc().subtract(d, 'month').format('YYYY-MM'))),
-            // currThreeMonths: computed(() => range(0, 3).map(d => dayjs.utc().subtract(d, 'month').format('YYYY-MM'))),
         });
 
         /* util */
@@ -155,13 +136,6 @@ export default {
             dateAxis.renderer.labels.template.fill = am4core.color(gray[400]);
             dateAxis.tooltip.label.fontSize = 12;
             dateAxis.renderer.grid.template.strokeOpacity = 0;
-            // dateAxis.renderer.labels.template.adapter.add('fill', (text, target) => {
-            //     if (state.currThreeMonths.includes(dayjs.utc(target.dataItem.date).format('YYYY-MM'))) {
-            //         return am4core.color(gray[600]);
-            //     }
-            //     console.log(dayjs.utc(target.dataItem.date).format('YYYY-MM'));
-            //     return am4core.color(gray[400]);
-            // });
 
             const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
             valueAxis.tooltip.disabled = true;
@@ -181,16 +155,12 @@ export default {
             });
 
             const createSeries = (legend) => {
-                const series = chart.series.push(new am4charts.ColumnSeries());
+                const series = chart.series.push(new am4charts.LineSeries());
                 series.name = legend.label;
                 series.dataFields.dateX = 'date';
                 series.dataFields.valueY = legend.name;
-                series.strokeWidth = 0;
-                series.columns.template.width = am4core.percent(60);
                 series.tooltipText = '{name}: [bold]{valueY}[/]';
                 series.tooltip.label.fontSize = 10;
-                series.stacked = true;
-                series.columns.template.propertyFields.fillOpacity = 'fillOpacity';
                 return series;
             };
 
@@ -215,7 +185,7 @@ export default {
                 const thisMonth = dayjs.utc();
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
-                    group_by: [GROUP_BY_ITEM.PRODUCT],
+                    group_by: [GROUP_BY_ITEM.PROJECT],
                     start: thisMonth.subtract(5, 'month'),
                     end: thisMonth.format('YYYY-MM'),
                     pivot_type: 'TABLE',
@@ -225,38 +195,41 @@ export default {
                     ...costApiQueryHelper.data,
                 });
                 state.totalCount = total_count > 15 ? 15 : total_count;
-                state.items = getTableDataFromRawData(results, [{ name: GROUP_BY_ITEM.PRODUCT, label: 'Product' }]) as TableItem[];
-                state.top15ProductNames = results.map(d => d.product);
+                state.items = getTableDataFromRawData(results, [{ name: GROUP_BY_ITEM.PROJECT, label: 'Project' }]) as TableItem[];
+                state.top15ProjectIds = results.map(d => d.project_id);
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {
                 state.tableLoading = false;
             }
         };
-        const getCostChartData = async (top15ProductNames) => {
+        const getCostChartData = async (top15ProjectIds) => {
             costApiQueryHelper.setFilters([
                 ...getConvertedFilter(state.filters),
                 {
-                    k: GROUP_BY_ITEM.PRODUCT,
-                    v: top15ProductNames,
+                    k: GROUP_BY_ITEM.PROJECT,
+                    v: top15ProjectIds,
                     o: '=',
                 },
             ]);
             try {
+                state.chartLoading = true;
                 const thisMonth = dayjs.utc();
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
-                    group_by: [GROUP_BY_ITEM.PRODUCT],
+                    group_by: [GROUP_BY_ITEM.PROJECT],
                     start: thisMonth.subtract(5, 'month'),
                     end: thisMonth.format('YYYY-MM'),
                     pivot_type: 'CHART',
                     ...costApiQueryHelper.data,
                 });
-                const { chartData, legends } = getXYChartDataAndLegends(results, GROUP_BY_ITEM.PRODUCT);
+                const { chartData, legends } = getXYChartDataAndLegends(results, GROUP_BY_ITEM.PROJECT);
                 state.chartData = chartData;
                 state.legends = legends;
             } catch (e) {
-
+                ErrorHandler.handleError(e);
+            } finally {
+                state.chartLoading = false;
             }
         };
 
@@ -269,21 +242,23 @@ export default {
             getCostTableData();
         })();
 
-        watch(() => state.top15ProductNames, (top15ProductNames) => {
-            if (top15ProductNames.length > 0) {
-                getCostChartData(top15ProductNames);
+        watch(() => state.top15ProjectIds, (top15ProjectIds) => {
+            if (top15ProjectIds.length > 0) {
+                getCostChartData(top15ProjectIds);
             }
         });
-        watch([() => state.chartRef, () => state.chartData], ([chartContext, chartData]) => {
-            if (chartContext && (chartData as ChartData[]).length) {
-                state.chart = drawChart(chartContext, chartData, state.legends);
+        watch([() => state.chartLoading, () => state.chartRef], ([chartLoading, chartContext]) => {
+            if (!chartLoading && chartContext) {
+                state.chart = drawChart(chartContext, state.chartData, state.legends);
             }
         }, { immediate: false });
 
+        onUnmounted(() => {
+            if (state.chart) state.chart.dispose();
+        });
+
         return {
             ...toRefs(state),
-            CUSTOM_COLORS,
-            DISABLED_COLOR,
             handleToggleLegend,
         };
     },
@@ -291,22 +266,15 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.product-cost-trend::v-deep {
-    .card-body {
-        @apply grid grid-cols-12;
-        .chart-wrapper {
-            @apply col-span-6;
-            .chart {
-                height: 100%;
-            }
+.cost-trend-by-project {
+    .chart-wrapper {
+        height: 10rem;
+        .chart {
+            height: 100%;
         }
-        .table-wrapper {
-            @apply col-span-6;
-            .month-pagination-wrapper {
-                display: flex;
-                align-items: center;
-            }
-        }
+    }
+    .table-wrapper {
+        padding-top: 1rem;
     }
 }
 </style>

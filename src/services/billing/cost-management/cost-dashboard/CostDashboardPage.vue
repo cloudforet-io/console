@@ -56,7 +56,8 @@
             </div>
         </div>
         <div style="height: 50rem; background-color: #fff;">
-            <product-cost-trend />
+            <cost-trend-by-project />
+            <cost-trend-by-product />
         </div>
     </div>
 </template>
@@ -70,7 +71,8 @@ import {
 } from '@spaceone/design-system';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 
-import ProductCostTrend from '@/services/billing/cost-management/cost-dashboard/widgets/ProductCostTrend.vue';
+import CostTrendByProduct from '@/services/billing/cost-management/cost-dashboard/widgets/CostTrendByProduct.vue';
+import CostTrendByProject from '@/services/billing/cost-management/cost-dashboard/widgets/CostTrendByProject.vue';
 
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
@@ -98,6 +100,8 @@ const tempProjectsData = [
 export default {
     name: 'CostDashboardPage',
     components: {
+        CostTrendByProject,
+        CostTrendByProduct,
         FavoriteButton,
         PIconButton,
         PBreadcrumbs,
@@ -105,7 +109,6 @@ export default {
         PIconTextButton,
         PSelectDropdown,
         PTag,
-        ProductCostTrend,
     },
     props: {
         dashboardId: {
