@@ -3,7 +3,7 @@ import { reactive, toRefs } from '@vue/composition-api';
 
 import PCard from './PCard.vue';
 import PI from '@/foundation/icons/PI.vue'
-import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
+import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
 import { getCardArgTypes } from '@/data-display/cards/card/story-helper';
 
 
@@ -23,7 +23,8 @@ export const Template = (args, { argTypes }) => ({
         <p-card
             :header="header"
             :style-type="styleType"
-            style="width: 12rem;"
+            :size="size"
+            style="width: 20rem;"
         >
             <template #header><div v-if="headerSlot" v-html="headerSlot" /></template>
             <div v-if="defaultSlot" v-html="defaultSlot" />
@@ -120,6 +121,36 @@ If you give ```false``` to ```header``` props and don't give ```header``` slot, 
             ...toRefs(state)
         }
     }
+        }}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Size
+
+<Canvas>
+    <Story name="Size">
+        {{
+            components: { PCard },
+            template: `
+    <div class="h-full w-full overflow p-8 flex flex-wrap">
+        <p-card v-for="size in sizes" :key="size" :header="size" :size="size"
+            style="min-width: 20rem; margin: 1rem;"
+        >
+            This is {{size}} size.
+        </p-card>
+     </div>
+    `,
+            setup() {
+                const state = reactive({
+                    sizes: Object.values(CARD_SIZE)
+                })
+                return {
+                    ...toRefs(state)
+                }
+            }
         }}
     </Story>
 </Canvas>

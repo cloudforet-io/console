@@ -1,5 +1,10 @@
 <template>
-    <div class="p-card" :class="styleType">
+    <div class="p-card"
+         :class="{
+             [styleType]: true,
+             [size]: true,
+         }"
+    >
         <header v-if="header !== false || $scopedSlots.header">
             <slot name="header">
                 {{ header }}
@@ -13,7 +18,7 @@
 
 <script lang="ts">
 import { defineComponent } from '@vue/composition-api';
-import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
+import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
 import { CardProps } from '@/data-display/cards/card/type';
 
 
@@ -31,6 +36,13 @@ export default defineComponent<CardProps>({
                 return Object.values(CARD_STYLE_TYPE).includes(styleType);
             },
         },
+        size: {
+            type: String,
+            default: CARD_SIZE.md,
+            validator(size: any) {
+                return Object.values(CARD_SIZE).includes(size);
+            },
+        },
     },
     setup() {
         return {};
@@ -41,7 +53,7 @@ export default defineComponent<CardProps>({
 <style lang="postcss">
 .p-card {
     header {
-        @apply border rounded-t-lg;
+        @apply border-t border-r border-l rounded-t-lg;
         padding: 0.5rem 1rem;
         border-color: inherit;
     }
@@ -55,43 +67,44 @@ export default defineComponent<CardProps>({
         }
     }
 
-    @define-mixin style-type $bg-color, $border-color {
+    @define-mixin style-type $bg-color, $border-color, $font-color {
         border-color: $border-color;
         header {
-            @apply text-gray-500;
-            min-height: 1.875rem;
-            font-size: 0.75rem;
-            line-height: 1.2;
             background-color: $bg-color;
-            border-color: $border-color;
+            color: $font-color;
         }
     }
 
-    @define-mixin style-type2 $bg-color, $border-color {
-        border-color: $border-color;
+    @define-mixin size $header-height, $font-size, $line-height {
         header {
-            @apply font-bold text-white;
-            min-height: 2.25rem;
-            font-size: 1rem;
-            line-height: 1.2;
-            background-color: $bg-color;
-            border-color: $border-color;
+            min-height: $header-height;
+            font-size: $font-size;
+            line-height: $line-height;
         }
     }
     &.gray100 {
-        @mixin style-type theme('colors.gray.100'), theme('colors.gray.200');
+        @mixin style-type theme('colors.gray.100'), theme('colors.gray.200'), theme('colors.gray.900');
     }
     &.yellow100 {
-        @mixin style-type theme('colors.yellow.100'), theme('colors.gray.200');
+        @mixin style-type theme('colors.yellow.100'), theme('colors.gray.200'), theme('colors.gray.500');
     }
     &.yellow500 {
-        @mixin style-type2 theme('colors.yellow.500'), theme('colors.yellow.500');
+        @mixin style-type theme('colors.yellow.500'), theme('colors.yellow.500'), theme('colors.white');
     }
     &.indigo400 {
-        @mixin style-type2 theme('colors.indigo.400'), theme('colors.indigo.400');
+        @mixin style-type theme('colors.indigo.400'), theme('colors.indigo.400'), theme('colors.white');
     }
     &.red400 {
-        @mixin style-type2 theme('colors.red.400'), theme('colors.red.400');
+        @mixin style-type theme('colors.red.400'), theme('colors.red.400'), theme('colors.white');
+    }
+    &.sm {
+        @mixin size 1.875rem, 0.75rem, 1.17;
+    }
+    &.md {
+        @mixin size 2.25rem, 1rem, 1.22;
+    }
+    &.lg {
+        @mixin size 4rem, 1.5rem, 1.6;
     }
 }
 </style>

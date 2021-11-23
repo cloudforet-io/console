@@ -1,5 +1,5 @@
 import { ArgTypes } from '@storybook/addons';
-import { CARD_STYLE_TYPE } from '@/data-display/cards/card/config';
+import { CARD_STYLE_TYPE, CARD_SIZE } from '@/data-display/cards/card/config';
 
 export const getCardArgTypes = (): ArgTypes => ({
     header: {
@@ -37,6 +37,25 @@ export const getCardArgTypes = (): ArgTypes => ({
         control: {
             type: 'select',
             options: Object.values(CARD_STYLE_TYPE),
+        },
+    },
+    size: {
+        name: 'size',
+        type: { name: 'string' },
+        description: `Card size. ${Object.values(CARD_SIZE)} are available.`,
+        defaultValue: CARD_SIZE.md,
+        table: {
+            type: {
+                summary: 'string',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: `"${CARD_SIZE.md}"`,
+            },
+        },
+        control: {
+            type: 'select',
+            options: Object.values(CARD_SIZE),
         },
     },
     defaultSlot: {
