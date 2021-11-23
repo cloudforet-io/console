@@ -4,6 +4,9 @@ export interface ResourceItem {
     color?: string;
     icon?: string;
     linkTemplate?: string;
+    continent?: string;
+    latitude?: string;
+    longitude?: string;
 }
 
 export type ResourceMap = Record<string, ResourceItem>;

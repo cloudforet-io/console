@@ -1,6 +1,6 @@
 <template>
     <cost-dashboard-card-widget-layout
-        title="Service Account Cost Insight"
+        title="Cost By Project"
         :data-range="15"
         :widget-link="widgetLink"
     >
@@ -22,28 +22,15 @@ import { TreeMap } from '@amcharts/amcharts4/charts';
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { GRANULARITY } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import dayjs from 'dayjs';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 am4core.useTheme(am4themesAnimated);
 
-const tempMapData = [{
-    name: 'Service Account1',
-    value: 190,
-}, {
-    name: 'Service Account2',
-    value: 289,
-}, {
-    name: 'Service Account3',
-    value: 635,
-}, {
-    name: 'Service Account4',
-    value: 732,
-}, {
-    name: 'Service Account5',
-    value: 835,
-}];
-
-const categoryKey = 'name';
-const valueName = 'value';
+const categoryKey = 'project_id';
+const valueName = 'usd_cost';
 
 const widgetLink = {
     name: IDENTITY_ROUTE.SERVICE_ACCOUNT._NAME,
@@ -51,14 +38,27 @@ const widgetLink = {
     query: {},
 };
 
+const currentDay = dayjs().utc();
+const currentMonthPeriod = {
+    start: currentDay.startOf('month'),
+    end: currentDay,
+};
+
+interface ChartData {
+    project_id: string;
+    usd_cost: number;
+}
+
 export default {
-    name: 'ServiceAccountCostInsight',
+    name: 'CostByProject',
     components: { CostDashboardCardWidgetLayout },
     setup() {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as TreeMap | null,
             chartRegistry: {},
+            loading: true,
+            data: [] as ChartData[],
         });
 
         const disposeChart = (chartContext) => {
@@ -78,13 +78,34 @@ export default {
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.colors.step = 2;
 
-            chart.data = tempMapData;
+            chart.data = state.data;
             chart.dataFields.value = valueName;
             chart.dataFields.name = categoryKey;
         };
 
-        watch(() => state.chartRef, (chartContext) => {
-            if (chartContext) {
+        const getChartData = async () => {
+            try {
+                state.loading = true;
+                const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
+                    include_usage_quantity: false,
+                    granularity: GRANULARITY.ACCUMULATED,
+                    group_by: ['project_id'],
+                    start: currentMonthPeriod.start,
+                    end: currentMonthPeriod.end,
+                    page: {
+                        limit: 15,
+                    },
+                });
+                state.data = results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
+            if (!loading && chartContext) {
                 drawChart(chartContext);
             }
         }, { immediate: false });
@@ -92,6 +113,10 @@ export default {
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();
         });
+
+        (() => {
+            getChartData();
+        })();
 
         return {
             ...toRefs(state),

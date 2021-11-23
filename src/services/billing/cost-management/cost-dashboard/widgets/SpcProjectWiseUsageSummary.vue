@@ -11,35 +11,26 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import { PieChart } from '@amcharts/amcharts4/charts';
 import config from '@/lib/config';
 import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { GRANULARITY } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import dayjs from 'dayjs';
 
 am4core.useTheme(am4themesAnimated);
 
-const tempChartData = [{
-    name: 'Lithuania',
-    value: 501.9,
-}, {
-    name: 'Czechia',
-    value: 301.9,
-}, {
-    name: 'Ireland',
-    value: 201.1,
-}, {
-    name: 'Germany',
-    value: 165.8,
-}, {
-    name: 'Australia',
-    value: 139.9,
-}, {
-    name: 'Austria',
-    value: 128.3,
-}, {
-    name: 'UK',
-    value: 99,
-},
-];
+const categoryKey = 'project_id';
+const valueName = 'usd_cost';
 
-const categoryKey = 'name';
-const valueName = 'value';
+const currentDay = dayjs().utc();
+const currentMonthPeriod = {
+    start: currentDay.startOf('month'),
+    end: currentDay,
+};
+
+interface ChartData {
+    project_id: string;
+    usd_cost: number;
+}
 
 export default {
     name: 'SpcProjectWiseUsageSummary',
@@ -50,6 +41,8 @@ export default {
             chartRef: null as HTMLElement | null,
             chart: null as PieChart | null,
             chartRegistry: {},
+            loading: true,
+            data: [] as ChartData[],
         });
 
         const disposeChart = (chartContext) => {
@@ -67,7 +60,7 @@ export default {
             };
             const chart = createChart();
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-            chart.data = tempChartData;
+            chart.data = state.data;
 
             const pieSeries = chart.series.push(new am4charts.PieSeries());
             pieSeries.dataFields.value = valueName;
@@ -76,8 +69,29 @@ export default {
             pieSeries.labels.template.disabled = true;
         };
 
-        watch(() => state.chartRef, (chartContext) => {
-            if (chartContext) {
+        const getChartData = async () => {
+            try {
+                state.loading = true;
+                const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
+                    include_usage_quantity: false,
+                    granularity: GRANULARITY.ACCUMULATED,
+                    group_by: ['project_id'],
+                    start: currentMonthPeriod.start,
+                    end: currentMonthPeriod.end,
+                    page: {
+                        limit: 15,
+                    },
+                });
+                state.data = results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
+            if (!loading && chartContext) {
                 drawChart(chartContext);
             }
         }, { immediate: false });
@@ -85,6 +99,10 @@ export default {
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();
         });
+
+        (() => {
+            getChartData();
+        })();
 
         return {
             ...toRefs(state),
