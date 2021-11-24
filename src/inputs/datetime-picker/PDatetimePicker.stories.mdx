@@ -31,6 +31,8 @@ export const Template = (args, { argTypes }) => {
             :max-date="maxDate"
             :select-mode="selectMode"
             :data-type="dataType"
+            :invalid="invalid"
+            @update:selectedDates="onUpdateSelectedDates"
         />
         <br>
         <p>Selected Dates: {{ proxySelectedDates }}</p>
@@ -66,7 +68,8 @@ Please refer to the table below. <br/>
 | yearToTime | O | O | O |
 | time | O | X | X |
 
-
+<br/>
+<br/>
 
 ## Default
 <Canvas>
@@ -77,6 +80,43 @@ Please refer to the table below. <br/>
             template: `
         <p-datetime-picker />
 `,
+        })}
+    </Story>
+</Canvas>
+
+<br/>
+<br/>
+
+## Invalid
+<Canvas>
+    <Story name="Invalid Datetime Picker">
+        {() => ({
+            components: { PDatetimePicker },
+            i18n,
+            template: `
+<table style="border-collapse: separate; border-spacing: 16px;">
+    <tr>
+        <td><p-datetime-picker invalid :selected-dates.sync="selectedDates" /></td>
+        <td><p-datetime-picker invalid style-type="text" :selected-dates.sync="selectedDates" /></td>
+    </tr>
+    <tr>
+        <td><p-datetime-picker invalid data-type="yearToTime" :selected-dates.sync="selectedDates" /></td>
+        <td><p-datetime-picker invalid data-type="yearToTime" style-type="text" :selected-dates.sync="selectedDates" /></td>
+    </tr>
+    <tr>
+        <td><p-datetime-picker invalid data-type="time" /></td>
+        <td><p-datetime-picker invalid data-type="time" style-type="text" /></td>
+    </tr>
+</table>
+`,
+            setup() {
+                const state = reactive({
+                    selectedDates: ['2021-10-01T00:00:00+09:00']
+                });
+                return {
+                    ...toRefs(state),
+                }
+            }
         })}
     </Story>
 </Canvas>
@@ -109,17 +149,12 @@ Please refer to the table below. <br/>
             i18n,
             template: `
 <div>
-    <p>UTC</p>
-    <p>{{ selectedUTCDates }}</p>
-    <p-datetime-picker data-type="yearToTime" timezone="UTC" :selected-dates.sync="selectedUTCDates" />
-    <br/><br/>
-    <p>Asia/Seoul (GMT+9)</p>
-    <p>{{ selectedSeoulDates }}</p>
-    <p-datetime-picker data-type="yearToTime" timezone="Asia/Seoul" :selected-dates.sync="selectedSeoulDates" />
-    <br/><br/>
-    <p>America/New_York (GMT-4)</p>
-    <p>{{ selectedNewYorkDates }}</p>
-    <p-datetime-picker data-type="yearToTime" timezone="America/New_York" :selected-dates.sync="selectedNewYorkDates" />
+    <p class="pb-2">UTC - {{ selectedUTCDates }}</p>
+    <div class="pb-6"><p-datetime-picker data-type="yearToTime" timezone="UTC" :selected-dates.sync="selectedUTCDates" /></div>
+    <p class="pb-2">Asia/Seoul (GMT+9) - {{ selectedSeoulDates }}</p>
+    <div class="pb-6"><p-datetime-picker data-type="yearToTime" timezone="Asia/Seoul" :selected-dates.sync="selectedSeoulDates" /></div>
+    <p class="pb-2">America/New_York (GMT-4) - {{ selectedNewYorkDates }}</p>
+    <div class="pb-6"><p-datetime-picker data-type="yearToTime" timezone="America/New_York" :selected-dates.sync="selectedNewYorkDates" /></div>
 </div>
 `,
             setup() {
@@ -148,9 +183,8 @@ Please refer to the table below. <br/>
             i18n,
             template: `
 <div>
-        <p-datetime-picker min-date="2021-10-10" max-date="2021-10-20" />
-        <p>min date: 2021-10-10</p>
-        <p>max date: 2021-10-20</p>
+    <p-datetime-picker min-date="2021-10-10" max-date="2021-10-20" />
+    <div class="pt-2"><span>min date: 2021-10-10</span> / <span>max date: 2021-10-20</span></div>
 </div>
 `,
         }}
@@ -212,7 +246,7 @@ Please refer to the table below. <br/>
             template: `
 <div>
     <p-datetime-picker select-mode="range" :selected-dates.sync="selectedDates" />
-    <p>{{ selectedDates }}</p>
+    <p class="pt-2">{{ selectedDates }}</p>
 </div>
 `,
             setup() {
@@ -243,7 +277,7 @@ Please refer to the table below. <br/>
             template: `
 <div>
     <p-datetime-picker data-type="time" :selected-dates.sync="selectedDates" />
-    <p>{{ selectedDates }}</p>
+    <p class="pt-2">{{ selectedDates }}</p>
 </div>
 `,
             setup() {
@@ -270,7 +304,7 @@ Please refer to the table below. <br/>
             template: `
 <div>
     <p-datetime-picker data-type="yearToMonth" :selected-dates.sync="selectedDates" />
-    <p>{{ selectedDates }}</p>
+    <p class="pt-2">{{ selectedDates }}</p>
 </div>
 `,
             setup() {

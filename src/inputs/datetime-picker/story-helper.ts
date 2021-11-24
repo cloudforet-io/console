@@ -36,6 +36,24 @@ export const getDatetimePickerArtTypes = (): ArgTypes => ({
             options: Object.keys(STYLE_TYPE),
         },
     },
+    invalid: {
+        name: 'invalid',
+        type: { name: 'boolean' },
+        description: 'Whether to apply invalid style or not.',
+        defaultValue: false,
+        table: {
+            type: {
+                summary: 'boolean',
+            },
+            category: 'props',
+            defaultValue: {
+                summary: false,
+            },
+        },
+        control: {
+            type: 'boolean',
+        },
+    },
     timezone: {
         name: 'timezone',
         type: { name: 'string' },
@@ -135,5 +153,17 @@ export const getDatetimePickerArtTypes = (): ArgTypes => ({
             },
         },
         control: null,
+    },
+    // events
+    onUpdateSelectedDates: {
+        name: 'update:selectedDates',
+        description: 'Event emitted when date was selected. works with `selectedDates` props sync.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+        },
     },
 });

@@ -3,7 +3,8 @@
          :class="{
              [styleType] : true,
              open : visiblePicker,
-             'time-type': dataType === DATA_TYPE.time
+             'time-type': dataType === DATA_TYPE.time,
+             invalid,
          }"
     >
         <div class="input-sizer">
@@ -101,6 +102,10 @@ export default {
             type: String,
             default: DATA_TYPE.yearToDate,
             validator: (dataType: any) => Object.values(DATA_TYPE).includes(dataType),
+        },
+        invalid: {
+            type: Boolean,
+            default: false,
         },
     },
     setup(props: DatetimePickerProps) {
@@ -245,12 +250,6 @@ export default {
     padding-right: 0.5rem;
     font-size: 0.875rem;
     letter-spacing: -0.01rem;
-    &:hover,
-    &.open,
-    &:focus-within {
-        @apply text-secondary border-secondary;
-        cursor: pointer;
-    }
     .input-sizer {
         width: 100%;
         height: 100%;
@@ -273,9 +272,31 @@ export default {
         flex-shrink: 0;
         margin-left: 0.5rem;
     }
+
+    /* active */
+    &:hover,
+    &.open,
+    &:focus-within {
+        @apply text-secondary border-secondary;
+        cursor: pointer;
+    }
+
+    /* invalid */
+    &.invalid {
+        @apply border-red-500;
+        color: initial;
+
+        &.text {
+            @apply text-red-500;
+        }
+    }
+
+    /* data-type = time */
     &.time-type {
         width: 8rem;
     }
+
+    /* style-type = text */
     &.text:not(.open.time) {
         @apply border-0 bg-transparent;
         width: auto;
@@ -303,6 +324,7 @@ export default {
     }
 }
 
+/* calendar */
 .p-datetime-picker-calendar {
     &.flatpickr-calendar {
         margin-top: -0.125rem;
