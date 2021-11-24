@@ -82,6 +82,8 @@ import {
     PBreadcrumbs, PPageTitle, PIconButton, PSelectDropdown, PI, PIconTextButton, PButton,
 } from '@spaceone/design-system';
 
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+
 import CostAnalysisChart from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisChart.vue';
 import CostAnalysisQueryFilter
     from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisQueryFilter.vue';
@@ -94,19 +96,16 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import {
-    QUERY_VISIBILITY_TYPE,
-    REQUEST_TYPE,
-    CostQuerySetModel,
+    QUERY_VISIBILITY_TYPE, REQUEST_TYPE,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
-import { i18n } from '@/translations';
 import { registerServiceStore } from '@/common/composables/register-service-store';
-import { CostAnalysisStoreState } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { CostAnalysisStoreState, CostQuerySetModel } from '@/services/billing/cost-management/cost-analysis/store/type';
 import costAnalysisStoreModule from '@/services/billing/cost-management/cost-analysis/store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import { store } from '@/store';
+import { i18n } from '@/translations';
 import { SpaceRouter } from '@/router';
 
 export interface SaveQueryEmitParam {

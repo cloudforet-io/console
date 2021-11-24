@@ -45,9 +45,6 @@ import {
 } from '@spaceone/design-system';
 
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import {
-    FilterItem, FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM,
-} from '@/services/billing/cost-management/cost-analysis/lib/config';
 
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardCardWidgetLayout.vue';
@@ -66,6 +63,8 @@ import {
     customColorTheme, CUSTOM_COLORS, DISABLED_COLOR,
 } from '@/common/composables/dynamic-chart';
 import { ChartData, Legend } from '@/common/composables/dynamic-chart/type';
+import { FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
+import { FilterItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
@@ -150,7 +149,7 @@ export default {
             dateAxis.tooltip.disabled = true;
             dateAxis.renderer.grid.template.strokeOpacity = 1;
             dateAxis.renderer.grid.template.location = 0;
-            dateAxis.renderer.labels.template.fill = am4core.color(gray[400]);
+            dateAxis.renderer.labels.template.fill = am4core.color(gray[600]);
             dateAxis.tooltip.label.fontSize = 12;
             dateAxis.renderer.grid.template.strokeOpacity = 0;
 
@@ -161,7 +160,7 @@ export default {
             valueAxis.extraMax = 0.01;
             valueAxis.renderer.grid.template.strokeOpacity = 1;
             valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
-            valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);
+            valueAxis.renderer.labels.template.fill = am4core.color(gray[600]);
             valueAxis.tooltip.label.fontSize = 12;
             valueAxis.renderer.labels.template.adapter.add('text', (text, target) => {
                 if (target.dataItem) {

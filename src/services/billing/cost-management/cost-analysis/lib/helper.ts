@@ -1,9 +1,9 @@
 import dayjs, { Dayjs } from 'dayjs';
-import {
-    CHART_TYPE, FILTER_ITEM, FilterItem, GRANULARITY, Period,
-} from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { TimeUnit } from '@amcharts/amcharts4/core';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import { FilterItem, Period } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { FILTER_ITEM, GRANULARITY } from '@/services/billing/cost-management/lib/config';
 
 
 export const getConvertedGranularity = (period: Period, granularity: GRANULARITY): GRANULARITY => {

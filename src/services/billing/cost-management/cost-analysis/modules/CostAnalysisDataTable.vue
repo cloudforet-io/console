@@ -44,32 +44,18 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 
+import { GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import {
     getConvertedFilter, getConvertedGranularity, getTimeUnit,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { getTableDataFromRawData } from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
-import { getTableDataFromRawData } from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
 
 
 interface CostAnalysisItem {
     [key: string]: string | number | object;
-}
-
-interface TableData {
-    [key: string]: any;
-}
-
-interface Value {
-    usd_cost: number;
-    date: string;
-}
-
-interface RawTableData {
-    [key: string]: any;
-    values: Value[];
 }
 
 export default {

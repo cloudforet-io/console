@@ -12,7 +12,7 @@ import { PieChart } from '@amcharts/amcharts4/charts';
 import config from '@/lib/config';
 import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { GRANULARITY } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import dayjs from 'dayjs';
 

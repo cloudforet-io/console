@@ -1,7 +1,7 @@
-import { GROUP_BY_ITEM } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { ChartData, Legend } from '@/common/composables/dynamic-chart/type';
 import { store } from '@/store';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 
 
@@ -121,10 +121,10 @@ export const getPieChartDataAndLegends = (rawData: PieChartRawData[], groupBy?: 
             });
             groupByNameSet.add(groupByName);
         });
-    } else {
+    } else if (rawData[0]?.usd_cost) {
         chartData = [{
             category: 'Total Cost',
-            value: rawData[0]?.usd_cost || 0,
+            value: rawData[0].usd_cost,
         }];
     }
 

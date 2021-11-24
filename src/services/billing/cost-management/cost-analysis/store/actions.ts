@@ -1,12 +1,11 @@
 import { Action } from 'vuex';
-
-import {
-    CHART_TYPE, CostQuerySetModel, GRANULARITY, CostQuerySetOption,
-} from '@/services/billing/cost-management/cost-analysis/lib/config';
-import { CostAnalysisStoreState } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
+import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { CostAnalysisStoreState, CostQuerySetModel, CostQuerySetOption } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import ErrorHandler from '@/common/composables/error/errorHandler';
 import { getInitialDates } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = ({ commit }): void => {
     commit('setChartType', CHART_TYPE.STACKED_COLUMN);

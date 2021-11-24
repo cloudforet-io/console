@@ -113,13 +113,12 @@ import {
     getConvertedFilter, getConvertedGranularity, getConvertedPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import {
-    CHART_TYPE, FILTER_MAP, GRANULARITY,
-} from '@/services/billing/cost-management/cost-analysis/lib/config';
-import { store } from '@/store';
-import { i18n } from '@/translations';
-import {
     getPieChartDataAndLegends, getXYChartDataAndLegends,
 } from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
+import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { FILTER_MAP, GRANULARITY } from '@/services/billing/cost-management/lib/config';
+import { store } from '@/store';
+import { i18n } from '@/translations';
 
 
 export default {

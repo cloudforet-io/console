@@ -38,12 +38,12 @@ import {
     PSelectButton,
 } from '@spaceone/design-system';
 
-// import CostAnalysisSetMoreModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetMoreModal.vue';
-
-import { GROUP_BY_ITEM } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+
+// import CostAnalysisSetMoreModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetMoreModal.vue';
 
 
 export default {

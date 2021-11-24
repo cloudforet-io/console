@@ -2,7 +2,7 @@
     <card-widget-layout
         :title="'Month-to-Date Spend'"
         unit-type="CURRENCY"
-        :unit="CURRENCY.USD"
+        unit="USD"
         :value="currentMonthData"
         :description="`${formattedCurrentMonthData.start} ~ ${formattedCurrentMonthData.end}`"
     >
@@ -37,7 +37,7 @@
 import dayjs, { Dayjs } from 'dayjs';
 
 import CardWidgetLayout from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardSimpleCardWidget.vue';
-import { CURRENCY, GRANULARITY } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { PI } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -116,7 +116,6 @@ export default {
 
         return {
             ...toRefs(state),
-            CURRENCY,
         };
     },
 };

@@ -73,10 +73,10 @@ import { BILLING_ROUTE } from '@/services/billing/routes';
 
 import CostTrendByProduct from '@/services/billing/cost-management/cost-dashboard/widgets/CostTrendByProduct.vue';
 import CostTrendByProject from '@/services/billing/cost-management/cost-dashboard/widgets/CostTrendByProject.vue';
-
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
-import { CURRENCY } from '@/services/billing/cost-management/cost-analysis/lib/config';
+
 
 const tempProjectsData = [
     {
@@ -132,11 +132,11 @@ export default {
         });
 
         const filterState = reactive({
-            selectedCurrency: CURRENCY.USD,
+            selectedCurrency: 'USD',
             currencyItems: computed<MenuItem[]>(() => ([
-                { type: 'item', name: CURRENCY.USD, label: '$USD' },
-                { type: 'item', name: CURRENCY.KRW, label: '$KRW' },
-                { type: 'item', name: CURRENCY.JPY, label: '¥JPY' },
+                { type: 'item', name: 'USD', label: '$USD' },
+                { type: 'item', name: 'KRW', label: '$KRW' },
+                { type: 'item', name: 'JPY', label: '¥JPY' },
             ])),
         });
 

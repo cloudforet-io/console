@@ -23,7 +23,7 @@ import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { GRANULARITY } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import dayjs from 'dayjs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 

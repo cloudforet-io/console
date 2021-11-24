@@ -27,12 +27,12 @@
                                    @update:selectedDates="handleSelectedDates"
                 />
             </div>
-            <!--            <p-select-dropdown class="filter-item"-->
-            <!--                               :items="currencyItems"-->
-            <!--                               :selected="currency"-->
-            <!--                               without-outline-->
-            <!--                               @select="handleSelectCurrency"-->
-            <!--            />-->
+            <p-select-dropdown class="filter-item"
+                               :items="currencyItems"
+                               :selected="currency"
+                               without-outline
+                               @select="handleSelectCurrency"
+            />
             <p-icon-button class="filter-item" name="ic_refresh" @click="handleClickRefresh" />
         </div>
     </div>
@@ -44,11 +44,10 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import {
     PIconButton, PSelectDropdown, PDatetimePicker,
 } from '@spaceone/design-system';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
-import {
-    CHART_TYPE, CURRENCY, GRANULARITY,
-} from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -65,6 +64,7 @@ export default {
             granularity: computed(() => store.state.service.costAnalysis.granularity),
             chartType: computed(() => store.state.service.costAnalysis.chartType),
             period: computed(() => store.state.service.costAnalysis.period),
+            currency: 'USD',
             //
             granularityItems: computed<MenuItem[]>(() => ([
                 {
@@ -116,9 +116,9 @@ export default {
                 },
             ])),
             currencyItems: computed<MenuItem[]>(() => ([
-                { type: 'item', name: CURRENCY.USD, label: '$USD' },
-                { type: 'item', name: CURRENCY.KRW, label: '$KRW' },
-                { type: 'item', name: CURRENCY.JPY, label: '¥JPY' },
+                { type: 'item', name: 'USD', label: '$USD' },
+                { type: 'item', name: 'KRW', label: '$KRW' },
+                { type: 'item', name: 'JPY', label: '¥JPY' },
             ])),
         });
 
@@ -140,7 +140,7 @@ export default {
             store.commit('service/costAnalysis/setPeriod', { start: selectedDates[0], end: selectedDates[1] });
         };
         const handleSelectCurrency = async (currency: string) => {
-            store.commit('service/costAnalysis/setCurrency', currency);
+            state.currency = currency;
         };
         const handleClickRefresh = async () => {
             // todo

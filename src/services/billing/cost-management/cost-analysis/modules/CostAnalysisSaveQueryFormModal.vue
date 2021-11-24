@@ -52,15 +52,14 @@ import {
     PButtonModal, PFieldGroup, PTextInput, PRadio, PI,
 } from '@spaceone/design-system';
 import {
-    CostQuerySetModel,
-    QUERY_VISIBILITY_TYPE,
-    REQUEST_TYPE,
+    QUERY_VISIBILITY_TYPE, REQUEST_TYPE,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { CostQuerySetModel } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { makeProxy } from '@/lib/helper/composition-helpers';
-import { i18n } from '@/translations';
-import ErrorHandler from '@/common/composables/error/errorHandler';
-import { store } from '@/store';
 import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { i18n } from '@/translations';
+import { store } from '@/store';
 
 
 interface Props {

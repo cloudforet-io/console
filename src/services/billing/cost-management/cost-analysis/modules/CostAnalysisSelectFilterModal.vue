@@ -71,7 +71,8 @@ import {
 import CostAnalysisFilterItem from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisFilterItem.vue';
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
-import { FILTER_ITEM, FILTER_MAP, FilterItem } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { FILTER_ITEM, FILTER_MAP } from '@/services/billing/cost-management/lib/config';
+import { FilterItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { store } from '@/store';
 
 

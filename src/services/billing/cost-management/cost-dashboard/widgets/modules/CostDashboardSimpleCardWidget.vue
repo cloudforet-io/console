@@ -20,7 +20,6 @@
 <script lang="ts">
 import { PDivider, PPaneLayout } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { CURRENCY } from '@/services/billing/cost-management/cost-analysis/lib/config';
 
 const UNIT_TYPE = Object.freeze({
     PERCENT: 'PERCENT',
@@ -42,10 +41,10 @@ export default {
         },
         unit: {
             type: String,
-            default: CURRENCY.USD,
-            validator(value: CURRENCY) {
-                return Object.values(CURRENCY).includes(value);
-            },
+            default: 'USD',
+            // validator(value: CURRENCY) {
+            //     return Object.values(CURRENCY).includes(value);
+            // },
         },
         unitType: {
             type: String,
@@ -73,7 +72,6 @@ export default {
         });
         return {
             ...toRefs(state),
-            CURRENCY,
             UNIT_TYPE,
         };
     },

@@ -8,8 +8,9 @@
 </template>
 
 <script lang="ts">
-import { cloneDeep } from 'lodash';
 import dayjs from 'dayjs';
+import * as am4core from '@amcharts/amcharts4/core';
+import { TimeUnit } from '@amcharts/amcharts4/core';
 
 import {
     computed, reactive, toRefs, watch,
@@ -24,12 +25,13 @@ import {
 } from '@/common/composables/dynamic-chart';
 import { ChartData, DynamicChartStateArgs, Legend } from '@/common/composables/dynamic-chart/type';
 
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 import { getTimeUnit } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { mergePrevChartDataAndCurrChartData } from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
-import { CHART_TYPE, GRANULARITY, Period } from '@/services/billing/cost-management/cost-analysis/lib/config';
-import { TimeUnit } from '@amcharts/amcharts4/core';
+import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
+import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
+
 
 interface Props {
     loading: boolean;
@@ -83,18 +85,18 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props: Props, { emit }) {
+    setup(props: Props) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
-            proxyChart: makeProxy('chart', props, emit),
         });
 
         /* util */
         const getAccumulatedData = (chartData: ChartData[], period: Period, timeUnit: TimeUnit): ChartData[] => {
             const accumulatedChartData = [] as ChartData[];
             let now = dayjs(period.start).clone();
+            const end = dayjs(period.end).isSameOrBefore(dayjs.utc(), timeUnit) ? dayjs(period.end) : dayjs.utc();
             let accumulatedData: Record<string, number> = {};
-            while (now.isSameOrBefore(dayjs(period.end), timeUnit)) {
+            while (now.isSameOrBefore(end, timeUnit)) {
                 let eachChartData: ChartData = {};
                 // eslint-disable-next-line no-loop-func
                 const existData = chartData.find(d => now.isSame(d.date, timeUnit));
@@ -121,13 +123,12 @@ export default {
 
         const drawChart = (chartContext) => {
             const timeUnit = getTimeUnit(props.granularity, dayjs(props.period.start), dayjs(props.period.end));
-            let chartData = cloneDeep(props.chartData);
+            let chartData = [...props.chartData];
             if (props.chartType !== CHART_TYPE.DONUT) {
                 if (props.granularity === GRANULARITY.ACCUMULATED) {
-                    chartData = getAccumulatedData(props.chartData, props.period, timeUnit);
-                } else {
-                    chartData = fillDefaultDataOfLastDay(props.chartData, props.period, timeUnit);
+                    chartData = getAccumulatedData(chartData, props.period, timeUnit);
                 }
+                chartData = fillDefaultDataOfLastDay(chartData, props.period, timeUnit);
             }
             const params: DynamicChartStateArgs = {
                 data: chartData,
@@ -152,7 +153,15 @@ export default {
             } else if (props.chartType === CHART_TYPE.DONUT) {
                 ({ chart } = usePieChart(params));
             }
-            state.proxyChart = chart;
+
+            if (props.chartType !== CHART_TYPE.DONUT) {
+                const start = dayjs(props.period.start);
+                const end = dayjs(props.period.end);
+                const diff = end.diff(start, timeUnit);
+                if (diff > 31) {
+                    chart.scrollbarX = new am4core.Scrollbar();
+                }
+            }
         };
 
         watch([() => state.chartRef, () => props.loading], async ([chartContext, loading]) => {
