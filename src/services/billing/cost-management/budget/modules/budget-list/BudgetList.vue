@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="budget-list">
         <budget-list-card v-for="budget in budgets" :key="budget.budget_id" :budget="budget" />
     </div>
 </template>
@@ -29,8 +29,15 @@ export default {
                     budget_id: 'budget-675a56fe8175',
                     name: 'Belkin Budget',
                     limit: 50000,
-                    total_usage_usd_cost: 0,
-                    cost_types: {},
+                    total_usage_usd_cost: 37777,
+                    cost_types: {
+                        region_code: null,
+                        product: null,
+                        provider: [
+                            'aws',
+                        ],
+                        account: null,
+                    },
                     time_unit: 'TOTAL',
                     start: '2022-01-01',
                     end: '2022-12-31',
@@ -52,13 +59,14 @@ export default {
                     ],
                     budget_id: 'budget-df7f905dbc8f',
                     name: 'Belkin Snow - Budget',
-                    limit: 0,
-                    total_usage_usd_cost: 0,
+                    limit: 300,
+                    total_usage_usd_cost: 295,
                     cost_types: {
                         region_code: null,
                         product: null,
                         provider: [
                             'aws',
+                            'google_cloud',
                         ],
                         account: null,
                     },
@@ -81,3 +89,12 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.budget-list {
+    @apply grid grid-cols-2 gap-4;
+
+    @screen mobile {
+        @apply grid-cols-1;
+    }
+}
+</style>
