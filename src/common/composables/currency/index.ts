@@ -6,8 +6,8 @@ import {
 
 
 import { Options as CashifyOptions } from 'cashify/dist/lib/options';
-import { CURRENCY_SYMBOL } from '@/store/modules/display/config';
-import { Currency, CurrencyRates } from '@/store/modules/display/type';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { CurrencyRates } from '@/store/modules/display/type';
 
 
 /** currency library: https://www.npmjs.com/package/currency.js */
@@ -81,11 +81,11 @@ export const useCurrency = (
 ) => {
     const state = reactive({
         money: _money,
-        currency: currency.value as Currency,
+        currency: currency.value as CURRENCY,
         convertOptions: {
-            base: 'USD',
+            base: CURRENCY.USD,
             rates: rates.value,
-            from: 'USD',
+            from: CURRENCY.USD,
             to: currency.value,
         } as CashifyOptions,
         convertedMoney: computed<Money>(() => {

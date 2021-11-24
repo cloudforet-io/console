@@ -1,4 +1,4 @@
-import { SIDEBAR_TYPE } from '@/store/modules/display/config';
+import { CURRENCY, SIDEBAR_TYPE } from '@/store/modules/display/config';
 
 export interface DisplayState {
     visibleSidebar: boolean;
@@ -7,10 +7,8 @@ export interface DisplayState {
     isDownloaded: boolean;
     uncheckedNotificationCount: number;
     isSignInFailed: boolean;
-    currency: Currency;
+    currency: CURRENCY;
     currencyRates: CurrencyRates;
 }
-
-export type Currency = 'USD'|'KRW'|'JPY'
 
 export type CurrencyRates = Record<string, number>

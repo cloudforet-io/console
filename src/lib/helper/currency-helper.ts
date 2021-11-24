@@ -1,12 +1,13 @@
 import { convert as cashifyConvert } from 'cashify';
-import { Currency, CurrencyRates } from '@/store/modules/display/type';
+import { CURRENCY } from '@/store/modules/display/config';
+import { CurrencyRates } from '@/store/modules/display/type';
 
 
 /** cashify library: https://www.npmjs.com/package/cashify */
 
-export const convertUSDToCurrency = (money: number, currency: Currency, rates: CurrencyRates): number => cashifyConvert(money, {
-    base: 'USD',
+export const convertUSDToCurrency = (money: number, currency: CURRENCY, rates: CurrencyRates): number => cashifyConvert(money, {
+    base: CURRENCY.USD,
     rates,
-    from: 'USD',
+    from: CURRENCY.USD,
     to: currency,
 });
