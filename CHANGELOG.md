@@ -1,3 +1,10 @@
+# [1.1.0-beta.187](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.186...v1.1.0-beta.187) (2021-11-24)
+
+
+### Bug Fixes
+
+* update icons and asset head ([#763](https://github.com/spaceone-dev/spaceone-design-system/issues/763)) ([29d3c7c](https://github.com/spaceone-dev/spaceone-design-system/commit/29d3c7c6c341904456ef9e4c32266d9eb1509d3a))
+
 # [1.1.0-beta.186](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.185...v1.1.0-beta.186) (2021-11-23)
 
 
