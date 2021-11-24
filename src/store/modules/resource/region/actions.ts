@@ -51,7 +51,7 @@ export const load = async ({ state, commit }, lazyLoad = false): Promise<void|Er
         const regions: ResourceMap = {};
 
         response.results.forEach((regionInfo: any): void => {
-            regions[`${regionInfo.provider}:${regionInfo.region_code}`] = {
+            regions[regionInfo.region_code] = {
                 label: `${regionInfo.name} | ${regionInfo.region_code}`,
                 name: regionInfo.name,
                 continent: regionMap[regionInfo.tags.continent] || {},

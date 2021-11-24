@@ -65,7 +65,7 @@ export const getLegendsFromGroupByNames = (groupByNames: string[], groupBy?: GRO
             } else if (groupBy === GROUP_BY_ITEM.REGION) {
                 _label = _regions[d]?.name || d;
             } else if (groupBy === GROUP_BY_ITEM.PROVIDER) {
-                _label = _providers[d]?.label || d;
+                _label = _providers[d]?.name || d;
             }
             legends.push({
                 name: d as string,

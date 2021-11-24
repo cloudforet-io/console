@@ -85,7 +85,7 @@ export default {
             default: () => ({}),
         },
     },
-    setup(props: Props) {
+    setup(props: Props, { emit }) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
         });
@@ -162,11 +162,14 @@ export default {
                     chart.scrollbarX = new am4core.Scrollbar();
                 }
             }
+
+            return chart;
         };
 
         watch([() => state.chartRef, () => props.loading], async ([chartContext, loading]) => {
             if (chartContext && !loading) {
-                drawChart(chartContext);
+                const chart = drawChart(chartContext);
+                emit('update:chart', chart);
             }
         }, { immediate: false });
 

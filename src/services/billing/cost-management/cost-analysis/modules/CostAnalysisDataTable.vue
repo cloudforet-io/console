@@ -17,7 +17,7 @@
                     {{ projects[value] ? projects[value].label : value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY_ITEM.PROVIDER">
-                    {{ providers[value] ? providers[value].label : value }}
+                    {{ providers[value] ? providers[value].name : value }}
                 </span>
                 <span v-else-if="field.name === GROUP_BY_ITEM.REGION">
                     {{ regions[value] ? regions[value].name : value }}
