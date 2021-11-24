@@ -3,7 +3,7 @@
 // @ts-ignore
 import icon from 'vue-svgicon'
 icon.register({
-  'sad-face v1': {
+  'sad-face': {
     width: 16,
     height: 16,
     viewBox: '0 0 16 16',

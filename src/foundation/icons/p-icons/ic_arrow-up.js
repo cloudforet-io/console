@@ -3,7 +3,7 @@
 // @ts-ignore
 import icon from 'vue-svgicon'
 icon.register({
-  'ic_arrow-up v1': {
+  'ic_arrow-up': {
     width: 16,
     height: 16,
     viewBox: '0 0 16 16',
