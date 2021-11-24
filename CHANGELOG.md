@@ -1,3 +1,10 @@
+# [1.1.0-beta.189](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.188...v1.1.0-beta.189) (2021-11-24)
+
+
+### Features
+
+* add invalid props to PDatetimePicker ([#765](https://github.com/spaceone-dev/spaceone-design-system/issues/765)) ([aa75268](https://github.com/spaceone-dev/spaceone-design-system/commit/aa75268173ff8d5dcd1fe815e0d0ae96579ede94))
+
 # [1.1.0-beta.188](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.187...v1.1.0-beta.188) (2021-11-24)
 
 
