@@ -51,7 +51,7 @@
                     <p-badge v-if="budget.time_unit==='MONTHLY'"
                              class="period" style-type="gray200" shape="square"
                     >
-                        {{ `${budget.start.slice(0,7)} ~ ${budget.end.slice(0,7)}` }}
+                        {{ formatTime(budget.start) }} ~ {{ formatTime(budget.end) }}
                     </p-badge>
                     <p-badge v-if="budget.time_unit==='TOTAL'"
                              class="period" style-type="gray"
@@ -79,6 +79,7 @@ import {
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { red, yellow, indigo } from '@/styles/colors';
 import { capitalize } from 'lodash';
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 interface Props {
     budget: BudgetData;
@@ -112,6 +113,8 @@ export default {
         },
     },
     setup(props: Props) {
+        const { i18nDayjs } = useI18nDayjs();
+
         const state = reactive({
             linkLocation: computed<Location>(() => ({
                 name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
@@ -154,6 +157,8 @@ export default {
             }),
         });
 
+        const formatTime = (time: string) => i18nDayjs.value(time).format('MMMYYYY');
+
         (async () => {
             await SpaceConnector.client.costAnalysis.budgetUsage.list({
                 budget_id: props.budget.budget_id,
@@ -163,6 +168,7 @@ export default {
         return {
             ...toRefs(state),
             PROVIDER_MAP,
+            formatTime,
         };
     },
 };
