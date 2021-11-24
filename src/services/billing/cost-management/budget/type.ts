@@ -1,6 +1,6 @@
 import { Tags, TimeStamp } from '@/models';
 
-export type BudgetCostType = 'all'| 'provider'| 'region'| 'account'| 'product'
+export type BudgetCostType = 'all'| 'provider'| 'region_code'| 'account'| 'product'
 
 interface BudgetPlannedLimit {
 	date: string;
@@ -39,13 +39,13 @@ export interface BudgetNotifications {
 export interface BudgetData {
 	budget_id: string;
 	name: string;
-	project_id: string;
+	project_id?: string;
 	project_group_id?: string;
 	limit: number;
 	planned_limits: BudgetPlannedLimit[];
 	total_usage_usd_cost: number;
 	monthly_costs?: BudgetMonthlyCost[];
-	cost_types: Record<CostType, string[]>;
+	cost_types?: Partial<Record<CostType, string[]>>;
 	time_unit: BudgetTimeUnit;
 	start: string;
 	end: string;

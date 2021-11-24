@@ -5,23 +5,35 @@
         </p-panel-top>
         <div class="p-4">
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_NAME')"
+                           :invalid="invalidState.name"
+                           :invalid-text="invalidTexts.name"
                            required
             >
-                <p-text-input v-model="name" />
+                <p-text-input :value="name" :invalid="invalidState.name" @input="setForm('name', $event)" />
             </p-field-group>
 
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_TARGET')"
+                           :invalid="invalidState.selectedTargets"
+                           :invalid-text="invalidTexts.selectedTargets"
                            required
             >
-                <project-select-dropdown :selected-project-ids.sync="selectedTargets" />
+                <project-select-dropdown :selected-project-ids="selectedTargets"
+                                         :invalid="invalidState.selectedTargets"
+                                         project-group-selectable
+                                         @update:selectedProjectIds="setForm('selectedTargets', $event)"
+                />
             </p-field-group>
 
             <p-field-group :label="$t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.LABEL_COST_TYPE')"
                            required
+                           :invalid="invalidState.selectedCostType"
+                           :invalid-text="invalidTexts.selectedCostType"
                            class="cost-type"
             >
                 <p-radio v-for="(costTypeLabel, costTypeKey) in costTypeItems" :key="costTypeKey"
-                         v-model="selectedCostType" :value="costTypeKey"
+                         :selected="selectedCostType" :value="costTypeKey"
+                         :invalid="costTypeKey === selectedCostType && invalidState.selectedCostType"
+                         @change="setForm('selectedCostType', $event)"
                 >
                     {{ costTypeLabel }}
                 </p-radio>
@@ -29,7 +41,9 @@
                                    :handler="resourceMenuHandler"
                                    :loading="resourceMenuLoading"
                                    type="checkbox"
-                                   :selected.sync="selectedResources"
+                                   :invalid="invalidState.selectedCostType"
+                                   :selected="selectedResources"
+                                   @update:selected="setForm('selectedResources', $event)"
                 />
             </p-field-group>
         </div>
@@ -37,9 +51,12 @@
 </template>
 
 <script lang="ts">
+import axios, { CancelTokenSource } from 'axios';
+
 import {
-    computed, reactive, toRefs, watch,
+    computed, reactive, toRefs, watch, watchEffect,
 } from '@vue/composition-api';
+import { TranslateResult } from 'vue-i18n';
 
 import {
     PFieldGroup, PPaneLayout, PPanelTop, PRadio, PSearchDropdown, PTextInput,
@@ -48,23 +65,42 @@ import {
     SearchDropdownMenuItem, AutocompleteHandler,
 } from '@spaceone/design-system/dist/src/inputs/search/search-dropdown/type';
 
-import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
 import { i18n } from '@/translations';
-import { TranslateResult } from 'vue-i18n';
-import { BudgetCostType } from '@/services/billing/cost-management/budget/type';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+
+import { useFormValidator } from '@/common/composables/form-validator';
+import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import axios, { CancelTokenSource } from 'axios';
+
+import { BudgetCostType, BudgetData, CostType } from '@/services/billing/cost-management/budget/type';
 
 
 type BudgetCostTypes = Record<BudgetCostType, TranslateResult>
+type BudgetInfo = Pick<BudgetData, 'name'|'cost_types'|'project_group_id'|'project_id'>
 
-const COST_TYPE_TO_RESOURCE_TYPE: Record<Exclude<BudgetCostType, 'all'>, string> = {
+
+const COST_TYPE_TO_RESOURCE_TYPE: Record<CostType, string> = {
     provider: 'identity.Provider',
-    region: 'inventory.Region',
+    region_code: 'inventory.Region',
     account: 'identity.ServiceAccount',
     product: 'inventory.CloudServiceType',
+};
+
+const getBudgetInfo = (_name: string, targets: string[], costType: BudgetCostType, resources: string[]) => {
+    const target = targets[0];
+    const isProjectGroup = target?.startsWith('pg-');
+
+    const budgetInfo: BudgetInfo = {
+        name: _name,
+        [isProjectGroup ? 'project_group_id' : 'project_id']: target,
+    };
+
+    if (costType !== 'all') {
+        budgetInfo.cost_types = { [costType as CostType]: resources };
+    }
+
+    return budgetInfo;
 };
 
 export default {
@@ -84,19 +120,37 @@ export default {
             default: undefined,
         },
     },
-    setup() {
-        const state = reactive({
+    setup(props, { emit }) {
+        const {
+            forms: {
+                name, selectedTargets, selectedCostType, selectedResources,
+            },
+            setForm,
+            invalidState,
+            invalidTexts,
+            isAllValid,
+        } = useFormValidator({
             name: '',
             selectedTargets: [] as string[],
             selectedCostType: 'all' as BudgetCostType,
+            selectedResources: [] as SearchDropdownMenuItem[],
+        }, {
+            name(value: string) { return value.trim().length ? '' : 'Required'; },
+            selectedTargets(value: string[]) { return value.length ? '' : 'Required'; },
+            selectedCostType(value: BudgetCostType) {
+                if (value === 'all') return '';
+                return selectedResources.value.length ? '' : 'Required';
+            },
+        });
+
+        const state = reactive({
             costTypeItems: computed<BudgetCostTypes>(() => ({
                 all: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ALL'),
                 provider: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PROVIDER'),
-                region: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.REGION'),
+                region_code: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.REGION'),
                 account: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ACCOUNT'),
                 product: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PRODUCT'),
             })),
-            selectedResources: [] as SearchDropdownMenuItem[],
             resourceMenuLoading: false,
         });
 
@@ -132,24 +186,41 @@ export default {
             }
         };
 
-        const resourceMenuHandler: AutocompleteHandler = async (value: string) => {
-            const resourceType = COST_TYPE_TO_RESOURCE_TYPE[state.selectedCostType];
+        const resourceMenuHandler: AutocompleteHandler = async (inputText: string) => {
+            const resourceType = COST_TYPE_TO_RESOURCE_TYPE[selectedCostType.value];
             if (!resourceType) return { results: [] };
 
             state.resourceMenuLoading = true;
-            const results = await getResources(value, resourceType);
+            const results = await getResources(inputText, resourceType);
             state.resourceMenuLoading = false;
 
             return { results: results ? results.map(d => ({ name: d.key, label: d.name })) : [] };
         };
 
-        watch(() => state.selectedCostType, () => {
-            state.selectedResources = [];
+        watch(() => selectedCostType.value, () => {
+            setForm('selectedResources', []);
+        });
+
+        watchEffect(() => {
+            if (!isAllValid.value) return;
+
+            const resources = selectedResources.value.map(d => d.name);
+            const budgetInfo = getBudgetInfo(name.value, selectedTargets.value, selectedCostType.value, resources);
+
+
+            emit('update', budgetInfo);
         });
 
 
         return {
+            name,
+            selectedTargets,
+            selectedCostType,
+            selectedResources,
+            invalidState,
+            invalidTexts,
             ...toRefs(state),
+            setForm,
             resourceMenuHandler,
         };
     },

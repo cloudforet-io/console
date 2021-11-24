@@ -128,8 +128,12 @@ export default {
                 { name: props.budget.name },
             ])),
             costTypeList: computed<string>(() => {
+                const costTypes = props.budget.cost_types;
                 let costTypeList = '';
-                Object.entries(props.budget.cost_types).forEach(([costType, costTypeValue]) => {
+
+                if (!costTypes) return costTypeList;
+
+                Object.entries(costTypes).forEach(([costType, costTypeValue]) => {
                     if (costTypeValue) costTypeList += ` ${capitalize(costType)}: ${costTypeValue.map(value => (` ${PROVIDER_MAP[value]}`))}`;
                 });
                 return costTypeList;
