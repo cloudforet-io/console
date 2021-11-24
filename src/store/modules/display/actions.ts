@@ -5,6 +5,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { DisplayState } from '@/store/modules/display/type';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 export const showHandbook = ({ commit }): void => {
@@ -79,7 +80,7 @@ export const checkNotification: Action<DisplayState, any> = async ({
 
         if (state.uncheckedNotificationCount !== total_count) commit('setUncheckedNotificationCount', total_count);
     } catch (e) {
-        console.error(e);
+        ErrorHandler.handleError(e);
     }
 };
 

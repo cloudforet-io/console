@@ -100,7 +100,9 @@ export default defineComponent({
                     name: AUTH_ROUTE.SIGN_OUT._NAME,
                 };
                 await vm.$router.push(res);
-            } else state.isExpired = false;
+            } else {
+                vm.$store.dispatch('user/setIsSessionExpired', false);
+            }
         };
 
         watch(() => vm.$store.state.display.isDownloaded, async (after) => {

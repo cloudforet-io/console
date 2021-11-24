@@ -1,11 +1,21 @@
 <template>
-    <div ref="chartRef" class="chart" />
+    <cost-dashboard-card-widget-layout
+        title="Cost By Region"
+        :data-range="15"
+        :widget-link="widgetLink"
+    >
+        <template #default>
+            <div ref="chartRef" class="chart" />
+        </template>
+    </cost-dashboard-card-widget-layout>
 </template>
 
 <script lang="ts">
 import {
+    computed,
     onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
+import { cloneDeep } from 'lodash';
 import { MapChart } from '@amcharts/amcharts4/maps';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
@@ -14,85 +24,37 @@ import am4geodataContinentsLow from '@amcharts/amcharts4-geodata/continentsLow';
 import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import config from '@/lib/config';
 import { gray } from '@/styles/colors';
+import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { continentData } from '@/services/billing/cost-management/cost-dashboard/lib/config';
+import CostDashboardCardWidgetLayout
+    from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardCardWidgetLayout.vue';
+import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 
 am4core.useTheme(am4themesAnimated);
 
-const tempPieChartData = [{
-    title: 'North America',
-    latitude: 39.563353,
-    longitude: -99.316406,
-    width: 100,
-    height: 100,
-    pieData: [{
-        category: 'AWS',
-        value: 1200,
-    }, {
-        category: 'Azure',
-        value: 500,
-    }, {
-        category: 'Google',
-        value: 765,
-    }],
-}, {
-    title: 'Europe',
-    latitude: 50.896104,
-    longitude: 19.160156,
-    width: 50,
-    height: 50,
-    pieData: [{
-        category: 'AWS',
-        value: 200,
-    }, {
-        category: 'Azure',
-        value: 600,
-    }, {
-        category: 'Google Cloud',
-        value: 350,
-    }],
-}, {
-    title: 'Asia',
-    latitude: 47.212106,
-    longitude: 103.183594,
-    width: 80,
-    height: 80,
-    pieData: [{
-        category: 'AWS',
-        value: 352,
-    }, {
-        category: 'Azure',
-        value: 266,
-    }, {
-        category: 'Google Cloud',
-        value: 512,
-    }],
-}, {
-    title: 'Africa',
-    latitude: 11.081385,
-    longitude: 21.621094,
-    width: 50,
-    height: 50,
-    pieData: [{
-        category: 'AWS',
-        value: 200,
-    }, {
-        category: 'Azure',
-        value: 300,
-    }, {
-        category: 'Google Cloud',
-        value: 599,
-    }],
-}];
 
 const categoryKey = 'title';
 const valueName = 'value';
 
+const widgetLink = {
+    name: INVENTORY_ROUTE.CLOUD_SERVICE._NAME,
+    params: {},
+    query: {},
+};
+
 export default {
     name: 'CostByRegion',
+    components: { CostDashboardCardWidgetLayout },
     setup() {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as MapChart | null,
             chartRegistry: {},
+            regions: computed(() => store.state.resource.region.items),
+            loading: true,
+            data: [] as any,
         });
 
         const disposeChart = (chartContext) => {
@@ -144,11 +106,11 @@ export default {
             pieSeriesTemplate.labels.template.disabled = true;
             pieSeriesTemplate.ticks.template.disabled = true;
 
-            pieSeries.data = tempPieChartData;
+            pieSeries.data = state.data;
         };
 
-        watch(() => state.chartRef, (chartContext) => {
-            if (chartContext) {
+        watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
+            if (!loading && chartContext) {
                 drawChart(chartContext);
             }
         }, { immediate: false });
@@ -157,8 +119,49 @@ export default {
             if (state.chart) state.chart.dispose();
         });
 
+        const setPieChartData = (chartData) => {
+            const _continentData = cloneDeep(continentData);
+            chartData.forEach((d) => {
+                const target = _continentData.find(continent => continent.continent_code === (state.regions[`${d.provider}:${d.region_code}`]?.continent?.continent_code));
+                if (target) {
+                    target.pieData.push({
+                        category: `${d.provider}:${d.region_code}`,
+                        value: d.usd_cost,
+                    });
+                }
+            });
+            return _continentData;
+        };
+
+        const getChartData = async () => {
+            try {
+                state.loading = true;
+                const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
+                    include_usage_quantity: false,
+                    granularity: 'ACCUMULATED',
+                    group_by: ['provider', 'region_code'],
+                    start: '2021-10-01T00:00:00Z',
+                    end: '2021-10-16T00:00:00Z',
+                    page: {
+                        limit: 15,
+                    },
+                });
+                state.data = setPieChartData(results);
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
+            }
+        };
+
+        (async () => {
+            await store.dispatch('resource/region/load');
+            await getChartData();
+        })();
+
         return {
             ...toRefs(state),
+            widgetLink,
         };
     },
 };

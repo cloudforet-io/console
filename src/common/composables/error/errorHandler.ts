@@ -1,6 +1,5 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { SpaceRouter } from '@/router';
-import { store } from '@/store';
 import {
     isInstanceOfAPIError, isInstanceOfAuthenticationError, isInstanceOfAuthorizationError,
     isInstanceOfBadRequestError,
@@ -10,8 +9,21 @@ import { isInstanceOfNoResourceError, isInstanceOfNoSearchResourceError } from '
 import { showErrorMessage } from '@/lib/helper/notice-alert-helper';
 import { TranslateResult } from 'vue-i18n';
 
+interface GlobalErrorHandlers {
+    authenticationErrorHandler: () => void;
+    authorizationErrorHandler: () => void;
+}
 
 export default class ErrorHandler {
+    private static authenticationErrorHandler;
+
+    private static authorizationErrorHandler;
+
+    static init({ authenticationErrorHandler, authorizationErrorHandler }: GlobalErrorHandlers) {
+        ErrorHandler.authenticationErrorHandler = authenticationErrorHandler;
+        ErrorHandler.authorizationErrorHandler = authorizationErrorHandler;
+    }
+
     static handleError(error) {
         if (isInstanceOfAPIError(error)) {
             console.error(error);
@@ -22,11 +34,11 @@ export default class ErrorHandler {
             if (!isTokenAlive && !SpaceRouter.router.currentRoute.meta.excludeAuth) {
                 (async () => {
                     const res = await SpaceConnector.refreshAccessToken(false);
-                    if (!res) store.dispatch('error/showSessionExpiredError');
+                    if (!res) ErrorHandler.authenticationErrorHandler();
                 })();
             }
         } else if (isInstanceOfAuthorizationError(error)) {
-            store.dispatch('error/showAuthorizationError');
+            ErrorHandler.authorizationErrorHandler();
         } else if (isInstanceOfNoResourceError(error)) {
             showErrorMessage('No Resource', 'No Resource');
             SpaceRouter.router.push(error.redirectUrl);

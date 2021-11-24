@@ -30,6 +30,15 @@ Vue.use(SpaceDesignSystem);
 Vue.config.errorHandler = error => ErrorHandler.handleError(error);
 
 (async () => {
+    ErrorHandler.init({
+        authenticationErrorHandler: () => {
+            store.dispatch('user/setIsSessionExpired', true);
+        },
+        authorizationErrorHandler: () => {
+            store.dispatch('error/showAuthorizationError');
+        },
+    });
+
     await siteInit();
 
     new Vue({
