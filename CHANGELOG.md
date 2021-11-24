@@ -1,3 +1,10 @@
+# [1.1.0-beta.188](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.187...v1.1.0-beta.188) (2021-11-24)
+
+
+### Features
+
+* add simple tableStyleType and textAlign field to PDataTable ([#764](https://github.com/spaceone-dev/spaceone-design-system/issues/764)) ([b4078a7](https://github.com/spaceone-dev/spaceone-design-system/commit/b4078a744b1330b2346058ae4573a058bfaae53c))
+
 # [1.1.0-beta.187](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.186...v1.1.0-beta.187) (2021-11-24)
 
 
