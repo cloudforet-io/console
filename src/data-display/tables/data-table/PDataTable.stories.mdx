@@ -7,7 +7,7 @@ import PTextarea from '@/inputs/textarea/PTextarea';
 import PToggleButton from '@/inputs/buttons/toggle-button/PToggleButton';
 
 import PDataTable from '@/data-display/tables/data-table/PDataTable.vue';
-import {DATA_TABLE_STYLE_TYPE} from './config';
+import { DATA_TABLE_STYLE_TYPE, DATA_TABLE_CELL_TEXT_ALIGN } from './config';
 import { getDataTableArgsType } from '@/data-display/tables/data-table/story-helper';
 import { getUserFields, getUsers, getLongUsers } from '@/data-display/tables/data-table/mock';
 
@@ -89,6 +89,7 @@ interface DataTableFieldType {
     sortable?: boolean;
     sortKey?: string;
     width?: string;
+    textAlign?: string;
 }
 
 ```
@@ -100,7 +101,7 @@ interface DataTableFieldType {
 |sortable|Whether to sortable the table by the column or not. If it's not given, it follows the `sortable` props.|
 |sortKey|If you give the value to this property, the value of `sortBy` passed to the `changeSort` and `update:sortBy` events is replaced with this value when sorting based on the corresponding column. default is the column `name`.|
 |width|If you want to fix the cell width, give the value.|
-
+|textAlign|If you want to align text in the cell, give the value.|
 
 
 
@@ -379,6 +380,10 @@ To enable multi selection on row click, give `true` to `rowClickMultiSelectionMo
         <p class="mb-4 font-xl font-bold">Style Type: {{DATA_TABLE_STYLE_TYPE.primary4}}</p>
         <p-data-table :fields="fields" :items="items" selectable :table-style-type="DATA_TABLE_STYLE_TYPE.primary4" />
     </div>
+    <div class="mt-6">
+        <p class="mb-4 font-xl font-bold">Style Type: {{DATA_TABLE_STYLE_TYPE.simple}}</p>
+        <p-data-table :fields="fields" :items="items" selectable :table-style-type="DATA_TABLE_STYLE_TYPE.simple" />
+    </div>
 </div>
 `,
     setup() {
@@ -391,6 +396,9 @@ To enable multi selection on row click, give `true` to `rowClickMultiSelectionMo
 }}
     </Story>
 </Canvas>
+
+<br/>
+<br/>
 
 ## Fixed Row Height
 

@@ -15,6 +15,7 @@ export interface DataTableFieldType {
     sortable?: boolean;
     sortKey?: string;
     width?: string;
+    textAlign?: string;
 }
 export type DataTableField = string | DataTableFieldType
 

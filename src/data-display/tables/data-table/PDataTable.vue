@@ -1,13 +1,13 @@
 <template>
-    <div class="p-data-table">
+    <div class="p-data-table"
+         :class="{
+             striped: striped,
+             bordered: bordered,
+             [tableStyleType]: true,
+         }"
+    >
         <div class="table-container">
-            <table ref="table"
-                   :class="{
-                       striped: striped,
-                       bordered: bordered,
-                       [tableStyleType]: true,
-                   }"
-            >
+            <table ref="table">
                 <thead>
                     <slot name="head" v-bind="getDefaultSlotProps()">
                         <tr v-if="showHeader" class="fade-in">
@@ -29,14 +29,19 @@
                                 <slot :name="`th-${field.name}`"
                                       v-bind="getHeadSlotProps(field, index)"
                                 >
-                                    <span class="th-contents">
+                                    <span class="th-contents"
+                                          :class="{
+                                              [field.textAlign]: field.textAlign ? true : false,
+                                              'has-icon': sortable && field.sortable || colCopy,
+                                          }"
+                                    >
                                         <span class="th-text">
                                             <slot :name="`th-${field.name}-format`"
                                                   v-bind="getHeadSlotProps(field, index)"
                                             >
                                                 {{ field.label ? field.label : field.name }}
                                             </slot>
-                                            <p-copy-button v-if="colCopy" class="ml-2"
+                                            <p-copy-button v-if="colCopy"
                                                            copy-manually
                                                            @copy="onClickColCopy(index)"
                                             />
@@ -102,11 +107,16 @@
                             </td>
                             <td v-for="(field, i) in fieldsData"
                                 :key="`td-${contextKey}-${index}-${i}`"
-                                :class="{'has-width': !!field.width}"
+                                :class="{
+                                    'has-width': !!field.width,
+                                    [field.textAlign]: field.textAlign ? true : false,
+                                }"
                             >
-                                <slot :name="`col-${field.name}-format`" v-bind="getColSlotProps(item, index, field, )">
-                                    <slot :name="`col-${i}-format`" v-bind="getColSlotProps(item, index, field, )">
-                                        {{ getValue(item,field) }}
+                                <slot name="col-format" v-bind="getColSlotProps(item, index, field)">
+                                    <slot :name="`col-${field.name}-format`" v-bind="getColSlotProps(item, index, field)">
+                                        <slot :name="`col-${i}-format`" v-bind="getColSlotProps(item, index, field)">
+                                            {{ getValue(item,field) }}
+                                        </slot>
                                     </slot>
                                 </slot>
                             </td>
@@ -145,7 +155,7 @@ import PRadio from '@/inputs/radio/PRadio.vue';
 import PCopyButton from '@/inputs/buttons/copy-button/PCopyButton.vue';
 import PLottie from '@/foundation/lottie/PLottie.vue';
 import PI from '@/foundation/icons/PI.vue';
-import { DATA_TABLE_STYLE_TYPE } from '@/data-display/tables/data-table/config';
+import { DATA_TABLE_STYLE_TYPE, DATA_TABLE_CELL_TEXT_ALIGN } from '@/data-display/tables/data-table/config';
 
 
 export default defineComponent<DataTableProps>({
@@ -427,6 +437,7 @@ export default defineComponent<DataTableProps>({
             onSelectAllToggle,
             onClickColCopy,
             onChangeRadioSelect,
+            DATA_TABLE_CELL_TEXT_ALIGN,
         };
     },
 });
@@ -500,6 +511,21 @@ export default defineComponent<DataTableProps>({
             .th-text {
                 display: inline-flex;
                 align-content: center;
+                .p-copy-button {
+                    @apply inline-block text-center;
+                    width: 1.5rem;
+                }
+            }
+            &.right {
+                justify-content: flex-end;
+                padding-right: 1rem;
+            }
+            &.center {
+                justify-content: center;
+                padding-right: 1rem;
+            }
+            &.has-icon {
+                padding-right: 0;
             }
         }
         .sort-icon {
@@ -510,8 +536,8 @@ export default defineComponent<DataTableProps>({
             @apply min-w-19;
         }
         &:last-child {
-            .th-contents {
-                @apply pr-2;
+            .th-contents:not(.has-icon) {
+                padding-right: 1rem;
             }
         }
         &.all-select {
@@ -523,11 +549,16 @@ export default defineComponent<DataTableProps>({
     }
     td {
         @apply h-10 px-4 z-0 align-middle min-w-28 text-sm;
-        vertical-align: middle;
         &.has-width {
             word-break: break-word;
             padding-top: 0.5rem;
             padding-bottom: 0.5rem;
+        }
+        &.right {
+            @apply text-right;
+        }
+        &.center {
+            @apply text-center;
         }
     }
     tr {
@@ -596,11 +627,11 @@ export default defineComponent<DataTableProps>({
     }
 
     /* themes */
-    .default {
+    &.default {
         @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.300'), theme('colors.blue.100');
     }
 
-    .light {
+    &.light {
         @mixin table-theme theme('colors.white'), theme('colors.primary4'), theme('colors.gray.300'), theme('colors.blue.100');
         th {
             @apply border-gray-200;
@@ -608,7 +639,7 @@ export default defineComponent<DataTableProps>({
         }
     }
 
-    .primary4 {
+    &.primary4 {
         @mixin table-theme theme('colors.white'), transparent, theme('colors.white'), transparent;
         tr {
             @apply bg-primary4;
@@ -616,6 +647,27 @@ export default defineComponent<DataTableProps>({
         &.bordered {
             td {
                 border-bottom-width: 4px;
+            }
+        }
+    }
+
+    &.simple {
+        min-height: 10.75rem;
+
+        @mixin table-theme theme('colors.white'), transparent, theme('colors.gray.200'), transparent;
+        th {
+            @apply border-transparent text-gray-600 font-normal;
+            height: 1.75rem;
+            font-size: 0.75rem;
+        }
+        &.bordered {
+            td {
+                height: 2.25rem;
+            }
+            tr:last-of-type {
+                td {
+                    @apply border-white;
+                }
             }
         }
     }
