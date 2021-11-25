@@ -1,5 +1,6 @@
 import { FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
-import { CHART_TYPE, QUERY_VISIBILITY_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { QUERY_VISIBILITY_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 
 
 export interface Period {

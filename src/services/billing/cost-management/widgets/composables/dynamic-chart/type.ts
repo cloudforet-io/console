@@ -1,14 +1,6 @@
-import { TranslateResult } from 'vue-i18n';
 import { ComputedRef } from '@vue/composition-api';
 import { TimeUnit } from '@amcharts/amcharts4/core';
-import { ChartData } from '@/services/billing/cost-management/widgets/type';
-
-
-export interface Legend {
-    name: string;
-    label: string | TranslateResult;
-    disabled?: boolean;
-}
+import { ChartData, Legend } from '@/services/billing/cost-management/widgets/type';
 
 
 interface CategoryOptions {

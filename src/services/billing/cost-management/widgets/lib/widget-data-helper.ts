@@ -10,11 +10,11 @@ import { CurrencyRates } from '@/store/modules/display/type';
 
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
-import { Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
-import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
-import { GroupByItem, Period } from '@/services/billing/cost-management/cost-analysis/store/type';
-import { ChartData } from '@/services/billing/cost-management/widgets/type';
+import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
+
+import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
+import { ChartData, Legend } from '@/services/billing/cost-management/widgets/type';
 
 
 interface TableRawValue {
@@ -46,7 +46,7 @@ interface PieChartRawData {
 }
 
 
-export const mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: ChartData): ChartData => {
+const mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: ChartData): ChartData => {
     const mergedData: Record<string, number> = {};
     Object.keys({ ...prevData, ...currData }).forEach((k) => {
         const prevValue = prevData[k] || 0;
@@ -119,6 +119,11 @@ export const getXYChartDataAndLegends = (rawData: XYChartRawData[], groupBy?: GR
     };
 };
 
+/**
+ * @name getPieChartDataAndLegends
+ * @param rawData
+ * @param groupBy
+ */
 export const getPieChartDataAndLegends = (rawData: PieChartRawData[], groupBy?: GROUP_BY_ITEM): { chartData: ChartData[]; legends: Legend[] } => {
     let chartData: ChartData[] = [];
     const groupByNameSet = new Set<string>();
@@ -147,28 +152,33 @@ export const getPieChartDataAndLegends = (rawData: PieChartRawData[], groupBy?: 
     };
 };
 
-export const getTableDataFromRawData = (rawData: TableRawData[], groupByItems: GroupByItem[]): TableData[] => {
-    const tableData: TableData[] = [];
-    rawData.forEach((eachRawData) => {
-        const rowData: TableData = {};
 
-        /* extract group by data (ex. { provider: 'aws', region_code: 'us-west-1' }) */
-        if (groupByItems.length) {
-            groupByItems.forEach((item) => {
-                rowData[item.name] = eachRawData[item.name];
-            });
-        } else {
-            rowData.total_cost = 'Total Cost';
-        }
-
-        /* extract data per each date (ex. { 2021-11-01: '29.4K', 2021-11-02: '8,962' } ) */
-        eachRawData.values.forEach((value) => {
-            rowData[value.date] = commaFormatter(numberFormatter(value.usd_cost));
+const getDefaultRowDataWithGroupBy = (groupBy: string[], tableRawData: TableRawData): TableData => {
+    const rowData: TableData = {};
+    /* extract group by data (ex. { provider: 'aws', region_code: 'us-west-1' }) */
+    if (groupBy.length) {
+        groupBy.forEach((name) => {
+            rowData[name] = tableRawData[name];
         });
-        tableData.push(rowData);
-    });
-    return tableData;
+    } else {
+        rowData.total_cost = 'Total Cost';
+    }
+    return rowData;
 };
+
+export const getTableDataFromRawData = (
+    rawData: TableRawData[],
+    groupBy: string[],
+): TableData[] => rawData.map((eachRawData) => {
+    const rowData = getDefaultRowDataWithGroupBy(groupBy, eachRawData);
+
+    /* extract data per each date (ex. { 2021-11-01: '29.4K', 2021-11-02: '8,962' } ) */
+    eachRawData.values.forEach((value) => {
+        rowData[value.date] = commaFormatter(numberFormatter(value.usd_cost));
+    });
+
+    return rowData;
+});
 
 
 const getAccumulatedData = (

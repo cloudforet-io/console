@@ -5,7 +5,7 @@ type HideAllSeries = (chart: XYChart | PieChart | TreeMap) => void;
 
 export const toggleSeries: ToggleSeries = (chart, index) => {
     if (chart instanceof PieChart) {
-        const series = (chart as PieChart).series.getIndex(0);
+        const series = (chart as PieChart).series?.getIndex(0);
         if (!series) return;
 
         const slice = series.slices.values[index];
@@ -17,7 +17,7 @@ export const toggleSeries: ToggleSeries = (chart, index) => {
             slice.dataItem.hide();
         }
     } else {
-        const series = (chart as XYChart).series.getIndex(index);
+        const series = (chart as XYChart).series?.getIndex(index);
         if (!series) return;
         if (series.isHiding || series.isHidden) {
             series.show();

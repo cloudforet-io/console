@@ -72,7 +72,7 @@
                      @click="handleClickLegend(idx)"
                 >
                     <p-status :text="legend.label"
-                              :icon-color="legend.disabled ? DISABLED_COLOR : CUSTOM_COLORS[idx % CUSTOM_COLORS.length]"
+                              :icon-color="legend.disabled ? DISABLED_COLOR : DEFAULT_CHART_COLORS[idx % DEFAULT_CHART_COLORS.length]"
                               :text-color="legend.disabled ? DISABLED_COLOR : null"
                     />
                 </div>
@@ -109,23 +109,22 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { CUSTOM_COLORS } from '@/lib/site-initializer/amcharts';
+import {
+    hideAllSeries,
+    toggleSeries,
+} from '@/lib/amcharts/helper';
+import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 
-import { Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
 import {
     getConvertedFilter, getConvertedGranularity, getConvertedPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { FILTER_MAP, GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import {
     getPieChartDataAndLegends,
     getXYChartDataAndLegends,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
-import { ChartData } from '@/services/billing/cost-management/widgets/type';
-import {
-    hideAllSeries,
-    toggleSeries,
-} from '@/services/billing/cost-management/widgets/composables/dynamic-chart/helper';
+import { ChartData, Legend } from '@/services/billing/cost-management/widgets/type';
 import {
     DISABLED_COLOR,
 } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/config';
@@ -269,7 +268,7 @@ export default {
             selectFilterModalState,
             FILTER_MAP,
             DISABLED_COLOR,
-            CUSTOM_COLORS,
+            DEFAULT_CHART_COLORS,
             CHART_TYPE,
             GRANULARITY,
             handleClickLegend,

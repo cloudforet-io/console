@@ -41,7 +41,7 @@ import {
 } from '@spaceone/design-system';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
-import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { store } from '@/store';
 import { i18n } from '@/translations';

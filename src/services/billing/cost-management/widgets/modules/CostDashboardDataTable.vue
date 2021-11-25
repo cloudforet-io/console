@@ -48,9 +48,9 @@ import {
 } from '@spaceone/design-system';
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
-import { CUSTOM_COLORS } from '@/lib/site-initializer/amcharts';
+import { toggleSeries } from '@/lib/amcharts/helper';
+import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 
-import { toggleSeries } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/helper';
 import {
     DISABLED_COLOR,
 } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/config';
@@ -127,7 +127,7 @@ export default {
             const convertedIndex = index + ((state.proxyThisPage - 1) * props.pageSize);
             const legend = props.legends[convertedIndex];
             if (legend?.disabled) return DISABLED_COLOR;
-            return CUSTOM_COLORS[convertedIndex];
+            return DEFAULT_CHART_COLORS[convertedIndex];
         };
         const getStatusTextColor = (index) => {
             const convertedIndex = index + ((state.proxyThisPage - 1) * props.pageSize);

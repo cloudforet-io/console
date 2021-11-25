@@ -8,9 +8,9 @@ import { computed } from '@vue/composition-api';
 import { serviceRoutes } from '@/router/service-routes';
 import { adminDomainServiceRoutes } from '@/router/admin-domain-service-routes';
 import { errorRoutes } from '@/router/error-routes';
+import { addAmchartsLicense, applyAmchartsGlobalSettings } from '@/lib/amcharts/global-settings';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
 import { initI18n } from '@/translations';
-import { initAmcharts } from '@/lib/site-initializer/amcharts';
 
 
 const initConfig = async () => {
@@ -63,6 +63,17 @@ const initRouter = (domainName?: string) => {
     } else {
         SpaceRouter.init(serviceRoutes);
     }
+};
+
+const initAmcharts = () => {
+    if (config.get('AMCHARTS_LICENSE.ENABLED')) {
+        addAmchartsLicense([
+            config.get('AMCHARTS_LICENSE.CHARTS'),
+            config.get('AMCHARTS_LICENSE.MAPS'),
+            config.get('AMCHARTS_LICENSE.TIMELINE'),
+        ]);
+    }
+    applyAmchartsGlobalSettings();
 };
 
 

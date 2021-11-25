@@ -57,18 +57,17 @@ import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
-import { CUSTOM_COLORS } from '@/lib/site-initializer/amcharts';
+import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 
 import {
     getCurrencyAppliedChartData, getTableDataFromRawData,
     getXYChartDataAndLegends,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
 import { FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
 import { FilterItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { CURRENCY } from '@/store/modules/display/config';
-import { ChartData, WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import { ChartData, Legend, WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { DISABLED_COLOR } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/config';
 
 
@@ -223,7 +222,7 @@ export default {
                     ...costApiQueryHelper.data,
                 });
                 state.totalCount = total_count > 15 ? 15 : total_count;
-                state.items = getTableDataFromRawData(results, [{ name: GROUP_BY_ITEM.PRODUCT, label: 'Product' }]) as TableItem[];
+                state.items = getTableDataFromRawData(results, [GROUP_BY_ITEM.PRODUCT]) as TableItem[];
                 state.top15ProductNames = results.map(d => d.product);
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -292,7 +291,7 @@ export default {
 
         return {
             ...toRefs(state),
-            CUSTOM_COLORS,
+            DEFAULT_CHART_COLORS,
             DISABLED_COLOR,
             handleToggleLegend,
         };

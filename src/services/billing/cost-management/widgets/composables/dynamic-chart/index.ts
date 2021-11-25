@@ -17,7 +17,7 @@ import drawStackedLineChart from '@/services/billing/cost-management/widgets/com
 import drawPieChart from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-pie-chart';
 
 import { DynamicChartStateArgs } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
-import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
+import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 
 
 const createCursor = (chart) => {

@@ -24,7 +24,6 @@ import {
     useDynamicChart,
 } from '@/services/billing/cost-management/widgets/composables/dynamic-chart';
 
-import { Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { CURRENCY } from '@/store/modules/display/config';
 
@@ -32,13 +31,13 @@ import { CURRENCY } from '@/store/modules/display/config';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { getTimeUnitByPeriod } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
 
+import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import {
     getCurrencyAppliedChartData,
     getQueryAppliedChartData,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
-import { ChartData, WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import { ChartData, Legend, WidgetProps } from '@/services/billing/cost-management/widgets/type';
 
 
 interface Props extends WidgetProps {

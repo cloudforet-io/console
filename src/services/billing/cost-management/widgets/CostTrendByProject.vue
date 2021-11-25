@@ -45,7 +45,6 @@ import { DataTableField } from '@spaceone/design-system/dist/src/data-display/ta
 
 import { FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
 import { FilterItem } from '@/services/billing/cost-management/cost-analysis/store/type';
-import { Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -54,7 +53,7 @@ import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
 import { CURRENCY } from '@/store/modules/display/config';
-import { ChartData, WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import { ChartData, Legend, WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import {
     getCurrencyAppliedChartData, getTableDataFromRawData,
     getXYChartDataAndLegends,
@@ -205,7 +204,7 @@ export default {
                     ...costApiQueryHelper.data,
                 });
                 state.totalCount = total_count > 15 ? 15 : total_count;
-                state.items = getTableDataFromRawData(results, [{ name: GROUP_BY_ITEM.PROJECT, label: 'Project' }]) as TableItem[];
+                state.items = getTableDataFromRawData(results, [GROUP_BY_ITEM.PRODUCT]) as TableItem[];
                 state.top15ProjectIds = results.map(d => d.project_id);
             } catch (e) {
                 ErrorHandler.handleError(e);

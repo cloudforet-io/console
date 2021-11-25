@@ -151,15 +151,17 @@ export default {
                 const granularity = getConvertedGranularity(state.period, state.granularity);
                 const convertedFilters = getConvertedFilter(state.filters);
                 costApiQueryHelper.setFilters(convertedFilters);
+
+                const groupBy = state.groupByItems.map(d => d.name);
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity,
-                    group_by: state.groupByItems.map(d => d.name),
+                    group_by: groupBy,
                     start: state.period.start,
                     end: state.period.end,
                     pivot_type: 'TABLE',
                     ...costApiQueryHelper.data,
                 });
-                tableState.items = getTableDataFromRawData(results, state.groupByItems);
+                tableState.items = getTableDataFromRawData(results, groupBy);
                 tableState.totalCount = total_count;
             } catch (e) {
                 tableState.items = [];
