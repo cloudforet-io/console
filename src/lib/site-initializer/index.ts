@@ -3,7 +3,6 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { store } from '@/store';
 import { SpaceRouter } from '@/router';
 import { GTag } from '@/lib/gtag';
-import * as am4core from '@amcharts/amcharts4/core';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { computed } from '@vue/composition-api';
 import { serviceRoutes } from '@/router/service-routes';
@@ -11,6 +10,7 @@ import { adminDomainServiceRoutes } from '@/router/admin-domain-service-routes';
 import { errorRoutes } from '@/router/error-routes';
 import { initDayjs } from '@/lib/site-initializer/dayjs';
 import { initI18n } from '@/translations';
+import { initAmcharts } from '@/lib/site-initializer/amcharts';
 
 
 const initConfig = async () => {
@@ -55,14 +55,6 @@ const initQueryHelper = () => {
     QueryHelper.init(computed(() => store.state.user.timezone));
 };
 
-const initAmchartsLicense = () => {
-    if (config.get('AMCHARTS_LICENSE.ENABLED')) {
-        am4core.addLicense(config.get('AMCHARTS_LICENSE.CHARTS'));
-        am4core.addLicense(config.get('AMCHARTS_LICENSE.MAPS'));
-        am4core.addLicense(config.get('AMCHARTS_LICENSE.TIMELINE'));
-    }
-};
-
 const initRouter = (domainName?: string) => {
     if (!domainName) {
         SpaceRouter.init(errorRoutes);
@@ -91,7 +83,7 @@ const init = async () => {
         initDayjs();
         initQueryHelper();
         initGtag();
-        initAmchartsLicense();
+        initAmcharts();
     } else {
         initRouter();
         throw new Error('Site initialization failed: No matched domain');
