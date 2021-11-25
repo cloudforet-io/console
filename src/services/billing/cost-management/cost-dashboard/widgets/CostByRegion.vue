@@ -122,7 +122,7 @@ export default {
         const setPieChartData = (chartData) => {
             const _continentData = cloneDeep(continentData);
             chartData.forEach((d) => {
-                const target = _continentData.find(continent => continent.continent_code === (state.regions[`${d.provider}:${d.region_code}`]?.continent?.continent_code));
+                const target = _continentData.find(continent => continent.continent_code === (state.regions[d.region_code]?.continent?.continent_code));
                 if (target) {
                     target.pieData.push({
                         category: `${d.provider}:${d.region_code}`,

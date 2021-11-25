@@ -29,7 +29,7 @@ const UNIT_TYPE = Object.freeze({
 type UNIT_TYPE = typeof UNIT_TYPE[keyof typeof UNIT_TYPE];
 
 export default {
-    name: 'CardWidgetLayout',
+    name: 'CostDashboardSimpleCardWidget',
     components: {
         PPaneLayout,
         PDivider,
@@ -81,7 +81,6 @@ export default {
 <style lang="postcss" scoped>
 .card-widget-layout {
     min-width: 22rem;
-    max-height: 12.81rem;
     padding: 1rem 1.25rem;
 
     .title-wrapper {

@@ -48,7 +48,7 @@ export default {
         const disposeChart = (chartContext) => {
             if (state.chartRegistry[chartContext]) {
                 state.chartRegistry[chartContext].dispose();
-                delete state.chartRegistry[chartContext];
+                state.chartRegistry[chartContext] = undefined;
             }
         };
 

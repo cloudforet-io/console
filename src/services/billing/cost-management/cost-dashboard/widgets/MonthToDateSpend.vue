@@ -1,5 +1,5 @@
 <template>
-    <card-widget-layout
+    <cost-dashboard-simple-card-widget
         :title="'Month-to-Date Spend'"
         unit-type="CURRENCY"
         unit="USD"
@@ -30,13 +30,13 @@
                 Decreased from {{ formattedLastMonthData.start }} ~ {{ formattedLastMonthData.end }}
             </div>
         </template>
-    </card-widget-layout>
+    </cost-dashboard-simple-card-widget>
 </template>
 
 <script lang="ts">
 import dayjs, { Dayjs } from 'dayjs';
 
-import CardWidgetLayout from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardSimpleCardWidget.vue';
+import CostDashboardSimpleCardWidget from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardSimpleCardWidget.vue';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { PI } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
@@ -63,7 +63,7 @@ const lastMonthPeriod = {
 export default {
     name: 'MonthToDateSpend',
     components: {
-        CardWidgetLayout,
+        CostDashboardSimpleCardWidget,
         PI,
     },
 

@@ -12,6 +12,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import config from '@/lib/config';
 import { gray, coral } from '@/styles/colors';
+import { XYChart } from '@amcharts/amcharts4/charts';
 
 am4core.useTheme(am4themesAnimated);
 
@@ -57,7 +58,7 @@ export default {
     setup(props) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
-            chart: null as null | any,
+            chart: null as XYChart | null,
             chartRegistry: {},
         });
 
