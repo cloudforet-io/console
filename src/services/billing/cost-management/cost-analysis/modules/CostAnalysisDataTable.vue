@@ -51,8 +51,8 @@ import {
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
-import { getTableDataFromRawData } from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
+import { getTableDataFromRawData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 
 
 interface CostAnalysisItem {

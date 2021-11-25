@@ -47,8 +47,13 @@ import {
     PDataTable, PTextPagination, PStatus,
 } from '@spaceone/design-system';
 
-import { CUSTOM_COLORS, DISABLED_COLOR, toggleSeries } from '@/services/billing/cost-management/widgets/composables/dynamic-chart';
 import { makeProxy } from '@/lib/helper/composition-helpers';
+import { CUSTOM_COLORS } from '@/lib/site-initializer/amcharts';
+
+import { toggleSeries } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/helper';
+import {
+    DISABLED_COLOR,
+} from '@/services/billing/cost-management/widgets/composables/dynamic-chart/config';
 
 
 // interface Item {

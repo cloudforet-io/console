@@ -4,6 +4,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import config from '@/lib/config';
 import { gray } from '@/styles/colors';
 import { Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
+import { PieChart } from '@amcharts/amcharts4/charts';
 
 
 const createSeries = (chart, legends: Legend[]) => {
@@ -37,7 +38,7 @@ const createSeries = (chart, legends: Legend[]) => {
     return series;
 };
 
-export const drawPieChart = (data, chartContainer, valueOptions, categoryOptions) => {
+export default (data, chartContainer, valueOptions, categoryOptions): PieChart => {
     const chart = am4core.create(chartContainer, am4charts.PieChart);
     if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
     chart.paddingLeft = -5;

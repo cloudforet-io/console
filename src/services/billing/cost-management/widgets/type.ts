@@ -5,3 +5,7 @@ export interface WidgetProps {
     currency: CURRENCY;
     currencyRates: CurrencyRates;
 }
+
+export interface ChartData {
+    [key: string]: any;
+}

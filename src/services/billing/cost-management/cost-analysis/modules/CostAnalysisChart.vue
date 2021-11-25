@@ -106,21 +106,29 @@ import CostAnalysisSelectFilterModal
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 
+import { store } from '@/store';
+import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import {
-    CUSTOM_COLORS, DISABLED_COLOR, hideAllSeries, toggleSeries,
-} from '@/services/billing/cost-management/widgets/composables/dynamic-chart';
-import { ChartData, Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
+import { CUSTOM_COLORS } from '@/lib/site-initializer/amcharts';
+
+import { Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
 import {
     getConvertedFilter, getConvertedGranularity, getConvertedPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import {
-    getPieChartDataAndLegends, getXYChartDataAndLegends,
-} from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
 import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { FILTER_MAP, GRANULARITY } from '@/services/billing/cost-management/lib/config';
-import { store } from '@/store';
-import { i18n } from '@/translations';
+import {
+    getPieChartDataAndLegends,
+    getXYChartDataAndLegends,
+} from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
+import { ChartData } from '@/services/billing/cost-management/widgets/type';
+import {
+    hideAllSeries,
+    toggleSeries,
+} from '@/services/billing/cost-management/widgets/composables/dynamic-chart/helper';
+import {
+    DISABLED_COLOR,
+} from '@/services/billing/cost-management/widgets/composables/dynamic-chart/config';
 
 
 export default {

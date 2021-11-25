@@ -2,6 +2,7 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
+import { XYChart } from '@amcharts/amcharts4/charts';
 
 
 const createCategoryAxis = (chart, categoryOptions) => {
@@ -60,7 +61,7 @@ const createSeries = (chart, legend) => {
     return series;
 };
 
-export const drawStackedLineChart = (data, chartContainer, valueOptions, categoryOptions) => {
+export default (data, chartContainer, valueOptions, categoryOptions): XYChart => {
     const chart = am4core.create(chartContainer, am4charts.XYChart);
     if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
     chart.paddingLeft = -5;

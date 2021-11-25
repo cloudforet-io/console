@@ -5,6 +5,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 import config from '@/lib/config';
 import { gray } from '@/styles/colors';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
+import { XYChart } from '@amcharts/amcharts4/charts';
 
 
 const createCategoryAxis = (chart, categoryOptions) => {
@@ -88,7 +89,7 @@ const createSeries = (chart, legend, timeUnit) => {
     return series;
 };
 
-export const drawStackedColumnChart = (data, chartContainer, valueOptions, categoryOptions) => {
+export default (data, chartContainer, valueOptions, categoryOptions): XYChart => {
     /* Chart Data must have data of last day, because AmCharts DateAxis not work properly if there's no last day. */
 
     const chart = am4core.create(chartContainer, am4charts.XYChart);

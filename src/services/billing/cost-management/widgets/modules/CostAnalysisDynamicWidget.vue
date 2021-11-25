@@ -21,10 +21,10 @@ import {
 } from '@spaceone/design-system';
 
 import {
-    useColumnChart, useLineChart, usePieChart, useStackedColumnChart, useStackedLineChart,
+    useDynamicChart,
 } from '@/services/billing/cost-management/widgets/composables/dynamic-chart';
 
-import { ChartData, DynamicChartStateArgs, Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
+import { Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { CURRENCY } from '@/store/modules/display/config';
 
@@ -38,7 +38,7 @@ import {
     getCurrencyAppliedChartData,
     getQueryAppliedChartData,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
-import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import { ChartData, WidgetProps } from '@/services/billing/cost-management/widgets/type';
 
 
 interface Props extends WidgetProps {
@@ -119,7 +119,8 @@ export default {
                 timeUnit,
             );
 
-            const params: DynamicChartStateArgs = {
+
+            const { chart } = useDynamicChart(props.chartType, {
                 data: getCurrencyAppliedChartData(
                     state.USDChartData,
                     props.currency,
@@ -132,27 +133,14 @@ export default {
                     timeUnit,
                 },
                 chartContainer: chartContext,
-            };
-
-            let chart;
-            if (props.chartType === CHART_TYPE.STACKED_COLUMN) {
-                ({ chart } = useStackedColumnChart(params));
-            } else if (props.chartType === CHART_TYPE.COLUMN) {
-                ({ chart } = useColumnChart(params));
-            } else if (props.chartType === CHART_TYPE.LINE) {
-                ({ chart } = useLineChart(params));
-            } else if (props.chartType === CHART_TYPE.STACKED_LINE) {
-                ({ chart } = useStackedLineChart(params));
-            } else if (props.chartType === CHART_TYPE.DONUT) {
-                ({ chart } = usePieChart(params));
-            }
+            });
 
             if (props.chartType !== CHART_TYPE.DONUT) {
                 const start = dayjs(props.period.start);
                 const end = dayjs(props.period.end);
                 const diff = end.diff(start, timeUnit);
                 if (diff > 31) {
-                    chart.scrollbarX = new am4core.Scrollbar();
+                    (chart as XYChart).scrollbarX = new am4core.Scrollbar();
                 }
             }
 

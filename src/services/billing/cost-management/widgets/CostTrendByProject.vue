@@ -45,20 +45,20 @@ import { DataTableField } from '@spaceone/design-system/dist/src/data-display/ta
 
 import { FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
 import { FilterItem } from '@/services/billing/cost-management/cost-analysis/store/type';
-import { ChartData, Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
+import { Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import {
-    getTableDataFromRawData, getXYChartDataAndLegends,
-} from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
 import { CURRENCY } from '@/store/modules/display/config';
-import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
-import { getCurrencyAppliedChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
+import { ChartData, WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import {
+    getCurrencyAppliedChartData, getTableDataFromRawData,
+    getXYChartDataAndLegends,
+} from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 
 
 interface TableItem {

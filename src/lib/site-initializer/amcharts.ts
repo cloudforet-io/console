@@ -6,7 +6,7 @@ import {
     blue, coral, green, indigo, peacock, red, violet, yellow,
 } from '@/styles/colors';
 
-const CUSTOM_COLORS = [
+export const CUSTOM_COLORS = [
     violet[400], violet[500], blue[400], blue[600], coral[400], coral[600],
     yellow[400], yellow[600], green[400], green[600], peacock[400], peacock[600],
     red[400], red[600], indigo[400], indigo[600], violet[600], violet[800],

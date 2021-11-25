@@ -33,7 +33,6 @@ import { range } from 'lodash';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import { XYChart } from '@amcharts/amcharts4/charts';
 
 import {
@@ -55,25 +54,22 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 
-import {
-    getTableDataFromRawData, getXYChartDataAndLegends,
-} from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
-import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import {
-    customColorTheme, CUSTOM_COLORS, DISABLED_COLOR,
-} from '@/services/billing/cost-management/widgets/composables/dynamic-chart';
-import { ChartData, Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
-import { FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
-import { FilterItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
-import { CURRENCY } from '@/store/modules/display/config';
-import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
-import { getCurrencyAppliedChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
+import { CUSTOM_COLORS } from '@/lib/site-initializer/amcharts';
 
-am4core.useTheme(customColorTheme);
-am4core.useTheme(am4themesAnimated);
+import {
+    getCurrencyAppliedChartData, getTableDataFromRawData,
+    getXYChartDataAndLegends,
+} from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
+import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
+import { FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
+import { FilterItem } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { CURRENCY } from '@/store/modules/display/config';
+import { ChartData, WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import { DISABLED_COLOR } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/config';
 
 
 interface TableItem {
