@@ -1,23 +1,23 @@
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
+import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 
 import {
     reactive,
 } from '@vue/composition-api';
 
-import { DynamicChartStateArgs } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
+import {
+    gray,
+} from '@/styles/colors';
+
 import drawStackedColumnChart from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-stacked-column-chart';
 import drawColumnChart from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-column-chart';
 import drawLineChart from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-line-chart';
 import drawStackedLineChart from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-stacked-line-chart';
 import drawPieChart from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-pie-chart';
 
-import {
-    gray,
-} from '@/styles/colors';
-
+import { DynamicChartStateArgs } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
 import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
-import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 
 
 const createCursor = (chart) => {
