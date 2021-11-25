@@ -99,7 +99,7 @@ import {
 } from '@spaceone/design-system';
 
 import CostAnalysisDynamicWidget
-    from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostAnalysisDynamicWidget.vue';
+    from '@/services/billing/cost-management/widgets/modules/CostAnalysisDynamicWidget.vue';
 import CostAnalysisSelectFilterModal
     from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSelectFilterModal.vue';
 
@@ -109,8 +109,8 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import {
     CUSTOM_COLORS, DISABLED_COLOR, hideAllSeries, toggleSeries,
-} from '@/common/composables/dynamic-chart';
-import { ChartData, Legend } from '@/common/composables/dynamic-chart/type';
+} from '@/services/billing/cost-management/widgets/composables/dynamic-chart';
+import { ChartData, Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
 import {
     getConvertedFilter, getConvertedGranularity, getConvertedPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';

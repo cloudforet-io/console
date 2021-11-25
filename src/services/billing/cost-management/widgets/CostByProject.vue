@@ -20,7 +20,7 @@ import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import config from '@/lib/config';
 import { TreeMap } from '@amcharts/amcharts4/charts';
 import CostDashboardCardWidgetLayout
-    from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardCardWidgetLayout.vue';
+    from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';

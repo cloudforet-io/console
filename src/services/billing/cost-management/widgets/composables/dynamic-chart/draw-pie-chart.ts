@@ -3,7 +3,7 @@ import * as am4charts from '@amcharts/amcharts4/charts';
 
 import config from '@/lib/config';
 import { gray } from '@/styles/colors';
-import { Legend } from '@/common/composables/dynamic-chart/type';
+import { Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
 
 
 const createSeries = (chart, legends: Legend[]) => {

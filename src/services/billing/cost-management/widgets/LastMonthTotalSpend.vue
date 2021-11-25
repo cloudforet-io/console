@@ -15,7 +15,7 @@
 
 <script lang="ts">
 import CostDashboardSimpleCardWidget
-    from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardSimpleCardWidget.vue';
+    from '@/services/billing/cost-management/widgets/modules/CostDashboardSimpleCardWidget.vue';
 import {
     computed,
     onUnmounted, reactive, toRefs, watch,

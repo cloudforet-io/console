@@ -29,7 +29,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { continentData } from '@/services/billing/cost-management/cost-dashboard/lib/config';
 import CostDashboardCardWidgetLayout
-    from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardCardWidgetLayout.vue';
+    from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 
 am4core.useTheme(am4themesAnimated);

@@ -1,4 +1,4 @@
-import { ChartData, Legend } from '@/common/composables/dynamic-chart/type';
+import { ChartData, Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
 import { store } from '@/store';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';

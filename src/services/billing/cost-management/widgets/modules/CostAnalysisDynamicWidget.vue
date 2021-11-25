@@ -22,9 +22,9 @@ import {
 
 import {
     useColumnChart, useLineChart, usePieChart, useStackedColumnChart, useStackedLineChart,
-} from '@/common/composables/dynamic-chart';
+} from '@/services/billing/cost-management/widgets/composables/dynamic-chart';
 
-import { ChartData, DynamicChartStateArgs, Legend } from '@/common/composables/dynamic-chart/type';
+import { ChartData, DynamicChartStateArgs, Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { CURRENCY } from '@/store/modules/display/config';
 
@@ -37,8 +37,8 @@ import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib
 import {
     getCurrencyAppliedChartData,
     getQueryAppliedChartData,
-} from '@/services/billing/cost-management/cost-dashboard/widgets/lib/widget-data-helper';
-import { WidgetProps } from '@/services/billing/cost-management/cost-dashboard/widgets/type';
+} from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
+import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 
 
 interface Props extends WidgetProps {

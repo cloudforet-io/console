@@ -36,7 +36,7 @@
 <script lang="ts">
 import dayjs, { Dayjs } from 'dayjs';
 
-import CostDashboardSimpleCardWidget from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardSimpleCardWidget.vue';
+import CostDashboardSimpleCardWidget from '@/services/billing/cost-management/widgets/modules/CostDashboardSimpleCardWidget.vue';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { PI } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';

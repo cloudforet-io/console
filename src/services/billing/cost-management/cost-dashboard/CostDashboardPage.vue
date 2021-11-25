@@ -69,8 +69,8 @@ import { store } from '@/store';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 
 import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
-import CostTrendByProduct from '@/services/billing/cost-management/cost-dashboard/widgets/CostTrendByProduct.vue';
-import CostTrendByProject from '@/services/billing/cost-management/cost-dashboard/widgets/CostTrendByProject.vue';
+import CostTrendByProduct from '@/services/billing/cost-management/widgets/CostTrendByProduct.vue';
+import CostTrendByProject from '@/services/billing/cost-management/widgets/CostTrendByProject.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
 
 

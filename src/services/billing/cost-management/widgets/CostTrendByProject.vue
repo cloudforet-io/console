@@ -37,15 +37,15 @@ import {
 } from '@spaceone/design-system';
 
 import CostDashboardCardWidgetLayout
-    from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardCardWidgetLayout.vue';
+    from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable
-    from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardDataTable.vue';
+    from '@/services/billing/cost-management/widgets/modules/CostDashboardDataTable.vue';
 
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 import { FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
 import { FilterItem } from '@/services/billing/cost-management/cost-analysis/store/type';
-import { ChartData, Legend } from '@/common/composables/dynamic-chart/type';
+import { ChartData, Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -57,8 +57,8 @@ import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
 import { CURRENCY } from '@/store/modules/display/config';
-import { WidgetProps } from '@/services/billing/cost-management/cost-dashboard/widgets/type';
-import { getCurrencyAppliedChartData } from '@/services/billing/cost-management/cost-dashboard/widgets/lib/widget-data-helper';
+import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import { getCurrencyAppliedChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 
 
 interface TableItem {

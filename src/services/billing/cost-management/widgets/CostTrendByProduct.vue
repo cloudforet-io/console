@@ -47,9 +47,9 @@ import {
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 import CostDashboardCardWidgetLayout
-    from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardCardWidgetLayout.vue';
+    from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import CostDashboardDataTable
-    from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostDashboardDataTable.vue';
+    from '@/services/billing/cost-management/widgets/modules/CostDashboardDataTable.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
@@ -61,16 +61,16 @@ import {
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import {
     customColorTheme, CUSTOM_COLORS, DISABLED_COLOR,
-} from '@/common/composables/dynamic-chart';
-import { ChartData, Legend } from '@/common/composables/dynamic-chart/type';
+} from '@/services/billing/cost-management/widgets/composables/dynamic-chart';
+import { ChartData, Legend } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
 import { FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
 import { FilterItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
 import { CURRENCY } from '@/store/modules/display/config';
-import { WidgetProps } from '@/services/billing/cost-management/cost-dashboard/widgets/type';
-import { getCurrencyAppliedChartData } from '@/services/billing/cost-management/cost-dashboard/widgets/lib/widget-data-helper';
+import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import { getCurrencyAppliedChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 
 am4core.useTheme(customColorTheme);
 am4core.useTheme(am4themesAnimated);

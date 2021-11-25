@@ -6,12 +6,12 @@ import {
     reactive,
 } from '@vue/composition-api';
 
-import { DynamicChartStateArgs } from '@/common/composables/dynamic-chart/type';
-import { drawStackedColumnChart } from '@/common/composables/dynamic-chart/draw-stacked-column-chart';
-import { drawColumnChart } from '@/common/composables/dynamic-chart/draw-column-chart';
-import { drawLineChart } from '@/common/composables/dynamic-chart/draw-line-chart';
-import { drawStackedLineChart } from '@/common/composables/dynamic-chart/draw-stacked-line-chart';
-import { drawPieChart } from '@/common/composables/dynamic-chart/draw-pie-chart';
+import { DynamicChartStateArgs } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
+import { drawStackedColumnChart } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-stacked-column-chart';
+import { drawColumnChart } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-column-chart';
+import { drawLineChart } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-line-chart';
+import { drawStackedLineChart } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-stacked-line-chart';
+import { drawPieChart } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-pie-chart';
 import {
     blue, coral, gray, green, indigo, peacock, violet, yellow, red,
 } from '@/styles/colors';

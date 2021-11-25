@@ -1,4 +1,4 @@
-import { ChartData } from '@/common/composables/dynamic-chart/type';
+import { ChartData } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
 import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { TimeUnit } from '@amcharts/amcharts4/core';
 import dayjs from 'dayjs';
