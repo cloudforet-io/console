@@ -27,12 +27,7 @@
                                    @update:selectedDates="handleSelectedDates"
                 />
             </div>
-            <p-select-dropdown class="filter-item"
-                               :items="currencyItems"
-                               :selected="currency"
-                               without-outline
-                               @select="handleSelectCurrency"
-            />
+            <currency-select-dropdown />
             <p-icon-button class="filter-item" name="ic_refresh" @click="handleClickRefresh" />
         </div>
     </div>
@@ -44,17 +39,19 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import {
     PIconButton, PSelectDropdown, PDatetimePicker,
 } from '@spaceone/design-system';
-
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+
 import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
 
 
 export default {
     name: 'CostAnalysisQueryFilter',
     components: {
+        CurrencySelectDropdown,
         PSelectDropdown,
         PDatetimePicker,
         PIconButton,
@@ -115,11 +112,6 @@ export default {
                     label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DONUT'),
                 },
             ])),
-            currencyItems: computed<MenuItem[]>(() => ([
-                { type: 'item', name: 'USD', label: '$USD' },
-                { type: 'item', name: 'KRW', label: '$KRW' },
-                { type: 'item', name: 'JPY', label: '¥JPY' },
-            ])),
         });
 
         /* event */
@@ -139,9 +131,6 @@ export default {
         const handleSelectedDates = async (selectedDates: string[]) => {
             store.commit('service/costAnalysis/setPeriod', { start: selectedDates[0], end: selectedDates[1] });
         };
-        const handleSelectCurrency = async (currency: string) => {
-            state.currency = currency;
-        };
         const handleClickRefresh = async () => {
             // todo
         };
@@ -151,7 +140,6 @@ export default {
             handleSelectGranularity,
             handleSelectChartType,
             handleSelectedDates,
-            handleSelectCurrency,
             handleClickRefresh,
         };
     },

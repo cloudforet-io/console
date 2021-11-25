@@ -22,7 +22,12 @@ const state: DisplayState = {
     uncheckedNotificationCount: storedDisplayState.uncheckedNotificationCount ?? 0,
     isSignInFailed: storedDisplayState.isSignInFailed ?? false,
     currency: storedDisplayState.currency ?? 'USD',
-    currencyRates: storedDisplayState.currencyRates ?? {},
+    currencyRates: storedDisplayState.currencyRates ?? {
+        USD: 1,
+        KRW: 1000,
+        JPY: 12,
+
+    },
 };
 
 export default {

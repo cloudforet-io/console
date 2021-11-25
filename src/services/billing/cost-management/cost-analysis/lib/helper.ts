@@ -46,7 +46,7 @@ export const getConvertedPeriod = (granularity: GRANULARITY, chartType: CHART_TY
     return { start, end };
 };
 
-export const getTimeUnit = (granularity: GRANULARITY, start: Dayjs, end: Dayjs): TimeUnit => {
+export const getTimeUnitByPeriod = (granularity: GRANULARITY, start: Dayjs, end: Dayjs): TimeUnit => {
     if (granularity !== GRANULARITY.ACCUMULATED) {
         if (granularity === GRANULARITY.DAILY) return 'day';
         if (granularity === GRANULARITY.MONTHLY) return 'month';

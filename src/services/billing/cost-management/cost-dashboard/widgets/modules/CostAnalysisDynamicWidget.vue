@@ -10,7 +10,7 @@
 <script lang="ts">
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
-import { TimeUnit } from '@amcharts/amcharts4/core';
+import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
 
 import {
     computed, reactive, toRefs, watch,
@@ -23,17 +23,25 @@ import {
 import {
     useColumnChart, useLineChart, usePieChart, useStackedColumnChart, useStackedLineChart,
 } from '@/common/composables/dynamic-chart';
+
 import { ChartData, DynamicChartStateArgs, Legend } from '@/common/composables/dynamic-chart/type';
+import { makeProxy } from '@/lib/helper/composition-helpers';
+import { CURRENCY } from '@/store/modules/display/config';
 
-import { PieChart, XYChart } from '@amcharts/amcharts4/charts';
-import { getTimeUnit } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { mergePrevChartDataAndCurrChartData } from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
+
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
-import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { getTimeUnitByPeriod } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { CHART_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
+
+import {
+    getCurrencyAppliedChartData,
+    getQueryAppliedChartData,
+} from '@/services/billing/cost-management/cost-dashboard/widgets/lib/widget-data-helper';
+import { WidgetProps } from '@/services/billing/cost-management/cost-dashboard/widgets/type';
 
 
-interface Props {
+interface Props extends WidgetProps {
     loading: boolean;
     chart: XYChart | PieChart;
     chartType: CHART_TYPE;
@@ -84,54 +92,39 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        currency: {
+            type: String,
+            default: CURRENCY.USD,
+        },
+        currencyRates: {
+            type: Object,
+            default: () => ({}),
+        },
     },
     setup(props: Props, { emit }) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
+            proxyChart: makeProxy('chart', props, emit),
+            USDChartData: [] as ChartData[],
         });
 
-        /* util */
-        const getAccumulatedData = (chartData: ChartData[], period: Period, timeUnit: TimeUnit): ChartData[] => {
-            const accumulatedChartData = [] as ChartData[];
-            let now = dayjs(period.start).clone();
-            const end = dayjs(period.end).isSameOrBefore(dayjs.utc(), timeUnit) ? dayjs(period.end) : dayjs.utc();
-            let accumulatedData: Record<string, number> = {};
-            while (now.isSameOrBefore(end, timeUnit)) {
-                let eachChartData: ChartData = {};
-                // eslint-disable-next-line no-loop-func
-                const existData = chartData.find(d => now.isSame(d.date, timeUnit));
-                accumulatedData = mergePrevChartDataAndCurrChartData(accumulatedData, existData);
-                eachChartData = {
-                    date: now.toDate(),
-                    ...accumulatedData,
-                };
-                accumulatedChartData.push(eachChartData);
-                now = now.add(1, timeUnit);
-            }
-            return accumulatedChartData;
-        };
-        const fillDefaultDataOfLastDay = (chartData: ChartData[], period: Period, timeUnit: TimeUnit): ChartData[] => {
-            const convertedChartData = [...chartData];
-            const dataOfLastDate = chartData.find(d => dayjs(period.end).isSame(d.date, timeUnit));
-            if (!dataOfLastDate) {
-                convertedChartData.push({
-                    date: dayjs(period.end).toDate(),
-                });
-            }
-            return convertedChartData;
-        };
-
         const drawChart = (chartContext) => {
-            const timeUnit = getTimeUnit(props.granularity, dayjs(props.period.start), dayjs(props.period.end));
-            let chartData = [...props.chartData];
-            if (props.chartType !== CHART_TYPE.DONUT) {
-                if (props.granularity === GRANULARITY.ACCUMULATED) {
-                    chartData = getAccumulatedData(chartData, props.period, timeUnit);
-                }
-                chartData = fillDefaultDataOfLastDay(chartData, props.period, timeUnit);
-            }
+            const timeUnit = getTimeUnitByPeriod(props.granularity, dayjs(props.period.start), dayjs(props.period.end));
+
+            state.USDChartData = getQueryAppliedChartData(
+                props.chartData,
+                props.period,
+                props.chartType,
+                props.granularity,
+                timeUnit,
+            );
+
             const params: DynamicChartStateArgs = {
-                data: chartData,
+                data: getCurrencyAppliedChartData(
+                    state.USDChartData,
+                    props.currency,
+                    props.currencyRates,
+                ),
                 valueOptions: {},
                 categoryOptions: {
                     legends: computed(() => props.legends),
@@ -172,6 +165,12 @@ export default {
                 emit('update:chart', chart);
             }
         }, { immediate: false });
+
+        watch(() => props.currency, (currency) => {
+            if (state.proxyChart) {
+                state.proxyChart.data = getCurrencyAppliedChartData(state.USDChartData, currency, props.currencyRates);
+            }
+        });
 
         return {
             ...toRefs(state),

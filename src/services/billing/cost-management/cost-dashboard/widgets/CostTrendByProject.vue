@@ -56,6 +56,9 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
+import { CURRENCY } from '@/store/modules/display/config';
+import { WidgetProps } from '@/services/billing/cost-management/cost-dashboard/widgets/type';
+import { getCurrencyAppliedChartData } from '@/services/billing/cost-management/cost-dashboard/widgets/lib/widget-data-helper';
 
 
 interface TableItem {
@@ -71,8 +74,17 @@ export default {
         PChartLoader,
         PSkeleton,
     },
-    props: {},
-    setup() {
+    props: {
+        currency: {
+            type: String,
+            default: CURRENCY.USD,
+        },
+        currencyRates: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props: WidgetProps) {
         const state = reactive({
             filters: {} as Record<FILTER_ITEM, FilterItem[]>,
             top15ProjectIds: [],
@@ -116,7 +128,7 @@ export default {
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
             chart.paddingLeft = -5;
             chart.paddingBottom = -10;
-            chart.data = chartData;
+            chart.data = getCurrencyAppliedChartData(chartData, props.currency, props.currencyRates);
 
             chart.dateFormatter.inputDateFormat = 'yyyy-MM';
             const dateAxis = chart.xAxes.push(new am4charts.DateAxis());
@@ -249,7 +261,12 @@ export default {
             if (!chartLoading && chartContext) {
                 state.chart = drawChart(chartContext, state.chartData, state.legends);
             }
-        }, { immediate: false });
+        });
+        watch(() => props.currency, (currency) => {
+            if (state.chart) {
+                state.chart.data = getCurrencyAppliedChartData(state.chartData, currency, props.currencyRates);
+            }
+        });
 
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();

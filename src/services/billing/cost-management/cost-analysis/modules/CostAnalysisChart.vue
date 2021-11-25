@@ -11,6 +11,8 @@
                                           :granularity="granularity"
                                           :legends="legends"
                                           :period="period"
+                                          :currency="currency"
+                                          :currency-rates="currencyRates"
             />
         </section>
         <section class="query-section">
@@ -97,7 +99,7 @@ import {
 } from '@spaceone/design-system';
 
 import CostAnalysisDynamicWidget
-    from '@/services/billing/cost-management/cost-analysis/components/CostAnalysisDynamicWidget.vue';
+    from '@/services/billing/cost-management/cost-dashboard/widgets/modules/CostAnalysisDynamicWidget.vue';
 import CostAnalysisSelectFilterModal
     from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSelectFilterModal.vue';
 
@@ -141,6 +143,8 @@ export default {
             chartType: computed(() => store.state.service.costAnalysis.chartType),
             period: computed(() => store.state.service.costAnalysis.period),
             filters: computed(() => store.state.service.costAnalysis.filters),
+            currency: computed(() => store.state.display.currency),
+            currencyRates: computed(() => store.state.display.currencyRates),
             filtersLength: computed<number>(() => {
                 const selectedValues = Object.values(state.filters);
                 return sum(selectedValues.map(v => v?.length || 0));

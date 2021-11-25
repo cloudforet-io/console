@@ -47,11 +47,12 @@ import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/compon
 import { GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import {
-    getConvertedFilter, getConvertedGranularity, getTimeUnit,
+    getConvertedFilter, getConvertedGranularity, getTimeUnitByPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { getTableDataFromRawData } from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
+import { getTableDataFromRawData } from '@/services/billing/cost-management/cost-analysis/lib/converting-data-helper';
+import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
 
 interface CostAnalysisItem {
@@ -71,16 +72,35 @@ export default {
             regions: computed(() => store.state.resource.region.items),
             //
             granularity: computed(() => store.state.service.costAnalysis.granularity),
-            currency: computed(() => store.state.service.costAnalysis.currency),
             period: computed(() => store.state.service.costAnalysis.period),
             groupByItems: computed(() => store.state.service.costAnalysis.groupByItems),
             filters: computed(() => store.state.service.costAnalysis.filters),
+            //
+            currency: computed(() => store.state.display.currency),
+            currencyRates: computed(() => store.state.display.currencyRates),
         });
         const tableState = reactive({
             loading: true,
             fields: [] as DataTableField[],
             items: [] as CostAnalysisItem[],
             totalCount: 0,
+            currencyAppliedItems: computed(() => {
+                const currency = state.currency;
+                const currencyRates = state.currencyRates;
+
+                return tableState.items.map((dataObj) => {
+                    const results = {};
+                    Object.keys(dataObj).forEach((key) => {
+                        const data = dataObj[key];
+                        results[key] = typeof data === 'number' ? convertUSDToCurrency(
+                            data ?? 0,
+                            currency,
+                            currencyRates,
+                        ) : data;
+                    });
+                    return results;
+                });
+            }),
         });
 
         /* util */
@@ -97,7 +117,7 @@ export default {
             const dateFields: DataTableField[] = [];
             const start = dayjs(state.period.start);
             const end = dayjs(state.period.end);
-            const timeUnit = getTimeUnit(granularity, start, end);
+            const timeUnit = getTimeUnitByPeriod(granularity, start, end);
 
             let nameDateFormat = 'YYYY-MM-DD';
             let labelDateFormat = 'M/D';

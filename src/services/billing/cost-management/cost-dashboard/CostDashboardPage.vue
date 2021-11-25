@@ -15,12 +15,7 @@
                 </div>
                 <ul class="top-right-group">
                     <li class="group-item">
-                        <p-select-dropdown v-model="filterState.selectedCurrency"
-                                           class="filter-item"
-                                           :items="filterState.currencyItems"
-                                           without-outline
-                                           @select="handleSelectCurrency"
-                        />
+                        <currency-select-dropdown />
                     </li>
                     <li class="group-item">
                         <p-icon-text-button name="ic_download" style-type="gray-border" size="sm">
@@ -56,8 +51,8 @@
             </div>
         </div>
         <div style="height: 50rem; background-color: #fff;">
-            <cost-trend-by-project />
-            <cost-trend-by-product />
+            <cost-trend-by-project :currency="currency" :currency-rates="currencyRates" />
+            <cost-trend-by-product :currency="currency" :currency-rates="currencyRates" />
         </div>
     </div>
 </template>
@@ -67,15 +62,16 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { i18n } from '@/translations';
 
 import {
-    PBreadcrumbs, PIconButton, PIconTextButton, PPageTitle, PSelectDropdown, PTag,
+    PBreadcrumbs, PIconButton, PIconTextButton, PPageTitle, PTag,
 } from '@spaceone/design-system';
+
+import { store } from '@/store';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 
+import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
 import CostTrendByProduct from '@/services/billing/cost-management/cost-dashboard/widgets/CostTrendByProduct.vue';
 import CostTrendByProject from '@/services/billing/cost-management/cost-dashboard/widgets/CostTrendByProject.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 
 const tempProjectsData = [
@@ -100,6 +96,7 @@ const tempProjectsData = [
 export default {
     name: 'CostDashboardPage',
     components: {
+        CurrencySelectDropdown,
         CostTrendByProject,
         CostTrendByProduct,
         FavoriteButton,
@@ -107,7 +104,6 @@ export default {
         PBreadcrumbs,
         PPageTitle,
         PIconTextButton,
-        PSelectDropdown,
         PTag,
     },
     props: {
@@ -121,6 +117,8 @@ export default {
             selectedProjects: computed(() => tempProjectsData.map(d => ({
                 ...d,
             }))),
+            currency: computed(() => store.state.display.currency),
+            currencyRates: computed(() => store.state.display.currencyRates),
         });
 
         const routeState = reactive({
@@ -131,21 +129,10 @@ export default {
             ]),
         });
 
-        const filterState = reactive({
-            selectedCurrency: 'USD',
-            currencyItems: computed<MenuItem[]>(() => ([
-                { type: 'item', name: 'USD', label: '$USD' },
-                { type: 'item', name: 'KRW', label: '$KRW' },
-                { type: 'item', name: 'JPY', label: '¥JPY' },
-            ])),
-        });
 
         /* event */
         const handleClickEditDashboard = () => {
             console.log('edit dashboard');
-        };
-        const handleSelectCurrency = () => {
-            console.log('select currency');
         };
         const handleClickMore = () => {
             console.log('click more!');
@@ -157,9 +144,7 @@ export default {
         return {
             ...toRefs(state),
             routeState,
-            filterState,
             handleClickEditDashboard,
-            handleSelectCurrency,
             handleClickMore,
             handleClickFilter,
         };
