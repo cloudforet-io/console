@@ -105,6 +105,9 @@ export default defineComponent<CardProps>({
     }
     &.lg {
         @mixin size 4rem, 1.5rem, 1.6;
+        header {
+            padding: 0.8125rem 1rem;
+        }
     }
 }
 </style>
