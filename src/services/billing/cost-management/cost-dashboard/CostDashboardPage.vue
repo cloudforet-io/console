@@ -50,9 +50,32 @@
                 />
             </div>
         </div>
-        <div style="height: 50rem; background-color: #fff;">
-            <cost-trend-by-project :currency="currency" :currency-rates="currencyRates" />
-            <cost-trend-by-product :currency="currency" :currency-rates="currencyRates" />
+        <div class="dashboard-list-layout">
+            <div class="dashboard-row col-3">
+                <month-to-date-spend :currency="currency" :currency-rates="currencyRates" />
+                <last-month-total-spend :currency="currency" :currency-rates="currencyRates" />
+                <budget-usage :currency="currency" :currency-rates="currencyRates" />
+            </div>
+            <div class="dashboard-row">
+                <cost-by-project :currency="currency" :currency-rates="currencyRates" />
+            </div>
+            <div class="dashboard-row">
+                <cost-trend-by-project :currency="currency" :currency-rates="currencyRates" />
+            </div>
+            <div class="dashboard-row col-2">
+                <div class="cost-by-provider" style="height: 550px; background-color: #fff;">
+                    임의 영역이니 컴포넌트 개발 후 삭제 부탁드려요
+                </div>
+                <div class="cost-by-status" style="height: 550px; background-color: #fff;">
+                    임의 영역이니 컴포넌트 개발 후 삭제 부탁드려요
+                </div>
+            </div>
+            <div class="dashboard-row">
+                <cost-trend-by-product :currency="currency" :currency-rates="currencyRates" />
+            </div>
+            <div class="dashboard-row">
+                <cost-by-region :currency="currency" :currency-rates="currencyRates" />
+            </div>
         </div>
     </div>
 </template>
@@ -72,6 +95,11 @@ import CurrencySelectDropdown from '@/services/billing/cost-management/modules/C
 import CostTrendByProduct from '@/services/billing/cost-management/widgets/CostTrendByProduct.vue';
 import CostTrendByProject from '@/services/billing/cost-management/widgets/CostTrendByProject.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
+import LastMonthTotalSpend from '@/services/billing/cost-management/widgets/LastMonthTotalSpend.vue';
+import MonthToDateSpend from '@/services/billing/cost-management/widgets/MonthToDateSpend.vue';
+import BudgetUsage from '@/services/billing/cost-management/widgets/BudgetUsage.vue';
+import CostByProject from '@/services/billing/cost-management/widgets/CostByProject.vue';
+import CostByRegion from '@/services/billing/cost-management/widgets/CostByRegion.vue';
 
 
 const tempProjectsData = [
@@ -96,6 +124,11 @@ const tempProjectsData = [
 export default {
     name: 'CostDashboardPage',
     components: {
+        CostByRegion,
+        CostByProject,
+        BudgetUsage,
+        MonthToDateSpend,
+        LastMonthTotalSpend,
         CurrencySelectDropdown,
         CostTrendByProject,
         CostTrendByProduct,
@@ -153,8 +186,9 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
+@import './styles/dashboardListLayout.pcss';
 .cost-dashboard-page {
-    max-width: 85.5rem;
+    max-width: 120rem;
 }
 .p-page-title {
     margin-bottom: 1rem;

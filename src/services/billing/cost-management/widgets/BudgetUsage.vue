@@ -1,5 +1,7 @@
 <template>
-    <budget-usage-progress-bar :usage-rate="90" />
+    <div style="height: 315px; background-color: #fff;">
+        <budget-usage-progress-bar :usage-rate="90" />
+    </div>
 </template>
 
 <script lang="ts">
