@@ -4,6 +4,7 @@
                       :items="slicedItems"
                       :total-count="totalCount"
                       :loading="loading"
+                      table-style-type="simple"
                       disable-hover
         >
             <template #col-format="{field: { name }, value, index}">

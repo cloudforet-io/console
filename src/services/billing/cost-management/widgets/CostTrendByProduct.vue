@@ -312,10 +312,30 @@ export default {
             }
         }
         .table-wrapper {
-            @apply col-span-6;
+            @apply flex flex-col col-span-6;
             .month-pagination-wrapper {
                 display: flex;
                 align-items: center;
+                margin-left: auto;
+            }
+            .cost-dashboard-data-table {
+                @apply flex flex-col;
+                .p-data-table {
+                    margin: 0.5rem 0;
+                }
+            }
+            .table-pagination-wrapper {
+                margin-bottom: -1rem;
+            }
+        }
+    }
+
+    @screen tablet {
+        .card-body {
+            @apply grid-rows-2;
+            .chart-wrapper,
+            .table-wrapper {
+                @apply col-span-12 row-span-1;
             }
         }
     }
