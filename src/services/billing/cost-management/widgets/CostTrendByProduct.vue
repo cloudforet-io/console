@@ -59,7 +59,7 @@ import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { gray } from '@/styles/colors';
 import config from '@/lib/config';
-import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
+import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import {
     getCurrencyAppliedChartData, getTableDataFromRawData,
@@ -70,7 +70,6 @@ import { FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost
 import { FilterItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import { ChartData, Legend, WidgetProps } from '@/services/billing/cost-management/widgets/type';
-import { DISABLED_COLOR } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/config';
 
 
 interface TableItem {
@@ -294,7 +293,7 @@ export default {
         return {
             ...toRefs(state),
             DEFAULT_CHART_COLORS,
-            DISABLED_COLOR,
+            DISABLED_LEGEND_COLOR,
             handleToggleLegend,
         };
     },

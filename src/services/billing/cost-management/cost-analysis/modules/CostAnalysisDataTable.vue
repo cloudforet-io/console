@@ -21,8 +21,8 @@
             <span v-else-if="field.name === GROUP_BY_ITEM.REGION">
                 {{ regions[value] ? regions[value].name : value }}
             </span>
-            <span v-else class="text-center">
-                {{ valueFormatter(value, currency) }}
+            <span v-else-if="typeof value !== 'string'" class="text-center">
+                {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
             </span>
         </template>
     </p-toolbox-table>
@@ -49,7 +49,9 @@ import {
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
-import { convertAndFormatMoney } from '@/lib/helper/currency-helper';
+import {
+    currencyMoneyFormatter,
+} from '@/lib/helper/currency-helper';
 import { getTableDataFromRawData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 
 
@@ -124,10 +126,6 @@ export default {
             tableState.fields = groupByFields.concat(dateFields);
         };
 
-        const valueFormatter = (value: string|number, currency) => {
-            if (typeof value === 'number') return convertAndFormatMoney(value, currency, state.currencyRates, true);
-            return value ?? '--';
-        };
 
         /* api */
         const costApiQueryHelper = new ApiQueryHelper()
@@ -181,7 +179,7 @@ export default {
             GROUP_BY_ITEM,
             handleChange,
             handleRefresh,
-            valueFormatter,
+            currencyMoneyFormatter,
         };
     },
 };

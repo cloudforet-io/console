@@ -17,8 +17,11 @@
                                   :text-color="getStatusTextColor(index)"
                                   @click="handleClickLegend(index)"
                         />
+                        {{ value }}
                     </template>
-                    {{ valueFormatter(value, currency) }}
+                    <template v-else>
+                        {{ currencyMoneyFormatter(value, currency, currencyRates) }}
+                    </template>
                     <!--                    <template v-else>-->
                     <!--                        <span v-if="value.isRaised" :class="{raised: value.isRaised}">-->
                     <!--                            <span>{{ value.value }}</span>-->
@@ -50,12 +53,9 @@ import {
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { toggleSeries } from '@/lib/amcharts/helper';
-import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
+import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
-import {
-    DISABLED_COLOR,
-} from '@/services/billing/cost-management/widgets/composables/dynamic-chart/config';
-import { convertAndFormatMoney } from '@/lib/helper/currency-helper';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { CURRENCY } from '@/store/modules/display/config';
 
 
@@ -137,18 +137,14 @@ export default {
         const getStatusIconColor = (index) => {
             const convertedIndex = index + ((state.proxyThisPage - 1) * props.pageSize);
             const legend = props.legends[convertedIndex];
-            if (legend?.disabled) return DISABLED_COLOR;
+            if (legend?.disabled) return DISABLED_LEGEND_COLOR;
             return DEFAULT_CHART_COLORS[convertedIndex];
         };
         const getStatusTextColor = (index) => {
             const convertedIndex = index + ((state.proxyThisPage - 1) * props.pageSize);
             const legend = props.legends[convertedIndex];
-            if (legend?.disabled) return DISABLED_COLOR;
+            if (legend?.disabled) return DISABLED_LEGEND_COLOR;
             return null;
-        };
-        const valueFormatter = (value: string|number, currency) => {
-            if (typeof value === 'number') return convertAndFormatMoney(value, currency, props.currencyRates);
-            return value;
         };
         // const getConvertedItems = (items) => {
         //     const convertedItems: Item[] = [];
@@ -198,7 +194,7 @@ export default {
             getStatusIconColor,
             getStatusTextColor,
             handleClickLegend,
-            valueFormatter,
+            currencyMoneyFormatter,
         };
     },
 };

@@ -25,6 +25,11 @@ export const convertUSDToCurrency = (money: number, currency: CURRENCY, rates: C
  * @param short
  * @description Formats a given number into a form appropriate for a given currency.
  If short is true, round off the decimal point.
+ @example
+ currency X, short X: 12345 -> 12,345.00
+ currency O, short X: 12345 -> $12,345.00
+ currency O, short O: 12345 -> $12,345
+ currency X, short O: 12345 -> 12,345
  */
 export const moneyFormatter = (money: number, currency?: CURRENCY, short?: boolean): string => {
     const symbol = currency ? CURRENCY_SYMBOL[currency] : '';
@@ -32,22 +37,25 @@ export const moneyFormatter = (money: number, currency?: CURRENCY, short?: boole
     return currencyjs(money, { symbol, precision: short ? 0 : 2 }).format();
 };
 
-
 /**
- * @param money
+ * @param value
  * @param currency
  * @param rates
  * @param short
- * @description Converts US Dollars to a given currency based on a given exchange rate,
- and formats converted number into a form appropriate for a given currency.
- If short is true, round off the decimal point.
+ * @description Convert given value with given currency and exchange rates, and format into money format.
+ If given value is number, it treats it in US dollars and converts it to a given currency based on the given exchange rate.
+ It's convert logic follows convertUSDToCurrency function.
+ If given value is undefined, returns '--'.
+ It's formatting logic follows moneyFormatter function.
  */
-export const convertAndFormatMoney = (money: number, currency?: CURRENCY, rates?: CurrencyRates, short?: boolean): string => {
-    let value = money;
-
-    if (currency && rates) {
-        value = convertUSDToCurrency(value, currency, rates);
+export const currencyMoneyFormatter = (value?: number, currency?: CURRENCY, rates?: CurrencyRates, short?: boolean): string => {
+    if (typeof value === 'number') {
+        let money = value;
+        if (currency && rates) {
+            money = convertUSDToCurrency(value, currency, rates);
+        }
+        return moneyFormatter(money, currency, short);
     }
 
-    return moneyFormatter(value, currency, short);
+    return '--';
 };

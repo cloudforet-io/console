@@ -1,5 +1,5 @@
 import {
-    blue, coral, green, indigo, peacock, red, violet, yellow,
+    blue, coral, gray, green, indigo, peacock, red, violet, yellow,
 } from '@/styles/colors';
 
 export const DEFAULT_CHART_COLORS = [
@@ -9,3 +9,5 @@ export const DEFAULT_CHART_COLORS = [
     blue[500], blue[700], coral[500], coral[700], yellow[500], yellow[700],
     green[500], green[700], peacock[500], peacock[700], red[500], red[700],
 ];
+
+export const DISABLED_LEGEND_COLOR = gray[300];

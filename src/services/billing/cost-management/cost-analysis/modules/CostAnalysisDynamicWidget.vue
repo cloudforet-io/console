@@ -22,7 +22,7 @@ import {
 
 import {
     useDynamicChart,
-} from '@/services/billing/cost-management/widgets/composables/dynamic-chart';
+} from '@/services/billing/cost-management/cost-analysis/composables/cost-analysis-dynamic-chart';
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { CURRENCY } from '@/store/modules/display/config';

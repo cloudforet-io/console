@@ -72,8 +72,8 @@
                      @click="handleClickLegend(idx)"
                 >
                     <p-status :text="legend.label"
-                              :icon-color="legend.disabled ? DISABLED_COLOR : DEFAULT_CHART_COLORS[idx % DEFAULT_CHART_COLORS.length]"
-                              :text-color="legend.disabled ? DISABLED_COLOR : null"
+                              :icon-color="legend.disabled ? DISABLED_LEGEND_COLOR : DEFAULT_CHART_COLORS[idx % DEFAULT_CHART_COLORS.length]"
+                              :text-color="legend.disabled ? DISABLED_LEGEND_COLOR : null"
                     />
                 </div>
                 <template #no-data>
@@ -99,7 +99,7 @@ import {
 } from '@spaceone/design-system';
 
 import CostAnalysisDynamicWidget
-    from '@/services/billing/cost-management/widgets/modules/CostAnalysisDynamicWidget.vue';
+    from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisDynamicWidget.vue';
 import CostAnalysisSelectFilterModal
     from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSelectFilterModal.vue';
 
@@ -113,7 +113,7 @@ import {
     hideAllSeries,
     toggleSeries,
 } from '@/lib/amcharts/helper';
-import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
+import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import {
     getConvertedFilter, getConvertedGranularity, getConvertedPeriod,
@@ -125,9 +125,6 @@ import {
     getXYChartDataAndLegends,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { ChartData, Legend } from '@/services/billing/cost-management/widgets/type';
-import {
-    DISABLED_COLOR,
-} from '@/services/billing/cost-management/widgets/composables/dynamic-chart/config';
 
 
 export default {
@@ -267,7 +264,7 @@ export default {
             ...toRefs(state),
             selectFilterModalState,
             FILTER_MAP,
-            DISABLED_COLOR,
+            DISABLED_LEGEND_COLOR,
             DEFAULT_CHART_COLORS,
             CHART_TYPE,
             GRANULARITY,

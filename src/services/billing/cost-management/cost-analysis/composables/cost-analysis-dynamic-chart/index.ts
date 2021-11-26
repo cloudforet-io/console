@@ -10,13 +10,13 @@ import {
     gray,
 } from '@/styles/colors';
 
-import drawStackedColumnChart from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-stacked-column-chart';
-import drawColumnChart from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-column-chart';
-import drawLineChart from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-line-chart';
-import drawStackedLineChart from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-stacked-line-chart';
-import drawPieChart from '@/services/billing/cost-management/widgets/composables/dynamic-chart/draw-pie-chart';
+import drawStackedColumnChart from '@/services/billing/cost-management/cost-analysis/composables/cost-analysis-dynamic-chart/draw-stacked-column-chart';
+import drawColumnChart from '@/services/billing/cost-management/cost-analysis/composables/cost-analysis-dynamic-chart/draw-column-chart';
+import drawLineChart from '@/services/billing/cost-management/cost-analysis/composables/cost-analysis-dynamic-chart/draw-line-chart';
+import drawStackedLineChart from '@/services/billing/cost-management/cost-analysis/composables/cost-analysis-dynamic-chart/draw-stacked-line-chart';
+import drawPieChart from '@/services/billing/cost-management/cost-analysis/composables/cost-analysis-dynamic-chart/draw-pie-chart';
 
-import { DynamicChartStateArgs } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/type';
+import { DynamicChartStateArgs } from '@/services/billing/cost-management/cost-analysis/composables/cost-analysis-dynamic-chart/type';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 
 
