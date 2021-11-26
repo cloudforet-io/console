@@ -302,7 +302,7 @@ export default {
 
 <style lang="postcss" scoped>
 .cost-trend-by-product::v-deep {
-    .card-body {
+    .body {
         @apply grid grid-cols-12;
         .chart-wrapper {
             @apply col-span-6;
@@ -330,7 +330,7 @@ export default {
     }
 
     @screen tablet {
-        .card-body {
+        .body {
             @apply grid-rows-2;
             .chart-wrapper,
             .table-wrapper {

@@ -1,35 +1,38 @@
 <template>
-    <p-pane-layout class="cost-dashboard-card-widget-layout">
-        <div class="card-header">
-            <span class="title">{{ title }}</span>
-            <p class="title-extra">
-                <span class="show-top-text">Showing Top {{ dataRange }}
-                    <p-i name="ic_tooltip" width="1rem" height="1rem"
-                         color="inherit transparent" class="tooltip-button"
-                    />
-                </span>
-                <router-link :to="widgetLink" class="anchor-button">
-                    Full data
-                    <p-i name="ic_arrow_right" width="1rem" height="1rem"
-                         color="inherit transparent"
-                    />
-                </router-link>
-            </p>
-        </div>
-        <div class="card-body">
-            <slot />
-        </div>
-    </p-pane-layout>
+    <p-card class="cost-dashboard-card-widget-layout"
+            style-type="gray100"
+            size="lg"
+    >
+        <template #header>
+            <div class="header">
+                {{ title }}
+                <p class="title-extra">
+                    <span class="show-top-text">Showing Top {{ dataRange }}
+                        <p-i name="ic_tooltip" width="1rem" height="1rem"
+                             color="inherit transparent" class="tooltip-button"
+                        />
+                    </span>
+                    <router-link :to="widgetLink" class="anchor-button">
+                        Full data
+                        <p-i name="ic_arrow_right" width="1rem" height="1rem"
+                             color="inherit transparent"
+                        />
+                    </router-link>
+                </p>
+            </div>
+        </template>
+        <slot />
+    </p-card>
 </template>
 
 <script lang="ts">
-import { PPaneLayout, PI } from '@spaceone/design-system';
+import { PI, PCard } from '@spaceone/design-system';
 
 export default {
     name: 'CostDashboardCardWidgetLayout',
     components: {
-        PPaneLayout,
         PI,
+        PCard,
     },
     props: {
         title: {
@@ -53,26 +56,14 @@ export default {
 
 <style lang="postcss" scoped>
 .cost-dashboard-card-widget-layout {
-    @apply flex flex-col;
-    .card-header {
-        @apply bg-gray-100 items-center;
-        display: inherit;
-        justify-content: space-between;
-        padding: 1rem;
-        min-height: 4rem;
-        font-size: 1.5rem;
-        line-height: 135%;
-        border: none;
-        border-top-left-radius: 0.25rem;
-        border-top-right-radius: 0.25rem;
-    }
-    .card-body {
-        padding: 1rem;
+    .header {
+        @apply flex items-center justify-between;
     }
     .title-extra {
-        @apply inline-flex items-center;
+        @apply inline-flex;
+        flex-shrink: 0;
         .show-top-text {
-            @apply text-gray-500;
+            @apply flex items-center text-gray-500;
             font-size: 0.875rem;
             line-height: 150%;
             .tooltip-button {
@@ -80,11 +71,23 @@ export default {
             }
         }
         .anchor-button {
-            @apply flex-shrink-0 text-sm text-blue-600 font-normal cursor-pointer;
+            @apply flex items-center flex-shrink-0 text-sm text-blue-600 font-normal cursor-pointer;
             font-size: 0.75rem;
             line-height: 120%;
             &:hover {
                 @apply text-secondary underline;
+            }
+        }
+    }
+    &::v-deep .body {
+        @apply bg-white;
+        padding: 1rem;
+    }
+
+    @screen mobile {
+        .title-extra {
+            .show-top-text {
+                @apply hidden;
             }
         }
     }
