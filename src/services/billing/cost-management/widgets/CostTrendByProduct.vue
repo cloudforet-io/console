@@ -53,7 +53,6 @@ import CostDashboardDataTable
     from '@/services/billing/cost-management/widgets/modules/CostDashboardDataTable.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
 
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -70,6 +69,7 @@ import { FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost
 import { FilterItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import { ChartData, Legend, WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 
 
 interface TableItem {
@@ -205,9 +205,9 @@ export default {
         };
 
         /* api */
-        const costApiQueryHelper = new ApiQueryHelper();
+        const costQueryHelper = new QueryHelper();
         const getCostTableData = async () => {
-            costApiQueryHelper.setFilters(getConvertedFilter(state.filters));
+            costQueryHelper.setFilters(getConvertedFilter(state.filters));
             try {
                 state.tableLoading = true;
                 const thisMonth = dayjs.utc();
@@ -220,7 +220,7 @@ export default {
                     page: {
                         limit: 15,
                     },
-                    ...costApiQueryHelper.data,
+                    ...costQueryHelper.apiQuery,
                 });
                 state.totalCount = total_count > 15 ? 15 : total_count;
                 state.items = getTableDataFromRawData(results, [GROUP_BY_ITEM.PRODUCT]) as TableItem[];
@@ -232,7 +232,7 @@ export default {
             }
         };
         const getCostChartData = async (top15ProductNames) => {
-            costApiQueryHelper.setFilters([
+            costQueryHelper.setFilters([
                 ...getConvertedFilter(state.filters),
                 {
                     k: GROUP_BY_ITEM.PRODUCT,
@@ -249,7 +249,7 @@ export default {
                     start: thisMonth.subtract(5, 'month'),
                     end: thisMonth.format('YYYY-MM'),
                     pivot_type: 'CHART',
-                    ...costApiQueryHelper.data,
+                    ...costQueryHelper.apiQuery,
                 });
                 const { chartData, legends } = getXYChartDataAndLegends(results, GROUP_BY_ITEM.PRODUCT);
                 state.chartData = chartData;
