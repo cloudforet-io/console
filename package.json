@@ -22,7 +22,7 @@
     "@amcharts/amcharts4": "^4.10.10",
     "@amcharts/amcharts4-geodata": "^4.1.18",
     "@spaceone/console-core-lib": "^1.8.1",
-    "@spaceone/design-system": "^1.1.0-beta.184",
+    "@spaceone/design-system": "^1.1.0-beta.189",
     "@vue/composition-api": "^0.6.7",
     "@vvo/tzdb": "^6.4.1",
     "animated-number-vue": "^1.0.0",

@@ -14,6 +14,8 @@
                                        :page-size="5"
                                        :chart="chart"
                                        :legends="legends"
+                                       :currency-rates="currencyRates"
+                                       :currency="currency"
                                        show-legend
                                        @toggle-legend="handleToggleLegend"
             />

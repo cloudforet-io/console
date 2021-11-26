@@ -11,21 +11,19 @@
                      @change="handleChange"
                      @refresh="handleChange()"
     >
-        <template v-for="field in tableState.fields" v-slot:[`col-${field.name}-format`]="{value, index}">
-            <div :key="`${field.name}-${index}-${value}`">
-                <span v-if="field.name === GROUP_BY_ITEM.PROJECT">
-                    {{ projects[value] ? projects[value].label : value }}
-                </span>
-                <span v-else-if="field.name === GROUP_BY_ITEM.PROVIDER">
-                    {{ providers[value] ? providers[value].name : value }}
-                </span>
-                <span v-else-if="field.name === GROUP_BY_ITEM.REGION">
-                    {{ regions[value] ? regions[value].name : value }}
-                </span>
-                <span v-else>
-                    {{ value ? value : '--' }}
-                </span>
-            </div>
+        <template #col-format="{field, value, index}">
+            <span v-if="field.name === GROUP_BY_ITEM.PROJECT">
+                {{ projects[value] ? projects[value].label : value }}
+            </span>
+            <span v-else-if="field.name === GROUP_BY_ITEM.PROVIDER">
+                {{ providers[value] ? providers[value].name : value }}
+            </span>
+            <span v-else-if="field.name === GROUP_BY_ITEM.REGION">
+                {{ regions[value] ? regions[value].name : value }}
+            </span>
+            <span v-else class="text-center">
+                {{ valueFormatter(value, currency) }}
+            </span>
         </template>
     </p-toolbox-table>
 </template>
@@ -51,7 +49,7 @@ import {
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
-import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
+import { convertAndFormatMoney } from '@/lib/helper/currency-helper';
 import { getTableDataFromRawData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 
 
@@ -84,23 +82,6 @@ export default {
             fields: [] as DataTableField[],
             items: [] as CostAnalysisItem[],
             totalCount: 0,
-            currencyAppliedItems: computed(() => {
-                const currency = state.currency;
-                const currencyRates = state.currencyRates;
-
-                return tableState.items.map((dataObj) => {
-                    const results = {};
-                    Object.keys(dataObj).forEach((key) => {
-                        const data = dataObj[key];
-                        results[key] = typeof data === 'number' ? convertUSDToCurrency(
-                            data ?? 0,
-                            currency,
-                            currencyRates,
-                        ) : data;
-                    });
-                    return results;
-                });
-            }),
         });
 
         /* util */
@@ -109,7 +90,7 @@ export default {
             const groupByFields: DataTableField[] = [...groupByItems];
             if (!groupByItems.length) {
                 groupByFields.push({
-                    name: 'total_cost', label: ' ', sortable: false,
+                    name: 'total_cost', label: ' ', sortable: false, textAlign: 'center',
                 });
             }
 
@@ -135,11 +116,17 @@ export default {
                     name: now.format(nameDateFormat),
                     label: now.format(labelDateFormat),
                     sortable: false,
+                    textAlign: 'center',
                 });
                 now = now.add(1, timeUnit);
             }
 
             tableState.fields = groupByFields.concat(dateFields);
+        };
+
+        const valueFormatter = (value: string|number, currency) => {
+            if (typeof value === 'number') return convertAndFormatMoney(value, currency, state.currencyRates, true);
+            return value ?? '--';
         };
 
         /* api */
@@ -194,6 +181,7 @@ export default {
             GROUP_BY_ITEM,
             handleChange,
             handleRefresh,
+            valueFormatter,
         };
     },
 };

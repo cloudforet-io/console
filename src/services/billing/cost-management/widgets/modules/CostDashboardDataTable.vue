@@ -6,9 +6,9 @@
                       :loading="loading"
                       disable-hover
         >
-            <template v-for="(field, fIdx) in fields" v-slot:[`col-${field.name}-format`]="{value, index}">
-                <div :key="`${field.name}-${index}-${value}`">
-                    <template v-if="fIdx === 0">
+            <template #col-format="{field: { name }, value, index}">
+                <div>
+                    <template v-if="fields[0].name === name">
                         <p-status v-if="showLegend"
                                   class="toggle-button"
                                   :text="getStatusText(index)"
@@ -17,7 +17,7 @@
                                   @click="handleClickLegend(index)"
                         />
                     </template>
-                    {{ value }}
+                    {{ valueFormatter(value, currency) }}
                     <!--                    <template v-else>-->
                     <!--                        <span v-if="value.isRaised" :class="{raised: value.isRaised}">-->
                     <!--                            <span>{{ value.value }}</span>-->
@@ -54,6 +54,8 @@ import { DEFAULT_CHART_COLORS } from '@/styles/colorsets';
 import {
     DISABLED_COLOR,
 } from '@/services/billing/cost-management/widgets/composables/dynamic-chart/config';
+import { convertAndFormatMoney } from '@/lib/helper/currency-helper';
+import { CURRENCY } from '@/store/modules/display/config';
 
 
 // interface Item {
@@ -100,6 +102,14 @@ export default {
             type: Array,
             default: undefined,
         },
+        currency: {
+            type: String,
+            default: CURRENCY.USD,
+        },
+        currencyRates: {
+            type: Object,
+            default: () => ({}),
+        },
         // showSharpRises: {
         //     type: Boolean,
         //     default: false,
@@ -134,6 +144,10 @@ export default {
             const legend = props.legends[convertedIndex];
             if (legend?.disabled) return DISABLED_COLOR;
             return null;
+        };
+        const valueFormatter = (value: string|number, currency) => {
+            if (typeof value === 'number') return convertAndFormatMoney(value, currency, props.currencyRates);
+            return value;
         };
         // const getConvertedItems = (items) => {
         //     const convertedItems: Item[] = [];
@@ -183,6 +197,7 @@ export default {
             getStatusIconColor,
             getStatusTextColor,
             handleClickLegend,
+            valueFormatter,
         };
     },
 };

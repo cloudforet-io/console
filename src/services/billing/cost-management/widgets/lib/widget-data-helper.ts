@@ -2,8 +2,6 @@ import dayjs from 'dayjs';
 import { cloneDeep } from 'lodash';
 import { TimeUnit } from '@amcharts/amcharts4/core';
 
-import { commaFormatter, numberFormatter } from '@spaceone/console-core-lib';
-
 import { store } from '@/store';
 import { CURRENCY } from '@/store/modules/display/config';
 import { CurrencyRates } from '@/store/modules/display/type';
@@ -174,7 +172,7 @@ export const getTableDataFromRawData = (
 
     /* extract data per each date (ex. { 2021-11-01: '29.4K', 2021-11-02: '8,962' } ) */
     eachRawData.values.forEach((value) => {
-        rowData[value.date] = commaFormatter(numberFormatter(value.usd_cost));
+        rowData[value.date] = value.usd_cost;
     });
 
     return rowData;
