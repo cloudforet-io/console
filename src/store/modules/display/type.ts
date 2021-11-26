@@ -11,4 +11,6 @@ export interface DisplayState {
     currencyRates: CurrencyRates;
 }
 
-export type CurrencyRates = Record<string, number>
+export type CurrencyRates = {
+    [K in CURRENCY]: number;
+}

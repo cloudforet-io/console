@@ -17,7 +17,6 @@ import GeneralPageLayout from '@/common/modules/page-layouts/GeneralPageLayout.v
 
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import BudgetForm from '@/services/billing/cost-management/budget/modules/budget-form/BudgetForm.vue';
-import { store } from '@/store';
 
 export default {
     name: 'BudgetCreatePage',
@@ -42,14 +41,6 @@ export default {
         const handleFormConfirm = () => {
 
         };
-
-        /* Init */
-        (async () => {
-            await Promise.all([
-                store.dispatch('resource/project/load'),
-                store.dispatch('resource/projectGroup/load'),
-            ]);
-        })();
 
         return {
             ...toRefs(state),

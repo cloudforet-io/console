@@ -1,9 +1,9 @@
-import { Action } from 'vuex';
+import { Action, Dispatch } from 'vuex';
 import dayjs from 'dayjs';
-import { SIDEBAR_TYPE } from '@/store/modules/display/config';
+import { CURRENCY, DEFAULT_CURRENCY_RATES, SIDEBAR_TYPE } from '@/store/modules/display/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
-import { DisplayState } from '@/store/modules/display/type';
+import { CurrencyRates, DisplayState } from '@/store/modules/display/type';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
@@ -111,4 +111,60 @@ export const startCheckNotification: Action<DisplayState, any> = ({ dispatch }):
     checkNotificationInterval = setInterval(() => {
         dispatch('checkNotification');
     }, 10000);
+};
+
+type ExchangeRateData = {
+    currency: CURRENCY;
+    rate: number;
+    is_default: boolean;
+}
+
+const getCurrencyRates = async (): Promise<CurrencyRates> => {
+    try {
+        const { results } = await SpaceConnector.client.costAnalysis.exchangeRate.list();
+
+        const rates = {} as CurrencyRates;
+        results.forEach(({ currency, rate }: ExchangeRateData) => {
+            rates[currency] = rate;
+        });
+        return rates;
+    } catch (e) {
+        ErrorHandler.handleError(e);
+        return DEFAULT_CURRENCY_RATES;
+    }
+};
+
+interface CurrencyRatesStoredData {
+    rates: CurrencyRates;
+    expireTime: string;
+}
+
+const storeCurrencyRates = (rates, dispatch: Dispatch) => {
+    const currencyRatesStoreData: CurrencyRatesStoredData = {
+        rates,
+        expireTime: dayjs().add(1, 'day').toISOString(),
+    };
+    dispatch('settings/setItem', {
+        key: 'currencyRates',
+        value: currencyRatesStoreData,
+        path: '/common',
+    }, { root: true });
+};
+
+export const loadCurrencyRates: Action<DisplayState, any> = async ({
+    commit, dispatch, rootGetters,
+}) => {
+    const storedData: CurrencyRatesStoredData|undefined = rootGetters['settings/getItem']('currencyRates', '/common');
+
+    const now = dayjs();
+    if (dayjs(storedData?.expireTime).isBefore(now, 'day') && storedData?.rates) {
+        commit('setCurrencyRates', storedData.rates);
+        return;
+    }
+
+    const rates = await getCurrencyRates();
+    commit('setCurrencyRates', rates);
+    if (rates !== DEFAULT_CURRENCY_RATES) {
+        storeCurrencyRates(rates, dispatch);
+    }
 };

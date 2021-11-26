@@ -97,7 +97,6 @@ export default {
             try {
                 await Promise.allSettled([
                     store.dispatch('service/budget/getBudgetData', 'budget-df7f905dbc8f'),
-                    store.dispatch('resource/project/load'),
                 ]);
             } catch (e) {
                 ErrorHandler.handleError(e);

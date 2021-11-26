@@ -25,8 +25,10 @@ export default {
             await Promise.all([
                 store.dispatch('resource/serviceAccount/load'),
                 store.dispatch('resource/project/load'),
+                store.dispatch('resource/projectGroup/load'),
                 store.dispatch('resource/region/load'),
                 store.dispatch('resource/provider/load'),
+                store.dispatch('display/loadCurrencyRates'),
             ]);
         })();
 
