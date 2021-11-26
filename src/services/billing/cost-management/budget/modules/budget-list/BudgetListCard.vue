@@ -22,22 +22,21 @@
                             <p class="label">
                                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.AMOUNT_SPENT') }}
                             </p>
-                            <div class="amount-used-wrapper" :class="usdCostColor">
+                            <div class="amount-used-wrapper" :class="progressStatus">
                                 <span class="cost">{{ `$${budget.total_usage_usd_cost}` }}</span>
                                 <span class="percent">{{ `(${percentage}%)` }}</span>
                             </div>
                         </div>
                         <div class="label-right">
                             <p class="label">
-                                {{ limitLabel }}
+                                {{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.BUDGETED') }}
                             </p>
                             <div class="cost">
                                 {{ `$${budget.limit}` }}
                             </div>
                         </div>
                     </div>
-                    <p-progress-bar v-if="percentage > 100 || percentage < 90" :percentage="percentage" :color="progressBarColor" />
-                    <p-progress-bar v-else :percentage="percentage" :gradient="{startColor: progressBarColor.start, endColor: progressBarColor.end, gradientPoint: percentage - 5}" />
+                    <budget-usage-progress-bar :usage-rate="percentage" />
                 </div>
                 <div class="budget-description">
                     <div class="cost-type-wrapper">
@@ -48,17 +47,6 @@
                             <span>{{ costTypeList }}</span>
                         </div>
                     </div>
-                    <p-badge v-if="budget.time_unit==='MONTHLY'"
-                             class="period" style-type="gray200" shape="square"
-                    >
-                        {{ formatTime(budget.start) }} ~ {{ formatTime(budget.end) }}
-                    </p-badge>
-                    <p-badge v-if="budget.time_unit==='TOTAL'"
-                             class="period" style-type="gray"
-                             :outline="true" shape="square"
-                    >
-                        Month-to-date
-                    </p-badge>
                 </div>
             </div>
         </div>
@@ -74,10 +62,10 @@ import { Location } from 'vue-router';
 import { BudgetData } from '@/services/billing/cost-management/budget/type';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import {
-    PBreadcrumbs, PDivider, PProgressBar, PBadge, PSkeleton,
+    PBreadcrumbs, PDivider, PSkeleton,
 } from '@spaceone/design-system';
+import BudgetUsageProgressBar from '@/services/billing/cost-management/modules/BudgetUsageProgressBar.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { red, yellow, indigo } from '@/styles/colors';
 import { capitalize } from 'lodash';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
@@ -102,9 +90,8 @@ export default {
     components: {
         PBreadcrumbs,
         PDivider,
-        PProgressBar,
-        PBadge,
         PSkeleton,
+        BudgetUsageProgressBar,
     },
     props: {
         budget: {
@@ -143,21 +130,11 @@ export default {
                 if (Number.isNaN(value)) return 0;
                 return value;
             }),
-            progressBarColor: computed<string|{start: string; end: string}>(() => {
-                if (state.percentage > 100) return red[400];
-                if (state.percentage >= 90) return { start: yellow[500], end: red[400] };
-                return indigo[500];
-            }),
-            usdCostColor: computed<'red'|'yellow'|'indigo'>(() => {
-                if (state.percentage > 100) return 'red';
-                if (state.percentage >= 90) return 'yellow';
-                return 'indigo';
-            }),
-            limitLabel: computed<string>(() => {
-                if (props.budget.time_unit === 'MONTHLY') {
-                    return 'Monthly budget';
-                }
-                return 'Total budget';
+            progressStatus: computed<'overspent'|'warning'|'unused'|'common'>(() => {
+                if (state.percentage >= 100) return 'overspent';
+                if (state.percentage >= 90) return 'warning';
+                if (state.percentage === 0) return 'unused';
+                return 'common';
             }),
         });
 
@@ -213,14 +190,17 @@ export default {
                 .label-left {
                     .amount-used-wrapper {
                         @apply flex flex-wrap gap-1 items-center;
-                        &.red {
+                        &.overspent {
                             @apply text-red-400;
                         }
-                        &.yellow {
+                        &.warning {
                             @apply text-yellow-500;
                         }
-                        &.indigo {
+                        &.common {
                             @apply text-indigo-500;
+                        }
+                        &.unused {
+                            @apply text-gray-500;
                         }
                         .cost {
                             @apply font-bold;
