@@ -1,3 +1,10 @@
+# [1.1.0-beta.190](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.189...v1.1.0-beta.190) (2021-11-26)
+
+
+### Bug Fixes
+
+* change padding for vertical align of header ([#767](https://github.com/spaceone-dev/spaceone-design-system/issues/767)) ([3b3836d](https://github.com/spaceone-dev/spaceone-design-system/commit/3b3836d4f4e590b6c754b05931998d6104b5849a))
+
 # [1.1.0-beta.189](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.188...v1.1.0-beta.189) (2021-11-24)
 
 
