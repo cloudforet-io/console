@@ -1,8 +1,35 @@
 [
-  ["MonthToDateSpend","LastMonthTotalSpend","BudgetUsage"],
-  ["CostByProject"],
-  ["CostTrendByProject"],
-  ["CostTrendByProduct"],
-  ["CostByProvider","BudgetStatus"],
-  ["CostByRegion"]
+  [{
+    "widget_id": "MonthToDateSpend",
+    "options": {}
+  }, {
+    "widget_id": "LastMonthTotalSpend",
+    "options": {}
+  }, {
+    "widget_id": "BudgetUsage",
+    "options": {}
+  }],
+  [{
+    "widget_id": "CostByProject",
+    "options": {}
+  }],
+  [{
+    "widget_id": "CostTrendByProject",
+    "options": {}
+  }],
+  [{
+    "widget_id": "CostTrendByProduct",
+    "options": {}
+  }],
+  [{
+    "widget_id": "CostByProvider",
+    "options": {}
+  }, {
+    "widget_id": "BudgetStatus",
+    "options": {}
+  }],
+  [{
+    "widget_id": "CostByRegion",
+    "options": {}
+  }]
 ]

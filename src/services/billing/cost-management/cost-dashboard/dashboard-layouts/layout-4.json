@@ -1,5 +1,14 @@
 [
-  ["TrafficCostTrend"],
-  ["TrafficCostByRegion"],
-  ["CostTrendByAmazonCloudFront"]
+  [{
+    "widget_id": "TrafficCostTrend",
+    "options": {}
+  }],
+  [{
+    "widget_id": "TrafficCostByRegion",
+    "options": {}
+  }],
+  [{
+    "widget_id": "CostTrendByAmazonCloudFront",
+    "options": {}
+  }]
 ]

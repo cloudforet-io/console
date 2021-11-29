@@ -51,7 +51,12 @@
             </div>
         </div>
 
-        <dashboard-layouts :layout="layout" />
+        <dashboard-layouts :layout="layout"
+                           :period="period"
+                           :filters="filters"
+                           :currency="currency"
+                           :currency-rates="currencyRates"
+        />
     </div>
 </template>
 
@@ -72,6 +77,8 @@ import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteB
 import DashboardLayouts from '@/services/billing/cost-management/cost-dashboard/modules/DashboardLayouts.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { store } from '@/store';
+import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
 
 const tempProjectsData = [
     {
@@ -80,7 +87,7 @@ const tempProjectsData = [
     },
     {
         id: 'a-2',
-        name: 'project22',
+        name: 'project2',
     },
     {
         id: 'a-3',
@@ -118,6 +125,10 @@ export default {
             }))),
             dashboard: null as any,
             layout: [] as any[],
+            period: {} as Period,
+            filters: {},
+            currency: computed(() => store.state.display.currency),
+            currencyRates: computed(() => store.state.display.currencyRates),
         });
 
         const routeState = reactive({

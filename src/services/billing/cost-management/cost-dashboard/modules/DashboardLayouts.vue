@@ -1,8 +1,14 @@
 <template>
     <div class="dashboard-layouts">
         <div v-for="(row, rowIdx) in layout" :key="`row-${rowIdx}`" :class="`row col-${row.length}`">
-            <div v-for="(widgetId, widgetIdx) in row" :key="`widget-${widgetIdx}`">
-                <dynamic-widget :widget-id="widgetId" />
+            <div v-for="({widget_id, options}) in row" :key="`widget-${widget_id}`">
+                <dynamic-widget :widget-id="widget_id"
+                                :options="options"
+                                :period="period"
+                                :filters="filters"
+                                :currency="currency"
+                                :currency-rates="currencyRates"
+                />
             </div>
         </div>
     </div>
@@ -14,6 +20,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { store } from '@/store';
 
 import DynamicWidget from '@/services/billing/cost-management/cost-dashboard/modules/DynamicWidget.vue';
+import { CURRENCY } from '@/store/modules/display/config';
 
 type Row = string[]
 
@@ -30,6 +37,22 @@ export default {
         layout: {
             type: Array,
             default: () => [],
+        },
+        period: {
+            type: Object,
+            default: () => ({}),
+        },
+        filters: {
+            type: Object,
+            default: () => ({}),
+        },
+        currency: {
+            type: String,
+            default: CURRENCY.USD,
+        },
+        currencyRates: {
+            type: Object,
+            default: () => ({}),
         },
     },
     setup() {

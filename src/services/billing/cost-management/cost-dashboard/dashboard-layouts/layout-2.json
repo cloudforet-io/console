@@ -1,4 +1,10 @@
 [
-  ["BudgetUsage"],
-  ["SPCProjectUsage"]
+  [{
+    "widget_id": "BudgetUsage",
+    "options": {}
+  }],
+  [{
+    "widget_id": "SPCProjectUsage",
+    "options": {}
+  }]
 ]

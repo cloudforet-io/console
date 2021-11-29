@@ -1,5 +1,11 @@
 <template>
-    <component :is="component" />
+    <component :is="component"
+               :options="options"
+               :period="period"
+               :filters="filters"
+               :currency="currency"
+               :currency-rates="currencyRates"
+    />
 </template>
 
 <script lang="ts">
@@ -7,8 +13,10 @@ import { isEqual } from 'lodash';
 import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
+import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import { CURRENCY } from '@/store/modules/display/config';
 
-interface Props {
+interface Props extends WidgetProps {
     widgetId: string;
 }
 
@@ -18,6 +26,26 @@ export default {
         widgetId: {
             type: String,
             default: '',
+        },
+        options: {
+            type: Object,
+            default: () => ({}),
+        },
+        period: {
+            type: Object,
+            default: () => ({}),
+        },
+        filters: {
+            type: Object,
+            default: () => ({}),
+        },
+        currency: {
+            type: String,
+            default: CURRENCY.USD,
+        },
+        currencyRates: {
+            type: Object,
+            default: () => ({}),
         },
     },
     setup(props: Props) {

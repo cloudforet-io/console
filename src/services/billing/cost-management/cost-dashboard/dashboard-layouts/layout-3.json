@@ -1,5 +1,14 @@
 [
-  ["BudgetUsage"],
-  ["ProjectBudgetUsage"],
-  ["CostTrendByProvider"]
+  [{
+    "widget_id": "BudgetUsage",
+    "options": {}
+  }],
+  [{
+    "widget_id": "ProjectBudgetUsage",
+    "options": {}
+  }],
+  [{
+    "widget_id": "CostTrendByProvider",
+    "options": {}
+  }]
 ]
