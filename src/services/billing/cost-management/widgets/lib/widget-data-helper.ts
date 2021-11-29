@@ -1,5 +1,4 @@
 import dayjs from 'dayjs';
-import { cloneDeep } from 'lodash';
 import { TimeUnit } from '@amcharts/amcharts4/core';
 
 import { store } from '@/store';
@@ -8,58 +7,32 @@ import { CurrencyRates } from '@/store/modules/display/type';
 
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
-import { GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
+import { GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
 import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
-
-import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
-import { ChartData, Legend } from '@/services/billing/cost-management/widgets/type';
-
-
-interface TableRawValue {
-    date: string;
-    usd_cost?: number;
-}
-interface TableRawData {
-    values: TableRawValue[];
-    [key: string]: any;
-}
-interface TableData {
-    [key: string]: any;
-}
+import {
+    ChartData, Legend, PieChartData, PieChartRawData, TableData, TableRawData, XYChartData, XYChartRawData,
+} from '@/services/billing/cost-management/widgets/type';
 
 
-interface XYChartRawValue {
-    usd_cost: number;
-    [key: string]: any;
-}
-interface XYChartRawData {
-    values: XYChartRawValue[];
-    [key: string]: any;
-}
-
-
-interface PieChartRawData {
-    usd_cost: number;
-    [key: string]: any;
-}
-
-
-const mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: ChartData): ChartData => {
+/**
+ * This function only merges numeric values, not string.
+ * ({ date: '2021-11', aws: 100, azure: 100 }, { date: '2021-12', azure: 200 }) => { aws: 100, azure: 300 }
+*/
+const _mergePrevChartDataAndCurrChartData = (prevData: ChartData, currData?: ChartData): ChartData => {
     const mergedData: Record<string, number> = {};
-    Object.keys({ ...prevData, ...currData }).forEach((k) => {
-        const prevValue = prevData[k] || 0;
-        if (k !== 'date') {
+    Object.entries({ ...prevData, ...currData }).forEach(([k, v]) => {
+        if (typeof v === 'number') {
             if (currData && currData[k]) {
-                mergedData[k] = currData[k] + prevValue;
+                mergedData[k] = currData[k] + (prevData[k] || 0);
             } else {
-                mergedData[k] = prevValue;
+                mergedData[k] = prevData[k] || 0;
             }
         }
     });
     return mergedData;
 };
 
-export const getLegendsFromGroupByNames = (groupByNames: string[], groupBy?: GROUP_BY_ITEM): Legend[] => {
+const _getLegendsFromGroupByNames = (groupByNames: string[], groupBy?: string): Legend[] => {
     let legends: Legend[] = [];
     if (groupBy) {
         const _providers = store.state.resource.provider.items;
@@ -84,17 +57,65 @@ export const getLegendsFromGroupByNames = (groupByNames: string[], groupBy?: GRO
             });
         });
     } else {
-        legends = [{ name: 'total_cost', label: 'Total Cost', disabled: false }];
+        legends = [{ name: 'totalCost', label: 'Total Cost', disabled: false }];
     }
     return legends;
 };
 
-export const getXYChartDataAndLegends = (rawData: XYChartRawData[], groupBy?: GROUP_BY_ITEM): { chartData: ChartData[]; legends: Legend[] } => {
-    const chartData: ChartData[] = [];
+const _getTableRowData = (groupBy: string[], tableRawData: TableRawData): TableData => {
+    const rowData: TableData = {};
+    /* extract group by data (ex. { provider: 'aws', region_code: 'us-west-1' }) */
+    if (groupBy.length) {
+        groupBy.forEach((name) => {
+            rowData[name] = tableRawData[name];
+        });
+    } else {
+        rowData.totalCost = 'Total Cost';
+    }
+    return rowData;
+};
+
+
+/**
+ * @name getPieChartData
+ * @description Convert raw data to PieChart data.
+ * @example [{ provider: 'aws', usd_cost: 100 }, { provider: 'azure', usd_cost: 30 }]
+ *       => [{ category: 'aws', value: 100 }, { category: 'azure', value: 30 }]
+ * @usage SpcProjectWiseUsageSummary, CostByProvider
+ */
+export const getPieChartData = (rawData: PieChartRawData[], groupBy: string): PieChartData[] => rawData.map(d => ({
+    category: d[groupBy],
+    value: d.usd_cost,
+}));
+
+
+/**
+ * @name getXYChartData
+ * @description Convert raw data to XYChart data.
+ * @example [{ date: '2021-11-01', values: [{ provider: 'aws', usd_cost: 100 }] }, { date: '2021-11-02', values: [{ provider: 'aws', usd_cost: 300 }] }]
+ *       => [{ date: '2021-11-01', aws: 100 }, { date: '2021-11-02', aws: 300 }]
+ * @usage BudgetSummaryChart, LastMonthTotalSpend
+ */
+export const getXYChartData = (rawData: XYChartRawData[], groupBy: string): XYChartData[] => rawData.map((d) => {
+    const eachChartData: XYChartData = { date: d.date };
+    d.values.forEach((value) => {
+        eachChartData[groupBy] = value.usd_cost;
+    });
+    return eachChartData;
+});
+
+
+/**
+ * @name getXYChartDataAndLegends
+ * @description Get converted chart data and legends. If you don't need legends, use getXYChartData().
+ * @usage CostAnalysisChart, CostTrendByProduct, CostTrendByProject
+ */
+export const getXYChartDataAndLegends = (rawData: XYChartRawData[], groupBy?: string): { chartData: XYChartData[]; legends: Legend[] } => {
+    const chartData: XYChartData[] = [];
     const groupByNameSet = new Set<string>();
 
     rawData.forEach((d) => {
-        const eachChartData: ChartData = { date: d.date };
+        const eachChartData: XYChartData = { date: d.date };
         if (groupBy) {
             d.values.forEach((value) => {
                 let groupByName = value[groupBy];
@@ -104,7 +125,7 @@ export const getXYChartDataAndLegends = (rawData: XYChartRawData[], groupBy?: GR
             });
         } else {
             d.values.forEach((value) => {
-                eachChartData.total_cost = value.usd_cost;
+                eachChartData.totalCost = value.usd_cost;
             });
         }
         chartData.push(eachChartData);
@@ -113,64 +134,20 @@ export const getXYChartDataAndLegends = (rawData: XYChartRawData[], groupBy?: GR
     const groupByNames = [...groupByNameSet];
     return {
         chartData,
-        legends: getLegendsFromGroupByNames(groupByNames, groupBy),
+        legends: _getLegendsFromGroupByNames(groupByNames, groupBy),
     };
 };
+
 
 /**
- * @name getPieChartDataAndLegends
- * @param rawData
- * @param groupBy
+ * @name getTableDataFromRawData
+ * @description Get converted table data.
+ * @example [{ provider: 'aws', values: [{ date: '2021-11-01', usd_code: 100 }, { date: '2021-11-02', usd_code: 150 }] }, { provider: 'azure', values: [{ date: '2021-11-01', usd_code: 200 }] }]
+ *       => [{ provider: 'aws', 2021-11-01: 100, 2021-11-02: 150 }, { provider: 'azure', 2021-11-01: 200 }]
+ * @usage CostAnalysisChart, CostTrendByProduct, CostTrendByProject
  */
-export const getPieChartDataAndLegends = (rawData: PieChartRawData[], groupBy?: GROUP_BY_ITEM): { chartData: ChartData[]; legends: Legend[] } => {
-    let chartData: ChartData[] = [];
-    const groupByNameSet = new Set<string>();
-
-    if (groupBy) {
-        rawData.forEach((d) => {
-            let groupByName = d[groupBy];
-            if (!groupByName) groupByName = `No ${groupBy}`;
-            chartData.push({
-                category: groupByName,
-                value: d.usd_cost,
-            });
-            groupByNameSet.add(groupByName);
-        });
-    } else if (rawData[0]?.usd_cost) {
-        chartData = [{
-            category: 'Total Cost',
-            value: rawData[0].usd_cost,
-        }];
-    }
-
-    const groupByNames = [...groupByNameSet];
-    return {
-        chartData,
-        legends: getLegendsFromGroupByNames(groupByNames, groupBy),
-    };
-};
-
-
-const getDefaultRowDataWithGroupBy = (groupBy: string[], tableRawData: TableRawData): TableData => {
-    const rowData: TableData = {};
-    /* extract group by data (ex. { provider: 'aws', region_code: 'us-west-1' }) */
-    if (groupBy.length) {
-        groupBy.forEach((name) => {
-            rowData[name] = tableRawData[name];
-        });
-    } else {
-        rowData.total_cost = 'Total Cost';
-    }
-    return rowData;
-};
-
-export const getTableDataFromRawData = (
-    rawData: TableRawData[],
-    groupBy: string[],
-): TableData[] => rawData.map((eachRawData) => {
-    const rowData = getDefaultRowDataWithGroupBy(groupBy, eachRawData);
-
-    /* extract data per each date (ex. { 2021-11-01: '29.4K', 2021-11-02: '8,962' } ) */
+export const getTableDataFromRawData = (rawData: TableRawData[], groupBy: string[]): TableData[] => rawData.map((eachRawData) => {
+    const rowData = _getTableRowData(groupBy, eachRawData);
     eachRawData.values.forEach((value) => {
         rowData[value.date] = value.usd_cost;
     });
@@ -179,21 +156,24 @@ export const getTableDataFromRawData = (
 });
 
 
-const getAccumulatedData = (
-    chartData: ChartData[],
-    period: Period,
-    timeUnit: TimeUnit,
-): ChartData[] => {
-    const accumulatedChartData = [] as ChartData[];
+/**
+ * @name getAccumulatedChartData
+ * @description Get accumulated array of chart data. Chart data must have 'date' property.
+ * @example [{ date: '2021-01', usd_cost: 10, limit: 100 }, { date: '2021-02', usd_cost: 10, limit: 0 }, { date: '2021-03', usd_cost: 10, limit: 100 }]
+ *       => [{ date: '2021-01-01', usd_cost: 10, limit: 100 }, { date: '2021-02-01', usd_cost: 20, limit: 100 }, { date: '2021-03-01', usd_cost: 30, limit: 200 }]
+ * @usage CostAnalysisDynamicWidget
+ */
+export const getAccumulatedChartData = (chartData: XYChartData[], period: Period, timeUnit: TimeUnit): XYChartData[] => {
+    const accumulatedChartData = [] as XYChartData[];
     let now = dayjs(period.start).clone();
     let accumulatedData: Record<string, number> = {};
     while (now.isSameOrBefore(dayjs(period.end), timeUnit)) {
-        let eachChartData: ChartData = {};
+        let eachChartData: XYChartData = { date: now.format('YYYY-MM-DD') };
         // eslint-disable-next-line no-loop-func
         const existData = chartData.find(d => now.isSame(d.date, timeUnit));
-        accumulatedData = mergePrevChartDataAndCurrChartData(accumulatedData, existData);
+        accumulatedData = _mergePrevChartDataAndCurrChartData(accumulatedData, existData);
         eachChartData = {
-            date: now.toDate(),
+            ...eachChartData,
             ...accumulatedData,
         };
         accumulatedChartData.push(eachChartData);
@@ -202,36 +182,14 @@ const getAccumulatedData = (
     return accumulatedChartData;
 };
 
-const fillDefaultDataOfLastDay = (chartData: ChartData[], period: Period, timeUnit: TimeUnit): ChartData[] => {
-    const convertedChartData = [...chartData];
-    const dataOfLastDate = chartData.find(d => dayjs(period.end).isSame(d.date, timeUnit));
-    if (!dataOfLastDate) {
-        convertedChartData.push({
-            date: dayjs(period.end).toDate(),
-        });
-    }
-    return convertedChartData;
-};
 
-
-export const getQueryAppliedChartData = (
-    chartData: ChartData[],
-    period: Period,
-    chartType: CHART_TYPE,
-    granularity: GRANULARITY,
-    timeUnit: TimeUnit,
-): ChartData[] => {
-    let results = cloneDeep(chartData);
-    if (chartType !== CHART_TYPE.DONUT) {
-        if (granularity === GRANULARITY.ACCUMULATED) {
-            results = getAccumulatedData(chartData, period, timeUnit);
-        } else {
-            results = fillDefaultDataOfLastDay(chartData, period, timeUnit);
-        }
-    }
-    return results;
-};
-
+/**
+ * @name getCurrencyAppliedChartData
+ * @description Set currency rate to chart data. If the value is a number, it's unconditionally multiplied by the currency rate.
+ * @example [{ date: '2021-01', aws: 1, lineDash: '5,5' }, { date: '2021-02', aws: 10 }] : USD
+ *       => [{ date: '2021-01', aws: 1200, lineDash: '5,5' }, { date: '2021-02', aws: 12000 }] : KRW
+ * @usage CostAnalysisDynamicWidget, CostTrendByProduct, CostTrendByProject, BudgetSummaryChart, LastMonthTotalSpend
+ */
 export const getCurrencyAppliedChartData = (
     chartData: ChartData[],
     currency: CURRENCY,

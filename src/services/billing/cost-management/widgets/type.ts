@@ -8,6 +8,41 @@ export interface ChartData {
     [key: string]: any;
 }
 
+interface TableRawValue {
+    date: string;
+    usd_cost?: number;
+}
+export interface TableRawData {
+    values: TableRawValue[];
+    [key: string]: any;
+}
+export interface TableData {
+    [key: string]: any;
+}
+
+interface XYChartRawValue {
+    usd_cost: number;
+    [key: string]: any;
+}
+export interface XYChartRawData {
+    date: string;
+    values: XYChartRawValue[];
+}
+export interface XYChartData {
+    date: string;
+    totalCost?: number;
+    [key: string]: any;
+}
+
+export interface PieChartRawData {
+    usd_cost: number;
+    [key: string]: any;
+}
+export interface PieChartData {
+    category: string;
+    value: number;
+}
+
 export interface Legend {
     name: string;
     label: string | TranslateResult;

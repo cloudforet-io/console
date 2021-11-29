@@ -109,22 +109,18 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import {
-    hideAllSeries,
-    toggleSeries,
-} from '@/lib/amcharts/helper';
+import { hideAllSeries, toggleSeries } from '@/lib/amcharts/helper';
 import { DEFAULT_CHART_COLORS, DISABLED_LEGEND_COLOR } from '@/styles/colorsets';
 
 import {
     getConvertedFilter, getConvertedGranularity, getConvertedPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
-import { FILTER_MAP, GRANULARITY } from '@/services/billing/cost-management/lib/config';
+import { FILTER_MAP, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
+import { getXYChartDataAndLegends } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import {
-    getPieChartDataAndLegends,
-    getXYChartDataAndLegends,
-} from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
-import { ChartData, Legend } from '@/services/billing/cost-management/widgets/type';
+    Legend, PieChartRawData, PieChartData, XYChartData,
+} from '@/services/billing/cost-management/widgets/type';
 
 
 export default {
@@ -156,7 +152,7 @@ export default {
             //
             loading: true,
             legends: [] as Legend[],
-            chartData: [] as ChartData[],
+            chartData: [] as Array<XYChartData|PieChartData>,
             donutPeriodText: computed(() => {
                 if (state.chartType !== CHART_TYPE.DONUT) return '';
                 if (state.granularity === GRANULARITY.DAILY) {
@@ -172,6 +168,64 @@ export default {
         const selectFilterModalState = reactive({
             visible: false,
         });
+
+        /* util */
+        const getLegendsFromGroupByNames = (groupByNames: string[], groupBy?: GROUP_BY_ITEM): Legend[] => {
+            let legends: Legend[] = [];
+            if (groupBy) {
+                const _providers = store.state.resource.provider.items;
+                const _serviceAccounts = store.state.resource.serviceAccount.items;
+                const _projects = store.state.resource.project.items;
+                const _regions = store.state.resource.region.items;
+                groupByNames.forEach((d) => {
+                    let _label = d;
+                    if (groupBy === GROUP_BY_ITEM.PROJECT) {
+                        _label = _projects[d]?.label || d;
+                    } else if (groupBy === GROUP_BY_ITEM.SERVICE_ACCOUNT) {
+                        _label = _serviceAccounts[d]?.label || d;
+                    } else if (groupBy === GROUP_BY_ITEM.REGION) {
+                        _label = _regions[d]?.name || d;
+                    } else if (groupBy === GROUP_BY_ITEM.PROVIDER) {
+                        _label = _providers[d]?.name || d;
+                    }
+                    legends.push({
+                        name: d as string,
+                        label: _label as string,
+                        disabled: false,
+                    });
+                });
+            } else {
+                legends = [{ name: 'totalCost', label: 'Total Cost', disabled: false }];
+            }
+            return legends;
+        };
+        const getPieChartDataAndLegends = (rawData: PieChartRawData[], groupBy?: GROUP_BY_ITEM): { chartData: PieChartData[]; legends: Legend[] } => {
+            let chartData: PieChartData[] = [];
+            const groupByNameSet = new Set<string>();
+
+            if (groupBy) {
+                rawData.forEach((d) => {
+                    let groupByName = d[groupBy];
+                    if (!groupByName) groupByName = `No ${groupBy}`;
+                    chartData.push({
+                        category: groupByName,
+                        value: d.usd_cost,
+                    });
+                    groupByNameSet.add(groupByName);
+                });
+            } else if (rawData[0]?.usd_cost) {
+                chartData = [{
+                    category: 'Total Cost',
+                    value: rawData[0].usd_cost,
+                }];
+            }
+
+            const groupByNames = [...groupByNameSet];
+            return {
+                chartData,
+                legends: getLegendsFromGroupByNames(groupByNames, groupBy),
+            };
+        };
 
         /* api */
         const costApiQueryHelper = new ApiQueryHelper();

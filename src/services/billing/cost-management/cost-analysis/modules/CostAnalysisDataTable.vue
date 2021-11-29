@@ -5,7 +5,7 @@
                      :total-count="tableState.totalCount"
                      :sort-desc="true"
                      sort-by="total_count"
-                     searchable
+                     :searchable="false"
                      exportable
                      sortable
                      @change="handleChange"
@@ -48,16 +48,11 @@ import {
     getConvertedFilter, getConvertedGranularity, getTimeUnitByPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
-import { store } from '@/store';
-import {
-    currencyMoneyFormatter,
-} from '@/lib/helper/currency-helper';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { getTableDataFromRawData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
+import { TableData } from '@/services/billing/cost-management/widgets/type';
+import { store } from '@/store';
 
-
-interface CostAnalysisItem {
-    [key: string]: string | number | object;
-}
 
 export default {
     name: 'CostAnalysisDataTable',
@@ -82,7 +77,7 @@ export default {
         const tableState = reactive({
             loading: true,
             fields: [] as DataTableField[],
-            items: [] as CostAnalysisItem[],
+            items: [] as TableData[],
             totalCount: 0,
         });
 
@@ -92,7 +87,7 @@ export default {
             const groupByFields: DataTableField[] = [...groupByItems];
             if (!groupByItems.length) {
                 groupByFields.push({
-                    name: 'total_cost', label: ' ', sortable: false, textAlign: 'center',
+                    name: 'totalCost', label: ' ', sortable: false, textAlign: 'center',
                 });
             }
 
