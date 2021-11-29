@@ -1,0 +1,8 @@
+[
+  ["MonthToDateSpend","LastMonthTotalSpend","BudgetUsage"],
+  ["CostByProject"],
+  ["CostTrendByProject"],
+  ["CostTrendByProduct"],
+  ["CostByProvider","BudgetStatus"],
+  ["CostByRegion"]
+]

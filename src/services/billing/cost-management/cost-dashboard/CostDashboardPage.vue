@@ -50,57 +50,28 @@
                 />
             </div>
         </div>
-        <div class="dashboard-list-layout">
-            <div class="dashboard-row col-3">
-                <month-to-date-spend :currency="currency" :currency-rates="currencyRates" />
-                <last-month-total-spend :currency="currency" :currency-rates="currencyRates" />
-                <budget-usage :currency="currency" :currency-rates="currencyRates" />
-            </div>
-            <div class="dashboard-row">
-                <cost-by-project :currency="currency" :currency-rates="currencyRates" />
-            </div>
-            <div class="dashboard-row">
-                <cost-trend-by-project :currency="currency" :currency-rates="currencyRates" />
-            </div>
-            <div class="dashboard-row col-2">
-                <div class="cost-by-provider" style="height: 550px; background-color: #fff;">
-                    임의 영역이니 컴포넌트 개발 후 삭제 부탁드려요
-                </div>
-                <div class="cost-by-status" style="height: 550px; background-color: #fff;">
-                    임의 영역이니 컴포넌트 개발 후 삭제 부탁드려요
-                </div>
-            </div>
-            <div class="dashboard-row">
-                <cost-trend-by-product :currency="currency" :currency-rates="currencyRates" />
-            </div>
-            <div class="dashboard-row">
-                <cost-by-region :currency="currency" :currency-rates="currencyRates" />
-            </div>
-        </div>
+
+        <dashboard-layouts :layout="layout" />
     </div>
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import { i18n } from '@/translations';
 
 import {
     PBreadcrumbs, PIconButton, PIconTextButton, PPageTitle, PTag,
 } from '@spaceone/design-system';
 
-import { store } from '@/store';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 
 import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
-import CostTrendByProduct from '@/services/billing/cost-management/widgets/CostTrendByProduct.vue';
-import CostTrendByProject from '@/services/billing/cost-management/widgets/CostTrendByProject.vue';
 import FavoriteButton from '@/common/modules/favorites/favorite-button/FavoriteButton.vue';
-import LastMonthTotalSpend from '@/services/billing/cost-management/widgets/LastMonthTotalSpend.vue';
-import MonthToDateSpend from '@/services/billing/cost-management/widgets/MonthToDateSpend.vue';
-import BudgetUsage from '@/services/billing/cost-management/widgets/BudgetUsage.vue';
-import CostByProject from '@/services/billing/cost-management/widgets/CostByProject.vue';
-import CostByRegion from '@/services/billing/cost-management/widgets/CostByRegion.vue';
-
+import DashboardLayouts from '@/services/billing/cost-management/cost-dashboard/modules/DashboardLayouts.vue';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 const tempProjectsData = [
     {
@@ -124,14 +95,9 @@ const tempProjectsData = [
 export default {
     name: 'CostDashboardPage',
     components: {
-        CostByRegion,
-        CostByProject,
-        BudgetUsage,
-        MonthToDateSpend,
-        LastMonthTotalSpend,
+        DashboardLayouts,
+        // PublicCloudCostSummary,
         CurrencySelectDropdown,
-        CostTrendByProject,
-        CostTrendByProduct,
         FavoriteButton,
         PIconButton,
         PBreadcrumbs,
@@ -150,8 +116,8 @@ export default {
             selectedProjects: computed(() => tempProjectsData.map(d => ({
                 ...d,
             }))),
-            currency: computed(() => store.state.display.currency),
-            currencyRates: computed(() => store.state.display.currencyRates),
+            dashboard: null as any,
+            layout: [] as any[],
         });
 
         const routeState = reactive({
@@ -174,6 +140,38 @@ export default {
             console.log('click more!');
         };
 
+        const getLayoutData = async (layoutId: string) => {
+            try {
+                // noinspection TypeScriptCheckImport
+                const res = await import(`./dashboard-layouts/${layoutId}.json`);
+                return res.default;
+            } catch (e) {
+                console.error(e);
+                return [];
+            }
+        };
+
+        const getDashboard = async (dashboardId: string) => {
+            try {
+                const res = await SpaceConnector.client.costAnalysis.dashboard.get({
+                    dashboard_id: dashboardId,
+                });
+                return res;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return null;
+            }
+        };
+
+        watch(() => props.dashboardId, async (dashboardId) => {
+            if (!dashboardId) return;
+
+            state.dashboard = await getDashboard(dashboardId);
+            if (state.dashboard?.default_layout_id) {
+                state.layout = await getLayoutData(state.dashboard.default_layout_id);
+            }
+        }, { immediate: true });
+
         return {
             ...toRefs(state),
             routeState,
@@ -186,7 +184,6 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-@import './styles/dashboardListLayout.pcss';
 .cost-dashboard-page {
     max-width: 120rem;
 }
