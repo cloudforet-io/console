@@ -56,6 +56,8 @@ export default {
 
 <style lang="postcss" scoped>
 .cost-dashboard-card-widget-layout {
+    @apply flex flex-col;
+    min-height: 100%;
     .header {
         @apply flex items-center justify-between;
     }
@@ -81,6 +83,7 @@ export default {
     }
     &::v-deep .body {
         @apply bg-white;
+        flex-grow: 1;
         padding: 1rem;
     }
 

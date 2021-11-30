@@ -304,6 +304,7 @@ export default {
 .cost-trend-by-product::v-deep {
     .body {
         @apply grid grid-cols-12;
+        min-height: 26rem;
         .chart-wrapper {
             @apply col-span-6;
             .chart {
@@ -318,7 +319,7 @@ export default {
                 margin-left: auto;
             }
             .cost-dashboard-data-table {
-                @apply flex flex-col;
+                @apply flex flex-col flex-grow;
                 .p-data-table {
                     margin: 0.5rem 0;
                 }
@@ -335,6 +336,11 @@ export default {
             .chart-wrapper,
             .table-wrapper {
                 @apply col-span-12 row-span-1;
+            }
+            .table-wrapper {
+                .month-pagination-wrapper {
+                    margin: 1rem 0 0.5rem auto;
+                }
             }
         }
     }

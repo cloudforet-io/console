@@ -81,8 +81,8 @@ export default {
 <style lang="postcss" scoped>
 .card-widget-layout {
     min-width: 22rem;
+    min-height: 100%;
     padding: 1rem 1.25rem;
-
     .title-wrapper {
         @apply flex text-gray-800;
         justify-content: space-between;
@@ -115,6 +115,10 @@ export default {
     .divider {
         margin-top: 0.75rem;
         margin-bottom: 0.75rem;
+    }
+
+    @screen mobile {
+        min-width: 100%;
     }
 }
 </style>
