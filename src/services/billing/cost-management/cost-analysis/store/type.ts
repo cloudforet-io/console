@@ -33,13 +33,16 @@ export interface CostQuerySetModel {
     options?: CostQuerySetOption;
 }
 
+export type CostQueryFilters = Partial<Record<FILTER_ITEM, string[]>>
+export type CostQueryFilterItemsMap = Partial<Record<FILTER_ITEM, FilterItem[]>>
+
 export interface CostAnalysisStoreState {
     chartType: CHART_TYPE;
     granularity: GRANULARITY;
     groupByItems: GroupByItem[];
     groupBy?: string;
     period: Period;
-    filters: Record<FILTER_ITEM, FilterItem[]>;
+    filters: CostQueryFilters;
     selectedQueryId: string|undefined;
     costQueryList: CostQuerySetModel[];
 }

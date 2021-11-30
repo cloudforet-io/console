@@ -45,8 +45,8 @@ import CostDashboardDataTable
 
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
-import { FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
-import { FilterItem } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
+import { CostQueryFilters } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
@@ -87,7 +87,7 @@ export default {
     },
     setup(props: WidgetProps) {
         const state = reactive({
-            filters: {} as Record<FILTER_ITEM, FilterItem[]>,
+            filters: {} as CostQueryFilters,
             top15ProjectIds: [],
             //
             chartLoading: true,
@@ -100,7 +100,7 @@ export default {
             tableLoading: true,
             items: [] as TableItem[],
             fields: computed<DataTableField[]>(() => {
-                const fields = [{ name: GROUP_BY_ITEM.PROJECT, label: 'Project' }];
+                const fields: DataTableField[] = [{ name: GROUP_BY_ITEM.PROJECT, label: 'Project' }];
                 const fiveMonthsAgo = dayjs.utc().subtract(5, 'month');
                 range(6).forEach((d) => {
                     const date = fiveMonthsAgo.add(d, 'month');

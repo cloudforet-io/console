@@ -15,15 +15,16 @@ export const GROUP_BY_ITEM = Object.freeze({
     TYPE: 'type',
     RESOURCE: 'resource',
     ACCOUNT: 'account',
-});
+} as const);
 export type GROUP_BY_ITEM = typeof GROUP_BY_ITEM[keyof typeof GROUP_BY_ITEM];
 
 export const FILTER_ITEM = Object.freeze({
     ...GROUP_BY_ITEM,
     TAG: 'tag',
     ADDITIONAL_FIELD: 'additional_info',
-});
+} as const);
 export type FILTER_ITEM = typeof FILTER_ITEM[keyof typeof FILTER_ITEM];
+
 export const FILTER_MAP = Object.freeze({
     PROJECT: { name: FILTER_ITEM.PROJECT, label: 'Project' },
     SERVICE_ACCOUNT: { name: FILTER_ITEM.SERVICE_ACCOUNT, label: 'Service Account' },

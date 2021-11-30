@@ -4,6 +4,7 @@ import { CostAnalysisStoreState } from '@/services/billing/cost-management/cost-
 import { getInitialDates } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import * as actions from './actions';
 import * as mutations from './mutations';
+import * as getters from './getters';
 
 
 const state: CostAnalysisStoreState = {
@@ -22,4 +23,5 @@ export default {
     state: () => ({ ...state }),
     actions,
     mutations,
+    getters,
 };

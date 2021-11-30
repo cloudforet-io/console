@@ -35,7 +35,7 @@
                             {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SELECTED_FILTER') }} ({{ selectedItemsLength }})
                         </div>
                         <div v-if="selectedItemsLength" class="selected-tags-wrapper">
-                            <template v-for="([filterName, selectedItems], idx) in Object.entries(selectedItemsMap)">
+                            <template v-for="(selectedItems, filterName, idx) in selectedItemsMap">
                                 <p-tag v-for="(item, itemIdx) in selectedItems" :key="`selected-tag-${idx}-${item.name}`"
                                        @delete="handleDeleteTag(filterName, itemIdx)"
                                 >
@@ -71,8 +71,11 @@ import {
 import CostAnalysisFilterItem from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisFilterItem.vue';
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
-import { FILTER_ITEM, FILTER_MAP } from '@/services/billing/cost-management/lib/config';
-import { FilterItem } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { FILTER_MAP } from '@/services/billing/cost-management/lib/config';
+import {
+    CostQueryFilterItemsMap,
+    CostQueryFilters,
+} from '@/services/billing/cost-management/cost-analysis/store/type';
 import { store } from '@/store';
 
 
@@ -93,12 +96,11 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
-            filters: computed<Record<FILTER_ITEM, FilterItem[]>>(() => store.state.service.costAnalysis.filters),
             filterItems: computed(() => Object.values(FILTER_MAP).map(item => ({
                 name: item.name,
                 title: item.label,
             }))),
-            selectedItemsMap: {} as Record<FILTER_ITEM, FilterItem[]>,
+            selectedItemsMap: {} as CostQueryFilterItemsMap,
             selectedItemsLength: computed<number>(() => {
                 const selectedValues = Object.values(state.selectedItemsMap);
                 return sum(selectedValues.map(v => v?.length || 0));
@@ -110,9 +112,9 @@ export default {
         /* util */
         const init = () => {
             const unfoldedIndices: number[] = [];
-            state.selectedItemsMap = { ...state.filters };
+            state.selectedItemsMap = store.getters['service/costAnalysis/filterItemsMap'];
             state.filterItems.forEach((item, idx) => {
-                if (state.filters[item.name]?.length) {
+                if (state.selectedItemsMap[item.name]?.length) {
                     unfoldedIndices.push(idx);
                 }
             });
@@ -133,7 +135,11 @@ export default {
         };
         const handleFormConfirm = () => {
             state.proxyVisible = false;
-            store.commit('service/costAnalysis/setFilters', state.selectedItemsMap);
+            const filters: CostQueryFilters = {};
+            Object.entries(state.selectedItemsMap as CostQueryFilterItemsMap).forEach(([key, selectedItems]) => {
+                filters[key] = selectedItems?.map(({ name }) => name);
+            });
+            store.commit('service/costAnalysis/setFilters', filters);
         };
         const handleClearAll = () => {
             state.selectedItemsMap = {};

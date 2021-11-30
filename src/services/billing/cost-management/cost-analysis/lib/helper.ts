@@ -1,8 +1,8 @@
 import dayjs, { Dayjs } from 'dayjs';
 import { TimeUnit } from '@amcharts/amcharts4/core';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
-import { FilterItem, Period } from '@/services/billing/cost-management/cost-analysis/store/type';
-import { FILTER_ITEM, GRANULARITY } from '@/services/billing/cost-management/lib/config';
+import { CostQueryFilters, Period } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 
 
@@ -16,14 +16,13 @@ export const getConvertedGranularity = (period: Period, granularity: GRANULARITY
     return GRANULARITY.YEARLY;
 };
 
-export const getConvertedFilter = (filters: Record<FILTER_ITEM, FilterItem[]>): QueryStoreFilter[] => {
+export const getConvertedFilter = (filters: CostQueryFilters): QueryStoreFilter[] => {
     const result: QueryStoreFilter[] = [];
-    Object.entries(filters).forEach(([filterName, filterItems]) => {
-        if (filterItems?.length) {
-            const filterValues = filterItems.map(d => d.name);
+    Object.entries(filters).forEach(([key, data]) => {
+        if (data?.length) {
             result.push({
-                k: filterName,
-                v: filterValues,
+                k: key,
+                v: data,
                 o: '=',
             });
         }

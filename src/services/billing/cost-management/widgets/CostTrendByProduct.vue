@@ -65,8 +65,8 @@ import {
     getXYChartDataAndLegends,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
-import { FilterItem } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
+import { CostQueryFilters } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import { ChartData, Legend, WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
@@ -98,7 +98,7 @@ export default {
     },
     setup(props: WidgetProps) {
         const state = reactive({
-            filters: {} as Record<FILTER_ITEM, FilterItem[]>,
+            filters: {} as CostQueryFilters,
             top15ProductNames: [],
             //
             chartLoading: true,
@@ -111,7 +111,7 @@ export default {
             tableLoading: true,
             items: [] as TableItem[],
             fields: computed<DataTableField[]>(() => {
-                const fields = [{ name: GROUP_BY_ITEM.PRODUCT, label: 'Product' }];
+                const fields: DataTableField[] = [{ name: GROUP_BY_ITEM.PRODUCT, label: 'Product' }];
                 const fiveMonthsAgo = dayjs.utc().subtract(5, 'month');
                 range(state.thisMonthPage * 3 - 3, state.thisMonthPage * 3).forEach((d) => {
                     const date = fiveMonthsAgo.add(d, 'month');

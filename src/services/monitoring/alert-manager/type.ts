@@ -1,5 +1,3 @@
-/* eslint-disable camelcase */
-
 import { Tags, TimeStamp } from '@/models';
 import { QueryStoreFilter } from '@spaceone/console-core-lib/query/type';
 import {

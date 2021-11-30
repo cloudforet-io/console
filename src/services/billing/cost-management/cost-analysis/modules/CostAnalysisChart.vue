@@ -35,8 +35,8 @@
                     />
                 </div>
             </div>
-            <p-data-loader :loading="false" :data="filters" class="filter-wrapper">
-                <template v-for="([filterName, selectedItems], idx) in Object.entries(filters)">
+            <p-data-loader :loading="false" :data="filterItemsMap" class="filter-wrapper">
+                <template v-for="(selectedItems, filterName, idx) in filterItemsMap">
                     <p-tag v-for="(item, itemIdx) in selectedItems" :key="`selected-tag-${idx}-${item.name}`"
                            @delete="handleDeleteFilterTag(filterName, itemIdx)"
                     >
@@ -143,6 +143,7 @@ export default {
             chartType: computed(() => store.state.service.costAnalysis.chartType),
             period: computed(() => store.state.service.costAnalysis.period),
             filters: computed(() => store.state.service.costAnalysis.filters),
+            filterItemsMap: computed(() => store.getters['service/costAnalysis/filterItemsMap']),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
             filtersLength: computed<number>(() => {
