@@ -58,7 +58,13 @@ export default {
         BudgetBillingAdmin,
         DeleteModal,
     },
-    setup() {
+    props: {
+        budgetId: {
+            type: String,
+            default: undefined,
+        },
+    },
+    setup(props) {
         registerServiceStore<BudgetStoreState>('budget', BudgetStoreModule);
 
         const state = reactive({
@@ -96,7 +102,9 @@ export default {
             state.loading = true;
             try {
                 await Promise.allSettled([
-                    store.dispatch('service/budget/getBudgetData', 'budget-df7f905dbc8f'),
+                    store.dispatch('service/budget/getBudgetData', props.budgetId),
+                    store.dispatch('service/budget/getBudgetUsageData', props.budgetId),
+                    store.dispatch('resource/project/load'),
                 ]);
             } catch (e) {
                 ErrorHandler.handleError(e);

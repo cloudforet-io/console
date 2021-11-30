@@ -16,6 +16,14 @@ export type CostType = 'provider' | 'region_code' | 'account' | 'product'
 
 export type BudgetTimeUnit = 'MONTHLY' | 'YEARLY' | 'TOTAL'
 
+export const BUDGET_TIME_UNIT = Object.freeze({
+    MONTHLY: 'MONTHLY',
+    YEARLY: 'YEARLY',
+    TOTAL: 'TOTAL',
+} as const);
+
+export type BUDGET_TIME_UNIT = typeof BUDGET_TIME_UNIT[keyof typeof BUDGET_TIME_UNIT];
+
 export const BUDGET_NOTIFICATIONS_UNIT = Object.freeze({
     PERCENT: 'PERCENT',
     ACTUAL_COST: 'ACTUAL_COST',
@@ -53,5 +61,14 @@ export interface BudgetData {
 	tags: Tags;
 	domain_id?: string;
 	created_at: TimeStamp;
+	updated_at: TimeStamp;
+}
+
+export interface BudgetUsageData {
+	budget_id: string;
+	limit: number;
+	usd_cost: number;
+	date: string;
+	domain_id?: string;
 	updated_at: TimeStamp;
 }

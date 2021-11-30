@@ -76,7 +76,7 @@ export default {
                     component: BudgetUpdatePage,
                 },
                 {
-                    path: 'budget/:id',
+                    path: 'budget/:budgetId',
                     name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
                     props: true,
                     component: BudgetDetailPage,

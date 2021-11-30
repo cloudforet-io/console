@@ -106,7 +106,7 @@ export default {
             linkLocation: computed<Location>(() => ({
                 name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
                 params: {
-                    id: props.budget.budget_id,
+                    budgetId: props.budget.budget_id,
                 },
             })),
             loading: true,

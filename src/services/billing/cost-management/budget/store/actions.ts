@@ -1,5 +1,5 @@
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { BudgetData, BudgetNotifications } from '@/services/billing/cost-management/budget/type';
+import { BudgetData, BudgetNotifications, BudgetUsageData } from '@/services/billing/cost-management/budget/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { UpdateBudgetParams } from '@/services/billing/cost-management/budget/store/type';
 
@@ -33,6 +33,18 @@ export const updateBudgetNotifications = async ({ commit }, params: { budgetId: 
             budget_id: params.budgetId,
         });
         commit('setBudgetData', budget);
+    } catch (e) {
+        ErrorHandler.handleError(e);
+    }
+};
+
+export const getBudgetUsageData = async ({ commit }, budgetId: string): Promise<void|Error> => {
+    try {
+        const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.list({
+            budget_id: budgetId,
+        });
+        const usage: BudgetUsageData = results;
+        commit('setBudgetUsageData', usage);
     } catch (e) {
         ErrorHandler.handleError(e);
     }

@@ -5,6 +5,7 @@ import * as mutations from './mutations';
 
 const state: BudgetStoreState = {
     budgetData: null,
+    budgetUsageData: null,
 };
 
 export default {

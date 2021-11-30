@@ -1,66 +1,73 @@
 <template>
-    <div ref="chartRef" class="chart" />
+    <p-chart-loader :loading="loading">
+        <template #loader>
+            <p-skeleton height="100%" />
+        </template>
+        <div ref="chartRef" class="chart" />
+    </p-chart-loader>
 </template>
 
 <script lang="ts">
 import {
+    computed,
     onUnmounted,
     reactive, toRefs, watch,
 } from '@vue/composition-api';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import config from '@/lib/config';
-import { gray, coral } from '@/styles/colors';
+import {
+    gray, indigo, red,
+} from '@/styles/colors';
 import { XYChart } from '@amcharts/amcharts4/charts';
+import { store } from '@/store';
+import { getAccumulatedChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import dayjs from 'dayjs';
+import { BUDGET_TIME_UNIT } from '@/services/billing/cost-management/budget/type';
+import { PChartLoader, PSkeleton } from '@spaceone/design-system';
 
-am4core.useTheme(am4themesAnimated);
-
-const tempData = [
-    {
-        date: '2021-10',
-        limit: 100,
-        usd_cost: 120,
-        lineDash: '5,5',
-    }, {
-        date: '2021-09',
-        limit: 100,
-        usd_cost: 88,
-        lineDash: '5,5',
-    }, {
-        date: '2021-08',
-        limit: 120,
-        usd_cost: 50,
-        lineDash: '5,5',
-    }, {
-        date: '2021-07',
-        limit: 100,
-        usd_cost: 70,
-        lineDash: '5,5',
-    }, {
-        date: '2021-06',
-        limit: 100,
-        usd_cost: 90,
-        lineDash: '5,5',
-        columnDash: '5,5',
-        fillOpacity: 0.2,
-        additional: '(projection)',
-    }];
+const categoryKey = 'date';
+const columnChartValueName = 'usd_cost';
 
 export default {
     name: 'BudgetSummaryChart',
-    props: {
-        chartData: {
-            type: Array,
-            default: () => ([]),
-        },
+    components: {
+        PChartLoader,
+        PSkeleton,
     },
-    setup(props) {
+    setup() {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as XYChart | null,
             chartRegistry: {},
+            budgetUsageData: computed(() => store.state.service.budget.budgetUsageData),
+            budgetData: computed(() => store.state.service.budget.budgetData),
+            limitProperty: computed(() => ((state.budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL) ? 'total_limit' : 'limit')),
+            chartData: [] as any,
+            loading: true,
         });
+
+        const getChartData = () => {
+            try {
+                state.loading = true;
+                const accumulatedData = getAccumulatedChartData(state.budgetUsageData, {
+                    start: state.budgetData.start,
+                    end: state.budgetData.end,
+                }, 'month');
+                if (state.budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL) {
+                    accumulatedData.forEach((data) => {
+                        data.total_limit = state.budgetData.limit;
+                    });
+                }
+                return accumulatedData;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return [];
+            } finally {
+                state.loading = false;
+            }
+        };
 
         const disposeChart = (chartContext) => {
             if (state.chartRegistry[chartContext]) {
@@ -68,6 +75,37 @@ export default {
                 delete state.chartRegistry[chartContext];
             }
         };
+
+        const makeTotalPlanningLineSeries = (chart: XYChart) => {
+            const lineSeries = chart.series.push(new am4charts.LineSeries());
+            lineSeries.name = 'Total Budget';
+            lineSeries.dataFields.valueY = state.limitProperty;
+            lineSeries.dataFields.categoryX = categoryKey;
+            lineSeries.stroke = am4core.color(gray[600]);
+            lineSeries.strokeWidth = 2;
+            lineSeries.strokeDasharray = '4, 3';
+        };
+
+        const makeMonthlyPlanningLineSeries = (chart: XYChart) => {
+            /* Create series - Line */
+            const lineSeries = chart.series.push(new am4charts.LineSeries());
+            lineSeries.name = 'Budgeted';
+            lineSeries.dataFields.valueY = state.limitProperty;
+            lineSeries.dataFields.categoryX = categoryKey;
+            lineSeries.stroke = am4core.color(gray[400]);
+            lineSeries.strokeWidth = 2;
+            lineSeries.strokeDasharray = '4, 3';
+
+            /* Create Bullet */
+            const bullet = lineSeries.bullets.push(new am4charts.Bullet());
+            bullet.fill = am4core.color(gray[600]);
+            bullet.tooltipText = '[#fff font-size: 15px]{name} in {categoryX}:\n[/][#fff font-size: 20px]{valueY}[/] [#fff]{additional}[/]';
+            const circle = bullet.createChild(am4core.Circle);
+            circle.radius = 5;
+            circle.fill = am4core.color('white');
+            circle.strokeWidth = 2;
+        };
+
         const drawChart = (chartContext) => {
             /* Create chart */
             const createChart = () => {
@@ -81,7 +119,7 @@ export default {
 
             /* Create axes */
             const categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
-            categoryAxis.dataFields.category = 'date';
+            categoryAxis.dataFields.category = categoryKey;
             categoryAxis.renderer.minGridDistance = 30;
 
             /* Create value axis */
@@ -90,49 +128,36 @@ export default {
             /* Create series - Column */
             const columnSeries = chart.series.push(new am4charts.ColumnSeries());
             columnSeries.name = 'Actual Cost';
-            columnSeries.dataFields.valueY = 'usd_cost';
+            columnSeries.dataFields.valueY = columnChartValueName;
             columnSeries.dataFields.categoryX = 'date';
 
             columnSeries.columns.template.tooltipText = '[#fff font-size: 15px]{name} in {categoryX}:\n[/][#fff font-size: 20px]{valueY}[/] [#fff]{additional}[/]';
-            columnSeries.columns.template.propertyFields.fillOpacity = 'fillOpacity';
             columnSeries.columns.template.propertyFields.stroke = 'stroke';
             columnSeries.columns.template.propertyFields.strokeWidth = 'strokeWidth';
-            columnSeries.columns.template.propertyFields.strokeDasharray = 'columnDash';
-            columnSeries.columns.template.width = am4core.percent(10);
+            columnSeries.columns.template.strokeOpacity = 0;
+            columnSeries.columns.template.width = am4core.percent(20);
             columnSeries.tooltip.label.textAlign = 'middle';
-
-            /* Create series - Line */
-            const lineSeries = chart.series.push(new am4charts.LineSeries());
-            lineSeries.name = 'Budgeted';
-            lineSeries.dataFields.valueY = 'limit';
-            lineSeries.dataFields.categoryX = 'date';
-
-            lineSeries.stroke = am4core.color(gray[400]);
-            lineSeries.strokeWidth = 2;
-            lineSeries.propertyFields.strokeDasharray = 'lineDash';
-            lineSeries.tooltip.label.textAlign = 'middle';
 
             /* Fill column by condition */
             columnSeries.columns.template.adapter.add('fill', (fill, target) => {
-                if (target.dataItem?.dataContext?.limit < target.dataItem?.dataContext?.usd_cost) {
-                    return am4core.color(coral[500]);
+                const MonthToDate = dayjs.utc().startOf('month').format('YYYY-MM-DD');
+                if (target.dataItem?.dataContext?.date === MonthToDate) {
+                    return am4core.color(indigo[300]);
+                }
+                if (target.dataItem?.dataContext[state.limitProperty] < target.dataItem?.dataContext?.usd_cost) {
+                    return am4core.color(red[400]);
                 }
                 return fill;
             });
 
-            /* Create Bullet */
-            const bullet = lineSeries.bullets.push(new am4charts.Bullet());
-            bullet.fill = am4core.color(gray[400]); // tooltips grab fill from parent by default
-            bullet.tooltipText = '[#fff font-size: 15px]{name} in {categoryX}:\n[/][#fff font-size: 20px]{valueY}[/] [#fff]{additional}[/]';
-            const circle = bullet.createChild(am4core.Circle);
-            circle.radius = 5;
-            circle.fill = am4core.color('#fff');
-            circle.strokeWidth = 1.5;
-            chart.data = tempData;
+            if (state.budgetData.time_unit === BUDGET_TIME_UNIT.TOTAL) makeTotalPlanningLineSeries(chart);
+            else makeMonthlyPlanningLineSeries(chart);
+
+            chart.data = getChartData();
         };
 
-        watch([() => state.chartRef, () => props.chartData], ([chartContext, chartData]) => {
-            if (chartContext && chartData.length > 0) {
+        watch([() => state.chartRef], ([chartContext]) => {
+            if (chartContext) {
                 drawChart(chartContext);
             }
         }, { immediate: false });
@@ -140,6 +165,10 @@ export default {
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();
         });
+
+        (() => {
+            getChartData();
+        })();
 
         return {
             ...toRefs(state),
