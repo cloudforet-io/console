@@ -33,11 +33,11 @@ export const durationFormatter = (createdAt: string, finishedAt: string, timezon
     return null;
 };
 
-export const numberFormatter = (num) => {
+export const numberFormatter = (num, digits = 1) => {
     if (Math.abs(num) < 10000) {
         return Math.round(num * 100) / 100;
     }
-    const options = { notation: 'compact', signDisplay: 'auto', maximumFractionDigits: 1 };
+    const options = { notation: 'compact', signDisplay: 'auto', maximumFractionDigits: digits };
     return Intl.NumberFormat('en', options).format(num);
 };
 export const commaFormatter = (num) => {
