@@ -23,7 +23,7 @@ export interface CostQuerySetOption {
     group_by: GROUP_BY_ITEM[];
     granularity: GRANULARITY;
     period: Period;
-    filter: FILTER_ITEM[];
+    filters: CostQueryFilters;
 }
 
 export interface CostQuerySetModel {

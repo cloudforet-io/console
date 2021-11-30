@@ -262,7 +262,7 @@ export default {
                         chart_type: chartType,
                         period,
                         group_by: groupByItems,
-                        filter: filters,
+                        filters,
                     },
                 });
                 await store.dispatch('service/costAnalysis/listCostQueryList');

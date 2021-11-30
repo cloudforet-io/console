@@ -27,7 +27,7 @@ export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit },
     commit('setGranularity', options.granularity);
     commit('setGroupByItems', options.group_by);
     commit('setPeriod', { start: options.period.start, end: options.period.end });
-    commit('setFilters', options.filter);
+    commit('setFilters', options.filters);
     commit('setSelectedQueryId', queryId);
 };
 

@@ -1,4 +1,3 @@
-/* eslint-disable camelcase */
 import { ResourceState } from '@/store/modules/resource/type';
 import { forEach } from 'lodash';
 import { DynamicFieldProps } from '@spaceone/design-system/dist/src/data-display/dynamic/dynamic-field/type';
