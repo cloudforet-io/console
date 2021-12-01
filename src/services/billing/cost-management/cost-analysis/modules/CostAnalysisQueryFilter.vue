@@ -1,35 +1,48 @@
 <template>
     <div class="cost-analysis-query-filter">
-        <div class="left-part">
-            <div class="filter-item">
-                <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY') }}</b>
-                <p-select-dropdown :items="granularityItems"
-                                   :selected="granularity"
-                                   without-outline
-                                   @select="handleSelectGranularity"
-                />
+        <div class="filter-wrapper tablet-off">
+            <div class="left-part">
+                <div class="filter-item">
+                    <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GRANULARITY') }}</b>
+                    <p-select-dropdown :items="granularityItems"
+                                       :selected="granularity"
+                                       without-outline
+                                       @select="handleSelectGranularity"
+                    />
+                </div>
+                <div class="filter-item">
+                    <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHART_TYPE') }}</b>
+                    <p-select-dropdown :items="chartTypeItems"
+                                       :selected="chartType"
+                                       without-outline
+                                       @select="handleSelectChartType"
+                    />
+                </div>
             </div>
-            <div class="filter-item">
-                <b>{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHART_TYPE') }}</b>
-                <p-select-dropdown :items="chartTypeItems"
-                                   :selected="chartType"
-                                   without-outline
-                                   @select="handleSelectChartType"
-                />
+            <div class="right-part">
+                <span class="timezone-text">UTC</span>
+                <div class="filter-item">
+                    <p-datetime-picker :selected-dates="[period.start, period.end]"
+                                       style-type="text"
+                                       select-mode="range"
+                                       @update:selectedDates="handleSelectedDates"
+                    />
+                </div>
+                <currency-select-dropdown />
+                <p-icon-button class="filter-item" name="ic_refresh" @click="handleClickRefresh" />
             </div>
         </div>
-        <div class="right-part">
-            <span class="timezone-text">UTC</span>
-            <div class="filter-item">
-                <p-datetime-picker :selected-dates="[period.start, period.end]"
-                                   style-type="text"
-                                   select-mode="range"
-                                   @update:selectedDates="handleSelectedDates"
-                />
+        <div class="filter-wrapper tablet-on">
+            <div class="left-part">
+                <span class="timezone-text">UTC</span>
+                <span>{{ `${dateFormatter(period.start)} ~ ${dateFormatter(period.end)}` }}</span>
             </div>
-            <currency-select-dropdown />
-            <p-icon-button class="filter-item" name="ic_refresh" @click="handleClickRefresh" />
+            <div class="right-part">
+                <p-icon-button class="filter-item" name="ic_setting" @click="handleClickSetFilter" />
+                <p-icon-button class="filter-item" name="ic_refresh" @click="handleClickRefresh" />
+            </div>
         </div>
+        <cost-analysis-set-query-modal :visible.sync="setQueryModalVisible" />
     </div>
 </template>
 
@@ -46,12 +59,15 @@ import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
-
+import CostAnalysisSetQueryModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetQueryModal.vue';
+import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
+import dayjs from 'dayjs';
 
 export default {
     name: 'CostAnalysisQueryFilter',
     components: {
         CurrencySelectDropdown,
+        CostAnalysisSetQueryModal,
         PSelectDropdown,
         PDatetimePicker,
         PIconButton,
@@ -60,7 +76,7 @@ export default {
         const state = reactive({
             granularity: computed(() => store.state.service.costAnalysis.granularity),
             chartType: computed(() => store.state.service.costAnalysis.chartType),
-            period: computed(() => store.state.service.costAnalysis.period),
+            period: computed<Period>(() => store.state.service.costAnalysis.period),
             currency: 'USD',
             //
             granularityItems: computed<MenuItem[]>(() => ([
@@ -112,6 +128,7 @@ export default {
                     label: i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.DONUT'),
                 },
             ])),
+            setQueryModalVisible: false,
         });
 
         /* event */
@@ -134,6 +151,11 @@ export default {
         const handleClickRefresh = async () => {
             // todo
         };
+        const handleClickSetFilter = () => {
+            state.setQueryModalVisible = true;
+        };
+
+        const dateFormatter = date => dayjs.utc(date).format('YYYY/MM/DD');
 
         return {
             ...toRefs(state),
@@ -141,6 +163,8 @@ export default {
             handleSelectChartType,
             handleSelectedDates,
             handleClickRefresh,
+            handleClickSetFilter,
+            dateFormatter,
         };
     },
 };
@@ -148,23 +172,12 @@ export default {
 
 <style lang="postcss" scoped>
 .cost-analysis-query-filter {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.875rem;
-    padding-bottom: 1rem;
+    .filter-wrapper {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.875rem;
+        padding-bottom: 1rem;
 
-    .left-part {
-        display: flex;
-        align-items: center;
-        .filter-item {
-            .p-select-dropdown {
-                padding-left: 0.5rem;
-            }
-        }
-    }
-    .right-part {
-        display: flex;
-        align-items: center;
         .timezone-text {
             @apply text-gray-400;
             font-size: 0.875rem;
@@ -172,27 +185,63 @@ export default {
             line-height: 1.5;
             padding-right: 0.5rem;
         }
-    }
-    .filter-item {
-        display: flex;
-        align-items: center;
-        margin-right: 0.5rem;
-        &::after {
-            @apply bg-gray-300;
-            display: inline-block;
-            position: relative;
-            content: '';
-            width: 1px;
-            height: 1rem;
-        }
-        &:last-child {
-            &::after {
-                display: none;
+
+        .left-part {
+            display: flex;
+            align-items: center;
+            .filter-item {
+                .p-select-dropdown {
+                    padding-left: 0.5rem;
+                }
             }
         }
+        .right-part {
+            display: flex;
+            align-items: center;
+        }
+        .filter-item {
+            display: flex;
+            align-items: center;
+            margin-right: 0.5rem;
+            &::after {
+                @apply bg-gray-300;
+                display: inline-block;
+                position: relative;
+                content: '';
+                width: 1px;
+                height: 1rem;
+            }
+            &:last-child {
+                &::after {
+                    display: none;
+                }
+            }
+
+            @screen tablet {
+                &::after {
+                    display: none;
+                }
+            }
+        }
+
+        .p-select-dropdown {
+            @apply bg-transparent;
+        }
     }
-    .p-select-dropdown {
-        @apply bg-transparent;
+    .tablet-on {
+        display: none;
+    }
+
+    @screen tablet {
+        .tablet-off {
+            display: none;
+        }
+        .tablet-on {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.875rem;
+            padding-bottom: 1rem;
+        }
     }
 }
 </style>

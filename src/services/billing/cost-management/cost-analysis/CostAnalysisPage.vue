@@ -85,13 +85,10 @@ import {
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 import CostAnalysisChart from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisChart.vue';
-import CostAnalysisQueryFilter
-    from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisQueryFilter.vue';
-import CostAnalysisGroupByFilter
-    from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisGroupByFilter.vue';
+import CostAnalysisQueryFilter from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisQueryFilter.vue';
+import CostAnalysisGroupByFilter from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisGroupByFilter.vue';
 import CostAnalysisDataTable from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisDataTable.vue';
-import SaveQueryFormModal
-    from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue';
+import SaveQueryFormModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSaveQueryFormModal.vue';
 import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import { BILLING_ROUTE } from '@/services/billing/routes';
