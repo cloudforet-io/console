@@ -6,7 +6,7 @@
         :loading="loading"
         :value="lastMonthCost"
         :currency-symbol="currencySymbol"
-        :description="description"
+        :description="lastMonth.format('MMM YYYY')"
         :show-divider="false"
     >
         <template #default>
@@ -73,7 +73,6 @@ export default {
                 const cost = state.data.find(d => d.date === state.lastMonth.format('YYYY-MM'))?.totalCost || 0;
                 return numberFormatter(convertUSDToCurrency(cost, props.currency, props.currencyRates));
             }),
-            description: computed(() => state.lastMonth.format('MMM YYYY')),
             currencySymbol: computed(() => CURRENCY_SYMBOL[props.currency]),
         });
 

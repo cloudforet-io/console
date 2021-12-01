@@ -2,22 +2,25 @@
     <cost-dashboard-simple-card-widget
         title="Budget Usage"
         unit-type="PERCENT"
-        :value="data.usage"
+        :value="usageRate"
+        :description="`${currencyMoneyFormatter(availableCost, currency, currencyRates)} Available`"
         :loading="loading"
-        :description="`$${data.limit - data.usd_cost} Available`"
     >
         <template #title-extra>
             <p-i name="ic_budget" width="1em" height="1em"
                  class="mr-1"
             />
-            {{ data.budget_count }} budgets
+            {{ budgetCount }} budgets
         </template>
         <template #default>
-            <budget-usage-progress-bar :usage-rate="data.usage" class="budget-progress-bar" />
+            <budget-usage-progress-bar :usage-rate="usageRate" class="budget-progress-bar" />
             <p class="progress-bar-label">
-                <span class="usd-cost">$ {{ data.usd_cost }} <span class="spent">Spent</span>
+                <span class="usage-cost">
+                    {{ currencyMoneyFormatter(usageCost, currency, currencyRates) }} <span class="spent">Spent</span>
                 </span>
-                <span class="limit">$ {{ data.limit }}</span>
+                <span class="limit-cost">
+                    {{ currencyMoneyFormatter(limitCost, currency, currencyRates) }}
+                </span>
             </p>
         </template>
     </cost-dashboard-simple-card-widget>
@@ -28,17 +31,13 @@ import BudgetUsageProgressBar
     from '@/services/billing/cost-management/modules/BudgetUsageProgressBar.vue';
 import CostDashboardSimpleCardWidget
     from '@/services/billing/cost-management/widgets/modules/CostDashboardSimpleCardWidget.vue';
-import { reactive, toRefs } from '@vue/composition-api';
-import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PI } from '@spaceone/design-system';
+import { computed, reactive, toRefs } from '@vue/composition-api';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { CURRENCY } from '@/store/modules/display/config';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
-interface BudgetUsageData {
-    usd_cost: number;
-    usage: number;
-    limit: number;
-    budget_count?: number;
-}
 
 export default {
     name: 'BudgetUsage',
@@ -47,28 +46,52 @@ export default {
         BudgetUsageProgressBar,
         PI,
     },
-
+    props: {
+        period: {
+            type: Object,
+            default: () => ({}),
+        },
+        currency: {
+            type: String,
+            default: CURRENCY.USD,
+            validator(value: CURRENCY) {
+                return Object.values(CURRENCY).includes(value);
+            },
+        },
+        currencyRates: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
     setup() {
         const state = reactive({
-            data: {} as BudgetUsageData,
             loading: true,
+            budgetCount: 0,
+            usageRate: 0,
+            usageCost: 0,
+            limitCost: 0,
+            availableCost: computed(() => {
+                if (state.limitCost - state.usageCost > 0) return state.limitCost - state.usageCost;
+                return 0;
+            }),
         });
 
         const getData = async () => {
             try {
+                state.loading = true;
                 const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze({
                     include_budget_count: true,
                     include_project_info: false,
-                    filter: [],
-                    start: '2020-12',
-                    end: '2021-11',
+                    filter: [
+                    ],
+                    start: '2020-12-01', // dayjs.utc(props.period.start),
+                    end: '2021-12-01', // dayjs.utc(props.period.end).add(1, 'day'),
                 });
-                state.data = results.map(d => ({
-                    usd_cost: d.usd_cost.toFixed(2),
-                    usage: Number(d.usage.toFixed(2)),
-                    limit: d.limit.toFixed(2),
-                    budget_count: d.budget_count,
-                }))[0];
+
+                state.usageCost = results[0]?.usd_cost || 0;
+                state.usageRate = Number(results[0]?.usage.toFixed(2)) || 0;
+                state.limitCost = results[0]?.limit || 0;
+                state.budgetCount = results[0]?.budget_count || 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {
@@ -83,6 +106,7 @@ export default {
 
         return {
             ...toRefs(state),
+            currencyMoneyFormatter,
         };
     },
 };
@@ -107,7 +131,7 @@ export default {
     margin-top: 1rem;
     justify-content: space-between;
 
-    .usd-cost {
+    .usage-cost {
         @apply text-indigo-500 font-bold;
         font-size: 1.125rem;
         line-height: 155%;
@@ -117,7 +141,7 @@ export default {
         font-size: 0.875rem;
         line-height: 150%;
     }
-    .limit {
+    .limit-cost {
         @apply text-gray-800;
         font-size: 0.875rem;
         line-height: 150%;

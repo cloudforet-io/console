@@ -3,7 +3,7 @@
         title="Month-to-Date Spend"
         unit-type="CURRENCY"
         :loading="loading"
-        :value="currencyMoneyFormatter(currentMonthData, currency, currencyRates, false, true)"
+        :value="currencyMoneyFormatter(currentMonthCost, currency, currencyRates, false, true)"
         :currency-symbol="currencySymbol"
         :description="`${currentMonth.startOf('month').format('MMM DD')} ~ ${currentMonth.endOf('month').format('DD')}, ${currentMonth.format('YYYY')}`"
     >
@@ -19,12 +19,14 @@
                     {{ increaseRate }}%
                 </span>
                 <span class="increase-amount">
-                    <p-i v-if="increaseAmount < 0" name="ic_arrow-down" width="1rem"
+                    <p-i v-if="increaseCost < 0" name="ic_arrow-down" width="1rem"
                          height="1rem"
                     />
                     <p-i v-else name="ic_arrow-up" width="1rem"
                          height="1rem"
-                    /><span class="unit">$</span> {{ currencyMoneyFormatter(Math.abs(increaseAmount), currency, currencyRates, false, true) }}
+                    />
+                    <span class="unit">{{ currencySymbol }} </span>
+                    <span>{{ currencyMoneyFormatter(Math.abs(increaseCost), currency, currencyRates, true, true) }}</span>
                 </span>
             </div>
             <div class="range">
@@ -74,10 +76,10 @@ export default {
     setup(props: WidgetProps) {
         const state = reactive({
             loading: true,
-            currentMonthData: 0,
-            lastMonthData: 0,
-            increaseAmount: computed(() => state.currentMonthData - state.lastMonthData),
-            increaseRate: computed(() => Math.round((state.currentMonthData / state.lastMonthData) * 100) - 100),
+            currentMonthCost: 0,
+            lastMonthCost: 0,
+            increaseCost: computed(() => state.currentMonthCost - state.lastMonthCost),
+            increaseRate: computed(() => Math.round((state.currentMonthCost / state.lastMonthCost) * 100) - 100),
             currentMonth: computed<Dayjs>(() => dayjs.utc(props.period.end)),
             lastMonth: computed<Dayjs>(() => dayjs.utc(props.period.end).subtract(1, 'month')),
             currencySymbol: computed(() => CURRENCY_SYMBOL[props.currency]),
@@ -104,13 +106,13 @@ export default {
         const getCurrentMonthChartData = async () => {
             const start = state.currentMonth.startOf('month');
             const end = state.currentMonth.add(1, 'month').startOf('month');
-            state.currentMonthData = await getData(start, end);
+            state.currentMonthCost = await getData(start, end);
         };
 
         const getLastMonthChartData = async () => {
             const start = state.lastMonth.startOf('month');
             const end = state.currentMonth.startOf('month');
-            state.lastMonthData = await getData(start, end);
+            state.lastMonthCost = await getData(start, end);
         };
 
         (() => {
