@@ -4,6 +4,7 @@ export const CARD_STYLE_TYPE = {
     yellow500: 'yellow500',
     indigo400: 'indigo400',
     red400: 'red400',
+    white: 'white',
 } as const;
 export type CARD_STYLE_TYPE = typeof CARD_STYLE_TYPE[keyof typeof CARD_STYLE_TYPE]
 

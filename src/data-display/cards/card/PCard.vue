@@ -58,7 +58,7 @@ export default defineComponent<CardProps>({
         border-color: inherit;
     }
     .body {
-        @apply border-b border-l border-r rounded-b-lg;
+        @apply border-b border-l border-r rounded-b-lg bg-white;
         padding: 0.75rem 0.875rem;
         border-color: inherit;
         &.no-header {
@@ -96,6 +96,9 @@ export default defineComponent<CardProps>({
     }
     &.red400 {
         @mixin style-type theme('colors.red.400'), theme('colors.red.400'), theme('colors.white');
+    }
+    &.white {
+        @mixin style-type theme('colors.white'), theme('colors.white'), theme('colors.gray.900');
     }
     &.sm {
         @mixin size 1.875rem, 0.75rem, 1.17;
