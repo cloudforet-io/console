@@ -113,7 +113,7 @@ import vClickOutside from 'v-click-outside';
 import { Location } from 'vue-router';
 
 import {
-    ComponentRenderProxy, computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs,
+    ComponentRenderProxy, computed, getCurrentInstance, onMounted, onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PAnchor, PI, PDivider } from '@spaceone/design-system';
@@ -233,6 +233,10 @@ export default {
 
         onUnmounted(() => {
             store.dispatch('display/stopCheckNotification');
+        });
+
+        watch(() => vm.$store.state.user.isSessionExpired, (isSessionExpired) => {
+            if (isSessionExpired) store.dispatch('display/stopCheckNotification');
         });
 
         return {
