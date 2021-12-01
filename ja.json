@@ -359,9 +359,11 @@
 				"CLEAR_ALL": "",
 				"COLUMN": "",
 				"COST_ANALYSIS": "",
+				"CURRENCY": "",
 				"DAILY": "",
 				"DONUT": "",
 				"EDIT_QUERY": "",
+				"END_DATE": "",
 				"FILTER": "",
 				"FILTER_MODAL_HELP_TEXT_1": "",
 				"FILTER_MODAL_HELP_TEXT_2": "",
@@ -393,8 +395,10 @@
 				"SELECTED_FILTER": "",
 				"SELECT_FILTER": "",
 				"SET_MORE": "",
+				"SET_QUERY": "",
 				"STACKED_COLUMN": "",
 				"STACKED_LINE": "",
+				"START_DATE": "",
 				"YEARLY": ""
 			},
 			"MAIN": {

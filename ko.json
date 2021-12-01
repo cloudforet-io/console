@@ -359,9 +359,11 @@
 				"CLEAR_ALL": "모두 지우기",
 				"COLUMN": "컬럼",
 				"COST_ANALYSIS": "비용 분석",
+				"CURRENCY": "통화",
 				"DAILY": "일",
 				"DONUT": "도넛",
 				"EDIT_QUERY": "쿼리 편집",
+				"END_DATE": "종료 일",
 				"FILTER": "필터",
 				"FILTER_MODAL_HELP_TEXT_1": "선택된 필터가 없습니다.",
 				"FILTER_MODAL_HELP_TEXT_2": "리스트에서 필터를 선택해주세요.",
@@ -393,8 +395,10 @@
 				"SELECTED_FILTER": "선택된 필터",
 				"SELECT_FILTER": "필터 선택",
 				"SET_MORE": "추가 설정",
+				"SET_QUERY": "쿼리 설정",
 				"STACKED_COLUMN": "누적 컬럼",
 				"STACKED_LINE": "누적 라인",
+				"START_DATE": " 시작 일",
 				"YEARLY": "년"
 			},
 			"MAIN": {
