@@ -65,7 +65,7 @@ import {
     getXYChartDataAndLegends,
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
-import { GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { CostQueryFilters } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import { ChartData, Legend, WidgetProps } from '@/services/billing/cost-management/widgets/type';
@@ -111,7 +111,7 @@ export default {
             tableLoading: true,
             items: [] as TableItem[],
             fields: computed<DataTableField[]>(() => {
-                const fields: DataTableField[] = [{ name: GROUP_BY_ITEM.PRODUCT, label: 'Product' }];
+                const fields: DataTableField[] = [{ name: GROUP_BY.PRODUCT, label: 'Product' }];
                 const fiveMonthsAgo = dayjs.utc().subtract(5, 'month');
                 range(state.thisMonthPage * 3 - 3, state.thisMonthPage * 3).forEach((d) => {
                     const date = fiveMonthsAgo.add(d, 'month');
@@ -213,7 +213,7 @@ export default {
                 const thisMonth = dayjs.utc();
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
-                    group_by: [GROUP_BY_ITEM.PRODUCT],
+                    group_by: [GROUP_BY.PRODUCT],
                     start: thisMonth.subtract(5, 'month'),
                     end: thisMonth.format('YYYY-MM'),
                     pivot_type: 'TABLE',
@@ -223,7 +223,7 @@ export default {
                     ...costQueryHelper.apiQuery,
                 });
                 state.totalCount = total_count > 15 ? 15 : total_count;
-                state.items = getTableDataFromRawData(results, [GROUP_BY_ITEM.PRODUCT]) as TableItem[];
+                state.items = getTableDataFromRawData(results, [GROUP_BY.PRODUCT]) as TableItem[];
                 state.top15ProductNames = results.map(d => d.product);
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -235,7 +235,7 @@ export default {
             costQueryHelper.setFilters([
                 ...getConvertedFilter(state.filters),
                 {
-                    k: GROUP_BY_ITEM.PRODUCT,
+                    k: GROUP_BY.PRODUCT,
                     v: top15ProductNames,
                     o: '=',
                 },
@@ -245,13 +245,13 @@ export default {
                 const thisMonth = dayjs.utc();
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
-                    group_by: [GROUP_BY_ITEM.PRODUCT],
+                    group_by: [GROUP_BY.PRODUCT],
                     start: thisMonth.subtract(5, 'month'),
                     end: thisMonth.format('YYYY-MM'),
                     pivot_type: 'CHART',
                     ...costQueryHelper.apiQuery,
                 });
-                const { chartData, legends } = getXYChartDataAndLegends(results, GROUP_BY_ITEM.PRODUCT);
+                const { chartData, legends } = getXYChartDataAndLegends(results, GROUP_BY.PRODUCT);
                 state.chartData = chartData;
                 state.legends = legends;
             } catch (e) {

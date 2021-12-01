@@ -52,7 +52,7 @@ import { PieChartData, PieChartRawData, WidgetProps } from '@/services/billing/c
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { forEach } from 'lodash';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
-import { GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import dayjs from 'dayjs';
 import { commaFormatter } from '@spaceone/console-core-lib';
@@ -110,7 +110,7 @@ export default defineComponent<WidgetProps>({
 
         const dataTableState = reactive({
             fields: [
-                { name: GROUP_BY_ITEM.PROVIDER, label: 'Provider' },
+                { name: GROUP_BY.PROVIDER, label: 'Provider' },
                 { name: 'value', label: 'Cost', textAlign: 'right' },
             ] as DataTableField[],
             slicedItem: computed<CostByProviderChartData[]>(() => {
@@ -191,7 +191,7 @@ export default defineComponent<WidgetProps>({
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: false,
                     granularity: GRANULARITY.ACCUMULATED,
-                    group_by: [GROUP_BY_ITEM.PROVIDER],
+                    group_by: [GROUP_BY.PROVIDER],
                     start: thisMonth.startOf('month').format(),
                     end: thisMonth.format(''),
                     page: {

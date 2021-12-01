@@ -12,13 +12,13 @@
                      @refresh="handleChange()"
     >
         <template #col-format="{field, value, index}">
-            <span v-if="field.name === GROUP_BY_ITEM.PROJECT">
+            <span v-if="field.name === GROUP_BY.PROJECT">
                 {{ projects[value] ? projects[value].label : value }}
             </span>
-            <span v-else-if="field.name === GROUP_BY_ITEM.PROVIDER">
+            <span v-else-if="field.name === GROUP_BY.PROVIDER">
                 {{ providers[value] ? providers[value].name : value }}
             </span>
-            <span v-else-if="field.name === GROUP_BY_ITEM.REGION">
+            <span v-else-if="field.name === GROUP_BY.REGION">
                 {{ regions[value] ? regions[value].name : value }}
             </span>
             <span v-else-if="typeof value !== 'string'" class="text-center">
@@ -42,7 +42,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 
-import { GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import {
     getConvertedFilter, getConvertedGranularity, getTimeUnitByPeriod,
@@ -171,7 +171,7 @@ export default {
         return {
             ...toRefs(state),
             tableState,
-            GROUP_BY_ITEM,
+            GROUP_BY,
             handleChange,
             handleRefresh,
             currencyMoneyFormatter,

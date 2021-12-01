@@ -39,7 +39,7 @@ import {
 } from '@spaceone/design-system';
 
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
-import { GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
+import { GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import { store } from '@/store';
 import { i18n } from '@/translations';
 
@@ -57,16 +57,7 @@ export default {
     setup() {
         const state = reactive({
             selectedGroupByItems: computed<GroupByItem[]>(() => store.state.service.costAnalysis.groupByItems),
-            groupByItems: [
-                { name: GROUP_BY_ITEM.PROJECT, label: 'Project' },
-                { name: GROUP_BY_ITEM.SERVICE_ACCOUNT, label: 'Service Account' },
-                { name: GROUP_BY_ITEM.PRODUCT, label: 'Product' },
-                { name: GROUP_BY_ITEM.REGION, label: 'Region' },
-                { name: GROUP_BY_ITEM.PROVIDER, label: 'Provider' },
-                { name: GROUP_BY_ITEM.TYPE, label: 'Type' },
-                { name: GROUP_BY_ITEM.RESOURCE, label: 'Resource' },
-                { name: GROUP_BY_ITEM.ACCOUNT, label: 'Account' },
-            ],
+            groupByItems: Object.values(GROUP_BY_ITEM_MAP),
             moreGroupBy: [],
         });
 

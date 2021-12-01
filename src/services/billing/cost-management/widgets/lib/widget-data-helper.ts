@@ -7,7 +7,7 @@ import { CurrencyRates } from '@/store/modules/display/type';
 
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
-import { GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
+import { GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
 import {
     ChartData, Legend, PieChartData, PieChartRawData, TableData, TableRawData, XYChartData, XYChartRawData,
@@ -41,13 +41,13 @@ const _getLegendsFromGroupByNames = (groupByNames: string[], groupBy?: string): 
         const _regions = store.state.resource.region.items;
         groupByNames.forEach((d) => {
             let _label = d;
-            if (groupBy === GROUP_BY_ITEM.PROJECT) {
+            if (groupBy === GROUP_BY.PROJECT) {
                 _label = _projects[d]?.label || d;
-            } else if (groupBy === GROUP_BY_ITEM.SERVICE_ACCOUNT) {
+            } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
                 _label = _serviceAccounts[d]?.label || d;
-            } else if (groupBy === GROUP_BY_ITEM.REGION) {
+            } else if (groupBy === GROUP_BY.REGION) {
                 _label = _regions[d]?.name || d;
-            } else if (groupBy === GROUP_BY_ITEM.PROVIDER) {
+            } else if (groupBy === GROUP_BY.PROVIDER) {
                 _label = _providers[d]?.name || d;
             }
             legends.push({

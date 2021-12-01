@@ -71,7 +71,7 @@ import {
 import CostAnalysisFilterItem from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisFilterItem.vue';
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
-import { FILTER_MAP } from '@/services/billing/cost-management/lib/config';
+import { FILTER_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import {
     CostQueryFilterItemsMap,
     CostQueryFilters,
@@ -96,7 +96,7 @@ export default {
     setup(props, { emit }) {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
-            filterItems: computed(() => Object.values(FILTER_MAP).map(item => ({
+            filterItems: computed(() => Object.values(FILTER_ITEM_MAP).map(item => ({
                 name: item.name,
                 title: item.label,
             }))),

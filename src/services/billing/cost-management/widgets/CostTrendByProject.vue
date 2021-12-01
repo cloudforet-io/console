@@ -45,7 +45,7 @@ import CostDashboardDataTable
 
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
-import { GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
+import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { CostQueryFilters } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
@@ -100,7 +100,7 @@ export default {
             tableLoading: true,
             items: [] as TableItem[],
             fields: computed<DataTableField[]>(() => {
-                const fields: DataTableField[] = [{ name: GROUP_BY_ITEM.PROJECT, label: 'Project' }];
+                const fields: DataTableField[] = [{ name: GROUP_BY.PROJECT, label: 'Project' }];
                 const fiveMonthsAgo = dayjs.utc().subtract(5, 'month');
                 range(6).forEach((d) => {
                     const date = fiveMonthsAgo.add(d, 'month');
@@ -196,7 +196,7 @@ export default {
                 const thisMonth = dayjs.utc();
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
-                    group_by: [GROUP_BY_ITEM.PROJECT],
+                    group_by: [GROUP_BY.PROJECT],
                     start: thisMonth.subtract(5, 'month'),
                     end: thisMonth.format('YYYY-MM'),
                     pivot_type: 'TABLE',
@@ -206,7 +206,7 @@ export default {
                     ...costApiQueryHelper.data,
                 });
                 state.totalCount = total_count > 15 ? 15 : total_count;
-                state.items = getTableDataFromRawData(results, [GROUP_BY_ITEM.PRODUCT]) as TableItem[];
+                state.items = getTableDataFromRawData(results, [GROUP_BY.PRODUCT]) as TableItem[];
                 state.top15ProjectIds = results.map(d => d.project_id);
             } catch (e) {
                 ErrorHandler.handleError(e);
@@ -218,7 +218,7 @@ export default {
             costApiQueryHelper.setFilters([
                 ...getConvertedFilter(state.filters),
                 {
-                    k: GROUP_BY_ITEM.PROJECT,
+                    k: GROUP_BY.PROJECT,
                     v: top15ProjectIds,
                     o: '=',
                 },
@@ -228,13 +228,13 @@ export default {
                 const thisMonth = dayjs.utc();
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
-                    group_by: [GROUP_BY_ITEM.PROJECT],
+                    group_by: [GROUP_BY.PROJECT],
                     start: thisMonth.subtract(5, 'month'),
                     end: thisMonth.format('YYYY-MM'),
                     pivot_type: 'CHART',
                     ...costApiQueryHelper.data,
                 });
-                const { chartData, legends } = getXYChartDataAndLegends(results, GROUP_BY_ITEM.PROJECT);
+                const { chartData, legends } = getXYChartDataAndLegends(results, GROUP_BY.PROJECT);
                 state.chartData = chartData;
                 state.legends = legends;
             } catch (e) {

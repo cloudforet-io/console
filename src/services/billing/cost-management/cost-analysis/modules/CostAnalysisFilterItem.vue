@@ -1,12 +1,12 @@
 <template>
     <div>
-        <project-select-dropdown v-if="type === FILTER_MAP.PROJECT.name"
+        <project-select-dropdown v-if="type === FILTER.PROJECT"
                                  :selected-project-ids="proxySelected.map(d => d.name)"
                                  multi-selectable
                                  @select="handleSelectProject"
         />
         <p-search-dropdown
-            v-else-if="type === FILTER_MAP.SERVICE_ACCOUNT.name || type === FILTER_MAP.REGION.name || type === FILTER_MAP.PROVIDER.name"
+            v-else-if="type === FILTER.SERVICE_ACCOUNT || type === FILTER.REGION || type === FILTER.PROVIDER"
             :menu="menuItems"
             :selected.sync="proxySelected"
             type="checkbox"
@@ -14,7 +14,7 @@
             use-fixed-menu-style
         />
         <p-search-dropdown
-            v-else-if="type === FILTER_MAP.RESOURCE.name || type === FILTER_MAP.PRODUCT.name || type === FILTER_MAP.ACCOUNT.name || type === FILTER_MAP.TYPE.name"
+            v-else-if="type === FILTER.RESOURCE || type === FILTER.PRODUCT || type === FILTER.ACCOUNT || type === FILTER.TYPE"
             type="checkbox"
             :handler="menuHandler"
             :selected.sync="proxySelected"
@@ -39,7 +39,7 @@ import {
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
 import { AutocompleteHandler } from '@spaceone/design-system/dist/src/inputs/search/search-dropdown/type';
-import { FILTER_MAP } from '@/services/billing/cost-management/lib/config';
+import { FILTER } from '@/services/billing/cost-management/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -69,15 +69,15 @@ export default {
             providers: computed(() => store.state.resource.provider.items),
             regions: computed(() => store.state.resource.region.items),
             menuItems: computed(() => {
-                if (props.type === FILTER_MAP.SERVICE_ACCOUNT.name) {
+                if (props.type === FILTER.SERVICE_ACCOUNT) {
                     return Object.keys(state.serviceAccounts).map(k => ({
                         name: k, label: state.serviceAccounts[k].label,
                     }));
-                } if (props.type === FILTER_MAP.PROVIDER.name) {
+                } if (props.type === FILTER.PROVIDER) {
                     return Object.keys(state.providers).map(k => ({
                         name: k, label: state.providers[k].label,
                     }));
-                } if (props.type === FILTER_MAP.REGION.name) {
+                } if (props.type === FILTER.REGION) {
                     return Object.keys(state.regions).map(k => ({
                         name: k, label: state.regions[k].name,
                     }));
@@ -139,7 +139,7 @@ export default {
 
         return {
             ...toRefs(state),
-            FILTER_MAP,
+            FILTER,
             handleSelectProject,
             menuHandler,
         };

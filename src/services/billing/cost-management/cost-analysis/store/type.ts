@@ -1,4 +1,4 @@
-import { FILTER_ITEM, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
+import { FILTER, GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { QUERY_VISIBILITY_TYPE } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 
@@ -20,7 +20,7 @@ export interface FilterItem {
 
 export interface CostQuerySetOption {
     chart_type: CHART_TYPE;
-    group_by: GROUP_BY_ITEM[];
+    group_by: GROUP_BY[]; // string[]
     granularity: GRANULARITY;
     period: Period;
     filters: CostQueryFilters;
@@ -33,14 +33,14 @@ export interface CostQuerySetModel {
     options?: CostQuerySetOption;
 }
 
-export type CostQueryFilters = Partial<Record<FILTER_ITEM, string[]>>
-export type CostQueryFilterItemsMap = Partial<Record<FILTER_ITEM, FilterItem[]>>
+export type CostQueryFilters = Partial<Record<FILTER, string[]>>
+export type CostQueryFilterItemsMap = Partial<Record<FILTER, FilterItem[]>>
 
 export interface CostAnalysisStoreState {
     chartType: CHART_TYPE;
     granularity: GRANULARITY;
     groupByItems: GroupByItem[];
-    groupBy?: string;
+    groupBy?: GROUP_BY;
     period: Period;
     filters: CostQueryFilters;
     selectedQueryId: string|undefined;

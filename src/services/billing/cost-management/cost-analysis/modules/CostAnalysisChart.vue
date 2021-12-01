@@ -40,7 +40,7 @@
                     <p-tag v-for="(item, itemIdx) in selectedItems" :key="`selected-tag-${idx}-${item.name}`"
                            @delete="handleDeleteFilterTag(filterName, itemIdx)"
                     >
-                        <b>{{ Object.values(FILTER_MAP).find(d => d.name === filterName).label }}: </b>{{ item.label }}
+                        <b>{{ FILTER_ITEM_MAP[filterName].label }}: </b>{{ item.label }}
                     </p-tag>
                 </template>
                 <template #no-data>
@@ -116,7 +116,7 @@ import {
     getConvertedFilter, getConvertedGranularity, getConvertedPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
-import { FILTER_MAP, GRANULARITY, GROUP_BY_ITEM } from '@/services/billing/cost-management/lib/config';
+import { FILTER_ITEM_MAP, GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { getXYChartDataAndLegends } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import {
     Legend, PieChartRawData, PieChartData, XYChartData,
@@ -171,7 +171,7 @@ export default {
         });
 
         /* util */
-        const getLegendsFromGroupByNames = (groupByNames: string[], groupBy?: GROUP_BY_ITEM): Legend[] => {
+        const getLegendsFromGroupByNames = (groupByNames: string[], groupBy?: GROUP_BY): Legend[] => {
             let legends: Legend[] = [];
             if (groupBy) {
                 const _providers = store.state.resource.provider.items;
@@ -180,13 +180,13 @@ export default {
                 const _regions = store.state.resource.region.items;
                 groupByNames.forEach((d) => {
                     let _label = d;
-                    if (groupBy === GROUP_BY_ITEM.PROJECT) {
+                    if (groupBy === GROUP_BY.PROJECT) {
                         _label = _projects[d]?.label || d;
-                    } else if (groupBy === GROUP_BY_ITEM.SERVICE_ACCOUNT) {
+                    } else if (groupBy === GROUP_BY.SERVICE_ACCOUNT) {
                         _label = _serviceAccounts[d]?.label || d;
-                    } else if (groupBy === GROUP_BY_ITEM.REGION) {
+                    } else if (groupBy === GROUP_BY.REGION) {
                         _label = _regions[d]?.name || d;
-                    } else if (groupBy === GROUP_BY_ITEM.PROVIDER) {
+                    } else if (groupBy === GROUP_BY.PROVIDER) {
                         _label = _providers[d]?.name || d;
                     }
                     legends.push({
@@ -200,7 +200,7 @@ export default {
             }
             return legends;
         };
-        const getPieChartDataAndLegends = (rawData: PieChartRawData[], groupBy?: GROUP_BY_ITEM): { chartData: PieChartData[]; legends: Legend[] } => {
+        const getPieChartDataAndLegends = (rawData: PieChartRawData[], groupBy?: GROUP_BY): { chartData: PieChartData[]; legends: Legend[] } => {
             let chartData: PieChartData[] = [];
             const groupByNameSet = new Set<string>();
 
@@ -318,7 +318,7 @@ export default {
         return {
             ...toRefs(state),
             selectFilterModalState,
-            FILTER_MAP,
+            FILTER_ITEM_MAP,
             DISABLED_LEGEND_COLOR,
             DEFAULT_CHART_COLORS,
             CHART_TYPE,

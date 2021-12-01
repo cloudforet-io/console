@@ -6,7 +6,7 @@ export const GRANULARITY = Object.freeze({
 });
 export type GRANULARITY = typeof GRANULARITY[keyof typeof GRANULARITY];
 
-export const GROUP_BY_ITEM = Object.freeze({
+export const GROUP_BY = Object.freeze({
     PROJECT: 'project_id',
     SERVICE_ACCOUNT: 'service_account_id',
     PRODUCT: 'product',
@@ -16,24 +16,28 @@ export const GROUP_BY_ITEM = Object.freeze({
     RESOURCE: 'resource',
     ACCOUNT: 'account',
 } as const);
-export type GROUP_BY_ITEM = typeof GROUP_BY_ITEM[keyof typeof GROUP_BY_ITEM];
+export type GROUP_BY = typeof GROUP_BY[keyof typeof GROUP_BY];
 
-export const FILTER_ITEM = Object.freeze({
-    ...GROUP_BY_ITEM,
+export const GROUP_BY_ITEM_MAP = Object.freeze({
+    [GROUP_BY.PROJECT]: { name: GROUP_BY.PROJECT, label: 'Project' },
+    [GROUP_BY.SERVICE_ACCOUNT]: { name: GROUP_BY.SERVICE_ACCOUNT, label: 'Service Account' },
+    [GROUP_BY.PRODUCT]: { name: GROUP_BY.PRODUCT, label: 'Product' },
+    [GROUP_BY.REGION]: { name: GROUP_BY.REGION, label: 'Region' },
+    [GROUP_BY.PROVIDER]: { name: GROUP_BY.PROVIDER, label: 'Provider' },
+    [GROUP_BY.TYPE]: { name: GROUP_BY.TYPE, label: 'Type' },
+    [GROUP_BY.RESOURCE]: { name: GROUP_BY.RESOURCE, label: 'Resource' },
+    [GROUP_BY.ACCOUNT]: { name: GROUP_BY.ACCOUNT, label: 'Account' },
+});
+
+export const FILTER = Object.freeze({
+    ...GROUP_BY,
     TAG: 'tag',
     ADDITIONAL_FIELD: 'additional_info',
 } as const);
-export type FILTER_ITEM = typeof FILTER_ITEM[keyof typeof FILTER_ITEM];
+export type FILTER = typeof FILTER[keyof typeof FILTER];
 
-export const FILTER_MAP = Object.freeze({
-    PROJECT: { name: FILTER_ITEM.PROJECT, label: 'Project' },
-    SERVICE_ACCOUNT: { name: FILTER_ITEM.SERVICE_ACCOUNT, label: 'Service Account' },
-    PRODUCT: { name: FILTER_ITEM.PRODUCT, label: 'Product' },
-    REGION: { name: FILTER_ITEM.REGION, label: 'Region' },
-    PROVIDER: { name: FILTER_ITEM.PROVIDER, label: 'Provider' },
-    TYPE: { name: FILTER_ITEM.TYPE, label: 'Type' },
-    RESOURCE: { name: FILTER_ITEM.RESOURCE, label: 'Resource' },
-    ACCOUNT: { name: FILTER_ITEM.ACCOUNT, label: 'Account' },
-    // TAG: { name: FILTER_ITEM.TAG, label: 'Tag' },
-    // ADDITIONAL_FIELD: { name: FILTER_ITEM.ADDITIONAL_FIELD, label: 'Additional Field' },
+export const FILTER_ITEM_MAP = Object.freeze({
+    ...GROUP_BY_ITEM_MAP,
+    // TAG: { name: FILTER.TAG, label: 'Tag' },
+    // ADDITIONAL_FIELD: { name: FILTER.ADDITIONAL_FIELD, label: 'Additional Field' },
 });
