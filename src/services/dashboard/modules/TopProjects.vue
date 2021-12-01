@@ -81,7 +81,6 @@ import { orderBy, range } from 'lodash';
 import bytes from 'bytes';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import { Location } from 'vue-router';
 
 import {
@@ -104,7 +103,6 @@ import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import { PROJECT_ROUTE } from '@/services/project/routes';
 import config from '@/lib/config';
 
-am4core.useTheme(am4themesAnimated);
 
 enum CLOUD_SERVICE_LABEL {
     compute = 'Compute',

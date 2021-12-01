@@ -21,7 +21,6 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import am4geodataContinentsLow from '@amcharts/amcharts4-geodata/continentsLow';
-import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import config from '@/lib/config';
 import { gray } from '@/styles/colors';
 import { store } from '@/store';
@@ -31,8 +30,6 @@ import { continentData } from '@/services/billing/cost-management/cost-dashboard
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
-
-am4core.useTheme(am4themesAnimated);
 
 
 const categoryKey = 'title';

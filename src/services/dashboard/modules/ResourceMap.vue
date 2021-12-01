@@ -63,7 +63,6 @@
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import am4geodataWorldLow from '@amcharts/amcharts4-geodata/worldLow';
-import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import {
     computed, onUnmounted,
     reactive, toRefs, watch,
@@ -83,7 +82,6 @@ import { QueryHelper } from '@spaceone/console-core-lib/query';
 import config from '@/lib/config';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 
-am4core.useTheme(am4themesAnimated);
 
 interface Provider {
     label: string;

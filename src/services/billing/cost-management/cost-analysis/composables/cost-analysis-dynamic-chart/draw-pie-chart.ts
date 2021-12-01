@@ -8,6 +8,20 @@ import { gray } from '@/styles/colors';
 import { Legend } from '@/services/billing/cost-management/widgets/type';
 
 
+const createDummySeries = (chart) => {
+    const series = chart.series.push(new am4charts.PieSeries());
+    series.dataFields.value = 'value';
+    series.dataFields.category = 'category';
+    series.slices.template.togglable = false;
+    series.slices.template.clickable = false;
+    series.slices.template.propertyFields.fill = 'color';
+    series.tooltip.disabled = true;
+    series.ticks.template.disabled = true;
+    series.labels.template.text = '';
+    const slice = series.slices.template;
+    slice.states.getKey('hover').properties.scale = 1;
+};
+
 const createSeries = (chart, legends: Legend[]) => {
     const series = chart.series.push(new am4charts.PieSeries());
     series.dataFields.value = 'value';
@@ -30,13 +44,8 @@ const createSeries = (chart, legends: Legend[]) => {
     series.slices.template.tooltipText = '{category}: [bold]{value} ({value.percent.formatNumber(\'#.0\')}%)[/]';
     series.tooltip.label.fontSize = 10;
 
-    // series.labels.template.maxWidth = 100;
-    // series.labels.template.wrap = true;
-
     const slice = series.slices.template;
     slice.states.getKey('hover').properties.scale = 1;
-
-    return series;
 };
 
 export default (data, chartContainer, valueOptions, categoryOptions): PieChart => {
@@ -44,11 +53,21 @@ export default (data, chartContainer, valueOptions, categoryOptions): PieChart =
     if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
     chart.paddingLeft = -5;
     chart.paddingBottom = -10;
-    chart.data = data;
+
+    if (data.length) {
+        chart.data = data;
+        createSeries(chart, categoryOptions.legends);
+    } else {
+        chart.data = [{
+            category: 'Dummy',
+            value: 1000,
+            color: gray[200],
+        }];
+        createDummySeries(chart);
+    }
+
     chart.responsive.enabled = true;
     chart.innerRadius = am4core.percent(57);
-
-    createSeries(chart, categoryOptions.legends);
 
     return chart;
 };

@@ -25,13 +25,11 @@
 
 <script lang="ts">
 import {
-    find,
-    forEach, range, debounce,
+    find, forEach, range, debounce,
 } from 'lodash';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 
 import {
     computed, reactive, toRefs, watch, getCurrentInstance, ComponentRenderProxy,
@@ -46,10 +44,6 @@ import {
 } from '@/styles/colors';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import config from '@/lib/config';
-
-am4core.useTheme(am4themesAnimated);
-am4core.options.autoSetClassName = true;
-am4core.options.classNamePrefix = 'InstanceBillingChart';
 
 
 interface ChartData {

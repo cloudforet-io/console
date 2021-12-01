@@ -96,7 +96,6 @@ import {
 } from 'lodash';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 
 import {
     ComponentRenderProxy, computed, getCurrentInstance, onUnmounted, reactive, toRefs, watch,
@@ -115,7 +114,6 @@ import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import config from '@/lib/config';
 
-am4core.useTheme(am4themesAnimated);
 
 enum STATUS {
     error = 'error',

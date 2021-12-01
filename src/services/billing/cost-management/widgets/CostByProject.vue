@@ -16,7 +16,6 @@ import {
 } from '@vue/composition-api';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import config from '@/lib/config';
 import { TreeMap } from '@amcharts/amcharts4/charts';
 import CostDashboardCardWidgetLayout
@@ -27,7 +26,6 @@ import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import dayjs from 'dayjs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
-am4core.useTheme(am4themesAnimated);
 
 const categoryKey = 'project_id';
 const valueName = 'usd_cost';

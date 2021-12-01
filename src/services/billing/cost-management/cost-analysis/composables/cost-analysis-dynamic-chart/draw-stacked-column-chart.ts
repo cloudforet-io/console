@@ -21,9 +21,8 @@ const createCategoryAxis = (chart, categoryOptions) => {
     dateAxis.dateFormats.setKey('year', 'YYYY');
 
     dateAxis.dataFields.category = 'date';
-    dateAxis.renderer.minGridDistance = 30;
+    dateAxis.renderer.minGridDistance = 35;
     dateAxis.fontSize = 12;
-    dateAxis.renderer.grid.template.strokeOpacity = 1;
     dateAxis.renderer.grid.template.location = 0;
     dateAxis.renderer.labels.template.fill = am4core.color(gray[400]);
     dateAxis.tooltip.label.fontSize = 12;
@@ -97,7 +96,6 @@ export default (data, chartContainer, valueOptions, categoryOptions): XYChart =>
     chart.paddingLeft = -5;
     chart.paddingBottom = -10;
     chart.data = data;
-    chart.scrollbarX = new am4core.Scrollbar();
 
     createCategoryAxis(chart, categoryOptions);
     createValueAxis(chart);

@@ -10,13 +10,11 @@ import { MapChart } from '@amcharts/amcharts4/maps';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4maps from '@amcharts/amcharts4/maps';
 import am4geodataWorldLow from '@amcharts/amcharts4-geodata/worldLow';
-import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import config from '@/lib/config';
 import {
     gray, red, yellow, green, violet,
 } from '@/styles/colors';
 
-am4core.useTheme(am4themesAnimated);
 
 const tempMapData = [
     {

@@ -12,7 +12,6 @@ import { capitalize } from 'lodash';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 
 import {
     computed, reactive, toRefs, watch,
@@ -23,9 +22,6 @@ import { gray, red } from '@/styles/colors';
 import config from '@/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 
-am4core.useTheme(am4themesAnimated);
-am4core.options.autoSetClassName = true;
-am4core.options.classNamePrefix = 'AlertHistoryChart';
 
 interface ChartData {
     date: string;

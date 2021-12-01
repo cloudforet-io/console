@@ -10,13 +10,11 @@ import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import { PieChart } from '@amcharts/amcharts4/charts';
 import config from '@/lib/config';
-import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import dayjs from 'dayjs';
 
-am4core.useTheme(am4themesAnimated);
 
 const categoryKey = 'project_id';
 const valueName = 'usd_cost';

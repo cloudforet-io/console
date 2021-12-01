@@ -1,6 +1,7 @@
 <template>
     <div>
         <project-select-dropdown v-if="type === FILTER_MAP.PROJECT.name"
+                                 :selected-project-ids="proxySelected.map(d => d.name)"
                                  multi-selectable
                                  @select="handleSelectProject"
         />

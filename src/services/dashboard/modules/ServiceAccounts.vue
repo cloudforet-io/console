@@ -52,7 +52,6 @@ import { Location } from 'vue-router';
 import Color from 'color';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 
 import {
     computed, reactive, toRefs, watch,
@@ -72,7 +71,6 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import config from '@/lib/config';
 
-am4core.useTheme(am4themesAnimated);
 
 const DEFAULT_COLORS = [violet[200], Color(violet[200]).alpha(0.5).toString()];
 

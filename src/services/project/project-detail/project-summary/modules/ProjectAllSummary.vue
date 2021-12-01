@@ -98,7 +98,6 @@ import bytes from 'bytes';
 import dayjs from 'dayjs';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
-import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
 import { TranslateResult } from 'vue-i18n';
 import { Location } from 'vue-router';
 
@@ -120,7 +119,6 @@ import { store } from '@/store';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import config from '@/lib/config';
 
-am4core.useTheme(am4themesAnimated);
 
 /* enum */
 enum DATE_TYPE {
