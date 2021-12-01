@@ -3,6 +3,7 @@
         title="Budget Usage"
         unit-type="PERCENT"
         :value="data.usage"
+        :loading="loading"
         :description="`$${data.limit - data.usd_cost} Available`"
     >
         <template #title-extra>
@@ -30,6 +31,7 @@ import CostDashboardSimpleCardWidget
 import { reactive, toRefs } from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { PI } from '@spaceone/design-system';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface BudgetUsageData {
     usd_cost: number;
@@ -49,23 +51,29 @@ export default {
     setup() {
         const state = reactive({
             data: {} as BudgetUsageData,
+            loading: true,
         });
 
         const getData = async () => {
-            const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze({
-                include_budget_count: true,
-                include_project_info: false,
-                filter: [
-                ],
-                start: '2020-12',
-                end: '2021-11',
-            });
-            state.data = results.map(d => ({
-                usd_cost: d.usd_cost.toFixed(2),
-                usage: Number(d.usage.toFixed(2)),
-                limit: d.limit.toFixed(2),
-                budget_count: d.budget_count,
-            }))[0];
+            try {
+                const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze({
+                    include_budget_count: true,
+                    include_project_info: false,
+                    filter: [],
+                    start: '2020-12',
+                    end: '2021-11',
+                });
+                state.data = results.map(d => ({
+                    usd_cost: d.usd_cost.toFixed(2),
+                    usage: Number(d.usage.toFixed(2)),
+                    limit: d.limit.toFixed(2),
+                    budget_count: d.budget_count,
+                }))[0];
+            } catch (e) {
+                ErrorHandler.handleError(e);
+            } finally {
+                state.loading = false;
+            }
         };
 
         (() => {

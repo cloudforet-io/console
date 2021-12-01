@@ -92,7 +92,7 @@ export default {
                     start,
                     end,
                 });
-                return results[0].usd_cost;
+                return results[0]?.usd_cost || 0;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 return 0;
@@ -107,14 +107,14 @@ export default {
             state.currentMonthData = await getData(start, end);
         };
 
-        const getLastMothChartData = async () => {
+        const getLastMonthChartData = async () => {
             const start = state.lastMonth.startOf('month');
             const end = state.currentMonth.startOf('month');
             state.lastMonthData = await getData(start, end);
         };
 
         (() => {
-            Promise.allSettled([getCurrentMonthChartData(), getLastMothChartData()]);
+            Promise.allSettled([getCurrentMonthChartData(), getLastMonthChartData()]);
         })();
 
         return {

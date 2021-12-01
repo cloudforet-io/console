@@ -15,10 +15,6 @@
 </template>
 
 <script lang="ts">
-import { computed, reactive, toRefs } from '@vue/composition-api';
-
-import { store } from '@/store';
-
 import DynamicWidget from '@/services/billing/cost-management/cost-dashboard/modules/DynamicWidget.vue';
 import { CURRENCY } from '@/store/modules/display/config';
 
@@ -56,13 +52,7 @@ export default {
         },
     },
     setup() {
-        const state = reactive({
-            currency: computed(() => store.state.display.currency),
-            currencyRates: computed(() => store.state.display.currencyRates),
-        });
-
         return {
-            ...toRefs(state),
         };
     },
 };

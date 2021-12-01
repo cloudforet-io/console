@@ -54,7 +54,7 @@
                 </p-button>
                 <div class="left-divider">
                     <p-icon-button name="ic_setting" style-type="gray900" size="sm"
-                                   outline="true"
+                                   outline
                     />
                 </div>
             </div>
