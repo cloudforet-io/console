@@ -1,6 +1,7 @@
 import { Getter } from 'vuex';
-import { CostAnalysisStoreState, CostQueryFilterItemsMap } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { CostAnalysisStoreState, CostQueryFilterItemsMap, GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { ResourceItem } from '@/store/modules/resource/type';
+import { GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 
 export const filterItemsMap: Getter<CostAnalysisStoreState, any> = ({ filters }, getters, rootState): CostQueryFilterItemsMap => {
     const itemsMap: CostQueryFilterItemsMap = {};
@@ -22,3 +23,5 @@ export const filterItemsMap: Getter<CostAnalysisStoreState, any> = ({ filters },
     });
     return itemsMap;
 };
+
+export const groupByItems: Getter<CostAnalysisStoreState, any> = ({ groupBy }): GroupByItem[] => groupBy.map(d => GROUP_BY_ITEM_MAP[d]);

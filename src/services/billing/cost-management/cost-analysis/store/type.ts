@@ -39,8 +39,7 @@ export type CostQueryFilterItemsMap = Partial<Record<FILTER, FilterItem[]>>
 export interface CostAnalysisStoreState {
     chartType: CHART_TYPE;
     granularity: GRANULARITY;
-    groupByItems: GroupByItem[];
-    groupBy?: GROUP_BY;
+    groupBy: GROUP_BY[];
     period: Period;
     filters: CostQueryFilters;
     selectedQueryId: string|undefined;

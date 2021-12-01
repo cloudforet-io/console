@@ -10,8 +10,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = ({ commit }): void => {
     commit('setChartType', CHART_TYPE.STACKED_COLUMN);
     commit('setGranularity', GRANULARITY.ACCUMULATED);
-    commit('setGroupByItems', []);
-    commit('setGroupBy', undefined);
+    commit('setGroupBy', []);
     commit('setPeriod', getInitialDates());
     commit('setFilters', []);
     commit('setSelectedQueryId', undefined);
@@ -25,7 +24,7 @@ interface SetQueryOptionsParam {
 export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit }, { queryId, options }: SetQueryOptionsParam): void => {
     commit('setChartType', options.chart_type);
     commit('setGranularity', options.granularity);
-    commit('setGroupByItems', options.group_by);
+    commit('setGroupBy', options.group_by);
     commit('setPeriod', { start: options.period.start, end: options.period.end });
     commit('setFilters', options.filters);
     commit('setSelectedQueryId', queryId);
@@ -45,7 +44,7 @@ export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, co
     try {
         const {
             granularity, chartType, period,
-            groupByItems, filters,
+            groupBy, filters,
         } = state;
         const updatedQueryData = await SpaceConnector.client.costAnalysis.costQuerySet.create({
             name,
@@ -53,7 +52,7 @@ export const saveQuery: Action<CostAnalysisStoreState, any> = async ({ state, co
                 granularity,
                 chart_type: chartType,
                 period,
-                group_by: groupByItems,
+                group_by: groupBy,
                 filter: filters,
             },
         });

@@ -253,7 +253,7 @@ export default {
             try {
                 const {
                     granularity, chartType,
-                    period, groupByItems, filters,
+                    period, groupBy, filters,
                 } = store.state.service.costAnalysis;
                 await SpaceConnector.client.costAnalysis.costQuerySet.update({
                     cost_query_set_id: state.selectedQueryId,
@@ -261,7 +261,7 @@ export default {
                         granularity,
                         chart_type: chartType,
                         period,
-                        group_by: groupByItems,
+                        group_by: groupBy,
                         filters,
                     },
                 });

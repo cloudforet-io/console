@@ -2,7 +2,7 @@
     <div class="cost-analysis-group-by-filter">
         <b class="mr-3">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}</b>
         <div class="button-wrapper">
-            <p-select-button v-for="groupByItem in groupByItems"
+            <p-select-button v-for="groupByItem in allGroupByItems"
                              :key="groupByItem.name"
                              class="group-by-button"
                              :value="groupByItem"
@@ -39,9 +39,9 @@ import {
 } from '@spaceone/design-system';
 
 import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
-import { GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 import { store } from '@/store';
 import { i18n } from '@/translations';
+import { GROUP_BY_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
 
 // import CostAnalysisSetMoreModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetMoreModal.vue';
 
@@ -56,8 +56,8 @@ export default {
     },
     setup() {
         const state = reactive({
-            selectedGroupByItems: computed<GroupByItem[]>(() => store.state.service.costAnalysis.groupByItems),
-            groupByItems: Object.values(GROUP_BY_ITEM_MAP),
+            selectedGroupByItems: computed<GroupByItem[]>(() => store.getters['service/costAnalysis/groupByItems']),
+            allGroupByItems: Object.values(GROUP_BY_ITEM_MAP),
             moreGroupBy: [],
         });
 
@@ -67,11 +67,12 @@ export default {
         });
 
         /* util */
-        const predicate = (current, data) => Object.keys(current).every(key => current[key] === data[key]);
+        const predicate = (current, data) => Object.keys(current).every(key => data && current[key] === data[key]);
 
         /* event */
         const handleSelectGroupByItems = async (items: GroupByItem[]) => {
-            store.commit('service/costAnalysis/setGroupByItems', items);
+            const groupBy = items.map(d => d.name);
+            store.commit('service/costAnalysis/setGroupBy', groupBy);
         };
 
         const handleClickMore = () => {

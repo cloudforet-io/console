@@ -52,9 +52,9 @@
             <div class="title-wrapper">
                 <p-select-dropdown v-if="groupByItems.length"
                                    :items="groupByItems"
-                                   :selected="groupBy"
+                                   :selected="chartGroupBy"
                                    without-outline
-                                   @select="handleSelectGroupByItem"
+                                   @select="handleSelectChartGroupByItem"
                 />
                 <span v-else class="title">Total Cost</span>
                 <div class="button-wrapper">
@@ -116,7 +116,11 @@ import {
     getConvertedFilter, getConvertedGranularity, getConvertedPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
-import { FILTER_ITEM_MAP, GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
+import {
+    FILTER_ITEM_MAP,
+    GRANULARITY,
+    GROUP_BY,
+} from '@/services/billing/cost-management/lib/config';
 import { getXYChartDataAndLegends } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import {
     Legend, PieChartRawData, PieChartData, XYChartData,
@@ -138,11 +142,12 @@ export default {
     setup() {
         const state = reactive({
             granularity: computed(() => store.state.service.costAnalysis.granularity),
-            groupByItems: computed(() => store.state.service.costAnalysis.groupByItems),
-            groupBy: computed(() => store.state.service.costAnalysis.groupBy),
             chartType: computed(() => store.state.service.costAnalysis.chartType),
             period: computed(() => store.state.service.costAnalysis.period),
             filters: computed(() => store.state.service.costAnalysis.filters),
+            chartGroupBy: store.state.service.costAnalysis.groupBy[0],
+            //
+            groupByItems: computed(() => store.getters['service/costAnalysis/groupByItems']),
             filterItemsMap: computed(() => store.getters['service/costAnalysis/filterItemsMap']),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
@@ -234,7 +239,7 @@ export default {
             costApiQueryHelper.setFilters(getConvertedFilter(state.filters));
             let _granularity: GRANULARITY;
             const _period = getConvertedPeriod(state.granularity, state.chartType, state.period);
-            const _groupBy = state.groupBy ? [state.groupBy] : [];
+            const _groupBy = state.chartGroupBy ? [state.chartGroupBy] : [];
             if (state.chartType === CHART_TYPE.DONUT) {
                 _granularity = GRANULARITY.ACCUMULATED;
             } else {
@@ -268,8 +273,8 @@ export default {
                 d.disabled = true;
             });
         };
-        const handleSelectGroupByItem = async (groupBy?: string) => {
-            store.commit('service/costAnalysis/setGroupBy', groupBy);
+        const handleSelectChartGroupByItem = async (groupBy?: string) => {
+            state.chartGroupBy = groupBy;
         };
         const handleClickSelectFilter = () => {
             selectFilterModalState.visible = true;
@@ -295,9 +300,9 @@ export default {
             let chartData;
             let legends;
             if (state.chartType !== CHART_TYPE.DONUT) {
-                ({ chartData, legends } = getXYChartDataAndLegends(rawData, state.groupBy));
+                ({ chartData, legends } = getXYChartDataAndLegends(rawData, state.chartGroupBy));
             } else {
-                ({ chartData, legends } = getPieChartDataAndLegends(rawData, state.groupBy));
+                ({ chartData, legends } = getPieChartDataAndLegends(rawData, state.chartGroupBy));
             }
             state.chartData = chartData;
             state.legends = legends;
@@ -306,12 +311,12 @@ export default {
 
         watch(() => state.groupByItems, (after, before) => {
             if (!after.length) {
-                handleSelectGroupByItem(undefined);
-            } else if ((!before.length && after.length) || !after.filter(d => d.name === state.groupBy).length) {
-                handleSelectGroupByItem(after[0].name);
+                state.chartGroupBy = undefined;
+            } else if ((!before.length && after.length) || !after.filter(d => d.name === state.chartGroupBy).length) {
+                state.chartGroupBy = after[0].name;
             }
         });
-        watch([() => state.chartType, () => state.granularity, () => state.period, () => state.groupBy, () => state.filters], () => {
+        watch([() => state.chartType, () => state.granularity, () => state.period, () => state.chartGroupBy, () => state.filters], () => {
             refreshChart();
         }, { immediate: true, deep: true });
 
@@ -325,7 +330,7 @@ export default {
             GRANULARITY,
             handleClickLegend,
             handleClickHideAllLegends,
-            handleSelectGroupByItem,
+            handleSelectChartGroupByItem,
             handleClickSelectFilter,
             handleDeleteFilterTag,
             handleClearAllFilters,

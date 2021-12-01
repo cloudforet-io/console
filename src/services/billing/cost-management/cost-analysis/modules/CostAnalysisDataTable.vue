@@ -43,7 +43,6 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { setApiQueryWithToolboxOptions } from '@spaceone/console-core-lib/component-util/toolbox';
 
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
-import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 import {
     getConvertedFilter, getConvertedGranularity, getTimeUnitByPeriod,
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
@@ -52,6 +51,7 @@ import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import { getTableDataFromRawData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { TableData } from '@/services/billing/cost-management/widgets/type';
 import { store } from '@/store';
+import { GroupByItem } from '@/services/billing/cost-management/cost-analysis/store/type';
 
 
 export default {
@@ -68,9 +68,10 @@ export default {
             //
             granularity: computed(() => store.state.service.costAnalysis.granularity),
             period: computed(() => store.state.service.costAnalysis.period),
-            groupByItems: computed(() => store.state.service.costAnalysis.groupByItems),
             filters: computed(() => store.state.service.costAnalysis.filters),
+            groupBy: computed(() => store.state.service.costAnalysis.groupBy),
             //
+            groupByItems: computed<GroupByItem[]>(() => store.getters['service/costAnalysis/groupByItems']),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
         });
@@ -132,16 +133,15 @@ export default {
                 const convertedFilters = getConvertedFilter(state.filters);
                 costApiQueryHelper.setFilters(convertedFilters);
 
-                const groupBy = state.groupByItems.map(d => d.name);
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity,
-                    group_by: groupBy,
+                    group_by: state.groupBy,
                     start: state.period.start,
                     end: state.period.end,
                     pivot_type: 'TABLE',
                     ...costApiQueryHelper.data,
                 });
-                tableState.items = getTableDataFromRawData(results, groupBy);
+                tableState.items = getTableDataFromRawData(results, state.groupBy);
                 tableState.totalCount = total_count;
             } catch (e) {
                 tableState.items = [];
@@ -159,7 +159,7 @@ export default {
             await listCostAnalysisTableData();
         };
 
-        watch([() => state.granularity, () => state.groupByItems, () => state.period, () => state.filters], async () => {
+        watch([() => state.granularity, () => state.groupBy, () => state.period, () => state.filters], async () => {
             tableState.loading = true;
             await Promise.all([
                 listCostAnalysisTableData(),

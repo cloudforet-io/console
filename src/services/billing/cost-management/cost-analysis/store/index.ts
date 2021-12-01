@@ -10,8 +10,7 @@ import * as getters from './getters';
 const state: CostAnalysisStoreState = {
     chartType: CHART_TYPE.STACKED_COLUMN,
     granularity: GRANULARITY.ACCUMULATED,
-    groupByItems: [],
-    groupBy: undefined,
+    groupBy: [],
     period: getInitialDates(),
     filters: {},
     selectedQueryId: undefined,

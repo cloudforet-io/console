@@ -1,6 +1,6 @@
 import { Mutation } from 'vuex';
 import {
-    CostAnalysisStoreState, CostQueryFilters, CostQuerySetModel, GroupByItem, Period,
+    CostAnalysisStoreState, CostQueryFilters, CostQuerySetModel, Period,
 } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { GROUP_BY } from '@/services/billing/cost-management/lib/config';
@@ -14,11 +14,7 @@ export const setGranularity: Mutation<CostAnalysisStoreState> = (state, granular
     state.granularity = granularity;
 };
 
-export const setGroupByItems: Mutation<CostAnalysisStoreState> = (state, groupByItems: Array<GroupByItem>) => {
-    state.groupByItems = groupByItems;
-};
-
-export const setGroupBy: Mutation<CostAnalysisStoreState> = (state, groupBy?: GROUP_BY) => {
+export const setGroupBy: Mutation<CostAnalysisStoreState> = (state, groupBy: GROUP_BY[]) => {
     state.groupBy = groupBy;
 };
 
