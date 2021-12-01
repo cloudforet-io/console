@@ -1,3 +1,10 @@
+# [1.1.0-beta.191](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.190...v1.1.0-beta.191) (2021-12-01)
+
+
+### Features
+
+* add white styleType to Pcard ([#769](https://github.com/spaceone-dev/spaceone-design-system/issues/769)) ([1ab3d68](https://github.com/spaceone-dev/spaceone-design-system/commit/1ab3d68c938f788234dfd9ac2d97a07ceb32a33f))
+
 # [1.1.0-beta.190](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.189...v1.1.0-beta.190) (2021-11-26)
 
 
