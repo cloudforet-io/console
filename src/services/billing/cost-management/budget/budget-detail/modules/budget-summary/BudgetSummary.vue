@@ -4,7 +4,7 @@
             Budget Summary
         </div>
         <budget-summary-chart />
-        <!--        <budget-summary-table />-->
+        <budget-summary-table />
     </p-pane-layout>
 </template>
 
@@ -12,15 +12,15 @@
 import { PPaneLayout } from '@spaceone/design-system';
 import BudgetSummaryChart
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-summary/BudgetSummaryChart.vue';
-// import BudgetSummaryTable
-//     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-summary/BudgetSummaryTable.vue';
+import BudgetSummaryTable
+    from '@/services/billing/cost-management/budget/budget-detail/modules/budget-summary/BudgetSummaryTable.vue';
 
 export default {
     name: 'BudgetSummary',
     components: {
         PPaneLayout,
         BudgetSummaryChart,
-        // BudgetSummaryTable,
+        BudgetSummaryTable,
     },
     setup() {
         return {
