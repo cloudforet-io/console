@@ -71,6 +71,7 @@ import {
 import {
     computed, reactive, toRefs,
 } from '@vue/composition-api';
+import cloneDeep from 'lodash/cloneDeep';
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
@@ -113,7 +114,7 @@ export default {
         const state = reactive({
             loading: true,
             proxyVisible: makeProxy('visible', props, emit),
-            conditions: store.state.service.budget.budgetData.notifications as Condition[],
+            conditions: cloneDeep(store.state.service.budget.budgetData.notifications) as Condition[],
             units: computed(() => ([
                 {
                     name: NOTIFICATION_UNIT.ACTUAL_COST,
@@ -135,6 +136,7 @@ export default {
                 },
             ])),
             thresholdPlaceholder: '',
+            budgetId: computed(() => store.state.service.budget.budgetData.budget_id),
         });
 
         const handleAddCondition = () => {
@@ -154,7 +156,7 @@ export default {
         const setBudgetAlert = async () => {
             try {
                 await store.dispatch('service/budget/updateBudgetNotifications', {
-                    budgetId: 'budget-df7f905dbc8f',
+                    budgetId: state.budgetId,
                     notifications: state.conditions,
                 });
             } catch (e) {

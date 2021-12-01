@@ -104,6 +104,7 @@ export default {
             hasBudgetAlert: computed(() => (store.state.service.budget.budgetData.notifications.length > 0)),
             notifications: computed(() => store.state.service.budget.budgetData.notifications.map(d => ({ ...d, id: getUUID() }))),
             budgetAlertModalVisible: false,
+            budgetId: computed(() => store.state.service.budget.budgetData.budget_id),
         });
 
 
@@ -119,7 +120,7 @@ export default {
             try {
                 checkDeleteState.loading = true;
                 await store.dispatch('service/budget/updateBudgetNotifications', {
-                    budgetId: 'budget-df7f905dbc8f',
+                    budgetId: state.budgetId,
                     notifications: [],
                 });
             } catch (e) {
