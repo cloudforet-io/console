@@ -3,6 +3,8 @@
         title="Cost By Project"
         :data-range="15"
         :widget-link="widgetLink"
+        :no-data="data.length === 0"
+        class="cost-by-project"
     >
         <template #default>
             <div ref="chartRef" class="chart" />
@@ -97,13 +99,14 @@ export default {
                 state.data = results;
             } catch (e) {
                 ErrorHandler.handleError(e);
+                state.data = [];
             } finally {
                 state.loading = false;
             }
         };
 
         watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
-            if (!loading && chartContext) {
+            if (!loading && chartContext && state.data.length > 0) {
                 drawChart(chartContext);
             }
         }, { immediate: false });
@@ -125,8 +128,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.chart {
-    @apply flex;
+.cost-by-project {
     height: 20rem;
 }
 </style>

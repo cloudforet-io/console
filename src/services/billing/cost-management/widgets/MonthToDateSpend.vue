@@ -6,6 +6,7 @@
         :value="currencyMoneyFormatter(currentMonthCost, currency, currencyRates, false, true)"
         :currency-symbol="currencySymbol"
         :description="`${currentMonth.startOf('month').format('MMM DD')} ~ ${currentMonth.endOf('month').format('DD')}, ${currentMonth.format('YYYY')}`"
+        :no-data="!currentMonthCost || !lastMonthCost"
     >
         <template #default>
             <div class="cost-trend-wrapper">
@@ -94,10 +95,10 @@ export default {
                     start,
                     end,
                 });
-                return results[0]?.usd_cost || 0;
+                return results[0]?.usd_cost;
             } catch (e) {
                 ErrorHandler.handleError(e);
-                return 0;
+                return undefined;
             } finally {
                 state.loading = false;
             }

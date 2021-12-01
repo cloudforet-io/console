@@ -22,6 +22,9 @@
             </div>
         </template>
         <slot />
+        <div v-if="noData" class="no-data">
+            No Item
+        </div>
     </p-card>
 </template>
 
@@ -46,6 +49,10 @@ export default {
         widgetLink: {
             type: [Object, String],
             default: () => ({}),
+        },
+        noData: {
+            type: Boolean,
+            default: false,
         },
     },
     setup() {
@@ -85,6 +92,12 @@ export default {
         @apply bg-white;
         flex-grow: 1;
         padding: 1rem;
+        .no-data {
+            @apply flex text-center justify-center items-center text-violet-300 font-bold;
+            height: 100%;
+            font-size: 0.875rem;
+            line-height: 160%;
+        }
     }
 
     @screen mobile {

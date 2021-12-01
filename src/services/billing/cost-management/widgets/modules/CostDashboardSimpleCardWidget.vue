@@ -5,6 +5,11 @@
             <p-skeleton width="9.5rem" height="1rem" class="mb-5" />
             <p-skeleton width="14rem" height="1.75rem" />
         </template>
+        <template v-else-if="noData">
+            <div class="no-data">
+                No Item
+            </div>
+        </template>
         <template v-else>
             <p class="title-wrapper">
                 <span class="title">{{ title }}</span>
@@ -78,6 +83,10 @@ export default {
             type: String,
             default: '',
         },
+        noData: {
+            type: Boolean,
+            default: false,
+        },
     },
     setup() {
         return {
@@ -90,7 +99,7 @@ export default {
 <style lang="postcss" scoped>
 .card-widget-layout {
     min-width: 22rem;
-    min-height: 100%;
+    height: 100%;
     padding: 1rem 1.25rem;
     .title-wrapper {
         @apply flex text-gray-800;
@@ -124,6 +133,12 @@ export default {
     .divider {
         margin-top: 0.75rem;
         margin-bottom: 0.75rem;
+    }
+    .no-data {
+        @apply flex text-center justify-center items-center text-violet-300 font-bold;
+        height: 100%;
+        font-size: 0.875rem;
+        line-height: 160%;
     }
 
     @screen mobile {
