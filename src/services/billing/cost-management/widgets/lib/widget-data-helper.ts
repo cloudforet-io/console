@@ -96,11 +96,17 @@ export const getPieChartData = (rawData: PieChartRawData[], groupBy: string): Pi
  *       => [{ date: '2021-11-01', aws: 100 }, { date: '2021-11-02', aws: 300 }]
  * @usage BudgetSummaryChart, LastMonthTotalSpend
  */
-export const getXYChartData = (rawData: XYChartRawData[], groupBy: string): XYChartData[] => rawData.map((d) => {
+export const getXYChartData = (rawData: XYChartRawData[], groupBy?: string): XYChartData[] => rawData.map((d) => {
     const eachChartData: XYChartData = { date: d.date };
-    d.values.forEach((value) => {
-        eachChartData[groupBy] = value.usd_cost;
-    });
+    if (groupBy) {
+        d.values.forEach((value) => {
+            eachChartData[groupBy] = value.usd_cost;
+        });
+    } else {
+        d.values.forEach((value) => {
+            eachChartData.totalCost = value.usd_cost;
+        });
+    }
     return eachChartData;
 });
 

@@ -1,11 +1,13 @@
 <template>
     <cost-dashboard-simple-card-widget
-        v-if="!loading"
+        class="last-month-total-spend"
         title="Last Month Total Spend"
         unit-type="CURRENCY"
-        unit="USD"
-        :value="lastMonth.usd_cost"
-        :description="lastMonth.date"
+        :loading="loading"
+        :value="lastMonthCost"
+        :currency-symbol="currencySymbol"
+        :description="description"
+        :show-divider="false"
     >
         <template #default>
             <div ref="chartRef" class="chart" />
@@ -14,30 +16,28 @@
 </template>
 
 <script lang="ts">
+import dayjs from 'dayjs';
 import CostDashboardSimpleCardWidget
     from '@/services/billing/cost-management/widgets/modules/CostDashboardSimpleCardWidget.vue';
 import {
-    computed,
-    onUnmounted, reactive, toRefs, watch,
+    onUnmounted, computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { XYChart } from '@amcharts/amcharts4/charts';
 import * as am4core from '@amcharts/amcharts4/core';
 import * as am4charts from '@amcharts/amcharts4/charts';
 import config from '@/lib/config';
-import { violet } from '@/styles/colors';
-import am4themesAnimated from '@amcharts/amcharts4/themes/animated';
+import { gray, violet } from '@/styles/colors';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { WidgetProps, XYChartData } from '@/services/billing/cost-management/widgets/type';
+import { getXYChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
+import { convertUSDToCurrency, currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { numberFormatter } from '@spaceone/console-core-lib';
 
-am4core.useTheme(am4themesAnimated);
 
 const categoryKey = 'date';
-const valueName = 'usd_cost';
-
-interface ChartData {
-    date: string;
-    usd_cost: number;
-}
+const valueName = 'totalCost';
 
 export default {
     name: 'LastMonthTotalSpend',
@@ -47,17 +47,34 @@ export default {
             type: Array,
             default: () => ([]),
         },
+        currency: {
+            type: String,
+            default: CURRENCY.USD,
+            validator(value: CURRENCY) {
+                return Object.values(CURRENCY).includes(value);
+            },
+        },
+        currencyRates: {
+            type: Object,
+            default: () => ({}),
+        },
     },
-    setup() {
+    setup(props: WidgetProps) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as XYChart | null,
             chartRegistry: {},
             loading: true,
-            data: [] as ChartData[],
-            firstMonth: computed(() => state.data[0]),
-            lastMonth: computed(() => state.data[state.data.length - 2]),
-            thisMonth: computed(() => state.data[state.data.length - 1]),
+            data: [] as XYChartData[],
+            firstMonth: dayjs.utc().subtract(11, 'month'),
+            lastMonth: dayjs.utc().subtract(1, 'month'),
+            thisMonth: dayjs.utc(),
+            lastMonthCost: computed(() => {
+                const cost = state.data.find(d => d.date === state.lastMonth.format('YYYY-MM'))?.totalCost || 0;
+                return numberFormatter(convertUSDToCurrency(cost, props.currency, props.currencyRates));
+            }),
+            description: computed(() => state.lastMonth.format('MMM YYYY')),
+            currencySymbol: computed(() => CURRENCY_SYMBOL[props.currency]),
         });
 
         const disposeChart = (chartContext) => {
@@ -77,6 +94,7 @@ export default {
             state.chart = chart;
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
 
+            chart.paddingTop = -5;
             chart.paddingBottom = 0;
 
             const categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
@@ -84,10 +102,16 @@ export default {
             categoryAxis.renderer.minGridDistance = 1;
             categoryAxis.renderer.grid.template.strokeOpacity = 0;
             categoryAxis.renderer.grid.template.disabled = true;
+            categoryAxis.renderer.labels.template.fill = am4core.color(gray[400]);
+            categoryAxis.fontSize = 12;
 
             categoryAxis.renderer.labels.template.adapter.add('text', (text, target) => {
-                if (target.dataItem.category === state.firstMonth.date) return state.firstMonth.date;
-                if (target.dataItem.category === state.lastMonth.date) return state.lastMonth.date;
+                if (target.dataItem.category === state.firstMonth.format('YYYY-MM')) {
+                    return state.firstMonth.format('MMM');
+                }
+                if (target.dataItem.category === state.lastMonth.format('YYYY-MM')) {
+                    return state.lastMonth.format('MMM');
+                }
                 return '';
             });
 
@@ -105,13 +129,12 @@ export default {
             series.columns.template.column.cornerRadiusTopLeft = 6;
             series.columns.template.column.cornerRadiusTopRight = 6;
             series.columns.template.width = am4core.percent(45);
-            series.columns.template.tooltipText = '{categoryX}: [bold]{valueY}[/b]';
 
             series.columns.template.adapter.add('fill', (fill, target) => {
-                if (target.dataItem?.dataContext?.date === state.thisMonth.date) {
+                if (target.dataItem?.dataContext?.date === state.thisMonth.format('YYYY-MM')) {
                     return am4core.color(violet[200]);
                 }
-                if (target.dataItem?.dataContext?.date === state.lastMonth.date) {
+                if (target.dataItem?.dataContext?.date === state.lastMonth.format('YYYY-MM')) {
                     return am4core.color(violet[500]);
                 }
                 return fill;
@@ -127,16 +150,13 @@ export default {
                     granularity: 'MONTHLY',
                     filter: [],
                     pivot_type: 'CHART',
-                    start: '2020-11-01T00:00:00Z',
-                    end: '2021-10-16T00:00:00Z',
+                    start: state.firstMonth.format('YYYY-MM'),
+                    end: state.thisMonth.add(1, 'month').format('YYYY-MM'),
                     page: {
                         limit: 12,
                     },
                 });
-                state.data = results.map(d => ({
-                    date: d.date,
-                    usd_cost: d.values[0].usd_cost,
-                }));
+                state.data = getXYChartData(results);
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.data = [];
@@ -159,7 +179,17 @@ export default {
             if (state.chart) state.chart.dispose();
         });
 
-        return { ...toRefs(state) };
+        return {
+            ...toRefs(state),
+            currencyMoneyFormatter,
+        };
     },
 };
 </script>
+<style lang="postcss" scoped>
+.last-month-total-spend {
+    .chart {
+        height: 8rem;
+    }
+}
+</style>

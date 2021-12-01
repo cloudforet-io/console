@@ -1,33 +1,34 @@
 <template>
     <cost-dashboard-simple-card-widget
-        :title="'Month-to-Date Spend'"
+        title="Month-to-Date Spend"
         unit-type="CURRENCY"
-        unit="USD"
-        :value="currentMonthData"
-        :description="`${formattedCurrentMonthData.start} ~ ${formattedCurrentMonthData.end}`"
+        :loading="loading"
+        :value="currencyMoneyFormatter(currentMonthData, currency, currencyRates, false, true)"
+        :currency-symbol="currencySymbol"
+        :description="`${currentMonth.startOf('month').format('MMM DD')} ~ ${currentMonth.endOf('month').format('DD')}, ${currentMonth.format('YYYY')}`"
     >
         <template #default>
             <div class="cost-trend-wrapper">
-                <span class="rate" :class="[{safe: rate < 0}, {alert: rate > 0}]">
-                    <p-i v-if="rate < 0" name="ic_arrow-down v1" width="1rem"
+                <span class="increase-rate" :class="[{safe: increaseRate < 0}, {alert: increaseRate > 0}]">
+                    <p-i v-if="increaseRate < 0" name="ic_arrow-down" width="1rem"
                          height="1rem"
                     />
-                    <p-i v-else name="ic_arrow-up v1" width="1rem"
+                    <p-i v-else name="ic_arrow-up" width="1rem"
                          height="1rem"
                     />
-                    {{ rate }}%
+                    {{ increaseRate }}%
                 </span>
-                <span class="cost">
-                    <p-i v-if="cost < 0" name="ic_arrow-down v1" width="1rem"
+                <span class="increase-amount">
+                    <p-i v-if="increaseAmount < 0" name="ic_arrow-down" width="1rem"
                          height="1rem"
                     />
-                    <p-i v-else name="ic_arrow-up v1" width="1rem"
+                    <p-i v-else name="ic_arrow-up" width="1rem"
                          height="1rem"
-                    /><span class="unit">$</span> {{ cost.toFixed(2) }}
+                    /><span class="unit">$</span> {{ currencyMoneyFormatter(Math.abs(increaseAmount), currency, currencyRates, false, true) }}
                 </span>
             </div>
             <div class="range">
-                Decreased from {{ formattedLastMonthData.start }} ~ {{ formattedLastMonthData.end }}
+                Decreased from {{ `${lastMonth.startOf('month').format('MMM DD')} ~ ${lastMonth.endOf('month').format('DD')}, ${lastMonth.format('YYYY')}` }}
             </div>
         </template>
     </cost-dashboard-simple-card-widget>
@@ -42,23 +43,10 @@ import { PI } from '@spaceone/design-system';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
+import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
-interface Period {
-    start: Dayjs | string;
-    end: Dayjs | string;
-}
-
-const currentDay = dayjs().utc();
-
-const currentMonthPeriod = {
-    start: currentDay.startOf('month'),
-    end: currentDay,
-};
-
-const lastMonthPeriod = {
-    start: currentDay.subtract(1, 'month').startOf('month'),
-    end: currentDay.subtract(1, 'month').endOf('month'),
-};
 
 export default {
     name: 'MonthToDateSpend',
@@ -66,32 +54,43 @@ export default {
         CostDashboardSimpleCardWidget,
         PI,
     },
-
-    setup() {
+    props: {
+        period: {
+            type: Object,
+            default: () => ({}),
+        },
+        currency: {
+            type: String,
+            default: CURRENCY.USD,
+            validator(value: CURRENCY) {
+                return Object.values(CURRENCY).includes(value);
+            },
+        },
+        currencyRates: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props: WidgetProps) {
         const state = reactive({
+            loading: true,
             currentMonthData: 0,
             lastMonthData: 0,
-            cost: computed(() => state.currentMonthData - state.lastMonthData),
-            rate: computed(() => Math.round((state.currentMonthData / state.lastMonthData) * 100) - 100),
-            formattedCurrentMonthData: computed<Period>(() => ({
-                start: currentMonthPeriod.start.format('MM/DD'),
-                end: currentMonthPeriod.end.format('MM/DD'),
-            })),
-            formattedLastMonthData: computed<Period>(() => ({
-                start: lastMonthPeriod.start.format('MM/DD'),
-                end: lastMonthPeriod.end.format('MM/DD'),
-            })),
-            loading: true,
+            increaseAmount: computed(() => state.currentMonthData - state.lastMonthData),
+            increaseRate: computed(() => Math.round((state.currentMonthData / state.lastMonthData) * 100) - 100),
+            currentMonth: computed<Dayjs>(() => dayjs.utc(props.period.end)),
+            lastMonth: computed<Dayjs>(() => dayjs.utc(props.period.end).subtract(1, 'month')),
+            currencySymbol: computed(() => CURRENCY_SYMBOL[props.currency]),
         });
 
-        const getChartData = async (period: {start: Dayjs; end: Dayjs}) => {
+        const getData = async (start: Dayjs, end: Dayjs) => {
             try {
                 state.loading = true;
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: false,
                     granularity: GRANULARITY.ACCUMULATED,
-                    start: period.start,
-                    end: period.end,
+                    start,
+                    end,
                 });
                 return results[0].usd_cost;
             } catch (e) {
@@ -103,11 +102,15 @@ export default {
         };
 
         const getCurrentMonthChartData = async () => {
-            state.currentMonthData = await getChartData(currentMonthPeriod);
+            const start = state.currentMonth.startOf('month');
+            const end = state.currentMonth.add(1, 'month').startOf('month');
+            state.currentMonthData = await getData(start, end);
         };
 
         const getLastMothChartData = async () => {
-            state.lastMonthData = await getChartData(lastMonthPeriod);
+            const start = state.lastMonth.startOf('month');
+            const end = state.currentMonth.startOf('month');
+            state.lastMonthData = await getData(start, end);
         };
 
         (() => {
@@ -116,13 +119,14 @@ export default {
 
         return {
             ...toRefs(state),
+            currencyMoneyFormatter,
         };
     },
 };
 </script>
 
 <style lang="postcss" scoped>
-.rate {
+.increase-rate {
     margin-left: 0.125rem;
     font-size: 1.125rem;
     line-height: 155%;
@@ -135,11 +139,11 @@ export default {
 }
 .cost-trend-wrapper {
     @apply flex;
-    .rate {
+    .increase-rate {
         flex-basis: 50%;
     }
 }
-.cost {
+.increase-amount {
     @apply text-gray-800 font-bold;
     font-size: 1.125rem;
     line-height: 155%;

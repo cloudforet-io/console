@@ -42,19 +42,20 @@ export const moneyFormatter = (money: number, currency?: CURRENCY, short?: boole
  * @param currency
  * @param rates
  * @param short
+ * @param disableSymbol
  * @description Convert given value with given currency and exchange rates, and format into money format.
  If given value is number, it treats it in US dollars and converts it to a given currency based on the given exchange rate.
  It's convert logic follows convertUSDToCurrency function.
  If given value is undefined, returns '--'.
  It's formatting logic follows moneyFormatter function.
  */
-export const currencyMoneyFormatter = (value?: number, currency?: CURRENCY, rates?: CurrencyRates, short?: boolean): string => {
+export const currencyMoneyFormatter = (value?: number, currency?: CURRENCY, rates?: CurrencyRates, short?: boolean, disableSymbol = false): string => {
     if (typeof value === 'number') {
         let money = value;
         if (currency && rates) {
             money = convertUSDToCurrency(value, currency, rates);
         }
-        return moneyFormatter(money, currency, short);
+        return moneyFormatter(money, disableSymbol ? undefined : currency, short);
     }
 
     return '--';
