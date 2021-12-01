@@ -1,56 +1,64 @@
 <template>
     <div class="cost-dashboard-page">
         <p-breadcrumbs :routes="routeState.route" />
-        <p-page-title :title="$t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')">
-            <template #extra>
-                <div class="top-left-group">
-                    <favorite-button :item-id="'item-id1'"
-                                     favorite-type="project"
-                                     resource-type="identity.Project"
-                    />
-                    <p-icon-button name="ic_edit-text"
-                                   class="edit-btn"
-                                   @click.stop="handleClickEditDashboard"
-                    />
-                </div>
-                <ul class="top-right-group">
-                    <li class="group-item">
-                        <currency-select-dropdown />
-                    </li>
-                    <li class="group-item">
-                        <p-icon-text-button name="ic_download" style-type="gray-border" size="sm">
-                            PDF
-                        </p-icon-text-button>
-                    </li>
-                    <li class="group-item">
-                        <p-icon-text-button name="ic_edit" style-type="transparent" size="sm">
-                            Customize
-                        </p-icon-text-button>
-                    </li>
-                </ul>
-            </template>
-        </p-page-title>
-        <div class="filter-group">
-            <p class="date">
-                August 1 ~ August 18, 2021 <span>(18 days)</span>
-            </p>
-            <div class="filter-project">
-                <p-tag v-for="(item, index) in selectedProjects.slice(0, 3)" :key="index" :deletable="false">
-                    {{ item.name }}
-                </p-tag>
-                <button class="more-btn" @click.stop="handleClickMore">
-                    and 52 more
-                </button>
-                <p-icon-button
-                    name="ic_setting"
-                    style-type="transparent"
-                    color="inherit"
-                    size="md"
-                    @click.stop="handleClickFilter"
+        <div class="top-wrapper">
+            <p-page-title :title="$t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD')" />
+            <div class="left-part">
+                <favorite-button :item-id="'item-id1'"
+                                 favorite-type="project"
+                                 resource-type="identity.Project"
+                />
+                <p-icon-button name="ic_edit-text"
+                               class="edit-btn"
+                               :outline="false"
+                               @click.stop="handleClickEditDashboard"
+                />
+                <p-select-dropdown class="more-button"
+                                   :items="moreMenuItems"
+                                   button-style-type="transparent"
+                                   use-fixed-menu-style
+                                   type="icon-button"
+                                   button-icon="ic_more"
                 />
             </div>
+            <div class="right-part">
+                <div class="date-filter">
+                    <p-badge style-type="gray200">
+                        <div>December 1, 2020 ~ November 30, 2021</div>
+                    </p-badge>
+                    <p-select-dropdown :items="MonthDateItems"
+                                       :selected="currency"
+                                       without-outline
+                    />
+                </div>
+                <currency-select-dropdown />
+                <div class="left-divider download-pdf">
+                    <p-icon-button name="ic_download" style-type="gray-border" size="sm" />
+                </div>
+                <!--                <div class="left-divider">-->
+                <!--                    <p-icon-text-button name="ic_edit" style-type="gray-border" size="sm">-->
+                <!--                        Customize-->
+                <!--                    </p-icon-text-button>-->
+                <!--                </div>-->
+            </div>
+            <div class="set-filter-part">
+                <p class="applied-filter">
+                    <span class="label">Applied Filter:</span><span class="count"> 55 Projects & 20 Service Accounts</span>
+                </p>
+                <p-button
+                    style-type="gray-border"
+                    size="sm"
+                    @click.stop="handleClickFilter"
+                >
+                    View Filter
+                </p-button>
+                <div class="left-divider">
+                    <p-icon-button name="ic_setting" style-type="gray900" size="sm"
+                                   outline="true"
+                    />
+                </div>
+            </div>
         </div>
-
         <dashboard-layouts :layout="layout"
                            :period="period"
                            :filters="filters"
@@ -67,7 +75,7 @@ import {
 import { i18n } from '@/translations';
 
 import {
-    PBreadcrumbs, PIconButton, PIconTextButton, PPageTitle, PTag,
+    PBreadcrumbs, PIconButton, PPageTitle, PSelectDropdown, PBadge, PButton,
 } from '@spaceone/design-system';
 
 import { BILLING_ROUTE } from '@/services/billing/routes';
@@ -79,6 +87,7 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
 import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 
 const tempProjectsData = [
     {
@@ -103,14 +112,14 @@ export default {
     name: 'CostDashboardPage',
     components: {
         DashboardLayouts,
-        // PublicCloudCostSummary,
         CurrencySelectDropdown,
         FavoriteButton,
         PIconButton,
+        PButton,
         PBreadcrumbs,
         PPageTitle,
-        PIconTextButton,
-        PTag,
+        PSelectDropdown,
+        PBadge,
     },
     props: {
         dashboardId: {
@@ -129,6 +138,36 @@ export default {
             filters: {},
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
+            moreMenuItems: computed(() => [
+                { name: 'visibility', label: 'Edit Visibility' },
+                { name: 'duplicate', label: 'Duplicate' },
+                { name: 'set as home', label: 'Set as Home Dashboard' },
+            ]),
+            MonthDateItems: computed<MenuItem[]>(() => ([
+                {
+                    type: 'item',
+                    name: 'Custom',
+                    label: 'Custom',
+                },
+                {
+                    type: 'divider',
+                },
+                {
+                    type: 'item',
+                    name: 'November 2021',
+                    label: 'November 2021',
+                },
+                {
+                    type: 'item',
+                    name: 'October 2021',
+                    label: 'October 2021',
+                },
+                {
+                    type: 'item',
+                    name: 'September 2021',
+                    label: 'September 2021',
+                },
+            ])),
         });
 
         const routeState = reactive({
@@ -198,24 +237,54 @@ export default {
 .cost-dashboard-page {
     max-width: 120rem;
 }
-.p-page-title {
-    margin-bottom: 1rem;
-}
-.top-left-group {
-    display: flex;
-    align-items: center;
-    margin-left: 0.5rem;
-    .edit-btn {
-        margin-left: 0.5rem;
+.top-wrapper {
+    @apply flex flex-wrap;
+    row-gap: 1rem;
+    .p-page-title {
+        width: auto;
+        margin-bottom: 0;
     }
-}
-.top-right-group {
-    display: flex;
-    align-items: center;
-    margin-left: auto;
-    .group-item {
-        position: relative;
-        padding: 0 0.5rem;
+    .left-part {
+        display: flex;
+        align-items: center;
+        margin-left: 0.5rem;
+        .edit-btn {
+            margin-left: 0.5rem;
+        }
+        .more-button {
+            @apply bg-transparent;
+        }
+    }
+    .right-part {
+        @apply flex items-center;
+        margin-left: auto;
+        .p-badge {
+            margin-right: 0.5rem;
+        }
+        .p-select-dropdown {
+            background-color: transparent;
+        }
+        .download-pdf::v-deep {
+            margin-left: 0;
+            .p-button {
+                padding: 0 1rem;
+            }
+        }
+    }
+    .set-filter-part {
+        @apply flex items-center;
+        width: 100%;
+        .applied-filter {
+            margin-right: 0.5rem;
+            .count {
+                @apply text-gray-800;
+            }
+        }
+    }
+    .left-divider {
+        @apply relative;
+        padding-left: 0.5rem;
+        margin-left: 0.5rem;
         &::before {
             @apply bg-gray-300;
             position: absolute;
@@ -227,40 +296,32 @@ export default {
             content: ' ';
             margin-top: calc(-1.25rem / 2);
         }
-        &:last-of-type button:hover {
-            background-color: transparent;
-        }
-        &:first-of-type::before {
-            @apply hidden;
-        }
-    }
-    .p-select-dropdown {
-        background-color: transparent;
     }
 }
-.filter-group {
-    display: flex;
-    align-items: center;
-    margin-bottom: 1rem;
-    .date {
-        display: flex;
-        align-items: center;
-        span {
-            @apply text-gray-700;
-            display: inline-block;
-            margin-left: 0.5rem;
+
+@screen mobile {
+    .p-page-title::v-deep .title-wrapper h2 {
+        width: 100%;
+    }
+
+    .left-part {
+        margin-left: 0;
+    }
+
+    .right-part {
+        @apply flex flex-wrap justify-end;
+        .date-filter {
+            @apply flex flex-wrap justify-end items-center;
+            width: 100%;
         }
     }
-    .filter-project {
-        display: flex;
-        align-items: center;
-        margin-left: auto;
-        .more-btn {
-            @apply text-blue-600;
-            margin-right: 1rem;
-            font-size: 0.75rem;
-            &:hover {
-                text-decoration: underline;
+
+    .set-filter-part {
+        @apply flex flex-wrap;
+        .applied-filter {
+            width: 100%;
+            .label {
+                display: none;
             }
         }
     }
