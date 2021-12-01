@@ -85,9 +85,13 @@ export default {
 
 <style lang="postcss" scoped>
 .budget-form-amount-plan-unit-select {
+    @apply flex;
+    column-gap: 0.5rem;
+
     .p-select-card {
-        max-width: 336px;
-        margin-right: 0.5rem;
+        max-width: 21rem;
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
     }
     .title {
         color: inherit;
@@ -99,4 +103,12 @@ export default {
         line-height: 1.5;
     }
 }
+
+@screen mobile {
+    .budget-form-amount-plan-unit-select {
+        @apply flex-col;
+        row-gap: 0.5rem;
+    }
+}
+
 </style>

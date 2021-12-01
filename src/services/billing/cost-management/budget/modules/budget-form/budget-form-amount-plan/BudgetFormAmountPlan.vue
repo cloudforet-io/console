@@ -6,8 +6,8 @@
         <div class="p-4">
             <budget-form-amount-plan-period-select class="mb-2" />
             <budget-form-amount-plan-unit-select class="mb-6" :selected-unit.sync="timeUnit" />
-            <budget-form-amount-plan-monthly v-if="timeUnit === 'MONTHLY'" />
-            <budget-form-amount-plan-total v-else />
+            <budget-form-amount-plan-monthly v-if="timeUnit === 'MONTHLY'" class="mb-6" />
+            <budget-form-amount-plan-total v-else class="mb-6" />
         </div>
     </p-pane-layout>
 </template>

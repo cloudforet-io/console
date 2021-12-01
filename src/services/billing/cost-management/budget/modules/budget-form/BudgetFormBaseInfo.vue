@@ -239,6 +239,11 @@ export default {
         margin-right: 1rem;
     }
 }
+.cost-type {
+    .p-search-dropdown {
+        margin-top: 0.5rem;
+    }
+}
 
 @screen mobile {
     .p-field-group {

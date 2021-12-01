@@ -34,5 +34,16 @@ export default {
             @apply border-0;
         }
     }
+
+    @screen mobile {
+        padding-right: 8.75rem;
+        label {
+            @apply block;
+        }
+        .data {
+            @apply border-none block;
+            padding: 0;
+        }
+    }
 }
 </style>

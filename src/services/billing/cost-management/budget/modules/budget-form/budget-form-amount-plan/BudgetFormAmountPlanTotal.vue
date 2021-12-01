@@ -49,3 +49,14 @@ export default {
     },
 };
 </script>
+<style>
+.p-text-input {
+    width: 28.5rem;
+}
+
+@screen mobile {
+    .p-text-input {
+        width: 100%;
+    }
+}
+</style>

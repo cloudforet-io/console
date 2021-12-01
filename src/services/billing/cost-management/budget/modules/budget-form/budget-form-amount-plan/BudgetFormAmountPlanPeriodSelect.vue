@@ -44,5 +44,11 @@ export default {
         display: inline-block;
         margin-right: 1rem;
     }
+
+    @screen mobile {
+        .period-select {
+            width: 100%;
+        }
+    }
 }
 </style>

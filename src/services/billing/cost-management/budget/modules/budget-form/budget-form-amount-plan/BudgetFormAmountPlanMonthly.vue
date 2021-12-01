@@ -7,7 +7,7 @@
                 </p>
                 <budget-form-amount-plan-last-months-cost :data="lastMonthsCost" />
             </div>
-            <p-button style-type="gray-border" size="lg" :outline="true">
+            <p-button style-type="gray-border" :outline="true">
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL') }}
             </p-button>
         </div>
@@ -62,6 +62,7 @@ export default {
 </script>
 <style lang="postcss" scoped>
 .budget-form-amount-plan-monthly {
+    max-width: 87rem;
     .header {
         display: flex;
         margin-bottom: 0.5rem;
@@ -69,10 +70,39 @@ export default {
             flex-grow: 1;
             flex-shrink: 0;
         }
+        .p-button {
+            margin-top: auto;
+        }
     }
     .input-wrapper {
-        @apply grid grid-cols-4 gap-4;
+        @apply grid grid-cols-6;
+        column-gap: 1rem;
         overflow: hidden;
+        margin-bottom: 1.5rem;
+    }
+
+    @screen tablet {
+        .input-wrapper {
+            @apply grid-cols-4;
+        }
+    }
+
+    @screen mobile {
+        .header {
+            @apply relative;
+            .title {
+                @apply flex-shrink;
+            }
+            .p-button {
+                @apply absolute;
+                bottom: 0;
+                right: 0;
+            }
+        }
+        .input-wrapper {
+            @apply grid-cols-2;
+        }
     }
 }
+
 </style>
