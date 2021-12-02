@@ -32,8 +32,7 @@ import ErrorHandler from '@/common/composables/error/errorHandler';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { WidgetProps, XYChartData } from '@/services/billing/cost-management/widgets/type';
 import { getXYChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
-import { convertUSDToCurrency, currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-import { numberFormatter } from '@spaceone/console-core-lib';
+import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 
 
 const categoryKey = 'date';
@@ -71,7 +70,7 @@ export default {
             thisMonth: dayjs.utc(),
             lastMonthCost: computed(() => {
                 const cost = state.data.find(d => d.date === state.lastMonth.format('YYYY-MM'))?.totalCost || 0;
-                return numberFormatter(convertUSDToCurrency(cost, props.currency, props.currencyRates));
+                return currencyMoneyFormatter(cost, props.currency, props.currencyRates, true);
             }),
             currencySymbol: computed(() => CURRENCY_SYMBOL[props.currency]),
         });

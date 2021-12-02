@@ -1,10 +1,8 @@
-import currencyjs from 'currency.js';
 import { convert as cashifyConvert } from 'cashify';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { CurrencyRates } from '@/store/modules/display/type';
 
 /** cashify library: https://www.npmjs.com/package/cashify */
-/** currency library: https://www.npmjs.com/package/currency.js */
 
 /**
  * @param money
@@ -20,42 +18,74 @@ export const convertUSDToCurrency = (money: number, currency: CURRENCY, rates: C
 });
 
 /**
- * @param money
- * @param currency
- * @param short
- * @description Formats a given number into a form appropriate for a given currency.
- If short is true, round off the decimal point.
- @example
- currency X, short X: 12345 -> 12,345.00
- currency O, short X: 12345 -> $12,345.00
- currency O, short O: 12345 -> $12,345
- currency X, short O: 12345 -> 12,345
- */
-export const moneyFormatter = (money: number, currency?: CURRENCY, short?: boolean): string => {
-    const symbol = currency ? CURRENCY_SYMBOL[currency] : '';
-
-    return currencyjs(money, { symbol, precision: short ? 0 : 2 }).format();
-};
-
-/**
+ * @name getCurrencyAppliedMoney
  * @param value
  * @param currency
  * @param rates
- * @param short
+ * @description Convert usd value to currency applied value(ex. KRW, JPY). Rounding places are different for each currency.
+ * @example
+ * value 1,000, currency USD -> 1,000.00
+ * value 1,000, currency KRW -> 1,200,000
+ */
+const getCurrencyAppliedMoney = (value: number, currency?: CURRENCY, rates?: CurrencyRates): number => {
+    let _money = value;
+    if (currency && rates) {
+        _money = convertUSDToCurrency(value, currency, rates);
+    }
+
+    if (currency === CURRENCY.KRW || currency === CURRENCY.JPY) {
+        _money = Math.round(_money);
+    } else {
+        _money = Math.round(_money * 100) / 100;
+    }
+
+    return _money;
+};
+
+/**
+ * @name getFormattedMoney
+ * @param money
+ * @param transitionValue
+ * @description Get formatted money according to transition value.
+ * @example
+ * money 1,000, transitionValue 1,000 -> 1K
+ * money 1,000, transitionValue 10,000 -> 1,000
+ */
+const getFormattedMoney = (money: number, transitionValue: number): number|string => {
+    if (Math.abs(money) < transitionValue) {
+        return Math.round(money * 100) / 100;
+    }
+    const options = { notation: 'compact', signDisplay: 'auto', maximumFractionDigits: 2 };
+    return Intl.NumberFormat('en', options).format(money);
+};
+
+
+/**
+ * @name currencyMoneyFormatter
+ * @param value
+ * @param currency
+ * @param rates
  * @param disableSymbol
+ * @param transitionValue
  * @description Convert given value with given currency and exchange rates, and format into money format.
  If given value is number, it treats it in US dollars and converts it to a given currency based on the given exchange rate.
  It's convert logic follows convertUSDToCurrency function.
  If given value is undefined, returns '--'.
- It's formatting logic follows moneyFormatter function.
  */
-export const currencyMoneyFormatter = (value?: number, currency?: CURRENCY, rates?: CurrencyRates, short?: boolean, disableSymbol = false): string => {
+export const currencyMoneyFormatter = (
+    value?: number,
+    currency?: CURRENCY,
+    rates?: CurrencyRates,
+    disableSymbol = false,
+    transitionValue = 10000,
+): string|number => {
     if (typeof value === 'number') {
-        let money = value;
-        if (currency && rates) {
-            money = convertUSDToCurrency(value, currency, rates);
-        }
-        return moneyFormatter(money, disableSymbol ? undefined : currency, short);
+        const _symbol = (currency && !disableSymbol) ? CURRENCY_SYMBOL[currency] : '';
+        const _money = getCurrencyAppliedMoney(value, currency, rates);
+        const _formattedMoney = getFormattedMoney(_money, transitionValue);
+
+        if (disableSymbol) return _formattedMoney;
+        return `${_symbol}${_formattedMoney}`;
     }
 
     return '--';

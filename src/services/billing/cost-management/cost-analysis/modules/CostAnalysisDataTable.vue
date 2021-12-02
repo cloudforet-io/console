@@ -23,7 +23,7 @@
                 {{ regions[value] ? regions[value].name : value }}
             </span>
             <span v-else-if="typeof value !== 'string'" class="text-center">
-                {{ currencyMoneyFormatter(value, currency, currencyRates, true) }}
+                {{ currencyMoneyFormatter(value, currency, currencyRates) }}
             </span>
         </template>
     </p-toolbox-table>
