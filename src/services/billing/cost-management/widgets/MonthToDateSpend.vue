@@ -3,7 +3,7 @@
         title="Month-to-Date Spend"
         unit-type="CURRENCY"
         :loading="loading"
-        :value="currencyMoneyFormatter(currentMonthCost, currency, currencyRates, true)"
+        :value="currencyMoneyFormatter(currentMonthCost, currency, currencyRates, true, 10000000000)"
         :currency-symbol="currencySymbol"
         :description="`${currentMonth.startOf('month').format('MMM DD')} ~ ${currentMonth.endOf('month').format('DD')}, ${currentMonth.format('YYYY')}`"
         :no-data="!currentMonthCost || !lastMonthCost"
@@ -27,7 +27,7 @@
                          height="1rem"
                     />
                     <span class="unit">{{ currencySymbol }} </span>
-                    <span>{{ currencyMoneyFormatter(Math.abs(increaseCost), currency, currencyRates, true) }}</span>
+                    <span>{{ currencyMoneyFormatter(Math.abs(increaseCost), currency, currencyRates, true, 10000000) }}</span>
                 </span>
             </div>
             <div class="range">

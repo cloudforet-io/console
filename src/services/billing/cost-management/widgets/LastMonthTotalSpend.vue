@@ -70,7 +70,7 @@ export default {
             thisMonth: dayjs.utc(),
             lastMonthCost: computed(() => {
                 const cost = state.data.find(d => d.date === state.lastMonth.format('YYYY-MM'))?.totalCost || 0;
-                return currencyMoneyFormatter(cost, props.currency, props.currencyRates, true);
+                return currencyMoneyFormatter(cost, props.currency, props.currencyRates, true, 10000000000);
             }),
             currencySymbol: computed(() => CURRENCY_SYMBOL[props.currency]),
         });
