@@ -1,18 +1,22 @@
 <template>
-    <p-pane-layout class="budget-billing-admin-wrapper">
-        <div class="card-header">
+    <p-card
+        class="budget-billing-admin-wrapper"
+        style-type="gray100"
+        size="lg"
+    >
+        <template #header>
             Billing Admin
-        </div>
+        </template>
         <p-data-table :fields="fields" :items="data"
                       :skeleton-rows="3"
                       :stripe="false"
                       :disable-copy="true"
         />
-    </p-pane-layout>
+    </p-card>
 </template>
 
 <script lang="ts">
-import { PDataTable, PPaneLayout } from '@spaceone/design-system';
+import { PDataTable, PCard } from '@spaceone/design-system';
 import { reactive, toRefs } from '@vue/composition-api';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import ErrorHandler from '@/common/composables/error/errorHandler';
@@ -22,7 +26,7 @@ import { DataTableField } from '@spaceone/design-system/dist/src/data-display/ta
 export default {
     name: 'BudgetDetailSummaryTable',
     components: {
-        PPaneLayout,
+        PCard,
         PDataTable,
     },
     props: {
@@ -72,18 +76,7 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.budget-billing-admin-wrapper {
-    @apply flex flex-col;
-    min-width: 100%;
-    min-height: 100%;
-}
-.card-header {
-    @apply bg-gray-100 items-center;
-    display: inherit;
-    padding: 1rem;
-    margin-bottom: 1.5rem;
-    min-height: 4rem;
-    font-size: 1.5rem;
-    line-height: 135%;
+.budget-billing-admin-wrapper::v-deep .body {
+    padding: 1.5rem 0 0 0;
 }
 </style>

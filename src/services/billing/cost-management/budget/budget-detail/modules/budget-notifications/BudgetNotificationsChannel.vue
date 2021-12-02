@@ -4,6 +4,7 @@
         :loading="loading"
         :fields="fields"
         :striped="false"
+        class="budget-notifications-channel"
     >
         <template #col-data-format="{ index, field, item }">
             <div v-if="item.data.length > 1">

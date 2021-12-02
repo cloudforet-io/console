@@ -92,7 +92,8 @@ export default {
 
 <style lang="postcss" scoped>
 .budget-detail-summary {
-    @apply flex justify-between;
+    @apply flex;
+    column-gap: 1rem;
     .summary-card {
         width: 33%;
         min-height: 4.875rem;
@@ -121,6 +122,14 @@ export default {
                 margin-left: 0.5rem;
                 flex-shrink: 0;
             }
+        }
+    }
+
+    @screen tablet {
+        @apply flex-col;
+        row-gap: 0.5rem;
+        .summary-card {
+            width: auto;
         }
     }
 }

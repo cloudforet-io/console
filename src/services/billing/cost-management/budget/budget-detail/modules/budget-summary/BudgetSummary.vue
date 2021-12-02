@@ -1,15 +1,20 @@
 <template>
-    <p-pane-layout class="budget-summary-wrapper">
-        <div class="card-header">
-            Budget Summary
-        </div>
+    <p-card class="budget-summary-wrapper"
+            style-type="gray100"
+            size="lg"
+    >
+        <template #header>
+            <div class="header">
+                Budget Summary
+            </div>
+        </template>
         <budget-summary-chart />
         <budget-summary-table />
-    </p-pane-layout>
+    </p-card>
 </template>
 
 <script lang="ts">
-import { PPaneLayout } from '@spaceone/design-system';
+import { PCard } from '@spaceone/design-system';
 import BudgetSummaryChart
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-summary/BudgetSummaryChart.vue';
 import BudgetSummaryTable
@@ -18,7 +23,7 @@ import BudgetSummaryTable
 export default {
     name: 'BudgetSummary',
     components: {
-        PPaneLayout,
+        PCard,
         BudgetSummaryChart,
         BudgetSummaryTable,
     },
@@ -29,19 +34,3 @@ export default {
     },
 };
 </script>
-
-<style lang="postcss" scoped>
-.budget-summary-wrapper {
-    @apply flex flex-col;
-    min-width: 100%;
-    min-height: 100%;
-}
-.card-header {
-    @apply bg-gray-100 items-center;
-    display: inherit;
-    padding: 1rem 1rem;
-    min-height: 4rem;
-    font-size: 1.5rem;
-    line-height: 135%;
-}
-</style>

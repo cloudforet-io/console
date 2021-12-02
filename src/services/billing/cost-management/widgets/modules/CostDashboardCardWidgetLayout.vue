@@ -1,6 +1,6 @@
 <template>
     <p-card class="cost-dashboard-card-widget-layout"
-            style-type="gray100"
+            style-type="white"
             size="lg"
     >
         <template #header>

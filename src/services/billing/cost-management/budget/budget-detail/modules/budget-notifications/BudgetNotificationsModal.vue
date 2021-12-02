@@ -1,21 +1,23 @@
 <template>
     <p-button-modal
-        :header-title="'Set Budget Notifications'"
+        :header-title="'Set Budget Notifications Condition'"
         centered
         size="md"
         fade
         :scrollable="false"
         backdrop
         :visible.sync="proxyVisible"
+        class="budget-notifications-modal"
         @confirm="handleConfirm"
     >
         <template #body>
-            When <b>any</b> of the following conditions are met, a notification will be sent immediately.<br>
-            <p-anchor class="anchor"
-                      :text="'Set Notifications'"
-                      :href="'/'"
-                      highlight
-            />
+            <div class="desc">
+                <p>When <b>any</b> of the following conditions are met, a notification will be sent immediately.</p>
+                <p-anchor :text="'Set Notifications'"
+                          :href="'/'"
+                          highlight
+                />
+            </div>
             <p-icon-text-button name="ic_plus_bold" outline
                                 style-type="gray900"
                                 @click="handleAddCondition"
@@ -29,12 +31,13 @@
                     <span>Type</span>
                 </p>
                 <template v-for="(condition, idx) of conditions">
-                    <article :key="`condition-${idx}`" class="condition-input-wrapper">
+                    <div :key="`condition-${idx}`" class="condition-input-wrapper">
                         <p-select-dropdown v-model="condition.unit"
                                            class="condition"
                                            :items="units"
                                            use-fixed-menu-style
                         />
+                        <span class="align-middle">&gt;</span>
                         <p-text-input v-model="condition.threshold"
                                       class="condition"
                                       :placeholder="condition.unit === NOTIFICATION_UNIT.ACTUAL_COST
@@ -57,7 +60,7 @@
                                        class="delete-button"
                                        @click="handleDeleteCondition(idx)"
                         />
-                    </article>
+                    </div>
                 </template>
             </section>
         </template>
@@ -183,32 +186,63 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.anchor {
-    @apply block;
-    margin-top: 0.25rem;
-    margin-bottom: 1.5rem;
+.budget-notifications-modal::v-deep .modal-content .header .modal-header {
+    height: auto;
+    min-height: 3.5rem;
+}
+.desc {
+    margin-bottom: 1rem;
+    line-height: 1.6;
 }
 .condition-wrapper {
     display: flex;
     flex-direction: column;
-}
-.condition-header {
-    @apply grid font-bold;
-    display: grid;
-    gap: 0.5rem;
-    grid-template-columns: repeat(auto-fill, 12.5rem);
-    font-size: 0.875rem;
-    line-height: 140%;
+    row-gap: 0.5rem;
     margin-top: 1rem;
-    margin-bottom: 0.5rem;
-}
-.condition-input-wrapper {
-    display: inline-flex;
-    column-gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    .condition {
-        width: 12.5rem;
+    margin-bottom: 4rem;
+    .condition-header {
+        @apply font-bold;
+        display: flex;
+        gap: 0.5rem;
+        padding-right: 2.5rem;
+        font-size: 0.875rem;
+        line-height: 140%;
+        span {
+            width: 12.25rem;
+            &:first-of-type {
+                width: 13.25rem;
+            }
+        }
+    }
+    .condition-input-wrapper {
+        @apply inline-flex flex-wrap items-center;
+        gap: 0.5rem;
+        width: 100%;
+        padding-right: 1.875rem;
+        .condition {
+            min-width: 7rem;
+            width: 30%;
+            max-width: 12.25rem;
+        }
     }
 }
 
+@screen tablet {
+    .condition-wrapper {
+        margin-bottom: 1rem;
+        .condition-header {
+            @apply hidden;
+        }
+        .condition-input-wrapper {
+            @apply bg-gray-100 rounded-sm;
+            padding: 0.5rem;
+        }
+    }
+}
+
+@screen mobile {
+    .desc {
+        margin-top: 2rem;
+    }
+}
 </style>

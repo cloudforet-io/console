@@ -1,62 +1,67 @@
 <template>
-    <p-pane-layout class="budget-alert-wrapper">
-        <section class="card-header">
-            <span class="title">Budget Notifications</span>
-            <p-icon-button name="ic_trashcan" @click="handleDelete" />
-        </section>
-        <section v-if="hasBudgetAlert" class="card-body">
-            <article class="alert-condition">
-                <span class="sub-title">Condition</span>
-                <span class="content-desc">
-                    Any of the following are met, <br>
-                    a notification will be sent immediately.
-                </span>
-                <ul class="content">
-                    <li v-for="item in notifications" :key="item.id">
-                        <span class="bullet">•</span>
-                        <p-badge :style-type="item.notification_type === BUDGET_NOTIFICATIONS_TYPE.WARNING ? 'gray'
-                            : 'alert'" outline class="icon"
-                        >
-                            {{ item.notification_type === 'WARNING' ? 'Warning' : 'Critical' }}
-                        </p-badge>
-                        <span v-if="item.unit !== BUDGET_NOTIFICATIONS_UNIT.PERCENT">Actual Cost > ${{ commaFormatter(item.threshold) }}</span>
-                        <span v-else>% of budget > {{ item.threshold }}%</span>
-                    </li>
-                </ul>
-                <p-icon-text-button name="ic_setting" style-type="gray900" outline
-                                    class="mt-4"
-                                    @click="handleSetAlert"
-                >
-                    Set
-                </p-icon-text-button>
-            </article>
-            <article class="noti-channel">
-                <span class="sub-title">Notifications Channel</span>
-                <p class="content">
-                    <span class="content-desc">Budget alert Message will be sent to the notifications channels below.
-                        <p-anchor class="link-text ml-2"
-                                  :text="'Set Notifications'"
-                                  :href="'/'"
-                                  highlight
-                        />
-                    </span>
-                    <budget-notifications-channel class="mt-2" />
-                </p>
-            </article>
-        </section>
-        <section v-else class="card-body no-alert">
-            <p class="content no-alert">
-                <span class="content-desc no-alert">
-                    Set budget alert if you want to send notifications when the cost exceeds the budget
-                </span> <br>
-                <p-icon-text-button name="ic_setting" style-type="gray900" outline
-                                    class="mt-4"
-                                    @click="handleSetAlert"
-                >
-                    Set
-                </p-icon-text-button>
-            </p>
-        </section>
+    <div class="budget-notifications">
+        <p-card
+            style-type="gray100"
+            size="lg"
+        >
+            <template #header>
+                <section class="header">
+                    <span class="title">Budget Notifications</span>
+                    <p-icon-button name="ic_trashcan" @click="handleDelete" />
+                </section>
+            </template>
+            <template #default>
+                <section class="card-body">
+                    <template v-if="hasBudgetAlert">
+                        <article class="noti-condition">
+                            <span class="sub-title">Condition</span>
+                            <span class="desc">Any of the following are met, <br>a notification will be sent immediately.</span>
+                            <ul class="condition-list">
+                                <li v-for="item in notifications" :key="item.id">
+                                    <span class="bullet">•</span>
+                                    <p-badge :style-type="item.notification_type === BUDGET_NOTIFICATIONS_TYPE.WARNING ? 'gray'
+                                        : 'alert'" outline class="icon"
+                                    >
+                                        {{ item.notification_type === 'WARNING' ? 'Warning' : 'Critical' }}
+                                    </p-badge>
+                                    <span v-if="item.unit !== BUDGET_NOTIFICATIONS_UNIT.PERCENT">Actual Cost > ${{ commaFormatter(item.threshold) }}</span>
+                                    <span v-else>% of budget > {{ item.threshold }}%</span>
+                                </li>
+                            </ul>
+                            <p-icon-text-button name="ic_setting" style-type="gray900" outline
+                                                @click="handleSetAlert"
+                            >
+                                Set
+                            </p-icon-text-button>
+                        </article>
+                        <article class="noti-channel">
+                            <span class="sub-title">Notifications Channel</span>
+                            <div class="desc-wrapper">
+                                <span class="desc">Budget alert Message will be sent to the notifications channels below.</span>
+                                <p-anchor class="link-text"
+                                          :text="'Set Notifications'"
+                                          :href="'/'"
+                                          highlight
+                                />
+                            </div>
+                            <budget-notifications-channel />
+                        </article>
+                    </template>
+                    <template v-else>
+                        <div class="noti-not-set">
+                            <p class="desc">
+                                Set budget alert if you want to send notifications when the cost exceeds the budget
+                            </p>
+                            <p-icon-text-button name="ic_setting" style-type="gray900" outline
+                                                @click="handleSetAlert"
+                            >
+                                Set
+                            </p-icon-text-button>
+                        </div>
+                    </template>
+                </section>
+            </template>
+        </p-card>
         <delete-modal :header-title="checkDeleteState.headerTitle"
                       :visible.sync="checkDeleteState.visible"
                       :loading="checkDeleteState.loading"
@@ -66,12 +71,12 @@
                             :visible.sync="budgetAlertModalVisible"
                             @confirm="handleBudgetAlert"
         />
-    </p-pane-layout>
+    </div>
 </template>
 
 <script lang="ts">
 import {
-    PPaneLayout, PIconButton, PAnchor, PIconTextButton, PBadge,
+    PCard, PIconButton, PAnchor, PIconTextButton, PBadge,
 } from '@spaceone/design-system';
 import BudgetNotificationsChannel
     from '@/services/billing/cost-management/budget/budget-detail/modules/budget-notifications/BudgetNotificationsChannel.vue';
@@ -92,7 +97,7 @@ export default {
     components: {
         BudgetAlertModal,
         BudgetNotificationsChannel,
-        PPaneLayout,
+        PCard,
         PIconButton,
         PIconTextButton,
         PAnchor,
@@ -155,74 +160,89 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.budget-alert-wrapper {
-    @apply flex flex-col;
-    min-width: 100%;
-    min-height: 100%;
+.budget-notifications::v-deep .body {
+    padding: 0;
 }
-.card-header {
-    @apply bg-gray-100 items-center;
-    display: inherit;
-    padding: 1rem 1rem;
-    min-height: 4rem;
-    font-size: 1.5rem;
-    line-height: 135%;
-    .title {
-        margin-right: 0.5rem;
-    }
+.header {
+    @apply flex justify-between items-center;
 }
 .card-body {
-    @apply px-4;
-    display: grid;
-    grid-template-columns: repeat(12, 1fr);
-    gap: 1rem;
-    padding: 1.5rem 1rem 2.5rem;
+    @apply flex px-4;
+    padding: 1.5rem 0 2.5rem;
     .sub-title {
         @apply font-bold block;
         font-size: 1rem;
         line-height: 160%;
         margin-bottom: 0.5rem;
     }
-    .content {
-        li {
-            @apply inline-block items-center;
-            height: 1.625rem;
-            vertical-align: middle;
-            font-size: 0.875rem;
-            line-height: 150%;
-        }
-        .bullet {
-            @apply text-center;
-            display: inherit;
-            width: 1.5rem;
-            margin-right: 0.25rem;
-        }
-        .icon {
-            margin-right: 0.25rem;
-        }
-    }
-    .content-desc {
-        display: inline-flex;
-        align-items: center;
+    .desc {
         font-size: 0.875rem;
-        line-height: 160%;
-        margin-bottom: 0.5rem;
-        white-space: nowrap;
+        line-height: 150%;
     }
-    .alert-condition {
-        grid-column: 1 / 4;
+    .noti-condition {
+        width: 22rem;
+        padding: 0 1rem;
+        .condition-list {
+            margin-top: 0.75rem;
+            margin-bottom: 1rem;
+            li {
+                @apply inline-flex items-center;
+                height: 1.625rem;
+                font-size: 0.875rem;
+                line-height: 150%;
+            }
+            .bullet {
+                @apply inline-block text-center;
+                width: 1.5rem;
+                margin-right: 0.25rem;
+            }
+            .p-badge {
+                margin-right: 0.25rem;
+            }
+        }
     }
     .noti-channel {
-        grid-column: 5 / 12;
+        flex-grow: 1;
+        .desc-wrapper {
+            @apply inline-flex flex-wrap items-center;
+            .desc {
+                margin-right: 0.5rem;
+            }
+            .link-text {
+                font-size: 0.875rem;
+                line-height: 160%;
+            }
+        }
+        .budget-notifications-channel {
+            margin-top: 0.5rem;
+        }
     }
-    &.no-alert {
-        display: flex;
+    .noti-not-set {
         flex-direction: column;
-        .content-desc {
+        padding-right: 1.5rem;
+        padding-left: 1.5rem;
+        .desc {
             @apply text-gray-500;
             font-size: 0.875rem;
             line-height: 135%;
             margin-bottom: 1rem;
+        }
+    }
+
+    @screen tablet {
+        @apply flex-col;
+        row-gap: 1.5em;
+
+        .noti-condition {
+            width: 100%;
+        }
+        .noti-channel {
+            .sub-title {
+                padding-left: 1rem;
+            }
+            .desc-wrapper {
+                margin-left: 1rem;
+            }
         }
     }
 }

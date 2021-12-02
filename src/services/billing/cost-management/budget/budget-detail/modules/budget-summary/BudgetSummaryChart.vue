@@ -99,7 +99,7 @@ export default {
             /* Create Bullet */
             const bullet = lineSeries.bullets.push(new am4charts.Bullet());
             bullet.fill = am4core.color(gray[600]);
-            bullet.tooltipText = '[#fff font-size: 15px]{name} in {categoryX}:\n[/][#fff font-size: 20px]{valueY}[/] [#fff]{additional}[/]';
+            bullet.tooltipText = '[#fff font-size: 12px]{name} in {categoryX}:\n[/][#fff font-size: 12px]{valueY}[/] [#fff]{additional}[/]';
             const circle = bullet.createChild(am4core.Circle);
             circle.radius = 5;
             circle.fill = am4core.color('white');
@@ -121,9 +121,11 @@ export default {
             const categoryAxis = chart.xAxes.push(new am4charts.CategoryAxis());
             categoryAxis.dataFields.category = categoryKey;
             categoryAxis.renderer.minGridDistance = 30;
+            categoryAxis.fontSize = 12;
 
             /* Create value axis */
-            chart.yAxes.push(new am4charts.ValueAxis());
+            const valueAxis = chart.yAxes.push(new am4charts.ValueAxis());
+            valueAxis.fontSize = 12;
 
             /* Create series - Column */
             const columnSeries = chart.series.push(new am4charts.ColumnSeries());
@@ -131,7 +133,7 @@ export default {
             columnSeries.dataFields.valueY = columnChartValueName;
             columnSeries.dataFields.categoryX = 'date';
 
-            columnSeries.columns.template.tooltipText = '[#fff font-size: 15px]{name} in {categoryX}:\n[/][#fff font-size: 20px]{valueY}[/] [#fff]{additional}[/]';
+            columnSeries.columns.template.tooltipText = '[#fff font-size: 12px]{name} in {categoryX}:\n[/][#fff font-size: 12px]{valueY}[/] [#fff]{additional}[/]';
             columnSeries.columns.template.propertyFields.stroke = 'stroke';
             columnSeries.columns.template.propertyFields.strokeWidth = 'strokeWidth';
             columnSeries.columns.template.strokeOpacity = 0;
