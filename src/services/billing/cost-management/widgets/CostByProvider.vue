@@ -25,7 +25,7 @@
                 </template>
             </p-data-table>
             <div class="pagination">
-                <p-text-pagination :all-page="allPage"
+                <p-text-pagination v-if="!!chartData.length" :all-page="allPage"
                                    :this-page.sync="thisPage"
                 />
             </div>
@@ -58,13 +58,18 @@ import dayjs from 'dayjs';
 import { commaFormatter } from '@spaceone/console-core-lib';
 import { CURRENCY } from '@/store/modules/display/config';
 import { store } from '@/store';
+import { gray } from '@/styles/colors';
 
 interface CostByProviderChartData extends PieChartData {
     color: string;
 }
 
+interface CostByProviderAnalysisModel extends PieChartRawData {
+    provider: string;
+}
+
 export default defineComponent<WidgetProps>({
-    name: 'CostTrendByProduct',
+    name: 'CostByProvider',
     components: {
         CostDashboardCardWidgetLayout,
         PDataTable,
@@ -128,7 +133,10 @@ export default defineComponent<WidgetProps>({
             }
         };
 
-        const drawChart = (chartContext, chartData) => {
+        const drawChart = (chartContext) => {
+            const isChartItemExists = !!state.chartData.length;
+            const noItemsChartData: CostByProviderChartData[] = [{ category: 'dummy', value: 1, color: gray[100] }];
+            const chartData = isChartItemExists ? state.chartData : noItemsChartData;
             const createChart = () => {
                 disposeChart(chartContext);
                 state.chartRegistry[chartContext] = am4core.create(chartContext, am4charts.PieChart);
@@ -143,6 +151,7 @@ export default defineComponent<WidgetProps>({
             series.dataFields.value = 'value';
             series.dataFields.category = 'category';
             series.labels.template.disabled = true;
+            series.tooltip.disabled = true;
 
             const sliceTemplate = series.slices.template;
             sliceTemplate.clickable = false;
@@ -151,27 +160,29 @@ export default defineComponent<WidgetProps>({
             sliceTemplate.propertyFields.fill = 'color';
             sliceTemplate.tooltipText = '{category}: $ {value}';
 
-            chart.legend = new am4charts.Legend();
-            chart.legend.contentAlign = 'left';
-            chart.legend.fontSize = 12;
-            chart.legend.valueLabels.template.text = '';
-            chart.legend.useDefaultMarker = true;
-            chart.legend.itemContainers.template.clickable = false;
-            chart.legend.itemContainers.template.focusable = false;
-            chart.legend.itemContainers.template.hoverable = false;
-            chart.legend.itemContainers.template.cursorOverStyle = am4core.MouseCursorStyle.default;
+            if (isChartItemExists) {
+                series.tooltip.disabled = false;
 
-            const marker = chart.legend.markers.template;
-            marker.children.getIndex(0)
-                .cornerRadius(12, 12, 12, 12);
-            marker.width = 8;
-            marker.height = 8;
+                chart.legend = new am4charts.Legend();
+                chart.legend.contentAlign = 'left';
+                chart.legend.fontSize = 12;
+                chart.legend.valueLabels.template.text = '';
+                chart.legend.useDefaultMarker = true;
+                chart.legend.itemContainers.template.clickable = false;
+                chart.legend.itemContainers.template.focusable = false;
+                chart.legend.itemContainers.template.hoverable = false;
+                chart.legend.itemContainers.template.cursorOverStyle = am4core.MouseCursorStyle.default;
 
+                const marker = chart.legend.markers.template;
+                marker.children.getIndex(0)
+                    .cornerRadius(12, 12, 12, 12);
+                marker.width = 8;
+                marker.height = 8;
+            }
             state.chart = chart;
-            return chart;
         };
 
-        const convertToChartData = (rawData: PieChartRawData[]) => {
+        const convertToChartData = (rawData: CostByProviderAnalysisModel[]) => {
             forEach(rawData, (d) => {
                 if (state.providers[d.provider]) {
                     state.chartData.push({
@@ -220,7 +231,7 @@ export default defineComponent<WidgetProps>({
 
         watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
             if (!loading && chartContext) {
-                state.chart = drawChart(chartContext, state.chartData);
+                drawChart(chartContext);
             }
         });
 
