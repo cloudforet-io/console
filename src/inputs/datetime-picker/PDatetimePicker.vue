@@ -125,8 +125,8 @@ export default {
             plugins: computed(() => (props.dataType === DATA_TYPE.yearToMonth ? [
                 monthSelectPlugin({
                     shorthand: false,
-                    dateFormat: 'Y/m',
-                    altFormat: 'Y/m',
+                    dateFormat: 'F Y',
+                    altFormat: 'F Y',
                     theme: 'light',
                 }),
             ] : [])),
@@ -200,8 +200,12 @@ export default {
                 });
             } else {
                 let defaultDate;
-                if (props.selectedDates.length) {
-                    defaultDate = props.selectedDates.map(d => dayjs(d).tz(props.timezone).format('YYYY-MM-DD HH:mm'));
+                if (state.proxySelectedDates.length) {
+                    if (props.dataType === DATA_TYPE.yearToMonth) {
+                        defaultDate = state.proxySelectedDates.map(d => Flatpickr.formatDate(dayjs(d).tz(props.timezone).toDate(), 'F Y'));
+                    } else {
+                        defaultDate = state.proxySelectedDates.map(d => dayjs(d).tz(props.timezone).format('YYYY-MM-DD HH:mm'));
+                    }
                 }
                 state.datePicker = Flatpickr(datePickerRef, {
                     mode: state.mode,
