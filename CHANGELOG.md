@@ -1,3 +1,10 @@
+# [1.1.0-beta.193](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.192...v1.1.0-beta.193) (2021-12-03)
+
+
+### Bug Fixes
+
+* fix bug of monthSelectPlugin ([#771](https://github.com/spaceone-dev/spaceone-design-system/issues/771)) ([11de762](https://github.com/spaceone-dev/spaceone-design-system/commit/11de76296f37c86ef9a62c950cc739eedddfabce))
+
 # [1.1.0-beta.192](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.191...v1.1.0-beta.192) (2021-12-03)
 
 
