@@ -16,18 +16,13 @@ export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = (
     commit('setSelectedQueryId', undefined);
 };
 
-interface SetQueryOptionsParam {
-    queryId: string;
-    options: CostQuerySetOption;
-}
 
-export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit }, { queryId, options }: SetQueryOptionsParam): void => {
-    commit('setChartType', options.chart_type);
-    commit('setGranularity', options.granularity);
-    commit('setGroupBy', options.group_by);
-    commit('setPeriod', { start: options.period.start, end: options.period.end });
-    commit('setFilters', options.filters);
-    commit('setSelectedQueryId', queryId);
+export const setQueryOptions: Action<CostAnalysisStoreState, any> = ({ commit }, options: Partial<CostQuerySetOption>): void => {
+    if (options.chart_type) commit('setChartType', options.chart_type);
+    if (options.granularity) commit('setGranularity', options.granularity);
+    if (options.group_by?.length) commit('setGroupBy', options.group_by);
+    if (options.period) commit('setPeriod', { start: options.period.start, end: options.period.end });
+    if (options.filters) commit('setFilters', options.filters);
 };
 
 export const listCostQueryList: Action<CostAnalysisStoreState, any> = async ({ commit }): Promise<void|Error> => {
