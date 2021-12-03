@@ -1,3 +1,10 @@
+# [1.1.0-beta.194](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.193...v1.1.0-beta.194) (2021-12-03)
+
+
+### Bug Fixes
+
+* yearToMonth case bug fix in DatetimePicker ([#772](https://github.com/spaceone-dev/spaceone-design-system/issues/772)) ([6d71c4f](https://github.com/spaceone-dev/spaceone-design-system/commit/6d71c4f4ca4e706adf30db557c518db612f068a0))
+
 # [1.1.0-beta.193](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.192...v1.1.0-beta.193) (2021-12-03)
 
 
