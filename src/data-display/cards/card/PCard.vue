@@ -98,7 +98,7 @@ export default defineComponent<CardProps>({
         @mixin style-type theme('colors.red.400'), theme('colors.red.400'), theme('colors.white');
     }
     &.white {
-        @mixin style-type theme('colors.white'), theme('colors.white'), theme('colors.gray.900');
+        @mixin style-type theme('colors.white'), theme('colors.gray.200'), theme('colors.gray.900');
     }
     &.sm {
         @mixin size 1.875rem, 0.75rem, 1.17;
