@@ -68,6 +68,8 @@ import BudgetUsageProgressBar from '@/services/billing/cost-management/modules/B
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { capitalize } from 'lodash';
 import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+
 
 interface Props {
     budget: BudgetData;
@@ -110,10 +112,7 @@ export default {
                 },
             })),
             loading: true,
-            budgetRoutes: computed<Route[]>(() => ([
-                { name: 'Project Group' },
-                { name: props.budget.name },
-            ])),
+            budgetRoutes: [] as Route[],
             costTypeList: computed<string>(() => {
                 const costTypes = props.budget.cost_types;
                 let costTypeList = '';
@@ -140,12 +139,42 @@ export default {
 
         const formatTime = (time: string) => i18nDayjs.value(time).format('MMMYYYY');
 
+        const getParentProjectGroupName = async (projectId?: string, projectGroupId?: string) => {
+            try {
+                if (projectId) {
+                    // eslint-disable-next-line @typescript-eslint/camelcase
+                    const { project_group_info } = await SpaceConnector.client.identity.project.get({
+                        project_id: props.budget?.project_id,
+                    });
+                    return project_group_info.name;
+                }
+                if (projectGroupId) {
+                    // eslint-disable-next-line @typescript-eslint/camelcase
+                    const { parent_project_group_info } = await SpaceConnector.client.identity.projectGroup.get({
+                        project_group_id: props.budget.project_group_id,
+                    });
+                    // eslint-disable-next-line @typescript-eslint/camelcase
+                    return parent_project_group_info ? parent_project_group_info.name : undefined;
+                }
+                return undefined;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                return undefined;
+            }
+        };
         (async () => {
+            const {
+                budget_id, project_id, project_group_id, name,
+            } = props.budget;
             await SpaceConnector.client.costAnalysis.budgetUsage.list({
-                budget_id: props.budget.budget_id,
+                budget_id,
             });
+            const parentProjectGroupName = await getParentProjectGroupName(project_id, project_group_id);
+
+            state.budgetRoutes = parentProjectGroupName ? [{ name: parentProjectGroupName }, { name }] : [{ name }];
             state.loading = false;
         })();
+
         return {
             ...toRefs(state),
             PROVIDER_MAP,
