@@ -1,3 +1,10 @@
+# [1.1.0-beta.192](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.191...v1.1.0-beta.192) (2021-12-03)
+
+
+### Bug Fixes
+
+* change border color of white styleStyle PCard ([#770](https://github.com/spaceone-dev/spaceone-design-system/issues/770)) ([495ebca](https://github.com/spaceone-dev/spaceone-design-system/commit/495ebcaf70f53ac2b9b5ba54f6ae25c6c26f09d2))
+
 # [1.1.0-beta.191](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.190...v1.1.0-beta.191) (2021-12-01)
 
 
