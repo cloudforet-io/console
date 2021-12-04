@@ -27,16 +27,18 @@
                      width="1rem"
                      height="1rem"
                 />
-                <p-i v-if="item.default_layout_id" name="ic_home" class="home-icon"
+                <p-i v-if="item.dashboard_id === homeDashboardId" name="ic_home" class="home-icon"
                      width="1rem" height="1rem"
                 />
-                <p-select-dropdown class="more-button"
+                <p-select-dropdown v-model="selectedMoreMenuItem"
+                                   class="more-button"
                                    :items="moreMenuItems"
                                    button-style-type="transparent"
                                    use-fixed-menu-style
                                    menu-position="right"
                                    type="icon-button"
                                    button-icon="ic_more"
+                                   @select="handleSelectMoreMenu(item)"
                 />
             </li>
         </ul>
@@ -65,8 +67,9 @@ import { BILLING_ROUTE } from '@/services/billing/routes';
 import { SpaceRouter } from '@/router';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { DashboardItem } from '@/services/billing/cost-management/cost-dashboard/type';
+import { store } from '@/store';
 
-interface MenuItem {
+interface ListItem {
     routeName?: string;
     label?: TranslateResult;
 }
@@ -83,7 +86,7 @@ export default {
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
-            menuList: computed<MenuItem[]>(() => [
+            menuList: computed<ListItem[]>(() => [
                 {
                     routeName: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
                     label: i18n.t('BILLING.COST_MANAGEMENT.MAIN.COST_ANALYSIS'),
@@ -99,12 +102,13 @@ export default {
                 label: d.name,
                 routeName: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
             }))),
-            selectedItem: {} as MenuItem,
             moreMenuItems: computed(() => [
-                { name: 'duplicate', label: 'Duplicate' },
-                { name: 'set as home', label: 'Set as Home', disabled: true },
+                { name: 'duplicate', label: 'Duplicate', disabled: true },
+                { name: 'setHome', label: 'Set as Home' },
             ]),
+            selectedMoreMenuItem: '',
             dashboardIdFromRoute: computed(() => vm.$route.params.dashboardId),
+            homeDashboardId: computed(() => store.getters['settings/getItem']('homeDashboard', '/costDashboard')),
         });
 
         /* util */
@@ -116,6 +120,16 @@ export default {
                 }).catch(() => {});
             } else {
                 SpaceRouter.router.replace({ name: routeName }).catch(() => {});
+            }
+        };
+
+        const handleSelectMoreMenu = (item) => {
+            if (state.selectedMoreMenuItem === 'setHome') {
+                store.dispatch('settings/setItem', {
+                    key: 'homeDashboard',
+                    value: item.dashboard_id,
+                    path: '/costDashboard',
+                });
             }
         };
 
@@ -132,6 +146,7 @@ export default {
         return {
             ...toRefs(state),
             showPage,
+            handleSelectMoreMenu,
         };
     },
 };

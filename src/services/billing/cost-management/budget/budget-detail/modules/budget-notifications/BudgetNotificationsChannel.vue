@@ -60,10 +60,8 @@ export default {
         });
 
         const apiQueryHelper = new ApiQueryHelper();
-        apiQueryHelper.setFilters([
-            { k: 'is_subscribe', v: false, o: '=' },
-        ])
-            .setOrFilters([{ k: 'subscriptions', v: 'monitoring.Alert', o: '=' }]);
+        apiQueryHelper
+            .setOrFilters([{ k: 'is_subscribe', v: false, o: '=' }, { k: 'subscriptions', v: 'cost_analysis.Budget', o: '=' }]);
 
         const listNotificationsChannel = async () => {
             state.loading = true;

@@ -28,24 +28,24 @@ export const BILLING_ROUTE = Object.freeze({
 export default {
     path: 'billing',
     name: BILLING_ROUTE._NAME,
-    redirect: '/billing/cost-management/cost-analysis',
+    redirect: '/billing/cost-management/dashboard',
     meta: { label: 'Billing' },
     component: { template: '<router-view />' },
     children: [
         {
             path: 'cost-management',
-            meta: { label: 'Alert Manager' },
-            redirect: 'cost-analysis',
+            meta: { label: 'Cost Management' },
+            redirect: 'dashboard',
             component: { template: '<router-view />' },
             children: [
                 {
                     path: '/',
                     name: BILLING_ROUTE.COST_MANAGEMENT._NAME,
-                    redirect: 'cost-analysis',
+                    redirect: 'dashboard',
                     component: CostManagementPage,
                     children: [
                         {
-                            path: 'dashboard/:dashboardId',
+                            path: 'dashboard/:dashboardId?',
                             name: BILLING_ROUTE.COST_MANAGEMENT.DASHBOARD._NAME,
                             props: true,
                             component: CostDashboardPage,

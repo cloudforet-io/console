@@ -13,24 +13,10 @@
                                :outline="false"
                                @click.stop="handleClickEditDashboard"
                 />
-                <p-select-dropdown class="more-button"
-                                   :items="moreMenuItems"
-                                   button-style-type="transparent"
-                                   use-fixed-menu-style
-                                   type="icon-button"
-                                   button-icon="ic_more"
-                />
+                <cost-dashboard-more-menu :dashboard-id="dashboardId" />
             </div>
             <div class="right-part">
-                <div class="date-filter">
-                    <p-badge style-type="gray200">
-                        <div>December 1, 2020 ~ November 30, 2021</div>
-                    </p-badge>
-                    <p-select-dropdown :items="MonthDateItems"
-                                       :selected="currency"
-                                       without-outline
-                    />
-                </div>
+                <cost-dashboard-period-select-dropdown />
                 <currency-select-dropdown />
                 <div class="left-divider download-pdf">
                     <p-icon-button name="ic_download" style-type="gray-border" size="sm" />
@@ -41,23 +27,7 @@
                 <!--                    </p-icon-text-button>-->
                 <!--                </div>-->
             </div>
-            <div class="set-filter-part">
-                <p class="applied-filter">
-                    <span class="label">Applied Filter:</span><span class="count"> 55 Projects & 20 Service Accounts</span>
-                </p>
-                <p-button
-                    style-type="gray-border"
-                    size="sm"
-                    @click.stop="handleClickFilter"
-                >
-                    View Filter
-                </p-button>
-                <div class="left-divider">
-                    <p-icon-button name="ic_setting" style-type="gray900" size="sm"
-                                   outline
-                    />
-                </div>
-            </div>
+            <cost-dashboard-filter />
         </div>
         <dashboard-layouts :layout="layout"
                            :period="period"
@@ -73,9 +43,8 @@ import {
     computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { i18n } from '@/translations';
-
 import {
-    PBreadcrumbs, PIconButton, PPageTitle, PSelectDropdown, PBadge, PButton,
+    PBreadcrumbs, PIconButton, PPageTitle,
 } from '@spaceone/design-system';
 
 import { BILLING_ROUTE } from '@/services/billing/routes';
@@ -87,7 +56,10 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
 import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
-import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
+import CostDashboardFilter from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardFilter.vue';
+import CostDashboardMoreMenu from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardMoreMenu.vue';
+import CostDashboardPeriodSelectDropdown
+    from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
 
 const tempProjectsData = [
     {
@@ -108,18 +80,19 @@ const tempProjectsData = [
     },
 ];
 
+
 export default {
     name: 'CostDashboardPage',
     components: {
+        CostDashboardPeriodSelectDropdown,
+        CostDashboardMoreMenu,
         DashboardLayouts,
         CurrencySelectDropdown,
         FavoriteButton,
+        CostDashboardFilter,
         PIconButton,
-        PButton,
         PBreadcrumbs,
         PPageTitle,
-        PSelectDropdown,
-        PBadge,
     },
     props: {
         dashboardId: {
@@ -138,36 +111,6 @@ export default {
             filters: {},
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
-            moreMenuItems: computed(() => [
-                { name: 'visibility', label: 'Edit Visibility' },
-                { name: 'duplicate', label: 'Duplicate' },
-                { name: 'set as home', label: 'Set as Home Dashboard' },
-            ]),
-            MonthDateItems: computed<MenuItem[]>(() => ([
-                {
-                    type: 'item',
-                    name: 'Custom',
-                    label: 'Custom',
-                },
-                {
-                    type: 'divider',
-                },
-                {
-                    type: 'item',
-                    name: 'November 2021',
-                    label: 'November 2021',
-                },
-                {
-                    type: 'item',
-                    name: 'October 2021',
-                    label: 'October 2021',
-                },
-                {
-                    type: 'item',
-                    name: 'September 2021',
-                    label: 'September 2021',
-                },
-            ])),
         });
 
         const routeState = reactive({
@@ -178,16 +121,9 @@ export default {
             ]),
         });
 
-
         /* event */
         const handleClickEditDashboard = () => {
             console.log('edit dashboard');
-        };
-        const handleClickMore = () => {
-            console.log('click more!');
-        };
-        const handleClickFilter = () => {
-            console.log('click more!');
         };
 
         const getLayoutData = async (layoutId: string) => {
@@ -215,19 +151,17 @@ export default {
 
         watch(() => props.dashboardId, async (dashboardId) => {
             if (!dashboardId) return;
-
             state.dashboard = await getDashboard(dashboardId);
             if (state.dashboard?.default_layout_id) {
                 state.layout = await getLayoutData(state.dashboard.default_layout_id);
             }
         }, { immediate: true });
 
+
         return {
             ...toRefs(state),
             routeState,
             handleClickEditDashboard,
-            handleClickMore,
-            handleClickFilter,
         };
     },
 };
@@ -271,16 +205,7 @@ export default {
             }
         }
     }
-    .set-filter-part {
-        @apply flex items-center;
-        width: 100%;
-        .applied-filter {
-            margin-right: 0.5rem;
-            .count {
-                @apply text-gray-800;
-            }
-        }
-    }
+
     .left-divider {
         @apply relative;
         padding-left: 0.5rem;
@@ -313,16 +238,6 @@ export default {
         .date-filter {
             @apply flex flex-wrap justify-end items-center;
             width: 100%;
-        }
-    }
-
-    .set-filter-part {
-        @apply flex flex-wrap;
-        .applied-filter {
-            width: 100%;
-            .label {
-                display: none;
-            }
         }
     }
 }
