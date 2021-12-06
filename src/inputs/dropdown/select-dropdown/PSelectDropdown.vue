@@ -97,23 +97,11 @@ import { BUTTON_STYLE } from '@/inputs/buttons/button/type';
 import { makeOptionalProxy } from '@/util/composition-helpers';
 import PIconButton from '@/inputs/buttons/icon-button/PIconButton.vue';
 import PI from '@/foundation/icons/PI.vue';
-import { SELECT_DROPDOWN_TYPE, CONTEXT_MENU_POSITION } from '@/inputs/dropdown/select-dropdown/type';
-
-interface SelectDropdownProps {
-    items?: MenuItem[];
-    selected?: string | number;
-    invalid?: boolean;
-    disabled?: boolean;
-    loading?: boolean;
-    indexMode?: boolean;
-    placeholder?: string;
-    type?: SELECT_DROPDOWN_TYPE;
-    buttonStyleType?: BUTTON_STYLE;
-    buttonIcon?: string;
-    // context menu fixed style props
-    useFixedMenuStyle?: boolean;
-    visibleMenu?: boolean;
-}
+import {
+    SELECT_DROPDOWN_TYPE,
+    CONTEXT_MENU_POSITION,
+    SelectDropdownProps,
+} from '@/inputs/dropdown/select-dropdown/type';
 
 
 export default defineComponent<SelectDropdownProps>({
