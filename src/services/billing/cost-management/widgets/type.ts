@@ -1,7 +1,7 @@
 import { CURRENCY } from '@/store/modules/display/config';
 import { CurrencyRates } from '@/store/modules/display/type';
 import { TranslateResult } from 'vue-i18n';
-import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { Period } from '@/services/billing/cost-management/type';
 
 /* widget spec */
 export interface ChartData {

@@ -80,7 +80,7 @@ import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/t
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { i18n } from '@/translations';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
-import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { Period } from '@/services/billing/cost-management/type';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 
 

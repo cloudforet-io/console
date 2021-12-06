@@ -1,26 +1,28 @@
 <template>
     <div>
         <project-select-dropdown v-if="type === FILTER.PROJECT"
-                                 :selected-project-ids="proxySelected.map(d => d.name)"
                                  multi-selectable
-                                 @select="handleSelectProject"
+                                 :selected-project-ids="selected"
+                                 @update:selectedProjectIds="handleSelectedProjectIds"
         />
         <p-search-dropdown
             v-else-if="type === FILTER.SERVICE_ACCOUNT || type === FILTER.REGION || type === FILTER.PROVIDER"
             :menu="menuItems"
-            :selected.sync="proxySelected"
             type="checkbox"
+            :selected="selectedItems"
             :show-selected-list="true"
             use-fixed-menu-style
+            @update:selected="handleSelectMenuItem"
         />
         <p-search-dropdown
             v-else-if="type === FILTER.RESOURCE || type === FILTER.PRODUCT || type === FILTER.ACCOUNT || type === FILTER.TYPE"
             type="checkbox"
             :handler="menuHandler"
-            :selected.sync="proxySelected"
+            :selected="selectedItems"
             :show-selected-list="true"
             :loading="menuLoading"
             use-fixed-menu-style
+            @update:selected="handleSelectMenuItem"
         />
     </div>
 </template>
@@ -38,13 +40,19 @@ import {
 
 import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdown.vue';
 
-import { AutocompleteHandler } from '@spaceone/design-system/dist/src/inputs/search/search-dropdown/type';
+import {
+    AutocompleteHandler, SearchDropdownMenuItem,
+} from '@spaceone/design-system/dist/src/inputs/search/search-dropdown/type';
 import { FILTER } from '@/services/billing/cost-management/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { makeProxy } from '@/lib/helper/composition-helpers';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
 
+
+interface Props {
+    type: string;
+    selected: string[];
+}
 
 export default {
     name: 'CostAnalysisFilterItem',
@@ -62,9 +70,12 @@ export default {
             default: () => ([]),
         },
     },
-    setup(props, { emit }) {
+    setup(props: Props, { emit }) {
         const state = reactive({
-            proxySelected: makeProxy('selected', props, emit),
+            selectedItems: computed<SearchDropdownMenuItem[]>(() => props.selected.map(selectedName => ({
+                name: selectedName,
+                label: state.menuItems.find(d => d.name === selectedName)?.label || selectedName,
+            }))),
             serviceAccounts: computed(() => store.state.resource.serviceAccount.items),
             providers: computed(() => store.state.resource.provider.items),
             regions: computed(() => store.state.resource.region.items),
@@ -130,18 +141,19 @@ export default {
         };
 
         /* event */
-        const handleSelectProject = (selectedProjects) => {
-            state.proxySelected = selectedProjects.map(d => ({
-                name: d.id,
-                label: d.name,
-            }));
+        const handleSelectedProjectIds = (selectedProjectIds) => {
+            emit('update:selected', selectedProjectIds);
+        };
+        const handleSelectMenuItem = (selectedItems) => {
+            emit('update:selected', selectedItems.map(d => d.name));
         };
 
         return {
             ...toRefs(state),
             FILTER,
-            handleSelectProject,
             menuHandler,
+            handleSelectedProjectIds,
+            handleSelectMenuItem,
         };
     },
 };

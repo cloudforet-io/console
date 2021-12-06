@@ -60,7 +60,7 @@ import { store } from '@/store';
 import { i18n } from '@/translations';
 import CurrencySelectDropdown from '@/services/billing/cost-management/modules/CurrencySelectDropdown.vue';
 import CostAnalysisSetQueryModal from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSetQueryModal.vue';
-import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { Period } from '@/services/billing/cost-management/type';
 import dayjs from 'dayjs';
 
 export default {

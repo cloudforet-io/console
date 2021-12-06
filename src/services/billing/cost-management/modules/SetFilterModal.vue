@@ -1,8 +1,8 @@
 <template>
     <p-button-modal
         v-if="visible"
-        class="select-filter-modal-container"
-        :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SELECT_FILTER')"
+        class="set-filter-modal"
+        :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SET_FILTER')"
         :visible.sync="proxyVisible"
         :footer-reset-button-visible="true"
         @confirm="handleFormConfirm"
@@ -23,7 +23,7 @@
                                 <cost-analysis-filter-item
                                     v-if="!isCollapsed"
                                     :type="name"
-                                    :selected.sync="selectedItemsMap[name]"
+                                    :selected.sync="filters[name]"
                                 />
                             </keep-alive>
                         </template>
@@ -35,11 +35,11 @@
                             {{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.SELECTED_FILTER') }} ({{ selectedItemsLength }})
                         </div>
                         <div v-if="selectedItemsLength" class="selected-tags-wrapper">
-                            <template v-for="(selectedItems, filterName, idx) in selectedItemsMap">
-                                <p-tag v-for="(item, itemIdx) in selectedItems" :key="`selected-tag-${idx}-${item.name}`"
+                            <template v-for="([filterName, items], idx) in Object.entries(selectedItemsMap)">
+                                <p-tag v-for="(item, itemIdx) in items" :key="`selected-tag-${idx}-${item.name}`"
                                        @delete="handleDeleteTag(filterName, itemIdx)"
                                 >
-                                    <b>{{ filterItems.find(d => d.name === filterName).title }}: </b>{{ item.label }}
+                                    <b>{{ FILTER_ITEM_MAP[filterName].label }}: </b>{{ item.label }}
                                 </p-tag>
                             </template>
                         </div>
@@ -72,15 +72,24 @@ import CostAnalysisFilterItem from '@/services/billing/cost-management/cost-anal
 
 import { makeProxy } from '@/lib/helper/composition-helpers';
 import { FILTER_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
-import {
-    CostQueryFilterItemsMap,
-    CostQueryFilters,
-} from '@/services/billing/cost-management/cost-analysis/store/type';
+import { CostQueryFilterItemsMap, CostQueryFilters } from '@/services/billing/cost-management/type';
+import { ResourceItem } from '@/store/modules/resource/type';
 import { store } from '@/store';
 
 
+interface FilterItem {
+    name: string;
+    title: string;
+}
+
+interface Props {
+    visible: boolean;
+    filterItems: FilterItem[];
+    selectedFilters: CostQueryFilters;
+}
+
 export default {
-    name: 'CostAnalysisSelectFilterModal',
+    name: 'SetFilterModal',
     components: {
         CostAnalysisFilterItem,
         PButtonModal,
@@ -92,15 +101,39 @@ export default {
             type: Boolean,
             default: false,
         },
+        filterItems: {
+            type: Array,
+            default: () => ([]),
+        },
+        selectedFilters: {
+            type: Object,
+            default: () => ({}),
+        },
     },
-    setup(props, { emit }) {
+    setup(props: Props, { emit }) {
         const state = reactive({
             proxyVisible: makeProxy('visible', props, emit),
-            filterItems: computed(() => Object.values(FILTER_ITEM_MAP).map(item => ({
-                name: item.name,
-                title: item.label,
-            }))),
-            selectedItemsMap: {} as CostQueryFilterItemsMap,
+            filters: {} as CostQueryFilters,
+            selectedItemsMap: computed<CostQueryFilterItemsMap>(() => {
+                const itemsMap: CostQueryFilterItemsMap = {};
+                const resourceItemsMap = {
+                    project_id: store.state.resource.project.items,
+                    service_account_id: store.state.resource.serviceAccount.items,
+                    provider: store.state.resource.provider.items,
+                    region_code: store.state.resource.region.items,
+                };
+
+                Object.entries(state.filters as CostQueryFilters).forEach(([key, data]) => {
+                    const resourceItems = resourceItemsMap[key];
+                    if (resourceItems) {
+                        itemsMap[key] = data?.map((d) => {
+                            const resourceItem: ResourceItem = resourceItems[d];
+                            return { name: d, label: resourceItem?.label ?? d };
+                        });
+                    } else itemsMap[key] = data?.map(d => ({ name: d, label: d }));
+                });
+                return itemsMap;
+            }),
             selectedItemsLength: computed<number>(() => {
                 const selectedValues = Object.values(state.selectedItemsMap);
                 return sum(selectedValues.map(v => v?.length || 0));
@@ -111,48 +144,44 @@ export default {
 
         /* util */
         const init = () => {
-            const unfoldedIndices: number[] = [];
-            state.selectedItemsMap = store.getters['service/costAnalysis/filterItemsMap'];
-            state.filterItems.forEach((item, idx) => {
-                if (state.selectedItemsMap[item.name]?.length) {
-                    unfoldedIndices.push(idx);
+            const _unfoldedIndices: number[] = [];
+            props.filterItems.forEach((item, idx) => {
+                if (props.selectedFilters[item.name]?.length) {
+                    _unfoldedIndices.push(idx);
                 }
             });
-            state.unfoldedIndices = unfoldedIndices;
+            state.unfoldedIndices = _unfoldedIndices;
+            state.filters = { ...props.selectedFilters };
         };
 
         /* event */
         const handleDeleteTag = (filterName: string, itemIdx: number) => {
-            const _selectedItemsMap = { ...state.selectedItemsMap };
-            const _selectedItems = [..._selectedItemsMap[filterName]];
-            _selectedItems.splice(itemIdx, 1);
-            if (_selectedItems.length) {
-                _selectedItemsMap[filterName] = _selectedItems;
+            const _filters = { ...state.filters };
+            const _filterItems = [..._filters[filterName]];
+            _filterItems.splice(itemIdx, 1);
+            if (_filterItems.length) {
+                _filters[filterName] = _filterItems;
             } else {
-                _selectedItemsMap[filterName] = undefined;
+                _filters[filterName] = undefined;
             }
-            state.selectedItemsMap = _selectedItemsMap;
+            state.filters = _filters;
         };
         const handleFormConfirm = () => {
             state.proxyVisible = false;
-            const filters: CostQueryFilters = {};
-            Object.entries(state.selectedItemsMap as CostQueryFilterItemsMap).forEach(([key, selectedItems]) => {
-                filters[key] = selectedItems?.map(({ name }) => name);
-            });
-            store.commit('service/costAnalysis/setFilters', filters);
+            emit('confirm', state.filters);
         };
         const handleClearAll = () => {
-            state.selectedItemsMap = {};
+            state.filters = {};
             state.unfoldedIndices = [];
         };
 
         watch(() => state.unfoldedIndices, (after, before) => {
             if (after.length < before.length) {
-                const _selectedItemsMap = { ...state.selectedItemsMap };
+                const _filters = { ...state.filters };
                 const deletedIndex: number = before.filter(idx => !after.includes(idx))[0];
-                const deletedFilterName = state.filterItems[deletedIndex].name;
-                _selectedItemsMap[deletedFilterName] = undefined;
-                state.selectedItemsMap = _selectedItemsMap;
+                const deletedFilterName = props.filterItems[deletedIndex].name;
+                _filters[deletedFilterName] = undefined;
+                state.filters = _filters;
             }
         });
         watch(() => props.visible, (after) => {
@@ -161,6 +190,7 @@ export default {
 
         return {
             ...toRefs(state),
+            FILTER_ITEM_MAP,
             handleFormConfirm,
             handleClearAll,
             handleDeleteTag,
@@ -170,7 +200,12 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.select-filter-modal-container {
+.set-filter-modal {
+    &.p-button-modal::v-deep {
+        .modal-content {
+            height: 48.75rem;
+        }
+    }
     .select-filter-body {
         @apply grid grid-cols-2 gap-4;
 

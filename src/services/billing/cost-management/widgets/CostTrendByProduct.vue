@@ -66,7 +66,7 @@ import {
 } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
-import { CostQueryFilters } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { CostQueryFilters } from '@/services/billing/cost-management/type';
 import { CURRENCY } from '@/store/modules/display/config';
 import { ChartData, Legend, WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { QueryHelper } from '@spaceone/console-core-lib/query';

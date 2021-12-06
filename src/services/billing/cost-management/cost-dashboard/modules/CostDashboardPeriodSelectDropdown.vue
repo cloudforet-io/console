@@ -20,7 +20,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import { range } from 'lodash';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import dayjs from 'dayjs';
-import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { Period } from '@/services/billing/cost-management/type';
 import { PBadge, PSelectDropdown } from '@spaceone/design-system';
 import CostDashboardCustomRangeModal
     from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardCustomRangeModal.vue';

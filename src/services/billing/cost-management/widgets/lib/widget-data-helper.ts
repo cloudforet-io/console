@@ -8,7 +8,7 @@ import { CurrencyRates } from '@/store/modules/display/type';
 import { convertUSDToCurrency } from '@/lib/helper/currency-helper';
 
 import { GROUP_BY } from '@/services/billing/cost-management/lib/config';
-import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { Period } from '@/services/billing/cost-management/type';
 import {
     ChartData, Legend, PieChartData, PieChartRawData, TableData, TableRawData, XYChartData, XYChartRawData,
 } from '@/services/billing/cost-management/widgets/type';

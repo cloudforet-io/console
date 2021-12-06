@@ -1,9 +1,10 @@
 import { Mutation } from 'vuex';
 import {
-    CostAnalysisStoreState, CostQueryFilters, CostQuerySetModel, Period,
+    CostAnalysisStoreState, CostQuerySetModel,
 } from '@/services/billing/cost-management/cost-analysis/store/type';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import { GROUP_BY } from '@/services/billing/cost-management/lib/config';
+import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
 
 
 export const setChartType: Mutation<CostAnalysisStoreState> = (state, chartType: CHART_TYPE) => {

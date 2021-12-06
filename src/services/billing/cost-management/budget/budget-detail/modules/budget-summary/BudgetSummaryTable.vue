@@ -12,7 +12,7 @@ import { computed, reactive, toRefs } from '@vue/composition-api';
 import cloneDeep from 'lodash/cloneDeep';
 import { store } from '@/store';
 import { BUDGET_TIME_UNIT, BudgetTimeUnit, BudgetUsageData } from '@/services/billing/cost-management/budget/type';
-import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { Period } from '@/services/billing/cost-management/type';
 import { getAccumulatedChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 
 const defaultTableKey = [{ name: 'Actual Cost', path: 'usd_cost' }, { name: 'Current vs Budget.', path: 'ratio' }];

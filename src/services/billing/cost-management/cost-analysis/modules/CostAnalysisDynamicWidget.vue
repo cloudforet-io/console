@@ -30,7 +30,7 @@ import { CURRENCY } from '@/store/modules/display/config';
 
 
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
-import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { Period } from '@/services/billing/cost-management/type';
 import { getTimeUnitByPeriod } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';

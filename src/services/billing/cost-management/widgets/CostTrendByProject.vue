@@ -46,7 +46,7 @@ import CostDashboardDataTable
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
-import { CostQueryFilters } from '@/services/billing/cost-management/cost-analysis/store/type';
+import { CostQueryFilters } from '@/services/billing/cost-management/type';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
 import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';

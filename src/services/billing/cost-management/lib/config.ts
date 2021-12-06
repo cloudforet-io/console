@@ -31,8 +31,8 @@ export const GROUP_BY_ITEM_MAP = Object.freeze({
 
 export const FILTER = Object.freeze({
     ...GROUP_BY,
-    TAG: 'tag',
-    ADDITIONAL_FIELD: 'additional_info',
+    // TAG: 'tag',
+    // ADDITIONAL_FIELD: 'additional_info',
 } as const);
 export type FILTER = typeof FILTER[keyof typeof FILTER];
 

@@ -81,7 +81,11 @@
                 </template>
             </p-data-loader>
         </section>
-        <cost-analysis-select-filter-modal :visible.sync="selectFilterModalState.visible" />
+        <set-filter-modal :visible.sync="selectFilterModalState.visible"
+                          :selected-filters="filters"
+                          :filter-items="filterItems"
+                          @confirm="handleConfirmSetFilter"
+        />
     </div>
 </template>
 
@@ -100,8 +104,8 @@ import {
 
 import CostAnalysisDynamicWidget
     from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisDynamicWidget.vue';
-import CostAnalysisSelectFilterModal
-    from '@/services/billing/cost-management/cost-analysis/modules/CostAnalysisSelectFilterModal.vue';
+import SetFilterModal
+    from '@/services/billing/cost-management/modules/SetFilterModal.vue';
 
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helper';
@@ -117,9 +121,7 @@ import {
 } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { CHART_TYPE } from '@/services/billing/cost-management/widgets/lib/config';
 import {
-    FILTER_ITEM_MAP,
-    GRANULARITY,
-    GROUP_BY,
+    FILTER_ITEM_MAP, GRANULARITY, GROUP_BY,
 } from '@/services/billing/cost-management/lib/config';
 import { getXYChartDataAndLegends } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import {
@@ -131,7 +133,7 @@ export default {
     name: 'CostAnalysisChart',
     components: {
         CostAnalysisDynamicWidget,
-        CostAnalysisSelectFilterModal,
+        SetFilterModal,
         PButton,
         PIconButton,
         PSelectDropdown,
@@ -149,10 +151,13 @@ export default {
             //
             groupByItems: computed(() => store.getters['service/costAnalysis/groupByItems']),
             filterItemsMap: computed(() => store.getters['service/costAnalysis/filterItemsMap']),
+            filterItems: computed(() => Object.values(FILTER_ITEM_MAP).map(item => ({
+                name: item.name, title: item.label,
+            }))),
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
             filtersLength: computed<number>(() => {
-                const selectedValues = Object.values(state.filters);
+                const selectedValues: Array<string[]> = Object.values(state.filters);
                 return sum(selectedValues.map(v => v?.length || 0));
             }),
             //
@@ -293,6 +298,9 @@ export default {
             }
             store.commit('service/costAnalysis/setFilters', _filters);
         };
+        const handleConfirmSetFilter = (filters) => {
+            store.commit('service/costAnalysis/setFilters', filters);
+        };
         const refreshChart = async () => {
             state.loading = true;
 
@@ -334,6 +342,7 @@ export default {
             handleClickSelectFilter,
             handleDeleteFilterTag,
             handleClearAllFilters,
+            handleConfirmSetFilter,
         };
     },
 };

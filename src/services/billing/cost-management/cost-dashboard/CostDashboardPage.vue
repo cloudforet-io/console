@@ -27,7 +27,7 @@
                 <!--                    </p-icon-text-button>-->
                 <!--                </div>-->
             </div>
-            <cost-dashboard-filter :default-filter="dashboard.default_filter" />
+            <cost-dashboard-filter :dashboard-id="dashboardId" :filters.sync="filters" />
         </div>
         <dashboard-layouts :layout="layout"
                            :period="period"
@@ -55,12 +55,13 @@ import DashboardLayouts from '@/services/billing/cost-management/cost-dashboard/
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { store } from '@/store';
-import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
 import CostDashboardFilter from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardFilter.vue';
 import CostDashboardMoreMenu from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardMoreMenu.vue';
 import CostDashboardPeriodSelectDropdown
     from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
 import { DashboardInfo } from '@/services/billing/cost-management/cost-dashboard/type';
+import { CostQueryFilters, Period } from '@/services/billing/cost-management/type';
+
 
 const tempProjectsData = [
     {
@@ -108,7 +109,7 @@ export default {
             dashboard: {} as DashboardInfo,
             layout: [] as any[],
             period: {} as Period,
-            filters: {},
+            filters: {} as CostQueryFilters,
             currency: computed(() => store.state.display.currency),
             currencyRates: computed(() => store.state.display.currencyRates),
         });
@@ -143,9 +144,11 @@ export default {
 
         const getDashboard = async (dashboardId: string) => {
             try {
-                state.dashboard = await SpaceConnector.client.costAnalysis.dashboard.get({
+                const dashboard = await SpaceConnector.client.costAnalysis.dashboard.get({
                     dashboard_id: dashboardId,
                 });
+                state.dashboard = dashboard;
+                state.filters = dashboard.default_filter;
             } catch (e) {
                 ErrorHandler.handleError(e);
                 state.dashboard = {} as DashboardInfo;
