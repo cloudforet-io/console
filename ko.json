@@ -344,6 +344,12 @@
 					"MONTHLY": "",
 					"TOTAL": "",
 					"TOTAL_BUDGET": ""
+				},
+				"STAT": {
+					"AVAILABLE": "사용가능",
+					"BUDGET_USAGE": "예산 사용률",
+					"TOTAL_BUDGET": " 총 예산",
+					"TOTAL_COST": "총 비용"
 				}
 			},
 			"COST_ANALYSIS": {

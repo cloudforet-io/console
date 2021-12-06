@@ -344,6 +344,12 @@
 					"MONTHLY": "Monthly",
 					"TOTAL": "Total",
 					"TOTAL_BUDGET": "Total Budget"
+				},
+				"STAT": {
+					"AVAILABLE": "Available",
+					"BUDGET_USAGE": "Budget Usage",
+					"TOTAL_BUDGET": "Total Budget",
+					"TOTAL_COST": "Total Cost"
 				}
 			},
 			"COST_ANALYSIS": {
