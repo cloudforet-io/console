@@ -1,3 +1,10 @@
+# [1.1.0-beta.197](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.196...v1.1.0-beta.197) (2021-12-06)
+
+
+### Bug Fixes
+
+* make recreate datePicker on props changes ([#776](https://github.com/spaceone-dev/spaceone-design-system/issues/776)) ([139fad3](https://github.com/spaceone-dev/spaceone-design-system/commit/139fad3941b6cdb0a932d5d9ec40a8339232d2d9))
+
 # [1.1.0-beta.196](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.195...v1.1.0-beta.196) (2021-12-06)
 
 
