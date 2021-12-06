@@ -155,6 +155,17 @@ export const getDatetimePickerArtTypes = (): ArgTypes => ({
         control: null,
     },
     // events
+    onClose: {
+        name: 'close',
+        description: 'Event emitted when calendar is start closing.',
+        defaultValue: null,
+        table: {
+            type: {
+                summary: null,
+            },
+            category: 'events',
+        },
+    },
     onUpdateSelectedDates: {
         name: 'update:selectedDates',
         description: 'Event emitted when date was selected. works with `selectedDates` props sync.',

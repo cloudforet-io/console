@@ -108,7 +108,7 @@ export default {
             default: false,
         },
     },
-    setup(props: DatetimePickerProps) {
+    setup(props: DatetimePickerProps, { emit }) {
         const vm = getCurrentInstance() as ComponentRenderProxy;
         const state = reactive({
             datePickerRef: null as null | HTMLElement,
@@ -179,6 +179,7 @@ export default {
             }
             state.visiblePicker = false;
             resizeInputWidth(state.dateString, instance);
+            emit('close');
         };
         const handleOpenPicker = () => {
             state.visiblePicker = true;

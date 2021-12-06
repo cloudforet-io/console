@@ -33,6 +33,7 @@ export const Template = (args, { argTypes }) => {
             :data-type="dataType"
             :invalid="invalid"
             @update:selectedDates="onUpdateSelectedDates"
+            @close="onClose"
         />
         <br>
         <p>Selected Dates: {{ proxySelectedDates }}</p>
