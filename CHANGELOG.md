@@ -1,3 +1,10 @@
+# [1.1.0-beta.195](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.194...v1.1.0-beta.195) (2021-12-06)
+
+
+### Bug Fixes
+
+* add close event to datetimePicker ([#773](https://github.com/spaceone-dev/spaceone-design-system/issues/773)) ([40e001c](https://github.com/spaceone-dev/spaceone-design-system/commit/40e001c952262b051243f4e6ded0c06f935883fa))
+
 # [1.1.0-beta.194](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.193...v1.1.0-beta.194) (2021-12-03)
 
 
