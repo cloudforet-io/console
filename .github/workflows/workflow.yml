@@ -15,6 +15,7 @@ jobs:
         uses: actions/checkout@v2
         with:
           submodules: true
+          token: ${{ secrets.PAT_TOKEN }}
       - name: Setup Node.js
         uses: actions/setup-node@v2
         with:
@@ -28,16 +29,20 @@ jobs:
             restore-keys: |
               $ {{ runner.OS }}-build-
               $ {{ runner.OS }}-
+
       - name: Install dependencies
         if: steps.node-cache.outputs.cache-hit != 'true'
         run: npm install
+
       - name: Build
         run: npm run build && npm run css && npm run tsc-alias
+
       - name: Release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ secrets.PAT_TOKEN }}
         run: npm run semantic-release
+
       - name: Slack
         if: always()
         uses: 8398a7/action-slack@v3.2.0
