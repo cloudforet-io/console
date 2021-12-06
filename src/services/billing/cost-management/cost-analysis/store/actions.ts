@@ -12,8 +12,7 @@ export const initCostAnalysisStoreState: Action<CostAnalysisStoreState, any> = (
     commit('setGranularity', GRANULARITY.ACCUMULATED);
     commit('setGroupBy', []);
     commit('setPeriod', getInitialDates());
-    commit('setFilters', []);
-    commit('setSelectedQueryId', undefined);
+    commit('setFilters', {});
 };
 
 

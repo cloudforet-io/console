@@ -26,7 +26,7 @@ export const setFilters: Mutation<CostAnalysisStoreState> = (state, filters: Cos
     state.filters = filters;
 };
 
-export const setSelectedQueryId: Mutation<CostAnalysisStoreState> = (state, selectedQueryId: string) => {
+export const setSelectedQueryId: Mutation<CostAnalysisStoreState> = (state, selectedQueryId?: string) => {
     state.selectedQueryId = selectedQueryId;
 };
 

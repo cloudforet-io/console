@@ -64,7 +64,7 @@
                                :selected-query="saveQueryFormState.selectedQuery" :request-type="saveQueryFormState.requestType"
                                @confirm="handleSaveQueryConfirm"
         />
-        <delete-modal :header-title="checkDeleteState.headerTitle"
+        <delete-modal :header-title="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHECK_DELETE_MODAL_DESC')"
                       :visible.sync="checkDeleteState.visible"
                       @confirm="handleDeleteQueryConfirm"
         />
@@ -72,7 +72,6 @@
 </template>
 
 <script lang="ts">
-import { upperFirst } from 'lodash';
 import { TranslateResult } from 'vue-i18n';
 
 import {
@@ -94,7 +93,6 @@ import DeleteModal from '@/common/components/modals/DeleteModal.vue';
 
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import {
-    COST_ANALYSIS_PAGE_URL_QUERY_KEY,
     QUERY_VISIBILITY_TYPE, REQUEST_TYPE,
 } from '@/services/billing/cost-management/cost-analysis/lib/config';
 import { registerServiceStore } from '@/common/composables/register-service-store';
@@ -117,8 +115,6 @@ import {
     queryStringToArray,
     queryStringToObject,
     queryStringToString,
-    replaceUrlQuery,
-    ConvertValueToQueryString,
 } from '@/lib/router-query-string';
 import { CostAnalysisPageUrlQuery } from '@/services/billing/cost-management/cost-analysis/type';
 
@@ -126,6 +122,8 @@ export interface SaveQueryEmitParam {
     updatedQuery: CostQuerySetModel;
     requestType: REQUEST_TYPE;
 }
+
+type QuerySetOptions = Pick<CostAnalysisStoreState, 'chartType'|'granularity'|'groupBy'|'period'|'filters'>
 
 export default {
     name: 'CostAnalysisPage',
@@ -153,36 +151,6 @@ export default {
     setup(props, { root }) {
         registerServiceStore<CostAnalysisStoreState>('costAnalysis', costAnalysisStoreModule);
 
-        const subscribeQuerySetOptions = () => {
-            const MutationToUrlQueryKeyMap: Record<string, COST_ANALYSIS_PAGE_URL_QUERY_KEY> = {};
-            COST_ANALYSIS_PAGE_URL_QUERY_KEY.forEach((k) => {
-                MutationToUrlQueryKeyMap[`service/costAnalysis/set${upperFirst(k)}`] = k;
-            });
-
-            const urlQueryStringConverterMap: Record<COST_ANALYSIS_PAGE_URL_QUERY_KEY, ConvertValueToQueryString> = {
-                chartType: primitiveToQueryString,
-                granularity: primitiveToQueryString,
-                groupBy: arrayToQueryString,
-                period: objectToQueryString,
-                filters: objectToQueryString,
-            };
-
-            store.subscribe((mutation, storeState) => {
-                if (props.querySetId) return;
-
-                const urlQueryKey = MutationToUrlQueryKeyMap[mutation.type];
-                if (urlQueryKey) {
-                    try {
-                        const value = storeState.service.costAnalysis[urlQueryKey];
-                        const converter = urlQueryStringConverterMap[urlQueryKey];
-                        replaceUrlQuery(urlQueryKey, converter(value));
-                    } catch (e) {
-                        console.error(e);
-                    }
-                }
-            });
-        };
-
         const state = reactive({
             defaultTitle: computed<TranslateResult>(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.COST_ANALYSIS')),
             costQueryList: computed<CostQuerySetModel[]>(() => store.state.service.costAnalysis.costQueryList),
@@ -199,6 +167,13 @@ export default {
             selectedQuerySet: computed<CostQuerySetModel|undefined>(() => store.getters['service/costAnalysis/selectedQuerySet']),
             title: computed<string>(() => state.selectedQuerySet?.name ?? 'Cost Analysis'),
             itemIdForDeleteQuery: '',
+            currentQuerySetOptions: computed<QuerySetOptions>(() => ({
+                chartType: store.state.service.costAnalysis.chartType,
+                granularity: store.state.service.costAnalysis.granularity,
+                groupBy: store.state.service.costAnalysis.groupBy,
+                period: store.state.service.costAnalysis.period,
+                filters: store.state.service.costAnalysis.filters,
+            })),
         });
 
         const saveQueryFormState = reactive({
@@ -218,13 +193,25 @@ export default {
 
         const checkDeleteState = reactive({
             visible: false,
-            headerTitle: computed(() => i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.CHECK_DELETE_MODAL_DESC')),
         });
 
         /* util */
-        const initSelectedQueryOptions = () => {
-            store.dispatch('service/costAnalysis/initCostAnalysisStoreState');
+        const setSelectedQueryId = (queryId?: string) => {
+            store.commit('service/costAnalysis/setSelectedQueryId', queryId);
         };
+
+        const setQueryOptions = (options?: Partial<CostQuerySetOption>) => {
+            if (options) store.dispatch('service/costAnalysis/setQueryOptions', options);
+            else store.dispatch('service/costAnalysis/initCostAnalysisStoreState');
+        };
+
+        const getQueryOptionsFromUrlQuery = (urlQuery: CostAnalysisPageUrlQuery): Partial<CostQuerySetOption> => ({
+            chart_type: queryStringToString(urlQuery.chartType),
+            granularity: queryStringToString(urlQuery.granularity),
+            group_by: queryStringToArray(urlQuery.groupBy),
+            period: queryStringToObject(urlQuery.period),
+            filters: queryStringToObject(urlQuery.filters),
+        });
 
         const getQueryWithKey = (queryItemKey: string): Partial<CostQuerySetModel> => (state.costQueryList.find(item => item.cost_query_set_id === queryItemKey)) || {};
 
@@ -254,7 +241,8 @@ export default {
                 showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_S_DELETE_QUERY'), '', root);
                 if (state.selectedQueryId === state.itemIdForDeleteQuery) {
                     await SpaceRouter.router.push({ name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME });
-                    initSelectedQueryOptions();
+                    setQueryOptions();
+                    setSelectedQueryId();
                 }
             } catch (e) {
                 ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.ALT_E_DELETE_QUERY'));
@@ -262,20 +250,21 @@ export default {
         };
 
         const handleClickQueryItem = async (queryItem: Required<MenuItem>) => {
-            if (queryItem.name !== props.querySetId) {
+            if (queryItem.name !== state.selectedQueryId) {
                 await SpaceRouter.router.replace({
                     name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
                     params: { querySetId: queryItem.name },
                 });
             }
-            await store.commit('service/costAnalysis/setSelectedQueryId', queryItem.name);
-            if (!queryItem.name) {
-                initSelectedQueryOptions();
-                return;
+
+            if (queryItem.name) {
+                const { options } = getQueryWithKey(queryItem.name);
+                setQueryOptions(options);
+                setSelectedQueryId(queryItem.name);
+            } else {
+                setQueryOptions();
+                setSelectedQueryId();
             }
-            const { options } = getQueryWithKey(queryItem.name);
-            store.dispatch('service/costAnalysis/setQueryOptions', options);
-            store.commit('service/costAnalysis/setSelectedQueryId', queryItem.name);
         };
 
         const handleSaveQueryConfirm = ({ updatedQuery, requestType }: SaveQueryEmitParam) => {
@@ -319,39 +308,44 @@ export default {
         watch(() => saveQueryFormState.visible, () => {
             if (saveQueryFormState.visible === false) saveQueryFormState.selectedQuery = {};
         });
-        watch(() => props.querySetId, (querySetId) => {
-            if (querySetId) {
-                replaceUrlQuery();
+
+        watch([() => props.querySetId, () => state.selectedQueryId], ([urlParamValue, selectedQueryId]) => {
+            if (urlParamValue !== selectedQueryId) SpaceRouter.router.replace({ query: {} });
+        }, { immediate: true });
+
+        watch(() => state.currentQuerySetOptions, (options) => {
+            const query: CostAnalysisPageUrlQuery = {
+                chartType: primitiveToQueryString(options.chartType),
+                granularity: primitiveToQueryString(options.granularity),
+                groupBy: arrayToQueryString(options.groupBy),
+                period: objectToQueryString(options.period),
+                filters: objectToQueryString(options.filters),
+            };
+
+            if (JSON.stringify(query) !== JSON.stringify(SpaceRouter.router.currentRoute.query)) {
+                SpaceRouter.router.replace({ query });
             }
         });
 
+        /* Page Init */
         (async () => {
-            initSelectedQueryOptions();
-
             await store.dispatch('service/costAnalysis/listCostQueryList');
+
             if (props.querySetId) {
                 const { name, options } = getQueryWithKey(props.querySetId);
                 if (name) {
-                    store.dispatch('service/costAnalysis/setQueryOptions', options);
-                    store.commit('service/costAnalysis/setSelectedQueryId', props.querySetId);
+                    setQueryOptions(options);
+                    setSelectedQueryId(props.querySetId);
                 } else {
-                    await SpaceRouter.router.replace({ name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME });
+                    SpaceRouter.router.replace({
+                        name: BILLING_ROUTE.COST_MANAGEMENT.COST_ANALYSIS._NAME,
+                        params: {},
+                    });
                 }
             } else {
-                const urlQuery: CostAnalysisPageUrlQuery = SpaceRouter.router.currentRoute.query;
-                const options: Partial<CostQuerySetOption> = {
-                    chart_type: queryStringToString(urlQuery.chartType),
-                    granularity: queryStringToString(urlQuery.granularity),
-                    group_by: queryStringToArray(urlQuery.groupBy),
-                    period: queryStringToObject(urlQuery.period),
-                    filters: queryStringToObject(urlQuery.filters),
-                };
-
-                store.dispatch('service/costAnalysis/setQueryOptions', options);
-                store.commit('service/costAnalysis/setSelectedQueryId', props.querySetId);
+                const options = getQueryOptionsFromUrlQuery(SpaceRouter.router.currentRoute.query);
+                setQueryOptions(options);
             }
-
-            subscribeQuerySetOptions();
         })();
 
         return {
