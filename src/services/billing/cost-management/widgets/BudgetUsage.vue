@@ -32,12 +32,13 @@ import BudgetUsageProgressBar
 import CostDashboardSimpleCardWidget
     from '@/services/billing/cost-management/widgets/modules/CostDashboardSimpleCardWidget.vue';
 import { PI } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { CURRENCY } from '@/store/modules/display/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
-
 
 export default {
     name: 'BudgetUsage',
@@ -63,7 +64,7 @@ export default {
             default: () => ({}),
         },
     },
-    setup() {
+    setup(props) {
         const state = reactive({
             loading: true,
             budgetCount: 0,
@@ -84,8 +85,8 @@ export default {
                     include_project_info: false,
                     filter: [
                     ],
-                    start: '2020-12-01', // dayjs.utc(props.period.start),
-                    end: '2021-12-01', // dayjs.utc(props.period.end).add(1, 'day'),
+                    start: props.period.start,
+                    end: props.period.end,
                 });
 
                 state.usageCost = results[0]?.usd_cost || 0;
@@ -99,9 +100,11 @@ export default {
             }
         };
 
-        (() => {
+        watch(() => props.period, () => {
             getData();
-        })();
+        });
+
+        getData();
 
 
         return {

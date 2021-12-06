@@ -25,7 +25,6 @@ import CostDashboardCardWidgetLayout
 import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
-import dayjs from 'dayjs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
@@ -38,11 +37,11 @@ const widgetLink = {
     query: {},
 };
 
-const currentDay = dayjs().utc();
-const currentMonthPeriod = {
-    start: currentDay.startOf('month'),
-    end: currentDay,
-};
+// const currentDay = dayjs().utc();
+// const currentMonthPeriod = {
+//     start: currentDay.startOf('month'),
+//     end: currentDay,
+// };
 
 interface ChartData {
     project_id: string;
@@ -52,7 +51,13 @@ interface ChartData {
 export default {
     name: 'CostByProject',
     components: { CostDashboardCardWidgetLayout },
-    setup() {
+    props: {
+        period: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as TreeMap | null,
@@ -90,8 +95,8 @@ export default {
                     include_usage_quantity: false,
                     granularity: GRANULARITY.ACCUMULATED,
                     group_by: ['project_id'],
-                    start: currentMonthPeriod.start,
-                    end: currentMonthPeriod.end,
+                    start: props.period?.start,
+                    end: props.period?.end,
                     page: {
                         limit: 15,
                     },
@@ -111,13 +116,18 @@ export default {
             }
         }, { immediate: false });
 
+        watch(() => props.period, async (after) => {
+            if (after) {
+                await getChartData();
+                drawChart(state.chartRef);
+            }
+        });
+
+        getChartData();
+
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();
         });
-
-        (() => {
-            getChartData();
-        })();
 
         return {
             ...toRefs(state),

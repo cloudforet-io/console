@@ -30,9 +30,9 @@
                     <span>{{ currencyMoneyFormatter(Math.abs(increaseCost), currency, currencyRates, true, 10000000) }}</span>
                 </span>
             </div>
-            <div class="range">
+            <span class="range">
                 Decreased from {{ `${lastMonth.startOf('month').format('MMM DD')} ~ ${lastMonth.endOf('month').format('DD')}, ${lastMonth.format('YYYY')}` }}
-            </div>
+            </span>
         </template>
     </cost-dashboard-simple-card-widget>
 </template>
@@ -43,7 +43,9 @@ import dayjs, { Dayjs } from 'dayjs';
 import CostDashboardSimpleCardWidget from '@/services/billing/cost-management/widgets/modules/CostDashboardSimpleCardWidget.vue';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import { PI } from '@spaceone/design-system';
-import { computed, reactive, toRefs } from '@vue/composition-api';
+import {
+    computed, reactive, toRefs, watch,
+} from '@vue/composition-api';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
@@ -116,9 +118,15 @@ export default {
             state.lastMonthCost = await getData(start, end);
         };
 
-        (() => {
-            Promise.allSettled([getCurrentMonthChartData(), getLastMonthChartData()]);
-        })();
+        const getChartData = async () => {
+            await Promise.allSettled([getCurrentMonthChartData(), getLastMonthChartData()]);
+        };
+
+        watch(() => props.period, async (after) => {
+            if (after) await getChartData();
+        });
+
+        getChartData();
 
         return {
             ...toRefs(state),
@@ -145,15 +153,15 @@ export default {
     .increase-rate {
         flex-basis: 50%;
     }
-}
-.increase-amount {
-    @apply text-gray-800 font-bold;
-    font-size: 1.125rem;
-    line-height: 155%;
-    .unit {
-        @apply font-normal;
-        font-size: 1rem;
-        line-height: 160%;
+    .increase-amount {
+        @apply text-gray-800 font-bold;
+        font-size: 1.125rem;
+        line-height: 155%;
+        .unit {
+            @apply font-normal;
+            font-size: 1rem;
+            line-height: 160%;
+        }
     }
 }
 .range {
