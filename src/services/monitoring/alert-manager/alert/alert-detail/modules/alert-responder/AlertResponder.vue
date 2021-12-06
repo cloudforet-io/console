@@ -61,6 +61,7 @@ import ProjectChannelList from '@/services/monitoring/alert-manager/alert/alert-
 import { i18n } from '@/translations';
 import { store } from '@/store';
 import VueI18n from 'vue-i18n';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import TranslateResult = VueI18n.TranslateResult;
 
@@ -168,7 +169,7 @@ export default {
                     resource_id: userId,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 
@@ -190,7 +191,7 @@ export default {
                     resource_id: userID,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             }
         };
 

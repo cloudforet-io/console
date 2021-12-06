@@ -25,9 +25,7 @@ export default class ErrorHandler {
     }
 
     static handleError(error) {
-        if (isInstanceOfAPIError(error)) {
-            console.error(error);
-        } else if (isInstanceOfNotFoundError(error)) {
+        if (isInstanceOfNotFoundError(error)) {
             showErrorMessage('관리자에게 문의하세요.', error);
         } else if (isInstanceOfAuthenticationError(error)) {
             const isTokenAlive = SpaceConnector.isTokenAlive;
@@ -39,11 +37,14 @@ export default class ErrorHandler {
             }
         } else if (isInstanceOfAuthorizationError(error)) {
             ErrorHandler.authorizationErrorHandler();
+            console.error(error);
         } else if (isInstanceOfNoResourceError(error)) {
             showErrorMessage('No Resource', 'No Resource');
             SpaceRouter.router.push(error.redirectUrl);
         } else if (isInstanceOfNoSearchResourceError(error)) {
             SpaceRouter.router.push(error.redirectUrl);
+        } else if (isInstanceOfAPIError(error)) {
+            console.error(error);
         } else {
             console.error(error);
         }

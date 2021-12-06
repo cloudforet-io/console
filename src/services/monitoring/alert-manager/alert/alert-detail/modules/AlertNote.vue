@@ -115,7 +115,7 @@ export default {
                     ...d,
                 }));
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
                 state.noteList = [];
             } finally {
                 state.loading = false;
@@ -159,7 +159,7 @@ export default {
                     note_id: state.selectedNoteIdForDelete,
                 });
             } catch (e) {
-                console.error(e);
+                ErrorHandler.handleError(e);
             } finally {
                 checkDeleteState.loading = false;
                 checkDeleteState.visible = false;
