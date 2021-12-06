@@ -393,7 +393,7 @@
 				"SEARCH_PLACEHOLDER": "Search",
 				"SEARCH_TAG_PLACEHOLDER": "Search Tag",
 				"SELECTED_FILTER": "Selected Filter",
-				"SELECT_FILTER": "Select Filter",
+				"SET_FILTER": "Set Filter",
 				"SET_MORE": "Set More",
 				"SET_QUERY": "Set query",
 				"STACKED_COLUMN": "Stacked Column",
@@ -402,9 +402,12 @@
 				"YEARLY": "Yearly"
 			},
 			"MAIN": {
+				"APPLIED_FILTER": "Applied Filter",
 				"BUDGET": "Budget",
+				"CLOSE": "Close",
 				"COST_ANALYSIS": "Cost Analysis",
-				"DASHBOARD": "Dashboard"
+				"DASHBOARD": "Dashboard",
+				"VIEW_FILTER": "View Filter"
 			}
 		}
 	},

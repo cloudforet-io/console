@@ -393,7 +393,7 @@
 				"SEARCH_PLACEHOLDER": "",
 				"SEARCH_TAG_PLACEHOLDER": "",
 				"SELECTED_FILTER": "",
-				"SELECT_FILTER": "",
+				"SET_FILTER": "",
 				"SET_MORE": "",
 				"SET_QUERY": "",
 				"STACKED_COLUMN": "",
@@ -402,9 +402,12 @@
 				"YEARLY": ""
 			},
 			"MAIN": {
+				"APPLIED_FILTER": "",
 				"BUDGET": "",
+				"CLOSE": "",
 				"COST_ANALYSIS": "",
-				"DASHBOARD": ""
+				"DASHBOARD": "",
+				"VIEW_FILTER": ""
 			}
 		}
 	},

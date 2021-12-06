@@ -393,7 +393,7 @@
 				"SEARCH_PLACEHOLDER": "검색",
 				"SEARCH_TAG_PLACEHOLDER": "태그 검색",
 				"SELECTED_FILTER": "선택된 필터",
-				"SELECT_FILTER": "필터 선택",
+				"SET_FILTER": "필터 선택",
 				"SET_MORE": "추가 설정",
 				"SET_QUERY": "쿼리 설정",
 				"STACKED_COLUMN": "누적 컬럼",
@@ -402,9 +402,12 @@
 				"YEARLY": "년"
 			},
 			"MAIN": {
+				"APPLIED_FILTER": "적용된 필터",
 				"BUDGET": "예산",
+				"CLOSE": "종료",
 				"COST_ANALYSIS": "비용 분석",
-				"DASHBOARD": "대시보드"
+				"DASHBOARD": "대시보드",
+				"VIEW_FILTER": "필터 보기"
 			}
 		}
 	},
