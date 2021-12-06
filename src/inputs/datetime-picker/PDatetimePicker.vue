@@ -233,9 +233,9 @@ export default {
                 createDatePicker(datePickerRef);
             }
         });
-        watch(() => props.selectedDates, () => {
-            createDatePicker(state.datePickerRef as HTMLElement);
-        }, { immediate: false });
+        watch([() => props.selectedDates, () => props.minDate, () => props.maxDate, () => state.enableTime, () => state.localeFile], () => {
+            if (state.datePickerRef) createDatePicker(state.datePickerRef);
+        });
 
         return {
             ...toRefs(state),
