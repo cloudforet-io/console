@@ -1,7 +1,7 @@
 <template>
     <div class="dashboard-layouts">
-        <div v-for="(row, rowIdx) in layout" :key="`row-${rowIdx}`" :class="`row col-${row.length}`">
-            <div v-for="({widget_id, options}) in row" :key="`widget-${widget_id}`">
+        <div v-for="(row, rowIdx) in layout" :key="`row-${rowIdx}`" class="row">
+            <div v-for="({widget_id, options}) in row" :key="`widget-${widget_id}`" :class="`col-${row.length}`">
                 <dynamic-widget :widget-id="widget_id"
                                 :options="options"
                                 :period="period"
@@ -66,35 +66,37 @@ export default {
 
     .row {
         @apply flex;
-        > * {
+        column-gap: 1rem;
+    }
+    [class^='col-'] {
+        width: 100%;
+    }
+    .col-1 {
+        width: 100%;
+    }
+    .col-2 {
+        width: 50%;
+    }
+    .col-3 {
+        min-width: 19.5625rem;
+        width: 33.33%;
+    }
+
+    @screen tablet {
+        row-gap: 1rem;
+        min-width: 100%;
+        max-width: 100%;
+        .row {
+            @apply flex-col;
+            row-gap: 1rem;
+        }
+        [class^='col-'] {
             width: 100%;
         }
-        &.col-1 {
+        .col-2, .col-3 {
             > * {
                 width: 100%;
-            }
-        }
-        &.col-2 {
-            column-gap: 1rem;
-            > * {
-                width: 50%;
-            }
-        }
-        &.col-3 {
-            column-gap: 1rem;
-            > * {
-                width: 33.33%;
-            }
-        }
-
-        @screen tablet {
-            &.col-2, &.col-3 {
-                @apply flex-col;
-                row-gap: 1rem;
-                > * {
-                    width: 100%;
-                    min-width: 100%;
-                }
+                min-width: 100%;
             }
         }
     }

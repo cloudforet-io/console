@@ -172,12 +172,11 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.cost-dashboard-page {
-    max-width: 120rem;
-}
 .top-wrapper {
     @apply flex flex-wrap;
     row-gap: 1rem;
+    min-width: 62.25rem;
+    max-width: 117rem;
     .p-page-title {
         width: auto;
         margin-bottom: 0;
@@ -225,6 +224,13 @@ export default {
             content: ' ';
             margin-top: calc(-1.25rem / 2);
         }
+    }
+}
+
+@screen tablet {
+    .top-wrapper {
+        min-width: 100%;
+        max-width: 100%;
     }
 }
 

@@ -39,7 +39,10 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.cost-management-page {
+.cost-management-page::v-deep {
     @apply flex;
+    .page-contents {
+        overflow-x: auto;
+    }
 }
 </style>

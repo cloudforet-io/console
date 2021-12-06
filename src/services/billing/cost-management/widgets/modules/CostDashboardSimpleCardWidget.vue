@@ -98,7 +98,8 @@ export default {
 
 <style lang="postcss" scoped>
 .card-widget-layout {
-    min-width: 22rem;
+    min-height: 12.8125rem;
+    width: 100%;
     height: 100%;
     padding: 1rem 1.25rem;
     .title-wrapper {
@@ -139,10 +140,6 @@ export default {
         height: 100%;
         font-size: 0.875rem;
         line-height: 160%;
-    }
-
-    @screen mobile {
-        min-width: 100%;
     }
 }
 </style>
