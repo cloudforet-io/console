@@ -598,6 +598,12 @@ export default {
             .field-group-wrapper {
                 padding-top: 1.125rem;
 
+                .p-radio {
+                    display: inline-block;
+                    margin-bottom: 0.25rem;
+                    margin-right: 0.25rem;
+                }
+
                 .label-input-wrapper {
                     display: flex;
                     gap: 0.5rem;
