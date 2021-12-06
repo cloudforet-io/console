@@ -16,7 +16,7 @@
                 <cost-dashboard-more-menu :dashboard-id="dashboardId" />
             </div>
             <div class="right-part">
-                <cost-dashboard-period-select-dropdown />
+                <cost-dashboard-period-select-dropdown @update="handleUpdatePeriod" />
                 <currency-select-dropdown />
                 <div class="left-divider download-pdf">
                     <p-icon-button name="ic_download" style-type="gray-border" size="sm" />
@@ -27,7 +27,7 @@
                 <!--                    </p-icon-text-button>-->
                 <!--                </div>-->
             </div>
-            <cost-dashboard-filter />
+            <cost-dashboard-filter :default-filter="dashboard.default_filter" />
         </div>
         <dashboard-layouts :layout="layout"
                            :period="period"
@@ -60,6 +60,7 @@ import CostDashboardFilter from '@/services/billing/cost-management/cost-dashboa
 import CostDashboardMoreMenu from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardMoreMenu.vue';
 import CostDashboardPeriodSelectDropdown
     from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardPeriodSelectDropdown.vue';
+import { DashboardInfo } from '@/services/billing/cost-management/cost-dashboard/type';
 
 const tempProjectsData = [
     {
@@ -79,7 +80,6 @@ const tempProjectsData = [
         name: 'project4',
     },
 ];
-
 
 export default {
     name: 'CostDashboardPage',
@@ -105,7 +105,7 @@ export default {
             selectedProjects: computed(() => tempProjectsData.map(d => ({
                 ...d,
             }))),
-            dashboard: null as any,
+            dashboard: {} as DashboardInfo,
             layout: [] as any[],
             period: {} as Period,
             filters: {},
@@ -126,34 +126,37 @@ export default {
             console.log('edit dashboard');
         };
 
+        const handleUpdatePeriod = (period: Period) => {
+            state.period = period;
+        };
+
         const getLayoutData = async (layoutId: string) => {
             try {
                 // noinspection TypeScriptCheckImport
                 const res = await import(`./dashboard-layouts/${layoutId}.json`);
-                return res.default;
+                state.layout = res.default;
             } catch (e) {
-                console.error(e);
-                return [];
+                ErrorHandler.handleError(e);
+                state.layout = [];
             }
         };
 
         const getDashboard = async (dashboardId: string) => {
             try {
-                const res = await SpaceConnector.client.costAnalysis.dashboard.get({
+                state.dashboard = await SpaceConnector.client.costAnalysis.dashboard.get({
                     dashboard_id: dashboardId,
                 });
-                return res;
             } catch (e) {
                 ErrorHandler.handleError(e);
-                return null;
+                state.dashboard = {} as DashboardInfo;
             }
         };
 
         watch(() => props.dashboardId, async (dashboardId) => {
             if (!dashboardId) return;
-            state.dashboard = await getDashboard(dashboardId);
+            await getDashboard(dashboardId);
             if (state.dashboard?.default_layout_id) {
-                state.layout = await getLayoutData(state.dashboard.default_layout_id);
+                await getLayoutData(state.dashboard.default_layout_id);
             }
         }, { immediate: true });
 
@@ -162,6 +165,7 @@ export default {
             ...toRefs(state),
             routeState,
             handleClickEditDashboard,
+            handleUpdatePeriod,
         };
     },
 };

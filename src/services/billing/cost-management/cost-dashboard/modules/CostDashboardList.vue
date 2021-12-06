@@ -68,6 +68,7 @@ import { SpaceRouter } from '@/router';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { DashboardItem } from '@/services/billing/cost-management/cost-dashboard/type';
 import { store } from '@/store';
+import ErrorHandler from '@/common/composables/error/errorHandler';
 
 interface ListItem {
     routeName?: string;
@@ -134,8 +135,13 @@ export default {
         };
 
         const listDashboard = async () => {
-            const { results } = await SpaceConnector.client.costAnalysis.dashboard.list();
-            state.items = results;
+            try {
+                const { results } = await SpaceConnector.client.costAnalysis.dashboard.list();
+                state.items = results;
+            } catch (e) {
+                ErrorHandler.handleError(e);
+                state.items = [];
+            }
         };
 
         (() => {

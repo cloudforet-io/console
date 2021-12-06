@@ -19,7 +19,6 @@
 </template>
 
 <script lang="ts">
-import { reactive, toRefs } from '@vue/composition-api';
 import { PButton, PIconButton } from '@spaceone/design-system';
 
 export default {
@@ -28,15 +27,17 @@ export default {
         PButton,
         PIconButton,
     },
+    props: {
+        defaultFilter: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
     setup() {
-        const state = reactive({
-            filters: {},
-        });
         const handleClickFilter = () => {
             console.log('click more!');
         };
         return {
-            ...toRefs(state),
             handleClickFilter,
         };
     },

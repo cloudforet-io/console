@@ -13,7 +13,7 @@ interface DefaultFilter {
     service_accounts: string[];
     provider: string[];
 }
-interface DashboardListResponse {
+export interface DashboardInfo {
     created_at: TimeStamp;
     updated_at: TimeStamp;
     custom_layouts: string[];
@@ -22,12 +22,12 @@ interface DashboardListResponse {
     default_layout_id: string;
     domain_id?: string;
     name: string;
-    scope: 'PRIVATE';
+    scope: DASHBOARD_SCOPE;
     tags: Tags;
     user_id: string;
 }
 
-export interface DashboardItem extends DashboardListResponse {
+export interface DashboardItem extends DashboardInfo {
     label: string;
     routeName: string;
 }

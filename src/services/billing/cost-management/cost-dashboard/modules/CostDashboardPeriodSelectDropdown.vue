@@ -1,6 +1,6 @@
 <template>
     <div class="date-filter">
-        <p-badge v-if="!isPeriodEmpty" style-type="gray200">
+        <p-badge style-type="gray200">
             <div>{{ period.start }} ~ {{ period.end }}</div>
         </p-badge>
         <p-select-dropdown :items="MonthMenuItems"
@@ -17,7 +17,7 @@
 
 <script lang="ts">
 import { computed, reactive, toRefs } from '@vue/composition-api';
-import { isEmpty, range } from 'lodash';
+import { range } from 'lodash';
 import { MenuItem } from '@spaceone/design-system/dist/src/inputs/context-menu/type';
 import dayjs from 'dayjs';
 import { Period } from '@/services/billing/cost-management/cost-analysis/store/type';
@@ -25,9 +25,9 @@ import { PBadge, PSelectDropdown } from '@spaceone/design-system';
 import CostDashboardCustomRangeModal
     from '@/services/billing/cost-management/cost-dashboard/modules/CostDashboardCustomRangeModal.vue';
 
+const yesterday = dayjs.utc().subtract(1, 'day');
 const getMonthMenuItem = () => {
     const monthData: MenuItem[] = [];
-    const yesterday = dayjs.utc().subtract(1, 'day');
     range(12).forEach((i) => {
         monthData.push({
             type: 'item',
@@ -45,11 +45,12 @@ export default {
         PSelectDropdown,
         PBadge,
     },
-
-    setup() {
+    setup(_, { emit }) {
         const state = reactive({
-            period: {} as Period,
-            isPeriodEmpty: computed(() => isEmpty(state.period)),
+            period: {
+                start: yesterday.startOf('month').format('YYYY-MM-DD'),
+                end: yesterday.endOf('month').format('YYYY-MM-DD'),
+            },
             MonthMenuItems: computed<MenuItem[]>(() => ([
                 ...getMonthMenuItem().reverse(),
                 {
@@ -69,6 +70,7 @@ export default {
             const _start = dayjs(start).startOf('month').format('YYYY-MM-DD');
             const _end = dayjs(end).endOf('month').format('YYYY-MM-DD');
             state.period = { start: _start, end: _end };
+            emit('update', state.period);
         };
         const handleSelectMonthMenuItem = (monthMenuItem) => {
             state.selectedMonthMenuItem = monthMenuItem;
@@ -81,7 +83,11 @@ export default {
             state.customRangeModalVisible = false;
         };
 
-        getMonthMenuItem();
+        const initPeriod = () => {
+            emit('update', state.period);
+        };
+
+        initPeriod();
 
         return {
             ...toRefs(state),
