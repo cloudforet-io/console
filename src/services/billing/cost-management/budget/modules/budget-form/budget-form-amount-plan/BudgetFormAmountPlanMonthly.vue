@@ -5,7 +5,7 @@
                 <p>
                     <p-label>{{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.MONTHLY_PLAN') }}</p-label> ($USD)
                 </p>
-                <budget-form-amount-plan-last-months-cost :data="lastMonthsCost" />
+                <budget-form-amount-plan-last-months-cost />
             </div>
             <p-button style-type="gray-border" :outline="true">
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.AMOUNT_PLAN.AUTO_FILL') }}
@@ -33,6 +33,12 @@ import BudgetFormAmountPlanMonthInput
     from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanMonthInput.vue';
 import BudgetFormAmountPlanLastMonthsCost
     from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
+import { Period } from '@/services/billing/cost-management/type';
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
+
+interface Props {
+    period: Period;
+}
 
 export default {
     name: 'BudgetFormAmountPlanMonthly',
@@ -43,15 +49,29 @@ export default {
         PButton,
         PDivider,
     },
-    setup() {
+    props: {
+        period: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props: Props) {
+        const { i18nDayjs } = useI18nDayjs();
+
         const state = reactive({
-            months: ['January 2021', 'February 2021', 'March 2021', 'April 2021', 'May 2021', 'June 2021', 'July 2021',
-                'August 2021', 'September 2021', 'October 2021', 'November 2021', 'December 2021'],
-            lastMonthsCost: computed(() => [
-                { month: 'January 2021', cost: 408.88 },
-                { month: 'February 2021', cost: 408.88 },
-                { month: 'March 2021', cost: 408.88 },
-            ]),
+            months: computed<string[]>(() => {
+                const { start, end } = props.period;
+                if (!start || !end) return [];
+
+                const months: string[] = [];
+                let month = i18nDayjs.value(start as string);
+                const monthEnd = i18nDayjs.value(end as string);
+                while (month.isSameOrBefore(monthEnd, 'month')) {
+                    months.push(i18nDayjs.value(month).format('MMMM YYYY'));
+                    month = month.add(1, 'month');
+                }
+                return months;
+            }),
         });
 
         return {

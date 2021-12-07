@@ -8,14 +8,22 @@
 </template>
 
 <script lang="ts">
+import { reactive, toRefs } from '@vue/composition-api';
+
 export default {
     name: 'BudgetFormAmountPlanLastMonthsCost',
-    props: {
-        data: {
-            type: Array,
-            default: () => [],
-        },
+    setup() {
+        const state = reactive({
+            data: [
+                { month: 'January 2021', cost: 408.88 },
+                { month: 'February 2021', cost: 408.88 },
+                { month: 'March 2021', cost: 408.88 },
+            ],
+        });
+
+        return toRefs(state);
     },
+
 };
 </script>
 

@@ -29,12 +29,14 @@
 
 <script lang="ts">
 import {
-    reactive, toRefs, watchEffect,
+    computed,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PDatetimePicker, PFieldGroup } from '@spaceone/design-system';
 import { useFormValidator } from '@/common/composables/form-validator';
 import dayjs from 'dayjs';
+import { Period } from '@/services/billing/cost-management/type';
 
 export default {
     name: 'BudgetFormAmountPlanPeriodSelect',
@@ -77,12 +79,13 @@ export default {
             }
         };
 
-        const state = reactive({});
+        const state = reactive({
+            period: computed<Period>(() => ({ start: startDates.value[0], end: endDates.value[0] })),
+        });
 
-        watchEffect(() => {
+        watch(() => state.period, (period) => {
             if (!isAllValid.value) return;
 
-            const period = { start: startDates.value[0], end: endDates.value[0] };
             emit('update', period);
         });
 

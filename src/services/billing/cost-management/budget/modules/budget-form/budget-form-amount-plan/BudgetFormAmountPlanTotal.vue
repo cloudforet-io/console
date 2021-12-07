@@ -10,13 +10,12 @@
                 </template>
             </p-text-input>
         </p-field-group>
-        <budget-form-amount-plan-last-months-cost :data="lastMonthsCost" />
+        <budget-form-amount-plan-last-months-cost />
     </div>
 </template>
 
 <script lang="ts">
 import {
-    computed,
     reactive, toRefs,
 } from '@vue/composition-api';
 
@@ -36,11 +35,6 @@ export default {
         const state = reactive({
             defaultAmount: 1000,
             amount: undefined,
-            lastMonthsCost: computed(() => [
-                { month: 'January 2021', cost: 408.88 },
-                { month: 'February 2021', cost: 408.88 },
-                { month: 'March 2021', cost: 408.88 },
-            ]),
         });
 
         return {
