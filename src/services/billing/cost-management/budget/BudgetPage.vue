@@ -2,7 +2,18 @@
     <div class="budget-page">
         <p-breadcrumbs :routes="routeState.route" />
         <p-page-title :title="$t('BILLING.COST_MANAGEMENT.MAIN.BUDGET')">
-            <template #extra />
+            <template #extra>
+                <p-select-dropdown
+                    class="create-budget-box"
+                    use-fixed-menu-style
+                    :items="createButtonItemList"
+                    :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET')"
+                    type="outline-button"
+                    @select="handleCreateBudgetSelect"
+                >
+                    <template class="input-text" />
+                </p-select-dropdown>
+            </template>
         </p-page-title>
         <budget-toolbox />
         <budget-stat />
@@ -14,7 +25,7 @@
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PBreadcrumbs, PPageTitle,
+    PBreadcrumbs, PPageTitle, PSelectDropdown,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -22,6 +33,8 @@ import { i18n } from '@/translations';
 import BudgetToolbox from '@/services/billing/cost-management/budget/modules/budget-toolbox/BudgetToolbox.vue';
 import BudgetStat from '@/services/billing/cost-management/budget/modules/budget-stat/BudgetStat.vue';
 import BudgetList from '@/services/billing/cost-management/budget/modules/budget-list/BudgetList.vue';
+import { BILLING_ROUTE } from '@/services/billing/routes';
+import { SpaceRouter } from '@/router';
 
 export default {
     name: 'BudgetPage',
@@ -31,6 +44,7 @@ export default {
         BudgetToolbox,
         PBreadcrumbs,
         PPageTitle,
+        PSelectDropdown,
     },
     setup() {
         const routeState = reactive({
@@ -42,12 +56,35 @@ export default {
         });
 
         const state = reactive({
+            createButtonItemList: [
+                {
+                    label: 'Single Budget',
+                    name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.CREATE._NAME,
+                },
+            ],
         });
+
+        const handleCreateBudgetSelect = (name) => {
+            SpaceRouter.router.push({ name });
+        };
 
         return {
             ...toRefs(state),
             routeState,
+            handleCreateBudgetSelect,
         };
     },
 };
 </script>
+<style scoped lang="postcss">
+.budget-page {
+    .create-budget-box {
+        width: 9rem;
+    }
+}
+.p-select-dropdown::v-deep {
+    .placeholder {
+        @apply font-bold;
+    }
+}
+</style>
