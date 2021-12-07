@@ -45,6 +45,18 @@ export const commaFormatter = (num) => {
     return num;
 };
 
+/**
+ * @param value
+ * @description get number or undefined from string.
+ * @example
+ * getNumberFromString('1,000,000') => 1000000
+ * getNumberFromString('$1,000,000') => 1000000
+ */
+export const getNumberFromString = (value: string): number|undefined => {
+    const str = value.match(/\d+/g)?.join('');
+    return str ? parseFloat(str) : undefined;
+};
+
 /** @function
  * @name isNotEmpty
  * @param value
