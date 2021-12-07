@@ -32,15 +32,17 @@
             >
                 <p-radio v-for="(costTypeLabel, costTypeKey) in costTypeItems" :key="costTypeKey"
                          :selected="selectedCostType" :value="costTypeKey"
-                         :invalid="costTypeKey === selectedCostType && invalidState.selectedCostType"
                          @change="setForm('selectedCostType', $event)"
                 >
                     {{ costTypeLabel }}
                 </p-radio>
                 <p-search-dropdown v-if="selectedCostType !== 'all'"
-                                   :handler="resourceMenuHandler"
+                                   :visible-menu.sync="visibleResourceMenu"
+                                   :menu="resourceMenuItems"
+                                   :handler="resourceMenuItems ? undefined : resourceMenuHandler"
                                    :loading="resourceMenuLoading"
                                    type="checkbox"
+                                   show-selected-list
                                    :invalid="invalidState.selectedCostType"
                                    :selected="selectedResources"
                                    @update:selected="setForm('selectedResources', $event)"
@@ -74,18 +76,16 @@ import ProjectSelectDropdown from '@/common/modules/project/ProjectSelectDropdow
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 import { BudgetCostType, BudgetData, CostType } from '@/services/billing/cost-management/budget/type';
+import { store } from '@/store';
+import { ResourceMap } from '@/store/modules/resource/type';
 
 
 type BudgetCostTypes = Record<BudgetCostType, TranslateResult>
 type BudgetInfo = Pick<BudgetData, 'name'|'cost_types'|'project_group_id'|'project_id'>
-
-
-const COST_TYPE_TO_RESOURCE_TYPE: Record<CostType, string> = {
-    provider: 'identity.Provider',
-    region_code: 'inventory.Region',
-    account: 'identity.ServiceAccount',
-    product: 'inventory.CloudServiceType',
-};
+interface DistinctResult {
+    results?: {name: string; key: string}[];
+    total_count?: number;
+}
 
 const getBudgetInfo = (_name: string, targets: string[], costType: BudgetCostType, resources: string[]) => {
     const target = targets[0];
@@ -102,6 +102,10 @@ const getBudgetInfo = (_name: string, targets: string[], costType: BudgetCostTyp
 
     return budgetInfo;
 };
+
+const getSearchDropdownItems = (resourceItems: ResourceMap): SearchDropdownMenuItem[] => Object.keys(resourceItems).map(k => ({
+    name: k, label: resourceItems[k].label,
+}));
 
 export default {
     name: 'BudgetFormBaseInfo',
@@ -148,15 +152,21 @@ export default {
                 all: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ALL'),
                 provider: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PROVIDER'),
                 region_code: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.REGION'),
-                account: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ACCOUNT'),
+                service_account_id: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.ACCOUNT'),
                 product: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.FORM.BASE_INFO.PRODUCT'),
             })),
             resourceMenuLoading: false,
+            visibleResourceMenu: false,
+            resourceMenuItems: computed<SearchDropdownMenuItem[]|undefined>(() => {
+                if (selectedCostType.value === 'provider') return getSearchDropdownItems(store.state.resource.provider.items);
+                if (selectedCostType.value === 'region_code') return getSearchDropdownItems(store.state.resource.region.items);
+                if (selectedCostType.value === 'service_account_id') return getSearchDropdownItems(store.state.resource.serviceAccount.items);
+                return undefined;
+            }),
         });
 
-
         let resourceToken: CancelTokenSource | undefined;
-        const getResources = async (inputText: string, resourceType): Promise<{name: string; key: string}[]|void> => {
+        const getResources = async (inputText: string, distinctKey): Promise<DistinctResult> => {
             if (resourceToken) {
                 resourceToken.cancel('Next request has been called.');
                 resourceToken = undefined;
@@ -165,8 +175,9 @@ export default {
             resourceToken = axios.CancelToken.source();
 
             try {
-                const { results } = await SpaceConnector.client.addOns.autocomplete.resource({
-                    resource_type: resourceType,
+                const res = await SpaceConnector.client.addOns.autocomplete.distinct({
+                    resource_type: 'cost_analysis.Cost',
+                    distinct_key: distinctKey,
                     search: inputText,
                     options: {
                         limit: 10,
@@ -176,28 +187,31 @@ export default {
                 });
                 resourceToken = undefined;
 
-                return results;
+                return res;
             } catch (e) {
                 if (!axios.isCancel(e.axiosError)) {
                     ErrorHandler.handleError(e);
                 }
 
-                return undefined;
+                return {};
             }
         };
 
         const resourceMenuHandler: AutocompleteHandler = async (inputText: string) => {
-            const resourceType = COST_TYPE_TO_RESOURCE_TYPE[selectedCostType.value];
-            if (!resourceType) return { results: [] };
+            if (state.resourceMenuItems) return { results: [] };
 
             state.resourceMenuLoading = true;
-            const results = await getResources(inputText, resourceType);
+            const { results, total_count } = await getResources(inputText, selectedCostType.value);
             state.resourceMenuLoading = false;
 
-            return { results: results ? results.map(d => ({ name: d.key, label: d.name })) : [] };
+            return {
+                results: results ? results.map(d => ({ name: d.key, label: d.name })) : [],
+                totalCount: total_count,
+            };
         };
 
         watch(() => selectedCostType.value, () => {
+            state.visibleResourceMenu = false;
             setForm('selectedResources', []);
         });
 

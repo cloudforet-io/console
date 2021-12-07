@@ -39,7 +39,7 @@
                                        @change="changeSelectState(node, path, ...arguments)"
                             />
                             <p-i :name="node.data.item_type === 'PROJECT_GROUP' ? 'ic_tree_project-group' : 'ic_tree_project'"
-                                 width="1rem" height="1rem" color="inherit transparent"
+                                 width="1rem" height="1rem"
                             />
                         </span>
                     </template>

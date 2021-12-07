@@ -1,7 +1,5 @@
 import { Tags, TimeStamp } from '@/models';
 
-export type BudgetCostType = 'all'| 'provider'| 'region_code'| 'account'| 'product'
-
 interface BudgetPlannedLimit {
 	date: string;
 	limit: number;
@@ -12,7 +10,9 @@ interface BudgetMonthlyCost {
 	usd_cost: number|string;
 }
 
-export type CostType = 'provider' | 'region_code' | 'account' | 'product'
+export type CostType = 'provider' | 'region_code' | 'service_account_id' | 'product'
+
+export type BudgetCostType = 'all'| CostType
 
 export type BudgetTimeUnit = 'MONTHLY' | 'YEARLY' | 'TOTAL'
 
