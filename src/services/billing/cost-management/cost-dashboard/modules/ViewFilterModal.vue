@@ -9,17 +9,19 @@
         @confirm="handleClickConfirm"
     >
         <template #body>
-            <div v-for="filterName in DASHBOARD_FILTER_NAMES" :key="`filter-wrapper-${filterName}`">
+            <div v-for="filterName in DASHBOARD_FILTER_NAMES" :key="`filter-wrapper-${filterName}`" class="filter-wrapper">
                 <p class="title">
                     {{ FILTER_ITEM_MAP[filterName].label }} ({{ count[filterName] }})
                 </p>
                 <p-empty v-if="!count[filterName]">
                     No selected filters.
                 </p-empty>
-                <div v-else>
-                    <p-badge v-for="(item, idx) in filterItemsMap[filterName]" :key="`filter-${item.name}-${idx}`" style-type="gray200">
+                <div v-else class="filters">
+                    <p-tag v-for="(item, idx) in filterItemsMap[filterName]" :key="`filter-${item.name}-${idx}`"
+                           :deletable="false"
+                    >
                         {{ item.label }}
-                    </p-badge>
+                    </p-tag>
                 </div>
             </div>
         </template>
@@ -33,7 +35,7 @@
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PButtonModal, PEmpty, PBadge,
+    PButtonModal, PEmpty, PTag,
 } from '@spaceone/design-system';
 
 import { FILTER, FILTER_ITEM_MAP } from '@/services/billing/cost-management/lib/config';
@@ -55,7 +57,7 @@ export default {
     components: {
         PButtonModal,
         PEmpty,
-        PBadge,
+        PTag,
     },
     props: {
         visible: {
@@ -114,6 +116,20 @@ export default {
 
 <style lang="postcss" scoped>
 .view-filter-modal::v-deep {
+    .filter-wrapper {
+        margin-bottom: 1.5rem;
+        .title {
+            margin-bottom: 1rem;
+        }
+        .p-empty {
+            @apply justify-start ;
+            font-size: 0.875rem;
+        }
+        .filters {
+            @apply flex flex-wrap;
+            gap: 0.5rem;
+        }
+    }
     .modal-footer {
         .cancel-button {
             display: none;
