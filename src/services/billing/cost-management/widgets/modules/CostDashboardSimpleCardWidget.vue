@@ -102,10 +102,11 @@ export default {
     width: 100%;
     height: 100%;
     padding: 1rem 1.25rem;
+    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.06);
     .title-wrapper {
         @apply flex text-gray-800;
         justify-content: space-between;
-        margin-bottom: 0.75rem;
+        margin-bottom: 0.25rem;
         font-size: 1rem;
         line-height: 160%;
     }

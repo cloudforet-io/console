@@ -198,12 +198,6 @@ export default {
     .right-part {
         @apply flex items-center;
         margin-left: auto;
-        .p-badge {
-            margin-right: 0.5rem;
-        }
-        .p-select-dropdown {
-            background-color: transparent;
-        }
         .download-pdf::v-deep {
             margin-left: 0;
             .p-button {
@@ -212,7 +206,7 @@ export default {
         }
     }
 
-    .left-divider {
+    &::v-deep .left-divider {
         @apply relative;
         padding-left: 0.5rem;
         margin-left: 0.5rem;
@@ -248,10 +242,6 @@ export default {
 
     .right-part {
         @apply flex flex-wrap justify-end;
-        .date-filter {
-            @apply flex flex-wrap justify-end items-center;
-            width: 100%;
-        }
     }
 }
 </style>

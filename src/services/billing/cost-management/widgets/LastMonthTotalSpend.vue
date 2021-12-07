@@ -187,7 +187,8 @@ export default {
 <style lang="postcss" scoped>
 .last-month-total-spend {
     .chart {
-        height: 8rem;
+        height: 5.125rem;
+        margin-bottom: -1rem;
     }
 }
 </style>

@@ -131,7 +131,7 @@ export default {
 
 .progress-bar-label {
     @apply flex;
-    margin-top: 1rem;
+    margin-top: 0.25rem;
     justify-content: space-between;
 
     .usage-cost {

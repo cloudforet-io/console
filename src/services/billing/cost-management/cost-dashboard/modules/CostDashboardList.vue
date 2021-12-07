@@ -6,9 +6,9 @@
         <p-divider class="sidebar-divider" />
         <p class="sidebar-title">
             {{ $t('BILLING.COST_MANAGEMENT.MAIN.DASHBOARD') }}
-            <p-icon-button name="ic_plus" class="add-button"
-                           style-type="transparent" size="sm"
-            />
+            <!--            <p-icon-button name="ic_plus" class="add-button"-->
+            <!--                           style-type="transparent" size="sm"-->
+            <!--            />-->
         </p>
         <p-divider class="sidebar-divider" />
         <ul class="dashboard-list">
@@ -59,7 +59,7 @@ import {
     computed, getCurrentInstance, reactive, toRefs,
 } from '@vue/composition-api';
 import {
-    PDivider, PI, PSelectDropdown, PIconButton,
+    PDivider, PI, PSelectDropdown,
 } from '@spaceone/design-system';
 import SidebarTitle from '@/common/components/titles/sidebar-title/SidebarTitle.vue';
 import { i18n } from '@/translations';
@@ -82,7 +82,7 @@ export default {
         PDivider,
         PI,
         PSelectDropdown,
-        PIconButton,
+        // PIconButton,
     },
     setup() {
         const vm = getCurrentInstance() as ComponentRenderProxy;

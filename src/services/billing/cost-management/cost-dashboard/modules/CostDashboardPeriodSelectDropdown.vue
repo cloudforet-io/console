@@ -97,3 +97,18 @@ export default {
     },
 };
 </script>
+<style lang="postcss" scoped>
+.p-badge {
+    margin-right: 0.5rem;
+}
+.p-select-dropdown {
+    background-color: transparent;
+}
+
+@screen mobile {
+    .date-filter {
+        @apply flex flex-wrap justify-end items-center;
+        width: 100%;
+    }
+}
+</style>

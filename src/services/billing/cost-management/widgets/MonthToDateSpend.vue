@@ -9,8 +9,8 @@
         :no-data="!currentMonthCost || !lastMonthCost"
     >
         <template #default>
-            <div class="cost-trend-wrapper">
-                <span class="increase-rate" :class="[{safe: increaseRate < 0}, {alert: increaseRate > 0}]">
+            <div class="cost-trend-wrapper flex">
+                <span class="increase increase-rate" :class="[{safe: increaseRate < 0}, {alert: increaseRate > 0}]">
                     <p-i v-if="increaseRate < 0" name="ic_arrow-down" width="1rem"
                          height="1rem"
                     />
@@ -19,7 +19,7 @@
                     />
                     {{ increaseRate }}%
                 </span>
-                <span class="increase-amount">
+                <span class="increase increase-amount">
                     <p-i v-if="increaseCost < 0" name="ic_arrow-down" width="1rem"
                          height="1rem"
                     />
@@ -137,30 +137,33 @@ export default {
 </script>
 
 <style lang="postcss" scoped>
-.increase-rate {
-    margin-left: 0.125rem;
-    font-size: 1.125rem;
-    line-height: 155%;
-    &.safe {
-        @apply text-safe;
-    }
-    &.alert {
-        @apply text-alert;
-    }
-}
 .cost-trend-wrapper {
     @apply flex;
-    .increase-rate {
-        flex-basis: 50%;
-    }
-    .increase-amount {
-        @apply text-gray-800 font-bold;
+    .increase {
+        @apply flex items-center;
         font-size: 1.125rem;
         line-height: 155%;
-        .unit {
-            @apply font-normal;
-            font-size: 1rem;
-            line-height: 160%;
+        .p-i-icon {
+            @apply relative;
+            top: -0.1rem;
+        }
+        &-rate {
+            flex-basis: 50%;
+            margin-left: 0.125rem;
+            &.safe {
+                @apply text-safe;
+            }
+            &.alert {
+                @apply text-alert;
+            }
+        }
+        &-amount {
+            @apply text-gray-800 font-bold;
+            .unit {
+                @apply font-normal;
+                font-size: 1rem;
+                line-height: 160%;
+            }
         }
     }
 }
@@ -169,5 +172,4 @@ export default {
     font-size: 0.875rem;
     line-height: 150%;
 }
-
 </style>
