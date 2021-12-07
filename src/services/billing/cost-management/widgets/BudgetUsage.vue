@@ -85,8 +85,8 @@ export default {
                     include_project_info: false,
                     filter: [
                     ],
-                    start: props.period.start,
-                    end: props.period.end,
+                    start: props.period.start?.substr(0, 7),
+                    end: props.period.end?.substr(0, 7),
                 });
 
                 state.usageCost = results[0]?.usd_cost || 0;

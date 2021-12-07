@@ -19,6 +19,9 @@
                         />
                         {{ value }}
                     </template>
+                    <template v-else-if="typeof value === 'string'">
+                        {{ value }}
+                    </template>
                     <template v-else>
                         {{ currencyMoneyFormatter(value, currency, currencyRates) }}
                     </template>
@@ -32,7 +35,7 @@
                 </div>
             </template>
         </p-data-table>
-        <div class="table-pagination-wrapper">
+        <div v-if="paginationVisible" class="table-pagination-wrapper">
             <p-text-pagination :all-page="allPage"
                                :this-page.sync="proxyThisPage"
             />
@@ -115,6 +118,10 @@ export default {
         //     type: Boolean,
         //     default: false,
         // },
+        paginationVisible: {
+            type: Boolean,
+            default: true,
+        },
     },
     setup(props, { emit }) {
         const state = reactive({
