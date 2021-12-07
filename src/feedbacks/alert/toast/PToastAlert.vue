@@ -84,6 +84,7 @@ export default {
 <style lang="postcss">
 .vue-notification-group {
     overflow: unset;
+    z-index: 10000;
 }
 .vue-notification-wrapper {
     margin: 1rem 0;

@@ -61,6 +61,7 @@ export default {
 .vue-notification-group {
     overflow: unset;
     margin: 0 2rem;
+    z-index: 10000;
 }
 .vue-notification-wrapper {
     margin: 1rem 0;
