@@ -26,7 +26,7 @@ function useValueValidator<T = any>(
     const validatorResult = computed<ValidatorResult>(() => {
         if (!validationStarted.value) return undefined;
         if (validator) return validator(valueRef.value);
-        return undefined;
+        return true;
     });
 
     const isInvalid = computed<ValidateResult>(() => {
@@ -44,11 +44,22 @@ function useValueValidator<T = any>(
         return result;
     });
 
+    const reset = () => {
+        valueRef.value = value as UnwrapRef<T>;
+        validationStarted.value = immediate;
+    };
+
+    const resetValidation = () => {
+        validationStarted.value = immediate;
+    };
+
     return {
         value: computed<UnwrapRef<T>>(() => valueRef.value),
         isInvalid,
         invalidText,
         setValue,
+        reset,
+        resetValidation,
     };
 }
 
@@ -56,6 +67,13 @@ function useValueValidator<T = any>(
 /**
  * @param _forms: set of form input data. object.
  * @param validators: set of validators. object.
+ * properties are keys of _forms parameter, and values are validators.
+ * if validator is not given to a property, it's validation result is always true.
+ * [Validator result]
+ * validators can return boolean, string or undefined.
+ * when it returns boolean, true means valid, and false means invalid.
+ * when it returns string, empty string means valid, and others mean invalid.
+ * when it returns undefined, it means nothing. invalid state is just undefined.
  * @param immediate:
  *  whether to start validation immediately or not. boolean.
  *  if it's false, it starts validation when value is updated at least once.
@@ -132,6 +150,10 @@ type invalidState<T> = {
     [K in keyof T]: ComputedRef<ValidateResult>
 }
 
+type Resets<T> = {
+    [K in keyof T]: () => void
+}
+
 export function useFormValidator<T extends Record<string, any> = any>(
     _forms: T,
     validators: Partial<Validators<T>>,
@@ -143,19 +165,33 @@ export function useFormValidator<T extends Record<string, any> = any>(
     const valueSetters = {} as ValueSetters<T>;
     const invalidTexts = {} as InvalidTexts<T>;
     const invalidState = {} as invalidState<T>;
+    const resets = {} as Resets<T>;
+    const resetValidationMap = {} as Resets<T>;
 
 
     formKeys.forEach((key) => {
         const validator = validators[key];
 
         const {
-            value, setValue, isInvalid, invalidText,
+            value, setValue, isInvalid, invalidText, reset, resetValidation,
         } = useValueValidator(_forms[key], validator, immediate);
 
         forms[key] = value;
         valueSetters[key] = setValue;
         invalidTexts[key] = invalidText;
         invalidState[key] = isInvalid;
+        resets[key] = reset;
+        resetValidationMap[key] = resetValidation;
+    });
+
+    const isAllValid = computed<ValidateResult>(() => {
+        let result: ValidateResult;
+        Object.values(invalidState).some((isInvalid) => {
+            if (result === undefined && isInvalid.value === undefined) result = undefined;
+            else result = !isInvalid.value;
+            return result === false;
+        });
+        return result;
     });
 
     const setForm = (key: keyof T, value: T[keyof T]) => {
@@ -163,14 +199,25 @@ export function useFormValidator<T extends Record<string, any> = any>(
         if (setter) setter(value);
     };
 
-    const isAllValid = computed(() => Object.values(invalidState).every(state => !state.value));
+    const resetAll = () => {
+        formKeys.forEach((key) => {
+            resets[key]();
+        });
+    };
 
+    const resetValidations = () => {
+        formKeys.forEach((key) => {
+            resetValidationMap[key]();
+        });
+    };
 
     return {
         forms,
         invalidState,
         invalidTexts,
-        setForm,
         isAllValid,
+        setForm,
+        resetAll,
+        resetValidations,
     };
 }
