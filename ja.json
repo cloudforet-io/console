@@ -342,6 +342,8 @@
 					"COST_TYPE": "",
 					"CREATE_BUDGET": "",
 					"MONTHLY": "",
+					"PERIOD": "",
+					"THIS_MONTH": "",
 					"TOTAL": "",
 					"TOTAL_BUDGET": ""
 				},

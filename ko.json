@@ -342,7 +342,9 @@
 					"COST_TYPE": "",
 					"CREATE_BUDGET": "",
 					"MONTHLY": "",
-					"TOTAL": "",
+					"PERIOD": "기\u001b간",
+					"THIS_MONTH": "이번 달",
+					"TOTAL": "전체",
 					"TOTAL_BUDGET": ""
 				},
 				"STAT": {
