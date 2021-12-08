@@ -30,6 +30,32 @@ export const getConvertedFilter = (filters: CostQueryFilters): QueryStoreFilter[
     return result;
 };
 
+export const getConvertedBudgetFilter = (filters: CostQueryFilters): QueryStoreFilter[] => {
+    const result: QueryStoreFilter[] = [];
+    Object.entries(filters).forEach(([key, data]) => {
+        if (key === 'project_id' && data?.length) {
+            result.push({
+                k: key,
+                v: data,
+                o: '=',
+            });
+        } else {
+            const values = [] as Array<string|null>;
+            if (data?.length) {
+                data.forEach((value) => {
+                    values.push(value);
+                });
+                result.push({
+                    k: `cost_types.${key}`,
+                    v: [null, ...values],
+                    o: '=',
+                });
+            }
+        }
+    });
+    return result;
+};
+
 export const getConvertedPeriod = (granularity: GRANULARITY, chartType: CHART_TYPE, period: Period): Period => {
     let start = period.start;
     if (chartType === CHART_TYPE.DONUT && granularity !== GRANULARITY.ACCUMULATED) {

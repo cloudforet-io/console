@@ -49,7 +49,9 @@ import CostDashboardCardWidgetLayout
 
 import { QueryHelper } from '@spaceone/console-core-lib/query';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import {
+    getConvertedBudgetFilter,
+} from '@/services/billing/cost-management/cost-analysis/lib/helper';
 import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { BILLING_ROUTE } from '@/services/billing/routes';
@@ -123,11 +125,7 @@ export default {
         /* api */
         const budgetQueryHelper = new QueryHelper();
         const getBudgetUsageData = async (period, filters) => {
-            if (filters.project_id) {
-                budgetQueryHelper.setFilters(getConvertedFilter({ project_id: filters.project_id }));
-            } else {
-                budgetQueryHelper.setFilters([]);
-            }
+            budgetQueryHelper.setFilters(getConvertedBudgetFilter(filters));
             try {
                 state.loading = true;
                 const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze({

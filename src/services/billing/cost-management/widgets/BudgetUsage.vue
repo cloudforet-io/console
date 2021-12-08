@@ -41,7 +41,9 @@ import { CURRENCY } from '@/store/modules/display/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
 import dayjs from 'dayjs';
 import { QueryHelper } from '@spaceone/console-core-lib/query';
-import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import {
+    getConvertedBudgetFilter,
+} from '@/services/billing/cost-management/cost-analysis/lib/helper';
 
 export default {
     name: 'BudgetUsage',
@@ -84,9 +86,9 @@ export default {
             }),
         });
 
-        const costQueryHelper = new QueryHelper();
+        const budgetQueryHelper = new QueryHelper();
         const fetchData = async () => {
-            costQueryHelper.setFilters(getConvertedFilter(props.filters));
+            budgetQueryHelper.setFilters(getConvertedBudgetFilter(props.filters));
             try {
                 const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze({
                     include_budget_count: true,
@@ -95,7 +97,7 @@ export default {
                     ],
                     start: dayjs.utc(props.period?.start).format('YYYY-MM'),
                     end: dayjs.utc(props.period?.end).format('YYYY-MM'),
-                    ...costQueryHelper.apiQuery,
+                    ...budgetQueryHelper.apiQuery,
                 });
                 return results;
             } catch (e) {
