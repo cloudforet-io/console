@@ -53,8 +53,8 @@ export default {
             startDates: [] as string[],
             endDates: [] as string[],
         }, {
-            startDates: (value: string[]) => (value.length > 0 ? '' : 'Required'),
-            endDates: (value: string[]) => (value.length > 0 ? '' : 'Required'),
+            startDates: (value: string[]) => (value[0] ? '' : 'Required'),
+            endDates: (value: string[]) => (value[0] ? '' : 'Required'),
         });
 
         const handleUpdateSelectedDates = (target: 'startDates'|'endDates', value) => {
@@ -84,9 +84,7 @@ export default {
         });
 
         watch(() => state.period, (period) => {
-            if (!isAllValid.value) return;
-
-            emit('update', period);
+            emit('update', period, isAllValid.value);
         });
 
         return {

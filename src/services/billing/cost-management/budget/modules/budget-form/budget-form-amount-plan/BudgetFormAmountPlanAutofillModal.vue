@@ -77,7 +77,7 @@ export default {
             growth: undefined as number|undefined,
         }, {
             start: val => (typeof val === 'number' ? '' : 'Required'),
-        });
+        }, { growth: true });
 
         const state = reactive({
             _visible: props.visible,

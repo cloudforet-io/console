@@ -22,7 +22,7 @@
 <script lang="ts">
 import {
     computed,
-    reactive, toRefs,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
@@ -39,7 +39,7 @@ export default {
         PFieldGroup,
         PTextInput,
     },
-    setup() {
+    setup(props, { emit }) {
         const {
             forms: { amount },
             invalidTexts, invalidState, setForm,
@@ -54,6 +54,10 @@ export default {
                 get: () => commaFormatter(amount.value),
                 set: (val: string) => { setForm('amount', getNumberFromString(val)); },
             }),
+        });
+
+        watch(() => amount.value, (value) => {
+            emit('update', value, invalidState.amount.value);
         });
 
         return {

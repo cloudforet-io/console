@@ -51,7 +51,7 @@ interface Props {
     period: Period;
 }
 
-type MonthAmountInputMap = Record<string, MonthAmountInput>
+export type MonthAmountInputMap = Record<string, MonthAmountInput>
 
 export default {
     name: 'BudgetFormAmountPlanMonthly',

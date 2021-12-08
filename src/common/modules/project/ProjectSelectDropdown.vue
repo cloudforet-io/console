@@ -11,6 +11,7 @@
                            :disabled="readonly"
                            :placeholder="$t('COMMON.PROJECT_SELECT_DROPDOWN.PLACEHOLDER')"
                            :selected.sync="selectedProjectItems"
+                           @update:visibleMenu="handleUpdateVisibleMenu"
                            @delete-tag="handleDeleteTag"
         >
             <template #menu-no-data-format>
@@ -225,6 +226,9 @@ export default {
             if (state.root) state.root.changeSelectState(node, path, false);
         };
 
+        const handleUpdateVisibleMenu = (value) => {
+            if (!value) emit('close');
+        };
 
         return {
             ...toRefs(state),
@@ -237,6 +241,7 @@ export default {
             onChangeSelect,
             changeSelectState,
             handleDeleteTag,
+            handleUpdateVisibleMenu,
         };
     },
 };
