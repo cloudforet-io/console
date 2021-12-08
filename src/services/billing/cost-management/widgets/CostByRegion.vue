@@ -44,6 +44,9 @@ import { INVENTORY_ROUTE } from '@/services/inventory/routes';
 import CostDashboardDataTable from '@/services/billing/cost-management/widgets/modules/CostDashboardDataTable.vue';
 import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { CURRENCY } from '@/store/modules/display/config';
+import dayjs from 'dayjs';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 
 
 const categoryKey = 'title';
@@ -168,22 +171,33 @@ export default defineComponent<WidgetProps>({
             return _continentData;
         };
 
-        const getChartData = async () => {
+        const costQueryHelper = new QueryHelper();
+        const fetchData = async () => {
+            costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
-                state.loading = true;
-                tableState.loading = true;
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: false,
                     granularity: 'ACCUMULATED',
                     group_by: ['provider', 'region_code'],
-                    start: props.period.start,
-                    end: props.period.end,
+                    start: props.period?.start,
+                    end: dayjs.utc(props.period?.end).add(1, 'month').startOf('month').format('YYYY-MM-DD'),
                     page: {
                         limit: 15,
                     },
+                    ...costQueryHelper.apiQuery,
                 });
-                state.data = setPieChartData(results);
-                tableState.items = results.map(d => ({
+                return results;
+            } catch (e) {
+                return [];
+            }
+        };
+        const getChartData = async () => {
+            try {
+                state.loading = true;
+                tableState.loading = true;
+                const results = await fetchData();
+                state.data = setPieChartData(results); // pie chart data (continent, latitude, etc.)
+                tableState.items = results.map(d => ({ // table data (usd_cost, region, provider)
                     usd_cost: d.usd_cost,
                     provider: state.providers[d.provider]?.label,
                     region: state.regions[d.region_code]?.name || d.region_code,
@@ -202,7 +216,7 @@ export default defineComponent<WidgetProps>({
             }
         }, { immediate: false });
 
-        watch(() => props.period, () => {
+        watch([() => props.period, () => props.filters], () => {
             getChartData();
         });
 

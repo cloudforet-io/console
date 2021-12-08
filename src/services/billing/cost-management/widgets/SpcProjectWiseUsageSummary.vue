@@ -64,6 +64,9 @@ import { getPieChartDataAndLegends } from '@/services/billing/cost-management/wi
 import { store } from '@/store';
 import { PChartLoader, PSkeleton } from '@spaceone/design-system';
 import { gray } from '@/styles/colors';
+import dayjs from 'dayjs';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 
 
 const categoryKey = 'category';
@@ -117,7 +120,7 @@ export default defineComponent<WidgetProps>({
         const tableState = reactive({
             loading: false,
             items: [],
-            secondTableItems: computed(() => tableState.items.slice(10, 20)),
+            secondTableItems: computed(() => tableState.items.slice(11, 20)),
             fields: computed(() => [
                 { name: 'project_id', label: 'Project' },
                 { name: 'usd_cost', label: 'Accumulated Spent', textAlign: 'right' },
@@ -153,22 +156,37 @@ export default defineComponent<WidgetProps>({
             pieSeries.dataFields.category = categoryKey;
             pieSeries.labels.template.disabled = true;
             pieSeries.slices.template.propertyFields.fill = 'color';
+            return chart;
+        };
+
+        const costQueryHelper = new QueryHelper();
+        const fetchData = async () => {
+            costQueryHelper.setFilters(getConvertedFilter(props.filters));
+            try {
+                const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
+                    include_usage_quantity: false,
+                    granularity: GRANULARITY.ACCUMULATED,
+                    group_by: ['project_id'],
+                    start: props.period?.start,
+                    end: dayjs.utc(props.period?.end).add(1, 'month').startOf('month').format('YYYY-MM-DD'),
+                    page: {
+                        limit: 20,
+                    },
+                    ...costQueryHelper.apiQuery,
+                });
+                return results;
+            } catch (e) {
+                return [];
+            }
         };
 
         const getData = async () => {
             try {
                 state.loading = true;
                 tableState.loading = true;
-                const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
-                    include_usage_quantity: false,
-                    granularity: GRANULARITY.ACCUMULATED,
-                    group_by: ['project_id'],
-                    start: props.period.start,
-                    end: props.period.end,
-                    page: {
-                        limit: 20,
-                    },
-                });
+
+                const results = await fetchData();
+
                 const { chartData, legends } = getPieChartDataAndLegends(results, GROUP_BY.PROJECT);
                 state.chartData = chartData.map(d => ({
                     ...d,
@@ -195,7 +213,7 @@ export default defineComponent<WidgetProps>({
 
         watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
             if (!loading && chartContext) {
-                drawChart(chartContext);
+                state.chart = drawChart(chartContext);
             }
         }, { immediate: false });
 
@@ -203,7 +221,7 @@ export default defineComponent<WidgetProps>({
             if (state.chart) state.chart.dispose();
         });
 
-        watch(() => props.period, () => {
+        watch([() => props.period, () => props.filters], () => {
             getData();
         }, { immediate: true });
 

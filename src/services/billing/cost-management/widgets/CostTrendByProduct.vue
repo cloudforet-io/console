@@ -255,7 +255,7 @@ export default {
                     granularity: GRANULARITY.MONTHLY,
                     group_by: [GROUP_BY.PRODUCT],
                     start: state._period.start,
-                    end: state._period.end,
+                    end: dayjs.utc(state._period?.end).add(1, 'month').startOf('month').format('YYYY-MM-DD'),
                     pivot_type: 'CHART',
                     ...costQueryHelper.apiQuery,
                 });

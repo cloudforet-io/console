@@ -51,6 +51,8 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 
 
 export default {
@@ -75,6 +77,10 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        filters: {
+            type: Object,
+            default: () => ({}),
+        },
     },
     setup(props: WidgetProps) {
         const state = reactive({
@@ -88,7 +94,9 @@ export default {
             currencySymbol: computed(() => CURRENCY_SYMBOL[props.currency]),
         });
 
+        const costQueryHelper = new QueryHelper();
         const getData = async (start: Dayjs, end: Dayjs) => {
+            costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
                 state.loading = true;
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
@@ -96,6 +104,7 @@ export default {
                     granularity: GRANULARITY.ACCUMULATED,
                     start,
                     end,
+                    ...costQueryHelper.apiQuery,
                 });
                 return results[0]?.usd_cost;
             } catch (e) {
@@ -122,7 +131,7 @@ export default {
             await Promise.allSettled([getCurrentMonthChartData(), getLastMonthChartData()]);
         };
 
-        watch(() => props.period, async (after) => {
+        watch([() => props.period, () => props.filters], async (after) => {
             if (after) await getChartData();
         });
 

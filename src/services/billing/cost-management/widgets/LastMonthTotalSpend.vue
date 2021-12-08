@@ -33,6 +33,8 @@ import { CURRENCY, CURRENCY_SYMBOL } from '@/store/modules/display/config';
 import { WidgetProps, XYChartData } from '@/services/billing/cost-management/widgets/type';
 import { getXYChartData } from '@/services/billing/cost-management/widgets/lib/widget-data-helper';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 
 
 const categoryKey = 'date';
@@ -57,6 +59,14 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        period: {
+            type: Object,
+            default: () => ({}),
+        },
+        filters: {
+            type: Object,
+            default: () => ({}),
+        },
     },
     setup(props: WidgetProps) {
         const state = reactive({
@@ -65,9 +75,9 @@ export default {
             chartRegistry: {},
             loading: true,
             data: [] as XYChartData[],
-            firstMonth: dayjs.utc().subtract(11, 'month'),
-            lastMonth: dayjs.utc().subtract(1, 'month'),
-            thisMonth: dayjs.utc(),
+            firstMonth: computed(() => dayjs.utc(props.period?.end).subtract(11, 'month')),
+            lastMonth: computed(() => dayjs.utc(props.period?.end).subtract(1, 'month')),
+            thisMonth: computed(() => dayjs.utc(props.period?.end)),
             lastMonthCost: computed(() => {
                 const cost = state.data.find(d => d.date === state.lastMonth.format('YYYY-MM'))?.totalCost || 0;
                 return currencyMoneyFormatter(cost, props.currency, props.currencyRates, true, 10000000000);
@@ -140,32 +150,44 @@ export default {
             chart.data = state.data;
         };
 
-        const getChartData = async () => {
+        const costQueryHelper = new QueryHelper();
+        const fetchData = async () => {
+            costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
-                state.loading = true;
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: false,
                     granularity: 'MONTHLY',
                     filter: [],
                     pivot_type: 'CHART',
                     start: state.firstMonth.format('YYYY-MM'),
-                    end: state.thisMonth.add(1, 'month').format('YYYY-MM'),
+                    end: state.thisMonth.format('YYYY-MM'),
                     page: {
                         limit: 12,
                     },
+                    ...costQueryHelper.apiQuery,
                 });
+                return results;
+            } catch (e) {
+                return [];
+            }
+        };
+
+        const getChartData = async () => {
+            try {
+                state.loading = true;
+                const results = await fetchData();
                 state.data = getXYChartData(results);
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.data = [];
             } finally {
                 state.loading = false;
             }
         };
 
-        (() => {
+        watch([() => props.period, () => props.filters], () => {
             getChartData();
-        })();
+        }, { immediate: true });
+
 
         watch([() => state.chartRef, () => state.loading], ([chartContext, loading]) => {
             if (chartContext && !loading) {

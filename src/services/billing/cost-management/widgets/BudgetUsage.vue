@@ -39,6 +39,9 @@ import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 import { CURRENCY } from '@/store/modules/display/config';
 import { currencyMoneyFormatter } from '@/lib/helper/currency-helper';
+import dayjs from 'dayjs';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
 
 export default {
     name: 'BudgetUsage',
@@ -48,6 +51,10 @@ export default {
         PI,
     },
     props: {
+        filters: {
+            type: Object,
+            default: () => ({}),
+        },
         period: {
             type: Object,
             default: () => ({}),
@@ -77,18 +84,29 @@ export default {
             }),
         });
 
-        const getData = async () => {
+        const costQueryHelper = new QueryHelper();
+        const fetchData = async () => {
+            costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
-                state.loading = true;
                 const { results } = await SpaceConnector.client.costAnalysis.budgetUsage.analyze({
                     include_budget_count: true,
                     include_project_info: false,
                     filter: [
                     ],
-                    start: props.period.start?.substr(0, 7),
-                    end: props.period.end?.substr(0, 7),
+                    start: dayjs.utc(props.period?.start).format('YYYY-MM'),
+                    end: dayjs.utc(props.period?.end).format('YYYY-MM'),
+                    ...costQueryHelper.apiQuery,
                 });
+                return results;
+            } catch (e) {
+                return [];
+            }
+        };
 
+        const getData = async () => {
+            try {
+                state.loading = true;
+                const results = await fetchData();
                 state.usageCost = results[0]?.usd_cost || 0;
                 state.usageRate = Number(results[0]?.usage.toFixed(2)) || 0;
                 state.limitCost = results[0]?.limit || 0;
@@ -100,7 +118,7 @@ export default {
             }
         };
 
-        watch(() => props.period, () => {
+        watch([() => props.period, () => props.filters], () => {
             getData();
         }, { immediate: true });
 

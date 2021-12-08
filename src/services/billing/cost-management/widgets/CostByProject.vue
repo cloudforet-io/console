@@ -26,6 +26,10 @@ import { IDENTITY_ROUTE } from '@/services/identity/routes';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { GRANULARITY } from '@/services/billing/cost-management/lib/config';
 import ErrorHandler from '@/common/composables/error/errorHandler';
+import dayjs from 'dayjs';
+import { CURRENCY } from '@/store/modules/display/config';
+import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 
 
 const categoryKey = 'project_id';
@@ -37,12 +41,6 @@ const widgetLink = {
     query: {},
 };
 
-// const currentDay = dayjs().utc();
-// const currentMonthPeriod = {
-//     start: currentDay.startOf('month'),
-//     end: currentDay,
-// };
-
 interface ChartData {
     project_id: string;
     usd_cost: number;
@@ -53,6 +51,21 @@ export default {
     components: { CostDashboardCardWidgetLayout },
     props: {
         period: {
+            type: Object,
+            default: () => ({}),
+        },
+        filters: {
+            type: Object,
+            default: () => ({}),
+        },
+        currency: {
+            type: String,
+            default: CURRENCY.USD,
+            validator(value: CURRENCY) {
+                return Object.values(CURRENCY).includes(value);
+            },
+        },
+        currencyRates: {
             type: Object,
             default: () => ({}),
         },
@@ -88,23 +101,33 @@ export default {
             chart.dataFields.name = categoryKey;
         };
 
-        const getChartData = async () => {
+        const costQueryHelper = new QueryHelper();
+        const fetchData = async () => {
+            costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
-                state.loading = true;
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: false,
                     granularity: GRANULARITY.ACCUMULATED,
                     group_by: ['project_id'],
                     start: props.period?.start,
-                    end: props.period?.end,
+                    end: dayjs.utc(props.period?.end).add(1, 'month').startOf('month').format('YYYY-MM-DD'),
                     page: {
                         limit: 15,
                     },
+                    ...costQueryHelper.apiQuery,
                 });
-                state.data = results;
+                return results;
+            } catch (e) {
+                return [];
+            }
+        };
+
+        const getChartData = async () => {
+            try {
+                state.loading = true;
+                state.data = await fetchData();
             } catch (e) {
                 ErrorHandler.handleError(e);
-                state.data = [];
             } finally {
                 state.loading = false;
             }
@@ -116,7 +139,7 @@ export default {
             }
         }, { immediate: false });
 
-        watch(() => props.period, async (after) => {
+        watch([() => props.period, () => props.filters], async (after) => {
             if (after) {
                 await getChartData();
                 drawChart(state.chartRef);

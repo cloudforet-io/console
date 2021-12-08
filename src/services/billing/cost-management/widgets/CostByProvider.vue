@@ -58,6 +58,9 @@ import { commaFormatter } from '@spaceone/console-core-lib';
 import { CURRENCY } from '@/store/modules/display/config';
 import { store } from '@/store';
 import { gray } from '@/styles/colors';
+import dayjs from 'dayjs';
+import { getConvertedFilter } from '@/services/billing/cost-management/cost-analysis/lib/helper';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
 
 interface CostByProviderChartData extends PieChartData {
     color: string;
@@ -193,21 +196,23 @@ export default defineComponent<WidgetProps>({
             });
         };
 
+        const costQueryHelper = new QueryHelper();
         const getData = async () => {
             state.loading = true;
             state.chartData = [];
+            costQueryHelper.setFilters(getConvertedFilter(props.filters));
             try {
-                // const thisMonth = dayjs.utc();
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: false,
                     granularity: GRANULARITY.ACCUMULATED,
                     group_by: [GROUP_BY.PROVIDER],
                     start: props.period?.start,
-                    end: props.period?.end,
+                    end: dayjs.utc(props.period?.end).add(1, 'month').startOf('month').format('YYYY-MM-DD'),
                     page: {
                         start: 1,
                         limit: 15,
                     },
+                    ...costQueryHelper.apiQuery,
                 });
 
                 if (results.length > 0) {
@@ -234,7 +239,7 @@ export default defineComponent<WidgetProps>({
             }
         });
 
-        watch(() => props.period, () => {
+        watch([() => props.period, () => props.filters], () => {
             getData();
         }, { immediate: true });
 
