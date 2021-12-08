@@ -370,11 +370,17 @@ export default {
 <style lang="postcss" scoped>
 .cost-analysis-page {
     .title-section {
+        @apply relative;
         display: flex;
+
+        .p-page-title {
+            flex-wrap: wrap;
+            row-gap: 2rem;
+        }
 
         .title-main-wrapper {
             @apply flex items-center flex-wrap gap-2;
-
+            margin-left: 2.5rem;
             .button-wrapper {
                 @apply flex items-center;
             }
@@ -389,9 +395,9 @@ export default {
         }
 
         .list-button::v-deep {
-            @apply bg-transparent;
-            margin-right: 0.5rem;
-
+            @apply absolute bg-transparent;
+            top: 0;
+            left: 0;
             .p-context-menu {
                 min-width: 22rem;
 
@@ -412,7 +418,6 @@ export default {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-left: 0.75rem;
 
             .button-wrapper {
                 @apply flex items-center flex-wrap gap-4;
@@ -422,6 +427,12 @@ export default {
 
     .cost-analysis-chart {
         margin-bottom: 1rem;
+    }
+
+    @screen mobile {
+        &::v-deep .extra {
+            width: 100%;
+        }
     }
 }
 </style>

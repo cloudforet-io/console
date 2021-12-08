@@ -1,20 +1,17 @@
 <template>
     <div class="cost-analysis-group-by-filter">
         <b class="mr-3">{{ $t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.GROUP_BY') }}</b>
-        <div class="button-wrapper">
-            <p-select-button v-for="groupByItem in allGroupByItems"
-                             :key="groupByItem.name"
-                             class="group-by-button"
-                             :value="groupByItem"
-                             :selected="selectedGroupByItems"
-                             multi-selectable
-                             size="sm"
-                             :predicate="predicate"
-                             @change="handleSelectGroupByItems"
-            >
-                {{ groupByItem.label }}
-            </p-select-button>
-        </div>
+        <p-select-button v-for="groupByItem in allGroupByItems"
+                         :key="groupByItem.name"
+                         :value="groupByItem"
+                         :selected="selectedGroupByItems"
+                         multi-selectable
+                         size="sm"
+                         :predicate="predicate"
+                         @change="handleSelectGroupByItems"
+        >
+            {{ groupByItem.label }}
+        </p-select-button>
         <!--        <component :is="moreGroupBy.length ? 'p-icon-button' : 'p-icon-text-button'"-->
         <!--                   name="ic_setting" style-type="gray900" outline-->
         <!--                   size="sm"-->
@@ -97,20 +94,12 @@ export default {
 
 <style lang="postcss" scoped>
 .cost-analysis-group-by-filter {
-    @apply bg-white rounded-md border border-gray-200;
-    display: flex;
+    @apply flex flex-wrap bg-white rounded-md border border-gray-200;
+    column-gap: 0.375rem;
+    row-gap: 0.5rem;
     align-items: center;
     font-size: 0.875rem;
     padding: 1rem;
     margin-bottom: 1rem;
-
-    .button-wrapper {
-        .group-by-button {
-            margin-left: 0.375rem;
-            &:first-of-type {
-                margin-left: 0;
-            }
-        }
-    }
 }
 </style>

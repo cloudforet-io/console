@@ -385,6 +385,10 @@ export default {
 
         .filter-wrapper {
             height: 8rem;
+            padding: 0.75rem 1rem;
+            .p-tag {
+                margin-bottom: 0.5rem;
+            }
         }
         .legend-wrapper {
             height: 16.75rem;
@@ -404,6 +408,26 @@ export default {
                 }
                 &.disabled {
                     @apply text-gray-300;
+                }
+            }
+        }
+    }
+
+    @screen tablet {
+        height: auto;
+        .chart-section {
+            @apply col-span-12;
+        }
+        .query-section {
+            @apply col-span-12 row-start-1;
+            .legend-wrapper {
+                height: auto;
+                padding: 0.5rem;
+                .legend {
+                    display: inline-block;
+                    .p-status {
+                        height: 100%;
+                    }
                 }
             }
         }
