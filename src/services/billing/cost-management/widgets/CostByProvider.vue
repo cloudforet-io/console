@@ -54,7 +54,6 @@ import { forEach } from 'lodash';
 import { DataTableField } from '@spaceone/design-system/dist/src/data-display/tables/data-table/type';
 import { GRANULARITY, GROUP_BY } from '@/services/billing/cost-management/lib/config';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
-import dayjs from 'dayjs';
 import { commaFormatter } from '@spaceone/console-core-lib';
 import { CURRENCY } from '@/store/modules/display/config';
 import { store } from '@/store';
@@ -99,7 +98,7 @@ export default defineComponent<WidgetProps>({
             default: () => ({}),
         },
     },
-    setup() {
+    setup(props: WidgetProps) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chartRegistry: {},
@@ -198,13 +197,13 @@ export default defineComponent<WidgetProps>({
             state.loading = true;
             state.chartData = [];
             try {
-                const thisMonth = dayjs.utc();
+                // const thisMonth = dayjs.utc();
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: false,
                     granularity: GRANULARITY.ACCUMULATED,
                     group_by: [GROUP_BY.PROVIDER],
-                    start: thisMonth.startOf('month').format(),
-                    end: thisMonth.format(''),
+                    start: props.period?.start,
+                    end: props.period?.end,
                     page: {
                         start: 1,
                         limit: 15,
@@ -235,7 +234,9 @@ export default defineComponent<WidgetProps>({
             }
         });
 
-        (() => { getData(); })();
+        watch(() => props.period, () => {
+            getData();
+        }, { immediate: true });
 
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();

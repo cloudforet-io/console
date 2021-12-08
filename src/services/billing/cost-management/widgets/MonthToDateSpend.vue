@@ -83,8 +83,8 @@ export default {
             lastMonthCost: 0,
             increaseCost: computed(() => state.currentMonthCost - state.lastMonthCost),
             increaseRate: computed(() => Math.round((state.currentMonthCost / state.lastMonthCost) * 100) - 100),
-            currentMonth: computed<Dayjs>(() => dayjs.utc(props.period.end)),
-            lastMonth: computed<Dayjs>(() => dayjs.utc(props.period.end).subtract(1, 'month')),
+            currentMonth: computed<Dayjs>(() => dayjs.utc(props.period?.end)),
+            lastMonth: computed<Dayjs>(() => dayjs.utc(props.period?.end).subtract(1, 'month')),
             currencySymbol: computed(() => CURRENCY_SYMBOL[props.currency]),
         });
 

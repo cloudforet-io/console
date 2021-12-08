@@ -102,10 +102,7 @@ export default {
 
         watch(() => props.period, () => {
             getData();
-        });
-
-        getData();
-
+        }, { immediate: true });
 
         return {
             ...toRefs(state),

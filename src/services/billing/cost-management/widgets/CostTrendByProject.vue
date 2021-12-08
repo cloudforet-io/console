@@ -84,11 +84,19 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        period: {
+            type: Object,
+            default: () => ({}),
+        },
     },
     setup(props: WidgetProps) {
         const state = reactive({
             filters: {} as CostQueryFilters,
             top15ProjectIds: [],
+            _period: {
+                start: computed(() => dayjs(props.period?.end).subtract(5, 'month').format('YYYY-MM')),
+                end: computed(() => props.period?.end),
+            },
             //
             chartLoading: true,
             chartRegistry: {},
@@ -193,12 +201,12 @@ export default {
             costApiQueryHelper.setFilters(getConvertedFilter(state.filters));
             try {
                 state.tableLoading = true;
-                const thisMonth = dayjs.utc();
+                // const thisMonth = dayjs.utc();
                 const { results, total_count } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
                     group_by: [GROUP_BY.PROJECT],
-                    start: thisMonth.subtract(5, 'month'),
-                    end: thisMonth.format('YYYY-MM'),
+                    start: state._period?.start,
+                    end: state._period?.end,
                     pivot_type: 'TABLE',
                     page: {
                         limit: 15,
@@ -225,12 +233,12 @@ export default {
             ]);
             try {
                 state.chartLoading = true;
-                const thisMonth = dayjs.utc();
+                // const thisMonth = dayjs.utc();
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     granularity: GRANULARITY.MONTHLY,
                     group_by: [GROUP_BY.PROJECT],
-                    start: thisMonth.subtract(5, 'month'),
-                    end: thisMonth.format('YYYY-MM'),
+                    start: state._period?.start,
+                    end: state._period?.end,
                     pivot_type: 'CHART',
                     ...costApiQueryHelper.data,
                 });
@@ -268,6 +276,10 @@ export default {
                 state.chart.data = getCurrencyAppliedChartData(state.chartData, currency, props.currencyRates);
             }
         });
+        watch(() => props.period, () => {
+            getCostChartData(state.top15ProjectIds);
+            getCostTableData();
+        }, { immediate: false });
 
         onUnmounted(() => {
             if (state.chart) state.chart.dispose();
