@@ -3,7 +3,7 @@
         title="Budget Usage"
         unit-type="PERCENT"
         :value="usageRate"
-        :description="`${currencyMoneyFormatter(availableCost, currency, currencyRates)} Available`"
+        :description="`${currencyMoneyFormatter(availableCost, currency, currencyRates, false, 10000000)} Available`"
         :loading="loading"
     >
         <template #title-extra>
@@ -16,10 +16,10 @@
             <budget-usage-progress-bar :usage-rate="usageRate" class="budget-progress-bar" />
             <p class="progress-bar-label">
                 <span class="usage-cost">
-                    {{ currencyMoneyFormatter(usageCost, currency, currencyRates) }} <span class="spent">Spent</span>
+                    {{ currencyMoneyFormatter(usageCost, currency, currencyRates, false, 10000000) }} <span class="spent">Spent</span>
                 </span>
                 <span class="limit-cost">
-                    {{ currencyMoneyFormatter(limitCost, currency, currencyRates) }}
+                    {{ currencyMoneyFormatter(limitCost, currency, currencyRates, false, 10000000) }}
                 </span>
             </p>
         </template>

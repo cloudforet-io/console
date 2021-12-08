@@ -1,7 +1,7 @@
 <template>
-    <cost-dashboard-card-widget-layout title="Cost Trend by Project">
+    <cost-dashboard-card-widget-layout title="Cost Trend by Provider">
         <cost-dashboard-stacked-column-widget
-            :group-by="GROUP_BY.PROJECT"
+            :group-by="GROUP_BY.PROVIDER"
             :currency="currency"
             :currency-rates="currencyRates"
             :period="period"
@@ -26,7 +26,7 @@ import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
 
 
 export default defineComponent<WidgetProps>({
-    name: 'CostTrendByProject',
+    name: 'CostTrendByProvider',
     components: {
         CostDashboardStackedColumnWidget,
         CostDashboardCardWidgetLayout,

@@ -49,6 +49,7 @@ const createValueAxis = (chart) => {
     valueAxis.renderer.minWidth = 20;
     valueAxis.fontSize = 12;
     valueAxis.extraMax = 0.01;
+    valueAxis.min = 0;
     valueAxis.renderer.grid.template.strokeOpacity = 1;
     valueAxis.renderer.grid.template.stroke = am4core.color(gray[200]);
     valueAxis.renderer.labels.template.fill = am4core.color(gray[400]);

@@ -3,11 +3,8 @@
                      :fields="tableState.fields"
                      :items="tableState.items"
                      :total-count="tableState.totalCount"
-                     :sort-desc="true"
-                     sort-by="total_count"
                      :searchable="false"
                      exportable
-                     sortable
                      @change="handleChange"
                      @refresh="handleChange()"
                      @export="handleExport"
@@ -95,7 +92,7 @@ export default {
             const groupByFields: DataTableField[] = [...groupByItems];
             if (!groupByItems.length) {
                 groupByFields.push({
-                    name: 'totalCost', label: ' ', sortable: false, textAlign: 'center',
+                    name: 'totalCost', label: ' ', textAlign: 'center',
                 });
             }
 
@@ -119,7 +116,6 @@ export default {
                 dateFields.push({
                     name: now.format(nameDateFormat),
                     label: now.format(labelDateFormat),
-                    sortable: false,
                     textAlign: 'center',
                 });
                 now = now.add(1, state.timeUnit);
