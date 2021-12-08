@@ -6,13 +6,24 @@
     >
         <template #default>
             <div ref="chartRef" class="chart" />
+            <cost-dashboard-data-table
+                :fields="tableState.fields"
+                :items="tableState.items"
+                :loading="tableState.loading"
+                :this-page.sync="tableState.thisPage"
+                :page-size="8"
+                :chart="chart"
+                :show-legend="false"
+                :currency-rates="currencyRates"
+                :currency="currency"
+            />
         </template>
     </cost-dashboard-card-widget-layout>
 </template>
 
 <script lang="ts">
 import {
-    computed,
+    computed, defineComponent,
     onUnmounted, reactive, toRefs, watch,
 } from '@vue/composition-api';
 import { cloneDeep } from 'lodash';
@@ -30,6 +41,9 @@ import { continentData } from '@/services/billing/cost-management/cost-dashboard
 import CostDashboardCardWidgetLayout
     from '@/services/billing/cost-management/widgets/modules/CostDashboardCardWidgetLayout.vue';
 import { INVENTORY_ROUTE } from '@/services/inventory/routes';
+import CostDashboardDataTable from '@/services/billing/cost-management/widgets/modules/CostDashboardDataTable.vue';
+import { WidgetProps } from '@/services/billing/cost-management/widgets/type';
+import { CURRENCY } from '@/store/modules/display/config';
 
 
 const categoryKey = 'title';
@@ -41,17 +55,52 @@ const widgetLink = {
     query: {},
 };
 
-export default {
+export default defineComponent<WidgetProps>({
     name: 'CostByRegion',
-    components: { CostDashboardCardWidgetLayout },
-    setup() {
+    components: { CostDashboardDataTable, CostDashboardCardWidgetLayout },
+    props: {
+        options: {
+            type: Object,
+            default: () => ({}),
+        },
+        period: {
+            type: Object,
+            default: () => ({}),
+        },
+        filters: {
+            type: Object,
+            default: () => ({}),
+        },
+        currency: {
+            type: String,
+            default: CURRENCY.USD,
+        },
+        currencyRates: {
+            type: Object,
+            default: () => ({}),
+        },
+    },
+    setup(props) {
         const state = reactive({
             chartRef: null as HTMLElement | null,
             chart: null as MapChart | null,
             chartRegistry: {},
             regions: computed(() => store.state.resource.region.items),
-            loading: true,
+            providers: computed(() => store.state.resource.provider.items),
+            loading: false,
             data: [] as any,
+        });
+
+        const tableState = reactive({
+            loading: false,
+            items: [],
+            fields: computed(() => [
+                { name: 'provider', label: 'Provider' },
+                { name: 'region', label: ' ' },
+                { name: 'usd_cost', label: 'Cost', textAlign: 'right' },
+            ]),
+            totalCount: 15,
+            thisPage: 1,
         });
 
         const disposeChart = (chartContext) => {
@@ -69,8 +118,6 @@ export default {
             };
             const chart = createChart();
             if (!config.get('AMCHARTS_LICENSE.ENABLED')) chart.logo.disabled = true;
-            chart.chartContainer.wheelable = true;
-            chart.zoomControl = new am4maps.ZoomControl();
 
             chart.geodata = am4geodataContinentsLow;
             chart.projection = new am4maps.projections.Miller();
@@ -106,15 +153,6 @@ export default {
             pieSeries.data = state.data;
         };
 
-        watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
-            if (!loading && chartContext) {
-                drawChart(chartContext);
-            }
-        }, { immediate: false });
-
-        onUnmounted(() => {
-            if (state.chart) state.chart.dispose();
-        });
 
         const setPieChartData = (chartData) => {
             const _continentData = cloneDeep(continentData);
@@ -122,7 +160,7 @@ export default {
                 const target = _continentData.find(continent => continent.continent_code === (state.regions[d.region_code]?.continent?.continent_code));
                 if (target) {
                     target.pieData.push({
-                        category: `${d.provider}:${d.region_code}`,
+                        category: `${d.provider}:${state.regions[d.region_code]?.name}`,
                         value: d.usd_cost,
                     });
                 }
@@ -133,35 +171,58 @@ export default {
         const getChartData = async () => {
             try {
                 state.loading = true;
+                tableState.loading = true;
                 const { results } = await SpaceConnector.client.costAnalysis.cost.analyze({
                     include_usage_quantity: false,
                     granularity: 'ACCUMULATED',
                     group_by: ['provider', 'region_code'],
-                    start: '2021-10-01T00:00:00Z',
-                    end: '2021-10-16T00:00:00Z',
+                    start: props.period.start,
+                    end: props.period.end,
                     page: {
                         limit: 15,
                     },
                 });
                 state.data = setPieChartData(results);
+                tableState.items = results.map(d => ({
+                    usd_cost: d.usd_cost,
+                    provider: state.providers[d.provider]?.label,
+                    region: state.regions[d.region_code]?.name || d.region_code,
+                }));
             } catch (e) {
                 ErrorHandler.handleError(e);
             } finally {
                 state.loading = false;
+                tableState.loading = false;
             }
         };
+
+        watch([() => state.loading, () => state.chartRef], ([loading, chartContext]) => {
+            if (!loading && chartContext) {
+                drawChart(chartContext);
+            }
+        }, { immediate: false });
+
+        watch(() => props.period, () => {
+            getChartData();
+        });
 
         (async () => {
             await store.dispatch('resource/region/load');
             await getChartData();
         })();
 
+
+        onUnmounted(() => {
+            if (state.chart) state.chart.dispose();
+        });
+
         return {
             ...toRefs(state),
+            tableState,
             widgetLink,
         };
     },
-};
+});
 </script>
 
 <style lang="postcss" scoped>
