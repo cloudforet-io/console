@@ -88,6 +88,15 @@ export const getPieChartData = (rawData: PieChartRawData[], groupBy: string): Pi
     value: d.usd_cost,
 }));
 
+export const getPieChartDataAndLegends = (rawData: PieChartRawData[], groupBy: string): { chartData: PieChartData[]; legends: Legend[] } => {
+    const chartData: PieChartData[] = getPieChartData(rawData, groupBy);
+    const groupByNames = rawData.map(d => d[groupBy]);
+    return {
+        chartData,
+        legends: _getLegendsFromGroupByNames(groupByNames, groupBy),
+    };
+};
+
 
 /**
  * @name getXYChartData
