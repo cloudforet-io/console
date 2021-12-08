@@ -1,5 +1,5 @@
 <template>
-    <p-field-group required :label="month" class="budget-form-amount-plan-month-input"
+    <p-field-group required :label="formattedMonth" class="budget-form-amount-plan-month-input"
                    :invalid-texts="invalidTexts._amount"
                    :invalid="invalidState._amount"
     >
@@ -18,12 +18,13 @@
 
 <script lang="ts">
 import {
-    computed, watch,
+    computed, reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PFieldGroup, PTextInput } from '@spaceone/design-system';
 import { commaFormatter, getNumberFromString } from '@spaceone/console-core-lib';
 import { useFormValidator } from '@/common/composables/form-validator';
+import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 
 interface Props {
     amount: number|undefined;
@@ -61,6 +62,8 @@ export default {
         },
     },
     setup(props: Props, { emit }) {
+        const { i18nDayjs } = useI18nDayjs();
+
         const {
             forms: { _amount },
             invalidTexts, invalidState, setForm, resetValidations,
@@ -75,9 +78,14 @@ export default {
             emit('update:amount', amount);
         };
 
-        const formattedAmount = computed<string>({
-            get: () => commaFormatter(_amount.value),
-            set: (val: string) => { setAmount(getNumberFromString(val)); },
+        const state = reactive({
+            formattedMonth: computed(() => {
+                i18nDayjs.value(props.month).format('MMMM YYYY');
+            }),
+            formattedAmount: computed<string>({
+                get: () => commaFormatter(_amount.value),
+                set: (val: string) => { setAmount(getNumberFromString(val)); },
+            }),
         });
 
         watch(() => props.amount, (amount) => {
@@ -99,7 +107,7 @@ export default {
             _amount,
             invalidTexts,
             invalidState,
-            formattedAmount,
+            ...toRefs(state),
             setAmount,
         };
     },

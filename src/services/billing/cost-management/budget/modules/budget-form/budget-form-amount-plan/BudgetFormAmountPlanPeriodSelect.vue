@@ -80,7 +80,10 @@ export default {
         };
 
         const state = reactive({
-            period: computed<Period>(() => ({ start: startDates.value[0], end: endDates.value[0] })),
+            period: computed<Period>(() => ({
+                start: dayjs(startDates.value[0]).locale('en').format('YYYY-MM-DD'),
+                end: dayjs(endDates.value[0]).locale('en').format('YYYY-MM-DD'),
+            })),
         });
 
         watch(() => state.period, (period) => {

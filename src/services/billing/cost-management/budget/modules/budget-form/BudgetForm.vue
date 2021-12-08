@@ -8,7 +8,9 @@
             >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CANCEL') }}
             </p-button>
-            <p-button style-type="primary-dark" :disabled="!isAllValid">
+            <p-button style-type="primary-dark" :loading="loading" :disabled="!isAllValid"
+                      @click="handleClickConfirm"
+            >
                 {{ $t('BILLING.COST_MANAGEMENT.BUDGET.FORM.CONFIRM') }}
             </p-button>
         </div>
@@ -26,6 +28,12 @@ import { PButton } from '@spaceone/design-system';
 import BudgetFormBaseInfo, { BudgetBaseInfo } from '@/services/billing/cost-management/budget/modules/budget-form/BudgetFormBaseInfo.vue';
 import BudgetFormAmountPlan
 , { BudgetAmountPlanInfo } from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlan.vue';
+import ErrorHandler from '@/common/composables/error/errorHandler';
+import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
+import { showSuccessMessage } from '@/lib/helper/notice-alert-helper';
+import { i18n } from '@/translations';
+import { SpaceRouter } from '@/router';
+import { BILLING_ROUTE } from '@/services/billing/routes';
 
 export default {
     name: 'BudgetForm',
@@ -40,15 +48,39 @@ export default {
             default: undefined,
         },
     },
-    setup() {
+    setup(props, { root }) {
         const state = reactive({
             baseInfo: {} as BudgetBaseInfo,
             isBaseInfoValid: false,
             amountPlanInfo: {} as BudgetAmountPlanInfo,
             isAmountPlanInfoValid: false,
             isAllValid: computed(() => state.isBaseInfoValid && state.isAmountPlanInfoValid),
+            loading: false,
         });
 
+        const createBudget = async () => {
+            if (state.loading) return;
+
+            state.loading = true;
+            try {
+                await SpaceConnector.client.costAnalysis.budget.create({
+                    ...state.baseInfo,
+                    ...state.amountPlanInfo,
+                });
+
+                showSuccessMessage(i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_S_CREATE_BUDGET'), '', root);
+                SpaceRouter.router.push({
+                    name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET._NAME,
+                });
+            } catch (e) {
+                ErrorHandler.handleRequestError(e, i18n.t('BILLING.COST_MANAGEMENT.BUDGET.ALT_E_CREATE_BUDGET'));
+            } finally {
+                state.loading = false;
+            }
+        };
+
+
+        /* Handlers */
         const handleChangeBaseInfo = (baseInfo: BudgetBaseInfo, isValid: boolean) => {
             state.baseInfo = baseInfo;
             state.isBaseInfoValid = isValid;
@@ -59,10 +91,15 @@ export default {
             state.isAmountPlanInfoValid = isValid;
         };
 
+        const handleClickConfirm = () => {
+            createBudget();
+        };
+
         return {
             ...toRefs(state),
             handleChangeBaseInfo,
             handleChangeAmountPlanning,
+            handleClickConfirm,
         };
     },
 };

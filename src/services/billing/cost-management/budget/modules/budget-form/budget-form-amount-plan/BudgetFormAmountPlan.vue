@@ -37,7 +37,9 @@ import { Period } from '@/services/billing/cost-management/type';
 export interface BudgetAmountPlanInfo {
     limit?: BudgetData['limit'];
     planned_limits?: BudgetData['planned_limits'];
-    time_unit: BudgetTimeUnit;
+    time_unit: BudgetData['time_unit'];
+    start: BudgetData['start'];
+    end: BudgetData['end'];
 }
 
 export default {
@@ -75,20 +77,23 @@ export default {
                 return state.isMonthlyInputsValid && state.isPeriodValid;
             }),
             amountPlanInfo: computed<BudgetAmountPlanInfo>(() => {
+                const result = {
+                    time_unit: state.timeUnit,
+                    start: state.period.start,
+                    end: state.period.end,
+                } as BudgetAmountPlanInfo;
+
                 if (state.timeUnit === 'TOTAL') {
-                    return {
-                        limit: state.totalAmount,
-                        time_unit: state.timeUnit,
-                    };
-                }
-                return {
-                    planned_limits: state.monthlyInputs ? Object.keys(state.monthlyInputs)
+                    result.limit = state.totalAmount;
+                } else if (state.monthlyInputs) {
+                    result.planned_limits = Object.keys(state.monthlyInputs)
                         .map(key => ({
                             date: key,
                             limit: state.monthlyInputs[key].amount,
-                        })) : [],
-                    time_unit: state.timeUnit,
-                };
+                        }));
+                }
+
+                return result;
             }),
         });
 

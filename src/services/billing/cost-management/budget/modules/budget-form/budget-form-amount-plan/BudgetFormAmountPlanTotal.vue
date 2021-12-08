@@ -42,7 +42,7 @@ export default {
     setup(props, { emit }) {
         const {
             forms: { amount },
-            invalidTexts, invalidState, setForm,
+            invalidTexts, invalidState, setForm, isAllValid,
         } = useFormValidator({
             amount: undefined as number|undefined,
         }, {
@@ -57,7 +57,7 @@ export default {
         });
 
         watch(() => amount.value, (value) => {
-            emit('update', value, invalidState.amount.value);
+            emit('update', value, isAllValid.value);
         });
 
         return {

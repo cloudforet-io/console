@@ -35,8 +35,6 @@ import {
 
 import { PButton, PDivider, PLabel } from '@spaceone/design-system';
 
-import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
-
 import { Period } from '@/services/billing/cost-management/type';
 
 import BudgetFormAmountPlanMonthInput
@@ -45,7 +43,7 @@ import BudgetFormAmountPlanLastMonthsCost
     from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanLastMonthsCost.vue';
 import BudgetFormAmountPlanAutofillModal
 , { AutofillOptions } from '@/services/billing/cost-management/budget/modules/budget-form/budget-form-amount-plan/BudgetFormAmountPlanAutofillModal.vue';
-import { Dayjs } from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 interface Props {
     period: Period;
@@ -70,13 +68,11 @@ export default {
         },
     },
     setup(props: Props, { emit }) {
-        const { i18nDayjs } = useI18nDayjs();
-
         const getAllMonths = (month: Dayjs, monthEnd: Dayjs) => {
             const months: string[] = [];
             let _month = month;
             while (_month.isSameOrBefore(monthEnd, 'month')) {
-                months.push(i18nDayjs.value(_month).format('MMMM YYYY'));
+                months.push(dayjs(_month).locale('en').format('YYYY-MM'));
                 _month = _month.add(1, 'month');
             }
             return months;
@@ -87,8 +83,8 @@ export default {
                 const { start, end } = props.period;
                 if (!start || !end) return [];
 
-                const month = i18nDayjs.value(start as string);
-                const monthEnd = i18nDayjs.value(end as string);
+                const month = dayjs(start as string);
+                const monthEnd = dayjs(end as string);
 
                 return getAllMonths(month, monthEnd);
             }),
