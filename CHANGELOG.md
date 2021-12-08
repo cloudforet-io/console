@@ -1,3 +1,10 @@
+# [1.1.0-beta.199](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.198...v1.1.0-beta.199) (2021-12-08)
+
+
+### Bug Fixes
+
+* add sidebar drop-shadow ([#779](https://github.com/spaceone-dev/spaceone-design-system/issues/779)) ([5f68082](https://github.com/spaceone-dev/spaceone-design-system/commit/5f68082d4a52d339b943aa1106b7c457eb925529))
+
 # [1.1.0-beta.198](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.197...v1.1.0-beta.198) (2021-12-07)
 
 
