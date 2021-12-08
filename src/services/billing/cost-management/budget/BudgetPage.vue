@@ -15,8 +15,6 @@
                 </p-select-dropdown>
             </template>
         </p-page-title>
-        <budget-toolbox />
-        <budget-stat />
         <budget-list />
     </div>
 </template>
@@ -30,8 +28,6 @@ import {
 
 import { i18n } from '@/translations';
 
-import BudgetToolbox from '@/services/billing/cost-management/budget/modules/budget-toolbox/BudgetToolbox.vue';
-import BudgetStat from '@/services/billing/cost-management/budget/modules/budget-stat/BudgetStat.vue';
 import BudgetList from '@/services/billing/cost-management/budget/modules/budget-list/BudgetList.vue';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { SpaceRouter } from '@/router';
@@ -40,8 +36,6 @@ export default {
     name: 'BudgetPage',
     components: {
         BudgetList,
-        BudgetStat,
-        BudgetToolbox,
         PBreadcrumbs,
         PPageTitle,
         PSelectDropdown,

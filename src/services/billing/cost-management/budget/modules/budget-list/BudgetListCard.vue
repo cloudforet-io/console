@@ -67,12 +67,12 @@ import {
 import BudgetUsageProgressBar from '@/services/billing/cost-management/modules/BudgetUsageProgressBar.vue';
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import { capitalize } from 'lodash';
-import { useI18nDayjs } from '@/common/composables/i18n-dayjs';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
 
 interface Props {
     budget: BudgetData;
+    budgetLoading: boolean;
 }
 
 interface Route {
@@ -100,10 +100,12 @@ export default {
             type: Object,
             default: () => ({}),
         },
+        budgetLoading: {
+            type: Boolean,
+            default: true,
+        },
     },
     setup(props: Props) {
-        const { i18nDayjs } = useI18nDayjs();
-
         const state = reactive({
             linkLocation: computed<Location>(() => ({
                 name: BILLING_ROUTE.COST_MANAGEMENT.BUDGET.DETAIL._NAME,
@@ -111,7 +113,8 @@ export default {
                     budgetId: props.budget.budget_id,
                 },
             })),
-            loading: true,
+            loading: computed<boolean>(() => props.budgetLoading || state.cardInfoLoading),
+            cardInfoLoading: true,
             budgetRoutes: [] as Route[],
             costTypeList: computed<string>(() => {
                 const costTypes = props.budget.cost_types;
@@ -137,8 +140,6 @@ export default {
             }),
         });
 
-        const formatTime = (time: string) => i18nDayjs.value(time).format('MMMYYYY');
-
         const getParentProjectGroupName = async (projectId?: string, projectGroupId?: string) => {
             try {
                 if (projectId) {
@@ -163,22 +164,16 @@ export default {
             }
         };
         (async () => {
-            const {
-                budget_id, project_id, project_group_id, name,
-            } = props.budget;
-            await SpaceConnector.client.costAnalysis.budgetUsage.list({
-                budget_id,
-            });
+            const { project_id, project_group_id, name } = props.budget;
             const parentProjectGroupName = await getParentProjectGroupName(project_id, project_group_id);
 
             state.budgetRoutes = parentProjectGroupName ? [{ name: parentProjectGroupName }, { name }] : [{ name }];
-            state.loading = false;
+            state.cardInfoLoading = false;
         })();
 
         return {
             ...toRefs(state),
             PROVIDER_MAP,
-            formatTime,
         };
     },
 };
