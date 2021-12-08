@@ -408,11 +408,14 @@
 				"YEARLY": "Yearly"
 			},
 			"MAIN": {
+				"ALT_E_EDIT_FILTER": "Failed to Update Filter",
+				"ALT_S_EDIT_FILTER": "Successfully Updated Filter",
 				"APPLIED_FILTER": "Applied Filter",
 				"BUDGET": "Budget",
 				"CLOSE": "Close",
 				"COST_ANALYSIS": "Cost Analysis",
 				"DASHBOARD": "Dashboard",
+				"OVERSPENT": "Overspent",
 				"VIEW_FILTER": "View Filter"
 			}
 		}

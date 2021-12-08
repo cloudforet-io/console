@@ -408,11 +408,14 @@
 				"YEARLY": ""
 			},
 			"MAIN": {
+				"ALT_E_EDIT_FILTER": "",
+				"ALT_S_EDIT_FILTER": "",
 				"APPLIED_FILTER": "",
 				"BUDGET": "",
 				"CLOSE": "",
 				"COST_ANALYSIS": "",
 				"DASHBOARD": "",
+				"OVERSPENT": "",
 				"VIEW_FILTER": ""
 			}
 		}

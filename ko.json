@@ -408,11 +408,14 @@
 				"YEARLY": "년"
 			},
 			"MAIN": {
+				"ALT_E_EDIT_FILTER": "필터 편집 실패",
+				"ALT_S_EDIT_FILTER": "필터 편집 성공",
 				"APPLIED_FILTER": "적용된 필터",
 				"BUDGET": "예산",
 				"CLOSE": "종료",
 				"COST_ANALYSIS": "비용 분석",
 				"DASHBOARD": "대시보드",
+				"OVERSPENT": "초과지출",
 				"VIEW_FILTER": "필터 보기"
 			}
 		}
