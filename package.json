@@ -8,11 +8,11 @@
     "serve": "vue-cli-service serve",
     "build": "NODE_OPTIONS=--max_old_space_size=4096 vue-cli-service build",
     "test:unit": "vue-cli-service test:unit",
-    "test:unit:watch": "vue-cli-service test:unit --watch",
+    "test:unit:watch": "vue-cli-service test:unit --watchAll",
     "eslint": "eslint --ext .js,.vue,.ts .",
     "stylelint": "stylelint \"src/**/*.{css,vue,pcss,scss}\"",
     "lint": "npm run eslint && npm run stylelint",
-    "prepare": "husky install",
+    "prepare": "node -e \"if(require('fs').existsSync('.git')){process.exit(1)}\" || is-ci || husky install",
     "analyze": "NODE_ENV=production VUE_APP_ANALYZE_MOD=true vue-cli-service build",
     "postcss": "node build/reset-css.js",
     "serve:docker": "docker build --tag spaceone/console . && docker run -p 80:80 spaceone/console"

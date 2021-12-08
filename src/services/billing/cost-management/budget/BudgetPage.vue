@@ -30,6 +30,7 @@ import { i18n } from '@/translations';
 import BudgetList from '@/services/billing/cost-management/budget/modules/budget-list/BudgetList.vue';
 import { BILLING_ROUTE } from '@/services/billing/routes';
 import { SpaceRouter } from '@/router';
+import { store } from '@/store';
 
 export default {
     name: 'BudgetPage',
@@ -61,6 +62,17 @@ export default {
         const handleCreateBudgetSelect = (name) => {
             SpaceRouter.router.push({ name });
         };
+
+        /* Init */
+        (async () => {
+            await Promise.allSettled([
+                store.dispatch('resource/serviceAccount/load'),
+                store.dispatch('resource/project/load'),
+                store.dispatch('resource/projectGroup/load'),
+                store.dispatch('resource/region/load'),
+                store.dispatch('resource/provider/load'),
+            ]);
+        })();
 
         return {
             ...toRefs(state),
