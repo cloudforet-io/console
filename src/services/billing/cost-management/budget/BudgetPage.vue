@@ -10,11 +10,10 @@
                     :placeholder="$t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.CREATE_BUDGET')"
                     type="outline-button"
                     @select="handleCreateBudgetSelect"
-                >
-                    <template class="input-text" />
-                </p-select-dropdown>
+                />
             </template>
         </p-page-title>
+        <p-divider />
         <budget-list />
     </div>
 </template>
@@ -23,7 +22,7 @@
 import { computed, reactive, toRefs } from '@vue/composition-api';
 
 import {
-    PBreadcrumbs, PPageTitle, PSelectDropdown,
+    PBreadcrumbs, PPageTitle, PSelectDropdown, PDivider,
 } from '@spaceone/design-system';
 
 import { i18n } from '@/translations';
@@ -39,6 +38,7 @@ export default {
         PBreadcrumbs,
         PPageTitle,
         PSelectDropdown,
+        PDivider,
     },
     setup() {
         const routeState = reactive({
