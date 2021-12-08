@@ -21,24 +21,24 @@
                     />
                 </template>
             </p-field-group>
-            <p-field-group v-if="!(requestType === REQUEST_TYPE.SAVE)" :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LABEL_VISIBILITY')" required>
-                <div class="visibility-radio-list">
-                    <p-radio v-for="visibility in visibilityList" :key="visibility.value"
-                             v-model="formState.selectedVisibility"
-                             :value="visibility.value"
-                             @change="handleChangeVisibility(visibility.value)"
-                    >
-                        <div class="visibility-radio-content-wrapper">
-                            <template>
-                                <p-i v-if="visibility.value === QUERY_VISIBILITY_TYPE.PRIVATE" name="ic_private"
-                                     height="1.3rem"
-                                />
-                            </template>
-                            <span>{{ visibility.label }}</span>
-                        </div>
-                    </p-radio>
-                </div>
-            </p-field-group>
+            <!--            <p-field-group v-if="!(requestType === REQUEST_TYPE.SAVE)" :label="$t('BILLING.COST_MANAGEMENT.COST_ANALYSIS.LABEL_VISIBILITY')" required>-->
+            <!--                <div class="visibility-radio-list">-->
+            <!--                    <p-radio v-for="visibility in visibilityList" :key="visibility.value"-->
+            <!--                             v-model="formState.selectedVisibility"-->
+            <!--                             :value="visibility.value"-->
+            <!--                             @change="handleChangeVisibility(visibility.value)"-->
+            <!--                    >-->
+            <!--                        <div class="visibility-radio-content-wrapper">-->
+            <!--                            <template>-->
+            <!--                                <p-i v-if="visibility.value === QUERY_VISIBILITY_TYPE.PRIVATE" name="ic_private"-->
+            <!--                                     height="1.3rem"-->
+            <!--                                />-->
+            <!--                            </template>-->
+            <!--                            <span>{{ visibility.label }}</span>-->
+            <!--                        </div>-->
+            <!--                    </p-radio>-->
+            <!--                </div>-->
+            <!--            </p-field-group>-->
         </template>
     </p-button-modal>
 </template>
@@ -49,7 +49,8 @@ import {
 } from '@vue/composition-api';
 
 import {
-    PButtonModal, PFieldGroup, PTextInput, PRadio, PI,
+    PButtonModal, PFieldGroup, PTextInput,
+    // PRadio, PI,
 } from '@spaceone/design-system';
 import {
     QUERY_VISIBILITY_TYPE, REQUEST_TYPE,
@@ -75,8 +76,8 @@ export default {
         PTextInput,
         PFieldGroup,
         PButtonModal,
-        PRadio,
-        PI,
+        // PRadio,
+        // PI,
     },
     props: {
         visible: {
