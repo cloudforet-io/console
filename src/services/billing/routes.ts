@@ -1,4 +1,5 @@
 import { RouteConfig } from 'vue-router';
+import BudgetDetailPage from '@/services/billing/cost-management/budget/budget-detail/BudgetDetailPage.vue';
 
 const CostManagementPage = () => import(/* webpackChunkName: "CostManagementPage" */ '@/services/billing/cost-management/CostManagementPage.vue');
 const CostDashboardPage = () => import(/* webpackChunkName: "CostDashboardPage" */ '@/services/billing/cost-management/cost-dashboard/CostDashboardPage.vue');
@@ -6,7 +7,6 @@ const CostAnalysisPage = () => import(/* webpackChunkName: "CostAnalysisPage" */
 const BudgetPage = () => import(/* webpackChunkName: "BudgetPage" */ '@/services/billing/cost-management/budget/BudgetPage.vue');
 const BudgetCreatePage = () => import(/* webpackChunkName: "BudgetCreatePage" */ '@/services/billing/cost-management/budget/budget-create/BudgetCreatePage.vue');
 const BudgetUpdatePage = () => import(/* webpackChunkName: "BudgetUpdatePage" */ '@/services/billing/cost-management/budget/budget-update/BudgetUpdatePage.vue');
-const BudgetDetailPage = () => import(/* webpackChunkName: "BudgetDetailPage" */ '@/services/billing/cost-management/budget/budget-detail/BudgetDetailPage.vue');
 
 
 export const BILLING_ROUTE = Object.freeze({
