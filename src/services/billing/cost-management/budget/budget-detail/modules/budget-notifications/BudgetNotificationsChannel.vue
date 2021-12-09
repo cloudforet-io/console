@@ -6,10 +6,13 @@
         :striped="false"
         class="budget-notifications-channel"
     >
+        <template #col-protocol_id-format="{value}">
+            {{ protocolFormatter(value) }}
+        </template>
         <template #col-data-format="{ index, field, item }">
             <div v-if="item.data.length > 1">
                 <p v-for="(value, index) in item.data" :key="`item-${index}`">
-                    {{ Object.keys(value)[0] }} : {{ Object.values(value)[0] }}
+                    {{ Object.values(value)[0] }}
                 </p>
             </div>
             <p v-else-if="item.secret_id.length > 0">
@@ -17,8 +20,13 @@
                 data: *******
             </p>
             <p v-else>
-                {{ Object.keys(item.data)[0] }} : {{ Object.values(item.data)[0] }}
+                {{ Object.values(item.data)[0] }}
             </p>
+        </template>
+        <template #col-notification_level-format="{value}">
+            <p-badge :style-type="getBadgeColor(value)" outline>
+                {{ value }}
+            </p-badge>
         </template>
         <template #col-schedule-format="{value}">
             <p v-if="value">
@@ -32,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { PDataTable } from '@spaceone/design-system';
+import { PBadge, PDataTable } from '@spaceone/design-system';
 import { utcToTimezoneFormatter } from '@/services/identity/user/lib/helper';
 import { computed, reactive, toRefs } from '@vue/composition-api';
 import { store } from '@/store';
@@ -41,22 +49,42 @@ import { ApiQueryHelper } from '@spaceone/console-core-lib/space-connector/helpe
 import { SpaceConnector } from '@spaceone/console-core-lib/space-connector';
 import ErrorHandler from '@/common/composables/error/errorHandler';
 
+const getBadgeColor = (level: string) => {
+    switch (level) {
+    case 'LV1':
+        return 'secondary1';
+    case 'LV2':
+        return 'indigo';
+    case 'LV3':
+        return 'peacock';
+    case 'LV4':
+        return 'coral500';
+    case 'LV5':
+        return 'alert';
+    default:
+        return 'primary';
+    }
+};
+
 export default {
     name: 'BudgetNotificationsChannel',
     components: {
         PDataTable,
+        PBadge,
     },
     setup() {
         const state = reactive({
             loading: false,
             fields: computed(() => [
-                { name: 'protocol_type', label: 'Channel' },
+                { name: 'protocol_id', label: 'Channel' },
                 { name: 'name', label: 'Channel Name' },
                 { name: 'data', label: 'Details' },
                 { name: 'notification_level', label: 'Notifications Level' },
+                { name: 'schedule', label: 'Schedule ' },
             ]),
             items: [] as ChannelItem[],
             timezone: computed(() => store.state.user.timezone),
+            protocols: computed(() => store.state.resource.protocol.items),
         });
 
         const apiQueryHelper = new ApiQueryHelper();
@@ -78,13 +106,17 @@ export default {
             }
         };
 
+        const protocolFormatter = val => state.protocols[val]?.name || val;
+
         (async () => {
-            await listNotificationsChannel();
+            await Promise.allSettled([listNotificationsChannel(), store.dispatch('resource/protocol/load')]);
         })();
 
         return {
             ...toRefs(state),
             utcToTimezoneFormatter,
+            getBadgeColor,
+            protocolFormatter,
         };
     },
 };
