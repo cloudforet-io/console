@@ -1,3 +1,10 @@
+# [1.1.0-beta.202](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.201...v1.1.0-beta.202) (2021-12-09)
+
+
+### Bug Fixes
+
+* remove outline of focused number type input ([#781](https://github.com/spaceone-dev/spaceone-design-system/issues/781)) ([06966f1](https://github.com/spaceone-dev/spaceone-design-system/commit/06966f174aee74fb9dcdcccc352af3f2b8f8620e))
+
 # [1.1.0-beta.201](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.200...v1.1.0-beta.201) (2021-12-09)
 
 
