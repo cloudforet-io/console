@@ -143,19 +143,16 @@ export default {
         const getParentProjectGroupName = async (projectId?: string, projectGroupId?: string) => {
             try {
                 if (projectId) {
-                    // eslint-disable-next-line @typescript-eslint/camelcase
-                    const { project_group_info } = await SpaceConnector.client.identity.project.get({
+                    const res = await SpaceConnector.client.identity.project.get({
                         project_id: props.budget?.project_id,
                     });
-                    return project_group_info.name;
+                    return res.project_group_info.name;
                 }
                 if (projectGroupId) {
-                    // eslint-disable-next-line @typescript-eslint/camelcase
-                    const { parent_project_group_info } = await SpaceConnector.client.identity.projectGroup.get({
+                    const res = await SpaceConnector.client.identity.projectGroup.get({
                         project_group_id: props.budget.project_group_id,
                     });
-                    // eslint-disable-next-line @typescript-eslint/camelcase
-                    return parent_project_group_info ? parent_project_group_info.name : undefined;
+                    return res.parent_project_group_info ? res.parent_project_group_info.name : undefined;
                 }
                 return undefined;
             } catch (e) {

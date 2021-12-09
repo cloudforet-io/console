@@ -4,9 +4,9 @@
             <div class="period-box">
                 <span class="label">{{ $t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.PERIOD') }}</span>
                 <p-select-status v-for="(status, idx) in periodList" :key="idx"
-                                 v-model="selectedPeriod"
+                                 :selected="selectedPeriod"
                                  :value="status.name"
-                                 multi-selectable
+                                 :multi-selectable="false"
                                  @change="handleSelectStatus"
                 >
                     {{ status.label }}
@@ -19,13 +19,13 @@
                    :setting-visible="false"
                    filters-visible
                    :page-size-options="pageSizeOptions"
-                   :this-page="thisPage"
-                   :page-size.sync="pageSize"
-                   :total-count="totalCount"
+                   :page-size="24"
                    :query-tags="queryTags"
                    :key-item-sets="keyItemSets"
                    :value-handler-map="valueHandlerMap"
                    @change="handleChangeToolbox"
+                   @refresh="$emit('refresh')"
+                   @export="$emit('export')"
         />
     </div>
 </template>
@@ -33,7 +33,7 @@
 <script lang="ts">
 import {
     computed,
-    reactive, toRefs,
+    reactive, toRefs, watch,
 } from '@vue/composition-api';
 
 import { PToolbox, PSelectStatus } from '@spaceone/design-system';
@@ -44,11 +44,18 @@ import {
     makeDistinctValueHandler,
     makeReferenceValueHandler,
 } from '@spaceone/console-core-lib/component-util/query-search';
-import { getThisPage } from '@spaceone/console-core-lib/component-util/pagination';
 import { KeyItemSet, ValueHandlerMap } from '@spaceone/console-core-lib/component-util/query-search/type';
 
 import { i18n } from '@/translations';
+import dayjs from 'dayjs';
 
+import { Period } from '@/services/billing/cost-management/type';
+import { QueryHelper } from '@spaceone/console-core-lib/query';
+
+export interface Pagination {
+    pageStart: number;
+    pageLimit: number;
+}
 
 export default {
     name: 'BudgetToolbox',
@@ -57,12 +64,8 @@ export default {
         PSelectStatus,
     },
     props: {
-        queryTags: {
-            type: Array,
-            default: () => [],
-        },
     },
-    setup() {
+    setup(props, { emit }) {
         const pageSizeOptions = [12, 24, 36];
 
         const keyItemSets: KeyItemSet[] = [{
@@ -95,37 +98,60 @@ export default {
             budget_id: makeDistinctValueHandler('cost_analysis.Budget', 'budget_id'),
             name: makeDistinctValueHandler('cost_analysis.Budget', 'name'),
             project_id: makeReferenceValueHandler('identity.Project'),
-            project_group_id: makeReferenceValueHandler('identity.Project'),
+            project_group_id: makeReferenceValueHandler('identity.ProjectGroup'),
             time_unit: makeDistinctValueHandler('cost_analysis.Budget', 'time_unit'),
         };
 
+        const filtersHelper = new QueryHelper();
+
         const state = reactive({
-            selectedPeriod: [],
+            selectedPeriod: [] as string[],
             periodList: computed(() => [
                 { name: 'total', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.TOTAL') },
                 { name: 'thisMonth', label: i18n.t('BILLING.COST_MANAGEMENT.BUDGET.MAIN.THIS_MONTH') },
             ]),
-            pageSize: 24,
-            totalCount: 0,
+            pageStart: 1,
+            pageLimit: 24,
             queryTags: [] as QueryTag[],
-            thisPage: 1,
+            // query
+            pagination: computed<Pagination>(() => ({
+                pageStart: state.pageStart,
+                pageLimit: state.pageLimit,
+            })),
+            period: computed<Period>(() => {
+                const period: Period = {};
+
+                if (state.selectedPeriod[0] === 'thisMonth') {
+                    period.start = dayjs().startOf('month').format('YYYY-MM');
+                }
+
+                return period;
+            }),
+            filters: computed(() => filtersHelper.setFiltersAsQueryTag(state.queryTags).filters),
         });
 
-        const handleSelectStatus = () => {
-            console.log('select');
+        /* Handlers */
+        const handleSelectStatus = (selected: string[]) => {
+            state.selectedPeriod = selected;
         };
 
         const handleChangeToolbox = async (options: ToolboxOptions) => {
-            if (options.queryTags !== undefined) {
-                state.queryTags = options.queryTags;
-            }
-            if (options.pageLimit !== undefined) {
-                state.pageSize = options.pageLimit;
-            }
-            if (options.pageStart !== undefined) {
-                state.thisPage = getThisPage(options.pageStart, state.pageSize);
-            }
+            if (options.queryTags !== undefined) state.queryTags = options.queryTags;
+            if (options.pageLimit !== undefined) state.pageLimit = options.pageLimit;
+            if (options.pageStart !== undefined) state.pageStart = options.pageStart;
         };
+
+        /* Watchers */
+        watch(() => state.pagination, (pagination) => {
+            emit('update-pagination', pagination);
+        });
+        watch(() => state.period, (period) => {
+            emit('update-period', period);
+        });
+        watch(() => state.filters, (filters) => {
+            emit('update-filters', filters);
+        });
+
 
         return {
             ...toRefs(state),
