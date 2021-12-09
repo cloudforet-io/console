@@ -301,17 +301,24 @@ export default defineComponent<SelectDropdownProps>({
             outline: none;
         }
     }
-
     &.default {
         .dropdown-button {
             @apply border-gray-300;
         }
     }
-
+    &.button {
+        .dropdown-button {
+            @apply font-bold;
+        }
+    }
+    &.outline-button {
+        .dropdown-button {
+            @apply font-bold;
+        }
+    }
     &.icon-button {
         min-width: unset;
     }
-
     &.without-outline {
         min-width: unset;
         .dropdown-button {
