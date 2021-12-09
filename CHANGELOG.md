@@ -1,3 +1,10 @@
+# [1.1.0-beta.201](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.200...v1.1.0-beta.201) (2021-12-09)
+
+
+### Bug Fixes
+
+* change button background-color ([#780](https://github.com/spaceone-dev/spaceone-design-system/issues/780)) ([1c41e28](https://github.com/spaceone-dev/spaceone-design-system/commit/1c41e2824633c1fd0adc600ff5ac7865c91a5fe6))
+
 # [1.1.0-beta.200](https://github.com/spaceone-dev/spaceone-design-system/compare/v1.1.0-beta.199...v1.1.0-beta.200) (2021-12-09)
 
 
